@@ -1,10 +1,12 @@
 ---
-name: Task Front Issue Template
+name: Task Front-end Template
 about: Demandas técnicas de front-end
 title: "[FRONT] "
-type: Task
-status: Backlog
+labels: ''
+assignees: ''
+
 ---
+
 > 🚨 **Entregas são feitas via PR. Associe este issue ao pull request correspondente.**
 
 ## Descrição

@@ -1,9 +1,11 @@
 ---
 name: Milestone PortalFapes Template
-about: Descrever qual dor visa suprir e qual estratégia pretende utilizar para alcançá-la, com uma escrita em alto nível não detalhada
+about: Descrever qual dor visa suprir e qual estratégia pretende utilizar para alcançá-la,
+  com uma escrita em alto nível não detalhada
 title: "[PORTAL_FAPES] "
-dueDate: Data alvo para a entrega, em quarters (a cada 3 meses) ou semestrais (a cada 6 meses).
-description: Descrever qual dor aquele milestone visa suprir e qual estratégia pretende utilizar para alcançá-la, com uma escrita em alto nível não detalhada.
+labels: ''
+assignees: ''
+
 ---
 
 ## Title

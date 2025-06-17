@@ -1,10 +1,12 @@
 ---
-name: Task Back Issue Template
+name: Task Back-end Template
 about: Demandas técnicas de back-end
-title: "[BACK] "
-type: Task
-status: Backlog
+title: "[BACK-END] "
+labels: ''
+assignees: ''
+
 ---
+
 > 🚨 **Entregas são feitas via PR. Associe este issue ao pull request correspondente.**
 
 ## Descrição
