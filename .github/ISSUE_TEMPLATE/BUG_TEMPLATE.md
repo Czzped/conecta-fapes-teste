@@ -1,8 +1,6 @@
 ---
 name: Bug Issue Template  
-about: Reportar erros, comportamentos inesperados ou problemas no sistema.  
-title: "[BUG] "  
-assignees: ''  
+about: Reportar erros, comportamentos inesperados ou problemas no sistema.
 type: Bug 
 ---  
 **⚠️ Correções devem ser validadas via PR. Associe este issue ao pull request correspondente.**  
