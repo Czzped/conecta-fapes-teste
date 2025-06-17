@@ -1,11 +1,12 @@
 ---
 name: Bug Issue Template  
 about: Reportar erros, comportamentos inesperados ou problemas no sistema.
-type: Bug 
+type: Bug
+status: Backlog 
 ---  
 **⚠️ Correções devem ser validadas via PR. Associe este issue ao pull request correspondente.**  
 
-# Descrição do Bug  
+## Descrição do Bug  
 [Descreva o problema de forma objetiva, incluindo contexto se necessário.]  
 
 ## Comportamento Observado  
@@ -16,6 +17,6 @@ type: Bug
 [Descreva o que deveria acontecer em condições normais.]  
 
 
-# Informações Adicionais  
+## Informações Adicionais  
 - Ambiente (ex: navegador, sistema operacional, versão):  
 - Screenshots/logs (se relevante):  

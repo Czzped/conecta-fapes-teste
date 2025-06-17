@@ -2,17 +2,18 @@
 name: Feature Issue Template
 about: Funcionalidade que entrega valor ao cliente.  
 type: Feature  
+status: Backlog
 ---  
 **⚠️ Entregas são feitas via PR. Associe este issue ao pull request correspondente.**
 
-# Descrição
+## Descrição
 [Descreva de forma detalhada o propósito da funcionalidade, inclua exemplos e possíveis dores a serem solucionadas.]
 
 ## Requisitos Técnicos
 - Item 1
 - Item 2
 
-# Critérios de Aceitação (Feature-Level)
+## Critérios de Aceitação (Feature-Level)
 Para que essa tarefa seja considerada **concluída com sucesso**, o seguinte deve ser entregue: 
 
 - [ ] Item 1
