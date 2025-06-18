@@ -7,7 +7,8 @@ assignees: ''
 
 ---
 
-**⚠️ Correções devem ser validadas via PR. Associe este issue ao pull request correspondente.**  
+🚨 **Correções devem ser validadas via PR**🚨
+> Associe este bug ao pull request correspondente.
 
 ## Descrição do Bug  
 Descreva o problema de forma objetiva, incluindo contexto se necessário.

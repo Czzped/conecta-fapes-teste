@@ -1,13 +1,14 @@
 ---
-name: Feature Template
-about: Funcionalidade que entrega valor ao cliente.
-title: ''
-labels: ''
-assignees: ''
+name: "[Portal ADM] Feature Template"
+about: Funcionalidade que entrega valor ao cliente dentro do escopo do Portal Administrador.
+title: "[Portal ADM]"
+labels: feat
+assignees: vinicius-je
 
 ---
 
-**⚠️ Entregas são feitas via PR. Associe este issue ao pull request correspondente.**
+🚨 **Entregas são feitas via PR**🚨
+> Associe esta feature ao pull request correspondente.
 
 ## Descrição
 Descreva de forma detalhada o propósito da funcionalidade, inclua exemplos e possíveis dores a serem solucionadas.

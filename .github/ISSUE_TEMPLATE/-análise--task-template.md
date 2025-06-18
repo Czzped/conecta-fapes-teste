@@ -1,18 +1,16 @@
 ---
-name: Task Back-end Template
-about: Demandas técnicas de back-end
-title: "[BACK-END] "
+name: "[Análise] Task Template"
+about: Demandas de análise
+title: "[Análise] "
 labels: ''
 assignees: ''
 
 ---
 
-> 🚨 **Entregas são feitas via PR. Associe este issue ao pull request correspondente.**
-
 ## Descrição
 Descreva de forma detalhada o propósito da funcionalidade, inclua exemplos e possíveis dores a serem solucionadas.
 
-## Requisitos Técnicos
+## Requisitos
 - Item 1
 - Item 2
 
@@ -22,3 +20,6 @@ Para que essa tarefa seja considerada **concluída com sucesso**, o seguinte dev
 - [ ] Item 1
 - [ ] Item 2
 - [ ] Item 3
+
+## Observações
+Outras informações relevantes que devem ser consideradas neste desenvolvimento. Possíveis informações para este campo seriam links externos como figma, aplicação ou documentação diretamente relacionada.
