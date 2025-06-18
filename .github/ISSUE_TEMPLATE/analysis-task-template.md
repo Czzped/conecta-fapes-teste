@@ -1,10 +1,10 @@
 ---
-name: "[Design] Task Template"
-about: Demandas de design
-title: "[Design] "
+name: "[Análise] Task Template"
+about: Demandas de análise
+title: "[Análise] "
 labels: ''
 assignees: ''
-
+type: Task
 ---
 
 ## Descrição

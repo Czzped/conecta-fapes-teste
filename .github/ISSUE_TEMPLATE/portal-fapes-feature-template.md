@@ -1,10 +1,10 @@
 ---
-name: "[Portal ADM] Feature Template"
-about: Funcionalidade que entrega valor ao cliente dentro do escopo do Portal Administrador.
-title: "[Portal ADM]"
+name: "[Portal FAPES] Feature Template"
+about: Funcionalidade que entrega valor ao cliente dentro do escopo do Portal Fapes
+title: "[Portal FAPES]"
 labels: feat
-assignees: vinicius-je
-
+assignees: marcelasfl
+type: Feature
 ---
 
 🚨 **Entregas são feitas via PR**🚨
