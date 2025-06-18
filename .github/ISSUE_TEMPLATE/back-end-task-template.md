@@ -4,7 +4,7 @@ about: Demandas técnicas de back-end
 title: "[Back-end]"
 labels: ''
 assignees: ''
-
+type: Task
 ---
 
 🚨 **Entregas são feitas via PR**🚨

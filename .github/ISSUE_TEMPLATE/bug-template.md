@@ -4,7 +4,7 @@ about: Reportar erros, comportamentos inesperados ou problemas no sistema.
 title: ''
 labels: bug
 assignees: ''
-
+type: Bug
 ---
 
 🚨 **Correções devem ser validadas via PR**🚨

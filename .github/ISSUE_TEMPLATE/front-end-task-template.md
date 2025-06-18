@@ -1,16 +1,19 @@
 ---
-name: "[Análise] Task Template"
-about: Demandas de análise
-title: "[Análise] "
+name: "[Front-end] Task Template"
+about: Demandas técnicas de front-end
+title: "[Front-end]"
 labels: ''
 assignees: ''
-
+type: Task
 ---
+
+🚨 **Entregas são feitas via PR**🚨
+> Associe a feature, ao qual esta task está vinculada, ao pull request correspondente.
 
 ## Descrição
 Descreva de forma detalhada o propósito da funcionalidade, inclua exemplos e possíveis dores a serem solucionadas.
 
-## Requisitos
+## Requisitos Técnicos
 - Item 1
 - Item 2
 
