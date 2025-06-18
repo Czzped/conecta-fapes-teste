@@ -5,6 +5,7 @@ title: "[Portal FAPES]"
 labels: feat
 assignees: marcelasfl
 type: Feature
+project: ConectaFapes
 ---
 
 🚨 **Entregas são feitas via PR**🚨
