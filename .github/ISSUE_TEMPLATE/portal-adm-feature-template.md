@@ -5,6 +5,7 @@ title: "[Portal ADM]"
 labels: feat
 assignees: vinicius-je
 type: Feature
+project: ConectaFapes
 ---
 
 🚨 **Entregas são feitas via PR**🚨

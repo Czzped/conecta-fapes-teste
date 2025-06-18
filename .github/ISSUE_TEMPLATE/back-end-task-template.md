@@ -5,6 +5,7 @@ title: "[Back-end]"
 labels: ''
 assignees: ''
 type: Task
+project: ConectaFapes
 ---
 
 🚨 **Entregas são feitas via PR**🚨

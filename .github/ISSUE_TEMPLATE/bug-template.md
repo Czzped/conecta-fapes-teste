@@ -5,6 +5,7 @@ title: ''
 labels: bug
 assignees: ''
 type: Bug
+project: ConectaFapes
 ---
 
 🚨 **Correções devem ser validadas via PR**🚨
