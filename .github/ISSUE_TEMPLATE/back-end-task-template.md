@@ -2,10 +2,9 @@
 name: "[Back-end] Task Template"
 about: Demandas técnicas de back-end
 title: "[Back-end]"
-labels: ''
+labels: back-end
 assignees: ''
-type: Task
-project: ConectaFapes
+
 ---
 
 🚨 **Entregas são feitas via PR**🚨

@@ -2,10 +2,9 @@
 name: "[Análise] Task Template"
 about: Demandas de análise
 title: "[Análise] "
-labels: ''
+labels: análise
 assignees: ''
-type: Task
-project: ConectaFapes
+
 ---
 
 ## Descrição

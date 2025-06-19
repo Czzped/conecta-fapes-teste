@@ -2,10 +2,9 @@
 name: "[Front-end] Task Template"
 about: Demandas técnicas de front-end
 title: "[Front-end]"
-labels: ''
+labels: front-end
 assignees: ''
-type: Task
-project: ConectaFapes
+
 ---
 
 🚨 **Entregas são feitas via PR**🚨

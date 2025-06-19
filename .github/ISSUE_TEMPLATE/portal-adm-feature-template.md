@@ -2,10 +2,9 @@
 name: "[Portal ADM] Feature Template"
 about: Funcionalidade que entrega valor ao cliente dentro do escopo do Portal Administrador.
 title: "[Portal ADM]"
-labels: feat
+labels: feature, portal adm
 assignees: vinicius-je
-type: Feature
-project: ConectaFapes
+
 ---
 
 🚨 **Entregas são feitas via PR**🚨

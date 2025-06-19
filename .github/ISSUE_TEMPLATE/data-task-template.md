@@ -2,10 +2,9 @@
 name: "[Dados] Task Template"
 about: Demandas de Dados
 title: "[Dados] "
-labels: ''
+labels: dados
 assignees: ''
-type: Task
-project: ConectaFapes
+
 ---
 
 ## Descrição

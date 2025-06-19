@@ -2,10 +2,9 @@
 name: "[Portal FAPES] Feature Template"
 about: Funcionalidade que entrega valor ao cliente dentro do escopo do Portal Fapes
 title: "[Portal FAPES]"
-labels: feat
+labels: feature, portal fapes
 assignees: marcelasfl
-type: Feature
-project: ConectaFapes
+
 ---
 
 🚨 **Entregas são feitas via PR**🚨

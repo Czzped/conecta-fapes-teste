@@ -2,10 +2,9 @@
 name: "[Design] Task Template"
 about: Demandas de design
 title: "[Design] "
-labels: ''
+labels: design
 assignees: ''
-type: Task
-project: ConectaFapes
+
 ---
 
 ## Descrição
