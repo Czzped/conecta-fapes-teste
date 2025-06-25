@@ -5,7 +5,6 @@ title: ''
 labels: bug
 assignees: ''
 type: Bug
-project: Produtos Conecta
 ---
 
 🚨 **Correções devem ser validadas via PR**🚨

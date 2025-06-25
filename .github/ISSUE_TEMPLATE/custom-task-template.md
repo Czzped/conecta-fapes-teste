@@ -1,13 +1,11 @@
 ---
-name: "[Design] Task Template"
-about: Demandas de design
-title: "[Design] "
-labels: design
+name: "[CUSTOM] Task Template"
+about: 'No título substituir CUSTOM por um escopo, por exemplo: [Dados] ou [Design]'
+title: "[CUSTOM] "
+labels: ''
 assignees: ''
 type: Task
 ---
-🚨 **Entregas são feitas via PR**🚨
-> Associe a feature, ao qual esta task está vinculada, ao pull request correspondente. Caso seja uma task isolada associe-a ao pull requeste correspondente.
 
 ## Descrição
 Descreva de forma detalhada o propósito da funcionalidade, inclua exemplos e possíveis dores a serem solucionadas.
