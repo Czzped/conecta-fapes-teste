@@ -5,9 +5,7 @@ title: "[Portal FAPES]"
 labels: feature, portal fapes
 assignees: marcelasfl
 type: Feature
-project: Produtos Conecta
 ---
-
 🚨 **Entregas são feitas via PR**🚨
 > Associe esta feature ao pull request correspondente.
 

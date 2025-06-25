@@ -5,8 +5,9 @@ title: "[Dados] "
 labels: dados
 assignees: ''
 type: Task
-project: Produtos Conecta
 ---
+🚨 **Entregas são feitas via PR**🚨
+> Associe a feature, ao qual esta task está vinculada, ao pull request correspondente. Caso seja uma task isolada associe-a ao pull requeste correspondente.
 
 ## Descrição
 Descreva de forma detalhada o propósito da funcionalidade, inclua exemplos e possíveis dores a serem solucionadas.
