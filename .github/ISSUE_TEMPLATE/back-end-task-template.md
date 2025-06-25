@@ -5,6 +5,7 @@ title: "[Back-end]"
 labels: back-end
 assignees: ''
 type: Task
+project: Produtos Conecta
 ---
 
 🚨 **Entregas são feitas via PR**🚨

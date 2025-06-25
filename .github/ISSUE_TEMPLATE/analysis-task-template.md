@@ -5,6 +5,7 @@ title: "[Análise] "
 labels: análise, QA
 assignees: ''
 type: Task
+project: Produtos Conecta
 ---
 
 ## Descrição

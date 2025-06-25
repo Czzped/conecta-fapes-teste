@@ -5,6 +5,7 @@ title: "[CUSTOM] "
 labels: feature
 assignees: ''
 type: Feature
+project: Produtos Conecta
 ---
 
 🚨 **Entregas são feitas via PR**🚨
