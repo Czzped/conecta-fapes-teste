@@ -5,6 +5,7 @@ title: "[Front-end]"
 labels: front-end
 assignees: ''
 type: Task
+project: Produtos Conecta
 ---
 
 🚨 **Entregas são feitas via PR**🚨

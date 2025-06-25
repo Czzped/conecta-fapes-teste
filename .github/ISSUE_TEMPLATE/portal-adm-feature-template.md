@@ -5,6 +5,7 @@ title: "[Portal ADM]"
 labels: feature, portal adm
 assignees: vinicius-je
 type: Feature
+project: Produtos Conecta
 ---
 
 🚨 **Entregas são feitas via PR**🚨

@@ -5,6 +5,7 @@ title: "[Design] "
 labels: design
 assignees: ''
 type: Task
+project: Produtos Conecta
 ---
 
 ## Descrição

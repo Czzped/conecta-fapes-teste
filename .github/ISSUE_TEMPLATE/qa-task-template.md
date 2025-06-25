@@ -5,6 +5,7 @@ title: "[QA] "
 labels: QA
 assignees: ''
 type: Task
+project: Produtos Conecta
 ---
 
 ## Descrição
