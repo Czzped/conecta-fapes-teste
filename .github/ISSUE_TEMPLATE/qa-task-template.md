@@ -4,7 +4,7 @@ about: Demandas de QA
 title: "[QA] "
 labels: QA
 assignees: ''
-
+type: Task
 ---
 
 ## Descrição

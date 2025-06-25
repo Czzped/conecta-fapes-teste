@@ -4,7 +4,7 @@ about: Funcionalidade que entrega valor ao cliente dentro do escopo do Portal Ad
 title: "[Portal ADM]"
 labels: feature, portal adm
 assignees: vinicius-je
-
+type: Feature
 ---
 
 🚨 **Entregas são feitas via PR**🚨
