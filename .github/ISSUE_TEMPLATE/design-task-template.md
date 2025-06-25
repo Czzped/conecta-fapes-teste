@@ -4,7 +4,7 @@ about: Demandas de design
 title: "[Design] "
 labels: design
 assignees: ''
-
+type: Task
 ---
 
 ## Descrição

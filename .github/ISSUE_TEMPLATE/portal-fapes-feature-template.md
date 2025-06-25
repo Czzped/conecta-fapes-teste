@@ -4,7 +4,7 @@ about: Funcionalidade que entrega valor ao cliente dentro do escopo do Portal Fa
 title: "[Portal FAPES]"
 labels: feature, portal fapes
 assignees: marcelasfl
-
+type: Feature
 ---
 
 🚨 **Entregas são feitas via PR**🚨

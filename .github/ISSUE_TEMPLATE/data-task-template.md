@@ -4,7 +4,7 @@ about: Demandas de Dados
 title: "[Dados] "
 labels: dados
 assignees: ''
-
+type: Task
 ---
 
 ## Descrição

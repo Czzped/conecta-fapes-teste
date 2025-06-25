@@ -4,7 +4,7 @@ about: Demandas de análise
 title: "[Análise] "
 labels: análise, QA
 assignees: ''
-
+type: Task
 ---
 
 ## Descrição

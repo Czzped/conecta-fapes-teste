@@ -4,7 +4,7 @@ about: Demandas técnicas de front-end
 title: "[Front-end]"
 labels: front-end
 assignees: ''
-
+type: Task
 ---
 
 🚨 **Entregas são feitas via PR**🚨

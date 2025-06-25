@@ -2,9 +2,9 @@
 name: "[CUSTOM] Feature Template"
 about: 'No título substituir CUSTOM por um escopo, por exemplo: [Dados] ou [Design]'
 title: "[CUSTOM] "
-labels: ''
+labels: feature
 assignees: ''
-
+type: Feature
 ---
 
 🚨 **Entregas são feitas via PR**🚨
