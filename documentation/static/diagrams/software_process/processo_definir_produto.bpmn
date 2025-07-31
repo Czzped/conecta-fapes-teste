@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:collaboration id="Collaboration_0tej755">
+    <bpmn:participant id="Participant_0z6lm08" name="Processo definir Produto" processRef="Process_1" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_1" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_07xxnq4">
+      <bpmn:lane id="Lane_16fgvcm" name="Equipe de Produto">
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_14y0kqs</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0w485gd</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1orkqh3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1e2shvf</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_045wh7f</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent_1" name="Processo Modelados e Objetivo definidos">
+      <bpmn:outgoing>Flow_0ep713m</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0ep713m" sourceRef="StartEvent_1" targetRef="Activity_14y0kqs" />
+    <bpmn:task id="Activity_14y0kqs" name="Definir o escopo mínimo">
+      <bpmn:incoming>Flow_0ep713m</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ltfp04</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_0ltfp04" sourceRef="Activity_14y0kqs" targetRef="Activity_0w485gd" />
+    <bpmn:task id="Activity_0w485gd" name="Definir objetivos a serem alcançados">
+      <bpmn:incoming>Flow_0ltfp04</bpmn:incoming>
+      <bpmn:outgoing>Flow_1imzjgj</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Activity_1orkqh3" name="Validar com Stakeholders">
+      <bpmn:incoming>Flow_1imzjgj</bpmn:incoming>
+      <bpmn:outgoing>Flow_074cm9z</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_1imzjgj" sourceRef="Activity_0w485gd" targetRef="Activity_1orkqh3" />
+    <bpmn:task id="Activity_1e2shvf" name="Escrever e Publicar documento com escopo">
+      <bpmn:incoming>Flow_074cm9z</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ssnbf8</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_074cm9z" sourceRef="Activity_1orkqh3" targetRef="Activity_1e2shvf" />
+    <bpmn:sequenceFlow id="Flow_1ssnbf8" sourceRef="Activity_1e2shvf" targetRef="Event_045wh7f" />
+    <bpmn:endEvent id="Event_045wh7f" name="Documento publicado">
+      <bpmn:incoming>Flow_1ssnbf8</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0tej755">
+      <bpmndi:BPMNShape id="Participant_0z6lm08_di" bpmnElement="Participant_0z6lm08" isHorizontal="true">
+        <dc:Bounds x="123" y="-80" width="727" height="370" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_16fgvcm_di" bpmnElement="Lane_16fgvcm" isHorizontal="true">
+        <dc:Bounds x="153" y="-80" width="697" height="370" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="212" y="72" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="115" width="88" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_14y0kqs_di" bpmnElement="Activity_14y0kqs">
+        <dc:Bounds x="290" y="50" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0w485gd_di" bpmnElement="Activity_0w485gd">
+        <dc:Bounds x="410" y="50" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1orkqh3_di" bpmnElement="Activity_1orkqh3">
+        <dc:Bounds x="530" y="50" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1e2shvf_di" bpmnElement="Activity_1e2shvf">
+        <dc:Bounds x="650" y="50" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_045wh7f_di" bpmnElement="Event_045wh7f">
+        <dc:Bounds x="782" y="72" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="772" y="115" width="57" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0ep713m_di" bpmnElement="Flow_0ep713m">
+        <di:waypoint x="248" y="90" />
+        <di:waypoint x="290" y="90" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ltfp04_di" bpmnElement="Flow_0ltfp04">
+        <di:waypoint x="390" y="90" />
+        <di:waypoint x="410" y="90" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1imzjgj_di" bpmnElement="Flow_1imzjgj">
+        <di:waypoint x="510" y="90" />
+        <di:waypoint x="530" y="90" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_074cm9z_di" bpmnElement="Flow_074cm9z">
+        <di:waypoint x="630" y="90" />
+        <di:waypoint x="650" y="90" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ssnbf8_di" bpmnElement="Flow_1ssnbf8">
+        <di:waypoint x="750" y="90" />
+        <di:waypoint x="782" y="90" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

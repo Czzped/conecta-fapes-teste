@@ -1,0 +1,99 @@
+---
+title: Desenvolvimento da SQUAD
+sidebar_position: 4
+---
+import BpmnViewer from '@site/src/components/BpmnViewer';
+
+<BpmnViewer diagramUrl="/diagrams/software_process/processo.bpmn"  height="350px"/>
+
+
+
+| Artefato/Marco      | Descrição       |
+|---------------|----------------|
+| Backlog do Projeto  |  Lista de módulos ou requisitos por módulo do projeto          |
+| Undestanding/Entendimento  |  Reunião com o cliente para entendimento e priorização |
+| Sketching/Wireframe  |  Primeira versão do protótipo proposta da equipe           |
+| Best Solution/Protótipo escolhido  |  Segunda versão do Protótipo validada   |
+| Testing with user/Teste com usuário | Teste com usuário final    |
+| Backlog executivo Feature   |  Reavaliar/priorizar em relação ao negócio e as outras squads                    |
+
+
+
+## Realizar Inspiração de Design Sprint
+Após a priorização do cliente e a análise das dependências de desenvolvimento pela equipe,
+é hora de buscar soluções já existentes. Isso inclui explorar funcionalidades previamente
+implementadas no projeto, investigar outros sistemas e ferramentas internas que o cliente utiliza, 
+como o SIGFAPES e planilhas, além de compreender os processos internos da FAPES e conversar com o 
+cliente. 
+
+
+## Registrar impressões e insights para realizar a tarefa
+
+É fundamental documentar todas as informações levantadas na etapa anterior para facilitar consultas futuras,
+preferencialmente registrando-as no Docsaurus para manter uma organização centralizada e acessível.
+
+## Definir Histórias de Usuários
+Registrar a história de usuário de forma mais detalhada é essencial. 
+Para isso, recomenda-se seguir o formato clássico que responde às perguntas Quem?, O quê? e Para quê?, 
+garantindo clareza sobre o papel do usuário, a funcionalidade desejada e o objetivo esperado.
+
+Além disso, é importante complementar a história com uma descrição detalhada, 
+fornecendo contexto e informações adicionais que ajudem a entender melhor a necessidade. 
+Caso haja requisitos funcionais associados, eles devem ser mencionados na descrição para 
+assegurar que todos os aspectos relevantes sejam considerados no desenvolvimento.
+
+
+## Desenvolver protótipo de prova de conceito (PoC)
+
+Iniciar a construção do protótipo, que pode ser desenvolvido no 
+Figma ou em outra ferramenta de prototipação. É fundamental considerar todas as 
+referências e inspirações coletadas para criar uma interface que esteja alinhada com as 
+ideias previamente discutidas.
+
+Além disso, é importante analisar telas e funcionalidades já existentes, 
+garantindo que as novas propostas mantenham consistência e compatibilidade com as soluções
+ previamente implementadas. Isso ajuda a criar uma experiência integrada e coerente para o usuário.
+
+
+## Obter insights junto com cliente usuário (validação prévia)
+
+Apresentar os protótipos desenvolvidos para validação junto ao cliente. 
+Nesse momento, é essencial coletar feedback, comentários e críticas construtivas do cliente, 
+garantindo que suas expectativas e necessidades sejam atendidas.
+
+Essa tarefa deve ser iterativa, avançando por meio de ajustes e refinamentos até que se 
+alcance uma solução satisfatória e alinhada com o cliente. 
+
+
+## Definir estrutura mínima viável do projeto
+
+Projetar a estrutura mínima do projeto, incluindo a definição das rotas que conectarão o backend ao frontend.
+
+## Definir estrutura de dados entre Front-End e Back-End
+
+Definir um JSON mínimo para estabelecer a estrutura de dados acordada entre o backend e o frontend. 
+Essa abordagem permite que o frontend utilize dados simulados e inicie o desenvolvimento das interfaces de
+forma independente, garantindo maior agilidade no processo.
+
+## Desenvolver frontend protótipo real
+
+Desenvolver o frontend utilizando dados simulados com o objetivo de validar as 
+funcionalidades e interfaces junto ao cliente. Os testes serão realizados em um ambiente dedicado de testing, 
+garantindo que todas as validações ocorram de forma controlada e segura
+
+## Abrir PR para Deploy em prototyping
+
+Implantar o frontend com dados simulados no ambiente de testing,
+ preparando-o adequadamente para a validação com o cliente.
+
+## Validação final com cliente usuário
+
+Validação do frontend simulado com o usuário final. 
+
+## Ajustar sugestões e necessidades
+
+Caso aja necessidade, ajustar o frontend as sugestões do usuário. 
+
+## Gerar backlog executivo do produto
+
+Atualizar o backlog.

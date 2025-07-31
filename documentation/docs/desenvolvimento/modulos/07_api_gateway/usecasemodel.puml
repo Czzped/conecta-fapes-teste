@@ -1,0 +1,35 @@
+@startuml UseCaseDiagram
+' Definindo atores
+actor clientapp
+
+' Caso de uso principal
+usecase (UC01) as "Restrição de acesso por IP"
+
+' Relações entre atores e caso de uso
+clientapp -> (UC01)
+
+' Dependências de outros casos de uso
+
+' Definindo atores
+actor clientapp
+
+' Caso de uso principal
+usecase (UC02) as "Restrição de acesso por poliicas de acesso"
+
+' Relações entre atores e caso de uso
+clientapp -> (UC02)
+
+' Dependências de outros casos de uso
+
+' Definindo atores
+actor clientapp
+
+' Caso de uso principal
+usecase (UC03) as "Restrição de acesso por token gerado"
+
+' Relações entre atores e caso de uso
+clientapp -> (UC03)
+
+' Dependências de outros casos de uso
+
+@enduml

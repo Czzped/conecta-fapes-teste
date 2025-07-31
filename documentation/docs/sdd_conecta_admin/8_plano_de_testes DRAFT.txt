@@ -1,0 +1,60 @@
+---
+title: Qualidade e Testes
+sidebar_position: 8
+---
+
+## 1. Critérios de Qualidade do Software
+   A seção de qualidade deve abordar os **atributos de qualidade** que o sistema deve atender. Isso pode incluir:
+
+   - **Confiabilidade**: Como garantir que o sistema seja consistente e estável em suas operações.
+   - **Segurança**: Medidas para proteger o sistema contra falhas, ataques ou acessos não autorizados.
+   - **Eficiência**: Desempenho em termos de tempo de execução, uso de recursos (memória, processamento).
+   - **Manutenibilidade**: Facilidade de manutenção do software, incluindo correção de bugs, atualizações e modificações.
+   - **Portabilidade**: A capacidade do software de ser transferido para diferentes ambientes de hardware ou software.
+   - **Usabilidade**: Quão intuitivo e fácil de usar o sistema é para o usuário final.
+   - **Extensibilidade**: Facilidade de adicionar novas funcionalidades ao sistema sem impactos negativos no design existente.
+   
+   Nessa seção, é importante descrever os atributos de qualidade que foram levados em consideração durante o design, como foram priorizados e as estratégias usadas para garantir que esses atributos sejam cumpridos.
+
+## 2. Medição da Qualidade
+   Aqui, a norma espera que se descreva como a qualidade do sistema será medida. Isso pode incluir:
+
+   - **Métricas de qualidade**: Como medir confiabilidade (ex: taxa de falhas), eficiência (ex: tempo de resposta), etc.
+   - **Ferramentas de medição**: Ferramentas ou técnicas que serão utilizadas para medir esses atributos (por exemplo, ferramentas de análise estática ou dinâmicas).
+   - **Critérios de aceitação**: Definir quais níveis de desempenho ou de qualidade são considerados aceitáveis para que o sistema seja aprovado.
+
+## 3. Planos de Teste
+O plano de teste inclui diversas estratégias para garantir que todos os requisitos do sistema sejam verificados:
+
+### Abordagem de Testes
+
+- **Testes de Unidade:** Cada componente individual do sistema é testado isoladamente para garantir que suas funcionalidades funcionem conforme o esperado. Usamos XUnit no backend e Jest no frontend para esses testes.
+- **Testes de Integração:** Verificamos a interação entre os componentes do sistema, incluindo a comunicação entre o frontend e o backend e a integração com o banco de dados.
+- **Testes E2E:** Utilizamos Cypress para garantir que os fluxos principais do sistema funcionem de ponta a ponta. Estes testes cobrem cenários críticos como submissão de projetos, aprovação por gestores e geração de relatórios.
+- **Testes de Aceitação:** Testes manuais para validar que o sistema atende às expectativas e requisitos dos stakeholders. Esses testes são conduzidos em conjunto com usuários reais e administradores do sistema.
+
+### Critérios de Sucesso e Falha
+   
+   - **Critérios de sucesso/falha**: Definir claramente o que constitui um teste bem-sucedido ou falho para cada um dos cenários descritos.
+
+## 4. Relacionamento entre Qualidade e Testes
+   Esta seção deve mostrar como as **atividades de teste** e **verificação** são projetadas para garantir que os **requisitos de qualidade** sejam atendidos. Isso pode incluir:
+
+   - Mapeamento entre os **atributos de qualidade** e os **testes planejados**. Por exemplo, quais testes garantem que o sistema seja eficiente, seguro, etc.
+   - **Ferramentas de teste** que serão usadas para medir ou verificar esses atributos (exemplo: ferramentas de automação de testes de desempenho).
+
+## 5. Registro de Problemas e Defeitos
+   A norma recomenda que haja uma seção sobre como serão documentados e gerenciados os **problemas e defeitos** encontrados durante os testes. Isso inclui:
+   
+   - **Processo de rastreamento de defeitos**: Como identificar, documentar e corrigir defeitos no sistema.
+   - **Prioridade e severidade** dos defeitos: Critérios para classificar a importância dos defeitos identificados.
+   - **Ações corretivas**: Como os defeitos serão tratados e corrigidos.
+
+## 6. Avaliação e Revisão da Qualidade
+   Descreva como os **resultados dos testes** serão revisados e como a qualidade será avaliada durante o ciclo de desenvolvimento. Isso pode incluir:
+
+Revisões de Design: São realizadas revisões periódicas no design e na arquitetura da solução para garantir que o sistema continue escalável e de fácil manutenção.
+
+Auditorias de Código: O código é revisado com ferramentas como SonarQube, além de code reviews realizados pela equipe de desenvolvimento.
+
+Feedback e Melhoria Contínua: Feedbacks dos usuários finais são coletados após a implementação de cada versão, e os resultados dos testes são analisados para identificar oportunidades de melhoria no design e nos processos.

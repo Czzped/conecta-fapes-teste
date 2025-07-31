@@ -1,0 +1,57 @@
+@startuml UseCaseDiagram
+' Definindo atores
+actor GestorDePoliticaDeSeguranca
+
+' Caso de uso principal
+usecase (UC01) as "Validar regras de acesso"
+
+' Relações entre atores e caso de uso
+GestorDePoliticaDeSeguranca -> (UC01)
+
+' Dependências de outros casos de uso
+
+' Definindo atores
+actor GestorDePoliticaDeSeguranca
+
+' Caso de uso principal
+usecase (UC02) as "Cadastrar Políticas de Segurança"
+
+' Relações entre atores e caso de uso
+GestorDePoliticaDeSeguranca -> (UC02)
+
+' Dependências de outros casos de uso
+
+' Definindo atores
+actor GestorDePoliticaDeSeguranca
+
+' Caso de uso principal
+usecase (UC03) as "Instanciar as Políticas"
+
+' Relações entre atores e caso de uso
+GestorDePoliticaDeSeguranca -> (UC03)
+
+' Dependências de outros casos de uso
+
+' Definindo atores
+actor GestorDePoliticaDeSeguranca
+
+' Caso de uso principal
+usecase (UC04) as "Validar Regras de Acesso"
+
+' Relações entre atores e caso de uso
+GestorDePoliticaDeSeguranca -> (UC04)
+
+' Dependências de outros casos de uso
+
+' Definindo atores
+
+
+' Caso de uso principal
+usecase (UC05) as "Validar Regras de Acesso"
+
+' Relações entre atores e caso de uso
+
+
+' Dependências de outros casos de uso
+
+@enduml

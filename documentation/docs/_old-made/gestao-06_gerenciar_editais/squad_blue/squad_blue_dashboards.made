@@ -1,0 +1,400 @@
+project dashboards {
+    name: "Dashboards para Gerenciamento dos Editais"
+    description: "Dashboards para auxiliar nas tomadas de decisão das Áreas Técnicas da FAPES sobre os Editais e Projetos"
+    startDate: 03/11/2024
+    dueDate: 01/02/2025
+}
+
+team squadBlue {
+    name: "Squad Blue"
+    description: "Equipe responsável por devenvolvimento do sistema"
+    teammember felipefrechiani {name: "Felipe Frechiani" email: "felipefo@gmail.com"}
+    teammember isabelaoliveira {name: "Isabela Oliveira da Silva" email: "oliver.isabela2303@gmail.com"}
+    teammember joaobarcellos {name: "João Pedro Zamborlini Barcellos" email: "jpzbarcellos@gmail.com"}
+    teammember manoelrodrigues {name: "Manoel Rodrigues Loureiro" email: "manoel.rl@gmail.com"}
+    teammember marcelastarling {name: "Marcela Starling" email: "marcelasfl46@gmail.com"}
+    teammember marcossouza {name: "Marcos Vinícius Souza dos Santos" email: "marcosviniciussouzadossantos19@gmail.com"}
+}
+
+roadmap projeto {
+    name: "Roadmap do Dashboard de Gerencimento dos Editais"
+    description: "Roadmap do Dashboard de Gerencimento dos Editais."
+
+    milestone dashVersao0 {
+        name: "Versão 0"
+        description: "Versão 0 do Dashboard para Gerenciamento dos Editais, para ser mostrado como exemplo nas reuniões do dia 19/12/2024 e 20/12/2024."
+        startDate: 03/11/2024
+        dueDate: 18/12/2024
+        status: COMPLETED
+    }
+
+    milestone dashVersao1 {
+        name: "Versão 1 do Dashboard para Gerenciamento dos Editais"
+        description: "Versão 1 do Dashboard para Gerenciamento dos Editais, com as principais features prontas para serem validadas e entregue."
+        startDate: 06/01/2025
+        dueDate: 30/01/2025
+        status: IN_PROGRESS
+    }
+}
+
+backlog dashboard {
+    name: "Backlog do Dashboard para Gerenciamento dos Editais"
+    description: "Backlog que foi levantado nas reuniões com as Áreas Técnicas, contendo os requisitos que serão desenvolvidos para compor o Dashboard."
+
+    epic visualizarOrcamentos {
+        name: "Visualizar Orçamentos"
+        description: "Prover a visualização dos orçamentos (total e bolsa) das áreas técnicas, editais e projetos."
+
+        story orcamentoProjeto {
+            name: "Visualizar o orçamento dos projetos"
+            description: "Prover a visualização dos orçamentos (total e bolsa) dos projetos."
+
+            task frontend {
+                name: "Criação de componentes"
+                description: "Criação dos componentes necessários para visualização dos orçamentos de projetos."
+            }
+
+            task backend {
+                name: "Criação de endpoints"
+                description: "Criação dos endpoints necessários para prover informação relativas aos orçamentos de projetos para o frontend consumir."
+            }
+        }
+
+        story orcamentoEdital {
+            name: "Visualizar o orçamento dos editais"
+            description: "Prover a visualização dos orçamentos (total e bolsa) dos editais."
+
+            task frontend {
+                name: "Criação de componentes"
+                description: "Criação dos componentes necessários para visualização dos orçamentos de editais."
+            }
+
+            task backend {
+                name: "Criação de endpoints"
+                description: "Criação dos endpoints necessários para prover informação relativas aos orçamentos de editais para o frontend consumir."
+            }
+        }
+
+        story orcamentoAreaTecnica {
+            name: "Visualizar o orçamento das áreas técnicas"
+            description: "Prover a visualização dos orçamentos (total e bolsa) das áreas técnicas."
+
+            task frontend {
+                name: "Criação de componentes"
+                description: "Criação dos componentes necessários para visualização dos orçamentos de áreas técnicas."
+            }
+
+            task backend {
+                name: "Criação de endpoints"
+                description: "Criação dos endpoints necessários para prover informação relativas aos orçamentos de áreas técnicas para o frontend consumir."
+            }
+        }
+
+        story orcamentoBolsa {
+            name: "Visualizar o saldo do orçamento destinado a bolsa dos editais e projetos"
+            description: "Prover a visualização do saldo do orçamento destinado a bolsa dos editais e projetos."
+
+            task frontend {
+                name: "Criação de componentes"
+                description: "Criação dos componentes necessários para visualização dos orçamentos de áreas técnicas."
+            }
+
+            task backend {
+                name: "Criação de endpoints"
+                description: "Criação dos endpoints necessários para prover informações relativas aos orçamentos de áreas técnicas para o frontend consumir."
+            }
+        }
+
+    }
+
+    epic visualizarModBolsa {
+        name: "Visualizar Modalidades de Bolsas e seus níveis"
+        description: "Prover a visualização das Modalidades de Bolsas e seus níveis nas áreas técnicas, editais e projetos."
+
+        story modalidadeBolsaProj {
+            name: "Visualizar modalidades de bolsas e seus níveis dentro dos projetos"
+            description: "Prover a visualização dos tipos de modalidades de bolsas e seus níveis dentro dos projetos."
+
+            task frontend {
+                name: "Criação dos componentes"
+                description: "Criação dos componentes necessários para visualização da quantidade de tipos de modalidades de bolsas e seus níveis nos projetos."
+            }
+
+            task backend {
+                name: "Criação dos endpoints"
+                description: "Criação dos endpoints necessários para prover informações relativas as quantidades de tipos de modalidades de bolsas e seus níveis nos projetos."
+            }
+        }
+
+        story modalidadeBolsaEdit {
+            name: "Visualizar modalidades de bolsas e seus níveis dentro dos editais"
+            description: "Prover a visualização dos tipos de modalidades de bolsas e seus níveis dentro dos editais."
+
+            task frontend {
+                name: "Criação dos componentes"
+                description: "Criação dos componentes necessários para visualização da quantidade de tipos de modalidades de bolsas e seus níveis nos editais."
+            }
+
+            task backend {
+                name: "Criação dos endpoints"
+                description: "Criação dos endpoints necessários para prover informações relativas as quantidades de tipos de modalidades de bolsas e seus níveis nos editais."
+            }
+        }
+
+        story modalidadeBolsaAreaTec {
+            name: "Visualizar modalidades de bolsas e seus níveis dentro das áreas técnicas"
+            description: "Prover a visualização dos tipos de modalidades de bolsas e seus níveis dentro das áreas técnicas."
+
+            task frontend {
+                name: "Criação dos componentes"
+                description: "Criação dos componentes necessários para visualização da quantidade de tipos de modalidades de bolsas e seus níveis nas áreas técnicas."
+            }
+
+            task backend {
+                name: "Criação dos endpoints"
+                description: "Criação dos endpoints necessários para prover informações relativas as quantidades de tipos de modalidades de bolsas e seus níveis nas áreas técnicas."
+            }
+        }
+    }
+
+    epic gerenciarBolsistas {
+        name: "Visualizar Bolsistas com informações pessoais e de pagamentos"
+        description: "Prover a visualização dos bolsistas com informações das cotas pagas, cotas a pagar, status no projeto, tipo de bolsa e informações pessoais."
+
+        story infosBolsistas {
+            name: "Visualizar informações específicas dos bolsistas"
+            description: "Prover a visualização específicas como cotas pagas, cotas a pagar, status no projeto, tipo de bolsa e infomações pessoais."
+
+            task frontend {
+                name: "Criação dos componentes"
+                description: "Criação dos componentes necessários para visualização dos bolsistas e suas informações no formato de listagem/tabela."
+            }
+
+            task backend {
+                name: "Criação dos endpoints"
+                description: "Criação dos endpoints necessários para prover as informações relativas aos bolsistas, calculando os valores de cotas a pagar e cotas já pagas."
+            }
+        }
+
+        story bolsistasSuspensos {
+            name: "Visualizar os bolsistas suspensos"
+            description: "Prover a visualização dos bolsistas que estão suspensos através de um filtro no componente da listagem de bolsistas."
+
+            task frontend {
+                name: "Exibir bolsistas suspensos"
+                description: "Criação de um filtro que permita exibir somente os bolsistas que estão com o status 'Suspenso'."
+            }
+        }
+
+        story bolsistasCancelados {
+            name: "Visualizar os bolsistas cancelados"
+            description: "Prover a visualização dos bolsistas que estão cancelados através de um filtro no componente da listagem de bolsistas."
+
+            task frontend {
+                name: "Exibir bolsistas cancelados"
+                description: "Criação de um filtro que permita exibir somente os bolsistas que estão com o status 'Cancelado'."
+            }
+        }
+
+        story bolsistasFinalizados {
+            name: "Visualizar os bolsistas finalizados"
+            description: "Prover a visualização dos bolsistas que estão finalizados através de um filtro no componente da listagem de bolsistas."
+
+            task frontend {
+                name: "Exibir bolsistas finalizados"
+                description: "Criação de um filtro que permita exibir somente os bolsistas que estão com o status 'Finalizado'."
+            }
+        }
+
+        story vazaoBolsistas {
+            name: "Visualizar a quantidade atual de bolsistas e sua 'vazão'"
+            description: "Prover a visualização da quantidade bolsistas atuais e também dos bolsistas que saíram, ao longo do tempo."
+
+            task frontend {
+                name: "Criação dos componentes"
+                description: "Criação do componente que será um gráfico que mostrará a quantidade atual de bolsistas, a quantidade que entrou e a quantidade que saiu, a cada mês."
+            }
+
+            task backend {
+                name: "Criação dos endpoints"
+                description: "Criação dos endpoints necessários para prover as informações da quantidade atual de bolsistas e sua vazão a cada mês."
+            }
+        }
+
+        story quantTotalBolsistas {
+            name: "Visualizar a quantidade total de bolsistas em cada status"
+            description: "Prover a visualização do quantitativo total de bolsistas ativos, suspensos, cancelados e finalizados"
+
+            task frontend {
+                name: "Criação dos componentes"
+                description: "Criação dos componentes em formato de 'card' com as informações do quantitativo dos bolsistas em cada status"
+            }
+
+            task backend {
+                name: "Criação dos endpoints"
+                description: "Criação dos endpoints necessários para prover as informações dos quantitativos dos bolsistas em cada status"
+            }
+        }
+    }
+
+    epic cotasRemanescentes {
+        name: "Visualizar Cotas Remanescentes"
+        description: "Prover a visualização das cotas previstas e do saldo atual de cotas nos editais e projetos."
+
+        story cotasEditais {
+            name: "Visualizar a quantidade de cotas remanescentes nos editais"
+            description: "Prover a visualização da quantidade de cotas previstas e o saldo atual de cotas nos editais."
+
+            task frontend {
+                name: "Criação dos componentes"
+                description: "Criação dos componentes que serão 'cards' exibindo em texto a quantidade de cotas previstas e o saldo atual de cotas de cada tipo de modalidade bolsa e seus níveis."
+            }
+
+            task backend {
+                name: "Criação dos endpoints"
+                description: "Criação dos endpoints necessários para prover as informações da quantidade de cotas previstas e o saldo atual de cotas de cada tipo de modalidade bolsa e seus níveis nos editais."
+            }
+        }
+
+        story cotasProjetos {
+            name: "Visualizar a quantidade de cotas remanescentes nos projetos"
+            description: "Prover a visualização da quantidade de cotas previstas e o saldo atual de cotas nos projetos."
+
+            task frontend {
+                name: "Criação dos componentes"
+                description: "Criação dos componentes que serão 'cards' exibindo em texto a quantidade de cotas previstas e o saldo atual de cotas de cada tipo de modalidade bolsa e seus níveis."
+            }
+
+            task backend {
+                name: "Criação dos endpoints"
+                description: "Criação dos endpoints necessários para prover as informações da quantidade de cotas previstas e o saldo atual de cotas de cada tipo de modalidade bolsa e seus níveis nos projetos."
+            }
+        }
+    }
+    
+}
+
+backlog planejamentoSprint4 {
+    name: "Backlog de Planejamento da Sprint 4"
+    description: "Backlog para planejamento e organização da Sprint 4, logo após o recesso."
+
+    epic organizarRevisar {
+        name: "Organizar e Revisar o que já foi feito"
+        description: "Organizar e Revisar o que já foi feito antes do recesso, e também planejar as próximas tarefas."
+
+        story updatePlanning {
+            name: "Planejar primeira semana pós recesso"
+            description: "Planejar a primeira semana de trabalho após recesso."
+
+            task updateAddTasks {
+                name: "Adicionar e atualizar as tarefas na planning"
+                description: "Adicionar e atualizar as tarefas da planning, verificando se possui alguma pendência para ser feita."
+            }
+        }
+
+        story criarGruposWpp {
+            name: "Criar grupos de Whatsapp com as áreas técnicas"
+            description: "Criar os grupos de Whatsapp com as áreas técnicas que foram entrevistadas nos dias 19/12/2024 e 20/12/2024 para levantamento dos requisitos do Dashboard."
+
+            task grupoNUPEX {
+                name: "Criar grupo com a NUPEX"
+                description: "Criar grupo de Whatsapp com os membros da área técnica NUPEX."
+            }
+
+            task grupoGEPED {
+                name: "Criar grupo com a GEPED"
+                description: "Criar grupo de Whatsapp com os membros da área técnica GEPED."
+            }
+
+            task grupoGECAP {
+                name: "Criar grupo com a GECAP"
+                description: "Criar grupo de Whatsapp com os membros da área técnica GECAP."
+            }
+        }
+
+        story reunioes {
+            name: "Reuniões para planejamento e para tirar dúvidas"
+            description: "Reuniões importantes para o planejamento das próximas tarefas e para tirar algumas dúvidas."
+
+            task duvidaJSON {
+                name: "Tirar dúvidas sobre salvamento de dados do Dashboard"
+                description: "Tirar dúvidas de como e qual a melhor abordagem para salvar os JSON's dos dados relativos aos componentes dos Dashboards."
+            }
+
+            task proxPassosDash {
+                name: "Reunião para discutir próximos passos do Dashboard"
+                description: "Reunião para o time discutir os próximos passos de desenvolvimento do Dashboard, e também revisar o que já foi feito"
+            }
+
+            task priorizacaoGEINOV {
+                name: "Marcar uma renião com a GEINOV"
+                description: "Marcar uma reunião com a GEINOV para priorização dos requisitos levantados nas entrevistas com as áreas técnicas"
+            }
+
+            task revisarEndpoints {
+                name: "Revisar e Planejar os Endpoints"
+                description: "Revisar os Endpoints que já foram feitos, e planejar os Endpoints que serão feitos para alimentar os novos componentes"
+            }
+
+            task addCoordenadores {
+                name: "Adicionar os Coordenadores"
+                description: "Adicionar e destacar os Coordenadores dos Projetos dentro da listagem de Bolsistas"
+            }
+
+            task addSaldoCotas {
+                name: "Adicionar informações de saldos de cotas no Dashboard"
+                description: "Adicionar informações relativas aos saldos de cotas no Dashboard, mas antes verificar se existe essas informações no Sigfapes"
+            }
+
+            task reuniaoChecagem {
+                name: "Reunião com Vinícius para checagem de tudo"
+                description: "Reunião com Vinícius para levantamento do que já temos e discussão de um possível merge."
+            }
+        }
+        
+    }
+}
+
+
+sprint sprint4 {
+    name: "Sprint pós recesso"
+    description: "Planejar e organizar as atividades para continuar o desenvolvimento"
+    startDate: 06/01/2025
+    endDate: 17/01/2025
+    status: IN_PROGRESS
+
+    sprintbacklog tarefas {
+        item planejamentoSprint4.organizarRevisar.updatePlanning.updateAddTasks {assignee: squadBlue.manoelrodrigues startDate: 06/01/2025 dueDate: 08/01/2025 status: DONE}
+        
+        item planejamentoSprint4.organizarRevisar.criarGruposWpp.grupoNUPEX {assignee: squadBlue.manoelrodrigues startDate: 06/01/2025 dueDate: 06/01/2025 status: DONE}
+        item planejamentoSprint4.organizarRevisar.criarGruposWpp.grupoGEPED {assignee: squadBlue.manoelrodrigues startDate: 06/01/2025 dueDate: 06/01/2025 status: DONE}
+        item planejamentoSprint4.organizarRevisar.criarGruposWpp.grupoGECAP {assignee: squadBlue.manoelrodrigues startDate: 06/01/2025 dueDate: 06/01/2025 status: DONE}
+        
+        item planejamentoSprint4.organizarRevisar.reunioes.duvidaJSON {assignee: squadBlue.manoelrodrigues startDate: 06/01/2025 dueDate: 06/01/2025 status: DONE}
+        
+        item planejamentoSprint4.organizarRevisar.reunioes.proxPassosDash {assignee: squadBlue.manoelrodrigues startDate: 07/01/2025 dueDate: 07/01/2025 status: DONE}
+        item planejamentoSprint4.organizarRevisar.reunioes.proxPassosDash {assignee: squadBlue.joaobarcellos startDate: 07/01/2025 dueDate: 07/01/2025 status: DONE}
+        item planejamentoSprint4.organizarRevisar.reunioes.proxPassosDash {assignee: squadBlue.marcelastarling startDate: 07/01/2025 dueDate: 07/01/2025 status: DONE}
+        item planejamentoSprint4.organizarRevisar.reunioes.proxPassosDash {assignee: squadBlue.marcossouza startDate: 07/01/2025 dueDate: 07/01/2025 status: DONE}
+        item planejamentoSprint4.organizarRevisar.reunioes.proxPassosDash {assignee: squadBlue.isabelaoliveira startDate: 07/01/2025 dueDate: 07/01/2025 status: DONE}
+        
+        item planejamentoSprint4.organizarRevisar.reunioes.priorizacaoGEINOV {assignee: squadBlue.manoelrodrigues startDate: 07/01/2025 dueDate: 17/01/2025 status: DOING}
+        
+        item planejamentoSprint4.organizarRevisar.reunioes.revisarEndpoints {assignee: squadBlue.joaobarcellos startDate: 07/01/2025 dueDate: 08/01/2025 status: DONE}
+        item planejamentoSprint4.organizarRevisar.reunioes.revisarEndpoints {assignee: squadBlue.manoelrodrigues startDate: 07/01/2025 dueDate: 08/01/2025 status: DONE}
+        item planejamentoSprint4.organizarRevisar.reunioes.revisarEndpoints {assignee: squadBlue.marcelastarling startDate: 07/01/2025 dueDate: 08/01/2025 status: DONE}
+        item planejamentoSprint4.organizarRevisar.reunioes.revisarEndpoints {assignee: squadBlue.marcossouza startDate: 07/01/2025 dueDate: 08/01/2025 status: DONE}
+
+        item planejamentoSprint4.organizarRevisar.reunioes.addCoordenadores {assignee: squadBlue.joaobarcellos startDate: 07/01/2025 dueDate: 17/01/2025 status: TODO}
+        item planejamentoSprint4.organizarRevisar.reunioes.addCoordenadores {assignee: squadBlue.manoelrodrigues startDate: 07/01/2025 dueDate: 17/01/2025 status: TODO}
+        item planejamentoSprint4.organizarRevisar.reunioes.addCoordenadores {assignee: squadBlue.marcelastarling startDate: 07/01/2025 dueDate: 17/01/2025 status: TODO}
+        item planejamentoSprint4.organizarRevisar.reunioes.addCoordenadores {assignee: squadBlue.marcossouza startDate: 07/01/2025 dueDate: 17/01/2025 status: TODO}
+
+        item planejamentoSprint4.organizarRevisar.reunioes.addSaldoCotas {assignee: squadBlue.joaobarcellos startDate: 07/01/2025 dueDate: 17/01/2025 status: TODO}
+        item planejamentoSprint4.organizarRevisar.reunioes.addSaldoCotas {assignee: squadBlue.manoelrodrigues startDate: 07/01/2025 dueDate: 17/01/2025 status: TODO}
+        item planejamentoSprint4.organizarRevisar.reunioes.addSaldoCotas {assignee: squadBlue.marcelastarling startDate: 07/01/2025 dueDate: 17/01/2025 status: TODO}
+        item planejamentoSprint4.organizarRevisar.reunioes.addSaldoCotas {assignee: squadBlue.marcossouza startDate: 07/01/2025 dueDate: 17/01/2025 status: TODO}
+
+        item planejamentoSprint4.organizarRevisar.reunioes.reuniaoChecagem {assignee: squadBlue.manoelrodrigues startDate: 10/01/2025 dueDate: 10/01/2025 status: TODO}
+    }
+}

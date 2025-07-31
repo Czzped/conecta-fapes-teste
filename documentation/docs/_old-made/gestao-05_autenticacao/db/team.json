@@ -1,0 +1,36 @@
+{
+  "data": [
+    {
+      "id": "black_squad",
+      "name": "Black Squad",
+      "description": "Equipe responsável pela autorização e logging do Conecta Fapes",
+      "teammebers": [
+        {
+          "id": "heitorlima",
+          "name": "Heitor Lima",
+          "email": "heitor.lipeixoto@gmail.com"
+        },
+        {
+          "id": "gianpaneto",
+          "name": "Gian Paneto",
+          "email": "gianpaneto@gmail.com"
+        },
+        {
+          "id": "arthurcremasco",
+          "name": "Arthur Cremasco",
+          "email": "arthurcremascoamaral7@gmail.com"
+        },
+        {
+          "id": "sofiadealcantara",
+          "name": "Sofia de Alcantara",
+          "email": "sofiaalcantaras@outlook.com"
+        },
+        {
+          "id": "joaomarcos",
+          "name": "João Marcos",
+          "email": "joaomarcosrpimentel@gmail.com"
+        }
+      ]
+    }
+  ]
+}

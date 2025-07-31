@@ -1,0 +1,140 @@
+project PagamentoBolsista {
+    name: "Modulo de Pagamento Bolsista"
+    description: "Modulo responsável por realizar os pagamentos de bolsistas"
+    startDate: 06/01/2025
+    dueDate: 28/02/2025
+}
+
+team SquadGreen {
+    name: "Squad Green"
+    description: "Equipe responsável pelo desenvolvimento do módulo de pagamento"
+    teammember brunocaxias {name: "Bruno Caxias" email: "bccaxias03.bc@gmail.com"}
+    teammember harianadami {name: "Harian Adami " email: "harianadami@gmail.com"}
+    teammember jennifergamaral {name: "Jennifer Amaral" email: "jennifergamaral@gmail.com"}
+    teammember gustavocaetano {name: "Gustavo Caetano" email: "gustavo.gustavovat@gmail.com"}
+    teammember viniciusestevam {name: "Vinícius Estevam" email: "vinicius.estevam99@gmail.com"}
+}
+
+// roadmap projeto {
+//     name: "Rodmap do projeto"
+//     description: "Roadmap de todo do projeto"
+//     milestone beta {
+//         name: "Primeira versão do Pagamento I"
+//         description: "Módulo de pagamento com as funcionalidades: definir calendário de folhas, liberar editais, gerar folha, cancelar folha, autorizar folha"
+//         startDate: 06/01/2025        
+//         dueDate: 20/01/2025
+//         status: IN_PROGRESS
+//         release beta {
+//             description: "Estudo para entender as tecnologias"
+//             // item : Sp
+//             status: IN_DEVELOPMENT
+//             dueDate: 20/11/2025
+//             version: "1.0"
+//         }
+//     }
+// }
+
+backlog PagamentoBolsistaII {
+   name: "Backlog - Janeiro-2025"
+   description: "Backlog dedicado a estudo da equipe"
+
+    epic E001 {
+        name: "Realizar deploy da primeira versão do sistema do Pagamento Bolsista I"
+        description: "Objetivo: Conseguir entregar uma versão estável no nosso ambiente de desenvolvimento para testes"
+
+        story S001 {
+            name: "Deploy Job Importação"
+            
+            task documentation { name: "Documentar a arquitetura do hangfire" }
+            task autenticacao { name: "Adaptar a autenticação do job de importação" }
+            task deploy_jb_importacao { name: "Deploy do Job Importação" }
+        }
+
+        story S002 {
+            name: "Deploy da API Pagamento Bolsista I"
+            
+            task deploy_api_pg1 { name: "Deploy da API Pagamento Bolsista I" }
+        }
+    }
+
+    epic E002 {
+        name: "Desenvolvimento da API Pagamento Bolsista I"
+        description: "Objetivo: Adaptar a API Pagamento Bolsista I para iniciar a fase II do desenvolvimento"
+
+        story S003 {
+            name: "Remover paginação das telas do módulo Pagamento Bolsista I"
+            
+            task remover_pagination_api { name: "Criar rotas customizadas para o módulo Pagamento Bolsista I" }
+            task integration_pagination_api { name: "Integrar as telas do módulo Pagamento Bolsista I com as novas rotas" }
+        }
+    }
+
+    epic E003 {
+        name: "Desenvolvimento da API Pagamento Bolsista II"
+        description: "Objetivo: Desenvolver da API Pagamento Bolsista II"
+        
+
+        story S005 {
+            name: "Implementar as telas do módulo Pagamento Bolsista II"
+            
+            task tela_monitorar_remessa { name: "Implementar a tela de Monitorar Remessa" }
+            task tela_solicitar_recurso { name: "Implementar a tela de Solicitar Rescurso" }
+        }
+
+        story S006 {
+            name: "Reuniões"
+            
+            task meet_edi { name: "Reunião para tratar sobre o @EDI do baneste" }
+            task meet_batch { name: "Reunião sobre o processo de gerar arquivo de remessa" }
+        }
+
+        story S007 {
+            name: "Especificação do módulo Pagamento Bolsista II"
+            
+            task especificacao_arq_remessa { name: "Criar seção de regra de negócios para especificação Pagto II" }
+            task especificacao_arq_regra_remessa { name: "Resumir as regras de remessa e retorno do Banestes" }
+            task especificacao_diagrama { name: "Adequar os diagramas de projetos" }
+        }
+
+        story S008 {
+            name: "Gerar Arquivo de Remessa"
+            
+            task gerar_arq_remessa_pgt { name: "Gerar Arquivo de Remessa de Pagamento" }
+            task gerar_arq_remessa_cad { name: "Gerar Arquivo de Remessa de Cadastro Bolsista" }
+        }
+    }
+   
+   
+}
+
+sprint SPRT001 {
+    name: "Sprint I"
+    description: "Integração dos módulos"
+    startDate: 13/01/2025
+    endDate: 24/01/2025
+    status: IN_PROGRESS
+
+    sprintbacklog janeiro25 {
+        item PagamentoBolsistaII.E001.S001.autenticacao {assignee: SquadGreen.brunocaxias startDate: 20/01/2025  dueDate: 17/01/2025 status: DOING}
+        item PagamentoBolsistaII.E001.S001.deploy_jb_importacao {assignee: SquadGreen.brunocaxias startDate: 21/01/2025  dueDate: 21/01/2025 status: DOING}
+        item PagamentoBolsistaII.E001.S001.documentation {assignee: SquadGreen.brunocaxias startDate: 13/01/2025  dueDate: 14/01/2025 status: DONE}
+        item PagamentoBolsistaII.E001.S002.deploy_api_pg1 {assignee: SquadGreen.viniciusestevam startDate: 20/01/2025  dueDate: 21/01/2025 status: DOING}
+
+        item PagamentoBolsistaII.E002.S003.remover_pagination_api {assignee: SquadGreen.viniciusestevam startDate: 15/01/2025  dueDate: 17/01/2025 status: DONE}
+        item PagamentoBolsistaII.E002.S003.integration_pagination_api {assignee: SquadGreen.gustavocaetano startDate: 17/01/2025  dueDate: 22/01/2025 status: DONE}
+
+        item PagamentoBolsistaII.E003.S005.tela_monitorar_remessa {assignee: SquadGreen.gustavocaetano startDate: 14/01/2025  dueDate: 17/01/2025 status: DONE}
+        item PagamentoBolsistaII.E003.S005.tela_solicitar_recurso {assignee: SquadGreen.harianadami startDate: 22/01/2025  dueDate: 24/01/2025 status: DOING}
+
+        item PagamentoBolsistaII.E003.S006.meet_batch {assignee: SquadGreen.viniciusestevam startDate: 16/01/2025 dueDate: 16/01/2025 status: DONE}
+        item PagamentoBolsistaII.E003.S006.meet_edi {assignee: SquadGreen.viniciusestevam startDate: 14/01/2025 dueDate: 14/01/2025 status: DONE}
+
+        item PagamentoBolsistaII.E003.S007.especificacao_arq_remessa {assignee: SquadGreen.jennifergamaral startDate: 13/01/2025 dueDate: 15/01/2025 status: DONE}
+        item PagamentoBolsistaII.E003.S007.especificacao_arq_regra_remessa {assignee: SquadGreen.jennifergamaral startDate: 15/01/2025  dueDate: 17/01/2025 status: DONE}
+        item PagamentoBolsistaII.E003.S007.especificacao_diagrama {assignee: SquadGreen.jennifergamaral startDate: 20/01/2025  dueDate: 21/01/2025 status: DOING}
+
+        item PagamentoBolsistaII.E003.S008.gerar_arq_remessa_pgt {assignee: SquadGreen.viniciusestevam startDate: 22/01/2025  dueDate: 24/01/2025 status: DOING}
+        item PagamentoBolsistaII.E003.S008.gerar_arq_remessa_cad {assignee: SquadGreen.brunocaxias startDate: 22/01/2025  dueDate: 24/01/2025 status: DOING}
+    }
+    
+}

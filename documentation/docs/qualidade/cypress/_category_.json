@@ -1,0 +1,8 @@
+{
+  "label": "Material Cypress",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Documentos relativos aos materiais necessários para desenvolver scripts Cypress implementados no contexto do projeto ConectaFapes."
+  }
+}

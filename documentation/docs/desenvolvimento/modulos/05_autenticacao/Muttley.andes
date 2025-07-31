@@ -1,0 +1,194 @@
+overview Muttley{
+    name:"Muttley"
+    description:"Sistema de controle de acesso baseado em política de segurança."
+    purpose:"O projeto tem como objetivo definir e controlar o acesso a objetos (e.g., papéis, rotas, documentos e dados) baseado em uma política de segurança."
+    miniworld:
+    "
+        Inicialmente, as políticas de segurança são definidas pelo Gestor de Políticas da organização. Uma política de segurança define regras de acesso aos objetos, por meio da definição de relações entre objetos. Por exemplo, podemos definir que todo analista (objeto do tipo papel) tem acesso de leitura a um documento do tipo Ata (objeto do tipo documento), ou podemos definir que o Vinícius (objeto do tipo usuário) tem acesso ao documento da ata do dia 21/12/2024 (instância do objeto do tipo documento).
+        Além disso, as políticas são agrupadas, ou armazenadas, em um store, para melhorar a organização destas. 
+
+        Todo sistema ou usuário utiliza o Muttley para verificar se tem acesso ou não a um objeto. Para isso, ele questiona se há ou não permissão baseada nas relações. Assim, o Muttley responde informando se o usuário pode realizar a ação com uma mensagem de aprovação ou reprovação. 
+        
+    "
+}
+
+
+requirements Security{
+    name:"Requisitos do módulo"
+
+    functional_requirement RF01{
+        description:"O sistema deve cadastrar stores."
+        priority:"Alta"
+    }
+
+    functional_requirement RF02{
+        description:"O sistema deve cadastrar as políticas de segurança."
+        priority:"Alta"
+        depend: Security.RF02
+    }
+
+    functional_requirement RF03{
+        description:"O sistema deve cadastrar relações entre objetos."
+        priority:"Alta"
+        depend: Security.RF03
+    }
+
+    functional_requirement RF04{
+        description:"O sistema deve avaliar se o usuário pode acessar o objeto baseado nas relações."
+        priority:"Alta"
+        depend: Security.RF03
+    }
+
+}   
+
+module Page{
+    description:""
+    entity UserAdmin{}
+    entity User{}
+}
+
+actor GestorDePoliticaDeSeguranca is UserAdmin
+
+
+
+usecase UC01{
+    name:"Validar regras de acesso"
+    description:"Cadastrar stores que armazenam políticas de segurança."
+    performer: GestorDePoliticaDeSeguranca
+
+    event E01{
+        name:"Criar Store"
+        description:"
+        1. O Gestor de Políticas informa o nome do store.
+        2. O sistema verifica se o nome existe.
+        3. O sistema informa sucesso, caso não exista ou informa erro caso o nome já exista.    
+        "
+    }
+
+    event E02{
+        name:"Deletar Store"
+        description:"
+        1. O Gestor de Políticas seleciona um store.
+        2. O Gestor clica em deletar.
+        3. O sistema solicita que o usuário confirme a ação.
+        4. O sistema deleta o store, as políticas armazenadas, as instâncias e todo o conteúdo, e informa uma mensagem de sucesso.    
+        "
+        depend: UC01.E01, UC01.E03
+    }
+
+    event E03{
+        name:"Listar Store"
+        description:"
+        1. Lista as stores informando o nome.
+        2. Caso não tenha stores, informa que não há stores.      
+        "
+    }
+}
+
+usecase UC02{
+    name:"Cadastrar Políticas de Segurança"
+    description:"Cadastrar políticas de segurança."
+    performer: GestorDePoliticaDeSeguranca
+    depend: UC01
+
+    event E01{
+        name:"Criar Políticas"
+        description:"
+        1. O Gestor de Políticas digita a política de segurança.
+        2. O sistema valida a política de segurança.
+        3. O sistema informa uma mensagem de sucesso, caso não tenha problemas. Caso contrário, exibe uma mensagem de erro. 
+        "
+    }
+
+    event E02{
+        name:"Deletar Políticas"
+        description:"
+        1. O Gestor seleciona uma política.
+        2. O Gestor clica em deletar.
+        3. O sistema solicita que o usuário confirme a ação.
+        4. O sistema deleta a política, as instâncias e todo o conteúdo, e informa uma mensagem de sucesso.    
+        "
+        depend: UC02.E01, UC02.E03
+    }
+
+    
+    event E03{
+        name:"Listar Políticas"
+        description:"
+        1. O sistema apresenta as políticas, caso existam. Caso contrário, apresenta uma mensagem 'Não existe'.
+
+        "
+        
+    }
+}
+
+ 
+usecase UC03{
+    name:"Instanciar as Políticas"
+    description:"Instanciar as políticas de acesso."
+    performer: GestorDePoliticaDeSeguranca
+    depend: UC02
+    event E01{
+        name:"Instanciar as políticas de acesso"
+        description:"
+        1. Adicionar um usuário.
+        2. Adicionar sua relação.
+        3. Adicionar seu papel.
+        "
+    }
+
+    event E02{
+        name:"Deletar as instâncias das políticas de acesso"
+        description:"
+        1. Através de um ícone, é possível o Admin deletar uma tupla.
+        "
+    }
+
+    event E03{
+        name:"Buscar as instâncias das políticas de acesso"
+        description:"
+        1. Retornar as tuplas.
+        "
+    }
+}
+
+usecase UC04 {
+    name:"Validar Regras de Acesso"
+    description:""
+    performer: GestorDePoliticaDeSeguranca
+    
+    event E01{
+        name:"Criar Gestor de Políticas no primeiro acesso"
+        description:"
+        1. No primeiro acesso ao sistema, quando o sistema carregar, será solicitado o e-mail e o nome do novo Gestor de Políticas.
+        2. O sistema envia um e-mail com o link para mudar a senha.
+        3. O Gestor acessa e cadastra a nova senha.
+        4. É redirecionado para a tela de login.
+        "
+    }
+    
+    event E03{
+        name:"Login"
+        description:"
+        1. O usuário informa a senha e o e-mail. 
+        2. O sistema valida as informações.
+        3. O usuário é redirecionado para a tela principal ou recebe uma mensagem de que os dados não são válidos.        
+        "
+    }
+}
+
+usecase UC05 {
+    name:"Validar Regras de Acesso"
+    description:"Validar as solicitações de acesso baseado nas regras de acesso."
+    depend: UC03   
+
+    event E01{
+        name:"Validar acesso a objetos"
+        description:"
+        1. O usuário solicita acesso ao objeto informando a operação que deseja realizar.
+        2. O sistema valida a solicitação baseada nas regras já existentes.
+        3. O sistema aprova a solicitação, se estiver conforme as regras, ou reprova, caso contrário.        
+        "
+    }   
+    
+}

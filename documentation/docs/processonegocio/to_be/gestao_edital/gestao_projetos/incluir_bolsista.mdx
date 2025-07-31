@@ -1,0 +1,38 @@
+---
+title: "Incluir Bolsista"
+sidebar_position: 1
+---
+import BpmnViewer from '@site/src/components/BpmnViewer';
+
+
+<BpmnViewer diagramUrl="/diagrams\business_process\incluirbolsista\IncluirBolsista.bpmn" height="400px" />
+
+
+
+##	 Realizar Cadastro Pessoal
+A Pessoa, com cadastro validado no Acesso Cidadão, acessa o sistema. Os dados básicos (Nome, CPF, E-mail e Data Nascimento) são importados do Acesso Cidadão e a pessoa completa seu cadastro com: demais Informações Pessoais, Documentos, Formação Acadêmica e Experiência Profissional (incluindo tempo de experiência, vínculos e bolsas atuais) e Dados Bancários (Banestes).
+
+##	 Solicitar Bolsa
+O Coordenador do Projeto cria o plano de trabalho do bolsista, definindo: Pessoa Bolsista; Bolsa (modalidade e nível); e o Plano de Trabalho com: Orientador, Data de Início, Duração (meses), Atividades (lista), Cronograma, Objetivos e Metas e Método. A solicitação para a competência deverá ser feita de forma completa (incluindo os termos aceitos) até o marco “limite da solicitação de bolsa”, definido no calendário. Ao informar os dados, são exibidos alertas para questões como a falta de documentação no cadastro e o não cumprimento de requisitos da bolsa (ex.: formação, tempo de experiência, vínculos ativos). Uma vez que Orientador e Bolsista são definidos, o Bolsista pode visualizar a solicitação e o Orientador pode editar (atividades, cronograma, objetivos e metas e método). O Coordenador conclui a solicitação, implicando em seu aceite do termo de responsabilidade.
+
+##	 Atualizar Documentos do Bolsista
+
+O Candidato a bolsa envia os documentos pessoais requeridos para implementação da bolsa (e.g., RG, Lattes, diploma, certidões negativas, extrato INSS, dados bancários). Se houver pendência de documentos necessários à implementação da bolsa, ele deve atualizá-los. Assim que os documentos estiverem completos são disparados os termos de aceite para Bolsista e Orientador.
+
+##	 Aceitar Termo de Responsabilidade
+
+O Orientador aceita o Termo de Responsabilidade, implicando em concordar em orientar o plano proposto ao bolsista.
+
+##   Aceitar Termo de Responsabilidade
+
+O Candidato aceita o Termo de Responsabilidade, incluindo o plano de trabalho proposto, a declaração de que não tem impedimentos para receber a bolsa, e as responsabilidades da bolsa.
+
+Prazo para Aceite: Caso todos os aceites sejam registrados até o marco “limite da solicitação de bolsa”, definido no calendário, a solicitação é submetida a avaliação. Caso contrário, a solicitação fica como pendente, aberta à edição, podendo o Coordenador Solicitar Bolsa (com eventuais ajustes) para o mês seguinte.
+
+##	 Avaliar Solicitação de Bolsa
+
+A Área Técnica verifica a documentação do candidato à bolsa, observando a adequação da documentação, a validade das certidões e o atendimento aos requisitos da bolsa. A Área Técnica confirma a alocação do bolsista ao projeto. Caso haja falha na documentação e houver tempo hábil (dentro do limite de ajustes), poderá retornar para atualização de documentos pelo bolsista, com prazo definido. Para as demais falhas, a solicitação poderá retornar para adequação pelo Coordenador (atividade Solicitar Bolsa), com prazo definido. Os termos deverão ser aceitos novamente, dentro do prazo definido, para que possam ser reavaliados. Caso exceda o prazo, retorna para edição sendo possível solicitação em mês posterior.
+
+##	 Finalizar Pagamento da Folha
+
+Ao final de cada dia em que houve alocação, para todos os novos bolsistas alocados no dia, é gerado um arquivo com os dados dos bolsistas para que seja feito o cadastro no Banestes.

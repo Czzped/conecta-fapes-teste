@@ -1,0 +1,56 @@
+---
+title: Realizar Processo de Desenvolvimento do Produto
+sidebar_position: 6
+---
+import BpmnViewer from '@site/src/components/BpmnViewer';
+
+Este documento contempla as atividades "Realizar Processo de Desenvolvimento do Produto", "Realizar Processo de Garantia de Qualidade" e "Realizar Processo Entrega e Monitoramento do Produto" do procesos Visão Geral.
+<BpmnViewer diagramUrl="/diagrams/software_process/processo_desenvolvimento.bpmn"  height="900px"/>
+
+## Codificar nova Funcionalidade
+
+O Squad desenvolve a nova funcionalidade tomando como base as informações adquiridas no processo de design sprint.
+
+## Construir Testes Unitários e Casos de Unitários
+
+O Squad constroi e testar os testes Unitários para cada requisito definido no projeto.
+
+## Testar Testes Localmente
+
+O desenvolvedor "roda" os testes Unitários Localmente.
+
+## Testar Manualmente no ambiente de Desenvolvimento
+
+O Analista de Qualidade simula o usuário usando a aplicação.
+
+## Criar um Card de Correção de Bug
+
+O Analista de Qualidade cria uma card de coreçao de bug no sistema de gestão de projetos, caso identifique um problema.
+
+## Criar um PR na Branch de Test para publicar no ambiente de Testes
+
+O Analista de Qualidade cria um card de publicação no ambiente de Testing no sistema de gestão de projetos, caso não identifique um problema.
+
+## Validar nova Funcionalidade com o Cliente
+
+O Analista de Qualidade valida a funcionalidade com o cliente n ambiente de testing.
+
+## Solicitar Deploy no ambiente do Cliente 
+
+O Analista de Qualidade cria um card para publicação da nova funcionalidade no ambiente do cliente, caso o cliente aprove a funcionalidade.
+
+## Acompanhar a publicação no ambiente de Homologação do Cliente
+
+O Analista de DevOps acompanha a publicação da nova funcionalidade no ambiente do cliente.
+
+## Testar Funcionalidade no ambiente de Homologação do Cliente
+
+O Analista de Qualidade  testa a funcionalidade no ambiente do cliente.
+
+## Publicar nova Funcionalidade em ambiente de Produção do Cliente
+
+O Analista de DevOps publica a nova funcionalidade no ambiente de produção do cliente.
+
+## Notificar os Stakeholders sobre nova Funcionalidade.
+
+O Analista de DevOps notifica os Stakeholders sobre a nova funcionalidade publicada. 

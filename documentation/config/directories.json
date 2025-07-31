@@ -1,0 +1,10 @@
+[
+    {
+      "path": "./docs/bi/gestao/",
+      "webhook": "https://discord.com/api/webhooks/1326175070804119613/X4-SVt1Q5xNj1QzvayjV6qpLxJBvRb0VzrMohAlPoSvy_aHLyMFhEB3rAh1Pqy01PTPW"
+    },
+    {
+      "path": "./docs/qualidade/gestao/",
+      "webhook": "https://discord.com/api/webhooks/1325852057290145802/kYnTJVGzGe-BPOz_MlALsAHIilxIHv838W3AHUQHfannye79FujrbaVIlKq7PPtwH9Ty"
+    }
+  ]

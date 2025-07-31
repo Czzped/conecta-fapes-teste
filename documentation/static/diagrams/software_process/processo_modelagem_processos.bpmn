@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:collaboration id="Collaboration_0ytcy8p">
+    <bpmn:participant id="Participant_1m0a2fx" name="Processo de Mapeamento de Processo" processRef="Process_1" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_1" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_14b1hhq">
+      <bpmn:lane id="Lane_1sx0v4d" name="Equipe de Produto">
+        <bpmn:flowNodeRef>Event_1u2i06g</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1tyh1vy</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0v4r41p</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1lv9hu8</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1qqa7v5</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_0ob5dsm</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Event_1u2i06g" name="Objetivo projeto definido">
+      <bpmn:outgoing>Flow_140i8n4</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_140i8n4" sourceRef="Event_1u2i06g" targetRef="Activity_1tyh1vy" />
+    <bpmn:sequenceFlow id="Flow_0f52ntn" sourceRef="Activity_1tyh1vy" targetRef="Activity_0v4r41p" />
+    <bpmn:task id="Activity_1tyh1vy" name="Levantar os processo que atendem ao objetivo do projeto">
+      <bpmn:incoming>Flow_140i8n4</bpmn:incoming>
+      <bpmn:outgoing>Flow_0f52ntn</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Activity_0v4r41p" name="Criar os processos AS IS">
+      <bpmn:incoming>Flow_0f52ntn</bpmn:incoming>
+      <bpmn:outgoing>Flow_09tjp9o</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Activity_1lv9hu8" name="Analisar os processo AS IS e propor melhorias nos processos">
+      <bpmn:incoming>Flow_09tjp9o</bpmn:incoming>
+      <bpmn:outgoing>Flow_00vczmp</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_09tjp9o" sourceRef="Activity_0v4r41p" targetRef="Activity_1lv9hu8" />
+    <bpmn:task id="Activity_1qqa7v5" name="Validar os processos TO BE com os clientes">
+      <bpmn:incoming>Flow_00vczmp</bpmn:incoming>
+      <bpmn:outgoing>Flow_1luphym</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_00vczmp" sourceRef="Activity_1lv9hu8" targetRef="Activity_1qqa7v5" />
+    <bpmn:endEvent id="Event_0ob5dsm" name="Processos To Be modelados e aprovados">
+      <bpmn:incoming>Flow_1luphym</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1luphym" sourceRef="Activity_1qqa7v5" targetRef="Event_0ob5dsm" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0ytcy8p">
+      <bpmndi:BPMNShape id="Participant_1m0a2fx_di" bpmnElement="Participant_1m0a2fx" isHorizontal="true">
+        <dc:Bounds x="123" y="70" width="797" height="250" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_1sx0v4d_di" bpmnElement="Lane_1sx0v4d" isHorizontal="true">
+        <dc:Bounds x="153" y="70" width="767" height="250" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1u2i06g_di" bpmnElement="Event_1u2i06g">
+        <dc:Bounds x="212" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="192" y="205" width="78" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1tyh1vy_di" bpmnElement="Activity_1tyh1vy">
+        <dc:Bounds x="280" y="140" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0v4r41p_di" bpmnElement="Activity_0v4r41p">
+        <dc:Bounds x="410" y="140" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1lv9hu8_di" bpmnElement="Activity_1lv9hu8">
+        <dc:Bounds x="540" y="140" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1qqa7v5_di" bpmnElement="Activity_1qqa7v5">
+        <dc:Bounds x="670" y="140" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0ob5dsm_di" bpmnElement="Event_0ob5dsm">
+        <dc:Bounds x="802" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="779" y="205" width="83" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_140i8n4_di" bpmnElement="Flow_140i8n4">
+        <di:waypoint x="248" y="180" />
+        <di:waypoint x="280" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0f52ntn_di" bpmnElement="Flow_0f52ntn">
+        <di:waypoint x="380" y="180" />
+        <di:waypoint x="410" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09tjp9o_di" bpmnElement="Flow_09tjp9o">
+        <di:waypoint x="510" y="180" />
+        <di:waypoint x="540" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00vczmp_di" bpmnElement="Flow_00vczmp">
+        <di:waypoint x="640" y="180" />
+        <di:waypoint x="670" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1luphym_di" bpmnElement="Flow_1luphym">
+        <di:waypoint x="770" y="180" />
+        <di:waypoint x="802" y="180" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

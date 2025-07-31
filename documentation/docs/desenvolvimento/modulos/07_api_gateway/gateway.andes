@@ -1,0 +1,112 @@
+overview LedsApiGateway
+{
+    name: "Gateway de API"
+    description: "Gateway de API para o ConectaFapes"
+    purpose: "Tem com objetivo conrtolar o acesso as serviços providos do Conecta Fapes"
+    miniworld:"
+
+O gateway de API garante que somente requisições legítimas e autorizadas sejam encaminhadas aos serviços do conecta fapes (e.g. controle de bolsistas e pagamento). Para isso implementa funcionalidade de Validação de IP, Validação de Politica de Segurança e Validação de Requisição. 
+
+A Validação do IP verifica se IP de origem de cada requisição, é valido, ou seja, se está no range de IP definido. A Validação de Politica de Segurança usa o sistema Muttley para verificar se o usuário tem a permissão de executa a operação requisitada. Por fim, a Validação de Requisição verifica se o token de autorização foi gerado por algum serviço do Conecta Fapes. 
+
+"
+}
+
+
+requirements restricaodeacesso {
+    name: "Restrição de Acesso"
+
+    functional_requirement restricaoip {
+        description: "Permitir acesso apenas aos IPs válidos."
+        depend: restricaodeacesso.cadastroip
+    }
+
+    functional_requirement controlerota {
+        description: "Autorizar acesso às rotas apenas para usuários com papéis autorizados, baseado nas politicas de acesso."
+        }
+
+    
+    functional_requirement cadastroip {
+        description: "Cadastrar IPs válidos para acessar o sistema."
+    }
+
+    functional_requirement ratelimit {
+        description: "Configurar limite de acesso por rota."
+    }
+    
+    functional_requirement validartokenacesso {
+        description: "Valiar se o token de acesso foi criado por um serviço do conecta Fapes"
+    }
+}
+
+module ApiGateway {
+    description: ""
+    entity clientapp{}
+}
+
+actor clientapp is clientapp
+
+
+usecase UC01 {
+    name: "Restrição de acesso por IP"
+    description: "Este caso de uso tem como funcionalidade controlar o acesso às rotas."
+    performer: clientapp
+
+
+    event E01 {
+        name: "Permitir acesso ao IP."
+        description: "
+        1. O usuário tenta acessar a API
+        2. O gateway verifica se o IP é válido
+        3. O gateway autoriza o acesso à rota, pois o IP é válido"
+        requirements: restricaodeacesso.restricaoip
+    }
+
+    event E02 {
+        name: "Restringir acesso ao IP"
+        description: "
+        1. O usuário tenta acessar a API
+        2. O gateway verifica se o IP é válido
+        3. O gateway não autoriza o acesso à rota, pois o IP é inválido"
+        requirements: restricaodeacesso.restricaoip
+    }
+ 
+}
+
+usecase UC02 {
+    name: "Restrição de acesso por poliicas de acesso"
+    description: "Este caso de uso tem como funcionalidade controlar o acesso às rotas."
+    performer: clientapp
+
+
+    event E03 {
+        name: "Permitir acesso à rota baseado no cargo do usuário"
+        description: "
+        1. O usuário tenta acessar a API
+        2. O gateway permite acesso ao IP
+        3. O gateway verifica se o cargo do usuário tem permissão para acessar a rota
+        4. O gateway autoriza o acesso à rota, pois o cargo tem permissão"
+        requirements: restricaodeacesso.controlerota
+        depend: UC01.E01, UC01.E02
+    }
+
+    event E04 {
+        name: "Restringir acesso à rota baseado no cargo do usuário"
+        description: "
+        1. O usuário tenta acessar a API
+        2. O gateway permite acesso ao IP
+        3. O gateway verifica se o cargo do usuário tem permissão para acessar a rota
+        4. O gateway não autoriza o acesso à rota, pois o cargo não tem permissão"
+        requirements: restricaodeacesso.controlerota
+        depend: UC01.E01
+    }
+}
+
+usecase UC03 {
+    name: "Restrição de acesso por token gerado"
+    description: "Este caso de uso tem como funcionalidade controlar o acesso usando os tokens."
+    performer: clientapp
+
+
+    
+}

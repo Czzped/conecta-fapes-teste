@@ -1,0 +1,24 @@
+---
+sidebar_position: 1
+---
+import BpmnViewer from '@site/src/components/BpmnViewer';
+
+# Sincronizar Editais
+
+Processo responsável por sincronizar os editais entre o SigFapes e o Conecta Fapes. Todas as rotas do SigFapes estão em [Sigfapes](https://servicos.fapes.es.gov.br/webServicesSig/swagger.php). 
+
+<BpmnViewer diagramUrl="/diagrams/integracao.bpmn"  height="300px"/>
+
+## Autenticar no SigFapes e Conecta Fapes
+
+Periodicamente, o **Agente Integrador** realiza a autenticação por meio da seguinte rota [Buscar Token](https://servicos.fapes.es.gov.br/webServicesSig/swagger.php). 
+
+## Buscar Editais no SigFapes
+
+Para realizar a busca dos editais é necessário acessar a seguinte rota [Buscar Editais](https://servicos.fapes.es.gov.br/webServicesSig/swagger.php). 
+
+## Cadastrar Novos Editais no Conecta Fapes
+
+Para cadastrar o Edital no Conecta Fapes é necessário enviar os dados para o Conecta Fapes na seguinte rota, com o status "A importa"
+
+

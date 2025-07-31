@@ -1,0 +1,54 @@
+## Processo de Tratamento de Issues
+
+### 1. Abertura do Issue
+Qualquer membro do time de QA ou Design (exclusivamente em casos de solicitaçõs de correção de Design) pode abrir um issue no repositório **[leds-conectafapes-blackbox-tests](https://github.com/leds-conectafapes/leds-conectafapes-blackbox-tests/issues)**, categorizando-o adequadamente com uma das seguintes tags:
+
+- [DESIGN]
+- [BUG]
+- [FEAT]
+
+O issue deve conter uma descrição detalhada, que permita ao desenvolvedor e demais interessados o entendimento pleno do problema ou solicitação. Existem templates já disponíveis para cada tipo de issue, que podem ser visualizados ao acionar a adição de um novo issue (veja abaixo):
+
+![alt text](./img/template-issues.png)
+
+### 2. Responsabilidades do Desenvolvedor
+Ao ser criado a um issue, o desenvolvedor deve seguir as seguintes etapas:
+
+1. **Ler a descrição do issue**: Certifique-se de compreender completamente o problema ou a solicitação.
+   
+2. **Assumir a responsabilidade pelo issue**: Na aba "Assignees", adicione-se como responsável pelo issue.
+   
+3. **Criar uma nova branch**: Crie uma branch no repositório correspondente, utilizando uma branch fonte apropriada e nomeando-a conforme a seguinte convenção:
+
+   - `seu-nick/fix-issue#ISSUE-NUMBER` (para correção de bug)
+
+   - `seu-nick/feature-issue#ISSUE-NUMBER` (para nova funcionalidade ou melhoria)
+
+   - Exemplo.: Issue de nº 21 e título `[BUG] Erro de lógica na tela "Cadastro de Pessoa"` gera uma branch nomeada **seu-nick/fix-issue#21**
+
+:::tip
+
+Criar branches exclusivas para resolução de issues específicos facilita o processo de possíveis correções, caso necessário.
+:::
+
+4. **Implementar a solução**: Commite as alterações que resolvem o issue diretamente na branch criada. 
+
+5. **Abrir Pull Request (PR) da branch do issue para a `develop`**: Uma vez concluída a implementação, abra um PR da branch que resolve o issue para a branch `develop`. 
+
+   ⚠️🚨 **ATENÇÃO!** Em caso de problemas de merge, crie um *draft* do PR, resolva os conflitos e só então marque o pull request como 'Ready for review'.
+
+      ![alt text](./img/image.png)
+
+   **Volte até o issue e associe-o ao PR criado na aba Development**. Se obedecido o processo, as branches criadas têm suas solicitações de pull vinculadas automaticamente ao pull request e, caso o PR seja mergeado (fechado) com sucesso, os issues também são automaticamente fechados.
+
+   ![alt text](./img/image-1.png)
+
+6. **Análise e feedback do QA:** Um membro do time QA irá analisar o PR, fazer comentários e solicitações caso necessário e quando viável, aprovar o pull request. **Esteja sempre em alerta para notificações do GitHub!** É seu dever como desenvolvedor acompanhar os status dos PRs e issues que te envolvem.
+
+### 3. Verificação pelo Time de QA
+O time de QA é responsável por:
+1. **Testar a solução implementada**: Verificar se o problema foi efetivamente resolvido ou se a nova funcionalidade atende aos critérios estabelecidos.
+
+2. **Fechar o PR/issue**: Caso a correção ou a funcionalidade esteja satisfatória, o QA fechará o issue marcando-o como resolvido.
+
+3. **Retornar ao desenvolvedor, se necessário**: Caso a solução não esteja completa ou contenha erros, o QA deverá apontar que o PR/issue permanece aberto e descrever o problema encontrado para que o desenvolvedor realize as correções.

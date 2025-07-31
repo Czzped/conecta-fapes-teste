@@ -1,0 +1,8 @@
+{
+  "label": "SDD ConectaAdmin",
+  "position": 8,
+  "link": {
+    "type": "generated-index",
+    "description": "Software Design Description do ConectaAdmin do ConectaFapes (IEEE-1016-2019)"
+  }
+}

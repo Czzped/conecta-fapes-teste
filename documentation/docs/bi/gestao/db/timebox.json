@@ -1,0 +1,1245 @@
+{
+  "data": [
+    {
+      "id": "sprin1",
+      "name": "1 - Entender os objetivos organizacionais",
+      "description": "Entender os objetivos organizacionais da FAPES",
+      "startDate": "25/11/2024",
+      "endDate": "06/12/2024",
+      "status": "CLOSED",
+      "sprintItems": [
+        {
+          "id": "identificarobjetivos.entrevista",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "identificarobjetivos.entrevista",
+            "title": "Entrevistar",
+            "description": "Entrevista os clientes para levantar os objetivos organizacionais relacionados bolsa",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "25/11/2024",
+          "dueDate": "06/12/2024",
+          "status": "TODO"
+        },
+        {
+          "id": "identificarobjetivos.entrevista",
+          "assignee": {
+            "id": "felipecostabeber",
+            "name": "Felipe Costabeber",
+            "email": "felipe.costabeber.s@gmail.com"
+          },
+          "issue": {
+            "id": "identificarobjetivos.entrevista",
+            "title": "Entrevistar",
+            "description": "Entrevista os clientes para levantar os objetivos organizacionais relacionados bolsa",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "25/11/2024",
+          "dueDate": "06/12/2024",
+          "completedDate": "03/12/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "identificarobjetivos.validar",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "identificarobjetivos.validar",
+            "title": "Validar dos da entrevista",
+            "description": "Validar objetivos organizacionais",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.identificarobjetivo.identificarobjetivos.entrevista",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "25/11/2024",
+          "dueDate": "06/12/2024",
+          "completedDate": "04/12/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "identificarnecessidadeinformacao.entrevista",
+          "assignee": {
+            "id": "felipecostabeber",
+            "name": "Felipe Costabeber",
+            "email": "felipe.costabeber.s@gmail.com"
+          },
+          "issue": {
+            "id": "identificarnecessidadeinformacao.entrevista",
+            "title": "Entrevistar",
+            "description": "Entrevista os clientes para levantar os objetivos organizacionais relacionados bolsa",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.identificarobjetivo.identificarobjetivos.validar",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "25/11/2024",
+          "dueDate": "05/12/2024",
+          "completedDate": "03/12/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "definirmedidasindicadores.pesquisar",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "definirmedidasindicadores.pesquisar",
+            "title": "Pesquisar sobre Medidas e Indicadores",
+            "description": "Pesquisar sobre medidas e indicadores para atender a necessidade de informações",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.identificarobjetivo.identificarobjetivos.validar",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "25/11/2024",
+          "dueDate": "06/12/2024",
+          "completedDate": "06/12/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "identificarnecessidadeinformacao.validar",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "identificarnecessidadeinformacao.validar",
+            "title": "Validar necessidade de informação",
+            "description": "Validar as necessidade de informação",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.identificarobjetivo.identificarnecessidadeinformacao.entrevista",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "25/11/2024",
+          "dueDate": "06/12/2024",
+          "status": "TODO"
+        },
+        {
+          "id": "definirmedidasindicadores.validar",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "definirmedidasindicadores.validar",
+            "title": "Validar as medidas e indicadores ",
+            "description": "Validar medias e indicadores",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.identificarobjetivo.definirmedidasindicadores.pesquisar",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "25/11/2024",
+          "dueDate": "06/12/2024",
+          "status": "TODO"
+        }
+      ]
+    },
+    {
+      "id": "sprint2",
+      "name": "2 - Levantar Infraestrutura de BI no LEDS",
+      "description": "Levantar a infraestrutura de BI no LEDS, contendo o banco Stage Data, Apache Airflow e Power BI conectados.",
+      "startDate": "09/12/2024",
+      "endDate": "13/12/2024",
+      "status": "CLOSED",
+      "sprintItems": [
+        {
+          "id": "identificarnecessidadeinformacao.validar",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "identificarnecessidadeinformacao.validar",
+            "title": "Validar necessidade de informação",
+            "description": "Validar as necessidade de informação",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.identificarobjetivo.identificarnecessidadeinformacao.entrevista",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "09/12/2024",
+          "completedDate": "09/12/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "definirmedidasindicadores.validar",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "definirmedidasindicadores.validar",
+            "title": "Validar as medidas e indicadores ",
+            "description": "Validar medias e indicadores",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.identificarobjetivo.definirmedidasindicadores.pesquisar",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "09/12/2024",
+          "dueDate": "10/12/2024",
+          "status": "TODO"
+        },
+        {
+          "id": "levantardatastage.alinharcomdevops",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "levantardatastage.alinharcomdevops",
+            "title": "Alinhar com a equipe de DevOps",
+            "description": "Alinhar permissões e acessos do bnaco com a equipe de DevOps.",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "10/12/2024",
+          "dueDate": "10/12/2024",
+          "completedDate": "10/12/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "levantardatastage.verificarfuncionamentodatastage",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "levantardatastage.verificarfuncionamentodatastage",
+            "title": "Verificar funcionamento do Stage Data",
+            "description": "Testar a conectividade e validação do banco Stage Data",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.levantarinfraestruturaleds.levantardatastage.alinharcomdevops",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "09/12/2024",
+          "dueDate": "10/12/2024",
+          "completedDate": "10/12/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "configurarairflowetl.instalarconfigurarairflow",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "configurarairflowetl.instalarconfigurarairflow",
+            "title": "Instalar e configurar o Airflow",
+            "description": "Instalar o Airflow e configurar conexões com os bancos Conecta e Stage Data.",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "11/12/2024",
+          "dueDate": "11/12/2024",
+          "completedDate": "12/12/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "configurarairflowetl.criardagsetl",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "configurarairflowetl.criardagsetl",
+            "title": "Transformar arquivos Python em DAGs",
+            "description": "Transformar os arquivos Python em DAGs para execução no Airflow.",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.levantarinfraestruturaleds.configurarairflowetl.criararquivopythonetl",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "11/12/2024",
+          "dueDate": "12/12/2024",
+          "status": "TODO"
+        },
+        {
+          "id": "configurarairflowetl.testarpipelinesetl",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "configurarairflowetl.testarpipelinesetl",
+            "title": "Testar pipelines ETL",
+            "description": "transformar as DAGS pipelines criados.",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.levantarinfraestruturaleds.configurarairflowetl.criardagsetl",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "12/12/2024",
+          "dueDate": "12/12/2024",
+          "status": "TODO"
+        },
+        {
+          "id": "conectarbancoaopowerbi.importardadosnopowerbi",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "conectarbancoaopowerbi.importardadosnopowerbi",
+            "title": "Importar dados no Power BI",
+            "description": "Configurar a conexão do Power BI com o banco Stage Data e importar dados.",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "12/12/2024",
+          "dueDate": "12/12/2024",
+          "status": "TODO"
+        },
+        {
+          "id": "conectarbancoaopowerbi.criarmodelopowerbi",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "conectarbancoaopowerbi.criarmodelopowerbi",
+            "title": "Criar modelo de dados no Power BI",
+            "description": "Configurar relacionamentos e transformações no Power BI para estruturar os dados para visualização.",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.levantarinfraestruturaleds.conectarbancoaopowerbi.importardadosnopowerbi",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "12/12/2024",
+          "dueDate": "13/12/2024",
+          "status": "TODO"
+        },
+        {
+          "id": "conectarbancoaopowerbi.criarrelatoriospowerbi",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "conectarbancoaopowerbi.criarrelatoriospowerbi",
+            "title": "Validar relatórios e gráficos no Power BI",
+            "description": "Garantir que os relatórios e gráficos gerados no Power BI estão corretos e atendem aos requisitos do projeto.",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.levantarinfraestruturaleds.conectarbancoaopowerbi.criarmodelopowerbi",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "13/12/2024",
+          "dueDate": "13/12/2024",
+          "status": "TODO"
+        }
+      ]
+    },
+    {
+      "id": "sprint3",
+      "name": "3 - Levantar Infraestrutura de BI no LEDS",
+      "description": "Levantar a infraestrutura de BI no LEDS, contendo o banco Stage Data, Apache Airflow e Power BI conectados.",
+      "startDate": "16/12/2024",
+      "endDate": "20/12/2024",
+      "status": "CLOSED",
+      "sprintItems": [
+        {
+          "id": "definirmedidasindicadores.validar",
+          "assignee": {
+            "id": "felipecostabeber",
+            "name": "Felipe Costabeber",
+            "email": "felipe.costabeber.s@gmail.com"
+          },
+          "issue": {
+            "id": "definirmedidasindicadores.validar",
+            "title": "Validar as medidas e indicadores ",
+            "description": "Validar medias e indicadores",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.identificarobjetivo.definirmedidasindicadores.pesquisar",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "09/12/2024",
+          "dueDate": "10/12/2024",
+          "status": "TODO"
+        },
+        {
+          "id": "configurarairflowetl.criararquivopythonetl",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "configurarairflowetl.criararquivopythonetl",
+            "title": "Criar arquivos Python para ETL",
+            "description": "Criar arquivos Python para duplicar o formato da tabela do Banco do Conecta para o Banco do BI",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.levantarinfraestruturaleds.configurarairflowetl.criardagsetl",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "11/12/2024",
+          "dueDate": "12/12/2024",
+          "completedDate": "19/12/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "configurarairflowetl.criararquivopythonetl2",
+          "assignee": {
+            "id": "felipecostabeber",
+            "name": "Felipe Costabeber",
+            "email": "felipe.costabeber.s@gmail.com"
+          },
+          "issue": {
+            "id": "configurarairflowetl.criararquivopythonetl2",
+            "title": "Criar arquivos Python para ETL",
+            "description": "Criar arquivos Python para duplicar o formato da tabela do Banco do Conecta para o Banco do BI.",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.levantarinfraestruturaleds.configurarairflowetl.criardagsetl",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "11/12/2024",
+          "dueDate": "12/12/2024",
+          "completedDate": "19/12/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "configurarairflowetl.criardagsetl",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "configurarairflowetl.criardagsetl",
+            "title": "Transformar arquivos Python em DAGs",
+            "description": "Transformar os arquivos Python em DAGs para execução no Airflow.",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.levantarinfraestruturaleds.configurarairflowetl.criararquivopythonetl",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "11/12/2024",
+          "dueDate": "12/12/2024",
+          "completedDate": "19/12/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "configurarconexoes.testarconexoes",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "configurarconexoes.testarconexoes",
+            "title": "Testar conexões",
+            "description": "Testar as conexões com os bancos de dados no Apache Airflow",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.instalarairflow.configurarconexoes",
+                "type": "atomicuserstory"
+              }
+            ]
+          },
+          "startDate": "12/12/2024",
+          "dueDate": "12/12/2024",
+          "completedDate": "17/12/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "criardags.criardags",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "criardags.criardags",
+            "title": "Criar DAGs",
+            "description": "Criar DAGs de duplicar o formato da tabela do Banco do Conecta para o Banco do BI",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "12/12/2024",
+          "dueDate": "12/12/2024",
+          "status": "DOING"
+        },
+        {
+          "id": "subirrepositorio.testarrepositorio",
+          "assignee": {
+            "id": "felipecostabeber",
+            "name": "Felipe Costabeber",
+            "email": "felipe.costabeber.s@gmail.com"
+          },
+          "issue": {
+            "id": "subirrepositorio.testarrepositorio",
+            "title": "Testar repositório",
+            "description": "Outra pessoa o airflow que esta no GitHub",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.instalarairflow.criardags",
+                "type": "atomicuserstory"
+              }
+            ]
+          },
+          "startDate": "12/12/2024",
+          "dueDate": "12/12/2024",
+          "completedDate": "17/12/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "configurarairflowetl.testarpipelinesetl",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "configurarairflowetl.testarpipelinesetl",
+            "title": "Testar pipelines ETL",
+            "description": "transformar as DAGS pipelines criados.",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.levantarinfraestruturaleds.configurarairflowetl.criardagsetl",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "12/12/2024",
+          "dueDate": "12/12/2024",
+          "completedDate": "19/12/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "conectarbancoaopowerbi.importardadosnopowerbi",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "conectarbancoaopowerbi.importardadosnopowerbi",
+            "title": "Importar dados no Power BI",
+            "description": "Configurar a conexão do Power BI com o banco Stage Data e importar dados.",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "12/12/2024",
+          "dueDate": "12/12/2024",
+          "completedDate": "19/12/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "conectarbancoaopowerbi.criarmodelopowerbi",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "conectarbancoaopowerbi.criarmodelopowerbi",
+            "title": "Criar modelo de dados no Power BI",
+            "description": "Configurar relacionamentos e transformações no Power BI para estruturar os dados para visualização.",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.levantarinfraestruturaleds.conectarbancoaopowerbi.importardadosnopowerbi",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "12/12/2024",
+          "dueDate": "13/12/2024",
+          "completedDate": "19/12/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "conectarbancoaopowerbi.criarrelatoriospowerbi",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "conectarbancoaopowerbi.criarrelatoriospowerbi",
+            "title": "Validar relatórios e gráficos no Power BI",
+            "description": "Garantir que os relatórios e gráficos gerados no Power BI estão corretos e atendem aos requisitos do projeto.",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "bi.levantarinfraestruturaleds.conectarbancoaopowerbi.criarmodelopowerbi",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "13/12/2024",
+          "dueDate": "13/12/2024",
+          "completedDate": "19/12/2024",
+          "status": "DONE"
+        }
+      ]
+    },
+    {
+      "id": "sprint4",
+      "name": "4 - Ajustes Primeira Semana 2025",
+      "description": "",
+      "startDate": "06/01/2025",
+      "endDate": "10/01/2025",
+      "status": "CLOSED",
+      "sprintItems": [
+        {
+          "id": "ajudarbackend.ajudarbackendmade",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "ajudarbackend.ajudarbackendmade",
+            "title": "Ajudar o Backend no Made",
+            "description": "Ajudar o backend a entender o Made e como ele pode ser utilizado para gerenciar as tarefas",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "08/01/2025",
+          "dueDate": "08/01/2025",
+          "completedDate": "08/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "ajudarbackend.ajudarbackenddocker",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "ajudarbackend.ajudarbackenddocker",
+            "title": "Ajudar o Backend com problemas no docker",
+            "description": "",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "09/01/2025",
+          "dueDate": "09/01/2025",
+          "completedDate": "09/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "roadmapfrancisco.roadmapcominfraestrutura",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "roadmapfrancisco.roadmapcominfraestrutura",
+            "title": "Roadmap",
+            "description": "Roadmap no excalidraw com toda infraestrutura do projeto atual, Docker, GitHub, Airflow, PowerBI",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "06/01/2025",
+          "dueDate": "07/01/2025",
+          "completedDate": "07/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "roadmapfrancisco.roadmapcomentregas",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "roadmapfrancisco.roadmapcomentregas",
+            "title": "Entregas no Roadmap",
+            "description": "Roadmap no excalidraw com os objetivos cumpridos, planejados e aqueles que serão feitos, onde evoluímos e o que temos atualmente. Além de\r\n                colocar visualmente o power BI que temos e processo de ETL e todo o processo até a criação do primeiro dashboard",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "06/01/2025",
+          "dueDate": "07/01/2025",
+          "completedDate": "07/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "roadmapfrancisco.roadmapcominfraestrutura",
+          "assignee": {
+            "id": "felipecostabeber",
+            "name": "Felipe Costabeber",
+            "email": "felipe.costabeber.s@gmail.com"
+          },
+          "issue": {
+            "id": "roadmapfrancisco.roadmapcominfraestrutura",
+            "title": "Roadmap",
+            "description": "Roadmap no excalidraw com toda infraestrutura do projeto atual, Docker, GitHub, Airflow, PowerBI",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "06/01/2025",
+          "dueDate": "07/01/2025",
+          "completedDate": "07/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "roadmapfrancisco.roadmapcomentregas",
+          "assignee": {
+            "id": "felipecostabeber",
+            "name": "Felipe Costabeber",
+            "email": "felipe.costabeber.s@gmail.com"
+          },
+          "issue": {
+            "id": "roadmapfrancisco.roadmapcomentregas",
+            "title": "Entregas no Roadmap",
+            "description": "Roadmap no excalidraw com os objetivos cumpridos, planejados e aqueles que serão feitos, onde evoluímos e o que temos atualmente. Além de\r\n                colocar visualmente o power BI que temos e processo de ETL e todo o processo até a criação do primeiro dashboard",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "06/01/2025",
+          "dueDate": "07/01/2025",
+          "completedDate": "07/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "posreuniao.anotardemandas",
+          "assignee": {
+            "id": "felipecostabeber",
+            "name": "Felipe Costabeber",
+            "email": "felipe.costabeber.s@gmail.com"
+          },
+          "issue": {
+            "id": "posreuniao.anotardemandas",
+            "title": "Anotar demandas",
+            "description": "Anotar as demandas que temos para as proximas semanas, utilizando com base a reunião",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "06/01/2025",
+          "dueDate": "06/01/2025",
+          "completedDate": "09/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "posreuniao.anotardemandas",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "posreuniao.anotardemandas",
+            "title": "Anotar demandas",
+            "description": "Anotar as demandas que temos para as proximas semanas, utilizando com base a reunião",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "06/01/2025",
+          "dueDate": "06/01/2025",
+          "completedDate": "09/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "posreuniao.fazerplanejamento",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "posreuniao.fazerplanejamento",
+            "title": "Fazer planejamento",
+            "description": "Reunião com Felipe para planejar dos dias 09 ao 24 de janeiro de 2025 as entregas",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "backlogsprint4.epico.posreuniao.anotardemandas",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "09/01/2025",
+          "dueDate": "09/01/2025",
+          "completedDate": "10/01/2024",
+          "status": "DONE"
+        },
+        {
+          "id": "posreuniao.atualizarmade",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "posreuniao.atualizarmade",
+            "title": "Atualizar Made",
+            "description": "Atualizar o Made com as entregas planejadas",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "backlogsprint4.epico.posreuniao.fazerplanejamento",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "06/01/2025",
+          "dueDate": "09/01/2025",
+          "completedDate": "10/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "adicionargraficosnodashboardbolsa.inspiracaodegraficos",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "adicionargraficosnodashboardbolsa.inspiracaodegraficos",
+            "title": "Inspirar gráficos",
+            "description": "Procurar inspirações, olhar os dados, analisar cases de gráficos para adicionar no Dashboard de Bolsa",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "08/01/2025",
+          "dueDate": "08/01/2025",
+          "completedDate": "08/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "adicionargraficosnodashboardbolsa.prototipardashboard",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "adicionargraficosnodashboardbolsa.prototipardashboard",
+            "title": "Prototipar novo Dashboard de Bolsa",
+            "description": "",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "backlogsprint4.epico.adicionargraficosnodashboardbolsa.inspiracaodegraficos",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "06/01/2025",
+          "dueDate": "10/01/2025",
+          "completedDate": "10/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "adicionargraficosnodashboardbolsa.inspiracaodegraficos",
+          "assignee": {
+            "id": "felipecostabeber",
+            "name": "Felipe Costabeber",
+            "email": "felipe.costabeber.s@gmail.com"
+          },
+          "issue": {
+            "id": "adicionargraficosnodashboardbolsa.inspiracaodegraficos",
+            "title": "Inspirar gráficos",
+            "description": "Procurar inspirações, olhar os dados, analisar cases de gráficos para adicionar no Dashboard de Bolsa",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "08/01/2025",
+          "dueDate": "08/01/2025",
+          "completedDate": "08/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "adicionargraficosnodashboardbolsa.prototipardashboard",
+          "assignee": {
+            "id": "felipecostabeber",
+            "name": "Felipe Costabeber",
+            "email": "felipe.costabeber.s@gmail.com"
+          },
+          "issue": {
+            "id": "adicionargraficosnodashboardbolsa.prototipardashboard",
+            "title": "Prototipar novo Dashboard de Bolsa",
+            "description": "",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "backlogsprint4.epico.adicionargraficosnodashboardbolsa.inspiracaodegraficos",
+                "type": "taskbacklog"
+              }
+            ]
+          },
+          "startDate": "09/01/2025",
+          "dueDate": "10/01/2025",
+          "completedDate": "10/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "melhorardesigndashboard.inspiracao",
+          "assignee": {
+            "id": "felipecostabeber",
+            "name": "Felipe Costabeber",
+            "email": "felipe.costabeber.s@gmail.com"
+          },
+          "issue": {
+            "id": "melhorardesigndashboard.inspiracao",
+            "title": "inspirar Design Dashboard de Bolsa",
+            "description": "Procurar inspirações de design de dashboard para melhorar o design do dashboard de Bolsa atual",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "06/01/2025",
+          "dueDate": "10/01/2025",
+          "completedDate": "10/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "melhorardesigndashboard.implementardesign",
+          "assignee": {
+            "id": "felipecostabeber",
+            "name": "Felipe Costabeber",
+            "email": "felipe.costabeber.s@gmail.com"
+          },
+          "issue": {
+            "id": "melhorardesigndashboard.implementardesign",
+            "title": "Implementar Design Dashboard de Bolsa",
+            "description": "Implementar o design do dashboard de Bolsa atual",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "06/01/2025",
+          "dueDate": "06/01/2025",
+          "completedDate": "10/01/2025",
+          "status": "DONE"
+        }
+      ]
+    },
+    {
+      "id": "sprint5",
+      "name": "5 - Entrega Dashoard de Bolsa",
+      "description": "finalizar o prototipo, e fazer o deploy do dashboard de bolsa na PRODEST",
+      "startDate": "13/01/2025",
+      "endDate": "17/01/2025",
+      "status": "IN_PROGRESS",
+      "sprintItems": [
+        {
+          "id": "liveconnection.estudarliveconnection",
+          "assignee": {
+            "id": "felipecostabeber",
+            "name": "Felipe Costabeber",
+            "email": "felipe.costabeber.s@gmail.com"
+          },
+          "issue": {
+            "id": "liveconnection.estudarliveconnection",
+            "title": "Estudar Live Connection",
+            "description": "Estudar como implantar Live Connection no Power BI",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "13/01/2025",
+          "dueDate": "13/01/2025",
+          "status": "DOING"
+        },
+        {
+          "id": "liveconnection.implantarliveconnection",
+          "assignee": {
+            "id": "felipecostabeber",
+            "name": "Felipe Costabeber",
+            "email": "felipe.costabeber.s@gmail.com"
+          },
+          "issue": {
+            "id": "liveconnection.implantarliveconnection",
+            "title": "Implantar Live Connection",
+            "description": "Implantar Live Connection no Power BI",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "13/01/2025",
+          "dueDate": "13/01/2025",
+          "status": "TODO"
+        },
+        {
+          "id": "deployprototipobolsaprodest.deployprototipobolsaprodest.deployprototipobolsaprodest",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "deployprototipobolsaprodest.deployprototipobolsaprodest.deployprototipobolsaprodest",
+            "title": "Deploy do protótipo de Bolsa na Prodest",
+            "description": "Deploy do protótipo de Bolsa na Prodest, sem live coonection",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "10/01/2025",
+          "dueDate": "10/01/2025",
+          "status": "TODO"
+        },
+        {
+          "id": "deployprototipobolsaprodest.deployprototipobolsaprodest.deployprototipobolsaprodestrs",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "deployprototipobolsaprodest.deployprototipobolsaprodest.deployprototipobolsaprodestrs",
+            "title": "transferir Paineis para a versão do Power BI Desktop adaptado para RS, versão maio 2024",
+            "description": "Deploy do protótipo de Bolsa na Prodest, sem live coonection",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "10/01/2025",
+          "dueDate": "10/01/2025",
+          "status": "TODO"
+        },
+        {
+          "id": "deployprototipobolsaprodest.deployprototipobolsaprodest.deployprototipobolsaprodestrs2",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "deployprototipobolsaprodest.deployprototipobolsaprodest.deployprototipobolsaprodestrs2",
+            "title": "transferir Paineis para a versão do Power BI Desktop adaptado para RS, versão maio 2023",
+            "description": "Deploy do protótipo de Bolsa na Prodest, sem live coonection",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "10/01/2025",
+          "dueDate": "10/01/2025",
+          "status": "TODO"
+        },
+        {
+          "id": "deployprototipobolsaprodest.deployprototipobolsaprodestrs",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "deployprototipobolsaprodest.deployprototipobolsaprodestrs",
+            "title": "transferir Paineis para a versão do Power BI Desktop adaptado para RS, versão maio 2024",
+            "description": "Deploy do protótipo de Bolsa na Prodest, sem live coonection",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "13/01/2025",
+          "dueDate": "13/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "deployprototipobolsaprodest.deployprototipobolsaprodestrs2",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "deployprototipobolsaprodest.deployprototipobolsaprodestrs2",
+            "title": "transferir Paineis para a versão do Power BI Desktop adaptado para RS, versão maio 2023",
+            "description": "Deploy do protótipo de Bolsa na Prodest, sem live coonection",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "14/01/2025",
+          "dueDate": "14/01/2025",
+          "status": "DOING"
+        },
+        {
+          "id": "aprimorarprototipopainelbolsa.aprimorarprototipopainelbolsamoises",
+          "assignee": {
+            "id": "felipecostabeber",
+            "name": "Felipe Costabeber",
+            "email": "felipe.costabeber.s@gmail.com"
+          },
+          "issue": {
+            "id": "aprimorarprototipopainelbolsa.aprimorarprototipopainelbolsamoises",
+            "title": "Aprimorar Protótipo do Painel de Bolsa",
+            "description": "Aprimorar o protótipo do Painel de Bolsa com feedback do Moises",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "13/01/2025",
+          "dueDate": "13/01/2025",
+          "completedDate": "13/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "aprimorarprototipopainelbolsa.aprimorarprototipopainelbolsamoises",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "aprimorarprototipopainelbolsa.aprimorarprototipopainelbolsamoises",
+            "title": "Aprimorar Protótipo do Painel de Bolsa",
+            "description": "Aprimorar o protótipo do Painel de Bolsa com feedback do Moises",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "13/01/2025",
+          "dueDate": "13/01/2025",
+          "completedDate": "13/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "aprimorarprototipopainelbolsa.criarnovapagina",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "aprimorarprototipopainelbolsa.criarnovapagina",
+            "title": "Criar nova página de Bolsa",
+            "description": "nova página com dagboard de distribuição de bolsa por mes, Bolsistas por municipio e um mapa",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "13/01/2025",
+          "dueDate": "13/01/2025",
+          "completedDate": "14/01/2025",
+          "status": "DONE"
+        },
+        {
+          "id": "aprimorarprototipopainelbolsa.aprimorarprototipopainelbolsavitor",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "aprimorarprototipopainelbolsa.aprimorarprototipopainelbolsavitor",
+            "title": "Aprimorar Protótipo do Painel de Bolsa",
+            "description": "Aprimorar o protótipo do Painel de Bolsa com feedback do Vitor",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "14/01/2025",
+          "dueDate": "14/01/2025",
+          "status": "TODO"
+        },
+        {
+          "id": "criacaodedagsbolsa.criardagsdebolsa",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "criacaodedagsbolsa.criardagsdebolsa",
+            "title": "Criar DAGs com tratamento de dados para Bolsa",
+            "description": "Criar DAGs com tratamento de dados no Apache Airflow para o painel de Bolsas",
+            "type": "taskbacklog",
+            "depends": []
+          },
+          "startDate": "13/01/2025",
+          "dueDate": "13/01/2025",
+          "status": "TODO"
+        },
+        {
+          "id": "tratamentodedadosbolsapowerquery.tratardadosbolsa",
+          "assignee": {
+            "id": "mateuslannes",
+            "name": "Mateus Lannes ",
+            "email": "mateuslannes@gmail.com"
+          },
+          "issue": {
+            "id": "tratamentodedadosbolsapowerquery.tratardadosbolsa",
+            "title": "Tratar dados de Bolsa",
+            "description": "Tratar os dados de Bolsa no Power BI com Power Query",
+            "type": "taskbacklog",
+            "depends": [
+              {
+                "id": "backlogsprint5.desenvolverdashboardbolsa.criacaodedagsbolsa",
+                "type": "atomicuserstory"
+              }
+            ]
+          },
+          "startDate": "13/01/2025",
+          "dueDate": "13/01/2025",
+          "status": "TODO"
+        }
+      ]
+    }
+  ]
+}
