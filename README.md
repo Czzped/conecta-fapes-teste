@@ -1,10 +1,12 @@
 
 # 📋 Repositorio do Conecta Fapes
 
-Este repositório é organizado em duas pastas principais:
+Este repositório é organizado nas seguintes pastas:
 
 1. **`documentation/`** – Contém a **documentação do projeto**, incluindo orientações de uso dos templates e boas práticas de contribuição.
 2. **`management/`** – Armazena **dados de performance da equipe**, utilizados para análises e relatórios internos.
+3. **`.github/`** – Contém os templates de tarefas.
+4. **`tools/`** – Tem algumas ferramentas que foram desenvovidas para melhorar o dia-a-dia da equipe.
 
 ## GESTAO DE TAREFAS
 
