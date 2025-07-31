@@ -3,8 +3,8 @@
 
 Este repositório é organizado em duas pastas principais:
 
-1. **`docs/`** – Contém a **documentação do projeto**, incluindo orientações de uso dos templates e boas práticas de contribuição.
-2. **`data/`** – Armazena **dados de performance da equipe**, utilizados para análises e relatórios internos.
+1. **`documentation/`** – Contém a **documentação do projeto**, incluindo orientações de uso dos templates e boas práticas de contribuição.
+2. **`management/`** – Armazena **dados de performance da equipe**, utilizados para análises e relatórios internos.
 
 ## GESTAO DE TAREFAS
 
