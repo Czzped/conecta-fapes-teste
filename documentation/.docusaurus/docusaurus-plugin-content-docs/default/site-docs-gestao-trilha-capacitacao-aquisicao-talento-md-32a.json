@@ -1,0 +1,28 @@
+{
+  "id": "gestao/trilha_capacitacao/aquisicao_talento",
+  "title": "Descoberta de Talentos",
+  "description": "Atualmente, não temos um banco de talentos para os projetos de desenvolvimento e pesquisa. Essa lacuna impacta diretamente a capacidade de realizar projetos estratégicos com a qualidade e velocidade desejadas.",
+  "source": "@site/docs/gestao/trilha_capacitacao/aquisicao_talento.md",
+  "sourceDirName": "gestao/trilha_capacitacao",
+  "slug": "/gestao/trilha_capacitacao/aquisicao_talento",
+  "permalink": "/gestao/trilha_capacitacao/aquisicao_talento",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 3,
+  "frontMatter": {
+    "title": "Descoberta de Talentos",
+    "sidebar_position": 3
+  },
+  "sidebar": "gestao",
+  "previous": {
+    "title": "Backlog",
+    "permalink": "/gestao/trilha_capacitacao/visaogeral"
+  },
+  "next": {
+    "title": "Trilha de Desenvolvimento",
+    "permalink": "/category/trilha-de-desenvolvimento"
+  }
+}

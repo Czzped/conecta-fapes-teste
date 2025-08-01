@@ -1,0 +1,27 @@
+{
+  "id": "desenvolvimento/modulos/importacao_editais/arquitetura",
+  "title": "Arquitetura",
+  "description": "",
+  "source": "@site/docs/desenvolvimento/modulos/02_importacao_editais/07_arquitetura.md",
+  "sourceDirName": "desenvolvimento/modulos/02_importacao_editais",
+  "slug": "/desenvolvimento/modulos/importacao_editais/arquitetura",
+  "permalink": "/desenvolvimento/modulos/importacao_editais/arquitetura",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 7,
+  "frontMatter": {
+    "sidebar_position": 7
+  },
+  "sidebar": "desenvolvimento",
+  "previous": {
+    "title": "Modelos Comportamentais",
+    "permalink": "/desenvolvimento/modulos/importacao_editais/modelo-comportamental"
+  },
+  "next": {
+    "title": "Pagamento de bolsistas",
+    "permalink": "/category/pagamento-de-bolsistas"
+  }
+}

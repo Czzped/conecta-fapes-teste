@@ -1,0 +1,28 @@
+{
+  "id": "sdd_conecta_admin/plano_de_testes",
+  "title": "Qualidade e Testes",
+  "description": "",
+  "source": "@site/docs/sdd_conecta_admin/8_plano_de_testes.md",
+  "sourceDirName": "sdd_conecta_admin",
+  "slug": "/sdd_conecta_admin/plano_de_testes",
+  "permalink": "/sdd_conecta_admin/plano_de_testes",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 8,
+  "frontMatter": {
+    "title": "Qualidade e Testes",
+    "sidebar_position": 8
+  },
+  "sidebar": "sdd_conecta_admin",
+  "previous": {
+    "title": "Diretrizes de Design",
+    "permalink": "/sdd_conecta_admin/diretrizes_design"
+  },
+  "next": {
+    "title": "Política de Segurança",
+    "permalink": "/sdd_conecta_admin/seguranca"
+  }
+}

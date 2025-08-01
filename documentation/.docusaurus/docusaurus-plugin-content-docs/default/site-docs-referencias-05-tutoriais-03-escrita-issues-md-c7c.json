@@ -1,0 +1,28 @@
+{
+  "id": "referencias/tutoriais/escrita_issues",
+  "title": "JIRA - Padrões de Escrita de Issues",
+  "description": "*Objetivo do Documento: Detalhar como a escrita de Epics, User Stories e Subtasks no Jira devem se feita, tomando como base a documentação de Análise. Como exemplo, usaremos os Casos de Uso \"Cadastrar Resolução\", \"Cadastrar Modalidade\" e \"Cadastrar Nível\".*",
+  "source": "@site/docs/referencias/05_tutoriais/03_escrita_issues.md",
+  "sourceDirName": "referencias/05_tutoriais",
+  "slug": "/referencias/tutoriais/escrita_issues",
+  "permalink": "/referencias/tutoriais/escrita_issues",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 3,
+  "frontMatter": {
+    "sidebar_position": 3,
+    "title": "JIRA - Padrões de Escrita de Issues"
+  },
+  "sidebar": "referencias",
+  "previous": {
+    "title": "Prompt do DIBB com 6 Memo",
+    "permalink": "/referencias/tutoriais/prompt"
+  },
+  "next": {
+    "title": "LeSS (Large-Scale Scrum)",
+    "permalink": "/referencias/tutoriais/less"
+  }
+}

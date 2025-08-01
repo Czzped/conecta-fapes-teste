@@ -1,0 +1,18 @@
+{
+  "id": "processonegocio/as_is/gestao_edital/conceber_edital",
+  "title": "Conceber Edital",
+  "description": "Processo que envolve todas as tarefas desde a concepção do edital, escrita do edital e publicação do mesmo.",
+  "source": "@site/docs/processonegocio/as_is/gestao_edital/conceber_edital.md",
+  "sourceDirName": "processonegocio/as_is/gestao_edital",
+  "slug": "/processonegocio/as_is/gestao_edital/conceber_edital",
+  "permalink": "/processonegocio/as_is/gestao_edital/conceber_edital",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_position": 2
+  }
+}

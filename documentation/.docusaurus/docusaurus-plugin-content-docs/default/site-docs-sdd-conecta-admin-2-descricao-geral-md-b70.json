@@ -1,0 +1,28 @@
+{
+  "id": "sdd_conecta_admin/descricao_geral",
+  "title": "Descrição Geral",
+  "description": "2.1 Perspectiva do Produto",
+  "source": "@site/docs/sdd_conecta_admin/2_descricao_geral.md",
+  "sourceDirName": "sdd_conecta_admin",
+  "slug": "/sdd_conecta_admin/descricao_geral",
+  "permalink": "/sdd_conecta_admin/descricao_geral",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "title": "Descrição Geral",
+    "sidebar_position": 2
+  },
+  "sidebar": "sdd_conecta_admin",
+  "previous": {
+    "title": "Introdução",
+    "permalink": "/sdd_conecta_admin/introducao"
+  },
+  "next": {
+    "title": "Requisitos Funcionais",
+    "permalink": "/sdd_conecta_admin/requisitos_funcionais"
+  }
+}

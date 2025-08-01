@@ -1,0 +1,28 @@
+{
+  "id": "referencias/tutoriais/less",
+  "title": "LeSS (Large-Scale Scrum)",
+  "description": "LeSS (Large-Scale Scrum) é uma estrutura de escala para equipes que utilizam Scrum em organizações de grande porte. O principal objetivo do LeSS é simplificar a adoção de Scrum em múltiplas equipes, mantendo o foco em entregar valor ao cliente e promover a agilidade organizacional.",
+  "source": "@site/docs/referencias/05_tutoriais/03_less.md",
+  "sourceDirName": "referencias/05_tutoriais",
+  "slug": "/referencias/tutoriais/less",
+  "permalink": "/referencias/tutoriais/less",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 3,
+  "frontMatter": {
+    "sidebar_position": 3,
+    "title": "LeSS (Large-Scale Scrum)"
+  },
+  "sidebar": "referencias",
+  "previous": {
+    "title": "JIRA - Padrões de Escrita de Issues",
+    "permalink": "/referencias/tutoriais/escrita_issues"
+  },
+  "next": {
+    "title": "Integração Acesso Cidadão",
+    "permalink": "/referencias/tutoriais/integracao-acesso-cidadao"
+  }
+}

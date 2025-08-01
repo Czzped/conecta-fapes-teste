@@ -1,0 +1,27 @@
+{
+  "id": "desenvolvimento/modulos/importacao_editais/processos/integracao_edital_projeto",
+  "title": "Sincronizar Projetos dos Editais",
+  "description": "Processo responsável por sincronizar os projetos e suas alocações dos Editais Selecionados",
+  "source": "@site/docs/desenvolvimento/modulos/02_importacao_editais/processos/integracao_edital_projeto.mdx",
+  "sourceDirName": "desenvolvimento/modulos/02_importacao_editais/processos",
+  "slug": "/desenvolvimento/modulos/importacao_editais/processos/integracao_edital_projeto",
+  "permalink": "/desenvolvimento/modulos/importacao_editais/processos/integracao_edital_projeto",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_position": 2
+  },
+  "sidebar": "desenvolvimento",
+  "previous": {
+    "title": "Sincronizar Editais",
+    "permalink": "/desenvolvimento/modulos/importacao_editais/processos/integracao_edital"
+  },
+  "next": {
+    "title": "Integrar Projetos",
+    "permalink": "/desenvolvimento/modulos/importacao_editais/processos/integracao_projeto"
+  }
+}

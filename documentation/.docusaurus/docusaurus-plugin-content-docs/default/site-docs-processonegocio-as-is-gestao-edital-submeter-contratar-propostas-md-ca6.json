@@ -1,0 +1,18 @@
+{
+  "id": "processonegocio/as_is/gestao_edital/submeter_contratar_propostas",
+  "title": "Submeter e Contratar Propostas",
+  "description": "Envolve todas as tarefas desde a submissão de propostas, com avaliação de documentações e méritos, classificação de propostas e, por fim, contratação de propostas dando origem a projetos.",
+  "source": "@site/docs/processonegocio/as_is/gestao_edital/submeter_contratar_propostas.md",
+  "sourceDirName": "processonegocio/as_is/gestao_edital",
+  "slug": "/processonegocio/as_is/gestao_edital/submeter_contratar_propostas",
+  "permalink": "/processonegocio/as_is/gestao_edital/submeter_contratar_propostas",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 3,
+  "frontMatter": {
+    "sidebar_position": 3
+  }
+}

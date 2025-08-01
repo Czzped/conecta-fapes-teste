@@ -1,0 +1,27 @@
+{
+  "id": "referencias/governo/sigfapes",
+  "title": "SigFapes",
+  "description": "Webservice para buscar dados do Sigfapes.",
+  "source": "@site/docs/referencias/03_governo/03_sigfapes.md",
+  "sourceDirName": "referencias/03_governo",
+  "slug": "/referencias/governo/sigfapes",
+  "permalink": "/referencias/governo/sigfapes",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 3,
+  "frontMatter": {
+    "sidebar_position": 3
+  },
+  "sidebar": "referencias",
+  "previous": {
+    "title": "Arquivos do Banestes",
+    "permalink": "/referencias/governo/banestes"
+  },
+  "next": {
+    "title": "API de Notificações",
+    "permalink": "/referencias/governo/api_notificacao"
+  }
+}

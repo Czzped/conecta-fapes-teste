@@ -1,0 +1,23 @@
+{
+  "id": "desenvolvimento/intro",
+  "title": "Visão Geral",
+  "description": "A seção está organizada como segue:",
+  "source": "@site/docs/desenvolvimento/intro.md",
+  "sourceDirName": "desenvolvimento",
+  "slug": "/desenvolvimento/intro",
+  "permalink": "/desenvolvimento/intro",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 0,
+  "frontMatter": {
+    "sidebar_position": 0
+  },
+  "sidebar": "desenvolvimento",
+  "next": {
+    "title": "Visão Geral do Conecta",
+    "permalink": "/category/visão-geral-do-conecta"
+  }
+}

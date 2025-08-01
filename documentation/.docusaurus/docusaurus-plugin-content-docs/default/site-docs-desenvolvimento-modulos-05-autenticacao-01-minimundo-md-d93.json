@@ -1,0 +1,27 @@
+{
+  "id": "desenvolvimento/modulos/autenticacao/minimundo",
+  "title": "Propósito",
+  "description": "O projeto tem como objetivo definir e controlar o acesso a objetos (e.g., papéis, rotas, documentos e dados) baseado em uma política de segurança.",
+  "source": "@site/docs/desenvolvimento/modulos/05_autenticacao/01_minimundo.md",
+  "sourceDirName": "desenvolvimento/modulos/05_autenticacao",
+  "slug": "/desenvolvimento/modulos/autenticacao/minimundo",
+  "permalink": "/desenvolvimento/modulos/autenticacao/minimundo",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "desenvolvimento",
+  "previous": {
+    "title": "Autenticacação e Autorização",
+    "permalink": "/category/autenticacação-e-autorização"
+  },
+  "next": {
+    "title": "Requisitos",
+    "permalink": "/desenvolvimento/modulos/autenticacao/requirements"
+  }
+}

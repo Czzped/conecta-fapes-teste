@@ -1,0 +1,28 @@
+{
+  "id": "gestao/trilha_desenvolvimento/negocio/entrega_pagamento_bolsista",
+  "title": "Pagar bolsistas de projetos",
+  "description": "Redução de Erros e Tempo no Processo de Pagamento de Bolsistas.",
+  "source": "@site/docs/gestao/trilha_desenvolvimento/negocio/02_entrega_pagamento_bolsista.md",
+  "sourceDirName": "gestao/trilha_desenvolvimento/negocio",
+  "slug": "/gestao/trilha_desenvolvimento/negocio/entrega_pagamento_bolsista",
+  "permalink": "/gestao/trilha_desenvolvimento/negocio/entrega_pagamento_bolsista",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 4,
+  "frontMatter": {
+    "title": "Pagar bolsistas de projetos",
+    "sidebar_position": 4
+  },
+  "sidebar": "gestao",
+  "previous": {
+    "title": "📊 Relatório Analítico",
+    "permalink": "/gestao/trilha_desenvolvimento/negocio/relatorio_analitico_leds-conectafapes"
+  },
+  "next": {
+    "title": "Gerir bolsas do projeto por parte do Coordenador e Fapes",
+    "permalink": "/gestao/trilha_desenvolvimento/negocio/implementacao_bolsa"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "gestao/trilha_desenvolvimento/negocio/relatorio_analitico_leds-conectafapes",
+  "title": "📊 Relatório Analítico",
+  "description": "- 📅 Data de geração02:24",
+  "source": "@site/docs/gestao/trilha_desenvolvimento/negocio/relatorio_analitico_leds-conectafapes.md",
+  "sourceDirName": "gestao/trilha_desenvolvimento/negocio",
+  "slug": "/gestao/trilha_desenvolvimento/negocio/relatorio_analitico_leds-conectafapes",
+  "permalink": "/gestao/trilha_desenvolvimento/negocio/relatorio_analitico_leds-conectafapes",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 3,
+  "frontMatter": {
+    "title": "📊 Relatório Analítico",
+    "sidebar_position": 3
+  },
+  "sidebar": "gestao",
+  "previous": {
+    "title": "Backlog",
+    "permalink": "/gestao/trilha_desenvolvimento/negocio/backlog_negocio"
+  },
+  "next": {
+    "title": "Pagar bolsistas de projetos",
+    "permalink": "/gestao/trilha_desenvolvimento/negocio/entrega_pagamento_bolsista"
+  }
+}

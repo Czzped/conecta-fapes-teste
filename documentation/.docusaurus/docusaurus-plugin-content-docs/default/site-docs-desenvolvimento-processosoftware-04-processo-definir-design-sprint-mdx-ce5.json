@@ -1,0 +1,28 @@
+{
+  "id": "desenvolvimento/processosoftware/processo_definir_design_sprint",
+  "title": "Desenvolvimento da SQUAD",
+  "description": "| Artefato/Marco      | Descrição       |",
+  "source": "@site/docs/desenvolvimento/processosoftware/04_processo_definir_design_sprint.mdx",
+  "sourceDirName": "desenvolvimento/processosoftware",
+  "slug": "/desenvolvimento/processosoftware/processo_definir_design_sprint",
+  "permalink": "/desenvolvimento/processosoftware/processo_definir_design_sprint",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 4,
+  "frontMatter": {
+    "title": "Desenvolvimento da SQUAD",
+    "sidebar_position": 4
+  },
+  "sidebar": "desenvolvimento",
+  "previous": {
+    "title": "Definir Produto a ser Desenvolvido",
+    "permalink": "/desenvolvimento/processosoftware/processo_definir_produto_desenvolvido"
+  },
+  "next": {
+    "title": "exemplo_documentacao_squad",
+    "permalink": "/desenvolvimento/processosoftware/exemplo_documentacao_squad"
+  }
+}

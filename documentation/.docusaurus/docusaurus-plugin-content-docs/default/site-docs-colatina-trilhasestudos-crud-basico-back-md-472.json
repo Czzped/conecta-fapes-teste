@@ -1,0 +1,28 @@
+{
+  "id": "colatina/trilhasestudos/crud_basico_back",
+  "title": "CRUD Básico back",
+  "description": "- Clean Architecture",
+  "source": "@site/docs/colatina/trilhasestudos/crud_basico_back.md",
+  "sourceDirName": "colatina/trilhasestudos",
+  "slug": "/colatina/trilhasestudos/crud_basico_back",
+  "permalink": "/colatina/trilhasestudos/crud_basico_back",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "title": "CRUD Básico back",
+    "sidebar_position": 1
+  },
+  "sidebar": "colatina",
+  "previous": {
+    "title": "Trilha de estudos",
+    "permalink": "/category/trilha-de-estudos"
+  },
+  "next": {
+    "title": "CRUD Básico front",
+    "permalink": "/colatina/trilhasestudos/crud_basico_front"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "gestao/trilha_capacitacao/visaogeral",
+  "title": "Backlog",
+  "description": "Tem como objetivo identificar competencias e criar capacitações para que a trilha de desenvolvimento e pesquisa seja concluído com sucesso.",
+  "source": "@site/docs/gestao/trilha_capacitacao/visaogeral.md",
+  "sourceDirName": "gestao/trilha_capacitacao",
+  "slug": "/gestao/trilha_capacitacao/visaogeral",
+  "permalink": "/gestao/trilha_capacitacao/visaogeral",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "title": "Backlog",
+    "sidebar_position": 1
+  },
+  "sidebar": "gestao",
+  "previous": {
+    "title": "Trilha de Capacitação",
+    "permalink": "/category/trilha-de-capacitação"
+  },
+  "next": {
+    "title": "Descoberta de Talentos",
+    "permalink": "/gestao/trilha_capacitacao/aquisicao_talento"
+  }
+}

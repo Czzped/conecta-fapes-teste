@@ -1,0 +1,24 @@
+{
+  "id": "referencias/tutoriais/token-jwt-interno",
+  "title": "Integração Acesso Cidadão com Token JWT",
+  "description": "Um vez que o backend tem acesso às informações do usuário, precisamos de uma maneira segura de informar ao cliente (frontend) que o usuário poderá acessar os demais recursos do sistema. No Conecta Fapes foi implemmentado a autênticação baseada em token, assim o backend envia esse token ao frontend que a cada requisição do usuário no Conecta Fapes retorna esse token ao backend que então será responsável por verificar se o token é válido e suas devidas permissões e por fim retornar ou negar o acesso ao recurso solicitado.",
+  "source": "@site/docs/referencias/05_tutoriais/06_token-jwt-interno.md",
+  "sourceDirName": "referencias/05_tutoriais",
+  "slug": "/referencias/tutoriais/token-jwt-interno",
+  "permalink": "/referencias/tutoriais/token-jwt-interno",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 6,
+  "frontMatter": {
+    "sidebar_position": 6,
+    "title": "Integração Acesso Cidadão com Token JWT"
+  },
+  "sidebar": "referencias",
+  "previous": {
+    "title": "Integração Acesso Cidadão",
+    "permalink": "/referencias/tutoriais/integracao-acesso-cidadao"
+  }
+}

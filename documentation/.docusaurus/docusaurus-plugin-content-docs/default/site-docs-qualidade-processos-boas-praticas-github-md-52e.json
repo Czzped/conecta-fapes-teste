@@ -1,0 +1,28 @@
+{
+  "id": "qualidade/processos/boas-praticas-github",
+  "title": "Boas Práticas de Git",
+  "description": "Este documento descreve boas práticas a serem seguidas por todos os colaboradores da organização leds-conectafapes para garantir um fluxo de trabalho eficiente e organizado no GitHub. Vamos abordar os principais eventos:",
+  "source": "@site/docs/qualidade/processos/boas-praticas-github.md",
+  "sourceDirName": "qualidade/processos",
+  "slug": "/qualidade/processos/boas-praticas-github",
+  "permalink": "/qualidade/processos/boas-praticas-github",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "title": "Boas Práticas de Git",
+    "sidebar_position": 1
+  },
+  "sidebar": "qa",
+  "previous": {
+    "title": "Processos de Garantia da Qualidade",
+    "permalink": "/category/processos-de-garantia-da-qualidade"
+  },
+  "next": {
+    "title": "Material Cypress",
+    "permalink": "/category/material-cypress"
+  }
+}

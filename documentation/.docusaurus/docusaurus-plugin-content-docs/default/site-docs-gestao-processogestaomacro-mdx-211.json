@@ -1,0 +1,24 @@
+{
+  "id": "gestao/processogestaomacro",
+  "title": "Processo de Gestão Macro",
+  "description": "Reunião de Sprint Planning Macro",
+  "source": "@site/docs/gestao/processogestaomacro.mdx",
+  "sourceDirName": "gestao",
+  "slug": "/gestao/processogestaomacro",
+  "permalink": "/gestao/processogestaomacro",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "title": "Processo de Gestão Macro",
+    "sidebar_position": 1
+  },
+  "sidebar": "gestao",
+  "next": {
+    "title": "Gestão Orientada a Dados",
+    "permalink": "/category/gestão-orientada-a-dados"
+  }
+}

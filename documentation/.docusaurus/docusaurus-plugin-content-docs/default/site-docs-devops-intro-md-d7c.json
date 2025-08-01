@@ -1,0 +1,24 @@
+{
+  "id": "devops/intro",
+  "title": "Visão Geral",
+  "description": "",
+  "source": "@site/docs/devops/intro.md",
+  "sourceDirName": "devops",
+  "slug": "/devops/intro",
+  "permalink": "/devops/intro",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "title": "Visão Geral",
+    "sidebar_position": 1
+  },
+  "sidebar": "devops",
+  "next": {
+    "title": "Ambientes",
+    "permalink": "/devops/ambientes"
+  }
+}

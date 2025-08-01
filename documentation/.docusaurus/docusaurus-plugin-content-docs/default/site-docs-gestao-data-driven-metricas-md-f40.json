@@ -1,0 +1,28 @@
+{
+  "id": "gestao/data_driven/metricas",
+  "title": "📊 Métricas",
+  "description": "A utilização de métricas permite acompanhar a saúde do processo, melhorar a previsibilidade e fomentar a melhoria contínua. Abaixo estão as principais métricas aplicáveis na gestão de projetos usando dados de issues do GitHub.",
+  "source": "@site/docs/gestao/data_driven/metricas.md",
+  "sourceDirName": "gestao/data_driven",
+  "slug": "/gestao/data_driven/metricas",
+  "permalink": "/gestao/data_driven/metricas",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "title": "📊 Métricas",
+    "sidebar_position": 2
+  },
+  "sidebar": "gestao",
+  "previous": {
+    "title": "🎯 Gestão Orientada a Dados",
+    "permalink": "/gestao/data_driven/visao_geral"
+  },
+  "next": {
+    "title": "🎓 Gestão de Tarefas",
+    "permalink": "/gestao/data_driven/tratamento-de-issues"
+  }
+}

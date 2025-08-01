@@ -1,0 +1,27 @@
+{
+  "id": "desenvolvimento/modulos/api_gateway/processos",
+  "title": "Processos do API Gateway",
+  "description": "Visão Geral",
+  "source": "@site/docs/desenvolvimento/modulos/07_api_gateway/02_processos.md",
+  "sourceDirName": "desenvolvimento/modulos/07_api_gateway",
+  "slug": "/desenvolvimento/modulos/api_gateway/processos",
+  "permalink": "/desenvolvimento/modulos/api_gateway/processos",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_position": 2
+  },
+  "sidebar": "desenvolvimento",
+  "previous": {
+    "title": "Propósito",
+    "permalink": "/desenvolvimento/modulos/api_gateway/minimundo"
+  },
+  "next": {
+    "title": "Requisitos",
+    "permalink": "/desenvolvimento/modulos/api_gateway/requirements"
+  }
+}

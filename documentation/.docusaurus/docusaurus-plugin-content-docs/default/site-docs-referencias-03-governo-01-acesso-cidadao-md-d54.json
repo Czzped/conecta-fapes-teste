@@ -1,0 +1,27 @@
+{
+  "id": "referencias/governo/acesso_cidadao",
+  "title": "Acesso Cidadão",
+  "description": "A proposta inicial do Acesso Cidadão (AC) foi criar um sistema que centralizasse as informações do cidadão e do servidor público em uma base de dados única, facilitando assim a validação da consistência dos dados e provendo autenticação e autorização de uma forma simples e segura",
+  "source": "@site/docs/referencias/03_governo/01_acesso_cidadao.md",
+  "sourceDirName": "referencias/03_governo",
+  "slug": "/referencias/governo/acesso_cidadao",
+  "permalink": "/referencias/governo/acesso_cidadao",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "referencias",
+  "previous": {
+    "title": "Governo",
+    "permalink": "/category/governo"
+  },
+  "next": {
+    "title": "Arquivos do Banestes",
+    "permalink": "/referencias/governo/banestes"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "desenvolvimento/design/design_system",
+  "title": "Design System",
+  "description": "Um Design System é um conjunto de padrões, componentes e diretrizes que auxiliam na criação de interfaces de usuário de maneira consistente e eficiente.",
+  "source": "@site/docs/desenvolvimento/design/2_design_system.md",
+  "sourceDirName": "desenvolvimento/design",
+  "slug": "/desenvolvimento/design/design_system",
+  "permalink": "/desenvolvimento/design/design_system",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_position": 2
+  },
+  "sidebar": "desenvolvimento",
+  "previous": {
+    "title": "Visão Geral",
+    "permalink": "/desenvolvimento/design/intro"
+  },
+  "next": {
+    "title": "Diretrizes",
+    "permalink": "/category/diretrizes"
+  }
+}

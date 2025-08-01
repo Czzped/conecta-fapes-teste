@@ -1,0 +1,27 @@
+{
+  "id": "desenvolvimento/modulos/gerenciar_editais/minimundo",
+  "title": "Propósito do Módulo",
+  "description": "O módulo Gerenciar Editais visa permitir a visualização de dados referentes aos Editais e Projetos para melhor tomada de decisão das gerencias das Áreas Técnicas.",
+  "source": "@site/docs/desenvolvimento/modulos/06_gerenciar_editais/01_minimundo.md",
+  "sourceDirName": "desenvolvimento/modulos/06_gerenciar_editais",
+  "slug": "/desenvolvimento/modulos/gerenciar_editais/minimundo",
+  "permalink": "/desenvolvimento/modulos/gerenciar_editais/minimundo",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "desenvolvimento",
+  "previous": {
+    "title": "Gerenciar Editais",
+    "permalink": "/category/gerenciar-editais"
+  },
+  "next": {
+    "title": "Requisitos",
+    "permalink": "/desenvolvimento/modulos/gerenciar_editais/requisitos"
+  }
+}

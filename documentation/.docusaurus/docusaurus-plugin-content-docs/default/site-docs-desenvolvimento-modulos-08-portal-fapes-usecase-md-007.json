@@ -1,0 +1,27 @@
+{
+  "id": "desenvolvimento/modulos/portal_fapes/usecase",
+  "title": "Casos de Uso",
+  "description": "UC-0-LG: Acesso ao sistema",
+  "source": "@site/docs/desenvolvimento/modulos/08_portal_fapes/usecase.md",
+  "sourceDirName": "desenvolvimento/modulos/08_portal_fapes",
+  "slug": "/desenvolvimento/modulos/portal_fapes/usecase",
+  "permalink": "/desenvolvimento/modulos/portal_fapes/usecase",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 3,
+  "frontMatter": {
+    "sidebar_position": 3
+  },
+  "sidebar": "desenvolvimento",
+  "previous": {
+    "title": "Requisitos",
+    "permalink": "/desenvolvimento/modulos/portal_fapes/requirements"
+  },
+  "next": {
+    "title": "Modelo Estrutural",
+    "permalink": "/desenvolvimento/modulos/portal_fapes/modeloestrutural"
+  }
+}

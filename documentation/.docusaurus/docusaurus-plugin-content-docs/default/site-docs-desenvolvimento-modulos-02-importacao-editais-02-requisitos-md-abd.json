@@ -1,0 +1,27 @@
+{
+  "id": "desenvolvimento/modulos/importacao_editais/requisitos",
+  "title": "Requisitos",
+  "description": "Tomando por base o contexto do sistema, foram identificados os requisitos de usuário a seguir.",
+  "source": "@site/docs/desenvolvimento/modulos/02_importacao_editais/02_requisitos.md",
+  "sourceDirName": "desenvolvimento/modulos/02_importacao_editais",
+  "slug": "/desenvolvimento/modulos/importacao_editais/requisitos",
+  "permalink": "/desenvolvimento/modulos/importacao_editais/requisitos",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_position": 2
+  },
+  "sidebar": "desenvolvimento",
+  "previous": {
+    "title": "Propósito do Módulo",
+    "permalink": "/desenvolvimento/modulos/importacao_editais/minimundo"
+  },
+  "next": {
+    "title": "Casos de Uso",
+    "permalink": "/desenvolvimento/modulos/importacao_editais/casos-uso"
+  }
+}

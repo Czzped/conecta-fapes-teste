@@ -1,0 +1,24 @@
+{
+  "id": "sdd_conecta_admin/introducao",
+  "title": "Introdução",
+  "description": "1.1 Propósito deste documento",
+  "source": "@site/docs/sdd_conecta_admin/1_introducao.md",
+  "sourceDirName": "sdd_conecta_admin",
+  "slug": "/sdd_conecta_admin/introducao",
+  "permalink": "/sdd_conecta_admin/introducao",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "title": "Introdução",
+    "sidebar_position": 1
+  },
+  "sidebar": "sdd_conecta_admin",
+  "next": {
+    "title": "Descrição Geral",
+    "permalink": "/sdd_conecta_admin/descricao_geral"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "desenvolvimento/design/intro",
+  "title": "Visão Geral",
+  "description": "Aqui, você encontrará toda a documentação essencial produzida pela equipe de Design. As telas produzidas estão no Figma, que você pode acessar conferindo as credenciais de login na mensagem fixada do canal # 💬┃ geral do nosso servidor.",
+  "source": "@site/docs/desenvolvimento/design/1_intro.md",
+  "sourceDirName": "desenvolvimento/design",
+  "slug": "/desenvolvimento/design/intro",
+  "permalink": "/desenvolvimento/design/intro",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "lastUpdatedAt": 1539502055000,
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "desenvolvimento",
+  "previous": {
+    "title": "Design/UX",
+    "permalink": "/category/designux"
+  },
+  "next": {
+    "title": "Design System",
+    "permalink": "/desenvolvimento/design/design_system"
+  }
+}
