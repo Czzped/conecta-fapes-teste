@@ -5,7 +5,7 @@
   "source": "@site/docs/colatina/trilhasestudos/config_eslint.md",
   "sourceDirName": "colatina/trilhasestudos",
   "slug": "/colatina/trilhasestudos/config_eslint",
-  "permalink": "/conectafapes-project/colatina/trilhasestudos/config_eslint",
+  "permalink": "/colatina/trilhasestudos/config_eslint",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -19,6 +19,6 @@
   "sidebar": "colatina",
   "previous": {
     "title": "CRUD Básico front",
-    "permalink": "/conectafapes-project/colatina/trilhasestudos/crud_basico_front"
+    "permalink": "/colatina/trilhasestudos/crud_basico_front"
   }
 }

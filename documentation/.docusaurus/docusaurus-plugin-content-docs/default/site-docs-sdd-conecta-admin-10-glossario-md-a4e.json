@@ -5,7 +5,7 @@
   "source": "@site/docs/sdd_conecta_admin/10_glossario.md",
   "sourceDirName": "sdd_conecta_admin",
   "slug": "/sdd_conecta_admin/glossario",
-  "permalink": "/conectafapes-project/sdd_conecta_admin/glossario",
+  "permalink": "/sdd_conecta_admin/glossario",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -19,6 +19,6 @@
   "sidebar": "sdd_conecta_admin",
   "previous": {
     "title": "Política de Segurança",
-    "permalink": "/conectafapes-project/sdd_conecta_admin/seguranca"
+    "permalink": "/sdd_conecta_admin/seguranca"
   }
 }

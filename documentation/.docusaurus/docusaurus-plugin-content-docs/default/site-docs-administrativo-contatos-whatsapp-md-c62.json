@@ -5,7 +5,7 @@
   "source": "@site/docs/administrativo/contatos-whatsapp.md",
   "sourceDirName": "administrativo",
   "slug": "/administrativo/contatos-whatsapp",
-  "permalink": "/conectafapes-project/administrativo/contatos-whatsapp",
+  "permalink": "/administrativo/contatos-whatsapp",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -19,6 +19,6 @@
   "sidebar": "administrativo",
   "previous": {
     "title": "Bolsas do Projeto",
-    "permalink": "/conectafapes-project/administrativo/bolsas-do-projeto"
+    "permalink": "/administrativo/bolsas-do-projeto"
   }
 }

@@ -5,7 +5,7 @@
   "source": "@site/docs/qualidade/intro.md",
   "sourceDirName": "qualidade",
   "slug": "/qualidade/intro",
-  "permalink": "/conectafapes-project/qualidade/intro",
+  "permalink": "/qualidade/intro",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -19,6 +19,6 @@
   "sidebar": "qa",
   "next": {
     "title": "Processos de Garantia da Qualidade",
-    "permalink": "/conectafapes-project/category/processos-de-garantia-da-qualidade"
+    "permalink": "/category/processos-de-garantia-da-qualidade"
   }
 }

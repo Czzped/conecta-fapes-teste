@@ -5,7 +5,7 @@
   "source": "@site/docs/desenvolvimento/processosoftware/05_exemplo_documentacao_squad.md",
   "sourceDirName": "desenvolvimento/processosoftware",
   "slug": "/desenvolvimento/processosoftware/exemplo_documentacao_squad",
-  "permalink": "/conectafapes-project/desenvolvimento/processosoftware/exemplo_documentacao_squad",
+  "permalink": "/desenvolvimento/processosoftware/exemplo_documentacao_squad",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -16,10 +16,10 @@
   "sidebar": "desenvolvimento",
   "previous": {
     "title": "Desenvolvimento da SQUAD",
-    "permalink": "/conectafapes-project/desenvolvimento/processosoftware/processo_definir_design_sprint"
+    "permalink": "/desenvolvimento/processosoftware/processo_definir_design_sprint"
   },
   "next": {
     "title": "Realizar Processo de Desenvolvimento do Produto",
-    "permalink": "/conectafapes-project/desenvolvimento/processosoftware/processo_desenvolvimento"
+    "permalink": "/desenvolvimento/processosoftware/processo_desenvolvimento"
   }
 }

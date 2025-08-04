@@ -5,7 +5,7 @@
   "source": "@site/docs/bi/gestao/sprints/sprint3.md",
   "sourceDirName": "bi/gestao/sprints",
   "slug": "/bi/gestao/sprints/sprint3",
-  "permalink": "/conectafapes-project/bi/gestao/sprints/sprint3",
+  "permalink": "/bi/gestao/sprints/sprint3",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -15,10 +15,10 @@
   "sidebar": "bi",
   "previous": {
     "title": "2 - LEVANTAR INFRAESTRUTURA DE BI NO LEDS",
-    "permalink": "/conectafapes-project/bi/gestao/sprints/sprint2"
+    "permalink": "/bi/gestao/sprints/sprint2"
   },
   "next": {
     "title": "4 - AJUSTES PRIMEIRA SEMANA 2025",
-    "permalink": "/conectafapes-project/bi/gestao/sprints/sprint4"
+    "permalink": "/bi/gestao/sprints/sprint4"
   }
 }

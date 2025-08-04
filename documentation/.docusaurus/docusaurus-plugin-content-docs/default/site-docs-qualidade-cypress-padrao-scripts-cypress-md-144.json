@@ -5,7 +5,7 @@
   "source": "@site/docs/qualidade/cypress/padrao_scripts_cypress.md",
   "sourceDirName": "qualidade/cypress",
   "slug": "/qualidade/cypress/padrao_scripts_cypress",
-  "permalink": "/conectafapes-project/qualidade/cypress/padrao_scripts_cypress",
+  "permalink": "/qualidade/cypress/padrao_scripts_cypress",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -19,6 +19,6 @@
   "sidebar": "qa",
   "previous": {
     "title": "Boas práticas em automação de testes com Cypress",
-    "permalink": "/conectafapes-project/qualidade/cypress/boas_praticas_cypress"
+    "permalink": "/qualidade/cypress/boas_praticas_cypress"
   }
 }

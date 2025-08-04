@@ -5,7 +5,7 @@
   "source": "@site/docs/qualidade/cypress/boas_praticas_cypress.md",
   "sourceDirName": "qualidade/cypress",
   "slug": "/qualidade/cypress/boas_praticas_cypress",
-  "permalink": "/conectafapes-project/qualidade/cypress/boas_praticas_cypress",
+  "permalink": "/qualidade/cypress/boas_praticas_cypress",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -19,10 +19,10 @@
   "sidebar": "qa",
   "previous": {
     "title": "Material Cypress",
-    "permalink": "/conectafapes-project/category/material-cypress"
+    "permalink": "/category/material-cypress"
   },
   "next": {
     "title": "Padrão de escrita de scripts Cypress",
-    "permalink": "/conectafapes-project/qualidade/cypress/padrao_scripts_cypress"
+    "permalink": "/qualidade/cypress/padrao_scripts_cypress"
   }
 }

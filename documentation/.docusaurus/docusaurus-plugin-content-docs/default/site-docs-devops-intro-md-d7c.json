@@ -5,7 +5,7 @@
   "source": "@site/docs/devops/intro.md",
   "sourceDirName": "devops",
   "slug": "/devops/intro",
-  "permalink": "/conectafapes-project/devops/intro",
+  "permalink": "/devops/intro",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -19,6 +19,6 @@
   "sidebar": "devops",
   "next": {
     "title": "Ambientes",
-    "permalink": "/conectafapes-project/devops/ambientes"
+    "permalink": "/devops/ambientes"
   }
 }

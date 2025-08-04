@@ -5,7 +5,7 @@
   "source": "@site/docs/administrativo/intro.md",
   "sourceDirName": "administrativo",
   "slug": "/administrativo/intro",
-  "permalink": "/conectafapes-project/administrativo/intro",
+  "permalink": "/administrativo/intro",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -19,6 +19,6 @@
   "sidebar": "administrativo",
   "next": {
     "title": "Bolsas do Projeto",
-    "permalink": "/conectafapes-project/administrativo/bolsas-do-projeto"
+    "permalink": "/administrativo/bolsas-do-projeto"
   }
 }

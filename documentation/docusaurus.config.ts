@@ -5,20 +5,21 @@ const config: Config = {
   title: 'ConectaFapes Docs',
   favicon: 'img/favicon.ico',
 
-  url: 'https://leds-conectafapes.com/',
-  baseUrl: '/conectafapes-project/',
-
-  organizationName: 'leds-conectafapes',
-  projectName: 'conectafapes-project',
+  url: 'https://conectafapes.docs.leds.dev.br/',
+  baseUrl: '/',
+  organizationName: 'leds-conectafapes', 
+  projectName: 'Conecta Fapes',
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'throw',
+  onDuplicateRoutes: 'warn',
+  staticDirectories: ['static'],
 
   markdown: {
     mermaid: true,
-  
   },
   themes: ['@docusaurus/theme-mermaid'],
+  
   plugins: [
     require.resolve('docusaurus-lunr-search'),    
   ],
@@ -52,12 +53,7 @@ const config: Config = {
     footer: {
 
       style: 'light',      
-    copyright: `
-    <div style="display: flex; align-items: center; justify-content: center;">
-      <span>Copyright © ${new Date().getFullYear()}. Desenvolvido por <a href="https://www.instagram.com/ledsifes/">LEDS</a>, utilizando o Docusaurus.</span>
-    </div>
-  `,
-
+      copyright:'Copyright © 2025. Desenvolvido por <a href=\"https://www.instagram.com/ledsifes/\">LEDS</a>, utilizando o Docusaurus.',
     },
 
     mermaid: {
@@ -68,14 +64,13 @@ const config: Config = {
 
     docs: {
       sidebar: {
-        hideable: true,
         autoCollapseCategories: true,
       }
     },
 
     image: 'img/leds-social-card.jpg',
     navbar: {
-      title: 'Documentação ',
+      title: 'Home',
       logo: {
         src: 'img/fapes1.svg',
       },

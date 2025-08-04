@@ -5,7 +5,7 @@
   "source": "@site/docs/bi/gestao/README.md",
   "sourceDirName": "bi/gestao",
   "slug": "/bi/gestao/",
-  "permalink": "/conectafapes-project/bi/gestao/",
+  "permalink": "/bi/gestao/",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -15,10 +15,10 @@
   "sidebar": "bi",
   "previous": {
     "title": "5 - ENTREGA DASHOARD DE BOLSA",
-    "permalink": "/conectafapes-project/bi/gestao/sprints/sprint5"
+    "permalink": "/bi/gestao/sprints/sprint5"
   },
   "next": {
     "title": "Processes",
-    "permalink": "/conectafapes-project/bi/gestao/process/"
+    "permalink": "/bi/gestao/process/"
   }
 }

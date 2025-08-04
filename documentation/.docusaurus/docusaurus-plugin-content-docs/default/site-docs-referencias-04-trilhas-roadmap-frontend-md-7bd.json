@@ -5,7 +5,7 @@
   "source": "@site/docs/referencias/04_trilhas/roadmap-frontend.md",
   "sourceDirName": "referencias/04_trilhas",
   "slug": "/referencias/trilhas/roadmap-frontend",
-  "permalink": "/conectafapes-project/referencias/trilhas/roadmap-frontend",
+  "permalink": "/referencias/trilhas/roadmap-frontend",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -18,10 +18,10 @@
   "sidebar": "referencias",
   "previous": {
     "title": "Trilha Backend",
-    "permalink": "/conectafapes-project/referencias/trilhas/roadmap-backend"
+    "permalink": "/referencias/trilhas/roadmap-backend"
   },
   "next": {
     "title": "Tutoriais",
-    "permalink": "/conectafapes-project/category/tutoriais"
+    "permalink": "/category/tutoriais"
   }
 }

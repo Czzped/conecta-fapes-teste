@@ -5,7 +5,7 @@
   "source": "@site/docs/desenvolvimento/design/1_intro.md",
   "sourceDirName": "desenvolvimento/design",
   "slug": "/desenvolvimento/design/intro",
-  "permalink": "/conectafapes-project/desenvolvimento/design/intro",
+  "permalink": "/desenvolvimento/design/intro",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -18,10 +18,10 @@
   "sidebar": "desenvolvimento",
   "previous": {
     "title": "Design/UX",
-    "permalink": "/conectafapes-project/category/designux"
+    "permalink": "/category/designux"
   },
   "next": {
     "title": "Design System",
-    "permalink": "/conectafapes-project/desenvolvimento/design/design_system"
+    "permalink": "/desenvolvimento/design/design_system"
   }
 }

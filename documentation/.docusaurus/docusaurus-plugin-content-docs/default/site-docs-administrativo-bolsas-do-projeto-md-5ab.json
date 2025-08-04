@@ -5,7 +5,7 @@
   "source": "@site/docs/administrativo/bolsas-do-projeto.md",
   "sourceDirName": "administrativo",
   "slug": "/administrativo/bolsas-do-projeto",
-  "permalink": "/conectafapes-project/administrativo/bolsas-do-projeto",
+  "permalink": "/administrativo/bolsas-do-projeto",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -19,10 +19,10 @@
   "sidebar": "administrativo",
   "previous": {
     "title": "Organograma",
-    "permalink": "/conectafapes-project/administrativo/intro"
+    "permalink": "/administrativo/intro"
   },
   "next": {
     "title": "Contatos via WhatsApp",
-    "permalink": "/conectafapes-project/administrativo/contatos-whatsapp"
+    "permalink": "/administrativo/contatos-whatsapp"
   }
 }

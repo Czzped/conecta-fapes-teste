@@ -5,7 +5,7 @@
   "source": "@site/docs/desenvolvimento/modulos/08_portal_fapes/requirements.md",
   "sourceDirName": "desenvolvimento/modulos/08_portal_fapes",
   "slug": "/desenvolvimento/modulos/portal_fapes/requirements",
-  "permalink": "/conectafapes-project/desenvolvimento/modulos/portal_fapes/requirements",
+  "permalink": "/desenvolvimento/modulos/portal_fapes/requirements",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -19,10 +19,10 @@
   "sidebar": "desenvolvimento",
   "previous": {
     "title": "Introdução",
-    "permalink": "/conectafapes-project/desenvolvimento/modulos/portal_fapes/introducao"
+    "permalink": "/desenvolvimento/modulos/portal_fapes/introducao"
   },
   "next": {
     "title": "Casos de Uso",
-    "permalink": "/conectafapes-project/desenvolvimento/modulos/portal_fapes/usecase"
+    "permalink": "/desenvolvimento/modulos/portal_fapes/usecase"
   }
 }

@@ -6,12 +6,16 @@
 export default {
   "title": "ConectaFapes Docs",
   "favicon": "img/favicon.ico",
-  "url": "https://leds-conectafapes.com",
-  "baseUrl": "/conectafapes-project/",
+  "url": "https://conectafapes.docs.leds.dev.br",
+  "baseUrl": "/",
   "organizationName": "leds-conectafapes",
-  "projectName": "conectafapes-project",
+  "projectName": "Conecta Fapes",
   "onBrokenLinks": "throw",
   "onBrokenMarkdownLinks": "throw",
+  "onDuplicateRoutes": "warn",
+  "staticDirectories": [
+    "static"
+  ],
   "markdown": {
     "mermaid": true,
     "format": "mdx",
@@ -54,7 +58,7 @@ export default {
   "themeConfig": {
     "footer": {
       "style": "light",
-      "copyright": "\n    <div style=\"display: flex; align-items: center; justify-content: center;\">\n      <span>Copyright © 2025. Desenvolvido por <a href=\"https://www.instagram.com/ledsifes/\">LEDS</a>, utilizando o Docusaurus.</span>\n    </div>\n  ",
+      "copyright": "Copyright © 2025. Desenvolvido por <a href=\"https://www.instagram.com/ledsifes/\">LEDS</a>, utilizando o Docusaurus.",
       "links": []
     },
     "mermaid": {
@@ -68,14 +72,14 @@ export default {
     },
     "docs": {
       "sidebar": {
-        "hideable": true,
-        "autoCollapseCategories": true
+        "autoCollapseCategories": true,
+        "hideable": false
       },
       "versionPersistence": "localStorage"
     },
     "image": "img/leds-social-card.jpg",
     "navbar": {
-      "title": "Documentação ",
+      "title": "Home",
       "logo": {
         "src": "img/fapes1.svg"
       },
@@ -363,10 +367,6 @@ export default {
     "experimental_router": "browser"
   },
   "onBrokenAnchors": "warn",
-  "onDuplicateRoutes": "warn",
-  "staticDirectories": [
-    "static"
-  ],
   "customFields": {},
   "scripts": [],
   "headTags": [],

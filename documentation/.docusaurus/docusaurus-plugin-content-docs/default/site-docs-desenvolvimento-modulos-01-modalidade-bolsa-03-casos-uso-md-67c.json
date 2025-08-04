@@ -5,7 +5,7 @@
   "source": "@site/docs/desenvolvimento/modulos/01_modalidade_bolsa/03_casos-uso.md",
   "sourceDirName": "desenvolvimento/modulos/01_modalidade_bolsa",
   "slug": "/desenvolvimento/modulos/modalidade_bolsa/casos-uso",
-  "permalink": "/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/casos-uso",
+  "permalink": "/desenvolvimento/modulos/modalidade_bolsa/casos-uso",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -18,10 +18,10 @@
   "sidebar": "desenvolvimento",
   "previous": {
     "title": "Requisitos",
-    "permalink": "/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/requisitos"
+    "permalink": "/desenvolvimento/modulos/modalidade_bolsa/requisitos"
   },
   "next": {
     "title": "Modelo Estrutural",
-    "permalink": "/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/modelo-estrutural"
+    "permalink": "/desenvolvimento/modulos/modalidade_bolsa/modelo-estrutural"
   }
 }
