@@ -49,15 +49,15 @@ export default [
   },
   {
     path: '/',
-    component: ComponentCreator('/', '6f9'),
+    component: ComponentCreator('/', 'd94'),
     routes: [
       {
         path: '/',
-        component: ComponentCreator('/', 'caa'),
+        component: ComponentCreator('/', '050'),
         routes: [
           {
             path: '/',
-            component: ComponentCreator('/', 'b4d'),
+            component: ComponentCreator('/', 'a2b'),
             routes: [
               {
                 path: '/bi/gestao/',
@@ -138,58 +138,16 @@ export default [
                 sidebar: "bi"
               },
               {
-                path: '/category/-2-importação-de-editais',
-                component: ComponentCreator('/category/-2-importação-de-editais', '4f0'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/category/1-modalidades-de-bolsas',
-                component: ComponentCreator('/category/1-modalidades-de-bolsas', '4df'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/category/4-pagamento-de-bolsistas',
-                component: ComponentCreator('/category/4-pagamento-de-bolsistas', 'cc4'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/category/5-autenticacação-e-autorização',
-                component: ComponentCreator('/category/5-autenticacação-e-autorização', 'bff'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/category/api-gateway',
-                component: ComponentCreator('/category/api-gateway', 'fe9'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
                 path: '/category/arquitetura',
                 component: ComponentCreator('/category/arquitetura', '94b'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/category/gerenciar-editais',
-                component: ComponentCreator('/category/gerenciar-editais', 'f5e'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
                 path: '/category/gestão',
                 component: ComponentCreator('/category/gestão', '2a5'),
                 exact: true,
                 sidebar: "bi"
-              },
-              {
-                path: '/category/gestao-bolsa-pesquisa',
-                component: ComponentCreator('/category/gestao-bolsa-pesquisa', '77b'),
-                exact: true,
-                sidebar: "desenvolvimento"
               },
               {
                 path: '/category/gestão-orientada-a-dados',
@@ -210,18 +168,6 @@ export default [
                 sidebar: "qa"
               },
               {
-                path: '/category/módulos',
-                component: ComponentCreator('/category/módulos', 'd95'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/category/portal-fapes',
-                component: ComponentCreator('/category/portal-fapes', '8e7'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
                 path: '/category/processo',
                 component: ComponentCreator('/category/processo', 'cf0'),
                 exact: true,
@@ -232,12 +178,6 @@ export default [
                 component: ComponentCreator('/category/processos-de-garantia-da-qualidade', '307'),
                 exact: true,
                 sidebar: "qa"
-              },
-              {
-                path: '/category/processos-de-integração',
-                component: ComponentCreator('/category/processos-de-integração', '9fe'),
-                exact: true,
-                sidebar: "desenvolvimento"
               },
               {
                 path: '/category/trilha-de-capacitação',
@@ -326,258 +266,6 @@ export default [
               {
                 path: '/desenvolvimento/intro',
                 component: ComponentCreator('/desenvolvimento/intro', '220'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/api_gateway/architecture',
-                component: ComponentCreator('/desenvolvimento/modulos/api_gateway/architecture', '6e1'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/api_gateway/minimundo',
-                component: ComponentCreator('/desenvolvimento/modulos/api_gateway/minimundo', '412'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/api_gateway/processos',
-                component: ComponentCreator('/desenvolvimento/modulos/api_gateway/processos', 'a14'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/api_gateway/requirements',
-                component: ComponentCreator('/desenvolvimento/modulos/api_gateway/requirements', 'c49'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/api_gateway/usecase',
-                component: ComponentCreator('/desenvolvimento/modulos/api_gateway/usecase', '92a'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/autenticacao/minimundo',
-                component: ComponentCreator('/desenvolvimento/modulos/autenticacao/minimundo', '501'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/autenticacao/requirements',
-                component: ComponentCreator('/desenvolvimento/modulos/autenticacao/requirements', '892'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/autenticacao/usecase',
-                component: ComponentCreator('/desenvolvimento/modulos/autenticacao/usecase', 'f84'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/gerenciar_editais/minimundo',
-                component: ComponentCreator('/desenvolvimento/modulos/gerenciar_editais/minimundo', '69a'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/gerenciar_editais/requisitos',
-                component: ComponentCreator('/desenvolvimento/modulos/gerenciar_editais/requisitos', 'ed9'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/gestao_bolsa_pesquisa/casos_uso',
-                component: ComponentCreator('/desenvolvimento/modulos/gestao_bolsa_pesquisa/casos_uso', '5c5'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/gestao_bolsa_pesquisa/minimundo',
-                component: ComponentCreator('/desenvolvimento/modulos/gestao_bolsa_pesquisa/minimundo', '263'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_comportamental',
-                component: ComponentCreator('/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_comportamental', '8aa'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_estrutural',
-                component: ComponentCreator('/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_estrutural', '87f'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/gestao_bolsa_pesquisa/requirements',
-                component: ComponentCreator('/desenvolvimento/modulos/gestao_bolsa_pesquisa/requirements', 'a13'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/importacao_editais/arquitetura',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/arquitetura', '97a'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/importacao_editais/casos-uso',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/casos-uso', '882'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/importacao_editais/minimundo',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/minimundo', 'c89'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/importacao_editais/modelo-comportamental',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/modelo-comportamental', '116'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/importacao_editais/modelo-estrutural',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/modelo-estrutural', '3e8'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/importacao_editais/processos/integracao_edital',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/processos/integracao_edital', 'c59'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/importacao_editais/processos/integracao_edital_projeto',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/processos/integracao_edital_projeto', 'e65'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/importacao_editais/processos/integracao_projeto',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/processos/integracao_projeto', '847'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/importacao_editais/prototipo_telas',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/prototipo_telas', 'c6b'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/importacao_editais/requisitos',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/requisitos', 'b5c'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/intro',
-                component: ComponentCreator('/desenvolvimento/modulos/intro', '203'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/modalidade_bolsa/arquitetura',
-                component: ComponentCreator('/desenvolvimento/modulos/modalidade_bolsa/arquitetura', '1e2'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/modalidade_bolsa/casos-uso',
-                component: ComponentCreator('/desenvolvimento/modulos/modalidade_bolsa/casos-uso', '81f'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/modalidade_bolsa/minimundo',
-                component: ComponentCreator('/desenvolvimento/modulos/modalidade_bolsa/minimundo', '372'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/modalidade_bolsa/modelo-comportamental',
-                component: ComponentCreator('/desenvolvimento/modulos/modalidade_bolsa/modelo-comportamental', '46a'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/modalidade_bolsa/modelo-estrutural',
-                component: ComponentCreator('/desenvolvimento/modulos/modalidade_bolsa/modelo-estrutural', '7cd'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/modalidade_bolsa/requisitos',
-                component: ComponentCreator('/desenvolvimento/modulos/modalidade_bolsa/requisitos', '8b0'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/pagamento_bolsista/casos_uso',
-                component: ComponentCreator('/desenvolvimento/modulos/pagamento_bolsista/casos_uso', 'e3a'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/pagamento_bolsista/minimundo',
-                component: ComponentCreator('/desenvolvimento/modulos/pagamento_bolsista/minimundo', '105'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/pagamento_bolsista/modelo_comportamental',
-                component: ComponentCreator('/desenvolvimento/modulos/pagamento_bolsista/modelo_comportamental', 'aae'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/pagamento_bolsista/modelo_estrutural',
-                component: ComponentCreator('/desenvolvimento/modulos/pagamento_bolsista/modelo_estrutural', '6ae'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/pagamento_bolsista/requirements',
-                component: ComponentCreator('/desenvolvimento/modulos/pagamento_bolsista/requirements', '6d9'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/portal_fapes/diagramafluxo',
-                component: ComponentCreator('/desenvolvimento/modulos/portal_fapes/diagramafluxo', '389'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/portal_fapes/introducao',
-                component: ComponentCreator('/desenvolvimento/modulos/portal_fapes/introducao', 'a5e'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/portal_fapes/modeloestrutural',
-                component: ComponentCreator('/desenvolvimento/modulos/portal_fapes/modeloestrutural', '47b'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/portal_fapes/requirements',
-                component: ComponentCreator('/desenvolvimento/modulos/portal_fapes/requirements', 'd09'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/modulos/portal_fapes/usecase',
-                component: ComponentCreator('/desenvolvimento/modulos/portal_fapes/usecase', 'f42'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
@@ -730,6 +418,216 @@ export default [
                 component: ComponentCreator('/gestao/trilha_pesquisa/visaogeral', '811'),
                 exact: true,
                 sidebar: "gestao"
+              },
+              {
+                path: '/modulos/api_gateway/architecture',
+                component: ComponentCreator('/modulos/api_gateway/architecture', '54c'),
+                exact: true
+              },
+              {
+                path: '/modulos/api_gateway/minimundo',
+                component: ComponentCreator('/modulos/api_gateway/minimundo', '602'),
+                exact: true
+              },
+              {
+                path: '/modulos/api_gateway/processos',
+                component: ComponentCreator('/modulos/api_gateway/processos', '091'),
+                exact: true
+              },
+              {
+                path: '/modulos/api_gateway/requirements',
+                component: ComponentCreator('/modulos/api_gateway/requirements', 'fc0'),
+                exact: true
+              },
+              {
+                path: '/modulos/api_gateway/usecase',
+                component: ComponentCreator('/modulos/api_gateway/usecase', '4fa'),
+                exact: true
+              },
+              {
+                path: '/modulos/autenticacao/minimundo',
+                component: ComponentCreator('/modulos/autenticacao/minimundo', 'b40'),
+                exact: true
+              },
+              {
+                path: '/modulos/autenticacao/requirements',
+                component: ComponentCreator('/modulos/autenticacao/requirements', 'bb7'),
+                exact: true
+              },
+              {
+                path: '/modulos/autenticacao/usecase',
+                component: ComponentCreator('/modulos/autenticacao/usecase', '3ff'),
+                exact: true
+              },
+              {
+                path: '/modulos/gerenciar_editais/minimundo',
+                component: ComponentCreator('/modulos/gerenciar_editais/minimundo', '4ae'),
+                exact: true
+              },
+              {
+                path: '/modulos/gerenciar_editais/requisitos',
+                component: ComponentCreator('/modulos/gerenciar_editais/requisitos', '5ea'),
+                exact: true
+              },
+              {
+                path: '/modulos/gestao_bolsa_pesquisa/casos_uso',
+                component: ComponentCreator('/modulos/gestao_bolsa_pesquisa/casos_uso', '45d'),
+                exact: true
+              },
+              {
+                path: '/modulos/gestao_bolsa_pesquisa/minimundo',
+                component: ComponentCreator('/modulos/gestao_bolsa_pesquisa/minimundo', '39b'),
+                exact: true
+              },
+              {
+                path: '/modulos/gestao_bolsa_pesquisa/modelo_comportamental',
+                component: ComponentCreator('/modulos/gestao_bolsa_pesquisa/modelo_comportamental', 'd6c'),
+                exact: true
+              },
+              {
+                path: '/modulos/gestao_bolsa_pesquisa/modelo_estrutural',
+                component: ComponentCreator('/modulos/gestao_bolsa_pesquisa/modelo_estrutural', '772'),
+                exact: true
+              },
+              {
+                path: '/modulos/gestao_bolsa_pesquisa/requirements',
+                component: ComponentCreator('/modulos/gestao_bolsa_pesquisa/requirements', '915'),
+                exact: true
+              },
+              {
+                path: '/modulos/importacao_editais/arquitetura',
+                component: ComponentCreator('/modulos/importacao_editais/arquitetura', 'f96'),
+                exact: true
+              },
+              {
+                path: '/modulos/importacao_editais/casos-uso',
+                component: ComponentCreator('/modulos/importacao_editais/casos-uso', 'd89'),
+                exact: true
+              },
+              {
+                path: '/modulos/importacao_editais/minimundo',
+                component: ComponentCreator('/modulos/importacao_editais/minimundo', 'f25'),
+                exact: true
+              },
+              {
+                path: '/modulos/importacao_editais/modelo-comportamental',
+                component: ComponentCreator('/modulos/importacao_editais/modelo-comportamental', 'ef0'),
+                exact: true
+              },
+              {
+                path: '/modulos/importacao_editais/modelo-estrutural',
+                component: ComponentCreator('/modulos/importacao_editais/modelo-estrutural', '763'),
+                exact: true
+              },
+              {
+                path: '/modulos/importacao_editais/processos/integracao_edital',
+                component: ComponentCreator('/modulos/importacao_editais/processos/integracao_edital', '5bc'),
+                exact: true
+              },
+              {
+                path: '/modulos/importacao_editais/processos/integracao_edital_projeto',
+                component: ComponentCreator('/modulos/importacao_editais/processos/integracao_edital_projeto', 'c15'),
+                exact: true
+              },
+              {
+                path: '/modulos/importacao_editais/processos/integracao_projeto',
+                component: ComponentCreator('/modulos/importacao_editais/processos/integracao_projeto', 'eb3'),
+                exact: true
+              },
+              {
+                path: '/modulos/importacao_editais/prototipo_telas',
+                component: ComponentCreator('/modulos/importacao_editais/prototipo_telas', '9c9'),
+                exact: true
+              },
+              {
+                path: '/modulos/importacao_editais/requisitos',
+                component: ComponentCreator('/modulos/importacao_editais/requisitos', '935'),
+                exact: true
+              },
+              {
+                path: '/modulos/intro',
+                component: ComponentCreator('/modulos/intro', 'fb8'),
+                exact: true
+              },
+              {
+                path: '/modulos/modalidade_bolsa/arquitetura',
+                component: ComponentCreator('/modulos/modalidade_bolsa/arquitetura', '0fb'),
+                exact: true
+              },
+              {
+                path: '/modulos/modalidade_bolsa/casos-uso',
+                component: ComponentCreator('/modulos/modalidade_bolsa/casos-uso', '17c'),
+                exact: true
+              },
+              {
+                path: '/modulos/modalidade_bolsa/minimundo',
+                component: ComponentCreator('/modulos/modalidade_bolsa/minimundo', 'e36'),
+                exact: true
+              },
+              {
+                path: '/modulos/modalidade_bolsa/modelo-comportamental',
+                component: ComponentCreator('/modulos/modalidade_bolsa/modelo-comportamental', '46b'),
+                exact: true
+              },
+              {
+                path: '/modulos/modalidade_bolsa/modelo-estrutural',
+                component: ComponentCreator('/modulos/modalidade_bolsa/modelo-estrutural', '051'),
+                exact: true
+              },
+              {
+                path: '/modulos/modalidade_bolsa/requisitos',
+                component: ComponentCreator('/modulos/modalidade_bolsa/requisitos', 'ebe'),
+                exact: true
+              },
+              {
+                path: '/modulos/pagamento_bolsista/casos_uso',
+                component: ComponentCreator('/modulos/pagamento_bolsista/casos_uso', 'ce6'),
+                exact: true
+              },
+              {
+                path: '/modulos/pagamento_bolsista/minimundo',
+                component: ComponentCreator('/modulos/pagamento_bolsista/minimundo', '9fc'),
+                exact: true
+              },
+              {
+                path: '/modulos/pagamento_bolsista/modelo_comportamental',
+                component: ComponentCreator('/modulos/pagamento_bolsista/modelo_comportamental', 'a22'),
+                exact: true
+              },
+              {
+                path: '/modulos/pagamento_bolsista/modelo_estrutural',
+                component: ComponentCreator('/modulos/pagamento_bolsista/modelo_estrutural', '0a4'),
+                exact: true
+              },
+              {
+                path: '/modulos/pagamento_bolsista/requirements',
+                component: ComponentCreator('/modulos/pagamento_bolsista/requirements', 'b62'),
+                exact: true
+              },
+              {
+                path: '/modulos/portal_fapes/diagramafluxo',
+                component: ComponentCreator('/modulos/portal_fapes/diagramafluxo', '81f'),
+                exact: true
+              },
+              {
+                path: '/modulos/portal_fapes/introducao',
+                component: ComponentCreator('/modulos/portal_fapes/introducao', 'd97'),
+                exact: true
+              },
+              {
+                path: '/modulos/portal_fapes/modeloestrutural',
+                component: ComponentCreator('/modulos/portal_fapes/modeloestrutural', '2ed'),
+                exact: true
+              },
+              {
+                path: '/modulos/portal_fapes/requirements',
+                component: ComponentCreator('/modulos/portal_fapes/requirements', '72a'),
+                exact: true
+              },
+              {
+                path: '/modulos/portal_fapes/usecase',
+                component: ComponentCreator('/modulos/portal_fapes/usecase', 'ebb'),
+                exact: true
               },
               {
                 path: '/qualidade/cypress/boas_praticas_cypress',

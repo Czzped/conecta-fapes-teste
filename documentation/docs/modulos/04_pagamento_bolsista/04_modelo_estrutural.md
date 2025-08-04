@@ -3,7 +3,7 @@ sidebar_position: 4
 ---
 # Modelo de Domínio
 
-![alt text](../../../../static/img/modulos/pagamento_bolsista/diagrama-classe-pagamento.svg)
+![alt text](../../../static/img/modulos/pagamento_bolsista/diagrama-classe-pagamento.svg)
 
 O modelo conceitual estrutural captura e descreve as informações (classes, associações e atributos) que o sistema deve representar para prover as funcionalidades descritas nos casos de uso.
     
