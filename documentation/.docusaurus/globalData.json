@@ -440,34 +440,6 @@
               "path": "/"
             },
             {
-              "id": "processonegocio/as_is/gestao_edital/conceber_edital",
-              "path": "/processonegocio/as_is/gestao_edital/conceber_edital"
-            },
-            {
-              "id": "processonegocio/as_is/gestao_edital/gerenciar_projetos",
-              "path": "/processonegocio/as_is/gestao_edital/gerenciar_projetos"
-            },
-            {
-              "id": "processonegocio/as_is/gestao_edital/gestao_edital",
-              "path": "/processonegocio/as_is/gestao_edital/"
-            },
-            {
-              "id": "processonegocio/as_is/gestao_edital/submeter_contratar_propostas",
-              "path": "/processonegocio/as_is/gestao_edital/submeter_contratar_propostas"
-            },
-            {
-              "id": "processonegocio/intro",
-              "path": "/processonegocio/intro"
-            },
-            {
-              "id": "processonegocio/to_be/gestao_edital/gestao_projetos/gerar_folha_de_pagamento",
-              "path": "/processonegocio/to_be/gestao_edital/gestao_projetos/gerar_folha_de_pagamento"
-            },
-            {
-              "id": "processonegocio/to_be/gestao_edital/gestao_projetos/incluir_bolsista",
-              "path": "/processonegocio/to_be/gestao_edital/gestao_projetos/incluir_bolsista"
-            },
-            {
               "id": "qualidade/cypress/boas_praticas_cypress",
               "path": "/qualidade/cypress/boas_praticas_cypress",
               "sidebar": "qa"

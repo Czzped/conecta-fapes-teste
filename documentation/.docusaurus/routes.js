@@ -49,15 +49,15 @@ export default [
   },
   {
     path: '/',
-    component: ComponentCreator('/', '643'),
+    component: ComponentCreator('/', '6f9'),
     routes: [
       {
         path: '/',
-        component: ComponentCreator('/', '030'),
+        component: ComponentCreator('/', 'caa'),
         routes: [
           {
             path: '/',
-            component: ComponentCreator('/', 'ac4'),
+            component: ComponentCreator('/', 'b4d'),
             routes: [
               {
                 path: '/bi/gestao/',
@@ -730,41 +730,6 @@ export default [
                 component: ComponentCreator('/gestao/trilha_pesquisa/visaogeral', '811'),
                 exact: true,
                 sidebar: "gestao"
-              },
-              {
-                path: '/processonegocio/as_is/gestao_edital/',
-                component: ComponentCreator('/processonegocio/as_is/gestao_edital/', '0f4'),
-                exact: true
-              },
-              {
-                path: '/processonegocio/as_is/gestao_edital/conceber_edital',
-                component: ComponentCreator('/processonegocio/as_is/gestao_edital/conceber_edital', '06c'),
-                exact: true
-              },
-              {
-                path: '/processonegocio/as_is/gestao_edital/gerenciar_projetos',
-                component: ComponentCreator('/processonegocio/as_is/gestao_edital/gerenciar_projetos', '67d'),
-                exact: true
-              },
-              {
-                path: '/processonegocio/as_is/gestao_edital/submeter_contratar_propostas',
-                component: ComponentCreator('/processonegocio/as_is/gestao_edital/submeter_contratar_propostas', 'fff'),
-                exact: true
-              },
-              {
-                path: '/processonegocio/intro',
-                component: ComponentCreator('/processonegocio/intro', 'd31'),
-                exact: true
-              },
-              {
-                path: '/processonegocio/to_be/gestao_edital/gestao_projetos/gerar_folha_de_pagamento',
-                component: ComponentCreator('/processonegocio/to_be/gestao_edital/gestao_projetos/gerar_folha_de_pagamento', '96d'),
-                exact: true
-              },
-              {
-                path: '/processonegocio/to_be/gestao_edital/gestao_projetos/incluir_bolsista',
-                component: ComponentCreator('/processonegocio/to_be/gestao_edital/gestao_projetos/incluir_bolsista', '570'),
-                exact: true
               },
               {
                 path: '/qualidade/cypress/boas_praticas_cypress',

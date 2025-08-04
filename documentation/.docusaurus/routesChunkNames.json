@@ -56,17 +56,17 @@
     },
     "content": "content---conectafapes-project-markdown-page-393-c1d"
   },
-  "/-643": {
+  "/-6f9": {
     "__comp": "__comp---theme-docs-root-5-e-9-0b6",
     "__context": {
       "plugin": "plugin---conectafapes-project-aba-522"
     }
   },
-  "/-030": {
+  "/-caa": {
     "__comp": "__comp---theme-doc-version-roota-7-b-5de",
     "__props": "__props---22-d-307"
   },
-  "/-ac4": {
+  "/-b4d": {
     "__comp": "__comp---theme-doc-roota-94-67a"
   },
   "/bi/gestao/-90b": {
@@ -516,34 +516,6 @@
   "/gestao/trilha_pesquisa/visaogeral-811": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---conectafapes-project-gestao-trilha-pesquisa-visaogeral-03-d-f4d"
-  },
-  "/processonegocio/as_is/gestao_edital/-0f4": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---conectafapes-project-processonegocio-as-is-gestao-edital-ebd-a85"
-  },
-  "/processonegocio/as_is/gestao_edital/conceber_edital-06c": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---conectafapes-project-processonegocio-as-is-gestao-edital-conceber-edital-48-b-8ad"
-  },
-  "/processonegocio/as_is/gestao_edital/gerenciar_projetos-67d": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---conectafapes-project-processonegocio-as-is-gestao-edital-gerenciar-projetos-510-55e"
-  },
-  "/processonegocio/as_is/gestao_edital/submeter_contratar_propostas-fff": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---conectafapes-project-processonegocio-as-is-gestao-edital-submeter-contratar-propostasca-6-7fc"
-  },
-  "/processonegocio/intro-d31": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---conectafapes-project-processonegocio-intro-4-ab-775"
-  },
-  "/processonegocio/to_be/gestao_edital/gestao_projetos/gerar_folha_de_pagamento-96d": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---conectafapes-project-processonegocio-to-be-gestao-edital-gestao-projetos-gerar-folha-de-pagamento-960-ae5"
-  },
-  "/processonegocio/to_be/gestao_edital/gestao_projetos/incluir_bolsista-570": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---conectafapes-project-processonegocio-to-be-gestao-edital-gestao-projetos-incluir-bolsistad-41-1b1"
   },
   "/qualidade/cypress/boas_praticas_cypress-422": {
     "__comp": "__comp---theme-doc-item-178-a40",
