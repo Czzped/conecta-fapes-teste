@@ -5,7 +5,7 @@
   "source": "@site/docs/colatina/intro.md",
   "sourceDirName": "colatina",
   "slug": "/colatina/intro",
-  "permalink": "/colatina/intro",
+  "permalink": "/conectafapes-project/colatina/intro",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -19,6 +19,6 @@
   "sidebar": "colatina",
   "next": {
     "title": "Trilha de estudos",
-    "permalink": "/category/trilha-de-estudos"
+    "permalink": "/conectafapes-project/category/trilha-de-estudos"
   }
 }

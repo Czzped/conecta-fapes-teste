@@ -5,7 +5,7 @@
   "source": "@site/docs/desenvolvimento/modulos/01_modalidade_bolsa/06_arquitetura.md",
   "sourceDirName": "desenvolvimento/modulos/01_modalidade_bolsa",
   "slug": "/desenvolvimento/modulos/modalidade_bolsa/arquitetura",
-  "permalink": "/desenvolvimento/modulos/modalidade_bolsa/arquitetura",
+  "permalink": "/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/arquitetura",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -18,10 +18,10 @@
   "sidebar": "desenvolvimento",
   "previous": {
     "title": "Modelos Comportamentais",
-    "permalink": "/desenvolvimento/modulos/modalidade_bolsa/modelo-comportamental"
+    "permalink": "/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/modelo-comportamental"
   },
   "next": {
     "title": "Importação de Editais",
-    "permalink": "/category/importação-de-editais"
+    "permalink": "/conectafapes-project/category/importação-de-editais"
   }
 }

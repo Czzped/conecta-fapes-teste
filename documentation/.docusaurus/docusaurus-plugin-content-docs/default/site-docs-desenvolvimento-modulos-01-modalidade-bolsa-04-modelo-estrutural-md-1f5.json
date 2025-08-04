@@ -5,7 +5,7 @@
   "source": "@site/docs/desenvolvimento/modulos/01_modalidade_bolsa/04_modelo-estrutural.md",
   "sourceDirName": "desenvolvimento/modulos/01_modalidade_bolsa",
   "slug": "/desenvolvimento/modulos/modalidade_bolsa/modelo-estrutural",
-  "permalink": "/desenvolvimento/modulos/modalidade_bolsa/modelo-estrutural",
+  "permalink": "/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/modelo-estrutural",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -18,10 +18,10 @@
   "sidebar": "desenvolvimento",
   "previous": {
     "title": "Casos de Uso",
-    "permalink": "/desenvolvimento/modulos/modalidade_bolsa/casos-uso"
+    "permalink": "/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/casos-uso"
   },
   "next": {
     "title": "Modelos Comportamentais",
-    "permalink": "/desenvolvimento/modulos/modalidade_bolsa/modelo-comportamental"
+    "permalink": "/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/modelo-comportamental"
   }
 }

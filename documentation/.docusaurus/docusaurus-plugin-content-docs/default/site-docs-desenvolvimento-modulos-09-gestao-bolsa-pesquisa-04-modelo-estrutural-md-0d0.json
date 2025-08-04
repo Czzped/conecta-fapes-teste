@@ -5,7 +5,7 @@
   "source": "@site/docs/desenvolvimento/modulos/09_gestao_bolsa_pesquisa/04_modelo_estrutural.md",
   "sourceDirName": "desenvolvimento/modulos/09_gestao_bolsa_pesquisa",
   "slug": "/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_estrutural",
-  "permalink": "/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_estrutural",
+  "permalink": "/conectafapes-project/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_estrutural",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -18,10 +18,10 @@
   "sidebar": "desenvolvimento",
   "previous": {
     "title": "Casos de Uso",
-    "permalink": "/desenvolvimento/modulos/gestao_bolsa_pesquisa/casos_uso"
+    "permalink": "/conectafapes-project/desenvolvimento/modulos/gestao_bolsa_pesquisa/casos_uso"
   },
   "next": {
     "title": "Modelos Comportamentais",
-    "permalink": "/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_comportamental"
+    "permalink": "/conectafapes-project/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_comportamental"
   }
 }

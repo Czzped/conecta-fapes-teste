@@ -5,7 +5,7 @@
   "source": "@site/docs/gestao/processogestaomacro.mdx",
   "sourceDirName": "gestao",
   "slug": "/gestao/processogestaomacro",
-  "permalink": "/gestao/processogestaomacro",
+  "permalink": "/conectafapes-project/gestao/processogestaomacro",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -19,6 +19,6 @@
   "sidebar": "gestao",
   "next": {
     "title": "Gestão Orientada a Dados",
-    "permalink": "/category/gestão-orientada-a-dados"
+    "permalink": "/conectafapes-project/category/gestão-orientada-a-dados"
   }
 }

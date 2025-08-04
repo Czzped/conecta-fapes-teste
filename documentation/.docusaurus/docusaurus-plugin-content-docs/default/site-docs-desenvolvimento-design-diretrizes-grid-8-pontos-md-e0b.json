@@ -5,7 +5,7 @@
   "source": "@site/docs/desenvolvimento/design/diretrizes/grid8pontos.md",
   "sourceDirName": "desenvolvimento/design/diretrizes",
   "slug": "/desenvolvimento/design/diretrizes/grid8pontos",
-  "permalink": "/desenvolvimento/design/diretrizes/grid8pontos",
+  "permalink": "/conectafapes-project/desenvolvimento/design/diretrizes/grid8pontos",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -17,10 +17,10 @@
   "sidebar": "desenvolvimento",
   "previous": {
     "title": "Acessibilidade Digital",
-    "permalink": "/desenvolvimento/design/diretrizes/acessibilidade-digital"
+    "permalink": "/conectafapes-project/desenvolvimento/design/diretrizes/acessibilidade-digital"
   },
   "next": {
     "title": "Processo",
-    "permalink": "/category/processo"
+    "permalink": "/conectafapes-project/category/processo"
   }
 }

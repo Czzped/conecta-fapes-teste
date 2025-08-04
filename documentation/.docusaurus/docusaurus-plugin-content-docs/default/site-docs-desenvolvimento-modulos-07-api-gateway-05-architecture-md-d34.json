@@ -5,7 +5,7 @@
   "source": "@site/docs/desenvolvimento/modulos/07_api_gateway/05_architecture.md",
   "sourceDirName": "desenvolvimento/modulos/07_api_gateway",
   "slug": "/desenvolvimento/modulos/api_gateway/architecture",
-  "permalink": "/desenvolvimento/modulos/api_gateway/architecture",
+  "permalink": "/conectafapes-project/desenvolvimento/modulos/api_gateway/architecture",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -18,10 +18,10 @@
   "sidebar": "desenvolvimento",
   "previous": {
     "title": "Casos de Uso",
-    "permalink": "/desenvolvimento/modulos/api_gateway/usecase"
+    "permalink": "/conectafapes-project/desenvolvimento/modulos/api_gateway/usecase"
   },
   "next": {
     "title": "Portal Fapes",
-    "permalink": "/category/portal-fapes"
+    "permalink": "/conectafapes-project/category/portal-fapes"
   }
 }

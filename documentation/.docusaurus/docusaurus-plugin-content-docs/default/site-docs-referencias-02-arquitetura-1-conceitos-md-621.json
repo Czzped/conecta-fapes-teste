@@ -5,7 +5,7 @@
   "source": "@site/docs/referencias/02_arquitetura/1_conceitos.md",
   "sourceDirName": "referencias/02_arquitetura",
   "slug": "/referencias/arquitetura/conceitos",
-  "permalink": "/referencias/arquitetura/conceitos",
+  "permalink": "/conectafapes-project/referencias/arquitetura/conceitos",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -18,10 +18,10 @@
   "sidebar": "referencias",
   "previous": {
     "title": "Arquitetura",
-    "permalink": "/category/arquitetura"
+    "permalink": "/conectafapes-project/category/arquitetura"
   },
   "next": {
     "title": "Arquitetura Conceitual",
-    "permalink": "/referencias/arquitetura/arquitetura"
+    "permalink": "/conectafapes-project/referencias/arquitetura/arquitetura"
   }
 }

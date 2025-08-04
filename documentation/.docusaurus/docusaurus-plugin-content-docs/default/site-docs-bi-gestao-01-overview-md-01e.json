@@ -5,7 +5,7 @@
   "source": "@site/docs/bi/gestao/01_overview.md",
   "sourceDirName": "bi/gestao",
   "slug": "/bi/gestao/overview",
-  "permalink": "/bi/gestao/overview",
+  "permalink": "/conectafapes-project/bi/gestao/overview",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -16,10 +16,10 @@
   "sidebar": "bi",
   "previous": {
     "title": "Gestão",
-    "permalink": "/category/gestão"
+    "permalink": "/conectafapes-project/category/gestão"
   },
   "next": {
     "title": "📋 Backlogs",
-    "permalink": "/bi/gestao/backlogs"
+    "permalink": "/conectafapes-project/bi/gestao/backlogs"
   }
 }

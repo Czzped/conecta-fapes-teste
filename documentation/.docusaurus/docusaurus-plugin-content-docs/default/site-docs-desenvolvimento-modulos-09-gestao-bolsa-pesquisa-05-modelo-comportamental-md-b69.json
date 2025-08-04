@@ -5,7 +5,7 @@
   "source": "@site/docs/desenvolvimento/modulos/09_gestao_bolsa_pesquisa/05_modelo_comportamental.md",
   "sourceDirName": "desenvolvimento/modulos/09_gestao_bolsa_pesquisa",
   "slug": "/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_comportamental",
-  "permalink": "/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_comportamental",
+  "permalink": "/conectafapes-project/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_comportamental",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -18,10 +18,10 @@
   "sidebar": "desenvolvimento",
   "previous": {
     "title": "Modelo de Domínio",
-    "permalink": "/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_estrutural"
+    "permalink": "/conectafapes-project/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_estrutural"
   },
   "next": {
     "title": "Gerenciar Editais",
-    "permalink": "/category/gerenciar-editais"
+    "permalink": "/conectafapes-project/category/gerenciar-editais"
   }
 }

@@ -5,7 +5,7 @@
   "source": "@site/docs/referencias/05_tutoriais/01_intro.md",
   "sourceDirName": "referencias/05_tutoriais",
   "slug": "/referencias/tutoriais/intro",
-  "permalink": "/referencias/tutoriais/intro",
+  "permalink": "/conectafapes-project/referencias/tutoriais/intro",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -18,10 +18,10 @@
   "sidebar": "referencias",
   "previous": {
     "title": "Tutoriais",
-    "permalink": "/category/tutoriais"
+    "permalink": "/conectafapes-project/category/tutoriais"
   },
   "next": {
     "title": "DIBB",
-    "permalink": "/referencias/tutoriais/dibb"
+    "permalink": "/conectafapes-project/referencias/tutoriais/dibb"
   }
 }

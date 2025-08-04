@@ -5,7 +5,7 @@
   "source": "@site/docs/colatina/trilhasestudos/crud_basico_back.md",
   "sourceDirName": "colatina/trilhasestudos",
   "slug": "/colatina/trilhasestudos/crud_basico_back",
-  "permalink": "/colatina/trilhasestudos/crud_basico_back",
+  "permalink": "/conectafapes-project/colatina/trilhasestudos/crud_basico_back",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -19,10 +19,10 @@
   "sidebar": "colatina",
   "previous": {
     "title": "Trilha de estudos",
-    "permalink": "/category/trilha-de-estudos"
+    "permalink": "/conectafapes-project/category/trilha-de-estudos"
   },
   "next": {
     "title": "CRUD Básico front",
-    "permalink": "/colatina/trilhasestudos/crud_basico_front"
+    "permalink": "/conectafapes-project/colatina/trilhasestudos/crud_basico_front"
   }
 }

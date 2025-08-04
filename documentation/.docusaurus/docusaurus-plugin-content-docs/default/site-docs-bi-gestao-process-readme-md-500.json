@@ -5,7 +5,7 @@
   "source": "@site/docs/bi/gestao/process/README.md",
   "sourceDirName": "bi/gestao/process",
   "slug": "/bi/gestao/process/",
-  "permalink": "/bi/gestao/process/",
+  "permalink": "/conectafapes-project/bi/gestao/process/",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -15,10 +15,10 @@
   "sidebar": "bi",
   "previous": {
     "title": "Visão da Gestão do Projeto Business intelligence Conecta Fapes",
-    "permalink": "/bi/gestao/"
+    "permalink": "/conectafapes-project/bi/gestao/"
   },
   "next": {
     "title": "PROCESSO DE CRIAÇÃO DE DASHBOARD",
-    "permalink": "/bi/gestao/process/processocriacaodashboard/"
+    "permalink": "/conectafapes-project/bi/gestao/process/processocriacaodashboard/"
   }
 }

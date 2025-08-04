@@ -6,10 +6,10 @@
 export default {
   "title": "ConectaFapes Docs",
   "favicon": "img/favicon.ico",
-  "url": "https://conectafapes.docs.leds.dev.br",
-  "baseUrl": "/",
+  "url": "https://leds-conectafapes.com",
+  "baseUrl": "/conectafapes-project/",
   "organizationName": "leds-conectafapes",
-  "projectName": "Conecta Fapes",
+  "projectName": "conectafapes-project",
   "onBrokenLinks": "warn",
   "onBrokenMarkdownLinks": "warn",
   "markdown": {
@@ -28,7 +28,7 @@ export default {
     "@docusaurus/theme-mermaid"
   ],
   "plugins": [
-    "/home/paulossjunior/projects/conectafapes-project/documentation/node_modules/docusaurus-lunr-search/src/index.js"
+    "C:\\leds-org\\conectafapes-project\\documentation\\node_modules\\docusaurus-lunr-search\\src\\index.js"
   ],
   "i18n": {
     "defaultLocale": "en",

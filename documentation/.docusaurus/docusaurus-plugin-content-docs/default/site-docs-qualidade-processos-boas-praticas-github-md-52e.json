@@ -5,7 +5,7 @@
   "source": "@site/docs/qualidade/processos/boas-praticas-github.md",
   "sourceDirName": "qualidade/processos",
   "slug": "/qualidade/processos/boas-praticas-github",
-  "permalink": "/qualidade/processos/boas-praticas-github",
+  "permalink": "/conectafapes-project/qualidade/processos/boas-praticas-github",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -19,10 +19,10 @@
   "sidebar": "qa",
   "previous": {
     "title": "Processos de Garantia da Qualidade",
-    "permalink": "/category/processos-de-garantia-da-qualidade"
+    "permalink": "/conectafapes-project/category/processos-de-garantia-da-qualidade"
   },
   "next": {
     "title": "Material Cypress",
-    "permalink": "/category/material-cypress"
+    "permalink": "/conectafapes-project/category/material-cypress"
   }
 }

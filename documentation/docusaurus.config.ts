@@ -5,15 +5,11 @@ const config: Config = {
   title: 'ConectaFapes Docs',
   favicon: 'img/favicon.ico',
 
-  url: 'https://conectafapes.docs.leds.dev.br/',
-  // Set the /<baseUrl>/ pathname under which your site is served
-  // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  url: 'https://leds-conectafapes.com/',
+  baseUrl: '/conectafapes-project/',
 
-  // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'leds-conectafapes', // Usually your GitHub org/user name.
-  projectName: 'Conecta Fapes', // Usually your repo name.
+  organizationName: 'leds-conectafapes',
+  projectName: 'conectafapes-project',
 
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',

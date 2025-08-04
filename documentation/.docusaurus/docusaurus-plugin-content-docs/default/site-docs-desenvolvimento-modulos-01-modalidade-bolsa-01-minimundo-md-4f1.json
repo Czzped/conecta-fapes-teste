@@ -5,7 +5,7 @@
   "source": "@site/docs/desenvolvimento/modulos/01_modalidade_bolsa/01_minimundo.md",
   "sourceDirName": "desenvolvimento/modulos/01_modalidade_bolsa",
   "slug": "/desenvolvimento/modulos/modalidade_bolsa/minimundo",
-  "permalink": "/desenvolvimento/modulos/modalidade_bolsa/minimundo",
+  "permalink": "/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/minimundo",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -18,10 +18,10 @@
   "sidebar": "desenvolvimento",
   "previous": {
     "title": "Modalidades de Bolsas",
-    "permalink": "/category/modalidades-de-bolsas"
+    "permalink": "/conectafapes-project/category/modalidades-de-bolsas"
   },
   "next": {
     "title": "Requisitos",
-    "permalink": "/desenvolvimento/modulos/modalidade_bolsa/requisitos"
+    "permalink": "/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/requisitos"
   }
 }

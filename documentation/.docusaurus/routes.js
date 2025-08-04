@@ -3,1024 +3,1024 @@ import ComponentCreator from '@docusaurus/ComponentCreator';
 
 export default [
   {
-    path: '/__docusaurus/debug',
-    component: ComponentCreator('/__docusaurus/debug', '5ff'),
+    path: '/conectafapes-project/__docusaurus/debug',
+    component: ComponentCreator('/conectafapes-project/__docusaurus/debug', 'bbf'),
     exact: true
   },
   {
-    path: '/__docusaurus/debug/config',
-    component: ComponentCreator('/__docusaurus/debug/config', '5ba'),
+    path: '/conectafapes-project/__docusaurus/debug/config',
+    component: ComponentCreator('/conectafapes-project/__docusaurus/debug/config', '6a6'),
     exact: true
   },
   {
-    path: '/__docusaurus/debug/content',
-    component: ComponentCreator('/__docusaurus/debug/content', 'a2b'),
+    path: '/conectafapes-project/__docusaurus/debug/content',
+    component: ComponentCreator('/conectafapes-project/__docusaurus/debug/content', '74f'),
     exact: true
   },
   {
-    path: '/__docusaurus/debug/globalData',
-    component: ComponentCreator('/__docusaurus/debug/globalData', 'c3c'),
+    path: '/conectafapes-project/__docusaurus/debug/globalData',
+    component: ComponentCreator('/conectafapes-project/__docusaurus/debug/globalData', '509'),
     exact: true
   },
   {
-    path: '/__docusaurus/debug/metadata',
-    component: ComponentCreator('/__docusaurus/debug/metadata', '156'),
+    path: '/conectafapes-project/__docusaurus/debug/metadata',
+    component: ComponentCreator('/conectafapes-project/__docusaurus/debug/metadata', '6e2'),
     exact: true
   },
   {
-    path: '/__docusaurus/debug/registry',
-    component: ComponentCreator('/__docusaurus/debug/registry', '88c'),
+    path: '/conectafapes-project/__docusaurus/debug/registry',
+    component: ComponentCreator('/conectafapes-project/__docusaurus/debug/registry', '118'),
     exact: true
   },
   {
-    path: '/__docusaurus/debug/routes',
-    component: ComponentCreator('/__docusaurus/debug/routes', '000'),
+    path: '/conectafapes-project/__docusaurus/debug/routes',
+    component: ComponentCreator('/conectafapes-project/__docusaurus/debug/routes', 'a7e'),
     exact: true
   },
   {
-    path: '/bpmn',
-    component: ComponentCreator('/bpmn', '880'),
+    path: '/conectafapes-project/bpmn',
+    component: ComponentCreator('/conectafapes-project/bpmn', '536'),
     exact: true
   },
   {
-    path: '/markdown-page',
-    component: ComponentCreator('/markdown-page', '3d7'),
+    path: '/conectafapes-project/markdown-page',
+    component: ComponentCreator('/conectafapes-project/markdown-page', '45d'),
     exact: true
   },
   {
-    path: '/',
-    component: ComponentCreator('/', 'bc7'),
+    path: '/conectafapes-project/',
+    component: ComponentCreator('/conectafapes-project/', '3ab'),
     routes: [
       {
-        path: '/',
-        component: ComponentCreator('/', '954'),
+        path: '/conectafapes-project/',
+        component: ComponentCreator('/conectafapes-project/', '46d'),
         routes: [
           {
-            path: '/',
-            component: ComponentCreator('/', '9d7'),
+            path: '/conectafapes-project/',
+            component: ComponentCreator('/conectafapes-project/', '9aa'),
             routes: [
               {
-                path: '/administrativo/bolsas-do-projeto',
-                component: ComponentCreator('/administrativo/bolsas-do-projeto', '0df'),
+                path: '/conectafapes-project/administrativo/bolsas-do-projeto',
+                component: ComponentCreator('/conectafapes-project/administrativo/bolsas-do-projeto', 'ed4'),
                 exact: true,
                 sidebar: "administrativo"
               },
               {
-                path: '/administrativo/contatos-whatsapp',
-                component: ComponentCreator('/administrativo/contatos-whatsapp', 'cf4'),
+                path: '/conectafapes-project/administrativo/contatos-whatsapp',
+                component: ComponentCreator('/conectafapes-project/administrativo/contatos-whatsapp', 'd1c'),
                 exact: true,
                 sidebar: "administrativo"
               },
               {
-                path: '/administrativo/intro',
-                component: ComponentCreator('/administrativo/intro', '026'),
+                path: '/conectafapes-project/administrativo/intro',
+                component: ComponentCreator('/conectafapes-project/administrativo/intro', '803'),
                 exact: true,
                 sidebar: "administrativo"
               },
               {
-                path: '/bi/gestao/',
-                component: ComponentCreator('/bi/gestao/', '90b'),
+                path: '/conectafapes-project/bi/gestao/',
+                component: ComponentCreator('/conectafapes-project/bi/gestao/', '690'),
                 exact: true,
                 sidebar: "bi"
               },
               {
-                path: '/bi/gestao/backlogs',
-                component: ComponentCreator('/bi/gestao/backlogs', 'fdc'),
+                path: '/conectafapes-project/bi/gestao/backlogs',
+                component: ComponentCreator('/conectafapes-project/bi/gestao/backlogs', '45b'),
                 exact: true,
                 sidebar: "bi"
               },
               {
-                path: '/bi/gestao/overview',
-                component: ComponentCreator('/bi/gestao/overview', '9a7'),
+                path: '/conectafapes-project/bi/gestao/overview',
+                component: ComponentCreator('/conectafapes-project/bi/gestao/overview', '023'),
                 exact: true,
                 sidebar: "bi"
               },
               {
-                path: '/bi/gestao/process/',
-                component: ComponentCreator('/bi/gestao/process/', '215'),
+                path: '/conectafapes-project/bi/gestao/process/',
+                component: ComponentCreator('/conectafapes-project/bi/gestao/process/', '72f'),
                 exact: true,
                 sidebar: "bi"
               },
               {
-                path: '/bi/gestao/process/processocriacaodashboard/',
-                component: ComponentCreator('/bi/gestao/process/processocriacaodashboard/', '5a7'),
+                path: '/conectafapes-project/bi/gestao/process/processocriacaodashboard/',
+                component: ComponentCreator('/conectafapes-project/bi/gestao/process/processocriacaodashboard/', '23e'),
                 exact: true,
                 sidebar: "bi"
               },
               {
-                path: '/bi/gestao/roadmap',
-                component: ComponentCreator('/bi/gestao/roadmap', 'c28'),
+                path: '/conectafapes-project/bi/gestao/roadmap',
+                component: ComponentCreator('/conectafapes-project/bi/gestao/roadmap', 'df7'),
                 exact: true,
                 sidebar: "bi"
               },
               {
-                path: '/bi/gestao/sprints/sprin1',
-                component: ComponentCreator('/bi/gestao/sprints/sprin1', '582'),
+                path: '/conectafapes-project/bi/gestao/sprints/sprin1',
+                component: ComponentCreator('/conectafapes-project/bi/gestao/sprints/sprin1', 'da5'),
                 exact: true,
                 sidebar: "bi"
               },
               {
-                path: '/bi/gestao/sprints/sprint2',
-                component: ComponentCreator('/bi/gestao/sprints/sprint2', '4c4'),
+                path: '/conectafapes-project/bi/gestao/sprints/sprint2',
+                component: ComponentCreator('/conectafapes-project/bi/gestao/sprints/sprint2', '43a'),
                 exact: true,
                 sidebar: "bi"
               },
               {
-                path: '/bi/gestao/sprints/sprint3',
-                component: ComponentCreator('/bi/gestao/sprints/sprint3', 'f07'),
+                path: '/conectafapes-project/bi/gestao/sprints/sprint3',
+                component: ComponentCreator('/conectafapes-project/bi/gestao/sprints/sprint3', 'a25'),
                 exact: true,
                 sidebar: "bi"
               },
               {
-                path: '/bi/gestao/sprints/sprint4',
-                component: ComponentCreator('/bi/gestao/sprints/sprint4', '5c5'),
+                path: '/conectafapes-project/bi/gestao/sprints/sprint4',
+                component: ComponentCreator('/conectafapes-project/bi/gestao/sprints/sprint4', 'dda'),
                 exact: true,
                 sidebar: "bi"
               },
               {
-                path: '/bi/gestao/sprints/sprint5',
-                component: ComponentCreator('/bi/gestao/sprints/sprint5', 'efc'),
+                path: '/conectafapes-project/bi/gestao/sprints/sprint5',
+                component: ComponentCreator('/conectafapes-project/bi/gestao/sprints/sprint5', '552'),
                 exact: true,
                 sidebar: "bi"
               },
               {
-                path: '/bi/visao_geral',
-                component: ComponentCreator('/bi/visao_geral', '23a'),
+                path: '/conectafapes-project/bi/visao_geral',
+                component: ComponentCreator('/conectafapes-project/bi/visao_geral', '487'),
                 exact: true,
                 sidebar: "bi"
               },
               {
-                path: '/category/--sprints',
-                component: ComponentCreator('/category/--sprints', '621'),
+                path: '/conectafapes-project/category/--sprints',
+                component: ComponentCreator('/conectafapes-project/category/--sprints', 'c56'),
                 exact: true,
                 sidebar: "bi"
               },
               {
-                path: '/category/api-gateway',
-                component: ComponentCreator('/category/api-gateway', 'fe9'),
+                path: '/conectafapes-project/category/api-gateway',
+                component: ComponentCreator('/conectafapes-project/category/api-gateway', '843'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/category/arquitetura',
-                component: ComponentCreator('/category/arquitetura', '94b'),
+                path: '/conectafapes-project/category/arquitetura',
+                component: ComponentCreator('/conectafapes-project/category/arquitetura', 'e31'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/category/autenticacação-e-autorização',
-                component: ComponentCreator('/category/autenticacação-e-autorização', '4a6'),
+                path: '/conectafapes-project/category/autenticacação-e-autorização',
+                component: ComponentCreator('/conectafapes-project/category/autenticacação-e-autorização', '44f'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/category/designux',
-                component: ComponentCreator('/category/designux', 'ec4'),
+                path: '/conectafapes-project/category/designux',
+                component: ComponentCreator('/conectafapes-project/category/designux', '6df'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/category/diretrizes',
-                component: ComponentCreator('/category/diretrizes', '0c5'),
+                path: '/conectafapes-project/category/diretrizes',
+                component: ComponentCreator('/conectafapes-project/category/diretrizes', 'b9d'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/category/gerenciar-editais',
-                component: ComponentCreator('/category/gerenciar-editais', 'f5e'),
+                path: '/conectafapes-project/category/gerenciar-editais',
+                component: ComponentCreator('/conectafapes-project/category/gerenciar-editais', 'bae'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/category/gestão',
-                component: ComponentCreator('/category/gestão', '2a5'),
+                path: '/conectafapes-project/category/gestão',
+                component: ComponentCreator('/conectafapes-project/category/gestão', '632'),
                 exact: true,
                 sidebar: "bi"
               },
               {
-                path: '/category/gestao-bolsa-pesquisa',
-                component: ComponentCreator('/category/gestao-bolsa-pesquisa', '77b'),
+                path: '/conectafapes-project/category/gestao-bolsa-pesquisa',
+                component: ComponentCreator('/conectafapes-project/category/gestao-bolsa-pesquisa', 'f09'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/category/gestão-orientada-a-dados',
-                component: ComponentCreator('/category/gestão-orientada-a-dados', '03c'),
+                path: '/conectafapes-project/category/gestão-orientada-a-dados',
+                component: ComponentCreator('/conectafapes-project/category/gestão-orientada-a-dados', '47d'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/category/governo',
-                component: ComponentCreator('/category/governo', '75d'),
+                path: '/conectafapes-project/category/governo',
+                component: ComponentCreator('/conectafapes-project/category/governo', '2d4'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/category/importação-de-editais',
-                component: ComponentCreator('/category/importação-de-editais', 'a47'),
+                path: '/conectafapes-project/category/importação-de-editais',
+                component: ComponentCreator('/conectafapes-project/category/importação-de-editais', '5dc'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/category/material-cypress',
-                component: ComponentCreator('/category/material-cypress', '34f'),
+                path: '/conectafapes-project/category/material-cypress',
+                component: ComponentCreator('/conectafapes-project/category/material-cypress', '7b4'),
                 exact: true,
                 sidebar: "qa"
               },
               {
-                path: '/category/modalidades-de-bolsas',
-                component: ComponentCreator('/category/modalidades-de-bolsas', '6c5'),
+                path: '/conectafapes-project/category/modalidades-de-bolsas',
+                component: ComponentCreator('/conectafapes-project/category/modalidades-de-bolsas', '612'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/category/módulos',
-                component: ComponentCreator('/category/módulos', 'd95'),
+                path: '/conectafapes-project/category/módulos',
+                component: ComponentCreator('/conectafapes-project/category/módulos', '2b3'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/category/pagamento-de-bolsistas',
-                component: ComponentCreator('/category/pagamento-de-bolsistas', 'e5a'),
+                path: '/conectafapes-project/category/pagamento-de-bolsistas',
+                component: ComponentCreator('/conectafapes-project/category/pagamento-de-bolsistas', 'b95'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/category/portal-fapes',
-                component: ComponentCreator('/category/portal-fapes', '8e7'),
+                path: '/conectafapes-project/category/portal-fapes',
+                component: ComponentCreator('/conectafapes-project/category/portal-fapes', '01e'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/category/processo',
-                component: ComponentCreator('/category/processo', 'cf0'),
+                path: '/conectafapes-project/category/processo',
+                component: ComponentCreator('/conectafapes-project/category/processo', '1a5'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/category/processos-de-garantia-da-qualidade',
-                component: ComponentCreator('/category/processos-de-garantia-da-qualidade', '307'),
+                path: '/conectafapes-project/category/processos-de-garantia-da-qualidade',
+                component: ComponentCreator('/conectafapes-project/category/processos-de-garantia-da-qualidade', '8ee'),
                 exact: true,
                 sidebar: "qa"
               },
               {
-                path: '/category/processos-de-integração',
-                component: ComponentCreator('/category/processos-de-integração', '9fe'),
+                path: '/conectafapes-project/category/processos-de-integração',
+                component: ComponentCreator('/conectafapes-project/category/processos-de-integração', 'fe6'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/category/trilha-de-capacitação',
-                component: ComponentCreator('/category/trilha-de-capacitação', 'f89'),
+                path: '/conectafapes-project/category/trilha-de-capacitação',
+                component: ComponentCreator('/conectafapes-project/category/trilha-de-capacitação', 'e89'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/category/trilha-de-desenvolvimento',
-                component: ComponentCreator('/category/trilha-de-desenvolvimento', '3d6'),
+                path: '/conectafapes-project/category/trilha-de-desenvolvimento',
+                component: ComponentCreator('/conectafapes-project/category/trilha-de-desenvolvimento', '389'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/category/trilha-de-estudos',
-                component: ComponentCreator('/category/trilha-de-estudos', '5d9'),
+                path: '/conectafapes-project/category/trilha-de-estudos',
+                component: ComponentCreator('/conectafapes-project/category/trilha-de-estudos', 'b01'),
                 exact: true,
                 sidebar: "colatina"
               },
               {
-                path: '/category/trilha-de-pesquisa',
-                component: ComponentCreator('/category/trilha-de-pesquisa', '854'),
+                path: '/conectafapes-project/category/trilha-de-pesquisa',
+                component: ComponentCreator('/conectafapes-project/category/trilha-de-pesquisa', 'cfc'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/category/trilhas-de-estudo',
-                component: ComponentCreator('/category/trilhas-de-estudo', 'e3c'),
+                path: '/conectafapes-project/category/trilhas-de-estudo',
+                component: ComponentCreator('/conectafapes-project/category/trilhas-de-estudo', 'ec5'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/category/tutoriais',
-                component: ComponentCreator('/category/tutoriais', '8f9'),
+                path: '/conectafapes-project/category/tutoriais',
+                component: ComponentCreator('/conectafapes-project/category/tutoriais', '69a'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/category/visão-de-negócio',
-                component: ComponentCreator('/category/visão-de-negócio', '19a'),
+                path: '/conectafapes-project/category/visão-de-negócio',
+                component: ComponentCreator('/conectafapes-project/category/visão-de-negócio', '66f'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/category/visão-de-plataforma',
-                component: ComponentCreator('/category/visão-de-plataforma', 'f38'),
+                path: '/conectafapes-project/category/visão-de-plataforma',
+                component: ComponentCreator('/conectafapes-project/category/visão-de-plataforma', 'f70'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/category/visão-geral-do-conecta',
-                component: ComponentCreator('/category/visão-geral-do-conecta', 'd81'),
+                path: '/conectafapes-project/category/visão-geral-do-conecta',
+                component: ComponentCreator('/conectafapes-project/category/visão-geral-do-conecta', '171'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/colatina/intro',
-                component: ComponentCreator('/colatina/intro', '1ba'),
+                path: '/conectafapes-project/colatina/intro',
+                component: ComponentCreator('/conectafapes-project/colatina/intro', '411'),
                 exact: true,
                 sidebar: "colatina"
               },
               {
-                path: '/colatina/trilhasestudos/config_eslint',
-                component: ComponentCreator('/colatina/trilhasestudos/config_eslint', 'd9b'),
+                path: '/conectafapes-project/colatina/trilhasestudos/config_eslint',
+                component: ComponentCreator('/conectafapes-project/colatina/trilhasestudos/config_eslint', 'b7f'),
                 exact: true,
                 sidebar: "colatina"
               },
               {
-                path: '/colatina/trilhasestudos/crud_basico_back',
-                component: ComponentCreator('/colatina/trilhasestudos/crud_basico_back', '480'),
+                path: '/conectafapes-project/colatina/trilhasestudos/crud_basico_back',
+                component: ComponentCreator('/conectafapes-project/colatina/trilhasestudos/crud_basico_back', 'e5d'),
                 exact: true,
                 sidebar: "colatina"
               },
               {
-                path: '/colatina/trilhasestudos/crud_basico_front',
-                component: ComponentCreator('/colatina/trilhasestudos/crud_basico_front', '875'),
+                path: '/conectafapes-project/colatina/trilhasestudos/crud_basico_front',
+                component: ComponentCreator('/conectafapes-project/colatina/trilhasestudos/crud_basico_front', 'beb'),
                 exact: true,
                 sidebar: "colatina"
               },
               {
-                path: '/desenvolvimento/design/design_system',
-                component: ComponentCreator('/desenvolvimento/design/design_system', '1b3'),
+                path: '/conectafapes-project/desenvolvimento/design/design_system',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/design/design_system', '12d'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/design/diretrizes/acessibilidade-digital',
-                component: ComponentCreator('/desenvolvimento/design/diretrizes/acessibilidade-digital', '119'),
+                path: '/conectafapes-project/desenvolvimento/design/diretrizes/acessibilidade-digital',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/design/diretrizes/acessibilidade-digital', '413'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/design/diretrizes/grid8pontos',
-                component: ComponentCreator('/desenvolvimento/design/diretrizes/grid8pontos', '9d1'),
+                path: '/conectafapes-project/desenvolvimento/design/diretrizes/grid8pontos',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/design/diretrizes/grid8pontos', 'ef6'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/design/intro',
-                component: ComponentCreator('/desenvolvimento/design/intro', 'aec'),
+                path: '/conectafapes-project/desenvolvimento/design/intro',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/design/intro', 'dcb'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/equipe',
-                component: ComponentCreator('/desenvolvimento/equipe', '4d0'),
+                path: '/conectafapes-project/desenvolvimento/equipe',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/equipe', '58c'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/intro',
-                component: ComponentCreator('/desenvolvimento/intro', '220'),
+                path: '/conectafapes-project/desenvolvimento/intro',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/intro', 'f1d'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/api_gateway/architecture',
-                component: ComponentCreator('/desenvolvimento/modulos/api_gateway/architecture', '6e1'),
+                path: '/conectafapes-project/desenvolvimento/modulos/api_gateway/architecture',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/api_gateway/architecture', 'ff4'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/api_gateway/minimundo',
-                component: ComponentCreator('/desenvolvimento/modulos/api_gateway/minimundo', '412'),
+                path: '/conectafapes-project/desenvolvimento/modulos/api_gateway/minimundo',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/api_gateway/minimundo', '3e8'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/api_gateway/processos',
-                component: ComponentCreator('/desenvolvimento/modulos/api_gateway/processos', 'a14'),
+                path: '/conectafapes-project/desenvolvimento/modulos/api_gateway/processos',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/api_gateway/processos', '2ae'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/api_gateway/requirements',
-                component: ComponentCreator('/desenvolvimento/modulos/api_gateway/requirements', 'c49'),
+                path: '/conectafapes-project/desenvolvimento/modulos/api_gateway/requirements',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/api_gateway/requirements', '526'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/api_gateway/usecase',
-                component: ComponentCreator('/desenvolvimento/modulos/api_gateway/usecase', '92a'),
+                path: '/conectafapes-project/desenvolvimento/modulos/api_gateway/usecase',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/api_gateway/usecase', '624'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/autenticacao/minimundo',
-                component: ComponentCreator('/desenvolvimento/modulos/autenticacao/minimundo', '501'),
+                path: '/conectafapes-project/desenvolvimento/modulos/autenticacao/minimundo',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/autenticacao/minimundo', '168'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/autenticacao/requirements',
-                component: ComponentCreator('/desenvolvimento/modulos/autenticacao/requirements', '892'),
+                path: '/conectafapes-project/desenvolvimento/modulos/autenticacao/requirements',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/autenticacao/requirements', '9e8'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/autenticacao/usecase',
-                component: ComponentCreator('/desenvolvimento/modulos/autenticacao/usecase', 'f84'),
+                path: '/conectafapes-project/desenvolvimento/modulos/autenticacao/usecase',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/autenticacao/usecase', '2ed'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/gerenciar_editais/minimundo',
-                component: ComponentCreator('/desenvolvimento/modulos/gerenciar_editais/minimundo', '69a'),
+                path: '/conectafapes-project/desenvolvimento/modulos/gerenciar_editais/minimundo',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/gerenciar_editais/minimundo', '0f1'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/gerenciar_editais/requisitos',
-                component: ComponentCreator('/desenvolvimento/modulos/gerenciar_editais/requisitos', 'ed9'),
+                path: '/conectafapes-project/desenvolvimento/modulos/gerenciar_editais/requisitos',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/gerenciar_editais/requisitos', 'b80'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/gestao_bolsa_pesquisa/casos_uso',
-                component: ComponentCreator('/desenvolvimento/modulos/gestao_bolsa_pesquisa/casos_uso', '5c5'),
+                path: '/conectafapes-project/desenvolvimento/modulos/gestao_bolsa_pesquisa/casos_uso',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/gestao_bolsa_pesquisa/casos_uso', 'f41'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/gestao_bolsa_pesquisa/minimundo',
-                component: ComponentCreator('/desenvolvimento/modulos/gestao_bolsa_pesquisa/minimundo', '263'),
+                path: '/conectafapes-project/desenvolvimento/modulos/gestao_bolsa_pesquisa/minimundo',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/gestao_bolsa_pesquisa/minimundo', '413'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_comportamental',
-                component: ComponentCreator('/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_comportamental', '8aa'),
+                path: '/conectafapes-project/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_comportamental',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_comportamental', 'df9'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_estrutural',
-                component: ComponentCreator('/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_estrutural', '87f'),
+                path: '/conectafapes-project/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_estrutural',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/gestao_bolsa_pesquisa/modelo_estrutural', 'af7'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/gestao_bolsa_pesquisa/requirements',
-                component: ComponentCreator('/desenvolvimento/modulos/gestao_bolsa_pesquisa/requirements', 'a13'),
+                path: '/conectafapes-project/desenvolvimento/modulos/gestao_bolsa_pesquisa/requirements',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/gestao_bolsa_pesquisa/requirements', 'deb'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/importacao_editais/arquitetura',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/arquitetura', '97a'),
+                path: '/conectafapes-project/desenvolvimento/modulos/importacao_editais/arquitetura',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/importacao_editais/arquitetura', 'c39'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/importacao_editais/casos-uso',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/casos-uso', '882'),
+                path: '/conectafapes-project/desenvolvimento/modulos/importacao_editais/casos-uso',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/importacao_editais/casos-uso', 'f3a'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/importacao_editais/minimundo',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/minimundo', 'c89'),
+                path: '/conectafapes-project/desenvolvimento/modulos/importacao_editais/minimundo',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/importacao_editais/minimundo', 'be3'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/importacao_editais/modelo-comportamental',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/modelo-comportamental', '116'),
+                path: '/conectafapes-project/desenvolvimento/modulos/importacao_editais/modelo-comportamental',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/importacao_editais/modelo-comportamental', '964'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/importacao_editais/modelo-estrutural',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/modelo-estrutural', '3e8'),
+                path: '/conectafapes-project/desenvolvimento/modulos/importacao_editais/modelo-estrutural',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/importacao_editais/modelo-estrutural', 'a5a'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/importacao_editais/processos/integracao_edital',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/processos/integracao_edital', 'c59'),
+                path: '/conectafapes-project/desenvolvimento/modulos/importacao_editais/processos/integracao_edital',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/importacao_editais/processos/integracao_edital', 'b81'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/importacao_editais/processos/integracao_edital_projeto',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/processos/integracao_edital_projeto', 'e65'),
+                path: '/conectafapes-project/desenvolvimento/modulos/importacao_editais/processos/integracao_edital_projeto',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/importacao_editais/processos/integracao_edital_projeto', '55e'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/importacao_editais/processos/integracao_projeto',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/processos/integracao_projeto', '847'),
+                path: '/conectafapes-project/desenvolvimento/modulos/importacao_editais/processos/integracao_projeto',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/importacao_editais/processos/integracao_projeto', 'a67'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/importacao_editais/prototipo_telas',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/prototipo_telas', 'c6b'),
+                path: '/conectafapes-project/desenvolvimento/modulos/importacao_editais/prototipo_telas',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/importacao_editais/prototipo_telas', '3aa'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/importacao_editais/requisitos',
-                component: ComponentCreator('/desenvolvimento/modulos/importacao_editais/requisitos', 'b5c'),
+                path: '/conectafapes-project/desenvolvimento/modulos/importacao_editais/requisitos',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/importacao_editais/requisitos', 'ea2'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/intro',
-                component: ComponentCreator('/desenvolvimento/modulos/intro', '203'),
+                path: '/conectafapes-project/desenvolvimento/modulos/intro',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/intro', 'da0'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/modalidade_bolsa/arquitetura',
-                component: ComponentCreator('/desenvolvimento/modulos/modalidade_bolsa/arquitetura', '1e2'),
+                path: '/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/arquitetura',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/arquitetura', 'aa5'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/modalidade_bolsa/casos-uso',
-                component: ComponentCreator('/desenvolvimento/modulos/modalidade_bolsa/casos-uso', '81f'),
+                path: '/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/casos-uso',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/casos-uso', '482'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/modalidade_bolsa/minimundo',
-                component: ComponentCreator('/desenvolvimento/modulos/modalidade_bolsa/minimundo', '372'),
+                path: '/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/minimundo',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/minimundo', '267'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/modalidade_bolsa/modelo-comportamental',
-                component: ComponentCreator('/desenvolvimento/modulos/modalidade_bolsa/modelo-comportamental', '46a'),
+                path: '/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/modelo-comportamental',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/modelo-comportamental', '57a'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/modalidade_bolsa/modelo-estrutural',
-                component: ComponentCreator('/desenvolvimento/modulos/modalidade_bolsa/modelo-estrutural', '7cd'),
+                path: '/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/modelo-estrutural',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/modelo-estrutural', '07f'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/modalidade_bolsa/requisitos',
-                component: ComponentCreator('/desenvolvimento/modulos/modalidade_bolsa/requisitos', '8b0'),
+                path: '/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/requisitos',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/modalidade_bolsa/requisitos', 'df2'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/pagamento_bolsista/casos_uso',
-                component: ComponentCreator('/desenvolvimento/modulos/pagamento_bolsista/casos_uso', 'e3a'),
+                path: '/conectafapes-project/desenvolvimento/modulos/pagamento_bolsista/casos_uso',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/pagamento_bolsista/casos_uso', 'b9b'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/pagamento_bolsista/minimundo',
-                component: ComponentCreator('/desenvolvimento/modulos/pagamento_bolsista/minimundo', '105'),
+                path: '/conectafapes-project/desenvolvimento/modulos/pagamento_bolsista/minimundo',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/pagamento_bolsista/minimundo', '8c9'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/pagamento_bolsista/modelo_comportamental',
-                component: ComponentCreator('/desenvolvimento/modulos/pagamento_bolsista/modelo_comportamental', 'aae'),
+                path: '/conectafapes-project/desenvolvimento/modulos/pagamento_bolsista/modelo_comportamental',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/pagamento_bolsista/modelo_comportamental', '0f7'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/pagamento_bolsista/modelo_estrutural',
-                component: ComponentCreator('/desenvolvimento/modulos/pagamento_bolsista/modelo_estrutural', '6ae'),
+                path: '/conectafapes-project/desenvolvimento/modulos/pagamento_bolsista/modelo_estrutural',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/pagamento_bolsista/modelo_estrutural', '531'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/pagamento_bolsista/requirements',
-                component: ComponentCreator('/desenvolvimento/modulos/pagamento_bolsista/requirements', '6d9'),
+                path: '/conectafapes-project/desenvolvimento/modulos/pagamento_bolsista/requirements',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/pagamento_bolsista/requirements', '06c'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/portal_fapes/diagramafluxo',
-                component: ComponentCreator('/desenvolvimento/modulos/portal_fapes/diagramafluxo', '389'),
+                path: '/conectafapes-project/desenvolvimento/modulos/portal_fapes/diagramafluxo',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/portal_fapes/diagramafluxo', 'dd3'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/portal_fapes/introducao',
-                component: ComponentCreator('/desenvolvimento/modulos/portal_fapes/introducao', 'a5e'),
+                path: '/conectafapes-project/desenvolvimento/modulos/portal_fapes/introducao',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/portal_fapes/introducao', 'faf'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/portal_fapes/modeloestrutural',
-                component: ComponentCreator('/desenvolvimento/modulos/portal_fapes/modeloestrutural', '47b'),
+                path: '/conectafapes-project/desenvolvimento/modulos/portal_fapes/modeloestrutural',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/portal_fapes/modeloestrutural', '386'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/portal_fapes/requirements',
-                component: ComponentCreator('/desenvolvimento/modulos/portal_fapes/requirements', 'd09'),
+                path: '/conectafapes-project/desenvolvimento/modulos/portal_fapes/requirements',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/portal_fapes/requirements', 'b23'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/modulos/portal_fapes/usecase',
-                component: ComponentCreator('/desenvolvimento/modulos/portal_fapes/usecase', 'f42'),
+                path: '/conectafapes-project/desenvolvimento/modulos/portal_fapes/usecase',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/modulos/portal_fapes/usecase', '6a9'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/processosoftware/exemplo_documentacao_squad',
-                component: ComponentCreator('/desenvolvimento/processosoftware/exemplo_documentacao_squad', 'c8d'),
+                path: '/conectafapes-project/desenvolvimento/processosoftware/exemplo_documentacao_squad',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/processosoftware/exemplo_documentacao_squad', 'b53'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/processosoftware/modelostacy',
-                component: ComponentCreator('/desenvolvimento/processosoftware/modelostacy', '683'),
+                path: '/conectafapes-project/desenvolvimento/processosoftware/modelostacy',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/processosoftware/modelostacy', 'c2f'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/processosoftware/processo_definir_design_sprint',
-                component: ComponentCreator('/desenvolvimento/processosoftware/processo_definir_design_sprint', '259'),
+                path: '/conectafapes-project/desenvolvimento/processosoftware/processo_definir_design_sprint',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/processosoftware/processo_definir_design_sprint', 'e4c'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/processosoftware/processo_definir_produto_desenvolvido',
-                component: ComponentCreator('/desenvolvimento/processosoftware/processo_definir_produto_desenvolvido', '5d4'),
+                path: '/conectafapes-project/desenvolvimento/processosoftware/processo_definir_produto_desenvolvido',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/processosoftware/processo_definir_produto_desenvolvido', '4ab'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/processosoftware/processo_desenvolvimento',
-                component: ComponentCreator('/desenvolvimento/processosoftware/processo_desenvolvimento', '615'),
+                path: '/conectafapes-project/desenvolvimento/processosoftware/processo_desenvolvimento',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/processosoftware/processo_desenvolvimento', 'ed8'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/processosoftware/processo_mapear_processos',
-                component: ComponentCreator('/desenvolvimento/processosoftware/processo_mapear_processos', '12b'),
+                path: '/conectafapes-project/desenvolvimento/processosoftware/processo_mapear_processos',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/processosoftware/processo_mapear_processos', '6ac'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/processosoftware/visao_geral',
-                component: ComponentCreator('/desenvolvimento/processosoftware/visao_geral', 'e83'),
+                path: '/conectafapes-project/desenvolvimento/processosoftware/visao_geral',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/processosoftware/visao_geral', '881'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/desenvolvimento/visaogeral/',
-                component: ComponentCreator('/desenvolvimento/visaogeral/', 'a7a'),
+                path: '/conectafapes-project/desenvolvimento/visaogeral/',
+                component: ComponentCreator('/conectafapes-project/desenvolvimento/visaogeral/', 'f8f'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
               {
-                path: '/devops/ambientes',
-                component: ComponentCreator('/devops/ambientes', '657'),
+                path: '/conectafapes-project/devops/ambientes',
+                component: ComponentCreator('/conectafapes-project/devops/ambientes', '773'),
                 exact: true,
                 sidebar: "devops"
               },
               {
-                path: '/devops/intro',
-                component: ComponentCreator('/devops/intro', '90a'),
+                path: '/conectafapes-project/devops/intro',
+                component: ComponentCreator('/conectafapes-project/devops/intro', '800'),
                 exact: true,
                 sidebar: "devops"
               },
               {
-                path: '/gestao/data_driven/metricas',
-                component: ComponentCreator('/gestao/data_driven/metricas', '807'),
+                path: '/conectafapes-project/gestao/data_driven/metricas',
+                component: ComponentCreator('/conectafapes-project/gestao/data_driven/metricas', '09e'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/gestao/data_driven/tratamento-de-issues',
-                component: ComponentCreator('/gestao/data_driven/tratamento-de-issues', '786'),
+                path: '/conectafapes-project/gestao/data_driven/tratamento-de-issues',
+                component: ComponentCreator('/conectafapes-project/gestao/data_driven/tratamento-de-issues', '3c2'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/gestao/data_driven/visao_geral',
-                component: ComponentCreator('/gestao/data_driven/visao_geral', 'ce1'),
+                path: '/conectafapes-project/gestao/data_driven/visao_geral',
+                component: ComponentCreator('/conectafapes-project/gestao/data_driven/visao_geral', '5d8'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/gestao/processogestaomacro',
-                component: ComponentCreator('/gestao/processogestaomacro', '305'),
+                path: '/conectafapes-project/gestao/processogestaomacro',
+                component: ComponentCreator('/conectafapes-project/gestao/processogestaomacro', 'e2c'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/gestao/trilha_capacitacao/aquisicao_talento',
-                component: ComponentCreator('/gestao/trilha_capacitacao/aquisicao_talento', 'f79'),
+                path: '/conectafapes-project/gestao/trilha_capacitacao/aquisicao_talento',
+                component: ComponentCreator('/conectafapes-project/gestao/trilha_capacitacao/aquisicao_talento', '51a'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/gestao/trilha_capacitacao/visaogeral',
-                component: ComponentCreator('/gestao/trilha_capacitacao/visaogeral', 'f94'),
+                path: '/conectafapes-project/gestao/trilha_capacitacao/visaogeral',
+                component: ComponentCreator('/conectafapes-project/gestao/trilha_capacitacao/visaogeral', '856'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/gestao/trilha_desenvolvimento/negocio/backlog_negocio',
-                component: ComponentCreator('/gestao/trilha_desenvolvimento/negocio/backlog_negocio', 'f2e'),
+                path: '/conectafapes-project/gestao/trilha_desenvolvimento/negocio/backlog_negocio',
+                component: ComponentCreator('/conectafapes-project/gestao/trilha_desenvolvimento/negocio/backlog_negocio', '2c9'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/gestao/trilha_desenvolvimento/negocio/controlar_recursos_projeto',
-                component: ComponentCreator('/gestao/trilha_desenvolvimento/negocio/controlar_recursos_projeto', '35e'),
+                path: '/conectafapes-project/gestao/trilha_desenvolvimento/negocio/controlar_recursos_projeto',
+                component: ComponentCreator('/conectafapes-project/gestao/trilha_desenvolvimento/negocio/controlar_recursos_projeto', '595'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/gestao/trilha_desenvolvimento/negocio/entrega_pagamento_bolsista',
-                component: ComponentCreator('/gestao/trilha_desenvolvimento/negocio/entrega_pagamento_bolsista', '281'),
+                path: '/conectafapes-project/gestao/trilha_desenvolvimento/negocio/entrega_pagamento_bolsista',
+                component: ComponentCreator('/conectafapes-project/gestao/trilha_desenvolvimento/negocio/entrega_pagamento_bolsista', '21f'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/gestao/trilha_desenvolvimento/negocio/implementacao_bolsa',
-                component: ComponentCreator('/gestao/trilha_desenvolvimento/negocio/implementacao_bolsa', 'c1c'),
+                path: '/conectafapes-project/gestao/trilha_desenvolvimento/negocio/implementacao_bolsa',
+                component: ComponentCreator('/conectafapes-project/gestao/trilha_desenvolvimento/negocio/implementacao_bolsa', 'a2c'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/gestao/trilha_desenvolvimento/negocio/relatorio_analitico_leds-conectafapes',
-                component: ComponentCreator('/gestao/trilha_desenvolvimento/negocio/relatorio_analitico_leds-conectafapes', 'c65'),
+                path: '/conectafapes-project/gestao/trilha_desenvolvimento/negocio/relatorio_analitico_leds-conectafapes',
+                component: ComponentCreator('/conectafapes-project/gestao/trilha_desenvolvimento/negocio/relatorio_analitico_leds-conectafapes', '626'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/gestao/trilha_desenvolvimento/negocio/stakeholders',
-                component: ComponentCreator('/gestao/trilha_desenvolvimento/negocio/stakeholders', '2ae'),
+                path: '/conectafapes-project/gestao/trilha_desenvolvimento/negocio/stakeholders',
+                component: ComponentCreator('/conectafapes-project/gestao/trilha_desenvolvimento/negocio/stakeholders', '99b'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/gestao/trilha_desenvolvimento/plataforma/backlog_plataforma',
-                component: ComponentCreator('/gestao/trilha_desenvolvimento/plataforma/backlog_plataforma', '1d0'),
+                path: '/conectafapes-project/gestao/trilha_desenvolvimento/plataforma/backlog_plataforma',
+                component: ComponentCreator('/conectafapes-project/gestao/trilha_desenvolvimento/plataforma/backlog_plataforma', '3cf'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/gestao/trilha_desenvolvimento/plataforma/geracao_codigo',
-                component: ComponentCreator('/gestao/trilha_desenvolvimento/plataforma/geracao_codigo', 'cba'),
+                path: '/conectafapes-project/gestao/trilha_desenvolvimento/plataforma/geracao_codigo',
+                component: ComponentCreator('/conectafapes-project/gestao/trilha_desenvolvimento/plataforma/geracao_codigo', '621'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/gestao/trilha_pesquisa/visaogeral',
-                component: ComponentCreator('/gestao/trilha_pesquisa/visaogeral', '811'),
+                path: '/conectafapes-project/gestao/trilha_pesquisa/visaogeral',
+                component: ComponentCreator('/conectafapes-project/gestao/trilha_pesquisa/visaogeral', '584'),
                 exact: true,
                 sidebar: "gestao"
               },
               {
-                path: '/processonegocio/as_is/gestao_edital/',
-                component: ComponentCreator('/processonegocio/as_is/gestao_edital/', '0f4'),
+                path: '/conectafapes-project/processonegocio/as_is/gestao_edital/',
+                component: ComponentCreator('/conectafapes-project/processonegocio/as_is/gestao_edital/', '6b4'),
                 exact: true
               },
               {
-                path: '/processonegocio/as_is/gestao_edital/conceber_edital',
-                component: ComponentCreator('/processonegocio/as_is/gestao_edital/conceber_edital', '06c'),
+                path: '/conectafapes-project/processonegocio/as_is/gestao_edital/conceber_edital',
+                component: ComponentCreator('/conectafapes-project/processonegocio/as_is/gestao_edital/conceber_edital', '5a7'),
                 exact: true
               },
               {
-                path: '/processonegocio/as_is/gestao_edital/gerenciar_projetos',
-                component: ComponentCreator('/processonegocio/as_is/gestao_edital/gerenciar_projetos', '67d'),
+                path: '/conectafapes-project/processonegocio/as_is/gestao_edital/gerenciar_projetos',
+                component: ComponentCreator('/conectafapes-project/processonegocio/as_is/gestao_edital/gerenciar_projetos', 'e16'),
                 exact: true
               },
               {
-                path: '/processonegocio/as_is/gestao_edital/submeter_contratar_propostas',
-                component: ComponentCreator('/processonegocio/as_is/gestao_edital/submeter_contratar_propostas', 'fff'),
+                path: '/conectafapes-project/processonegocio/as_is/gestao_edital/submeter_contratar_propostas',
+                component: ComponentCreator('/conectafapes-project/processonegocio/as_is/gestao_edital/submeter_contratar_propostas', 'b18'),
                 exact: true
               },
               {
-                path: '/processonegocio/intro',
-                component: ComponentCreator('/processonegocio/intro', 'd31'),
+                path: '/conectafapes-project/processonegocio/intro',
+                component: ComponentCreator('/conectafapes-project/processonegocio/intro', '56e'),
                 exact: true
               },
               {
-                path: '/processonegocio/to_be/gestao_edital/gestao_projetos/gerar_folha_de_pagamento',
-                component: ComponentCreator('/processonegocio/to_be/gestao_edital/gestao_projetos/gerar_folha_de_pagamento', '96d'),
+                path: '/conectafapes-project/processonegocio/to_be/gestao_edital/gestao_projetos/gerar_folha_de_pagamento',
+                component: ComponentCreator('/conectafapes-project/processonegocio/to_be/gestao_edital/gestao_projetos/gerar_folha_de_pagamento', '434'),
                 exact: true
               },
               {
-                path: '/processonegocio/to_be/gestao_edital/gestao_projetos/incluir_bolsista',
-                component: ComponentCreator('/processonegocio/to_be/gestao_edital/gestao_projetos/incluir_bolsista', '570'),
+                path: '/conectafapes-project/processonegocio/to_be/gestao_edital/gestao_projetos/incluir_bolsista',
+                component: ComponentCreator('/conectafapes-project/processonegocio/to_be/gestao_edital/gestao_projetos/incluir_bolsista', '937'),
                 exact: true
               },
               {
-                path: '/qualidade/cypress/boas_praticas_cypress',
-                component: ComponentCreator('/qualidade/cypress/boas_praticas_cypress', '422'),
+                path: '/conectafapes-project/qualidade/cypress/boas_praticas_cypress',
+                component: ComponentCreator('/conectafapes-project/qualidade/cypress/boas_praticas_cypress', '190'),
                 exact: true,
                 sidebar: "qa"
               },
               {
-                path: '/qualidade/cypress/padrao_scripts_cypress',
-                component: ComponentCreator('/qualidade/cypress/padrao_scripts_cypress', '114'),
+                path: '/conectafapes-project/qualidade/cypress/padrao_scripts_cypress',
+                component: ComponentCreator('/conectafapes-project/qualidade/cypress/padrao_scripts_cypress', 'bab'),
                 exact: true,
                 sidebar: "qa"
               },
               {
-                path: '/qualidade/intro',
-                component: ComponentCreator('/qualidade/intro', 'b32'),
+                path: '/conectafapes-project/qualidade/intro',
+                component: ComponentCreator('/conectafapes-project/qualidade/intro', 'ea8'),
                 exact: true,
                 sidebar: "qa"
               },
               {
-                path: '/qualidade/processos/boas-praticas-github',
-                component: ComponentCreator('/qualidade/processos/boas-praticas-github', '948'),
+                path: '/conectafapes-project/qualidade/processos/boas-praticas-github',
+                component: ComponentCreator('/conectafapes-project/qualidade/processos/boas-praticas-github', '726'),
                 exact: true,
                 sidebar: "qa"
               },
               {
-                path: '/referencias/arquitetura/arquitetura',
-                component: ComponentCreator('/referencias/arquitetura/arquitetura', '463'),
+                path: '/conectafapes-project/referencias/arquitetura/arquitetura',
+                component: ComponentCreator('/conectafapes-project/referencias/arquitetura/arquitetura', '0cf'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/arquitetura/componentes_arquitetura',
-                component: ComponentCreator('/referencias/arquitetura/componentes_arquitetura', '2f6'),
+                path: '/conectafapes-project/referencias/arquitetura/componentes_arquitetura',
+                component: ComponentCreator('/conectafapes-project/referencias/arquitetura/componentes_arquitetura', '91e'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/arquitetura/conceitos',
-                component: ComponentCreator('/referencias/arquitetura/conceitos', '8a4'),
+                path: '/conectafapes-project/referencias/arquitetura/conceitos',
+                component: ComponentCreator('/conectafapes-project/referencias/arquitetura/conceitos', '2a6'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/arquitetura/tecnologias',
-                component: ComponentCreator('/referencias/arquitetura/tecnologias', 'ee7'),
+                path: '/conectafapes-project/referencias/arquitetura/tecnologias',
+                component: ComponentCreator('/conectafapes-project/referencias/arquitetura/tecnologias', '16c'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/governo/acesso_cidadao',
-                component: ComponentCreator('/referencias/governo/acesso_cidadao', 'b05'),
+                path: '/conectafapes-project/referencias/governo/acesso_cidadao',
+                component: ComponentCreator('/conectafapes-project/referencias/governo/acesso_cidadao', 'f7d'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/governo/api_notificacao',
-                component: ComponentCreator('/referencias/governo/api_notificacao', '142'),
+                path: '/conectafapes-project/referencias/governo/api_notificacao',
+                component: ComponentCreator('/conectafapes-project/referencias/governo/api_notificacao', 'b58'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/governo/banestes',
-                component: ComponentCreator('/referencias/governo/banestes', '826'),
+                path: '/conectafapes-project/referencias/governo/banestes',
+                component: ComponentCreator('/conectafapes-project/referencias/governo/banestes', '417'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/governo/sigfapes',
-                component: ComponentCreator('/referencias/governo/sigfapes', '0d6'),
+                path: '/conectafapes-project/referencias/governo/sigfapes',
+                component: ComponentCreator('/conectafapes-project/referencias/governo/sigfapes', 'fab'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/intro',
-                component: ComponentCreator('/referencias/intro', 'e89'),
+                path: '/conectafapes-project/referencias/intro',
+                component: ComponentCreator('/conectafapes-project/referencias/intro', 'e9a'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/trilhas/roadmap-backend',
-                component: ComponentCreator('/referencias/trilhas/roadmap-backend', '7e3'),
+                path: '/conectafapes-project/referencias/trilhas/roadmap-backend',
+                component: ComponentCreator('/conectafapes-project/referencias/trilhas/roadmap-backend', 'fe0'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/trilhas/roadmap-frontend',
-                component: ComponentCreator('/referencias/trilhas/roadmap-frontend', 'b60'),
+                path: '/conectafapes-project/referencias/trilhas/roadmap-frontend',
+                component: ComponentCreator('/conectafapes-project/referencias/trilhas/roadmap-frontend', 'e85'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/tutoriais/dibb',
-                component: ComponentCreator('/referencias/tutoriais/dibb', 'a57'),
+                path: '/conectafapes-project/referencias/tutoriais/dibb',
+                component: ComponentCreator('/conectafapes-project/referencias/tutoriais/dibb', '1c8'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/tutoriais/escrita_issues',
-                component: ComponentCreator('/referencias/tutoriais/escrita_issues', '8d0'),
+                path: '/conectafapes-project/referencias/tutoriais/escrita_issues',
+                component: ComponentCreator('/conectafapes-project/referencias/tutoriais/escrita_issues', 'd56'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/tutoriais/integracao-acesso-cidadao',
-                component: ComponentCreator('/referencias/tutoriais/integracao-acesso-cidadao', 'da7'),
+                path: '/conectafapes-project/referencias/tutoriais/integracao-acesso-cidadao',
+                component: ComponentCreator('/conectafapes-project/referencias/tutoriais/integracao-acesso-cidadao', '134'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/tutoriais/intro',
-                component: ComponentCreator('/referencias/tutoriais/intro', 'f3c'),
+                path: '/conectafapes-project/referencias/tutoriais/intro',
+                component: ComponentCreator('/conectafapes-project/referencias/tutoriais/intro', 'f85'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/tutoriais/less',
-                component: ComponentCreator('/referencias/tutoriais/less', '256'),
+                path: '/conectafapes-project/referencias/tutoriais/less',
+                component: ComponentCreator('/conectafapes-project/referencias/tutoriais/less', '6be'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/tutoriais/prompt',
-                component: ComponentCreator('/referencias/tutoriais/prompt', 'fcf'),
+                path: '/conectafapes-project/referencias/tutoriais/prompt',
+                component: ComponentCreator('/conectafapes-project/referencias/tutoriais/prompt', '164'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/tutoriais/six_paper',
-                component: ComponentCreator('/referencias/tutoriais/six_paper', 'fbd'),
+                path: '/conectafapes-project/referencias/tutoriais/six_paper',
+                component: ComponentCreator('/conectafapes-project/referencias/tutoriais/six_paper', 'b92'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/referencias/tutoriais/token-jwt-interno',
-                component: ComponentCreator('/referencias/tutoriais/token-jwt-interno', 'da8'),
+                path: '/conectafapes-project/referencias/tutoriais/token-jwt-interno',
+                component: ComponentCreator('/conectafapes-project/referencias/tutoriais/token-jwt-interno', '01d'),
                 exact: true,
                 sidebar: "referencias"
               },
               {
-                path: '/sdd_conecta_admin/banco_dados',
-                component: ComponentCreator('/sdd_conecta_admin/banco_dados', '617'),
+                path: '/conectafapes-project/sdd_conecta_admin/banco_dados',
+                component: ComponentCreator('/conectafapes-project/sdd_conecta_admin/banco_dados', '74e'),
                 exact: true,
                 sidebar: "sdd_conecta_admin"
               },
               {
-                path: '/sdd_conecta_admin/descricao_geral',
-                component: ComponentCreator('/sdd_conecta_admin/descricao_geral', 'a95'),
+                path: '/conectafapes-project/sdd_conecta_admin/descricao_geral',
+                component: ComponentCreator('/conectafapes-project/sdd_conecta_admin/descricao_geral', '1bd'),
                 exact: true,
                 sidebar: "sdd_conecta_admin"
               },
               {
-                path: '/sdd_conecta_admin/design_detalhado',
-                component: ComponentCreator('/sdd_conecta_admin/design_detalhado', 'b8f'),
+                path: '/conectafapes-project/sdd_conecta_admin/design_detalhado',
+                component: ComponentCreator('/conectafapes-project/sdd_conecta_admin/design_detalhado', 'd91'),
                 exact: true,
                 sidebar: "sdd_conecta_admin"
               },
               {
-                path: '/sdd_conecta_admin/diretrizes_design',
-                component: ComponentCreator('/sdd_conecta_admin/diretrizes_design', '718'),
+                path: '/conectafapes-project/sdd_conecta_admin/diretrizes_design',
+                component: ComponentCreator('/conectafapes-project/sdd_conecta_admin/diretrizes_design', 'de7'),
                 exact: true,
                 sidebar: "sdd_conecta_admin"
               },
               {
-                path: '/sdd_conecta_admin/glossario',
-                component: ComponentCreator('/sdd_conecta_admin/glossario', 'bda'),
+                path: '/conectafapes-project/sdd_conecta_admin/glossario',
+                component: ComponentCreator('/conectafapes-project/sdd_conecta_admin/glossario', 'ff0'),
                 exact: true,
                 sidebar: "sdd_conecta_admin"
               },
               {
-                path: '/sdd_conecta_admin/interfaces_externas',
-                component: ComponentCreator('/sdd_conecta_admin/interfaces_externas', 'd45'),
+                path: '/conectafapes-project/sdd_conecta_admin/interfaces_externas',
+                component: ComponentCreator('/conectafapes-project/sdd_conecta_admin/interfaces_externas', '218'),
                 exact: true,
                 sidebar: "sdd_conecta_admin"
               },
               {
-                path: '/sdd_conecta_admin/introducao',
-                component: ComponentCreator('/sdd_conecta_admin/introducao', 'ce4'),
+                path: '/conectafapes-project/sdd_conecta_admin/introducao',
+                component: ComponentCreator('/conectafapes-project/sdd_conecta_admin/introducao', '19a'),
                 exact: true,
                 sidebar: "sdd_conecta_admin"
               },
               {
-                path: '/sdd_conecta_admin/plano_de_testes',
-                component: ComponentCreator('/sdd_conecta_admin/plano_de_testes', 'e5a'),
+                path: '/conectafapes-project/sdd_conecta_admin/plano_de_testes',
+                component: ComponentCreator('/conectafapes-project/sdd_conecta_admin/plano_de_testes', '46d'),
                 exact: true,
                 sidebar: "sdd_conecta_admin"
               },
               {
-                path: '/sdd_conecta_admin/requisitos_funcionais',
-                component: ComponentCreator('/sdd_conecta_admin/requisitos_funcionais', '3ee'),
+                path: '/conectafapes-project/sdd_conecta_admin/requisitos_funcionais',
+                component: ComponentCreator('/conectafapes-project/sdd_conecta_admin/requisitos_funcionais', '7fa'),
                 exact: true,
                 sidebar: "sdd_conecta_admin"
               },
               {
-                path: '/sdd_conecta_admin/seguranca',
-                component: ComponentCreator('/sdd_conecta_admin/seguranca', 'f7d'),
+                path: '/conectafapes-project/sdd_conecta_admin/seguranca',
+                component: ComponentCreator('/conectafapes-project/sdd_conecta_admin/seguranca', '12d'),
                 exact: true,
                 sidebar: "sdd_conecta_admin"
               },
               {
-                path: '/',
-                component: ComponentCreator('/', '6d3'),
+                path: '/conectafapes-project/',
+                component: ComponentCreator('/conectafapes-project/', '943'),
                 exact: true
               }
             ]
