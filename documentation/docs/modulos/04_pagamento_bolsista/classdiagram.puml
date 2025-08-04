@@ -1,0 +1,226 @@
+@startuml
+
+    class Pessoa #palegreen{
+    String: nome
+    String: descricao
+    }
+    
+    class AreaTecnica #palegreen{
+    String: nome
+    String: descricao
+    }
+    
+    
+    class Edital #palegreen{
+    String: nome
+    Date: dataCriacao
+    Date: dataUltimaSincronizacao
+    Integer: idSigFapes
+    EnumStatusImportacao: statusImportacao
+    
+    }
+    enum EnumStatusEdital #lightyellow{
+    String ATIVO
+    String INATIVO
+    }
+    Edital "0..*" --> "1"  AreaTecnica
+    Edital "1" <---> "0..*" EditalCompetencia
+    Edital "1" --> "1" EnumStatusEdital
+    
+    Edital "1" <---> "0..*" Projeto
+    
+    class Projeto #palegreen{
+    String: nome
+    Date: dataInicio
+    Date: dataFimPrevista
+    EnumStatusPreenchimento: statusPreenchimento
+    Integer: idSigFapes
+    }
+    Enum EnumStatusProjeto #lightyellow{
+    String: EM ANDAMENTO
+    String: FINALIZADO
+    String: CANCELADO
+    }
+    Projeto "1" --> "1" EnumStatusProjeto:status
+    
+    
+    class AlocacaoBolsista #palegreen{
+    Date:dataSolicitacao
+    Date:dataInicio
+    Date:dataPrevistaFim
+    Date:dataFimAtividades
+    Integer:qtdeAlocadas
+    Integer:qtdeCotasPagasPreImportacao
+    string:justificativaCancelamento
+    Integer:idSigFapes
+    Integer:matricula
+    }
+    Enum EnumStatusAlocacaoBolsista #lightyellow{
+    String:EM EDICAO
+    String:DOCUMENTACAO PENDENTE
+    String:AGUARDANDO ACEITES
+    String:PENDENTE DE AVALIACAO
+    String:EM AVALIACAO
+    String:ATIVA
+    String:SUSPENSA
+    String:CANCELADA
+    String:FINALIZADA
+    }
+    Enum EnumCadastroBanestes #lightyellow{
+    String PENDENTE
+    String ENVIADO
+    String CADASTRADO
+    }
+    AlocacaoBolsista "0..*" --> "1" Pessoa:bolsista
+    AlocacaoBolsista "0..*" --> "1" VersaoNivel:bolsa
+    AlocacaoBolsista "0..*" <--> "1" Projeto
+    AlocacaoBolsista "1" --> "0..*" PagamentoBolsista:pagamentos
+    AlocacaoBolsista "1" --> "1" EnumCadastroBanestes:statusCadastroBanestes
+    AlocacaoBolsista "1" --> "1" EnumStatusAlocacaoBolsista:status
+    
+    
+    class VersaoNivel #lightblue{
+    double: valor
+    Integer: idSigFapes
+    }
+    
+    
+    class EditalCompetencia #lightyellow{
+    }
+    enum EnumStatusEditalCompetencia #lightyellow{
+    String SEM DECISAO
+    String LIBERADO
+    String NAO LIBERADO
+    String INCLUIDO EM FOLHA
+    }
+    EditalCompetencia "1" --> "0..*" DecisaoLiberacao:decisoes
+    EditalCompetencia "1" --> "1" EnumStatusEditalCompetencia:status
+    EditalCompetencia "0..*" --> "1" PlanoMensal: mes
+    
+    
+    class DecisaoLiberacao #lightyellow{
+    Date: horario
+    Boolean: ehLiberado
+    String: justificativa
+    }
+    DecisaoLiberacao "0..*" --> "1" Usuario
+    
+    
+    class Usuario #lightyellow{
+    String: nome
+    }
+    
+    
+    class PlanoMensal #lightyellow{
+    Date: mes
+    Date: marcoSolicitacao
+    Date: marcoGeracaoFolha
+    Date: marcoPagamento
+    Boolean: ehAtual
+    }
+    PlanoMensal "1" <-- "0..*" Folha : mes
+    
+    
+    class DecisaoFolha #lightyellow{
+    Date: horario
+    String: justificativa
+    }
+    Enum EnumTipoAcaoFolha #lightyellow{
+    String:GERAR
+    String:CANCELAR
+    String:AUTORIZAR
+    String:REJEITAR
+    }
+    DecisaoFolha "1" --> "0..*" Usuario
+    DecisaoFolha "1" --> "1" EnumTipoAcaoFolha:tipoAcao
+    
+    
+    class Folha #lightyellow{
+    Integer: ordem
+    Date: dataPagto
+    }
+    Enum EnumStatusFolha #lightyellow{
+    String: GERADA
+    String: CANCELADA
+    String: AUTORIZADA
+    String: EM AGENDAMENTO
+    String: AGENDADA
+    String: SOLICITADO AO BANDES
+    String: REMESSAS AUTORIZADAS
+    String: PAGA
+    }
+    Folha "1" --> "0..*" DecisaoFolha:decisoes
+    Folha "0..1" --> "0..*" PagamentoBolsista:pagamentos
+    Folha "1" --> "0..2" GuiaDeLiberacao
+    Folha "1" --> "1" EnumStatusFolha
+    
+    class PagamentoBolsista #lightyellow{
+    Integer: numCota
+    Date: mesCompetencia
+    double: valorPago
+    }
+    Enum EnumStatusPagamentoBolsista #lightyellow{
+    String:ALOCADO
+    String:EM FOLHA
+    String:ENVIADO
+    String:FALHA AGENDAMENTO
+    String:INCLUIDO EM GL ALTERNATIVA
+    String:AGENDADO
+    String:PAGO
+    }
+    PagamentoBolsista "1" --> "1" EnumStatusPagamentoBolsista:status
+    
+    
+    class GuiaDeLiberacao #lightyellow{
+    Integer:tipo
+    Date:dataEnvio
+    String:textoEmail
+    Integer:quantPagamentos
+    Integer:valorTotal
+    }
+    GuiaDeLiberacao "0..1" --> "0..*" PagamentoBolsista
+    
+    
+    class Remessa #lightyellow{
+    Integer:numero
+    Date:dataEnvio
+    Date:dataRetorno
+    String:arquivoRetorno
+    String:arquivoEnviado
+    }
+    
+    
+    class RemessaCadastro #lightyellow{
+    }
+    Remessa <|-- RemessaCadastro
+    RemessaCadastro "1" --> "0..*" ErroCadastro:erros
+    RemessaCadastro "1" --> "0..*" AlocacaoBolsista:enviados
+    
+    class ErroCadastro #lightyellow{
+    Integer:erros
+    }
+    ErroCadastro "0..*" --> "1" AlocacaoBolsista
+    
+    
+    class RemessaPagamento #lightyellow{
+    dataAprovacao
+    dataEfetivacao
+    }
+    Enum EnumStatusRemessa #lightyellow{
+    String:ENVIADA
+    String:AGENDADA
+    String:AUTORIZADA
+    String:EFETIVADA
+    }
+    Remessa <|-- RemessaPagamento
+    RemessaPagamento "1" --> "1" EnumStatusRemessa
+    RemessaPagamento "1" --> "0..*" ErroAgendamentoPagamento:erros
+    RemessaPagamento "1" <--> "0..*" Folha
+    RemessaPagamento "0..*" <--> "1..*" PagamentoBolsista
+    
+    class ErroAgendamentoPagamento #lightyellow{
+    Integer:erros
+    }
+    ErroAgendamentoPagamento "0..*" --> "1" PagamentoBolsista
+    
+@enduml
