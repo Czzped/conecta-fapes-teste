@@ -56,17 +56,17 @@
     },
     "content": "content---conectafapes-project-markdown-page-393-c1d"
   },
-  "/-ef5": {
+  "/-643": {
     "__comp": "__comp---theme-docs-root-5-e-9-0b6",
     "__context": {
       "plugin": "plugin---conectafapes-project-aba-522"
     }
   },
-  "/-646": {
+  "/-030": {
     "__comp": "__comp---theme-doc-version-roota-7-b-5de",
     "__props": "__props---22-d-307"
   },
-  "/-a24": {
+  "/-ac4": {
     "__comp": "__comp---theme-doc-roota-94-67a"
   },
   "/bi/gestao/-90b": {
@@ -144,14 +144,6 @@
   "/category/arquitetura-94b": {
     "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
     "__props": "__props---category-arquitetura-5-a-1-708"
-  },
-  "/category/designux-ec4": {
-    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
-    "__props": "__props---category-designux-575-904"
-  },
-  "/category/diretrizes-0c5": {
-    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
-    "__props": "__props---category-diretrizes-633-a87"
   },
   "/category/gerenciar-editais-f5e": {
     "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
@@ -248,22 +240,6 @@
   "/colatina/trilhasestudos/crud_basico_front-875": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---conectafapes-project-colatina-trilhasestudos-crud-basico-front-6-ea-486"
-  },
-  "/desenvolvimento/design/design_system-1b3": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---conectafapes-project-desenvolvimento-design-design-system-2-f-4-f79"
-  },
-  "/desenvolvimento/design/diretrizes/acessibilidade-digital-119": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---conectafapes-project-desenvolvimento-design-diretrizes-acessibilidade-digital-74-e-38c"
-  },
-  "/desenvolvimento/design/diretrizes/grid8pontos-9d1": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---conectafapes-project-desenvolvimento-design-diretrizes-grid-8-pontose-0-b-2e4"
-  },
-  "/desenvolvimento/design/intro-aec": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---conectafapes-project-desenvolvimento-design-intro-09-b-b53"
   },
   "/desenvolvimento/equipe-4d0": {
     "__comp": "__comp---theme-doc-item-178-a40",

@@ -91,26 +91,6 @@
               "sidebar": "colatina"
             },
             {
-              "id": "desenvolvimento/design/design_system",
-              "path": "/desenvolvimento/design/design_system",
-              "sidebar": "desenvolvimento"
-            },
-            {
-              "id": "desenvolvimento/design/diretrizes/acessibilidade-digital",
-              "path": "/desenvolvimento/design/diretrizes/acessibilidade-digital",
-              "sidebar": "desenvolvimento"
-            },
-            {
-              "id": "desenvolvimento/design/diretrizes/grid8pontos",
-              "path": "/desenvolvimento/design/diretrizes/grid8pontos",
-              "sidebar": "desenvolvimento"
-            },
-            {
-              "id": "desenvolvimento/design/intro",
-              "path": "/desenvolvimento/design/intro",
-              "sidebar": "desenvolvimento"
-            },
-            {
               "id": "desenvolvimento/equipe",
               "path": "/desenvolvimento/equipe",
               "sidebar": "desenvolvimento"
@@ -690,16 +670,6 @@
             {
               "id": "/category/visão-geral-do-conecta",
               "path": "/category/visão-geral-do-conecta",
-              "sidebar": "desenvolvimento"
-            },
-            {
-              "id": "/category/designux",
-              "path": "/category/designux",
-              "sidebar": "desenvolvimento"
-            },
-            {
-              "id": "/category/diretrizes",
-              "path": "/category/diretrizes",
               "sidebar": "desenvolvimento"
             },
             {

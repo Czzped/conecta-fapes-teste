@@ -16,11 +16,7 @@
   },
   "sidebar": "desenvolvimento",
   "previous": {
-    "title": "Acessibilidade Digital",
-    "permalink": "/desenvolvimento/design/diretrizes/acessibilidade-digital"
-  },
-  "next": {
-    "title": "Processo",
-    "permalink": "/category/processo"
+    "title": "Design System",
+    "permalink": "/desenvolvimento/design/design_system"
   }
 }

@@ -49,15 +49,15 @@ export default [
   },
   {
     path: '/',
-    component: ComponentCreator('/', 'ef5'),
+    component: ComponentCreator('/', '643'),
     routes: [
       {
         path: '/',
-        component: ComponentCreator('/', '646'),
+        component: ComponentCreator('/', '030'),
         routes: [
           {
             path: '/',
-            component: ComponentCreator('/', 'a24'),
+            component: ComponentCreator('/', 'ac4'),
             routes: [
               {
                 path: '/bi/gestao/',
@@ -172,18 +172,6 @@ export default [
                 component: ComponentCreator('/category/arquitetura', '94b'),
                 exact: true,
                 sidebar: "referencias"
-              },
-              {
-                path: '/category/designux',
-                component: ComponentCreator('/category/designux', 'ec4'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/category/diretrizes',
-                component: ComponentCreator('/category/diretrizes', '0c5'),
-                exact: true,
-                sidebar: "desenvolvimento"
               },
               {
                 path: '/category/gerenciar-editais',
@@ -328,30 +316,6 @@ export default [
                 component: ComponentCreator('/colatina/trilhasestudos/crud_basico_front', '875'),
                 exact: true,
                 sidebar: "colatina"
-              },
-              {
-                path: '/desenvolvimento/design/design_system',
-                component: ComponentCreator('/desenvolvimento/design/design_system', '1b3'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/design/diretrizes/acessibilidade-digital',
-                component: ComponentCreator('/desenvolvimento/design/diretrizes/acessibilidade-digital', '119'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/design/diretrizes/grid8pontos',
-                component: ComponentCreator('/desenvolvimento/design/diretrizes/grid8pontos', '9d1'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/desenvolvimento/design/intro',
-                component: ComponentCreator('/desenvolvimento/design/intro', 'aec'),
-                exact: true,
-                sidebar: "desenvolvimento"
               },
               {
                 path: '/desenvolvimento/equipe',
