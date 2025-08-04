@@ -11,8 +11,8 @@ const config: Config = {
   organizationName: 'leds-conectafapes',
   projectName: 'conectafapes-project',
 
-  onBrokenLinks: 'warn',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenLinks: 'throw',
+  onBrokenMarkdownLinks: 'throw',
 
   markdown: {
     mermaid: true,
@@ -22,12 +22,6 @@ const config: Config = {
   plugins: [
     require.resolve('docusaurus-lunr-search'),    
   ],
-
-
-  i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
-  },
 
   presets: [
     [
@@ -60,8 +54,7 @@ const config: Config = {
       style: 'light',      
     copyright: `
     <div style="display: flex; align-items: center; justify-content: center;">
-      <img src="/img/leds.png" alt="Powered by LEDS" style="height: 24px; margin-right: 8px;" />
-      <span>Copyright © ${new Date().getFullYear()}. Powered by <a href="https://www.instagram.com/ledsifes/">LEDS</a>, created with Docusaurus.</span>
+      <span>Copyright © ${new Date().getFullYear()}. Desenvolvido por <a href="https://www.instagram.com/ledsifes/">LEDS</a>, utilizando o Docusaurus.</span>
     </div>
   `,
 

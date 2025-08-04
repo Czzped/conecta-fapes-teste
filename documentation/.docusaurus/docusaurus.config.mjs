@@ -10,8 +10,8 @@ export default {
   "baseUrl": "/conectafapes-project/",
   "organizationName": "leds-conectafapes",
   "projectName": "conectafapes-project",
-  "onBrokenLinks": "warn",
-  "onBrokenMarkdownLinks": "warn",
+  "onBrokenLinks": "throw",
+  "onBrokenMarkdownLinks": "throw",
   "markdown": {
     "mermaid": true,
     "format": "mdx",
@@ -30,14 +30,6 @@ export default {
   "plugins": [
     "C:\\leds-org\\conectafapes-project\\documentation\\node_modules\\docusaurus-lunr-search\\src\\index.js"
   ],
-  "i18n": {
-    "defaultLocale": "en",
-    "locales": [
-      "en"
-    ],
-    "path": "i18n",
-    "localeConfigs": {}
-  },
   "presets": [
     [
       "classic",
@@ -62,7 +54,7 @@ export default {
   "themeConfig": {
     "footer": {
       "style": "light",
-      "copyright": "\n    <div style=\"display: flex; align-items: center; justify-content: center;\">\n      <img src=\"/img/leds.png\" alt=\"Powered by LEDS\" style=\"height: 24px; margin-right: 8px;\" />\n      <span>Copyright © 2025. Powered by <a href=\"https://www.instagram.com/ledsifes/\">LEDS</a>, created with Docusaurus.</span>\n    </div>\n  ",
+      "copyright": "\n    <div style=\"display: flex; align-items: center; justify-content: center;\">\n      <span>Copyright © 2025. Desenvolvido por <a href=\"https://www.instagram.com/ledsifes/\">LEDS</a>, utilizando o Docusaurus.</span>\n    </div>\n  ",
       "links": []
     },
     "mermaid": {
@@ -355,6 +347,14 @@ export default {
     }
   },
   "baseUrlIssueBanner": true,
+  "i18n": {
+    "defaultLocale": "en",
+    "path": "i18n",
+    "locales": [
+      "en"
+    ],
+    "localeConfigs": {}
+  },
   "future": {
     "experimental_storage": {
       "type": "localStorage",
