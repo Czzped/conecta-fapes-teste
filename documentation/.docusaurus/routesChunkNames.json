@@ -56,30 +56,18 @@
     },
     "content": "content---conectafapes-project-markdown-page-393-c1d"
   },
-  "/-bc7": {
+  "/-ef5": {
     "__comp": "__comp---theme-docs-root-5-e-9-0b6",
     "__context": {
       "plugin": "plugin---conectafapes-project-aba-522"
     }
   },
-  "/-954": {
+  "/-646": {
     "__comp": "__comp---theme-doc-version-roota-7-b-5de",
     "__props": "__props---22-d-307"
   },
-  "/-9d7": {
+  "/-a24": {
     "__comp": "__comp---theme-doc-roota-94-67a"
-  },
-  "/administrativo/bolsas-do-projeto-0df": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---conectafapes-project-administrativo-bolsas-do-projeto-5-ab-ebc"
-  },
-  "/administrativo/contatos-whatsapp-cf4": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---conectafapes-project-administrativo-contatos-whatsappc-62-5f0"
-  },
-  "/administrativo/intro-026": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---conectafapes-project-administrativo-introf-0-e-738"
   },
   "/bi/gestao/-90b": {
     "__comp": "__comp---theme-doc-item-178-a40",
@@ -133,6 +121,22 @@
     "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
     "__props": "__props---category-sprints-4-fb-b2f"
   },
+  "/category/-2-importação-de-editais-4f0": {
+    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
+    "__props": "__props---category-2-importacao-de-editaisfb-6-fbb"
+  },
+  "/category/1-modalidades-de-bolsas-4df": {
+    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
+    "__props": "__props---category-1-modalidades-de-bolsasda-5-acd"
+  },
+  "/category/4-pagamento-de-bolsistas-cc4": {
+    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
+    "__props": "__props---category-4-pagamento-de-bolsistas-65-c-1e4"
+  },
+  "/category/5-autenticacação-e-autorização-bff": {
+    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
+    "__props": "__props---category-5-autenticacacao-e-autorizacao-4-b-9-a27"
+  },
   "/category/api-gateway-fe9": {
     "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
     "__props": "__props---category-api-gatewayf-03-f40"
@@ -140,10 +144,6 @@
   "/category/arquitetura-94b": {
     "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
     "__props": "__props---category-arquitetura-5-a-1-708"
-  },
-  "/category/autenticacação-e-autorização-4a6": {
-    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
-    "__props": "__props---category-autenticacacao-e-autorizacaod-6-d-b45"
   },
   "/category/designux-ec4": {
     "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
@@ -173,25 +173,13 @@
     "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
     "__props": "__props---category-governo-098-350"
   },
-  "/category/importação-de-editais-a47": {
-    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
-    "__props": "__props---category-importacao-de-editais-424-032"
-  },
   "/category/material-cypress-34f": {
     "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
     "__props": "__props---category-material-cypress-65-c-9d8"
   },
-  "/category/modalidades-de-bolsas-6c5": {
-    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
-    "__props": "__props---category-modalidades-de-bolsas-39-f-925"
-  },
   "/category/módulos-d95": {
     "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
     "__props": "__props---category-modulose-88-346"
-  },
-  "/category/pagamento-de-bolsistas-e5a": {
-    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
-    "__props": "__props---category-pagamento-de-bolsistasd-56-6fe"
   },
   "/category/portal-fapes-8e7": {
     "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
@@ -596,6 +584,10 @@
   "/qualidade/processos/boas-praticas-github-948": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---conectafapes-project-qualidade-processos-boas-praticas-github-52-e-7ac"
+  },
+  "/qualidade/processos/novo-processo-4b3": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---qualidade-processos-novo-processob-57-3cb"
   },
   "/referencias/arquitetura/arquitetura-463": {
     "__comp": "__comp---theme-doc-item-178-a40",

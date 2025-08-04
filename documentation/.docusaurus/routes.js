@@ -49,34 +49,16 @@ export default [
   },
   {
     path: '/',
-    component: ComponentCreator('/', 'bc7'),
+    component: ComponentCreator('/', 'ef5'),
     routes: [
       {
         path: '/',
-        component: ComponentCreator('/', '954'),
+        component: ComponentCreator('/', '646'),
         routes: [
           {
             path: '/',
-            component: ComponentCreator('/', '9d7'),
+            component: ComponentCreator('/', 'a24'),
             routes: [
-              {
-                path: '/administrativo/bolsas-do-projeto',
-                component: ComponentCreator('/administrativo/bolsas-do-projeto', '0df'),
-                exact: true,
-                sidebar: "administrativo"
-              },
-              {
-                path: '/administrativo/contatos-whatsapp',
-                component: ComponentCreator('/administrativo/contatos-whatsapp', 'cf4'),
-                exact: true,
-                sidebar: "administrativo"
-              },
-              {
-                path: '/administrativo/intro',
-                component: ComponentCreator('/administrativo/intro', '026'),
-                exact: true,
-                sidebar: "administrativo"
-              },
               {
                 path: '/bi/gestao/',
                 component: ComponentCreator('/bi/gestao/', '90b'),
@@ -156,6 +138,30 @@ export default [
                 sidebar: "bi"
               },
               {
+                path: '/category/-2-importação-de-editais',
+                component: ComponentCreator('/category/-2-importação-de-editais', '4f0'),
+                exact: true,
+                sidebar: "desenvolvimento"
+              },
+              {
+                path: '/category/1-modalidades-de-bolsas',
+                component: ComponentCreator('/category/1-modalidades-de-bolsas', '4df'),
+                exact: true,
+                sidebar: "desenvolvimento"
+              },
+              {
+                path: '/category/4-pagamento-de-bolsistas',
+                component: ComponentCreator('/category/4-pagamento-de-bolsistas', 'cc4'),
+                exact: true,
+                sidebar: "desenvolvimento"
+              },
+              {
+                path: '/category/5-autenticacação-e-autorização',
+                component: ComponentCreator('/category/5-autenticacação-e-autorização', 'bff'),
+                exact: true,
+                sidebar: "desenvolvimento"
+              },
+              {
                 path: '/category/api-gateway',
                 component: ComponentCreator('/category/api-gateway', 'fe9'),
                 exact: true,
@@ -166,12 +172,6 @@ export default [
                 component: ComponentCreator('/category/arquitetura', '94b'),
                 exact: true,
                 sidebar: "referencias"
-              },
-              {
-                path: '/category/autenticacação-e-autorização',
-                component: ComponentCreator('/category/autenticacação-e-autorização', '4a6'),
-                exact: true,
-                sidebar: "desenvolvimento"
               },
               {
                 path: '/category/designux',
@@ -216,32 +216,14 @@ export default [
                 sidebar: "referencias"
               },
               {
-                path: '/category/importação-de-editais',
-                component: ComponentCreator('/category/importação-de-editais', 'a47'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
                 path: '/category/material-cypress',
                 component: ComponentCreator('/category/material-cypress', '34f'),
                 exact: true,
                 sidebar: "qa"
               },
               {
-                path: '/category/modalidades-de-bolsas',
-                component: ComponentCreator('/category/modalidades-de-bolsas', '6c5'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
                 path: '/category/módulos',
                 component: ComponentCreator('/category/módulos', 'd95'),
-                exact: true,
-                sidebar: "desenvolvimento"
-              },
-              {
-                path: '/category/pagamento-de-bolsistas',
-                component: ComponentCreator('/category/pagamento-de-bolsistas', 'e5a'),
                 exact: true,
                 sidebar: "desenvolvimento"
               },
@@ -841,6 +823,12 @@ export default [
               {
                 path: '/qualidade/processos/boas-praticas-github',
                 component: ComponentCreator('/qualidade/processos/boas-praticas-github', '948'),
+                exact: true,
+                sidebar: "qa"
+              },
+              {
+                path: '/qualidade/processos/novo-processo',
+                component: ComponentCreator('/qualidade/processos/novo-processo', '4b3'),
                 exact: true,
                 sidebar: "qa"
               },

@@ -77,12 +77,6 @@ const config: Config = {
       },
 
       items: [
-         {
-          type: 'docSidebar',
-          sidebarId: 'administrativo',
-          position: 'left',
-          label: 'Administrativo',
-        },
         {
           type: 'docSidebar',
           sidebarId: 'desenvolvimento',

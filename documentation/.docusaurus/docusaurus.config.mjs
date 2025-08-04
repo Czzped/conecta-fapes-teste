@@ -86,12 +86,6 @@ export default {
       "items": [
         {
           "type": "docSidebar",
-          "sidebarId": "administrativo",
-          "position": "left",
-          "label": "Administrativo"
-        },
-        {
-          "type": "docSidebar",
           "sidebarId": "desenvolvimento",
           "position": "left",
           "label": "Desenvolvimento"

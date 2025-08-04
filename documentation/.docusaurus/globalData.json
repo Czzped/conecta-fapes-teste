@@ -11,21 +11,6 @@
           "mainDocId": "intro",
           "docs": [
             {
-              "id": "administrativo/bolsas-do-projeto",
-              "path": "/administrativo/bolsas-do-projeto",
-              "sidebar": "administrativo"
-            },
-            {
-              "id": "administrativo/contatos-whatsapp",
-              "path": "/administrativo/contatos-whatsapp",
-              "sidebar": "administrativo"
-            },
-            {
-              "id": "administrativo/intro",
-              "path": "/administrativo/intro",
-              "sidebar": "administrativo"
-            },
-            {
               "id": "bi/gestao/backlogs",
               "path": "/bi/gestao/backlogs",
               "sidebar": "bi"
@@ -523,6 +508,11 @@
               "sidebar": "qa"
             },
             {
+              "id": "qualidade/processos/novo-processo",
+              "path": "/qualidade/processos/novo-processo",
+              "sidebar": "qa"
+            },
+            {
               "id": "referencias/arquitetura/arquitetura",
               "path": "/referencias/arquitetura/arquitetura",
               "sidebar": "referencias"
@@ -723,13 +713,13 @@
               "sidebar": "desenvolvimento"
             },
             {
-              "id": "/category/modalidades-de-bolsas",
-              "path": "/category/modalidades-de-bolsas",
+              "id": "/category/1-modalidades-de-bolsas",
+              "path": "/category/1-modalidades-de-bolsas",
               "sidebar": "desenvolvimento"
             },
             {
-              "id": "/category/importação-de-editais",
-              "path": "/category/importação-de-editais",
+              "id": "/category/-2-importação-de-editais",
+              "path": "/category/-2-importação-de-editais",
               "sidebar": "desenvolvimento"
             },
             {
@@ -738,13 +728,13 @@
               "sidebar": "desenvolvimento"
             },
             {
-              "id": "/category/pagamento-de-bolsistas",
-              "path": "/category/pagamento-de-bolsistas",
+              "id": "/category/4-pagamento-de-bolsistas",
+              "path": "/category/4-pagamento-de-bolsistas",
               "sidebar": "desenvolvimento"
             },
             {
-              "id": "/category/autenticacação-e-autorização",
-              "path": "/category/autenticacação-e-autorização",
+              "id": "/category/5-autenticacação-e-autorização",
+              "path": "/category/5-autenticacação-e-autorização",
               "sidebar": "desenvolvimento"
             },
             {
@@ -815,12 +805,6 @@
           ],
           "draftIds": [],
           "sidebars": {
-            "administrativo": {
-              "link": {
-                "path": "/administrativo/intro",
-                "label": "administrativo/intro"
-              }
-            },
             "gestao": {
               "link": {
                 "path": "/gestao/processogestaomacro",
@@ -878,8 +862,8 @@
   "docusaurus-lunr-search": {
     "default": {
       "fileNames": {
-        "searchDoc": "search-doc-1754347895939.json",
-        "lunrIndex": "lunr-index-1754347895939.json"
+        "searchDoc": "search-doc-1754349135803.json",
+        "lunrIndex": "lunr-index-1754349135803.json"
       }
     }
   }
