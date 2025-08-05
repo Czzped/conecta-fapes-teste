@@ -1,5 +1,9 @@
 image: node:21
 
+default:
+  before_script:
+    - cd documentation
+
 cache:
   paths:
     - documentation/node_modules/
@@ -9,7 +13,6 @@ cache:
 pages:
   stage: deploy
   script:
-    - cd documentation
     - yarn install
     - yarn build:gitlab
   artifacts:
