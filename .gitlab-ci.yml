@@ -9,9 +9,11 @@ cache:
 pages:
   stage: deploy
   script:
-    - cd documentation
-    - yarn install
-    - yarn build:gitlab
+  - cd documentation
+  - rm -rf public
+  - yarn install
+  - yarn build:gitlab
+
   artifacts:
     paths:
       - documentation/public

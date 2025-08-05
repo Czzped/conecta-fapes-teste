@@ -5,12 +5,12 @@
   "source": "@site/docs/referencias/05_tutoriais/05_six_paper.md",
   "sourceDirName": "referencias/05_tutoriais",
   "slug": "/referencias/tutoriais/six_paper",
-  "permalink": "/referencias/tutoriais/six_paper",
+  "permalink": "/conectafapes-project/referencias/tutoriais/six_paper",
   "draft": false,
   "unlisted": false,
   "tags": [],
   "version": "current",
-  "lastUpdatedAt": 1539502055000,
+  "lastUpdatedAt": 1753961134000,
   "sidebarPosition": 2,
   "frontMatter": {
     "sidebar_position": 2,
@@ -19,10 +19,10 @@
   "sidebar": "referencias",
   "previous": {
     "title": "DIBB",
-    "permalink": "/referencias/tutoriais/dibb"
+    "permalink": "/conectafapes-project/referencias/tutoriais/dibb"
   },
   "next": {
     "title": "Prompt do DIBB com 6 Memo",
-    "permalink": "/referencias/tutoriais/prompt"
+    "permalink": "/conectafapes-project/referencias/tutoriais/prompt"
   }
 }

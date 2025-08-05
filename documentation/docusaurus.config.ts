@@ -5,8 +5,8 @@ const config: Config = {
   title: 'ConectaFapes Docs',
   favicon: 'img/favicon.ico',
 
-  url: 'https://conectafapes.docs.leds.dev.br/',
-  baseUrl: '/',
+  url: 'https://ledsifes.gitlab.io/',
+  baseUrl: '/conectafapes-project/',
   organizationName: 'leds-conectafapes', 
   projectName: 'Conecta Fapes',
 

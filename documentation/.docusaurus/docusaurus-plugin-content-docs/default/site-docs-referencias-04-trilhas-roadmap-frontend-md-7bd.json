@@ -5,12 +5,12 @@
   "source": "@site/docs/referencias/04_trilhas/roadmap-frontend.md",
   "sourceDirName": "referencias/04_trilhas",
   "slug": "/referencias/trilhas/roadmap-frontend",
-  "permalink": "/referencias/trilhas/roadmap-frontend",
+  "permalink": "/conectafapes-project/referencias/trilhas/roadmap-frontend",
   "draft": false,
   "unlisted": false,
   "tags": [],
   "version": "current",
-  "lastUpdatedAt": 1539502055000,
+  "lastUpdatedAt": 1753961134000,
   "sidebarPosition": 2,
   "frontMatter": {
     "sidebar_position": 2
@@ -18,10 +18,10 @@
   "sidebar": "referencias",
   "previous": {
     "title": "Trilha Backend",
-    "permalink": "/referencias/trilhas/roadmap-backend"
+    "permalink": "/conectafapes-project/referencias/trilhas/roadmap-backend"
   },
   "next": {
     "title": "Tutoriais",
-    "permalink": "/category/tutoriais"
+    "permalink": "/conectafapes-project/category/tutoriais"
   }
 }

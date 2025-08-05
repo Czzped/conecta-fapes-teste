@@ -5,12 +5,12 @@
   "source": "@site/docs/referencias/05_tutoriais/02_dibb.md",
   "sourceDirName": "referencias/05_tutoriais",
   "slug": "/referencias/tutoriais/dibb",
-  "permalink": "/referencias/tutoriais/dibb",
+  "permalink": "/conectafapes-project/referencias/tutoriais/dibb",
   "draft": false,
   "unlisted": false,
   "tags": [],
   "version": "current",
-  "lastUpdatedAt": 1539502055000,
+  "lastUpdatedAt": 1753961134000,
   "sidebarPosition": 1,
   "frontMatter": {
     "sidebar_position": 1,
@@ -19,10 +19,10 @@
   "sidebar": "referencias",
   "previous": {
     "title": "Visão Geral",
-    "permalink": "/referencias/tutoriais/intro"
+    "permalink": "/conectafapes-project/referencias/tutoriais/intro"
   },
   "next": {
     "title": "Six Page Memo",
-    "permalink": "/referencias/tutoriais/six_paper"
+    "permalink": "/conectafapes-project/referencias/tutoriais/six_paper"
   }
 }
