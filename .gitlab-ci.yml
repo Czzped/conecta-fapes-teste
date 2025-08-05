@@ -2,18 +2,18 @@ image: node:21
 
 cache:
   paths:
-    - conectafapes-project/documentation/node_modules/
-    - conectafapes-project/documentation/public/
-    - conectafapes-project/documentation/.cache/
+    - documentation/node_modules/
+    - documentation/public/
+    - documentation/.cache/
 
 pages:
   stage: deploy
   script:
-    - cd conectafapes-project/documentation
+    - cd documentation
     - yarn install
     - yarn build:gitlab
   artifacts:
     paths:
-      - conectafapes-project/documentation/public
+      - documentation/public
   only:
     - main
