@@ -17,6 +17,6 @@ pages:
     - yarn build:gitlab
   artifacts:
     paths:
-      - public
+      - documentation/public
   only:
     - main
