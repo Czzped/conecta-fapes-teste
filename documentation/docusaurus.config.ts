@@ -6,7 +6,7 @@ const config: Config = {
   favicon: 'img/favicon.ico',
 
   url: 'https://ledsifes.gitlab.io/',
-  baseUrl: '/conectafapes-project/',
+  baseUrl: '/',
   organizationName: 'leds-conectafapes', 
   projectName: 'Conecta Fapes',
 
