@@ -1,8 +1,8 @@
 {
-            "label": "Portal Fapes",
-            "position": 8,
-            "link": {
-                "type": "generated-index",
-                "description": "Portal Fapes"
-            }
-        }
+    "label": "8. Portal Fapes",
+    "position": 8,
+    "link": {
+        "type": "generated-index",
+        "description": "Portal Fapes"
+    }
+}

@@ -14,11 +14,11 @@
   "frontMatter": {},
   "sidebar": "bi",
   "previous": {
-    "title": "5 - ENTREGA DASHOARD DE BOLSA",
-    "permalink": "/bi/gestao/sprints/sprint5"
+    "title": "Visão Geral",
+    "permalink": "/bi/visao_geral"
   },
   "next": {
-    "title": "Processes",
-    "permalink": "/bi/gestao/process/"
+    "title": " 🚀 Sprints",
+    "permalink": "/category/--sprints"
   }
 }

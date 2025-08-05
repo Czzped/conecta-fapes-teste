@@ -86,52 +86,21 @@ export default {
       "items": [
         {
           "type": "docSidebar",
-          "sidebarId": "desenvolvimento",
-          "position": "left",
-          "label": "Desenvolvimento"
-        },
-        {
-          "type": "docSidebar",
           "sidebarId": "gestao",
           "position": "left",
           "label": "Gestão"
         },
         {
-          "type": "dropdown",
+          "type": "docSidebar",
+          "sidebarId": "modulos",
           "label": "Módulos",
+          "position": "left"
+        },
+        {
+          "type": "docSidebar",
+          "sidebarId": "desenvolvimento",
           "position": "left",
-          "items": [
-            {
-              "type": "doc",
-              "label": "M001 - Modalidades de Bolsa",
-              "docId": "desenvolvimento/modulos/modalidade_bolsa/minimundo"
-            },
-            {
-              "type": "doc",
-              "label": "M002 - Importação de Editais",
-              "docId": "desenvolvimento/modulos/importacao_editais/minimundo"
-            },
-            {
-              "type": "doc",
-              "label": "M003 - Gerenciar Editais",
-              "docId": "desenvolvimento/modulos/gerenciar_editais/minimundo"
-            },
-            {
-              "type": "doc",
-              "label": "M004 - Pagamento de Bolsistas",
-              "docId": "desenvolvimento/modulos/pagamento_bolsista/minimundo"
-            },
-            {
-              "type": "doc",
-              "label": "M005 - Autenticação, Autorização e Auditoria",
-              "docId": "desenvolvimento/modulos/autenticacao/minimundo"
-            },
-            {
-              "type": "doc",
-              "label": "M006 - Portal do ConectaFapes",
-              "docId": "desenvolvimento/modulos/portal_fapes/introducao"
-            }
-          ]
+          "label": "Processos de Desenvolvimento"
         },
         {
           "type": "docSidebar",
@@ -141,40 +110,13 @@ export default {
         },
         {
           "type": "dropdown",
-          "label": "SDD",
+          "label": "Software Design Documentation",
           "position": "left",
           "items": [
             {
               "type": "doc",
               "label": "Conecta Fapes",
               "docId": "sdd_conecta_admin/introducao"
-            }
-          ]
-        },
-        {
-          "type": "dropdown",
-          "label": "Times",
-          "position": "left",
-          "items": [
-            {
-              "type": "doc",
-              "label": "BI",
-              "docId": "bi/visao_geral"
-            },
-            {
-              "type": "doc",
-              "docId": "colatina/intro",
-              "label": "Colatina"
-            },
-            {
-              "type": "doc",
-              "label": "DevOps",
-              "docId": "devops/intro"
-            },
-            {
-              "type": "doc",
-              "docId": "qualidade/intro",
-              "label": "QA"
             }
           ]
         },

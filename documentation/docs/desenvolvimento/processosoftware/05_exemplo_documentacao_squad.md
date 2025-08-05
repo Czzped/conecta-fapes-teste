@@ -1,4 +1,6 @@
-
+---
+title: Exemplo de Documentação de Squad
+---
 ## Contexto
 
 **Módulo**: Pagamento

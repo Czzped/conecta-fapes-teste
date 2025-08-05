@@ -1,5 +1,5 @@
 ---
-title: 🧠 Modelo de Stacey e Métodos Ágeis
+title: Modelo de Stacey e Métodos Ágeis
 sidebar_position: 0
 ---
 O **Modelo de Stacey** é uma ferramenta visual criada por Ralph D. Stacey para ajudar gestores a **entender o nível de complexidade de um problema** e, com isso, **escolher a melhor abordagem de gestão**.

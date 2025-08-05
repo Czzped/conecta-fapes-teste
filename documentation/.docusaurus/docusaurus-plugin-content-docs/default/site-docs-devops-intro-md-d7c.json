@@ -16,9 +16,5 @@
     "title": "Visão Geral",
     "sidebar_position": 1
   },
-  "sidebar": "devops",
-  "next": {
-    "title": "Ambientes",
-    "permalink": "/devops/ambientes"
-  }
+  "sidebar": "devops"
 }

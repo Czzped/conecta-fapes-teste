@@ -16,9 +16,5 @@
     "title": "Visão Geral",
     "sidebar_position": 1
   },
-  "sidebar": "colatina",
-  "next": {
-    "title": "Trilha de estudos",
-    "permalink": "/category/trilha-de-estudos"
-  }
+  "sidebar": "colatina"
 }

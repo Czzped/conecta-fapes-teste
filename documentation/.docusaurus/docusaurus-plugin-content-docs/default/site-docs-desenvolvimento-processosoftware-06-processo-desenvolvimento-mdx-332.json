@@ -18,7 +18,11 @@
   },
   "sidebar": "desenvolvimento",
   "previous": {
-    "title": "exemplo_documentacao_squad",
+    "title": "Exemplo de Documentação de Squad",
     "permalink": "/desenvolvimento/processosoftware/exemplo_documentacao_squad"
+  },
+  "next": {
+    "title": "Garantia de Qualidade (QA)",
+    "permalink": "/category/garantia-de-qualidade-qa"
   }
 }

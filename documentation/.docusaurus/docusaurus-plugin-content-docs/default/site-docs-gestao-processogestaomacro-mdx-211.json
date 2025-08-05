@@ -17,6 +17,10 @@
     "sidebar_position": 1
   },
   "sidebar": "gestao",
+  "previous": {
+    "title": "Modelo de Stacey e Métodos Ágeis",
+    "permalink": "/gestao/modelostacy"
+  },
   "next": {
     "title": "Gestão Orientada a Dados",
     "permalink": "/category/gestão-orientada-a-dados"

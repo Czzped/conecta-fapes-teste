@@ -11,103 +11,8 @@
           "mainDocId": "intro",
           "docs": [
             {
-              "id": "bi/gestao/backlogs",
-              "path": "/bi/gestao/backlogs",
-              "sidebar": "bi"
-            },
-            {
-              "id": "bi/gestao/overview",
-              "path": "/bi/gestao/overview",
-              "sidebar": "bi"
-            },
-            {
-              "id": "bi/gestao/process/processocriacaodashboard/README",
-              "path": "/bi/gestao/process/processocriacaodashboard/",
-              "sidebar": "bi"
-            },
-            {
-              "id": "bi/gestao/process/README",
-              "path": "/bi/gestao/process/",
-              "sidebar": "bi"
-            },
-            {
-              "id": "bi/gestao/README",
-              "path": "/bi/gestao/",
-              "sidebar": "bi"
-            },
-            {
-              "id": "bi/gestao/roadmap",
-              "path": "/bi/gestao/roadmap",
-              "sidebar": "bi"
-            },
-            {
-              "id": "bi/gestao/sprints/sprin1",
-              "path": "/bi/gestao/sprints/sprin1",
-              "sidebar": "bi"
-            },
-            {
-              "id": "bi/gestao/sprints/sprint2",
-              "path": "/bi/gestao/sprints/sprint2",
-              "sidebar": "bi"
-            },
-            {
-              "id": "bi/gestao/sprints/sprint3",
-              "path": "/bi/gestao/sprints/sprint3",
-              "sidebar": "bi"
-            },
-            {
-              "id": "bi/gestao/sprints/sprint4",
-              "path": "/bi/gestao/sprints/sprint4",
-              "sidebar": "bi"
-            },
-            {
-              "id": "bi/gestao/sprints/sprint5",
-              "path": "/bi/gestao/sprints/sprint5",
-              "sidebar": "bi"
-            },
-            {
-              "id": "bi/visao_geral",
-              "path": "/bi/visao_geral",
-              "sidebar": "bi"
-            },
-            {
-              "id": "colatina/intro",
-              "path": "/colatina/intro",
-              "sidebar": "colatina"
-            },
-            {
-              "id": "colatina/trilhasestudos/config_eslint",
-              "path": "/colatina/trilhasestudos/config_eslint",
-              "sidebar": "colatina"
-            },
-            {
-              "id": "colatina/trilhasestudos/crud_basico_back",
-              "path": "/colatina/trilhasestudos/crud_basico_back",
-              "sidebar": "colatina"
-            },
-            {
-              "id": "colatina/trilhasestudos/crud_basico_front",
-              "path": "/colatina/trilhasestudos/crud_basico_front",
-              "sidebar": "colatina"
-            },
-            {
-              "id": "desenvolvimento/equipe",
-              "path": "/desenvolvimento/equipe",
-              "sidebar": "desenvolvimento"
-            },
-            {
-              "id": "desenvolvimento/intro",
-              "path": "/desenvolvimento/intro",
-              "sidebar": "desenvolvimento"
-            },
-            {
               "id": "desenvolvimento/processosoftware/exemplo_documentacao_squad",
               "path": "/desenvolvimento/processosoftware/exemplo_documentacao_squad",
-              "sidebar": "desenvolvimento"
-            },
-            {
-              "id": "desenvolvimento/processosoftware/modelostacy",
-              "path": "/desenvolvimento/processosoftware/modelostacy",
               "sidebar": "desenvolvimento"
             },
             {
@@ -136,19 +41,34 @@
               "sidebar": "desenvolvimento"
             },
             {
-              "id": "desenvolvimento/visaogeral/visaogeral",
-              "path": "/desenvolvimento/visaogeral/",
+              "id": "desenvolvimento/qualidade/cypress/boas_praticas_cypress",
+              "path": "/desenvolvimento/qualidade/cypress/boas_praticas_cypress",
               "sidebar": "desenvolvimento"
             },
             {
-              "id": "devops/ambientes",
-              "path": "/devops/ambientes",
-              "sidebar": "devops"
+              "id": "desenvolvimento/qualidade/cypress/padrao_scripts_cypress",
+              "path": "/desenvolvimento/qualidade/cypress/padrao_scripts_cypress",
+              "sidebar": "desenvolvimento"
             },
             {
-              "id": "devops/intro",
-              "path": "/devops/intro",
-              "sidebar": "devops"
+              "id": "desenvolvimento/qualidade/intro",
+              "path": "/desenvolvimento/qualidade/intro",
+              "sidebar": "desenvolvimento"
+            },
+            {
+              "id": "desenvolvimento/qualidade/processos/boas-praticas-github",
+              "path": "/desenvolvimento/qualidade/processos/boas-praticas-github",
+              "sidebar": "desenvolvimento"
+            },
+            {
+              "id": "desenvolvimento/qualidade/processos/novo-processo",
+              "path": "/desenvolvimento/qualidade/processos/novo-processo",
+              "sidebar": "desenvolvimento"
+            },
+            {
+              "id": "desenvolvimento/visaogeral/intro",
+              "path": "/desenvolvimento/visaogeral/intro",
+              "sidebar": "desenvolvimento"
             },
             {
               "id": "gestao/data_driven/metricas",
@@ -163,6 +83,11 @@
             {
               "id": "gestao/data_driven/visao_geral",
               "path": "/gestao/data_driven/visao_geral",
+              "sidebar": "gestao"
+            },
+            {
+              "id": "gestao/modelostacy",
+              "path": "/gestao/modelostacy",
               "sidebar": "gestao"
             },
             {
@@ -231,196 +156,213 @@
             },
             {
               "id": "modulos/api_gateway/architecture",
-              "path": "/modulos/api_gateway/architecture"
+              "path": "/modulos/api_gateway/architecture",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/api_gateway/minimundo",
-              "path": "/modulos/api_gateway/minimundo"
+              "path": "/modulos/api_gateway/minimundo",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/api_gateway/processos",
-              "path": "/modulos/api_gateway/processos"
+              "path": "/modulos/api_gateway/processos",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/api_gateway/requirements",
-              "path": "/modulos/api_gateway/requirements"
+              "path": "/modulos/api_gateway/requirements",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/api_gateway/usecase",
-              "path": "/modulos/api_gateway/usecase"
+              "path": "/modulos/api_gateway/usecase",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/autenticacao/minimundo",
-              "path": "/modulos/autenticacao/minimundo"
+              "path": "/modulos/autenticacao/minimundo",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/autenticacao/requirements",
-              "path": "/modulos/autenticacao/requirements"
+              "path": "/modulos/autenticacao/requirements",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/autenticacao/usecase",
-              "path": "/modulos/autenticacao/usecase"
+              "path": "/modulos/autenticacao/usecase",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/gerenciar_editais/minimundo",
-              "path": "/modulos/gerenciar_editais/minimundo"
+              "path": "/modulos/gerenciar_editais/minimundo",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/gerenciar_editais/requisitos",
-              "path": "/modulos/gerenciar_editais/requisitos"
+              "path": "/modulos/gerenciar_editais/requisitos",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/gestao_bolsa_pesquisa/casos_uso",
-              "path": "/modulos/gestao_bolsa_pesquisa/casos_uso"
+              "path": "/modulos/gestao_bolsa_pesquisa/casos_uso",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/gestao_bolsa_pesquisa/minimundo",
-              "path": "/modulos/gestao_bolsa_pesquisa/minimundo"
+              "path": "/modulos/gestao_bolsa_pesquisa/minimundo",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/gestao_bolsa_pesquisa/modelo_comportamental",
-              "path": "/modulos/gestao_bolsa_pesquisa/modelo_comportamental"
+              "path": "/modulos/gestao_bolsa_pesquisa/modelo_comportamental",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/gestao_bolsa_pesquisa/modelo_estrutural",
-              "path": "/modulos/gestao_bolsa_pesquisa/modelo_estrutural"
+              "path": "/modulos/gestao_bolsa_pesquisa/modelo_estrutural",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/gestao_bolsa_pesquisa/requirements",
-              "path": "/modulos/gestao_bolsa_pesquisa/requirements"
+              "path": "/modulos/gestao_bolsa_pesquisa/requirements",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/arquitetura",
-              "path": "/modulos/importacao_editais/arquitetura"
+              "path": "/modulos/importacao_editais/arquitetura",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/casos-uso",
-              "path": "/modulos/importacao_editais/casos-uso"
+              "path": "/modulos/importacao_editais/casos-uso",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/minimundo",
-              "path": "/modulos/importacao_editais/minimundo"
+              "path": "/modulos/importacao_editais/minimundo",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/modelo-comportamental",
-              "path": "/modulos/importacao_editais/modelo-comportamental"
+              "path": "/modulos/importacao_editais/modelo-comportamental",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/modelo-estrutural",
-              "path": "/modulos/importacao_editais/modelo-estrutural"
+              "path": "/modulos/importacao_editais/modelo-estrutural",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/processos/integracao_edital",
-              "path": "/modulos/importacao_editais/processos/integracao_edital"
+              "path": "/modulos/importacao_editais/processos/integracao_edital",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/processos/integracao_edital_projeto",
-              "path": "/modulos/importacao_editais/processos/integracao_edital_projeto"
+              "path": "/modulos/importacao_editais/processos/integracao_edital_projeto",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/processos/integracao_projeto",
-              "path": "/modulos/importacao_editais/processos/integracao_projeto"
+              "path": "/modulos/importacao_editais/processos/integracao_projeto",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/prototipo_telas",
-              "path": "/modulos/importacao_editais/prototipo_telas"
+              "path": "/modulos/importacao_editais/prototipo_telas",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/requisitos",
-              "path": "/modulos/importacao_editais/requisitos"
+              "path": "/modulos/importacao_editais/requisitos",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/intro",
-              "path": "/modulos/intro"
+              "path": "/modulos/intro",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/modalidade_bolsa/arquitetura",
-              "path": "/modulos/modalidade_bolsa/arquitetura"
+              "path": "/modulos/modalidade_bolsa/arquitetura",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/modalidade_bolsa/casos-uso",
-              "path": "/modulos/modalidade_bolsa/casos-uso"
+              "path": "/modulos/modalidade_bolsa/casos-uso",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/modalidade_bolsa/minimundo",
-              "path": "/modulos/modalidade_bolsa/minimundo"
+              "path": "/modulos/modalidade_bolsa/minimundo",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/modalidade_bolsa/modelo-comportamental",
-              "path": "/modulos/modalidade_bolsa/modelo-comportamental"
+              "path": "/modulos/modalidade_bolsa/modelo-comportamental",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/modalidade_bolsa/modelo-estrutural",
-              "path": "/modulos/modalidade_bolsa/modelo-estrutural"
+              "path": "/modulos/modalidade_bolsa/modelo-estrutural",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/modalidade_bolsa/requisitos",
-              "path": "/modulos/modalidade_bolsa/requisitos"
+              "path": "/modulos/modalidade_bolsa/requisitos",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/pagamento_bolsista/casos_uso",
-              "path": "/modulos/pagamento_bolsista/casos_uso"
+              "path": "/modulos/pagamento_bolsista/casos_uso",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/pagamento_bolsista/minimundo",
-              "path": "/modulos/pagamento_bolsista/minimundo"
+              "path": "/modulos/pagamento_bolsista/minimundo",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/pagamento_bolsista/modelo_comportamental",
-              "path": "/modulos/pagamento_bolsista/modelo_comportamental"
+              "path": "/modulos/pagamento_bolsista/modelo_comportamental",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/pagamento_bolsista/modelo_estrutural",
-              "path": "/modulos/pagamento_bolsista/modelo_estrutural"
+              "path": "/modulos/pagamento_bolsista/modelo_estrutural",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/pagamento_bolsista/requirements",
-              "path": "/modulos/pagamento_bolsista/requirements"
+              "path": "/modulos/pagamento_bolsista/requirements",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/portal_fapes/diagramafluxo",
-              "path": "/modulos/portal_fapes/diagramafluxo"
+              "path": "/modulos/portal_fapes/diagramafluxo",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/portal_fapes/introducao",
-              "path": "/modulos/portal_fapes/introducao"
+              "path": "/modulos/portal_fapes/introducao",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/portal_fapes/modeloestrutural",
-              "path": "/modulos/portal_fapes/modeloestrutural"
+              "path": "/modulos/portal_fapes/modeloestrutural",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/portal_fapes/requirements",
-              "path": "/modulos/portal_fapes/requirements"
+              "path": "/modulos/portal_fapes/requirements",
+              "sidebar": "modulos"
             },
             {
               "id": "modulos/portal_fapes/usecase",
-              "path": "/modulos/portal_fapes/usecase"
-            },
-            {
-              "id": "qualidade/cypress/boas_praticas_cypress",
-              "path": "/qualidade/cypress/boas_praticas_cypress",
-              "sidebar": "qa"
-            },
-            {
-              "id": "qualidade/cypress/padrao_scripts_cypress",
-              "path": "/qualidade/cypress/padrao_scripts_cypress",
-              "sidebar": "qa"
-            },
-            {
-              "id": "qualidade/intro",
-              "path": "/qualidade/intro",
-              "sidebar": "qa"
-            },
-            {
-              "id": "qualidade/processos/boas-praticas-github",
-              "path": "/qualidade/processos/boas-praticas-github",
-              "sidebar": "qa"
-            },
-            {
-              "id": "qualidade/processos/novo-processo",
-              "path": "/qualidade/processos/novo-processo",
-              "sidebar": "qa"
+              "path": "/modulos/portal_fapes/usecase",
+              "sidebar": "modulos"
             },
             {
               "id": "referencias/arquitetura/arquitetura",
@@ -598,34 +540,74 @@
               "sidebar": "gestao"
             },
             {
-              "id": "/category/visão-geral-do-conecta",
-              "path": "/category/visão-geral-do-conecta",
+              "id": "/category/1-modalidades-de-bolsas",
+              "path": "/category/1-modalidades-de-bolsas",
+              "sidebar": "modulos"
+            },
+            {
+              "id": "/category/-2-importação-de-editais",
+              "path": "/category/-2-importação-de-editais",
+              "sidebar": "modulos"
+            },
+            {
+              "id": "/category/processos-de-integração",
+              "path": "/category/processos-de-integração",
+              "sidebar": "modulos"
+            },
+            {
+              "id": "/category/4-pagamento-de-bolsistas",
+              "path": "/category/4-pagamento-de-bolsistas",
+              "sidebar": "modulos"
+            },
+            {
+              "id": "/category/5-autenticacação-e-autorização",
+              "path": "/category/5-autenticacação-e-autorização",
+              "sidebar": "modulos"
+            },
+            {
+              "id": "/category/6-gerenciar-editais",
+              "path": "/category/6-gerenciar-editais",
+              "sidebar": "modulos"
+            },
+            {
+              "id": "/category/7-api-gateway",
+              "path": "/category/7-api-gateway",
+              "sidebar": "modulos"
+            },
+            {
+              "id": "/category/8-portal-fapes",
+              "path": "/category/8-portal-fapes",
+              "sidebar": "modulos"
+            },
+            {
+              "id": "/category/9-gestão-de-bolsa-de-pesquisa",
+              "path": "/category/9-gestão-de-bolsa-de-pesquisa",
+              "sidebar": "modulos"
+            },
+            {
+              "id": "/category/visão-geral",
+              "path": "/category/visão-geral",
               "sidebar": "desenvolvimento"
             },
             {
-              "id": "/category/processo",
-              "path": "/category/processo",
+              "id": "/category/processos",
+              "path": "/category/processos",
               "sidebar": "desenvolvimento"
             },
             {
-              "id": "/category/gestão",
-              "path": "/category/gestão",
-              "sidebar": "bi"
+              "id": "/category/garantia-de-qualidade-qa",
+              "path": "/category/garantia-de-qualidade-qa",
+              "sidebar": "desenvolvimento"
             },
             {
-              "id": "/category/--sprints",
-              "path": "/category/--sprints",
-              "sidebar": "bi"
-            },
-            {
-              "id": "/category/processos-de-garantia-da-qualidade",
-              "path": "/category/processos-de-garantia-da-qualidade",
-              "sidebar": "qa"
+              "id": "/category/processos-qa",
+              "path": "/category/processos-qa",
+              "sidebar": "desenvolvimento"
             },
             {
               "id": "/category/material-cypress",
               "path": "/category/material-cypress",
-              "sidebar": "qa"
+              "sidebar": "desenvolvimento"
             },
             {
               "id": "/category/arquitetura",
@@ -646,55 +628,32 @@
               "id": "/category/tutoriais",
               "path": "/category/tutoriais",
               "sidebar": "referencias"
-            },
-            {
-              "id": "/category/trilha-de-estudos",
-              "path": "/category/trilha-de-estudos",
-              "sidebar": "colatina"
             }
           ],
           "draftIds": [],
           "sidebars": {
             "gestao": {
               "link": {
-                "path": "/gestao/processogestaomacro",
-                "label": "gestao/processogestaomacro"
+                "path": "/gestao/modelostacy",
+                "label": "gestao/modelostacy"
+              }
+            },
+            "modulos": {
+              "link": {
+                "path": "/modulos/intro",
+                "label": "modulos/intro"
               }
             },
             "desenvolvimento": {
               "link": {
-                "path": "/desenvolvimento/intro",
-                "label": "desenvolvimento/intro"
-              }
-            },
-            "bi": {
-              "link": {
-                "path": "/category/gestão",
-                "label": "Gestão"
-              }
-            },
-            "qa": {
-              "link": {
-                "path": "/qualidade/intro",
-                "label": "qualidade/intro"
-              }
-            },
-            "devops": {
-              "link": {
-                "path": "/devops/intro",
-                "label": "devops/intro"
+                "path": "/category/visão-geral",
+                "label": "Visão Geral"
               }
             },
             "referencias": {
               "link": {
                 "path": "/referencias/intro",
                 "label": "referencias/intro"
-              }
-            },
-            "colatina": {
-              "link": {
-                "path": "/colatina/intro",
-                "label": "colatina/intro"
               }
             },
             "sdd_conecta_admin": {
@@ -712,8 +671,8 @@
   "docusaurus-lunr-search": {
     "default": {
       "fileNames": {
-        "searchDoc": "search-doc-1754350160413.json",
-        "lunrIndex": "lunr-index-1754350160413.json"
+        "searchDoc": "search-doc-1754352044147.json",
+        "lunrIndex": "lunr-index-1754352044147.json"
       }
     }
   }
