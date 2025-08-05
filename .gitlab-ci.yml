@@ -1,22 +1,22 @@
 image: node:21
 
-default:
-  before_script:
-    - cd documentation
-
 cache:
   paths:
     - documentation/node_modules/
-    - documentation/public/
     - documentation/.cache/
 
 pages:
   stage: deploy
   script:
+    - cd documentation
     - yarn install
     - yarn build:gitlab
+    - cd ..
+    - mkdir public
+    - cp -r documentation/public/* public/
   artifacts:
     paths:
-      - documentation/public
+      - public
+    when: always
   only:
     - main
