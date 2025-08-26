@@ -5,12 +5,12 @@
   "source": "@site/docs/referencias/03_governo/03_sigfapes.md",
   "sourceDirName": "referencias/03_governo",
   "slug": "/referencias/governo/sigfapes",
-  "permalink": "/conectafapes-project/referencias/governo/sigfapes",
+  "permalink": "/referencias/governo/sigfapes",
   "draft": false,
   "unlisted": false,
   "tags": [],
   "version": "current",
-  "lastUpdatedAt": 1753961134000,
+  "lastUpdatedAt": 1539502055000,
   "sidebarPosition": 3,
   "frontMatter": {
     "sidebar_position": 3
@@ -18,10 +18,10 @@
   "sidebar": "referencias",
   "previous": {
     "title": "Arquivos do Banestes",
-    "permalink": "/conectafapes-project/referencias/governo/banestes"
+    "permalink": "/referencias/governo/banestes"
   },
   "next": {
     "title": "API de Notificações",
-    "permalink": "/conectafapes-project/referencias/governo/api_notificacao"
+    "permalink": "/referencias/governo/api_notificacao"
   }
 }

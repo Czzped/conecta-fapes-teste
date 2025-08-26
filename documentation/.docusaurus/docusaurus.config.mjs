@@ -7,7 +7,7 @@ export default {
   "title": "ConectaFapes Docs",
   "favicon": "img/favicon.ico",
   "url": "https://ledsifes.gitlab.io",
-  "baseUrl": "/conectafapes-project/",
+  "baseUrl": "/",
   "organizationName": "leds-conectafapes",
   "projectName": "Conecta Fapes",
   "onBrokenLinks": "throw",

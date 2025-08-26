@@ -72,7 +72,7 @@
     </exclusiveGateway>
     <sequenceFlow id="Flow_0amhqa5" name="Validado sem bugs" sourceRef="Gateway_1rak9jh" targetRef="Activity_1dgknhz" />
     <sequenceFlow id="Flow_1963daw" sourceRef="Gateway_1rak9jh" targetRef="Activity_0i30h0m" />
-    <sendTask id="Activity_1dgknhz" name="Formalizar entrega das features">
+    <sendTask id="Activity_1dgknhz" name="Formalizar entrega das features com cliente">
       <incoming>Flow_0amhqa5</incoming>
     </sendTask>
     <subProcess id="Activity_0i30h0m" name="Bug é encontrado pelo usuário">
@@ -81,10 +81,10 @@
         <outgoing>Flow_12h0gzf</outgoing>
       </startEvent>
       <task id="Activity_1s6spvl" name="QA coleta descrição do bug encontrado">
-        <incoming>Flow_12h0gzf</incoming>
+        <incoming>Flow_0zw3frx</incoming>
         <outgoing>Flow_0mubudp</outgoing>
       </task>
-      <sequenceFlow id="Flow_12h0gzf" sourceRef="Event_09l1cia" targetRef="Activity_1s6spvl" />
+      <sequenceFlow id="Flow_12h0gzf" sourceRef="Event_09l1cia" targetRef="Activity_1j8b73w" />
       <sequenceFlow id="Flow_0mubudp" sourceRef="Activity_1s6spvl" targetRef="Activity_1hevoib" />
       <task id="Activity_1hevoib" name="QA reproduz em ambiente DEV o bug relatado">
         <incoming>Flow_0mubudp</incoming>
@@ -94,17 +94,18 @@
         <incoming>Flow_0d95xhg</incoming>
       </task>
       <sequenceFlow id="Flow_0d95xhg" sourceRef="Activity_1hevoib" targetRef="Activity_1lovj18" />
-      <textAnnotation id="TextAnnotation_0manwfl">
-        <text>Service Desk já funcionaria aqui? Precisa ser jogo rápido</text>
-      </textAnnotation>
-      <association id="Association_177f0uv" sourceRef="Activity_1s6spvl" targetRef="TextAnnotation_0manwfl" />
+      <task id="Activity_1j8b73w" name="Usuário abre ticket via Service Desk">
+        <incoming>Flow_12h0gzf</incoming>
+        <outgoing>Flow_0zw3frx</outgoing>
+      </task>
+      <sequenceFlow id="Flow_0zw3frx" sourceRef="Activity_1j8b73w" targetRef="Activity_1s6spvl" />
     </subProcess>
   </process>
   <bpmndi:BPMNDiagram id="BpmnDiagram_1">
     <bpmndi:BPMNPlane id="BpmnPlane_1" bpmnElement="Process_1">
       <bpmndi:BPMNEdge id="Flow_1963daw_di" bpmnElement="Flow_1963daw">
         <omgdi:waypoint x="460" y="555" />
-        <omgdi:waypoint x="460" y="680" />
+        <omgdi:waypoint x="460" y="640" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0amhqa5_di" bpmnElement="Flow_0amhqa5">
         <omgdi:waypoint x="460" y="505" />
@@ -241,45 +242,45 @@
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1ffmoxo_di" bpmnElement="Activity_0i30h0m" isExpanded="true" bioc:stroke="#e53935" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#e53935">
-        <omgdc:Bounds x="430" y="680" width="640" height="240" />
+        <omgdc:Bounds x="430" y="640" width="860" height="390" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_0manwfl_di" bpmnElement="TextAnnotation_0manwfl">
-        <omgdc:Bounds x="546" y="702" width="100" height="70" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_0mubudp_di" bpmnElement="Flow_0mubudp">
-        <omgdi:waypoint x="646" y="852" />
-        <omgdi:waypoint x="706" y="852" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_12h0gzf_di" bpmnElement="Flow_12h0gzf">
-        <omgdi:waypoint x="494" y="852" />
-        <omgdi:waypoint x="546" y="852" />
+        <omgdi:waypoint x="514" y="770" />
+        <omgdi:waypoint x="580" y="770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zw3frx_di" bpmnElement="Flow_0zw3frx">
+        <omgdi:waypoint x="680" y="770" />
+        <omgdi:waypoint x="720" y="770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0mubudp_di" bpmnElement="Flow_0mubudp">
+        <omgdi:waypoint x="820" y="770" />
+        <omgdi:waypoint x="860" y="770" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0d95xhg_di" bpmnElement="Flow_0d95xhg">
-        <omgdi:waypoint x="806" y="852" />
-        <omgdi:waypoint x="870" y="852" />
+        <omgdi:waypoint x="960" y="770" />
+        <omgdi:waypoint x="990" y="770" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_09l1cia_di" bpmnElement="Event_09l1cia">
-        <omgdc:Bounds x="458" y="834" width="36" height="36" />
+        <omgdc:Bounds x="478" y="752" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds x="433" y="877" width="87" height="40" />
+          <omgdc:Bounds x="453" y="795" width="88" height="40" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1j8b73w_di" bpmnElement="Activity_1j8b73w">
+        <omgdc:Bounds x="580" y="730" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1s6spvl_di" bpmnElement="Activity_1s6spvl">
-        <omgdc:Bounds x="546" y="812" width="100" height="80" />
+        <omgdc:Bounds x="720" y="730" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1hevoib_di" bpmnElement="Activity_1hevoib">
-        <omgdc:Bounds x="706" y="812" width="100" height="80" />
+        <omgdc:Bounds x="860" y="730" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1lovj18_di" bpmnElement="Activity_1lovj18">
-        <omgdc:Bounds x="870" y="812" width="100" height="80" />
+        <omgdc:Bounds x="990" y="730" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Association_177f0uv_di" bpmnElement="Association_177f0uv">
-        <omgdi:waypoint x="596" y="812" />
-        <omgdi:waypoint x="596" y="772" />
-      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </definitions>

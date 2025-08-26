@@ -1,632 +1,632 @@
 {
   "docusaurus-plugin-content-docs": {
     "default": {
-      "path": "/conectafapes-project/",
+      "path": "/",
       "versions": [
         {
           "name": "current",
           "label": "Next",
           "isLast": true,
-          "path": "/conectafapes-project/",
+          "path": "/",
           "mainDocId": "intro",
           "docs": [
             {
               "id": "desenvolvimento/processosoftware/exemplo_documentacao_squad",
-              "path": "/conectafapes-project/desenvolvimento/processosoftware/exemplo_documentacao_squad",
+              "path": "/desenvolvimento/processosoftware/exemplo_documentacao_squad",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "desenvolvimento/processosoftware/processo_definir_design_sprint",
-              "path": "/conectafapes-project/desenvolvimento/processosoftware/processo_definir_design_sprint",
+              "path": "/desenvolvimento/processosoftware/processo_definir_design_sprint",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "desenvolvimento/processosoftware/processo_definir_produto_desenvolvido",
-              "path": "/conectafapes-project/desenvolvimento/processosoftware/processo_definir_produto_desenvolvido",
+              "path": "/desenvolvimento/processosoftware/processo_definir_produto_desenvolvido",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "desenvolvimento/processosoftware/processo_desenvolvimento",
-              "path": "/conectafapes-project/desenvolvimento/processosoftware/processo_desenvolvimento",
+              "path": "/desenvolvimento/processosoftware/processo_desenvolvimento",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "desenvolvimento/processosoftware/processo_mapear_processos",
-              "path": "/conectafapes-project/desenvolvimento/processosoftware/processo_mapear_processos",
+              "path": "/desenvolvimento/processosoftware/processo_mapear_processos",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "desenvolvimento/processosoftware/visao_geral",
-              "path": "/conectafapes-project/desenvolvimento/processosoftware/visao_geral",
+              "path": "/desenvolvimento/processosoftware/visao_geral",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "desenvolvimento/qualidade/cypress/boas_praticas_cypress",
-              "path": "/conectafapes-project/desenvolvimento/qualidade/cypress/boas_praticas_cypress",
+              "path": "/desenvolvimento/qualidade/cypress/boas_praticas_cypress",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "desenvolvimento/qualidade/cypress/padrao_scripts_cypress",
-              "path": "/conectafapes-project/desenvolvimento/qualidade/cypress/padrao_scripts_cypress",
+              "path": "/desenvolvimento/qualidade/cypress/padrao_scripts_cypress",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "desenvolvimento/qualidade/intro",
-              "path": "/conectafapes-project/desenvolvimento/qualidade/intro",
+              "path": "/desenvolvimento/qualidade/intro",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "desenvolvimento/qualidade/processos/boas-praticas-github",
-              "path": "/conectafapes-project/desenvolvimento/qualidade/processos/boas-praticas-github",
+              "path": "/desenvolvimento/qualidade/processos/boas-praticas-github",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "desenvolvimento/qualidade/processos/novo-processo",
-              "path": "/conectafapes-project/desenvolvimento/qualidade/processos/novo-processo",
+              "path": "/desenvolvimento/qualidade/processos/novo-processo",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "desenvolvimento/visaogeral/intro",
-              "path": "/conectafapes-project/desenvolvimento/visaogeral/intro",
+              "path": "/desenvolvimento/visaogeral/intro",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "gestao/data_driven/metricas",
-              "path": "/conectafapes-project/gestao/data_driven/metricas",
+              "path": "/gestao/data_driven/metricas",
               "sidebar": "gestao"
             },
             {
               "id": "gestao/data_driven/tratamento-de-issues",
-              "path": "/conectafapes-project/gestao/data_driven/tratamento-de-issues",
+              "path": "/gestao/data_driven/tratamento-de-issues",
               "sidebar": "gestao"
             },
             {
               "id": "gestao/data_driven/visao_geral",
-              "path": "/conectafapes-project/gestao/data_driven/visao_geral",
+              "path": "/gestao/data_driven/visao_geral",
               "sidebar": "gestao"
             },
             {
               "id": "gestao/modelostacy",
-              "path": "/conectafapes-project/gestao/modelostacy",
+              "path": "/gestao/modelostacy",
               "sidebar": "gestao"
             },
             {
               "id": "gestao/processogestaomacro",
-              "path": "/conectafapes-project/gestao/processogestaomacro",
+              "path": "/gestao/processogestaomacro",
               "sidebar": "gestao"
             },
             {
               "id": "gestao/trilha_capacitacao/aquisicao_talento",
-              "path": "/conectafapes-project/gestao/trilha_capacitacao/aquisicao_talento",
+              "path": "/gestao/trilha_capacitacao/aquisicao_talento",
               "sidebar": "gestao"
             },
             {
               "id": "gestao/trilha_capacitacao/visaogeral",
-              "path": "/conectafapes-project/gestao/trilha_capacitacao/visaogeral",
+              "path": "/gestao/trilha_capacitacao/visaogeral",
               "sidebar": "gestao"
             },
             {
               "id": "gestao/trilha_desenvolvimento/negocio/backlog_negocio",
-              "path": "/conectafapes-project/gestao/trilha_desenvolvimento/negocio/backlog_negocio",
+              "path": "/gestao/trilha_desenvolvimento/negocio/backlog_negocio",
               "sidebar": "gestao"
             },
             {
               "id": "gestao/trilha_desenvolvimento/negocio/controlar_recursos_projeto",
-              "path": "/conectafapes-project/gestao/trilha_desenvolvimento/negocio/controlar_recursos_projeto",
+              "path": "/gestao/trilha_desenvolvimento/negocio/controlar_recursos_projeto",
               "sidebar": "gestao"
             },
             {
               "id": "gestao/trilha_desenvolvimento/negocio/entrega_pagamento_bolsista",
-              "path": "/conectafapes-project/gestao/trilha_desenvolvimento/negocio/entrega_pagamento_bolsista",
+              "path": "/gestao/trilha_desenvolvimento/negocio/entrega_pagamento_bolsista",
               "sidebar": "gestao"
             },
             {
               "id": "gestao/trilha_desenvolvimento/negocio/implementacao_bolsa",
-              "path": "/conectafapes-project/gestao/trilha_desenvolvimento/negocio/implementacao_bolsa",
+              "path": "/gestao/trilha_desenvolvimento/negocio/implementacao_bolsa",
               "sidebar": "gestao"
             },
             {
               "id": "gestao/trilha_desenvolvimento/negocio/relatorio_analitico_leds-conectafapes",
-              "path": "/conectafapes-project/gestao/trilha_desenvolvimento/negocio/relatorio_analitico_leds-conectafapes",
+              "path": "/gestao/trilha_desenvolvimento/negocio/relatorio_analitico_leds-conectafapes",
               "sidebar": "gestao"
             },
             {
               "id": "gestao/trilha_desenvolvimento/negocio/stakeholders",
-              "path": "/conectafapes-project/gestao/trilha_desenvolvimento/negocio/stakeholders",
+              "path": "/gestao/trilha_desenvolvimento/negocio/stakeholders",
               "sidebar": "gestao"
             },
             {
               "id": "gestao/trilha_desenvolvimento/plataforma/backlog_plataforma",
-              "path": "/conectafapes-project/gestao/trilha_desenvolvimento/plataforma/backlog_plataforma",
+              "path": "/gestao/trilha_desenvolvimento/plataforma/backlog_plataforma",
               "sidebar": "gestao"
             },
             {
               "id": "gestao/trilha_desenvolvimento/plataforma/geracao_codigo",
-              "path": "/conectafapes-project/gestao/trilha_desenvolvimento/plataforma/geracao_codigo",
+              "path": "/gestao/trilha_desenvolvimento/plataforma/geracao_codigo",
               "sidebar": "gestao"
             },
             {
               "id": "gestao/trilha_pesquisa/visaogeral",
-              "path": "/conectafapes-project/gestao/trilha_pesquisa/visaogeral",
+              "path": "/gestao/trilha_pesquisa/visaogeral",
               "sidebar": "gestao"
             },
             {
               "id": "intro",
-              "path": "/conectafapes-project/"
+              "path": "/"
             },
             {
               "id": "modulos/api_gateway/architecture",
-              "path": "/conectafapes-project/modulos/api_gateway/architecture",
+              "path": "/modulos/api_gateway/architecture",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/api_gateway/minimundo",
-              "path": "/conectafapes-project/modulos/api_gateway/minimundo",
+              "path": "/modulos/api_gateway/minimundo",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/api_gateway/processos",
-              "path": "/conectafapes-project/modulos/api_gateway/processos",
+              "path": "/modulos/api_gateway/processos",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/api_gateway/requirements",
-              "path": "/conectafapes-project/modulos/api_gateway/requirements",
+              "path": "/modulos/api_gateway/requirements",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/api_gateway/usecase",
-              "path": "/conectafapes-project/modulos/api_gateway/usecase",
+              "path": "/modulos/api_gateway/usecase",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/autenticacao/minimundo",
-              "path": "/conectafapes-project/modulos/autenticacao/minimundo",
+              "path": "/modulos/autenticacao/minimundo",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/autenticacao/requirements",
-              "path": "/conectafapes-project/modulos/autenticacao/requirements",
+              "path": "/modulos/autenticacao/requirements",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/autenticacao/usecase",
-              "path": "/conectafapes-project/modulos/autenticacao/usecase",
+              "path": "/modulos/autenticacao/usecase",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/gerenciar_editais/minimundo",
-              "path": "/conectafapes-project/modulos/gerenciar_editais/minimundo",
+              "path": "/modulos/gerenciar_editais/minimundo",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/gerenciar_editais/requisitos",
-              "path": "/conectafapes-project/modulos/gerenciar_editais/requisitos",
+              "path": "/modulos/gerenciar_editais/requisitos",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/gestao_bolsa_pesquisa/casos_uso",
-              "path": "/conectafapes-project/modulos/gestao_bolsa_pesquisa/casos_uso",
+              "path": "/modulos/gestao_bolsa_pesquisa/casos_uso",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/gestao_bolsa_pesquisa/minimundo",
-              "path": "/conectafapes-project/modulos/gestao_bolsa_pesquisa/minimundo",
+              "path": "/modulos/gestao_bolsa_pesquisa/minimundo",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/gestao_bolsa_pesquisa/modelo_comportamental",
-              "path": "/conectafapes-project/modulos/gestao_bolsa_pesquisa/modelo_comportamental",
+              "path": "/modulos/gestao_bolsa_pesquisa/modelo_comportamental",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/gestao_bolsa_pesquisa/modelo_estrutural",
-              "path": "/conectafapes-project/modulos/gestao_bolsa_pesquisa/modelo_estrutural",
+              "path": "/modulos/gestao_bolsa_pesquisa/modelo_estrutural",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/gestao_bolsa_pesquisa/requirements",
-              "path": "/conectafapes-project/modulos/gestao_bolsa_pesquisa/requirements",
+              "path": "/modulos/gestao_bolsa_pesquisa/requirements",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/arquitetura",
-              "path": "/conectafapes-project/modulos/importacao_editais/arquitetura",
+              "path": "/modulos/importacao_editais/arquitetura",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/casos-uso",
-              "path": "/conectafapes-project/modulos/importacao_editais/casos-uso",
+              "path": "/modulos/importacao_editais/casos-uso",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/minimundo",
-              "path": "/conectafapes-project/modulos/importacao_editais/minimundo",
+              "path": "/modulos/importacao_editais/minimundo",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/modelo-comportamental",
-              "path": "/conectafapes-project/modulos/importacao_editais/modelo-comportamental",
+              "path": "/modulos/importacao_editais/modelo-comportamental",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/modelo-estrutural",
-              "path": "/conectafapes-project/modulos/importacao_editais/modelo-estrutural",
+              "path": "/modulos/importacao_editais/modelo-estrutural",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/processos/integracao_edital",
-              "path": "/conectafapes-project/modulos/importacao_editais/processos/integracao_edital",
+              "path": "/modulos/importacao_editais/processos/integracao_edital",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/processos/integracao_edital_projeto",
-              "path": "/conectafapes-project/modulos/importacao_editais/processos/integracao_edital_projeto",
+              "path": "/modulos/importacao_editais/processos/integracao_edital_projeto",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/processos/integracao_projeto",
-              "path": "/conectafapes-project/modulos/importacao_editais/processos/integracao_projeto",
+              "path": "/modulos/importacao_editais/processos/integracao_projeto",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/prototipo_telas",
-              "path": "/conectafapes-project/modulos/importacao_editais/prototipo_telas",
+              "path": "/modulos/importacao_editais/prototipo_telas",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/importacao_editais/requisitos",
-              "path": "/conectafapes-project/modulos/importacao_editais/requisitos",
+              "path": "/modulos/importacao_editais/requisitos",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/intro",
-              "path": "/conectafapes-project/modulos/intro",
+              "path": "/modulos/intro",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/modalidade_bolsa/arquitetura",
-              "path": "/conectafapes-project/modulos/modalidade_bolsa/arquitetura",
+              "path": "/modulos/modalidade_bolsa/arquitetura",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/modalidade_bolsa/casos-uso",
-              "path": "/conectafapes-project/modulos/modalidade_bolsa/casos-uso",
+              "path": "/modulos/modalidade_bolsa/casos-uso",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/modalidade_bolsa/minimundo",
-              "path": "/conectafapes-project/modulos/modalidade_bolsa/minimundo",
+              "path": "/modulos/modalidade_bolsa/minimundo",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/modalidade_bolsa/modelo-comportamental",
-              "path": "/conectafapes-project/modulos/modalidade_bolsa/modelo-comportamental",
+              "path": "/modulos/modalidade_bolsa/modelo-comportamental",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/modalidade_bolsa/modelo-estrutural",
-              "path": "/conectafapes-project/modulos/modalidade_bolsa/modelo-estrutural",
+              "path": "/modulos/modalidade_bolsa/modelo-estrutural",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/modalidade_bolsa/requisitos",
-              "path": "/conectafapes-project/modulos/modalidade_bolsa/requisitos",
+              "path": "/modulos/modalidade_bolsa/requisitos",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/pagamento_bolsista/casos_uso",
-              "path": "/conectafapes-project/modulos/pagamento_bolsista/casos_uso",
+              "path": "/modulos/pagamento_bolsista/casos_uso",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/pagamento_bolsista/minimundo",
-              "path": "/conectafapes-project/modulos/pagamento_bolsista/minimundo",
+              "path": "/modulos/pagamento_bolsista/minimundo",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/pagamento_bolsista/modelo_comportamental",
-              "path": "/conectafapes-project/modulos/pagamento_bolsista/modelo_comportamental",
+              "path": "/modulos/pagamento_bolsista/modelo_comportamental",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/pagamento_bolsista/modelo_estrutural",
-              "path": "/conectafapes-project/modulos/pagamento_bolsista/modelo_estrutural",
+              "path": "/modulos/pagamento_bolsista/modelo_estrutural",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/pagamento_bolsista/requirements",
-              "path": "/conectafapes-project/modulos/pagamento_bolsista/requirements",
+              "path": "/modulos/pagamento_bolsista/requirements",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/portal_fapes/diagramafluxo",
-              "path": "/conectafapes-project/modulos/portal_fapes/diagramafluxo",
+              "path": "/modulos/portal_fapes/diagramafluxo",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/portal_fapes/introducao",
-              "path": "/conectafapes-project/modulos/portal_fapes/introducao",
+              "path": "/modulos/portal_fapes/introducao",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/portal_fapes/modeloestrutural",
-              "path": "/conectafapes-project/modulos/portal_fapes/modeloestrutural",
+              "path": "/modulos/portal_fapes/modeloestrutural",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/portal_fapes/requirements",
-              "path": "/conectafapes-project/modulos/portal_fapes/requirements",
+              "path": "/modulos/portal_fapes/requirements",
               "sidebar": "modulos"
             },
             {
               "id": "modulos/portal_fapes/usecase",
-              "path": "/conectafapes-project/modulos/portal_fapes/usecase",
+              "path": "/modulos/portal_fapes/usecase",
               "sidebar": "modulos"
             },
             {
               "id": "referencias/arquitetura/arquitetura",
-              "path": "/conectafapes-project/referencias/arquitetura/arquitetura",
+              "path": "/referencias/arquitetura/arquitetura",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/arquitetura/componentes_arquitetura",
-              "path": "/conectafapes-project/referencias/arquitetura/componentes_arquitetura",
+              "path": "/referencias/arquitetura/componentes_arquitetura",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/arquitetura/conceitos",
-              "path": "/conectafapes-project/referencias/arquitetura/conceitos",
+              "path": "/referencias/arquitetura/conceitos",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/arquitetura/tecnologias",
-              "path": "/conectafapes-project/referencias/arquitetura/tecnologias",
+              "path": "/referencias/arquitetura/tecnologias",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/governo/acesso_cidadao",
-              "path": "/conectafapes-project/referencias/governo/acesso_cidadao",
+              "path": "/referencias/governo/acesso_cidadao",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/governo/api_notificacao",
-              "path": "/conectafapes-project/referencias/governo/api_notificacao",
+              "path": "/referencias/governo/api_notificacao",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/governo/banestes",
-              "path": "/conectafapes-project/referencias/governo/banestes",
+              "path": "/referencias/governo/banestes",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/governo/sigfapes",
-              "path": "/conectafapes-project/referencias/governo/sigfapes",
+              "path": "/referencias/governo/sigfapes",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/intro",
-              "path": "/conectafapes-project/referencias/intro",
+              "path": "/referencias/intro",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/trilhas/roadmap-backend",
-              "path": "/conectafapes-project/referencias/trilhas/roadmap-backend",
+              "path": "/referencias/trilhas/roadmap-backend",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/trilhas/roadmap-frontend",
-              "path": "/conectafapes-project/referencias/trilhas/roadmap-frontend",
+              "path": "/referencias/trilhas/roadmap-frontend",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/tutoriais/dibb",
-              "path": "/conectafapes-project/referencias/tutoriais/dibb",
+              "path": "/referencias/tutoriais/dibb",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/tutoriais/escrita_issues",
-              "path": "/conectafapes-project/referencias/tutoriais/escrita_issues",
+              "path": "/referencias/tutoriais/escrita_issues",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/tutoriais/integracao-acesso-cidadao",
-              "path": "/conectafapes-project/referencias/tutoriais/integracao-acesso-cidadao",
+              "path": "/referencias/tutoriais/integracao-acesso-cidadao",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/tutoriais/intro",
-              "path": "/conectafapes-project/referencias/tutoriais/intro",
+              "path": "/referencias/tutoriais/intro",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/tutoriais/less",
-              "path": "/conectafapes-project/referencias/tutoriais/less",
+              "path": "/referencias/tutoriais/less",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/tutoriais/prompt",
-              "path": "/conectafapes-project/referencias/tutoriais/prompt",
+              "path": "/referencias/tutoriais/prompt",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/tutoriais/six_paper",
-              "path": "/conectafapes-project/referencias/tutoriais/six_paper",
+              "path": "/referencias/tutoriais/six_paper",
               "sidebar": "referencias"
             },
             {
               "id": "referencias/tutoriais/token-jwt-interno",
-              "path": "/conectafapes-project/referencias/tutoriais/token-jwt-interno",
+              "path": "/referencias/tutoriais/token-jwt-interno",
               "sidebar": "referencias"
             },
             {
               "id": "sdd_conecta_admin/banco_dados",
-              "path": "/conectafapes-project/sdd_conecta_admin/banco_dados",
+              "path": "/sdd_conecta_admin/banco_dados",
               "sidebar": "sdd_conecta_admin"
             },
             {
               "id": "sdd_conecta_admin/descricao_geral",
-              "path": "/conectafapes-project/sdd_conecta_admin/descricao_geral",
+              "path": "/sdd_conecta_admin/descricao_geral",
               "sidebar": "sdd_conecta_admin"
             },
             {
               "id": "sdd_conecta_admin/design_detalhado",
-              "path": "/conectafapes-project/sdd_conecta_admin/design_detalhado",
+              "path": "/sdd_conecta_admin/design_detalhado",
               "sidebar": "sdd_conecta_admin"
             },
             {
               "id": "sdd_conecta_admin/diretrizes_design",
-              "path": "/conectafapes-project/sdd_conecta_admin/diretrizes_design",
+              "path": "/sdd_conecta_admin/diretrizes_design",
               "sidebar": "sdd_conecta_admin"
             },
             {
               "id": "sdd_conecta_admin/glossario",
-              "path": "/conectafapes-project/sdd_conecta_admin/glossario",
+              "path": "/sdd_conecta_admin/glossario",
               "sidebar": "sdd_conecta_admin"
             },
             {
               "id": "sdd_conecta_admin/interfaces_externas",
-              "path": "/conectafapes-project/sdd_conecta_admin/interfaces_externas",
+              "path": "/sdd_conecta_admin/interfaces_externas",
               "sidebar": "sdd_conecta_admin"
             },
             {
               "id": "sdd_conecta_admin/introducao",
-              "path": "/conectafapes-project/sdd_conecta_admin/introducao",
+              "path": "/sdd_conecta_admin/introducao",
               "sidebar": "sdd_conecta_admin"
             },
             {
               "id": "sdd_conecta_admin/plano_de_testes",
-              "path": "/conectafapes-project/sdd_conecta_admin/plano_de_testes",
+              "path": "/sdd_conecta_admin/plano_de_testes",
               "sidebar": "sdd_conecta_admin"
             },
             {
               "id": "sdd_conecta_admin/requisitos_funcionais",
-              "path": "/conectafapes-project/sdd_conecta_admin/requisitos_funcionais",
+              "path": "/sdd_conecta_admin/requisitos_funcionais",
               "sidebar": "sdd_conecta_admin"
             },
             {
               "id": "sdd_conecta_admin/seguranca",
-              "path": "/conectafapes-project/sdd_conecta_admin/seguranca",
+              "path": "/sdd_conecta_admin/seguranca",
               "sidebar": "sdd_conecta_admin"
             },
             {
               "id": "/category/gestão-orientada-a-dados",
-              "path": "/conectafapes-project/category/gestão-orientada-a-dados",
+              "path": "/category/gestão-orientada-a-dados",
               "sidebar": "gestao"
             },
             {
               "id": "/category/trilha-de-capacitação",
-              "path": "/conectafapes-project/category/trilha-de-capacitação",
+              "path": "/category/trilha-de-capacitação",
               "sidebar": "gestao"
             },
             {
               "id": "/category/trilha-de-desenvolvimento",
-              "path": "/conectafapes-project/category/trilha-de-desenvolvimento",
+              "path": "/category/trilha-de-desenvolvimento",
               "sidebar": "gestao"
             },
             {
               "id": "/category/visão-de-negócio",
-              "path": "/conectafapes-project/category/visão-de-negócio",
+              "path": "/category/visão-de-negócio",
               "sidebar": "gestao"
             },
             {
               "id": "/category/visão-de-plataforma",
-              "path": "/conectafapes-project/category/visão-de-plataforma",
+              "path": "/category/visão-de-plataforma",
               "sidebar": "gestao"
             },
             {
               "id": "/category/trilha-de-pesquisa",
-              "path": "/conectafapes-project/category/trilha-de-pesquisa",
+              "path": "/category/trilha-de-pesquisa",
               "sidebar": "gestao"
             },
             {
               "id": "/category/1-modalidades-de-bolsas",
-              "path": "/conectafapes-project/category/1-modalidades-de-bolsas",
+              "path": "/category/1-modalidades-de-bolsas",
               "sidebar": "modulos"
             },
             {
               "id": "/category/-2-importação-de-editais",
-              "path": "/conectafapes-project/category/-2-importação-de-editais",
+              "path": "/category/-2-importação-de-editais",
               "sidebar": "modulos"
             },
             {
               "id": "/category/processos-de-integração",
-              "path": "/conectafapes-project/category/processos-de-integração",
+              "path": "/category/processos-de-integração",
               "sidebar": "modulos"
             },
             {
               "id": "/category/4-pagamento-de-bolsistas",
-              "path": "/conectafapes-project/category/4-pagamento-de-bolsistas",
+              "path": "/category/4-pagamento-de-bolsistas",
               "sidebar": "modulos"
             },
             {
               "id": "/category/5-autenticacação-e-autorização",
-              "path": "/conectafapes-project/category/5-autenticacação-e-autorização",
+              "path": "/category/5-autenticacação-e-autorização",
               "sidebar": "modulos"
             },
             {
               "id": "/category/6-gerenciar-editais",
-              "path": "/conectafapes-project/category/6-gerenciar-editais",
+              "path": "/category/6-gerenciar-editais",
               "sidebar": "modulos"
             },
             {
               "id": "/category/7-api-gateway",
-              "path": "/conectafapes-project/category/7-api-gateway",
+              "path": "/category/7-api-gateway",
               "sidebar": "modulos"
             },
             {
               "id": "/category/8-portal-fapes",
-              "path": "/conectafapes-project/category/8-portal-fapes",
+              "path": "/category/8-portal-fapes",
               "sidebar": "modulos"
             },
             {
               "id": "/category/9-gestão-de-bolsa-de-pesquisa",
-              "path": "/conectafapes-project/category/9-gestão-de-bolsa-de-pesquisa",
+              "path": "/category/9-gestão-de-bolsa-de-pesquisa",
               "sidebar": "modulos"
             },
             {
               "id": "/category/visão-geral",
-              "path": "/conectafapes-project/category/visão-geral",
+              "path": "/category/visão-geral",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "/category/processos",
-              "path": "/conectafapes-project/category/processos",
+              "path": "/category/processos",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "/category/garantia-de-qualidade-qa",
-              "path": "/conectafapes-project/category/garantia-de-qualidade-qa",
+              "path": "/category/garantia-de-qualidade-qa",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "/category/processos-qa",
-              "path": "/conectafapes-project/category/processos-qa",
+              "path": "/category/processos-qa",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "/category/material-cypress",
-              "path": "/conectafapes-project/category/material-cypress",
+              "path": "/category/material-cypress",
               "sidebar": "desenvolvimento"
             },
             {
               "id": "/category/arquitetura",
-              "path": "/conectafapes-project/category/arquitetura",
+              "path": "/category/arquitetura",
               "sidebar": "referencias"
             },
             {
               "id": "/category/governo",
-              "path": "/conectafapes-project/category/governo",
+              "path": "/category/governo",
               "sidebar": "referencias"
             },
             {
               "id": "/category/trilhas-de-estudo",
-              "path": "/conectafapes-project/category/trilhas-de-estudo",
+              "path": "/category/trilhas-de-estudo",
               "sidebar": "referencias"
             },
             {
               "id": "/category/tutoriais",
-              "path": "/conectafapes-project/category/tutoriais",
+              "path": "/category/tutoriais",
               "sidebar": "referencias"
             }
           ],
@@ -634,31 +634,31 @@
           "sidebars": {
             "gestao": {
               "link": {
-                "path": "/conectafapes-project/gestao/modelostacy",
+                "path": "/gestao/modelostacy",
                 "label": "gestao/modelostacy"
               }
             },
             "modulos": {
               "link": {
-                "path": "/conectafapes-project/modulos/intro",
+                "path": "/modulos/intro",
                 "label": "modulos/intro"
               }
             },
             "desenvolvimento": {
               "link": {
-                "path": "/conectafapes-project/category/visão-geral",
+                "path": "/category/visão-geral",
                 "label": "Visão Geral"
               }
             },
             "referencias": {
               "link": {
-                "path": "/conectafapes-project/referencias/intro",
+                "path": "/referencias/intro",
                 "label": "referencias/intro"
               }
             },
             "sdd_conecta_admin": {
               "link": {
-                "path": "/conectafapes-project/sdd_conecta_admin/introducao",
+                "path": "/sdd_conecta_admin/introducao",
                 "label": "sdd_conecta_admin/introducao"
               }
             }
@@ -671,8 +671,8 @@
   "docusaurus-lunr-search": {
     "default": {
       "fileNames": {
-        "searchDoc": "search-doc-1754413565841.json",
-        "lunrIndex": "lunr-index-1754413565841.json"
+        "searchDoc": "search-doc-1756213749304.json",
+        "lunrIndex": "lunr-index-1756213749304.json"
       }
     }
   }

@@ -5,12 +5,12 @@
   "source": "@site/docs/gestao/trilha_pesquisa/visaogeral.md",
   "sourceDirName": "gestao/trilha_pesquisa",
   "slug": "/gestao/trilha_pesquisa/visaogeral",
-  "permalink": "/conectafapes-project/gestao/trilha_pesquisa/visaogeral",
+  "permalink": "/gestao/trilha_pesquisa/visaogeral",
   "draft": false,
   "unlisted": false,
   "tags": [],
   "version": "current",
-  "lastUpdatedAt": 1753961134000,
+  "lastUpdatedAt": 1539502055000,
   "sidebarPosition": 1,
   "frontMatter": {
     "title": "Backlog",
@@ -19,6 +19,6 @@
   "sidebar": "gestao",
   "previous": {
     "title": "Trilha de Pesquisa",
-    "permalink": "/conectafapes-project/category/trilha-de-pesquisa"
+    "permalink": "/category/trilha-de-pesquisa"
   }
 }

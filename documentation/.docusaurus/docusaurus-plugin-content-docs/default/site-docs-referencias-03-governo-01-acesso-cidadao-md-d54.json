@@ -5,12 +5,12 @@
   "source": "@site/docs/referencias/03_governo/01_acesso_cidadao.md",
   "sourceDirName": "referencias/03_governo",
   "slug": "/referencias/governo/acesso_cidadao",
-  "permalink": "/conectafapes-project/referencias/governo/acesso_cidadao",
+  "permalink": "/referencias/governo/acesso_cidadao",
   "draft": false,
   "unlisted": false,
   "tags": [],
   "version": "current",
-  "lastUpdatedAt": 1753961134000,
+  "lastUpdatedAt": 1539502055000,
   "sidebarPosition": 1,
   "frontMatter": {
     "sidebar_position": 1
@@ -18,10 +18,10 @@
   "sidebar": "referencias",
   "previous": {
     "title": "Governo",
-    "permalink": "/conectafapes-project/category/governo"
+    "permalink": "/category/governo"
   },
   "next": {
     "title": "Arquivos do Banestes",
-    "permalink": "/conectafapes-project/referencias/governo/banestes"
+    "permalink": "/referencias/governo/banestes"
   }
 }

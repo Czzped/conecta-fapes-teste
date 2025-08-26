@@ -1,5 +1,5 @@
 {
-  "blogBasePath": "/conectafapes-project/blog",
+  "blogBasePath": "/blog",
   "blogTitle": "Blog",
-  "authorsListPath": "/conectafapes-project/blog/authors"
+  "authorsListPath": "/blog/authors"
 }

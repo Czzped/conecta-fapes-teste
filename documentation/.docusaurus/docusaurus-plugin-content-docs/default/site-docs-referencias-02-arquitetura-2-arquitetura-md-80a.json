@@ -5,12 +5,12 @@
   "source": "@site/docs/referencias/02_arquitetura/2_arquitetura.md",
   "sourceDirName": "referencias/02_arquitetura",
   "slug": "/referencias/arquitetura/arquitetura",
-  "permalink": "/conectafapes-project/referencias/arquitetura/arquitetura",
+  "permalink": "/referencias/arquitetura/arquitetura",
   "draft": false,
   "unlisted": false,
   "tags": [],
   "version": "current",
-  "lastUpdatedAt": 1753961134000,
+  "lastUpdatedAt": 1539502055000,
   "sidebarPosition": 2,
   "frontMatter": {
     "sidebar_position": 2
@@ -18,10 +18,10 @@
   "sidebar": "referencias",
   "previous": {
     "title": "Conceitos",
-    "permalink": "/conectafapes-project/referencias/arquitetura/conceitos"
+    "permalink": "/referencias/arquitetura/conceitos"
   },
   "next": {
     "title": "Visão Geral dos Componentes",
-    "permalink": "/conectafapes-project/referencias/arquitetura/componentes_arquitetura"
+    "permalink": "/referencias/arquitetura/componentes_arquitetura"
   }
 }

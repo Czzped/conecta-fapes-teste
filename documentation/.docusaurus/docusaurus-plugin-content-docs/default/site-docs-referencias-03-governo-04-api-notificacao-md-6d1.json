@@ -5,12 +5,12 @@
   "source": "@site/docs/referencias/03_governo/04_api_notificacao.md",
   "sourceDirName": "referencias/03_governo",
   "slug": "/referencias/governo/api_notificacao",
-  "permalink": "/conectafapes-project/referencias/governo/api_notificacao",
+  "permalink": "/referencias/governo/api_notificacao",
   "draft": false,
   "unlisted": false,
   "tags": [],
   "version": "current",
-  "lastUpdatedAt": 1753975119000,
+  "lastUpdatedAt": 1539502055000,
   "sidebarPosition": 4,
   "frontMatter": {
     "sidebar_position": 4
@@ -18,10 +18,10 @@
   "sidebar": "referencias",
   "previous": {
     "title": "SigFapes",
-    "permalink": "/conectafapes-project/referencias/governo/sigfapes"
+    "permalink": "/referencias/governo/sigfapes"
   },
   "next": {
     "title": "Trilhas de Estudo",
-    "permalink": "/conectafapes-project/category/trilhas-de-estudo"
+    "permalink": "/category/trilhas-de-estudo"
   }
 }

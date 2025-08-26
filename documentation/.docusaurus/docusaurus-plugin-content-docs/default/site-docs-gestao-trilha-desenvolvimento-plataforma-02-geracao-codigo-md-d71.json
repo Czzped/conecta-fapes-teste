@@ -5,12 +5,12 @@
   "source": "@site/docs/gestao/trilha_desenvolvimento/plataforma/02_geracao_codigo.md",
   "sourceDirName": "gestao/trilha_desenvolvimento/plataforma",
   "slug": "/gestao/trilha_desenvolvimento/plataforma/geracao_codigo",
-  "permalink": "/conectafapes-project/gestao/trilha_desenvolvimento/plataforma/geracao_codigo",
+  "permalink": "/gestao/trilha_desenvolvimento/plataforma/geracao_codigo",
   "draft": false,
   "unlisted": false,
   "tags": [],
   "version": "current",
-  "lastUpdatedAt": 1753961134000,
+  "lastUpdatedAt": 1539502055000,
   "sidebarPosition": 1,
   "frontMatter": {
     "title": "Geração de Código",
@@ -19,10 +19,10 @@
   "sidebar": "gestao",
   "previous": {
     "title": "Backlog de Plataforma",
-    "permalink": "/conectafapes-project/gestao/trilha_desenvolvimento/plataforma/backlog_plataforma"
+    "permalink": "/gestao/trilha_desenvolvimento/plataforma/backlog_plataforma"
   },
   "next": {
     "title": "Trilha de Pesquisa",
-    "permalink": "/conectafapes-project/category/trilha-de-pesquisa"
+    "permalink": "/category/trilha-de-pesquisa"
   }
 }
