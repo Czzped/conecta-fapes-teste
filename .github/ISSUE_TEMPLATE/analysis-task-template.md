@@ -2,26 +2,26 @@
 name: "[Análise] Task Template"
 about: Demandas de análise
 title: "[Análise] "
-labels: análise, QA
+labels: análise
 assignees: ''
 type: Task
 ---
-🚨 **Entregas são feitas via PR**🚨
-> Associe a feature, ao qual esta task está vinculada, ao pull request correspondente. Caso seja uma task isolada associe-a ao pull requeste correspondente.
+## Objetivo
+Descreva em 1–2 frases o que se pretende alcançar com esta iniciativa.
 
-## Descrição
-Descreva de forma detalhada o propósito da funcionalidade, inclua exemplos e possíveis dores a serem solucionadas.
+## Contexto / Problema
+Explique de forma resumida a dor ou oportunidade identificada.
 
-## Requisitos
-- Item 1
-- Item 2
+## Público-alvo / Impacto
+Qual persona, área ou processo será impactado?
 
-## Entregáveis
-Para que essa tarefa seja considerada **concluída com sucesso**, o seguinte deve ser entregue: 
+## Critérios de Sucesso
+Quais indicadores ou sinais mostrarão que deu certo?
 
 - [ ] Item 1
 - [ ] Item 2
 - [ ] Item 3
 
-## Observações
-Outras informações relevantes que devem ser consideradas neste desenvolvimento. Possíveis informações para este campo seriam links externos como figma, aplicação ou documentação diretamente relacionada.
+## Links / Materiais de Apoio
+- Item 1
+- Item 2
