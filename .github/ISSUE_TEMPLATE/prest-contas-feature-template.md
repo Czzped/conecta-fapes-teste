@@ -2,7 +2,7 @@
 name: "[Prest. Contas] Feature Template"
 about: Funcionalidade que entrega valor ao cliente dentro do escopo do módulo de Prestação de Contas
 title: "[Prest. Contas]"
-labels: feature, portal fapes
+labels: feature, prestação contas
 assignees: ManoelRL
 type: Feature
 ---
