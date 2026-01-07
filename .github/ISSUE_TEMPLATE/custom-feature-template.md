@@ -2,7 +2,6 @@
 name: "[CUSTOM] Feature Template"
 about: 'No título substituir CUSTOM por um escopo, por exemplo: [Dados] ou [Design]'
 title: "[CUSTOM] "
-labels: feature
 assignees: ''
 type: Feature
 ---

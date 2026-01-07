@@ -2,7 +2,6 @@
 name: "[Back-end] Task Template"
 about: Demandas técnicas de back-end
 title: "[Back-end]"
-labels: back-end
 assignees: ''
 type: Task
 ---

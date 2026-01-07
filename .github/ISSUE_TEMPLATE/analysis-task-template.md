@@ -2,7 +2,6 @@
 name: "[Análise] Task Template"
 about: Demandas de análise
 title: "[Análise] "
-labels: análise
 assignees: ''
 type: Task
 ---
