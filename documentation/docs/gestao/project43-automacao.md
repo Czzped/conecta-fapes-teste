@@ -76,5 +76,5 @@ Depois do deploy, configurar o webhook do GitHub App para apontar para a URL do 
 
 1. Criar ou selecionar um issue de teste no Project 43.
 2. Mover para `In Progress` e verificar `Iniciado em`.
-3. Mover para `Done` e verificar `Data de Conclusao`.
+3. Mover para `Done` e verificar `Data de Conclusão`.
 4. Voltar para `In Progress` e verificar se `Data de Conclusão` foi limpa e `Iniciado em` foi preservado.
