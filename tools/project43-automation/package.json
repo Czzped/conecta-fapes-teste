@@ -1,0 +1,19 @@
+{
+  "name": "project43-automation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync:fields": "node ./scripts/sync-project-fields.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "jose": "^5.9.6"
+  },
+  "devDependencies": {
+    "wrangler": "^4.11.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
