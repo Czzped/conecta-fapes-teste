@@ -536,7 +536,7 @@ Execucao financeira de pagamentos: marcos de liberacao, processamento de bolsas 
 
 ### 5.4 Prevencao a Lavagem de Dinheiro (PLD)
 
-Controles e verificacoes para prevencao a lavagem de dinheiro e ao financiamento do terrorismo, conforme exigencias legais aplicaveis a entidades que gerenciam recursos publicos e de parceiros. A FAPES, como agencia de fomento que administra aportes financeiros de entidades parceiras e executa pagamentos a bolsistas e projetos, deve implementar mecanismos de monitoramento, verificacao e reporte de operacoes suspeitas.
+Controles e verificacoes para prevencao a lavagem de dinheiro e ao financiamento do terrorismo, conforme exigencias legais aplicaveis a entidades que gerenciam recursos publicos e de parceiros. A FAPES, como agencia de fomento que administra aportes financeiros de entidades parceiras e executa pagamentos a bolsistas e projetos, deve implementar mecanismos de monitoramento, verificacao e reporte de operacoes suspeitas. Inclui tambem a analise de conflitos de interesse entre os membros do projeto e as pessoas juridicas (PJ) contratadas, impedindo que o coordenador ou participantes tenham vinculo societario, familiar ou empregaticio com os fornecedores contratados pelo projeto.
 
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|
@@ -549,6 +549,7 @@ Controles e verificacoes para prevencao a lavagem de dinheiro e ao financiamento
 | 5.4.7 | Consulta a Listas Restritivas | Verificar pessoas e entidades contra listas de sancoes nacionais e internacionais (OFAC, ONU, UE) | Analista da Area Tecnica da Agencia | Art. 4, 1; Art. 6, par. unico |
 | 5.4.8 | Trilha de Auditoria PLD | Registrar log completo de todas as verificacoes, alertas, analises e decisoes de PLD para fiscalizacao | SECONT, Analista da Area Tecnica da Agencia | Art. 6, par. unico; Art. 15, III; Art. 27, II |
 | 5.4.9 | Dashboard PLD | Painel com indicadores de risco, alertas pendentes, operacoes bloqueadas e reportes ao COAF | Analista da Area Tecnica da Agencia, SECONT | Art. 25, III; Art. 3, 3 |
+| 5.4.10 | Analise de Conflito de Interesse com PJ | Verificar automaticamente se o coordenador ou qualquer participante do projeto possui vinculo com a pessoa juridica contratada — societario (socio ou administrador do CNPJ), familiar (parente ate segundo grau) ou empregaticio (funcionario ou prestador da PJ); a contratacao e bloqueada quando identificado conflito, exigindo analise manual e justificativa registrada pelo analista | Analista da Area Tecnica da Agencia | Art. 6, par. unico; Art. 4, 1 |
 
 ---
 
