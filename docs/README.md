@@ -1,6 +1,6 @@
 # Conecta FAPES - Documentacao
 
-Plataforma digital da FAPES para gestao do ciclo completo de fomento a pesquisa, desenvolvimento e inovacao.
+Plataforma digital da agencia de fomento para gestao do ciclo completo de fomento a pesquisa, desenvolvimento e inovacao.
 
 ## Produto
 

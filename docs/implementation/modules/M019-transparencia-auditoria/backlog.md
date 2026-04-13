@@ -4,7 +4,7 @@
 
 ## Sobre o Modulo
 
-A FAPES, como orgao publico, deve prestar contas de seus investimentos em fomento a sociedade e aos orgaos de controle. Atualmente, a publicacao de dados de transparencia e a geracao de relatorios para a SECONT sao feitas manualmente, sem trilha de auditoria sistematizada. Este modulo resolve esses problemas ao prover transparencia, relatorios automatizados e rastreabilidade completa.
+A agencia de fomento, como orgao publico, deve prestar contas de seus investimentos em fomento a sociedade e aos orgaos de controle. Atualmente, a publicacao de dados de transparencia e a geracao de relatorios para a SECONT sao feitas manualmente, sem trilha de auditoria sistematizada. Este modulo resolve esses problemas ao prover transparencia, relatorios automatizados e rastreabilidade completa.
 
 Especificacao de referencia: [README.md](README.md)
 

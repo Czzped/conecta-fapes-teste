@@ -66,11 +66,11 @@ classDiagram
     }
 
     class Projeto {
-        <<fora do escopo>>
+        <<fora do escopo - M003>>
     }
 
     class Bolsa {
-        <<fora do escopo>>
+        <<fora do escopo - M009>>
     }
 
     Resolucao "1" --> "*" VersaoModalidade : define

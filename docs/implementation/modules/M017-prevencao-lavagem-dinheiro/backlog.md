@@ -4,7 +4,7 @@
 
 ## Sobre o Modulo
 
-A FAPES deve cumprir regulamentacoes de prevencao a lavagem de dinheiro: verificar identidade de beneficiarios (KYC), monitorar transacoes para padroes suspeitos, reportar ao COAF, bloquear pagamentos preventivamente e consultar listas restritivas. Atualmente nao existe sistema automatizado para essas atividades, o que expoe a instituicao a riscos regulatorios e dificulta a deteccao de operacoes atipicas. Este modulo visa resolver esses problemas ao automatizar os processos de compliance PLD em uma plataforma integrada. O sucesso sera medido pela taxa de alertas tratados dentro do prazo legal e pela reducao do tempo de resposta a operacoes suspeitas.
+A agencia de fomento deve cumprir regulamentacoes de prevencao a lavagem de dinheiro: verificar identidade de beneficiarios (KYC), monitorar transacoes para padroes suspeitos, reportar ao COAF, bloquear pagamentos preventivamente e consultar listas restritivas. Atualmente nao existe sistema automatizado para essas atividades, o que expoe a instituicao a riscos regulatorios e dificulta a deteccao de operacoes atipicas. Este modulo visa resolver esses problemas ao automatizar os processos de compliance PLD em uma plataforma integrada. O sucesso sera medido pela taxa de alertas tratados dentro do prazo legal e pela reducao do tempo de resposta a operacoes suspeitas.
 
 Especificacao de referencia: [README.md](README.md)
 

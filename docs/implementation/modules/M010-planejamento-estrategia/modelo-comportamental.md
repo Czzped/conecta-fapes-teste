@@ -28,7 +28,7 @@ stateDiagram-v2
     state Suspensa : Operacoes interrompidas temporariamente
     state Encerrada : Prestacao de contas final aprovada
 
-    note right of Vigente : Aportes e aditivos so podem\nser registrados com parceria vigente
+    note right of Vigente : Aportes e aditivos so podem\nser registrados com parceria vigente.\nUma parceria vigente pode apoiar varios programas.
     note right of Encerrada : Nao pode encerrar se houver\nprogramas com editais em andamento (RI2)
 ```
 
@@ -39,12 +39,12 @@ stateDiagram-v2
     [*] --> EmPlanejamento : Cadastrar Programa
 
     EmPlanejamento --> EmPlanejamento : Atualizar Dados
-    EmPlanejamento --> EmPlanejamento : Cadastrar Comite Gestor
-    EmPlanejamento --> EmPlanejamento : Vincular Dotacao Orcamentaria
-    EmPlanejamento --> Ativo : Ativar Programa [eixo vinculado + dotacao definida]
+    EmPlanejamento --> EmPlanejamento : Cadastrar Comite de Governanca
+    EmPlanejamento --> EmPlanejamento : Registrar Recursos do Programa
+    EmPlanejamento --> Ativo : Ativar Programa [eixo vinculado + recursos definidos]
 
     Ativo --> Ativo : Vincular Dotacao Adicional
-    Ativo --> Ativo : Atualizar Comite Gestor
+    Ativo --> Ativo : Atualizar Comite de Governanca
     Ativo --> Ativo : Registrar Aditivo de Tempo
     Ativo --> Ativo : Registrar Aditivo de Aporte
     Ativo --> Suspenso : Suspender Programa
@@ -60,6 +60,6 @@ stateDiagram-v2
     state Suspenso : Novos editais bloqueados
     state Encerrado : Programa finalizado, historico mantido
 
-    note right of Ativo : Editais criados via M003\nvinculados ao programa
+    note right of Ativo : Editais configurados em M011 e acompanhados em M003\npodem ser vinculados ao programa.\nO programa pode referenciar uma parceria vigente.
     note right of Encerrado : Nao pode encerrar com\neditais em andamento (RI1)
 ```

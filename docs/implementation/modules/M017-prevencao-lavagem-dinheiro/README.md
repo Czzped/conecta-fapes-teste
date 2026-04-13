@@ -6,6 +6,7 @@
 
 | Documento | Descricao |
 |-----------|-----------|
+| [Contrato](contrato.md) | Superficie publica do modulo: comandos, consultas, jobs e eventos |
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclo de vida do AlertaPLD |
@@ -14,13 +15,13 @@
 
 ## Sobre o Modulo
 
-A FAPES deve cumprir regulamentacoes de prevencao a lavagem de dinheiro: verificar identidade de beneficiarios (KYC), monitorar transacoes para padroes suspeitos, reportar ao COAF, bloquear pagamentos preventivamente e consultar listas restritivas. Atualmente nao existe sistema automatizado para essas atividades, o que expoe a instituicao a riscos regulatorios e dificulta a deteccao de operacoes atipicas. Este modulo visa resolver esses problemas ao automatizar os processos de compliance PLD em uma plataforma integrada. O sucesso sera medido pela taxa de alertas tratados dentro do prazo legal e pela reducao do tempo de resposta a operacoes suspeitas.
+A agencia de fomento deve cumprir regulamentacoes de prevencao a lavagem de dinheiro: verificar identidade de beneficiarios (KYC), monitorar transacoes para padroes suspeitos, reportar ao COAF, bloquear pagamentos preventivamente e consultar listas restritivas. Atualmente nao existe sistema automatizado para essas atividades, o que expoe a instituicao a riscos regulatorios e dificulta a deteccao de operacoes atipicas. Este modulo visa resolver esses problemas ao automatizar os processos de compliance PLD em uma plataforma integrada. O sucesso sera medido pela taxa de alertas tratados dentro do prazo legal e pela reducao do tempo de resposta a operacoes suspeitas.
 
 ---
 
 ## Dominio
 
-A FAPES, como entidade publica que movimenta recursos financeiros para fomento a pesquisa, esta sujeita a legislacao de prevencao a lavagem de dinheiro. O processo de compliance PLD envolve diversas etapas complementares.
+A agencia de fomento, como entidade publica que movimenta recursos financeiros para fomento a pesquisa, esta sujeita a legislacao de prevencao a lavagem de dinheiro. O processo de compliance PLD envolve diversas etapas complementares.
 
 A verificacao cadastral (KYC - Know Your Customer) e o primeiro passo: antes de qualquer pagamento, o sistema deve verificar os dados cadastrais do beneficiario e consultar listas restritivas (lista de sancoes, PEPs, listas de impedidos). Essa consulta deve ocorrer automaticamente de forma diaria.
 
@@ -28,7 +29,7 @@ O monitoramento de transacoes analisa padroes de movimentacoes financeiras para 
 
 Alertas confirmados podem resultar em bloqueio preventivo de pagamentos e na geracao de reporte ao COAF (Conselho de Controle de Atividades Financeiras) dentro do prazo legal. O desbloqueio de pagamentos requer autorizacao do diretor.
 
-A analise de conflito de interesse verifica se existe relacao entre beneficiarios (pessoa fisica) e entidades contratadas pela FAPES (pessoa juridica), cruzando dados de CNPJ.
+A analise de conflito de interesse verifica se existe relacao entre beneficiarios (pessoa fisica) e entidades contratadas pela agencia de fomento (pessoa juridica), cruzando dados de CNPJ.
 
 Todas as acoes de PLD sao registradas em trilha de auditoria completa, e um dashboard permite que o oficial de compliance acompanhe indicadores de risco e status dos alertas.
 
@@ -45,7 +46,7 @@ Todas as acoes de PLD sao registradas em trilha de auditoria completa, e um dash
 | RN03 | Todo alerta gerado deve ser analisado por um oficial de compliance dentro de 48 horas. | Must |
 | RN04 | O reporte ao COAF deve ser gerado dentro do prazo legal definido pela legislacao vigente. | Must |
 | RN05 | O bloqueio preventivo de pagamento e imediato e requer autorizacao do diretor para desbloqueio. | Must |
-| RN06 | A verificacao de conflito de interesse deve cruzar CPF do beneficiario com CNPJ das entidades contratadas pela FAPES. | Must |
+| RN06 | A verificacao de conflito de interesse deve cruzar CPF do beneficiario com CNPJ das entidades contratadas pela agencia de fomento. | Must |
 | RN07 | Todas as acoes de PLD devem ser registradas em trilha de auditoria completa (usuario, data, hora, acao, justificativa). | Must |
 | RN08 | O dashboard PLD e acessivel exclusivamente para usuarios com perfil de oficial de compliance. | Must |
 | RN09 | Um alerta descartado deve conter justificativa obrigatoria do oficial de compliance. | Must |

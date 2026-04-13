@@ -6,6 +6,7 @@
 
 | Documento | Descricao |
 |-----------|-----------|
+| [Contrato](contrato.md) | Superficie publica do modulo: comandos, consultas, jobs e eventos |
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclos de vida de EditalCompetencia, Folha e PagamentoBolsista |
@@ -20,7 +21,7 @@ A geracao de folhas de pagamento e a comunicacao com Banestes e BANDES sao feita
 
 ## Dominio
 
-A FAPES gerencia centenas de editais e projetos com milhares de bolsistas alocados. A cada mes e necessario contabilizar as bolsas dos editais sob responsabilidade de cada area tecnica a serem agrupadas em uma folha de pagamento que, apos autorizada, e enviada ao Banestes para que os pagamentos sejam feitos aos respectivos bolsistas.
+A agencia de fomento gerencia centenas de editais e projetos com milhares de bolsistas alocados. A cada mes e necessario contabilizar as bolsas dos editais sob responsabilidade de cada area tecnica a serem agrupadas em uma folha de pagamento que, apos autorizada, e enviada ao Banestes para que os pagamentos sejam feitos aos respectivos bolsistas.
 
 O processo de pagamento ocorre em ciclos mensais que contam com tres marcos relevantes: Data Limite de Solicitacao de Bolsas (M1), Data Prevista de Geracao da Folha Normal (M2) e Data de Pagamento da Folha Normal (M3). Tais marcos devem ser definidos, mes a mes, em um calendario atual.
 
@@ -31,6 +32,8 @@ A partir do marco M2, a GEPOF pode monitorar a liberacao dos editais no mes e ge
 Uma vez gerada, a folha nao pode mais ter editais ou pagamentos alterados, mas podem ser geradas folhas complementares incluindo editais liberados posteriormente ou bolsistas com alocacao aprovada apos a geracao da folha anterior. Uma folha gerada tambem pode ser cancelada, para que seja gerada novamente com provaveis mudancas.
 
 A DIRAF decide sobre a autorizacao ou rejeicao de uma folha gerada. Em caso de rejeicao, a folha fica cancelada, podendo ser gerada novamente. Em caso de autorizacao, a folha segue para pagamento no Banestes, a ser efetuado na data do marco M3.
+
+> Editais, projetos, bolsistas e alocacoes sao gerenciados por M003. Areas tecnicas sao gerenciadas por M008 como unidades organizacionais da instituicao agencia. Este modulo consome esses contextos para operacionalizar a folha e o pagamento.
 
 ---
 

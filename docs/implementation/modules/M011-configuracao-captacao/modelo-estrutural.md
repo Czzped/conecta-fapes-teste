@@ -9,26 +9,15 @@ classDiagram
     direction TB
 
     class Edital {
-        +String codigo
-        +String titulo
-        +String descricao
-        +TipoEdital tipo
-        +EstadoEdital estado
-        +int versao
+        <<fora do escopo - M003>>
     }
 
-    class EstadoEdital {
-        <<enumeration>>
-        EM_ELABORACAO
-        PUBLICADO
-        EM_ANDAMENTO
-        ENCERRADO
+    class Programa {
+        <<fora do escopo - M010>>
     }
 
-    class TipoEdital {
-        <<enumeration>>
-        DEMANDA_PUBLICA
-        DEMANDA_INDUZIDA
+    class Parceria {
+        <<fora do escopo - M010>>
     }
 
     class Cronograma {
@@ -88,6 +77,7 @@ classDiagram
         +double orcamentoTotal
         +double valorMaximoProjeto
         +int quantidadeMaximaProjetos
+        +double valorParceria
     }
 
     class CotaArea {
@@ -96,11 +86,13 @@ classDiagram
         +int quantidadeVagas
     }
 
-    Edital "1" --> "1" Cronograma : possui
+    Edital "1" --> "1" Cronograma : configurado por
+    Edital "1" --> "0..1" Programa : vinculado a programa
     Edital "1" --> "0..1" FormularioSubmissao : formulario de submissao
     Edital "1" --> "0..1" FormularioAvaliacao : formulario de avaliacao
     Edital "1" --> "1" ParametroFomento : parametros
     Edital "1" --> "*" RevisorAdHoc : revisores associados
+    ParametroFomento "1" --> "0..1" Parceria : parceria financeira
     Cronograma "1" --> "*" PeriodoCronograma : periodos
     FormularioSubmissao "1" --> "*" VersaoFormulario : versoes
     FormularioAvaliacao "1" --> "*" VersaoFormulario : versoes
@@ -111,12 +103,6 @@ classDiagram
 
 | Classe | Atributo | Definicao | Obrig. | Tipo | Dominio | Tamanho | Unico |
 |--------|----------|-----------|--------|------|---------|---------|-------|
-| **Edital** | codigo | Codigo de identificacao do edital | Gerado | String | Ex: EDT-2026-001 | | Sim |
-| | titulo | Titulo do edital | Sim | String | | 300 | |
-| | descricao | Descricao detalhada do objeto do edital | Sim | String | | 5000 | |
-| | tipo | Tipo do edital (demanda publica ou induzida) | Sim | TipoEdital | Ver enumeracao | | |
-| | estado | Estado atual do edital no ciclo de vida | Gerado | EstadoEdital | Ver enumeracao | | |
-| | versao | Numero da versao do edital (incrementado a cada retificacao) | Gerado | Int | Ex: 1, 2, 3 | | |
 | **Cronograma** | descricao | Descricao geral do cronograma | Sim | String | | 500 | |
 | **PeriodoCronograma** | nome | Nome descritivo do periodo | Sim | String | Ex: Periodo de Submissao | 200 | |
 | | tipo | Tipo do periodo no fluxo do edital | Sim | TipoPeriodo | Ver enumeracao | | |
@@ -145,16 +131,17 @@ classDiagram
 | **ParametroFomento** | orcamentoTotal | Orcamento total do edital | Sim | Double | Ex: 5000000.00 | | |
 | | valorMaximoProjeto | Valor maximo por projeto | Sim | Double | | | |
 | | quantidadeMaximaProjetos | Numero maximo de projetos financiaveis | Sim | Int | | | |
+| | valorParceria | Valor da parceria destinado ao edital, quando houver | Nao | Double | | | |
 | **CotaArea** | areaConhecimento | Nome da area de conhecimento | Sim | String | Ex: Ciencias Exatas | 200 | |
 | | valorAlocado | Valor alocado para a area | Sim | Double | | | |
 | | quantidadeVagas | Numero de vagas disponiveis para a area | Sim | Int | | | |
 
 ## Notas de Implementacao
 
-**Tipagem:**
-- Atributos simples usam tipos da linguagem (int, Date, String, Double, Boolean)
-- Conjuntos de valores bem definidos usam enums (EstadoEdital, TipoEdital, TipoPeriodo)
+**Entidades externas:**
+- Edital: gerenciado por M003 (Gerenciar Editais). O modulo M011 apenas configura cronograma, formularios, revisores e parametros do edital.
+- Programa e Parceria: gerenciados por M010 (Planejamento e Estrategia). Podem ser associados ao edital durante a configuracao.
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: Edital.cronograma: Cronograma)
-- Cardinalidade N: atributo lista do tipo da classe destino (ex: Cronograma.periodos: List&lt;PeriodoCronograma&gt;)
+- Cardinalidade N: atributo lista do tipo da classe destino (ex: Cronograma.periodos: List<PeriodoCronograma>)

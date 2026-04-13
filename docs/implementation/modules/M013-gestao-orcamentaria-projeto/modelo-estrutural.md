@@ -15,7 +15,7 @@ classDiagram
         +double valorSolicitado
         +Date dataCriacao
         +Date dataSubmissao
-        +EstadoSolicitacao estado
+        +EstadoSolicitacaoOrcamentaria estado
     }
 
     class TipoSolicitacao {
@@ -26,7 +26,7 @@ classDiagram
         REALOCACAO_BOLSA
     }
 
-    class EstadoSolicitacao {
+    class EstadoSolicitacaoOrcamentaria {
         <<enumeration>>
         RASCUNHO
         SUBMETIDA
@@ -67,12 +67,12 @@ classDiagram
 
     class HistoricoOrcamentario {
         +Date data
-        +TipoMovimentacao tipo
+        +TipoMovimentacaoOrcamentaria tipo
         +String descricao
         +double valor
     }
 
-    class TipoMovimentacao {
+    class TipoMovimentacaoOrcamentaria {
         <<enumeration>>
         ADICAO
         INCLUSAO_RUBRICA
@@ -86,7 +86,7 @@ classDiagram
         <<fora do escopo - M003>>
     }
 
-    class Rubrica {
+    class RubricaFinanceira {
         <<fora do escopo - M008>>
     }
 
@@ -98,7 +98,7 @@ classDiagram
     SolicitacaoOrcamentaria "1" --> "0..1" ParecerSolicitacao : parecer
     SolicitacaoOrcamentaria "1" --> "0..1" Remanejamento : detalhe remanejamento
     RubricaProjeto "*" --> "1" Projeto : pertence a
-    RubricaProjeto "*" --> "1" Rubrica : referencia
+    RubricaProjeto "*" --> "1" RubricaFinanceira : referencia
     RubricaProjeto "1" --> "*" SaldoRubrica : historico de saldo
     Remanejamento "*" --> "1" RubricaProjeto : rubrica origem
     Remanejamento "*" --> "1" RubricaProjeto : rubrica destino
@@ -117,7 +117,7 @@ classDiagram
 | | valorSolicitado | Valor monetario envolvido na solicitacao | Sim | Double | Ex: 15000.00 | | |
 | | dataCriacao | Data de criacao da solicitacao | Gerado | Date | | | |
 | | dataSubmissao | Data em que a solicitacao foi submetida | Cond. | Date | Preenchida ao submeter | | |
-| | estado | Estado atual da solicitacao no fluxo de aprovacao | Gerado | EstadoSolicitacao | Ver enumeracao | | |
+| | estado | Estado atual da solicitacao no fluxo de aprovacao | Gerado | EstadoSolicitacaoOrcamentaria | Ver enumeracao | | |
 | **RubricaProjeto** | codigo | Codigo de identificacao da rubrica no projeto | Gerado | String | Ex: RP-2026-001 | | Sim |
 | | valorAprovado | Valor total aprovado para a rubrica no projeto | Sim | Double | | | |
 | | valorComprometido | Valor comprometido com despesas em andamento | Gerado | Double | | | |
@@ -137,17 +137,17 @@ classDiagram
 | | aprovado | Indica se a solicitacao foi aprovada | Sim | Boolean | true/false | | |
 | | justificativa | Justificativa do parecer | Sim | String | | 1000 | |
 | **HistoricoOrcamentario** | data | Data do evento orcamentario | Gerado | Date | | | |
-| | tipo | Tipo da movimentacao registrada | Sim | TipoMovimentacao | Ver enumeracao | | |
+| | tipo | Tipo da movimentacao registrada | Sim | TipoMovimentacaoOrcamentaria | Ver enumeracao | | |
 | | descricao | Descricao textual do evento | Sim | String | | 500 | |
 | | valor | Valor envolvido na movimentacao | Sim | Double | | | |
 
 ## Notas de Implementacao
 
 **Entidades externas:**
-- Projeto: gerenciado por M002/M003 (Importacao e Gerenciamento de Editais)
-- Rubrica: gerenciada por M008 (Cadastros Corporativos)
-- VersaoNivel: gerenciado por M001 (Modalidades de Bolsas)
+- Projeto: gerenciado por M003 (Gerenciar Editais).
+- RubricaFinanceira: gerenciada por M008 (Cadastros Corporativos). Este modulo especializa a rubrica no contexto do projeto por meio de RubricaProjeto.
+- VersaoNivel: gerenciada por M001 (Modalidade de Bolsa).
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: SolicitacaoOrcamentaria.projeto: Projeto)
-- Cardinalidade N: atributo lista do tipo da classe destino (ex: RubricaProjeto.historicoSaldo: List&lt;SaldoRubrica&gt;)
+- Cardinalidade N: atributo lista do tipo da classe destino (ex: RubricaProjeto.historicoSaldo: List<SaldoRubrica>)

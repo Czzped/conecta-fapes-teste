@@ -22,7 +22,7 @@
 | Gestao Financeira — compensacao, estorno e pagamento retroativo | PORTAL FAPES - ADMIN | M004 | To Do |
 | Reajuste de Bolsas — atualizacao e correcao de valores no sistema | PORTAL FAPES - ADMIN | M004 | To Do |
 | Cronograma de Expansao UNAC — adesao dos novos projetos do ciclo de Maio | PORTAL FAPES - ADMIN | M004 | To Do |
-| Gestao Financeira e Contabil da FAPES — Fluxo de Caixa | PORTAL FAPES - ADMIN | — | To Do |
+| Gestao Financeira e Contabil da agencia de fomento — Fluxo de Caixa | PORTAL FAPES - ADMIN | — | To Do |
 | Desenvolver consultas sobre as Financas do Projeto | CONECTA FAPES | — | To Do |
 
 ---

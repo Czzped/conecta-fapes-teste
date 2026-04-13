@@ -4,7 +4,7 @@
 
 ## Sobre o Modulo
 
-A FAPES necessita de visao analitica consolidada sobre programas, projetos, bolsas e resultados para tomada de decisao estrategica. Atualmente, os dados estao fragmentados entre multiplos sistemas e planilhas, exigindo compilacao manual a cada demanda de relatorio. Este modulo resolve esse problema ao fornecer paineis analiticos interativos que consolidam dados de toda a plataforma.
+A agencia de fomento necessita de visao analitica consolidada sobre programas, projetos, bolsas e resultados para tomada de decisao estrategica. Atualmente, os dados estao fragmentados entre multiplos sistemas e planilhas, exigindo compilacao manual a cada demanda de relatorio. Este modulo resolve esse problema ao fornecer paineis analiticos interativos que consolidam dados de toda a plataforma.
 
 Especificacao de referencia: [README.md](README.md)
 

@@ -13,7 +13,7 @@ Gestao de identidades, autenticacao e controle de acesso aos portais da platafor
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|
 | 1.1.1 | Autenticacao via Acesso Cidadao | Sistema de autenticacao unica do governo do ES para acesso aos portais | Todos | Art. 3, 3 |
-| 1.1.2 | Portal Back-office | Ambiente de acesso dos servidores da FAPES para gestao administrativa, financeira e tecnica | Analista da Area Tecnica da Agencia | Art. 16 a 19 |
+| 1.1.2 | Portal Back-office | Ambiente de acesso dos servidores da agencia de fomento para gestao administrativa, financeira e tecnica | Analista da Area Tecnica da Agencia | Art. 16 a 19 |
 | 1.1.3 | Portal Front-office | Ambiente de acesso dos participantes de projeto para submissao, acompanhamento e prestacao de contas | Participante de Projeto, Bolsista | Art. 4; Art. 3, 1 |
 | 1.1.4 | Portal da Transparencia | Portal aberto ao publico para consulta de projetos financiados, bolsas pagas e resultados da agencia, sem necessidade de autenticacao | Cidadao, SECONT | Art. 3, 3 |
 | 1.1.5 | Cadastro automatico Front-office | Cadastro automatico de pessoas no portal do participante de projeto | Participante de Projeto | Art. 4 |
@@ -49,7 +49,7 @@ Dados de referencia e parametros do sistema: estrutura organizacional da agencia
 
 ## 1.4 Modalidades de Bolsa
 
-Cadastro e manutencao das modalidades, niveis e requisitos de bolsas definidos por resolucoes da FAPES. Inclui versionamento de modalidades para preservar o historico conforme novas resolucoes sao publicadas.
+Cadastro e manutencao das modalidades, niveis e requisitos de bolsas definidos por resolucoes da agencia de fomento. Inclui versionamento de modalidades para preservar o historico conforme novas resolucoes sao publicadas.
 
 **Implementado por:** [M001 — Modalidades de Bolsa](../../modules/M001-modalidade-bolsa/README.md)
 

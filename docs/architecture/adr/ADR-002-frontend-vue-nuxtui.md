@@ -9,7 +9,7 @@
 
 ## Contexto
 
-O ConectaFAPES possui interfaces voltadas a diferentes personas — cidadaos no portal publico, coordenadores e bolsistas na area logada, e analistas da FAPES em paineis administrativos. A escolha do framework frontend impacta a experiencia do usuario, a produtividade do time, a acessibilidade e a capacidade de entrega de interfaces complexas com formularios, tabelas e fluxos multi-etapa.
+O ConectaFAPES possui interfaces voltadas a diferentes personas — cidadaos no portal publico, coordenadores e bolsistas na area logada, e analistas da agencia de fomento em paineis administrativos. A escolha do framework frontend impacta a experiencia do usuario, a produtividade do time, a acessibilidade e a capacidade de entrega de interfaces complexas com formularios, tabelas e fluxos multi-etapa.
 
 ## Decisao
 

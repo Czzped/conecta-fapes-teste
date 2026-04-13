@@ -4,7 +4,7 @@
 
 ## Sobre o Modulo
 
-Antes que um edital possa receber propostas, a FAPES precisa configura-lo: definir cronograma, criar formularios de submissao e avaliacao, registrar revisores ad hoc e definir parametros de fomento. Atualmente esse processo e realizado por meio de documentos manuais, sem templates nem padronizacao, o que gera inconsistencias entre editais e retrabalho frequente. Este modulo visa resolver esse problema ao permitir a configuracao completa de editais de forma estruturada e padronizada. O sucesso sera medido pela reducao do tempo de configuracao de editais e pela eliminacao de inconsistencias entre editais publicados.
+Antes que um edital possa receber propostas, a agencia de fomento precisa configura-lo: definir cronograma, vincular programa e parceria quando aplicavel, criar formularios de submissao e avaliacao, registrar revisores ad hoc e definir parametros de fomento. Atualmente esse processo e realizado por meio de documentos manuais, sem templates nem padronizacao, o que gera inconsistencias entre editais e retrabalho frequente. Este modulo visa resolver esse problema ao permitir a configuracao completa de editais de forma estruturada e padronizada. O sucesso sera medido pela reducao do tempo de configuracao de editais e pela eliminacao de inconsistencias entre editais publicados.
 
 Especificacao de referencia: [README.md](README.md)
 

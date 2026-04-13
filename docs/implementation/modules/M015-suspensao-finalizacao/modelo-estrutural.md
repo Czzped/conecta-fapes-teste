@@ -20,7 +20,7 @@ classDiagram
     class OrigemSuspensao {
         <<enumeration>>
         COORDENADOR
-        FAPES
+        AGENCIA_FOMENTO
     }
 
     class EstadoSolicitacaoSuspensao {
@@ -43,7 +43,7 @@ classDiagram
         <<enumeration>>
         CONCLUSAO_NATURAL
         DECISAO_COORDENADOR
-        DETERMINACAO_FAPES
+        DETERMINACAO_AGENCIA
     }
 
     class EstadoSolicitacaoFinalizacao {
@@ -121,7 +121,7 @@ classDiagram
 | Classe | Atributo | Definicao | Obrig. | Tipo | Dominio | Tamanho | Unico |
 |--------|----------|-----------|--------|------|---------|---------|-------|
 | **SolicitacaoSuspensao** | codigo | Codigo de identificacao unica da solicitacao | Gerado | String | Ex: SS-2026-001 | | Sim |
-| | origem | Indica se a suspensao foi solicitada pelo coordenador ou pela FAPES | Sim | OrigemSuspensao | Ver enumeracao | | |
+| | origem | Indica se a suspensao foi solicitada pelo coordenador ou pela agencia de fomento | Sim | OrigemSuspensao | Ver enumeracao | | |
 | | justificativa | Justificativa para a suspensao | Sim | String | | 2000 | |
 | | dataSolicitacao | Data em que a solicitacao foi registrada | Gerado | Date | | | |
 | | dataAprovacao | Data em que a suspensao foi aprovada | Cond. | Date | Preenchida ao aprovar | | |
@@ -146,10 +146,10 @@ classDiagram
 ## Notas de Implementacao
 
 **Entidades externas:**
-- Projeto: gerenciado por M002/M003 (Importacao e Gerenciamento de Editais)
-- BolsaPesquisa: gerenciada por M009 (Gestao Bolsa Pesquisa)
-- PrestacaoContas: gerenciada por M014 (Prestacao de Contas)
+- Projeto: gerenciado por M003 (Gerenciar Editais).
+- BolsaPesquisa: gerenciada por M009 (Gestao Bolsa Pesquisa).
+- PrestacaoContas: gerenciada por M014 (Prestacao de Contas).
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: SolicitacaoSuspensao.projeto: Projeto)
-- Cardinalidade N: atributo lista do tipo da classe destino (ex: SolicitacaoFinalizacao.pendencias: List&lt;VerificacaoPendencia&gt;)
+- Cardinalidade N: atributo lista do tipo da classe destino (ex: SolicitacaoFinalizacao.pendencias: List<VerificacaoPendencia>)

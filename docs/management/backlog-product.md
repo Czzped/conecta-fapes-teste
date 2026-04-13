@@ -14,7 +14,7 @@ Backlog central do produto. Ponto de entrada unico para a visao executiva e nave
 
 ## Visao Geral do Produto
 
-Conecta FAPES e uma plataforma de apoio a pesquisa, desenvolvimento e inovacao da FAPES (Fundacao de Amparo a Pesquisa e Inovacao do Espirito Santo). O sistema gerencia o ciclo completo de fomento: desde o planejamento estrategico e captacao de propostas, passando pela contratacao e execucao de iniciativas, ate o pagamento de bolsistas e prestacao de contas.
+Conecta FAPES e uma plataforma de apoio a pesquisa, desenvolvimento e inovacao da agencia de fomento (Fundacao de Amparo a Pesquisa e Inovacao do Espirito Santo). O sistema gerencia o ciclo completo de fomento: desde o planejamento estrategico e captacao de propostas, passando pela contratacao e execucao de iniciativas, ate o pagamento de bolsistas e prestacao de contas.
 
 ---
 
@@ -31,7 +31,7 @@ Conecta FAPES e uma plataforma de apoio a pesquisa, desenvolvimento e inovacao d
 | | 2.3 Gestao de Programa | Cadastro de programas, comites gestores, dotacao orcamentaria e captacoes | M010 |
 | **3. Fomento — Pre-Award** | 3.1 Configuracao da Captacao | Elaboracao do edital, formularios, revisores e parametrizacao | M011 |
 | | 3.2 Fases da Captacao | Submissao, analise documental, analise de merito, contratacao e deposito | M002, M003 |
-| **4. Fomento — Post-Award** | 4.1 Acompanhamento de Iniciativas | Dashboards de monitoramento para coordenador, FAPES e SECONT | M003, M012 |
+| **4. Fomento — Post-Award** | 4.1 Acompanhamento de Iniciativas | Dashboards de monitoramento para coordenador, agencia de fomento e SECONT | M003, M012 |
 | | 4.2 Gestao de Resultados | Submissao e analise de relatorios tecnicos e contestacao | M012 |
 | | 4.3 Gestao Orcamentaria do Projeto | Adicoes orcamentarias, rubricas e remanejamentos | M013 |
 | | 4.4 Prestacao de Contas | Submissao de documentos fiscais, analise, auditoria e contestacao | M014 |
@@ -56,7 +56,7 @@ Conecta FAPES e uma plataforma de apoio a pesquisa, desenvolvimento e inovacao d
 
 | ID | Modulo | Dor do Cliente | Capacidade (Solucao) | KPI de Sucesso | % Desenv. | Sub-Backlog |
 |----|--------|----------------|----------------------|----------------|-----------|-------------|
-| M001 | Modalidades de Bolsas | Modalidades, niveis e requisitos de bolsas sao controlados manualmente via planilhas, gerando inconsistencias entre resolucoes e dados cadastrados | Permitir o cadastro e manutencao de Modalidades, Niveis e Requisitos de Bolsas vinculados as Resolucoes da FAPES | Reducao de inconsistencias cadastrais; tempo de cadastro de nova modalidade | 0% | [backlog](modules/M001-modalidade-bolsa/backlog.md) |
+| M001 | Modalidades de Bolsas | Modalidades, niveis e requisitos de bolsas sao controlados manualmente via planilhas, gerando inconsistencias entre resolucoes e dados cadastrados | Permitir o cadastro e manutencao de Modalidades, Niveis e Requisitos de Bolsas vinculados as Resolucoes da agencia de fomento | Reducao de inconsistencias cadastrais; tempo de cadastro de nova modalidade | 0% | [backlog](modules/M001-modalidade-bolsa/backlog.md) |
 | M002 | Importacao SIGFAPES | Dados de editais, projetos, pessoas e pagamentos precisam ser digitados manualmente a partir do Sigfapes, causando retrabalho e erros de transcricao | Importar automaticamente do Sigfapes editais, projetos, equipes, pessoas e historico de pagamentos | Percentual de registros importados automaticamente; reducao de erros de transcricao | 0% | [backlog](modules/M002-importacao-editais/backlog.md) |
 | M003 | Gerenciar Editais | Falta de visibilidade consolidada sobre editais, projetos, bolsistas e alocacoes dificulta a tomada de decisao para pagamentos | Prover visualizacoes de dados de Editais, Projetos, Bolsistas e Alocacoes para apoio a decisao | Tempo medio de consulta para tomada de decisao; satisfacao do usuario com as visualizacoes | 0% | [backlog](modules/M003-gerenciar-editais/backlog.md) |
 | M004 | Pagamento de Bolsistas | Geracao de folhas de pagamento e comunicacao com Banestes/BANDES e feita por processos manuais, sujeitos a atrasos e erros que impactam bolsistas | Gerar folhas de pagamento e operacionalizar o pagamento via integracao com Banestes e BANDES, gerando documentos para EDOCS | Percentual de pagamentos processados no prazo; reducao de erros em folha | 0% | [backlog](modules/M004-pagamento-bolsista/backlog.md) |
@@ -67,7 +67,7 @@ Conecta FAPES e uma plataforma de apoio a pesquisa, desenvolvimento e inovacao d
 | M009 | Gestao Bolsa Pesquisa | Acompanhamento do ciclo de vida das bolsas (alocacao, vigencia, renovacao, encerramento) e feito de forma descentralizada e sem visao integrada | Gestao integrada do ciclo de vida das bolsas de pesquisa, da alocacao ao encerramento | Taxa de bolsas com acompanhamento em dia; tempo medio de processamento de renovacao | 0% | [backlog](modules/M009-gestao-bolsa-pesquisa/backlog.md) |
 | M010 | Planejamento e Estrategia | Planos estrategicos, parcerias e programas sao gerenciados em documentos avulsos sem rastreabilidade entre eixos, aportes e captacoes | Gestao integrada de planos estrategicos, eixos, parcerias (com aditivos e aportes) e programas de fomento vinculados a dotacao orcamentaria | Percentual de programas vinculados a eixos estrategicos; tempo de formalizacao de parcerias; visibilidade orcamentaria dos programas | 0% | [backlog](modules/M010-planejamento-estrategia/backlog.md) |
 | M011 | Configuracao de Captacao | A elaboracao de editais, formularios e parametrizacao de captacoes e feita de forma manual e descentralizada, causando retrabalho e erros de configuracao | Configuracao completa do processo de captacao: elaboracao de edital, formularios de submissao e avaliacao, cadastro de revisores ad hoc e parametrizacao de regras | Tempo medio de configuracao de uma captacao; taxa de erros em editais publicados | 0% | [backlog](modules/M011-configuracao-captacao/backlog.md) |
-| M012 | Acompanhamento e Resultados | Falta de visibilidade sobre o andamento das iniciativas contratadas e dificuldade na gestao de relatorios tecnicos e contestacoes | Dashboards de monitoramento para coordenador, FAPES e SECONT, e fluxo de submissao, analise e contestacao de resultados tecnicos | Percentual de iniciativas com acompanhamento atualizado; tempo medio de analise de relatorios tecnicos | 0% | [backlog](modules/M012-acompanhamento-resultados/backlog.md) |
+| M012 | Acompanhamento e Resultados | Falta de visibilidade sobre o andamento das iniciativas contratadas e dificuldade na gestao de relatorios tecnicos e contestacoes | Dashboards de monitoramento para coordenador, agencia de fomento e SECONT, e fluxo de submissao, analise e contestacao de resultados tecnicos | Percentual de iniciativas com acompanhamento atualizado; tempo medio de analise de relatorios tecnicos | 0% | [backlog](modules/M012-acompanhamento-resultados/backlog.md) |
 | M013 | Gestao Orcamentaria do Projeto | Adicoes orcamentarias, inclusao de rubricas e remanejamentos sao controlados por e-mail e planilhas, sem rastreabilidade e com risco de inconsistencias | Fluxo digital de solicitacao e aprovacao de adicoes orcamentarias, novas rubricas e remanejamentos entre rubricas, com aprovacao automatica intra-rubrica | Tempo medio de aprovacao de remanejamento; taxa de solicitacoes processadas digitalmente | 0% | [backlog](modules/M013-gestao-orcamentaria-projeto/backlog.md) |
 | M014 | Prestacao de Contas | Submissao e analise de prestacao de contas e feita com documentos fisicos e tramites manuais, gerando atrasos e dificuldade de auditoria | Fluxo digital de submissao de documentos fiscais (com validacao SERPRO), analise, recusa, reavaliacao e auditoria SECONT | Tempo medio de analise de prestacao de contas; percentual de prestacoes validadas automaticamente; taxa de contestacoes resolvidas | 0% | [backlog](modules/M014-prestacao-contas/backlog.md) |
 | M015 | Suspensao e Finalizacao | Processos de suspensao e encerramento de projetos sao informais, sem fluxo de aprovacao definido e sem vinculo com a prestacao de contas final | Fluxo formal de solicitacao, aprovacao e efetivacao de suspensao temporaria e encerramento definitivo de projetos | Tempo medio de finalizacao de projeto; percentual de projetos encerrados com prestacao de contas final aprovada | 0% | [backlog](modules/M015-suspensao-finalizacao/backlog.md) |
@@ -95,7 +95,7 @@ Funcionalidades identificadas na [visao do produto](discovery/product-vision.md)
 | Cadastro de Cidades / Regioes | - |
 | Cadastro de Areas de Conhecimento | - |
 | Rubricas Financeiras | - |
-| Suspender Pessoa (FAPES) | Art. 30, II |
+| Suspender Pessoa (agencia de fomento) | Art. 30, II |
 | Cadastro automatico de pessoas Front-office | Art. 4 |
 | Cadastro automatico de pessoas Back-office via API Organograma | Art. 30 |
 

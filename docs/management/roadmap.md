@@ -47,7 +47,7 @@ As entregas operacionais de 2026 mapeiam para os seguintes milestones estrategic
 | Produto | Descricao |
 |---------|-----------|
 | **CONECTA FAPES** | Plataforma principal de gestao de fomento |
-| **PORTAL FAPES - ADMIN** | Portal administrativo interno da FAPES |
+| **PORTAL FAPES - ADMIN** | Portal administrativo interno da agencia de fomento |
 | **PORTAL FAPES - COORDENADOR** | Portal do Coordenador de Projeto |
 | **IMPORTADOR** | Importacao de dados do SIGFAPES |
 
@@ -65,7 +65,7 @@ As entregas operacionais de 2026 mapeiam para os seguintes milestones estrategic
 
 | Feature | Produto | Responsavel | Categoria | Status |
 |---------|---------|-------------|-----------|--------|
-| Modulo de importacao de novos bolsistas e projetos pela equipe FAPES | PORTAL FAPES - ADMIN | Mateus | Oportunidade | Entregue / Pendente |
+| Modulo de importacao de novos bolsistas e projetos pela equipe agencia de fomento | PORTAL FAPES - ADMIN | Mateus | Oportunidade | Entregue / Pendente |
 | Importacao de cotas de bolsas por projetos | PORTAL FAPES - ADMIN | Marcela / Omena | Funcionalidade | Entregue |
 | Edicao de Cotas ao importar do Sigfapes | PORTAL FAPES - ADMIN | Marcela | Oportunidade | Homol |
 | Acerto do cadastro de Versao de Bolsa | PORTAL FAPES - ADMIN | Vinicius | Melhoria | Nao entregue |
@@ -106,7 +106,7 @@ As entregas operacionais de 2026 mapeiam para os seguintes milestones estrategic
 | Cronograma de Expansao UNAC — adesao dos novos projetos do ciclo de Maio | Junho | — | Funcionalidade | Planejado |
 | Escalonamento de Projetos — regua de prioridade para inclusao de editais no fluxo | Junho | — | Funcionalidade | Planejado |
 | Area de Conhecimento — correcao da experiencia de cadastro | Junho | — | Melhoria | Planejado |
-| Gestao Financeira e Contabil da FAPES sobre editais, projetos e programas (Fluxo de Caixa) | Junho | — | Funcionalidade | Planejado |
+| Gestao Financeira e Contabil da agencia de fomento sobre editais, projetos e programas (Fluxo de Caixa) | Junho | — | Funcionalidade | Planejado |
 
 ### CONECTA FAPES
 
@@ -135,7 +135,7 @@ As entregas operacionais de 2026 mapeiam para os seguintes milestones estrategic
 | Prorrogacao de Janela de Solicitacao — prazos excepcionais por edital, projeto ou coordenador | Junho | Eduardo | Funcionalidade | Planejado |
 | Gestao de Aditivos — alteracoes de valores, prazos, escopo e substituicao de coordenacao | Junho | Eduardo | Funcionalidade | Planejado |
 | Suspensao de Bolsa — interrupcao temporaria do pagamento e das atividades do bolsista | Junho | Eduardo | Funcionalidade | Planejado |
-| Ajuste Fluxo de Submissao — bloqueio de envio a FAPES quando ha pendencias documentais | Junho | Eduardo | Melhoria | Planejado |
+| Ajuste Fluxo de Submissao — bloqueio de envio a agencia de fomento quando ha pendencias documentais | Junho | Eduardo | Melhoria | Planejado |
 | Controle de Reenvio (Reavaliacao) — prazo minimo de 24h para reenvio apos recusa | Junho | Eduardo | Funcionalidade | Planejado |
 | Validacao de documentos por IA | Junho | Eduardo | Funcionalidade | Planejado |
 | Minha Equipe — melhorar titulos da tela | Junho | — | Melhoria | Planejado |

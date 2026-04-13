@@ -9,56 +9,27 @@ classDiagram
     direction TB
 
     class AreaTecnica {
-        <<importacao>>
-        +String nome
-        +String descricao
+        <<fora do escopo - M008>>
     }
 
     class Edital {
-        <<importacao>>
-        +String nome
-        +Date dataCriacao
-        +Date dataUltimaSincronizacao
-        +Integer idSigFapes
-        +EnumStatusImportacao statusImportacao
-        +EnumStatusEdital status
+        <<fora do escopo - M003>>
     }
 
     class Projeto {
-        <<importacao>>
-        +String nome
-        +Date dataInicio
-        +Date dataFimPrevista
-        +EnumStatusPreenchimento statusPreenchimento
-        +Integer idSigFapes
-        +EnumStatusProjeto status
+        <<fora do escopo - M003>>
     }
 
-    class Pessoa {
-        <<importacao>>
-        +String nome
-        +String descricao
+    class Bolsista {
+        <<fora do escopo - M003>>
     }
 
     class AlocacaoBolsista {
-        <<importacao>>
-        +Date dataSolicitacao
-        +Date dataInicio
-        +Date dataPrevistaFim
-        +Date dataFimAtividades
-        +Integer qtdeAlocadas
-        +Integer qtdeCotasPagasPreImportacao
-        +String justificativaCancelamento
-        +Integer idSigFapes
-        +Integer matricula
-        +EnumStatusAlocacaoBolsista status
-        +EnumCadastroBanestes statusCadastroBanestes
+        <<fora do escopo - M003>>
     }
 
     class VersaoNivel {
-        <<modalidade>>
-        +double valor
-        +Integer idSigFapes
+        <<fora do escopo - M001>>
     }
 
     class PlanoMensal {
@@ -183,18 +154,11 @@ classDiagram
         EFETIVADA
     }
 
-    class EnumCadastroBanestes {
-        <<enumeration>>
-        PENDENTE
-        ENVIADO
-        CADASTRADO
-    }
-
     Edital "0..*" --> "1" AreaTecnica
     Edital "1" --> "0..*" EditalCompetencia
     Edital "1" --> "0..*" Projeto
     Projeto "1" --> "0..*" AlocacaoBolsista
-    AlocacaoBolsista "0..*" --> "1" Pessoa : bolsista
+    AlocacaoBolsista "0..*" --> "1" Bolsista : bolsista
     AlocacaoBolsista "0..*" --> "1" VersaoNivel : bolsa
     AlocacaoBolsista "1" --> "0..*" PagamentoBolsista : pagamentos
     EditalCompetencia "0..*" --> "1" PlanoMensal : mes
@@ -245,7 +209,7 @@ classDiagram
 | | textoEmail | Texto do email associado a guia | Sim | String | | |
 | | quantPagamentos | Quantidade de pagamentos incluidos | Sim | Integer | | |
 | | valorTotal | Valor total da guia | Sim | Integer | | |
-| **Remessa** | numero | Numero identificador da remessa | Sim | Integer | Sim |
+| **Remessa** | numero | Numero identificador da remessa | Sim | Integer | | Sim |
 | | dataEnvio | Data de envio da remessa | Sim | Date | | |
 | | dataRetorno | Data de retorno do processamento | Sim | Date | | |
 | | arquivoRetorno | Caminho do arquivo de retorno | Sim | String | | |
@@ -259,11 +223,11 @@ classDiagram
 
 ## Notas de Implementacao
 
-**Origens das classes:**
-- Classes com estereotipo `<<importacao>>` pertencem ao Modulo de Importacao de Editais
-- Classes com estereotipo `<<modalidade>>` pertencem ao Modulo de Cadastro de Modalidades de Bolsas
-- Demais classes sao do escopo deste modulo (Pagamento de Bolsistas)
+**Entidades externas:**
+- AreaTecnica: gerenciada por M008 (Cadastros Corporativos) como especializacao de UnidadeOrganizacional da Instituicao agencia.
+- Edital, Projeto, Bolsista e AlocacaoBolsista: gerenciados por M003 (Gerenciar Editais).
+- VersaoNivel: gerenciada por M001 (Modalidade de Bolsa).
 
 **Navegabilidade:**
-- Cardinalidade 1: atributo do tipo da classe destino (ex: EditalCompetencia.planoMensal: PlanoMensal)
-- Cardinalidade N: atributo lista do tipo da classe destino (ex: Folha.pagamentos: List&lt;PagamentoBolsista&gt;)
+- Cardinalidade 1: atributo do tipo da classe destino (ex: EditalCompetencia.edital: Edital)
+- Cardinalidade N: atributo lista do tipo da classe destino (ex: Folha.pagamentos: List<PagamentoBolsista>)

@@ -6,6 +6,7 @@
 
 | Documento | Descricao |
 |-----------|-----------|
+| [Contrato](contrato.md) | Superficie publica do modulo: comandos, consultas, jobs e eventos |
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclos de vida de PrestacaoContas e Contestacao |
@@ -14,19 +15,19 @@
 
 ## Sobre o Modulo
 
-Coordenadores devem submeter documentos fiscais que comprovem a aplicacao dos recursos do projeto. A FAPES analisa e pode rejeitar documentos, e a SECONT realiza auditorias. Atualmente, esse processo e inteiramente baseado em papel e e-mail, sem fluxo digital, sem rastreabilidade e sem reconciliacao automatica entre extrato bancario e despesas declaradas. Este modulo visa resolver esse problema ao digitalizar todo o ciclo de prestacao de contas, desde a importacao do extrato bancario ate a auditoria da SECONT. O sucesso sera medido pela reducao do tempo medio de analise da prestacao de contas e pela taxa de prestacoes aprovadas na primeira submissao.
+Coordenadores devem submeter documentos fiscais que comprovem a aplicacao dos recursos do projeto. A agencia de fomento analisa e pode rejeitar documentos, e a SECONT realiza auditorias. Atualmente, esse processo e inteiramente baseado em papel e e-mail, sem fluxo digital, sem rastreabilidade e sem reconciliacao automatica entre extrato bancario e despesas declaradas. Este modulo visa resolver esse problema ao digitalizar todo o ciclo de prestacao de contas, desde a importacao do extrato bancario ate a auditoria da SECONT. O sucesso sera medido pela reducao do tempo medio de analise da prestacao de contas e pela taxa de prestacoes aprovadas na primeira submissao.
 
 ---
 
 ## Dominio
 
-A FAPES exige que coordenadores de projetos prestem contas dos recursos recebidos, comprovando cada despesa por meio de documentos fiscais (notas fiscais, recibos, bilhetes aereos, comprovantes de diarias). A prestacao de contas e organizada por rubrica, e cada documento fiscal deve estar vinculado a uma rubrica do orcamento aprovado.
+A agencia de fomento exige que coordenadores de projetos prestem contas dos recursos recebidos, comprovando cada despesa por meio de documentos fiscais (notas fiscais, recibos, bilhetes aereos, comprovantes de diarias). A prestacao de contas e organizada por rubrica, e cada documento fiscal deve estar vinculado a uma rubrica do orcamento aprovado.
 
-O fluxo de prestacao de contas segue as seguintes etapas: (1) o Coordenador importa o extrato bancario da conta do projeto; (2) submete os documentos fiscais organizados por tipo de despesa (servicos, produtos, diarias, passagens); (3) a Area Tecnica da FAPES analisa os documentos, verificando conformidade com as rubricas e consistencia com o extrato bancario; (4) caso haja irregularidades, a prestacao e recusada com justificativa; (5) o Coordenador pode contestar a recusa dentro de 15 dias; (6) a Area Tecnica reanalisa a contestacao; (7) apos aprovacao final, a SECONT pode solicitar auditoria a qualquer momento.
+O fluxo de prestacao de contas segue as seguintes etapas: (1) o Coordenador importa o extrato bancario da conta do projeto; (2) submete os documentos fiscais organizados por tipo de despesa (servicos, produtos, diarias, passagens); (3) a Area Tecnica da agencia de fomento analisa os documentos, verificando conformidade com as rubricas e consistencia com o extrato bancario; (4) caso haja irregularidades, a prestacao e recusada com justificativa; (5) o Coordenador pode contestar a recusa dentro de 15 dias; (6) a Area Tecnica reanalisa a contestacao; (7) apos aprovacao final, a SECONT pode solicitar auditoria a qualquer momento.
 
 O Coordenador possui 30 dias apos o encerramento do periodo para submeter a prestacao de contas. Uma prestacao aprovada e considerada final e irreversivel. Cada rubrica do orcamento deve ser reconciliada com os documentos fiscais submetidos.
 
-> Projetos, editais e orcamentos sao gerenciados pelos modulos M002, M003 e M013. Este modulo consome essas informacoes para operacionalizar a prestacao de contas.
+> Projetos e editais sao gerenciados por M003. Orcamentos e rubricas do projeto sao gerenciados por M013. Este modulo consome essas informacoes para operacionalizar a prestacao de contas.
 
 ---
 

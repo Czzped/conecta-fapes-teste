@@ -28,7 +28,7 @@
 | Ajustes no V1 da Prestacao de Contas Financeira | CONECTA FAPES | — | To Do |
 | Produtar / Iniciar Prestacao de Contas Tecnica | CONECTA FAPES | — | To Do |
 | Proposta de declaracao — exibir ao coordenador quando houver modelo disponivel | CONECTA FAPES | — | To Do |
-| Ajuste Fluxo de Submissao — bloqueio de envio a FAPES quando ha pendencias documentais | PORTAL FAPES - COORDENADOR | — | To Do |
+| Ajuste Fluxo de Submissao — bloqueio de envio a agencia de fomento quando ha pendencias documentais | PORTAL FAPES - COORDENADOR | — | To Do |
 | Controle de Reenvio (Reavaliacao) — prazo minimo de 24h para reenvio apos recusa | PORTAL FAPES - COORDENADOR | — | To Do |
 | Validacao de documentos por IA | PORTAL FAPES - COORDENADOR | — | To Do |
 

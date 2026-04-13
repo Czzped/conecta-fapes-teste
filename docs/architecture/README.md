@@ -8,7 +8,7 @@ Visao geral da arquitetura do projeto Conecta FAPES.
 
 ## Visao Geral
 
-O ConectaFAPES e desenvolvido pelo **LEDS (Laboratorio de Extensao em Desenvolvimento de Solucoes) do IFES Campus Serra** para a FAPES. O sistema e composto por modulos independentes que compartilham um banco de dados comum (SQL Server), seguindo uma arquitetura modular com Clean Architecture e CQRS no backend. A autenticacao e federada via Acesso Cidadao e a autorizacao e gerenciada pelo OpenFGA, aplicando uma estrategia de Defense in Depth com Zero Trust.
+O ConectaFAPES e desenvolvido pelo **LEDS (Laboratorio de Extensao em Desenvolvimento de Solucoes) do IFES Campus Serra** para a agencia de fomento. O sistema e composto por modulos independentes que compartilham um banco de dados comum (SQL Server), seguindo uma arquitetura modular com Clean Architecture e CQRS no backend. A autenticacao e federada via Acesso Cidadao e a autorizacao e gerenciada pelo OpenFGA, aplicando uma estrategia de Defense in Depth com Zero Trust.
 
 ## Diagrama de Contexto (C4 - Level 1)
 
@@ -17,7 +17,7 @@ O ConectaFAPES e desenvolvido pelo **LEDS (Laboratorio de Extensao em Desenvolvi
 ```mermaid
 graph TB
     subgraph Atores
-        SF[Servidor FAPES]
+        SF[Analista da Agencia de Fomento]
         PB[Pesquisador / Bolsista]
     end
 
@@ -145,7 +145,7 @@ O sistema possui tres perfis de acesso distintos:
 
 | Perfil | Descricao | Exemplos de Persona |
 |--------|-----------|---------------------|
-| **Publico Interno FAPES** | Servidores e analistas da FAPES que acessam o back-office para gestao administrativa, financeira e tecnica | Analista da Area Tecnica, SUCON |
+| **Publico Interno da agencia de fomento** | Servidores e analistas da agencia de fomento que acessam o back-office para gestao administrativa, financeira e tecnica | Analista da Area Tecnica, SUCON |
 | **Publico Externo (Coordenadores / Pesquisadores)** | Pesquisadores, bolsistas e coordenadores que acessam o front-office para submissao de propostas, acompanhamento de projetos e prestacao de contas | Coordenador, Bolsista, Participante de Projeto |
 | **Sysadmin** | Administradores do sistema responsaveis pela configuracao de politicas de acesso, gestao de usuarios e manutencao da plataforma | Equipe LEDS/IFES |
 
@@ -212,7 +212,7 @@ graph LR
 
 | Componente | Descricao |
 |------------|-----------|
-| **Conect Admin** | Modulo administrativo principal. Gerencia importacoes do Sigfapes, modelos de dominio (editais, projetos, alocacoes, bolsistas) e operacoes do back-office FAPES |
+| **Conect Admin** | Modulo administrativo principal. Gerencia importacoes do Sigfapes, modelos de dominio (editais, projetos, alocacoes, bolsistas) e operacoes do back-office da agencia de fomento |
 | **Dashboard Pagamento** | Painel analitico de gastos por edital, projeto e bolsista. Consolida dados financeiros para tomada de decisao |
 | **Modulo Pagamento** | Operacionaliza o pagamento de bolsas via integracao com Banestes (arquivos de remessa/retorno @-EDI) e geracao de documentos para BANDES e EDOCS |
 | **Gerenciamento de Usuarios** | Ultima barreira de acesso. Verifica se o usuario possui cadastro ativo no sistema apos autenticacao e autorizacao, aplicando restricoes adicionais (ex.: bloqueio por inatividade) |

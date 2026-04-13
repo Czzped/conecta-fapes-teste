@@ -6,6 +6,7 @@
 
 | Documento | Descricao |
 |-----------|-----------|
+| [Contrato](contrato.md) | Superficie publica do modulo: comandos, consultas, jobs e eventos |
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclo de vida da SolicitacaoOrcamentaria |
@@ -20,15 +21,15 @@ Durante a execucao de um projeto, coordenadores precisam solicitar adicoes orcam
 
 ## Dominio
 
-A FAPES concede recursos financeiros a projetos de pesquisa por meio de editais. Cada projeto possui um orcamento aprovado, distribuido em rubricas (categorias de despesa como diarias, passagens, material de consumo, servicos de terceiros, bolsas). Durante a execucao do projeto, e comum que o coordenador identifique a necessidade de ajustar o orcamento.
+A agencia de fomento concede recursos financeiros a projetos de pesquisa por meio de editais. Cada projeto possui um orcamento aprovado, distribuido em rubricas (categorias de despesa como diarias, passagens, material de consumo, servicos de terceiros, bolsas). Durante a execucao do projeto, e comum que o coordenador identifique a necessidade de ajustar o orcamento.
 
-As principais operacoes orcamentarias sao: (1) adicoes orcamentarias, quando recursos adicionais sao solicitados a FAPES; (2) inclusao de novas rubricas que nao estavam previstas originalmente no projeto; (3) remanejamento entre rubricas, quando recursos sao transferidos de uma categoria para outra; (4) realocacao de bolsas, quando cotas de bolsa sao redistribuidas entre modalidades ou niveis.
+As principais operacoes orcamentarias sao: (1) adicoes orcamentarias, quando recursos adicionais sao solicitados a agencia de fomento; (2) inclusao de novas rubricas que nao estavam previstas originalmente no projeto; (3) remanejamento entre rubricas, quando recursos sao transferidos de uma categoria para outra; (4) realocacao de bolsas, quando cotas de bolsa sao redistribuidas entre modalidades ou niveis.
 
-Todas essas operacoes exigem justificativa do coordenador e passam por analise da Area Tecnica da FAPES. Adicoes orcamentarias requerem aprovacao formal da FAPES. Remanejamentos acima de 25% do valor da rubrica de origem necessitam de aprovacao do Diretor.
+Todas essas operacoes exigem justificativa do coordenador e passam por analise da Area Tecnica da agencia de fomento. Adicoes orcamentarias requerem aprovacao formal da agencia de fomento. Remanejamentos acima de 25% do valor da rubrica de origem necessitam de aprovacao do Diretor.
 
-O saldo de cada rubrica deve ser atualizado em tempo real, refletindo comprometimentos, pagamentos ja realizados (M004) e movimentacoes aprovadas. As rubricas disponiveis para um projeto devem estar previamente cadastradas no modulo de cadastros basicos (M008).
+O saldo de cada rubrica deve ser atualizado em tempo real, refletindo comprometimentos, pagamentos ja realizados (M004) e movimentacoes aprovadas. As rubricas disponiveis para um projeto devem estar previamente cadastradas no modulo de cadastros corporativos (M008).
 
-> Projetos e editais sao gerenciados pelos modulos M002 e M003. Pagamentos sao gerenciados pelo modulo M004. Cadastros basicos de rubricas sao gerenciados pelo modulo M008. Este modulo consome essas informacoes para operacionalizar a gestao orcamentaria.
+> Projetos e editais sao gerenciados por M003. Pagamentos sao gerenciados por M004. Rubricas financeiras corporativas sao gerenciadas por M008 e especializadas neste modulo como RubricaProjeto. Este modulo consome essas informacoes para operacionalizar a gestao orcamentaria.
 
 ---
 
@@ -36,7 +37,7 @@ O saldo de cada rubrica deve ser atualizado em tempo real, refletindo comprometi
 
 | ID | Descricao | Prioridade |
 |----|-----------|------------|
-| RN01 | Toda solicitacao de adicao orcamentaria deve conter justificativa e requer aprovacao formal da FAPES. | Must |
+| RN01 | Toda solicitacao de adicao orcamentaria deve conter justificativa e requer aprovacao formal da agencia de fomento. | Must |
 | RN02 | Remanejamento entre rubricas nao pode exceder 25% do valor da rubrica de origem sem aprovacao do Diretor. | Must |
 | RN03 | A rubrica a ser incluida em um projeto deve existir no cadastro basico de rubricas (M008). | Must |
 | RN04 | Todas as operacoes orcamentarias (adicao, inclusao, remanejamento, realocacao) exigem justificativa do coordenador. | Must |

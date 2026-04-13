@@ -6,6 +6,7 @@
 
 | Documento | Descricao |
 |-----------|-----------|
+| [Contrato](contrato.md) | Superficie publica do modulo: comandos, consultas, jobs e eventos |
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclo de vida da Notificacao |
@@ -20,7 +21,7 @@ A plataforma ConectaFAPES necessita de um servico centralizado de notificacao e 
 
 ## Dominio
 
-O servico de comunicacao da FAPES e transversal a toda a plataforma. Cada modulo gera eventos que demandam notificacao aos usuarios envolvidos: a indicacao de um bolsista (M009) precisa notificar o orientador; a aprovacao de uma prestacao de contas (M014) precisa notificar o coordenador; o vencimento de uma bolsa precisa alertar a Area Tecnica.
+O servico de comunicacao da agencia de fomento e transversal a toda a plataforma. Cada modulo gera eventos que demandam notificacao aos usuarios envolvidos: a indicacao de um bolsista (M009) precisa notificar o orientador; a aprovacao de uma prestacao de contas (M014) precisa notificar o coordenador; o vencimento de uma bolsa precisa alertar a Area Tecnica.
 
 As notificacoes sao enviadas por email usando o remetente institucional no-reply@fapes.es.gov.br. Cada tipo de notificacao utiliza um template pre-configurado que suporta variaveis dinamicas (nome do destinatario, edital, prazo, status). O sistema realiza ate 3 tentativas de envio em caso de falha.
 

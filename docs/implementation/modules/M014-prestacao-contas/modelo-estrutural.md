@@ -93,7 +93,7 @@ classDiagram
         +String analistaResponsavel
     }
 
-    class Contestacao {
+    class ContestacaoPrestacaoContas {
         +String codigo
         +Date dataContestacao
         +Date prazoContestacao
@@ -167,7 +167,7 @@ classDiagram
     PrestacaoContas "1" --> "0..1" ExtratoBancario : extrato
     PrestacaoContas "1" --> "*" DocumentoFiscal : documentos fiscais
     PrestacaoContas "1" --> "*" ParecerPC : pareceres
-    PrestacaoContas "1" --> "0..1" Contestacao : contestacao
+    PrestacaoContas "1" --> "0..1" ContestacaoPrestacaoContas : contestacao
     PrestacaoContas "1" --> "0..1" AuditoriaSECONT : auditoria
     PrestacaoContas "1" --> "*" HistoricoPC : historico
     DocumentoFiscal "*" --> "1" RubricaProjeto : vinculado a rubrica
@@ -212,7 +212,7 @@ classDiagram
 | | aprovado | Indica se a prestacao foi aprovada | Sim | Boolean | true/false | | |
 | | justificativa | Justificativa do parecer | Sim | String | | 2000 | |
 | | analistaResponsavel | Nome do analista que emitiu o parecer | Sim | String | | 200 | |
-| **Contestacao** | codigo | Codigo de identificacao da contestacao | Gerado | String | Ex: CT-2026-001 | | Sim |
+| **ContestacaoPrestacaoContas** | codigo | Codigo de identificacao da contestacao | Gerado | String | Ex: CT-2026-001 | | Sim |
 | | dataContestacao | Data em que a contestacao foi submetida | Sim | Date | | | |
 | | prazoContestacao | Data limite para contestacao (data recusa + 15 dias) | Gerado | Date | | | |
 | | argumentacao | Argumentacao do coordenador contestando a recusa | Sim | String | | 3000 | |
@@ -235,9 +235,9 @@ classDiagram
 ## Notas de Implementacao
 
 **Entidades externas:**
-- Projeto: gerenciado por M002/M003 (Importacao e Gerenciamento de Editais)
-- RubricaProjeto: gerenciada por M013 (Gestao Orcamentaria do Projeto)
+- Projeto: gerenciado por M003 (Gerenciar Editais).
+- RubricaProjeto: gerenciada por M013 (Gestao Orcamentaria do Projeto).
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: PrestacaoContas.projeto: Projeto)
-- Cardinalidade N: atributo lista do tipo da classe destino (ex: PrestacaoContas.documentos: List&lt;DocumentoFiscal&gt;)
+- Cardinalidade N: atributo lista do tipo da classe destino (ex: PrestacaoContas.documentos: List<DocumentoFiscal>)

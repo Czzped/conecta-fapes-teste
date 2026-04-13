@@ -6,6 +6,7 @@
 
 | Documento | Descricao |
 |-----------|-----------|
+| [Contrato](contrato.md) | Superficie publica do modulo: comandos, consultas, jobs e eventos |
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclos de vida de BolsaPesquisa e TermoCompromisso |
@@ -20,17 +21,17 @@ O acompanhamento do ciclo de vida das bolsas -- desde a alocacao, passando pela 
 
 ## Dominio
 
-A FAPES concede bolsas de pesquisa a estudantes e pesquisadores por meio de projetos vinculados a editais. O processo de concessao de bolsa inicia-se com a alocacao de bolsas em um projeto e envolve multiplos atores: Coordenador do Programa, Orientador, Bolsista, Area Tecnica da FAPES e SUCON.
+A agencia de fomento concede bolsas de pesquisa a estudantes e pesquisadores por meio de projetos vinculados a editais. O processo de concessao de bolsa inicia-se com a alocacao de bolsas em um projeto e envolve multiplos atores: Coordenador do Programa, Orientador, Bolsista, Area Tecnica da agencia de fomento e SUCON.
 
-Um Edital (importado via M002) define cotas de bolsas por tipo (mestrado, doutorado, iniciacao cientifica). Cada Universidade possui Programas de Pos-graduacao (PPG) que participam dos editais e concorrem pelas cotas disponibilizadas. Um Coordenador e responsavel por um PPG e pode indicar bolsistas para as cotas do programa.
+Um Edital gerenciado operacionalmente em M003, eventualmente originado por sincronizacao do legado em M002, define cotas de bolsas por tipo (mestrado, doutorado, iniciacao cientifica). Cada Universidade possui Programas de Pos-graduacao (PPG) que participam dos editais e concorrem pelas cotas disponibilizadas. Um Coordenador e responsavel por um PPG e pode indicar bolsistas para as cotas do programa.
 
-O fluxo de concessao segue as seguintes etapas: (1) o Coordenador do Programa indica o bolsista, informando orientador, quantidade de cotas, tema de pesquisa, periodo da bolsa e periodo previsto do curso; (2) o Orientador assina o termo de aceite; (3) o Bolsista insere os documentos exigidos; (4) a Area Tecnica da FAPES avalia a documentacao; (5) caso aprovada, a Area Tecnica gera os termos de compromisso; (6) os termos sao assinados pelo Coordenador, Orientador, Bolsista, DIRAF e DIPRE; (7) a SUCON publica no Diario Oficial; (8) a Area Tecnica implementa a bolsa.
+O fluxo de concessao segue as seguintes etapas: (1) o Coordenador do Programa indica o bolsista, informando orientador, quantidade de cotas, tema de pesquisa, periodo da bolsa e periodo previsto do curso; (2) o Orientador assina o termo de aceite; (3) o Bolsista insere os documentos exigidos; (4) a Area Tecnica da agencia de fomento avalia a documentacao; (5) caso aprovada, a Area Tecnica gera os termos de compromisso; (6) os termos sao assinados pelo Coordenador, Orientador, Bolsista, DIRAF e DIPRE; (7) a SUCON publica no Diario Oficial; (8) a Area Tecnica implementa a bolsa.
 
 Caso a documentacao seja reprovada, o bolsista e notificado e pode reenviar os documentos. Caso a bolsa nao seja implementada, o Coordenador e notificado.
 
 Uma bolsa implementada possui vigencia definida e pode ser renovada, suspensa ou encerrada. A renovacao exige nova avaliacao documental. O encerramento pode ocorrer por conclusao do curso, desistencia do bolsista, corte de recursos ou descumprimento de requisitos.
 
-> Projetos, editais e alocacoes sao importados/gerenciados pelos modulos M002 e M003. Este modulo consome essas informacoes para operacionalizar a gestao das bolsas.
+> Projetos, editais, cotas e alocacoes sao gerenciados por M003. O modulo M002 apenas sincroniza dados legados quando necessario. Este modulo consome essas informacoes para operacionalizar a gestao das bolsas.
 
 ---
 
@@ -41,7 +42,7 @@ Uma bolsa implementada possui vigencia definida e pode ser renovada, suspensa ou
 | RN01 | Uma bolsa de pesquisa so pode ser alocada dentro das cotas disponibilizadas pelo edital para o programa. | Must |
 | RN02 | O Coordenador do Programa e responsavel pela indicacao do bolsista. | Must |
 | RN03 | O Orientador deve assinar o termo de aceite antes que o bolsista possa inserir documentos. | Must |
-| RN04 | A documentacao do bolsista deve ser avaliada pela Area Tecnica da FAPES antes da geracao dos termos de compromisso. | Must |
+| RN04 | A documentacao do bolsista deve ser avaliada pela Area Tecnica da agencia de fomento antes da geracao dos termos de compromisso. | Must |
 | RN05 | Documentacao reprovada permite reenvio pelo bolsista. | Must |
 | RN06 | Os termos de compromisso devem ser assinados por Coordenador, Orientador, Bolsista, DIRAF e DIPRE. | Must |
 | RN07 | A bolsa so pode ser implementada apos publicacao no Diario Oficial pela SUCON. | Must |

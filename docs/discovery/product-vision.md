@@ -2,7 +2,7 @@
 
 ## Proposito
 
-O ConectaFAPES e a plataforma digital da FAPES (Fundacao de Amparo a Pesquisa e Inovacao do Espirito Santo) para a gestao do ciclo completo de fomento a pesquisa, ao desenvolvimento e a inovacao. O sistema substitui processos manuais e fragmentados por fluxos digitais integrados — do planejamento estrategico a prestacao de contas.
+O ConectaFAPES e a plataforma digital da agencia de fomento (Fundacao de Amparo a Pesquisa e Inovacao do Espirito Santo) para a gestao do ciclo completo de fomento a pesquisa, ao desenvolvimento e a inovacao. O sistema substitui processos manuais e fragmentados por fluxos digitais integrados — do planejamento estrategico a prestacao de contas.
 
 ---
 
@@ -10,13 +10,13 @@ O ConectaFAPES e a plataforma digital da FAPES (Fundacao de Amparo a Pesquisa e 
 
 ### Comunidade Cientifica
 
-Personas externas que interagem com a FAPES como beneficiarias, proponentes ou participantes de projetos.
+Personas externas que interagem com a agencia de fomento como beneficiarias, proponentes ou participantes de projetos.
 
 O Cidadao e a persona base. Ao se associar a um projeto, torna-se Participante de Projeto. O Participante com bolsa e um Bolsista; sem bolsa, e um Voluntario. O Orientador e um Participante de Projeto responsavel pela orientacao de outros participantes. Um Terceiro (PJ) e uma pessoa juridica que participa do projeto. O Coordenador e o responsavel pela coordenacao do projeto.
 
 | Persona | Descricao |
 |---------|-----------|
-| **Cidadao** | Pessoa que acessa o portal publico da FAPES para consultar editais, programas e resultados |
+| **Cidadao** | Pessoa que acessa o portal publico da agencia de fomento para consultar editais, programas e resultados |
 | **Participante de Projeto** | Cidadao associado a um projeto de pesquisa |
 | **Bolsista** | Participante de projeto com bolsa ativa vinculada |
 | **Voluntario** | Participante de projeto sem bolsa associada |
@@ -35,23 +35,23 @@ Uma Instituicao e uma organizacao generica. Uma Instituicao de Ensino e Pesquisa
 
 ### Parceiros e Agencia de Fomento
 
-A FAPES e uma agencia de fomento — entidade que gerencia recursos financeiros de parceiros para investimento em pesquisa, desenvolvimento e inovacao (PD&I). Entidades Parceiras firmam parcerias com a FAPES mediante aporte financeiro, e a FAPES administra esses recursos vinculando-os a programas e projetos.
+A agencia de fomento e a entidade que gerencia recursos financeiros de parceiros para investimento em pesquisa, desenvolvimento e inovacao (PD&I). Entidades Parceiras firmam parcerias com a agencia de fomento mediante aporte financeiro, e a agencia de fomento administra esses recursos vinculando-os a programas e projetos.
 
 | Persona | Descricao |
 |---------|-----------|
-| **Agencia de Fomento** | A FAPES e uma Agencia estadual que gerencia recursos financeiros de parceiros para investimento em PD&I |
-| **Entidade Parceira** | Instituicao (publica ou privada) que firma parceria com a FAPES mediante aporte financeiro para execucao conjunta de programas e projetos |
+| **Agencia de Fomento** | A agencia de fomento e uma Agencia estadual que gerencia recursos financeiros de parceiros para investimento em PD&I |
+| **Entidade Parceira** | Instituicao (publica ou privada) que firma parceria com a agencia de fomento mediante aporte financeiro para execucao conjunta de programas e projetos |
 
-### FAPES (Interno)
+### Agencia de Fomento (Interno)
 
-Personas internas da FAPES responsaveis pela operacao e administracao do sistema.
+Personas internas da agencia de fomento responsaveis pela operacao e administracao do sistema.
 
 | Persona | Descricao |
 |---------|-----------|
-| **Analista da Area Tecnica da Agencia** | Funcionario da FAPES responsavel pela gestao administrativa, financeira e tecnica |
+| **Analista da Area Tecnica da Agencia** | Funcionario da agencia de fomento responsavel pela gestao administrativa, financeira e tecnica |
 | **Analista** | Servidor lotado em uma Area Tecnica, responsavel por gerenciar projetos, bolsas e prestacoes de contas |
-| **Area Tecnica** | Unidade organizacional da FAPES, composta por servidores, responsavel pela analise e liberacao de editais e pagamentos |
-| **SUCON** | Superintendencia de Contratos e Convenios — unidade organizacional da FAPES |
+| **Area Tecnica** | Unidade organizacional da agencia de fomento, composta por servidores, responsavel pela analise e liberacao de editais e pagamentos |
+| **SUCON** | Superintendencia de Contratos e Convenios — unidade organizacional da agencia de fomento |
 
 ### Orgaos de Controle e Transparencia
 
@@ -107,11 +107,11 @@ O coordenador e participantes do projeto nao podem ter vinculo com pessoas jurid
 
 ## Fundamentacao Legal
 
-Este documento e os domains referenciam artigos da **LEC 978/2021** — Lei Complementar que dispoe sobre a Fundacao de Amparo a Pesquisa e Inovacao do Espirito Santo (FAPES).
+Este documento e os domains referenciam artigos da **LEC 978/2021** — Lei Complementar que dispoe sobre a Fundacao de Amparo a Pesquisa e Inovacao do Espirito Santo, aqui tratada como agencia de fomento.
 
 | Artigo | Tema | Domains Relacionados |
 |--------|------|----------------------|
-| Art. 2 | Finalidades da FAPES | 01 |
+| Art. 2 | Finalidades da agencia de fomento | 01 |
 | Art. 3 | Publicidade, prestacao de contas e acompanhamento | 01, 03, 04, 05, 06 |
 | Art. 4 | Apoio financeiro, habilitacao e avaliacao de merito | 01, 03, 04 |
 | Art. 5 | Registros, programas e escrituracao contabil | 05, 06 |

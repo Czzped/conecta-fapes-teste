@@ -4,7 +4,7 @@
 
 ## Sobre o Modulo
 
-Projetos podem necessitar de suspensao temporaria (por solicitacao do coordenador ou decisao da FAPES) ou de encerramento definitivo. Atualmente, nao existe um fluxo de trabalho estruturado para essas operacoes -- suspensoes e encerramentos sao comunicados informalmente, sem garantia de que pagamentos sejam bloqueados, bolsas sejam encerradas ou prestacoes de contas sejam exigidas. Este modulo visa resolver esse problema ao prover um fluxo digital completo para suspensao e finalizacao de projetos, garantindo que todas as pendencias sejam verificadas antes do encerramento. O sucesso sera medido pela taxa de projetos encerrados com todas as pendencias resolvidas e pelo tempo medio de processamento de suspensoes.
+Projetos podem necessitar de suspensao temporaria (por solicitacao do coordenador ou decisao da agencia de fomento) ou de encerramento definitivo. Atualmente, nao existe um fluxo de trabalho estruturado para essas operacoes -- suspensoes e encerramentos sao comunicados informalmente, sem garantia de que pagamentos sejam bloqueados, bolsas sejam encerradas ou prestacoes de contas sejam exigidas. Este modulo visa resolver esse problema ao prover um fluxo digital completo para suspensao e finalizacao de projetos, garantindo que todas as pendencias sejam verificadas antes do encerramento. O sucesso sera medido pela taxa de projetos encerrados com todas as pendencias resolvidas e pelo tempo medio de processamento de suspensoes.
 
 Especificacao de referencia: [README.md](README.md)
 

@@ -204,8 +204,8 @@ classDiagram
 ## Notas de Implementacao
 
 **Entidades externas:**
-- Coordenador, Orientador, Bolsista, Projeto, CotaEdital: gerenciados por M002/M003 (Importacao e Gerenciamento de Editais)
-- VersaoNivel: gerenciado por M001 (Modalidades de Bolsas)
+- Coordenador, Orientador, Bolsista, Projeto e CotaEdital: gerenciados por M003 (Gerenciar Editais).
+- VersaoNivel: gerenciado por M001 (Modalidade de Bolsa).
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: BolsaPesquisa.projeto: Projeto)

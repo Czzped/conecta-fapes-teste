@@ -15,11 +15,13 @@ conectafapes-project/
 │   ├── architecture/       # Como construir — decisoes tecnicas de arquitetura
 │   │   ├── README.md       # Visao geral, stack, diagramas C4
 │   │   └── adr/            # Architecture Decision Records
-│   ├── implementation/     # Implementacao — backlog, epics e modelos por modulo
-│   │   ├── backlog-product.md
+│   ├── implementation/     # Implementacao — epics e modelos por modulo
 │   │   └── modules/        # Um diretorio por modulo (M001, M002, ...)
 │   └── management/         # Quando e em que ordem — roadmap e planejamento de sprints
+│       ├── backlog-product.md
 │       └── roadmap.md
+├── prototype/              # Prototipos navegaveis da aplicacao
+│   └── backoffice/         # Prototipo da interface interna (React + Vite)
 ├── .github/                # Templates de issues e pull requests
 ├── documentation/          # Documentacao publicada (Docusaurus)
 └── tools/                  # Ferramentas internas do time
@@ -52,7 +54,21 @@ O macro-sprint e planejado por **domain**. O backlog detalhado (epics, tasks) vi
 | [Roadmap](docs/management/roadmap.md) | Sequencia de entrega por domain e dependencias |
 | [Arquitetura](docs/architecture/README.md) | Stack tecnologico, diagramas C4 e integracoes externas |
 | [ADRs](docs/architecture/adr/README.md) | Decisoes de arquitetura registradas |
-| [Backlog do Produto](docs/implementation/backlog-product.md) | Dashboard central por modulo |
+| [Backlog do Produto](docs/management/backlog-product.md) | Dashboard central por modulo |
+
+---
+
+## Prototipos
+
+A pasta `prototype/` concentra os prototipos navegaveis da aplicacao. Ela complementa a pasta `docs/`: enquanto `docs/` descreve visao de produto, arquitetura e backlog de implementacao, `prototype/` materializa telas, fluxos e interacoes para validacao visual e funcional.
+
+Hoje o repositorio contem:
+
+| Caminho | Objetivo |
+|---------|----------|
+| [prototype/backoffice](prototype/backoffice) | Prototipo do backoffice da aplicacao, com codigo frontend executavel em ambiente local |
+
+Para detalhes de execucao do prototipo atual, consulte [prototype/backoffice/README.md](prototype/backoffice/README.md).
 
 ---
 

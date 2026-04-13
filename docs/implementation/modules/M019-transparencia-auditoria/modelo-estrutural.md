@@ -20,7 +20,7 @@ classDiagram
 
     class TipoPublicacao {
         <<enumeration>>
-        PROJETOS
+        INICIATIVAS
         BOLSAS
         EXECUCAO_FINANCEIRA
         AUXILIOS
@@ -51,12 +51,12 @@ classDiagram
         +String periodoInicio
         +String periodoFim
         +String moduloFiltro
-        +FormatoExportacao formato
+        +FormatoExportacaoAuditoria formato
         +URL urlArquivo
         +String solicitadoPor
     }
 
-    class FormatoExportacao {
+    class FormatoExportacaoAuditoria {
         <<enumeration>>
         CSV
         JSON
@@ -96,7 +96,7 @@ classDiagram
         <<fora do escopo - M010>>
     }
 
-    class Projeto {
+    class Iniciativa {
         <<fora do escopo - M003>>
     }
 
@@ -104,7 +104,7 @@ classDiagram
         <<fora do escopo - M009>>
     }
 
-    PublicacaoTransparencia "*" --> "*" Projeto : publica dados de
+    PublicacaoTransparencia "*" --> "*" Iniciativa : publica dados de
     PublicacaoTransparencia "*" --> "*" BolsaPesquisa : publica dados de
     PublicacaoTransparencia "*" --> "*" Programa : publica dados de
     RelatorioSECONT "1" --> "*" ExportacaoAuditoria : pode gerar
@@ -116,8 +116,8 @@ classDiagram
 | Classe | Atributo | Definicao | Obrig. | Tipo | Dominio | Tamanho | Unico |
 |--------|----------|-----------|--------|------|---------|---------|-------|
 | **PublicacaoTransparencia** | codigo | Codigo de identificacao da publicacao | Gerado | String | Ex: PT-2025-001 | | Sim |
-| | titulo | Titulo descritivo da publicacao de transparencia | Sim | String | Ex: Projetos Financiados 2024 | 300 | |
-| | tipo | Tipo de dado publicado | Sim | TipoPublicacao | Projetos, Bolsas, Execucao Financeira, Auxilios, Programas | | |
+| | titulo | Titulo descritivo da publicacao de transparencia | Sim | String | Ex: Iniciativas Financiadas 2024 | 300 | |
+| | tipo | Tipo de dado publicado | Sim | TipoPublicacao | Iniciativas, Bolsas, Execucao Financeira, Auxilios, Programas | | |
 | | dataPublicacao | Data da primeira publicacao | Gerado | Date | | | |
 | | dataAtualizacao | Data da ultima atualizacao dos dados | Gerado | Date | | | |
 | | dadosAnonimizados | Indicacao de que dados pessoais foram anonimizados | Gerado | String | Descricao do tratamento LGPD aplicado | 500 | |
@@ -134,7 +134,7 @@ classDiagram
 | | periodoInicio | Data de inicio do periodo exportado | Sim | String | | 10 | |
 | | periodoFim | Data de fim do periodo exportado | Sim | String | | 10 | |
 | | moduloFiltro | Modulo filtrado na exportacao | Nao | String | Ex: M009, M004. Todos se nao informado | 20 | |
-| | formato | Formato do arquivo exportado | Sim | FormatoExportacao | CSV, JSON, XML | | |
+| | formato | Formato do arquivo exportado | Sim | FormatoExportacaoAuditoria | CSV, JSON, XML | | |
 | | urlArquivo | URL para download do arquivo exportado | Gerado | URL | | | |
 | | solicitadoPor | Identificacao do usuario que solicitou a exportacao | Gerado | String | | 200 | |
 | **RegistroAuditoria** | id | Identificador unico do registro de auditoria | Gerado | String | UUID | | Sim |
@@ -159,10 +159,10 @@ classDiagram
 - RegistroAuditoria e imutavel: uma vez criado, nao pode ser alterado nem excluido (RN04). O repositorio deve implementar apenas operacoes de criacao e consulta.
 
 **Entidades externas:**
-- Programa: gerenciado por M010 (Planejamento e Estrategia)
-- Projeto: gerenciado por M003 (Gerenciar Editais)
-- BolsaPesquisa: gerenciado por M009 (Gestao Bolsa Pesquisa)
+- Programa: gerenciado por M010 (Planejamento e Estrategia).
+- Iniciativa: gerenciada por M003 (Gerenciar Editais) como abstracao estrutural para publicacoes e auditoria.
+- BolsaPesquisa: gerenciada por M009 (Gestao Bolsa Pesquisa).
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: ExportacaoAuditoria.relatorio: RelatorioSECONT)
-- Cardinalidade N: atributo lista do tipo da classe destino (ex: PublicacaoTransparencia.projetos: List&lt;Projeto&gt;)
+- Cardinalidade N: atributo lista do tipo da classe destino (ex: PublicacaoTransparencia.iniciativas: List<Iniciativa>)

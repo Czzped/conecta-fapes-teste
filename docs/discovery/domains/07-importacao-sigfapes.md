@@ -1,6 +1,6 @@
 # Domain 07 — Importacao de Dados (SIGFAPES)
 
-Dominio responsavel pela migracao e sincronizacao de dados do sistema legado **Sigfapes** para a plataforma ConectaFAPES. O Sigfapes e o sistema anterior da FAPES e contem o historico de editais, projetos, pessoas e pagamentos realizados. A importacao garante continuidade operacional sem necessidade de redigitacao manual, preservando o historico institucional.
+Dominio responsavel pela migracao e sincronizacao de dados do sistema legado **Sigfapes** para a plataforma ConectaFAPES. O Sigfapes e o sistema anterior da agencia de fomento e contem o historico de editais, projetos, pessoas e pagamentos realizados. A importacao garante continuidade operacional sem necessidade de redigitacao manual, preservando o historico institucional.
 
 **Modulos que implementam este domain:** M002
 

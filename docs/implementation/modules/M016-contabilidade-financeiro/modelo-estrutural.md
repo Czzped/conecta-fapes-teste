@@ -54,7 +54,7 @@ classDiagram
 
     class MovimentacaoFinanceira {
         +String codigo
-        +TipoMovimentacao tipo
+        +TipoMovimentacaoFinanceira tipo
         +double valor
         +Date dataMovimentacao
         +String descricao
@@ -62,7 +62,7 @@ classDiagram
         +Date dataRegistro
     }
 
-    class TipoMovimentacao {
+    class TipoMovimentacaoFinanceira {
         <<enumeration>>
         ENTRADA
         SAIDA
@@ -109,7 +109,7 @@ classDiagram
     }
 
     class Iniciativa {
-        <<fora do escopo - M010>>
+        <<fora do escopo - M003>>
     }
 
     class Programa {
@@ -120,16 +120,14 @@ classDiagram
         <<fora do escopo - M010>>
     }
 
-    class Projeto {
-        <<fora do escopo - M003>>
-    }
-
     ContaContabil "1" --> "*" AssociacaoConta : associacoes
     ContaContabil "1" --> "*" ContaContabil : subcontas
     AssociacaoConta "*" --> "0..1" Iniciativa : iniciativa
     AssociacaoConta "*" --> "0..1" Programa : programa
     AssociacaoConta "*" --> "0..1" Parceria : parceria
-    ContaBancaria "*" --> "1" Projeto : vinculada a
+    ContaBancaria "*" --> "0..1" Iniciativa : vinculada a
+    ContaBancaria "*" --> "0..1" Programa : compartilhada por
+    ContaBancaria "*" --> "0..1" Parceria : dedicada a
     ContaBancaria "1" --> "*" MovimentacaoFinanceira : movimentacoes
     ContaBancaria "1" --> "1" SaldoConta : saldo
     ContaBancaria "1" --> "*" ConciliacaoBancaria : conciliacoes
@@ -157,7 +155,7 @@ classDiagram
 | | descricao | Descricao da finalidade da conta | Sim | String | | 300 | |
 | | ativa | Indica se a conta esta ativa | Sim | Boolean | true/false | | |
 | **MovimentacaoFinanceira** | codigo | Codigo de identificacao unica da movimentacao | Gerado | String | Ex: MOV-2026-001 | | Sim |
-| | tipo | Tipo da movimentacao (entrada ou saida) | Sim | TipoMovimentacao | Entrada, Saida | | |
+| | tipo | Tipo da movimentacao (entrada ou saida) | Sim | TipoMovimentacaoFinanceira | Entrada, Saida | | |
 | | valor | Valor monetario da movimentacao | Sim | Double | | | |
 | | dataMovimentacao | Data efetiva da movimentacao | Sim | Date | | | |
 | | descricao | Descricao da movimentacao | Sim | String | | 500 | |
@@ -187,9 +185,9 @@ classDiagram
 ## Notas de Implementacao
 
 **Entidades externas:**
-- Iniciativa, Programa, Parceria: gerenciados por M010 (Planejamento e Estrategia)
-- Projeto: gerenciado por M003 (Gerenciar Editais)
+- Iniciativa: gerenciada por M003 (Gerenciar Editais) como abstracao estrutural de iniciativas apoiadas.
+- Programa e Parceria: gerenciados por M010 (Planejamento e Estrategia).
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: MovimentacaoFinanceira.contaContabil: ContaContabil)
-- Cardinalidade N: atributo lista do tipo da classe destino (ex: ContaBancaria.movimentacoes: List&lt;MovimentacaoFinanceira&gt;)
+- Cardinalidade N: atributo lista do tipo da classe destino (ex: ContaBancaria.movimentacoes: List<MovimentacaoFinanceira>)

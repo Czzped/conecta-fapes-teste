@@ -4,7 +4,7 @@
 
 ## Sobre o Modulo
 
-Atualmente, as modalidades, niveis e requisitos de bolsas sao controlados manualmente via planilhas, o que gera inconsistencias frequentes entre as resolucoes publicadas e os dados efetivamente cadastrados. Este modulo visa resolver esse problema ao permitir o cadastro e manutencao de Modalidades, Niveis e Requisitos de Bolsas diretamente vinculados as Resolucoes da FAPES, garantindo integridade e rastreabilidade dos dados. O sucesso sera medido pela reducao de inconsistencias cadastrais e pelo tempo necessario para cadastrar uma nova modalidade.
+Atualmente, as modalidades, niveis e requisitos de bolsas sao controlados manualmente via planilhas, o que gera inconsistencias frequentes entre as resolucoes publicadas e os dados efetivamente cadastrados. Este modulo visa resolver esse problema ao permitir o cadastro e manutencao de Modalidades, Niveis e Requisitos de Bolsas diretamente vinculados as Resolucoes da agencia de fomento, garantindo integridade e rastreabilidade dos dados. O sucesso sera medido pela reducao de inconsistencias cadastrais e pelo tempo necessario para cadastrar uma nova modalidade.
 
 Especificacao de referencia: [README.md](README.md)
 

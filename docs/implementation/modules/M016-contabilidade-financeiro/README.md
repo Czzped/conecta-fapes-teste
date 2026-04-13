@@ -6,6 +6,7 @@
 
 | Documento | Descricao |
 |-----------|-----------|
+| [Contrato](contrato.md) | Superficie publica do modulo: comandos, consultas, jobs e eventos |
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclo de vida da ConciliacaoBancaria |
@@ -14,21 +15,21 @@
 
 ## Sobre o Modulo
 
-A FAPES necessita de controle contabil (plano de contas, lancamentos vinculados a programas/projetos) e gestao financeira (contas bancarias, fluxo de caixa, conciliacao, controle de saldos). Atualmente esses processos estao dispersos em planilhas e sistemas externos sem integracao, gerando inconsistencias nos dados financeiros, dificuldade de rastreamento de recursos e atrasos na conciliacao bancaria. Este modulo visa resolver esses problemas ao centralizar a gestao contabil e financeira em uma unica plataforma integrada. O sucesso sera medido pela reducao do tempo de conciliacao bancaria e pela acuracia dos saldos contabeis.
+A agencia de fomento necessita de controle contabil (plano de contas, lancamentos vinculados a programas, parcerias e iniciativas) e gestao financeira (contas bancarias, fluxo de caixa, conciliacao, controle de saldos). Atualmente esses processos estao dispersos em planilhas e sistemas externos sem integracao, gerando inconsistencias nos dados financeiros, dificuldade de rastreamento de recursos e atrasos na conciliacao bancaria. Este modulo visa resolver esses problemas ao centralizar a gestao contabil e financeira em uma unica plataforma integrada. O sucesso sera medido pela reducao do tempo de conciliacao bancaria e pela acuracia dos saldos contabeis.
 
 ---
 
 ## Dominio
 
-A FAPES gerencia recursos financeiros provenientes de diversas fontes para fomento a pesquisa e inovacao. O controle financeiro envolve duas grandes areas: contabilidade e gestao de contas bancarias.
+A agencia de fomento gerencia recursos financeiros provenientes de diversas fontes para fomento a pesquisa e inovacao. O controle financeiro envolve duas grandes areas: contabilidade e gestao de contas bancarias.
 
-Na area contabil, a FAPES mantem um plano de contas que segue a estrutura do governo, onde cada conta contabil pode ser associada a iniciativas, programas ou parcerias. O plano de contas permite a classificacao dos lancamentos financeiros e a geracao de dashboards contabeis que apoiam a tomada de decisao.
+Na area contabil, a agencia de fomento mantem um plano de contas que segue a estrutura do governo, onde cada conta contabil pode ser associada a iniciativas, programas ou parcerias. O plano de contas permite a classificacao dos lancamentos financeiros e a geracao de dashboards contabeis que apoiam a tomada de decisao.
 
-Na area de gestao financeira, cada projeto ou programa possui uma ou mais contas bancarias associadas. As movimentacoes financeiras (entradas e saidas) sao registradas e rastreadas por conta. Periodicamente, e necessario realizar a conciliacao bancaria, comparando os registros do sistema com os extratos bancarios para identificar divergencias. O fluxo de caixa consolida as movimentacoes e permite projetar a disponibilidade de recursos.
+Na area de gestao financeira, cada iniciativa apoiada, programa ou parceria pode possuir uma ou mais contas bancarias associadas. As movimentacoes financeiras (entradas e saidas) sao registradas e rastreadas por conta. Periodicamente, e necessario realizar a conciliacao bancaria, comparando os registros do sistema com os extratos bancarios para identificar divergencias. O fluxo de caixa consolida as movimentacoes e permite projetar a disponibilidade de recursos.
 
 Dashboards financeiros fornecem visao consolidada de saldos, movimentacoes e projecoes, apoiando gestores na alocacao de recursos e no cumprimento de obrigacoes financeiras.
 
-> Projetos e programas sao gerenciados por outros modulos (M003, M010). Este modulo consome essas informacoes para operacionalizar a gestao contabil e financeira.
+> Iniciativas sao gerenciadas por M003 como abstracao estrutural, enquanto programas e parcerias sao gerenciados por M010. Este modulo consome esses contextos para operacionalizar a gestao contabil e financeira.
 
 ---
 
@@ -38,7 +39,7 @@ Dashboards financeiros fornecem visao consolidada de saldos, movimentacoes e pro
 |----|-----------|------------|
 | RN01 | O plano de contas deve seguir a estrutura do plano de contas do governo. | Must |
 | RN02 | Toda conta contabil deve estar associada a pelo menos uma iniciativa, programa ou parceria. | Must |
-| RN03 | Cada projeto deve possuir pelo menos uma conta bancaria associada (podendo ser compartilhada no nivel do programa). | Must |
+| RN03 | Cada iniciativa apoiada deve possuir pelo menos uma conta bancaria associada, podendo haver compartilhamento no nivel de programa ou parceria quando aplicavel. | Must |
 | RN04 | A conciliacao bancaria deve comparar os registros do sistema com os registros do extrato bancario. | Must |
 | RN05 | O saldo de uma conta bancaria nao pode ficar negativo sem autorizacao expressa de gestor autorizado. | Must |
 | RN06 | Toda movimentacao financeira deve possuir trilha de auditoria completa (usuario, data, hora, operacao). | Must |

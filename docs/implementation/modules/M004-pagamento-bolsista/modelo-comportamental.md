@@ -9,7 +9,7 @@ stateDiagram-v2
     [*] --> EmEdicao : Solicitar Bolsa
     EmEdicao --> DocumentacaoPendente : Enviar Documentacao
     DocumentacaoPendente --> AguardandoAceites : Completar Documentacao
-    AguardandoAceites --> PendenteDeAvaliacao : Enviar a FAPES
+    AguardandoAceites --> PendenteDeAvaliacao : Enviar a agencia de fomento
     PendenteDeAvaliacao --> EmAvaliacao : Iniciar Avaliacao
     EmAvaliacao --> Ativa : Aprovar Alocacao
     EmAvaliacao --> Cancelada : Reprovar Alocacao
@@ -74,7 +74,7 @@ stateDiagram-v2
 stateDiagram-v2
     [*] --> Enviada : Gerar e Enviar Remessa ao Banestes
     Enviada --> Agendada : Processar Retorno [pagamentos agendados]
-    Agendada --> Autorizada : Autorizar Remessa [FAPES confirma no Banestes]
+    Agendada --> Autorizada : Autorizar Remessa [agencia de fomento confirma no Banestes]
     Autorizada --> Efetivada : Processar DP9 [pagamento efetuado]
 ```
 

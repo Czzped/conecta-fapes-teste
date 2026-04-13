@@ -17,7 +17,7 @@ Definicao do plano estrategico da agencia e seus eixos, que orientam a criacao d
 
 ## 2.2 Gestao de Parcerias
 
-Parcerias sao instrumentos de cooperacao entre a FAPES e entidades publicas ou privadas para a execucao conjunta de programas, projetos e acoes de fomento. Uma parceria esta sempre vinculada a um programa, pode ter mais de um parceiro, e pode envolver cofinanciamento, compartilhamento de infraestrutura ou cooperacao tecnica. Parcerias podem receber aditivos de tempo e de aporte financeiro, sendo que cada aditivo deve ter um documento comprobatorio anexado.
+Parcerias sao instrumentos de cooperacao entre a agencia de fomento e entidades publicas ou privadas para a execucao conjunta de programas, projetos e acoes de fomento. Uma parceria esta sempre vinculada a um programa, pode ter mais de um parceiro, e pode envolver cofinanciamento, compartilhamento de infraestrutura ou cooperacao tecnica. Parcerias podem receber aditivos de tempo e de aporte financeiro, sendo que cada aditivo deve ter um documento comprobatorio anexado.
 
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|

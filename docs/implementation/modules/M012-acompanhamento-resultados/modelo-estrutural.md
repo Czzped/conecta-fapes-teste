@@ -8,7 +8,7 @@ Dominio e regras de negocio: ver [README.md](README.md)
 classDiagram
     direction TB
 
-    class DashboardIniciativa {
+    class DashboardProjeto {
         +String projetoId
         +String titulo
         +StatusProjeto statusProjeto
@@ -17,6 +17,14 @@ classDiagram
         +int relatoriosPendentes
         +int relatoriosSubmetidos
         +int solicitacoesPendentes
+    }
+
+    class StatusProjeto {
+        <<enumeration>>
+        ATIVO
+        SUSPENSO
+        CONCLUIDO
+        ENCERRADO
     }
 
     class RelatorioTecnico {
@@ -54,7 +62,7 @@ classDiagram
         REANALISE
     }
 
-    class Contestacao {
+    class ContestacaoRelatorio {
         +String justificativa
         +Date dataContestacao
         +Date prazoLimite
@@ -73,7 +81,7 @@ classDiagram
         +String descricao
         +String justificativa
         +Date dataSolicitacao
-        +EstadoSolicitacao estado
+        +EstadoSolicitacaoAlteracao estado
     }
 
     class TipoAlteracao {
@@ -84,7 +92,7 @@ classDiagram
         ORCAMENTO
     }
 
-    class EstadoSolicitacao {
+    class EstadoSolicitacaoAlteracao {
         <<enumeration>>
         PENDENTE
         EM_ANALISE
@@ -110,12 +118,12 @@ classDiagram
         <<fora do escopo - M003>>
     }
 
-    DashboardIniciativa "*" --> "1" Projeto : consolida dados de
+    DashboardProjeto "*" --> "1" Projeto : consolida dados de
     RelatorioTecnico "*" --> "1" Projeto : vinculado a
     RelatorioTecnico "*" --> "1" Coordenador : submetido por
     RelatorioTecnico "1" --> "*" ParecerRelatorio : pareceres
-    RelatorioTecnico "1" --> "0..1" Contestacao : contestacao
-    Contestacao "1" --> "*" DocumentoContestacao : documentos
+    RelatorioTecnico "1" --> "0..1" ContestacaoRelatorio : contestacao
+    ContestacaoRelatorio "1" --> "*" DocumentoContestacao : documentos
     SolicitacaoAlteracao "*" --> "1" Projeto : referente a
     SolicitacaoAlteracao "*" --> "1" Coordenador : solicitada por
     SolicitacaoAlteracao "1" --> "0..1" DecisaoSolicitacao : decisao
@@ -126,9 +134,9 @@ classDiagram
 
 | Classe | Atributo | Definicao | Obrig. | Tipo | Dominio | Tamanho | Unico |
 |--------|----------|-----------|--------|------|---------|---------|-------|
-| **DashboardIniciativa** | projetoId | Identificador do projeto no dashboard | Sim | String | Ex: PRJ-2026-001 | | |
+| **DashboardProjeto** | projetoId | Identificador do projeto no dashboard | Sim | String | Ex: PRJ-2026-001 | | |
 | | titulo | Titulo do projeto | Sim | String | | 300 | |
-| | statusProjeto | Status atual do projeto | Sim | StatusProjeto | Ativo, Concluido, Cancelado | | |
+| | statusProjeto | Status atual do projeto apresentado no dashboard | Sim | StatusProjeto | Ver enumeracao | | |
 | | dataInicio | Data de inicio do projeto | Sim | Date | | | |
 | | dataFim | Data prevista de fim do projeto | Sim | Date | | | |
 | | relatoriosPendentes | Quantidade de relatorios pendentes de submissao | Gerado | Int | | | |
@@ -144,7 +152,7 @@ classDiagram
 | | aprovado | Indica se o relatorio foi aprovado | Sim | Boolean | true/false | | |
 | | justificativa | Justificativa do parecer | Sim | String | | 2000 | |
 | | tipo | Tipo do parecer (analise inicial ou reanalise) | Sim | TipoParecer | Ver enumeracao | | |
-| **Contestacao** | justificativa | Justificativa da contestacao pelo coordenador | Sim | String | | 3000 | |
+| **ContestacaoRelatorio** | justificativa | Justificativa da contestacao pelo coordenador | Sim | String | | 3000 | |
 | | dataContestacao | Data em que a contestacao foi registrada | Gerado | Date | | | |
 | | prazoLimite | Data limite para registro da contestacao (15 dias apos notificacao) | Gerado | Date | | | |
 | **DocumentoContestacao** | nome | Nome do documento complementar | Sim | String | | 200 | |
@@ -156,7 +164,7 @@ classDiagram
 | | descricao | Descricao da alteracao pretendida | Sim | String | | 3000 | |
 | | justificativa | Justificativa para a alteracao | Sim | String | | 3000 | |
 | | dataSolicitacao | Data em que a solicitacao foi registrada | Gerado | Date | | | |
-| | estado | Estado atual da solicitacao | Gerado | EstadoSolicitacao | Ver enumeracao | | |
+| | estado | Estado atual da solicitacao | Gerado | EstadoSolicitacaoAlteracao | Ver enumeracao | | |
 | **DecisaoSolicitacao** | dataDecisao | Data em que a decisao foi registrada | Sim | Date | | | |
 | | deferida | Indica se a solicitacao foi deferida | Sim | Boolean | true/false | | |
 | | justificativa | Justificativa da decisao | Sim | String | | 2000 | |
@@ -164,8 +172,8 @@ classDiagram
 ## Notas de Implementacao
 
 **Entidades externas:**
-- Projeto, Coordenador, Edital: gerenciados por M002/M003 (Importacao e Gerenciamento de Editais)
+- Projeto, Coordenador e Edital: gerenciados por M003 (Gerenciar Editais). O suporte atual deste modulo permanece focado em iniciativas operacionalizadas como Projeto.
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: RelatorioTecnico.projeto: Projeto)
-- Cardinalidade N: atributo lista do tipo da classe destino (ex: RelatorioTecnico.pareceres: List&lt;ParecerRelatorio&gt;)
+- Cardinalidade N: atributo lista do tipo da classe destino (ex: RelatorioTecnico.pareceres: List<ParecerRelatorio>)

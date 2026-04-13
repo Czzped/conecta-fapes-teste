@@ -41,6 +41,9 @@ classDiagram
         +boolean ativa
     }
 
+    class AreaTecnica {
+    }
+
     class Dirigente {
         +TipoDirigente tipo
         +Date dataInicioMandato
@@ -86,12 +89,6 @@ classDiagram
         +String descricao
     }
 
-    class AreaTecnica {
-        +String nome
-        +String sigla
-        +boolean ativa
-    }
-
     class Servidor {
         +String nome
         +String matricula
@@ -116,6 +113,7 @@ classDiagram
 
     Instituicao "1" --> "*" UnidadeOrganizacional : possui
     UnidadeOrganizacional "0..1" --> "*" UnidadeOrganizacional : subunidades
+    UnidadeOrganizacional <|-- AreaTecnica
     UnidadeOrganizacional "1" --> "*" Dirigente : dirigentes
     Dirigente "*" --> "1" PessoaFisica : pessoa
     PessoaFisica "1" --> "*" HistoricoPessoa : historico
@@ -148,7 +146,7 @@ classDiagram
 | | ativa | Indica se a instituicao esta ativa | Sim | Boolean | true/false | | |
 | **UnidadeOrganizacional** | nome | Nome da unidade | Sim | String | Ex: Departamento de Informatica | 300 | |
 | | sigla | Sigla da unidade | Sim | String | Ex: DI | 20 | |
-| | nivel | Nivel hierarquico (1=raiz) | Gerado | Int | | | |
+| | nivel | Nivel hierarquico da unidade dentro da instituicao | Gerado | Int | Ex: 1, 2, 3 | | |
 | | ativa | Indica se a unidade esta ativa | Sim | Boolean | true/false | | |
 | **Dirigente** | tipo | Tipo do cargo de dirigente | Sim | TipoDirigente | Reitor, Diretor, Chefe | | |
 | | dataInicioMandato | Data de inicio do mandato | Sim | Date | | | |
@@ -165,9 +163,6 @@ classDiagram
 | | codigoIBGE | Codigo IBGE da cidade | Sim | String | Ex: 3205309 | 10 | Sim |
 | **Regiao** | nome | Nome da regiao | Sim | String | Ex: Grande Vitoria | 200 | Sim |
 | | descricao | Descricao da regiao | Nao | String | | 500 | |
-| **AreaTecnica** | nome | Nome da area tecnica da agencia | Sim | String | | 200 | |
-| | sigla | Sigla da area tecnica | Sim | String | Ex: DITEC | 20 | Sim |
-| | ativa | Indica se a area esta ativa | Sim | Boolean | true/false | | |
 | **Servidor** | nome | Nome do servidor | Sim | String | | 300 | |
 | | matricula | Matricula funcional do servidor | Sim | String | | 20 | Sim |
 | | email | Email institucional do servidor | Sim | String | | 200 | |
@@ -179,9 +174,12 @@ classDiagram
 
 ## Notas de Implementacao
 
+**Especializacao estrutural:**
+- `AreaTecnica` e uma especializacao de `UnidadeOrganizacional` usada para representar as unidades internas da instituicao agencia responsaveis pela gestao operacional dos modulos de negocio.
+
 **Entidades externas:**
 - Acesso Cidadao (SSO): gerenciado por M005 (Autenticacao). A identidade autenticada e usada para vincular ao cadastro da pessoa.
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: Dirigente.pessoa: PessoaFisica)
-- Cardinalidade N: atributo lista do tipo da classe destino (ex: Instituicao.unidades: List&lt;UnidadeOrganizacional&gt;)
+- Cardinalidade N: atributo lista do tipo da classe destino (ex: Instituicao.unidades: List<UnidadeOrganizacional>)

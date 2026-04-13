@@ -6,6 +6,7 @@
 
 | Documento | Descricao |
 |-----------|-----------|
+| [Contrato](contrato.md) | Superficie publica do modulo: comandos, consultas, jobs e eventos |
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclo de vida do RelatorioTecnico |
@@ -14,21 +15,21 @@
 
 ## Sobre o Modulo
 
-Apos a contratacao de projetos, a FAPES precisa acompanhar a execucao e gerenciar resultados tecnicos. Atualmente, nao ha dashboard consolidado para os diferentes perfis (coordenador, FAPES, SECONT) e as submissoes de relatorios e suas analises ocorrem fora do sistema, por e-mail e documentos avulsos. Este modulo visa resolver esse problema ao prover dashboards de acompanhamento por perfil, gestao de relatorios tecnicos com fluxo de analise e contestacao, e controle de solicitacoes de alteracao em projetos. O sucesso sera medido pela taxa de relatorios analisados no prazo e pela disponibilidade de informacoes consolidadas nos dashboards.
+Apos a contratacao de projetos, a agencia de fomento precisa acompanhar a execucao e gerenciar resultados tecnicos. Atualmente, nao ha dashboard consolidado para os diferentes perfis (coordenador, agencia de fomento, SECONT) e as submissoes de relatorios e suas analises ocorrem fora do sistema, por e-mail e documentos avulsos. Este modulo visa resolver esse problema ao prover dashboards de acompanhamento por perfil, gestao de relatorios tecnicos com fluxo de analise e contestacao, e controle de solicitacoes de alteracao em projetos. O sucesso sera medido pela taxa de relatorios analisados no prazo e pela disponibilidade de informacoes consolidadas nos dashboards.
 
 ---
 
 ## Dominio
 
-A FAPES, apos contratar projetos de pesquisa por meio de editais, precisa acompanhar a execucao e coletar os resultados tecnicos produzidos. O acompanhamento envolve tres perfis com necessidades distintas:
+A agencia de fomento, apos contratar projetos de pesquisa por meio de editais, precisa acompanhar a execucao e coletar os resultados tecnicos produzidos. O acompanhamento envolve tres perfis com necessidades distintas:
 
-O Coordenador do projeto precisa de uma visao consolidada da execucao do seu projeto: prazos, entregas pendentes, relatorios submetidos e solicitacoes de alteracao. O perfil FAPES (Area Tecnica) precisa de uma visao gerencial de todos os projetos em andamento, com indicadores de desempenho, relatorios pendentes de analise e solicitacoes de alteracao a avaliar. O perfil SECONT (auditoria externa) precisa de uma visao somente-leitura para fins de fiscalizacao.
+O Coordenador do projeto precisa de uma visao consolidada da execucao do seu projeto: prazos, entregas pendentes, relatorios submetidos e solicitacoes de alteracao. O perfil agencia de fomento (Area Tecnica) precisa de uma visao gerencial de todos os projetos em andamento, com indicadores de desempenho, relatorios pendentes de analise e solicitacoes de alteracao a avaliar. O perfil SECONT (auditoria externa) precisa de uma visao somente-leitura para fins de fiscalizacao.
 
-Os resultados tecnicos sao formalizados por meio de relatorios tecnicos submetidos pelo coordenador conforme cronograma definido no edital. A Area Tecnica da FAPES analisa cada relatorio, podendo aprova-lo ou reprova-lo com justificativa. Em caso de reprovacao, o coordenador pode contestar a decisao dentro de 15 dias. A contestacao e reanalisada pela Area Tecnica, que emite uma decisao final.
+Os resultados tecnicos sao formalizados por meio de relatorios tecnicos submetidos pelo coordenador conforme cronograma definido no edital. A Area Tecnica da agencia de fomento analisa cada relatorio, podendo aprova-lo ou reprova-lo com justificativa. Em caso de reprovacao, o coordenador pode contestar a decisao dentro de 15 dias. A contestacao e reanalisada pela Area Tecnica, que emite uma decisao final.
 
 Alteracoes no projeto (escopo, cronograma, equipe, orcamento) podem ser solicitadas pelo coordenador durante a execucao. Cada solicitacao requer justificativa e e analisada pela Area Tecnica, que registra a decisao de deferimento ou indeferimento.
 
-> Projetos e editais sao gerenciados pelos modulos M002 e M003. Este modulo consome essas informacoes para operacionalizar o acompanhamento e a gestao de resultados.
+> Projetos e editais sao gerenciados por M003. Neste ciclo documental, o acompanhamento permanece focado em iniciativas operacionalizadas como Projeto. O modulo M002 atua apenas como integracao legada quando necessario.
 
 ---
 
