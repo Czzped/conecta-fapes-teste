@@ -1,55 +1,67 @@
+# Repositorio ConectaFAPES
 
-# 📋 Repositorio do Conecta Fapes
-
-Este repositório é organizado nas seguintes pastas:
-
-1. **`documentation/`** – Contém a **documentação do projeto**, incluindo orientações de uso dos templates e boas práticas de contribuição.
-2. **`management/`** – Armazena **dados de performance da equipe**, utilizados para análises e relatórios internos.
-3. **`.github/`** – Contém os templates de tarefas.
-4. **`tools/`** – Tem algumas ferramentas que foram desenvovidas para melhorar o dia-a-dia da equipe.
-
-## GESTAO DE TAREFAS
-
-As tarefas sao criadas da seguinte forma:
-
-### 🐞 `BUG TEMPLATE`
-
-Modelo utilizado para reportar **erros ou comportamentos inesperados** no sistema.
-
-> ⚠️ Toda correção deve estar associada a um Pull Request (PR).
-
-🔗 **Ideal para:** problemas que afetam a experiência do usuário, falhas em funcionalidades existentes ou erros de lógica.
+Plataforma digital da FAPES para gestao do ciclo completo de fomento a pesquisa, desenvolvimento e inovacao no Espirito Santo.
 
 ---
 
-### ✨ `FEATURE TEMPLATE`
+## Estrutura de Pastas
 
-Modelo para sugerir ou registrar o desenvolvimento de **novas funcionalidades** que entreguem valor ao cliente.
-
-> ⚠️ Toda entrega deve estar vinculada a um PR correspondente.
-
-🔗 **Ideal para:** desenvolvimento de novas funcionalidades, melhorias incrementais ou ajustes significativos em processos do sistema.
-
----
-
-### 📌 `TASK TEMPLATE`
-
-Modelo voltado para execução de tarefas individuais ou que, quando em conjunto, compõem uma funcionalidade com valor agregado.
-
-> ⚠️ No caso de tasks que compõem uma feature, a *feature* deve estar associada ao PR.
-> ⚠️ Quando for uma task isolada, ela própria deve estar vinculada ao PR.
-
-🔗 **Ideal para:** atividades de desenvolvimento ou não-funcionais, como escrita de documentação, preparação de ambientes, reuniões ou tarefas administrativas.
-
----
-
-### ✅ Boas Práticas
-
-* Associe sempre as issues aos seus respectivos PRs.
-* Mantenha as descrições claras, completas e objetivas.
-* Marque responsáveis quando aplicável.
-* Utilize os templates conforme o tipo e objetivo da atividade.
+```
+conectafapes-project/
+├── docs/
+│   ├── discovery/          # O que construir — visao do produto, domains e regras de negocio
+│   │   ├── product-vision.md
+│   │   └── domains/        # Um arquivo por domain de negocio
+│   ├── architecture/       # Como construir — decisoes tecnicas de arquitetura
+│   │   ├── README.md       # Visao geral, stack, diagramas C4
+│   │   └── adr/            # Architecture Decision Records
+│   ├── implementation/     # Implementacao — backlog, epics e modelos por modulo
+│   │   ├── backlog-product.md
+│   │   └── modules/        # Um diretorio por modulo (M001, M002, ...)
+│   └── management/         # Quando e em que ordem — roadmap e planejamento de sprints
+│       └── roadmap.md
+├── .github/                # Templates de issues e pull requests
+├── documentation/          # Documentacao publicada (Docusaurus)
+└── tools/                  # Ferramentas internas do time
+```
 
 ---
 
-Se quiser, posso adaptar para Markdown multilíngue ou adicionar badges, links para exemplos e contribuições externas. Deseja isso?
+## Domain vs Modulo
+
+Dois conceitos complementares usados para organizar o produto:
+
+**Domain** e uma capacidade de negocio — define *o que* o sistema precisa fazer do ponto de vista da FAPES. E a unidade de discovery e de planejamento de macro-sprints. Exemplo: *Fomento Pre-Award* engloba tudo desde a publicacao do edital ate a contratacao da iniciativa.
+
+**Modulo** e a unidade de implementacao — define *como* aquela capacidade sera construida em codigo. Um domain pode ser implementado por um ou mais modulos. Exemplo: o Domain 01 (Corporativo) e implementado pelos modulos M001, M005, M006 e M007.
+
+| Conceito | Responde a | Onde vive |
+|----------|-----------|-----------|
+| Domain | O que o sistema faz | `docs/discovery/domains/` |
+| Modulo | Como sera implementado | `docs/implementation/modules/` |
+
+O macro-sprint e planejado por **domain**. O backlog detalhado (epics, tasks) vive dentro do **modulo**.
+
+---
+
+## Documentacao
+
+| Secao | Descricao |
+|-------|-----------|
+| [Visao do Produto](docs/discovery/product-vision.md) | Personas, mapa de domains e regras de negocio transversais |
+| [Roadmap](docs/management/roadmap.md) | Sequencia de entrega por domain e dependencias |
+| [Arquitetura](docs/architecture/README.md) | Stack tecnologico, diagramas C4 e integracoes externas |
+| [ADRs](docs/architecture/adr/README.md) | Decisoes de arquitetura registradas |
+| [Backlog do Produto](docs/implementation/backlog-product.md) | Dashboard central por modulo |
+
+---
+
+## Gestao de Issues
+
+| Template | Uso |
+|----------|-----|
+| `BUG TEMPLATE` | Erros ou comportamentos inesperados no sistema |
+| `FEATURE TEMPLATE` | Novas funcionalidades com valor entregavel |
+| `TASK TEMPLATE` | Tarefas tecnicas ou administrativas individuais |
+
+Toda entrega deve estar associada a um Pull Request. Mantenha descricoes claras e responsaveis atribuidos.
