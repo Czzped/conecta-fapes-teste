@@ -6,8 +6,8 @@ Plataforma digital da agencia de fomento para gestao do ciclo completo de foment
 
 | Documento | Descricao |
 |-----------|-----------|
-| [Visao do Produto](conecta-product-vision.md) | Funcionalidades, personas, dominios e fundamentacao legal (LEC 978/2021) |
-| [Backlog do Produto](backlog-product.md) | Dashboard central com dor, capacidade, KPI e % de desenvolvimento por modulo |
+| [Visao do Produto](discovery/product-vision.md) | Funcionalidades, personas, dominios e fundamentacao legal |
+| [Backlog do Produto](management/backlog-product.md) | Dashboard central com dor, capacidade, KPI e percentual de desenvolvimento por modulo |
 
 ## Gestao
 
@@ -22,19 +22,30 @@ Plataforma digital da agencia de fomento para gestao do ciclo completo de foment
 
 | Documento | Descricao |
 |-----------|-----------|
-| [Visao Geral](architecture/README.md) | Diagrama de contexto, stack tecnologico, integracoes externas |
+| [Visao Geral](architecture/README.md) | Contexto do sistema, stack tecnologica, integracoes e operacao |
 | [ADRs](architecture/adr/README.md) | Decisoes de arquitetura registradas |
 
 ## Modulos
 
 | ID | Modulo | Documentacao |
 |----|--------|--------------|
-| M001 | Modalidades de Bolsas | [README](modules/M001-modalidade-bolsa/README.md) |
-| M002 | Importacao de Editais | [README](modules/M002-importacao-editais/README.md) |
-| M003 | Gerenciar Editais | [README](modules/M003-gerenciar-editais/README.md) |
-| M004 | Pagamento de Bolsistas | [README](modules/M004-pagamento-bolsista/README.md) |
-| M005 | Autenticacao e Auditoria | [README](modules/M005-autenticacao/README.md) |
-| M006 | Autorizacao | [README](modules/M006-autorizacao/README.md) |
-| M007 | API Gateway | [README](modules/M007-api-gateway/README.md) |
-| M008 | Portal FAPES | [README](modules/M008-portal-fapes/README.md) |
-| M009 | Gestao Bolsa Pesquisa | [README](modules/M009-gestao-bolsa-pesquisa/README.md) |
+| M001 | Modalidades de Bolsas | [README](implementation/modules/M001-modalidade-bolsa/README.md) |
+| M002 | Importacao de Editais | [README](implementation/modules/M002-importacao-editais/README.md) |
+| M003 | Gerenciar Editais | [README](implementation/modules/M003-gerenciar-editais/README.md) |
+| M004 | Pagamento de Bolsistas | [README](implementation/modules/M004-pagamento-bolsista/README.md) |
+| M005 | Autenticacao e Auditoria | A definir |
+| M006 | Autorizacao | A definir |
+| M007 | API Gateway | A definir |
+| M008 | Cadastros Corporativos | [README](implementation/modules/M008-cadastros-corporativos/README.md) |
+| M009 | Gestao Bolsa Pesquisa | [README](implementation/modules/M009-gestao-bolsista/README.md) |
+| M010 | Planejamento e Estrategia | [README](implementation/modules/M010-planejamento-estrategia/README.md) |
+| M011 | Configuracao de Captacao | [README](implementation/modules/M011-configuracao-captacao/README.md) |
+| M012 | Acompanhamento e Resultados | [README](implementation/modules/M012-acompanhamento-resultados/README.md) |
+| M013 | Gestao Orcamentaria do Projeto | [README](implementation/modules/M013-gestao-orcamentaria-projeto/README.md) |
+| M014 | Prestacao de Contas | [README](implementation/modules/M014-prestacao-contas/README.md) |
+| M015 | Suspensao e Finalizacao | [README](implementation/modules/M015-suspensao-finalizacao/README.md) |
+| M016 | Contabilidade e Financeiro | [README](implementation/modules/M016-contabilidade-financeiro/README.md) |
+| M017 | Prevencao a Lavagem de Dinheiro (PLD) | [README](implementation/modules/M017-prevencao-lavagem-dinheiro/README.md) |
+| M018 | Business Intelligence | [README](implementation/modules/M018-business-intelligence/README.md) |
+| M019 | Transparencia e Auditoria | [README](implementation/modules/M019-transparencia-auditoria/README.md) |
+| M020 | Comunicacao | [README](implementation/modules/M020-comunicacao/README.md) |

@@ -32,7 +32,7 @@ Controle de contas bancarias, fluxo de caixa e gestao financeira dos recursos da
 
 Execucao financeira de pagamentos: marcos de liberacao, processamento de bolsas (padrao, Unac, mestrado/doutorado), parcelas de projetos, auxilios e integracao com Banestes e BANDES. Em caso de pagamento duplicado ao bolsista, o sistema registra a ocorrencia e notifica o bolsista para devolucao do valor na conta do projeto, acompanhando o status ate a regularizacao.
 
-**Implementado por:** [M004 — Pagamento de Bolsistas](../../modules/M004-pagamento-bolsista/README.md)
+**Implementado por:** [M004 — Pagamento de Bolsistas](../../implementation/modules/M004-pagamento-bolsista/README.md)
 
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|

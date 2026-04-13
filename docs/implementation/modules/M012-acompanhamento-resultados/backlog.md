@@ -1,6 +1,6 @@
 # Sub-Backlog: M012 - Acompanhamento e Resultados
 
-[<- Voltar ao Backlog Central](../../backlog-product.md)
+[<- Voltar ao Backlog Central](../../../management/backlog-product.md)
 
 ## Sobre o Modulo
 

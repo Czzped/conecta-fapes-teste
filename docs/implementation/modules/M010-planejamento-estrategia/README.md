@@ -1,6 +1,6 @@
 # M010 - Planejamento e Estrategia
 
-[<< Voltar ao Backlog Central](../../backlog-product.md) | [Domain 02 -- Planejamento e Estrategia](../../discovery/domains/02-planejamento.md)
+[<< Voltar ao Backlog Central](../../../management/backlog-product.md) | [Domain 02 -- Planejamento e Estrategia](../../../discovery/domains/02-planejamento.md)
 
 ## Indice
 

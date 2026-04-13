@@ -1,6 +1,6 @@
 # M002 - Importacao de Editais
 
-[← Voltar ao Backlog Central](../../backlog-product.md) | [Domain 07 — Importacao de Dados (SIGFAPES)](../../discovery/domains/07-importacao-sigfapes.md)
+[← Voltar ao Backlog Central](../../../management/backlog-product.md) | [Domain 07 — Importacao de Dados (SIGFAPES)](../../../discovery/domains/07-importacao-sigfapes.md)
 
 ## Indice
 

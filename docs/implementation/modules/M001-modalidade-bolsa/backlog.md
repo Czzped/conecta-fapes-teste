@@ -1,6 +1,6 @@
 # Sub-Backlog: M001 - Modalidades de Bolsas
 
-[← Voltar ao Backlog Central](../../backlog-product.md)
+[← Voltar ao Backlog Central](../../../management/backlog-product.md)
 
 ## Sobre o Modulo
 

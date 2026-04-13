@@ -51,7 +51,7 @@ Dados de referencia e parametros do sistema: estrutura organizacional da agencia
 
 Cadastro e manutencao das modalidades, niveis e requisitos de bolsas definidos por resolucoes da agencia de fomento. Inclui versionamento de modalidades para preservar o historico conforme novas resolucoes sao publicadas.
 
-**Implementado por:** [M001 — Modalidades de Bolsa](../../modules/M001-modalidade-bolsa/README.md)
+**Implementado por:** [M001 — Modalidades de Bolsa](../../implementation/modules/M001-modalidade-bolsa/README.md)
 
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|

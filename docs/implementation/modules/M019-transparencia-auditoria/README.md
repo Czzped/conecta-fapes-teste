@@ -1,6 +1,6 @@
 # M019 - Transparencia e Auditoria
 
-[<< Voltar ao Backlog Central](../../backlog-product.md) | [Domain 06 -- Suporte e Inteligencia](../../discovery/domains/06-suporte-inteligencia.md)
+[<< Voltar ao Backlog Central](../../../management/backlog-product.md) | [Domain 06 -- Suporte e Inteligencia](../../../discovery/domains/06-suporte-inteligencia.md)
 
 ## Indice
 

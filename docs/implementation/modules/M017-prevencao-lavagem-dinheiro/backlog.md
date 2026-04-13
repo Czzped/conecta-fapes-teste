@@ -1,6 +1,6 @@
 # Sub-Backlog: M017 - Prevencao a Lavagem de Dinheiro (PLD)
 
-[<< Voltar ao Backlog Central](../../backlog-product.md)
+[<< Voltar ao Backlog Central](../../../management/backlog-product.md)
 
 ## Sobre o Modulo
 

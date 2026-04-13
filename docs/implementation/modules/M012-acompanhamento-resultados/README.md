@@ -1,6 +1,6 @@
 # M012 - Acompanhamento e Resultados
 
-[<- Voltar ao Backlog Central](../../backlog-product.md) | [Domain 04 -- Fomento Post-Award](../../discovery/domains/04-fomento-post-award.md)
+[<- Voltar ao Backlog Central](../../../management/backlog-product.md) | [Domain 04 -- Fomento Post-Award](../../../discovery/domains/04-fomento-post-award.md)
 
 ## Indice
 

@@ -1,6 +1,6 @@
 # Sub-Backlog: M010 - Planejamento e Estrategia
 
-[<< Voltar ao Backlog Central](../../backlog-product.md)
+[<< Voltar ao Backlog Central](../../../management/backlog-product.md)
 
 ## Sobre o Modulo
 

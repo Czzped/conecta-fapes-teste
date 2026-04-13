@@ -1,6 +1,6 @@
 # Sub-Backlog: M002 - Importacao de Editais
 
-[← Voltar ao Backlog Central](../../backlog-product.md)
+[← Voltar ao Backlog Central](../../../management/backlog-product.md)
 
 ## Sobre o Modulo
 

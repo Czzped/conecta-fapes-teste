@@ -1,6 +1,6 @@
 # M017 - Prevencao a Lavagem de Dinheiro (PLD)
 
-[<< Voltar ao Backlog Central](../../backlog-product.md) | [Domain 05 -- Financeiro](../../discovery/domains/05-financeiro.md)
+[<< Voltar ao Backlog Central](../../../management/backlog-product.md) | [Domain 05 -- Financeiro](../../../discovery/domains/05-financeiro.md)
 
 ## Indice
 

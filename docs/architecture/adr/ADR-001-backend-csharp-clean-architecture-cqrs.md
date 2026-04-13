@@ -5,7 +5,7 @@
 | **Status** | Aceita |
 | **Data** | 2026-04-13 |
 | **Autores** | Time de Arquitetura ConectaFAPES |
-| **Modulos impactados** | M001, M002, M003, M004, M005, M006, M007, M009 |
+| **Modulos impactados** | M001-M020 |
 
 ## Contexto
 

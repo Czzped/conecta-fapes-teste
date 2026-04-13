@@ -1,6 +1,6 @@
 # M001 - Modalidades de Bolsas
 
-[← Voltar ao Backlog Central](../../backlog-product.md) | [Domain 01 — Corporativo e Administrativo](../../discovery/domains/01-corporativo.md)
+[← Voltar ao Backlog Central](../../../management/backlog-product.md) | [Domain 01 — Corporativo e Administrativo](../../../discovery/domains/01-corporativo.md)
 
 ## Indice
 

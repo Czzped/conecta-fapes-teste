@@ -67,7 +67,7 @@ Gestao dos bolsistas e membros da equipe do projeto: ciclo de vida das bolsas (s
 
 A solicitacao de bolsa e um processo em duas etapas: (1) o coordenador inicia a solicitacao e (2) o bolsista envia a documentacao dentro do prazo definido. A solicitacao somente e concluida apos o envio da documentacao. A competencia do pagamento e determinada pelo momento do envio: documentacao enviada dentro do prazo e aprovada para o mes corrente; enviada fora do prazo, e aprovada para o mes seguinte.
 
-**Implementado por:** [M009 — Gestao Bolsa Pesquisa](../../modules/M009-gestao-bolsa-pesquisa/README.md)
+**Implementado por:** [M009 — Gestao Bolsa Pesquisa](../../implementation/modules/M009-gestao-bolsista/README.md)
 
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|

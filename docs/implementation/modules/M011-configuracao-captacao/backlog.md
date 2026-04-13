@@ -1,6 +1,6 @@
 # Sub-Backlog: M011 - Configuracao de Captacao
 
-[<- Voltar ao Backlog Central](../../backlog-product.md)
+[<- Voltar ao Backlog Central](../../../management/backlog-product.md)
 
 ## Sobre o Modulo
 

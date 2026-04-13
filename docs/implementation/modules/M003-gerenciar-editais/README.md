@@ -1,6 +1,6 @@
 # M003 - Gerenciar Editais
 
-[← Voltar ao Backlog Central](../../backlog-product.md) | [Domain 03 — Fomento Pre-Award](../../discovery/domains/03-fomento-pre-award.md)
+[← Voltar ao Backlog Central](../../../management/backlog-product.md) | [Domain 03 — Fomento Pre-Award](../../../discovery/domains/03-fomento-pre-award.md)
 
 ## Indice
 

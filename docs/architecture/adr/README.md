@@ -18,6 +18,7 @@ Um ADR (Architecture Decision Record) documenta uma decisao de arquitetura signi
 | [ADR-002](ADR-002-frontend-vue-nuxtui.md) | Frontend em Vue com Nuxt UI | Aceita | 2026-04-13 |
 | [ADR-003](ADR-003-banco-de-dados-sql-server.md) | Banco de Dados SQL Server (instancia unica) | Aceita | 2026-04-13 |
 | [ADR-004](ADR-004-infraestrutura-docker-kubernetes.md) | Infraestrutura com Docker e Kubernetes | Aceita | 2026-04-13 |
+| [ADR-005](ADR-005-adocao-bff.md) | Adocao de Backend for Frontend (BFF) para composicao de interfaces | Proposta | 2026-04-13 |
 
 ## Status possiveis
 
