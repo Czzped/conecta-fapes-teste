@@ -73,12 +73,12 @@ Cada domain define uma capacidade de negocio. Um modulo e a implementacao de um 
 
 | # | Domain | Descricao | Modulos |
 |---|--------|-----------|---------|
-| 01 | [Corporativo e Administrativo](domains/01-corporativo.md) | Identidades, cadastros mestres, estrutura organizacional e modalidades de bolsa | M001, M005, M006, M007 |
-| 02 | [Planejamento e Estrategia](domains/02-planejamento.md) | Plano estrategico, parcerias e programas de fomento | — |
-| 03 | [Fomento Pre-Award](domains/03-fomento-pre-award.md) | Captacao, selecao e contratacao de iniciativas | M003 |
-| 04 | [Fomento Post-Award](domains/04-fomento-post-award.md) | Execucao, acompanhamento, bolsistas e finalizacao | M009 |
-| 05 | [Financeiro](domains/05-financeiro.md) | Contabilidade, contas bancarias, pagamentos e PLD | M004 |
-| 06 | [Suporte e Inteligencia](domains/06-suporte-inteligencia.md) | BI, transparencia, auditoria e comunicacao | — |
+| 01 | [Corporativo e Administrativo](domains/01-corporativo.md) | Identidades, cadastros mestres, estrutura organizacional e modalidades de bolsa | M001, M005, M006, M007, M008 |
+| 02 | [Planejamento e Estrategia](domains/02-planejamento.md) | Plano estrategico, parcerias e programas de fomento | M010 |
+| 03 | [Fomento Pre-Award](domains/03-fomento-pre-award.md) | Captacao, selecao e contratacao de iniciativas | M003, M011 |
+| 04 | [Fomento Post-Award](domains/04-fomento-post-award.md) | Execucao, acompanhamento, bolsistas e finalizacao | M009, M012, M013, M014, M015 |
+| 05 | [Financeiro](domains/05-financeiro.md) | Contabilidade, contas bancarias, pagamentos e PLD | M004, M016, M017 |
+| 06 | [Suporte e Inteligencia](domains/06-suporte-inteligencia.md) | BI, transparencia, auditoria e comunicacao | M018, M019, M020 |
 | 07 | [Importacao SIGFAPES](domains/07-importacao-sigfapes.md) | Migracao de editais, projetos, pessoas e pagamentos do sistema legado | M002 |
 
 ---

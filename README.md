@@ -1,4 +1,4 @@
-# Repositorio ConectaFAPES
+# Repositorio Conecta FAPES
 
 Plataforma digital da FAPES para gestao do ciclo completo de fomento a pesquisa, desenvolvimento e inovacao no Espirito Santo.
 

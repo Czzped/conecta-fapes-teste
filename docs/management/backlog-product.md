@@ -23,27 +23,27 @@ Conecta FAPES e uma plataforma de apoio a pesquisa, desenvolvimento e inovacao d
 | Dominio | Sub-dominio | Descricao | Modulos |
 |---------|-------------|-----------|---------|
 | **1. Corporativo e Administrativo** | 1.1 Acesso e Seguranca (IAM) | Autenticacao, portais back/front-office e portal de transparencia | M005, M006, M007 |
-| | 1.2 Pessoas e Organizacoes | Cadastro de pessoas fisicas, instituicoes, unidades e dirigentes | - |
-| | 1.3 Cadastros Basicos | Estrutura organizacional da agencia, tabelas geograficas, areas de conhecimento e rubricas | - |
+| | 1.2 Pessoas e Organizacoes | Cadastro de pessoas fisicas, instituicoes, unidades e dirigentes | M008 |
+| | 1.3 Cadastros Basicos | Estrutura organizacional da agencia, tabelas geograficas, areas de conhecimento e rubricas | M008 |
 | | 1.4 Modalidades de Bolsa | Cadastro e versionamento de modalidades, niveis e requisitos de bolsas | M001 |
-| **2. Planejamento e Estrategia** | 2.1 Planejamento Estrategico | Plano estrategico e eixos que orientam programas de fomento | - |
-| | 2.2 Gestao de Parcerias | Cooperacao com entidades publicas e privadas, aportes e aditivos | - |
-| | 2.3 Gestao de Programa | Cadastro de programas, comites gestores, dotacao orcamentaria e captacoes | - |
-| **3. Fomento — Pre-Award** | 3.1 Configuracao da Captacao | Elaboracao do edital, formularios, revisores e parametrizacao | - |
+| **2. Planejamento e Estrategia** | 2.1 Planejamento Estrategico | Plano estrategico e eixos que orientam programas de fomento | M010 |
+| | 2.2 Gestao de Parcerias | Cooperacao com entidades publicas e privadas, aportes e aditivos | M010 |
+| | 2.3 Gestao de Programa | Cadastro de programas, comites gestores, dotacao orcamentaria e captacoes | M010 |
+| **3. Fomento — Pre-Award** | 3.1 Configuracao da Captacao | Elaboracao do edital, formularios, revisores e parametrizacao | M011 |
 | | 3.2 Fases da Captacao | Submissao, analise documental, analise de merito, contratacao e deposito | M002, M003 |
-| **4. Fomento — Post-Award** | 4.1 Acompanhamento de Iniciativas | Dashboards de monitoramento para coordenador, FAPES e SECONT | M003 |
-| | 4.2 Gestao de Resultados | Submissao e analise de relatorios tecnicos e contestacao | - |
-| | 4.3 Gestao Orcamentaria do Projeto | Adicoes orcamentarias, rubricas e remanejamentos | - |
-| | 4.4 Prestacao de Contas | Submissao de documentos fiscais, analise, auditoria e contestacao | - |
+| **4. Fomento — Post-Award** | 4.1 Acompanhamento de Iniciativas | Dashboards de monitoramento para coordenador, FAPES e SECONT | M003, M012 |
+| | 4.2 Gestao de Resultados | Submissao e analise de relatorios tecnicos e contestacao | M012 |
+| | 4.3 Gestao Orcamentaria do Projeto | Adicoes orcamentarias, rubricas e remanejamentos | M013 |
+| | 4.4 Prestacao de Contas | Submissao de documentos fiscais, analise, auditoria e contestacao | M014 |
 | | 4.5 Gestao de Bolsistas de Equipe | Ciclo de vida das bolsas, plano de trabalho, voluntarios e coordenador adjunto | M009 |
-| | 4.6 Suspensao e Finalizacao | Suspensao temporaria e encerramento definitivo de projetos | - |
-| **5. Financeiro** | 5.1 Contabilidade | Escrituracao contabil, vinculacao de contas e dashboard contabil | - |
-| | 5.2 Financeiro | Contas bancarias, fluxo de caixa, conciliacao e controle de saldo | - |
+| | 4.6 Suspensao e Finalizacao | Suspensao temporaria e encerramento definitivo de projetos | M015 |
+| **5. Financeiro** | 5.1 Contabilidade | Escrituracao contabil, vinculacao de contas e dashboard contabil | M016 |
+| | 5.2 Financeiro | Contas bancarias, fluxo de caixa, conciliacao e controle de saldo | M016 |
 | | 5.3 Pagamentos | Marcos de pagamento, bolsas, parcelas, auxilios, Banestes/BANDES | M004 |
-| | 5.4 Prevencao a Lavagem de Dinheiro (PLD) | KYC, monitoramento de transacoes, bloqueios, COAF e conflito de interesse com PJ | - |
-| **6. Suporte e Inteligencia** | 6.1 Business Intelligence | Paineis analiticos de programas, projetos, bolsas e resultados | - |
-| | 6.2 Transparencia e Auditoria | Portal de dados abertos, relatorios SECONT e trilha de auditoria | - |
-| | 6.3 Comunicacao | Servico de envio de notificacoes e comunicados por email | - |
+| | 5.4 Prevencao a Lavagem de Dinheiro (PLD) | KYC, monitoramento de transacoes, bloqueios, COAF e conflito de interesse com PJ | M017 |
+| **6. Suporte e Inteligencia** | 6.1 Business Intelligence | Paineis analiticos de programas, projetos, bolsas e resultados | M018 |
+| | 6.2 Transparencia e Auditoria | Portal de dados abertos, relatorios SECONT e trilha de auditoria | M019 |
+| | 6.3 Comunicacao | Servico de envio de notificacoes e comunicados por email | M020 |
 | **7. Importacao SIGFAPES** | 7.1 Importacao de Editais | Importar e conciliar editais do sistema legado | M002 |
 | | 7.2 Importacao de Projetos | Importar projetos contratados, equipes e conciliar duplicidades | M002 |
 | | 7.3 Importacao de Pessoas | Importar pesquisadores, coordenadores, bolsistas e resolver duplicidades | M002 |
@@ -63,7 +63,19 @@ Conecta FAPES e uma plataforma de apoio a pesquisa, desenvolvimento e inovacao d
 | M005 | Autenticacao e Auditoria | Sem controle granular de acesso, qualquer usuario autenticado pode acessar dados sensiveis sem rastro de auditoria | Implementar autenticacao integrada ao Acesso Cidadao com autorizacao em nivel de dados e logs de auditoria | Cobertura de controle de acesso; percentual de acoes auditadas | 0% | [backlog](modules/M005-autenticacao/backlog.md) |
 | M006 | Autorizacao | Permissoes de acesso sao rigidas e nao permitem delegacao de funcoes, travando processos quando responsaveis estao ausentes | Gerenciar autorizacoes e delegacao de funcoes com politicas flexiveis via OpenFGA | Tempo medio de concessao/revogacao de acesso; incidentes de acesso indevido | 0% | [backlog](modules/M006-autorizacao/backlog.md) |
 | M007 | API Gateway | Servicos expostos diretamente sem camada unificada de roteamento, autenticacao e rate limiting, aumentando superficie de ataque | Gateway centralizado para roteamento, autenticacao e controle de acesso das APIs | Disponibilidade do gateway; latencia media das requisicoes; incidentes de seguranca | 0% | [backlog](modules/M007-api-gateway/backlog.md) |
+| M008 | Cadastros Corporativos | Dados de pessoas, instituicoes e tabelas de referencia estao dispersos em planilhas e sistemas isolados, gerando duplicidades e inconsistencias entre areas | Cadastro unificado de pessoas fisicas, instituicoes, unidades organizacionais, dirigentes, areas de conhecimento, regioes e rubricas financeiras | Reducao de cadastros duplicados; tempo medio de cadastro de nova entidade; cobertura de dados mestres | 0% | [backlog](modules/M008-cadastros-corporativos/backlog.md) |
 | M009 | Gestao Bolsa Pesquisa | Acompanhamento do ciclo de vida das bolsas (alocacao, vigencia, renovacao, encerramento) e feito de forma descentralizada e sem visao integrada | Gestao integrada do ciclo de vida das bolsas de pesquisa, da alocacao ao encerramento | Taxa de bolsas com acompanhamento em dia; tempo medio de processamento de renovacao | 0% | [backlog](modules/M009-gestao-bolsa-pesquisa/backlog.md) |
+| M010 | Planejamento e Estrategia | Planos estrategicos, parcerias e programas sao gerenciados em documentos avulsos sem rastreabilidade entre eixos, aportes e captacoes | Gestao integrada de planos estrategicos, eixos, parcerias (com aditivos e aportes) e programas de fomento vinculados a dotacao orcamentaria | Percentual de programas vinculados a eixos estrategicos; tempo de formalizacao de parcerias; visibilidade orcamentaria dos programas | 0% | [backlog](modules/M010-planejamento-estrategia/backlog.md) |
+| M011 | Configuracao de Captacao | A elaboracao de editais, formularios e parametrizacao de captacoes e feita de forma manual e descentralizada, causando retrabalho e erros de configuracao | Configuracao completa do processo de captacao: elaboracao de edital, formularios de submissao e avaliacao, cadastro de revisores ad hoc e parametrizacao de regras | Tempo medio de configuracao de uma captacao; taxa de erros em editais publicados | 0% | [backlog](modules/M011-configuracao-captacao/backlog.md) |
+| M012 | Acompanhamento e Resultados | Falta de visibilidade sobre o andamento das iniciativas contratadas e dificuldade na gestao de relatorios tecnicos e contestacoes | Dashboards de monitoramento para coordenador, FAPES e SECONT, e fluxo de submissao, analise e contestacao de resultados tecnicos | Percentual de iniciativas com acompanhamento atualizado; tempo medio de analise de relatorios tecnicos | 0% | [backlog](modules/M012-acompanhamento-resultados/backlog.md) |
+| M013 | Gestao Orcamentaria do Projeto | Adicoes orcamentarias, inclusao de rubricas e remanejamentos sao controlados por e-mail e planilhas, sem rastreabilidade e com risco de inconsistencias | Fluxo digital de solicitacao e aprovacao de adicoes orcamentarias, novas rubricas e remanejamentos entre rubricas, com aprovacao automatica intra-rubrica | Tempo medio de aprovacao de remanejamento; taxa de solicitacoes processadas digitalmente | 0% | [backlog](modules/M013-gestao-orcamentaria-projeto/backlog.md) |
+| M014 | Prestacao de Contas | Submissao e analise de prestacao de contas e feita com documentos fisicos e tramites manuais, gerando atrasos e dificuldade de auditoria | Fluxo digital de submissao de documentos fiscais (com validacao SERPRO), analise, recusa, reavaliacao e auditoria SECONT | Tempo medio de analise de prestacao de contas; percentual de prestacoes validadas automaticamente; taxa de contestacoes resolvidas | 0% | [backlog](modules/M014-prestacao-contas/backlog.md) |
+| M015 | Suspensao e Finalizacao | Processos de suspensao e encerramento de projetos sao informais, sem fluxo de aprovacao definido e sem vinculo com a prestacao de contas final | Fluxo formal de solicitacao, aprovacao e efetivacao de suspensao temporaria e encerramento definitivo de projetos | Tempo medio de finalizacao de projeto; percentual de projetos encerrados com prestacao de contas final aprovada | 0% | [backlog](modules/M015-suspensao-finalizacao/backlog.md) |
+| M016 | Contabilidade e Financeiro | Escrituracao contabil e controle financeiro sao feitos em sistemas separados sem conciliacao automatica, dificultando a visao consolidada de saldos e fluxo de caixa | Escrituracao contabil integrada, cadastro de contas bancarias, fluxo de caixa, conciliacao bancaria e controle de saldo por conta | Tempo de fechamento contabil mensal; percentual de conciliacoes automatizadas; acuracia do fluxo de caixa | 0% | [backlog](modules/M016-contabilidade-financeiro/backlog.md) |
+| M017 | Prevencao a Lavagem de Dinheiro (PLD) | Ausencia de controles sistematizados de PLD expoe a agencia a riscos regulatorios e dificulta a deteccao de operacoes atipicas e conflitos de interesse | Verificacao cadastral (KYC), monitoramento de transacoes atipicas, alertas, bloqueio preventivo, reporte ao COAF, consulta a listas restritivas e analise de conflito de interesse com PJ | Percentual de beneficiarios verificados antes do pagamento; tempo medio de tratamento de alertas; cobertura de reportes ao COAF | 0% | [backlog](modules/M017-pld/backlog.md) |
+| M018 | Business Intelligence | Dados de programas, projetos, bolsas e resultados estao dispersos, sem paineis consolidados para apoio a decisao estrategica | Paineis analiticos de programas, projetos, bolsas e resultados com analise de indicadores de desempenho | Numero de consultas aos dashboards; tempo medio de geracao de relatorios; satisfacao dos gestores com as analises | 0% | [backlog](modules/M018-business-intelligence/backlog.md) |
+| M019 | Transparencia e Auditoria | Cumprimento de obrigacoes de transparencia e atendimento a demandas da SECONT dependem de extraccoes manuais e relatorios ad hoc | Portal de dados abertos, relatorios de execucao financeira para SECONT, exportacao de dados para auditoria e trilha de auditoria | Percentual de dados publicados no portal de transparencia; tempo de atendimento a demandas SECONT; cobertura da trilha de auditoria | 0% | [backlog](modules/M019-transparencia-auditoria/backlog.md) |
+| M020 | Comunicacao | Notificacoes e comunicados sao enviados manualmente por e-mail, sem padronizacao e sem rastreabilidade de entrega | Servico centralizado de envio de notificacoes e comunicados por e-mail com templates, filas e confirmacao de entrega | Taxa de entrega de notificacoes; tempo medio de envio; percentual de comunicacoes rastreadas | 0% | [backlog](modules/M020-comunicacao/backlog.md) |
 
 ---
 
@@ -193,12 +205,50 @@ Funcionalidades identificadas na [visao do produto](discovery/product-vision.md)
 
 ```mermaid
 graph LR
+    %% Modulos existentes
     M002[M002 - Importacao Editais] --> M004[M004 - Pagamento Bolsistas]
     M002 --> M003[M003 - Gerenciar Editais]
     M001[M001 - Modalidades Bolsas] --> M004
     M005[M005 - Autenticacao] --> M007[M007 - API Gateway]
     M006[M006 - Autorizacao] --> M007
     M003 --> M009[M009 - Gestao Bolsa Pesquisa]
+
+    %% Novos modulos — Corporativo
+    M008[M008 - Cadastros Corporativos] --> M001
+    M008 --> M010[M010 - Planejamento e Estrategia]
+    M008 --> M011[M011 - Configuracao Captacao]
+    M008 --> M004
+
+    %% Planejamento e Estrategia
+    M010 --> M011
+    M010 --> M016[M016 - Contabilidade e Financeiro]
+
+    %% Pre-Award
+    M011 --> M003
+
+    %% Post-Award
+    M003 --> M012[M012 - Acompanhamento e Resultados]
+    M003 --> M013[M013 - Gestao Orcamentaria Projeto]
+    M003 --> M014[M014 - Prestacao de Contas]
+    M003 --> M015[M015 - Suspensao e Finalizacao]
+    M009 --> M004
+    M013 --> M016
+
+    %% Financeiro
+    M016 --> M004
+    M004 --> M017[M017 - PLD]
+    M016 --> M017
+
+    %% Suporte e Inteligencia
+    M012 --> M018[M018 - Business Intelligence]
+    M016 --> M018
+    M004 --> M018
+    M005 --> M019[M019 - Transparencia e Auditoria]
+    M018 --> M019
+    M020[M020 - Comunicacao] --> M003
+    M020 --> M009
+    M020 --> M012
+    M020 --> M014
 ```
 
 ---

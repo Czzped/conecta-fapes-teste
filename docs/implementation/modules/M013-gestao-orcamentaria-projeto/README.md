@@ -1,0 +1,48 @@
+# M013 - Gestao Orcamentaria do Projeto
+
+[<< Voltar ao Backlog Central](../../backlog-product.md) | [Domain 04 — Fomento Post-Award](../../discovery/domains/04-fomento-post-award.md)
+
+## Indice
+
+| Documento | Descricao |
+|-----------|-----------|
+| [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
+| [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
+| [Modelo Comportamental](modelo-comportamental.md) | Ciclo de vida da SolicitacaoOrcamentaria |
+
+---
+
+## Sobre o Modulo
+
+Durante a execucao de um projeto, coordenadores precisam solicitar adicoes orcamentarias, incluir novas rubricas de despesa e realocar recursos entre rubricas. Atualmente, esses processos sao realizados por e-mail e formularios em papel, sem visibilidade em tempo real sobre o saldo orcamentario disponivel. Este modulo visa resolver esse problema ao prover uma gestao digital e integrada do orcamento do projeto, com rastreabilidade de todas as movimentacoes financeiras. O sucesso sera medido pela reducao do tempo medio de aprovacao de remanejamentos e pela eliminacao de inconsistencias entre saldo registrado e saldo real.
+
+---
+
+## Dominio
+
+A FAPES concede recursos financeiros a projetos de pesquisa por meio de editais. Cada projeto possui um orcamento aprovado, distribuido em rubricas (categorias de despesa como diarias, passagens, material de consumo, servicos de terceiros, bolsas). Durante a execucao do projeto, e comum que o coordenador identifique a necessidade de ajustar o orcamento.
+
+As principais operacoes orcamentarias sao: (1) adicoes orcamentarias, quando recursos adicionais sao solicitados a FAPES; (2) inclusao de novas rubricas que nao estavam previstas originalmente no projeto; (3) remanejamento entre rubricas, quando recursos sao transferidos de uma categoria para outra; (4) realocacao de bolsas, quando cotas de bolsa sao redistribuidas entre modalidades ou niveis.
+
+Todas essas operacoes exigem justificativa do coordenador e passam por analise da Area Tecnica da FAPES. Adicoes orcamentarias requerem aprovacao formal da FAPES. Remanejamentos acima de 25% do valor da rubrica de origem necessitam de aprovacao do Diretor.
+
+O saldo de cada rubrica deve ser atualizado em tempo real, refletindo comprometimentos, pagamentos ja realizados (M004) e movimentacoes aprovadas. As rubricas disponiveis para um projeto devem estar previamente cadastradas no modulo de cadastros basicos (M008).
+
+> Projetos e editais sao gerenciados pelos modulos M002 e M003. Pagamentos sao gerenciados pelo modulo M004. Cadastros basicos de rubricas sao gerenciados pelo modulo M008. Este modulo consome essas informacoes para operacionalizar a gestao orcamentaria.
+
+---
+
+## Regras de Negocio
+
+| ID | Descricao | Prioridade |
+|----|-----------|------------|
+| RN01 | Toda solicitacao de adicao orcamentaria deve conter justificativa e requer aprovacao formal da FAPES. | Must |
+| RN02 | Remanejamento entre rubricas nao pode exceder 25% do valor da rubrica de origem sem aprovacao do Diretor. | Must |
+| RN03 | A rubrica a ser incluida em um projeto deve existir no cadastro basico de rubricas (M008). | Must |
+| RN04 | Todas as operacoes orcamentarias (adicao, inclusao, remanejamento, realocacao) exigem justificativa do coordenador. | Must |
+| RN05 | O sistema deve manter trilha de auditoria completa de todas as movimentacoes orcamentarias. | Must |
+| RN06 | O saldo de cada rubrica deve ser atualizado em tempo real apos aprovacao de qualquer movimentacao. | Must |
+| RN07 | Realocacao de bolsas segue as mesmas regras de aprovacao do remanejamento entre rubricas. | Must |
+| RN08 | Nao e permitido remanejamento que resulte em saldo negativo na rubrica de origem. | Must |
+| RI1 | Uma solicitacao orcamentaria so pode ser submetida para projetos com status "Ativo". | Must |
+| RI2 | O valor total do projeto apos adicao orcamentaria nao pode exceder o limite definido pelo edital, salvo autorizacao especial. | Should |
