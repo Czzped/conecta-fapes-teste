@@ -1,0 +1,95 @@
+# Domain 04 — Fomento Post-Award (Execucao e Acompanhamento)
+
+Fluxo de execucao do projeto contratado ate a sua finalizacao.
+
+**Modulos que implementam este domain:** M009
+
+---
+
+## 4.1 Acompanhamento de Iniciativas
+
+Paineis de acompanhamento para os diferentes perfis: coordenador monitora seus projetos, agencia monitora todas as iniciativas, e SECONT fiscaliza externamente.
+
+| # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
+|---|---------------|-----------|---------|---------------------|
+| 4.1.1 | Dashboard de Iniciativas (Coordenador) | Painel do coordenador para acompanhar seus projetos contratados | Coordenador | Art. 3, II; Art. 3, 3 |
+| 4.1.2 | Dashboard de Iniciativas (FAPES) | Painel da agencia para monitorar todas as iniciativas contratadas | Analista da Area Tecnica da Agencia | Art. 3, II; Art. 3, 3 |
+| 4.1.3 | Dashboard de Iniciativas (SECONT) | Painel de fiscalizacao para acompanhamento externo das iniciativas | SECONT | Art. 3, 3; Art. 15, III |
+
+## 4.2 Gestao de Resultados
+
+Gestao dos resultados esperados e entregues pelo projeto: solicitacao de mudancas, submissao de relatorios tecnicos, analise pela agencia e contestacao pelo coordenador.
+
+| # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
+|---|---------------|-----------|---------|---------------------|
+| 4.2.1 | Solicitar Mudancas de Resultados | Coordenador solicita alteracao nos resultados esperados da iniciativa, registrando a justificativa e os novos valores propostos | Coordenador | — |
+| 4.2.2 | Aprovar Mudancas de Resultados | Analista da area tecnica avalia a solicitacao com visibilidade comparativa entre a linha base (resultados prometidos na proposta original), os valores solicitados pelo coordenador e os resultados ja entregues, decidindo pela aprovacao ou rejeicao | Analista da Area Tecnica da Agencia | — |
+| 4.2.3 | Submissao dos Resultados | Coordenador submete relatorios tecnicos para apreciacao | Coordenador | Art. 12, 2; Art. 18 |
+| 4.2.4 | Analisar Resultados | Agencia avalia relatorios tecnicos e prestacao de contas | Analista da Area Tecnica da Agencia | Art. 12, 2; Art. 18; Art. 15, III |
+| 4.2.5 | Contestar Prestacao de Contas | Coordenador contesta parecer da prestacao de contas | Coordenador | — |
+
+## 4.3 Gestao Orcamentaria do Projeto
+
+Controle orcamentario do projeto em execucao: adicoes orcamentarias, inclusao de rubricas de despesa e remanejamento de recursos entre rubricas.
+
+| # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
+|---|---------------|-----------|---------|---------------------|
+| 4.3.1 | Solicitar Adicao Orcamentaria | Coordenador solicita aumento do orcamento do projeto | Coordenador | Art. 25 e 26 |
+| 4.3.2 | Aprovar Adicao Orcamentaria | Agencia avalia e aprova o acrescimo orcamentario | Analista da Area Tecnica da Agencia | Art. 25 e 26 |
+| 4.3.3 | Cancelar Adicao Orcamentaria | Agencia cancela uma solicitacao de adicao orcamentaria | Analista da Area Tecnica da Agencia | — |
+| 4.3.4 | Solicitar Adicao de Rubrica | Coordenador solicita inclusao de nova rubrica de despesa | Coordenador | — |
+| 4.3.5 | Aprovar Adicao de Rubrica | Agencia avalia e aprova a nova rubrica | Analista da Area Tecnica da Agencia | — |
+| 4.3.6 | Remanejamento Orcamentario | Coordenador solicita transferencia de recursos entre rubricas | Coordenador | Art. 25 e 26 |
+| 4.3.7 | Aprovar Remanejamento | Agencia avalia e aprova o remanejamento solicitado; a aprovacao e automatica quando o remanejamento ocorre entre subrubricas dentro da mesma rubrica, dispensando analise manual | Analista da Area Tecnica da Agencia | — |
+| 4.3.8 | Visualizar Remanejamento | Consultar historico de remanejamentos do projeto | Analista da Area Tecnica da Agencia | — |
+| 4.3.9 | Remanejar Bolsa | Coordenador transfere bolsa entre participantes do projeto | Coordenador | Art. 3, VII; Art. 14, VIII |
+
+## 4.4 Prestacao de Contas
+
+Fluxo de prestacao de contas do projeto: importacao de extratos bancarios, submissao eletronica pelo coordenador, analise pela agencia, auditoria pela SECONT e contestacao.
+
+| # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
+|---|---------------|-----------|---------|---------------------|
+| 4.4.1 | Leitura do Extrato Bancario | Importar e conferir extrato bancario do projeto | Analista da Area Tecnica da Agencia | Art. 27, II |
+| 4.4.2 | Submeter Prestacao de Contas de Produto | Submissao composta pelo documento fiscal (nota fiscal) e pelos orcamentos que embasaram a aquisicao; o sistema valida o XML da nota fiscal junto ao SERPRO e rejeita o documento caso a nota ja tenha sido utilizada neste ou em qualquer outro projeto — cada nota fiscal so pode ser vinculada a um unico projeto e registrada uma unica vez | Coordenador | Art. 27, II; Art. 3, 1 |
+| 4.4.3 | Submeter Prestacao de Contas de Servico | Submissao composta pelo documento fiscal (nota fiscal de servico ou recibo) e pelos orcamentos que embasaram a contratacao | Coordenador | Art. 27, II; Art. 3, 1 |
+| 4.4.4 | Submeter Prestacao de Contas de Diarias | Submissao composta pela autorizacao de diaria e pelos comprovantes de hospedagem e alimentacao | Coordenador | Art. 27, II; Art. 3, 1 |
+| 4.4.5 | Submeter Prestacao de Contas de Passagens Aereas | Submissao composta pelo bilhete aereo, comprovante de embarque e pelos orcamentos que embasaram a aquisicao da passagem | Coordenador | Art. 27, II; Art. 3, 1 |
+| 4.4.6 | Analisar Documentacao da Prestacao de Contas | Analista verifica documentacao tecnica e financeira | Analista da Area Tecnica da Agencia | Art. 15, III |
+| 4.4.7 | Recusar Prestacao de Contas | Analista recusa a prestacao de contas informando o motivo da recusa; o coordenador e notificado e pode solicitar nova avaliacao apos correcao | Analista da Area Tecnica da Agencia | Art. 15, III |
+| 4.4.8 | Solicitar Reavaliacao da Prestacao de Contas | Coordenador corrige as pendencias apontadas e solicita nova rodada de analise da prestacao de contas recusada | Coordenador | Art. 27, II |
+| 4.4.9 | Auditar Prestacao de Contas | SECONT fiscaliza e audita as prestacoes de contas | SECONT | Art. 15, III; Art. 27, II |
+| 4.4.10 | Contestar Prestacao de Contas | Coordenador contesta parecer da analise | Coordenador | — |
+
+## 4.5 Gestao de Bolsistas de Equipe
+
+Gestao dos bolsistas e membros da equipe do projeto: ciclo de vida das bolsas (solicitacao, submissao de documentos, aprovacao, cancelamento e suspensao), inclusao e remocao de voluntarios e designacao do gestor responsavel.
+
+A solicitacao de bolsa e um processo em duas etapas: (1) o coordenador inicia a solicitacao e (2) o bolsista envia a documentacao dentro do prazo definido. A solicitacao somente e concluida apos o envio da documentacao. A competencia do pagamento e determinada pelo momento do envio: documentacao enviada dentro do prazo e aprovada para o mes corrente; enviada fora do prazo, e aprovada para o mes seguinte.
+
+**Implementado por:** [M009 — Gestao Bolsa Pesquisa](../../modules/M009-gestao-bolsa-pesquisa/README.md)
+
+| # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
+|---|---------------|-----------|---------|---------------------|
+| 4.5.1 | Solicitar Bolsa | Coordenador inicia a solicitacao de bolsa para um participante do projeto, informando obrigatoriamente: o papel que ele exercera no projeto e a entrega do projeto a qual sua atuacao esta relacionada; o bolsista possui uma secao dedicada ao seu plano de trabalho (4.5.9); a solicitacao so e concluida apos o bolsista enviar a documentacao (4.5.2) | Coordenador | Art. 4; Art. 3, VII |
+| 4.5.2 | Submissao de Documentos da Bolsa | Bolsista envia documentacao para habilitacao dentro do prazo definido; se enviada no prazo, a bolsa e aprovada para o mes corrente; se fora do prazo, aprovada para o mes seguinte | Bolsista | Art. 4, 1 |
+| 4.5.3 | Aprovar Solicitacao de Bolsa e Documentos | Agencia analisa e aprova a solicitacao e documentos | Analista da Area Tecnica da Agencia | — |
+| 4.5.4 | Cancelar Solicitacao de Bolsa | Coordenador cancela uma solicitacao de bolsa | Coordenador | Art. 3, VII; Art. 15, III |
+| 4.5.5 | Suspender Solicitacao de Bolsa | Coordenador suspende temporariamente uma bolsa ativa | Coordenador | Art. 3, VII; Art. 6, par. unico |
+| 4.5.6 | Visualizar Remanejamento de Bolsa | Consultar historico de remanejamentos de bolsas | Analista da Area Tecnica da Agencia | — |
+| 4.5.7 | Gerir Voluntario | Incluir, alterar ou remover voluntarios do projeto | Coordenador | — |
+| 4.5.8 | Gerir Gestor do Projeto (Coordenador Adjunto) | Designar ou alterar o Coordenador Adjunto do projeto, responsavel por apoiar e substituir o coordenador principal na gestao das atividades | Coordenador | — |
+| 4.5.9 | Plano de Trabalho do Bolsista | Secao dedicada ao plano de trabalho do bolsista, contendo as atividades previstas, cronograma de execucao, papel no projeto e entregas relacionadas; vinculado a solicitacao de bolsa (4.5.1) | Coordenador, Bolsista | Art. 4, 1 |
+
+## 4.7 Suspensao e Finalizacao de Projetos
+
+Fluxos administrativos para suspensao temporaria ou encerramento definitivo de projetos em execucao, com aprovacao da agencia e prestacao de contas final.
+
+| # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
+|---|---------------|-----------|---------|---------------------|
+| 4.7.1 | Solicitar Suspensao de Projeto | Solicitar a suspensao temporaria de um projeto em execucao | Coordenador, Analista da Area Tecnica da Agencia | Art. 3, II; Art. 6, par. unico |
+| 4.7.2 | Aprovar Suspensao | Agencia avalia e aprova a suspensao solicitada | Analista da Area Tecnica da Agencia | — |
+| 4.7.3 | Suspender Projeto | Efetivar a suspensao do projeto, interrompendo atividades | Analista da Area Tecnica da Agencia | — |
+| 4.7.4 | Solicitar Finalizacao de Projeto | Solicitar o encerramento formal de um projeto | Coordenador, Analista da Area Tecnica da Agencia | — |
+| 4.7.5 | Aprovar Finalizacao | Agencia avalia e aprova o encerramento | Analista da Area Tecnica da Agencia | — |
+| 4.7.6 | Finalizar Projeto | Efetivar o encerramento do projeto com prestacao de contas final | Analista da Area Tecnica da Agencia | — |
