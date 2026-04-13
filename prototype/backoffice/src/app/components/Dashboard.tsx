@@ -1,0 +1,1498 @@
+import React, { useState } from 'react';
+import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, FileEdit } from 'lucide-react';
+import { toast } from 'sonner';
+import logoSmall from 'figma:asset/db135b6708f6cc7f72f27c6a31dd02aa5500d030.png';
+import logoFull from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
+import { Editais } from './Editais';
+import { EditaisLight } from './EditaisLight';
+import { Programa } from './Programa';
+import { Parceria } from './Parceria';
+
+interface DashboardProps {
+  onLogout: () => void;
+}
+
+type Theme = 'light' | 'dark' | 'auto';
+type Contrast = 'normal' | 'high' | 'maximum';
+type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
+type Language = 'pt' | 'en' | 'es';
+type NotificationTab = 'avisos' | 'editais';
+type ActivePage = 'home' | 'dashboard' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'detalhes' | 'editais' | 'editais-light' | 'programa' | 'parceria' | 'formulario';
+type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado';
+type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
+type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outro Exemplo de Projeto' | 'Mais um Exemplo de Projeto';
+
+interface PagamentoCard {
+  id: number;
+  tipo: 'Boleto' | 'Pix';
+  valor: string;
+  data: string;
+  cnpj: string;
+  projeto: string;
+  status: StatusFilter;
+}
+
+export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
+  const [showAccessibilityModal, setShowAccessibilityModal] = useState(false);
+  const [showNotificationsSidebar, setShowNotificationsSidebar] = useState(false);
+  const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const [activePage, setActivePage] = useState<ActivePage>('home');
+  const [selectedPagamento, setSelectedPagamento] = useState<PagamentoCard | null>(null);
+  
+  const [theme, setTheme] = useState<Theme>('dark');
+  const [contrast, setContrast] = useState<Contrast>('normal');
+  const [fontSize, setFontSize] = useState<FontSize>('medium');
+  const [language, setLanguage] = useState<Language>('pt');
+  const [notificationTab, setNotificationTab] = useState<NotificationTab>('avisos');
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [focusIndicators, setFocusIndicators] = useState(false);
+  const [screenReaderOptimized, setScreenReaderOptimized] = useState(false);
+  
+  // Filtros da página Financeira
+  const [searchTerm, setSearchTerm] = useState('');
+  const [dateFilter, setDateFilter] = useState('Todos');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('Em Validação');
+  const [categoriaFilter, setCategoriaFilter] = useState<CategoriaFilter>('Todos');
+  const [projetoFilter, setProjetoFilter] = useState<ProjetoFilter>('Todos');
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [showCategoriaDropdown, setShowCategoriaDropdown] = useState(false);
+  const [showProjetoDropdown, setShowProjetoDropdown] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  // Estado para observação
+  const [observacao, setObservacao] = useState('');
+  const maxObservacaoLength = 500;
+  
+  // Estados para avaliação
+  const [statusAvaliacao, setStatusAvaliacao] = useState<'validado' | 'revisar' | 'reprovado' | null>(null);
+  const [motivoRevisao, setMotivoRevisao] = useState('');
+  const [justificativa, setJustificativa] = useState('');
+  const [showMotivoDropdown, setShowMotivoDropdown] = useState(false);
+  const [showConfirmacaoModal, setShowConfirmacaoModal] = useState(false);
+  const [showCadastrarMotivoModal, setShowCadastrarMotivoModal] = useState(false);
+  const [novoMotivo, setNovoMotivo] = useState('');
+  const maxNovoMotivoLength = 50;
+  
+  // Estados para seleção em lote
+  const [selectedPagamentos, setSelectedPagamentos] = useState<number[]>([]);
+  const [showValidarLoteModal, setShowValidarLoteModal] = useState(false);
+
+  const languageNames = {
+    pt: 'Português',
+    en: 'Inglês',
+    es: 'Espanhol'
+  };
+
+  /* ── Design tokens derivados do tema ─────────────────────────── */
+  const isLight = theme === 'light';
+  const T = {
+    bgPage:           isLight ? '#f1f5f9'                 : '#0f172b',
+    bgSidebar:        isLight ? '#ffffff'                 : 'rgba(30, 41, 59, 0.95)',
+    sidebarBorder:    isLight ? '#e2e8f0'                 : 'rgba(255, 255, 255, 0.1)',
+    bgHeader:         isLight ? 'rgba(255,255,255,0.92)'  : 'rgba(30, 41, 59, 0.8)',
+    headerBorder:     isLight ? '#e2e8f0'                 : 'rgba(255, 255, 255, 0.1)',
+    iconColor:        isLight ? '#475569'                 : '#ffffff',
+    textPrimary:      isLight ? '#0f172a'                 : '#ffffff',
+    textSecondary:    isLight ? '#475569'                 : 'rgba(255, 255, 255, 0.7)',
+    textMuted:        isLight ? '#94a3b8'                 : 'rgba(255, 255, 255, 0.5)',
+    toggleBorder:     isLight ? '#e2e8f0'                 : 'rgba(255, 255, 255, 0.2)',
+    menuActiveBg:     isLight ? '#f0fdfa'                 : 'rgba(255, 255, 255, 0.1)',
+    menuActiveText:   '#00c1af',
+    menuInactiveText: isLight ? '#475569'                 : 'rgba(255, 255, 255, 0.7)',
+    dropdownBg:       isLight ? '#ffffff'                 : 'rgba(30, 41, 59, 0.95)',
+    dropdownBorder:   isLight ? '#e2e8f0'                 : 'rgba(255, 255, 255, 0.1)',
+    dropdownText:     isLight ? '#0f172a'                 : '#ffffff',
+    hoverClass:       isLight ? 'hover:bg-black/5'        : 'hover:bg-white/10',
+  } as const;
+
+  const statusOptions: StatusFilter[] = ['Todos', 'Pendente', 'Em Validação', 'Validado', 'Revisar', 'Reprovado'];
+  const categoriaOptions: CategoriaFilter[] = ['Todos', 'Material Permanente', 'Material de Consumo', 'Passagem', 'Diária', 'Pessoa Física', 'Pessoa Jurídica'];
+  const projetoOptions: ProjetoFilter[] = ['Todos', 'Conecta Fapes', 'Outro Exemplo de Projeto', 'Mais um Exemplo de Projeto'];
+
+  // Mock data para os cards de pagamento
+  const pagamentosData: PagamentoCard[] = [
+    { id: 1, tipo: 'Boleto', valor: 'R$ 3.456,70', data: '27/02/2026 - 09:35', cnpj: 'Magazine Luiza', projeto: 'Conecta Fapes', status: 'Em Validação' },
+    { id: 2, tipo: 'Pix', valor: 'R$ 4.567,90', data: '25/02/2026 - 10:05', cnpj: 'Magazine Luiza', projeto: 'Outro Exemplo', status: 'Em Validação' },
+    { id: 3, tipo: 'Pix', valor: 'R$ 789,00', data: '23/02/2026 - 12:50', cnpj: 'Kalunga', projeto: 'Mais um Exemplo', status: 'Em Validação' },
+    { id: 4, tipo: 'Boleto', valor: 'R$ 2.100,00', data: '22/02/2026 - 11:20', cnpj: 'Kalunga', projeto: 'Conecta Fapes', status: 'Em Validação' },
+    { id: 5, tipo: 'Boleto', valor: 'R$ 1.890,50', data: '20/02/2026 - 11:45', cnpj: 'Americanas', projeto: 'Outro Exemplo', status: 'Em Validação' },
+    { id: 6, tipo: 'Boleto', valor: 'R$ 2.345,60', data: '19/02/2026 - 17:25', cnpj: 'Americanas', projeto: 'Mais um Exemplo', status: 'Em Validação' },
+    { id: 7, tipo: 'Pix', valor: 'R$ 567,80', data: '18/02/2026 - 16:45', cnpj: 'Americanas', projeto: 'Conecta Fapes', status: 'Em Validação' },
+    { id: 8, tipo: 'Pix', valor: 'R$ 2.567,30', data: '15/02/2026 - 16:00', cnpj: 'Amazon', projeto: 'Conecta Fapes', status: 'Em Validação' },
+    { id: 9, tipo: 'Pix', valor: 'R$ 5.234,20', data: '14/02/2026 - 08:40', cnpj: 'Amazon', projeto: 'Outro Exemplo', status: 'Em Validação' },
+    { id: 10, tipo: 'Boleto', valor: 'R$ 3.690,00', data: '12/02/2026 - 08:15', cnpj: 'Amazon', projeto: 'Mais um Exemplo', status: 'Em Validação' },
+  ];
+
+  const getStatusColor = (status: StatusFilter): string => {
+    switch (status) {
+      case 'Pendente':
+        return '#f97316'; // orange
+      case 'Em Validação':
+        return '#3b82f6'; // blue
+      case 'Validado':
+        return '#10b981'; // green
+      case 'Revisar':
+        return '#f59e0b'; // amber/yellow
+      case 'Reprovado':
+        return '#ef4444'; // red
+      default:
+        return '#ffffff';
+    }
+  };
+
+  return (
+    <div
+      className="min-h-screen"
+      data-theme={theme === 'auto' ? 'dark' : theme}
+      style={{ backgroundColor: T.bgPage, transition: 'background-color 0.3s' }}
+    >
+      {/* Sidebar */}
+      <aside
+        className="fixed left-0 top-0 bottom-0 z-40 transition-all duration-300 ease-in-out"
+        style={{
+          width: sidebarExpanded ? '240px' : '80px',
+          backgroundColor: T.bgSidebar,
+          borderRight: `1px solid ${T.sidebarBorder}`,
+          transition: 'width 0.3s ease-in-out, background-color 0.3s, border-color 0.3s',
+        }}
+      >
+        <div className="flex h-full flex-col items-center py-6">
+          {/* Logo */}
+          <div className="mb-6">
+            {sidebarExpanded ? (
+              <img src={logoFull} alt="FAPES" className="h-10 w-auto" />
+            ) : (
+              <img src={logoSmall} alt="FAPES" className="h-8 w-auto" />
+            )}
+          </div>
+
+          {/* Toggle Button */}
+          <button
+            onClick={() => setSidebarExpanded(!sidebarExpanded)}
+            className={`flex items-center justify-center rounded-full transition-all duration-200 ${T.hoverClass}`}
+            style={{
+              width: '32px',
+              height: '32px',
+              border: `1px solid ${T.toggleBorder}`,
+              color: T.iconColor,
+              transition: 'color 0.3s, border-color 0.3s',
+            }}
+          >
+            {sidebarExpanded ? (
+              <ChevronLeft size={16} />
+            ) : (
+              <ChevronRight size={16} />
+            )}
+          </button>
+
+          {/* Menu */}
+          <div className={`mt-6 transition-all duration-300 ${sidebarExpanded ? 'w-full px-4' : 'w-auto'}`}>
+            {/* Dashboard */}
+            <button
+              className="flex items-center gap-3 rounded-lg transition-all duration-200"
+              style={{
+                backgroundColor: activePage === 'dashboard' ? T.menuActiveBg : 'transparent',
+                padding: sidebarExpanded ? '12px 16px' : '12px',
+                width: sidebarExpanded ? '100%' : '48px',
+                justifyContent: sidebarExpanded ? 'flex-start' : 'center',
+              }}
+              onClick={() => setActivePage('dashboard')}
+              onMouseEnter={(e) => { if (activePage !== 'dashboard') e.currentTarget.style.backgroundColor = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.07)'; }}
+              onMouseLeave={(e) => { if (activePage !== 'dashboard') e.currentTarget.style.backgroundColor = 'transparent'; }}
+            >
+              <LayoutDashboard
+                size={20}
+                style={{
+                  color: activePage === 'dashboard' ? T.menuActiveText : T.menuInactiveText,
+                  flexShrink: 0,
+                  transition: 'color 0.3s',
+                }}
+              />
+              {sidebarExpanded && (
+                <span
+                  style={{
+                    fontFamily: 'var(--font-family)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    color: activePage === 'dashboard' ? T.menuActiveText : T.menuInactiveText,
+                    transition: 'color 0.3s',
+                  }}
+                >
+                  Dashboard
+                </span>
+              )}
+            </button>
+
+            {/* Espaçamento entre seções */}
+            <div style={{ height: '24px' }} />
+
+            {/* Seção PROJETOS */}
+            {sidebarExpanded && (
+              <h3 
+                className="mb-3 px-2"
+                style={{
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  color: T.textMuted,
+                  letterSpacing: '0.05em',
+                  transition: 'color 0.3s',
+                }}
+              >
+                PROJETOS
+              </h3>
+            )}
+            
+            {/* Itens do menu PROJETOS */}
+            {([
+              { key: 'parceria' as ActivePage, Icon: Handshake, label: 'Parceria' },
+              { key: 'programa' as ActivePage, Icon: FolderOpen, label: 'Programa' },
+              { key: 'editais' as ActivePage, Icon: FileText, label: 'Captação' },
+              { key: 'formulario' as ActivePage, Icon: BookOpen, label: 'Formulário' },
+            ]).map(({ key, Icon, label }, index) => {
+              const active = activePage === key;
+              return (
+                <button
+                  key={key}
+                  className={`flex items-center gap-3 rounded-lg transition-all duration-200 ${index > 0 ? 'mt-2' : ''}`}
+                  style={{
+                    backgroundColor: active ? T.menuActiveBg : 'transparent',
+                    padding: sidebarExpanded ? '12px 16px' : '12px',
+                    width: sidebarExpanded ? '100%' : '48px',
+                    justifyContent: sidebarExpanded ? 'flex-start' : 'center',
+                  }}
+                  onClick={() => setActivePage(key)}
+                  onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.07)'; }}
+                  onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                >
+                  <Icon
+                    size={20}
+                    style={{
+                      color: active ? T.menuActiveText : T.menuInactiveText,
+                      flexShrink: 0,
+                      transition: 'color 0.3s',
+                    }}
+                  />
+                  {sidebarExpanded && (
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        color: active ? T.menuActiveText : T.menuInactiveText,
+                        transition: 'color 0.3s',
+                      }}
+                    >
+                      {label}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+            
+            {/* Espaçamento entre seções */}
+            <div style={{ height: '24px' }} />
+            
+            {/* Seção BOLSAS */}
+            {sidebarExpanded && (
+              <h3 
+                className="mb-3 px-2"
+                style={{
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  color: T.textMuted,
+                  letterSpacing: '0.05em',
+                  transition: 'color 0.3s',
+                }}
+              >
+                BOLSAS
+              </h3>
+            )}
+            
+            {/* Pagamento */}
+            <button
+              className="flex items-center gap-3 rounded-lg transition-all duration-200"
+              style={{
+                backgroundColor: activePage === 'pagamento' ? T.menuActiveBg : 'transparent',
+                padding: sidebarExpanded ? '12px 16px' : '12px',
+                width: sidebarExpanded ? '100%' : '48px',
+                justifyContent: sidebarExpanded ? 'flex-start' : 'center',
+              }}
+              onClick={() => setActivePage('pagamento')}
+              onMouseEnter={(e) => { if (activePage !== 'pagamento') e.currentTarget.style.backgroundColor = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.07)'; }}
+              onMouseLeave={(e) => { if (activePage !== 'pagamento') e.currentTarget.style.backgroundColor = 'transparent'; }}
+            >
+              <CreditCard 
+                size={20} 
+                style={{ 
+                  color: activePage === 'pagamento' ? T.menuActiveText : T.menuInactiveText,
+                  flexShrink: 0,
+                  transition: 'color 0.3s',
+                }} 
+              />
+              {sidebarExpanded && (
+                <span
+                  style={{
+                    fontFamily: 'var(--font-family)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    color: activePage === 'pagamento' ? T.menuActiveText : T.menuInactiveText,
+                    transition: 'color 0.3s',
+                  }}
+                >
+                  Pagamento
+                </span>
+              )}
+            </button>
+
+            {/* Espaçamento entre seções */}
+            <div style={{ height: '24px' }} />
+            
+            {/* Seção PRESTAÇÃO DE CONTAS */}
+            {sidebarExpanded && (
+              <h3 
+                className="mb-3 px-2"
+                style={{
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  color: T.textMuted,
+                  letterSpacing: '0.05em',
+                  transition: 'color 0.3s',
+                }}
+              >
+                PRESTAÇÃO DE CONTAS
+              </h3>
+            )}
+            
+            {/* Itens do menu PRESTAÇÃO DE CONTAS */}
+            {([
+              { key: 'financeira' as ActivePage, Icon: DollarSign, label: 'Financeira' },
+              { key: 'tecnica' as ActivePage, Icon: ClipboardCheck, label: 'Técnica' },
+              { key: 'remanejamento' as ActivePage, Icon: FileEdit, label: 'Remanejamento' },
+            ]).map(({ key, Icon, label }, index) => {
+              const active = activePage === key;
+              return (
+                <button
+                  key={key}
+                  className={`flex items-center gap-3 rounded-lg transition-all duration-200 ${index > 0 ? 'mt-2' : ''}`}
+                  style={{
+                    backgroundColor: active ? T.menuActiveBg : 'transparent',
+                    padding: sidebarExpanded ? '12px 16px' : '12px',
+                    width: sidebarExpanded ? '100%' : '48px',
+                    justifyContent: sidebarExpanded ? 'flex-start' : 'center',
+                  }}
+                  onClick={() => setActivePage(key)}
+                  onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.07)'; }}
+                  onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                >
+                  <Icon
+                    size={20}
+                    style={{
+                      color: active ? T.menuActiveText : T.menuInactiveText,
+                      flexShrink: 0,
+                      transition: 'color 0.3s',
+                    }}
+                  />
+                  {sidebarExpanded && (
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        color: active ? T.menuActiveText : T.menuInactiveText,
+                        transition: 'color 0.3s',
+                      }}
+                    >
+                      {label}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </aside>
+
+      {/* Header */}
+      <header 
+        className="fixed top-0 right-0 z-50 h-16 transition-all duration-300"
+        style={{
+          left: sidebarExpanded ? '240px' : '80px',
+          backgroundColor: T.bgHeader,
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: `1px solid ${T.headerBorder}`,
+          transition: 'left 0.3s ease-in-out, background-color 0.3s, border-color 0.3s',
+        }}
+      >
+        <div className="flex items-center justify-end gap-1 h-16 px-4 md:px-8">
+
+          {/* Ícone de Notificações */}
+          <button 
+            onClick={() => setShowNotificationsSidebar(true)}
+            className={`relative p-2 transition-colors rounded-lg ${T.hoverClass}`}
+            style={{ color: T.iconColor }}
+          >
+            <Bell size={20} />
+            <span 
+              className="absolute top-1 right-1 flex size-2 items-center justify-center rounded-full"
+              style={{ backgroundColor: '#ef4444' }}
+            />
+          </button>
+
+          {/* Ícone de Idioma */}
+          <div className="relative">
+            <button 
+              onClick={() => {
+                setShowLanguageDropdown(!showLanguageDropdown);
+                setShowUserDropdown(false);
+              }}
+              className={`p-2 transition-colors rounded-lg ${T.hoverClass}`}
+              style={{ color: T.iconColor }}
+            >
+              <Globe size={20} />
+            </button>
+            
+            {/* Dropdown de Idioma */}
+            {showLanguageDropdown && (
+              <div 
+                className="absolute right-0 top-12 w-48 rounded-xl shadow-lg overflow-hidden"
+                style={{
+                  backgroundColor: T.dropdownBg,
+                  border: `1px solid ${T.dropdownBorder}`,
+                  boxShadow: isLight
+                    ? '0 8px 24px rgba(0,0,0,0.12)'
+                    : '0 8px 24px rgba(0,0,0,0.4)',
+                }}
+              >
+                {(['pt', 'en', 'es'] as Language[]).map((lang) => (
+                  <button
+                    key={lang}
+                    onClick={() => {
+                      setLanguage(lang);
+                      setShowLanguageDropdown(false);
+                    }}
+                    className={`flex w-full items-center justify-between px-4 py-3 transition-colors ${T.hoverClass}`}
+                    style={{
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-sm)',
+                      color: T.dropdownText,
+                    }}
+                  >
+                    <span>{languageNames[lang]}</span>
+                    {language === lang && (
+                      <div className="size-2 rounded-full" style={{ backgroundColor: '#00c1af' }} />
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Ícone de Usuário */}
+          <div className="relative">
+            <button 
+              onClick={() => {
+                setShowUserDropdown(!showUserDropdown);
+                setShowLanguageDropdown(false);
+              }}
+              className={`p-2 transition-colors rounded-lg ${T.hoverClass}`}
+              style={{ color: T.iconColor }}
+            >
+              <User size={20} />
+            </button>
+            
+            {/* Dropdown de Usuário */}
+            {showUserDropdown && (
+              <div 
+                className="absolute right-0 top-12 w-36 rounded-xl shadow-lg overflow-hidden"
+                style={{
+                  backgroundColor: T.dropdownBg,
+                  border: `1px solid ${T.dropdownBorder}`,
+                  boxShadow: isLight
+                    ? '0 8px 24px rgba(0,0,0,0.12)'
+                    : '0 8px 24px rgba(0,0,0,0.4)',
+                }}
+              >
+                <button
+                  onClick={onLogout}
+                  className={`w-full px-4 py-3 text-left transition-colors ${T.hoverClass}`}
+                  style={{
+                    fontFamily: 'var(--font-family)',
+                    fontSize: 'var(--text-sm)',
+                    color: T.dropdownText,
+                  }}
+                >
+                  Sair
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Modal de Acessibilidade */}
+      {showAccessibilityModal && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0"
+            style={{ zIndex: 9998, backgroundColor: 'rgba(0,0,0,0.5)' }}
+            onClick={() => setShowAccessibilityModal(false)}
+          />
+          {/* Drawer lateral direito */}
+          <div className="fixed right-0 top-0 bottom-0 flex flex-col"
+            style={{ zIndex: 9999, width: '300px', backgroundColor: T.bgSidebar, borderLeft: `1px solid ${T.sidebarBorder}`, boxShadow: '-8px 0 32px rgba(0,0,0,0.25)', transition: 'background-color 0.3s' }}>
+            {/* Header */}
+            <div className="flex items-center justify-between flex-shrink-0"
+              style={{ padding: '24px 20px 20px', borderBottom: `1px solid ${T.sidebarBorder}` }}>
+              <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-bold)', color: T.textPrimary, letterSpacing: '0.1em', margin: 0 }}>ACESSIBILIDADE</h2>
+              <button onClick={() => setShowAccessibilityModal(false)}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '6px', border: 'none', backgroundColor: 'var(--dash-badge-bg)', color: T.textMuted, cursor: 'pointer', transition: 'background-color 0.15s' }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--dash-hover-bg)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--dash-badge-bg)'; }}>
+                <X size={15} />
+              </button>
+            </div>
+
+            {/* Scrollable body */}
+            <div className="flex-1 overflow-y-auto" style={{ padding: '20px' }}>
+
+              {/* TEMA */}
+              <div style={{ marginBottom: '24px' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: T.textMuted, letterSpacing: '0.1em', marginBottom: '10px' }}>TEMA</p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                  {([
+                    { key: 'light' as Theme, Icon: Sun,     label: 'Claro'  },
+                    { key: 'dark'  as Theme, Icon: Moon,    label: 'Escuro' },
+                    { key: 'auto'  as Theme, Icon: Monitor, label: 'Auto'   },
+                  ]).map(({ key, Icon, label }) => {
+                    const active = theme === key;
+                    return (
+                      <button key={key} onClick={() => setTheme(key)}
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '14px 8px', borderRadius: '10px', border: active ? '1.5px solid #00c1af' : `1px solid ${T.toggleBorder}`, backgroundColor: active ? '#00c1af' : 'var(--dash-badge-bg)', cursor: 'pointer', transition: 'all 0.15s' }}
+                        onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'var(--dash-hover-bg)'; }}
+                        onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'var(--dash-badge-bg)'; }}>
+                        <Icon size={20} style={{ color: active ? '#0f172b' : T.iconColor }} />
+                        <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: active ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', color: active ? '#0f172b' : T.textPrimary }}>{label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* CONTRASTE */}
+              <div style={{ marginBottom: '24px' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: T.textMuted, letterSpacing: '0.1em', marginBottom: '10px' }}>CONTRASTE</p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                  {([
+                    { key: 'normal'  as Contrast, label: 'Normal' },
+                    { key: 'high'    as Contrast, label: 'Alto'   },
+                    { key: 'maximum' as Contrast, label: 'Máximo' },
+                  ]).map(({ key, label }) => {
+                    const active = contrast === key;
+                    return (
+                      <button key={key} onClick={() => setContrast(key)}
+                        style={{ padding: '12px 8px', borderRadius: '10px', textAlign: 'center', border: active ? '1.5px solid #00c1af' : `1px solid ${T.toggleBorder}`, backgroundColor: active ? '#00c1af' : 'var(--dash-badge-bg)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: active ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', color: active ? '#0f172b' : T.textPrimary, cursor: 'pointer', transition: 'all 0.15s' }}
+                        onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'var(--dash-hover-bg)'; }}
+                        onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'var(--dash-badge-bg)'; }}>
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* TAMANHO DA FONTE */}
+              <div style={{ marginBottom: '24px' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: T.textMuted, letterSpacing: '0.1em', marginBottom: '10px' }}>TAMANHO DA FONTE</p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+                  {([
+                    { key: 'small'  as FontSize, fs: '13px' },
+                    { key: 'medium' as FontSize, fs: '17px' },
+                    { key: 'large'  as FontSize, fs: '21px' },
+                    { key: 'xlarge' as FontSize, fs: '26px' },
+                  ]).map(({ key, fs }) => {
+                    const active = fontSize === key;
+                    return (
+                      <button key={key} onClick={() => setFontSize(key)}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '52px', borderRadius: '10px', border: active ? '1.5px solid #00c1af' : `1px solid ${T.toggleBorder}`, backgroundColor: active ? '#00c1af' : 'var(--dash-badge-bg)', fontFamily: 'var(--font-family)', fontSize: fs, fontWeight: 'var(--font-weight-semibold)', color: active ? '#0f172b' : T.textPrimary, cursor: 'pointer', transition: 'all 0.15s' }}
+                        onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'var(--dash-hover-bg)'; }}
+                        onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'var(--dash-badge-bg)'; }}>
+                        A
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* OPÇÕES ADICIONAIS */}
+              <div style={{ marginBottom: '8px' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: T.textMuted, letterSpacing: '0.1em', marginBottom: '12px' }}>OPÇÕES ADICIONAIS</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  {([
+                    { checked: reduceMotion,         onChange: setReduceMotion,         title: 'Reduzir Movimento',           desc: 'Minimiza animações e transições'             },
+                    { checked: focusIndicators,       onChange: setFocusIndicators,       title: 'Indicadores de Foco',          desc: 'Destaca elementos focados'                   },
+                    { checked: screenReaderOptimized, onChange: setScreenReaderOptimized, title: 'Otimizar para Leitor de Tela', desc: 'Melhora compatibilidade com leitores de tela' },
+                  ] as { checked: boolean; onChange: (v: boolean) => void; title: string; desc: string }[]).map((opt, idx) => (
+                    <label key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
+                      <div onClick={() => opt.onChange(!opt.checked)}
+                        style={{ flexShrink: 0, marginTop: '2px', width: '18px', height: '18px', borderRadius: '4px', border: opt.checked ? '1.5px solid #00c1af' : `1.5px solid ${T.toggleBorder}`, backgroundColor: opt.checked ? '#00c1af' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s', cursor: 'pointer' }}>
+                        {opt.checked && (<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>)}
+                      </div>
+                      <div>
+                        <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: T.textPrimary, margin: '0 0 3px' }}>{opt.title}</p>
+                        <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, margin: 0 }}>{opt.desc}</p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Footer: Restaurar Padrões */}
+            <div style={{ padding: '16px 20px', borderTop: `1px solid ${T.sidebarBorder}`, flexShrink: 0 }}>
+              <button
+                onClick={() => { setTheme('dark'); setContrast('normal'); setFontSize('medium'); setReduceMotion(false); setFocusIndicators(false); setScreenReaderOptimized(false); }}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid rgba(0,193,175,0.35)', backgroundColor: 'rgba(0,193,175,0.06)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#00c1af', cursor: 'pointer', transition: 'all 0.15s' }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.12)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.06)'; }}>
+                <RotateCcw size={15} />
+                Restaurar Padrões
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Sidebar de Notificações */}
+      {showNotificationsSidebar && (
+        <>
+          {/* Overlay */}
+          <div 
+            className="fixed inset-0 z-40 bg-black/50"
+            onClick={() => setShowNotificationsSidebar(false)}
+          />
+          
+          {/* Sidebar */}
+          <div
+            className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md overflow-y-auto"
+            style={{ backgroundColor: T.bgSidebar, borderLeft: `1px solid ${T.sidebarBorder}`, transition: 'background-color 0.3s' }}
+          >
+            <div className="p-6">
+              {/* Header */}
+              <div className="mb-6 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xl)', fontWeight: 'var(--font-weight-bold)', color: T.textPrimary }}>Notificações</h2>
+                  <span className="rounded-full px-3 py-1" style={{ backgroundColor: '#00c1af', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#0f172b' }}>3 Novas</span>
+                </div>
+                <button onClick={() => setShowNotificationsSidebar(false)} className={`p-2 transition-colors ${T.hoverClass} rounded-lg`} style={{ color: T.iconColor }}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Search */}
+              <div className="mb-6 relative">
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--dash-icon-subdued)' }} />
+                <input type="text" placeholder="Pesquisar notificações..." className="w-full rounded-lg py-3 pl-10 pr-4"
+                  style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
+              </div>
+
+              {/* Tabs */}
+              <div className="mb-6 flex gap-2">
+                {(['avisos', 'editais'] as NotificationTab[]).map((tab) => (
+                  <button key={tab} onClick={() => setNotificationTab(tab)} className="rounded-lg px-4 py-2 transition-all"
+                    style={{ backgroundColor: notificationTab === tab ? '#00c1af' : 'var(--dash-badge-bg)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: notificationTab === tab ? '#0f172b' : 'var(--dash-text-primary)' }}>
+                    {tab === 'avisos' ? 'Avisos (1)' : 'Editais (2)'}
+                  </button>
+                ))}
+              </div>
+
+              {/* Notificações */}
+              <div className="space-y-4">
+                {notificationTab === 'avisos' ? (
+                  <>
+                    {([
+                      { Icon: CheckCircle,   iconColor: '#10b981', title: 'Pagamento do mês de janeiro foi processado', desc: 'Mantenha o seu cadastro sempre atualizado!' },
+                      { Icon: AlertTriangle, iconColor: '#f59e0b', title: 'Atualize seus documentos', desc: 'O envio do Diploma de Nível Superior está Pendente.' },
+                      { Icon: AlertCircle,   iconColor: '#ef4444', title: 'Manutenção Programada', desc: 'O sistema ficará indisponível nesta sexta-feira das 00:00 às 06:00 para atualizações de segurança.' },
+                    ] as { Icon: React.ElementType; iconColor: string; title: string; desc: string }[]).map(({ Icon, iconColor, title, desc }) => (
+                      <div key={title} className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
+                        <div className="mb-2 flex items-start gap-3">
+                          <Icon size={20} style={{ color: iconColor, flexShrink: 0, marginTop: '2px' }} />
+                          <div>
+                            <h3 className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>{title}</h3>
+                            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }}>{desc}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    {[
+                      { mes: 'FEV', dia: '20', title: 'Inscrições Edital 04/2026',  desc: 'Data limite para submissão de propostas de inovação.' },
+                      { mes: 'MAR', dia: '15', title: 'Resultado Edital 27/2025',   desc: 'Divulgação dos projetos aprovados para apoio à publicação.' },
+                    ].map(({ mes, dia, title, desc }) => (
+                      <div key={title} className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
+                        <div className="mb-3 flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="text-center">
+                              <div style={{ fontFamily: 'var(--font-family)', fontSize: '10px', fontWeight: 'var(--font-weight-medium)', color: '#00c1af' }}>{mes}</div>
+                              <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-weight-bold)', color: '#00c1af' }}>{dia}</div>
+                            </div>
+                            <div>
+                              <h3 className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>{title}</h3>
+                              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }}>{desc}</p>
+                            </div>
+                          </div>
+                          <div className="size-2 rounded-full" style={{ backgroundColor: '#00c1af', flexShrink: 0 }} />
+                        </div>
+                        <button style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#00c1af' }}>Ver Edital →</button>
+                      </div>
+                    ))}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Conteúdo Principal */}
+      <div 
+        className="pt-16 transition-all duration-300 ease-in-out" 
+        style={{
+          marginLeft: sidebarExpanded ? '240px' : '80px',
+          minHeight: '100vh',
+          backgroundColor: T.bgPage,
+          transition: 'margin-left 0.3s ease-in-out, background-color 0.3s',
+        }}
+      >
+        {activePage === 'financeira' ? (
+          <div className="pt-8 px-8 pb-1">
+            {/* Título e Subtítulo */}
+            <div className="mb-6">
+              <div className="flex items-start gap-3">
+                {/* Ícone em quadrado */}
+                <div 
+                  className="flex items-center justify-center flex-shrink-0"
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                    borderRadius: 'var(--radius)'
+                  }}
+                >
+                  <DollarSign 
+                    size={20} 
+                    className="text-teal-500"
+                  />
+                </div>
+                
+                {/* Texto do título e subtítulo */}
+                <div className="flex-1" style={{ marginTop: '6px' }}>
+                  <h1 
+                    className="mb-3"
+                    style={{ 
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-md)',
+                      fontWeight: 'var(--font-weight-normal)',
+                      color: 'var(--dash-text-primary)',
+                      lineHeight: '1.5'
+                    }}
+                  >
+                    Prestação de Contas Financeira
+                  </h1>
+                  
+                  <p 
+                    style={{ 
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-sm)',
+                      color: 'var(--dash-text-secondary)',
+                      lineHeight: '1.5'
+                    }}
+                  >
+                    Acompanhe a comprovação dos gastos dos projetos
+                  </p>
+                </div>
+              </div>
+              
+              {/* Divider */}
+              <div 
+                className="mt-6"
+                style={{ 
+                  width: '100%',
+                  height: '1px',
+                  backgroundColor: 'var(--dash-divider)'
+                }}
+              />
+            </div>
+
+            {/* Cards de Estatísticas */}
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              {[
+                { label: 'Projetos Ativos', value: '12', Icon: FolderOpen, iconColor: '#14b8a6', iconBg: 'rgba(20,184,166,0.12)' },
+                { label: 'Pendente',         value: '8',  Icon: Clock,       iconColor: '#fbbf24', iconBg: 'rgba(251,191,36,0.12)' },
+                { label: 'Em Validação',     value: '5',  Icon: Eye,         iconColor: '#3b82f6', iconBg: 'rgba(59,130,246,0.12)'  },
+                { label: 'Revisão',          value: '3',  Icon: AlertTriangle,iconColor: '#ef4444', iconBg: 'rgba(239,68,68,0.12)'  },
+              ].map(({ label, value, Icon, iconColor, iconBg }) => (
+                <div
+                  key={label}
+                  className="rounded-lg p-4"
+                  style={{
+                    backgroundColor: 'var(--dash-card-bg)',
+                    border: '1px solid var(--dash-card-border)',
+                    boxShadow: 'var(--dash-shadow)',
+                    transition: 'background-color 0.3s, border-color 0.3s',
+                  }}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div
+                      className="flex items-center justify-center flex-shrink-0"
+                      style={{ width: '40px', height: '40px', backgroundColor: iconBg, borderRadius: 'var(--radius)' }}
+                    >
+                      <Icon size={20} style={{ color: iconColor }} />
+                    </div>
+                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }}>
+                      {label}
+                    </p>
+                  </div>
+                  <p className="text-center" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: 'var(--dash-text-primary)' }}>
+                    {value}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Filtros */}
+            <div className="mb-6">
+              <div className="grid grid-cols-5 gap-4">
+                {/* Campo de Pesquisa + Selecionar Todos */}
+                <div>
+                  <label className="mb-2 block" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>
+                    Pesquisar
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text" placeholder="Buscar"
+                      value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full rounded-lg px-4 py-2 pr-10"
+                      style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }}
+                    />
+                    <Search size={18} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--dash-icon-subdued)' }} />
+                  </div>
+                  <div className="flex items-center gap-3 flex-nowrap mt-5">
+                    <label className="flex items-center gap-2 cursor-pointer flex-shrink-0">
+                      <input
+                        type="checkbox"
+                        checked={selectedPagamentos.length === pagamentosData.length && pagamentosData.length > 0}
+                        onChange={(e) => { if (e.target.checked) { setSelectedPagamentos(pagamentosData.map(p => p.id)); } else { setSelectedPagamentos([]); } }}
+                        className="flex-shrink-0"
+                      />
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', whiteSpace: 'nowrap' }}>
+                        Selecionar todos
+                      </span>
+                    </label>
+                    {selectedPagamentos.length > 0 && (
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', whiteSpace: 'nowrap' }}>
+                        ({selectedPagamentos.length} selecionado{selectedPagamentos.length > 1 ? 's' : ''})
+                      </span>
+                    )}
+                    {selectedPagamentos.length > 0 && (
+                      <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowValidarLoteModal(true); }}
+                        className="px-6 py-2 rounded-lg transition-all ml-auto"
+                        style={{ backgroundColor: '#00c1af', border: '1px solid #00c1af', color: '#0f172b', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
+                        Validar
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Filtros de dropdown genéricos */}
+                {([
+                  { label: 'Projeto',    value: projetoFilter,   options: projetoOptions,   show: showProjetoDropdown,   setShow: setShowProjetoDropdown,   setValue: setProjetoFilter,   others: [setShowDateDropdown, setShowStatusDropdown, setShowCategoriaDropdown] },
+                  { label: 'Data',       value: dateFilter,      options: [] as string[],   show: false,                 setShow: () => {},                 setValue: setDateFilter,      others: [] },
+                  { label: 'Status',     value: statusFilter,    options: statusOptions,    show: showStatusDropdown,    setShow: setShowStatusDropdown,    setValue: setStatusFilter,    others: [setShowDateDropdown, setShowCategoriaDropdown, setShowProjetoDropdown] },
+                  { label: 'Categoria',  value: categoriaFilter, options: categoriaOptions, show: showCategoriaDropdown, setShow: setShowCategoriaDropdown, setValue: setCategoriaFilter, others: [setShowDateDropdown, setShowStatusDropdown, setShowProjetoDropdown] },
+                ] as { label: string; value: string; options: string[]; show: boolean; setShow: (v: boolean) => void; setValue: (v: any) => void; others: ((v: boolean) => void)[] }[]).map(({ label, value, options, show, setShow, setValue, others }) =>
+                  label === 'Data' ? (
+                    <div key={label} className="relative">
+                      <label className="mb-2 block" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>Data</label>
+                      <div className="relative">
+                        <input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)}
+                          className="w-full rounded-lg px-4 py-2 pr-10"
+                          style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', colorScheme: isLight ? 'light' : 'dark' as any, outline: 'none' }} />
+                        <Calendar size={18} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--dash-icon-subdued)', pointerEvents: 'none' }} />
+                      </div>
+                      <style>{`input[type="date"]::-webkit-calendar-picker-indicator { position:absolute;right:0;width:100%;height:100%;opacity:0;cursor:pointer; }`}</style>
+                    </div>
+                  ) : (
+                    <div key={label} className="relative">
+                      <label className="mb-2 block" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>{label}</label>
+                      <button
+                        onClick={() => { setShow(!show); others.forEach(fn => fn(false)); }}
+                        className="flex w-full items-center justify-between rounded-lg px-4 py-2 transition-all"
+                        style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}
+                      >
+                        <span>{value}</span>
+                        <ChevronDown size={18} style={{ color: 'var(--dash-icon-subdued)' }} />
+                      </button>
+                      {show && (
+                        <div className="absolute left-0 top-full mt-1 w-full rounded-lg shadow-lg z-50 overflow-hidden"
+                          style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
+                          {options.map((opt) => (
+                            <button key={opt} onClick={() => { setValue(opt); setShow(false); }}
+                              className={`flex w-full items-center justify-between px-4 py-3 transition-colors ${T.hoverClass} first:rounded-t-lg last:rounded-b-lg`}
+                              style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', textAlign: 'left' }}>
+                              <span style={{ flex: 1, textAlign: 'left', whiteSpace: 'normal', wordBreak: 'break-word' }}>{opt}</span>
+                              {value === opt && <div className="size-2 rounded-full flex-shrink-0 ml-2" style={{ backgroundColor: '#00c1af' }} />}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+
+            {/* Cards de Pagamento */}
+            <div className="space-y-3">
+              {pagamentosData.map((pagamento) => (
+                <div
+                  key={pagamento.id}
+                  className="rounded-lg p-5 transition-colors"
+                  style={{
+                    backgroundColor: 'var(--dash-card-bg)',
+                    border: '1px solid var(--dash-card-border)',
+                    boxShadow: 'var(--dash-shadow)',
+                  }}
+                >
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedPagamentos.includes(pagamento.id)}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        if (selectedPagamentos.includes(pagamento.id)) {
+                          setSelectedPagamentos(selectedPagamentos.filter(id => id !== pagamento.id));
+                        } else {
+                          setSelectedPagamentos([...selectedPagamentos, pagamento.id]);
+                        }
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex-shrink-0"
+                    />
+                    
+                    {/* Conteúdo do Card */}
+                    <div
+                      className="flex items-center gap-6 flex-1 cursor-pointer"
+                      onClick={() => { setSelectedPagamento(pagamento); setActivePage('detalhes'); }}
+                      onMouseEnter={(e) => { (e.currentTarget.parentElement!.parentElement as HTMLElement).style.backgroundColor = isLight ? '#f8fafc' : 'rgba(30,41,59,0.8)'; }}
+                      onMouseLeave={(e) => { (e.currentTarget.parentElement!.parentElement as HTMLElement).style.backgroundColor = 'var(--dash-card-bg)'; }}
+                    >
+                      <div className="grid grid-cols-6 gap-6 flex-1">
+                        {[
+                          { label: 'Projeto',       value: pagamento.projeto, cls: '' },
+                          { label: 'Pagamento',     value: pagamento.tipo,    cls: '' },
+                          { label: 'Valor',         value: pagamento.valor,   cls: '' },
+                          { label: 'Data de Envio', value: pagamento.data,    cls: '' },
+                          { label: 'CNPJ',          value: pagamento.cnpj,    cls: 'pl-6' },
+                        ].map(({ label, value, cls }) => (
+                          <div key={label} className={cls}>
+                            <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)' }}>{label}</div>
+                            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{value}</div>
+                          </div>
+                        ))}
+                        <div className="pl-6">
+                          <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)' }}>Status</div>
+                          <div className="inline-block rounded-full px-3 py-1" style={{ backgroundColor: `${getStatusColor(pagamento.status)}20`, border: `1px solid ${getStatusColor(pagamento.status)}`, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: getStatusColor(pagamento.status) }}>
+                            {pagamento.status}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-center">
+                        <ChevronRight className="w-6 h-6" style={{ color: 'var(--dash-icon-subdued)' }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Paginação */}
+              <div className="flex justify-end mt-10 mb-4">
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1}
+                    className="flex items-center gap-2 px-4 py-2 transition-colors"
+                    style={{ color: currentPage === 1 ? 'var(--dash-text-muted)' : 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}>
+                    <ChevronLeft className="w-4 h-4" /> Anterior
+                  </button>
+                  {[1, 2].map((page) => (
+                    <button key={page} onClick={() => setCurrentPage(page)} className="px-4 py-2 rounded-lg transition-all"
+                      style={{ backgroundColor: currentPage === page ? '#00c1af' : 'var(--dash-badge-bg)', color: currentPage === page ? '#ffffff' : 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: currentPage === page ? 'var(--font-weight-semibold)' : 'var(--font-weight-medium)', minWidth: '40px' }}>
+                      {page}
+                    </button>
+                  ))}
+                  <button onClick={() => setCurrentPage(prev => Math.min(2, prev + 1))} disabled={currentPage === 2}
+                    className="flex items-center gap-2 px-4 py-2 transition-colors"
+                    style={{ color: currentPage === 2 ? 'var(--dash-text-muted)' : 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: currentPage === 2 ? 'not-allowed' : 'pointer' }}>
+                    Próximo <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : activePage === 'detalhes' && selectedPagamento ? (
+          <div className="pt-8 px-8 pb-1">
+            {/* Breadcrumb */}
+            <div className="flex items-center gap-2 mb-6">
+              <Home className="w-5 h-5 cursor-pointer" style={{ color: 'var(--dash-text-secondary)' }} onClick={() => setActivePage('home')} />
+              <ChevronRight className="w-4 h-4" style={{ color: 'var(--dash-text-muted)' }} />
+              <span className="cursor-pointer" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }} onClick={() => setActivePage('home')}>Prestação de Contas</span>
+              <ChevronRight className="w-4 h-4" style={{ color: 'var(--dash-text-muted)' }} />
+              <span className="cursor-pointer" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }} onClick={() => setActivePage('financeira')}>Financeira</span>
+              <ChevronRight className="w-4 h-4" style={{ color: 'var(--dash-text-muted)' }} />
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>Detalhes</span>
+            </div>
+
+            {/* Título */}
+            <h1 className="mb-6" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: 'var(--dash-text-primary)', lineHeight: '1.5' }}>
+              Detalhes do Pagamento
+            </h1>
+
+            {/* Card do Pagamento */}
+            <div className="rounded-lg p-5" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
+              <div className="grid grid-cols-6 gap-6">
+                {[
+                  { label: 'Projeto',       value: selectedPagamento.projeto, cls: '' },
+                  { label: 'Pagamento',     value: selectedPagamento.tipo,    cls: '' },
+                  { label: 'Valor',         value: selectedPagamento.valor,   cls: '' },
+                  { label: 'Data de Envio', value: selectedPagamento.data,    cls: '' },
+                  { label: 'CNPJ',          value: selectedPagamento.cnpj,    cls: 'pl-6' },
+                ].map(({ label, value, cls }) => (
+                  <div key={label} className={cls}>
+                    <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)' }}>{label}</div>
+                    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{value}</div>
+                  </div>
+                ))}
+                <div className="pl-6">
+                  <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)' }}>Status</div>
+                  <div className="inline-block rounded-full px-3 py-1" style={{ backgroundColor: `${getStatusColor(selectedPagamento.status)}20`, border: `1px solid ${getStatusColor(selectedPagamento.status)}`, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: getStatusColor(selectedPagamento.status) }}>
+                    {selectedPagamento.status}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Passo a Passo */}
+            <div 
+              className="mt-8 rounded-lg p-6"
+              style={{
+                backgroundColor: 'var(--dash-card-bg)',
+                border: '1px solid var(--dash-card-border)',
+                boxShadow: 'var(--dash-shadow)',
+              }}
+            >
+              <div className="space-y-6">
+              {/* Passo 1: Anexar Nota Fiscal */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <div 
+                    className="flex items-center justify-center rounded-full"
+                    style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#0f172b', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}
+                  >
+                    1
+                  </div>
+                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>
+                    Anexar Nota Fiscal <span style={{ color: '#ef4444' }}>*</span>
+                  </h2>
+                </div>
+                <p className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginLeft: '32px' }}>
+                  Inclua a Nota Fiscal que justifique esse pagamento
+                </p>
+                <div className="rounded-lg p-4 flex items-center justify-between cursor-pointer" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)', marginLeft: '32px' }}>
+                  <div className="flex items-center gap-3">
+                    <FileText className="w-5 h-5" style={{ color: 'var(--dash-text-secondary)' }} />
+                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>
+                      Nota_Fiscal_Monitor_2024.pdf
+                    </span>
+                  </div>
+                  <ChevronDown className="w-5 h-5" style={{ color: 'var(--dash-icon-subdued)' }} />
+                </div>
+              </div>
+
+              {/* Passo 2: Associar Compra */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <div 
+                    className="flex items-center justify-center rounded-full"
+                    style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#0f172b', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}
+                  >
+                    2
+                  </div>
+                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>
+                    Associar Compra <span style={{ color: '#ef4444' }}>*</span>
+                  </h2>
+                </div>
+                <div className="space-y-3" style={{ marginLeft: '32px' }}>
+                  <div className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
+                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>Monitor de Video LCD 22"</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { label: 'Selecione a categoria do item:', value: 'Material Permanente' },
+                      { label: 'Selecione o item do edital que foi adquirido:', value: 'Monitor' },
+                    ].map(({ label, value }) => (
+                      <div key={label}>
+                        <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{label}</label>
+                        <div className="rounded-lg p-4 flex items-center justify-between cursor-pointer" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
+                          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }}>{value}</span>
+                          <ChevronDown className="w-5 h-5" style={{ color: 'var(--dash-icon-subdued)' }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Passo 3: Cotação */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="flex items-center justify-center rounded-full" style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#0f172b', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}>3</div>
+                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Cotação</h2>
+                </div>
+                <div style={{ marginLeft: '32px' }}>
+                  <p className="mb-4" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', lineHeight: '1.6' }}>
+                    Se você comprou um item de valor superior a R$ 1.400, envie 3 orçamentos e selecione o de menor valor. O de menor valor deve ser o que você comprou. Se há mais de um item na Nota Fiscal com valor a cima de R$ 1.400, você deve enviar 3 orçamentos para cada item.
+                  </p>
+                  <div className="space-y-3">
+                    {[
+                      { file: 'Cotacao_Loja_A.pdf', selected: true },
+                      { file: 'Cotacao_Loja_B.pdf', selected: false },
+                      { file: 'Cotacao_Loja_C.pdf', selected: false },
+                    ].map(({ file, selected }) => (
+                      <div key={file} className="rounded-lg p-4 flex items-center gap-3 cursor-pointer" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
+                        <div className="flex items-center justify-center rounded-full" style={{ width: '20px', height: '20px', border: `2px solid ${selected ? '#00c1af' : 'var(--dash-card-border)'}`, backgroundColor: selected ? '#00c1af' : 'transparent', flexShrink: 0 }}>
+                          {selected && <div className="rounded-full" style={{ width: '8px', height: '8px', backgroundColor: '#ffffff' }} />}
+                        </div>
+                        <FileText className="w-5 h-5" style={{ color: 'var(--dash-text-secondary)' }} />
+                        <span className="flex-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{file}</span>
+                        <ChevronDown className="w-5 h-5" style={{ color: 'var(--dash-icon-subdued)' }} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              </div>
+            </div>
+
+            {/* Seção de Observação */}
+            <div className="mt-8">
+              <div className="flex items-center gap-2 mb-3" style={{ marginLeft: '32px' }}>
+                <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Observação</h3>
+              </div>
+              <p className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginLeft: '32px' }}>
+                Se o gasto precisa de justificativa, use o espaço abaixo.
+              </p>
+              <textarea
+                value={observacao}
+                onChange={(e) => { if (e.target.value.length <= maxObservacaoLength) { setObservacao(e.target.value); } }}
+                placeholder="Exemplo: motivo da viagem ou da compra do curso."
+                rows={4}
+                className="rounded-lg px-4 py-3 resize-none"
+                style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none', marginLeft: '32px', marginRight: '32px', width: 'calc(100% - 64px)' }}
+              />
+              <p className="mt-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-muted)', marginLeft: '32px' }}>
+                {observacao.length}/{maxObservacaoLength} caracteres
+              </p>
+            </div>
+
+            {/* Divider antes da Avaliação Fapes */}
+            <div style={{ marginTop: '32px', marginBottom: '32px', marginLeft: '32px', marginRight: '32px' }}>
+              <div style={{ height: '1px', backgroundColor: 'var(--dash-divider)' }}></div>
+            </div>
+
+            {/* Seção de Avaliação */}
+            <div className="mt-8">
+              <div className="flex items-center gap-2 mb-3" style={{ marginLeft: '32px' }}>
+                <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Avaliação Fapes</h3>
+              </div>
+              
+              <div className="flex gap-4" style={{ marginLeft: '32px', marginBottom: '24px' }}>
+                <button
+                  onClick={() => {
+                    setShowConfirmacaoModal(true);
+                  }}
+                  className="px-6 py-2 rounded-lg transition-all"
+                  style={{
+                    backgroundColor: statusAvaliacao === 'validado' ? '#14b8a6' : 'rgba(20, 184, 166, 0.1)',
+                    border: `1px solid ${statusAvaliacao === 'validado' ? '#14b8a6' : 'rgba(20, 184, 166, 0.3)'}`,
+                    color: statusAvaliacao === 'validado' ? '#0f172b' : '#14b8a6',
+                    fontFamily: 'var(--font-family)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Validado
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setStatusAvaliacao('revisar');
+                  }}
+                  className="px-6 py-2 rounded-lg transition-all"
+                  style={{
+                    backgroundColor: statusAvaliacao === 'revisar' ? '#eab308' : 'rgba(234, 179, 8, 0.1)',
+                    border: `1px solid ${statusAvaliacao === 'revisar' ? '#eab308' : 'rgba(234, 179, 8, 0.3)'}`,
+                    color: statusAvaliacao === 'revisar' ? '#0f172b' : '#eab308',
+                    fontFamily: 'var(--font-family)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Revisar
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setStatusAvaliacao('reprovado');
+                  }}
+                  className="px-6 py-2 rounded-lg transition-all"
+                  style={{
+                    backgroundColor: statusAvaliacao === 'reprovado' ? '#ef4444' : 'rgba(239, 68, 68, 0.1)',
+                    border: `1px solid ${statusAvaliacao === 'reprovado' ? '#ef4444' : 'rgba(239, 68, 68, 0.3)'}`,
+                    color: statusAvaliacao === 'reprovado' ? (theme === 'dark' ? '#0f172b' : '#ffffff') : '#ef4444',
+                    fontFamily: 'var(--font-family)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Reprovado
+                </button>
+              </div>
+              
+              {/* Campos condicionais para Revisar ou Reprovado */}
+              {(statusAvaliacao === 'revisar' || statusAvaliacao === 'reprovado') && (
+                <div className="mt-6">
+                  {/* Dropdown Motivo */}
+                  <div className="mb-4">
+                    <label className="mb-2 block" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)', marginLeft: '32px' }}>
+                      Motivo
+                    </label>
+                    <div className="flex gap-2" style={{ marginLeft: '32px', marginRight: '32px' }}>
+                      <div className="relative flex-1">
+                        <button
+                          onClick={() => setShowMotivoDropdown(!showMotivoDropdown)}
+                          className="rounded-lg px-4 py-3 flex items-center justify-between"
+                          style={{
+                            backgroundColor: 'var(--dash-input-bg)',
+                            border: '1px solid var(--dash-input-border)',
+                            fontFamily: 'var(--font-family)',
+                            fontSize: 'var(--text-sm)',
+                            color: motivoRevisao ? 'var(--dash-text-primary)' : 'var(--dash-text-muted)',
+                            cursor: 'pointer',
+                            width: '100%'
+                          }}
+                        >
+                          <span>{motivoRevisao || 'Selecione um motivo'}</span>
+                          <ChevronDown className="w-5 h-5" style={{ color: 'var(--dash-icon-subdued)' }} />
+                        </button>
+                      
+                      {showMotivoDropdown && (
+                        <div className="absolute top-full mt-1 w-full rounded-lg overflow-hidden z-10" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
+                          {['Comprovante enviado está errado', 'Está faltando um comprovante', 'Compra associada não está no edital', 'Cotação enviada não está adequada'].map((motivo) => (
+                            <button key={motivo} onClick={() => { setMotivoRevisao(motivo); setShowMotivoDropdown(false); }}
+                              className="w-full px-4 py-3 text-left transition-colors"
+                              style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', backgroundColor: motivoRevisao === motivo ? 'rgba(0,193,175,0.1)' : 'transparent' }}
+                              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.08)'; }}
+                              onMouseLeave={(e) => { if (motivoRevisao !== motivo) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                            >{motivo}</button>
+                          ))}
+                        </div>
+                      )}
+                      </div>
+                      <button onClick={() => setShowCadastrarMotivoModal(true)}
+                        className="rounded-lg px-3 py-3 transition-all"
+                        style={{ backgroundColor: 'transparent', border: '1px solid var(--dash-card-border)', color: 'var(--dash-text-secondary)', cursor: 'pointer', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--dash-hover-bg)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                      >
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Campo Justifique */}
+                  <div className="mb-4">
+                    <label className="mb-2 block" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)', marginLeft: '32px' }}>
+                      Justifique
+                    </label>
+                    <textarea value={justificativa} onChange={(e) => setJustificativa(e.target.value)}
+                      placeholder="Explique o motivo da sua decisão..." rows={4}
+                      className="rounded-lg px-4 py-3 resize-none"
+                      style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none', marginLeft: '32px', marginRight: '32px', width: 'calc(100% - 64px)' }}
+                    />
+                  </div>
+                  
+                  {/* Botão Enviar */}
+                  <div style={{ marginLeft: '32px', marginRight: '32px', marginBottom: '32px', display: 'flex', justifyContent: 'flex-end' }}>
+                    <button
+                      onClick={() => {
+                        if (!motivoRevisao || !justificativa) {
+                          toast.error('Por favor, preencha todos os campos');
+                          return;
+                        }
+                        toast.success(statusAvaliacao === 'revisar' ? 'Solicitação de revisão enviada!' : 'Reprovação registrada!');
+                        setTimeout(() => {
+                          setActivePage('financeira');
+                          setSelectedPagamento(null);
+                          setStatusAvaliacao(null);
+                          setMotivoRevisao('');
+                          setJustificativa('');
+                        }, 1000);
+                      }}
+                      className="px-8 py-3 rounded-lg transition-all"
+                      style={{
+                        backgroundColor: '#00c1af',
+                        border: '1px solid #00c1af',
+                        color: '#0f172b',
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-weight-semibold)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Enviar
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : activePage === 'editais' ? (
+          <Editais />
+        ) : activePage === 'editais-light' ? (
+          <EditaisLight />
+        ) : activePage === 'programa' ? (
+          <Programa onBack={() => setActivePage('home')} />
+        ) : activePage === 'parceria' ? (
+          <Parceria onBack={() => setActivePage('home')} />
+        ) : activePage === 'formulario' ? (
+          <Editais isFormularioMode={true} />
+        ) : (
+          <div className="p-8">
+            {/* Conteúdo da página inicial */}
+          </div>
+        )}
+      </div>
+
+      {/* Modal de Confirmação de Aprovação */}
+      {showConfirmacaoModal && (
+        <div className="fixed inset-0 flex items-start justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)', paddingTop: '20vh', zIndex: 9999 }} onClick={() => setShowConfirmacaoModal(false)}>
+          <div className="rounded-lg p-6 max-w-md w-full mx-4" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setShowConfirmacaoModal(false)} className="absolute top-4 right-4 p-1 rounded-lg transition-all" style={{ backgroundColor: 'transparent', border: 'none', color: 'var(--dash-text-muted)', cursor: 'pointer' }}>
+              <X size={20} />
+            </button>
+            <h3 className="mb-4 pr-8" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', color: 'var(--dash-text-primary)' }}>
+              Tem certeza que deseja aprovar essa Prestação de Contas Financeira?
+            </h3>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setShowConfirmacaoModal(false)} className="px-6 py-2 rounded-lg transition-all"
+                style={{ backgroundColor: 'transparent', border: '1px solid var(--dash-card-border)', color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
+                Cancelar
+              </button>
+              <button onClick={() => { setStatusAvaliacao('validado'); setShowConfirmacaoModal(false); toast.success('Pagamento validado com sucesso!'); setTimeout(() => { setActivePage('financeira'); setSelectedPagamento(null); }, 1000); }}
+                className="px-6 py-2 rounded-lg transition-all"
+                style={{ backgroundColor: '#00c1af', border: '1px solid #00c1af', color: '#0f172b', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer'
+                }}
+              >
+                Aprovar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Cadastrar Novo Motivo */}
+      {showCadastrarMotivoModal && (
+        <div 
+          className="fixed inset-0 flex items-start justify-center"
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            paddingTop: '20vh',
+            zIndex: 9999
+          }}
+          onClick={() => {
+            setShowCadastrarMotivoModal(false);
+            setNovoMotivo('');
+          }}
+        >
+          <div className="rounded-lg p-6 max-w-md w-full mx-4" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => { setShowCadastrarMotivoModal(false); setNovoMotivo(''); }}
+              className="absolute top-4 right-4 p-1 rounded-lg transition-all"
+              style={{ backgroundColor: 'transparent', border: 'none', color: 'var(--dash-text-muted)', cursor: 'pointer' }}>
+              <X size={20} />
+            </button>
+            <h3 className="mb-4 pr-8" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', color: 'var(--dash-text-primary)' }}>
+              Cadastrar novo motivo
+            </h3>
+            <div className="mb-6">
+              <input type="text" value={novoMotivo} onChange={(e) => { if (e.target.value.length <= maxNovoMotivoLength) setNovoMotivo(e.target.value); }}
+                placeholder="Digite o novo motivo" className="rounded-lg px-4 py-3 w-full"
+                style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
+              <p className="mt-2 text-right" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)' }}>{novoMotivo.length}/{maxNovoMotivoLength}</p>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => { setShowCadastrarMotivoModal(false); setNovoMotivo(''); }}
+                className="px-6 py-2 rounded-lg transition-all"
+                style={{ backgroundColor: 'transparent', border: '1px solid var(--dash-card-border)', color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
+                Cancelar
+              </button>
+              <button onClick={() => { if (novoMotivo.trim()) { toast.success('Motivo cadastrado com sucesso!'); setMotivoRevisao(novoMotivo); setShowCadastrarMotivoModal(false); setNovoMotivo(''); } else { toast.error('Por favor, digite um motivo válido'); } }}
+                className="px-6 py-2 rounded-lg transition-all"
+                style={{ backgroundColor: '#00c1af', border: '1px solid #00c1af', color: '#0f172b', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
+                Salvar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Validação em Lote */}
+      {showValidarLoteModal && (
+        <div className="fixed inset-0 flex items-start justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)', paddingTop: '20vh', zIndex: 9999 }} onClick={() => setShowValidarLoteModal(false)}>
+          <div className="rounded-lg p-6 max-w-md w-full mx-4" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setShowValidarLoteModal(false)} className="absolute top-4 right-4 p-1 rounded-lg transition-all" style={{ backgroundColor: 'transparent', border: 'none', color: 'var(--dash-text-muted)', cursor: 'pointer' }}>
+              <X size={20} />
+            </button>
+            <h3 className="mb-6" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', color: 'var(--dash-text-primary)' }}>
+              Tem certeza que deseja aprovar essa Prestação de Contas Financeira?
+            </h3>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setShowValidarLoteModal(false)} className="px-6 py-2 rounded-lg transition-all"
+                style={{ backgroundColor: 'transparent', border: '1px solid var(--dash-card-border)', color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
+                Cancelar
+              </button>
+              <button onClick={() => { setShowValidarLoteModal(false); const count = selectedPagamentos.length; toast.success(`${count} pagamento${count > 1 ? 's validados' : ' validado'} com sucesso!`); setSelectedPagamentos([]); }}
+                className="px-6 py-2 rounded-lg transition-all"
+                style={{ backgroundColor: '#00c1af', border: '1px solid #00c1af', color: '#0f172b', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
+                Aprovar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
