@@ -22,6 +22,7 @@ Este e o documento ancora do modulo. Toda informacao de dominio e regras de nego
 | Documento | Descricao |
 |-----------|-----------|
 | [Contrato](contrato.md) | Superficie publica do modulo: comandos, consultas, jobs e eventos |
+| [Contrato API](contrato-api.md) | Especificacao HTTP REST concreta: endpoints, payloads, erros e autorizacao |
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclo de vida das entidades |
@@ -174,7 +175,149 @@ Repetir a estrutura abaixo para **cada** operacao listada em `Operacoes Publicas
 
 ---
 
-## Step 3: EPICs com User Stories em Gherkin
+## Step 3: Contrato de API HTTP
+
+Create `/docs/implementation/modules/{M00x-name}/contrato-api.md`
+
+Este documento materializa as operacoes do `contrato.md` como endpoints HTTP REST concretos. Deve ser criado apos o `contrato.md` estar estavel, pois depende das operacoes ja definidas.
+
+Use o contrato de API para registrar:
+- metodo HTTP e path completo de cada endpoint;
+- query parameters para operacoes de listagem/filtro;
+- schemas de request e response com tipos e obrigatoriedade;
+- mapeamento de categorias de erro para HTTP status codes;
+- autorizacao por perfil para cada endpoint;
+- tabela geral de endpoints (mapa de rota).
+
+```markdown
+# Contrato de API HTTP — M00x [Nome do Modulo]
+
+Referencia de dominio e regras de negocio: [contrato.md](contrato.md) | [README.md](README.md)
+
+## Visao Geral
+
+[O que este documento cobre e como se relaciona com o contrato.md]
+
+### Base URL
+
+\```
+/api/v1/m00x
+\```
+
+### Convencoes Gerais
+
+| Aspecto | Convencao |
+|---------|-----------|
+| Formato de corpo | `application/json` |
+| Formato de data | ISO 8601 — `YYYY-MM-DD` |
+| Paginacao | Query params `?page=1&pageSize=20` |
+| Encoding | UTF-8 |
+
+### Autorizacao
+
+| Perfil | Descricao |
+|--------|-----------|
+| `PERFIL_A` | ... |
+
+---
+
+## Envelope de Erro
+
+\```json
+{
+  "error": {
+    "code": "CODIGO_DO_ERRO",
+    "message": "Mensagem de erro legivel para operador ou modulo consumidor.",
+    "details": {
+      "campo": "valor-relacionado-ao-erro"
+    }
+  }
+}
+\```
+
+### Mapeamento de HTTP Status
+
+| HTTP Status | Categoria | Quando usar |
+|-------------|-----------|-------------|
+| `400` | Dados invalidos | Campos obrigatorios ausentes, formato invalido |
+| `404` | Recurso inexistente | Identificador nao encontrado |
+| `409` | Conflito | Duplicata, conflito de estado |
+| `422` | Regra de negocio | Estado invalido para a operacao |
+
+---
+
+## Recursos
+
+### 1. [Nome do Recurso]
+
+#### `POST /api/v1/m00x/recurso`
+
+[Objetivo]
+
+- **Autorizacao:** `PERFIL_A`
+- **Operacao de origem:** `NomeDaOperacaoNoContratoMd`
+- **Idempotencia:** Nao
+
+**Request body**
+
+\```json
+{ "campo": "valor" }
+\```
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| `campo` | string | Sim | ... |
+
+**Response `201 Created`**
+
+\```json
+{ "recurso": { "id": "REC-001" } }
+\```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `400` | `DADOS_INVALIDOS` | Os dados informados sao invalidos. |
+
+---
+
+## Mapa Geral de Endpoints
+
+| Metodo | Path | Operacao | Autorizacao |
+|--------|------|----------|-------------|
+| `POST` | `/api/v1/m00x/recurso` | CriarRecurso | PERFIL_A |
+
+---
+
+## Schemas de Dominio (Referencia)
+
+\```json
+{ "id": "string", "campo": "string" }
+\```
+
+---
+
+## Rastreabilidade
+
+| Artefato | Link |
+|----------|------|
+| Contrato de aplicacao | [contrato.md](contrato.md) |
+| Dominio e regras | [README.md](README.md) |
+| Modelo estrutural | [modelo-estrutural.md](modelo-estrutural.md) |
+| Modelo comportamental | [modelo-comportamental.md](modelo-comportamental.md) |
+```
+
+**Principios**:
+- `contrato.md` define **o que** o modulo expoe (operacoes, regras, erros de negocio).
+- `contrato-api.md` define **como** acessar via HTTP (metodo, path, schema, status code).
+- O contrato de API nao deve redefinir regras de negocio — apenas mapear transporte.
+- Operacoes de mudanca de estado (publicar, desativar) devem usar `POST` em sub-resources, nao `PATCH` com semantica ambigua.
+- Incluir neste documento todas as operacoes do backlog ainda nao mapeadas no `contrato.md`.
+
+---
+
+## Step 4: EPICs com User Stories em Gherkin
 
 Create `/docs/implementation/modules/{M00x-name}/epics/EPIC-M00x-NNN.md`
 
@@ -227,7 +370,7 @@ Funcionalidade: [Nome]
 
 ---
 
-## Step 4: Backlog do Modulo
+## Step 5: Backlog do Modulo
 
 Create `/docs/implementation/modules/{M00x-name}/backlog.md`
 
@@ -267,7 +410,7 @@ EPIC-M00x-001 (Titulo)
 
 ---
 
-## Step 5: Modelo Estrutural
+## Step 6: Modelo Estrutural
 
 Create `/docs/implementation/modules/{M00x-name}/modelo-estrutural.md`
 
@@ -293,7 +436,7 @@ classDiagram
 
 ---
 
-## Step 6: Modelo Comportamental
+## Step 7: Modelo Comportamental
 
 Create `/docs/implementation/modules/{M00x-name}/modelo-comportamental.md`
 
@@ -314,7 +457,7 @@ stateDiagram-v2
 
 ---
 
-## Step 7: Atualizar Backlog Central
+## Step 8: Atualizar Backlog Central
 
 Update `/docs/management/backlog-product.md` — adicionar ou atualizar a linha do modulo na tabela com dor, capacidade, KPI e % de desenvolvimento.
 
@@ -325,7 +468,8 @@ Update `/docs/management/backlog-product.md` — adicionar ou atualizar a linha 
 ```
 docs/implementation/modules/{M00x-name}/
 ├── README.md                # Indice + Dominio + Regras de Negocio
-├── contrato.md             # Comandos + Consultas + Jobs + Eventos do modulo
+├── contrato.md              # Comandos + Consultas + Jobs + Eventos do modulo (o que expoe)
+├── contrato-api.md          # Endpoints HTTP REST concretos (como acessar via HTTP)
 ├── backlog.md               # EPICs + Rastreabilidade
 ├── modelo-estrutural.md     # Diagrama de classes + Dicionario de dados
 ├── modelo-comportamental.md # Diagramas de estado
@@ -342,6 +486,9 @@ Antes de considerar a documentacao do modulo completa:
 - [ ] README.md contem dominio e todas as regras de negocio
 - [ ] contrato.md documenta a superficie publica do modulo sem duplicar o dominio
 - [ ] Cada operacao do contrato aponta para RNxx/RIx existentes no README
+- [ ] contrato-api.md mapeia todas as operacoes do contrato.md para endpoints HTTP concretos
+- [ ] contrato-api.md cobre operacoes do backlog ainda nao mapeadas no contrato.md
+- [ ] contrato-api.md usa envelope de erro consistente com status HTTP corretos
 - [ ] Nenhum outro documento repete texto do dominio
 - [ ] Cada EPIC contem suas US com cenarios Gherkin
 - [ ] Regras de negocio nos EPICs sao links para o README
