@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "project43-status-dates",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "compatibility_date": "2026-04-10",
   "vars": {
     "GITHUB_ORG": "leds-conectafapes",
@@ -9,7 +9,7 @@
     "GITHUB_PROJECT_NUMBER": "43",
     "STATUS_FIELD_NAME": "Status",
     "STARTED_AT_FIELD_NAME": "Iniciado em",
-    "DONE_AT_FIELD_NAME": "Data de Conclusão",
+    "DONE_AT_FIELD_NAME": "Data de Conclusao",
     "IN_PROGRESS_OPTION_NAME": "In Progress",
     "DONE_OPTION_NAME": "Done"
   }

@@ -1,33 +1,30 @@
-import test from "node:test";
 import assert from "node:assert/strict";
+import test from "node:test";
 
+import { createProjectConfig } from "../src/config/project-config.js";
 import {
   buildDateMutations,
   formatToday,
-  shouldHandleStatusChange,
-} from "../src/logic.js";
+} from "../src/domain/date-mutations.js";
+import { shouldHandleStatusChange } from "../src/domain/project-webhook.js";
 
-const defaults = {
-  startedAtFieldName: "Iniciado em",
-  completedAtFieldName: "Data de Conclusão",
-  inProgressStatusName: "In Progress",
-  doneStatusName: "Done",
-};
+const defaults = createProjectConfig({});
 
 test("fills started date only once when entering In Progress", () => {
   const today = "2026-04-10";
   const result = buildDateMutations({
-    ...defaults,
+    fieldNames: defaults.fieldNames,
+    statusNames: defaults.statusNames,
     statusName: "In Progress",
     startedAt: null,
-    completedAt: null,
+    doneAt: null,
     today,
   });
 
   assert.deepEqual(result, [
     {
       op: "set_date",
-      fieldName: "Iniciado em",
+      fieldName: defaults.fieldNames.startedAt,
       date: today,
     },
   ]);
@@ -35,10 +32,11 @@ test("fills started date only once when entering In Progress", () => {
 
 test("does not overwrite started date on re-entry to In Progress", () => {
   const result = buildDateMutations({
-    ...defaults,
+    fieldNames: defaults.fieldNames,
+    statusNames: defaults.statusNames,
     statusName: "In Progress",
     startedAt: "2026-04-09",
-    completedAt: null,
+    doneAt: null,
     today: "2026-04-10",
   });
 
@@ -48,17 +46,18 @@ test("does not overwrite started date on re-entry to In Progress", () => {
 test("sets completion date when entering Done", () => {
   const today = "2026-04-10";
   const result = buildDateMutations({
-    ...defaults,
+    fieldNames: defaults.fieldNames,
+    statusNames: defaults.statusNames,
     statusName: "Done",
     startedAt: "2026-04-09",
-    completedAt: null,
+    doneAt: null,
     today,
   });
 
   assert.deepEqual(result, [
     {
       op: "set_date",
-      fieldName: "Data de Conclusão",
+      fieldName: defaults.fieldNames.doneAt,
       date: today,
     },
   ]);
@@ -66,17 +65,18 @@ test("sets completion date when entering Done", () => {
 
 test("clears completion date when leaving Done", () => {
   const result = buildDateMutations({
-    ...defaults,
+    fieldNames: defaults.fieldNames,
+    statusNames: defaults.statusNames,
     statusName: "Paused",
     startedAt: "2026-04-09",
-    completedAt: "2026-04-10",
+    doneAt: "2026-04-10",
     today: "2026-04-11",
   });
 
   assert.deepEqual(result, [
     {
       op: "clear",
-      fieldName: "Data de Conclusão",
+      fieldName: defaults.fieldNames.doneAt,
     },
   ]);
 });
