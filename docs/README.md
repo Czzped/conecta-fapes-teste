@@ -2,6 +2,13 @@
 
 Plataforma digital da agencia de fomento para gestao do ciclo completo de fomento a pesquisa, desenvolvimento e inovacao.
 
+## Prototipos
+
+| Prototipo | Link |
+|-----------|------|
+| Front-office | [https://rate-snort-02856207.figma.site/](https://rate-snort-02856207.figma.site/) |
+| Back-office | [https://bucket-lake-78647159.figma.site/](https://bucket-lake-78647159.figma.site/) |
+
 ## Produto
 
 | Documento | Descricao |
@@ -24,6 +31,8 @@ Plataforma digital da agencia de fomento para gestao do ciclo completo de foment
 |-----------|-----------|
 | [Visao Geral](architecture/README.md) | Contexto do sistema, stack tecnologica, integracoes e operacao |
 | [ADRs](architecture/adr/README.md) | Decisoes de arquitetura registradas |
+
+> **Nota:** A pasta `documentation_old/` na raiz do repositorio e uma versao antiga da documentacao e nao deve ser utilizada como referencia. Toda a documentacao atual esta organizada nesta pasta `docs/`.
 
 ## Modulos
 
