@@ -35,13 +35,13 @@ graph TD
 
 | Modulo | Funcionalidades | EPICs |
 |--------|----------------|-------|
-| [M001](../../implementation/modules/M001-modalidade-bolsa/README.md) | Resolucoes, modalidades, versoes e niveis de bolsa | 3 EPICs (To Do) |
+| [M001](../../implementation/modules/M001-modalidade-bolsa/README.md) | Resolucoes, modalidades, versoes e niveis de bolsa | 3 EPICs (Done) |
 | [M002](../../implementation/modules/M002-importacao-editais/README.md) | Importacao do SIGFAPES | 3 EPICs (Done) |
 | [M003](../../implementation/modules/M003-gerenciar-editais/README.md) | Visualizacao operacional de editais e projetos | 5 EPICs (Done) |
 | [M004](../../implementation/modules/M004-pagamento-bolsista/README.md) | Folhas, remessas, retornos, guias, relatorios | 12 EPICs (Done) |
 | [M005](../../implementation/modules/M005-autenticacao/README.md) | Autenticacao via Acesso Cidadao | A definir |
-| [M008](../../implementation/modules/M008-cadastros-corporativos/README.md) | Pessoas, instituicoes, areas tecnicas | 3 EPICs (To Do) |
-| [M009](../../implementation/modules/M009-gestao-bolsista/README.md) | Gestao de aditivos (admin) | 4 EPICs (To Do) |
+| [M008](../../implementation/modules/M008-cadastros-corporativos/README.md) | Pessoas, instituicoes, areas tecnicas | 3 EPICs (In Progress) |
+| [M009](../../implementation/modules/M009-gestao-bolsista/README.md) | Gestao de aditivos (admin) | 2 In Progress, 2 To Do |
 | [M015](../../implementation/modules/M015-suspensao-finalizacao/README.md) | Suspensao de bolsas | 2 EPICs (To Do) |
 | [M016](../../implementation/modules/M016-contabilidade-financeiro/README.md) | Gestao financeira e contabil | 3 EPICs (To Do) |
 

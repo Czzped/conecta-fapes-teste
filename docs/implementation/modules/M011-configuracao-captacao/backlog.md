@@ -14,7 +14,7 @@ Especificacao de referencia: [README.md](README.md)
 
 | ID | Titulo | Requisito | Prioridade | Status | Documento |
 |----|--------|-----------|------------|--------|-----------|
-| EPIC-M011-001 | Configuracao do Edital | UC01 | Must | To Do | [EPIC-M011-001](epics/EPIC-M011-001.md) |
+| EPIC-M011-001 | Configuracao do Edital | UC01 | Must | In Progress | [EPIC-M011-001](epics/EPIC-M011-001.md) |
 | EPIC-M011-002 | Gestao de Formularios | UC02 | Must | To Do | [EPIC-M011-002](epics/EPIC-M011-002.md) |
 | EPIC-M011-003 | Gestao de Revisores Ad Hoc | UC03 | Must | To Do | [EPIC-M011-003](epics/EPIC-M011-003.md) |
 

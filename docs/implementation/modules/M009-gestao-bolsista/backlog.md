@@ -14,8 +14,8 @@ Especificacao de referencia: [README.md](README.md)
 
 | ID | Titulo | Requisito | Prioridade | Status | Documento |
 |----|--------|-----------|------------|--------|-----------|
-| EPIC-M009-001 | Indicacao de Bolsista | UC01 | Must | To Do | [EPIC-M009-001](epics/EPIC-M009-001.md) |
-| EPIC-M009-002 | Avaliacao Documental | UC02 | Must | To Do | [EPIC-M009-002](epics/EPIC-M009-002.md) |
+| EPIC-M009-001 | Indicacao de Bolsista | UC01 | Must | In Progress | [EPIC-M009-001](epics/EPIC-M009-001.md) |
+| EPIC-M009-002 | Avaliacao Documental | UC02 | Must | In Progress | [EPIC-M009-002](epics/EPIC-M009-002.md) |
 | EPIC-M009-003 | Formalizacao e Implementacao de Bolsa | UC03 | Must | To Do | [EPIC-M009-003](epics/EPIC-M009-003.md) |
 | EPIC-M009-004 | Ciclo de Vida da Bolsa | UC04 | Must | To Do | [EPIC-M009-004](epics/EPIC-M009-004.md) |
 

@@ -10,9 +10,9 @@ Marcos de entrega do produto. Cada milestone agrupa domains que precisam estar c
 
 | # | Milestone | Domains | Status |
 |---|-----------|---------|--------|
-| MS-01 | [Base Operacional](#ms-01--base-operacional) | 01, 07 | Pendente |
-| MS-02 | [Ciclo de Fomento Pre-Award](#ms-02--ciclo-de-fomento-pre-award) | 02, 03 | Pendente |
-| MS-03 | [Ciclo de Fomento Post-Award](#ms-03--ciclo-de-fomento-post-award) | 04 | Pendente |
+| MS-01 | [Base Operacional](#ms-01--base-operacional) | 01, 07 | Parcial |
+| MS-02 | [Ciclo de Fomento Pre-Award](#ms-02--ciclo-de-fomento-pre-award) | 02, 03 | Parcial |
+| MS-03 | [Ciclo de Fomento Post-Award](#ms-03--ciclo-de-fomento-post-award) | 04 | Parcial |
 | MS-04 | [Financeiro](#ms-04--financeiro) | 05 | Parcial |
 | MS-05 | [Inteligencia e Transparencia](#ms-05--inteligencia-e-transparencia) | 06 | Pendente |
 
@@ -27,7 +27,7 @@ Fundacao do sistema: identidades, cadastros mestres e migracao do legado.
 | [01 Corporativo](../discovery/domains/01-corporativo.md) | IAM, Pessoas, Organizacoes, Cadastros Basicos, Modalidades de Bolsa | M001, M005, M006, M007, M008 |
 | [07 Importacao SIGFAPES](../discovery/domains/07-importacao-sigfapes.md) | Migracao de editais, projetos, pessoas e pagamentos do legado | M002 |
 
-> **Nota:** M005 (Autenticacao), M006 (Autorizacao) e M007 (API Gateway) ainda nao possuem documentacao de implementacao ("A definir" no backlog central). M008 (Cadastros Corporativos) possui spec completa.
+> **Progresso:** M001 (Modalidades de Bolsa) esta 100% implementado e em producao via Portal Admin. M002 (Importacao SIGFAPES) esta 100%. M005 (Autenticacao) esta ~30% — autenticacao via Acesso Cidadao funcional no Portal Coordenador, mas sem backlog formal. M008 (Cadastros Corporativos) esta ~40% — cadastro de pessoas e areas de conhecimento em uso, EPICs In Progress. M006, M007 ainda nao possuem implementacao.
 
 ---
 
@@ -40,6 +40,8 @@ Planejamento estrategico e fluxo completo de captacao de iniciativas.
 | [02 Planejamento](../discovery/domains/02-planejamento.md) | Plano estrategico, parcerias, programas de fomento | M010 |
 | [03 Fomento Pre-Award](../discovery/domains/03-fomento-pre-award.md) | Publicacao de edital, submissao, analise documental, merito, contratacao | M003, M011 |
 
+> **Progresso:** M003 (Gerenciar Editais) esta 100% implementado. M010 (Planejamento e Estrategia) esta ~15% — Gestao de Programas em desenvolvimento ativo. M011 (Configuracao de Captacao) esta ~10% — Configuracao do Edital em andamento.
+
 ---
 
 ## MS-03 — Ciclo de Fomento Post-Award
@@ -50,7 +52,7 @@ Execucao das iniciativas contratadas ate a finalizacao.
 |--------|-----------|---------|
 | [04 Fomento Post-Award](../discovery/domains/04-fomento-post-award.md) | Acompanhamento, resultados, orcamento, prestacao de contas, bolsistas, suspensao/finalizacao | M003, M009, M012, M013, M014, M015 |
 
-> **Progresso:** M014 (Prestacao de Contas) esta 62% implementado (6/8 EPICs Done — submissao, justificativas, documentos fiscais, SERPRO, orcamentos de fornecedor e fluxo V1). Restam EPIC-M014-002 (Analise) e EPIC-M014-003 (Contestacao e Auditoria SECONT).
+> **Progresso:** M003 (Gerenciar Editais) esta 100%. M014 (Prestacao de Contas) esta 62% (6/8 EPICs Done — submissao, justificativas, documentos fiscais, SERPRO, orcamentos de fornecedor e fluxo V1). M009 (Gestao Bolsa Pesquisa) esta ~35% — indicacao e avaliacao documental em progresso via Portal Coordenador. Restam M012, M013 e M015 nao iniciados.
 
 ---
 

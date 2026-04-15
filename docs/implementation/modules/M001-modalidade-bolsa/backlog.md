@@ -14,9 +14,9 @@ Especificacao de referencia: [README.md](README.md)
 
 | ID | Titulo | Requisito | Prioridade | Status | Documento |
 |----|--------|-----------|------------|--------|-----------|
-| EPIC-M001-001 | Cadastro de Resolucoes | UC02 | Must | To Do | [EPIC-M001-001](epics/EPIC-M001-001.md) |
-| EPIC-M001-002 | Controle de Modalidades de Bolsa | UC01 | Must | To Do | [EPIC-M001-002](epics/EPIC-M001-002.md) |
-| EPIC-M001-003 | Cadastro de Niveis de Bolsa | UC03 | Must | To Do | [EPIC-M001-003](epics/EPIC-M001-003.md) |
+| EPIC-M001-001 | Cadastro de Resolucoes | UC02 | Must | Done | [EPIC-M001-001](epics/EPIC-M001-001.md) |
+| EPIC-M001-002 | Controle de Modalidades de Bolsa | UC01 | Must | Done | [EPIC-M001-002](epics/EPIC-M001-002.md) |
+| EPIC-M001-003 | Cadastro de Niveis de Bolsa | UC03 | Must | Done | [EPIC-M001-003](epics/EPIC-M001-003.md) |
 
 ---
 

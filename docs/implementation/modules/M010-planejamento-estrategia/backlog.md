@@ -16,7 +16,7 @@ Especificacao de referencia: [README.md](README.md)
 |----|--------|-----------|------------|--------|-----------|
 | EPIC-M010-001 | Gestao do Plano Estrategico | UC01 | Must | To Do | [EPIC-M010-001](epics/EPIC-M010-001.md) |
 | EPIC-M010-002 | Gestao de Parcerias | UC02 | Must | To Do | [EPIC-M010-002](epics/EPIC-M010-002.md) |
-| EPIC-M010-003 | Gestao de Programas | UC03 | Must | To Do | [EPIC-M010-003](epics/EPIC-M010-003.md) |
+| EPIC-M010-003 | Gestao de Programas | UC03 | Must | In Progress | [EPIC-M010-003](epics/EPIC-M010-003.md) |
 
 ---
 

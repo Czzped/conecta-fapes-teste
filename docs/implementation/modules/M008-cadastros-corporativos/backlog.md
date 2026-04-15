@@ -14,9 +14,9 @@ Especificacao de referencia: [README.md](README.md)
 
 | ID | Titulo | Requisito | Prioridade | Status | Documento |
 |----|--------|-----------|------------|--------|-----------|
-| EPIC-M008-001 | Cadastro de Pessoas Fisicas | UC01 | Must | To Do | [EPIC-M008-001](epics/EPIC-M008-001.md) |
-| EPIC-M008-002 | Cadastro de Instituicoes e Unidades | UC02 | Must | To Do | [EPIC-M008-002](epics/EPIC-M008-002.md) |
-| EPIC-M008-003 | Cadastros Basicos de Referencia | UC03 | Must | To Do | [EPIC-M008-003](epics/EPIC-M008-003.md) |
+| EPIC-M008-001 | Cadastro de Pessoas Fisicas | UC01 | Must | In Progress | [EPIC-M008-001](epics/EPIC-M008-001.md) |
+| EPIC-M008-002 | Cadastro de Instituicoes e Unidades | UC02 | Must | In Progress | [EPIC-M008-002](epics/EPIC-M008-002.md) |
+| EPIC-M008-003 | Cadastros Basicos de Referencia | UC03 | Must | In Progress | [EPIC-M008-003](epics/EPIC-M008-003.md) |
 
 ---
 

@@ -123,6 +123,8 @@ nav:
       - M001 Modalidade de Bolsa:
           - implementation/modules/M001-modalidade-bolsa/README.md
           - Backlog: implementation/modules/M001-modalidade-bolsa/backlog.md
+          - Contrato: implementation/modules/M001-modalidade-bolsa/contrato.md
+          - Contrato API: implementation/modules/M001-modalidade-bolsa/contrato-api.md
           - Modelo Estrutural: implementation/modules/M001-modalidade-bolsa/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M001-modalidade-bolsa/modelo-comportamental.md
           - EPIC-001: implementation/modules/M001-modalidade-bolsa/epics/EPIC-M001-001.md
@@ -132,6 +134,7 @@ nav:
           - implementation/modules/M002-importacao-editais/README.md
           - Backlog: implementation/modules/M002-importacao-editais/backlog.md
           - Contrato: implementation/modules/M002-importacao-editais/contrato.md
+          - Contrato API: implementation/modules/M002-importacao-editais/contrato-api.md
           - Modelo Estrutural: implementation/modules/M002-importacao-editais/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M002-importacao-editais/modelo-comportamental.md
           - EPIC-001: implementation/modules/M002-importacao-editais/epics/EPIC-M002-001.md
@@ -139,6 +142,9 @@ nav:
           - EPIC-003: implementation/modules/M002-importacao-editais/epics/EPIC-M002-003.md
       - M003 Gerenciar Editais:
           - implementation/modules/M003-gerenciar-editais/README.md
+          - Backlog: implementation/modules/M003-gerenciar-editais/backlog.md
+          - Contrato: implementation/modules/M003-gerenciar-editais/contrato.md
+          - Contrato API: implementation/modules/M003-gerenciar-editais/contrato-api.md
           - Modelo Estrutural: implementation/modules/M003-gerenciar-editais/modelo-estrutural.md
           - EPIC-001: implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-001.md
           - EPIC-002: implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-002.md
@@ -147,6 +153,11 @@ nav:
           - EPIC-005: implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-005.md
       - M004 Pagamento de Bolsistas:
           - implementation/modules/M004-pagamento-bolsista/README.md
+          - Backlog: implementation/modules/M004-pagamento-bolsista/backlog.md
+          - Contrato: implementation/modules/M004-pagamento-bolsista/contrato.md
+          - Contrato API: implementation/modules/M004-pagamento-bolsista/contrato-api.md
+          - Modelo Estrutural: implementation/modules/M004-pagamento-bolsista/modelo-estrutural.md
+          - Modelo Comportamental: implementation/modules/M004-pagamento-bolsista/modelo-comportamental.md
           - Analise DDD: implementation/modules/M004-pagamento-bolsista/specifications/analise-ddd-modularidade.md
           - EPIC-001: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-001.md
           - EPIC-002: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-002.md
@@ -169,6 +180,8 @@ nav:
       - M008 Cadastros Corporativos:
           - implementation/modules/M008-cadastros-corporativos/README.md
           - Backlog: implementation/modules/M008-cadastros-corporativos/backlog.md
+          - Contrato: implementation/modules/M008-cadastros-corporativos/contrato.md
+          - Contrato API: implementation/modules/M008-cadastros-corporativos/contrato-api.md
           - Modelo Estrutural: implementation/modules/M008-cadastros-corporativos/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M008-cadastros-corporativos/modelo-comportamental.md
           - EPIC-001: implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-001.md
@@ -177,6 +190,8 @@ nav:
       - M009 Gestao Bolsa Pesquisa:
           - implementation/modules/M009-gestao-bolsista/README.md
           - Backlog: implementation/modules/M009-gestao-bolsista/backlog.md
+          - Contrato: implementation/modules/M009-gestao-bolsista/contrato.md
+          - Contrato API: implementation/modules/M009-gestao-bolsista/contrato-api.md
           - Modelo Estrutural: implementation/modules/M009-gestao-bolsista/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M009-gestao-bolsista/modelo-comportamental.md
           - EPIC-001: implementation/modules/M009-gestao-bolsista/epics/EPIC-M009-001.md
@@ -187,6 +202,7 @@ nav:
           - implementation/modules/M010-planejamento-estrategia/README.md
           - Backlog: implementation/modules/M010-planejamento-estrategia/backlog.md
           - Contrato: implementation/modules/M010-planejamento-estrategia/contrato.md
+          - Contrato API: implementation/modules/M010-planejamento-estrategia/contrato-api.md
           - Modelo Estrutural: implementation/modules/M010-planejamento-estrategia/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M010-planejamento-estrategia/modelo-comportamental.md
           - EPIC-001: implementation/modules/M010-planejamento-estrategia/epics/EPIC-M010-001.md
@@ -196,6 +212,7 @@ nav:
           - implementation/modules/M011-configuracao-captacao/README.md
           - Backlog: implementation/modules/M011-configuracao-captacao/backlog.md
           - Contrato: implementation/modules/M011-configuracao-captacao/contrato.md
+          - Contrato API: implementation/modules/M011-configuracao-captacao/contrato-api.md
           - Modelo Estrutural: implementation/modules/M011-configuracao-captacao/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M011-configuracao-captacao/modelo-comportamental.md
           - EPIC-001: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-001.md
@@ -205,6 +222,7 @@ nav:
           - implementation/modules/M012-acompanhamento-resultados/README.md
           - Backlog: implementation/modules/M012-acompanhamento-resultados/backlog.md
           - Contrato: implementation/modules/M012-acompanhamento-resultados/contrato.md
+          - Contrato API: implementation/modules/M012-acompanhamento-resultados/contrato-api.md
           - Modelo Estrutural: implementation/modules/M012-acompanhamento-resultados/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M012-acompanhamento-resultados/modelo-comportamental.md
           - EPIC-001: implementation/modules/M012-acompanhamento-resultados/epics/EPIC-M012-001.md
@@ -214,6 +232,7 @@ nav:
           - implementation/modules/M013-gestao-orcamentaria-projeto/README.md
           - Backlog: implementation/modules/M013-gestao-orcamentaria-projeto/backlog.md
           - Contrato: implementation/modules/M013-gestao-orcamentaria-projeto/contrato.md
+          - Contrato API: implementation/modules/M013-gestao-orcamentaria-projeto/contrato-api.md
           - Modelo Estrutural: implementation/modules/M013-gestao-orcamentaria-projeto/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M013-gestao-orcamentaria-projeto/modelo-comportamental.md
           - EPIC-001: implementation/modules/M013-gestao-orcamentaria-projeto/epics/EPIC-M013-001.md
@@ -221,6 +240,9 @@ nav:
           - EPIC-003: implementation/modules/M013-gestao-orcamentaria-projeto/epics/EPIC-M013-003.md
       - M014 Prestacao de Contas:
           - implementation/modules/M014-prestacao-contas/README.md
+          - Backlog: implementation/modules/M014-prestacao-contas/backlog.md
+          - Contrato: implementation/modules/M014-prestacao-contas/contrato.md
+          - Contrato API: implementation/modules/M014-prestacao-contas/contrato-api.md
           - Modelo Estrutural: implementation/modules/M014-prestacao-contas/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M014-prestacao-contas/modelo-comportamental.md
           - EPIC-001: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-001.md
@@ -235,6 +257,7 @@ nav:
           - implementation/modules/M015-suspensao-finalizacao/README.md
           - Backlog: implementation/modules/M015-suspensao-finalizacao/backlog.md
           - Contrato: implementation/modules/M015-suspensao-finalizacao/contrato.md
+          - Contrato API: implementation/modules/M015-suspensao-finalizacao/contrato-api.md
           - Modelo Estrutural: implementation/modules/M015-suspensao-finalizacao/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M015-suspensao-finalizacao/modelo-comportamental.md
           - EPIC-001: implementation/modules/M015-suspensao-finalizacao/epics/EPIC-M015-001.md
@@ -243,6 +266,7 @@ nav:
           - implementation/modules/M016-contabilidade-financeiro/README.md
           - Backlog: implementation/modules/M016-contabilidade-financeiro/backlog.md
           - Contrato: implementation/modules/M016-contabilidade-financeiro/contrato.md
+          - Contrato API: implementation/modules/M016-contabilidade-financeiro/contrato-api.md
           - Modelo Estrutural: implementation/modules/M016-contabilidade-financeiro/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M016-contabilidade-financeiro/modelo-comportamental.md
           - EPIC-001: implementation/modules/M016-contabilidade-financeiro/epics/EPIC-M016-001.md
@@ -252,6 +276,7 @@ nav:
           - implementation/modules/M017-prevencao-lavagem-dinheiro/README.md
           - Backlog: implementation/modules/M017-prevencao-lavagem-dinheiro/backlog.md
           - Contrato: implementation/modules/M017-prevencao-lavagem-dinheiro/contrato.md
+          - Contrato API: implementation/modules/M017-prevencao-lavagem-dinheiro/contrato-api.md
           - Modelo Estrutural: implementation/modules/M017-prevencao-lavagem-dinheiro/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M017-prevencao-lavagem-dinheiro/modelo-comportamental.md
           - EPIC-001: implementation/modules/M017-prevencao-lavagem-dinheiro/epics/EPIC-M017-001.md
@@ -262,6 +287,7 @@ nav:
           - implementation/modules/M018-business-intelligence/README.md
           - Backlog: implementation/modules/M018-business-intelligence/backlog.md
           - Contrato: implementation/modules/M018-business-intelligence/contrato.md
+          - Contrato API: implementation/modules/M018-business-intelligence/contrato-api.md
           - Modelo Estrutural: implementation/modules/M018-business-intelligence/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M018-business-intelligence/modelo-comportamental.md
           - EPIC-001: implementation/modules/M018-business-intelligence/epics/EPIC-M018-001.md
@@ -270,6 +296,7 @@ nav:
           - implementation/modules/M019-transparencia-auditoria/README.md
           - Backlog: implementation/modules/M019-transparencia-auditoria/backlog.md
           - Contrato: implementation/modules/M019-transparencia-auditoria/contrato.md
+          - Contrato API: implementation/modules/M019-transparencia-auditoria/contrato-api.md
           - Modelo Estrutural: implementation/modules/M019-transparencia-auditoria/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M019-transparencia-auditoria/modelo-comportamental.md
           - EPIC-001: implementation/modules/M019-transparencia-auditoria/epics/EPIC-M019-001.md
@@ -278,6 +305,7 @@ nav:
           - implementation/modules/M020-comunicacao/README.md
           - Backlog: implementation/modules/M020-comunicacao/backlog.md
           - Contrato: implementation/modules/M020-comunicacao/contrato.md
+          - Contrato API: implementation/modules/M020-comunicacao/contrato-api.md
           - Modelo Estrutural: implementation/modules/M020-comunicacao/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M020-comunicacao/modelo-comportamental.md
           - EPIC-001: implementation/modules/M020-comunicacao/epics/EPIC-M020-001.md
