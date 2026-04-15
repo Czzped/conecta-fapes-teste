@@ -50,7 +50,7 @@ Canais de entrega frontend que compoem funcionalidades de multiplos modulos back
 |----|--------|--------------|
 | M001 | Modalidades de Bolsas | [README](implementation/modules/M001-modalidade-bolsa/README.md) |
 | M002 | Importacao de Editais | [README](implementation/modules/M002-importacao-editais/README.md) |
-| M003 | Gerenciar Editais | [README](implementation/modules/M003-gerenciar-editais/README.md) |
+| M003 | Gestao de Iniciativas Captadas | [README](implementation/modules/M003-gerenciar-editais/README.md) |
 | M004 | Pagamento de Bolsistas | [README](implementation/modules/M004-pagamento-bolsista/README.md) |
 | M005 | Autenticacao e Auditoria | A definir |
 | M006 | Autorizacao | A definir |

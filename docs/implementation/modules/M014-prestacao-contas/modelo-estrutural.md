@@ -235,7 +235,7 @@ classDiagram
 ## Notas de Implementacao
 
 **Entidades externas:**
-- Projeto: gerenciado por M003 (Gerenciar Editais).
+- Projeto: gerenciado por M003 (Gestao de Iniciativas Captadas).
 - RubricaProjeto: gerenciada por M013 (Gestao Orcamentaria do Projeto).
 
 **Navegabilidade:**

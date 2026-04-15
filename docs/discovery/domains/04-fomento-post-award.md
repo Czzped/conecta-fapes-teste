@@ -2,7 +2,23 @@
 
 Fluxo de execucao do projeto contratado ate a sua finalizacao.
 
-**Modulos que implementam este domain:** M009
+**Modulos que implementam este domain:** M003, M009, M012, M013, M014, M015
+
+---
+
+## 4.0 Gestao de Iniciativas Captadas
+
+Apos a contratacao, as iniciativas aprovadas passam a ser gerenciadas operacionalmente pelo M003. Este sub-dominio concentra o ownership de editais operacionais, projetos contratados, cotas de bolsa e alocacoes de bolsistas.
+
+**Implementado por:** [M003 — Gestao de Iniciativas Captadas](../../implementation/modules/M003-gerenciar-editais/README.md)
+
+| # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
+|---|---------------|-----------|---------|---------------------|
+| 4.0.1 | Registrar Edital Operacional | Registrar edital com area tecnica e vinculos de programa/parceria | Analista da Area Tecnica da Agencia | Art. 15, I |
+| 4.0.2 | Registrar Projeto Contratado | Registrar projeto vinculado a edital com coordenador e datas | Analista da Area Tecnica da Agencia | Art. 28, I |
+| 4.0.3 | Gestao de Cotas de Bolsa | Cadastrar cotas por versao de nivel de bolsa no edital | Analista da Area Tecnica da Agencia | Art. 3, VII |
+| 4.0.4 | Alocacao Operacional de Bolsistas | Registrar alocacao consumindo cota do edital, vinculando bolsista e orientador | Analista da Area Tecnica da Agencia | Art. 3, VII; Art. 14, VIII |
+| 4.0.5 | Visao Operacional Consolidada | Consultar visao do edital com projetos, cotas e alocacoes | Analista da Area Tecnica da Agencia | Art. 3, II |
 
 ---
 

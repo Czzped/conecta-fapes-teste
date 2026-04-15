@@ -19,7 +19,7 @@ graph LR
     end
 
     subgraph Pre-Award
-        M003[M003 - Gerenciar Editais]
+        M003[M003 - Gestao de Iniciativas Captadas]
         M011[M011 - Configuracao Captacao]
     end
 

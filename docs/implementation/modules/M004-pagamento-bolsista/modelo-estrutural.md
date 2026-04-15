@@ -362,7 +362,7 @@ classDiagram
 
 **Entidades externas:**
 - AreaTecnica: gerenciada por M008 (Cadastros Corporativos) como especializacao de UnidadeOrganizacional da Instituicao agencia.
-- Edital, Projeto, Pessoa e AlocacaoBolsista: gerenciados por M003 (Gerenciar Editais) e M009 (Gestao Bolsista).
+- Edital, Projeto, Pessoa e AlocacaoBolsista: gerenciados por M003 (Gestao de Iniciativas Captadas) e M009 (Gestao Bolsista).
 - VersaoNivel e VersaoModalidade: gerenciadas por M001 (Modalidade de Bolsa).
 
 **Navegabilidade:**

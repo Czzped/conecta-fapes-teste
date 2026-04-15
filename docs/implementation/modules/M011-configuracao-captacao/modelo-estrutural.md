@@ -139,7 +139,7 @@ classDiagram
 ## Notas de Implementacao
 
 **Entidades externas:**
-- Edital: gerenciado por M003 (Gerenciar Editais). O modulo M011 apenas configura cronograma, formularios, revisores e parametros do edital.
+- Edital: gerenciado por M003 (Gestao de Iniciativas Captadas). O modulo M011 apenas configura cronograma, formularios, revisores e parametros do edital.
 - Programa e Parceria: gerenciados por M010 (Planejamento e Estrategia). Podem ser associados ao edital durante a configuracao.
 
 **Navegabilidade:**

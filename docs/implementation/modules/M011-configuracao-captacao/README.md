@@ -11,32 +11,39 @@
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclo de vida do Edital |
+| [Analise Prototipo](specifications/analise-prototipo-captacao.md) | Cruzamento prototipo backoffice vs documentacao — funcionalidades descobertas |
 
 ---
 
 ## Sobre o Modulo
 
-Antes que um edital possa receber propostas, a agencia de fomento precisa configura-lo: definir cronograma, vincular o edital a um programa quando aplicavel, selecionar parceria financeira quando houver, criar formularios de submissao e avaliacao, registrar revisores ad hoc e definir parametros de fomento. Atualmente esse processo e realizado por meio de documentos manuais, sem templates nem padronizacao, o que gera inconsistencias entre editais e retrabalho frequente. Este modulo visa resolver esse problema ao permitir a configuracao completa dos editais gerenciados operacionalmente em M003, de forma estruturada e padronizada. O sucesso sera medido pela reducao do tempo de configuracao de editais e pela eliminacao de inconsistencias entre editais publicados.
+A agencia de fomento publica editais para selecionar e financiar projetos de pesquisa, desenvolvimento e inovacao. O ciclo completo de uma captacao envolve: configuracao do edital (cronograma, formularios, parametros, bolsas, requisitos), recebimento de inscricoes, avaliacao de merito por revisores ad hoc, analise de recursos e publicacao do resultado final.
+
+Atualmente esse processo e realizado por meio de documentos manuais, sem templates nem padronizacao, o que gera inconsistencias entre editais e retrabalho frequente. Este modulo visa resolver esse problema ao permitir a gestao completa do processo de captacao de iniciativas, desde a configuracao do edital ate a publicacao do resultado. O sucesso sera medido pela reducao do tempo de configuracao de editais, pela eliminacao de inconsistencias e pelo tempo medio do ciclo de captacao.
+
+> **Referencia:** A [analise do prototipo backoffice](specifications/analise-prototipo-captacao.md) detalha todas as funcionalidades extraidas do prototipo e as lacunas identificadas na documentacao.
 
 ---
 
 ## Dominio
 
-A agencia de fomento publica editais de fomento (demanda publica ou induzida) para selecionar e financiar projetos de pesquisa. Antes de abrir o recebimento de propostas, cada edital gerenciado em M003 precisa ser configurado com cronograma, formularios e parametros.
+A agencia de fomento publica editais de fomento (demanda publica ou induzida) para selecionar e financiar projetos de pesquisa. O processo de captacao de iniciativas possui as seguintes etapas:
 
-Quando houver alinhamento estrategico definido, o edital pode ser vinculado a um programa de fomento previamente cadastrado no M010. Esse vinculo permite reaproveitar o contexto estrategico do programa e manter a rastreabilidade entre planejamento, programa e captacao.
+**1. Configuracao do Edital** — A agencia configura o edital com: identificacao (titulo, tipo de captacao, setor responsavel, tipo de fomento, numero, datas), cronograma (periodos sequenciais de submissao, avaliacao, resultado preliminar, recurso, resultado final, contratacao), formularios (submissao, avaliacao, recurso — versionados e reutilizaveis), parametros de fomento (faixas de financiamento com duracao/valor min/max, orcamento total, cotas por area, origens de recurso), regras de submissao (multiplas submissoes, coordenador com outro projeto), requisitos do coordenador (nivel academico, vinculo institucional, restricao empregaticia), rubricas permitidas e bolsas da captacao (modalidade M001, nivel, max bolsistas, cotas).
 
-O cronograma define os periodos do edital: submissao, avaliacao de merito, resultado preliminar, recurso, resultado final e contratacao. As datas devem ser sequenciais e o edital deve ter ao menos um periodo de submissao.
+**2. Publicacao** — O edital e publicado quando cronograma, formularios e parametros estao completos. Uma vez publicado, nao pode ser editado, apenas retificado via nova versao.
 
-Para cada edital, a agencia de fomento cria formularios de submissao (preenchidos pelos proponentes) e formularios de avaliacao (preenchidos pelos revisores). Os formularios podem ser versionados para reutilizacao em editais futuros. O formulario de avaliacao deve estar configurado antes da fase de avaliacao de merito.
+**3. Inscricoes** — Proponentes submetem propostas usando o formulario de inscricao. A agencia acompanha inscricoes com filtros por area, status, instituicao e setor.
 
-Revisores ad hoc sao consultores externos cadastrados pela agencia de fomento para avaliar propostas. Um revisor nao pode avaliar propostas da propria instituicao (conflito de interesses). Os revisores sao associados a editais especificos.
+**4. Avaliacao de Merito** — Revisores ad hoc (consultores externos) sao associados ao edital e avaliam as propostas. Um revisor nao pode avaliar propostas da propria instituicao. O formulario de avaliacao define perguntas com nota e peso.
 
-Os parametros de fomento definem orcamento total, cotas por area, valores maximos por projeto e outras restricoes financeiras do edital. Quando o edital utilizar recursos oriundos de parceria, a configuracao tambem registra a parceria selecionada e o valor da parceria destinado ao edital.
+**5. Recurso** — Proponentes podem contestar a avaliacao com motivo, descricao e anexos. A agencia analisa e decide sobre o recurso.
 
-Uma vez publicado em M003, um edital nao pode mais ter sua configuracao alterada diretamente. Caso necessario, deve-se registrar uma nova configuracao versionada para viabilizar a retificacao.
+**6. Resultado Final** — Publicacao do resultado com lista de aprovados e reprovados.
 
-> O edital e gerenciado operacionalmente por M003. Programas e parcerias sao gerenciados por M010. Este modulo consome esses contextos para estruturar a configuracao do edital.
+Quando houver alinhamento estrategico, o edital pode ser vinculado a um programa (M010) e parceria (M010) para rastreabilidade. O edital operacional (projeto, cota, alocacao) apos contratacao e gerenciado por M003.
+
+> O edital operacional pos-contratacao e gerenciado por M003. Programas e parcerias sao gerenciados por M010. Este modulo cobre o ciclo de captacao de ponta a ponta: da configuracao a publicacao do resultado.
 
 ---
 
@@ -47,11 +54,18 @@ Uma vez publicado em M003, um edital nao pode mais ter sua configuracao alterada
 | RN01 | Um edital deve possuir ao menos um periodo de submissao no cronograma antes de ser publicado. | Must |
 | RN02 | O formulario de avaliacao deve estar configurado antes do inicio da fase de avaliacao de merito. | Must |
 | RN03 | Um revisor ad hoc nao pode avaliar propostas da propria instituicao (conflito de interesses). | Must |
-| RN04 | Um edital publicado em M003 nao pode ter sua configuracao alterada diretamente, somente retificada por meio de nova versao de configuracao. | Must |
+| RN04 | Um edital publicado nao pode ter sua configuracao alterada diretamente, somente retificada por meio de nova versao de configuracao. | Must |
 | RN05 | As datas do cronograma devem ser sequenciais (submissao antes de avaliacao, avaliacao antes de resultado, etc.). | Must |
 | RN06 | Um formulario publicado nao pode ser alterado, apenas versionado. | Must |
 | RN07 | O orcamento total do edital deve ser igual ou superior a soma dos valores alocados por area. | Must |
-| RN08 | Um edital so pode ser publicado em M003 quando cronograma, formularios e parametros obrigatorios estiverem completos. | Must |
+| RN08 | Um edital so pode ser publicado quando cronograma, formularios e parametros obrigatorios estiverem completos. | Must |
 | RN09 | Alteracoes relevantes apos a publicacao devem gerar nova versao de configuracao vinculada ao mesmo edital. | Must |
+| RN10 | Um edital pode definir faixas de financiamento com duracao, valor minimo e valor maximo por faixa. | Should |
+| RN11 | As regras de submissao definem se multiplas propostas sao permitidas e se o coordenador pode ter outro projeto ativo. | Must |
+| RN12 | Os requisitos do coordenador podem exigir nivel academico minimo, vinculo institucional e restricao de vinculo empregaticio. | Must |
+| RN13 | O edital deve definir as rubricas financeiras permitidas para os projetos financiados. | Must |
+| RN14 | O edital define as bolsas da captacao vinculando modalidade (M001), nivel, versao, maximo de bolsistas e quantidade de cotas. | Must |
+| RN15 | Uma proposta submetida apos o fim do periodo de submissao deve ser recusada automaticamente. | Must |
+| RN16 | O resultado final so pode ser publicado apos a conclusao do periodo de recurso. | Must |
 | RI1 | Um revisor nao pode ser associado mais de uma vez ao mesmo edital. | Must |
 | RI2 | Um edital nao pode ter dois formularios de submissao ativos simultaneamente. | Must |

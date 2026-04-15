@@ -146,7 +146,7 @@ classDiagram
 ## Notas de Implementacao
 
 **Entidades externas:**
-- Projeto: gerenciado por M003 (Gerenciar Editais).
+- Projeto: gerenciado por M003 (Gestao de Iniciativas Captadas).
 - BolsaPesquisa: gerenciada por M009 (Gestao Bolsa Pesquisa).
 - PrestacaoContas: gerenciada por M014 (Prestacao de Contas).
 

@@ -33,7 +33,7 @@ O Portal Admin e a interface principal para operadores, gerentes e diretores da 
 |--------|---------------|
 | M001 | Modalidades de Bolsa — cadastro e versionamento |
 | M002 | Importacao SIGFAPES — monitoramento e reprocessamento |
-| M003 | Gerenciar Editais — visualizacao operacional |
+| M003 | Gestao de Iniciativas Captadas — visualizacao operacional |
 | M004 | Pagamento Bolsistas — folhas, remessas, retornos, guias |
 | M005 | Autenticacao |
 | M008 | Cadastros Corporativos — pessoas, instituicoes, areas tecnicas |

@@ -170,7 +170,7 @@ classDiagram
 ## Notas de Implementacao
 
 **Entidades externas:**
-- Edital, Projeto e AlocacaoBolsista: gerenciados por M003 (Gerenciar Editais)
+- Edital, Projeto e AlocacaoBolsista: gerenciados por M003 (Gestao de Iniciativas Captadas)
 - PessoaFisica e AreaTecnica: gerenciadas por M008 (Cadastros Corporativos)
 - VersaoNivel: gerenciada por M001 (Modalidades de Bolsas)
 

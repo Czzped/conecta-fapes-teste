@@ -185,7 +185,7 @@ classDiagram
 ## Notas de Implementacao
 
 **Entidades externas:**
-- Iniciativa: gerenciada por M003 (Gerenciar Editais) como abstracao estrutural de iniciativas apoiadas.
+- Iniciativa: gerenciada por M003 (Gestao de Iniciativas Captadas) como abstracao estrutural de iniciativas apoiadas.
 - Programa e Parceria: gerenciados por M010 (Planejamento e Estrategia).
 
 **Navegabilidade:**

@@ -45,7 +45,7 @@ Indice consolidado de debitos tecnicos identificados nos modulos do projeto. Cad
 
 ---
 
-### M003 — Gerenciar Editais
+### M003 — Gestao de Iniciativas Captadas
 
 **Backlog detalhado:** [M003/backlog.md](../implementation/modules/M003-gerenciar-editais/backlog.md)
 

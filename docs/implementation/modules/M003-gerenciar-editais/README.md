@@ -1,6 +1,6 @@
-# M003 - Gerenciar Editais
+# M003 - Gestao de Iniciativas Captadas
 
-[← Voltar ao Backlog Central](../../../management/backlog-product.md) | [Domain 03 — Fomento Pre-Award](../../../discovery/domains/03-fomento-pre-award.md)
+[← Voltar ao Backlog Central](../../../management/backlog-product.md) | [Domain 04 — Fomento Post-Award](../../../discovery/domains/04-fomento-post-award.md)
 
 ## Indice
 
@@ -15,7 +15,9 @@
 
 ## Sobre o Modulo
 
-A falta de visibilidade consolidada sobre editais, iniciativas, projetos, bolsistas e alocacoes dificulta a tomada de decisao operacional da agencia de fomento, obrigando os usuarios a consultar multiplas fontes desconectadas. Este modulo resolve esse problema ao concentrar o ownership operacional do edital e de suas iniciativas, permitindo acompanhar projetos, cotas e alocacoes em um unico contexto. O sucesso sera medido pelo tempo medio de consulta para tomada de decisao, pela consistencia dos dados operacionais e pela rastreabilidade entre edital, iniciativa e bolsa.
+Apos a contratacao de uma iniciativa (projeto de pesquisa, visita tecnica, publicacao, etc.), a agencia de fomento precisa gerenciar os dados operacionais: o edital de origem, os projetos contratados, as cotas de bolsa disponiveis, as alocacoes de bolsistas e os papeis de coordenador, orientador e bolsista. Atualmente, a falta de visibilidade consolidada dificulta a tomada de decisao, obrigando os usuarios a consultar multiplas fontes desconectadas. Este modulo concentra o ownership operacional das iniciativas captadas, permitindo acompanhar projetos, cotas e alocacoes em um unico contexto. O sucesso sera medido pelo tempo medio de consulta para tomada de decisao, pela consistencia dos dados operacionais e pela rastreabilidade entre edital, iniciativa e bolsa.
+
+> **Fronteira com M011:** O processo de captacao (configuracao do edital, inscricoes, avaliacao de merito, recurso e resultado final) e responsabilidade do M011. O M003 assume a gestao das iniciativas **apos a contratacao**, quando os projetos ja estao em execucao.
 
 ---
 

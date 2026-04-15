@@ -2,7 +2,7 @@
 
 Fluxo desde a publicacao do edital ate a contratacao da iniciativa.
 
-**Modulos que implementam este domain:** M003
+**Modulos que implementam este domain:** M011, M002
 
 ---
 

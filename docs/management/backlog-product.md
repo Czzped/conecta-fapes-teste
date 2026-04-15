@@ -30,8 +30,9 @@ Conecta FAPES e uma plataforma de apoio a pesquisa, desenvolvimento e inovacao d
 | | 2.2 Gestao de Parcerias | Cooperacao com entidades publicas e privadas, aportes e aditivos | M010 |
 | | 2.3 Gestao de Programa | Cadastro de programas, comites gestores, dotacao orcamentaria e captacoes | M010 |
 | **3. Fomento — Pre-Award** | 3.1 Configuracao da Captacao | Elaboracao do edital, formularios, revisores e parametrizacao | M011 |
-| | 3.2 Fases da Captacao | Submissao, analise documental, analise de merito, contratacao e deposito | M002, M003 |
-| **4. Fomento — Post-Award** | 4.1 Acompanhamento de Iniciativas | Dashboards de monitoramento para coordenador, agencia de fomento e SECONT | M003, M012 |
+| | 3.2 Fases da Captacao | Submissao, analise documental, analise de merito, contratacao e deposito | M011, M002 |
+| **4. Fomento — Post-Award** | 4.0 Gestao de Iniciativas Captadas | Ownership operacional de editais, projetos contratados, cotas e alocacoes | M003 |
+| | 4.1 Acompanhamento de Iniciativas | Dashboards de monitoramento para coordenador, agencia de fomento e SECONT | M003, M012 |
 | | 4.2 Gestao de Resultados | Submissao e analise de relatorios tecnicos e contestacao | M012 |
 | | 4.3 Gestao Orcamentaria do Projeto | Adicoes orcamentarias, rubricas e remanejamentos | M013 |
 | | 4.4 Prestacao de Contas | Submissao de documentos fiscais, analise, auditoria e contestacao | M014 |
@@ -58,7 +59,7 @@ Conecta FAPES e uma plataforma de apoio a pesquisa, desenvolvimento e inovacao d
 |----|--------|----------------|----------------------|----------------|-----------|-------------|
 | M001 | Modalidades de Bolsas | Modalidades, niveis e requisitos de bolsas sao controlados manualmente via planilhas, gerando inconsistencias entre resolucoes e dados cadastrados | Permitir o cadastro e manutencao de Modalidades, Niveis e Requisitos de Bolsas vinculados as Resolucoes da agencia de fomento | Reducao de inconsistencias cadastrais; tempo de cadastro de nova modalidade | 80% | [backlog](../implementation/modules/M001-modalidade-bolsa/backlog.md) |
 | M002 | Importacao SIGFAPES | Dados de editais, projetos, pessoas e pagamentos precisam ser digitados manualmente a partir do Sigfapes, causando retrabalho e erros de transcricao | Importar automaticamente do Sigfapes editais, projetos, equipes, pessoas e historico de pagamentos | Percentual de registros importados automaticamente; reducao de erros de transcricao | 100% | [backlog](../implementation/modules/M002-importacao-editais/backlog.md) |
-| M003 | Gerenciar Editais | Falta de visibilidade consolidada sobre editais, projetos, bolsistas e alocacoes dificulta a tomada de decisao para pagamentos | Prover visualizacoes de dados de Editais, Projetos, Bolsistas e Alocacoes para apoio a decisao | Tempo medio de consulta para tomada de decisao; satisfacao do usuario com as visualizacoes | 80% | [backlog](../implementation/modules/M003-gerenciar-editais/backlog.md) |
+| M003 | Gestao de Iniciativas Captadas | Falta de visibilidade consolidada sobre iniciativas contratadas, projetos, cotas e alocacoes dificulta a gestao pos-contratacao | Ownership operacional de editais, projetos contratados, cotas de bolsa e alocacoes de bolsistas em um unico contexto | Tempo medio de consulta para tomada de decisao; consistencia dos dados operacionais | 80% | [backlog](../implementation/modules/M003-gerenciar-editais/backlog.md) |
 | M004 | Pagamento de Bolsistas | Geracao de folhas de pagamento e comunicacao com Banestes/BANDES e feita por processos manuais, sujeitos a atrasos e erros que impactam bolsistas | Gerar folhas de pagamento e operacionalizar o pagamento via integracao com Banestes e BANDES, gerando documentos para EDOCS | Percentual de pagamentos processados no prazo; reducao de erros em folha | 100% | [backlog](../implementation/modules/M004-pagamento-bolsista/backlog.md) |
 | M005 | Autenticacao e Auditoria | Sem controle granular de acesso, qualquer usuario autenticado pode acessar dados sensiveis sem rastro de auditoria | Implementar autenticacao integrada ao Acesso Cidadao com autorizacao em nivel de dados e logs de auditoria | Cobertura de controle de acesso; percentual de acoes auditadas | 30% | A definir |
 | M006 | Autorizacao | Permissoes de acesso sao rigidas e nao permitem delegacao de funcoes, travando processos quando responsaveis estao ausentes | Gerenciar autorizacoes e delegacao de funcoes com politicas flexiveis via OpenFGA | Tempo medio de concessao/revogacao de acesso; incidentes de acesso indevido | 0% | A definir |
@@ -207,7 +208,7 @@ Funcionalidades identificadas na [visao do produto](../discovery/product-vision.
 graph LR
     %% Modulos existentes
     M002[M002 - Importacao Editais] --> M004[M004 - Pagamento Bolsistas]
-    M002 --> M003[M003 - Gerenciar Editais]
+    M002 --> M003[M003 - Gestao de Iniciativas Captadas]
     M001[M001 - Modalidades Bolsas] --> M004
     M005[M005 - Autenticacao] --> M007[M007 - API Gateway]
     M006[M006 - Autorizacao] --> M007

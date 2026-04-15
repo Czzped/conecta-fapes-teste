@@ -172,7 +172,7 @@ classDiagram
 ## Notas de Implementacao
 
 **Entidades externas:**
-- Projeto, Coordenador e Edital: gerenciados por M003 (Gerenciar Editais). O suporte atual deste modulo permanece focado em iniciativas operacionalizadas como Projeto.
+- Projeto, Coordenador e Edital: gerenciados por M003 (Gestao de Iniciativas Captadas). O suporte atual deste modulo permanece focado em iniciativas operacionalizadas como Projeto.
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: RelatorioTecnico.projeto: Projeto)

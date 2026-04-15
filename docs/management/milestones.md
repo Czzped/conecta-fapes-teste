@@ -40,7 +40,7 @@ Planejamento estrategico e fluxo completo de captacao de iniciativas.
 | [02 Planejamento](../discovery/domains/02-planejamento.md) | Plano estrategico, parcerias, programas de fomento | M010 |
 | [03 Fomento Pre-Award](../discovery/domains/03-fomento-pre-award.md) | Publicacao de edital, submissao, analise documental, merito, contratacao | M003, M011 |
 
-> **Progresso:** M003 (Gerenciar Editais) esta ~80% — em producao, pendente integracao com M010 (Programa/Parceria). M010 (Planejamento e Estrategia) esta ~15% — Gestao de Programas em desenvolvimento ativo. M011 (Configuracao de Captacao) esta ~10% — Configuracao do Edital em andamento.
+> **Progresso:** M003 (Gestao de Iniciativas Captadas) esta ~80% — em producao, pendente integracao com M010 (Programa/Parceria). M010 (Planejamento e Estrategia) esta ~15% — Gestao de Programas em desenvolvimento ativo. M011 (Configuracao de Captacao) esta ~10% — Configuracao do Edital em andamento.
 
 ---
 
@@ -52,7 +52,7 @@ Execucao das iniciativas contratadas ate a finalizacao.
 |--------|-----------|---------|
 | [04 Fomento Post-Award](../discovery/domains/04-fomento-post-award.md) | Acompanhamento, resultados, orcamento, prestacao de contas, bolsistas, suspensao/finalizacao | M003, M009, M012, M013, M014, M015 |
 
-> **Progresso:** M003 (Gerenciar Editais) esta ~80%. M014 (Prestacao de Contas) esta ~55% (6/8 EPICs Done, mas depende de M013 para RubricaProjeto — M013 nao iniciado). M009 (Gestao Bolsa Pesquisa) esta ~35% — indicacao e avaliacao documental em progresso via Portal Coordenador. Restam M012, M013 e M015 nao iniciados.
+> **Progresso:** M003 (Gestao de Iniciativas Captadas) esta ~80%. M014 (Prestacao de Contas) esta ~55% (6/8 EPICs Done, mas depende de M013 para RubricaProjeto — M013 nao iniciado). M009 (Gestao Bolsa Pesquisa) esta ~35% — indicacao e avaliacao documental em progresso via Portal Coordenador. Restam M012, M013 e M015 nao iniciados.
 
 ---
 

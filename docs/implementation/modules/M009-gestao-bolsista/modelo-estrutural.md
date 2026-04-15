@@ -204,7 +204,7 @@ classDiagram
 ## Notas de Implementacao
 
 **Entidades externas:**
-- Coordenador, Orientador, Bolsista, Projeto e CotaEdital: gerenciados por M003 (Gerenciar Editais).
+- Coordenador, Orientador, Bolsista, Projeto e CotaEdital: gerenciados por M003 (Gestao de Iniciativas Captadas).
 - VersaoNivel: gerenciado por M001 (Modalidade de Bolsa).
 
 **Navegabilidade:**

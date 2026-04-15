@@ -1,4 +1,4 @@
-# Contrato de API HTTP — M003 Gerenciar Editais
+# Contrato de API HTTP — M003 Gestao de Iniciativas Captadas
 
 Referencia de dominio e regras de negocio: [contrato.md](contrato.md) | [README.md](README.md)
 

@@ -1,10 +1,10 @@
-# Sub-Backlog: M003 - Gerenciar Editais
+# Sub-Backlog: M003 - Gestao de Iniciativas Captadas
 
 [← Voltar ao Backlog Central](../../../management/backlog-product.md)
 
 ## Sobre o Modulo
 
-A falta de visibilidade consolidada sobre editais, projetos, bolsistas e alocacoes dificulta a tomada de decisao para pagamentos, obrigando os servidores a consultar multiplas fontes de dados de forma fragmentada. Este modulo resolve esse problema ao prover visualizacoes integradas de dados de Editais, Projetos, Bolsistas e Alocacoes, apoiando a tomada de decisao de forma agil e informada. O sucesso sera medido pelo tempo medio de consulta para tomada de decisao e pela satisfacao do usuario com as visualizacoes.
+Apos a contratacao, a agencia precisa gerenciar os dados operacionais das iniciativas captadas: edital de origem, projetos contratados, cotas de bolsa e alocacoes de bolsistas. Este modulo concentra o ownership operacional das iniciativas pos-contratacao, fornecendo visualizacoes integradas para apoio a decisao.
 
 Especificacao de referencia: [README.md](README.md)
 

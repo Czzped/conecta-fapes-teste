@@ -144,7 +144,7 @@ classDiagram
 ## Notas de Implementacao
 
 **Entidades externas:**
-- Projeto: gerenciado por M003 (Gerenciar Editais).
+- Projeto: gerenciado por M003 (Gestao de Iniciativas Captadas).
 - RubricaFinanceira: gerenciada por M008 (Cadastros Corporativos). Este modulo especializa a rubrica no contexto do projeto por meio de RubricaProjeto.
 - VersaoNivel: gerenciada por M001 (Modalidade de Bolsa).
 

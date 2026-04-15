@@ -160,7 +160,7 @@ classDiagram
 
 **Entidades externas:**
 - Programa: gerenciado por M010 (Planejamento e Estrategia).
-- Iniciativa: gerenciada por M003 (Gerenciar Editais) como abstracao estrutural para publicacoes e auditoria.
+- Iniciativa: gerenciada por M003 (Gestao de Iniciativas Captadas) como abstracao estrutural para publicacoes e auditoria.
 - BolsaPesquisa: gerenciada por M009 (Gestao Bolsa Pesquisa).
 
 **Navegabilidade:**
