@@ -1,67 +1,25 @@
-# EP-11 — Prestação Financeira
+# EP-11 — Prestacao Financeira
 
 | Atributo | Valor |
 |----------|-------|
 | **Modulos backend** | M014 |
 | **Produto** | Portal Coordenador |
+| **Status** | Partial |
 
-`Bounded Context:` Portal FAPES (Prestação) `Status:` Partial `Dependências:` EP-01, EP-02, EP-06
+## Jornada
 
-## Descrição
+O coordenador navega por transacoes financeiras, abre detalhe da prestacao, processa notas fiscais (PDF/XML), associa itens a contas contabeis, coleta cotacoes de fornecedor e submete a prestacao.
 
-Conduzir o coordenador pelo fluxo de prestação financeira a partir da listagem de transações do projeto, incluindo abertura do detalhe, processamento de nota fiscal, associação contábil, envio de cotações, observações e submissão final.
+## EPICs de implementacao
 
-## Critérios de aceite
+| Modulo | EPIC | Titulo | Status |
+|--------|------|--------|--------|
+| M014 | [EPIC-M014-004](../../../implementation/modules/M014-prestacao-contas/epics/EPIC-M014-004.md) | Justificativas de Despesa | Done |
+| M014 | [EPIC-M014-005](../../../implementation/modules/M014-prestacao-contas/epics/EPIC-M014-005.md) | Documentos Fiscais e SERPRO | Done |
+| M014 | [EPIC-M014-006](../../../implementation/modules/M014-prestacao-contas/epics/EPIC-M014-006.md) | Itens de Documento Fiscal | Done |
+| M014 | [EPIC-M014-007](../../../implementation/modules/M014-prestacao-contas/epics/EPIC-M014-007.md) | Orcamentos de Fornecedor | Done |
+| M014 | [EPIC-M014-008](../../../implementation/modules/M014-prestacao-contas/epics/EPIC-M014-008.md) | Fluxo de Submissao e Analise V1 | Done |
 
-- A página principal lista transações e prestações do projeto com paginação.
-- A listagem oferece filtros de data, status e categoria, embora parte do fechamento funcional ainda esteja pendente.
-- O detalhe da prestação permite upload e processamento de nota fiscal em PDF/XML.
-- O usuário pode revisar itens da nota e associá-los a conta e subconta contábil.
-- O fluxo permite anexar até três cotações e marcar a escolhida.
-- Há área de observações e botão de submissão final da prestação.
-- O indicador orçamentário do módulo existe, mas ainda precisa evolução para refletir dados reais com maior confiança.
+## Cenarios de aceitacao do produto
 
-## Casos de Uso
-
-### Consultar lista de prestações
-
-```gherkin
-Feature: Acessar prestação financeira do projeto
-  Como coordenador do projeto
-  Quero consultar as transações que demandam prestação
-  Para iniciar ou acompanhar o fluxo financeiro do projeto
-
-  Background:
-    Given que sou coordenador do projeto ativo
-    And acesso "/prestacao-financeira"
-
-  Scenario: Listar transações e prestações
-    When a página principal é carregada
-    Then o sistema exibe a listagem paginada de transações
-    And disponibiliza filtros por data, status e categoria
-
-  Scenario: Abrir detalhe da prestação
-    Given que existe uma transação listada
-    When seleciono uma linha da listagem
-    Then o sistema navega para o detalhe da prestação correspondente
-```
-
-### Concluir prestação financeira
-
-```gherkin
-Feature: Executar fluxo detalhado da prestação
-  Como coordenador do projeto
-  Quero preencher todas as etapas da prestação financeira
-  Para submeter corretamente a documentação do gasto
-
-  Scenario: Processar nota fiscal e associar itens
-    Given que estou no detalhe da prestação
-    When envio uma nota fiscal e confirmo os dados processados
-    Then o sistema permite revisar os itens extraídos
-    And permite associar cada item a conta e subconta contábil
-
-  Scenario: Enviar cotações e submeter prestação
-    Given que todos os itens foram associados
-    When anexo as cotações exigidas e salvo as observações
-    Then o sistema habilita a submissão final da prestação
-```
+- **Abrir detalhe da prestacao**: navegacao do listagem para detalhe com stepper visual do fluxo

@@ -4,58 +4,19 @@
 |----------|-------|
 | **Modulos backend** | M003, M009 |
 | **Produto** | Portal Coordenador |
+| **Status** | Done |
 
-`Bounded Context:` Portal FAPES (Projetos) `Status:` Done `Dependências:` EP-01, EP-02
+## Jornada
 
-## Descrição
+O coordenador visualiza resumo financeiro e itens orcamentarios do projeto. O participante visualiza suas bolsas priorizadas por status.
 
-Apresentar a visão do projeto ou da bolsa do usuário conforme o papel exercido no projeto ativo, destacando resumo financeiro, orçamento e informações principais de acompanhamento.
+## EPICs de implementacao
 
-## Critérios de aceite
+| Modulo | EPIC | Titulo | Status |
+|--------|------|--------|--------|
+| M003 | [EPIC-M003-005](../../../implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-005.md) | Visao Operacional Consolidada | Done |
+| M009 | [EPIC-M009-004](../../../implementation/modules/M009-gestao-bolsista/epics/EPIC-M009-004.md) | Consultar Bolsa Pesquisa | To Do |
 
-- Coordenadores visualizam um resumo financeiro do projeto selecionado.
-- Coordenadores visualizam itens orçamentários do projeto.
-- Participantes visualizam a bolsa prioritária conforme status de relevância.
-- A página trata estados de carregamento, erro e ausência de bolsa.
-- O conteúdo exibido muda conforme o papel do usuário no projeto ativo.
+## Cenarios de aceitacao do produto
 
-## Casos de Uso
-
-### Visualizar Meu Projeto como coordenador
-
-```gherkin
-Feature: Consultar Meu Projeto no papel de coordenador
-  Como coordenador do projeto
-  Quero visualizar o resumo financeiro do projeto ativo
-  Para acompanhar orçamento e execução financeira
-
-  Background:
-    Given que estou autenticado
-    And possuo um projeto ativo no cabeçalho
-
-  Scenario: Exibir resumo financeiro
-    Given que sou coordenador do projeto ativo
-    When acesso "/meu-projeto"
-    Then o sistema exibe o resumo financeiro do projeto
-    And exibe os itens orçamentários vinculados ao projeto
-```
-
-### Visualizar Meu Projeto como participante
-
-```gherkin
-Feature: Consultar Minha Bolsa em Meu Projeto
-  Como bolsista ou participante
-  Quero visualizar minha bolsa principal
-  Para acompanhar meu vínculo atual no portal
-
-  Scenario: Exibir bolsa priorizada por status
-    Given que possuo bolsas vinculadas ao meu usuário
-    When acesso "/meu-projeto"
-    Then o sistema seleciona a bolsa mais relevante por status
-    And exibe o card correspondente
-
-  Scenario: Exibir estado sem bolsa
-    Given que não possuo bolsa disponível
-    When acesso "/meu-projeto"
-    Then o sistema exibe uma mensagem indicando ausência de bolsa
-```
+- **Exibir estado sem bolsa**: quando o participante nao possui bolsa ativa, exibir mensagem orientativa

@@ -1,58 +1,22 @@
-# EP-03 — Página Inicial do Portal
+# EP-03 — Pagina Inicial do Portal
 
 | Atributo | Valor |
 |----------|-------|
 | **Modulos backend** | M003, M009 |
 | **Produto** | Portal Coordenador |
+| **Status** | Partial |
 
-`Bounded Context:` Portal FAPES (Home) `Status:` Partial `Dependências:` EP-01, EP-02
+## Jornada
 
-## Descrição
+A home do portal exibe resumo do projeto para coordenadores e bolsas ativas para participantes, adaptando o conteudo ao perfil do usuario autenticado.
 
-Oferecer uma página inicial com visão resumida do projeto ativo para coordenadores, exibição das bolsas relevantes do usuário e um espaço de notificações do portal.
+## EPICs de implementacao
 
-## Critérios de aceite
+| Modulo | EPIC | Titulo | Status |
+|--------|------|--------|--------|
+| M003 | [EPIC-M003-005](../../../implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-005.md) | Visao Operacional Consolidada | Done |
+| M009 | [EPIC-M009-004](../../../implementation/modules/M009-gestao-bolsista/epics/EPIC-M009-004.md) | Consultar Bolsa Pesquisa | To Do |
 
-- Coordenadores visualizam um card consolidado do projeto na home.
-- Usuários com bolsas ativas ou com documentação pendente visualizam cards de bolsa na home.
-- A home carrega os dados do dashboard e exibe indicador de carregamento enquanto busca informações.
-- O bloco de notificações existe visualmente e já exibe um card estático.
-- O fluxo de notificações ainda não está ligado a eventos reais do backend.
+## Cenarios de aceitacao do produto
 
-## Casos de Uso
-
-### Consultar visão inicial do portal
-
-```gherkin
-Feature: Visualizar home do Portal FAPES
-  Como usuário autenticado
-  Quero abrir a página inicial do portal
-  Para consultar um resumo rápido do meu contexto atual
-
-  Background:
-    Given que possuo sessão ativa e um projeto selecionado
-
-  Scenario: Coordenador visualiza resumo do projeto
-    Given que sou coordenador do projeto ativo
-    When acesso a home
-    Then o sistema exibe o card consolidado do projeto
-
-  Scenario: Participante visualiza suas bolsas ativas
-    Given que possuo bolsas com status visível
-    When acesso a home
-    Then o sistema lista as bolsas ativas ou com documentação pendente
-```
-
-### Consultar notificações disponíveis
-
-```gherkin
-Feature: Exibir notificações da home
-  Como usuário autenticado
-  Quero consultar mensagens do portal na página inicial
-  Para ter visibilidade rápida de ocorrências relevantes
-
-  Scenario: Exibir bloco de notificações
-    When acesso a home
-    Then o sistema exibe a seção de notificações
-    And apresenta ao menos um card visual no layout atual
-```
+- **Exibir bloco de notificacoes**: area de notificacoes visivel com conteudo placeholder (eventos reais pendentes)
