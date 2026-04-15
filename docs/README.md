@@ -32,7 +32,17 @@ Plataforma digital da agencia de fomento para gestao do ciclo completo de foment
 | [Visao Geral](architecture/README.md) | Contexto do sistema, stack tecnologica, integracoes e operacao |
 | [ADRs](architecture/adr/README.md) | Decisoes de arquitetura registradas |
 
-> **Nota:** A pasta `documentation_old/` na raiz do repositorio e uma versao antiga da documentacao e nao deve ser utilizada como referencia. Toda a documentacao atual esta organizada nesta pasta `docs/`.
+> **Nota:** A pasta `documentation_old/` na raiz do repositorio e uma versao antiga da documentacao e nao deve ser utilizada como referencia. A pasta [deprecated/](deprecated/README.md) contem documentacao legada migrada (`pagamento-bolsista`, `portal-fapes`, `prestacao-de-contas`) — consulte `products/` e `implementation/modules/` para a documentacao atual.
+
+## Produtos
+
+Canais de entrega frontend que compoem funcionalidades de multiplos modulos backend.
+
+| Produto | Descricao | Documentacao |
+|---------|-----------|--------------|
+| Portal Coordenador | Portal web do coordenador de projeto e bolsista | [README](products/portal-coordenador/README.md) |
+| Portal Admin | Portal administrativo da agencia (back-office) | [README](products/portal-admin/README.md) |
+| Importador | Importacao de dados do SIGFAPES | [README](products/importador/README.md) |
 
 ## Modulos
 

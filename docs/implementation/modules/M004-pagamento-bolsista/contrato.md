@@ -4,7 +4,7 @@ Dominio e regras de negocio: ver [README.md](README.md)
 
 ## Proposito do Contrato
 
-Este contrato documenta a superficie publica do modulo M004 como contexto responsavel por calendario mensal, decisao de liberacao, geracao de folhas, remessas e acompanhamento do pagamento de bolsistas.
+Este contrato documenta a superficie publica do modulo M004 como contexto responsavel por calendario mensal, decisao de liberacao, geracao de folhas, bonus de pagamento, remessas bancarias, retornos, guias de liberacao, relatorios e acompanhamento do pagamento de bolsistas.
 
 ## Consumidores e Dependencias
 
@@ -12,8 +12,10 @@ Este contrato documenta a superficie publica do modulo M004 como contexto respon
 
 | Consumidor | Uso do contrato |
 |------------|-----------------|
-| Gerente GEPOF | Define marcos mensais, gera folhas e acompanha remessas |
+| Gerente GEPOF | Define marcos mensais, gera folhas, gera remessas, acompanha processos |
 | Area Tecnica | Decide a liberacao de editais por competencia |
+| Diretor (DIRAF) | Autoriza ou rejeita folhas de pagamento |
+| [Portal Coordenador](../../../products/portal-coordenador/README.md) | Consulta pagamentos por projeto ([EP-09](../../../products/portal-coordenador/features/EP-09-pagamentos-bolsa.md)) |
 | M015 e M017 | Bloqueiam ou restringem processamento de pagamentos em cenarios especificos |
 
 ### Dependencias
@@ -21,25 +23,39 @@ Este contrato documenta a superficie publica do modulo M004 como contexto respon
 | Dependencia | Tipo | Observacao |
 |-------------|------|------------|
 | M003 | Modulo interno | Fornece `Edital`, `Projeto` e `AlocacaoBolsista` |
-| M001 | Modulo interno | Fornece `VersaoNivel` |
+| M001 | Modulo interno | Fornece `VersaoNivel` e `VersaoModalidade` |
 | M008 | Modulo interno | Fornece `AreaTecnica` |
-| Banco / integracao financeira | Sistema externo | Recebe remessas e retorna status de agendamento/pagamento |
+| M009 | Modulo interno | Fornece gestao do ciclo de vida de bolsistas |
+| Banestes | Sistema externo | Recebe remessas de cadastro e pagamento, retorna status |
+| BANDES | Sistema externo | Recebe encaminhamento de pagamento |
+| MinIO | Sistema externo | Armazenamento de arquivos de remessa, retorno, guias e relacoes |
+| Redis | Sistema externo | Filas de processamento de retorno de remessas |
 
 ## Operacoes Publicas
 
 | Nome da Operacao | Tipo | Objetivo | Entrada | Saida | Regras relacionadas | Pre-condicoes | Recusas/erros | Idempotencia | Autorizacao | Mapeamento de transporte |
 |------------------|------|----------|---------|-------|---------------------|---------------|---------------|--------------|-------------|--------------------------|
-| ConfigurarPlanoMensalDeFolhas | Command | Definir os marcos M1, M2 e M3 da competencia | competencia, marcoSolicitacao, marcoGeracaoFolha, marcoPagamento | `PlanoMensal` criado/atualizado | RN01, RN02, RN03, RN07, RN08, RN09 | Datas informadas | Datas fora da janela, sequencia invalida | Nao | Gerente GEPOF | API interna/backoffice a definir |
-| RegistrarDecisaoDeLiberacaoDoEditalCompetencia | Command | Liberar ou nao liberar edital para a competencia | edital, competencia, ehLiberado, justificativa | `EditalCompetencia` atualizado | RN12, RN13, RN18, RN24 | EditalCompetencia existente ou gerado | Prazo invalido, edital ja incluido em folha | Nao | Area Tecnica | API interna/backoffice a definir |
-| GerarFolhaDePagamento | Command | Gerar folha normal ou complementar para a competencia | competencia, dataPagamento, tipoFolha | `Folha` gerada com pagamentos vinculados | RN10, RN15, RN16, RN23 | Marco de geracao atingido e folha anterior resolvida | Folha anterior pendente, pagamentos indisponiveis | Nao | Gerente GEPOF | API interna/backoffice a definir |
-| RegistrarDecisaoSobreFolha | Command | Autorizar, rejeitar ou cancelar uma folha gerada | folha, tipoAcao, justificativa | `Folha` e pagamentos atualizados | RN14, RN20, RN21, RN22, RN25 | Folha existente | Estado da folha invalido, cancelamento nao permitido | Nao | Gerente GEPOF ou Diretor autorizado | API interna/backoffice a definir |
-| GerarRemessaBancaria | Async Job | Preparar e enviar remessa de cadastro ou pagamento ao banco | folha, tipoRemessa | `Remessa` registrada | RN17, RN25 | Folha autorizada quando aplicavel | Folha nao autorizada, falha de integracao bancara | Sim por folha e tipo de remessa | Sistema | Job/fila a definir + integracao bancaria |
-| ConsultarFolhasDaCompetencia | Query | Consultar folhas, decisoes, guias e remessas de uma competencia | competencia, edital, status | Lista de folhas e seus artefatos | RN10, RN17 | Competencia informada | Nenhuma folha encontrada | N/A | Gerente GEPOF ou Area Tecnica autorizada | API interna a definir |
+| ConfigurarPlanoMensalDeFolhas | Command | Definir os marcos M1, M2 e M3 da competencia | competencia, marcoSolicitacao, marcoGeracaoFolha, marcoPagamento | `PlanoMensal` criado/atualizado | RN01, RN02, RN03, RN07, RN08, RN09 | Datas informadas | Datas fora da janela, sequencia invalida | Nao | Gerente GEPOF | `POST /api/planoMensal` |
+| RegistrarDecisaoDeLiberacaoDoEditalCompetencia | Command | Liberar ou nao liberar edital para a competencia | edital, competencia, ehLiberado, justificativa | `EditalCompetencia` atualizado | RN12, RN13, RN18, RN24 | EditalCompetencia existente ou gerado | Prazo invalido, edital ja incluido em folha | Nao | Area Tecnica | `POST /api/editalCompetencia` |
+| GerarFolhaDePagamento | Command | Gerar folha normal ou complementar para a competencia | competencia, dataPagamento, tipoFolha | `Folha` gerada com pagamentos vinculados | RN10, RN15, RN16, RN23 | Marco de geracao atingido e folha anterior resolvida | Folha anterior pendente, pagamentos indisponiveis | Nao | Gerente GEPOF | `POST /api/folha` |
+| RegistrarDecisaoSobreFolha | Command | Autorizar, rejeitar ou cancelar uma folha gerada | folha, tipoAcao, justificativa | `Folha` e pagamentos atualizados | RN14, RN20, RN21, RN22, RN25 | Folha existente | Estado da folha invalido, cancelamento nao permitido | Nao | Gerente GEPOF ou Diretor | `POST /api/folha/{id}/decisao` |
+| GerenciarBonusPagamento | Command | Criar, editar ou excluir bonus de pagamento | nome, valorFixo/porcentagem, tipoBonus, planoMensalId, versaoModalidades | `BonusPagamento` criado/atualizado/excluido | — | PlanoMensal existente | Bonus ja incluso em folha | Nao | Gerente GEPOF | `POST/PUT/DELETE /api/bonusPagamento` |
+| GerarRemessaCadastroBolsista | Command | Gerar arquivo de remessa de cadastro para o Banestes | alocacoes com StatusCadastroBaneste PENDENTE | `RemessaCadastro` com arquivo gerado no MinIO | — | Alocacoes ativas com cadastro pendente | Dados bancarios incompletos | Nao | Gerente GEPOF | `POST /api/remessaCadastro` |
+| GerarRemessaPagamento | Command | Gerar arquivo de remessa de pagamento para o Banestes | folhaId | `RemessaPagamento` com arquivo gerado no MinIO | RN17 | Folha autorizada | Folha nao autorizada, falha de geracao | Sim por folha | Gerente GEPOF / Sistema | `POST /api/remessaPagamento` |
+| ProcessarRetornoRemessaCadastro | Async Job | Processar arquivo de retorno de remessa de cadastro | mensagem da fila Redis | Alocacoes atualizadas (CADASTRADO ou PENDENTE) | — | Mensagem na fila Redis | Arquivo invalido, erro de processamento | Sim por remessa | Sistema (Job Hangfire) | Fila Redis `pagamentobolsista.remessa.cadastro` |
+| ProcessarRetornoRemessaPagamento | Async Job | Processar arquivo de retorno de remessa de pagamento | mensagem da fila Redis | Pagamentos atualizados (AGENDADO ou FALHA_AGENDAMENTO) | — | Mensagem na fila Redis | Arquivo invalido, erro de processamento | Sim por remessa | Sistema (Job Hangfire) | Fila Redis `pagamentobolsista.remessa.pagamento` |
+| EncaminharPagamentoBandes | Command | Encaminhar pagamentos ao BANDES para transferencia | folhaId | Pagamentos encaminhados | — | Folha com remessas agendadas | Folha nao agendada | Nao | Gerente GEPOF | `POST /api/folha/{id}/encaminhar-bandes` |
+| GerarGuiaLiberacao | Command | Gerar guia de liberacao (PDF) para Banestes ou Bandes | folhaId, tipo (NORMAL/ALTERNATIVA) | `GuiaLiberacao` com PDF gerado no MinIO | — | Folha existente com pagamentos | Folha sem pagamentos | Nao | Gerente GEPOF | `POST /api/folha/{id}/guia` |
+| GerarRelacaoPagamento | Query | Gerar relacao de pagamento por edital ou bolsista | folhaId, editalId, filtros | Documento de relacao gerado no MinIO | — | Folha existente | Nenhum pagamento encontrado | N/A | Gerente GEPOF | `GET /api/folha/{id}/relacao` |
+| ConsultarFolhasDaCompetencia | Query | Consultar folhas, decisoes, guias e remessas de uma competencia | competencia, edital, status | Lista de folhas e seus artefatos | RN10, RN17 | Competencia informada | Nenhuma folha encontrada | N/A | Gerente GEPOF ou Area Tecnica | `GET /api/folha` |
+| ConsultarProcessosRemessa | Query | Consultar processos de remessa e seus status | filtros de status e tipo | Lista de processos com detalhes | — | — | Nenhum processo encontrado | N/A | Gerente GEPOF | `GET /api/processoRemessa` |
+| SuspenderPagamento | Command | Suspender pagamento de um bolsista | pagamentoId, justificativa | Pagamento com status SUSPENSAO_POR_SOLICITACAO | — | Pagamento com status ALOCADO | Pagamento ja em folha | Nao | Gerente GEPOF | `POST /api/pagamentoBolsista/{id}/suspender` |
+| EstenderPagamento | Command | Estender cotas de pagamento de um bolsista | alocacaoId, quantidadeCotas | Novas cotas de pagamento criadas | — | Alocacao ativa | Alocacao nao ativa | Nao | Gerente GEPOF | `POST /api/pagamentoBolsista/{id}/estender` |
+| ExportarFolhaCsv | Query | Exportar dados da folha em formato CSV | folhaId | Arquivo CSV | — | Folha existente | Folha nao encontrada | N/A | Gerente GEPOF | `GET /api/folha/{id}/csv` |
 
 ## Padrao de Payload e Erro
 
 - Os JSON abaixo sao exemplos ilustrativos do contrato de aplicacao do modulo.
-- Endpoint, fila, arquivo de remessa e integracao bancaria concreta continuam `a definir`.
 
 **Envelope de erro sugerido**
 
@@ -178,7 +194,7 @@ Este contrato documenta a superficie publica do modulo M004 como contexto respon
 | ACAO_FOLHA_INVALIDA | A acao solicitada nao pode ser aplicada ao estado atual da folha. |
 | CANCELAMENTO_FOLHA_NAO_PERMITIDO | A folha nao pode mais ser cancelada no momento informado. |
 
-### GerarRemessaBancaria
+### GerarRemessaPagamento
 
 **Exemplo de entrada**
 
@@ -195,7 +211,7 @@ Este contrato documenta a superficie publica do modulo M004 como contexto respon
 {
   "remessa": {
     "numero": 1042,
-    "status": "ENVIADA"
+    "status": "GERADA"
   }
 }
 ```
@@ -242,16 +258,24 @@ Este contrato documenta a superficie publica do modulo M004 como contexto respon
 
 ## Mapeamento de Transporte
 
-- `Command` e `Query`: `API interna/backoffice a definir`.
-- `GerarRemessaBancaria`: `job/fila a definir`.
-- Integracao externa bancaria: `a definir`.
+A implementacao atual utiliza controllers genéricos do framework (`BaseCrudController`, `BaseController`) com endpoints no padrao `/api/{entidade}`. O mapeamento concreto de cada operacao esta documentado na coluna "Mapeamento de transporte" da tabela acima.
+
+Jobs assincronos:
+- `ProcessarRetornoRemessaCadastro`: consome fila Redis `pagamentobolsista.remessa.cadastro` a cada 3 min via Hangfire.
+- `ProcessarRetornoRemessaPagamento`: consome fila Redis `pagamentobolsista.remessa.pagamento` a cada 3 min via Hangfire.
 
 ## Eventos e Efeitos Colaterais
 
-- `RegistrarDecisaoDeLiberacaoDoEditalCompetencia` registra historico formal de decisao da area.
-- `GerarFolhaDePagamento` altera o status dos pagamentos vinculados e do edital por competencia.
-- `RegistrarDecisaoSobreFolha` pode devolver pagamentos para `ALOCADO`, conforme regras do modulo.
-- `GerarRemessaBancaria` inicia a comunicacao com o provedor financeiro externo.
+- `RegistrarDecisaoDeLiberacaoDoEditalCompetencia` registra historico formal de decisao da area (DecisaoLiberacao).
+- `GerarFolhaDePagamento` altera o status dos pagamentos vinculados para EM_FOLHA, EditalCompetencia para INCLUIDO_EM_FOLHA, BonusPagamento para INCLUSO_NA_FOLHA.
+- `RegistrarDecisaoSobreFolha` pode devolver pagamentos para ALOCADO e EditalCompetencia para LIBERADO, conforme regras do modulo.
+- `GerarRemessaCadastroBolsista` atualiza StatusCadastroBaneste para ENVIADO e gera arquivo no MinIO.
+- `GerarRemessaPagamento` gera arquivo de largura fixa no MinIO com hash SHA256 e vincula pagamentos a remessa.
+- `ProcessarRetornoRemessaCadastro` atualiza status de cadastro (CADASTRADO ou PENDENTE) e registra erros.
+- `ProcessarRetornoRemessaPagamento` atualiza status de pagamento (AGENDADO ou FALHA_AGENDAMENTO) e registra erros.
+- `EncaminharPagamentoBandes` inicia a comunicacao com o BANDES para transferencia de recursos.
+- `GerarGuiaLiberacao` gera documento PDF e armazena no MinIO (bucket BUCKET_GUIAS).
+- `GerarRelacaoPagamento` gera documento de relacao e armazena no MinIO (bucket BUCKET_RELACOES).
 
 ## Rastreabilidade
 

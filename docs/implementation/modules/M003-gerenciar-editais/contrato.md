@@ -15,6 +15,7 @@ Este contrato documenta a superficie publica do modulo M003 como bounded context
 | Analista da Agencia de Fomento | Registra editais, projetos, cotas e alocacoes operacionais |
 | M002 | Sincroniza dados legados do SigFapes para entidades canonicamente gerenciadas por M003 |
 | M011, M012, M015 e modulos correlatos | Consultam edital, projeto e alocacao como referencias operacionais |
+| [Portal Coordenador](../../../products/portal-coordenador/README.md) | Contexto de projeto, equipe, cadastro de bolsista ([EP-02](../../../products/portal-coordenador/features/EP-02-shell-portal-contexto-projeto.md), [EP-06](../../../products/portal-coordenador/features/EP-06-meu-projeto.md), [EP-07](../../../products/portal-coordenador/features/EP-07-minha-equipe-acompanhamento-bolsas.md), [EP-08](../../../products/portal-coordenador/features/EP-08-cadastro-edicao-bolsista.md)) |
 
 ### Dependencias
 

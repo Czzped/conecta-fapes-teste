@@ -1,0 +1,46 @@
+# Portal Admin
+
+Portal administrativo da agencia de fomento (back-office).
+
+[← Voltar aos Produtos](../README.md)
+
+---
+
+## Sobre o Produto
+
+O Portal Admin e a interface principal para operadores, gerentes e diretores da agencia de fomento. Permite gerenciar editais, projetos, modalidades de bolsa, pagamentos, folhas, remessas bancarias e cadastros corporativos.
+
+| Atributo | Valor |
+|----------|-------|
+| **Perfis de usuario** | Operadores GEPOF, Diretores (DIRAF), Areas Tecnicas, Administradores |
+| **Stack** | Vue 3, Nuxt UI |
+| **Status** | Em producao (documentacao parcial) |
+
+---
+
+## Indice
+
+| Documento | Descricao |
+|-----------|-----------|
+| [Backlog](backlog.md) | Epicos de produto com modulos backend consumidos |
+
+---
+
+## Modulos Backend Consumidos
+
+| Modulo | Funcionalidade |
+|--------|---------------|
+| M001 | Modalidades de Bolsa — cadastro e versionamento |
+| M002 | Importacao SIGFAPES — monitoramento e reprocessamento |
+| M003 | Gerenciar Editais — visualizacao operacional |
+| M004 | Pagamento Bolsistas — folhas, remessas, retornos, guias |
+| M005 | Autenticacao |
+| M008 | Cadastros Corporativos — pessoas, instituicoes, areas tecnicas |
+
+---
+
+## Proximos Passos
+
+- Migrar documentacao legada de `docs/deprecated/pagamento-bolsista/` (features de back-office) para esta pasta
+- Documentar arquitetura frontend do portal admin
+- Vincular features ao roadmap em `management/releases-2026.csv`

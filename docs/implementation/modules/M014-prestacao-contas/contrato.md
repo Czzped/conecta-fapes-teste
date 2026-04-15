@@ -15,6 +15,7 @@ Este contrato documenta a superficie publica do modulo M014 como contexto respon
 | Coordenador | Registra documentos e submete a prestacao de contas |
 | Area Tecnica / SECONT | Analisa, solicita complementos e acompanha auditoria |
 | M015 | Consulta pendencias antes do encerramento do projeto |
+| [Portal Coordenador](../../../products/portal-coordenador/README.md) | Prestacao financeira ([EP-11](../../../products/portal-coordenador/features/EP-11-prestacao-financeira.md)) |
 
 ### Dependencias
 
@@ -22,6 +23,8 @@ Este contrato documenta a superficie publica do modulo M014 como contexto respon
 |-------------|------|------------|
 | M003 | Modulo interno | Fornece `Projeto` |
 | M013 | Modulo interno | Fornece `RubricaProjeto` e limites aprovados |
+| SERPRO | Sistema externo | Consulta de NF-e (Nota Fiscal Eletronica) via API OAuth2 — valida documentos fiscais |
+| MinIO | Sistema externo | Armazenamento de PDFs de orcamento de fornecedor e justificativas |
 
 ## Operacoes Publicas
 

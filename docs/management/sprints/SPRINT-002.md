@@ -19,12 +19,12 @@
 
 | Feature | Produto | Modulo | Status |
 |---------|---------|--------|--------|
-| Cadastrar Parceria | CONECTA FAPES | — | To Do |
-| Associar Parceria a Programa | CONECTA FAPES | — | To Do |
-| Registrar Aporte Financeiro do Parceiro | CONECTA FAPES | — | To Do |
-| Acompanhar Execucao da Parceria | CONECTA FAPES | — | To Do |
-| Gestao de Programas | CONECTA FAPES | — | To Do |
-| Gestao de Planejamento Estrategico | CONECTA FAPES | — | To Do |
+| Cadastrar Parceria | CONECTA FAPES | M010 | To Do |
+| Associar Parceria a Programa | CONECTA FAPES | M010 | To Do |
+| Registrar Aporte Financeiro do Parceiro | CONECTA FAPES | M010 | To Do |
+| Acompanhar Execucao da Parceria | CONECTA FAPES | M010 | To Do |
+| Gestao de Programas | CONECTA FAPES | M010 | To Do |
+| Gestao de Planejamento Estrategico | CONECTA FAPES | M010 | To Do |
 
 ---
 

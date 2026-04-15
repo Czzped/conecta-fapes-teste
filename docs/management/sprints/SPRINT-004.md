@@ -19,7 +19,7 @@
 
 | Feature | Produto | Modulo | Status |
 |---------|---------|--------|--------|
-| Prorrogacao de Janela de Solicitacao — prazos excepcionais por edital, projeto ou coordenador | PORTAL FAPES - COORDENADOR | — | To Do |
+| Prorrogacao de Janela de Solicitacao — prazos excepcionais por edital, projeto ou coordenador | PORTAL FAPES - COORDENADOR | M011 | To Do |
 | Testar a Gestao de Editais e Novos Projetos com usuarios de teste | CONECTA FAPES | M003 | To Do |
 | Escalonamento de Projetos — regua de prioridade para inclusao de editais no fluxo | PORTAL FAPES - ADMIN | M003 | To Do |
 

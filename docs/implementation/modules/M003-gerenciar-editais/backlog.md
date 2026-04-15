@@ -6,55 +6,48 @@
 
 A falta de visibilidade consolidada sobre editais, projetos, bolsistas e alocacoes dificulta a tomada de decisao para pagamentos, obrigando os servidores a consultar multiplas fontes de dados de forma fragmentada. Este modulo resolve esse problema ao prover visualizacoes integradas de dados de Editais, Projetos, Bolsistas e Alocacoes, apoiando a tomada de decisao de forma agil e informada. O sucesso sera medido pelo tempo medio de consulta para tomada de decisao e pela satisfacao do usuario com as visualizacoes.
 
-Especificacao de referencia: [/documentation/docs/modulos/06_gerenciar_editais/](/documentation/docs/modulos/06_gerenciar_editais/)
+Especificacao de referencia: [README.md](README.md)
 
 ---
 
-## EPICs
+## Backlog
 
-| ID | Titulo | Prioridade | Status | Documento |
-|----|--------|------------|--------|-----------|
-| <!-- EPIC-M003-001 | Titulo | Must | To Do | [EPIC-M003-001](epics/EPIC-M003-001.md) --> |
+| ID | Titulo | Requisito | Prioridade | Status | Documento |
+|----|--------|-----------|------------|--------|-----------|
+| EPIC-M003-001 | Registrar Edital Operacional | RN01, RN07 | Must | Done | [EPIC-M003-001](epics/EPIC-M003-001.md) |
+| EPIC-M003-002 | Registrar Projetos e Coordenacao | RN02, RN03, RN06 | Must | Done | [EPIC-M003-002](epics/EPIC-M003-002.md) |
+| EPIC-M003-003 | Gestao de Cotas de Edital | RN04 | Must | Done | [EPIC-M003-003](epics/EPIC-M003-003.md) |
+| EPIC-M003-004 | Alocacao Operacional de Bolsistas | RN05, RN06 | Must | Done | [EPIC-M003-004](epics/EPIC-M003-004.md) |
+| EPIC-M003-005 | Visao Operacional Consolidada | RN01-RN05 | Must | Done | [EPIC-M003-005](epics/EPIC-M003-005.md) |
 
----
-
-## User Stories
-
-| ID | Titulo | EPIC | Prioridade | Status | Documento |
-|----|--------|------|------------|--------|-----------|
-| <!-- US-M003-001 | Titulo | EPIC-M003-001 | Must | To Do | [US-M003-001](user-stories/US-M003-001.md) --> |
-
----
-
-## Tasks
-
-| ID | Titulo | User Story | Escopo | Responsavel | Status | Documento |
-|----|--------|------------|--------|-------------|--------|-----------|
-| <!-- T-M003-001 | Titulo | US-M003-001 | Back-end | - | To Do | [T-M003-001](tasks/T-M003-001.md) --> |
-
----
-
-## Especificacoes
-
-| Documento | Status | Arquivo |
-|-----------|--------|---------|
-| Minimundo | - | [01_minimundo.md](specifications/01_minimundo.md) |
-| Requisitos | - | [02_requisitos.md](specifications/02_requisitos.md) |
-| Casos de Uso | - | [03_casos-uso.md](specifications/03_casos-uso.md) |
-| Modelo Estrutural | - | [04_modelo-estrutural.md](specifications/04_modelo-estrutural.md) |
-| Modelo Comportamental | - | [05_modelo-comportamental.md](specifications/05_modelo-comportamental.md) |
-| Arquitetura | - | [06_arquitetura.md](specifications/06_arquitetura.md) |
+> **Nota:** Estes EPICs foram derivados das 5 operacoes publicas do [contrato.md](contrato.md). As entidades (Edital, Projeto, CotaEdital, AlocacaoBolsista) ja existem no codigo e sao consumidas por M004, M009, M012-M015 e pelo Portal Coordenador.
 
 ---
 
 ## Rastreabilidade
 
 ```
-EPIC-M003-xxx
-├── US-M003-xxx
-│   ├── T-M003-xxx [Escopo]
-│   └── T-M003-xxx [Escopo]
-└── US-M003-xxx
-    └── T-M003-xxx [Escopo]
-```
+EPIC-M003-001 (Registrar Edital Operacional)
+├── US-M003-001 Criar Edital com Area Tecnica
+├── US-M003-002 Atualizar Edital Operacional
+└── US-M003-003 Vincular Edital a Programa/Parceria
 
+EPIC-M003-002 (Registrar Projetos e Coordenacao)  <- depende de EPIC-M003-001
+├── US-M003-004 Criar Projeto vinculado a Edital
+├── US-M003-005 Registrar Coordenador do Projeto
+└── US-M003-006 Substituir Coordenador com Justificativa
+
+EPIC-M003-003 (Gestao de Cotas de Edital)  <- depende de EPIC-M003-001
+├── US-M003-007 Cadastrar Cotas por VersaoNivel
+└── US-M003-008 Consultar Disponibilidade de Cotas
+
+EPIC-M003-004 (Alocacao Operacional de Bolsistas)  <- depende de EPIC-M003-002, EPIC-M003-003
+├── US-M003-009 Registrar Alocacao consumindo Cota
+├── US-M003-010 Vincular Orientador e Bolsista
+└── US-M003-011 Cancelar Alocacao com Justificativa
+
+EPIC-M003-005 (Visao Operacional Consolidada)  <- transversal
+├── US-M003-012 Consultar Visao do Edital (projetos, cotas, alocacoes)
+├── US-M003-013 Consultar Projetos do Edital
+└── US-M003-014 Consultar Bolsistas do Projeto
+```

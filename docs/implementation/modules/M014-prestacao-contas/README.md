@@ -8,9 +8,11 @@
 |-----------|-----------|
 | [Contrato](contrato.md) | Superficie publica do modulo: comandos, consultas, jobs e eventos |
 | [Contrato API](contrato-api.md) | Especificacao HTTP REST concreta: endpoints, payloads, erros e autorizacao |
-| [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
+| [Backlog](backlog.md) | EPICs (8 total, 6 Done), rastreabilidade e debito tecnico |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclos de vida de PrestacaoContas e Contestacao |
+
+> **Nota sobre implementacao:** Este modulo possui um backend independente (`ConectaFapes.PrestacaoContas.*`) com AppDbContext, SQL Server e integracoes proprias (SERPRO, MinIO). Detalhes de infraestrutura em [architecture/04-dados-e-operacao.md](../../../architecture/04-dados-e-operacao.md). Entidades financeiras (ContaBancaria, Orcamento, ContaContabil, TransacaoFinanceira) estao implementadas neste backend mas pertencem conceitualmente a M016/M013 — ver [debito tecnico](backlog.md#debito-tecnico).
 
 ---
 

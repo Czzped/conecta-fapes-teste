@@ -15,6 +15,7 @@ Este contrato documenta a superficie publica do modulo M009 como contexto respon
 | Coordenador e Orientador | Indicam bolsistas e acompanham o fluxo da bolsa |
 | Area Tecnica da Agencia de Fomento | Avalia documentos e decide continuidade do fluxo |
 | M004 e M015 | Consomem o estado da bolsa para pagamento, suspensao e encerramento |
+| [Portal Coordenador](../../../products/portal-coordenador/README.md) | Documentos, equipe, cadastro bolsista, aditivo ([EP-05](../../../products/portal-coordenador/features/EP-05-gestao-documentos-usuario.md), [EP-07](../../../products/portal-coordenador/features/EP-07-minha-equipe-acompanhamento-bolsas.md), [EP-08](../../../products/portal-coordenador/features/EP-08-cadastro-edicao-bolsista.md), [EP-12](../../../products/portal-coordenador/features/EP-12-aditivo-bolsa.md)) |
 
 ### Dependencias
 

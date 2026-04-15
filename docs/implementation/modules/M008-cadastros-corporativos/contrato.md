@@ -15,6 +15,7 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 | Todos os modulos operacionais | Consultam pessoas, instituicoes, unidades, areas tecnicas e rubricas como referencia canonica |
 | Autenticacao / Acesso Cidadao | Sincroniza cadastros de pessoas por CPF |
 | Analista da Agencia de Fomento | Mantem a base cadastral corporativa |
+| [Portal Coordenador](../../../products/portal-coordenador/README.md) | Gestao de perfil e dados pessoais ([EP-04](../../../products/portal-coordenador/features/EP-04-gestao-perfil-usuario.md)) |
 
 ### Dependencias
 

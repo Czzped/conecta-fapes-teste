@@ -13,7 +13,10 @@ Este contrato documenta a superficie publica do modulo M001 como bounded context
 | Consumidor | Uso do contrato |
 |------------|-----------------|
 | Analista da Agencia de Fomento | Cadastra, versiona, publica e consulta resolucoes, modalidades e niveis |
-| Modulos operacionais internos | Consultam versoes vigentes de modalidade e nivel para associacao e validacao de bolsas |
+| M003 | Referencia `VersaoNivel` para cotas de edital e alocacoes |
+| M004 | Referencia `VersaoNivel` para pagamentos e `VersaoModalidade` para bonus (relacao N:N com BonusPagamento) |
+| M009 | Referencia `VersaoNivel` para formalizacao de bolsas |
+| M013 | Referencia `VersaoNivel` para orcamento de bolsas |
 
 ### Dependencias
 

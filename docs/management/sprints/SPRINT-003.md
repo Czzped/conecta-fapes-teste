@@ -19,8 +19,8 @@
 
 | Feature | Produto | Modulo | Status |
 |---------|---------|--------|--------|
-| Gestao de Aditivos Admin — alteracao de valores, prazos, escopo e substituicao de coordenacao | PORTAL FAPES - ADMIN | — | To Do |
-| Gestao de Aditivos Coordenador — alteracoes de valores, prazos, escopo e substituicao | PORTAL FAPES - COORDENADOR | — | To Do |
+| Gestao de Aditivos Admin — alteracao de valores, prazos, escopo e substituicao de coordenacao | PORTAL FAPES - ADMIN | M009 | To Do |
+| Gestao de Aditivos Coordenador — alteracoes de valores, prazos, escopo e substituicao | PORTAL FAPES - COORDENADOR | M009 | To Do |
 | Suspensao de Bolsa — interrupcao temporaria do pagamento e das atividades do bolsista | PORTAL FAPES - COORDENADOR | M009 | To Do |
 | Prorrogacao de Vigencia — extensao do periodo das bolsas conforme parametrizacao do edital | PORTAL FAPES - COORDENADOR | M009 | To Do |
 | Ajuste Visualizar Pendencias — exibir apenas solicitacoes do Conecta | PORTAL FAPES - ADMIN | M009 | To Do |

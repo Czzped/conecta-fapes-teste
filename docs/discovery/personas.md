@@ -1,5 +1,29 @@
 # ConectaFAPES — Personas
 
+## Rastreabilidade de Personas por Dominio
+
+| Persona | Dominios onde atua | Modulos principais |
+|---------|--------------------|--------------------|
+| Cidadao | 01 (portal de transparencia), 03 (submissao de propostas) | M005, M008, M011 |
+| Participante de Projeto | 04 (execucao de iniciativas) | M003, M009 |
+| Bolsista | 04 (bolsas, documentos, plano de trabalho) | M009 |
+| Voluntario | 04 (participacao em projeto sem bolsa) | M009 |
+| Terceiro (PJ) | 04 (prestacao de servico a projetos) | M014 |
+| Coordenador | 03 (submissao), 04 (execucao, prestacao de contas, bolsistas) | M003, M009, M012, M013, M014 |
+| Orientador | 04 (orientacao de bolsistas em pos-graduacao) | M003, M009 |
+| Reitor | 01 (dirigente maximo de Instituicao de Ensino e Pesquisa) | M008 |
+| Diretor / Responsavel | 01 (responsavel por Unidade Organizacional) | M008 |
+| Agencia de Fomento | 01-06 (opera toda a plataforma como entidade gestora) | Todos |
+| Entidade Parceira | 02 (parcerias com aporte financeiro para programas) | M010 |
+| Analista da Area Tecnica da Agencia | 04 (analise de prestacao), 05 (liberacao de pagamento) | M004, M009, M012, M014 |
+| Analista | 04 (gestao de projetos, bolsas e prestacoes) | M003, M009, M014 |
+| Area Tecnica | 05 (liberacao de editais para folha de pagamento) | M004 |
+| SUCON | 03 (contratos e convenios da agencia) | M003, M011 |
+| SECONT | 04 (auditoria de prestacao de contas) | M014, M019 |
+| Consultor Ad Hoc | 03 (avaliacao de merito tecnico-cientifico) | M011 |
+
+---
+
 ## Comunidade Cientifica
 
 Personas externas que interagem com a agencia de fomento como beneficiarias, proponentes ou participantes de projetos.

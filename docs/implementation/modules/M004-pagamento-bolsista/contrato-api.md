@@ -2,9 +2,11 @@
 
 Referencia de dominio e regras de negocio: [contrato.md](contrato.md) | [README.md](README.md)
 
+> **Nota sobre implementacao atual:** A implementacao em producao utiliza controllers genericos do framework (`BaseCrudController`, `BaseController`) com endpoints no padrao `/api/{entidade}` (ex: `/api/planoMensal`, `/api/folha`). Os endpoints `/api/v1/m004/...` descritos abaixo representam o **design target** para a evolucao da API com versionamento e agrupamento por modulo. Consulte [contrato.md](contrato.md) para o mapeamento atual.
+
 ## Visao Geral
 
-Este documento especifica o contrato HTTP REST do modulo M004 como bounded context responsavel pelo calendario mensal, decisao de liberacao, geracao de folhas, remessas e acompanhamento do pagamento de bolsistas. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
+Este documento especifica o contrato HTTP REST do modulo M004 como bounded context responsavel pelo calendario mensal, decisao de liberacao, geracao de folhas, bonus de pagamento, remessas bancarias, retornos, guias de liberacao, relatorios e acompanhamento do pagamento de bolsistas. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
 
 ### Base URL
 

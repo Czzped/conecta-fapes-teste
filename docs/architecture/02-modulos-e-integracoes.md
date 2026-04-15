@@ -81,22 +81,36 @@ graph LR
 |------------|-----------|
 | **Conect Admin** | Modulo administrativo principal. Gerencia importacoes do Sigfapes, modelos de dominio (editais, projetos, alocacoes, bolsistas) e operacoes do back-office da agencia de fomento |
 | **Dashboard Pagamento** | Painel analitico de gastos por edital, projeto e bolsista. Consolida dados financeiros para tomada de decisao |
-| **Modulo Pagamento** | Operacionaliza o pagamento de bolsas via integracao com Banestes (arquivos de remessa/retorno @-EDI) e geracao de documentos para BANDES e EDOCS |
+| **Modulo Pagamento** | Operacionaliza o pagamento de bolsas via integracao com Banestes (arquivos de remessa/retorno @-EDI) e geracao de documentos para BANDES e EDOCS. **Implementado** — ver [M004](../implementation/modules/M004-pagamento-bolsista/README.md) e [ADR-006](adr/ADR-006-reconciliacao-m004-pagamento-bolsista.md) |
 | **Gerenciamento de Usuarios** | Ultima barreira de acesso. Verifica se o usuario possui cadastro ativo no sistema apos autenticacao e autorizacao, aplicando restricoes adicionais (ex.: bloqueio por inatividade) |
 
 ## Evolucao Proposta: BFF
 
-O [ADR-005](adr/ADR-005-adocao-bff.md) propoe introduzir uma camada de Backend for Frontend (BFF) para jornadas que agregam dados de varios modulos. A proposta nao substitui os contratos modulares nem transforma o M007 em BFF; o gateway continua sendo a camada tecnica de roteamento, autenticacao e enforcement.
+O [ADR-005](adr/ADR-005-adocao-bff.md) (Aceita) define a adocao de **um BFF por produto** para composicao de telas multi-modulo. O M007 continua como gateway tecnico; os BFFs ficam entre o frontend e o gateway.
 
 ```mermaid
 graph LR
-    U[Browser] --> FE[Frontend Nuxt]
-    FE --> BFF[BFF orientado a tela]
-    BFF --> IGW[Gateway Interno]
+    subgraph Produtos
+        PC[Portal Coordenador]
+        PA[Portal Admin]
+        IMP[Importador]
+    end
+
+    subgraph BFFs
+        BFFC[BFF Coordenador]
+        BFFA[BFF Admin]
+    end
+
+    PC --> BFFC
+    PA --> BFFA
+    IMP --> IGW
+
+    BFFC --> IGW[Gateway Interno M007]
+    BFFA --> IGW
     IGW --> API[APIs Modulares]
 ```
 
-Na fase inicial recomendada, o BFF pode ser implementado no proprio Nuxt/Nitro para compor queries e alguns fluxos multi-etapa com forte necessidade de experiencia integrada. Se a complexidade operacional crescer, a camada pode evoluir para BFFs logicos separados por canal, como back-office e front-office.
+A implementacao atual **ainda nao possui BFF** — os frontends chamam diretamente as APIs modulares. A introducao sera incremental: queries compostas primeiro, depois comandos multi-etapa. Ver [ADR-005](adr/ADR-005-adocao-bff.md) para mapa de endpoints e regras.
 
 ## Decisoes de Arquitetura
 

@@ -113,6 +113,7 @@ Cada US na tabela do epic inclui o numero da issue:
 | [roadmap.md](roadmap.md) | Visao operacional de entregas por trimestre e produto | Derivado de releases-2026.csv |
 | [releases-2026.csv](releases-2026.csv) | Dados brutos de entregas 2026 (produto, feature, status, dominio, modulo) | Sim — fonte do roadmap.md |
 | [sprints/](sprints/) | Um arquivo por sprint, referenciando features de releases-2026.csv | Sim — execucao do sprint |
+| [technical-debt.md](technical-debt.md) | Indice consolidado de debito tecnico de todos os modulos | Derivado dos backlogs dos modulos |
 
 ## Relacao entre os arquivos
 
@@ -123,9 +124,11 @@ backlog-product.md          → define dominios e modulos
     │         │
     │         └──▶ sprints/ → executa epics de implementation/modules/
     │
-    └──▶ releases-2026.csv  → rastreia entregas operacionais 2026 por produto
-              │
-              └──▶ roadmap.md  → visao markdown de releases-2026.csv (leitura/navegacao)
+    ├──▶ releases-2026.csv  → rastreia entregas operacionais 2026 por produto
+    │         │
+    │         └──▶ roadmap.md  → visao markdown de releases-2026.csv (leitura/navegacao)
+    │
+    └──▶ technical-debt.md  → indexa debito tecnico dos modulos (fonte: backlog de cada modulo)
 ```
 
 > **Regra de ouro:** `releases-2026.csv` e a fonte de verdade do calendario de entregas.

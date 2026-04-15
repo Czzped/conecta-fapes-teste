@@ -2,10 +2,10 @@
 
 | Atributo | Valor |
 |----------|-------|
-| **Status** | Proposta |
-| **Data** | 2026-04-13 |
+| **Status** | Aceita |
+| **Data** | 2026-04-14 |
 | **Autores** | Time de Arquitetura ConectaFAPES |
-| **Modulos impactados** | M003, M004, M007, M008, M009, M010, M011, M012, M013, M014, M015, M016, M017, M018, M019, M020 |
+| **Modulos impactados** | Todos os modulos consumidos por produtos frontend |
 
 ## Contexto
 
@@ -26,48 +26,94 @@ Ao mesmo tempo, o projeto ja possui um desenho arquitetural com gateways tecnico
 
 ## Decisao
 
-Adotar uma camada de **Backend for Frontend (BFF)** como composicao de aplicacao orientada a tela, preservando os contratos modulares como fonte canonica do dominio.
+Adotar **um BFF (Backend for Frontend) por produto**, como camada de composicao orientada a tela, preservando os contratos modulares como fonte canonica do dominio.
 
-Diretrizes da decisao:
+### Topologia: um BFF por produto
 
-- o BFF fica **entre o frontend e o gateway interno/APIs modulares**;
-- o **M007 continua sendo gateway tecnico**, responsavel por roteamento, autenticacao, rate limiting e enforcement de acesso, e nao deve ser transformado em BFF;
-- na fase inicial, o BFF deve ser implementado preferencialmente **no proprio Nuxt/Nitro**, por meio de rotas server-side orientadas a pagina e jornada;
-- o BFF **consome apenas APIs/contratos dos modulos** e nao acessa banco de dados diretamente;
-- o BFF **nao se torna dono de regras centrais de negocio**; sua responsabilidade e compor respostas aderentes a interface, traduzir chamadas e orquestrar fluxos que dependem de varios modulos;
-- a autorizacao continua baseada em **OpenFGA**, aplicada pelo gateway e confirmada pelos backends quando necessario;
-- a introducao deve comecar por **queries agregadas e telas compostas**, expandindo para comandos multi-etapa apenas quando houver ganho claro de experiencia e rastreabilidade.
-
-Fluxo alvo de referencia:
+Cada produto frontend possui seu proprio BFF, otimizado para as jornadas e perfis de usuario daquele produto:
 
 ```text
-Browser -> Frontend Nuxt -> BFF -> Gateway Interno -> APIs Modulares
+Portal Coordenador ──→ BFF Coordenador ──→ Gateway Interno ──→ APIs Modulares
+Portal Admin ──────→ BFF Admin ────────→ Gateway Interno ──→ APIs Modulares
+Importador ─────────→ (sem BFF — chama M002 diretamente)
 ```
 
-Se a complexidade operacional crescer, o desenho pode evoluir futuramente para BFFs logicos separados por canal, como front-office e back-office, sem alterar a regra de que contratos modulares continuam sendo a fonte de verdade do dominio.
+A decisao de um BFF por produto (e nao um BFF unico compartilhado) se baseia em:
+
+- **jornadas distintas**: o coordenador de projeto e o operador da agencia tem fluxos completamente diferentes;
+- **modulos consumidos parcialmente sobrepostos**: M003/M004/M008 sao compartilhados, mas as composicoes sao especificas por tela;
+- **ciclo de deploy independente**: mudancas no portal admin nao impactam o portal do coordenador;
+- **escalabilidade de equipe**: times podem trabalhar em paralelo nos BFFs sem coordenacao.
+
+O Importador nao possui BFF porque consome essencialmente M002 sem jornadas multi-modulo.
+
+### BFF Coordenador — Mapa de composicao
+
+| Jornada | Modulos compostos | Endpoint BFF |
+|---------|-------------------|--------------|
+| Meu Projeto | M003 (projeto) + M009 (bolsas) + M004 (pagamentos) | `GET /bff/coordenador/projeto/:id/resumo` |
+| Minha Equipe | M003 (projeto) + M009 (bolsas, docs) + M008 (pessoas) | `GET /bff/coordenador/projeto/:id/equipe` |
+| Cadastro Bolsista | M003 (alocacao) + M009 (bolsa) + M001 (modalidades) + M008 (pessoa) | `POST /bff/coordenador/projeto/:id/bolsista` |
+| Pagamentos | M004 (pagamentos) + M003 (projeto) | `GET /bff/coordenador/projeto/:id/pagamentos` |
+| Prestacao Financeira | M014 (prestacao) + M013 (orcamento) + M003 (projeto) | `GET /bff/coordenador/projeto/:id/prestacao` |
+| Remanejamento | M013 (orcamento) + M001 (modalidades) | `POST /bff/coordenador/projeto/:id/remanejamento` |
+| Perfil | M008 (pessoa, endereco, banco) | `PUT /bff/coordenador/perfil` |
+
+**Stack recomendada:** Nuxt/Nitro (server routes no mesmo runtime do frontend).
+
+### BFF Admin — Mapa de composicao
+
+| Jornada | Modulos compostos | Endpoint BFF |
+|---------|-------------------|--------------|
+| Dashboard Pagamento | M004 (folhas, remessas) + M003 (editais) + M008 (areas tecnicas) | `GET /bff/admin/dashboard/pagamento` |
+| Folha de Pagamento | M004 (folha, decisoes, guias) + M003 (editais, projetos) | `GET /bff/admin/folha/:id/detalhes` |
+| Importacao | M002 (importacao) + M003 (editais) + M008 (pessoas) | `GET /bff/admin/importacao/status` |
+| Modalidades | M001 (resolucao, versao, nivel) | `GET /bff/admin/modalidades` |
+
+**Stack recomendada:** Nuxt/Nitro ou .NET minimal API (decisao da equipe responsavel).
+
+### Regras do BFF
+
+1. O BFF **so consome APIs modulares** — nunca acessa banco de dados diretamente.
+2. O BFF **nao contem regras de negocio** — apenas composicao, transformacao e cache.
+3. O BFF e **dono do contrato com o frontend** — mudancas nos modulos backend nao quebram o frontend se o BFF absorver a diferenca.
+4. Cada BFF **vive no repositorio do seu produto** — nao e um modulo de `implementation/`.
+5. O **M007 (Gateway) continua sendo a camada tecnica** — autenticacao, rate limiting, routing. O BFF fica entre o frontend e o gateway.
+6. A autorizacao continua baseada em **OpenFGA**, aplicada pelo gateway e confirmada pelos backends quando necessario.
+7. A introducao deve comecar por **queries agregadas e telas compostas**, expandindo para comandos multi-etapa apenas quando houver ganho claro.
+
+### Implementacao incremental
+
+A introducao do BFF deve ser incremental:
+
+1. **Fase 1** — Queries compostas: telas que hoje fazem 3+ chamadas ao backend passam a chamar 1 endpoint BFF.
+2. **Fase 2** — Comandos multi-etapa: jornadas como cadastro de bolsista (M003 + M009 + M001 + M008) ganham endpoint BFF que orquestra a sequencia.
+3. **Fase 3** — Cache e otimizacao: BFF passa a cachear dados de referencia (modalidades, areas tecnicas, pessoas) para reduzir latencia.
 
 ## Consequencias
 
 ### Positivas
 
-- reduz o numero de chamadas do frontend para montar telas compostas;
-- diminui acoplamento do cliente com varios contratos internos ao mesmo tempo;
-- permite payloads aderentes a cada tela, sem expor detalhes desnecessarios dos modulos;
-- facilita evolucao de experiencia de usuario em jornadas que cruzam varios modulos;
-- preserva o gateway tecnico e a governanca dos contratos modulares.
+- Reduz o numero de chamadas do frontend para montar telas compostas.
+- Diminui acoplamento do cliente com varios contratos internos ao mesmo tempo.
+- Permite payloads aderentes a cada tela, sem expor detalhes desnecessarios dos modulos.
+- Facilita evolucao de experiencia de usuario em jornadas que cruzam varios modulos.
+- Preserva o gateway tecnico e a governanca dos contratos modulares.
+- Deploy independente por produto: mudancas no BFF Admin nao afetam o BFF Coordenador.
+- Times podem trabalhar em paralelo nos BFFs de cada produto.
 
 ### Negativas
 
-- adiciona uma nova camada de aplicacao para desenvolver, observar e testar;
-- cria mais um ponto onde contratos precisam ser versionados e monitorados;
-- exige disciplina para que o BFF nao vire repositorio de regra de negocio ou integracao ad hoc.
+- Adiciona uma camada de aplicacao por produto para desenvolver, observar e testar.
+- Cria mais pontos onde contratos precisam ser versionados e monitorados.
+- Exige disciplina para que o BFF nao vire repositorio de regra de negocio.
 
 ### Riscos
 
-- o BFF concentrar regras de negocio que deveriam permanecer nos modulos — mitigado por revisar contratos e manter ownership no bounded context correto;
-- o BFF contornar o modelo de seguranca e autorizacao — mitigado por obrigar propagacao de identidade e enforcement no gateway/backend;
-- duplicacao de orquestracao entre frontend, BFF e modulos — mitigado por introducao incremental e foco inicial em jornadas com dor clara de composicao;
-- aumento de latencia se o BFF apenas empilhar chamadas sem consolidacao efetiva — mitigado por projetar endpoints orientados a caso de uso e observabilidade por jornada.
+- O BFF concentrar regras de negocio que deveriam permanecer nos modulos — mitigado por revisao de contratos e ownership claro no bounded context.
+- O BFF contornar o modelo de seguranca e autorizacao — mitigado por obrigar propagacao de identidade e enforcement no gateway/backend.
+- Duplicacao de orquestracao entre frontend, BFF e modulos — mitigado por introducao incremental e foco em jornadas com dor clara.
+- Aumento de latencia se o BFF apenas empilhar chamadas sem consolidacao — mitigado por endpoints orientados a caso de uso e observabilidade por jornada.
 
 ## Referencias
 
@@ -78,3 +124,5 @@ Se a complexidade operacional crescer, o desenho pode evoluir futuramente para B
 - [ADR-001 — Backend em C# com Clean Architecture e CQRS](ADR-001-backend-csharp-clean-architecture-cqrs.md)
 - [ADR-002 — Frontend em Vue com Nuxt UI](ADR-002-frontend-vue-nuxtui.md)
 - [ADR-004 — Infraestrutura com Docker e Kubernetes](ADR-004-infraestrutura-docker-kubernetes.md)
+- [Portal Coordenador](../../products/portal-coordenador/README.md)
+- [Portal Admin](../../products/portal-admin/README.md)

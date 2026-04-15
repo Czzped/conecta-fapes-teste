@@ -11,6 +11,7 @@
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclos de vida de EditalCompetencia, Folha e PagamentoBolsista |
+| [Analise DDD e Modularidade](specifications/analise-ddd-modularidade.md) | Analise de aderencia a DDD: aggregates, ownership, domain events e melhorias propostas |
 
 ---
 
