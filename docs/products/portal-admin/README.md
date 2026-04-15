@@ -22,7 +22,7 @@ O Portal Admin e a interface principal para operadores, gerentes e diretores da 
 
 | Documento | Descricao |
 |-----------|-----------|
-| [Backlog](backlog.md) | Epicos de produto com modulos backend consumidos |
+| [Backlog](backlog.md) | Epicos de produto, features e grafo de dependencias |
 
 ---
 

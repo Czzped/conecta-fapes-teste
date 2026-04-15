@@ -4,14 +4,32 @@
 
 > Versao: 2026-04-14
 
-| ID | Titulo | EPICs de implementacao | Status |
-|----|--------|------------------------|--------|
-| EPA-01 | Gestao de Pagamento e Folhas | [EPIC-M004-001](../../implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-001.md) a [EPIC-M004-012](../../implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-012.md) — Calendario, liberacao, folhas, bonus, remessas, retornos, guias, relatorios | Em producao |
-| EPA-02 | Importacao de Editais e Projetos | [EPIC-M002-001](../../implementation/modules/M002-importacao-editais/epics/EPIC-M002-001.md) a [EPIC-M002-003](../../implementation/modules/M002-importacao-editais/epics/EPIC-M002-003.md) — Selecao, completar alocacoes, sincronizacao | Em producao |
-| EPA-03 | Modalidades de Bolsa | [EPIC-M001-001](../../implementation/modules/M001-modalidade-bolsa/epics/EPIC-M001-001.md) a [EPIC-M001-003](../../implementation/modules/M001-modalidade-bolsa/epics/EPIC-M001-003.md) — Resolucoes, modalidades, niveis | Em producao |
-| EPA-04 | Gestao de Aditivos e Suspensao | [EPIC-M009-004](../../implementation/modules/M009-gestao-bolsista/epics/EPIC-M009-004.md), [EPIC-M015-001](../../implementation/modules/M015-suspensao-finalizacao/epics/EPIC-M015-001.md) — Consulta bolsa, suspensao | Planejado (Q2) |
-| EPA-05 | Gestao Financeira e Contabil | [EPIC-M016-001](../../implementation/modules/M016-contabilidade-financeiro/epics/EPIC-M016-001.md) a [EPIC-M016-003](../../implementation/modules/M016-contabilidade-financeiro/epics/EPIC-M016-003.md) — Plano de contas, contas bancarias, fluxo de caixa | Planejado (Q2) |
-| EPA-06 | Reajuste de Bolsas e Expansao UNAC | [EPIC-M004-005](../../implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-005.md) — Bonus de Pagamento (reajuste via bonus) | Planejado (Q2) |
+| ID | Titulo | Detalhes | Modulos backend | Status |
+|----|--------|----------|-----------------|--------|
+| EPA-01 | Gestao de Pagamento e Folhas | [EPA-01](features/EPA-01-gestao-pagamento-folhas.md) | M004 | Em producao |
+| EPA-02 | Importacao de Editais e Projetos | [EPA-02](features/EPA-02-importacao-editais-projetos.md) | M002, M003 | Em producao |
+| EPA-03 | Modalidades de Bolsa | [EPA-03](features/EPA-03-modalidades-bolsa.md) | M001 | Em producao |
+| EPA-04 | Gestao de Aditivos e Suspensao | [EPA-04](features/EPA-04-gestao-aditivos-suspensao.md) | M009, M015 | Planejado (Q2) |
+| EPA-05 | Gestao Financeira e Contabil | [EPA-05](features/EPA-05-gestao-financeira-contabil.md) | M016 | Planejado (Q2) |
+| EPA-06 | Reajuste de Bolsas e Expansao UNAC | [EPA-06](features/EPA-06-reajuste-bolsas-unac.md) | M004 | Planejado (Q2) |
+
+## Grafo de Dependencias
+
+```mermaid
+graph TD
+  EPA01["EPA-01: Gestao de Pagamento e Folhas"]
+  EPA02["EPA-02: Importacao de Editais e Projetos"]
+  EPA03["EPA-03: Modalidades de Bolsa"]
+  EPA04["EPA-04: Gestao de Aditivos e Suspensao"]
+  EPA05["EPA-05: Gestao Financeira e Contabil"]
+  EPA06["EPA-06: Reajuste de Bolsas e Expansao UNAC"]
+
+  EPA02 --> EPA01
+  EPA03 --> EPA01
+  EPA01 --> EPA04
+  EPA01 --> EPA05
+  EPA01 --> EPA06
+```
 
 ## Modulos Backend Consumidos
 
