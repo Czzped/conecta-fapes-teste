@@ -14,9 +14,9 @@ Especificacao de referencia: [README.md](README.md)
 
 | ID | Titulo | Requisito | Prioridade | Status | Documento |
 |----|--------|-----------|------------|--------|-----------|
-| EPIC-M002-001 | Definir Editais a Sincronizar | UC04.0 | Must | To Do | [EPIC-M002-001](epics/EPIC-M002-001.md) |
-| EPIC-M002-002 | Completar Dados de Alocacoes | UC04.1 | Must | To Do | [EPIC-M002-002](epics/EPIC-M002-002.md) |
-| EPIC-M002-003 | Sincronizar Dados de Editais | UC04.2 | Must | To Do | [EPIC-M002-003](epics/EPIC-M002-003.md) |
+| EPIC-M002-001 | Definir Editais a Sincronizar | UC04.0 | Must | Done | [EPIC-M002-001](epics/EPIC-M002-001.md) |
+| EPIC-M002-002 | Completar Dados de Alocacoes | UC04.1 | Must | Done | [EPIC-M002-002](epics/EPIC-M002-002.md) |
+| EPIC-M002-003 | Sincronizar Dados de Editais | UC04.2 | Must | Done | [EPIC-M002-003](epics/EPIC-M002-003.md) |
 
 ---
 
