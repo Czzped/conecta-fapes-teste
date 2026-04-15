@@ -1,0 +1,273 @@
+site_name: Conecta FAPES
+site_description: Plataforma digital da agencia de fomento para gestao do ciclo completo de fomento a pesquisa, desenvolvimento e inovacao
+site_url: ""
+
+docs_dir: docs
+
+exclude_docs: |
+  deprecated/
+  templates/
+
+theme:
+  name: material
+  language: pt-BR
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Modo escuro
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Modo claro
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+plugins:
+  - search:
+      lang: pt
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Inicio: README.md
+
+  - Arquitetura:
+      - Visao Geral: architecture/README.md
+      - Visao do Sistema: architecture/01-visao-geral.md
+      - Modulos e Integracoes: architecture/02-modulos-e-integracoes.md
+      - Acesso e Seguranca: architecture/03-acesso-e-seguranca.md
+      - Dados e Operacao: architecture/04-dados-e-operacao.md
+      - ADR-001 Backend C# Clean Architecture CQRS: architecture/adr/ADR-001-backend-csharp-clean-architecture-cqrs.md
+      - ADR-002 Frontend Vue NuxtUI: architecture/adr/ADR-002-frontend-vue-nuxtui.md
+      - ADR-003 Banco de Dados SQL Server: architecture/adr/ADR-003-banco-de-dados-sql-server.md
+      - ADR-004 Infraestrutura Docker Kubernetes: architecture/adr/ADR-004-infraestrutura-docker-kubernetes.md
+      - ADR-005 Adocao BFF: architecture/adr/ADR-005-adocao-bff.md
+      - ADR-006 Reconciliacao M004 Pagamento Bolsista: architecture/adr/ADR-006-reconciliacao-m004-pagamento-bolsista.md
+      - ADR-007 Autorizacao OpenFGA: architecture/adr/ADR-007-autorizacao-openfga.md
+      - ADR-008 Backend Separado M014: architecture/adr/ADR-008-backend-separado-m014.md
+      - ADR-009 Hangfire Background Jobs: architecture/adr/ADR-009-hangfire-background-jobs.md
+      - ADR-010 MinIO Armazenamento Objetos: architecture/adr/ADR-010-minio-armazenamento-objetos.md
+
+  - Discovery:
+      - Visao do Produto: discovery/product-vision.md
+      - Personas: discovery/personas.md
+      - Corporativo: discovery/domains/01-corporativo.md
+      - Planejamento: discovery/domains/02-planejamento.md
+      - Fomento Pre-Award: discovery/domains/03-fomento-pre-award.md
+      - Fomento Post-Award: discovery/domains/04-fomento-post-award.md
+      - Financeiro: discovery/domains/05-financeiro.md
+      - Suporte e Inteligencia: discovery/domains/06-suporte-inteligencia.md
+      - Importacao SIGFAPES: discovery/domains/07-importacao-sigfapes.md
+
+  - Produtos:
+      - Visao Geral: products/README.md
+      - Portal Coordenador: products/portal-coordenador/README.md
+      - Portal Coordenador - Arquitetura: products/portal-coordenador/architecture.md
+      - Portal Coordenador - Backlog: products/portal-coordenador/backlog.md
+      - EP-01 Autenticacao Acesso Cidadao: products/portal-coordenador/features/EP-01-autenticacao-acesso-cidadao.md
+      - EP-02 Shell Portal Contexto Projeto: products/portal-coordenador/features/EP-02-shell-portal-contexto-projeto.md
+      - EP-03 Pagina Inicial Portal: products/portal-coordenador/features/EP-03-pagina-inicial-portal.md
+      - EP-04 Gestao Perfil Usuario: products/portal-coordenador/features/EP-04-gestao-perfil-usuario.md
+      - EP-05 Gestao Documentos Usuario: products/portal-coordenador/features/EP-05-gestao-documentos-usuario.md
+      - EP-06 Meu Projeto: products/portal-coordenador/features/EP-06-meu-projeto.md
+      - EP-07 Minha Equipe Acompanhamento Bolsas: products/portal-coordenador/features/EP-07-minha-equipe-acompanhamento-bolsas.md
+      - EP-08 Cadastro Edicao Bolsista: products/portal-coordenador/features/EP-08-cadastro-edicao-bolsista.md
+      - EP-09 Pagamentos Bolsa: products/portal-coordenador/features/EP-09-pagamentos-bolsa.md
+      - EP-10 Remanejamento Bolsas: products/portal-coordenador/features/EP-10-remanejamento-bolsas.md
+      - EP-11 Prestacao Financeira: products/portal-coordenador/features/EP-11-prestacao-financeira.md
+      - EP-12 Aditivo Bolsa: products/portal-coordenador/features/EP-12-aditivo-bolsa.md
+      - Portal Admin: products/portal-admin/README.md
+      - Portal Admin - Arquitetura: products/portal-admin/architecture.md
+      - Portal Admin - Backlog: products/portal-admin/backlog.md
+      - EPA-01 Gestao Pagamento Folhas: products/portal-admin/features/EPA-01-gestao-pagamento-folhas.md
+      - EPA-02 Importacao Editais Projetos: products/portal-admin/features/EPA-02-importacao-editais-projetos.md
+      - EPA-03 Modalidades Bolsa: products/portal-admin/features/EPA-03-modalidades-bolsa.md
+      - EPA-04 Gestao Aditivos Suspensao: products/portal-admin/features/EPA-04-gestao-aditivos-suspensao.md
+      - EPA-05 Gestao Financeira Contabil: products/portal-admin/features/EPA-05-gestao-financeira-contabil.md
+      - EPA-06 Reajuste Bolsas UNAC: products/portal-admin/features/EPA-06-reajuste-bolsas-unac.md
+      - Importador: products/importador/README.md
+      - Importador - Arquitetura: products/importador/architecture.md
+      - Importador - Backlog: products/importador/backlog.md
+      - EPI-01 Importacao Editais Selecao: products/importador/features/EPI-01-importacao-editais-selecao.md
+      - EPI-02 Completar Alocacoes: products/importador/features/EPI-02-completar-alocacoes.md
+      - EPI-03 Sincronizacao SIGFAPES: products/importador/features/EPI-03-sincronizacao-sigfapes.md
+
+  - Modulos:
+      - M001 - Modalidade de Bolsa: implementation/modules/M001-modalidade-bolsa/README.md
+      - M001 - Backlog: implementation/modules/M001-modalidade-bolsa/backlog.md
+      - M001 - Modelo Estrutural: implementation/modules/M001-modalidade-bolsa/modelo-estrutural.md
+      - M001 - Modelo Comportamental: implementation/modules/M001-modalidade-bolsa/modelo-comportamental.md
+      - M001 - EPIC-001: implementation/modules/M001-modalidade-bolsa/epics/EPIC-M001-001.md
+      - M001 - EPIC-002: implementation/modules/M001-modalidade-bolsa/epics/EPIC-M001-002.md
+      - M001 - EPIC-003: implementation/modules/M001-modalidade-bolsa/epics/EPIC-M001-003.md
+      - M002 - Importacao de Editais: implementation/modules/M002-importacao-editais/README.md
+      - M002 - Backlog: implementation/modules/M002-importacao-editais/backlog.md
+      - M002 - Contrato: implementation/modules/M002-importacao-editais/contrato.md
+      - M002 - Modelo Estrutural: implementation/modules/M002-importacao-editais/modelo-estrutural.md
+      - M002 - Modelo Comportamental: implementation/modules/M002-importacao-editais/modelo-comportamental.md
+      - M002 - EPIC-001: implementation/modules/M002-importacao-editais/epics/EPIC-M002-001.md
+      - M002 - EPIC-002: implementation/modules/M002-importacao-editais/epics/EPIC-M002-002.md
+      - M002 - EPIC-003: implementation/modules/M002-importacao-editais/epics/EPIC-M002-003.md
+      - M003 - Gerenciar Editais: implementation/modules/M003-gerenciar-editais/README.md
+      - M003 - Modelo Estrutural: implementation/modules/M003-gerenciar-editais/modelo-estrutural.md
+      - M003 - EPIC-001: implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-001.md
+      - M003 - EPIC-002: implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-002.md
+      - M003 - EPIC-003: implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-003.md
+      - M003 - EPIC-004: implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-004.md
+      - M003 - EPIC-005: implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-005.md
+      - M004 - Pagamento de Bolsistas: implementation/modules/M004-pagamento-bolsista/README.md
+      - M004 - Analise DDD: implementation/modules/M004-pagamento-bolsista/specifications/analise-ddd-modularidade.md
+      - M004 - EPIC-001: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-001.md
+      - M004 - EPIC-002: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-002.md
+      - M004 - EPIC-003: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-003.md
+      - M004 - EPIC-004: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-004.md
+      - M004 - EPIC-005: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-005.md
+      - M004 - EPIC-006: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-006.md
+      - M004 - EPIC-007: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-007.md
+      - M004 - EPIC-008: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-008.md
+      - M004 - EPIC-009: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-009.md
+      - M004 - EPIC-010: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-010.md
+      - M004 - EPIC-011: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-011.md
+      - M004 - EPIC-012: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-012.md
+      - M005 - Autenticacao: implementation/modules/M005-autenticacao/README.md
+      - M006 - Autorizacao: implementation/modules/M006-autorizacao/README.md
+      - M007 - API Gateway: implementation/modules/M007-api-gateway/README.md
+      - M008 - Cadastros Corporativos: implementation/modules/M008-cadastros-corporativos/README.md
+      - M008 - Backlog: implementation/modules/M008-cadastros-corporativos/backlog.md
+      - M008 - Modelo Estrutural: implementation/modules/M008-cadastros-corporativos/modelo-estrutural.md
+      - M008 - Modelo Comportamental: implementation/modules/M008-cadastros-corporativos/modelo-comportamental.md
+      - M008 - EPIC-001: implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-001.md
+      - M008 - EPIC-002: implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-002.md
+      - M008 - EPIC-003: implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-003.md
+      - M009 - Gestao Bolsa Pesquisa: implementation/modules/M009-gestao-bolsista/README.md
+      - M009 - Backlog: implementation/modules/M009-gestao-bolsista/backlog.md
+      - M009 - Modelo Estrutural: implementation/modules/M009-gestao-bolsista/modelo-estrutural.md
+      - M009 - Modelo Comportamental: implementation/modules/M009-gestao-bolsista/modelo-comportamental.md
+      - M009 - EPIC-001: implementation/modules/M009-gestao-bolsista/epics/EPIC-M009-001.md
+      - M009 - EPIC-002: implementation/modules/M009-gestao-bolsista/epics/EPIC-M009-002.md
+      - M009 - EPIC-003: implementation/modules/M009-gestao-bolsista/epics/EPIC-M009-003.md
+      - M009 - EPIC-004: implementation/modules/M009-gestao-bolsista/epics/EPIC-M009-004.md
+      - M010 - Planejamento e Estrategia: implementation/modules/M010-planejamento-estrategia/README.md
+      - M010 - Backlog: implementation/modules/M010-planejamento-estrategia/backlog.md
+      - M010 - Contrato: implementation/modules/M010-planejamento-estrategia/contrato.md
+      - M010 - Modelo Estrutural: implementation/modules/M010-planejamento-estrategia/modelo-estrutural.md
+      - M010 - Modelo Comportamental: implementation/modules/M010-planejamento-estrategia/modelo-comportamental.md
+      - M010 - EPIC-001: implementation/modules/M010-planejamento-estrategia/epics/EPIC-M010-001.md
+      - M010 - EPIC-002: implementation/modules/M010-planejamento-estrategia/epics/EPIC-M010-002.md
+      - M010 - EPIC-003: implementation/modules/M010-planejamento-estrategia/epics/EPIC-M010-003.md
+      - M011 - Configuracao de Captacao: implementation/modules/M011-configuracao-captacao/README.md
+      - M011 - Backlog: implementation/modules/M011-configuracao-captacao/backlog.md
+      - M011 - Contrato: implementation/modules/M011-configuracao-captacao/contrato.md
+      - M011 - Modelo Estrutural: implementation/modules/M011-configuracao-captacao/modelo-estrutural.md
+      - M011 - Modelo Comportamental: implementation/modules/M011-configuracao-captacao/modelo-comportamental.md
+      - M011 - EPIC-001: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-001.md
+      - M011 - EPIC-002: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-002.md
+      - M011 - EPIC-003: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-003.md
+      - M012 - Acompanhamento e Resultados: implementation/modules/M012-acompanhamento-resultados/README.md
+      - M012 - Backlog: implementation/modules/M012-acompanhamento-resultados/backlog.md
+      - M012 - Contrato: implementation/modules/M012-acompanhamento-resultados/contrato.md
+      - M012 - Modelo Estrutural: implementation/modules/M012-acompanhamento-resultados/modelo-estrutural.md
+      - M012 - Modelo Comportamental: implementation/modules/M012-acompanhamento-resultados/modelo-comportamental.md
+      - M012 - EPIC-001: implementation/modules/M012-acompanhamento-resultados/epics/EPIC-M012-001.md
+      - M012 - EPIC-002: implementation/modules/M012-acompanhamento-resultados/epics/EPIC-M012-002.md
+      - M012 - EPIC-003: implementation/modules/M012-acompanhamento-resultados/epics/EPIC-M012-003.md
+      - M013 - Gestao Orcamentaria do Projeto: implementation/modules/M013-gestao-orcamentaria-projeto/README.md
+      - M013 - Backlog: implementation/modules/M013-gestao-orcamentaria-projeto/backlog.md
+      - M013 - Contrato: implementation/modules/M013-gestao-orcamentaria-projeto/contrato.md
+      - M013 - Modelo Estrutural: implementation/modules/M013-gestao-orcamentaria-projeto/modelo-estrutural.md
+      - M013 - Modelo Comportamental: implementation/modules/M013-gestao-orcamentaria-projeto/modelo-comportamental.md
+      - M013 - EPIC-001: implementation/modules/M013-gestao-orcamentaria-projeto/epics/EPIC-M013-001.md
+      - M013 - EPIC-002: implementation/modules/M013-gestao-orcamentaria-projeto/epics/EPIC-M013-002.md
+      - M013 - EPIC-003: implementation/modules/M013-gestao-orcamentaria-projeto/epics/EPIC-M013-003.md
+      - M014 - Prestacao de Contas: implementation/modules/M014-prestacao-contas/README.md
+      - M014 - Modelo Estrutural: implementation/modules/M014-prestacao-contas/modelo-estrutural.md
+      - M014 - Modelo Comportamental: implementation/modules/M014-prestacao-contas/modelo-comportamental.md
+      - M014 - EPIC-001: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-001.md
+      - M014 - EPIC-002: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-002.md
+      - M014 - EPIC-003: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-003.md
+      - M014 - EPIC-004: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-004.md
+      - M014 - EPIC-005: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-005.md
+      - M014 - EPIC-006: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-006.md
+      - M014 - EPIC-007: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-007.md
+      - M014 - EPIC-008: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-008.md
+      - M015 - Suspensao e Finalizacao: implementation/modules/M015-suspensao-finalizacao/README.md
+      - M015 - Backlog: implementation/modules/M015-suspensao-finalizacao/backlog.md
+      - M015 - Contrato: implementation/modules/M015-suspensao-finalizacao/contrato.md
+      - M015 - Modelo Estrutural: implementation/modules/M015-suspensao-finalizacao/modelo-estrutural.md
+      - M015 - Modelo Comportamental: implementation/modules/M015-suspensao-finalizacao/modelo-comportamental.md
+      - M015 - EPIC-001: implementation/modules/M015-suspensao-finalizacao/epics/EPIC-M015-001.md
+      - M015 - EPIC-002: implementation/modules/M015-suspensao-finalizacao/epics/EPIC-M015-002.md
+      - M016 - Contabilidade e Financeiro: implementation/modules/M016-contabilidade-financeiro/README.md
+      - M016 - Backlog: implementation/modules/M016-contabilidade-financeiro/backlog.md
+      - M016 - Contrato: implementation/modules/M016-contabilidade-financeiro/contrato.md
+      - M016 - Modelo Estrutural: implementation/modules/M016-contabilidade-financeiro/modelo-estrutural.md
+      - M016 - Modelo Comportamental: implementation/modules/M016-contabilidade-financeiro/modelo-comportamental.md
+      - M016 - EPIC-001: implementation/modules/M016-contabilidade-financeiro/epics/EPIC-M016-001.md
+      - M016 - EPIC-002: implementation/modules/M016-contabilidade-financeiro/epics/EPIC-M016-002.md
+      - M016 - EPIC-003: implementation/modules/M016-contabilidade-financeiro/epics/EPIC-M016-003.md
+      - M017 - Prevencao a Lavagem de Dinheiro: implementation/modules/M017-prevencao-lavagem-dinheiro/README.md
+      - M017 - Backlog: implementation/modules/M017-prevencao-lavagem-dinheiro/backlog.md
+      - M017 - Contrato: implementation/modules/M017-prevencao-lavagem-dinheiro/contrato.md
+      - M017 - Modelo Estrutural: implementation/modules/M017-prevencao-lavagem-dinheiro/modelo-estrutural.md
+      - M017 - Modelo Comportamental: implementation/modules/M017-prevencao-lavagem-dinheiro/modelo-comportamental.md
+      - M017 - EPIC-001: implementation/modules/M017-prevencao-lavagem-dinheiro/epics/EPIC-M017-001.md
+      - M017 - EPIC-002: implementation/modules/M017-prevencao-lavagem-dinheiro/epics/EPIC-M017-002.md
+      - M017 - EPIC-003: implementation/modules/M017-prevencao-lavagem-dinheiro/epics/EPIC-M017-003.md
+      - M017 - EPIC-004: implementation/modules/M017-prevencao-lavagem-dinheiro/epics/EPIC-M017-004.md
+      - M018 - Business Intelligence: implementation/modules/M018-business-intelligence/README.md
+      - M018 - Backlog: implementation/modules/M018-business-intelligence/backlog.md
+      - M018 - Contrato: implementation/modules/M018-business-intelligence/contrato.md
+      - M018 - Modelo Estrutural: implementation/modules/M018-business-intelligence/modelo-estrutural.md
+      - M018 - Modelo Comportamental: implementation/modules/M018-business-intelligence/modelo-comportamental.md
+      - M018 - EPIC-001: implementation/modules/M018-business-intelligence/epics/EPIC-M018-001.md
+      - M018 - EPIC-002: implementation/modules/M018-business-intelligence/epics/EPIC-M018-002.md
+      - M019 - Transparencia e Auditoria: implementation/modules/M019-transparencia-auditoria/README.md
+      - M019 - Backlog: implementation/modules/M019-transparencia-auditoria/backlog.md
+      - M019 - Contrato: implementation/modules/M019-transparencia-auditoria/contrato.md
+      - M019 - Modelo Estrutural: implementation/modules/M019-transparencia-auditoria/modelo-estrutural.md
+      - M019 - Modelo Comportamental: implementation/modules/M019-transparencia-auditoria/modelo-comportamental.md
+      - M019 - EPIC-001: implementation/modules/M019-transparencia-auditoria/epics/EPIC-M019-001.md
+      - M019 - EPIC-002: implementation/modules/M019-transparencia-auditoria/epics/EPIC-M019-002.md
+      - M020 - Comunicacao: implementation/modules/M020-comunicacao/README.md
+      - M020 - Backlog: implementation/modules/M020-comunicacao/backlog.md
+      - M020 - Contrato: implementation/modules/M020-comunicacao/contrato.md
+      - M020 - Modelo Estrutural: implementation/modules/M020-comunicacao/modelo-estrutural.md
+      - M020 - Modelo Comportamental: implementation/modules/M020-comunicacao/modelo-comportamental.md
+      - M020 - EPIC-001: implementation/modules/M020-comunicacao/epics/EPIC-M020-001.md
+      - M020 - EPIC-002: implementation/modules/M020-comunicacao/epics/EPIC-M020-002.md
+
+  - Gestao:
+      - Visao Geral: management/README.md
+      - Roadmap: management/roadmap.md
+      - Milestones: management/milestones.md
+      - Backlog do Produto: management/backlog-product.md
+      - Divida Tecnica: management/technical-debt.md
+      - SPRINT-001: management/sprints/SPRINT-001.md
+      - SPRINT-002: management/sprints/SPRINT-002.md
+      - SPRINT-003: management/sprints/SPRINT-003.md
+      - SPRINT-004: management/sprints/SPRINT-004.md
+      - SPRINT-005: management/sprints/SPRINT-005.md
+      - SPRINT-006: management/sprints/SPRINT-006.md
