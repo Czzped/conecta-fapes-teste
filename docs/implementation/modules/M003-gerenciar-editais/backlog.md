@@ -22,6 +22,8 @@ Especificacao de referencia: [README.md](README.md)
 
 > **Nota:** Estes EPICs foram derivados das 5 operacoes publicas do [contrato.md](contrato.md). As entidades (Edital, Projeto, CotaEdital, AlocacaoBolsista) ja existem no codigo e sao consumidas por M004, M009, M012-M015 e pelo Portal Coordenador.
 
+> **Nota (80%):** EPICs implementados e em producao via Portal Admin (EPA-02) e Portal Coordenador (EP-06/07/08). Pendencias: (1) integracao com M010 (Programa/Parceria) ainda nao disponivel — US-M003-003 "Vincular Edital a Programa/Parceria" depende de M010 que esta em desenvolvimento; (2) Sprint-004 planeja "Testar Gestao de Editais com usuarios" e "Escalonamento de Projetos".
+
 ---
 
 ## Rastreabilidade

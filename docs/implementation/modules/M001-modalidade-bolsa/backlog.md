@@ -18,6 +18,8 @@ Especificacao de referencia: [README.md](README.md)
 | EPIC-M001-002 | Controle de Modalidades de Bolsa | UC01 | Must | Done | [EPIC-M001-002](epics/EPIC-M001-002.md) |
 | EPIC-M001-003 | Cadastro de Niveis de Bolsa | UC03 | Must | Done | [EPIC-M001-003](epics/EPIC-M001-003.md) |
 
+> **Nota (80%):** EPICs implementados e em producao via Portal Admin (EPA-03). Pendencias: (1) "Acerto do cadastro de Versao de Bolsa" nao entregue no Q1 — transferido para Sprint-006; (2) dependencia de M008 (Moeda) parcialmente resolvida com dados de referencia.
+
 ---
 
 ## Rastreabilidade
