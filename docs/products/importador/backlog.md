@@ -4,11 +4,11 @@
 
 > Versao: 2026-04-14
 
-| ID | Titulo | EPICs de implementacao | Status |
-|----|--------|------------------------|--------|
-| EPI-01 | Importacao de Editais e Selecao | [EPIC-M002-001](../../implementation/modules/M002-importacao-editais/epics/EPIC-M002-001.md) — Definir Editais a Sincronizar | Entregue |
-| EPI-02 | Completar Dados de Alocacoes | [EPIC-M002-002](../../implementation/modules/M002-importacao-editais/epics/EPIC-M002-002.md) — Completar Dados de Alocacoes | Entregue |
-| EPI-03 | Sincronizacao com SIGFAPES | [EPIC-M002-003](../../implementation/modules/M002-importacao-editais/epics/EPIC-M002-003.md) — Sincronizar Dados de Editais | Entregue |
+| ID | Titulo | Detalhes | EPICs de implementacao | Status |
+|----|--------|----------|------------------------|--------|
+| EPI-01 | Importacao de Editais e Selecao | [EPI-01](features/EPI-01-importacao-editais-selecao.md) | [EPIC-M002-001](../../implementation/modules/M002-importacao-editais/epics/EPIC-M002-001.md) | Entregue |
+| EPI-02 | Completar Dados de Alocacoes | [EPI-02](features/EPI-02-completar-alocacoes.md) | [EPIC-M002-002](../../implementation/modules/M002-importacao-editais/epics/EPIC-M002-002.md) | Entregue |
+| EPI-03 | Sincronizacao com SIGFAPES | [EPI-03](features/EPI-03-sincronizacao-sigfapes.md) | [EPIC-M002-003](../../implementation/modules/M002-importacao-editais/epics/EPIC-M002-003.md) | Entregue |
 
 ## Modulo Backend
 

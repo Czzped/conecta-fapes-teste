@@ -22,7 +22,8 @@ O Importador e uma ferramenta que realiza a migracao automatica de editais, proj
 
 | Documento | Descricao |
 |-----------|-----------|
-| [Backlog](backlog.md) | Epicos de produto com status de entrega |
+| [Backlog](backlog.md) | Epicos de produto com links para EPICs do M002 |
+| [Arquitetura Frontend](architecture.md) | Stack, fluxo de dados, integracao com M002 e diferencas com portais |
 
 ---
 
@@ -30,11 +31,4 @@ O Importador e uma ferramenta que realiza a migracao automatica de editais, proj
 
 | Modulo | Funcionalidade |
 |--------|---------------|
-| M002 | Importacao SIGFAPES — importacao, conciliacao, reprocessamento |
-
----
-
-## Proximos Passos
-
-- Documentar arquitetura e fluxos do importador
-- Vincular ao roadmap em `management/releases-2026.csv`
+| [M002](../../implementation/modules/M002-importacao-editais/README.md) | Importacao, sincronizacao e conciliacao de dados do SIGFAPES |
