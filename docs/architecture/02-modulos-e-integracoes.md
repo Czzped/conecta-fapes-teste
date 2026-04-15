@@ -19,11 +19,11 @@ graph LR
     end
 
     subgraph Pre-Award
-        M003[M003 - Gestao de Iniciativas Captadas]
         M011[M011 - Configuracao Captacao]
     end
 
     subgraph Post-Award
+        M003[M003 - Gestao de Iniciativas Captadas]
         M009[M009 - Gestao Bolsa Pesquisa]
         M012[M012 - Acompanhamento e Resultados]
         M013[M013 - Gestao Orcamentaria Projeto]

@@ -2,7 +2,7 @@
 
 Execucao financeira, controle de contas bancarias, fluxo de caixa, pagamentos, contabilidade e prevencao a lavagem de dinheiro.
 
-**Modulos que implementam este domain:** M004
+**Modulos que implementam este domain:** M004, M016, M017
 
 ---
 

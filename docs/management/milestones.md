@@ -38,9 +38,9 @@ Planejamento estrategico e fluxo completo de captacao de iniciativas.
 | Domain | Descricao | Modulos |
 |--------|-----------|---------|
 | [02 Planejamento](../discovery/domains/02-planejamento.md) | Plano estrategico, parcerias, programas de fomento | M010 |
-| [03 Fomento Pre-Award](../discovery/domains/03-fomento-pre-award.md) | Publicacao de edital, submissao, analise documental, merito, contratacao | M003, M011 |
+| [03 Fomento Pre-Award](../discovery/domains/03-fomento-pre-award.md) | Publicacao de edital, submissao, analise documental, merito, contratacao | M011, M002 |
 
-> **Progresso:** M003 (Gestao de Iniciativas Captadas) esta ~80% — em producao, pendente integracao com M010 (Programa/Parceria). M010 (Planejamento e Estrategia) esta ~15% — Gestao de Programas em desenvolvimento ativo. M011 (Configuracao de Captacao) esta ~10% — Configuracao do Edital em andamento.
+> **Progresso:** M010 (Planejamento e Estrategia) esta ~15% — Gestao de Programas em desenvolvimento ativo. M011 (Configuracao de Captacao) esta ~10% — Configuracao do Edital em andamento.
 
 ---
 

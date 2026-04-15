@@ -15,8 +15,8 @@ O coordenador registra nova alocacao de bolsista com orientador, modalidade, dat
 | Modulo | EPIC | Titulo | Status |
 |--------|------|--------|--------|
 | M003 | [EPIC-M003-004](../../../implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-004.md) | Alocacao Operacional de Bolsistas | Done |
-| M009 | [EPIC-M009-001](../../../implementation/modules/M009-gestao-bolsista/epics/EPIC-M009-001.md) | Indicar Bolsista | To Do |
-| M009 | [EPIC-M009-002](../../../implementation/modules/M009-gestao-bolsista/epics/EPIC-M009-002.md) | Formalizar e Implementar Bolsa | To Do |
+| M009 | [EPIC-M009-001](../../../implementation/modules/M009-gestao-bolsista/epics/EPIC-M009-001.md) | Indicar Bolsista | In Progress |
+| M009 | [EPIC-M009-002](../../../implementation/modules/M009-gestao-bolsista/epics/EPIC-M009-002.md) | Formalizar e Implementar Bolsa | In Progress |
 
 ## Cenarios de aceitacao do produto
 

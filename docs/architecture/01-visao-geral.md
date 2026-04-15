@@ -46,8 +46,11 @@ O detalhamento formal dos containers ainda nao foi consolidado neste documento. 
 | Back-end | C# / .NET (Clean Architecture + CQRS) | Conforme [ADR-001](adr/ADR-001-backend-csharp-clean-architecture-cqrs.md) |
 | Banco de Dados | Microsoft SQL Server | Instancia unica com schemas por dominio ([ADR-003](adr/ADR-003-banco-de-dados-sql-server.md)) |
 | Autenticacao | Acesso Cidadao (OpenID Connect) | SSO do governo do ES |
-| Autorizacao | OpenFGA | RBAC + ABAC com modelo Defense in Depth / Zero Trust |
+| Autorizacao | OpenFGA | RBAC + ABAC com modelo Defense in Depth / Zero Trust ([ADR-007](adr/ADR-007-autorizacao-openfga.md)) |
 | Infraestrutura | Docker + Kubernetes (Prodest) | Conforme [ADR-004](adr/ADR-004-infraestrutura-docker-kubernetes.md) |
 | CI/CD | GitHub Actions + GHCR | Build, testes e deploy automatizado |
+| Background Jobs | Hangfire | Processamento assincrono de remessas e importacoes ([ADR-009](adr/ADR-009-hangfire-background-jobs.md)) |
+| Armazenamento de Objetos | MinIO | Upload de PDFs, orcamentos e documentos fiscais ([ADR-010](adr/ADR-010-minio-armazenamento-objetos.md)) |
+| Integracao Fiscal | SERPRO | Consulta e validacao de NF-e via API OAuth2 |
 | BI | PowerBI via AirFlow | Dashboards analiticos |
-| Documentacao | Docusaurus | Portal de documentacao do projeto |
+| Documentacao | MkDocs Material | Portal de documentacao do projeto |

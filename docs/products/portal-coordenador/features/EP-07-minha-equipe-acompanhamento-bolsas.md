@@ -18,6 +18,8 @@ O coordenador visualiza dashboard de equipe com orcamento, estatisticas por moda
 | M003 | [EPIC-M003-004](../../../implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-004.md) | Alocacao Operacional de Bolsistas | Done |
 | M009 | [EPIC-M009-004](../../../implementation/modules/M009-gestao-bolsista/epics/EPIC-M009-004.md) | Consultar Bolsa Pesquisa | To Do |
 
+> **Nota:** A feature de frontend esta Done, porem o EPIC de backend (EPIC-M009-004) permanece To Do. O frontend foi implementado antecipadamente e aguarda a conclusao do backend para integracao completa.
+
 ## Cenarios de aceitacao do produto
 
 - **Alternar para a aba de bolsistas**: navegacao entre abas dashboard e listagem de bolsistas

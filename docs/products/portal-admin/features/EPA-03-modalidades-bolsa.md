@@ -14,9 +14,9 @@ O operador cadastra e versiona modalidades de bolsa, registra resolucoes da agen
 
 | Modulo | EPIC | Titulo | Status |
 |--------|------|--------|--------|
-| M001 | [EPIC-M001-001](../../../implementation/modules/M001-modalidade-bolsa/epics/EPIC-M001-001.md) | Cadastro de Resolucoes | To Do |
-| M001 | [EPIC-M001-002](../../../implementation/modules/M001-modalidade-bolsa/epics/EPIC-M001-002.md) | Controle de Modalidades de Bolsa | To Do |
-| M001 | [EPIC-M001-003](../../../implementation/modules/M001-modalidade-bolsa/epics/EPIC-M001-003.md) | Cadastro de Niveis de Bolsa | To Do |
+| M001 | [EPIC-M001-001](../../../implementation/modules/M001-modalidade-bolsa/epics/EPIC-M001-001.md) | Cadastro de Resolucoes | Done |
+| M001 | [EPIC-M001-002](../../../implementation/modules/M001-modalidade-bolsa/epics/EPIC-M001-002.md) | Controle de Modalidades de Bolsa | Done |
+| M001 | [EPIC-M001-003](../../../implementation/modules/M001-modalidade-bolsa/epics/EPIC-M001-003.md) | Cadastro de Niveis de Bolsa | Done |
 
 ## Cenarios de aceitacao do produto
 

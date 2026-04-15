@@ -2,7 +2,7 @@
 
 Dados mestres transversais a toda a organizacao, gestao de identidades e parametros do sistema.
 
-**Modulos que implementam este domain:** M001, M005, M006, M007
+**Modulos que implementam este domain:** M001, M005, M006, M007, M008
 
 ---
 

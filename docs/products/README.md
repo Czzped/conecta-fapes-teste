@@ -20,7 +20,7 @@ graph LR
 
     subgraph Modulos ["Modulos Backend"]
         M001[M001 Modalidades]
-        M003[M003 Editais]
+        M003[M003 Iniciativas Captadas]
         M004[M004 Pagamento]
         M005[M005 Autenticacao]
         M007[M007 Gateway]

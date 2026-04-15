@@ -2,7 +2,7 @@
 
 Servicos transversais de apoio, analise de dados, transparencia e comunicacao.
 
-**Modulos que implementam este domain:** nenhum atribuido ainda.
+**Modulos que implementam este domain:** M018, M019, M020
 
 ---
 

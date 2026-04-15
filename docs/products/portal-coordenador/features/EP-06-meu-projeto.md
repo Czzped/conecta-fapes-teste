@@ -17,6 +17,8 @@ O coordenador visualiza resumo financeiro e itens orcamentarios do projeto. O pa
 | M003 | [EPIC-M003-005](../../../implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-005.md) | Visao Operacional Consolidada | Done |
 | M009 | [EPIC-M009-004](../../../implementation/modules/M009-gestao-bolsista/epics/EPIC-M009-004.md) | Consultar Bolsa Pesquisa | To Do |
 
+> **Nota:** A feature de frontend esta Done, porem o EPIC de backend (EPIC-M009-004) permanece To Do. O frontend foi implementado antecipadamente e aguarda a conclusao do backend para integracao completa.
+
 ## Cenarios de aceitacao do produto
 
 - **Exibir estado sem bolsa**: quando o participante nao possui bolsa ativa, exibir mensagem orientativa

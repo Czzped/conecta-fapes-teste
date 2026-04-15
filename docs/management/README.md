@@ -138,12 +138,12 @@ backlog-product.md          → define dominios e modulos
 
 | Sprint | Periodo | Milestone | Goal |
 |--------|---------|-----------|------|
-| [SPRINT-001](sprints/SPRINT-001.md) | 2026-04-13 a 2026-04-24 | MS-01 / MS-03 | IAM, aditivos e suspensao de bolsa (Eduardo) |
-| [SPRINT-002](sprints/SPRINT-002.md) | 2026-04-27 a 2026-05-08 | MS-03 | Prazos, vigencia e bloqueio de submissao por pendencias |
-| [SPRINT-003](sprints/SPRINT-003.md) | 2026-05-11 a 2026-05-22 | MS-03 / MS-02 | Reavaliacao de documentos com IA e gestao de editais |
-| [SPRINT-004](sprints/SPRINT-004.md) | 2026-05-25 a 2026-06-05 | MS-04 | Operacoes financeiras e expansao UNAC |
-| [SPRINT-005](sprints/SPRINT-005.md) | 2026-06-08 a 2026-06-19 | MS-02 / MS-04 | Planejamento estrategico, programas e prestacao de contas |
-| [SPRINT-006](sprints/SPRINT-006.md) | 2026-06-22 a 2026-06-30 | MS-05 | Suporte operacional NUTIC e encerramento Q2 |
+| [SPRINT-001](sprints/SPRINT-001.md) | 2026-04-13 a 2026-04-24 | MS-03 | Prestacao de Contas completo e Portal do Coordenador em producao |
+| [SPRINT-002](sprints/SPRINT-002.md) | 2026-04-27 a 2026-05-08 | MS-02 | Gestao de Parcerias, Programas e Planejamento Estrategico |
+| [SPRINT-003](sprints/SPRINT-003.md) | 2026-05-11 a 2026-05-22 | MS-03 | Aditivos e gestao de bolsistas (Eduardo) |
+| [SPRINT-004](sprints/SPRINT-004.md) | 2026-05-25 a 2026-06-05 | MS-03 / MS-02 | Prazos excepcionais, fluxo de submissao e escalonamento de projetos |
+| [SPRINT-005](sprints/SPRINT-005.md) | 2026-06-08 a 2026-06-19 | MS-04 | Operacoes financeiras avancadas, expansao UNAC e consultas financeiras |
+| [SPRINT-006](sprints/SPRINT-006.md) | 2026-06-22 a 2026-06-30 | MS-05 / MS-01 | Encerramento Q2: suporte operacional NUTIC e itens transferidos do Q1 |
 
 ## Templates
 

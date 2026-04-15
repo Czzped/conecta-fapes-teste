@@ -14,7 +14,7 @@ O usuario visualiza e atualiza dados pessoais, academicos, enderecos e dados ban
 
 | Modulo | EPIC | Titulo | Status |
 |--------|------|--------|--------|
-| M008 | [EPIC-M008-001](../../../implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-001.md) | Cadastro de Pessoas Fisicas | To Do |
+| M008 | [EPIC-M008-001](../../../implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-001.md) | Cadastro de Pessoas Fisicas | In Progress |
 
 ## Cenarios de aceitacao do produto
 

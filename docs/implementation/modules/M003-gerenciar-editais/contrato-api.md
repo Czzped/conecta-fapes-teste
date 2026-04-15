@@ -691,7 +691,7 @@ Consulta o detalhe de uma alocacao pelo identificador.
 | `GET` | `/api/v1/m003/editais/{editalId}/cotas` | ListarCotasDoEdital | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `PUT` | `/api/v1/m003/editais/{editalId}/cotas/{cotaId}` | AtualizarCotaEdital | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m003/projetos/{projetoId}/alocacoes` | RegistrarAlocacaoBolsista | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m003/projetos/{projetoId}/alocacoes` | ListarAlocacoesDoProjeito | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `GET` | `/api/v1/m003/projetos/{projetoId}/alocacoes` | ListarAlocacoesDoProjeto | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `GET` | `/api/v1/m003/alocacoes/{id}` | ConsultarAlocacao | ANALISTA_AGENCIA, MODULO_INTERNO |
 
 ---
