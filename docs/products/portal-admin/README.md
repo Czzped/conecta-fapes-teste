@@ -23,6 +23,7 @@ O Portal Admin e a interface principal para operadores, gerentes e diretores da 
 | Documento | Descricao |
 |-----------|-----------|
 | [Backlog](backlog.md) | Epicos de produto, features e grafo de dependencias |
+| [Arquitetura Frontend](architecture.md) | Stack, estrutura do projeto, autenticacao, perfis e diferencas com Portal Coordenador |
 
 ---
 
