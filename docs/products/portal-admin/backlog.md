@@ -37,7 +37,7 @@ graph TD
 |--------|----------------|-------|
 | [M001](../../implementation/modules/M001-modalidade-bolsa/README.md) | Resolucoes, modalidades, versoes e niveis de bolsa | 3 EPICs (Done) |
 | [M002](../../implementation/modules/M002-importacao-editais/README.md) | Importacao do SIGFAPES | 3 EPICs (Done) |
-| [M003](../../implementation/modules/M003-gerenciar-editais/README.md) | Visualizacao operacional de editais e projetos | 5 EPICs (Done) |
+| [M003](../../implementation/modules/M003-gestao-iniciativas-captadas/README.md) | Visualizacao operacional de editais e projetos | 5 EPICs (Done) |
 | [M004](../../implementation/modules/M004-pagamento-bolsista/README.md) | Folhas, remessas, retornos, guias, relatorios | 12 EPICs (Done) |
 | [M005](../../implementation/modules/M005-autenticacao/README.md) | Autenticacao via Acesso Cidadao | A definir |
 | [M008](../../implementation/modules/M008-cadastros-corporativos/README.md) | Pessoas, instituicoes, areas tecnicas | 3 EPICs (In Progress) |

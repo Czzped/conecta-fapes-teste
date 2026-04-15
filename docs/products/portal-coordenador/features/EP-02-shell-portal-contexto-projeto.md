@@ -14,7 +14,7 @@ O usuario autenticado seleciona um projeto no cabecalho e o portal adapta menu, 
 
 | Modulo | EPIC | Titulo | Status |
 |--------|------|--------|--------|
-| M003 | [EPIC-M003-005](../../../implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-005.md) | Visao Operacional Consolidada | Done |
+| M003 | [EPIC-M003-005](../../../implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-005.md) | Visao Operacional Consolidada | Done |
 | M007 | — | API Gateway | A definir (M007 sem EPICs) |
 
 ## Cenarios de aceitacao do produto

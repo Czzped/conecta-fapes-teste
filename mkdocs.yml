@@ -141,16 +141,16 @@ nav:
           - EPIC-002: implementation/modules/M002-importacao-editais/epics/EPIC-M002-002.md
           - EPIC-003: implementation/modules/M002-importacao-editais/epics/EPIC-M002-003.md
       - M003 Gestao de Iniciativas Captadas:
-          - implementation/modules/M003-gerenciar-editais/README.md
-          - Backlog: implementation/modules/M003-gerenciar-editais/backlog.md
-          - Contrato: implementation/modules/M003-gerenciar-editais/contrato.md
-          - Contrato API: implementation/modules/M003-gerenciar-editais/contrato-api.md
-          - Modelo Estrutural: implementation/modules/M003-gerenciar-editais/modelo-estrutural.md
-          - EPIC-001: implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-001.md
-          - EPIC-002: implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-002.md
-          - EPIC-003: implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-003.md
-          - EPIC-004: implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-004.md
-          - EPIC-005: implementation/modules/M003-gerenciar-editais/epics/EPIC-M003-005.md
+          - implementation/modules/M003-gestao-iniciativas-captadas/README.md
+          - Backlog: implementation/modules/M003-gestao-iniciativas-captadas/backlog.md
+          - Contrato: implementation/modules/M003-gestao-iniciativas-captadas/contrato.md
+          - Contrato API: implementation/modules/M003-gestao-iniciativas-captadas/contrato-api.md
+          - Modelo Estrutural: implementation/modules/M003-gestao-iniciativas-captadas/modelo-estrutural.md
+          - EPIC-001: implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-001.md
+          - EPIC-002: implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-002.md
+          - EPIC-003: implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-003.md
+          - EPIC-004: implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-004.md
+          - EPIC-005: implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-005.md
       - M004 Pagamento de Bolsistas:
           - implementation/modules/M004-pagamento-bolsista/README.md
           - Backlog: implementation/modules/M004-pagamento-bolsista/backlog.md
@@ -219,6 +219,10 @@ nav:
           - EPIC-001: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-001.md
           - EPIC-002: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-002.md
           - EPIC-003: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-003.md
+          - EPIC-004: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-004.md
+          - EPIC-005: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-005.md
+          - EPIC-006: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-006.md
+          - EPIC-007: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-007.md
       - M012 Acompanhamento e Resultados:
           - implementation/modules/M012-acompanhamento-resultados/README.md
           - Backlog: implementation/modules/M012-acompanhamento-resultados/backlog.md
@@ -318,6 +322,7 @@ nav:
       - Milestones: management/milestones.md
       - Backlog do Produto: management/backlog-product.md
       - Divida Tecnica: management/technical-debt.md
+      - Definition of Ready e Done: management/definition-of-ready-done.md
       - SPRINT-001: management/sprints/SPRINT-001.md
       - SPRINT-002: management/sprints/SPRINT-002.md
       - SPRINT-003: management/sprints/SPRINT-003.md

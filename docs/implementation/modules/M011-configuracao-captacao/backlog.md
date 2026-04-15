@@ -17,10 +17,10 @@ Especificacao de referencia: [README.md](README.md)
 | EPIC-M011-001 | Configuracao do Edital | UC01 | Must | In Progress | [EPIC-M011-001](epics/EPIC-M011-001.md) |
 | EPIC-M011-002 | Gestao de Formularios | UC02 | Must | To Do | [EPIC-M011-002](epics/EPIC-M011-002.md) |
 | EPIC-M011-003 | Gestao de Revisores Ad Hoc | UC03 | Must | To Do | [EPIC-M011-003](epics/EPIC-M011-003.md) |
-| EPIC-M011-004 | Gestao de Inscricoes | UC04 | Must | To Do | A definir |
-| EPIC-M011-005 | Avaliacao de Merito | UC05 | Must | To Do | A definir |
-| EPIC-M011-006 | Gestao de Recursos Pre-Award | UC06 | Must | To Do | A definir |
-| EPIC-M011-007 | Publicacao de Resultado | UC07 | Must | To Do | A definir |
+| EPIC-M011-004 | Gestao de Inscricoes | UC04 | Must | To Do | [EPIC-M011-004](epics/EPIC-M011-004.md) |
+| EPIC-M011-005 | Avaliacao de Merito | UC05 | Must | To Do | [EPIC-M011-005](epics/EPIC-M011-005.md) |
+| EPIC-M011-006 | Gestao de Recursos Pre-Award | UC06 | Must | To Do | [EPIC-M011-006](epics/EPIC-M011-006.md) |
+| EPIC-M011-007 | Publicacao de Resultado | UC07 | Must | To Do | [EPIC-M011-007](epics/EPIC-M011-007.md) |
 
 > **Nota:** EPICs 004-007 foram identificados na [analise do prototipo backoffice](specifications/analise-prototipo-captacao.md) — funcionalidades presentes no prototipo sem cobertura na documentacao anterior.
 

@@ -10,7 +10,7 @@ Fluxo de execucao do projeto contratado ate a sua finalizacao.
 
 Apos a contratacao, as iniciativas aprovadas passam a ser gerenciadas operacionalmente pelo M003. Este sub-dominio concentra o ownership de editais operacionais, projetos contratados, cotas de bolsa e alocacoes de bolsistas.
 
-**Implementado por:** [M003 — Gestao de Iniciativas Captadas](../../implementation/modules/M003-gerenciar-editais/README.md)
+**Implementado por:** [M003 — Gestao de Iniciativas Captadas](../../implementation/modules/M003-gestao-iniciativas-captadas/README.md)
 
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|
