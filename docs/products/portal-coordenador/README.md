@@ -25,7 +25,6 @@ O Portal Coordenador e a interface principal para coordenadores de projetos de p
 |-----------|-----------|
 | [Backlog](backlog.md) | Epicos de produto, features e grafo de dependencias |
 | [Arquitetura Frontend](architecture.md) | Estrutura modular do frontend: common, layouts, modules, routing |
-| [Levantamento de Funcionalidades](levantamento-funcionalidades.md) | Inventario de capacidades existentes no frontend com status |
 
 ---
 
