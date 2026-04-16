@@ -2,7 +2,19 @@
 
 Dominio e regras de negocio: ver [README.md](README.md)
 
-### Diagrama de Classes
+## Sub-modelos
+
+Para facilitar a leitura, o modelo esta dividido em tres sub-modelos por area tematica:
+
+| Sub-modelo | Entidades | Descricao |
+|------------|-----------|-----------|
+| [Pessoas](modelo-estrutural-pessoas.md) | PessoaFisica, Servidor, HistoricoPessoa | Cadastro de individuos e auditoria |
+| [Instituicoes e Unidades](modelo-estrutural-instituicoes.md) | Instituicao, TipoInstituicao, UnidadeOrganizacional, AreaTecnica, Dirigente | Organizacoes e estrutura hierarquica |
+| [Cadastros de Referencia](modelo-estrutural-referencia.md) | AreaConhecimento, RubricaFinanceira, Cidade, Regiao, Finalidade | Tabelas de classificacao transversais |
+
+---
+
+### Diagrama Consolidado
 
 ```mermaid
 classDiagram

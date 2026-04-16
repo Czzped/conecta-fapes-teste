@@ -183,6 +183,9 @@ nav:
           - Contrato: implementation/modules/M008-cadastros-corporativos/contrato.md
           - Contrato API: implementation/modules/M008-cadastros-corporativos/contrato-api.md
           - Modelo Estrutural: implementation/modules/M008-cadastros-corporativos/modelo-estrutural.md
+          - Pessoas: implementation/modules/M008-cadastros-corporativos/modelo-estrutural-pessoas.md
+          - Instituicoes e Unidades: implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md
+          - Cadastros de Referencia: implementation/modules/M008-cadastros-corporativos/modelo-estrutural-referencia.md
           - Modelo Comportamental: implementation/modules/M008-cadastros-corporativos/modelo-comportamental.md
           - EPIC-001: implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-001.md
           - EPIC-002: implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-002.md
