@@ -94,7 +94,7 @@
 
 ---
 
-## Ordem de Implementacao (Equipe Dev)
+## Ordem de Implementacao (Vinicius Estevam)
 
 **Fase 1 — M008 (desbloqueio, primeira semana):**
 
