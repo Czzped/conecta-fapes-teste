@@ -15,6 +15,11 @@
 
 > EPIC de referencia: [#1724 Portal Admin — Parcerias](https://github.com/leds-conectafapes/conectafapes-project/issues/1724)
 
+**Prototipos:**
+- [Back-office (Figma)](https://bucket-lake-78647159.figma.site/) — Telas de Parcerias, Instituicoes e Cadastros
+- [Front-office (Figma)](https://rate-snort-02856207.figma.site/)
+- [Prototipo Backoffice (codigo)](../../prototype/backoffice/) — Componentes: Parceria.tsx, DetalhesParceria.tsx, FormularioParceria.tsx
+
 ### Domain 01 — Corporativo e Administrativo (M008 — Desbloqueio)
 
 | Feature | Produto | Modulo | Issue | Documentacao | Status |
