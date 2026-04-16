@@ -89,6 +89,11 @@ classDiagram
         +String descricao
     }
 
+    class Finalidade {
+        +String nome
+        +String descricao
+    }
+
     class Servidor {
         +String nome
         +String matricula
@@ -163,6 +168,8 @@ classDiagram
 | | codigoIBGE | Codigo IBGE da cidade | Sim | String | Ex: 3205309 | 10 | Sim |
 | **Regiao** | nome | Nome da regiao | Sim | String | Ex: Grande Vitoria | 200 | Sim |
 | | descricao | Descricao da regiao | Nao | String | | 500 | |
+| **Finalidade** | nome | Nome da finalidade | Sim | String | Ex: Pesquisa, Inovacao, Extensao | 200 | Sim |
+| | descricao | Descricao do proposito | Nao | String | | 500 | |
 | **Servidor** | nome | Nome do servidor | Sim | String | | 300 | |
 | | matricula | Matricula funcional do servidor | Sim | String | | 20 | Sim |
 | | email | Email institucional do servidor | Sim | String | | 200 | |

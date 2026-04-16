@@ -20,19 +20,18 @@ Este contrato documenta a superficie publica do modulo M010 como contexto respon
 
 | Dependencia | Tipo | Observacao |
 |-------------|------|------------|
-| M008 | Modulo interno | Fornece `PessoaFisica` e `Instituicao` como referencias |
-| Cadastros/documentos externos | Sistema externo | Podem suportar documentos de parceria e descentralizacao |
+| M008 | Modulo interno | Fornece `Pessoa`, `Instituicao`, `UnidadeOrganizacional`, `TipoInstituicao` e `Finalidade` |
 
 ## Operacoes Publicas
 
 | Nome da Operacao | Tipo | Objetivo | Entrada | Saida | Regras relacionadas | Pre-condicoes | Recusas/erros | Idempotencia | Autorizacao | Mapeamento de transporte |
 |------------------|------|----------|---------|-------|---------------------|---------------|---------------|--------------|-------------|--------------------------|
-| RegistrarPlanoEstrategico | Command | Criar ou atualizar plano estrategico com sua vigencia | nome, descricao, dataInicio, dataFim, estado | `PlanoEstrategico` persistido | RN08, RN09 | Vigencia informada | Plano ativo duplicado, vigencia invalida | Nao | Diretoria autorizada | API interna/backoffice a definir |
-| CriarPrograma | Command | Registrar programa associado a eixos estrategicos | nome, eixo, resumo, beneficios, resultados | `Programa` criado | RN01, RN02, RN11, RI1 | Eixo estrategico existente | Programa sem eixo, programa com parceria inconsistente | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
-| RegistrarRecursoDePrograma | Command | Registrar recurso e aporte financeiro do programa | programa, valor, origem, dataAporte, documento | `RecursoPrograma` criado | RN06, RN11 | Programa existente | Recurso invalido, saldo insuficiente | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
-| CriarParceria | Command | Registrar parceria com participantes, vigencia e documentos | nome, instituicoes, vigencia, objetivo, processo | `Parceria` criada | RN02, RN03, RN07, RI2 | Instituicoes informadas | Parceria sem instituicao, vigencia invalida | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
-| RegistrarMovimentacaoDeParceria | Command | Registrar aporte ou aditivo de parceria com justificativa e documento | parceria, tipoMovimentacao, valor, justificativa, documento | `AporteFinanceiro` ou `Aditivo` registrado | RN03, RN04, RN10 | Parceria vigente quando exigido | Parceria nao vigente, documento obrigatorio ausente | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
-| ConsultarPortfolioEstrategico | Query | Consultar plano, programas, parcerias e aportes consolidados | plano, programa, parceria, estado | Portfolio consolidado | RN01, RN02, RN09, RN10 | Filtro informado | Nenhum registro encontrado | N/A | Diretoria ou analista autorizado | API interna a definir |
+| RegistrarPlanoEstrategico | Command | Criar ou atualizar plano estrategico com sua vigencia | nome, descricao, dataInicio, dataFim | `PlanoEstrategico` persistido | RN08, RN09 | Vigencia informada | Plano ativo duplicado, vigencia invalida | Nao | Diretoria autorizada | API interna/backoffice a definir |
+| CriarPrograma | Command | Registrar programa associado a eixos estrategicos | nome, eixo, resumo, dataInicio, dataFim | `Programa` criado | RN01, RN02, RI1 | Eixo estrategico existente | Programa sem eixo | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| CriarParceria | Command | Registrar parceria com vigencia, objetivo e finalidade | nome, numeroDProcesso, dataAssinatura, vigenciaInicio, vigenciaFim, objetivo, finalidadeId, unidadeResponsavelId | `Parceria` criada | RN03, RN05, RN06, RI2 | Finalidade e UnidadeOrganizacional informadas | Finalidade inexistente, vigencia invalida | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| RegistrarAporteFinanceiro | Command | Registrar aporte financeiro com origem em instituicao | parceriaId, instituicaoId, valorInvestido, dataAporte | `AporteFinanceiro` registrado | RN03, RN04 | Parceria com dataAssinatura preenchida | Parceria sem acordo assinado, instituicao inexistente | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| RegistrarCoordenacao | Command | Registrar coordenacao temporal entre pessoa e parceria | parceriaId, pessoaId, dataInicio, dataFim | `Coordenacao` registrada | — | Parceria e Pessoa existentes | Parceria inexistente, pessoa inexistente | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| ConsultarPortfolioEstrategico | Query | Consultar plano, programas, parcerias e aportes consolidados | plano, programa, parceria, estado | Portfolio consolidado | RN01, RN02, RN09 | Filtro informado | Nenhum registro encontrado | N/A | Diretoria ou analista autorizado | API interna a definir |
 
 ## Padrao de Payload e Erro
 
