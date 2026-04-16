@@ -15,8 +15,8 @@
 
 | Frente | Responsavel | Objetivo | Issues |
 |--------|-------------|----------|--------|
-| **Cadastros Corporativos** | Equipe Dev | Implementar CRUD de Instituicao, UnidadeOrg, AreaTecnica, Finalidade e vinculo de pessoas — pre-requisito para Parcerias | 8 issues (M008) |
-| **Parcerias** | Equipe Dev | Implementar cadastro, aportes, coordenacao e consulta de parcerias no Portal Admin | 6 issues (M010) |
+| **Cadastros Corporativos** | Vinicius Estevam | Implementar CRUD de Instituicao, UnidadeOrg, AreaTecnica, Finalidade e vinculo de pessoas — pre-requisito para Parcerias | 8 issues (M008) |
+| **Parcerias** | Vinicius Estevam | Implementar cadastro, aportes, coordenacao e consulta de parcerias no Portal Admin | 6 issues (M010) |
 | **Prestacao de Contas** | Manoel | Entregar extrato do projeto com listagem paginada, controle de gastos e filtros | 5 issues (M014) |
 | **Design de Produto** | Leticia | Discovery dos modulos M014 (analise/contestacao) e M011 (captacao completa): jornadas, prototipos e criterios de aceitacao | 2 issues |
 | **Discovery de Melhorias** | Marcela + Leticia | Mapear jornadas de usuario em producao, coletar feedback e registrar melhorias e novas features | 1 issue |
@@ -30,7 +30,7 @@
 - [Front-office (Figma)](https://rate-snort-02856207.figma.site/)
 - [Prototipo Backoffice (codigo)](../../prototype/backoffice/) — Parceria.tsx, DetalhesParceria.tsx, FormularioParceria.tsx
 
-### Equipe Dev — Cadastros Corporativos (M008)
+### Vinicius Estevam — Cadastros Corporativos (M008)
 
 > EPIC: [#1748](https://github.com/leds-conectafapes/conectafapes-project/issues/1748) Instituicoes e Unidades | [#1745](https://github.com/leds-conectafapes/conectafapes-project/issues/1745) Finalidades
 
@@ -45,7 +45,7 @@
 | Cadastrar Finalidade | [#1746](https://github.com/leds-conectafapes/conectafapes-project/issues/1746) | [Modelo Referencia](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-referencia.md) | ⚪ To Do |
 | Listar Finalidades | [#1747](https://github.com/leds-conectafapes/conectafapes-project/issues/1747) | [Modelo Referencia](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-referencia.md) | ⚪ To Do |
 
-### Equipe Dev — Parcerias (M010)
+### Vinicius Estevam — Parcerias (M010)
 
 > EPIC: [#1724](https://github.com/leds-conectafapes/conectafapes-project/issues/1724) Portal Admin — Parcerias
 
@@ -138,7 +138,7 @@
 
 | Responsavel | Total | Done | In Progress | To Do | % |
 |-------------|-------|------|-------------|-------|---|
-| Equipe Dev | 14 | 0 | 0 | 14 | 0% |
+| Vinicius | 14 | 0 | 0 | 14 | 0% |
 | Manoel | 5 | 0 | 0 | 5 | 0% |
 | Leticia | 2 | 0 | 0 | 2 | 0% |
 | Marcela + Leticia | 1 | 0 | 0 | 1 | 0% |
@@ -147,20 +147,20 @@
 
 | # | Responsavel | Feature | Issue | Status |
 |---|-------------|---------|-------|--------|
-| 1 | Equipe | Cadastrar Instituicao | #1749 | ⚪ To Do |
-| 2 | Equipe | Cadastrar Unidade Organizacional | #1750 | ⚪ To Do |
-| 3 | Equipe | Vincular Pessoa a Instituicao/Unidade | #1753 | ⚪ To Do |
-| 4 | Equipe | Cadastrar e Gerenciar Area Tecnica | #1754 | ⚪ To Do |
-| 5 | Equipe | Cadastrar Dirigente | #1751 | ⚪ To Do |
-| 6 | Equipe | Listar e Consultar Instituicoes | #1752 | ⚪ To Do |
-| 7 | Equipe | Cadastrar Finalidade | #1746 | ⚪ To Do |
-| 8 | Equipe | Listar Finalidades | #1747 | ⚪ To Do |
-| 9 | Equipe | Cadastrar Parceria | #1739 | ⚪ To Do |
-| 10 | Equipe | Registrar Aporte Financeiro | #1740 | ⚪ To Do |
-| 11 | Equipe | Registrar Coordenacao | #1741 | ⚪ To Do |
-| 12 | Equipe | Associar Finalidade a Parceria | #1742 | ⚪ To Do |
-| 13 | Equipe | Listar e Consultar Parcerias | #1743 | ⚪ To Do |
-| 14 | Equipe | Encerrar Parceria | #1744 | ⚪ To Do |
+| 1 | Vinicius | Cadastrar Instituicao | #1749 | ⚪ To Do |
+| 2 | Vinicius | Cadastrar Unidade Organizacional | #1750 | ⚪ To Do |
+| 3 | Vinicius | Vincular Pessoa a Instituicao/Unidade | #1753 | ⚪ To Do |
+| 4 | Vinicius | Cadastrar e Gerenciar Area Tecnica | #1754 | ⚪ To Do |
+| 5 | Vinicius | Cadastrar Dirigente | #1751 | ⚪ To Do |
+| 6 | Vinicius | Listar e Consultar Instituicoes | #1752 | ⚪ To Do |
+| 7 | Vinicius | Cadastrar Finalidade | #1746 | ⚪ To Do |
+| 8 | Vinicius | Listar Finalidades | #1747 | ⚪ To Do |
+| 9 | Vinicius | Cadastrar Parceria | #1739 | ⚪ To Do |
+| 10 | Vinicius | Registrar Aporte Financeiro | #1740 | ⚪ To Do |
+| 11 | Vinicius | Registrar Coordenacao | #1741 | ⚪ To Do |
+| 12 | Vinicius | Associar Finalidade a Parceria | #1742 | ⚪ To Do |
+| 13 | Vinicius | Listar e Consultar Parcerias | #1743 | ⚪ To Do |
+| 14 | Vinicius | Encerrar Parceria | #1744 | ⚪ To Do |
 | 15 | Manoel | Extrato do Projeto (EPIC) | #1718 | ⚪ To Do |
 | 16 | Manoel | Listagem paginada do Extrato | #1721 | ⚪ To Do |
 | 17 | Manoel | Controle de Gastos do Projeto | #1719 | ⚪ To Do |
