@@ -35,9 +35,11 @@ EPIC-M008-002 (Cadastro de Instituicoes e Unidades)  <- depende de EPIC-M008-001
 ├── US-M008-007 Cadastrar Dirigente
 └── US-M008-008 Listar e Consultar Instituicoes
 
-EPIC-M008-003 (Cadastros Basicos de Referencia)
+EPIC-M008-003 (Cadastros Basicos de Referencia)  GitHub: #1745
 ├── US-M008-009 Gerenciar Areas de Conhecimento
 ├── US-M008-010 Gerenciar Rubricas Financeiras
 ├── US-M008-011 Gerenciar Cidades e Regioes
-└── US-M008-012 Gerenciar Estrutura Organizacional da Agencia
+├── US-M008-012 Gerenciar Estrutura Organizacional da Agencia
+├── US-M008-013 Cadastrar Finalidade                   #1746
+└── US-M008-014 Listar Finalidades                     #1747
 ```
