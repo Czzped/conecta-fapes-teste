@@ -76,6 +76,42 @@
 
 ---
 
+## Estatisticas
+
+| Metrica | Valor |
+|---------|-------|
+| **Total de issues** | 13 |
+| **M008 (desbloqueio)** | 8 |
+| **M010 (parcerias)** | 6 |
+| **Concluidas** | 0 |
+| **Em andamento** | 0 |
+| **Pendentes** | 13 |
+| **% Concluido** | 0% |
+
+### Progresso por Feature
+
+| # | Feature | Issue | Status |
+|---|---------|-------|--------|
+| 1 | Cadastrar Instituicao | #1749 | :white_circle: To Do |
+| 2 | Cadastrar Unidade Organizacional | #1750 | :white_circle: To Do |
+| 3 | Cadastrar Dirigente | #1751 | :white_circle: To Do |
+| 4 | Listar e Consultar Instituicoes | #1752 | :white_circle: To Do |
+| 5 | Vincular Pessoa a Instituicao/Unidade | #1753 | :white_circle: To Do |
+| 6 | Cadastrar e Gerenciar Area Tecnica | #1754 | :white_circle: To Do |
+| 7 | Cadastrar Finalidade | #1746 | :white_circle: To Do |
+| 8 | Listar Finalidades | #1747 | :white_circle: To Do |
+| 9 | Cadastrar Parceria | #1739 | :white_circle: To Do |
+| 10 | Registrar Aporte Financeiro | #1740 | :white_circle: To Do |
+| 11 | Registrar Coordenacao | #1741 | :white_circle: To Do |
+| 12 | Associar Finalidade a Parceria | #1742 | :white_circle: To Do |
+| 13 | Listar e Consultar Parcerias | #1743 | :white_circle: To Do |
+
+> **Legenda:** :white_circle: To Do | :large_blue_circle: In Progress | :green_circle: Done
+
+> **Nota:** Atualizar esta tabela ao final de cada dia ou ao concluir uma issue. Trocar o emoji conforme o status muda.
+
+---
+
 ## Review
 
 ### Entregue
