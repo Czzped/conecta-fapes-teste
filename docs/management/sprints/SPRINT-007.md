@@ -77,6 +77,15 @@
 | Discovery Prestacao de Contas (jornadas, prototipos, DoD dos EPICs 002/003) | M014 | [#1756](https://github.com/leds-conectafapes/conectafapes-project/issues/1756) | [M014 Backlog](../../implementation/modules/M014-prestacao-contas/backlog.md), [Modelo Comportamental](../../implementation/modules/M014-prestacao-contas/modelo-comportamental.md) | ⚪ To Do |
 | Discovery Captacao de Iniciativas (jornadas, prototipos, DoD dos EPICs 001-007) | M011 | [#1757](https://github.com/leds-conectafapes/conectafapes-project/issues/1757) | [M011 Backlog](../../implementation/modules/M011-configuracao-captacao/backlog.md), [Analise Prototipo](../../implementation/modules/M011-configuracao-captacao/specifications/analise-prototipo-captacao.md) | ⚪ To Do |
 
+### Lannes — Importacao SIGFAPES (M002)
+
+> Pendencia: documentacao do sistema de importacao nao foi feita. Questionar sobre status atual e proximos passos.
+
+| Item | Descricao | Status |
+|------|-----------|--------|
+| Documentacao do Importador | Documentar arquitetura, fluxo de dados e decisoes tecnicas do sistema de importacao | Pendente |
+| Proximos passos M002 | Definir se ha evolucoes planejadas ou se o modulo esta finalizado | A discutir |
+
 ### Marcela + Leticia — Discovery de Melhorias
 
 | Feature | Issue | Status |
