@@ -144,7 +144,7 @@ backlog-product.md          → define dominios e modulos
 | [SPRINT-004](sprints/SPRINT-004.md) | 2026-05-25 a 2026-06-05 | MS-03 / MS-02 | Prazos excepcionais, fluxo de submissao e escalonamento de projetos |
 | [SPRINT-005](sprints/SPRINT-005.md) | 2026-06-08 a 2026-06-19 | MS-04 | Operacoes financeiras avancadas, expansao UNAC e consultas financeiras |
 | [SPRINT-006](sprints/SPRINT-006.md) | 2026-06-22 a 2026-06-30 | MS-05 / MS-01 | Encerramento Q2: suporte operacional NUTIC e itens transferidos do Q1 |
-| [SPRINT-007](sprints/SPRINT-007.md) | 2026-04-16 a 2026-04-30 | MS-01 / MS-02 | Desbloqueio de Parcerias: cadastros corporativos (M008) e primeiras US de Parcerias (M010) |
+| [SPRINT-007](sprints/SPRINT-007.md) | 2026-04-21 a 2026-05-02 | MS-01 / MS-02 / MS-03 | Parcerias (M008+M010), Prestacao de Contas (M014) e Captacao (M011) |
 
 ## Templates
 
