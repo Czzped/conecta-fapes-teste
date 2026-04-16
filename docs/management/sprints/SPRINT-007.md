@@ -23,6 +23,7 @@
 | Cadastrar Unidade Organizacional | PORTAL FAPES - ADMIN | M008 | [#1750](https://github.com/leds-conectafapes/conectafapes-project/issues/1750) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md), [EPIC-M008-002](../../implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-002.md) | To Do |
 | Cadastrar Dirigente | PORTAL FAPES - ADMIN | M008 | [#1751](https://github.com/leds-conectafapes/conectafapes-project/issues/1751) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md), [EPIC-M008-002](../../implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-002.md) | To Do |
 | Listar e Consultar Instituicoes | PORTAL FAPES - ADMIN | M008 | [#1752](https://github.com/leds-conectafapes/conectafapes-project/issues/1752) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md), [EPIC-M008-002](../../implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-002.md) | To Do |
+| Vincular Pessoa a Instituicao/Unidade | PORTAL FAPES - ADMIN | M008 | [#1753](https://github.com/leds-conectafapes/conectafapes-project/issues/1753) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md), [Modelo Pessoas](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-pessoas.md) | To Do |
 | Cadastrar Finalidade | PORTAL FAPES - ADMIN | M008 | [#1746](https://github.com/leds-conectafapes/conectafapes-project/issues/1746) | [Modelo Referencia](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-referencia.md) | To Do |
 | Listar Finalidades | PORTAL FAPES - ADMIN | M008 | [#1747](https://github.com/leds-conectafapes/conectafapes-project/issues/1747) | [Modelo Referencia](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-referencia.md) | To Do |
 
@@ -44,9 +45,10 @@
 **Fase 1 — M008 (desbloqueio, primeira semana):**
 1. #1749 Cadastrar Instituicao
 2. #1750 Cadastrar Unidade Organizacional
-3. #1746 Cadastrar Finalidade + #1747 Listar Finalidades
-4. #1751 Cadastrar Dirigente
-5. #1752 Listar e Consultar Instituicoes
+3. #1753 Vincular Pessoa a Instituicao/Unidade
+4. #1746 Cadastrar Finalidade + #1747 Listar Finalidades
+5. #1751 Cadastrar Dirigente
+6. #1752 Listar e Consultar Instituicoes
 
 **Fase 2 — M010 (parcerias, segunda semana):**
 1. #1739 Cadastrar Parceria (depende de #1749, #1750, #1746)

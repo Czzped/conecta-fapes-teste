@@ -29,11 +29,12 @@ EPIC-M008-001 (Cadastro de Pessoas Fisicas)
 ├── US-M008-003 Atualizar Pessoa Fisica
 └── US-M008-004 Suspender Pessoa
 
-EPIC-M008-002 (Cadastro de Instituicoes e Unidades)  <- depende de EPIC-M008-001
-├── US-M008-005 Cadastrar Instituicao
-├── US-M008-006 Cadastrar Unidade Organizacional
-├── US-M008-007 Cadastrar Dirigente
-└── US-M008-008 Listar e Consultar Instituicoes
+EPIC-M008-002 (Cadastro de Instituicoes e Unidades)  <- depende de EPIC-M008-001  GitHub: #1748
+├── US-M008-005 Cadastrar Instituicao                 #1749
+├── US-M008-006 Cadastrar Unidade Organizacional       #1750
+├── US-M008-007 Cadastrar Dirigente                    #1751
+├── US-M008-008 Listar e Consultar Instituicoes        #1752
+└── US-M008-015 Vincular Pessoa a Instituicao/Unidade  #1753
 
 EPIC-M008-003 (Cadastros Basicos de Referencia)  GitHub: #1745
 ├── US-M008-009 Gerenciar Areas de Conhecimento
