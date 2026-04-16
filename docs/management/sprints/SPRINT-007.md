@@ -1,0 +1,95 @@
+# SPRINT-007
+
+[← Voltar ao Management](../README.md)
+
+| Atributo | Valor |
+|----------|-------|
+| **Periodo** | 2026-04-16 a 2026-04-30 |
+| **Milestone** | [MS-01 — Base Operacional](../milestones.md#ms-01--base-operacional) / [MS-02 — Ciclo de Fomento Pre-Award](../milestones.md#ms-02--ciclo-de-fomento-pre-award) |
+| **GitHub Milestone** | `milestone: MS-01` |
+| **Goal** | Desbloqueio de Parcerias: cadastros corporativos (M008) e primeiras US de Parcerias (M010) |
+
+---
+
+## Features Comprometidas
+
+> EPIC de referencia: [#1724 Portal Admin — Parcerias](https://github.com/leds-conectafapes/conectafapes-project/issues/1724)
+
+### Domain 01 — Corporativo e Administrativo (M008 — Desbloqueio)
+
+| Feature | Produto | Modulo | Issue | Status |
+|---------|---------|--------|-------|--------|
+| Cadastrar Instituicao | PORTAL FAPES - ADMIN | M008 | [#1749](https://github.com/leds-conectafapes/conectafapes-project/issues/1749) | To Do |
+| Cadastrar Unidade Organizacional | PORTAL FAPES - ADMIN | M008 | [#1750](https://github.com/leds-conectafapes/conectafapes-project/issues/1750) | To Do |
+| Cadastrar Dirigente | PORTAL FAPES - ADMIN | M008 | [#1751](https://github.com/leds-conectafapes/conectafapes-project/issues/1751) | To Do |
+| Listar e Consultar Instituicoes | PORTAL FAPES - ADMIN | M008 | [#1752](https://github.com/leds-conectafapes/conectafapes-project/issues/1752) | To Do |
+| Cadastrar Finalidade | PORTAL FAPES - ADMIN | M008 | [#1746](https://github.com/leds-conectafapes/conectafapes-project/issues/1746) | To Do |
+| Listar Finalidades | PORTAL FAPES - ADMIN | M008 | [#1747](https://github.com/leds-conectafapes/conectafapes-project/issues/1747) | To Do |
+
+### Domain 02 — Planejamento e Estrategia (M010 — Parcerias)
+
+| Feature | Produto | Modulo | Issue | Status |
+|---------|---------|--------|-------|--------|
+| Cadastrar Parceria | PORTAL FAPES - ADMIN | M010 | [#1739](https://github.com/leds-conectafapes/conectafapes-project/issues/1739) | To Do |
+| Registrar Aporte Financeiro | PORTAL FAPES - ADMIN | M010 | [#1740](https://github.com/leds-conectafapes/conectafapes-project/issues/1740) | To Do |
+| Registrar Coordenacao de Parceria | PORTAL FAPES - ADMIN | M010 | [#1741](https://github.com/leds-conectafapes/conectafapes-project/issues/1741) | To Do |
+| Associar Finalidade a Parceria | PORTAL FAPES - ADMIN | M010 | [#1742](https://github.com/leds-conectafapes/conectafapes-project/issues/1742) | To Do |
+| Listar e Consultar Parcerias | PORTAL FAPES - ADMIN | M010 | [#1743](https://github.com/leds-conectafapes/conectafapes-project/issues/1743) | To Do |
+| Encerrar Parceria | PORTAL FAPES - ADMIN | M010 | [#1744](https://github.com/leds-conectafapes/conectafapes-project/issues/1744) | To Do |
+
+---
+
+## Ordem de Implementacao
+
+**Fase 1 — M008 (desbloqueio, primeira semana):**
+1. #1749 Cadastrar Instituicao
+2. #1750 Cadastrar Unidade Organizacional
+3. #1746 Cadastrar Finalidade + #1747 Listar Finalidades
+4. #1751 Cadastrar Dirigente
+5. #1752 Listar e Consultar Instituicoes
+
+**Fase 2 — M010 (parcerias, segunda semana):**
+1. #1739 Cadastrar Parceria (depende de #1749, #1750, #1746)
+2. #1740 Registrar Aporte Financeiro (depende de #1749)
+3. #1741 Registrar Coordenacao
+4. #1742 Associar Finalidade (depende de #1746, #1747)
+5. #1743 Listar e Consultar Parcerias
+6. #1744 Encerrar Parceria
+
+---
+
+## EPICs Relacionados
+
+| EPIC | Modulo | Issue |
+|------|--------|-------|
+| Cadastro de Instituicoes e Unidades | M008 | [#1748](https://github.com/leds-conectafapes/conectafapes-project/issues/1748) |
+| Cadastro de Finalidades | M008 | [#1745](https://github.com/leds-conectafapes/conectafapes-project/issues/1745) |
+| Portal Admin — Parcerias | M010 | [#1724](https://github.com/leds-conectafapes/conectafapes-project/issues/1724) |
+
+---
+
+## Review
+
+### Entregue
+
+- ...
+
+### Nao entregue
+
+- ... (motivo)
+
+---
+
+## Retrospectiva
+
+### O que funcionou
+
+- ...
+
+### O que melhorar
+
+- ...
+
+### Acoes para o proximo sprint
+
+- ...
