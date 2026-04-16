@@ -61,11 +61,11 @@
 | Finalizar Prestacao de Contas | CONECTA FAPES | M014 | [#1756](https://github.com/leds-conectafapes/conectafapes-project/issues/1756) | [M014 Backlog](../../implementation/modules/M014-prestacao-contas/backlog.md) | To Do |
 | Finalizar Configuracao de Captacao | CONECTA FAPES | M011 | [#1757](https://github.com/leds-conectafapes/conectafapes-project/issues/1757) | [M011 Backlog](../../implementation/modules/M011-configuracao-captacao/backlog.md) | To Do |
 
-### Marcela — Melhorias
+### Marcela e Leticia — Discovery de Melhorias
 
 | Feature | Produto | Issue | Status |
 |---------|---------|-------|--------|
-| Levantar melhorias apontadas pelos usuarios | CONECTA FAPES | [#1755](https://github.com/leds-conectafapes/conectafapes-project/issues/1755) | To Do |
+| Mapear jornadas de usuario e levantar melhorias e novas features | CONECTA FAPES | [#1755](https://github.com/leds-conectafapes/conectafapes-project/issues/1755) | To Do |
 
 ---
 
