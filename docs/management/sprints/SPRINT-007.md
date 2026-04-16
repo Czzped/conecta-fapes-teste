@@ -94,9 +94,11 @@
 
 ---
 
-## Ordem de Implementacao (Vinicius Estevam)
+## Ordem de Implementacao
 
-**Fase 1 — M008 (desbloqueio, primeira semana):**
+### Vinicius Estevam — M008 + M010
+
+**Fase 1 — Cadastros Corporativos (semana 1):**
 
 1. #1749 Cadastrar Instituicao
 2. #1750 Cadastrar Unidade Organizacional
@@ -106,7 +108,7 @@
 6. #1751 Cadastrar Dirigente
 7. #1752 Listar e Consultar Instituicoes
 
-**Fase 2 — M010 (parcerias, segunda semana):**
+**Fase 2 — Parcerias (semana 2):**
 
 1. #1739 Cadastrar Parceria (depende de #1749, #1750, #1746)
 2. #1740 Registrar Aporte Financeiro (depende de #1749)
@@ -114,6 +116,32 @@
 4. #1742 Associar Finalidade (depende de #1746, #1747)
 5. #1743 Listar e Consultar Parcerias
 6. #1744 Encerrar Parceria
+
+### Manoel — M014 Prestacao de Contas
+
+1. #1718 Extrato do Projeto (EPIC — estrutura base)
+2. #1721 Listagem paginada do Extrato
+3. #1720 Filtros do Extrato do Projeto
+4. #1723 Abrir detalhes do extrato conforme status
+5. #1719 Controle de Gastos do Projeto
+
+### Leticia — Design de Produto
+
+**Paralelo com desenvolvimento (semanas 1 e 2):**
+
+1. #1755 Mapear jornadas de usuario e coletar feedback (com Marcela)
+2. #1756 Discovery Prestacao de Contas — jornadas de Analista/Coordenador/SECONT, maquina de estados (11 estados), prototipos
+3. #1757 Discovery Captacao de Iniciativas — jornadas de Analista/Proponente/Revisor, prototipos dos 7 EPICs
+
+### Marcela — Discovery de Melhorias
+
+1. #1755 Mapear jornadas de usuario em producao (com Leticia)
+2. Criar issues para cada melhoria e nova feature identificada
+
+### Lannes — Importacao SIGFAPES (M002)
+
+1. Documentar arquitetura e fluxo de dados do sistema de importacao
+2. Definir proximos passos do modulo
 
 ---
 
