@@ -17,25 +17,25 @@
 
 ### Domain 01 — Corporativo e Administrativo (M008 — Desbloqueio)
 
-| Feature | Produto | Modulo | Issue | Status |
-|---------|---------|--------|-------|--------|
-| Cadastrar Instituicao | PORTAL FAPES - ADMIN | M008 | [#1749](https://github.com/leds-conectafapes/conectafapes-project/issues/1749) | To Do |
-| Cadastrar Unidade Organizacional | PORTAL FAPES - ADMIN | M008 | [#1750](https://github.com/leds-conectafapes/conectafapes-project/issues/1750) | To Do |
-| Cadastrar Dirigente | PORTAL FAPES - ADMIN | M008 | [#1751](https://github.com/leds-conectafapes/conectafapes-project/issues/1751) | To Do |
-| Listar e Consultar Instituicoes | PORTAL FAPES - ADMIN | M008 | [#1752](https://github.com/leds-conectafapes/conectafapes-project/issues/1752) | To Do |
-| Cadastrar Finalidade | PORTAL FAPES - ADMIN | M008 | [#1746](https://github.com/leds-conectafapes/conectafapes-project/issues/1746) | To Do |
-| Listar Finalidades | PORTAL FAPES - ADMIN | M008 | [#1747](https://github.com/leds-conectafapes/conectafapes-project/issues/1747) | To Do |
+| Feature | Produto | Modulo | Issue | Documentacao | Status |
+|---------|---------|--------|-------|-------------|--------|
+| Cadastrar Instituicao | PORTAL FAPES - ADMIN | M008 | [#1749](https://github.com/leds-conectafapes/conectafapes-project/issues/1749) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md), [EPIC-M008-002](../../implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-002.md) | To Do |
+| Cadastrar Unidade Organizacional | PORTAL FAPES - ADMIN | M008 | [#1750](https://github.com/leds-conectafapes/conectafapes-project/issues/1750) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md), [EPIC-M008-002](../../implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-002.md) | To Do |
+| Cadastrar Dirigente | PORTAL FAPES - ADMIN | M008 | [#1751](https://github.com/leds-conectafapes/conectafapes-project/issues/1751) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md), [EPIC-M008-002](../../implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-002.md) | To Do |
+| Listar e Consultar Instituicoes | PORTAL FAPES - ADMIN | M008 | [#1752](https://github.com/leds-conectafapes/conectafapes-project/issues/1752) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md), [EPIC-M008-002](../../implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-002.md) | To Do |
+| Cadastrar Finalidade | PORTAL FAPES - ADMIN | M008 | [#1746](https://github.com/leds-conectafapes/conectafapes-project/issues/1746) | [Modelo Referencia](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-referencia.md) | To Do |
+| Listar Finalidades | PORTAL FAPES - ADMIN | M008 | [#1747](https://github.com/leds-conectafapes/conectafapes-project/issues/1747) | [Modelo Referencia](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-referencia.md) | To Do |
 
 ### Domain 02 — Planejamento e Estrategia (M010 — Parcerias)
 
-| Feature | Produto | Modulo | Issue | Status |
-|---------|---------|--------|-------|--------|
-| Cadastrar Parceria | PORTAL FAPES - ADMIN | M010 | [#1739](https://github.com/leds-conectafapes/conectafapes-project/issues/1739) | To Do |
-| Registrar Aporte Financeiro | PORTAL FAPES - ADMIN | M010 | [#1740](https://github.com/leds-conectafapes/conectafapes-project/issues/1740) | To Do |
-| Registrar Coordenacao de Parceria | PORTAL FAPES - ADMIN | M010 | [#1741](https://github.com/leds-conectafapes/conectafapes-project/issues/1741) | To Do |
-| Associar Finalidade a Parceria | PORTAL FAPES - ADMIN | M010 | [#1742](https://github.com/leds-conectafapes/conectafapes-project/issues/1742) | To Do |
-| Listar e Consultar Parcerias | PORTAL FAPES - ADMIN | M010 | [#1743](https://github.com/leds-conectafapes/conectafapes-project/issues/1743) | To Do |
-| Encerrar Parceria | PORTAL FAPES - ADMIN | M010 | [#1744](https://github.com/leds-conectafapes/conectafapes-project/issues/1744) | To Do |
+| Feature | Produto | Modulo | Issue | Documentacao | Status |
+|---------|---------|--------|-------|-------------|--------|
+| Cadastrar Parceria | PORTAL FAPES - ADMIN | M010 | [#1739](https://github.com/leds-conectafapes/conectafapes-project/issues/1739) | [Modelo Estrutural](../../implementation/modules/M010-planejamento-estrategia/modelo-estrutural.md), [Contrato](../../implementation/modules/M010-planejamento-estrategia/contrato.md) | To Do |
+| Registrar Aporte Financeiro | PORTAL FAPES - ADMIN | M010 | [#1740](https://github.com/leds-conectafapes/conectafapes-project/issues/1740) | [Modelo Estrutural](../../implementation/modules/M010-planejamento-estrategia/modelo-estrutural.md), [Contrato](../../implementation/modules/M010-planejamento-estrategia/contrato.md) | To Do |
+| Registrar Coordenacao de Parceria | PORTAL FAPES - ADMIN | M010 | [#1741](https://github.com/leds-conectafapes/conectafapes-project/issues/1741) | [Modelo Estrutural](../../implementation/modules/M010-planejamento-estrategia/modelo-estrutural.md), [Contrato](../../implementation/modules/M010-planejamento-estrategia/contrato.md) | To Do |
+| Associar Finalidade a Parceria | PORTAL FAPES - ADMIN | M010 | [#1742](https://github.com/leds-conectafapes/conectafapes-project/issues/1742) | [Modelo Estrutural](../../implementation/modules/M010-planejamento-estrategia/modelo-estrutural.md), [Modelo Referencia M008](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-referencia.md) | To Do |
+| Listar e Consultar Parcerias | PORTAL FAPES - ADMIN | M010 | [#1743](https://github.com/leds-conectafapes/conectafapes-project/issues/1743) | [Contrato](../../implementation/modules/M010-planejamento-estrategia/contrato.md), [Contrato API](../../implementation/modules/M010-planejamento-estrategia/contrato-api.md) | To Do |
+| Encerrar Parceria | PORTAL FAPES - ADMIN | M010 | [#1744](https://github.com/leds-conectafapes/conectafapes-project/issues/1744) | [Modelo Comportamental](../../implementation/modules/M010-planejamento-estrategia/modelo-comportamental.md) | To Do |
 
 ---
 
