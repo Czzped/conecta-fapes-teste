@@ -32,6 +32,12 @@ classDiagram
         +String telefone
         +String endereco
         +boolean ativa
+        +boolean isExterna
+    }
+
+    class TipoInstituicao {
+        +String nome
+        +String descricao
     }
 
     class UnidadeOrganizacional {
@@ -116,10 +122,14 @@ classDiagram
         REATIVACAO
     }
 
-    Instituicao "1" --> "*" UnidadeOrganizacional : possui
+    Instituicao "0..*" --> "1" TipoInstituicao : classificadaComo
+    Instituicao "1" --> "0..*" PessoaFisica : possui
+    Instituicao "1" --> "1..*" UnidadeOrganizacional : possui
     UnidadeOrganizacional "0..1" --> "*" UnidadeOrganizacional : subunidades
     UnidadeOrganizacional <|-- AreaTecnica
+    UnidadeOrganizacional "1" --> "1" PessoaFisica : responsavel
     UnidadeOrganizacional "1" --> "*" Dirigente : dirigentes
+    PessoaFisica "0..*" --> "1" UnidadeOrganizacional : trabalhaEm
     Dirigente "*" --> "1" PessoaFisica : pessoa
     PessoaFisica "1" --> "*" HistoricoPessoa : historico
 
@@ -149,6 +159,9 @@ classDiagram
 | | telefone | Telefone institucional | Nao | String | | 20 | |
 | | endereco | Endereco completo | Sim | String | | 500 | |
 | | ativa | Indica se a instituicao esta ativa | Sim | Boolean | true/false | | |
+| | isExterna | Indica se e instituicao externa a agencia de fomento | Sim | Boolean | true/false | | |
+| **TipoInstituicao** | nome | Nome do tipo de instituicao | Sim | String | Ex: Ensino, Empresa, Agencia de Fomento | 200 | Sim |
+| | descricao | Descricao do tipo | Nao | String | | 500 | |
 | **UnidadeOrganizacional** | nome | Nome da unidade | Sim | String | Ex: Departamento de Informatica | 300 | |
 | | sigla | Sigla da unidade | Sim | String | Ex: DI | 20 | |
 | | nivel | Nivel hierarquico da unidade dentro da instituicao | Gerado | Int | Ex: 1, 2, 3 | | |

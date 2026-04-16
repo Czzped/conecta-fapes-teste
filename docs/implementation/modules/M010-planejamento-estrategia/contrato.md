@@ -20,7 +20,7 @@ Este contrato documenta a superficie publica do modulo M010 como contexto respon
 
 | Dependencia | Tipo | Observacao |
 |-------------|------|------------|
-| M008 | Modulo interno | Fornece `Pessoa`, `Instituicao`, `UnidadeOrganizacional`, `TipoInstituicao` e `Finalidade` |
+| M008 | Modulo interno | Fornece `PessoaFisica`, `Instituicao`, `TipoInstituicao`, `UnidadeOrganizacional`, `AreaTecnica` e `Finalidade` |
 
 ## Operacoes Publicas
 

@@ -70,13 +70,22 @@ classDiagram
     class UnidadeOrganizacional {
         <<fora do escopo - M008>>
         +String nome
-        +String descricao
-        +boolean isAreaTecnica
+        +String sigla
+        +int nivel
+        +boolean ativa
+    }
+
+    class AreaTecnica {
+        <<fora do escopo - M008>>
     }
 
     class Instituicao {
         <<fora do escopo - M008>>
-        +String nome
+        +String cnpj
+        +String razaoSocial
+        +String nomeFantasia
+        +String email
+        +boolean ativa
         +boolean isExterna
     }
 
@@ -86,11 +95,11 @@ classDiagram
         +String descricao
     }
 
-    class Pessoa {
+    class PessoaFisica {
         <<fora do escopo - M008>>
+        +String cpf
         +String nome
         +String email
-        +String cpf
     }
 
     %% Plano Estrategico
@@ -104,19 +113,20 @@ classDiagram
     Parceria "0..*" --> "1" Finalidade : destinadoPara
 
     %% Coordenacao
-    Pessoa "1" --> "0..*" Coordenacao : coordena
+    PessoaFisica "1" --> "0..*" Coordenacao : coordena
     Parceria "1" --> "0..*" Coordenacao : possui
 
     %% Responsabilidade organizacional
     UnidadeOrganizacional "1" --> "0..*" Parceria : responsavel
 
     %% Relacoes M008 (fora do escopo)
-    Instituicao "1" --> "0..*" Pessoa : possui
-    Instituicao "1" --> "1..*" UnidadeOrganizacional : possui
     Instituicao "0..*" --> "1" TipoInstituicao : classificadaComo
-    UnidadeOrganizacional "1" --> "1" Pessoa : responsavel
+    Instituicao "1" --> "0..*" PessoaFisica : possui
+    Instituicao "1" --> "1..*" UnidadeOrganizacional : possui
+    UnidadeOrganizacional <|-- AreaTecnica
     UnidadeOrganizacional "1" --> "0..*" UnidadeOrganizacional : compostaPor
-    Pessoa "0..*" --> "1" UnidadeOrganizacional : trabalhaEm
+    UnidadeOrganizacional "1" --> "1" PessoaFisica : responsavel
+    PessoaFisica "0..*" --> "1" UnidadeOrganizacional : trabalhaEm
 ```
 
 ## Dicionario de Dados
@@ -152,19 +162,21 @@ classDiagram
 
 | Classe | Descricao | Relacao com M010 |
 |--------|-----------|------------------|
-| **Pessoa** | Individuo cadastrado no sistema | Coordena parcerias via Coordenacao; responsavel por UnidadeOrganizacional |
-| **Instituicao** | Organizacao cadastrada (IFES, empresa, agencia) | Origem de AporteFinanceiro; possui Pessoas e UnidadeOrganizacionais |
-| **TipoInstituicao** | Classificacao da instituicao | Classifica Instituicao (ensino, empresa, agencia de fomento) |
-| **UnidadeOrganizacional** | Setor, diretoria ou area da instituicao | Responsavel pela Parceria; estrutura hierarquica interna |
-| **Finalidade** | Classificacao do proposito do investimento | Classificacao da Parceria (Pesquisa, Inovacao, Extensao) |
+| **PessoaFisica** | Individuo cadastrado no sistema (cpf, nome, email) | Coordena parcerias via Coordenacao; responsavel por UnidadeOrganizacional; trabalha em UnidadeOrganizacional |
+| **Instituicao** | Organizacao cadastrada (cnpj, razaoSocial, isExterna) | Origem de AporteFinanceiro; possui PessoasFisicas e UnidadeOrganizacionais |
+| **TipoInstituicao** | Classificacao da instituicao (ensino, empresa, agencia) | Classifica Instituicao |
+| **UnidadeOrganizacional** | Setor, diretoria ou area (nome, sigla, nivel) | Responsavel pela Parceria; estrutura hierarquica; AreaTecnica e subclasse |
+| **AreaTecnica** | Especializacao de UnidadeOrganizacional | Area tecnica da agencia de fomento |
+| **Finalidade** | Classificacao do proposito (Pesquisa, Inovacao, Extensao) | Classificacao da Parceria |
 
 ## Notas de Implementacao
 
 **Simplificacao do modelo de Parcerias:**
 - Parceria e um instrumento direto com nome, processo, vigencia e objetivo. Nao possui mais EntidadeParceira, Aditivos nem DocumentoParceria.
 - AporteFinanceiro referencia diretamente a Instituicao de origem (M008), sem intermediacao de EntidadeParceira.
-- Coordenacao e uma relacao temporal entre Pessoa (M008) e Parceria, substituindo os atributos coordenadorNome/Email/Celular.
+- Coordenacao e uma relacao temporal entre PessoaFisica (M008) e Parceria, substituindo os atributos coordenadorNome/Email/Celular.
 - UnidadeOrganizacional (M008) e responsavel pela Parceria, substituindo o atributo gerenciaResponsavel.
+- AreaTecnica e subclasse de UnidadeOrganizacional no M008 (heranca, nao flag).
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: Parceria.finalidade: Finalidade)
