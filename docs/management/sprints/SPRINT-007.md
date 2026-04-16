@@ -54,7 +54,7 @@
 | Filtros do Extrato do Projeto | CONECTA FAPES | M014 | [#1720](https://github.com/leds-conectafapes/conectafapes-project/issues/1720) | [M014 Contrato API](../../implementation/modules/M014-prestacao-contas/contrato-api.md) | To Do |
 | Abrir detalhes do extrato conforme status | CONECTA FAPES | M014 | [#1723](https://github.com/leds-conectafapes/conectafapes-project/issues/1723) | [M014 Modelo Comportamental](../../implementation/modules/M014-prestacao-contas/modelo-comportamental.md) | To Do |
 
-### Leticia — Finalizacao de Modulos
+### Leticia — Design de Produto (Fase de Discovery)
 
 | Feature | Produto | Modulo | Issue | Documentacao | Status |
 |---------|---------|--------|-------|-------------|--------|
