@@ -1,4 +1,4 @@
-# EPI-03 — Sincronizacao com SIGFAPES
+# EPI-03 — Gerar Arquivos de Importacao (JSONL)
 
 | Atributo | Valor |
 |----------|-------|
@@ -8,17 +8,19 @@
 
 ## Jornada
 
-O operador dispara a sincronizacao de dados entre SIGFAPES e Conecta FAPES, acompanha o progresso em tempo real e consulta relatorios de execucao com erros e divergencias para tratamento.
+Com a planilha corrigida e o mapeamento de programas completo, o operador dispara a geracao dos arquivos JSONL de importacao. O backend cria um job assincrono (`import_jobs`), le a planilha ativa segundo o `active_kind` vigente em `resource_kind_state`, cruza com os Parquets de referencia e produz um arquivo JSONL por entidade (editais, projetos, pessoas, alocacoes, etc.), persistidos em `importacao/MM_YYYY/<edital_id>/*.jsonl`. O operador acompanha o progresso em tela e consulta o historico de versoes e arquivos gerados.
 
 ## EPICs de implementacao
 
 | Modulo | EPIC | Titulo | Status |
 |--------|------|--------|--------|
-| M002 | [EPIC-M002-003](../../../implementation/modules/M002-importacao-editais/epics/EPIC-M002-003.md) | Sincronizar Dados de Editais | Done |
+| M002 | [EPIC-M002-003](../../../implementation/modules/M002-importacao-editais/epics/EPIC-M002-003.md) | Gerar Arquivos de Importacao (JSONL) | Done |
 
 ## Cenarios de aceitacao do produto
 
-- **Disparar sincronizacao**: botao de inicio com confirmacao e indicador de progresso
-- **Acompanhar progresso**: barra de progresso com contadores (processados/total/erros)
-- **Consultar relatorio de sincronizacao**: detalhamento de registros importados, atualizados e com erro
-- **Reprocessar erros**: opcao de reexecutar a sincronizacao para registros com falha
+- **Geracao sob demanda**: botao inicia job assincrono que retorna `job_id` em 202.
+- **Validacao previa obrigatoria**: geracao recusada (422) quando `dados-programas.json` nao mapeia todos os projetos; UI abre modal destacando pendencias.
+- **Acompanhamento de progresso**: polling em `GET /jobs/{id}` mostra status (`pending` -> `running` -> `completed` / `failed`) e contadores de tentativas.
+- **JSONLs por entidade**: um arquivo por entidade com uma linha JSON por registro, prontos para ingestao por M003 e modulos donos.
+- **Respeito ao tipo ativo**: geracao le sempre a planilha cujo `kind` coincide com `resource_kind_state.active_kind` da competencia.
+- **Historico de versoes**: operador consulta `planilha_version_audit` e chaves S3 dos JSONLs gerados.

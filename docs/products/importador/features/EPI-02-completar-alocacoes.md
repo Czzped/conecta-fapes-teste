@@ -1,4 +1,4 @@
-# EPI-02 — Completar Dados de Alocacoes
+# EPI-02 — Corrigir Planilha do Edital
 
 | Atributo | Valor |
 |----------|-------|
@@ -8,17 +8,21 @@
 
 ## Jornada
 
-Apos a importacao inicial, o operador completa dados de alocacoes que nao vieram do SIGFAPES — cotas pagas, status de cancelamento e marcacao de projetos como completos. Esses ajustes garantem consistencia antes dos dados serem usados no fluxo de pagamento.
+Apos selecionar um edital, o operador adquire lock exclusivo sobre o recurso (com heartbeat automatico a cada 45 segundos), recebe a planilha XLSX pre-preenchida com dados dos Parquets, datas calculadas (`effective_end`, `MESES_DE_ATIVIDADE`) e contas bancarias atualizadas via `relatorio_beneficiario.json`. Edita na tela com virtual scroll (52px/linha) e validacoes em tempo real, corrige inconsistencias, configura o mapeamento `projeto -> AreaTecnica` e envia a versao corrigida com auditoria completa. Quando necessario, alterna entre os tipos `editais` e `programas` — o sistema clona a planilha mais recente para o tipo alvo.
 
 ## EPICs de implementacao
 
 | Modulo | EPIC | Titulo | Status |
 |--------|------|--------|--------|
-| M002 | [EPIC-M002-002](../../../implementation/modules/M002-importacao-editais/epics/EPIC-M002-002.md) | Completar Dados de Alocacoes | Done |
+| M002 | [EPIC-M002-002](../../../implementation/modules/M002-importacao-editais/epics/EPIC-M002-002.md) | Corrigir Planilha do Edital | Done |
 
 ## Cenarios de aceitacao do produto
 
-- **Consultar resumo do edital**: visao consolidada com projetos e alocacoes importados
-- **Informar cotas pagas**: campo para ajustar cotas ja pagas antes da importacao
-- **Cancelar alocacao**: marcacao de alocacao como cancelada com justificativa
-- **Marcar projeto como completo**: confirmacao de que todos os dados do projeto estao corretos
+- **Lock exclusivo com heartbeat**: um operador por vez por `(kind, MM_YYYY, edital_id)`; heartbeat de 45s impede expiracao; takeover de lock expirado e rastreado.
+- **Planilha inicial gerada do dump**: 4 fetches S3 paralelos, calculos vetorizados com NumPy, layout com 5 grupos de colunas de nivel.
+- **Editor com virtual scroll**: edita editais com 5000+ bolsistas sem perda de performance; datas com `react-datepicker`.
+- **Validacao em tempo real**: 9 regras por celula (datas consistentes, tipos corretos, obrigatoriedade).
+- **Pre-validacao de upload**: API retorna errors, warnings e diff linha a linha antes do envio definitivo.
+- **Versionamento auditado**: cada versao (inicial, upload, clone) gera linha em `planilha_version_audit` com ator e `request_id`.
+- **Alternancia de tipo (editais <-> programas)**: clona a planilha mais recente e registra troca em `resource_kind_switch_log`.
+- **Mapeamento de programas**: modal virtualizado para associar cada `projeto_id` a uma Area Tecnica e programa; obrigatorio antes de gerar JSONL.

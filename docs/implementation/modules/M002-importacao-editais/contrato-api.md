@@ -4,12 +4,14 @@ Referencia de dominio e regras de negocio: [contrato.md](contrato.md) | [README.
 
 ## Visao Geral
 
-Este documento especifica o contrato HTTP REST do modulo M002 como bounded context responsavel pela selecao, importacao, sincronizacao e conciliacao de dados legados do SigFapes. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
+Este documento especifica o contrato HTTP REST do modulo M002 conforme implementado no backend FastAPI do Importador SIGFAPES. Todas as rotas listadas existem no codigo e sao expostas por um unico servico web Python/Uvicorn, deployado na Render.
 
 ### Base URL
 
+A API nao utiliza prefixo de versao; as rotas sao expostas na raiz do servico.
+
 ```
-/api/v1/m002
+https://{host}/
 ```
 
 ### Convencoes Gerais
@@ -17,27 +19,24 @@ Este documento especifica o contrato HTTP REST do modulo M002 como bounded conte
 | Aspecto | Convencao |
 |---------|-----------|
 | Formato de corpo | `application/json` |
-| Formato de data | ISO 8601 — `YYYY-MM-DD` |
-| Formato de data-hora | ISO 8601 — `YYYY-MM-DDTHH:mm:ssZ` |
-| Paginacao | Query params `?page=1&pageSize=20` (padrao: page=1, pageSize=20) |
-| Identificadores | Strings opacas (ex: `IMP-2026-001`, `SIN-2026-003`) |
+| Formato de data | ISO 8601 (`YYYY-MM-DD` ou `YYYY-MM-DDTHH:mm:ssZ`) |
+| Competencia / mes-ano | `MM_YYYY` (ex: `02_2026`) em chaves S3 e `resource_key` |
+| Arquivos binarios | `data_url` base64 (`data:application/...;base64,<payload>`) |
 | Encoding | UTF-8 |
 | Idioma de erros | Portugues brasileiro |
 
-### Autorizacao
+### Autenticacao
 
-Todas as rotas exigem autenticacao. O perfil do chamador determina o acesso:
+- Token JWT Bearer obrigatorio em todas as rotas, exceto `/auth/login`, `/status`, `/health` e endpoints internos explicitos.
+- Aceita `Authorization: Bearer <token>` OU cookie HttpOnly `sb-access-token`.
+- Tokens sao emitidos pelo Supabase Auth e validados via `PyJWT` com a chave publica do projeto.
 
-| Perfil | Descricao |
-|--------|-----------|
-| `GERENTE_AREA_TECNICA` | Gerente da Area Tecnica — acesso completo as operacoes de selecao, consulta e reprocessamento |
-| `SISTEMA` | Job ou processo interno autorizado — acesso restrito a execucao de importacao e sincronizacao |
+| Perfil logico | Descricao |
+|--------------|-----------|
+| `OPERADOR` | Operador do Importador (equipe tecnica) — acesso completo as operacoes de correcao |
+| `SISTEMA` | Role de servico (`service_role`) — jobs e consultas internas privilegiadas |
 
----
-
-## Envelope de Erro
-
-Todas as respostas de erro seguem o envelope abaixo:
+### Envelope de Erro
 
 ```json
 {
@@ -45,60 +44,95 @@ Todas as respostas de erro seguem o envelope abaixo:
     "code": "CODIGO_DO_ERRO",
     "message": "Mensagem de erro legivel para operador ou modulo consumidor.",
     "details": {
-      "execucaoCodigo": "IMP-2026-001"
+      "resource_key": "02_2026/editais/7777"
     }
   }
 }
 ```
 
-### Mapeamento de HTTP Status para Categoria de Erro
+### Mapeamento de HTTP Status
 
 | HTTP Status | Categoria | Quando usar |
 |-------------|-----------|-------------|
-| `400 Bad Request` | Dados invalidos | Campos obrigatorios ausentes, formato invalido, filtros invalidos |
-| `404 Not Found` | Recurso inexistente | Edital, execucao ou vinculo nao encontrado |
-| `409 Conflict` | Conflito de estado | Selecao ja ativa para o edital informado |
-| `422 Unprocessable Entity` | Violacao de regra de negocio | Estado invalido para a operacao, reprocessamento nao permitido |
-| `502 Bad Gateway` | Falha na integracao externa | SigFapes indisponivel |
+| `400 Bad Request` | Dados invalidos | Campos obrigatorios ausentes, `is_programa` fora do conjunto permitido |
+| `401 Unauthorized` | Autenticacao | JWT ausente ou invalido |
+| `403 Forbidden` | Lock invalido ou chamador nao autorizado para o recurso |
+| `404 Not Found` | Recurso inexistente em S3 ou Supabase |
+| `409 Conflict` | Conflito de estado (lock de outro usuario, versao otimista, planilha ja criada, tipo conflitante) |
+| `502 Bad Gateway` | Falha em dependencia externa (S3, Supabase, Airflow) |
+
+**Observacao importante:** `POST /validate-upload-planilha` nao retorna 4xx por regra violada. Mesmo com erros de layout ou lógica, a resposta e `200 OK` com `ok=false` e `errors[]` preenchido, para permitir a UI apresentar a sidebar de erros sem tratamento de excecao.
 
 ---
 
 ## Recursos
 
-### 1. Editais do SigFapes
+### 1. Autenticacao
 
-#### `GET /api/v1/m002/sigfapes/editais`
+#### `POST /auth/login`
 
-Lista os editais disponiveis no SigFapes para selecao de importacao.
+Autentica operador junto ao Supabase Auth.
 
-- **Autorizacao:** `GERENTE_AREA_TECNICA`
-- **Operacao de origem:** `ListarEditaisDisponiveisNoSigFapes`
+- **Autorizacao:** publica
 
-**Query parameters**
+**Request body**
 
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `ano` | integer | Filtra editais pelo ano |
-| `termoBusca` | string | Busca textual no titulo do edital |
-| `somenteDisponiveis` | boolean | Quando `true`, retorna apenas editais no status `A_IMPORTAR` |
-| `page` | integer | Numero da pagina (padrao: 1) |
-| `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
+```json
+{ "email": "operador@agencia.gov.br", "password": "••••••••" }
+```
 
 **Response `200 OK`**
 
 ```json
 {
-  "items": [
+  "access_token": "eyJhbGciOi...",
+  "refresh_token": "v1.M2J...",
+  "expires_in": 3600,
+  "user": { "id": "u_abc123", "email": "operador@agencia.gov.br" }
+}
+```
+
+Cookies definidos na resposta: `sb-access-token` (HttpOnly) e `sb-refresh-token` (HttpOnly).
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `400` | `DADOS_INVALIDOS` | E obrigatorio informar email e senha validos. |
+| `401` | `CREDENCIAIS_INVALIDAS` | Email ou senha incorretos. |
+| `502` | `SUPABASE_INDISPONIVEL` | Provedor de autenticacao indisponivel. |
+
+---
+
+### 2. Editais
+
+#### `GET /editais-latest`
+
+Lista os editais do dump mais recente do SigFapes, anotando cada item com status de importacao e contagem de bolsistas.
+
+- **Autorizacao:** `OPERADOR`
+
+**Query parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `include_importados` | boolean | Quando `true`, inclui editais ja importados (padrao: `false`) |
+
+**Response `200 OK`**
+
+```json
+{
+  "data": [
     {
-      "idSigFapes": 1045,
-      "titulo": "Edital Pesquisa Aplicada 2026",
-      "dataCriacaoOrigem": "2026-02-10",
-      "statusVinculo": "A_IMPORTAR"
+      "edital_id": "7777",
+      "edital_nome": "Edital Pesquisa Aplicada 2026",
+      "edital_data_cadastro": "2026-03-10",
+      "qtd_bolsistas": 148,
+      "ja_importado": false,
+      "novo_este_mes": true
     }
   ],
-  "total": 1,
-  "page": 1,
-  "pageSize": 20
+  "bolsistas_count_degraded": false
 }
 ```
 
@@ -106,52 +140,32 @@ Lista os editais disponiveis no SigFapes para selecao de importacao.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `400` | `FILTRO_IMPORTACAO_INVALIDO` | Os filtros informados para consulta de editais do SigFapes sao invalidos. |
-| `502` | `SIGFAPES_INDISPONIVEL` | Nao foi possivel consultar os editais disponiveis no SigFapes neste momento. |
+| `404` | `DUMP_NAO_ENCONTRADO` | Nenhum dump completo do SigFapes foi encontrado. |
+| `502` | `S3_INDISPONIVEL` | Nao foi possivel acessar o bucket S3 neste momento. |
 
 ---
 
-### 2. Selecoes de Importacao
+#### `GET /editais-grafico-metricas`
 
-#### `POST /api/v1/m002/selecoes`
+Retorna metricas agregadas exibidas na aba Graficos do Importador.
 
-Registra quais editais entrarao no fluxo tecnico de importacao e qual area tecnica os acompanhara.
+- **Autorizacao:** `OPERADOR`
 
-- **Autorizacao:** `GERENTE_AREA_TECNICA`
-- **Operacao de origem:** `SelecionarEditaisParaImportacao`
-- **Idempotencia:** Sim — reaproveia a selecao ativa existente quando nao houver mudanca de intencao
-
-**Request body**
+**Response `200 OK`**
 
 ```json
 {
-  "editaisSigFapes": [1045, 1048],
-  "areaTecnicaId": "AT-DGPP-01"
-}
-```
-
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `editaisSigFapes` | array (integer) | Sim | Lista de identificadores SigFapes dos editais a selecionar |
-| `areaTecnicaId` | string | Sim | Identificador da area tecnica responsavel pela importacao |
-
-**Response `201 Created`**
-
-```json
-{
-  "selecoes": [
-    {
-      "idSigFapes": 1045,
-      "dataSelecao": "2026-04-13",
-      "ativa": true,
-      "areaTecnicaId": "AT-DGPP-01"
-    },
-    {
-      "idSigFapes": 1048,
-      "dataSelecao": "2026-04-13",
-      "ativa": true,
-      "areaTecnicaId": "AT-DGPP-01"
-    }
+  "allocation_importacao": {
+    "total_fapes_rows": 2580,
+    "imported_rows": 1984,
+    "not_imported_rows": 596
+  },
+  "allocation_auditoria": {
+    "matched_rows": 1980,
+    "unmatched_rows": 4
+  },
+  "allocation_importacao_ativos_por_edital": [
+    { "edital_id": "7777", "ativos": 84 }
   ]
 }
 ```
@@ -160,80 +174,202 @@ Registra quais editais entrarao no fluxo tecnico de importacao e qual area tecni
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `400` | `AREA_TECNICA_OBRIGATORIA` | E obrigatorio informar a area tecnica responsavel pela importacao. |
-| `422` | `EDITAL_SIGFAPES_INDISPONIVEL` | Um dos editais selecionados nao esta disponivel para importacao. |
+| `500` | `S3_BUCKET_NAO_CONFIGURADO` | A variavel S3_BUCKET nao esta definida. |
+| `502` | `S3_INDISPONIVEL` | Nao foi possivel acessar o bucket S3 neste momento. |
 
 ---
 
-#### `GET /api/v1/m002/selecoes`
+### 3. Planilhas
 
-Lista as selecoes de importacao ativas.
+#### `GET /recurso-kind`
 
-- **Autorizacao:** `GERENTE_AREA_TECNICA`
+Descobre se o recurso esta classificado como `editais` ou `programas`.
+
+- **Autorizacao:** `OPERADOR`
 
 **Query parameters**
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `areaTecnicaId` | string | Filtra por area tecnica responsavel |
-| `ativa` | boolean | Filtra por status de selecao (padrao: `true`) |
-| `page` | integer | Numero da pagina (padrao: 1) |
-| `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
+| `edital_id` | string | Identificador do edital |
 
 **Response `200 OK`**
 
 ```json
 {
-  "items": [
-    {
-      "idSigFapes": 1045,
-      "dataSelecao": "2026-04-13",
-      "ativa": true,
-      "areaTecnicaId": "AT-DGPP-01"
-    }
-  ],
-  "total": 1,
-  "page": 1,
-  "pageSize": 20
+  "kind": "editais",
+  "is_programa": "NAO",
+  "resource_key": "02_2026/editais/7777",
+  "historico_count": 5
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `HISTORICO_INEXISTENTE` | Nao ha historico para o edital no mes corrente. |
+| `409` | `TIPO_CONFLITANTE` | O recurso possui historico em `editais` e `programas` simultaneamente. |
+
+---
+
+#### `POST /cria-planilha-edital`
+
+Gera a planilha base (versao 0) do edital a partir dos dumps SigFapes. Pode executar sincronicamente ou enfileirar como job assincrono.
+
+- **Autorizacao:** `OPERADOR`
+- **Operacao de origem:** `CriarPlanilhaInicialDoEdital`
+- **Idempotencia:** Nao (409 quando ja existe planilha inicial)
+
+**Query parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `async` | boolean | Quando `true`, enfileira a geracao e retorna `job_id` |
+
+**Request body**
+
+```json
+{ "edital_id": "7777", "is_programa": "NAO" }
+```
+
+**Response `201 Created` (sincrono)**
+
+```json
+{
+  "ok": true,
+  "bucket": "conecta-fapes-importador",
+  "key": "editais_corrigidos/02_2026/editais/7777/historicoCorrecoesPlanilhas/0_17_04_2026.xlsx"
+}
+```
+
+**Response `202 Accepted` (async)**
+
+```json
+{ "ok": true, "queued": true, "job_id": "job_abc123", "status": "pending" }
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `DADOS_DO_DUMP_AUSENTES` | Nao foram encontrados dados do edital no dump mais recente. |
+| `409` | `PLANILHA_INICIAL_JA_EXISTE` | Ja existe uma planilha inicial para este recurso. |
+| `502` | `S3_INDISPONIVEL` | Nao foi possivel acessar o bucket S3. |
+
+---
+
+#### `GET /planilha-selecionada`
+
+Retorna a versao mais recente da planilha corrigida em base64.
+
+- **Autorizacao:** `OPERADOR`
+
+**Query parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `edital_id` | string | Identificador do edital |
+
+**Response `200 OK`**
+
+```json
+{
+  "base64": "UEsDBB...",
+  "filename": "4_17_04_2026.xlsx",
+  "version": 4,
+  "kind": "editais",
+  "last_action": "upload_corrigida",
+  "last_action_at": "2026-04-17T17:12:34Z",
+  "last_actor_email": "operador@agencia.gov.br"
 }
 ```
 
 ---
 
-### 3. Execucoes de Importacao e Sincronizacao
+#### `GET /planilhas-mes-passado`
 
-#### `POST /api/v1/m002/execucoes`
+Lista versoes corrigidas do mes anterior disponiveis para consulta.
 
-Inicia uma execucao de importacao ou sincronizacao de editais selecionados. Operacao assincrona — retorna imediatamente com a execucao em estado `PENDENTE`.
+- **Autorizacao:** `OPERADOR`
 
-- **Autorizacao:** `GERENTE_AREA_TECNICA`, `SISTEMA`
-- **Operacao de origem:** `ExecutarImportacaoDeEditaisSelecionados` (tipoExecucao=IMPORTACAO) | `ExecutarSincronizacaoDoSigFapes` (tipoExecucao=SINCRONIZACAO)
-- **Idempotencia:** Sim por vinculo tecnico (nao cria duplicidade de vinculos tecnicos)
+**Query parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `edital_id` | string | Identificador do edital |
+
+**Response `200 OK`**
+
+```json
+{
+  "ok": true,
+  "edital_id": "7777",
+  "month_year": "01_2026",
+  "items": [
+    {
+      "kind": "editais",
+      "filename": "3_28_01_2026.xlsx",
+      "version": 3,
+      "size_bytes": 84321,
+      "last_modified": "2026-01-28T19:02:11Z",
+      "action": "upload_corrigida",
+      "actor_email": "operador@agencia.gov.br"
+    }
+  ]
+}
+```
+
+---
+
+#### `GET /planilhas-mes-passado/download`
+
+Download direto de uma planilha do mes anterior.
+
+- **Autorizacao:** `OPERADOR`
+
+**Query parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `edital_id` | string | Identificador do edital |
+| `kind` | string | `editais` ou `programas` |
+| `filename` | string | Nome do arquivo XLSX conforme retornado por `/planilhas-mes-passado` |
+
+**Response `200 OK`** — corpo binario `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`.
+
+---
+
+#### `POST /recurso-kind/switch`
+
+Troca o tipo ativo do recurso entre `editais` e `programas`, clonando a ultima versao para o novo kind e reemitindo o lock.
+
+- **Autorizacao:** `OPERADOR` com lock valido
 
 **Request body**
 
 ```json
 {
-  "tipoExecucao": "IMPORTACAO",
-  "idsSigFapes": [1045, 1048]
+  "edital_id": "7777",
+  "target_kind": "programas",
+  "lock_token": "c2f4e8a0-9a1b-4e19-8a2f-3e6d9c4b77aa",
+  "confirm": true
 }
 ```
 
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `tipoExecucao` | string (enum) | Sim | Um de: `IMPORTACAO`, `SINCRONIZACAO` |
-| `idsSigFapes` | array (integer) | Nao | Identificadores SigFapes alvo; omitir para executar sobre todos os selecionados/importados |
-
-**Response `201 Created`**
+**Response `200 OK`**
 
 ```json
 {
-  "execucao": {
-    "codigo": "IMP-2026-001",
-    "tipo": "IMPORTACAO",
-    "status": "PENDENTE",
-    "totalRegistrosProcessados": 0,
-    "totalOcorrencias": 0
+  "ok": true,
+  "from_kind": "editais",
+  "to_kind": "programas",
+  "cloned_from_key": ".../editais/7777/historicoCorrecoesPlanilhas/4_17_04_2026.xlsx",
+  "cloned_to_key": ".../programas/7777/historicoCorrecoesPlanilhas/0_17_04_2026.xlsx",
+  "lock": {
+    "resource_key": "02_2026/programas/7777",
+    "lock_token": "d4e5f6a7-b8c9-4d01-8e2f-1234567890ab",
+    "expires_at": "2026-04-17T18:45:00Z"
   }
 }
 ```
@@ -242,76 +378,61 @@ Inicia uma execucao de importacao ou sincronizacao de editais selecionados. Oper
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `422` | `NENHUMA_SELECAO_ATIVA` | Nao existem editais selecionados para iniciar a importacao. |
-| `422` | `NENHUM_EDITAL_IMPORTADO` | Nao existe edital importado elegivel para sincronizacao. |
-| `502` | `SIGFAPES_INDISPONIVEL` | O Web Service do SigFapes esta indisponivel para iniciar a execucao. |
+| `403` | `LOCK_INVALIDO` | Lock invalido ou expirado. |
+| `409` | `TIPO_CONFLITANTE` | Ja existe historico no tipo de destino. |
 
 ---
 
-#### `GET /api/v1/m002/execucoes`
+#### `GET /bolsista-dump-json`
 
-Lista execucoes de importacao e sincronizacao.
+Inspeciona o registro bruto de um bolsista no dump SigFapes.
 
-- **Autorizacao:** `GERENTE_AREA_TECNICA`
+- **Autorizacao:** `OPERADOR`
 
 **Query parameters**
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `tipo` | string | Filtra por tipo: `IMPORTACAO` ou `SINCRONIZACAO` |
-| `status` | string | Filtra por status: `PENDENTE`, `EM_ANDAMENTO`, `CONCLUIDA`, `CONCLUIDA_COM_OCORRENCIAS`, `FALHOU` |
-| `page` | integer | Numero da pagina (padrao: 1) |
-| `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
+| `edital_id` | string | Identificador do edital |
+| `formulario_bolsa_id` | string | Identificador do bolsista no SigFapes |
 
 **Response `200 OK`**
 
 ```json
 {
-  "items": [
-    {
-      "codigo": "IMP-2026-001",
-      "tipo": "IMPORTACAO",
-      "status": "CONCLUIDA_COM_OCORRENCIAS",
-      "totalRegistrosProcessados": 60,
-      "totalOcorrencias": 3,
-      "dataInicio": "2026-04-13T14:00:00Z",
-      "dataFim": "2026-04-13T14:20:00Z"
-    }
-  ],
-  "total": 1,
-  "page": 1,
-  "pageSize": 20
+  "records": [ { "cpf": "...", "bolsa_nivel": 1, "bolsa_valor": 1500.0 } ],
+  "dump_prefix": "dados_input/dump_sigfapes/17_04_2026/",
+  "source_key": "dados_input/dump_sigfapes/17_04_2026/bolsistas_projeto.parquet"
 }
 ```
 
 ---
 
-#### `GET /api/v1/m002/execucoes/{codigo}`
+### 4. Locks
 
-Consulta o detalhe de uma execucao especifica.
+#### `POST /locks/acquire`
 
-- **Autorizacao:** `GERENTE_AREA_TECNICA`
-- **Operacao de origem:** `ConsultarResumoDoEditalImportado` (parcialmente)
+Adquire lock exclusivo sobre `{month_year}/{kind}/{edital_id}`.
 
-**Path parameters**
+- **Autorizacao:** `OPERADOR`
 
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `codigo` | string | Codigo da execucao (ex: `IMP-2026-001`) |
+**Request body**
+
+```json
+{ "edital_id": "7777", "kind": "editais" }
+```
 
 **Response `200 OK`**
 
 ```json
 {
-  "execucao": {
-    "codigo": "IMP-2026-001",
-    "tipo": "IMPORTACAO",
-    "status": "CONCLUIDA_COM_OCORRENCIAS",
-    "totalRegistrosProcessados": 60,
-    "totalOcorrencias": 3,
-    "dataInicio": "2026-04-13T14:00:00Z",
-    "dataFim": "2026-04-13T14:20:00Z"
-  }
+  "ok": true,
+  "resource_key": "02_2026/editais/7777",
+  "lock_token": "c2f4e8a0-9a1b-4e19-8a2f-3e6d9c4b77aa",
+  "expires_at": "2026-04-17T18:40:00Z",
+  "heartbeat_at": "2026-04-17T17:40:00Z",
+  "owner_user_id": "u_abc123",
+  "owner_email": "operador@agencia.gov.br"
 }
 ```
 
@@ -319,48 +440,158 @@ Consulta o detalhe de uma execucao especifica.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `EXECUCAO_IMPORTACAO_NAO_ENCONTRADA` | A execucao informada nao foi encontrada. |
+| `409` | `RECURSO_EM_USO` | Recurso em uso por outro operador. |
 
 ---
 
-#### `POST /api/v1/m002/execucoes/{codigo}/reprocessar`
+#### `POST /locks/heartbeat`
 
-Solicita novo processamento de uma execucao com falha ou com ocorrencias, a partir dos vinculos tecnicos existentes.
+Renova lock valido estendendo `expires_at`.
 
-- **Autorizacao:** `GERENTE_AREA_TECNICA`
-- **Operacao de origem:** `ReprocessarExecucaoImportacao`
-- **Idempotencia:** Nao
+- **Autorizacao:** `OPERADOR`
+- **Intervalo recomendado:** 45 segundos
 
-**Path parameters**
+**Request body**
 
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `codigo` | string | Codigo da execucao a reprocessar |
+```json
+{ "resource_key": "02_2026/editais/7777", "lock_token": "c2f4e8a0-9a1b-4e19-8a2f-3e6d9c4b77aa" }
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `403` | `LOCK_INVALIDO` | Token invalido ou lock ja expirado. |
+
+---
+
+#### `POST /locks/release`
+
+Encerra lock voluntariamente.
+
+- **Autorizacao:** `OPERADOR`
 
 **Request body**
 
 ```json
 {
-  "escopo": {
-    "entidades": ["ProjetoSigFapes", "AlocacaoSigFapes"]
+  "resource_key": "02_2026/editais/7777",
+  "lock_token": "c2f4e8a0-9a1b-4e19-8a2f-3e6d9c4b77aa",
+  "reason": "manual"
+}
+```
+
+`reason` aceita: `manual`, `completed`, `abandon`.
+
+---
+
+#### `GET /locks/me`
+
+Lista os locks ativos pertencentes ao chamador.
+
+---
+
+#### `POST /locks/batch-status`
+
+Retorna status de lock de varios editais em uma unica chamada. Usado pela listagem de editais para indicar quem esta editando o que.
+
+**Request body**
+
+```json
+{ "edital_ids": ["7777", "7778"], "month_year": "02_2026" }
+```
+
+**Response `200 OK`**
+
+```json
+{
+  "ok": true,
+  "month_year": "02_2026",
+  "locks": {
+    "7777": { "locked": true, "locked_by": "operador@agencia.gov.br", "expires_at": "2026-04-17T18:40:00Z" },
+    "7778": { "locked": false }
   }
 }
 ```
 
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `escopo.entidades` | array (string) | Nao | Entidades alvo do reprocessamento; omitir para reprocessar todas |
+---
+
+#### `GET /locks/status`
+
+Status de um unico recurso por `resource_key` ou `(edital_id, kind)`.
+
+---
+
+### 5. Upload de Planilha
+
+#### `POST /validate-upload-planilha`
+
+Valida uma planilha candidata e retorna erros, warnings e diff contra a versao atual. Nunca retorna 4xx por regra violada.
+
+- **Autorizacao:** `OPERADOR`
+
+**Request body**
+
+```json
+{
+  "edital_id": "7777",
+  "kind": "editais",
+  "data_url": "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,UEsDBB..."
+}
+```
+
+**Response `200 OK`**
+
+```json
+{
+  "ok": false,
+  "errors": [
+    { "message": "...", "summary": "FIM ATIV anterior a INICIO ATIV", "bolsista_ids": ["123456"] }
+  ],
+  "warnings": [],
+  "diff": {
+    "changed_cells": 12,
+    "changed_rows": 4,
+    "added_count": 0,
+    "removed_count": 0,
+    "no_current_version": false
+  }
+}
+```
+
+---
+
+#### `POST /upload-planilha-corrigida`
+
+Persiste uma nova versao da planilha, com validacao de layout, lock e versao otimista.
+
+- **Autorizacao:** `OPERADOR` com lock valido
+- **Operacao de origem:** `EnviarPlanilhaCorrigida`
+
+**Request body**
+
+```json
+{
+  "edital_id": "7777",
+  "kind": "editais",
+  "base_version": 3,
+  "lock_token": "c2f4e8a0-9a1b-4e19-8a2f-3e6d9c4b77aa",
+  "data_url": "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,UEsDBB..."
+}
+```
 
 **Response `201 Created`**
 
 ```json
 {
-  "execucao": {
-    "codigo": "IMP-2026-002",
-    "tipo": "IMPORTACAO",
-    "status": "PENDENTE",
-    "reprocessaExecucaoCodigo": "IMP-2026-001"
-  }
+  "ok": true,
+  "bucket": "conecta-fapes-importador",
+  "kind": "editais",
+  "key": "editais_corrigidos/02_2026/editais/7777/historicoCorrecoesPlanilhas/4_17_04_2026.xlsx",
+  "filename": "4_17_04_2026.xlsx",
+  "version": 4,
+  "base_version": 3,
+  "latest_version": 4
 }
 ```
 
@@ -368,146 +599,70 @@ Solicita novo processamento de uma execucao com falha ou com ocorrencias, a part
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `EXECUCAO_IMPORTACAO_NAO_ENCONTRADA` | A execucao informada para reprocessamento nao foi encontrada. |
-| `400` | `ESCOPO_REPROCESSAMENTO_INVALIDO` | O escopo informado para reprocessamento e invalido. |
-| `422` | `REPROCESSAMENTO_NAO_PERMITIDO` | A execucao informada nao pode ser reprocessada no estado atual. |
+| `403` | `LOCK_INVALIDO` | Lock invalido ou expirado. |
+| `409` | `CONFLITO_DE_VERSAO` | `base_version` informada nao corresponde a `latest_version` atual. |
+| `409` | `LAYOUT_INVALIDO` | A planilha enviada nao respeita o layout obrigatorio. |
 
 ---
 
-### 4. Ocorrencias de Sincronizacao
+#### `POST /upload`
 
-#### `GET /api/v1/m002/execucoes/{codigo}/ocorrencias`
+Upload tecnico para path controlado no bucket (uso interno).
 
-Visualiza o relatorio tecnico e ocorrencias de uma execucao de importacao ou sincronizacao.
+- **Autorizacao:** `OPERADOR`
 
-- **Autorizacao:** `GERENTE_AREA_TECNICA`
-- **Operacao de origem:** `ConsultarOcorrenciasDeSincronizacao`
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `codigo` | string | Codigo da execucao |
-
-**Query parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `nivel` | string | Filtra por nivel: `INFO`, `AVISO`, `ERRO` |
-| `entidadeOrigem` | string | Filtra por entidade de origem (ex: `ProjetoSigFapes`) |
-| `resolvida` | boolean | Filtra por status de resolucao |
-| `page` | integer | Numero da pagina (padrao: 1) |
-| `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
-
-**Response `200 OK`**
+**Request body**
 
 ```json
 {
-  "execucao": {
-    "codigo": "SIN-2026-003",
-    "status": "CONCLUIDA_COM_OCORRENCIAS"
-  },
-  "ocorrencias": [
-    {
-      "dataOcorrencia": "2026-04-13T14:20:00Z",
-      "nivel": "ERRO",
-      "entidadeOrigem": "ProjetoSigFapes",
-      "identificadorOrigem": "77441",
-      "mensagem": "Projeto sem vinculo canonico correspondente.",
-      "resolvida": false
-    }
-  ],
-  "total": 1,
-  "page": 1,
-  "pageSize": 20
+  "name": "relatorio.pdf",
+  "content_type": "application/pdf",
+  "data_url": "data:application/pdf;base64,JVBER...",
+  "path": "manual-uploads/"
 }
 ```
 
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `EXECUCAO_IMPORTACAO_NAO_ENCONTRADA` | A execucao informada nao foi encontrada para consulta de ocorrencias. |
-| `400` | `FILTRO_OCORRENCIA_INVALIDO` | Os filtros informados para ocorrencias de sincronizacao sao invalidos. |
-
 ---
 
-### 5. Editais Importados
+### 6. Programas
 
-#### `GET /api/v1/m002/editais-importados/{idSigFapes}`
+#### `GET /dados-programas`
 
-Consulta o estado atual de um edital importado e seu contexto tecnico de sincronizacao.
+Consulta a configuracao de areas tecnicas do edital tratado como programa.
 
-- **Autorizacao:** `GERENTE_AREA_TECNICA`
-- **Operacao de origem:** `ConsultarResumoDoEditalImportado`
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `idSigFapes` | integer | Identificador do edital no SigFapes |
+- **Autorizacao:** `OPERADOR`
 
 **Response `200 OK`**
 
 ```json
 {
-  "editalSigFapes": {
-    "idSigFapes": 1045,
-    "statusVinculo": "VINCULADO",
-    "ultimaSincronizacao": "2026-04-13T14:15:00Z"
-  },
-  "projetos": 12,
-  "alocacoes": 48,
-  "ultimaExecucao": {
-    "codigo": "IMP-2026-001",
-    "status": "CONCLUIDA_COM_OCORRENCIAS"
-  }
-}
-```
-
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `EDITAL_IMPORTADO_NAO_ENCONTRADO` | O edital importado informado nao foi encontrado. |
-
----
-
-### 6. Vinculos Tecnicos do Legado
-
-#### `GET /api/v1/m002/vinculos`
-
-Inspeciona o estado dos vinculos entre registros do SigFapes e entidades canonicas do ConectaFAPES.
-
-- **Autorizacao:** `GERENTE_AREA_TECNICA`
-- **Operacao de origem:** `ConsultarVinculosTecnicosDoLegado`
-
-**Query parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `entidade` | string | Filtra por tipo de entidade: `EditalSigFapes`, `ProjetoSigFapes`, `AlocacaoSigFapes`, `PessoaSigFapes` |
-| `idSigFapes` | integer | Filtra pelo identificador de origem no SigFapes |
-| `statusVinculo` | string | Filtra por status: `A_IMPORTAR`, `VINCULADO`, `DESATUALIZADO`, `ORFAO` |
-| `page` | integer | Numero da pagina (padrao: 1) |
-| `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
-
-**Response `200 OK`**
-
-```json
-{
+  "ok": true,
+  "found": true,
+  "allowed_areas": ["GEPED", "NUPEX", "GECAP", "GEINOV"],
   "items": [
-    {
-      "entidade": "ProjetoSigFapes",
-      "idSigFapes": 77441,
-      "statusVinculo": "DESATUALIZADO",
-      "ultimaSincronizacao": "2026-04-10T09:30:00Z",
-      "entidadeCanonicaId": "PROJ-2026-014"
-    }
+    { "edital": "465 - Pesquisa Basica 2026", "areaTecnica": "NUPEX", "projetos": ["PRJ001", "PRJ002"] }
   ],
-  "total": 1,
-  "page": 1,
-  "pageSize": 20
+  "saved_at": "2026-04-17T17:02:00Z"
+}
+```
+
+---
+
+#### `POST /dados-programas`
+
+Persiste o mapeamento projeto -> area tecnica.
+
+- **Autorizacao:** `OPERADOR` com lock valido
+
+**Request body**
+
+```json
+{
+  "edital_id": "7777",
+  "lock_token": "c2f4e8a0-9a1b-4e19-8a2f-3e6d9c4b77aa",
+  "items": [
+    { "edital": "465 - Pesquisa Basica 2026", "areaTecnica": "NUPEX", "projetos": ["PRJ001"] }
+  ]
 }
 ```
 
@@ -515,8 +670,114 @@ Inspeciona o estado dos vinculos entre registros do SigFapes e entidades canonic
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `VINCULO_LEGADO_NAO_ENCONTRADO` | Nenhum vinculo tecnico foi encontrado para o filtro informado. |
-| `400` | `FILTRO_VINCULO_INVALIDO` | Os filtros informados para consulta de vinculos tecnicos sao invalidos. |
+| `400` | `AREA_NAO_PERMITIDA` | Area tecnica informada nao esta no conjunto permitido. |
+| `403` | `LOCK_INVALIDO` | Lock invalido ou expirado. |
+| `409` | `CONFIG_PROGRAMAS_INCONSISTENTE` | Projetos ausentes ou duplicados entre areas. |
+
+---
+
+### 7. Importacao
+
+#### `POST /gerar-jsonl`
+
+Gera os JSONL de importacao (`bolsistas.jsonl`, `projetos.jsonl`, `alocacoes.jsonl`) a partir da planilha corrigida mais recente.
+
+- **Autorizacao:** `OPERADOR` com lock valido
+- **Operacao de origem:** `GerarArquivosJsonlDeImportacao`
+
+**Query parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `async` | boolean | Quando `true`, enfileira e retorna `job_id` |
+
+**Request body (edital simples)**
+
+```json
+{
+  "edital_id": "7777",
+  "is_programa": false,
+  "lock_token": "c2f4e8a0-9a1b-4e19-8a2f-3e6d9c4b77aa"
+}
+```
+
+**Request body (programa)**
+
+```json
+{
+  "edital_id": "7777",
+  "is_programa": true,
+  "lock_token": "c2f4e8a0-9a1b-4e19-8a2f-3e6d9c4b77aa",
+  "dados_programas": [
+    { "edital": "465 - Pesquisa Basica 2026", "areaTecnica": "NUPEX", "projetos": ["PRJ001"] }
+  ]
+}
+```
+
+**Response `201 Created`**
+
+```json
+{
+  "ok": true,
+  "bucket": "conecta-fapes-importador",
+  "keys": [
+    "editais_corrigidos/02_2026/importacao/7777/bolsistas.jsonl",
+    "editais_corrigidos/02_2026/importacao/7777/projetos.jsonl",
+    "editais_corrigidos/02_2026/importacao/7777/alocacoes.jsonl"
+  ]
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `403` | `LOCK_INVALIDO` | Lock invalido ou expirado. |
+| `502` | `S3_INDISPONIVEL` | Nao foi possivel gravar os JSONL no bucket. |
+
+---
+
+### 8. Jobs Assincronos
+
+#### `GET /jobs/{job_id}`
+
+Consulta o status de um job disparado em modo assincrono.
+
+- **Autorizacao:** criador do job OU `SISTEMA`
+
+**Response `200 OK`**
+
+```json
+{
+  "ok": true,
+  "job": {
+    "id": "job_abc123",
+    "status": "processing",
+    "created_at": "2026-04-17T17:30:00Z",
+    "updated_at": "2026-04-17T17:31:22Z",
+    "result": null,
+    "error": null
+  }
+}
+```
+
+Estados possiveis: `pending`, `processing`, `completed`, `failed`.
+
+---
+
+### 9. Status
+
+#### `GET /status`
+
+Healthcheck publico.
+
+```json
+{ "ok": true, "time_utc": "2026-04-17T17:30:00Z", "s3_bucket_configured": true }
+```
+
+#### `GET /health`
+
+Healthcheck curto: `{ "ok": true }`.
 
 ---
 
@@ -524,68 +785,118 @@ Inspeciona o estado dos vinculos entre registros do SigFapes e entidades canonic
 
 | Metodo | Path | Operacao | Autorizacao |
 |--------|------|----------|-------------|
-| `GET` | `/api/v1/m002/sigfapes/editais` | ListarEditaisDisponiveisNoSigFapes | GERENTE_AREA_TECNICA |
-| `POST` | `/api/v1/m002/selecoes` | SelecionarEditaisParaImportacao | GERENTE_AREA_TECNICA |
-| `GET` | `/api/v1/m002/selecoes` | ListarSelecoes | GERENTE_AREA_TECNICA |
-| `POST` | `/api/v1/m002/execucoes` | ExecutarImportacaoOuSincronizacao | GERENTE_AREA_TECNICA, SISTEMA |
-| `GET` | `/api/v1/m002/execucoes` | ListarExecucoes | GERENTE_AREA_TECNICA |
-| `GET` | `/api/v1/m002/execucoes/{codigo}` | ConsultarExecucao | GERENTE_AREA_TECNICA |
-| `POST` | `/api/v1/m002/execucoes/{codigo}/reprocessar` | ReprocessarExecucaoImportacao | GERENTE_AREA_TECNICA |
-| `GET` | `/api/v1/m002/execucoes/{codigo}/ocorrencias` | ConsultarOcorrenciasDeSincronizacao | GERENTE_AREA_TECNICA |
-| `GET` | `/api/v1/m002/editais-importados/{idSigFapes}` | ConsultarResumoDoEditalImportado | GERENTE_AREA_TECNICA |
-| `GET` | `/api/v1/m002/vinculos` | ConsultarVinculosTecnicosDoLegado | GERENTE_AREA_TECNICA |
+| `POST` | `/auth/login` | AutenticarOperador | Publica |
+| `GET` | `/editais-latest` | ListarEditaisDoUltimoDump | OPERADOR |
+| `GET` | `/editais-grafico-metricas` | ConsultarMetricasDeImportacao | OPERADOR |
+| `GET` | `/recurso-kind` | DescobrirTipoDoRecurso | OPERADOR |
+| `POST` | `/cria-planilha-edital` | CriarPlanilhaInicialDoEdital | OPERADOR |
+| `GET` | `/planilha-selecionada` | ObterPlanilhaSelecionada | OPERADOR |
+| `GET` | `/planilhas-mes-passado` | ListarPlanilhasDoMesAnterior | OPERADOR |
+| `GET` | `/planilhas-mes-passado/download` | BaixarPlanilhaDoMesAnterior | OPERADOR |
+| `POST` | `/recurso-kind/switch` | TrocarTipoDoRecurso | OPERADOR + lock |
+| `GET` | `/bolsista-dump-json` | VisualizarBolsistaNoDump | OPERADOR |
+| `POST` | `/locks/acquire` | AdquirirLockDoRecurso | OPERADOR |
+| `POST` | `/locks/heartbeat` | RenovarLockDoRecurso | OPERADOR |
+| `POST` | `/locks/release` | LiberarLockDoRecurso | OPERADOR |
+| `GET` | `/locks/me` | ConsultarLocksAtivosDoUsuario | OPERADOR |
+| `POST` | `/locks/batch-status` | ConsultarStatusDeLocksEmLote | OPERADOR |
+| `GET` | `/locks/status` | ConsultarStatusDeRecurso | OPERADOR |
+| `POST` | `/validate-upload-planilha` | ValidarUploadDePlanilha | OPERADOR |
+| `POST` | `/upload-planilha-corrigida` | EnviarPlanilhaCorrigida | OPERADOR + lock |
+| `POST` | `/upload` | UploadDeArquivoBruto | OPERADOR |
+| `GET` | `/dados-programas` | ConsultarDadosDeProgramas | OPERADOR |
+| `POST` | `/dados-programas` | SalvarDadosDeProgramas | OPERADOR + lock |
+| `POST` | `/gerar-jsonl` | GerarArquivosJsonlDeImportacao | OPERADOR + lock |
+| `GET` | `/jobs/{job_id}` | ConsultarStatusDeJobAssincrono | OPERADOR ou SISTEMA |
+| `GET` | `/status` | ConsultarStatusDoServico | Publica |
+| `GET` | `/health` | Healthcheck | Publica |
 
 ---
 
 ## Schemas de Dominio (Referencia)
 
-### SelecaoImportacaoEdital
+### EditalListado
 
 ```json
 {
-  "idSigFapes": "integer",
-  "dataSelecao": "string (YYYY-MM-DD)",
-  "ativa": "boolean",
-  "areaTecnicaId": "string"
+  "edital_id": "string",
+  "edital_nome": "string",
+  "edital_data_cadastro": "string (YYYY-MM-DD)",
+  "qtd_bolsistas": "integer",
+  "ja_importado": "boolean",
+  "novo_este_mes": "boolean"
 }
 ```
 
-### ExecucaoImportacao
+### ResourceLock
 
 ```json
 {
-  "codigo": "string",
-  "tipo": "IMPORTACAO | SINCRONIZACAO",
-  "status": "PENDENTE | EM_ANDAMENTO | CONCLUIDA | CONCLUIDA_COM_OCORRENCIAS | FALHOU",
-  "totalRegistrosProcessados": "integer",
-  "totalOcorrencias": "integer",
-  "dataInicio": "string (ISO 8601)",
-  "dataFim": "string (ISO 8601) | null"
+  "resource_key": "string (MM_YYYY/kind/edital_id)",
+  "lock_token": "string (UUID)",
+  "expires_at": "string (ISO 8601)",
+  "heartbeat_at": "string (ISO 8601)",
+  "owner_user_id": "string",
+  "owner_email": "string | null"
 }
 ```
 
-### OcorrenciaSincronizacao
+### PlanilhaVersao
 
 ```json
 {
-  "dataOcorrencia": "string (ISO 8601)",
-  "nivel": "INFO | AVISO | ERRO",
-  "entidadeOrigem": "string",
-  "identificadorOrigem": "string",
-  "mensagem": "string",
-  "resolvida": "boolean"
+  "kind": "editais | programas",
+  "version": "integer",
+  "filename": "string (\"{version}_{dd_mm_yyyy}.xlsx\")",
+  "key": "string (S3 key)",
+  "last_action": "create_initial | upload_corrigida | switch_clone",
+  "last_action_at": "string (ISO 8601)",
+  "last_actor_email": "string | null"
 }
 ```
 
-### VinculoTecnico
+### ValidationErrorItem
 
 ```json
 {
-  "entidade": "EditalSigFapes | ProjetoSigFapes | AlocacaoSigFapes | PessoaSigFapes",
-  "idSigFapes": "integer",
-  "statusVinculo": "A_IMPORTAR | VINCULADO | DESATUALIZADO | ORFAO",
-  "ultimaSincronizacao": "string (ISO 8601) | null",
-  "entidadeCanonicaId": "string | null"
+  "message": "string",
+  "summary": "string",
+  "bolsista_ids": ["string"]
+}
+```
+
+### ValidationDiff
+
+```json
+{
+  "changed_cells": "integer",
+  "changed_rows": "integer",
+  "added_count": "integer",
+  "removed_count": "integer",
+  "no_current_version": "boolean"
+}
+```
+
+### ProgramaItem
+
+```json
+{
+  "edital": "string",
+  "areaTecnica": "GEPED | NUPEX | GECAP | GEINOV",
+  "projetos": ["string"]
+}
+```
+
+### AsyncJob
+
+```json
+{
+  "id": "string",
+  "status": "pending | processing | completed | failed",
+  "created_at": "string (ISO 8601)",
+  "updated_at": "string (ISO 8601)",
+  "result": "object | null",
+  "error": "string | null"
 }
 ```
 
@@ -599,6 +910,7 @@ Inspeciona o estado dos vinculos entre registros do SigFapes e entidades canonic
 | Dominio e regras de negocio | [README.md](README.md) |
 | Modelo estrutural | [modelo-estrutural.md](modelo-estrutural.md) |
 | Modelo comportamental | [modelo-comportamental.md](modelo-comportamental.md) |
-| EPIC-M002-001 (Definir Editais a Sincronizar) | [epics/EPIC-M002-001.md](epics/EPIC-M002-001.md) |
-| EPIC-M002-002 (Completar Dados de Alocacoes) | [epics/EPIC-M002-002.md](epics/EPIC-M002-002.md) |
-| EPIC-M002-003 (Sincronizar Dados de Editais) | [epics/EPIC-M002-003.md](epics/EPIC-M002-003.md) |
+| EPIC-M002-001 (Listar e selecionar editais) | [epics/EPIC-M002-001.md](epics/EPIC-M002-001.md) |
+| EPIC-M002-002 (Corrigir planilha do edital) | [epics/EPIC-M002-002.md](epics/EPIC-M002-002.md) |
+| EPIC-M002-003 (Gerar arquivos de importacao) | [epics/EPIC-M002-003.md](epics/EPIC-M002-003.md) |
+| Produto consumidor | [Importador SIGFAPES](../../../products/importador/README.md) |

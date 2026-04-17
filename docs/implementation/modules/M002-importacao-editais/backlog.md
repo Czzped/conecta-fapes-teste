@@ -4,7 +4,7 @@
 
 ## Sobre o Modulo
 
-Hoje, os dados de editais, projetos e alocacoes precisam ser digitados manualmente a partir do Sigfapes, causando retrabalho significativo e erros de transcricao que comprometem a confiabilidade das informacoes. Este modulo resolve esse problema ao importar automaticamente do Sigfapes as informacoes de Editais, Projetos e Alocacoes, eliminando a entrada manual de dados. O sucesso sera medido pelo percentual de editais importados automaticamente e pela reducao de erros de transcricao.
+O M002 entrega o ciclo completo de correcao dos dados do SIGFAPES antes da importacao canonica: listagem de editais do ultimo dump, edicao colaborativa da planilha com lock exclusivo, versionamento auditado e geracao de JSONLs para consumo dos modulos donos do dominio. O sucesso e medido pelo tempo medio de correcao de um edital, pela cobertura de versionamento auditado e pela ausencia de conflitos de edicao concorrente.
 
 Especificacao de referencia: [README.md](README.md)
 
@@ -12,32 +12,35 @@ Especificacao de referencia: [README.md](README.md)
 
 ## Backlog
 
-| ID | Titulo | Requisito | Prioridade | Status | Documento |
-|----|--------|-----------|------------|--------|-----------|
-| EPIC-M002-001 | Definir Editais a Sincronizar | UC04.0 | Must | Done | [EPIC-M002-001](epics/EPIC-M002-001.md) |
-| EPIC-M002-002 | Completar Dados de Alocacoes | UC04.1 | Must | Done | [EPIC-M002-002](epics/EPIC-M002-002.md) |
-| EPIC-M002-003 | Sincronizar Dados de Editais | UC04.2 | Must | Done | [EPIC-M002-003](epics/EPIC-M002-003.md) |
+| ID | Titulo | Prioridade | Status | Documento |
+|----|--------|------------|--------|-----------|
+| EPIC-M002-001 | Listar e Selecionar Editais do SIGFAPES | Must | Done | [EPIC-M002-001](epics/EPIC-M002-001.md) |
+| EPIC-M002-002 | Corrigir Planilha do Edital | Must | Done | [EPIC-M002-002](epics/EPIC-M002-002.md) |
+| EPIC-M002-003 | Gerar Arquivos de Importacao (JSONL) | Must | Done | [EPIC-M002-003](epics/EPIC-M002-003.md) |
 
 ---
 
 ## Rastreabilidade
 
 ```
-EPIC-M002-001 (Definir Editais a Sincronizar)
-├── US-M002-001 Listar Editais Disponiveis no SigFapes
-├── US-M002-002 Selecionar Editais para Importacao
-├── US-M002-003 Importar Dados dos Editais Selecionados
-└── US-M002-004 Listar Editais a Sincronizar
+EPIC-M002-001 (Listar e Selecionar Editais do SIGFAPES)
+├── US-M002-001 Autenticar Operador
+├── US-M002-002 Listar Editais do Ultimo Dump
+├── US-M002-003 Sinalizar Editais Novos (60 dias)
+├── US-M002-004 Exibir Status de Lock e Planilha Existente
+└── US-M002-005 Filtrar e Ordenar Editais
 
-EPIC-M002-002 (Completar Dados de Alocacoes)  ← depende de EPIC-M002-001
-├── US-M002-005 Consultar Resumo do Edital
-├── US-M002-006 Visualizar Projetos e Alocacoes
-├── US-M002-007 Informar Cotas Pagas da Alocacao
-├── US-M002-008 Cancelar Alocacao
-└── US-M002-009 Marcar Projeto como Completo
+EPIC-M002-002 (Corrigir Planilha do Edital)  ← depende de EPIC-M002-001
+├── US-M002-006 Adquirir e Manter Lock Exclusivo
+├── US-M002-007 Gerar Planilha Inicial do Edital
+├── US-M002-008 Editar Planilha com Validacoes em Tempo Real
+├── US-M002-009 Validar e Enviar Planilha Corrigida
+├── US-M002-010 Alternar entre Tipos editais e programas
+└── US-M002-011 Configurar Mapeamento de Programas
 
-EPIC-M002-003 (Sincronizar Dados de Editais)  ← depende de EPIC-M002-001
-├── US-M002-010 Sincronizar Dados do SigFapes
-└── US-M002-011 Gerar Relatorio de Sincronizacao
+EPIC-M002-003 (Gerar Arquivos de Importacao)  ← depende de EPIC-M002-002
+├── US-M002-012 Iniciar Geracao de JSONL
+├── US-M002-013 Acompanhar Progresso do Job
+├── US-M002-014 Bloquear Geracao com Mapeamento Incompleto
+└── US-M002-015 Listar Versoes e Arquivos Produzidos
 ```
-

@@ -71,6 +71,7 @@ nav:
           - ADR-008 Backend Separado M014: architecture/adr/ADR-008-backend-separado-m014.md
           - ADR-009 Hangfire Jobs: architecture/adr/ADR-009-hangfire-background-jobs.md
           - ADR-010 MinIO Storage: architecture/adr/ADR-010-minio-armazenamento-objetos.md
+          - ADR-011 Arquitetura do Importador SIGFAPES: architecture/adr/ADR-011-arquitetura-importador-sigfapes.md
 
   - Discovery:
       - Visao do Produto: discovery/product-vision.md
