@@ -263,6 +263,7 @@ Canais de entrega frontend que compoem funcionalidades de multiplos modulos back
 | Portal Coordenador | Portal web do coordenador de projeto | Coordenador, Bolsista | [README](../products/portal-coordenador/README.md) |
 | Portal Admin | Portal administrativo da agencia (back-office) | Operadores, Diretores | [README](../products/portal-admin/README.md) |
 | Importador | Importacao de dados do SIGFAPES | Equipe tecnica | [README](../products/importador/README.md) |
+| AuthRix | Sistema interno de autorizacao (PDP com OpenFGA) | — (infra) | [README](../products/authrix/README.md) |
 
 ---
 

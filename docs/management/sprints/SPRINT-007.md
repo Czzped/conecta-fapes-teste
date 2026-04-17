@@ -23,6 +23,26 @@
 
 ---
 
+## Premissa Nao Negociavel — Testes
+
+> **Todo codigo entregue neste sprint DEVE ter testes unitarios e testes de integracao.** Sem excecoes.
+
+**Aplica-se a:**
+- Todas as issues de desenvolvimento do Vinicius (M008 + M010 — 14 issues)
+- Todas as issues do Manoel (M014 — 5 issues)
+- Qualquer PR aberto no sprint
+
+**Criterios de aceitacao adicionais (todas as US de desenvolvimento):**
+
+- [ ] Testes unitarios cobrindo regras de negocio (RN) documentadas no modulo
+- [ ] Testes de integracao cobrindo o fluxo end-to-end da operacao (endpoint -> persistencia -> resposta)
+- [ ] Cobertura minima validada em CI antes do merge
+- [ ] Testes executam em pipeline de CI sem dependencias manuais
+
+**PRs sem testes serao automaticamente reprovados no review.**
+
+---
+
 ## Features Comprometidas
 
 **Prototipos de referencia:**
@@ -91,6 +111,12 @@
 | Feature | Issue | Status |
 |---------|-------|--------|
 | Mapear jornadas de usuario, coletar feedback, registrar melhorias e novas features | [#1755](https://github.com/leds-conectafapes/conectafapes-project/issues/1755) | ⚪ To Do |
+
+### Marcela — Documentacao de Produto
+
+| Feature | Issue | Documentacao | Status |
+|---------|-------|-------------|--------|
+| Documentar AuthRix (sistema interno de autorizacao) | [#1758](https://github.com/leds-conectafapes/conectafapes-project/issues/1758) | [AuthRix README](../../products/authrix/README.md), [ADR-007](../../architecture/adr/ADR-007-autorizacao-openfga.md) | ⚪ To Do |
 
 ---
 

@@ -9,6 +9,14 @@ Plataforma digital da agencia de fomento para gestao do ciclo completo de foment
 | Front-office | [https://rate-snort-02856207.figma.site/](https://rate-snort-02856207.figma.site/) |
 | Back-office | [https://bucket-lake-78647159.figma.site/](https://bucket-lake-78647159.figma.site/) |
 
+## GitHub Project Board
+
+**[Conecta Fapes (Board #43)](https://github.com/orgs/leds-conectafapes/projects/43)** — Ver [detalhes](management/github-project.md)
+
+## Premissa Nao Negociavel
+
+> **Todo codigo entregue DEVE ter testes unitarios e testes de integracao.** Ver [Definition of Ready/Done](management/definition-of-ready-done.md).
+
 ## Produto
 
 | Documento | Descricao |
@@ -43,6 +51,7 @@ Canais de entrega frontend que compoem funcionalidades de multiplos modulos back
 | Portal Coordenador | Portal web do coordenador de projeto e bolsista | [README](products/portal-coordenador/README.md) |
 | Portal Admin | Portal administrativo da agencia (back-office) | [README](products/portal-admin/README.md) |
 | Importador | Importacao de dados do SIGFAPES | [README](products/importador/README.md) |
+| AuthRix | Sistema interno de autorizacao (OpenFGA) | [README](products/authrix/README.md) |
 
 ## Modulos
 

@@ -119,6 +119,9 @@ nav:
           - EPI-01 Importacao Editais: products/importador/features/EPI-01-importacao-editais-selecao.md
           - EPI-02 Completar Alocacoes: products/importador/features/EPI-02-completar-alocacoes.md
           - EPI-03 Sincronizacao: products/importador/features/EPI-03-sincronizacao-sigfapes.md
+      - AuthRix:
+          - products/authrix/README.md
+          - Backlog: products/authrix/backlog.md
 
   - Modulos:
       - M001 Modalidade de Bolsa:
@@ -327,6 +330,7 @@ nav:
       - Backlog do Produto: management/backlog-product.md
       - Divida Tecnica: management/technical-debt.md
       - Definition of Ready e Done: management/definition-of-ready-done.md
+      - GitHub Project Board: management/github-project.md
       - SPRINT-001: management/sprints/SPRINT-001.md
       - SPRINT-002: management/sprints/SPRINT-002.md
       - SPRINT-003: management/sprints/SPRINT-003.md

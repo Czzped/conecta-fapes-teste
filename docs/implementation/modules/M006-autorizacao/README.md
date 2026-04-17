@@ -21,8 +21,15 @@ Permissoes de acesso sao rigidas e nao permitem delegacao de funcoes, travando p
 | **KPI** | Tempo medio de concessao/revogacao de acesso; incidentes de acesso indevido |
 | **Integracao externa** | [OpenFGA](https://openfga.dev/docs) |
 
+## Produto Relacionado: AuthRix
+
+M006 e operacionalizado pelo **[AuthRix](../../../products/authrix/README.md)**, produto interno em desenvolvimento que atua como PDP centralizado consumindo OpenFGA. Os produtos Portal Coordenador, Portal Admin e Importador consultam o AuthRix para decisoes de autorizacao.
+
+**Responsaveis AuthRix:** Joao Marcos, Arthur Cremasco
+
 ## Referenciado por
 
+- [products/authrix/README.md](../../../products/authrix/README.md) — Produto que implementa/consome o modulo
 - [architecture/03-acesso-e-seguranca.md](../../../architecture/03-acesso-e-seguranca.md) — modelo XACML (PAP, PIP, PDP, PEP)
 - [architecture/02-modulos-e-integracoes.md](../../../architecture/02-modulos-e-integracoes.md) — diagrama de modulos
 - [management/milestones.md](../../../management/milestones.md) — MS-01 (Base Operacional)

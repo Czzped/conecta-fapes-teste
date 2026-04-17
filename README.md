@@ -2,6 +2,24 @@
 
 Plataforma digital da FAPES para gestao do ciclo completo de fomento a pesquisa, desenvolvimento e inovacao no Espirito Santo.
 
+## Links Rapidos
+
+- **Board do Projeto:** [Conecta Fapes (GitHub Project #43)](https://github.com/orgs/leds-conectafapes/projects/43)
+- **Documentacao:** [docs/README.md](docs/README.md)
+- **Sprint Atual:** [SPRINT-007](docs/management/sprints/SPRINT-007.md)
+- **Backlog do Produto:** [backlog-product.md](docs/management/backlog-product.md)
+
+## Premissas Nao Negociaveis do Projeto
+
+> **Todo codigo entregue DEVE ter testes unitarios e testes de integracao.**
+>
+> - Testes unitarios cobrindo regras de negocio documentadas
+> - Testes de integracao cobrindo fluxos end-to-end (endpoint → persistencia → resposta)
+> - Cobertura validada em CI antes do merge
+> - PRs sem testes serao automaticamente reprovados
+>
+> Aplica-se a **todas as entregas de codigo** em qualquer modulo, produto ou sprint. Ver [Definition of Ready/Done](docs/management/definition-of-ready-done.md).
+
 ---
 
 ## Estrutura de Pastas

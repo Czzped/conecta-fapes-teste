@@ -16,6 +16,7 @@ graph LR
         PC[Portal Coordenador]
         PA[Portal Admin]
         IMP[Importador]
+        AR[AuthRix]
     end
 
     subgraph Modulos ["Modulos Backend"]
@@ -57,6 +58,7 @@ graph LR
 | [Portal Coordenador](portal-coordenador/README.md) | Portal web do coordenador de projeto para gestao de equipe, bolsas, pagamentos e prestacao de contas | Coordenador de Projeto, Bolsista | Vue 3, Nuxt UI, Tailwind CSS v4 | Em producao |
 | [Portal Admin](portal-admin/README.md) | Portal administrativo da agencia de fomento (back-office) | Operadores GEPOF, Diretores, Areas Tecnicas | Vue 3, Nuxt UI | Documentacao pendente |
 | [Importador](importador/README.md) | Ferramenta de importacao de dados do sistema legado SIGFAPES | Equipe tecnica | Vue, Node | Documentacao pendente |
+| [AuthRix](authrix/README.md) | Sistema interno de autorizacao (PDP) consumido pelos demais produtos | — (infra) | OpenFGA | Em desenvolvimento |
 
 ## Relacao com outros artefatos
 

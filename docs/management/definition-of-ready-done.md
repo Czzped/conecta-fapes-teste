@@ -6,6 +6,21 @@ Criterios de prontidao (Ready) para iniciar implementacao e criterios de aceitac
 
 ---
 
+## Premissa Nao Negociavel do Projeto
+
+> **Todo codigo entregue DEVE ter testes unitarios e testes de integracao.**
+>
+> Esta premissa aplica-se a **todas as entregas de codigo** em qualquer modulo, produto ou sprint. E parte obrigatoria do DoD de qualquer US, Task ou EPIC de desenvolvimento.
+>
+> - **Testes unitarios** cobrindo regras de negocio documentadas
+> - **Testes de integracao** cobrindo fluxos end-to-end (endpoint → persistencia → resposta)
+> - Cobertura validada em CI antes do merge
+> - Execucao automatizada em pipeline sem dependencias manuais
+>
+> **PRs sem testes serao automaticamente reprovados no review.**
+
+---
+
 ## Criterios Gerais
 
 ### Definition of Ready (DoR) — Aplicavel a qualquer modulo
@@ -31,6 +46,17 @@ Um modulo esta **Done** quando:
 6. Modelo comportamental validado (maquina de estados implementada conforme spec)
 7. contrato-api.md com endpoints implementados e documentados
 8. Sem debito tecnico de prioridade Alta pendente
+
+### Premissa Nao Negociavel — Testes
+
+**Todo codigo entregue DEVE ter:**
+
+- **Testes unitarios** cobrindo as regras de negocio documentadas
+- **Testes de integracao** cobrindo os fluxos end-to-end (endpoint → persistencia → resposta)
+- Cobertura validada em CI antes do merge
+- Execucao automatizada em pipeline de CI sem dependencias manuais
+
+PRs sem testes unitarios e de integracao serao **automaticamente reprovados** no review, independentemente do modulo ou US.
 
 ---
 
