@@ -2,242 +2,378 @@
 
 Dominio e regras de negocio: ver [README.md](README.md)
 
-### Diagrama de Classes
+## Diagrama de Classes
 
 ```mermaid
 classDiagram
     direction TB
 
-    class PrestacaoContas {
-        +String codigo
-        +Date periodoInicio
-        +Date periodoFim
-        +Date dataSubmissao
-        +Date prazoSubmissao
-        +double valorTotal
-        +EstadoPC estado
+    %% Agregado Principal: Prestacao
+    class Prestacao {
+        +Guid Id
+        +DateTimeOffset Data
+        +StatusPrestacao Status
+        +IReadOnlyCollection~JustificativaDespesa~ Justificativas
+        +IReadOnlyCollection~TransacaoFinanceira~ Transacoes
+        +Submeter()
+        +SolicitarRevisao()
+        +Aprovar()
+        +Negar()
+        +AdicionarJustificativa(justificativa)
+        +RemoverJustificativa(justificativa)
+        +AdicionarTransacao(transacao)
+        +RemoverTransacao(transacao)
+        +ValorTotalJustificativas() decimal
+        +ValorTotalTransacoes() decimal
+        +Saldo() decimal
     }
 
-    class EstadoPC {
-        <<enumeration>>
-        EM_PREPARACAO
-        SUBMETIDA
-        EM_ANALISE
-        APROVADA
-        RECUSADA
-        EM_CONTESTACAO
-        EM_REANALISE
-        APROVADA_FINAL
-        RECUSADA_FINAL
-        EM_AUDITORIA
-        AUDITADA
+    %% Transacao Financeira
+    class TransacaoFinanceira {
+        +Guid Id
+        +Guid TransacaoFinanceiraContaBancariaId
+        +Guid? TransacaoFinanceiraPrestacaoId
+        +DateTimeOffset Data
+        +decimal Valor
+        +string Descricao
+        +string Identificador
+        +TipoOperacao Tipo
+        +StatusTransacao Status
+        +VincularPrestacao(prestacaoId)
+        +DesvincularPrestacao()
     }
 
+    %% Conta Bancaria
+    class ContaBancaria {
+        +Guid Id
+        +Guid? ContaBancariaProjetoId
+        +string Banco
+        +string Agencia
+        +string Numero
+        +string Titular
+        +decimal SaldoAtual
+        +AtualizarSaldo(novoSaldo)
+    }
+
+    %% Justificativa de Despesa (classe base)
+    class JustificativaDespesa {
+        <<abstract>>
+        +Guid Id
+        +Guid JustificativaDespesaPrestacaoId
+        +string Descricao
+        +decimal ValorTotal
+        +string? UrlArquivo
+        +ICollection~OrcamentoFornecedor~ Orcamentos
+        +AtualizarValorTotal(novoValorTotal)
+    }
+
+    %% Tipos de Justificativa
+    class JustificativaNF {
+        +DocumentoFiscal DocumentoFiscal
+    }
+
+    class JustificativaDiaria {
+        +decimal ValorDiaria
+        +int Quantidade
+        +Guid JustificativaDiariaAlocacaoBolsistaId
+    }
+
+    class JustificativaInvoice {
+        +decimal ValorCambio
+        +TipoMoeda Moeda
+    }
+
+    %% Documento Fiscal
     class DocumentoFiscal {
-        +String numero
-        +TipoDocumentoFiscal tipo
-        +String descricao
-        +double valor
-        +Date dataEmissao
-        +URL arquivoDigitalizado
-        +StatusDocumentoFiscal status
+        +Guid Id
+        +string ChaveAcesso
+        +string NomeEmitente
+        +string Descricao
+        +decimal ValorTotal
+        +string UF
+        +string Pais
+        +string Identificador
+        +decimal TotalICMS
+        +decimal TotalPIS
+        +decimal TotalIPI
+        +decimal TotalISS
+        +TipoNota TipoNota
+        +ICollection~ItemDocumentoFiscal~ ItensDocumentoFiscal
     }
 
-    class TipoDocumentoFiscal {
-        <<enumeration>>
-        NOTA_FISCAL_SERVICO
-        NOTA_FISCAL_PRODUTO
-        RECIBO_DIARIA
-        BILHETE_AEREO
-        COMPROVANTE_HOSPEDAGEM
-        OUTRO
+    %% Item de Documento Fiscal
+    class ItemDocumentoFiscal {
+        +Guid Id
+        +Guid ItemDocumentoFiscalDocumentoFiscalId
+        +Guid ItemDocumentoFiscalContaContabilId
+        +string Descricao
+        +int Quantidade
+        +decimal ValorUnitario
+        +decimal ValorTotal
+        +string? NCM
+        +string? CFOP
+        +VincularContaContabil(contaContabilId)
+        +DesvincularContaContabil()
     }
 
-    class StatusDocumentoFiscal {
-        <<enumeration>>
-        ENVIADO
-        APROVADO
-        REPROVADO
+    %% Orcamento Fornecedor
+    class OrcamentoFornecedor {
+        +Guid Id
+        +Guid OrcamentoFornecedorJustificativaDespesaId
+        +string Fornecedor
+        +decimal Valor
+        +DateTime Data
+        +string UrlArquivoPDF
+        +bool Escolhido
+        +MarcarComoEscolhido()
+        +DesmarcarComoEscolhido()
+        +Atualizar(fornecedor, valor, data, arquivoPDF)
     }
 
-    class ExtratoBancario {
-        +String banco
-        +String agencia
-        +String conta
-        +Date periodoInicio
-        +Date periodoFim
-        +double saldoInicial
-        +double saldoFinal
-        +URL arquivoImportado
-        +Date dataImportacao
+    %% Orcamento do Projeto
+    class Orcamento {
+        +Guid Id
+        +Guid? OrcamentoProjetoId
+        +int Ano
+        +decimal ValorTotal
+        +decimal ValorBolsasPrevisto
+        +decimal ValorCapitalPrevisto
+        +ICollection~ContaContabil~ ContasContabeis
+        +SaldoBolsas() decimal
+        +SaldoCapital() decimal
+        +SaldoTotal() decimal
     }
 
-    class LancamentoExtrato {
-        +Date data
-        +String descricao
-        +double valor
-        +TipoLancamento tipo
-        +boolean conciliado
+    %% Conta Contabil
+    class ContaContabil {
+        +Guid Id
+        +Guid ContaContabilOrcamentoId
+        +Guid? ContaContabilParentId
+        +string Descricao
+        +decimal Limite
+        +ICollection~ContaContabil~ SubContas
+        +ICollection~ItemDocumentoFiscal~ ItensDocumentoFiscal
+        +Saldo() decimal
     }
 
-    class TipoLancamento {
-        <<enumeration>>
-        CREDITO
-        DEBITO
-    }
+    %% Relacionamentos
+    Prestacao "1" --> "*" JustificativaDespesa : contem
+    Prestacao "1" --> "*" TransacaoFinanceira : contem
 
-    class ParecerPC {
-        +Date dataAnalise
-        +boolean aprovado
-        +String justificativa
-        +String analistaResponsavel
-    }
+    TransacaoFinanceira "*" --> "1" ContaBancaria : pertence a
+    TransacaoFinanceira "*" --> "0..1" Prestacao : vinculada a
 
-    class ContestacaoPrestacaoContas {
-        +String codigo
-        +Date dataContestacao
-        +Date prazoContestacao
-        +String argumentacao
-        +URL documentoComplementar
-        +EstadoContestacao estado
-    }
+    JustificativaDespesa <|-- JustificativaNF : herda
+    JustificativaDespesa <|-- JustificativaDiaria : herda
+    JustificativaDespesa <|-- JustificativaInvoice : herda
 
-    class EstadoContestacao {
-        <<enumeration>>
-        SUBMETIDA
-        EM_REANALISE
-        DEFERIDA
-        INDEFERIDA
-    }
+    JustificativaDespesa "1" --> "*" OrcamentoFornecedor : possui
+    JustificativaNF "1" --> "1" DocumentoFiscal : associada a
 
-    class AuditoriaSECONT {
-        +String codigo
-        +Date dataInicio
-        +Date dataConclusao
-        +String auditorResponsavel
-        +String parecer
-        +ResultadoAuditoria resultado
-    }
+    DocumentoFiscal "1" --> "*" ItemDocumentoFiscal : contem
 
-    class ResultadoAuditoria {
-        <<enumeration>>
-        REGULAR
-        REGULAR_COM_RESSALVAS
-        IRREGULAR
-    }
-
-    class SolicitacaoDocumentoAdicional {
-        +Date dataSolicitacao
-        +String descricao
-        +Date prazoResposta
-        +boolean atendida
-    }
-
-    class HistoricoPC {
-        +Date data
-        +TipoEventoPC tipo
-        +String descricao
-    }
-
-    class TipoEventoPC {
-        <<enumeration>>
-        CRIACAO
-        IMPORTACAO_EXTRATO
-        ENVIO_DOCUMENTO
-        SUBMISSAO
-        ANALISE
-        APROVACAO
-        RECUSA
-        CONTESTACAO
-        REANALISE
-        APROVACAO_FINAL
-        RECUSA_FINAL
-        AUDITORIA
-    }
-
-    class Projeto {
-        <<fora do escopo - M003>>
-    }
-
-    class RubricaProjeto {
-        <<fora do escopo - M013>>
-    }
-
-    PrestacaoContas "*" --> "1" Projeto : vinculada a
-    PrestacaoContas "1" --> "0..1" ExtratoBancario : extrato
-    PrestacaoContas "1" --> "*" DocumentoFiscal : documentos fiscais
-    PrestacaoContas "1" --> "*" ParecerPC : pareceres
-    PrestacaoContas "1" --> "0..1" ContestacaoPrestacaoContas : contestacao
-    PrestacaoContas "1" --> "0..1" AuditoriaSECONT : auditoria
-    PrestacaoContas "1" --> "*" HistoricoPC : historico
-    DocumentoFiscal "*" --> "1" RubricaProjeto : vinculado a rubrica
-    ExtratoBancario "1" --> "*" LancamentoExtrato : lancamentos
-    LancamentoExtrato "0..1" --> "0..1" DocumentoFiscal : conciliado com
-    AuditoriaSECONT "1" --> "*" SolicitacaoDocumentoAdicional : solicitacoes
+    Orcamento "1" --> "*" ContaContabil : possui
+    ContaContabil "1" --> "*" ContaContabil : subcontas
+    ContaContabil "1" --> "*" ItemDocumentoFiscal : classifica
 ```
+
+---
+
+## Classe Base — BaseEntity
+
+Todas as entidades herdam de `BaseEntity` (`ConectaFapes.Common.Domain.BaseEntities`):
+
+| Atributo | Tipo | Nullable | Descricao |
+|---|---|---|---|
+| Id | Guid | Nao | Identificador unico gerado automaticamente |
+| DateCreated | DateTimeOffset | Nao | Data de criacao do registro (default: DateTimeOffset.Now) |
+| DateUpdated | DateTimeOffset? | Sim | Data da ultima atualizacao |
+| DateDeleted | DateTimeOffset? | Sim | Data de exclusao logica — preenchida pelo metodo `Delete()` |
+
+---
 
 ## Dicionario de Dados
 
-| Classe | Atributo | Definicao | Obrig. | Tipo | Dominio | Tamanho | Unico |
-|--------|----------|-----------|--------|------|---------|---------|-------|
-| **PrestacaoContas** | codigo | Codigo de identificacao unica da prestacao | Gerado | String | Ex: PC-2026-001 | | Sim |
-| | periodoInicio | Data de inicio do periodo de execucao coberto | Sim | Date | | | |
-| | periodoFim | Data de fim do periodo de execucao coberto | Sim | Date | | | |
-| | dataSubmissao | Data em que a prestacao foi submetida | Cond. | Date | Preenchida ao submeter | | |
-| | prazoSubmissao | Data limite para submissao (periodoFim + 30 dias) | Gerado | Date | | | |
-| | valorTotal | Soma dos valores dos documentos fiscais submetidos | Gerado | Double | | | |
-| | estado | Estado atual da prestacao no fluxo | Gerado | EstadoPC | Ver enumeracao | | |
-| **DocumentoFiscal** | numero | Numero do documento fiscal | Sim | String | Ex: NF-2026-12345 | 100 | |
-| | tipo | Tipo do documento fiscal | Sim | TipoDocumentoFiscal | Ver enumeracao | | |
-| | descricao | Descricao da despesa | Sim | String | | 500 | |
-| | valor | Valor do documento fiscal | Sim | Double | | | |
-| | dataEmissao | Data de emissao do documento fiscal | Sim | Date | | | |
-| | arquivoDigitalizado | URL do arquivo digitalizado do documento | Sim | URL | | | |
-| | status | Status do documento na analise | Gerado | StatusDocumentoFiscal | Ver enumeracao | | |
-| **ExtratoBancario** | banco | Nome ou codigo do banco | Sim | String | | 100 | |
-| | agencia | Numero da agencia bancaria | Sim | String | | 20 | |
-| | conta | Numero da conta corrente do projeto | Sim | String | | 30 | |
-| | periodoInicio | Data de inicio do periodo do extrato | Sim | Date | | | |
-| | periodoFim | Data de fim do periodo do extrato | Sim | Date | | | |
-| | saldoInicial | Saldo da conta no inicio do periodo | Sim | Double | | | |
-| | saldoFinal | Saldo da conta no fim do periodo | Sim | Double | | | |
-| | arquivoImportado | URL do arquivo do extrato importado | Sim | URL | | | |
-| | dataImportacao | Data em que o extrato foi importado no sistema | Gerado | Date | | | |
-| **LancamentoExtrato** | data | Data do lancamento bancario | Sim | Date | | | |
-| | descricao | Descricao do lancamento | Sim | String | | 300 | |
-| | valor | Valor do lancamento | Sim | Double | | | |
-| | tipo | Tipo do lancamento (credito ou debito) | Sim | TipoLancamento | Ver enumeracao | | |
-| | conciliado | Indica se o lancamento foi conciliado com um documento fiscal | Gerado | Boolean | true/false | | |
-| **ParecerPC** | dataAnalise | Data em que o parecer foi emitido | Sim | Date | | | |
-| | aprovado | Indica se a prestacao foi aprovada | Sim | Boolean | true/false | | |
-| | justificativa | Justificativa do parecer | Sim | String | | 2000 | |
-| | analistaResponsavel | Nome do analista que emitiu o parecer | Sim | String | | 200 | |
-| **ContestacaoPrestacaoContas** | codigo | Codigo de identificacao da contestacao | Gerado | String | Ex: CT-2026-001 | | Sim |
-| | dataContestacao | Data em que a contestacao foi submetida | Sim | Date | | | |
-| | prazoContestacao | Data limite para contestacao (data recusa + 15 dias) | Gerado | Date | | | |
-| | argumentacao | Argumentacao do coordenador contestando a recusa | Sim | String | | 3000 | |
-| | documentoComplementar | URL de documento complementar anexado a contestacao | Nao | URL | | | |
-| | estado | Estado da contestacao | Gerado | EstadoContestacao | Ver enumeracao | | |
-| **AuditoriaSECONT** | codigo | Codigo de identificacao da auditoria | Gerado | String | Ex: AUD-2026-001 | | Sim |
-| | dataInicio | Data de inicio da auditoria | Sim | Date | | | |
-| | dataConclusao | Data de conclusao da auditoria | Cond. | Date | Preenchida ao concluir | | |
-| | auditorResponsavel | Nome do auditor responsavel | Sim | String | | 200 | |
-| | parecer | Parecer final da auditoria | Cond. | String | Preenchido ao concluir | 3000 | |
-| | resultado | Resultado da auditoria | Cond. | ResultadoAuditoria | Ver enumeracao | | |
-| **SolicitacaoDocumentoAdicional** | dataSolicitacao | Data em que o documento adicional foi solicitado | Sim | Date | | | |
-| | descricao | Descricao do documento solicitado | Sim | String | | 500 | |
-| | prazoResposta | Data limite para envio do documento | Sim | Date | | | |
-| | atendida | Indica se a solicitacao foi atendida | Gerado | Boolean | true/false | | |
-| **HistoricoPC** | data | Data do evento | Gerado | Date | | | |
-| | tipo | Tipo do evento registrado | Sim | TipoEventoPC | Ver enumeracao | | |
-| | descricao | Descricao textual do evento | Sim | String | | 500 | |
+### Prestacao
+
+| Atributo | Tipo | Nullable | Obrig. | Descricao |
+|---|---|---|---|---|
+| Data | DateTimeOffset | Nao | Sim | Data de referencia da prestacao de contas |
+| Status | StatusPrestacao | Nao | Gerado | Estado atual no ciclo de vida — ver enumeracoes |
+| Justificativas | IReadOnlyCollection&lt;JustificativaDespesa&gt; | Nao | — | Justificativas de despesa vinculadas a esta prestacao |
+| Transacoes | IReadOnlyCollection&lt;TransacaoFinanceira&gt; | Nao | — | Transacoes financeiras vinculadas a esta prestacao |
+
+### TransacaoFinanceira
+
+| Atributo | Tipo | Nullable | Obrig. | Descricao |
+|---|---|---|---|---|
+| TransacaoFinanceiraContaBancariaId | Guid | Nao | Sim | FK para ContaBancaria |
+| TransacaoFinanceiraPrestacaoId | Guid? | Sim | Nao | FK para Prestacao — null se a transacao ainda nao foi vinculada |
+| Data | DateTimeOffset | Nao | Sim | Data do lancamento bancario |
+| Valor | decimal | Nao | Sim | Valor monetario da transacao (>= 0) |
+| Descricao | string | Nao | Sim | Descricao do lancamento conforme extrato |
+| Identificador | string | Nao | Sim | Identificador unico da transacao no extrato bancario |
+| Tipo | TipoOperacao | Nao | Sim | DEBITO ou CREDITO |
+| Status | StatusTransacao | Nao | Gerado | Derivado do Status da Prestacao vinculada — ver enumeracoes |
+
+### ContaBancaria
+
+| Atributo | Tipo | Nullable | Obrig. | Descricao |
+|---|---|---|---|---|
+| ContaBancariaProjetoId | Guid? | Sim | Nao | FK para ProjetoRef (view externa do sistema de importacao) |
+| Banco | string | Nao | Sim | Nome do banco |
+| Agencia | string | Nao | Sim | Numero da agencia bancaria |
+| Numero | string | Nao | Sim | Numero da conta corrente do projeto |
+| Titular | string | Nao | Sim | Nome do titular da conta |
+| SaldoAtual | decimal | Nao | Gerado | Saldo atual calculado a partir das transacoes |
+
+### JustificativaDespesa (abstrata)
+
+| Atributo | Tipo | Nullable | Obrig. | Descricao |
+|---|---|---|---|---|
+| JustificativaDespesaPrestacaoId | Guid | Nao | Sim | FK para Prestacao |
+| Descricao | string | Nao | Sim | Descricao textual da despesa justificada |
+| ValorTotal | decimal | Nao | Gerado | Valor total da despesa (>= 0) — atualizado por `AtualizarValorTotal()` |
+| UrlArquivo | string? | Sim | Nao | URL do arquivo comprovante armazenado no MinIO |
+| Orcamentos | ICollection&lt;OrcamentoFornecedor&gt; | Nao | — | Orcamentos de fornecedor vinculados |
+
+### JustificativaNF
+
+Herda todos os atributos de `JustificativaDespesa`. Valor total derivado do `DocumentoFiscal` vinculado (inicializado como 0).
+
+| Atributo | Tipo | Nullable | Obrig. | Descricao |
+|---|---|---|---|---|
+| DocumentoFiscal | DocumentoFiscal | Nao | Sim | Nota fiscal associada a esta justificativa (navegacao) |
+
+### JustificativaDiaria
+
+Herda todos os atributos de `JustificativaDespesa`.
+
+| Atributo | Tipo | Nullable | Obrig. | Descricao |
+|---|---|---|---|---|
+| ValorDiaria | decimal | Nao | Sim | Valor unitario de cada diaria (>= 0) |
+| Quantidade | int | Nao | Sim | Numero de diarias (> 0) |
+| JustificativaDiariaAlocacaoBolsistaId | Guid | Nao | Sim | FK para AlocacaoBolsistaRef — bolsista beneficiario da diaria |
+
+### JustificativaInvoice
+
+Herda todos os atributos de `JustificativaDespesa`. Usada para despesas realizadas em moeda estrangeira.
+
+| Atributo | Tipo | Nullable | Obrig. | Descricao |
+|---|---|---|---|---|
+| ValorCambio | decimal | Nao | Sim | Taxa de cambio aplicada na conversao para BRL |
+| Moeda | TipoMoeda | Nao | Sim | Moeda estrangeira utilizada — ver enumeracoes |
+
+### OrcamentoFornecedor
+
+| Atributo | Tipo | Nullable | Obrig. | Descricao |
+|---|---|---|---|---|
+| OrcamentoFornecedorJustificativaDespesaId | Guid | Nao | Sim | FK para JustificativaDespesa |
+| Fornecedor | string | Nao | Sim | Nome ou razao social do fornecedor |
+| Valor | decimal | Nao | Sim | Valor total do orcamento (>= 0) |
+| Data | DateTime | Nao | Sim | Data de emissao do orcamento |
+| UrlArquivoPDF | string | Nao | Sim | URL do PDF do orcamento armazenado no MinIO |
+| Escolhido | bool | Nao | Gerado | Indica se este orcamento foi selecionado como vencedor — definido por `MarcarComoEscolhido()` |
+
+### DocumentoFiscal
+
+| Atributo | Tipo | Nullable | Obrig. | Descricao |
+|---|---|---|---|---|
+| DocumentoFiscalJustificativaNFId | Guid | Nao | Sim | FK para JustificativaNF |
+| ChaveAcesso | string | Nao | Sim | Chave de acesso da NF-e com 44 digitos — usada na consulta SERPRO |
+| NomeEmitente | string | Nao | Sim | Razao social do emitente da nota fiscal |
+| Descricao | string | Nao | Sim | Descricao do objeto da nota fiscal |
+| ValorTotal | decimal | Nao | Sim | Valor total da nota (>= 0) |
+| UF | string | Nao | Sim | Unidade federativa do emitente |
+| Pais | string | Nao | Sim | Pais do emitente |
+| Identificador | string | Nao | Sim | Identificador unico do documento fiscal no sistema |
+| TotalICMS | decimal | Nao | Sim | Total de ICMS destacado na nota (>= 0) |
+| TotalPIS | decimal | Nao | Sim | Total de PIS destacado na nota (>= 0) |
+| TotalIPI | decimal | Nao | Sim | Total de IPI destacado na nota (>= 0) |
+| TotalISS | decimal | Nao | Sim | Total de ISS destacado na nota (>= 0) |
+| TipoNota | TipoNota | Nao | Sim | Tipo da nota: PRODUTO ou SERVICO |
+| ItensDocumentoFiscal | ICollection&lt;ItemDocumentoFiscal&gt; | Nao | — | Itens discriminados na nota fiscal |
+
+### ItemDocumentoFiscal
+
+| Atributo | Tipo | Nullable | Obrig. | Descricao |
+|---|---|---|---|---|
+| ItemDocumentoFiscalDocumentoFiscalId | Guid | Nao | Sim | FK para DocumentoFiscal |
+| ItemDocumentoFiscalContaContabilId | Guid | Nao | Sim | FK para ContaContabil — define a classificacao contabil do item |
+| Descricao | string | Nao | Sim | Descricao do item conforme nota fiscal |
+| Quantidade | int | Nao | Sim | Quantidade do item (> 0) |
+| ValorUnitario | decimal | Nao | Sim | Valor unitario do item (>= 0) |
+| ValorTotal | decimal | Nao | Gerado | Valor total do item — calculado como Quantidade * ValorUnitario |
+| NCM | string? | Sim | Nao | Codigo NCM — Nomenclatura Comum do Mercosul |
+| CFOP | string? | Sim | Nao | Codigo CFOP — Codigo Fiscal de Operacoes e Prestacoes |
+
+### Orcamento
+
+> **DT-M014-001:** Implementado neste backend mas pertence conceitualmente a M013 (Gestao Orcamentaria).
+
+| Atributo | Tipo | Nullable | Obrig. | Descricao |
+|---|---|---|---|---|
+| OrcamentoProjetoId | Guid? | Sim | Nao | FK para ProjetoRef (view externa) |
+| Ano | int | Nao | Sim | Ano de referencia do orcamento |
+| ValorTotal | decimal | Nao | Sim | Valor total aprovado para o projeto no ano |
+| ValorBolsasPrevisto | decimal | Nao | Sim | Valor previsto para pagamento de bolsas |
+| ValorCapitalPrevisto | decimal | Nao | Sim | Valor previsto para aquisicao de capital |
+| ContasContabeis | ICollection&lt;ContaContabil&gt; | Nao | — | Contas contabeis que estruturam o orcamento |
+
+### ContaContabil
+
+> **DT-M014-001:** Implementado neste backend mas pertence conceitualmente a M013 (Gestao Orcamentaria).
+
+| Atributo | Tipo | Nullable | Obrig. | Descricao |
+|---|---|---|---|---|
+| ContaContabilOrcamentoId | Guid | Nao | Sim | FK para Orcamento |
+| ContaContabilParentId | Guid? | Sim | Nao | FK para ContaContabil pai — null se conta raiz (auto-referencia hierarquica) |
+| Descricao | string | Nao | Sim | Descricao da rubrica ou conta contabil |
+| Limite | decimal | Nao | Sim | Limite de gasto aprovado para esta conta (>= 0) |
+| SubContas | ICollection&lt;ContaContabil&gt; | Nao | — | Contas filhas na hierarquia |
+| ItensDocumentoFiscal | ICollection&lt;ItemDocumentoFiscal&gt; | Nao | — | Itens de documentos fiscais classificados nesta conta |
+
+---
+
+## Enumeracoes
+
+| Enum | Entidade | Valores |
+|---|---|---|
+| StatusPrestacao | Prestacao | RASCUNHO (1), EM_ANALISE (2), REVISAO (3), FINALIZADO (4), NEGADO (5) |
+| StatusTransacao | TransacaoFinanceira | PENDENTE (1), EM_RASCUNHO (2), EM_ANALISE (3), EM_REVISAO (4), APROVADA (5), REJEITADA (6) |
+| TipoOperacao | TransacaoFinanceira | DEBITO (1), CREDITO (2) |
+| TipoNota | DocumentoFiscal | PRODUTO (1), SERVICO (2) |
+| TipoDocumentoFiscal | DocumentoFiscal | NFE_PRODUTO (1), NFSE_SERVICO (2) |
+| TipoMoeda | JustificativaInvoice | BRL, USD, EUR, GBP |
+| TipoJustificativa | JustificativaDespesa | NF, INVOICE, DIARIA |
+| TipoArquivoNfe | (processamento interno SERPRO) | XML (1), PDF (2), Imagem (3) |
+
+---
 
 ## Notas de Implementacao
 
-**Entidades externas:**
-- Projeto: gerenciado por M003 (Gestao de Iniciativas Captadas).
-- RubricaProjeto: gerenciada por M013 (Gestao Orcamentaria do Projeto).
+**Backend separado:**
+Este modulo roda em projeto independente `ConectaFapes.PrestacaoContas.*` com seu proprio `AppDbContext` (SQL Server) e pipeline de injecao de dependencias. Detalhes de infraestrutura em [architecture/04-dados-e-operacao.md](../../../architecture/04-dados-e-operacao.md).
+
+**Heranca de BaseEntity:**
+Todas as entidades herdam de `BaseEntity` (`ConectaFapes.Common.Domain.BaseEntities`), que fornece `Id` (Guid), timestamps de auditoria (`DateCreated`, `DateUpdated`) e exclusao logica (`DateDeleted` via `Delete()`). Nenhuma entidade e removida fisicamente do banco.
+
+**Entidades de referencia externa:**
+`ProjetoRef` e `AlocacaoBolsistaRef` sao mapeadas a views de banco de dados do sistema de Importacao de Editais (M002). Nao herdam de `BaseEntity` e nao possuem repositorio proprio — sao somente leitura.
+
+**Divida tecnica DT-M014-001:**
+`ContaBancaria`, `Orcamento`, `ContaContabil` e `TransacaoFinanceira` estao implementadas neste backend mas pertencem conceitualmente a M013 (Gestao Orcamentaria) e M016 (Contabilidade e Financeiro). A separacao e planejada como debito tecnico de prioridade alta — ver [backlog.md](backlog.md#debito-tecnico).
+
+**Integracao SERPRO:**
+`DocumentoFiscal` e processado via API SERPRO para NF-e (consulta por `ChaveAcesso` de 44 digitos) ou por upload direto para NFS-e. A autenticacao usa OAuth2 com cache de token em `SerproTokenService`. O tipo do arquivo (XML, PDF ou imagem) e detectado automaticamente por `TipoArquivoIdentifierService`.
+
+**Armazenamento MinIO:**
+`UrlArquivo` em `JustificativaDespesa` e `UrlArquivoPDF` em `OrcamentoFornecedor` referenciam objetos armazenados no MinIO. O upload e feito via URL pre-assinada gerada pelo `MinioService` — o cliente faz o upload diretamente, sem passar pelo backend.
+
+**StatusTransacao como estado derivado:**
+O `Status` de `TransacaoFinanceira` nao e persistido diretamente — e uma propriedade calculada que reflete o `Status` da `Prestacao` a qual a transacao esta vinculada. Transacoes sem vinculo ficam com status `PENDENTE`.
 
 **Navegabilidade:**
-- Cardinalidade 1: atributo do tipo da classe destino (ex: PrestacaoContas.projeto: Projeto)
-- Cardinalidade N: atributo lista do tipo da classe destino (ex: PrestacaoContas.documentos: List<DocumentoFiscal>)
+- Cardinalidade 1: atributo do tipo da classe destino (ex: `JustificativaNF.DocumentoFiscal: DocumentoFiscal`)
+- Cardinalidade N: atributo lista (ex: `Prestacao.Justificativas: IReadOnlyCollection<JustificativaDespesa>`)
+- `IReadOnlyCollection` em `Prestacao` indica que as colecoes sao mutadas apenas pelos metodos da propria entidade (`AdicionarJustificativa`, `RemoverJustificativa`, etc.)
