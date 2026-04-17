@@ -118,6 +118,12 @@
 |---------|-------|-------------|--------|
 | Documentar AuthRix (sistema interno de autorizacao) | [#1758](https://github.com/leds-conectafapes/conectafapes-project/issues/1758) | [AuthRix README](../../products/authrix/README.md), [ADR-007](../../architecture/adr/ADR-007-autorizacao-openfga.md) | ⚪ To Do |
 
+### Marcela — Monitoramento UNAC
+
+| Feature | Issue | Status |
+|---------|-------|--------|
+| Monitorar cadastro e uso do Portal Coordenador UNAC (projetos e pessoas) | [#1759](https://github.com/leds-conectafapes/conectafapes-project/issues/1759) | ⚪ To Do |
+
 ---
 
 ## Ordem de Implementacao
