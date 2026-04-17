@@ -11,6 +11,18 @@
 
 ---
 
+## Prioridades da Sprint
+
+> **Tarefas mais importantes deste sprint:**
+>
+> 1. **Prestacao de Contas** — Entregar o extrato do projeto e finalizar o discovery dos fluxos de analise e contestacao (Manoel + Leticia)
+> 2. **Monitoramento e cadastro de novos usuarios (UNAC)** — Acompanhar adocao do Portal Coordenador e consolidar relatorio com usuarios cadastrados, problemas e melhorias (Marcela + Leticia)
+> 3. **Melhorias do Portal** — Mapear jornadas de usuario em producao, coletar feedback e registrar melhorias e novas features como issues (Marcela + Leticia)
+>
+> As demais frentes (Cadastros Corporativos, Parcerias, documentacao AuthRix, importacao SIGFAPES) continuam na sprint mas devem ceder prioridade em caso de conflito de capacidade.
+
+---
+
 ## Resumo por Frente de Trabalho
 
 | Frente | Responsavel | Objetivo | Issues |
