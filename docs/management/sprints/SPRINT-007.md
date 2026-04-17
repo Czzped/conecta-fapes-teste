@@ -32,6 +32,7 @@
 | **Prestacao de Contas** | Manoel | Entregar extrato do projeto com listagem paginada, controle de gastos e filtros | 5 issues (M014) |
 | **Design de Produto** | Leticia | Discovery dos modulos M014 (analise/contestacao) e M011 (captacao completa): jornadas, prototipos e criterios de aceitacao | 2 issues |
 | **Discovery de Melhorias** | Marcela + Leticia | Mapear jornadas de usuario em producao, coletar feedback e registrar melhorias e novas features | 1 issue |
+| **Importacao SIGFAPES** | Mateus Lannes | Documentar sistema de importacao e monitorar execucao, integridade e proximos passos | 1 issue |
 
 ---
 
@@ -109,14 +110,11 @@
 | Discovery Prestacao de Contas (jornadas, prototipos, DoD dos EPICs 002/003) | M014 | [#1756](https://github.com/leds-conectafapes/conectafapes-project/issues/1756) | [M014 Backlog](../../implementation/modules/M014-prestacao-contas/backlog.md), [Modelo Comportamental](../../implementation/modules/M014-prestacao-contas/modelo-comportamental.md) | ⚪ To Do |
 | Discovery Captacao de Iniciativas (jornadas, prototipos, DoD dos EPICs 001-007) | M011 | [#1757](https://github.com/leds-conectafapes/conectafapes-project/issues/1757) | [M011 Backlog](../../implementation/modules/M011-configuracao-captacao/backlog.md), [Analise Prototipo](../../implementation/modules/M011-configuracao-captacao/specifications/analise-prototipo-captacao.md) | ⚪ To Do |
 
-### Lannes — Importacao SIGFAPES (M002)
+### Mateus Lannes — Importacao SIGFAPES (M002)
 
-> Pendencia: documentacao do sistema de importacao nao foi feita. Questionar sobre status atual e proximos passos.
-
-| Item | Descricao | Status |
-|------|-----------|--------|
-| Documentacao do Importador | Documentar arquitetura, fluxo de dados e decisoes tecnicas do sistema de importacao | Pendente |
-| Proximos passos M002 | Definir se ha evolucoes planejadas ou se o modulo esta finalizado | A discutir |
+| Feature | Issue | Documentacao | Status |
+|---------|-------|-------------|--------|
+| Documentar e monitorar o sistema de Importacao SIGFAPES | [#1760](https://github.com/leds-conectafapes/conectafapes-project/issues/1760) | [Importador README](../../products/importador/README.md), [M002 Backlog](../../implementation/modules/M002-importacao-editais/backlog.md) | ⚪ To Do |
 
 ### Marcela + Leticia — Discovery de Melhorias
 
@@ -182,10 +180,11 @@
 1. #1755 Mapear jornadas de usuario em producao (com Leticia)
 2. Criar issues para cada melhoria e nova feature identificada
 
-### Lannes — Importacao SIGFAPES (M002)
+### Mateus Lannes — Importacao SIGFAPES (M002)
 
-1. Documentar arquitetura e fluxo de dados do sistema de importacao
-2. Definir proximos passos do modulo
+1. #1760 Documentar arquitetura e fluxo de dados do Importador
+2. Definir KPIs de monitoramento e executar primeiro ciclo
+3. Registrar proximos passos como issues
 
 ---
 
