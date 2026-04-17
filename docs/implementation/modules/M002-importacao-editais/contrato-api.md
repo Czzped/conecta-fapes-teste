@@ -61,7 +61,7 @@ https://{host}/
 | `409 Conflict` | Conflito de estado (lock de outro usuario, versao otimista, planilha ja criada, tipo conflitante) |
 | `502 Bad Gateway` | Falha em dependencia externa (S3, Supabase, Airflow) |
 
-**Observacao importante:** `POST /validate-upload-planilha` nao retorna 4xx por regra violada. Mesmo com erros de layout ou lógica, a resposta e `200 OK` com `ok=false` e `errors[]` preenchido, para permitir a UI apresentar a sidebar de erros sem tratamento de excecao.
+**Observacao importante:** `POST /validar-upload` nao retorna 4xx por regra violada. Mesmo com erros de layout ou lógica, a resposta e `200 OK` com `ok=false` e `errors[]` preenchido, para permitir a UI apresentar a sidebar de erros sem tratamento de excecao.
 
 ---
 
@@ -213,7 +213,7 @@ Descobre se o recurso esta classificado como `editais` ou `programas`.
 
 ---
 
-#### `POST /cria-planilha-edital`
+#### `POST /criar-planilha-edital`
 
 Gera a planilha base (versao 0) do edital a partir dos dumps SigFapes. Pode executar sincronicamente ou enfileirar como job assincrono.
 
@@ -287,7 +287,7 @@ Retorna a versao mais recente da planilha corrigida em base64.
 
 ---
 
-#### `GET /planilhas-mes-passado`
+#### `GET /planilha-mes-anterior`
 
 Lista versoes corrigidas do mes anterior disponiveis para consulta.
 
@@ -322,7 +322,7 @@ Lista versoes corrigidas do mes anterior disponiveis para consulta.
 
 ---
 
-#### `GET /planilhas-mes-passado/download`
+#### `GET /planilha-mes-anterior/download`
 
 Download direto de uma planilha do mes anterior.
 
@@ -334,7 +334,7 @@ Download direto de uma planilha do mes anterior.
 |-----------|------|-----------|
 | `edital_id` | string | Identificador do edital |
 | `kind` | string | `editais` ou `programas` |
-| `filename` | string | Nome do arquivo XLSX conforme retornado por `/planilhas-mes-passado` |
+| `month_year` | string | Competencia no formato `MM_YYYY` (ex.: `01_2026`) |
 
 **Response `200 OK`** — corpo binario `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`.
 
@@ -495,6 +495,8 @@ Lista os locks ativos pertencentes ao chamador.
 
 Retorna status de lock de varios editais em uma unica chamada. Usado pela listagem de editais para indicar quem esta editando o que.
 
+- **Autorizacao:** publica (endpoint de leitura usado pela UI antes do login efetivo em algumas rotinas de polling)
+
 **Request body**
 
 ```json
@@ -520,11 +522,13 @@ Retorna status de lock de varios editais em uma unica chamada. Usado pela listag
 
 Status de um unico recurso por `resource_key` ou `(edital_id, kind)`.
 
+- **Autorizacao:** publica
+
 ---
 
 ### 5. Upload de Planilha
 
-#### `POST /validate-upload-planilha`
+#### `POST /validar-upload`
 
 Valida uma planilha candidata e retorna erros, warnings e diff contra a versao atual. Nunca retorna 4xx por regra violada.
 
@@ -605,21 +609,16 @@ Persiste uma nova versao da planilha, com validacao de layout, lock e versao oti
 
 ---
 
-#### `POST /upload`
+#### `POST /criar-planilha` (legado)
 
-Upload tecnico para path controlado no bucket (uso interno).
+Cria uma planilha base a partir de um `numero` sem passar pelo fluxo edital. Mantido por compatibilidade; o caminho atual e `POST /criar-planilha-edital`.
 
 - **Autorizacao:** `OPERADOR`
 
 **Request body**
 
 ```json
-{
-  "name": "relatorio.pdf",
-  "content_type": "application/pdf",
-  "data_url": "data:application/pdf;base64,JVBER...",
-  "path": "manual-uploads/"
-}
+{ "numero": "7777" }
 ```
 
 ---
@@ -765,7 +764,67 @@ Estados possiveis: `pending`, `processing`, `completed`, `failed`.
 
 ---
 
-### 9. Status
+### 9. Endpoints Internos
+
+Prefixo `/internal`. Exigem autenticacao Bearer (JWT) **e** role pertencente a `INTERNAL_ALLOWED_ROLES` (por padrao `admin` e `service_role`). Nao sao consumidos pela UI regular.
+
+#### `GET /internal/airflow-check`
+
+Verifica a saude da instancia Airflow configurada. Retorna metadados da DAG `SigFapes2Conecta`.
+
+- **Autorizacao:** `SISTEMA`
+
+#### `POST /internal/airflow/trigger-sigfapes`
+
+Dispara manualmente a DAG `SigFapes2Conecta` no Airflow. O gatilho equivalente no frontend ainda nao foi implementado — esta rota hoje e acionada por operadores privilegiados via tooling externo.
+
+- **Autorizacao:** `SISTEMA`
+
+**Request body**
+
+```json
+{
+  "mes": "02_2026",
+  "tipo": "editais",
+  "numero": "7777",
+  "dag_run_id": "manual__2026-04-17",
+  "logical_date": "2026-04-17T00:00:00Z",
+  "conf": { "forcar_dump": true }
+}
+```
+
+**Response `200 OK`**
+
+```json
+{ "ok": true, "dag_run_id": "manual__2026-04-17" }
+```
+
+#### `POST /internal/planilha-audit/backfill`
+
+Reexecuta a auditoria de uma planilha ja existente no S3, recriando linhas em `planilha_version_audit` quando o arquivo precede o versionamento com audit.
+
+- **Autorizacao:** `SISTEMA`
+
+**Request body**
+
+```json
+{
+  "month_year": "02_2026",
+  "edital_id": "7777",
+  "kind": "editais",
+  "actor_user_id": "u_admin"
+}
+```
+
+**Response `200 OK`**
+
+```json
+{ "ok": true, "inserted": 3, "skipped": 1 }
+```
+
+---
+
+### 10. Status
 
 #### `GET /status`
 
@@ -789,25 +848,28 @@ Healthcheck curto: `{ "ok": true }`.
 | `GET` | `/editais-latest` | ListarEditaisDoUltimoDump | OPERADOR |
 | `GET` | `/editais-grafico-metricas` | ConsultarMetricasDeImportacao | OPERADOR |
 | `GET` | `/recurso-kind` | DescobrirTipoDoRecurso | OPERADOR |
-| `POST` | `/cria-planilha-edital` | CriarPlanilhaInicialDoEdital | OPERADOR |
+| `POST` | `/criar-planilha-edital` | CriarPlanilhaInicialDoEdital | OPERADOR |
+| `POST` | `/criar-planilha` | CriarPlanilhaLegado | OPERADOR |
 | `GET` | `/planilha-selecionada` | ObterPlanilhaSelecionada | OPERADOR |
-| `GET` | `/planilhas-mes-passado` | ListarPlanilhasDoMesAnterior | OPERADOR |
-| `GET` | `/planilhas-mes-passado/download` | BaixarPlanilhaDoMesAnterior | OPERADOR |
+| `GET` | `/planilha-mes-anterior` | ListarPlanilhasDoMesAnterior | OPERADOR |
+| `GET` | `/planilha-mes-anterior/download` | BaixarPlanilhaDoMesAnterior | OPERADOR |
 | `POST` | `/recurso-kind/switch` | TrocarTipoDoRecurso | OPERADOR + lock |
 | `GET` | `/bolsista-dump-json` | VisualizarBolsistaNoDump | OPERADOR |
 | `POST` | `/locks/acquire` | AdquirirLockDoRecurso | OPERADOR |
 | `POST` | `/locks/heartbeat` | RenovarLockDoRecurso | OPERADOR |
 | `POST` | `/locks/release` | LiberarLockDoRecurso | OPERADOR |
 | `GET` | `/locks/me` | ConsultarLocksAtivosDoUsuario | OPERADOR |
-| `POST` | `/locks/batch-status` | ConsultarStatusDeLocksEmLote | OPERADOR |
-| `GET` | `/locks/status` | ConsultarStatusDeRecurso | OPERADOR |
-| `POST` | `/validate-upload-planilha` | ValidarUploadDePlanilha | OPERADOR |
+| `POST` | `/locks/batch-status` | ConsultarStatusDeLocksEmLote | Publica |
+| `GET` | `/locks/status` | ConsultarStatusDeRecurso | Publica |
+| `POST` | `/validar-upload` | ValidarUploadDePlanilha | OPERADOR |
 | `POST` | `/upload-planilha-corrigida` | EnviarPlanilhaCorrigida | OPERADOR + lock |
-| `POST` | `/upload` | UploadDeArquivoBruto | OPERADOR |
 | `GET` | `/dados-programas` | ConsultarDadosDeProgramas | OPERADOR |
 | `POST` | `/dados-programas` | SalvarDadosDeProgramas | OPERADOR + lock |
 | `POST` | `/gerar-jsonl` | GerarArquivosJsonlDeImportacao | OPERADOR + lock |
 | `GET` | `/jobs/{job_id}` | ConsultarStatusDeJobAssincrono | OPERADOR ou SISTEMA |
+| `GET` | `/internal/airflow-check` | VerificarSaudeDoAirflow | SISTEMA |
+| `POST` | `/internal/airflow/trigger-sigfapes` | DispararDumpSigFapes | SISTEMA |
+| `POST` | `/internal/planilha-audit/backfill` | BackfillAuditoriaPlanilha | SISTEMA |
 | `GET` | `/status` | ConsultarStatusDoServico | Publica |
 | `GET` | `/health` | Healthcheck | Publica |
 

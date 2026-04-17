@@ -86,7 +86,7 @@ flowchart LR
 | XLSX | biblioteca `xlsx` | Parse/serialize no navegador |
 | Datas | `react-datepicker` | Campo de data na celula |
 | Virtual scroll | Implementacao manual | 52px/linha, overscan 5 linhas |
-| Estilos | CSS puro em `styles.css` | Tokens de design, sem Tailwind |
+| Estilos | CSS puro modular em `src/styles/` | `base.css`, `components.css`, `responsive.css` e `features/{correction,editais,import-sidebar,login,modals,programas,spreadsheet}.css`; tokens de design, sem Tailwind |
 
 ### Infraestrutura
 

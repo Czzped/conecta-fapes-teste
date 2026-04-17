@@ -71,3 +71,70 @@ A origem dos dados e o SIGFAPES atraves de dumps Parquet publicados diariamente 
 - **Autenticacao**: Supabase Auth + JWT Bearer com cookies HttpOnly (`sb-access-token`, `sb-refresh-token`).
 - **Orquestracao**: Airflow (DAG `SigFapes2Conecta`) publica dumps diarios.
 - **Deploy**: Render (backend + frontend).
+
+---
+
+## Variaveis de ambiente
+
+Todas lidas via classe `AppSettings` em `app/core/settings.py` e expostas por `get_app_settings()`. Segredos ficam em variaveis de ambiente do servico (Render), nunca commitados.
+
+### Feature flags
+
+| Variavel | Default | Efeito |
+|----------|---------|--------|
+| `USE_CASES_ENABLED` | `False` | Quando `True`, os routers delegam para a camada `app/use_cases/`; quando `False`, usam o caminho legado via `app/services/` + `app/gateways/`. Permite migracao gradual sem quebrar o fluxo em producao. |
+| `ASYNC_JOBS_ENABLED` | `False` | Habilita o modo assincrono (`?async=true`) em `/criar-planilha-edital` e `/gerar-jsonl`, enfileirando em `import_jobs`. |
+| `AUDIT_DB_ENABLED` | `True` | Liga/desliga a gravacao em `planilha_version_audit`. |
+| `AUDIT_DB_STRICT` | `False` | Quando `True`, falha de gravacao em audit aborta a operacao de escrita; quando `False`, apenas registra log. |
+| `LOG_STRUCTURED` | `True` | Emite logs JSON com `request_id`, `user_id`, `elapsed_ms`. |
+| `LOCKS_ENABLED` | `True` | Quando `False`, rotas de lock retornam no-op (util em ambientes de teste isolado). |
+
+### Seguranca e CORS
+
+| Variavel | Default | Efeito |
+|----------|---------|--------|
+| `INTERNAL_ALLOWED_ROLES` | `["admin","service_role"]` | Roles aceitas pelo guard `require_internal_role` em `/internal/*`. |
+| `CORS_ORIGINS` | `["*"]` | Lista de origens aceitas pelo `CORSMiddleware`. |
+| `CORS_ALLOW_CREDENTIALS` | `False` | Controla se cookies atravessam CORS. |
+| `AUTH_COOKIE_SECURE`, `AUTH_COOKIE_SAMESITE`, `AUTH_COOKIE_DOMAIN` | ambiente-dependente | Politicas dos cookies `sb-access-token` / `sb-refresh-token`. |
+| `SUPABASE_URL`, `SUPABASE_ANON_KEY` | — | Credenciais do Supabase Auth / Postgres. |
+
+### Armazenamento (S3 / MinIO)
+
+| Variavel | Default | Efeito |
+|----------|---------|--------|
+| `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | — | Credenciais AWS. |
+| `S3_ENDPOINT_URL` | — | Quando setado, aponta o boto3 para um endpoint S3-compativel (MinIO). |
+| `S3_BUCKET` | — | Bucket principal (planilhas corrigidas, JSONLs, dados-programas). |
+| `EDITAIS_PREFIX` | `dados_input/dump_sigfapes/` | Prefixo S3 dos dumps SIGFAPES. |
+| `EDITAIS_CORRIGIDOS_PREFIX` | `editais_corrigidos/` | Prefixo S3 das planilhas versionadas. |
+| `SIGFAPES_DUMP_BUCKET`, `SIGFAPES_DUMP_PREFIX` | — | Override opcional do bucket/prefix do dump SIGFAPES. |
+| `CONNECTA_DUMP_BUCKET`, `CONNECTA_DUMP_PREFIX` | — | Bucket/prefix do dump Conecta (MinIO copiado para S3). |
+| `DADOS_PROGRAMAS_KEY` | — | Nome do arquivo JSON de mapeamento programa -> area tecnica. |
+
+### Dump SIGFAPES (API HTTP)
+
+| Variavel | Default | Efeito |
+|----------|---------|--------|
+| `FAPES_URL_AUTH`, `FAPES_URL_CONSULTA` | — | Endpoints HTTP do SIGFAPES. |
+| `FAPES_USUARIO`, `FAPES_SENHA` | — | Credenciais consumidas por `FapesSession.autenticar()`. |
+| `SIGFAPES_RATE_MODE` | `adaptive` | Estrategia do `AdaptiveRateController`. |
+| `SIGFAPES_RATE_INITIAL_RPM` | — | RPM inicial da janela. |
+| `SIGFAPES_RATE_MAX_RPM` | — | Teto de RPM apos adaptacao. |
+
+### Airflow
+
+| Variavel | Default | Efeito |
+|----------|---------|--------|
+| `AIRFLOW_BASE_URL` | `""` | URL base da API Airflow; vazio desativa o trigger. |
+| `AIRFLOW_USERNAME`, `AIRFLOW_PASSWORD` | `""` | Credenciais basic auth. |
+| `AIRFLOW_TIMEOUT` | `5` | Timeout em segundos. |
+| `AIRFLOW_SIGFAPES_DAG_ID` | `SigFapes2Conecta` | Permite apontar para uma DAG alternativa em staging. |
+
+### Operacao
+
+| Variavel | Default | Efeito |
+|----------|---------|--------|
+| `ASYNC_JOBS_POLL_INTERVAL_SECONDS` | `5` | Periodicidade do worker de jobs assincronos. |
+| `FAKE_TODAY_TZ` | `America/Sao_Paulo` | Timezone usada nos calculos de `effective_end` e `novo_este_mes`. |
+| `LOG_LEVEL` | `INFO` | Nivel do logger raiz. |

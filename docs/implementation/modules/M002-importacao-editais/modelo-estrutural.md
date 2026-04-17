@@ -463,6 +463,87 @@ Data efetiva de encerramento da bolsa usada em todo o relatorio. Vetorizada em `
 
 Calculado em `app/services/editais.py`: `True` quando `edital_data_cadastro` esta dentro dos ultimos 60 dias em relacao ao instante da listagem. Exposto no endpoint `GET /editais-latest` para renderizar o badge "Novo".
 
+## Arquitetura em camadas do backend
+
+O backend FastAPI e organizado em sete camadas com responsabilidades distintas. A camada de use cases e habilitada por feature flag (`USE_CASES_ENABLED`) para suportar migracao gradual a partir do codigo legado da raiz.
+
+```mermaid
+flowchart TB
+    FE[Frontend React] -->|HTTP| Routers
+    Routers[app/routers/ - FastAPI endpoints] --> UseCases
+    Routers --> Services
+    UseCases[app/use_cases/ - orquestracao de casos de uso] --> Adapters
+    UseCases --> Gateways
+    Services[app/services/ - logica de dominio] --> Adapters
+    Gateways[app/gateways/ - bridge para legado] --> Legacy[planilha_edital.py / geraArquivosImportacao.py]
+    Adapters[app/adapters/ - S3, Supabase, Airflow] --> Clients
+    Clients[app/clients/ - boto3, postgrest, httpx]
+    Core[app/core/ - providers, settings, request_context]
+    Domain[app/domain/ - types, errors]
+    Middleware[app/middleware/ - RequestContextMiddleware]
+
+    Routers -. usa .-> Core
+    Routers -. usa .-> Domain
+    Routers -. passa por .-> Middleware
+```
+
+### Camada: `app/factory.py`
+
+Funcao `create_app()` monta o FastAPI: configura CORS (`CORS_ORIGINS`, `CORS_ALLOW_CREDENTIALS`), registra `RequestContextMiddleware` e inclui todos os routers. Routers publicos (`auth`, `status`) ficam sem dependencia de auth; routers de operador recebem `Depends(require_authenticated_user)`; o router `internal` ganha dependencia adicional `require_internal_role` que valida o claim contra `INTERNAL_ALLOWED_ROLES` (padrao `admin` + `service_role`).
+
+### Camada: `app/core/`
+
+- `settings.py` — classe `AppSettings` (Pydantic) com todas as variaveis de ambiente; exposta via `get_app_settings()`.
+- `providers.py` — factories `@lru_cache` que materializam singletons: `get_s3_adapter()`, `get_supabase_db_adapter()`, `get_supabase_auth_adapter()`, `get_airflow_adapter()`, `get_app_settings()`.
+- `request_context.py` — utilitarios de contexto por request (`set_request_id`, `set_user_id`).
+- `validation.py` — validadores de dominio (ex.: normalizacao de `edital_id`, `month_year`).
+
+### Camada: `app/middleware/`
+
+- `request_context.py` — `RequestContextMiddleware`: gera `X-Request-ID` (ou respeita o recebido), extrai `user_id` do JWT e emite logs estruturados `request_started` / `request_finished` com metodo, path, status, `elapsed_ms`. Controlado por `LOG_STRUCTURED`.
+
+### Camada: `app/adapters/`
+
+Abstracao entre os routers/use_cases e os clients brutos. Cada adapter expoe uma superficie minima e estavel; substituir o client nao exige mudar chamadores.
+
+| Adapter | Superficie publica (metodos) |
+|---------|------------------------------|
+| `S3Adapter` | `get_object_bytes`, `put_object_bytes`, `delete_object`, `list_keys` |
+| `SupabaseDbAdapter` | CRUD sobre tabelas auxiliares (locks, audit, kind state, jobs) |
+| `SupabaseAuthAdapter` | `sign_in_with_password`, `refresh_session` |
+| `AirflowAdapter` | `trigger_dag_run`, `check_dag_state` |
+
+### Camada: `app/use_cases/`
+
+Orquestracao de alto nivel (lock + S3 + audit + DB). Habilitada por `USE_CASES_ENABLED`; quando desligada, os routers caem no caminho legado (servicos + `app/gateways/`).
+
+| Use case | Responsabilidade |
+|----------|------------------|
+| `CreatePlanilhaEditalUseCase` | Producao da planilha inicial (4 fetches S3 paralelos, calculo vetorizado, versionamento e auditoria) |
+| `UploadPlanilhaCorrigidaUseCase` | Validacao de layout + lock + versao otimista + gravacao de `v{N+1}` + audit |
+| `ValidateUploadPlanilhaUseCase` | Pre-validacao sem persistencia (errors/warnings/diff) |
+| `SwitchResourceKindUseCase` | Troca `editais <-> programas`: clona versao, atualiza `resource_kind_state`, loga em `resource_kind_switch_log` e reemite lock |
+| `GenerateJsonlUseCase` | Leitura de planilha ativa + Parquets + config de programas + geracao de JSONLs |
+| `JobExecutor` | Ciclo de vida de `import_jobs` (pending -> running -> completed/failed) com polling configurado por `ASYNC_JOBS_POLL_INTERVAL_SECONDS` |
+
+### Camada: `app/gateways/`
+
+Padrao strangler-fig: isola as funcoes monoliticas em `planilha_edital.py` e `geraArquivosImportacao.py` (raiz do repo) por tras de uma interface estavel.
+
+- `legacy_planilhas.py` — encapsula `generate_planilha_edital_to_s3()`.
+- `legacy_importacao.py` — encapsula `generate_importacao_jsonl_to_s3()`, `validate_planilha_corrigida_layout_bytes()`, `collect_all_planilha_validation_errors()`.
+
+Os use cases chamam os gateways em vez dos arquivos da raiz diretamente; quando toda funcionalidade legada estiver portada para os use cases, os gateways e os arquivos da raiz podem ser removidos em bloco.
+
+### Camada: `app/domain/`
+
+- `types.py` — `ResourceKind(str, Enum)` com `EDITAIS="editais"` e `PROGRAMAS="programas"`; metodos `from_value(raw)` (normaliza) e `as_legacy_flag()` (converte para `"SIM"`/`"NAO"` usado pelos arquivos legados).
+- `errors.py` — hierarquia `DomainError` (base, `status_code=400`, metodo `as_payload()` serializa para `{error, detail, meta}`). Subclasses: `ValidationError` (400), `UnauthorizedError` (401), `ForbiddenError` (403), `NotFoundError` (404), `ConflictError` (409), `ConfigError` (500), `ExternalServiceError` (502). O mapeador `app/api/error_mapper.py` converte essas excecoes em respostas HTTP consistentes.
+
+### Camada: `app/routers/`
+
+Cada arquivo cobre um recurso REST e delega para os use cases (quando `USE_CASES_ENABLED=true`) ou diretamente para `app/services/` + `app/gateways/`. Decoradores incluem `Depends(require_authenticated_user)` (operadores) ou `require_internal_role` (interno). Ver [contrato-api.md](contrato-api.md) para a lista completa.
+
 ## Invariantes
 
 - Exatamente uma versao ativa por `(month_year, kind, edital_id, version)` - garantida pela constraint composta em `planilha_version_audit`.

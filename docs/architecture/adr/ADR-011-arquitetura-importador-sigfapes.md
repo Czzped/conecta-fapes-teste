@@ -23,7 +23,7 @@ Adotada arquitetura em quatro camadas integradas por S3 e Supabase Postgres:
    - `scripts/sigfapes_dump_job.py` — autentica na API HTTP do SIGFAPES (`FAPES_URL_AUTH` -> token; `FAPES_URL_CONSULTA` para `editais`/`projetos`/`bolsistas`), com `AdaptiveRateController` (janelas de 60s + backoff) para nao saturar o legado. Publica em `<SIGFAPES_DUMP_PREFIX>/<DD_MM_YYYY>/` os arquivos `editais.json|.parquet`, `projetos_por_edital.json|.parquet`, `bolsistas_projeto.jsonl|.parquet`, `bolsistas_por_edital.json` e marker `dump_complete.json` (idempotencia por data).
    - `scripts/conecta_dump_job.py` — copia Parquets ja materializados no MinIO do Conecta (prefixo `ConectaFapes/`) para `<CONNECTA_DUMP_PREFIX>/<DD_MM_YYYY>/`, renomeando (`Edital.parquet` -> `editais.parquet`, `Projeto.parquet` -> `projetos.parquet`, `AlocacaoBolsista.parquet` -> `alocacoes_bolsistas.parquet`, alem de `VersaoNivel`, `VersaoModalidade`, `NivelBolsa`, `ModalidadeBolsa`). Tambem usa marker `dump_complete.json`.
    - Futuramente os jobs serao orquestrados pela DAG `SigFapes2Conecta` no Airflow — o backend ja expoe rotas de trigger/status (`app/services/airflow_trigger.py`, `app/services/airflow_check.py`), mas o disparo manual pelo frontend ainda nao foi implementado.
-2. **Backend FastAPI** - le os Parquets on-demand (com 4 fetches S3 paralelos via `ThreadPoolExecutor`), vetoriza calculos derivados (`effective_end`, `MESES_DE_ATIVIDADE`, `total_deve_receber`) com NumPy e gera planilhas XLSX via `xlsxwriter`. Expoe 26 endpoints REST autenticados com JWT Bearer do Supabase Auth.
+2. **Backend FastAPI em camadas** - le os Parquets on-demand (com 4 fetches S3 paralelos via `ThreadPoolExecutor`), vetoriza calculos derivados (`effective_end`, `MESES_DE_ATIVIDADE`, `total_deve_receber`) com NumPy e gera planilhas XLSX via `xlsxwriter`. Expoe 28 endpoints REST autenticados com JWT Bearer do Supabase Auth. A camada interna e organizada como `routers` -> `use_cases` (ou `services` legado) -> `adapters` -> infraestrutura, com `domain/` concentrando tipos e erros e `core/` agregando settings e providers (`@lru_cache`).
 3. **Frontend React + TypeScript + Vite** - editor de planilhas com virtual scroll manual (`SPREADSHEET_ROW_HEIGHT=52px`, `overscan=5`), validacoes em tempo real e heartbeat automatico de lock a cada 45 segundos.
 4. **Persistencia auxiliar em Supabase Postgres** - tabelas para estado transacional que nao cabe em Parquet:
    - `resource_locks` - lock exclusivo por recurso `(kind, MM_YYYY, edital_id)` com indice unico parcial
@@ -31,6 +31,16 @@ Adotada arquitetura em quatro camadas integradas por S3 e Supabase Postgres:
    - `resource_kind_switch_log` - historico imutavel de alternancias com chaves S3 clonadas
    - `planilha_version_audit` - auditoria de cada versao gerada (ator, email, request_id, motivo)
    - `import_jobs` - fila de jobs assincronos com retries
+
+### Migracao gradual via feature flag `USE_CASES_ENABLED`
+
+A camada `app/use_cases/` foi introduzida depois do caminho legado (`app/services/` + `app/gateways/`) ja estar em producao. Para evitar reescrita big-bang, adotamos padrao **strangler-fig** mediado por feature flag:
+
+- Quando `USE_CASES_ENABLED=False` (default), os routers delegam ao caminho legado (`app/services/*` chamando `app/gateways/*`).
+- Quando `USE_CASES_ENABLED=True`, os mesmos routers delegam aos novos use cases (`CreatePlanilhaEditalUseCase`, `UploadPlanilhaCorrigidaUseCase`, `ValidateUploadPlanilhaUseCase`, `SwitchResourceKindUseCase`, `GenerateJsonlUseCase`, `JobExecutor`) que usam `app/adapters/*`.
+- `app/gateways/` e um anti-corruption layer temporario que espelha as capacidades dos adapters para o codigo legado; sera removido quando a flag virar default `True` e o caminho antigo for apagado.
+
+A flag e lida em `app/core/settings.py:AppSettings` e acessada via provider `@lru_cache`; os testes cobrem ambos os modos para garantir paridade comportamental.
 
 ### Invariantes arquiteturais
 
