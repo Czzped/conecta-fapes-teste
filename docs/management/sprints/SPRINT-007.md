@@ -122,12 +122,6 @@
 |---------|-------|--------|
 | Mapear jornadas de usuario, coletar feedback, registrar melhorias e novas features | [#1755](https://github.com/leds-conectafapes/conectafapes-project/issues/1755) | ⚪ To Do |
 
-### Marcela — Documentacao de Produto
-
-| Feature | Issue | Documentacao | Status |
-|---------|-------|-------------|--------|
-| Documentar AuthRix (sistema interno de autorizacao) | [#1758](https://github.com/leds-conectafapes/conectafapes-project/issues/1758) | [AuthRix README](../../products/authrix/README.md), [ADR-007](../../architecture/adr/ADR-007-autorizacao-openfga.md) | ⚪ To Do |
-
 ### Marcela + Leticia — Monitoramento UNAC
 
 | Feature | Issue | Status |
