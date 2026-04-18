@@ -15,13 +15,14 @@ Especificacao de referencia: [README.md](README.md)
 | ID | Titulo | Requisito | Prioridade | Status | Documento |
 |----|--------|-----------|------------|--------|-----------|
 | EPIC-M014-001 | Submissao de Prestacao de Contas | UC01 | Must | Done | [EPIC-M014-001](epics/EPIC-M014-001.md) |
-| EPIC-M014-002 | Analise de Prestacao de Contas | UC02 | Must | To Do | [EPIC-M014-002](epics/EPIC-M014-002.md) |
-| EPIC-M014-003 | Contestacao e Auditoria | UC03 | Must | To Do | [EPIC-M014-003](epics/EPIC-M014-003.md) |
+| EPIC-M014-002 | Analise de Prestacao de Contas | UC02 | Must | To Do (Pos-MVP) | [EPIC-M014-002](epics/EPIC-M014-002.md) |
+| EPIC-M014-003 | Contestacao e Auditoria | UC03 | Must | To Do (Pos-MVP) | [EPIC-M014-003](epics/EPIC-M014-003.md) |
 | EPIC-M014-004 | Justificativas de Despesa (NF, Diaria, Invoice) | UC04 | Must | Done | [EPIC-M014-004](epics/EPIC-M014-004.md) |
 | EPIC-M014-005 | Documentos Fiscais e Integracao SERPRO | UC05 | Must | Done | [EPIC-M014-005](epics/EPIC-M014-005.md) |
 | EPIC-M014-006 | Itens de Documento Fiscal e Associacao Contabil | UC06 | Must | Done | [EPIC-M014-006](epics/EPIC-M014-006.md) |
 | EPIC-M014-007 | Orcamentos de Fornecedor | UC07 | Must | Done | [EPIC-M014-007](epics/EPIC-M014-007.md) |
 | EPIC-M014-008 | Fluxo de Submissao e Analise (V1) | UC08 | Must | Done | [EPIC-M014-008](epics/EPIC-M014-008.md) |
+| EPIC-M014-009 | Prazos Temporais da Prestacao (30d submissao + 30d reposicao) | UC09 | Must | To Do (Pos-MVP) | [EPIC-M014-009](epics/EPIC-M014-009.md) |
 
 > **Nota:** Os EPICs do legado EP-01 a EP-04 (Contas Bancarias, Orcamento, Contas Contabeis, Transacoes Financeiras) estao implementados no backend `ConectaFapes.PrestacaoContas` mas pertencem conceitualmente a M016 (Contabilidade e Financeiro). Ver [debito tecnico](#debito-tecnico).
 
@@ -74,7 +75,23 @@ EPIC-M014-008 (Fluxo de Submissao e Analise V1)  <- depende de todos os anterior
 ├── US-M014-027 Aprovar Prestacao (EM_ANALISE → FINALIZADO)
 ├── US-M014-028 Negar Prestacao (EM_ANALISE → NEGADO)
 └── US-M014-029 Solicitar Revisao (EM_ANALISE → REVISAO)
+
+EPIC-M014-009 (Prazos Temporais)  [Pos-MVP]  <- depende de EPIC-M014-008
+├── US-M014-030 Validar Prazo de Submissao (30 dias)
+├── US-M014-031 Validar e Registrar Reposicao de Valor (30 dias)
+└── US-M014-032 Notificar Coordenador dos Prazos em Aberto
 ```
+
+## Pos-MVP
+
+Os EPICs abaixo tratam de escopo **fora do backend atual** (ver [README — Escopo Pos-MVP](README.md#escopo-pos-mvp-fora-do-backend-atual)). Estao documentados com User Stories e Gherkin mas aguardam decisao formal para entrar em desenvolvimento.
+
+| EPIC | Tema | Itens cobertos |
+|------|------|----------------|
+| [EPIC-M014-002](epics/EPIC-M014-002.md) | Analise de Prestacao de Contas (recusa com justificativa, prazo 15d) | Fluxo formal de recusa, gatilho de contestacao |
+| [EPIC-M014-003](epics/EPIC-M014-003.md) | Contestacao e Auditoria SECONT | Contestacao (15d), reanalise, auditoria SECONT, 6 estados adicionais |
+| [EPIC-M014-009](epics/EPIC-M014-009.md) | Prazos Temporais | Prazo 30d para submissao, prazo 30d para reposicao, notificacoes T-7/T-3/T-0 |
+| DT-M014-002 | Maquina de 11 estados | Transversal — infraestrutura que habilita EPIC-002 + -003 |
 
 ---
 

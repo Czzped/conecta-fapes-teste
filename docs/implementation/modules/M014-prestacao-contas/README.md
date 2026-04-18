@@ -59,14 +59,15 @@ Notas fiscais eletronicas (NF-e) sao validadas via API SERPRO pela `ChaveAcesso`
 
 ## Escopo Pos-MVP (fora do backend atual)
 
-O backend atual (`ConectaFapes.PrestacaoContas.*`) implementa o ciclo nuclear `RASCUNHO → EM_ANALISE → {FINALIZADO | NEGADO | REVISAO}` com dois atores (Coordenador e Responsavel FAPES). Os conceitos abaixo **aparecem em issues de discovery e em iteracoes anteriores da documentacao** mas **nao estao no backend atual** e sao classificados como evolucao pos-MVP. Eles exigem decisao formal antes de voltarem ao escopo.
+O backend atual (`ConectaFapes.PrestacaoContas.*`) implementa o ciclo nuclear `RASCUNHO → EM_ANALISE → {FINALIZADO | NEGADO | REVISAO}` com dois atores (Coordenador e Responsavel FAPES). Os temas abaixo **aparecem em issues de discovery e em iteracoes anteriores da documentacao** mas **nao estao no backend atual** e sao classificados como evolucao pos-MVP. Cada tema esta formalizado como EPIC com User Stories e cenarios Gherkin, aguardando decisao para entrar em desenvolvimento.
 
-| Tema | Situacao atual | Necessario para reintegrar |
-|------|---------------|----------------------------|
-| **Contestacao de parecer (coordenador contesta recusa em ate 15 dias)** | Fora do backend. Presente em iteracoes anteriores e mencionado em issue #1756. | Novo agregado `Contestacao` ou estados adicionais; prazo legal (Art. 15, III; Art. 27, II) a validar com juridico. |
-| **Auditoria SECONT (orgao externo audita prestacoes finalizadas)** | Fora do backend. SECONT nao e ator no M014 atual. Persona existe em `personas.md`. | Estados adicionais (`EmAuditoria`, `Auditada`); perfil de acesso; relatorios. |
-| **Prazo de 30 dias para submeter prestacao apos encerramento do periodo** | Fora do backend. Regra presente em documentacao anterior. | Validador temporal na transicao `RASCUNHO → EM_ANALISE`; definicao do "encerramento do periodo". |
-| **Prazo de 30 dias para reposicao de valores apos recusa** | Fora do backend. Aparece em issue #1723 (banner `Reprovado`). | Integracao com M013/M016 para lancamento financeiro; workflow de cobranca. |
-| **Maquina de estados expandida (11 estados: inclui EmContestacao, EmReanalise, AprovadaFinal, RecusadaFinal, EmAuditoria, Auditada)** | `modelo-comportamental.md` ainda descreve 11 estados (versao pre-alinhamento). | Sincronizar diagrama com backend atual (5 estados) ou expandir backend para suportar os 11. |
+| Tema Pos-MVP | EPIC | User Stories |
+|--------------|------|--------------|
+| **Contestacao de parecer (coordenador contesta recusa em ate 15 dias)** | [EPIC-M014-003 — Contestacao e Auditoria](epics/EPIC-M014-003.md) | US-M014-008 Contestar Recusa; US-M014-009 Analisar Contestacao |
+| **Auditoria SECONT (orgao externo audita prestacoes finalizadas)** | [EPIC-M014-003 — Contestacao e Auditoria](epics/EPIC-M014-003.md) | US-M014-010 Auditar Prestacao SECONT |
+| **Recusa formal com justificativa detalhada (prazo para contestacao)** | [EPIC-M014-002 — Analise de Prestacao](epics/EPIC-M014-002.md) | US-M014-005 Analisar Documentos; US-M014-006 Recusar com Justificativa; US-M014-007 Aprovar Prestacao |
+| **Prazo de 30 dias para submeter prestacao apos encerramento do periodo** | [EPIC-M014-009 — Prazos Temporais](epics/EPIC-M014-009.md) | US-M014-030 Validar Prazo de Submissao |
+| **Prazo de 30 dias para reposicao de valores apos recusa** (citado em issue [#1723](https://github.com/leds-conectafapes/conectafapes-project/issues/1723)) | [EPIC-M014-009 — Prazos Temporais](epics/EPIC-M014-009.md) | US-M014-031 Validar e Registrar Reposicao; US-M014-032 Notificar Prazos em Aberto |
+| **Maquina de estados expandida (11 estados: inclui EmContestacao, EmReanalise, AprovadaFinal, RecusadaFinal, EmAuditoria, Auditada)** | Transversal (DT-M014-002 no [backlog](backlog.md#debito-tecnico)) | Infraestrutura que habilita EPIC-M014-002 + EPIC-M014-003 |
 
-> Qualquer issue que pressuponha esses conceitos (ex.: #1756 discovery de contestacao/SECONT) deve declarar explicitamente que depende de reintegrar o escopo ao backend.
+> Qualquer issue que pressuponha esses conceitos (ex.: [#1756](https://github.com/leds-conectafapes/conectafapes-project/issues/1756) discovery de contestacao/SECONT) deve declarar explicitamente que depende de reintegrar o escopo ao backend.
