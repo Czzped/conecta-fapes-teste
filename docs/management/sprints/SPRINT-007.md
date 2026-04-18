@@ -36,6 +36,19 @@
 
 ---
 
+## Produtos Impactados
+
+| Produto | EPICs/Features | Modulos backend | Issues da sprint |
+|---------|---------------|-----------------|------------------|
+| [Portal Admin](../../products/portal-admin/README.md) | EPA-07 Gestao de Parcerias (novo), M008 via EPA-04 e outros | M008, M010 | 19 (8 M008 + 11 M010) |
+| [Portal Admin](../../products/portal-admin/README.md) + [Portal Coordenador](../../products/portal-coordenador/README.md) | Extrato do Projeto (M014) | M014 | 5 (dev) + 1 (discovery) = 6 |
+| [Portal Admin](../../products/portal-admin/README.md) | Discovery Captacao de Iniciativas | M011 | 1 (discovery) |
+| [Portal Coordenador](../../products/portal-coordenador/README.md) | Monitoramento UNAC | — | 1 |
+| [Importador](../../products/importador/README.md) | Documentacao e KPIs SIGFAPES | M002 | 1 |
+| Cross-product ([Portal Admin](../../products/portal-admin/README.md) + [Portal Coordenador](../../products/portal-coordenador/README.md)) | Discovery de Melhorias (jornadas de usuario) | — | 1 |
+
+---
+
 ## Premissa Nao Negociavel — Testes
 
 > **Todo codigo entregue neste sprint DEVE ter testes unitarios e testes de integracao.** Sem excecoes.
@@ -67,35 +80,35 @@
 
 > EPIC: [#1748](https://github.com/leds-conectafapes/conectafapes-project/issues/1748) Instituicoes e Unidades | [#1745](https://github.com/leds-conectafapes/conectafapes-project/issues/1745) Finalidades
 
-| Feature | Issue | Documentacao | Status |
-|---------|-------|-------------|--------|
-| Cadastrar Instituicao | [#1749](https://github.com/leds-conectafapes/conectafapes-project/issues/1749) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md), [EPIC-M008-002](../../implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-002.md) | ⚪ To Do |
-| Cadastrar Unidade Organizacional | [#1750](https://github.com/leds-conectafapes/conectafapes-project/issues/1750) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md), [EPIC-M008-002](../../implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-002.md) | ⚪ To Do |
-| Cadastrar Dirigente | [#1751](https://github.com/leds-conectafapes/conectafapes-project/issues/1751) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md), [EPIC-M008-002](../../implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-002.md) | ⚪ To Do |
-| Listar e Consultar Instituicoes | [#1752](https://github.com/leds-conectafapes/conectafapes-project/issues/1752) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md), [EPIC-M008-002](../../implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-002.md) | ⚪ To Do |
-| Vincular Pessoa a Instituicao/Unidade | [#1753](https://github.com/leds-conectafapes/conectafapes-project/issues/1753) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md), [Modelo Pessoas](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-pessoas.md) | ⚪ To Do |
-| Cadastrar e Gerenciar Area Tecnica | [#1754](https://github.com/leds-conectafapes/conectafapes-project/issues/1754) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md), [Modelo Pessoas](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-pessoas.md) | ⚪ To Do |
-| Cadastrar Finalidade | [#1746](https://github.com/leds-conectafapes/conectafapes-project/issues/1746) | [Modelo Referencia](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-referencia.md) | ⚪ To Do |
-| Listar Finalidades | [#1747](https://github.com/leds-conectafapes/conectafapes-project/issues/1747) | [Modelo Referencia](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-referencia.md) | ⚪ To Do |
+| Feature | Issue | Produto | Documentacao | Status |
+|---------|-------|---------|--------------|--------|
+| Cadastrar Instituicao | [#1749](https://github.com/leds-conectafapes/conectafapes-project/issues/1749) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md) | ⚪ To Do |
+| Cadastrar Unidade Organizacional | [#1750](https://github.com/leds-conectafapes/conectafapes-project/issues/1750) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md) | ⚪ To Do |
+| Cadastrar Dirigente | [#1751](https://github.com/leds-conectafapes/conectafapes-project/issues/1751) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md) | ⚪ To Do |
+| Listar e Consultar Instituicoes | [#1752](https://github.com/leds-conectafapes/conectafapes-project/issues/1752) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md) | ⚪ To Do |
+| Vincular Pessoa a Instituicao/Unidade | [#1753](https://github.com/leds-conectafapes/conectafapes-project/issues/1753) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Pessoas](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-pessoas.md) | ⚪ To Do |
+| Cadastrar e Gerenciar Area Tecnica | [#1754](https://github.com/leds-conectafapes/conectafapes-project/issues/1754) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Pessoas](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-pessoas.md) | ⚪ To Do |
+| Cadastrar Finalidade | [#1746](https://github.com/leds-conectafapes/conectafapes-project/issues/1746) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Referencia](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-referencia.md) | ⚪ To Do |
+| Listar Finalidades | [#1747](https://github.com/leds-conectafapes/conectafapes-project/issues/1747) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Referencia](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-referencia.md) | ⚪ To Do |
 
 ### Vinicius Estevam — Parcerias (M010)
 
 > EPIC: [#1724](https://github.com/leds-conectafapes/conectafapes-project/issues/1724) Portal Admin — Parcerias
 > **Mudancas de escopo nesta sprint**: domınio M010 refatorado — Coordenacao e Finalidade removidas do dominio (#1741 e #1742 fechadas). Adicionadas 7 novas US: Vigencia (aditivo), Aditivo de Aporte, Anexar Documentos, Aporte em Programa, Invariante Temporal, Saldo, Remover Parceria.
 
-| Feature | Issue | Documentacao | Status |
-|---------|-------|-------------|--------|
-| Cadastrar e Formalizar Parceria (RN19) | [#1739](https://github.com/leds-conectafapes/conectafapes-project/issues/1739) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md), [Contrato](../../implementation/modules/M010-planejamento-estrategia/contrato.md), [EPIC](../../implementation/modules/M010-planejamento-estrategia/parcerias/epics/EPIC-M010-002.md) | ⚪ To Do |
-| Registrar Aporte Financeiro (inflow, isAditivo) | [#1740](https://github.com/leds-conectafapes/conectafapes-project/issues/1740) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md), [Contrato](../../implementation/modules/M010-planejamento-estrategia/contrato.md) | ⚪ To Do |
-| Listar e Consultar Parcerias | [#1743](https://github.com/leds-conectafapes/conectafapes-project/issues/1743) | [Contrato](../../implementation/modules/M010-planejamento-estrategia/contrato.md), [Contrato API](../../implementation/modules/M010-planejamento-estrategia/contrato-api.md) | ⚪ To Do |
-| Encerrar Parceria (cascata RI2) | [#1744](https://github.com/leds-conectafapes/conectafapes-project/issues/1744) | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | ⚪ To Do |
-| Registrar Vigencia (Aditivo) | [#1791](https://github.com/leds-conectafapes/conectafapes-project/issues/1791) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
-| Registrar Aditivo de Aporte Financeiro | [#1792](https://github.com/leds-conectafapes/conectafapes-project/issues/1792) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
-| Anexar Documentos a Parceria | [#1793](https://github.com/leds-conectafapes/conectafapes-project/issues/1793) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
-| Registrar Aporte Financeiro Parceria em Programa (N:N) | [#1794](https://github.com/leds-conectafapes/conectafapes-project/issues/1794) | [Programas — Estrutural](../../implementation/modules/M010-planejamento-estrategia/programas/modelo-estrutural.md) | ⚪ To Do |
-| Validar Invariante Temporal Programa/Parceria (RN13) | [#1795](https://github.com/leds-conectafapes/conectafapes-project/issues/1795) | [Programas — Comportamental](../../implementation/modules/M010-planejamento-estrategia/programas/modelo-comportamental.md) | ⚪ To Do |
-| Consultar Saldo da Parceria (RN14) | [#1796](https://github.com/leds-conectafapes/conectafapes-project/issues/1796) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
-| Remover Parceria (RI3) | [#1797](https://github.com/leds-conectafapes/conectafapes-project/issues/1797) | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | ⚪ To Do |
+| Feature | Issue | Produto | Documentacao | Status |
+|---------|-------|---------|--------------|--------|
+| Cadastrar e Formalizar Parceria (RN19) | [#1739](https://github.com/leds-conectafapes/conectafapes-project/issues/1739) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md), [EPIC](../../implementation/modules/M010-planejamento-estrategia/parcerias/epics/EPIC-M010-002.md) | ⚪ To Do |
+| Registrar Aporte Financeiro (inflow, isAditivo) | [#1740](https://github.com/leds-conectafapes/conectafapes-project/issues/1740) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
+| Listar e Consultar Parcerias | [#1743](https://github.com/leds-conectafapes/conectafapes-project/issues/1743) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Contrato API](../../implementation/modules/M010-planejamento-estrategia/contrato-api.md) | ⚪ To Do |
+| Encerrar Parceria (cascata RI2) | [#1744](https://github.com/leds-conectafapes/conectafapes-project/issues/1744) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | ⚪ To Do |
+| Registrar Vigencia (Aditivo) | [#1791](https://github.com/leds-conectafapes/conectafapes-project/issues/1791) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
+| Registrar Aditivo de Aporte Financeiro | [#1792](https://github.com/leds-conectafapes/conectafapes-project/issues/1792) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
+| Anexar Documentos a Parceria | [#1793](https://github.com/leds-conectafapes/conectafapes-project/issues/1793) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
+| Registrar Aporte Financeiro Parceria em Programa (N:N) | [#1794](https://github.com/leds-conectafapes/conectafapes-project/issues/1794) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Programas — Estrutural](../../implementation/modules/M010-planejamento-estrategia/programas/modelo-estrutural.md) | ⚪ To Do |
+| Validar Invariante Temporal Programa/Parceria (RN13) | [#1795](https://github.com/leds-conectafapes/conectafapes-project/issues/1795) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Programas — Comportamental](../../implementation/modules/M010-planejamento-estrategia/programas/modelo-comportamental.md) | ⚪ To Do |
+| Consultar Saldo da Parceria (RN14) | [#1796](https://github.com/leds-conectafapes/conectafapes-project/issues/1796) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
+| Remover Parceria (RI3) | [#1797](https://github.com/leds-conectafapes/conectafapes-project/issues/1797) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | ⚪ To Do |
 
 **Issues fechadas** (concepts removidos do dominio M010):
 - ~~[#1741](https://github.com/leds-conectafapes/conectafapes-project/issues/1741) Registrar Coordenacao~~ — `Coordenacao` removida de M010 (parcerias nao tem coordenador no dominio atual)
@@ -105,38 +118,38 @@
 
 > EPIC: [#1718](https://github.com/leds-conectafapes/conectafapes-project/issues/1718) Extrato do Projeto
 
-| Feature | Issue | Documentacao | Status |
-|---------|-------|-------------|--------|
-| Extrato do Projeto (EPIC) | [#1718](https://github.com/leds-conectafapes/conectafapes-project/issues/1718) | [M014 Backlog](../../implementation/modules/M014-prestacao-contas/backlog.md) | ⚪ To Do |
-| Listagem paginada do Extrato | [#1721](https://github.com/leds-conectafapes/conectafapes-project/issues/1721) | [M014 Contrato API](../../implementation/modules/M014-prestacao-contas/contrato-api.md) | ⚪ To Do |
-| Controle de Gastos do Projeto | [#1719](https://github.com/leds-conectafapes/conectafapes-project/issues/1719) | [M014 Modelo Estrutural](../../implementation/modules/M014-prestacao-contas/modelo-estrutural.md) | ⚪ To Do |
-| Filtros do Extrato do Projeto | [#1720](https://github.com/leds-conectafapes/conectafapes-project/issues/1720) | [M014 Contrato API](../../implementation/modules/M014-prestacao-contas/contrato-api.md) | ⚪ To Do |
-| Detalhes do extrato conforme status | [#1723](https://github.com/leds-conectafapes/conectafapes-project/issues/1723) | [M014 Modelo Comportamental](../../implementation/modules/M014-prestacao-contas/modelo-comportamental.md) | ⚪ To Do |
+| Feature | Issue | Produto | Documentacao | Status |
+|---------|-------|---------|--------------|--------|
+| Extrato do Projeto (EPIC) | [#1718](https://github.com/leds-conectafapes/conectafapes-project/issues/1718) | [Portal Admin](../../products/portal-admin/README.md) + [Portal Coordenador](../../products/portal-coordenador/README.md) | [M014 Backlog](../../implementation/modules/M014-prestacao-contas/backlog.md) | ⚪ To Do |
+| Listagem paginada do Extrato | [#1721](https://github.com/leds-conectafapes/conectafapes-project/issues/1721) | [Portal Admin](../../products/portal-admin/README.md) + [Portal Coordenador](../../products/portal-coordenador/README.md) | [M014 Contrato API](../../implementation/modules/M014-prestacao-contas/contrato-api.md) | ⚪ To Do |
+| Controle de Gastos do Projeto | [#1719](https://github.com/leds-conectafapes/conectafapes-project/issues/1719) | [Portal Admin](../../products/portal-admin/README.md) + [Portal Coordenador](../../products/portal-coordenador/README.md) | [M014 Modelo Estrutural](../../implementation/modules/M014-prestacao-contas/modelo-estrutural.md) | ⚪ To Do |
+| Filtros do Extrato do Projeto | [#1720](https://github.com/leds-conectafapes/conectafapes-project/issues/1720) | [Portal Admin](../../products/portal-admin/README.md) + [Portal Coordenador](../../products/portal-coordenador/README.md) | [M014 Contrato API](../../implementation/modules/M014-prestacao-contas/contrato-api.md) | ⚪ To Do |
+| Detalhes do extrato conforme status | [#1723](https://github.com/leds-conectafapes/conectafapes-project/issues/1723) | [Portal Admin](../../products/portal-admin/README.md) + [Portal Coordenador](../../products/portal-coordenador/README.md) | [M014 Modelo Comportamental](../../implementation/modules/M014-prestacao-contas/modelo-comportamental.md) | ⚪ To Do |
 
 ### Leticia — Design de Produto (Fase de Discovery)
 
-| Feature | Modulo | Issue | Documentacao | Status |
-|---------|--------|-------|-------------|--------|
-| Discovery Prestacao de Contas (jornadas, prototipos, DoD dos EPICs 002/003) | M014 | [#1756](https://github.com/leds-conectafapes/conectafapes-project/issues/1756) | [M014 Backlog](../../implementation/modules/M014-prestacao-contas/backlog.md), [Modelo Comportamental](../../implementation/modules/M014-prestacao-contas/modelo-comportamental.md) | ⚪ To Do |
-| Discovery Captacao de Iniciativas (jornadas, prototipos, DoD dos EPICs 001-007) | M011 | [#1757](https://github.com/leds-conectafapes/conectafapes-project/issues/1757) | [M011 Backlog](../../implementation/modules/M011-configuracao-captacao/backlog.md), [Analise Prototipo](../../implementation/modules/M011-configuracao-captacao/specifications/analise-prototipo-captacao.md) | ⚪ To Do |
+| Feature | Modulo | Issue | Produto | Documentacao | Status |
+|---------|--------|-------|---------|--------------|--------|
+| Discovery Prestacao de Contas | M014 | [#1756](https://github.com/leds-conectafapes/conectafapes-project/issues/1756) | [Portal Admin](../../products/portal-admin/README.md) + [Portal Coordenador](../../products/portal-coordenador/README.md) | [M014 Backlog](../../implementation/modules/M014-prestacao-contas/backlog.md) | ⚪ To Do |
+| Discovery Captacao de Iniciativas | M011 | [#1757](https://github.com/leds-conectafapes/conectafapes-project/issues/1757) | [Portal Admin](../../products/portal-admin/README.md) | [M011 Backlog](../../implementation/modules/M011-configuracao-captacao/backlog.md) | ⚪ To Do |
 
 ### Mateus Lannes — Importacao SIGFAPES (M002)
 
-| Feature | Issue | Documentacao | Status |
-|---------|-------|-------------|--------|
-| Documentar e monitorar o sistema de Importacao SIGFAPES | [#1760](https://github.com/leds-conectafapes/conectafapes-project/issues/1760) | [Importador README](../../products/importador/README.md), [M002 Backlog](../../implementation/modules/M002-importacao-editais/backlog.md) | ⚪ To Do |
+| Feature | Issue | Produto | Documentacao | Status |
+|---------|-------|---------|--------------|--------|
+| Documentar e monitorar o sistema de Importacao SIGFAPES | [#1760](https://github.com/leds-conectafapes/conectafapes-project/issues/1760) | [Importador](../../products/importador/README.md) | [M002 Backlog](../../implementation/modules/M002-importacao-editais/backlog.md) | ⚪ To Do |
 
 ### Marcela + Leticia — Discovery de Melhorias
 
-| Feature | Issue | Status |
-|---------|-------|--------|
-| Mapear jornadas de usuario, coletar feedback, registrar melhorias e novas features | [#1755](https://github.com/leds-conectafapes/conectafapes-project/issues/1755) | ⚪ To Do |
+| Feature | Issue | Produto | Status |
+|---------|-------|---------|--------|
+| Mapear jornadas de usuario, coletar feedback, registrar melhorias e novas features | [#1755](https://github.com/leds-conectafapes/conectafapes-project/issues/1755) | Cross-product ([Portal Admin](../../products/portal-admin/README.md) + [Portal Coordenador](../../products/portal-coordenador/README.md)) | ⚪ To Do |
 
 ### Marcela + Leticia — Monitoramento UNAC
 
-| Feature | Issue | Status |
-|---------|-------|--------|
-| Monitorar cadastro e uso do Portal Coordenador UNAC (relatorio com usuarios, problemas e melhorias) | [#1759](https://github.com/leds-conectafapes/conectafapes-project/issues/1759) | ⚪ To Do |
+| Feature | Issue | Produto | Status |
+|---------|-------|---------|--------|
+| Monitorar cadastro e uso do Portal Coordenador UNAC (relatorio com usuarios, problemas e melhorias) | [#1759](https://github.com/leds-conectafapes/conectafapes-project/issues/1759) | [Portal Coordenador](../../products/portal-coordenador/README.md) | ⚪ To Do |
 
 ---
 
@@ -236,35 +249,35 @@
 
 ### Progresso Detalhado
 
-| # | Responsavel | Feature | Issue | Status |
-|---|-------------|---------|-------|--------|
-| 1 | Vinicius | Cadastrar Instituicao | #1749 | ⚪ To Do |
-| 2 | Vinicius | Cadastrar Unidade Organizacional | #1750 | ⚪ To Do |
-| 3 | Vinicius | Vincular Pessoa a Instituicao/Unidade | #1753 | ⚪ To Do |
-| 4 | Vinicius | Cadastrar e Gerenciar Area Tecnica | #1754 | ⚪ To Do |
-| 5 | Vinicius | Cadastrar Dirigente | #1751 | ⚪ To Do |
-| 6 | Vinicius | Listar e Consultar Instituicoes | #1752 | ⚪ To Do |
-| 7 | Vinicius | Cadastrar Finalidade | #1746 | ⚪ To Do |
-| 8 | Vinicius | Listar Finalidades | #1747 | ⚪ To Do |
-| 9 | Vinicius | Cadastrar e Formalizar Parceria (RN19) | #1739 | ⚪ To Do |
-| 10 | Vinicius | Registrar Aporte Financeiro (inflow) | #1740 | ⚪ To Do |
-| 11 | Vinicius | Listar e Consultar Parcerias | #1743 | ⚪ To Do |
-| 12 | Vinicius | Encerrar Parceria (cascata RI2) | #1744 | ⚪ To Do |
-| 13 | Vinicius | Registrar Vigencia (Aditivo) | #1791 | ⚪ To Do |
-| 14 | Vinicius | Registrar Aditivo de Aporte Financeiro | #1792 | ⚪ To Do |
-| 15 | Vinicius | Anexar Documentos a Parceria | #1793 | ⚪ To Do |
-| 16 | Vinicius | Registrar Aporte Parceria em Programa (N:N) | #1794 | ⚪ To Do |
-| 17 | Vinicius | Validar Invariante Temporal RN13 | #1795 | ⚪ To Do |
-| 18 | Vinicius | Consultar Saldo da Parceria | #1796 | ⚪ To Do |
-| 19 | Vinicius | Remover Parceria (RI3) | #1797 | ⚪ To Do |
-| 20 | Manoel | Extrato do Projeto (EPIC) | #1718 | ⚪ To Do |
-| 21 | Manoel | Listagem paginada do Extrato | #1721 | ⚪ To Do |
-| 22 | Manoel | Controle de Gastos do Projeto | #1719 | ⚪ To Do |
-| 23 | Manoel | Filtros do Extrato do Projeto | #1720 | ⚪ To Do |
-| 24 | Manoel | Detalhes do extrato conforme status | #1723 | ⚪ To Do |
-| 25 | Leticia | Discovery Prestacao de Contas | #1756 | ⚪ To Do |
-| 26 | Leticia | Discovery Captacao de Iniciativas | #1757 | ⚪ To Do |
-| 27 | Marcela + Leticia | Jornadas e melhorias de usuario | #1755 | ⚪ To Do |
+| # | Responsavel | Feature | Issue | Produto | Status |
+|---|-------------|---------|-------|---------|--------|
+| 1 | Vinicius | Cadastrar Instituicao | #1749 | Portal Admin | ⚪ To Do |
+| 2 | Vinicius | Cadastrar Unidade Organizacional | #1750 | Portal Admin | ⚪ To Do |
+| 3 | Vinicius | Vincular Pessoa a Instituicao/Unidade | #1753 | Portal Admin | ⚪ To Do |
+| 4 | Vinicius | Cadastrar e Gerenciar Area Tecnica | #1754 | Portal Admin | ⚪ To Do |
+| 5 | Vinicius | Cadastrar Dirigente | #1751 | Portal Admin | ⚪ To Do |
+| 6 | Vinicius | Listar e Consultar Instituicoes | #1752 | Portal Admin | ⚪ To Do |
+| 7 | Vinicius | Cadastrar Finalidade | #1746 | Portal Admin | ⚪ To Do |
+| 8 | Vinicius | Listar Finalidades | #1747 | Portal Admin | ⚪ To Do |
+| 9 | Vinicius | Cadastrar e Formalizar Parceria (RN19) | #1739 | Portal Admin / EPA-07 | ⚪ To Do |
+| 10 | Vinicius | Registrar Aporte Financeiro (inflow) | #1740 | Portal Admin / EPA-07 | ⚪ To Do |
+| 11 | Vinicius | Listar e Consultar Parcerias | #1743 | Portal Admin / EPA-07 | ⚪ To Do |
+| 12 | Vinicius | Encerrar Parceria (cascata RI2) | #1744 | Portal Admin / EPA-07 | ⚪ To Do |
+| 13 | Vinicius | Registrar Vigencia (Aditivo) | #1791 | Portal Admin / EPA-07 | ⚪ To Do |
+| 14 | Vinicius | Registrar Aditivo de Aporte Financeiro | #1792 | Portal Admin / EPA-07 | ⚪ To Do |
+| 15 | Vinicius | Anexar Documentos a Parceria | #1793 | Portal Admin / EPA-07 | ⚪ To Do |
+| 16 | Vinicius | Registrar Aporte Parceria em Programa (N:N) | #1794 | Portal Admin / EPA-07 | ⚪ To Do |
+| 17 | Vinicius | Validar Invariante Temporal RN13 | #1795 | Portal Admin / EPA-07 | ⚪ To Do |
+| 18 | Vinicius | Consultar Saldo da Parceria | #1796 | Portal Admin / EPA-07 | ⚪ To Do |
+| 19 | Vinicius | Remover Parceria (RI3) | #1797 | Portal Admin / EPA-07 | ⚪ To Do |
+| 20 | Manoel | Extrato do Projeto (EPIC) | #1718 | Portal Admin + Portal Coordenador | ⚪ To Do |
+| 21 | Manoel | Listagem paginada do Extrato | #1721 | Portal Admin + Portal Coordenador | ⚪ To Do |
+| 22 | Manoel | Controle de Gastos do Projeto | #1719 | Portal Admin + Portal Coordenador | ⚪ To Do |
+| 23 | Manoel | Filtros do Extrato do Projeto | #1720 | Portal Admin + Portal Coordenador | ⚪ To Do |
+| 24 | Manoel | Detalhes do extrato conforme status | #1723 | Portal Admin + Portal Coordenador | ⚪ To Do |
+| 25 | Leticia | Discovery Prestacao de Contas | #1756 | Portal Admin + Portal Coordenador | ⚪ To Do |
+| 26 | Leticia | Discovery Captacao de Iniciativas | #1757 | Portal Admin | ⚪ To Do |
+| 27 | Marcela + Leticia | Jornadas e melhorias de usuario | #1755 | Cross-product | ⚪ To Do |
 
 > **Legenda:** ⚪ To Do | 🔵 In Progress | 🟢 Done
 

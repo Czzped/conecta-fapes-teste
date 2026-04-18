@@ -37,6 +37,7 @@ O Portal Admin e a interface principal para operadores, gerentes e diretores da 
 | M004 | Pagamento Bolsistas — folhas, remessas, retornos, guias |
 | M005 | Autenticacao |
 | M008 | Cadastros Corporativos — pessoas, instituicoes, areas tecnicas |
+| M010 | Planejamento Estrategico — Plano, Eixos, Programas e Parcerias (aportes, vigencias, documentos regularizadores) |
 
 ---
 

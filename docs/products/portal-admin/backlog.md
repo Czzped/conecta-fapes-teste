@@ -2,7 +2,7 @@
 
 [← Voltar ao Portal Admin](README.md) | [Roadmap](../../management/roadmap.md) | [Releases 2026](../../management/releases-2026.csv)
 
-> Versao: 2026-04-14
+> Versao: 2026-04-18
 
 | ID | Titulo | Detalhes | Modulos backend | Status |
 |----|--------|----------|-----------------|--------|
@@ -12,6 +12,7 @@
 | EPA-04 | Gestao de Aditivos e Suspensao | [EPA-04](features/EPA-04-gestao-aditivos-suspensao.md) | M009, M015 | Planejado (Q2) |
 | EPA-05 | Gestao Financeira e Contabil | [EPA-05](features/EPA-05-gestao-financeira-contabil.md) | M016 | Planejado (Q2) |
 | EPA-06 | Reajuste de Bolsas e Expansao UNAC | [EPA-06](features/EPA-06-reajuste-bolsas-unac.md) | M004 | Planejado (Q2) |
+| EPA-07 | Gestao de Parcerias | [EPA-07](features/EPA-07-gestao-parcerias.md) | M010 | Em desenvolvimento (sprint-007) |
 
 ## Grafo de Dependencias
 
@@ -23,12 +24,14 @@ graph TD
   EPA04["EPA-04: Gestao de Aditivos e Suspensao"]
   EPA05["EPA-05: Gestao Financeira e Contabil"]
   EPA06["EPA-06: Reajuste de Bolsas e Expansao UNAC"]
+  EPA07["EPA-07: Gestao de Parcerias"]
 
   EPA02 --> EPA01
   EPA03 --> EPA01
   EPA01 --> EPA04
   EPA01 --> EPA05
   EPA01 --> EPA06
+  EPA07 --> EPA02
 ```
 
 ## Modulos Backend Consumidos
@@ -42,6 +45,7 @@ graph TD
 | [M005](../../implementation/modules/M005-autenticacao/README.md) | Autenticacao via Acesso Cidadao | A definir |
 | [M008](../../implementation/modules/M008-cadastros-corporativos/README.md) | Pessoas, instituicoes, areas tecnicas | 3 EPICs (In Progress) |
 | [M009](../../implementation/modules/M009-gestao-bolsista/README.md) | Gestao de aditivos (admin) | 2 In Progress, 2 To Do |
+| [M010](../../implementation/modules/M010-planejamento-estrategia/README.md) | Plano Estrategico, Programas e Parcerias (aportes, vigencias, documentos) | 3 EPICs (EPIC-M010-002 In Progress) |
 | [M015](../../implementation/modules/M015-suspensao-finalizacao/README.md) | Suspensao de bolsas | 2 EPICs (To Do) |
 | [M016](../../implementation/modules/M016-contabilidade-financeiro/README.md) | Gestao financeira e contabil | 3 EPICs (To Do) |
 
