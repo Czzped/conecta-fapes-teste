@@ -44,6 +44,19 @@ classDiagram
         PARCERIA
     }
 
+    class FundoFinanceiro {
+        +String codigo
+        +String nome
+        +String descricao
+        +EstadoFundo estado
+    }
+
+    class EstadoFundo {
+        <<enumeration>>
+        ATIVO
+        INATIVO
+    }
+
     class ContaBancaria {
         +String banco
         +String agencia
@@ -125,6 +138,7 @@ classDiagram
     AssociacaoConta "*" --> "0..1" Iniciativa : iniciativa
     AssociacaoConta "*" --> "0..1" Programa : programa
     AssociacaoConta "*" --> "0..1" Parceria : parceria
+    FundoFinanceiro "1" --> "*" ContaBancaria : alimentadoPor
     ContaBancaria "*" --> "0..1" Iniciativa : vinculada a
     ContaBancaria "*" --> "0..1" Programa : compartilhada por
     ContaBancaria "*" --> "0..1" Parceria : dedicada a
@@ -149,6 +163,10 @@ classDiagram
 | | ativa | Indica se a conta esta ativa para lancamentos | Sim | Boolean | true/false | | |
 | **AssociacaoConta** | tipo | Tipo da entidade associada a conta | Sim | TipoAssociacao | Iniciativa, Programa, Parceria | | |
 | | dataAssociacao | Data em que a associacao foi realizada | Gerado | Date | | | |
+| **FundoFinanceiro** | codigo | Codigo de identificacao unico do fundo | Gerado | String | Ex: FF-2026-001 | | Sim |
+| | nome | Nome do fundo financeiro | Sim | String | Ex: Fundo de Pesquisa e Inovacao | 300 | |
+| | descricao | Descricao da finalidade e origem do fundo | Sim | String | | 1000 | |
+| | estado | Estado do fundo | Gerado | EstadoFundo | `ATIVO` / `INATIVO` | | |
 | **ContaBancaria** | banco | Nome ou codigo do banco | Sim | String | Ex: Banco do Brasil, Banestes | 100 | |
 | | agencia | Numero da agencia bancaria | Sim | String | Ex: 0001 | 10 | |
 | | numeroConta | Numero da conta bancaria | Sim | String | Ex: 12345-6 | 20 | Sim |

@@ -46,6 +46,7 @@ classDiagram
         +Decimal valorInvestido
         +Date dataAporte
         +boolean isAditivo
+        +ContaBancaria contaBancariaDestino
     }
 
     %% Entidades externas
@@ -61,6 +62,10 @@ classDiagram
         <<fora do escopo - M008>>
     }
 
+    class ContaBancaria {
+        <<fora do escopo - M016>>
+    }
+
     class Programa {
         <<fora do escopo - M010/programas>>
     }
@@ -74,6 +79,7 @@ classDiagram
     Parceria "1" --> "0..*" AporteFinanceiro : tem
     AporteFinanceiro "1" --> "1" Instituicao : origem
     AporteFinanceiro "1" --> "1" Documento : regulariza
+    AporteFinanceiro "*" --> "1" ContaBancaria : depositadoEm
     Vigencia "1..*" --> "1" Documento : formalizadoPor
     Parceria "1" --> "0..*" Documento : regulariza
     Documento "1..*" --> "1" TipoDocumento : classificadoComo
@@ -107,6 +113,7 @@ classDiagram
 | | isAditivo | Original (`false`) ou aditivo (`true`); aditivo exige `dataAporte` posterior ao original (RN17) | Sim | Boolean | Padrao: `false` | | |
 | | documento (relacao) | Documento (M008) classificado como "Termo de Descentralizacao" (RN12) | Sim | FK → Documento | Via `regulariza` | | |
 | | instituicao (relacao) | Instituicao (M008) de origem | Sim | FK → Instituicao | Via `origem` | | |
+| | contaBancariaDestino (relacao) | Conta bancaria (M016) da agencia de fomento que recebe o deposito do aporte | Sim | FK → ContaBancaria (M016) | Via `depositadoEm` | | |
 
 ## Regras de Negocio Aplicaveis
 
@@ -131,6 +138,7 @@ classDiagram
 | `M008/Instituicao` | `origem` (N:1 via AporteFinanceiro) e `envolve` (N:N Parceria-Instituicao) | |
 | `M008/Documento` | `regulariza`, `formalizadoPor` | Termo de Cooperacao, Termo Aditivo, Termo de Descentralizacao, anexos |
 | `M008/TipoDocumento` | Classifica Documento | |
+| `M016/ContaBancaria` | `depositadoEm` (N:1 via AporteFinanceiro) | Conta bancaria da agencia que recebe o deposito; a conta pertence a um `FundoFinanceiro` gerido em M016 |
 
 ## Atributos derivados (prefixo `/`)
 
