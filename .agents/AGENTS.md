@@ -8,11 +8,16 @@ Agent personas and skills for the Conecta FAPES project.
 |-------|-------------|
 | [Product Owner](product-owner/AGENT.md) | Owns the product backlog, writes EPICs with Gherkin US, maintains module documentation |
 
-## Shared Skills
+## Shared Skills (proprias do projeto, com frontmatter)
 
 | Skill | Description |
 |-------|-------------|
 | [DDD](skills/ddd/SKILL.md) | Used by the Product Owner agent to define bounded context, ubiquitous language, invariants, and tactical model consistency when creating or reviewing module documentation |
+
+## Skills Globais em Uso no Projeto
+
+> Ver [**SKILLS.md**](SKILLS.md) — catalogo das skills globais (instaladas em `~/.agents/skills/`) relevantes ao stack do projeto (C#/.NET, Vue/Nuxt, Playwright, xUnit, etc.).
+> Esse catalogo e documentacao humana; as skills ja estao registradas globalmente e disponiveis automaticamente para o Claude.
 
 ## Output Directory
 
