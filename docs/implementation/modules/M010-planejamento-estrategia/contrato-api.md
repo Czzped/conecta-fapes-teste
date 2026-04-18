@@ -1,16 +1,18 @@
 # Contrato de API HTTP — M010 Planejamento e Estrategia
 
-Referencia de dominio e regras de negocio: [contrato.md](contrato.md) | [README.md](README.md)
+Referencia de dominio e regras de negocio: [contrato.md](contrato.md) | [README.md](README.md) | Modelos: [planejamento](planejamento/modelo-estrutural.md) / [programas](programas/modelo-estrutural.md) / [parcerias](parcerias/modelo-estrutural.md)
 
 ## Visao Geral
 
-Este documento especifica o contrato HTTP REST do modulo M010 como bounded context responsavel por plano estrategico, eixos, programas, parcerias e recursos associados ao fomento. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
+Este documento especifica o contrato HTTP REST do modulo M010 (Planejamento e Estrategia) — Plano Estrategico, Eixos, Programas e Parcerias — conforme o modelo de dominio consolidado. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
 
 ### Base URL
 
 ```
-/api/v1/m010
+/api/v1
 ```
+
+> **Nota**: as rotas nao expoem o identificador interno do modulo (`M010`). Os recursos sao expostos diretamente sob `/api/v1/` (ex.: `/parcerias`, `/programas`, `/planos-estrategicos`). A segmentacao por modulo e uma decisao interna de arquitetura e nao deve vazar para clientes externos.
 
 ### Convencoes Gerais
 
@@ -18,20 +20,20 @@ Este documento especifica o contrato HTTP REST do modulo M010 como bounded conte
 |---------|-----------|
 | Formato de corpo | `application/json` |
 | Formato de data | ISO 8601 — `YYYY-MM-DD` |
-| Paginacao | Query params `?page=1&pageSize=20` (padrao: page=1, pageSize=20) |
+| Paginacao | Query params `?page=1&pageSize=20` (padrao: page=1, pageSize=20; max pageSize=100) |
 | Identificadores | Strings opacas (ex: `PE-2026-01`, `PROG-2026-01`, `PAR-2026-03`) |
 | Encoding | UTF-8 |
 | Idioma de erros | Portugues brasileiro |
 
 ### Autorizacao
 
-Todas as rotas exigem autenticacao. O perfil do chamador determina o acesso:
+Todas as rotas exigem autenticacao. Perfis:
 
 | Perfil | Descricao |
 |--------|-----------|
-| `DIRETORIA` | Diretoria da Agencia de Fomento — manutencao e consulta do plano estrategico |
-| `ANALISTA_AGENCIA` | Analista da Agencia de Fomento — gestao de programas e parcerias |
-| `MODULO_INTERNO` | Modulo interno autorizado (M003, M011, M016, M018, M019) — acesso restrito a consultas de referencia |
+| `DIRETORIA` | Manutencao e consulta do plano estrategico |
+| `ANALISTA_AGENCIA` | Gestao de programas e parcerias (Area de Parcerias) |
+| `MODULO_INTERNO` | Modulos consumidores (M003, M011, M016, M018, M019) — apenas consultas |
 
 ---
 
@@ -45,7 +47,7 @@ Todas as respostas de erro seguem o envelope abaixo:
     "code": "CODIGO_DO_ERRO",
     "message": "Mensagem de erro legivel para operador ou modulo consumidor.",
     "details": {
-      "programa": "PROG-2026-01"
+      "parceriaId": "PAR-2026-03"
     }
   }
 }
@@ -57,18 +59,16 @@ Todas as respostas de erro seguem o envelope abaixo:
 |-------------|-----------|-------------|
 | `400 Bad Request` | Dados invalidos | Campos obrigatorios ausentes, formato invalido |
 | `404 Not Found` | Recurso inexistente | Identificador nao encontrado |
-| `409 Conflict` | Conflito de estado ou duplicata | Plano ativo duplicado |
-| `422 Unprocessable Entity` | Violacao de regra de negocio | Estado invalido para a operacao solicitada |
+| `409 Conflict` | Conflito de estado ou duplicata | Plano ativo duplicado, segunda Vigencia original |
+| `422 Unprocessable Entity` | Violacao de regra de negocio | Saldo insuficiente, invariante temporal violado |
 
 ---
 
-## Recursos
+## 1. Plano Estrategico
 
-### 1. Plano Estrategico
+### `POST /api/v1/planos-estrategicos`
 
-#### `POST /api/v1/m010/planos-estrategicos`
-
-Registra ou atualiza plano estrategico com sua vigencia.
+Registra plano estrategico.
 
 - **Autorizacao:** `DIRETORIA`
 - **Operacao de origem:** `RegistrarPlanoEstrategico`
@@ -82,17 +82,9 @@ Registra ou atualiza plano estrategico com sua vigencia.
   "descricao": "Diretrizes para o ciclo de fomento 2026-2029.",
   "dataInicio": "2026-01-01",
   "dataFim": "2029-12-31",
-  "estado": "ATIVO"
+  "ativo": true
 }
 ```
-
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `nome` | string | Sim | Nome do plano estrategico |
-| `descricao` | string | Nao | Descricao das diretrizes do plano |
-| `dataInicio` | string (date) | Sim | Data de inicio da vigencia |
-| `dataFim` | string (date) | Sim | Data de fim da vigencia |
-| `estado` | string (enum) | Sim | Um de: `ATIVO`, `INATIVO`, `EM_ELABORACAO` |
 
 **Response `201 Created`**
 
@@ -101,7 +93,7 @@ Registra ou atualiza plano estrategico com sua vigencia.
   "planoEstrategico": {
     "id": "PE-2026-01",
     "nome": "Plano Estrategico 2026-2029",
-    "estado": "ATIVO",
+    "ativo": true,
     "dataInicio": "2026-01-01",
     "dataFim": "2029-12-31"
   }
@@ -112,226 +104,80 @@ Registra ou atualiza plano estrategico com sua vigencia.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `400` | `PLANO_DADOS_INVALIDOS` | Os dados obrigatorios do plano estrategico nao foram informados corretamente. |
-| `409` | `PLANO_ATIVO_DUPLICADO` | Ja existe outro plano estrategico ativo no periodo informado. |
-| `422` | `VIGENCIA_PLANO_INVALIDA` | A vigencia informada para o plano estrategico e invalida. |
+| `400` | `PLANO_DADOS_INVALIDOS` | Dados obrigatorios do plano estrategico ausentes ou mal formados. |
+| `409` | `PLANO_ATIVO_DUPLICADO` | Ja existe outro plano ativo (RN09). |
+| `422` | `VIGENCIA_PLANO_INVALIDA` | `dataInicio` >= `dataFim`. |
 
----
+### `GET /api/v1/planos-estrategicos`
 
-#### `GET /api/v1/m010/planos-estrategicos`
-
-Lista os planos estrategicos cadastrados.
+Lista planos.
 
 - **Autorizacao:** `DIRETORIA`, `ANALISTA_AGENCIA`
 
-**Query parameters**
+**Query parameters**: `ativo`, `page`, `pageSize`
 
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `estado` | string | Filtra por estado: `ATIVO`, `INATIVO`, `EM_ELABORACAO` |
-| `page` | integer | Numero da pagina (padrao: 1) |
-| `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
+**Response `200 OK`** — objeto `{ items, total, page, pageSize }`
 
-**Response `200 OK`**
+### `GET /api/v1/planos-estrategicos/{id}`
 
-```json
-{
-  "items": [
-    {
-      "id": "PE-2026-01",
-      "nome": "Plano Estrategico 2026-2029",
-      "estado": "ATIVO",
-      "dataInicio": "2026-01-01",
-      "dataFim": "2029-12-31"
-    }
-  ],
-  "total": 1,
-  "page": 1,
-  "pageSize": 20
-}
-```
-
----
-
-#### `GET /api/v1/m010/planos-estrategicos/{id}`
-
-Consulta o detalhe de um plano estrategico.
+Consulta detalhe.
 
 - **Autorizacao:** `DIRETORIA`, `ANALISTA_AGENCIA`, `MODULO_INTERNO`
 
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `id` | string | Identificador do plano estrategico |
-
-**Response `200 OK`**
-
-```json
-{
-  "planoEstrategico": {
-    "id": "PE-2026-01",
-    "nome": "Plano Estrategico 2026-2029",
-    "descricao": "Diretrizes para o ciclo de fomento 2026-2029.",
-    "estado": "ATIVO",
-    "dataInicio": "2026-01-01",
-    "dataFim": "2029-12-31"
-  }
-}
-```
-
 **Erros**
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `PLANO_NAO_ENCONTRADO` | O plano estrategico informado nao foi encontrado. |
+| `404` | `PLANO_NAO_ENCONTRADO` | Plano nao encontrado. |
+
+### `PUT /api/v1/planos-estrategicos/{id}`
+
+Atualiza. **Autorizacao:** `DIRETORIA`. **Idempotencia:** Sim.
 
 ---
 
-#### `PUT /api/v1/m010/planos-estrategicos/{id}`
+## 2. Eixos Estrategicos
 
-Atualiza os dados de um plano estrategico existente (US-M010-001).
+### `POST /api/v1/planos-estrategicos/{planoId}/eixos`
 
-- **Autorizacao:** `DIRETORIA`
-- **Idempotencia:** Sim
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `id` | string | Identificador do plano estrategico |
+Cadastra eixo (RN08). **Autorizacao:** `DIRETORIA`.
 
 **Request body**
 
 ```json
 {
-  "nome": "Plano Estrategico 2026-2030 (Revisado)",
-  "descricao": "Diretrizes atualizadas para o ciclo de fomento.",
-  "dataFim": "2030-12-31"
-}
-```
-
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `nome` | string | Nao | Novo nome do plano |
-| `descricao` | string | Nao | Nova descricao |
-| `dataFim` | string (date) | Nao | Nova data de fim da vigencia |
-
-**Response `200 OK`**
-
-```json
-{
-  "planoEstrategico": {
-    "id": "PE-2026-01",
-    "nome": "Plano Estrategico 2026-2030 (Revisado)",
-    "estado": "ATIVO",
-    "dataFim": "2030-12-31"
-  }
-}
-```
-
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `PLANO_NAO_ENCONTRADO` | O plano estrategico informado nao foi encontrado. |
-| `422` | `VIGENCIA_PLANO_INVALIDA` | A vigencia informada para o plano estrategico e invalida. |
-
----
-
-### 2. Eixos Estrategicos
-
-#### `POST /api/v1/m010/planos-estrategicos/{planoId}/eixos`
-
-Cadastra um eixo estrategico vinculado a um plano (US-M010-002).
-
-- **Autorizacao:** `DIRETORIA`
-- **Idempotencia:** Nao
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `planoId` | string | Identificador do plano estrategico |
-
-**Request body**
-
-```json
-{
-  "codigo": "EIXO-TRANSFORMACAO-DIGITAL",
   "nome": "Transformacao Digital",
-  "descricao": "Iniciativas de inovacao e tecnologia no setor publico."
+  "descricao": "Iniciativas de inovacao e tecnologia.",
+  "prioridade": 1
 }
 ```
-
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `codigo` | string | Sim | Codigo unico do eixo dentro do plano |
-| `nome` | string | Sim | Nome do eixo estrategico |
-| `descricao` | string | Nao | Descricao das diretrizes do eixo |
 
 **Response `201 Created`**
 
 ```json
 {
   "eixoEstrategico": {
-    "id": "EIXO-TRANSFORMACAO-DIGITAL",
+    "id": "EIXO-TD-001",
     "planoId": "PE-2026-01",
-    "nome": "Transformacao Digital"
+    "nome": "Transformacao Digital",
+    "prioridade": 1
   }
 }
 ```
 
-**Erros**
+**Erros**: `404 PLANO_NAO_ENCONTRADO`, `400 EIXO_DADOS_INVALIDOS`, `409 EIXO_CODIGO_DUPLICADO`.
 
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `PLANO_NAO_ENCONTRADO` | O plano estrategico informado nao foi encontrado. |
-| `409` | `EIXO_CODIGO_DUPLICADO` | Ja existe um eixo estrategico com o codigo informado neste plano. |
-| `400` | `EIXO_DADOS_INVALIDOS` | Os dados obrigatorios do eixo nao foram informados corretamente. |
+### `GET /api/v1/planos-estrategicos/{planoId}/eixos`
+
+Lista eixos do plano. **Autorizacao:** `DIRETORIA`, `ANALISTA_AGENCIA`, `MODULO_INTERNO`.
 
 ---
 
-#### `GET /api/v1/m010/planos-estrategicos/{planoId}/eixos`
+## 3. Programas
 
-Lista os eixos estrategicos de um plano.
+### `POST /api/v1/programas`
 
-- **Autorizacao:** `DIRETORIA`, `ANALISTA_AGENCIA`, `MODULO_INTERNO`
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `planoId` | string | Identificador do plano estrategico |
-
-**Response `200 OK`**
-
-```json
-{
-  "planoId": "PE-2026-01",
-  "eixos": [
-    {
-      "id": "EIXO-TRANSFORMACAO-DIGITAL",
-      "nome": "Transformacao Digital",
-      "descricao": "Iniciativas de inovacao e tecnologia no setor publico."
-    }
-  ]
-}
-```
-
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `PLANO_NAO_ENCONTRADO` | O plano estrategico informado nao foi encontrado. |
-
----
-
-### 3. Programas
-
-#### `POST /api/v1/m010/programas`
-
-Registra um novo programa associado a eixos estrategicos.
+Registra programa vinculado a eixos e Instituicao demandante (RN01, RN16).
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
 - **Operacao de origem:** `CriarPrograma`
@@ -342,28 +188,13 @@ Registra um novo programa associado a eixos estrategicos.
 ```json
 {
   "nome": "Programa de Dados Publicos",
-  "eixos": [
-    "EIXO-TRANSFORMACAO-DIGITAL"
-  ],
+  "eixos": ["EIXO-TD-001"],
   "resumo": "Programa voltado a projetos de dados e inovacao.",
-  "beneficios": [
-    "Amplia capacidade analitica do estado."
-  ],
-  "resultadosEsperados": [
-    "Publicacao de datasets abertos."
-  ],
-  "parceriaReferenciaId": "PAR-2026-03"
+  "dataInicio": "2026-01-01",
+  "dataFim": "2028-12-31",
+  "instituicaoDemandanteId": "INST-2026-010"
 }
 ```
-
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `nome` | string | Sim | Nome do programa |
-| `eixos` | array (string) | Sim | Lista de identificadores de eixos estrategicos |
-| `resumo` | string | Nao | Resumo do programa |
-| `beneficios` | array (string) | Nao | Lista de beneficios esperados |
-| `resultadosEsperados` | array (string) | Nao | Lista de resultados esperados |
-| `parceriaReferenciaId` | string | Nao | Identificador da parceria de referencia (opcional) |
 
 **Response `201 Created`**
 
@@ -371,8 +202,11 @@ Registra um novo programa associado a eixos estrategicos.
 {
   "programa": {
     "id": "PROG-2026-01",
-    "nome": "Programa de Dados Publicos",
-    "estado": "EM_ESTRUTURACAO"
+    "estado": "EM_PLANEJAMENTO",
+    "eixos": ["EIXO-TD-001"],
+    "instituicaoDemandanteId": "INST-2026-010",
+    "dataInicio": "2026-01-01",
+    "dataFim": "2028-12-31"
   }
 }
 ```
@@ -381,59 +215,19 @@ Registra um novo programa associado a eixos estrategicos.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `400` | `PROGRAMA_DADOS_INVALIDOS` | Os dados obrigatorios do programa nao foram informados corretamente. |
-| `422` | `PROGRAMA_SEM_EIXO` | O programa deve estar vinculado a pelo menos um eixo estrategico. |
-| `404` | `EIXO_ESTRATEGICO_NAO_ENCONTRADO` | Um dos eixos informados nao foi encontrado. |
-| `404` | `PARCERIA_NAO_ENCONTRADA` | A parceria de referencia informada nao foi encontrada. |
+| `400` | `PROGRAMA_DADOS_INVALIDOS` | Dados obrigatorios ausentes. |
+| `400` | `INSTITUICAO_DEMANDANTE_AUSENTE` | Programa deve ter uma Instituicao demandante (RN16). |
+| `422` | `PROGRAMA_SEM_EIXO` | Programa deve ter pelo menos um eixo (RN01). |
+| `404` | `EIXO_ESTRATEGICO_NAO_ENCONTRADO` | Eixo informado nao encontrado. |
+| `404` | `INSTITUICAO_NAO_ENCONTRADA` | Instituicao demandante nao encontrada em M008. |
 
----
+### `GET /api/v1/programas`
 
-#### `GET /api/v1/m010/programas`
+Lista com filtros: `nome`, `estado` (`EM_PLANEJAMENTO`/`ATIVO`/`SUSPENSO`/`ENCERRADO`), `eixoId`, `instituicaoDemandanteId`, `page`, `pageSize`.
 
-Lista programas com filtros.
+### `GET /api/v1/programas/{id}`
 
-- **Autorizacao:** `DIRETORIA`, `ANALISTA_AGENCIA`, `MODULO_INTERNO`
-
-**Query parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `nome` | string | Filtra por nome (busca textual) |
-| `estado` | string | Filtra por estado: `EM_ESTRUTURACAO`, `ATIVO`, `ENCERRADO` |
-| `eixoId` | string | Filtra por eixo estrategico |
-| `page` | integer | Numero da pagina (padrao: 1) |
-| `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
-
-**Response `200 OK`**
-
-```json
-{
-  "items": [
-    {
-      "id": "PROG-2026-01",
-      "nome": "Programa de Dados Publicos",
-      "estado": "EM_ESTRUTURACAO"
-    }
-  ],
-  "total": 1,
-  "page": 1,
-  "pageSize": 20
-}
-```
-
----
-
-#### `GET /api/v1/m010/programas/{id}`
-
-Consulta detalhe de um programa, incluindo eixos e recursos.
-
-- **Autorizacao:** `DIRETORIA`, `ANALISTA_AGENCIA`, `MODULO_INTERNO`
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `id` | string | Identificador do programa |
+Consulta com aportes recebidos de parcerias e comite de governanca.
 
 **Response `200 OK`**
 
@@ -441,115 +235,48 @@ Consulta detalhe de um programa, incluindo eixos e recursos.
 {
   "programa": {
     "id": "PROG-2026-01",
-    "nome": "Programa de Dados Publicos",
-    "estado": "EM_ESTRUTURACAO",
-    "eixos": ["EIXO-TRANSFORMACAO-DIGITAL"],
-    "resumo": "Programa voltado a projetos de dados e inovacao.",
-    "parceriaReferenciaId": "PAR-2026-03"
+    "estado": "EM_PLANEJAMENTO",
+    "eixos": ["EIXO-TD-001"],
+    "instituicaoDemandanteId": "INST-2026-010",
+    "dataInicio": "2026-01-01",
+    "dataFim": "2028-12-31",
+    "aportesDeParcerias": [
+      { "parceriaId": "PAR-2026-03", "valor": 150000.0, "dataAporte": "2026-04-10" }
+    ],
+    "totalAportadoPorParcerias": 150000.0
   }
 }
 ```
 
-**Erros**
+### `PUT /api/v1/programas/{id}`
 
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `PROGRAMA_NAO_ENCONTRADO` | O programa informado nao foi encontrado. |
-
----
-
-#### `PUT /api/v1/m010/programas/{id}`
-
-Atualiza os dados de um programa existente (US-M010-010).
-
-- **Autorizacao:** `ANALISTA_AGENCIA`
-- **Idempotencia:** Sim
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `id` | string | Identificador do programa |
-
-**Request body**
-
-```json
-{
-  "resumo": "Programa voltado a projetos de dados, inovacao e governo aberto.",
-  "beneficios": [
-    "Amplia capacidade analitica do estado.",
-    "Promove transparencia."
-  ]
-}
-```
-
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `resumo` | string | Nao | Novo resumo do programa |
-| `beneficios` | array (string) | Nao | Nova lista de beneficios esperados |
-| `resultadosEsperados` | array (string) | Nao | Nova lista de resultados esperados |
-
-**Response `200 OK`**
-
-```json
-{
-  "programa": {
-    "id": "PROG-2026-01",
-    "nome": "Programa de Dados Publicos",
-    "estado": "EM_ESTRUTURACAO"
-  }
-}
-```
+Atualiza. **Invariante RN13**: se houver aportes, `dataInicio`/`dataFim` alterados devem respeitar a vigencia de todas as Parcerias aportantes.
 
 **Erros**
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `PROGRAMA_NAO_ENCONTRADO` | O programa informado nao foi encontrado. |
-| `422` | `PROGRAMA_COM_EDITAIS_VINCULADOS` | Nao e possivel excluir um programa que possua editais vinculados. |
+| `404` | `PROGRAMA_NAO_ENCONTRADO` | Programa nao encontrado. |
+| `422` | `PROGRAMA_FORA_DA_VIGENCIA` | Alteracao viola RN13 (periodo do Programa fora da vigencia de Parceria aportante). |
 
----
+### `DELETE /api/v1/programas/{id}`
 
-#### `DELETE /api/v1/m010/programas/{id}`
-
-Remove um programa sem editais vinculados.
-
-- **Autorizacao:** `ANALISTA_AGENCIA`
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `id` | string | Identificador do programa |
-
-**Response `204 No Content`**
-
-Sem corpo na resposta.
+Remove programa (RI1). **Autorizacao:** `ANALISTA_AGENCIA`.
 
 **Erros**
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `PROGRAMA_NAO_ENCONTRADO` | O programa informado nao foi encontrado. |
-| `422` | `PROGRAMA_COM_EDITAIS_VINCULADOS` | Nao e possivel excluir um programa que possua editais vinculados. |
+| `404` | `PROGRAMA_NAO_ENCONTRADO` | Programa nao encontrado. |
+| `422` | `PROGRAMA_COM_EDITAIS_VINCULADOS` | Existem editais vinculados (RI1). |
 
 ---
 
-### 4. Recursos do Programa
+## 4. Recursos Internos do Programa
 
-#### `POST /api/v1/m010/programas/{id}/recursos`
+Fontes internas como `LOA`, `TESOURO_ESTADUAL`, `FEDERAL`, `OUTRO`. Aportes oriundos de Parcerias usam o recurso 6 (`AporteFinanceiroParceriaPrograma`).
 
-Registra recurso e aporte financeiro de um programa.
-
-- **Autorizacao:** `ANALISTA_AGENCIA`
-- **Operacao de origem:** `RegistrarRecursoDePrograma`
-- **Idempotencia:** Nao
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `id` | string | Identificador do programa |
+### `POST /api/v1/programas/{id}/recursos`
 
 **Request body**
 
@@ -558,140 +285,42 @@ Registra recurso e aporte financeiro de um programa.
   "origem": "TESOURO_ESTADUAL",
   "valor": 500000.0,
   "dataAporte": "2026-02-01",
-  "documento": "DOC-2026-001"
+  "documento": "DOC-REC-2026-001"
 }
 ```
 
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `origem` | string (enum) | Sim | Origem do recurso: `TESOURO_ESTADUAL`, `PARCERIA`, `FEDERAL`, `OUTRO` |
-| `valor` | number | Sim | Valor do aporte |
-| `dataAporte` | string (date) | Sim | Data do aporte |
-| `documento` | string | Condicional | Identificador do documento de descentralizacao (obrigatorio quando aplicavel) |
+**Response `201 Created`** — `{ recursoPrograma: { id, ... } }`.
 
-**Response `201 Created`**
+### `GET /api/v1/programas/{id}/recursos`
 
-```json
-{
-  "recursoPrograma": {
-    "id": "REC-2026-011",
-    "programaId": "PROG-2026-01",
-    "origem": "TESOURO_ESTADUAL",
-    "valor": 500000.0,
-    "dataAporte": "2026-02-01"
-  }
-}
-```
-
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `PROGRAMA_NAO_ENCONTRADO` | O programa informado nao foi encontrado para registro de recurso. |
-| `422` | `SALDO_FONTE_INSUFICIENTE` | O valor informado excede o saldo disponivel da fonte de recursos. |
-| `400` | `DOCUMENTO_APORTE_OBRIGATORIO` | O recurso do programa exige documento de origem ou descentralizacao. |
+Lista recursos do programa.
 
 ---
 
-#### `GET /api/v1/m010/programas/{id}/recursos`
+## 5. Comite de Governanca
 
-Lista os recursos registrados para um programa.
+### `POST /api/v1/programas/{id}/comite`
 
-- **Autorizacao:** `DIRETORIA`, `ANALISTA_AGENCIA`, `MODULO_INTERNO`
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `id` | string | Identificador do programa |
-
-**Response `200 OK`**
-
-```json
-{
-  "programaId": "PROG-2026-01",
-  "recursos": [
-    {
-      "id": "REC-2026-011",
-      "origem": "TESOURO_ESTADUAL",
-      "valor": 500000.0,
-      "dataAporte": "2026-02-01"
-    }
-  ],
-  "totalAportado": 500000.0
-}
-```
-
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `PROGRAMA_NAO_ENCONTRADO` | O programa informado nao foi encontrado. |
-
----
-
-### 5. Comite de Governanca
-
-#### `POST /api/v1/m010/programas/{id}/comite`
-
-Cadastra ou atualiza membros do comite de governanca de um programa (US-M010-011).
-
-- **Autorizacao:** `ANALISTA_AGENCIA`
-- **Idempotencia:** Sim
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `id` | string | Identificador do programa |
+Cadastra/atualiza membros. **Idempotencia:** Sim.
 
 **Request body**
 
 ```json
 {
   "membros": [
-    {
-      "pessoaId": "PF-2026-001",
-      "papel": "PRESIDENTE"
-    },
-    {
-      "pessoaId": "PF-2026-002",
-      "papel": "MEMBRO"
-    }
+    { "pessoaId": "PF-2026-001", "papel": "PRESIDENTE" },
+    { "pessoaId": "PF-2026-002", "papel": "MEMBRO" }
   ]
 }
 ```
 
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `membros` | array | Sim | Lista de membros do comite |
-| `membros[].pessoaId` | string | Sim | Identificador da pessoa fisica em M008 |
-| `membros[].papel` | string (enum) | Sim | Um de: `PRESIDENTE`, `MEMBRO`, `SUPLENTE` |
-
-**Response `200 OK`**
-
-```json
-{
-  "programaId": "PROG-2026-01",
-  "comiteAtualizado": true,
-  "totalMembros": 2
-}
-```
-
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `PROGRAMA_NAO_ENCONTRADO` | O programa informado nao foi encontrado. |
-| `400` | `COMITE_DADOS_INVALIDOS` | Os dados do comite de governanca sao invalidos. |
-
 ---
 
-### 6. Parcerias
+## 6. Parcerias
 
-#### `POST /api/v1/m010/parcerias`
+### `POST /api/v1/parcerias`
 
-Registra uma nova parceria com participantes, vigencia e documentos.
+Registra parceria com Vigencia original e Instituicoes envolvidas (RN10, RN15).
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
 - **Operacao de origem:** `CriarParceria`
@@ -702,24 +331,18 @@ Registra uma nova parceria com participantes, vigencia e documentos.
 ```json
 {
   "nome": "Parceria Inovacao 2026",
-  "instituicoes": [
-    "INST-2026-010"
-  ],
-  "dataInicio": "2026-03-01",
-  "dataFim": "2027-12-31",
+  "numeroDProcesso": "PRC-2026-001",
+  "dataAssinatura": "2026-03-01",
   "objetivo": "Apoiar iniciativas de pesquisa aplicada.",
-  "processo": "PROC-2026-001"
+  "instituicoesIds": ["INST-2026-010", "INST-2026-020"],
+  "vigenciaOriginal": {
+    "dataInicio": "2026-03-01",
+    "dataFim": "2028-12-31",
+    "dataAssinatura": "2026-03-01",
+    "documento": "DOC-TC-2026-001"
+  }
 }
 ```
-
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `nome` | string | Sim | Nome da parceria |
-| `instituicoes` | array (string) | Sim | Lista de identificadores de instituicoes participantes (M008) |
-| `dataInicio` | string (date) | Sim | Data de inicio da vigencia |
-| `dataFim` | string (date) | Sim | Data de fim da vigencia |
-| `objetivo` | string | Sim | Objetivo da parceria |
-| `processo` | string | Nao | Numero ou identificador do processo administrativo |
 
 **Response `201 Created`**
 
@@ -727,10 +350,11 @@ Registra uma nova parceria com participantes, vigencia e documentos.
 {
   "parceria": {
     "id": "PAR-2026-03",
-    "nome": "Parceria Inovacao 2026",
-    "estado": "EM_NEGOCIACAO",
-    "dataInicio": "2026-03-01",
-    "dataFim": "2027-12-31"
+    "estado": "EmElaboracao",
+    "vigenciaInicioCorrente": "2026-03-01",
+    "vigenciaFimCorrente": "2028-12-31",
+    "saldo": 0.0,
+    "instituicoes": ["INST-2026-010", "INST-2026-020"]
   }
 }
 ```
@@ -739,60 +363,19 @@ Registra uma nova parceria com participantes, vigencia e documentos.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `400` | `PARCERIA_DADOS_INVALIDOS` | Os dados obrigatorios da parceria nao foram informados corretamente. |
-| `422` | `PARCERIA_SEM_INSTITUICAO` | A parceria deve ter ao menos uma instituicao participante. |
-| `422` | `VIGENCIA_PARCERIA_INVALIDA` | A vigencia informada para a parceria e invalida. |
+| `400` | `PARCERIA_DADOS_INVALIDOS` | Dados obrigatorios ausentes. |
+| `400` | `VIGENCIA_ORIGINAL_AUSENTE` | `vigenciaOriginal` obrigatoria (RN15). |
+| `422` | `PARCERIA_SEM_INSTITUICAO` | Pelo menos uma Instituicao e obrigatoria (RN10). |
+| `422` | `VIGENCIA_ORIGINAL_INVALIDA` | `dataInicio` >= `dataFim` na Vigencia original. |
+| `404` | `INSTITUICAO_NAO_ENCONTRADA` | Instituicao informada nao encontrada em M008. |
 
----
+### `GET /api/v1/parcerias`
 
-#### `GET /api/v1/m010/parcerias`
+Filtros: `nome`, `estado` (`EmElaboracao`/`Vigente`/`Suspensa`/`Encerrada`), `instituicaoId`, `page`, `pageSize`.
 
-Lista parcerias com filtros.
+### `GET /api/v1/parcerias/{id}`
 
-- **Autorizacao:** `DIRETORIA`, `ANALISTA_AGENCIA`, `MODULO_INTERNO`
-
-**Query parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `nome` | string | Filtra por nome (busca textual) |
-| `estado` | string | Filtra por estado: `EM_NEGOCIACAO`, `VIGENTE`, `ENCERRADA` |
-| `instituicaoId` | string | Filtra por instituicao participante |
-| `page` | integer | Numero da pagina (padrao: 1) |
-| `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
-
-**Response `200 OK`**
-
-```json
-{
-  "items": [
-    {
-      "id": "PAR-2026-03",
-      "nome": "Parceria Inovacao 2026",
-      "estado": "EM_NEGOCIACAO",
-      "dataInicio": "2026-03-01",
-      "dataFim": "2027-12-31"
-    }
-  ],
-  "total": 1,
-  "page": 1,
-  "pageSize": 20
-}
-```
-
----
-
-#### `GET /api/v1/m010/parcerias/{id}`
-
-Consulta detalhe de uma parceria, incluindo programas e movimentacoes.
-
-- **Autorizacao:** `DIRETORIA`, `ANALISTA_AGENCIA`, `MODULO_INTERNO`
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `id` | string | Identificador da parceria |
+Detalhe com Vigencias, aportes recebidos, aportes destinados a programas, documentos, saldo.
 
 **Response `200 OK`**
 
@@ -800,13 +383,112 @@ Consulta detalhe de uma parceria, incluindo programas e movimentacoes.
 {
   "parceria": {
     "id": "PAR-2026-03",
-    "nome": "Parceria Inovacao 2026",
-    "estado": "VIGENTE",
-    "dataInicio": "2026-03-01",
-    "dataFim": "2027-12-31",
-    "objetivo": "Apoiar iniciativas de pesquisa aplicada.",
-    "instituicoes": ["INST-2026-010"],
-    "valorTotalAportado": 120000.0
+    "estado": "Vigente",
+    "vigenciaInicioCorrente": "2026-03-01",
+    "vigenciaFimCorrente": "2029-12-31",
+    "saldo": 350000.0,
+    "vigencias": [
+      { "id": "VIG-2026-001", "isAditivo": false, "dataInicio": "2026-03-01", "dataFim": "2028-12-31" },
+      { "id": "VIG-2027-002", "isAditivo": true, "dataInicio": "2026-03-01", "dataFim": "2029-12-31" }
+    ],
+    "aportesFinanceiros": [
+      { "id": "APO-2026-001", "instituicaoId": "INST-2026-010", "valor": 500000.0, "isAditivo": false }
+    ],
+    "aportesEmProgramas": [
+      { "id": "AFP-2026-001", "programaId": "PROG-2026-01", "valor": 150000.0 }
+    ],
+    "instituicoes": ["INST-2026-010", "INST-2026-020"],
+    "documentos": ["DOC-TC-2026-001", "DOC-ANEXO-2026-005"]
+  }
+}
+```
+
+### `PUT /api/v1/parcerias/{id}`
+
+Atualiza dados cadastrais (nome, objetivo, processo). **Nao altera Vigencia nem saldo.**
+
+### `DELETE /api/v1/parcerias/{id}`
+
+Remove a Parceria em caso de erro de cadastro (RI3).
+
+- **Operacao de origem:** `RemoverParceria`
+- **Autorizacao:** `ANALISTA_AGENCIA`
+
+**Pre-condicao (RI3)**: a Parceria nao pode ter nenhum `AporteFinanceiroParceriaPrograma` vinculado.
+
+**Response `204 No Content`** (sucesso).
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `PARCERIA_NAO_ENCONTRADA` | Parceria nao encontrada. |
+| `422` | `PARCERIA_VINCULADA_A_PROGRAMAS` | Parceria vinculada a Programas; impossivel remover (RI3). `details.programasVinculados` lista os Programas. |
+
+### `POST /api/v1/parcerias/{id}/suspender`
+
+Suspende temporariamente uma Parceria `Vigente` (estado → `Suspensa`). **Autorizacao:** `ANALISTA_AGENCIA`.
+
+**Request body**: `{ "motivo": "..." }` (obrigatorio).
+
+**Erros**: `404 PARCERIA_NAO_ENCONTRADA`, `422 PARCERIA_NAO_VIGENTE`.
+
+### `POST /api/v1/parcerias/{id}/reativar`
+
+Reativa Parceria Suspensa (estado → `Vigente`). Exige hoje em `[vigenciaInicioCorrente, vigenciaFimCorrente]`.
+
+**Erros**: `404`, `422 PARCERIA_NAO_SUSPENSA`, `422 FORA_DA_VIGENCIA`.
+
+### `POST /api/v1/programas/{id}/ativar`
+
+Transiciona Programa para `ATIVO` (exige eixo vinculado e comite definido).
+
+**Erros**: `404 PROGRAMA_NAO_ENCONTRADO`, `422 SEM_EIXO`, `422 SEM_COMITE`, `422 ESTADO_INVALIDO`.
+
+### `POST /api/v1/programas/{id}/suspender`
+
+Suspende Programa Ativo. **Request body**: `{ "motivo": "..." }`.
+
+### `POST /api/v1/programas/{id}/reativar`
+
+Reativa Programa Suspenso.
+
+### `POST /api/v1/programas/{id}/encerrar`
+
+Encerra Programa (transicao de estado distinta de `DELETE /programas/{id}`). Bloqueado se houver editais em andamento (RI1).
+
+**Request body**:
+```json
+{ "dataEncerramento": "2029-12-31", "justificativa": "..." }
+```
+
+**Erros**: `404`, `422 PROGRAMA_COM_EDITAIS_EM_ANDAMENTO` (RI1).
+
+---
+
+### `POST /api/v1/parcerias/{id}/formalizar`
+
+Transiciona a Parceria de `EmElaboracao` para `Vigente` (RN19).
+
+- **Operacao de origem:** `FormalizarParceria`
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Idempotencia:** Sim (rechamadas em estado `Vigente` retornam o estado atual)
+
+**Pre-condicoes (RN19)**
+1. `dataAssinatura` preenchida
+2. Pelo menos 1 `AporteFinanceiro` registrado (original, `isAditivo = false`)
+3. Pelo menos 1 `Documento` anexado (tipicamente Termo de Cooperacao)
+4. Data atual em `[vigenciaInicioCorrente, vigenciaFimCorrente]`
+
+**Request body**: vazio ou `{}`.
+
+**Response `200 OK`**
+
+```json
+{
+  "parceria": {
+    "id": "PAR-2026-03",
+    "estado": "Vigente"
   }
 }
 ```
@@ -815,46 +497,203 @@ Consulta detalhe de uma parceria, incluindo programas e movimentacoes.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `PARCERIA_NAO_ENCONTRADA` | A parceria informada nao foi encontrada. |
+| `404` | `PARCERIA_NAO_ENCONTRADA` | Parceria nao encontrada. |
+| `422` | `FORMALIZACAO_DATA_ASSINATURA_AUSENTE` | `dataAssinatura` da Parceria nao preenchida (RN19). |
+| `422` | `FORMALIZACAO_SEM_APORTE` | Parceria nao possui AporteFinanceiro original registrado (RN19). |
+| `422` | `FORMALIZACAO_SEM_DOCUMENTO` | Parceria nao possui Documento anexado (RN19). |
+| `422` | `FORMALIZACAO_FORA_DA_VIGENCIA` | Data atual fora de `[vigenciaInicioCorrente, vigenciaFimCorrente]` (RN19). |
+
+### `POST /api/v1/parcerias/{id}/encerrar`
+
+Encerra a Parceria. Gatilhos: (a) solicitacao do usuario; (b) expiracao automatica via job `VerificarVigenciaExpirada`. Em ambos os casos, encerra em cascata todos os Programas aportados, exigindo confirmacao explicita (RI2).
+
+- **Autorizacao:** `ANALISTA_AGENCIA` (gatilho manual) | Sistema (gatilho automatico dispara notificacao ao usuario)
+
+**Request body**
+
+```json
+{
+  "dataEncerramento": "2029-12-31",
+  "justificativa": "Cumprimento do plano de trabalho e conclusao de entregas.",
+  "origemGatilho": "USUARIO",
+  "confirmarCascata": false
+}
+```
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| `dataEncerramento` | date | Sim | Data efetiva do encerramento informada pelo usuario |
+| `justificativa` | string | **Sim** | Justificativa textual do encerramento (obrigatoria) |
+| `origemGatilho` | enum `USUARIO` / `EXPIRACAO_VIGENCIA` | Nao (default `USUARIO`) | Origem do pedido |
+| `confirmarCascata` | boolean | Nao (default `false`) | Confirma o encerramento em cascata dos Programas vinculados |
+
+**Fluxo**:
+1. `confirmarCascata = false` → retorna `422 CONFIRMACAO_CASCATA_OBRIGATORIA` com lista dos Programas aportados que serao encerrados.
+2. `confirmarCascata = true` → encerra em cascata todos os Programas (estado `ENCERRADO`), emite evento `ProgramaEncerradoPorCascata` por Programa, e em seguida encerra a Parceria.
+
+**Response `200 OK`**
+
+```json
+{
+  "parceria": { "id": "PAR-2026-03", "estado": "Encerrada", "dataEncerramento": "2029-12-31" },
+  "programasEncerradosEmCascata": ["PROG-2026-001", "PROG-2026-002"],
+  "mensagem": "Parceria e 2 Programas encerrados."
+}
+```
+
+**Response `422 Unprocessable Entity` (aguardando confirmacao)**
+
+```json
+{
+  "error": {
+    "code": "CONFIRMACAO_CASCATA_OBRIGATORIA",
+    "message": "Para encerrar a parceria, todos os Programas vinculados serao encerrados em cascata. Reenvie com `confirmarCascata = true`.",
+    "details": {
+      "programasAfetados": ["PROG-2026-001", "PROG-2026-002"],
+      "origemGatilho": "USUARIO"
+    }
+  }
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `PARCERIA_NAO_ENCONTRADA` | Parceria nao encontrada. |
+| `400` | `JUSTIFICATIVA_AUSENTE` | Justificativa de encerramento e obrigatoria. |
+| `422` | `CONFIRMACAO_CASCATA_OBRIGATORIA` | Aguardando confirmacao explicita do encerramento em cascata (RI2). |
 
 ---
 
-#### `PUT /api/v1/m010/parcerias/{id}`
+## 7. Vigencias da Parceria
 
-Atualiza os dados cadastrais de uma parceria (US-M010-004).
+### `POST /api/v1/parcerias/{id}/vigencias`
 
+Registra **Vigencia aditivo** (`isAditivo = true`). A Vigencia original e criada automaticamente no cadastro da parceria.
+
+- **Operacao de origem:** `RegistrarVigencia`
+- **Autorizacao:** `ANALISTA_AGENCIA`
+
+**Request body**
+
+```json
+{
+  "dataInicio": "2026-03-01",
+  "dataFim": "2029-12-31",
+  "dataAssinatura": "2027-10-15",
+  "justificativa": "Continuidade das atividades de pesquisa.",
+  "documento": "DOC-TA-2027-001"
+}
+```
+
+**Response `201 Created`**
+
+```json
+{
+  "vigencia": {
+    "id": "VIG-2027-002",
+    "parceriaId": "PAR-2026-03",
+    "isAditivo": true,
+    "dataInicio": "2026-03-01",
+    "dataFim": "2029-12-31"
+  },
+  "vigenciaFimCorrente": "2029-12-31"
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `PARCERIA_NAO_ENCONTRADA` | Parceria nao encontrada. |
+| `422` | `PARCERIA_NAO_VIGENTE` | Parceria nao esta no estado Vigente. |
+| `422` | `ADITIVO_DATA_ASSINATURA_INVALIDA` | `dataAssinatura` do aditivo anterior a da Vigencia original (RN06). |
+| `422` | `ADITIVO_DATA_FIM_INVALIDA` | `dataFim` nao posterior a `vigenciaFimCorrente` (RN06). |
+| `409` | `VIGENCIA_ORIGINAL_DUPLICADA` | Ja existe Vigencia com `isAditivo = false` (RN15). |
+
+### `GET /api/v1/parcerias/{id}/vigencias`
+
+Lista todas as Vigencias da parceria (original + aditivos), ordenadas por `dataAssinatura`.
+
+---
+
+## 8. Aportes Financeiros Recebidos
+
+### `POST /api/v1/parcerias/{id}/aportes`
+
+Registra aporte recebido de Instituicao, formalizado por Documento tipo "Termo de Descentralizacao".
+
+- **Operacao de origem:** `RegistrarAporteFinanceiro`
+- **Autorizacao:** `ANALISTA_AGENCIA`
+
+**Request body**
+
+```json
+{
+  "instituicaoId": "INST-2026-010",
+  "valorInvestido": 500000.0,
+  "dataAporte": "2026-03-10",
+  "documentoTermoDescentralizacaoId": "DOC-TD-2026-001",
+  "isAditivo": false
+}
+```
+
+**Response `201 Created`**
+
+```json
+{
+  "aporteFinanceiro": {
+    "id": "APO-2026-001",
+    "parceriaId": "PAR-2026-03",
+    "instituicaoId": "INST-2026-010",
+    "valorInvestido": 500000.0,
+    "isAditivo": false
+  },
+  "saldoCorrente": 500000.0
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `INSTITUICAO_NAO_ENCONTRADA` | Instituicao nao encontrada em M008 (RN04). |
+| `404` | `DOCUMENTO_NAO_ENCONTRADO` | Documento nao encontrado em M008. |
+| `422` | `PARCERIA_SEM_ACORDO` | Parceria sem `dataAssinatura` (RN03). |
+| `422` | `ADITIVO_SEM_ORIGINAL` | Aditivo exige aporte original previo (RN17). |
+| `422` | `ADITIVO_DATA_APORTE_INVALIDA` | `dataAporte` anterior ao aporte original (RN17). |
+
+> **Observacao (RN12)**: o Documento informado e sempre classificado automaticamente com `TipoDocumento = "Termo de Descentralizacao"`, independente do tipo previo. Nao ha erro de "tipo invalido".
+
+### `GET /api/v1/parcerias/{id}/aportes`
+
+Lista aportes recebidos. Filtros: `isAditivo`, `instituicaoId`, `page`, `pageSize`.
+
+### `PUT /api/v1/parcerias/{id}/aportes/{aporteId}`
+
+Edita aporte com `isAditivo = true` (RN18). Recalcula saldo.
+
+- **Operacao de origem:** `EditarAporteFinanceiroAditivo`
 - **Autorizacao:** `ANALISTA_AGENCIA`
 - **Idempotencia:** Sim
 
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `id` | string | Identificador da parceria |
-
-**Request body**
+**Request body** (campos opcionais, enviar apenas os que serao alterados)
 
 ```json
 {
-  "objetivo": "Apoiar iniciativas de pesquisa aplicada e desenvolvimento tecnologico.",
-  "processo": "PROC-2026-002"
+  "valorInvestido": 180000.0,
+  "dataAporte": "2026-10-05",
+  "documentoTermoDescentralizacaoId": "DOC-TD-2026-007B"
 }
 ```
-
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `objetivo` | string | Nao | Novo objetivo da parceria |
-| `processo` | string | Nao | Novo numero do processo administrativo |
 
 **Response `200 OK`**
 
 ```json
 {
-  "parceria": {
-    "id": "PAR-2026-03",
-    "nome": "Parceria Inovacao 2026",
-    "estado": "EM_NEGOCIACAO"
-  }
+  "aporteFinanceiro": { "id": "APO-2026-007", "valorInvestido": 180000.0, "isAditivo": true },
+  "saldoCorrente": 380000.0
 }
 ```
 
@@ -862,103 +701,58 @@ Atualiza os dados cadastrais de uma parceria (US-M010-004).
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `PARCERIA_NAO_ENCONTRADA` | A parceria informada nao foi encontrada. |
+| `404` | `APORTE_NAO_ENCONTRADO` | AporteFinanceiro nao encontrado. |
+| `422` | `APORTE_ORIGINAL_IMUTAVEL` | Aporte com `isAditivo = false` nao pode ser editado por esta operacao (RN18). |
+| `422` | `SALDO_RESULTANTE_INSUFICIENTE` | Edicao tornaria saldo insuficiente para cobrir aportes em Programas (RN14, RN18). |
 
----
+### `DELETE /api/v1/parcerias/{id}/aportes/{aporteId}`
 
-#### `POST /api/v1/m010/parcerias/{id}/encerrar`
+Remove aporte com `isAditivo = true` (RN18). Recalcula saldo.
 
-Encerra uma parceria apos aprovacao da prestacao de contas final (US-M010-009).
-
+- **Operacao de origem:** `RemoverAporteFinanceiroAditivo`
 - **Autorizacao:** `ANALISTA_AGENCIA`
-- **Idempotencia:** Nao
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `id` | string | Identificador da parceria |
-
-**Request body**
-
-```json
-{
-  "justificativa": "Prestacao de contas final aprovada. Parceria concluida com exito.",
-  "dataEncerramento": "2027-12-31"
-}
-```
-
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `justificativa` | string | Sim | Justificativa e resultado da prestacao de contas final |
-| `dataEncerramento` | string (date) | Sim | Data efetiva do encerramento |
 
 **Response `200 OK`**
 
 ```json
-{
-  "parceria": {
-    "id": "PAR-2026-03",
-    "estado": "ENCERRADA",
-    "dataEncerramento": "2027-12-31"
-  }
-}
+{ "removido": true, "saldoCorrente": 200000.0 }
 ```
 
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `PARCERIA_NAO_ENCONTRADA` | A parceria informada nao foi encontrada para encerramento. |
-| `422` | `PARCERIA_COM_PROGRAMAS_ATIVOS` | Nao e possivel encerrar uma parceria que possua programas ativos com editais em andamento. |
-| `422` | `PRESTACAO_CONTAS_NAO_APROVADA` | O encerramento de parceria requer prestacao de contas final aprovada. |
+**Erros**: mesmos de PUT acima (`APORTE_NAO_ENCONTRADO`, `APORTE_ORIGINAL_IMUTAVEL`, `SALDO_RESULTANTE_INSUFICIENTE`).
 
 ---
 
-### 7. Movimentacoes de Parceria
+## 9. Aportes em Programas (N:N Parceria → Programa)
 
-#### `POST /api/v1/m010/parcerias/{id}/movimentacoes`
+### `POST /api/v1/parcerias/{parceriaId}/aportes-programas`
 
-Registra aporte ou aditivo de parceria com justificativa e documento.
+Registra aporte da Parceria em Programa (RN11, RN13, RN14).
 
+- **Operacao de origem:** `RegistrarAporteFinanceiroParceriaPrograma`
 - **Autorizacao:** `ANALISTA_AGENCIA`
-- **Operacao de origem:** `RegistrarMovimentacaoDeParceria`
-- **Idempotencia:** Nao
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `id` | string | Identificador da parceria |
 
 **Request body**
 
 ```json
 {
-  "tipoMovimentacao": "APORTE",
-  "valor": 120000.0,
-  "justificativa": "Aporte inicial da parceria.",
-  "documento": "DOC-PAR-2026-010"
+  "programaId": "PROG-2026-01",
+  "valor": 150000.0,
+  "dataAporte": "2026-04-10"
 }
 ```
-
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `tipoMovimentacao` | string (enum) | Sim | Um de: `APORTE`, `ADITIVO_TEMPO`, `ADITIVO_APORTE` |
-| `valor` | number | Condicional | Obrigatorio para `APORTE` e `ADITIVO_APORTE` |
-| `justificativa` | string | Sim | Justificativa da movimentacao |
-| `documento` | string | Sim | Identificador do documento comprobatorio |
 
 **Response `201 Created`**
 
 ```json
 {
-  "movimentacaoParceria": {
-    "id": "MOV-2026-001",
+  "aporteFinanceiroParceriaPrograma": {
+    "id": "AFP-2026-001",
     "parceriaId": "PAR-2026-03",
-    "tipoMovimentacao": "APORTE",
-    "valor": 120000.0
-  }
+    "programaId": "PROG-2026-01",
+    "valor": 150000.0,
+    "dataAporte": "2026-04-10"
+  },
+  "saldoCorrente": 350000.0
 }
 ```
 
@@ -966,96 +760,101 @@ Registra aporte ou aditivo de parceria com justificativa e documento.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `PARCERIA_NAO_ENCONTRADA` | A parceria informada nao foi encontrada para movimentacao. |
-| `422` | `PARCERIA_NAO_VIGENTE` | A parceria precisa estar vigente para registrar aporte financeiro. |
-| `400` | `DOCUMENTO_MOVIMENTACAO_OBRIGATORIO` | E obrigatorio anexar documento comprobatorio para a movimentacao da parceria. |
+| `404` | `PARCERIA_NAO_ENCONTRADA` | Parceria nao encontrada. |
+| `404` | `PROGRAMA_NAO_ENCONTRADO` | Programa nao encontrado. |
+| `422` | `PARCERIA_NAO_VIGENTE` | Parceria nao esta Vigente (RN11). |
+| `422` | `VALOR_NEGATIVO` | Valor negativo nao e permitido (RN11). |
+| `422` | `SALDO_INSUFICIENTE` | Saldo insuficiente (RN14). |
+| `422` | `PROGRAMA_FORA_DA_VIGENCIA` | Periodo do Programa extrapola vigencia da Parceria (RN13). |
+
+### `GET /api/v1/parcerias/{parceriaId}/aportes-programas`
+
+Lista aportes destinados a programas.
+
+### `GET /api/v1/programas/{programaId}/aportes-parcerias`
+
+Lista aportes recebidos pelo programa (visao dual).
 
 ---
 
-#### `GET /api/v1/m010/parcerias/{id}/movimentacoes`
+## 10. Documentos da Parceria
 
-Lista as movimentacoes financeiras de uma parceria.
+### `POST /api/v1/parcerias/{id}/documentos`
 
+Anexa Documento existente (M008) a parceria.
+
+- **Operacao de origem:** `AnexarDocumentoAParceria`
+- **Autorizacao:** `ANALISTA_AGENCIA`
+
+**Request body**
+
+```json
+{ "documentoId": "DOC-ANEXO-2026-005" }
+```
+
+**Response `201 Created`**
+
+```json
+{ "parceriaId": "PAR-2026-03", "documentoId": "DOC-ANEXO-2026-005", "anexado": true }
+```
+
+**Erros**: `404 PARCERIA_NAO_ENCONTRADA`, `404 DOCUMENTO_NAO_ENCONTRADO`.
+
+### `GET /api/v1/parcerias/{id}/documentos`
+
+Lista documentos anexados. Filtros: `tipoDocumentoId`.
+
+### `DELETE /api/v1/parcerias/{id}/documentos/{documentoId}`
+
+Desvincula Documento da parceria (nao remove o Documento de M008).
+
+---
+
+## 11. Saldo da Parceria
+
+### `GET /api/v1/parcerias/{id}/saldo`
+
+Consulta saldo corrente e composicao (RN14, RN15).
+
+- **Operacao de origem:** `ConsultarSaldoParceria`
 - **Autorizacao:** `DIRETORIA`, `ANALISTA_AGENCIA`, `MODULO_INTERNO`
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `id` | string | Identificador da parceria |
-
-**Query parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `tipoMovimentacao` | string | Filtra por tipo: `APORTE`, `ADITIVO_TEMPO`, `ADITIVO_APORTE` |
-| `page` | integer | Numero da pagina (padrao: 1) |
-| `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
 
 **Response `200 OK`**
 
 ```json
 {
   "parceriaId": "PAR-2026-03",
-  "items": [
-    {
-      "id": "MOV-2026-001",
-      "tipoMovimentacao": "APORTE",
-      "valor": 120000.0,
-      "justificativa": "Aporte inicial da parceria."
-    }
-  ],
-  "total": 1,
-  "page": 1,
-  "pageSize": 20
+  "saldo": 350000.0,
+  "totalRecebido": 500000.0,
+  "totalAportadoEmProgramas": 150000.0,
+  "vigenciaInicioCorrente": "2026-03-01",
+  "vigenciaFimCorrente": "2028-12-31"
 }
 ```
 
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `PARCERIA_NAO_ENCONTRADA` | A parceria informada nao foi encontrada. |
+**Erros**: `404 PARCERIA_NAO_ENCONTRADA`.
 
 ---
 
-### 8. Portfolio Estrategico
+## 12. Portfolio Estrategico
 
-#### `GET /api/v1/m010/portfolio`
+### `GET /api/v1/portfolio`
 
-Consulta plano, programas, parcerias e aportes consolidados.
+Consulta consolidado. Filtros: `planoId`, `estadoPrograma`, `estadoParceria`.
 
-- **Autorizacao:** `DIRETORIA`, `ANALISTA_AGENCIA`, `MODULO_INTERNO`
-- **Operacao de origem:** `ConsultarPortfolioEstrategico`
-
-**Query parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `estadoPrograma` | string | Filtra por estado do programa: `EM_ESTRUTURACAO`, `ATIVO`, `ENCERRADO` |
-| `estadoParceria` | string | Filtra por estado da parceria: `EM_NEGOCIACAO`, `VIGENTE`, `ENCERRADA` |
-| `planoId` | string | Filtra pelo plano estrategico |
+**Autorizacao:** `DIRETORIA`, `ANALISTA_AGENCIA`, `MODULO_INTERNO`.
 
 **Response `200 OK`**
 
 ```json
 {
-  "planoAtivo": {
-    "id": "PE-2026-01",
-    "nome": "Plano Estrategico 2026-2029"
-  },
-  "programas": 4,
-  "parcerias": 3,
-  "valorTotalAportado": 620000.0
+  "planoAtivo": { "id": "PE-2026-01", "nome": "Plano Estrategico 2026-2029" },
+  "totalProgramas": 4,
+  "totalParcerias": 3,
+  "totalAportadoInstituicoes": 1500000.0,
+  "totalAportadoEmProgramas": 620000.0
 }
 ```
-
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `PORTFOLIO_NAO_ENCONTRADO` | Nenhum registro estrategico foi encontrado para os filtros informados. |
-| `400` | `FILTRO_PORTFOLIO_INVALIDO` | Os filtros informados para o portfolio estrategico sao invalidos. |
 
 ---
 
@@ -1063,54 +862,107 @@ Consulta plano, programas, parcerias e aportes consolidados.
 
 | Metodo | Path | Operacao | Autorizacao |
 |--------|------|----------|-------------|
-| `POST` | `/api/v1/m010/planos-estrategicos` | RegistrarPlanoEstrategico | DIRETORIA |
-| `GET` | `/api/v1/m010/planos-estrategicos` | ListarPlanosEstrategicos | DIRETORIA, ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m010/planos-estrategicos/{id}` | ConsultarPlanoEstrategico | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
-| `PUT` | `/api/v1/m010/planos-estrategicos/{id}` | AtualizarPlanoEstrategico | DIRETORIA |
-| `POST` | `/api/v1/m010/planos-estrategicos/{planoId}/eixos` | CadastrarEixoEstrategico | DIRETORIA |
-| `GET` | `/api/v1/m010/planos-estrategicos/{planoId}/eixos` | ListarEixosEstrategicos | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
-| `POST` | `/api/v1/m010/programas` | CriarPrograma | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m010/programas` | ListarProgramas | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
-| `GET` | `/api/v1/m010/programas/{id}` | ConsultarPrograma | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
-| `PUT` | `/api/v1/m010/programas/{id}` | AtualizarPrograma | ANALISTA_AGENCIA |
-| `DELETE` | `/api/v1/m010/programas/{id}` | RemoverPrograma | ANALISTA_AGENCIA |
-| `POST` | `/api/v1/m010/programas/{id}/recursos` | RegistrarRecursoDePrograma | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m010/programas/{id}/recursos` | ListarRecursosDoPrograma | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
-| `POST` | `/api/v1/m010/programas/{id}/comite` | CadastrarComiteGovernanca | ANALISTA_AGENCIA |
-| `POST` | `/api/v1/m010/parcerias` | CriarParceria | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m010/parcerias` | ListarParcerias | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
-| `GET` | `/api/v1/m010/parcerias/{id}` | ConsultarParceria | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
-| `PUT` | `/api/v1/m010/parcerias/{id}` | AtualizarParceria | ANALISTA_AGENCIA |
-| `POST` | `/api/v1/m010/parcerias/{id}/encerrar` | EncerrarParceria | ANALISTA_AGENCIA |
-| `POST` | `/api/v1/m010/parcerias/{id}/movimentacoes` | RegistrarMovimentacaoDeParceria | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m010/parcerias/{id}/movimentacoes` | ListarMovimentacoesDeParceria | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
-| `GET` | `/api/v1/m010/portfolio` | ConsultarPortfolioEstrategico | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/planos-estrategicos` | RegistrarPlanoEstrategico | DIRETORIA |
+| `GET` | `/api/v1/planos-estrategicos` | ListarPlanosEstrategicos | DIRETORIA, ANALISTA_AGENCIA |
+| `GET` | `/api/v1/planos-estrategicos/{id}` | ConsultarPlanoEstrategico | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `PUT` | `/api/v1/planos-estrategicos/{id}` | AtualizarPlanoEstrategico | DIRETORIA |
+| `POST` | `/api/v1/planos-estrategicos/{planoId}/eixos` | CadastrarEixoEstrategico | DIRETORIA |
+| `GET` | `/api/v1/planos-estrategicos/{planoId}/eixos` | ListarEixosEstrategicos | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/programas` | CriarPrograma | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/programas` | ListarProgramas | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `GET` | `/api/v1/programas/{id}` | ConsultarPrograma | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `PUT` | `/api/v1/programas/{id}` | AtualizarPrograma | ANALISTA_AGENCIA |
+| `DELETE` | `/api/v1/programas/{id}` | RemoverPrograma (RI1) | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/programas/{id}/recursos` | RegistrarRecursoDePrograma | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/programas/{id}/recursos` | ListarRecursosDoPrograma | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/programas/{id}/comite` | CadastrarComiteGovernanca | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/programas/{programaId}/aportes-parcerias` | ListarAportesRecebidosPorPrograma | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/parcerias` | CriarParceria | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/parcerias` | ListarParcerias | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `GET` | `/api/v1/parcerias/{id}` | ConsultarParceria | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `PUT` | `/api/v1/parcerias/{id}` | AtualizarParceria | ANALISTA_AGENCIA |
+| `DELETE` | `/api/v1/parcerias/{id}` | RemoverParceria (RI3) | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/parcerias/{id}/formalizar` | FormalizarParceria (RN19) | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/parcerias/{id}/suspender` | SuspenderParceria | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/parcerias/{id}/reativar` | ReativarParceria | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/parcerias/{id}/encerrar` | EncerrarParceria (RI2) | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/programas/{id}/ativar` | AtivarPrograma | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/programas/{id}/suspender` | SuspenderPrograma | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/programas/{id}/reativar` | ReativarPrograma | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/programas/{id}/encerrar` | EncerrarPrograma (RI1) | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/parcerias/{id}/vigencias` | RegistrarVigencia (aditivo) | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/parcerias/{id}/vigencias` | ListarVigencias | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/parcerias/{id}/aportes` | RegistrarAporteFinanceiro | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/parcerias/{id}/aportes` | ListarAportesFinanceiros | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `PUT` | `/api/v1/parcerias/{id}/aportes/{aporteId}` | EditarAporteFinanceiroAditivo (RN18) | ANALISTA_AGENCIA |
+| `DELETE` | `/api/v1/parcerias/{id}/aportes/{aporteId}` | RemoverAporteFinanceiroAditivo (RN18) | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/parcerias/{parceriaId}/aportes-programas` | RegistrarAporteFinanceiroParceriaPrograma | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/parcerias/{parceriaId}/aportes-programas` | ListarAportesEmProgramas | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/parcerias/{id}/documentos` | AnexarDocumentoAParceria | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/parcerias/{id}/documentos` | ListarDocumentosDaParceria | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `DELETE` | `/api/v1/parcerias/{id}/documentos/{documentoId}` | DesanexarDocumento | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/parcerias/{id}/saldo` | ConsultarSaldoParceria | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `GET` | `/api/v1/portfolio` | ConsultarPortfolioEstrategico | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
 
 ---
 
 ## Schemas de Dominio (Referencia)
 
-### PlanoEstrategico
+### Parceria
 
 ```json
 {
   "id": "string",
   "nome": "string",
-  "descricao": "string (opcional)",
-  "estado": "EM_ELABORACAO | ATIVO | INATIVO",
-  "dataInicio": "string (YYYY-MM-DD)",
-  "dataFim": "string (YYYY-MM-DD)"
+  "numeroDProcesso": "string",
+  "dataAssinatura": "YYYY-MM-DD",
+  "objetivo": "string",
+  "estado": "EmElaboracao | Vigente | Suspensa | Encerrada",
+  "vigenciaInicioCorrente": "YYYY-MM-DD",
+  "vigenciaFimCorrente": "YYYY-MM-DD",
+  "saldo": "number",
+  "instituicoes": ["string"]
 }
 ```
 
-### EixoEstrategico
+### Vigencia
 
 ```json
 {
   "id": "string",
-  "planoId": "string",
-  "nome": "string",
-  "descricao": "string (opcional)"
+  "parceriaId": "string",
+  "dataInicio": "YYYY-MM-DD",
+  "dataFim": "YYYY-MM-DD",
+  "dataAssinatura": "YYYY-MM-DD",
+  "isAditivo": "boolean",
+  "justificativa": "string (opcional para original)",
+  "documento": "string (referencia a Documento em M008)"
+}
+```
+
+### AporteFinanceiro
+
+```json
+{
+  "id": "string",
+  "parceriaId": "string",
+  "instituicaoId": "string",
+  "valorInvestido": "number",
+  "dataAporte": "YYYY-MM-DD",
+  "documentoTermoDescentralizacaoId": "string",
+  "isAditivo": "boolean"
+}
+```
+
+### AporteFinanceiroParceriaPrograma
+
+```json
+{
+  "id": "string",
+  "parceriaId": "string",
+  "programaId": "string",
+  "valor": "number",
+  "dataAporte": "YYYY-MM-DD"
 }
 ```
 
@@ -1120,50 +972,12 @@ Consulta plano, programas, parcerias e aportes consolidados.
 {
   "id": "string",
   "nome": "string",
-  "estado": "EM_ESTRUTURACAO | ATIVO | ENCERRADO",
+  "resumo": "string",
+  "estado": "EM_PLANEJAMENTO | ATIVO | SUSPENSO | ENCERRADO",
   "eixos": ["string"],
-  "resumo": "string (opcional)",
-  "parceriaReferenciaId": "string (opcional)"
-}
-```
-
-### RecursoPrograma
-
-```json
-{
-  "id": "string",
-  "programaId": "string",
-  "origem": "TESOURO_ESTADUAL | PARCERIA | FEDERAL | OUTRO",
-  "valor": "number",
-  "dataAporte": "string (YYYY-MM-DD)",
-  "documento": "string (opcional)"
-}
-```
-
-### Parceria
-
-```json
-{
-  "id": "string",
-  "nome": "string",
-  "estado": "EM_NEGOCIACAO | VIGENTE | ENCERRADA",
-  "dataInicio": "string (YYYY-MM-DD)",
-  "dataFim": "string (YYYY-MM-DD)",
-  "objetivo": "string",
-  "instituicoes": ["string"]
-}
-```
-
-### MovimentacaoParceria
-
-```json
-{
-  "id": "string",
-  "parceriaId": "string",
-  "tipoMovimentacao": "APORTE | ADITIVO_TEMPO | ADITIVO_APORTE",
-  "valor": "number (opcional)",
-  "justificativa": "string",
-  "documento": "string"
+  "instituicaoDemandanteId": "string",
+  "dataInicio": "YYYY-MM-DD",
+  "dataFim": "YYYY-MM-DD"
 }
 ```
 
@@ -1175,8 +989,11 @@ Consulta plano, programas, parcerias e aportes consolidados.
 |----------|------|
 | Contrato de aplicacao (operacoes) | [contrato.md](contrato.md) |
 | Dominio e regras de negocio | [README.md](README.md) |
-| Modelo estrutural | [modelo-estrutural.md](modelo-estrutural.md) |
-| Modelo comportamental | [modelo-comportamental.md](modelo-comportamental.md) |
-| EPIC-M010-001 (Gestao do Plano Estrategico) | [epics/EPIC-M010-001.md](epics/EPIC-M010-001.md) |
-| EPIC-M010-002 (Gestao de Parcerias) | [epics/EPIC-M010-002.md](epics/EPIC-M010-002.md) |
-| EPIC-M010-003 (Gestao de Programas) | [epics/EPIC-M010-003.md](epics/EPIC-M010-003.md) |
+| Modelo estrutural — Planejamento | [planejamento/modelo-estrutural.md](planejamento/modelo-estrutural.md) |
+| Modelo estrutural — Programas | [programas/modelo-estrutural.md](programas/modelo-estrutural.md) |
+| Modelo estrutural — Parcerias | [parcerias/modelo-estrutural.md](parcerias/modelo-estrutural.md) |
+| Modelo comportamental — Programas | [programas/modelo-comportamental.md](programas/modelo-comportamental.md) |
+| Modelo comportamental — Parcerias | [parcerias/modelo-comportamental.md](parcerias/modelo-comportamental.md) |
+| EPIC-M010-001 (Plano Estrategico) | [epics/EPIC-M010-001.md](epics/EPIC-M010-001.md) |
+| EPIC-M010-002 (Parcerias) | [epics/EPIC-M010-002.md](epics/EPIC-M010-002.md) |
+| EPIC-M010-003 (Programas) | [epics/EPIC-M010-003.md](epics/EPIC-M010-003.md) |

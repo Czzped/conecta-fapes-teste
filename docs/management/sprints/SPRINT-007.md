@@ -7,7 +7,7 @@
 | **Periodo** | 2026-04-21 a 2026-05-02 |
 | **Milestone** | [MS-01](../milestones.md#ms-01--base-operacional) / [MS-02](../milestones.md#ms-02--ciclo-de-fomento-pre-award) / [MS-03](../milestones.md#ms-03--ciclo-de-fomento-post-award) |
 | **GitHub Milestone** | `milestone: MS-01` |
-| **Goal** | Construir a base cadastral corporativa (Instituicoes, Unidades, Finalidades) para desbloquear o modulo de Parcerias; entregar o extrato financeiro da Prestacao de Contas; iniciar discovery de Captacao de Iniciativas e melhorias de experiencia do usuario |
+| **Goal** | Construir a base cadastral corporativa (Instituicoes, Unidades, Documentos) para desbloquear o modulo de Parcerias (M010 refatorado — Finalidade permanece em M008 mas nao e mais vinculada a Parceria); entregar o extrato financeiro da Prestacao de Contas; iniciar discovery de Captacao de Iniciativas e melhorias de experiencia do usuario |
 
 ---
 
@@ -28,7 +28,7 @@
 | Frente | Responsavel | Objetivo | Issues |
 |--------|-------------|----------|--------|
 | **Cadastros Corporativos** | Vinicius Estevam | Implementar CRUD de Instituicao, UnidadeOrg, AreaTecnica, Finalidade e vinculo de pessoas — pre-requisito para Parcerias | 8 issues (M008) |
-| **Parcerias** | Vinicius Estevam | Implementar cadastro, aportes, coordenacao e consulta de parcerias no Portal Admin | 6 issues (M010) |
+| **Parcerias (M010 refatorado)** | Vinicius Estevam | Implementar cadastro + formalizacao (RN19), Vigencias (original + aditivos), aportes financeiros (inflow/outflow), anexo de Documentos, saldo, encerramento em cascata e remocao em caso de erro | 11 issues (M010) |
 | **Prestacao de Contas** | Manoel | Entregar extrato do projeto com listagem paginada, controle de gastos e filtros | 5 issues (M014) |
 | **Design de Produto** | Leticia | Discovery dos modulos M014 (analise/contestacao) e M011 (captacao completa): jornadas, prototipos e criterios de aceitacao | 2 issues |
 | **Discovery de Melhorias** | Marcela + Leticia | Mapear jornadas de usuario em producao, coletar feedback e registrar melhorias e novas features | 1 issue |
@@ -41,7 +41,7 @@
 > **Todo codigo entregue neste sprint DEVE ter testes unitarios e testes de integracao.** Sem excecoes.
 
 **Aplica-se a:**
-- Todas as issues de desenvolvimento do Vinicius (M008 + M010 — 14 issues)
+- Todas as issues de desenvolvimento do Vinicius (M008 — 8 issues + M010 — 11 issues = 19 issues)
 - Todas as issues do Manoel (M014 — 5 issues)
 - Qualquer PR aberto no sprint
 
@@ -81,15 +81,25 @@
 ### Vinicius Estevam — Parcerias (M010)
 
 > EPIC: [#1724](https://github.com/leds-conectafapes/conectafapes-project/issues/1724) Portal Admin — Parcerias
+> **Mudancas de escopo nesta sprint**: domınio M010 refatorado — Coordenacao e Finalidade removidas do dominio (#1741 e #1742 fechadas). Adicionadas 7 novas US: Vigencia (aditivo), Aditivo de Aporte, Anexar Documentos, Aporte em Programa, Invariante Temporal, Saldo, Remover Parceria.
 
 | Feature | Issue | Documentacao | Status |
 |---------|-------|-------------|--------|
-| Cadastrar Parceria | [#1739](https://github.com/leds-conectafapes/conectafapes-project/issues/1739) | [Modelo Estrutural](../../implementation/modules/M010-planejamento-estrategia/modelo-estrutural.md), [Contrato](../../implementation/modules/M010-planejamento-estrategia/contrato.md) | ⚪ To Do |
-| Registrar Aporte Financeiro | [#1740](https://github.com/leds-conectafapes/conectafapes-project/issues/1740) | [Modelo Estrutural](../../implementation/modules/M010-planejamento-estrategia/modelo-estrutural.md), [Contrato](../../implementation/modules/M010-planejamento-estrategia/contrato.md) | ⚪ To Do |
-| Registrar Coordenacao de Parceria | [#1741](https://github.com/leds-conectafapes/conectafapes-project/issues/1741) | [Modelo Estrutural](../../implementation/modules/M010-planejamento-estrategia/modelo-estrutural.md), [Contrato](../../implementation/modules/M010-planejamento-estrategia/contrato.md) | ⚪ To Do |
-| Associar Finalidade a Parceria | [#1742](https://github.com/leds-conectafapes/conectafapes-project/issues/1742) | [Modelo Estrutural](../../implementation/modules/M010-planejamento-estrategia/modelo-estrutural.md), [Modelo Referencia M008](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-referencia.md) | ⚪ To Do |
+| Cadastrar e Formalizar Parceria (RN19) | [#1739](https://github.com/leds-conectafapes/conectafapes-project/issues/1739) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md), [Contrato](../../implementation/modules/M010-planejamento-estrategia/contrato.md), [EPIC](../../implementation/modules/M010-planejamento-estrategia/parcerias/epics/EPIC-M010-002.md) | ⚪ To Do |
+| Registrar Aporte Financeiro (inflow, isAditivo) | [#1740](https://github.com/leds-conectafapes/conectafapes-project/issues/1740) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md), [Contrato](../../implementation/modules/M010-planejamento-estrategia/contrato.md) | ⚪ To Do |
 | Listar e Consultar Parcerias | [#1743](https://github.com/leds-conectafapes/conectafapes-project/issues/1743) | [Contrato](../../implementation/modules/M010-planejamento-estrategia/contrato.md), [Contrato API](../../implementation/modules/M010-planejamento-estrategia/contrato-api.md) | ⚪ To Do |
-| Encerrar Parceria | [#1744](https://github.com/leds-conectafapes/conectafapes-project/issues/1744) | [Modelo Comportamental](../../implementation/modules/M010-planejamento-estrategia/modelo-comportamental.md) | ⚪ To Do |
+| Encerrar Parceria (cascata RI2) | [#1744](https://github.com/leds-conectafapes/conectafapes-project/issues/1744) | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | ⚪ To Do |
+| Registrar Vigencia (Aditivo) | _a criar_ | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
+| Registrar Aditivo de Aporte Financeiro | _a criar_ | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
+| Anexar Documentos a Parceria | _a criar_ | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
+| Registrar Aporte Financeiro Parceria em Programa (N:N) | _a criar_ | [Programas — Estrutural](../../implementation/modules/M010-planejamento-estrategia/programas/modelo-estrutural.md) | ⚪ To Do |
+| Validar Invariante Temporal Programa/Parceria (RN13) | _a criar_ | [Programas — Comportamental](../../implementation/modules/M010-planejamento-estrategia/programas/modelo-comportamental.md) | ⚪ To Do |
+| Consultar Saldo da Parceria (RN14) | _a criar_ | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
+| Remover Parceria (RI3) | _a criar_ | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | ⚪ To Do |
+
+**Issues fechadas** (concepts removidos do dominio M010):
+- ~~[#1741](https://github.com/leds-conectafapes/conectafapes-project/issues/1741) Registrar Coordenacao~~ — `Coordenacao` removida de M010 (parcerias nao tem coordenador no dominio atual)
+- ~~[#1742](https://github.com/leds-conectafapes/conectafapes-project/issues/1742) Associar Finalidade~~ — `Finalidade` removida de Parceria (permanece em M008 como catalogo geral)
 
 ### Manoel — Prestacao de Contas (M014)
 
