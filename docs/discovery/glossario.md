@@ -62,7 +62,7 @@ Conceitos centrais a M010 (Parcerias e Programas).
 | **Vigencia** | Janela temporal (`dataInicio`, `dataFim`) de uma Parceria. A primeira Vigencia tem `isAditivo = false`; alteracoes posteriores sao novas Vigencias com `isAditivo = true` (RN06). | [M010 parcerias](../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) |
 | **vigenciaInicioCorrente** (derivado) | `MIN(Vigencia.dataInicio)` da Parceria (RN15). | M010 parcerias |
 | **vigenciaFimCorrente** (derivado) | `MAX(Vigencia.dataFim)` da Parceria (RN15). | M010 parcerias |
-| **AporteFinanceiro** | Valor aportado a uma Parceria por uma Instituicao. O primeiro aporte tem `isAditivo = false`; adicionais sao aditivos (RN17). Exige Documento (RN12) e origem em Instituicao M008 (RN04). | [M010 parcerias](../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) |
+| **AporteFinanceiro** | Valor aportado a uma Parceria por uma Instituicao, depositado em `ContaBancaria` (M016) da agencia de fomento. O primeiro aporte tem `isAditivo = false`; adicionais sao aditivos (RN17). Exige Documento (RN12), origem em Instituicao M008 (RN04) e `ContaBancaria` destino em M016. | [M010 parcerias](../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) |
 | **AporteFinanceiroParceriaPrograma** | Relacao N:N entre Parceria e Programa — destino do aporte de uma Parceria em um Programa. Valor sempre `>= 0`, exige Parceria vigente (RN11). | [M010 programas](../implementation/modules/M010-planejamento-estrategia/programas/modelo-estrutural.md) |
 | **Aditivo** | Nova Vigencia ou AporteFinanceiro com `isAditivo = true`, documentado por termo aditivo e sujeito a regras de ordenacao temporal (RN06, RN17). | M010 parcerias |
 | **saldo** (Parceria, derivado) | `SUM(AporteFinanceiro.valorInvestido) − SUM(AporteFinanceiroParceriaPrograma.valor)`, sempre `>= 0` (RN14). | M010 parcerias |
@@ -100,6 +100,8 @@ Conceitos centrais a M010 (Parcerias e Programas).
 
 | Termo | Definicao | Definido em |
 |-------|-----------|-------------|
+| **FundoFinanceiro** | Entidade gerida pela agencia de fomento que concentra recursos recebidos de multiplas fontes. Cada `ContaBancaria` pertence a exatamente um `FundoFinanceiro` (N:1). Permite visibilidade consolidada de saldos e fluxo de caixa por fundo. Implementacao deferida para pos-M014. | [M016](../implementation/modules/M016-contabilidade-financeiro/modelo-estrutural.md) |
+| **ContaBancaria** | Conta bancaria registrada em M016, vinculada a um `FundoFinanceiro` (M016) e opcionalmente a um Programa, Parceria ou Iniciativa. Recebe depositos de `AporteFinanceiro` registrados em M010. | [M016](../implementation/modules/M016-contabilidade-financeiro/modelo-estrutural.md) |
 | **Orcamento do Projeto** | Planejamento financeiro do projeto, com valor total, previsao de bolsas e capital, e rubricas. | [M013](../implementation/modules/M013-gestao-orcamentaria-projeto/README.md) |
 | **Orcamento Anual** | Planejamento financeiro anual agrupando ContasContabeis com limites. Implementado em M014 como debito tecnico (DT-M014-001), pertence conceitualmente a M013. | [M014 modelo-estrutural](../implementation/modules/M014-prestacao-contas/modelo-estrutural.md) |
 | **Rubrica** | Categoria de despesa do orcamento aprovado. Cada rubrica tem limite e pode ter subrubricas hierarquicas. | [M013](../implementation/modules/M013-gestao-orcamentaria-projeto/README.md) |

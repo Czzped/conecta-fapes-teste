@@ -27,6 +27,7 @@ Controle de contas bancarias, fluxo de caixa e gestao financeira dos recursos da
 | 5.2.3 | Conciliacao Bancaria | Reconciliar extratos bancarios com os registros contabeis do sistema | Analista da Area Tecnica da Agencia | Art. 25, III; Art. 27, II |
 | 5.2.4 | Controle de Saldo por Conta | Monitorar saldo disponivel por conta bancaria com alertas de limite minimo | Analista da Area Tecnica da Agencia | Art. 25, III |
 | 5.2.5 | Dashboard Financeiro | Painel consolidado com posicao financeira, saldos, fluxo de caixa e movimentacoes por programa e projeto | Analista da Area Tecnica da Agencia, SECONT | Art. 25, III; Art. 3, 3 |
+| 5.2.6 | Gestao de Fundos Financeiros | Criar e manter fundos financeiros que agregam recursos de multiplas contas bancarias; cada conta pertence a exatamente um fundo (N:1); implementacao deferida para pos-M014 | Analista da Area Tecnica da Agencia | Art. 25, I; Art. 27, II |
 
 ## 5.3 Pagamentos
 

@@ -17,6 +17,7 @@ Especificacao de referencia: [README.md](README.md)
 | EPIC-M016-001 | Plano de Contas | UC01 | Must | To Do | [EPIC-M016-001](epics/EPIC-M016-001.md) |
 | EPIC-M016-002 | Gestao de Contas Bancarias | UC02 | Must | To Do | [EPIC-M016-002](epics/EPIC-M016-002.md) |
 | EPIC-M016-003 | Fluxo de Caixa e Conciliacao | UC03 | Must | To Do | [EPIC-M016-003](epics/EPIC-M016-003.md) |
+| EPIC-M016-004 | Gestao de Fundos Financeiros | UC02 | Must | Deferido (pos-M014) | — |
 
 ---
 
@@ -37,4 +38,9 @@ EPIC-M016-003 (Fluxo de Caixa e Conciliacao)  <- depende de EPIC-M016-002
 ├── US-M016-007 Visualizar Fluxo de Caixa
 ├── US-M016-008 Realizar Conciliacao Bancaria
 └── US-M016-009 Dashboard Financeiro
+
+EPIC-M016-004 (Gestao de Fundos Financeiros)  <- deferido para pos-M014
+├── US-M016-010 Criar Fundo Financeiro
+├── US-M016-011 Associar Conta Bancaria a Fundo (N:1)
+└── US-M016-012 Consultar Saldo Consolidado por Fundo
 ```

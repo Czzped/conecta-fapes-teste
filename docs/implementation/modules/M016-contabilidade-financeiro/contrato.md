@@ -13,6 +13,7 @@ Este contrato documenta a superficie publica do modulo M016 como contexto respon
 | Consumidor | Uso do contrato |
 |------------|-----------------|
 | Gestor financeiro | Mantem contas, lancamentos e conciliacoes |
+| M010 | Referencia `ContaBancaria` como destino de aporte financeiro em `RegistrarAporteFinanceiro` (campo `contaBancariaDestinoId`) |
 | M017 | Consome movimentacoes para monitoramento PLD |
 | M018 e M019 | Consultam saldos, fluxo e dados consolidados para analise e auditoria |
 

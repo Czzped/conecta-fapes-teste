@@ -21,7 +21,7 @@ Definicao do plano estrategico da agencia e seus eixos, que orientam a criacao d
 
 ## 2.2 Gestao de Parcerias
 
-Parcerias sao instrumentos formais de cooperacao entre a agencia e uma ou mais **Instituicoes** (RN10, cadastradas em M008). Uma Parceria possui **Vigencia** (original + aditivos), **AporteFinanceiro** recebido das Instituicoes envolvidas, **Documentos** regularizadores e pode destinar aportes a Programas via `AporteFinanceiroParceriaPrograma` (N:N, RN11).
+Parcerias sao instrumentos formais de cooperacao entre a agencia e uma ou mais **Instituicoes** (RN10, cadastradas em M008). Uma Parceria possui **Vigencia** (original + aditivos), **AporteFinanceiro** recebido das Instituicoes envolvidas e depositado em `ContaBancaria` (M016) da agencia, **Documentos** regularizadores e pode destinar aportes a Programas via `AporteFinanceiroParceriaPrograma` (N:N, RN11).
 
 A vigencia efetiva e derivada: `vigenciaInicioCorrente = MIN(Vigencia.dataInicio)` e `vigenciaFimCorrente = MAX(Vigencia.dataFim)` (RN15). A primeira Vigencia tem `isAditivo = false`; alteracoes posteriores sao novas Vigencias com `isAditivo = true` contendo justificativa e termo aditivo (RN06). Analogamente, o primeiro AporteFinanceiro tem `isAditivo = false`; novos aportes sao aditivos (RN17). Todo AporteFinanceiro exige Documento classificado como `Termo de Descentralizacao` (RN12) e origem em Instituicao (RN04).
 
@@ -46,6 +46,8 @@ O saldo da Parceria e `SUM(AporteFinanceiro.valorInvestido) − SUM(AporteFinanc
 | 2.2.13 | Encerrar Parceria (com cascata) | Transicionar para `Encerrada` por solicitacao do usuario ou expiracao automatica (`vigenciaFimCorrente < hoje`); exige `justificativa` obrigatoria e encerra em cascata todos os Programas aportados apos confirmacao explicita (RI2) | Servidor da Area de Parcerias | Art. 15, III |
 | 2.2.14 | Remover Parceria | Remover Parceria apenas se nao houver `AporteFinanceiroParceriaPrograma` associado (RI3) | Servidor da Area de Parcerias | — |
 | 2.2.15 | Dashboard de Parcerias | Painel consolidado com status, vigencia, saldo e aportes destinados por todas as parcerias | Servidor da Area de Parcerias | Art. 3, 3; Art. 14, VII |
+| 2.2.16 | Relatorio Financeiro por Parceria | Relatorio detalhado de uma parceria com valor total aportado, valor alocado em programas e valor pago (executado) por programa, com percentual de execucao | Gestor da Parceria, Diretoria | Art. 3, 3; Art. 14, VII |
+| 2.2.17 | Painel Geral de Parcerias | Visao de portfolio com KPIs financeiros de todas as parcerias (aportado, alocado, pago, saldos), filtros por estado/instituicao/programa/vigencia e navegacao para relatorio por parceria | Gestor da Parceria, Diretoria | Art. 3, 3; Art. 14, VII |
 
 ## 2.3 Gestao de Programas
 

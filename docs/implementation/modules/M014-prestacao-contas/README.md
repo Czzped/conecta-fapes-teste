@@ -14,6 +14,8 @@
 
 > **Nota sobre implementacao:** Este modulo possui um backend independente (`ConectaFapes.PrestacaoContas.*`) com AppDbContext, SQL Server e integracoes proprias (SERPRO, MinIO). Detalhes de infraestrutura em [architecture/04-dados-e-operacao.md](../../../architecture/04-dados-e-operacao.md). Entidades financeiras (ContaBancaria, Orcamento, ContaContabil, TransacaoFinanceira) estao implementadas neste backend mas pertencem conceitualmente a M016/M013 — ver [debito tecnico](backlog.md#debito-tecnico).
 
+> **Dependencia de M016 — FundoFinanceiro:** A entidade `FundoFinanceiro` e a relacao N:1 entre `ContaBancaria` e `FundoFinanceiro` estao modeladas em M016 mas sua implementacao esta deferida ate que M014 (Prestacao de Contas) esteja concluido, pois os requisitos de segregacao de fundos surgem naturalmente do fluxo de prestacao de contas. Ver [M016 backlog](../M016-contabilidade-financeiro/backlog.md).
+
 ---
 
 ## Sobre o Modulo

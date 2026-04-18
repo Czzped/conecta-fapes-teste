@@ -30,7 +30,7 @@ Na area de gestao financeira, cada iniciativa apoiada, programa ou parceria pode
 
 Dashboards financeiros fornecem visao consolidada de saldos, movimentacoes e projecoes, apoiando gestores na alocacao de recursos e no cumprimento de obrigacoes financeiras.
 
-> Iniciativas sao gerenciadas por M003 como abstracao estrutural, enquanto programas e parcerias sao gerenciados por M010. Este modulo consome esses contextos para operacionalizar a gestao contabil e financeira.
+> Iniciativas sao gerenciadas por M003 como abstracao estrutural, enquanto programas e parcerias sao gerenciados por M010. Este modulo consome esses contextos para operacionalizar a gestao contabil e financeira. O M010 tambem consome este modulo: a operacao `RegistrarAporteFinanceiro` referencia `ContaBancaria` (M016) como destino do deposito via `contaBancariaDestinoId`.
 
 ---
 

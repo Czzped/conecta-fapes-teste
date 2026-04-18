@@ -15,6 +15,7 @@ Este contrato documenta a superficie publica do modulo M013 como contexto respon
 | Coordenador | Solicita adicoes, remanejamentos e realocacoes |
 | Analista da Agencia de Fomento | Analisa e decide solicitacoes orcamentarias |
 | M014 e M019 | Consomem rubricas, saldos e historico para prestacao de contas e auditoria |
+| M010 | Consulta `RubricaProjeto.valorExecutado` por programa (operacao `ConsultarExecucaoPorPrograma`) para calcular valor pago nos relatorios financeiros de parcerias (EPIC-M010-004) |
 
 ### Dependencias
 
@@ -33,6 +34,7 @@ Este contrato documenta a superficie publica do modulo M013 como contexto respon
 | RegistrarParecerSolicitacaoOrcamentaria | Command | Aprovar ou reprovar a solicitacao orcamentaria | solicitacao, aprovado, justificativa | `ParecerSolicitacao` registrado | RN01, RN02, RN05, RN06, RN07 | Solicitacao existente | Solicitacao inexistente, parecer inconsistente | Nao | Analista da Agencia de Fomento ou Diretor quando aplicavel | API interna/backoffice a definir |
 | ConsultarSaldoPorRubrica | Query | Consultar o saldo atualizado das rubricas do projeto | projeto, rubrica | `SaldoRubrica` consolidado | RN06, RN08 | Projeto existente | Projeto nao encontrado | N/A | Usuario interno autorizado | API interna a definir |
 | ConsultarHistoricoOrcamentario | Query | Consultar historico completo das movimentacoes orcamentarias do projeto | projeto, tipoMovimentacao, periodo | Lista de `HistoricoOrcamentario` | RN05, RN06 | Projeto existente | Nenhum historico encontrado | N/A | Usuario interno autorizado | API interna a definir |
+| ConsultarExecucaoPorPrograma | Query | Consultar valor total executado (`SUM(RubricaProjeto.valorExecutado)`) de todos os projetos vinculados a um programa; consumido por M010 para calcular `valorExecutado` nos relatorios financeiros de parcerias | programaId | `{ programaId, valorTotalExecutado, projetos: [{ projetoId, valorExecutado }] }` | RN06 | Programa existente em M010 | Programa nao encontrado, nenhuma rubrica registrada | N/A | M010 (relatorios financeiros de parcerias) | API interna a definir |
 
 ## Padrao de Payload e Erro
 

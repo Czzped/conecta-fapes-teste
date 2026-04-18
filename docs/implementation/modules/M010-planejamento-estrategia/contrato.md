@@ -23,6 +23,9 @@ Este contrato documenta a superficie publica do modulo M010 como contexto respon
 | Dependencia | Tipo | Observacao |
 |-------------|------|------------|
 | M008 | Modulo interno | Fornece `Instituicao`, `Documento` e `TipoDocumento` |
+| M016 | Modulo interno | Fornece `ContaBancaria` como destino do deposito em `RegistrarAporteFinanceiro` (`contaBancariaDestinoId`) — implementacao deferida para pos-M014 |
+| M013 | Modulo interno | Fornece `ConsultarExecucaoPorPrograma` — valor executado por programa, consumido por `GerarRelatorioParceria` e `ConsultarPainelFinanceiroParcerias` |
+| M003 | Modulo interno | Fornece `ConsultarProjetosPorPrograma` — navegacao Projeto ↔ Programa, necessaria para agregar valorExecutado por programa |
 
 ## Operacoes Publicas
 

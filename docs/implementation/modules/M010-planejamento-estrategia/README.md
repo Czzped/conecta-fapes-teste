@@ -46,6 +46,16 @@ M010-planejamento-estrategia/
 | Diretoria da Agencia de Fomento | Mantem Plano Estrategico e Eixos |
 | Servidor da Area Tecnica (Agencia de Fomento) | Mantem Programas (recursos, comite, aportes recebidos) |
 | Servidor da Area de Parcerias (Agencia de Fomento) | Mantem Parcerias (vigencias, aportes, documentos) |
+| Gestor da Parceria / Diretoria | Consulta relatorios financeiros de parcerias (EPIC-M010-004) |
+
+## Dependencias
+
+| Dependencia | Tipo | Observacao |
+|-------------|------|------------|
+| M008 | Modulo interno | Fornece `Instituicao`, `Documento` e `TipoDocumento` |
+| M016 | Modulo interno | Fornece `ContaBancaria` como destino do deposito em `RegistrarAporteFinanceiro` — deferido para pos-M014 |
+| M013 | Modulo interno | Fornece `ConsultarExecucaoPorPrograma` para calculo de `valorExecutado` nos relatorios financeiros de parcerias |
+| M003 | Modulo interno | Fornece `ConsultarProjetosPorPrograma` para navegacao Projeto ↔ Programa nos relatorios |
 
 ---
 

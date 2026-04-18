@@ -15,6 +15,7 @@ Este contrato documenta a superficie publica do modulo M003 como bounded context
 | Analista da Agencia de Fomento | Registra editais, projetos, cotas e alocacoes operacionais |
 | M002 | Sincroniza dados legados do SigFapes para entidades canonicamente gerenciadas por M003 |
 | M011, M012, M015 e modulos correlatos | Consultam edital, projeto e alocacao como referencias operacionais |
+| M010 | Usa `ConsultarProjetosPorPrograma` para agregar `valorExecutado` no relatorio financeiro de parcerias |
 | [Portal Coordenador](../../../products/portal-coordenador/README.md) | Contexto de projeto, equipe, cadastro de bolsista ([EP-02](../../../products/portal-coordenador/features/EP-02-shell-portal-contexto-projeto.md), [EP-06](../../../products/portal-coordenador/features/EP-06-meu-projeto.md), [EP-07](../../../products/portal-coordenador/features/EP-07-minha-equipe-acompanhamento-bolsas.md), [EP-08](../../../products/portal-coordenador/features/EP-08-cadastro-edicao-bolsista.md)) |
 
 ### Dependencias
@@ -34,6 +35,7 @@ Este contrato documenta a superficie publica do modulo M003 como bounded context
 | RegistrarCotaEdital | Command | Cadastrar cotas de bolsa do edital por versao de nivel | editalId, versaoNivel, quantidadeTotal | `CotaEdital` criada | RN04 | Edital existente e versao de nivel valida | VersaoNivel inexistente, quantidade invalida | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | RegistrarAlocacaoBolsista | Command | Registrar a alocacao operacional de um bolsista consumindo uma cota do edital | projetoId, cotaEdital, orientador, bolsista, datas | `AlocacaoBolsista` criada | RN05, RN06 | Projeto e cota existentes | Cota indisponivel, orientador invalido, bolsista invalido | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | ConsultarVisaoOperacionalDoEdital | Query | Consultar a visao consolidada do edital com projetos, cotas e alocacoes | editalId ou codigo | Visao operacional do edital | RN01, RN02, RN04, RN05 | Edital existente | Edital nao encontrado | N/A | Analista da Agencia de Fomento ou modulo interno autorizado | API interna a definir |
+| ConsultarProjetosPorPrograma | Query | Listar projetos vinculados a um programa (via edital); consumido por M010 para agregar valorExecutado no relatorio financeiro de parcerias | programaId | `[{ projetoId, titulo }]` | — | Programa existente | Programa nao encontrado | N/A | Modulo interno autorizado (M010) | API interna a definir |
 
 ## Padrao de Payload e Erro
 
