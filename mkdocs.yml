@@ -117,10 +117,32 @@ nav:
       - Importador:
           - products/importador/README.md
           - Arquitetura: products/importador/architecture.md
+          - Tecnologia: products/importador/technology.md
+          - Integracao: products/importador/integration.md
+          - Debitos Tecnicos: products/importador/tech-debt.md
+          - Backend: products/importador/backend-structure.md
+          - Frontend: products/importador/frontend-structure.md
+          - API Reference: products/importador/api-reference.md
+          - Setup Local: products/importador/setup.md
           - Backlog: products/importador/backlog.md
           - EPI-01 Importacao Editais: products/importador/features/EPI-01-importacao-editais-selecao.md
           - EPI-02 Completar Alocacoes: products/importador/features/EPI-02-completar-alocacoes.md
           - EPI-03 Sincronizacao: products/importador/features/EPI-03-sincronizacao-sigfapes.md
+          - EPI-04 Autenticacao e Sessao: products/importador/features/EPI-04-autenticacao-sessao.md
+          - EPI-05 Metricas e Cobertura: products/importador/features/EPI-05-metricas-cobertura.md
+          - EPI-06 Locks Exclusivos: products/importador/features/EPI-06-locks-exclusivos.md
+          - EPI-07 Upload e Validacao: products/importador/features/EPI-07-upload-validacao-planilha.md
+          - EPI-08 Config Programas: products/importador/features/EPI-08-configuracao-programas.md
+          - EPI-09 Trocar Tipo Recurso: products/importador/features/EPI-09-alternancia-tipo-recurso.md
+          - EPI-10 Historico Planilhas: products/importador/features/EPI-10-historico-planilhas.md
+          - EPI-11 Gerar Planilha Base: products/importador/features/EPI-11-geracao-planilha-base.md
+          - EPI-12 Dump para Diagnostico: products/importador/features/EPI-12-consulta-dump-diagnostico.md
+          - EPI-13 Jobs Assincronos: products/importador/features/EPI-13-jobs-assincronos.md
+          - EPI-14 Integracao Airflow: products/importador/features/EPI-14-integracao-airflow.md
+          - EPI-15 Auditoria de Versoes: products/importador/features/EPI-15-auditoria-versionamento.md
+          - EPI-16 Dump Adaptativo SIGFAPES: products/importador/features/EPI-16-dump-adaptativo-sigfapes.md
+          - EPI-17 Dump Conecta: products/importador/features/EPI-17-dump-conecta.md
+          - EPI-18 Operacoes Internas: products/importador/features/EPI-18-operacoes-internas.md
       - AuthRix:
           - products/authrix/README.md
           - Backlog: products/authrix/backlog.md

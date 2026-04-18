@@ -27,8 +27,15 @@ O Importador e uma ferramenta web operada pela equipe tecnica da FAPES que traz 
 
 | Documento | Descricao |
 |-----------|-----------|
-| [Backlog](backlog.md) | Epicos de produto com rastreabilidade para EPICs do M002 |
-| [Arquitetura](architecture.md) | Stack detalhada, fluxo ponta a ponta e integracao com Airflow e Supabase |
+| [Arquitetura](architecture.md) | Camadas do backend, fluxo ponta a ponta, modelo de dados, decisoes arquiteturais |
+| [Tecnologia](technology.md) | Stack detalhada com versoes, bibliotecas, tecnicas de otimizacao e infra |
+| [Integracao](integration.md) | Como o Importador se conecta a modulos, dominios e infraestrutura do ConectaFAPES |
+| [Debitos Tecnicos](tech-debt.md) | Gap entre stack atual e stack padrao ConectaFAPES + roadmap de convergencia |
+| [Backend](backend-structure.md) | Routers, services, use cases, adapters e feature flags |
+| [Frontend](frontend-structure.md) | Paginas, hooks, componentes e virtual scroll |
+| [Referencia de API](api-reference.md) | Todos os endpoints com auth, body, erros e exemplos |
+| [Setup local](setup.md) | Como rodar backend + frontend em dev |
+| [Backlog](backlog.md) | 18 EPICs com User Stories derivados do codigo |
 
 ---
 
