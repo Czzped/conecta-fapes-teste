@@ -76,6 +76,7 @@ nav:
   - Discovery:
       - Visao do Produto: discovery/product-vision.md
       - Personas: discovery/personas.md
+      - Glossario: discovery/glossario.md
       - Corporativo: discovery/domains/01-corporativo.md
       - Planejamento: discovery/domains/02-planejamento.md
       - Fomento Pre-Award: discovery/domains/03-fomento-pre-award.md

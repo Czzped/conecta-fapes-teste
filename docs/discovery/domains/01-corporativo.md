@@ -1,6 +1,6 @@
 # Domain 01 — Corporativo e Administrativo
 
-Dados mestres transversais a toda a organizacao, gestao de identidades e parametros do sistema.
+Dados mestres transversais a toda a organizacao, gestao de identidades e parametros do sistema. Glossario dos conceitos centrais em [../glossario.md](../glossario.md).
 
 **Modulos que implementam este domain:** M001, M005, M006, M007, M008
 

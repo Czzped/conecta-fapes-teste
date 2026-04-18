@@ -18,19 +18,24 @@
 
 ## Sobre o Modulo
 
-Coordenadores devem submeter documentos fiscais que comprovem a aplicacao dos recursos do projeto. A agencia de fomento analisa e pode rejeitar documentos, e a SECONT realiza auditorias. Atualmente, esse processo e inteiramente baseado em papel e e-mail, sem fluxo digital, sem rastreabilidade e sem reconciliacao automatica entre extrato bancario e despesas declaradas. Este modulo visa resolver esse problema ao digitalizar todo o ciclo de prestacao de contas, desde a importacao do extrato bancario ate a auditoria da SECONT. O sucesso sera medido pela reducao do tempo medio de analise da prestacao de contas e pela taxa de prestacoes aprovadas na primeira submissao.
+Coordenadores submetem documentos fiscais que comprovam a aplicacao dos recursos do projeto, e a agencia de fomento (Responsavel FAPES) analisa e aprova, nega ou devolve para revisao. O modulo digitaliza todo o ciclo de prestacao de contas — desde a preparacao backoffice (importacao de extrato, orcamento anual, contas contabeis, conta bancaria) ate a analise final — substituindo o processo atual baseado em papel e e-mail por um fluxo rastreavel com reconciliacao entre extrato bancario e despesas declaradas. O sucesso sera medido pela reducao do tempo medio de analise e pela taxa de prestacoes aprovadas na primeira submissao.
 
 ---
 
 ## Dominio
 
-A agencia de fomento exige que coordenadores de projetos prestem contas dos recursos recebidos, comprovando cada despesa por meio de documentos fiscais (notas fiscais, recibos, bilhetes aereos, comprovantes de diarias). A prestacao de contas e organizada por rubrica, e cada documento fiscal deve estar vinculado a uma rubrica do orcamento aprovado.
+A prestacao de contas e organizada como um agregado `Prestacao` que agrupa `JustificativaDespesa` (de tipos NF, Diaria ou Invoice internacional) e `TransacaoFinanceira` (lancamentos do extrato bancario vinculados a prestacao). Cada justificativa pode ter ate tres `OrcamentoFornecedor` como comprovacao de melhor preco, dos quais no maximo um e marcado como escolhido.
 
-O fluxo de prestacao de contas segue as seguintes etapas: (1) o Coordenador importa o extrato bancario da conta do projeto; (2) submete os documentos fiscais organizados por tipo de despesa (servicos, produtos, diarias, passagens); (3) a Area Tecnica da agencia de fomento analisa os documentos, verificando conformidade com as rubricas e consistencia com o extrato bancario; (4) caso haja irregularidades, a prestacao e recusada com justificativa; (5) o Coordenador pode contestar a recusa dentro de 15 dias; (6) a Area Tecnica reanalisa a contestacao; (7) apos aprovacao final, a SECONT pode solicitar auditoria a qualquer momento.
+O fluxo opera em duas frentes:
 
-O Coordenador possui 30 dias apos o encerramento do periodo para submeter a prestacao de contas. Uma prestacao aprovada e considerada final e irreversivel. Cada rubrica do orcamento deve ser reconciliada com os documentos fiscais submetidos.
+- **Backoffice (Responsavel FAPES)**: importa transacoes do extrato bancario do projeto, cadastra `Orcamento` anual, `ContaContabil` hierarquica com limites e `ContaBancaria` do projeto.
+- **Frontoffice (Coordenador)**: cria a `Prestacao` em RASCUNHO, vincula transacoes bancarias, registra justificativas, anexa orcamentos de fornecedor, classifica itens de nota fiscal em contas contabeis e submete para analise.
 
-> Projetos e editais sao gerenciados por M003. Orcamentos e rubricas do projeto sao gerenciados por M013. Este modulo consome essas informacoes para operacionalizar a prestacao de contas.
+O ciclo de estados da prestacao e `RASCUNHO → EM_ANALISE → {FINALIZADO | NEGADO | REVISAO → EM_ANALISE}`. Enquanto a prestacao esta `EM_ANALISE`, toda edicao e exclusao das entidades do agregado e bloqueada para preservar a integridade da analise. `FINALIZADO` e `NEGADO` sao estados terminais.
+
+Notas fiscais eletronicas (NF-e) sao validadas via API SERPRO pela `ChaveAcesso` de 44 digitos; NFS-e sao processadas a partir do XML. O `Status` de `TransacaoFinanceira` e derivado do `Status` da `Prestacao` vinculada (ou `PENDENTE` se nao vinculada). O `Saldo` da prestacao e calculado como `ValorTotalTransacoes - ValorTotalJustificativas`.
+
+> Projetos e editais sao gerenciados por M003 (referenciados via `ProjetoRef` e `AlocacaoBolsistaRef` como views externas). Orcamento, ContaContabil, ContaBancaria e TransacaoFinanceira pertencem conceitualmente a M013/M016 mas estao implementados neste backend como debito tecnico — ver [backlog.md](backlog.md#debito-tecnico).
 
 ---
 
@@ -38,14 +43,30 @@ O Coordenador possui 30 dias apos o encerramento do periodo para submeter a pres
 
 | ID | Descricao | Prioridade |
 |----|-----------|------------|
-| RN01 | Todos os documentos fiscais devem conter nota fiscal (NF) ou documento equivalente valido. | Must |
-| RN02 | O extrato bancario importado deve ser conciliado com as despesas declaradas na prestacao de contas. | Must |
-| RN03 | O Coordenador possui 30 dias apos o encerramento do periodo para submeter a prestacao de contas. | Must |
-| RN04 | O Coordenador pode contestar uma recusa dentro de 15 dias a partir da data da notificacao de rejeicao. | Must |
-| RN05 | A SECONT pode solicitar documentos adicionais a qualquer momento durante a auditoria. | Must |
-| RN06 | Uma prestacao de contas aprovada em carater final e irreversivel. | Must |
-| RN07 | Cada rubrica do orcamento do projeto deve ser reconciliada com os documentos fiscais submetidos. | Must |
-| RN08 | Documentos fiscais devem estar vinculados a uma rubrica do projeto. | Must |
-| RN09 | O sistema deve manter trilha de auditoria completa de todas as operacoes sobre a prestacao de contas. | Must |
-| RI1 | Uma prestacao de contas so pode ser submetida para projetos com prestacoes anteriores aprovadas ou sem prestacoes pendentes. | Must |
-| RI2 | A soma dos documentos fiscais de uma rubrica nao pode exceder o saldo aprovado da rubrica no modulo M013. | Must |
+| RN01 | Uma `Prestacao` so pode ser submetida se estiver em `RASCUNHO` ou `REVISAO`. | Must |
+| RN02 | Uma `Prestacao` so pode ser aprovada, negada ou ter revisao solicitada se estiver em `EM_ANALISE`. | Must |
+| RN03 | Enquanto a `Prestacao` esta em `EM_ANALISE`, operacoes de edicao e exclusao nas entidades do agregado (justificativas, documentos fiscais, itens, orcamentos de fornecedor e transacoes vinculadas) sao bloqueadas com erro `PRESTACAO_EM_ANALISE`. | Must |
+| RN04 | Uma `TransacaoFinanceira` so pode estar vinculada a uma `Prestacao` por vez; nova vinculacao e rejeitada se ja houver prestacao associada. | Must |
+| RN05 | Cada `JustificativaDespesa` pode ter ate 3 `OrcamentoFornecedor`, dos quais no maximo um e marcado como escolhido. | Must |
+| RN06 | NF-e sao validadas via API SERPRO por `ChaveAcesso` (44 digitos numericos) antes de vincular o `DocumentoFiscal` a `JustificativaNF`. | Must |
+| RN07 | Cada `ItemDocumentoFiscal` deve ser classificado em uma `ContaContabil`. | Must |
+| RN08 | `FINALIZADO` e `NEGADO` sao estados terminais — prestacoes nesses estados sao irreversiveis. | Must |
+| RI1 | Valores monetarios (`TransacaoFinanceira.Valor`, `JustificativaDespesa.ValorTotal`, `OrcamentoFornecedor.Valor`, `ContaBancaria.SaldoAtual`, `ContaContabil.Limite`) devem ser sempre >= 0. | Must |
+| RI2 | `StatusTransacao` e derivado do `Status` da `Prestacao` vinculada: `RASCUNHO→EM_RASCUNHO`, `EM_ANALISE→EM_ANALISE`, `REVISAO→EM_REVISAO`, `FINALIZADO→APROVADA`, `NEGADO→REJEITADA`; sem vinculo: `PENDENTE`. | Must |
+| RI3 | `ItemDocumentoFiscal.ValorTotal` = `Quantidade × ValorUnitario`. | Must |
+
+---
+
+## Escopo Pos-MVP (fora do backend atual)
+
+O backend atual (`ConectaFapes.PrestacaoContas.*`) implementa o ciclo nuclear `RASCUNHO → EM_ANALISE → {FINALIZADO | NEGADO | REVISAO}` com dois atores (Coordenador e Responsavel FAPES). Os conceitos abaixo **aparecem em issues de discovery e em iteracoes anteriores da documentacao** mas **nao estao no backend atual** e sao classificados como evolucao pos-MVP. Eles exigem decisao formal antes de voltarem ao escopo.
+
+| Tema | Situacao atual | Necessario para reintegrar |
+|------|---------------|----------------------------|
+| **Contestacao de parecer (coordenador contesta recusa em ate 15 dias)** | Fora do backend. Presente em iteracoes anteriores e mencionado em issue #1756. | Novo agregado `Contestacao` ou estados adicionais; prazo legal (Art. 15, III; Art. 27, II) a validar com juridico. |
+| **Auditoria SECONT (orgao externo audita prestacoes finalizadas)** | Fora do backend. SECONT nao e ator no M014 atual. Persona existe em `personas.md`. | Estados adicionais (`EmAuditoria`, `Auditada`); perfil de acesso; relatorios. |
+| **Prazo de 30 dias para submeter prestacao apos encerramento do periodo** | Fora do backend. Regra presente em documentacao anterior. | Validador temporal na transicao `RASCUNHO → EM_ANALISE`; definicao do "encerramento do periodo". |
+| **Prazo de 30 dias para reposicao de valores apos recusa** | Fora do backend. Aparece em issue #1723 (banner `Reprovado`). | Integracao com M013/M016 para lancamento financeiro; workflow de cobranca. |
+| **Maquina de estados expandida (11 estados: inclui EmContestacao, EmReanalise, AprovadaFinal, RecusadaFinal, EmAuditoria, Auditada)** | `modelo-comportamental.md` ainda descreve 11 estados (versao pre-alinhamento). | Sincronizar diagrama com backend atual (5 estados) ou expandir backend para suportar os 11. |
+
+> Qualquer issue que pressuponha esses conceitos (ex.: #1756 discovery de contestacao/SECONT) deve declarar explicitamente que depende de reintegrar o escopo ao backend.

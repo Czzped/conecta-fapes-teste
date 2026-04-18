@@ -1,5 +1,7 @@
 # ConectaFAPES — Personas
 
+> Glossario central de conceitos da plataforma: [glossario.md](glossario.md).
+
 ## Rastreabilidade de Personas por Dominio
 
 | Persona | Dominios onde atua | Modulos principais |

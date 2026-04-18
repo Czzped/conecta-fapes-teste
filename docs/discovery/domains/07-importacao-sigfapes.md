@@ -4,6 +4,8 @@ Dominio responsavel pela migracao operacional de dados do sistema legado **SIGFA
 
 **Modulos que implementam este domain:** M002.
 
+> Glossario dos conceitos centrais em [../glossario.md](../glossario.md).
+
 ---
 
 ## 7.1 Dump e Disponibilizacao dos Dados do SIGFAPES

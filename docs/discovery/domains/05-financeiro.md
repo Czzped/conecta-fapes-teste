@@ -1,6 +1,6 @@
 # Domain 05 — Financeiro
 
-Execucao financeira, controle de contas bancarias, fluxo de caixa, pagamentos, contabilidade e prevencao a lavagem de dinheiro.
+Execucao financeira, controle de contas bancarias, fluxo de caixa, pagamentos, contabilidade e prevencao a lavagem de dinheiro. Glossario dos conceitos centrais em [../glossario.md](../glossario.md).
 
 **Modulos que implementam este domain:** M004, M016, M017
 

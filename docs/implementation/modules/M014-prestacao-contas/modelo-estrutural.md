@@ -31,7 +31,9 @@ classDiagram
     %% Transacao Financeira
     class TransacaoFinanceira {
         +Guid Id
+        +ContaBancaria ContaBancaria
         +Guid TransacaoFinanceiraContaBancariaId
+        +Prestacao? Prestacao
         +Guid? TransacaoFinanceiraPrestacaoId
         +DateTimeOffset Data
         +decimal Valor
@@ -57,14 +59,15 @@ classDiagram
 
     %% Justificativa de Despesa (classe base)
     class JustificativaDespesa {
-        <<abstract>>
         +Guid Id
+        +Prestacao Prestacao
         +Guid JustificativaDespesaPrestacaoId
         +string Descricao
         +decimal ValorTotal
         +string? UrlArquivo
         +ICollection~OrcamentoFornecedor~ Orcamentos
         +AtualizarValorTotal(novoValorTotal)
+        +AtualizarUrlArquivo(urlArquivo)
     }
 
     %% Tipos de Justificativa
@@ -86,6 +89,8 @@ classDiagram
     %% Documento Fiscal
     class DocumentoFiscal {
         +Guid Id
+        +JustificativaNF? JustificativaNF
+        +Guid DocumentoFiscalJustificativaNFId
         +string ChaveAcesso
         +string NomeEmitente
         +string Descricao
@@ -119,6 +124,7 @@ classDiagram
     %% Orcamento Fornecedor
     class OrcamentoFornecedor {
         +Guid Id
+        +JustificativaDespesa JustificativaDespesa
         +Guid OrcamentoFornecedorJustificativaDespesaId
         +string Fornecedor
         +decimal Valor
@@ -156,6 +162,17 @@ classDiagram
         +Saldo() decimal
     }
 
+    %% Entidades de Referencia Externa (ImportacaoEditais)
+    class ProjetoRef {
+        <<view externa>>
+        +Guid Id
+    }
+
+    class AlocacaoBolsistaRef {
+        <<view externa>>
+        +Guid Id
+    }
+
     %% Relacionamentos
     Prestacao "1" --> "*" JustificativaDespesa : contem
     Prestacao "1" --> "*" TransacaoFinanceira : contem
@@ -175,6 +192,11 @@ classDiagram
     Orcamento "1" --> "*" ContaContabil : possui
     ContaContabil "1" --> "*" ContaContabil : subcontas
     ContaContabil "1" --> "*" ItemDocumentoFiscal : classifica
+
+    %% Referencias externas (views de M002 - Importacao de Editais)
+    ContaBancaria "*" --> "0..1" ProjetoRef : projeto
+    Orcamento "*" --> "0..1" ProjetoRef : projeto
+    JustificativaDiaria "*" --> "1" AlocacaoBolsistaRef : bolsista
 ```
 
 ---
@@ -207,7 +229,9 @@ Todas as entidades herdam de `BaseEntity` (`ConectaFapes.Common.Domain.BaseEntit
 
 | Atributo | Tipo | Nullable | Obrig. | Descricao |
 |---|---|---|---|---|
+| ContaBancaria | ContaBancaria | Nao | Sim | Navegacao para a conta bancaria proprietaria |
 | TransacaoFinanceiraContaBancariaId | Guid | Nao | Sim | FK para ContaBancaria |
+| Prestacao | Prestacao? | Sim | Nao | Navegacao para a prestacao vinculada (null se ainda nao vinculada) |
 | TransacaoFinanceiraPrestacaoId | Guid? | Sim | Nao | FK para Prestacao — null se a transacao ainda nao foi vinculada |
 | Data | DateTimeOffset | Nao | Sim | Data do lancamento bancario |
 | Valor | decimal | Nao | Sim | Valor monetario da transacao (>= 0) |
@@ -227,14 +251,17 @@ Todas as entidades herdam de `BaseEntity` (`ConectaFapes.Common.Domain.BaseEntit
 | Titular | string | Nao | Sim | Nome do titular da conta |
 | SaldoAtual | decimal | Nao | Gerado | Saldo atual calculado a partir das transacoes |
 
-### JustificativaDespesa (abstrata)
+### JustificativaDespesa (classe base)
+
+Classe base concreta (nao declarada `abstract` no codigo, porem com construtor `protected` — instancia-se apenas atraves de `JustificativaNF`, `JustificativaDiaria` ou `JustificativaInvoice`).
 
 | Atributo | Tipo | Nullable | Obrig. | Descricao |
 |---|---|---|---|---|
+| Prestacao | Prestacao | Nao | Sim | Navegacao para a prestacao proprietaria |
 | JustificativaDespesaPrestacaoId | Guid | Nao | Sim | FK para Prestacao |
 | Descricao | string | Nao | Sim | Descricao textual da despesa justificada |
 | ValorTotal | decimal | Nao | Gerado | Valor total da despesa (>= 0) — atualizado por `AtualizarValorTotal()` |
-| UrlArquivo | string? | Sim | Nao | URL do arquivo comprovante armazenado no MinIO |
+| UrlArquivo | string? | Sim | Nao | URL do arquivo comprovante armazenado no MinIO — atualizado por `AtualizarUrlArquivo()` |
 | Orcamentos | ICollection&lt;OrcamentoFornecedor&gt; | Nao | — | Orcamentos de fornecedor vinculados |
 
 ### JustificativaNF
@@ -268,6 +295,7 @@ Herda todos os atributos de `JustificativaDespesa`. Usada para despesas realizad
 
 | Atributo | Tipo | Nullable | Obrig. | Descricao |
 |---|---|---|---|---|
+| JustificativaDespesa | JustificativaDespesa | Nao | Sim | Navegacao para a justificativa proprietaria |
 | OrcamentoFornecedorJustificativaDespesaId | Guid | Nao | Sim | FK para JustificativaDespesa |
 | Fornecedor | string | Nao | Sim | Nome ou razao social do fornecedor |
 | Valor | decimal | Nao | Sim | Valor total do orcamento (>= 0) |
@@ -279,6 +307,7 @@ Herda todos os atributos de `JustificativaDespesa`. Usada para despesas realizad
 
 | Atributo | Tipo | Nullable | Obrig. | Descricao |
 |---|---|---|---|---|
+| JustificativaNF | JustificativaNF? | Sim | Nao | Navegacao para a justificativa associada (1:1) |
 | DocumentoFiscalJustificativaNFId | Guid | Nao | Sim | FK para JustificativaNF |
 | ChaveAcesso | string | Nao | Sim | Chave de acesso da NF-e com 44 digitos — usada na consulta SERPRO |
 | NomeEmitente | string | Nao | Sim | Razao social do emitente da nota fiscal |
@@ -286,7 +315,7 @@ Herda todos os atributos de `JustificativaDespesa`. Usada para despesas realizad
 | ValorTotal | decimal | Nao | Sim | Valor total da nota (>= 0) |
 | UF | string | Nao | Sim | Unidade federativa do emitente |
 | Pais | string | Nao | Sim | Pais do emitente |
-| Identificador | string | Nao | Sim | Identificador unico do documento fiscal no sistema |
+| Identificador | string | Nao | Sim | CPF ou CNPJ do emitente |
 | TotalICMS | decimal | Nao | Sim | Total de ICMS destacado na nota (>= 0) |
 | TotalPIS | decimal | Nao | Sim | Total de PIS destacado na nota (>= 0) |
 | TotalIPI | decimal | Nao | Sim | Total de IPI destacado na nota (>= 0) |
@@ -332,6 +361,45 @@ Herda todos os atributos de `JustificativaDespesa`. Usada para despesas realizad
 | Limite | decimal | Nao | Sim | Limite de gasto aprovado para esta conta (>= 0) |
 | SubContas | ICollection&lt;ContaContabil&gt; | Nao | — | Contas filhas na hierarquia |
 | ItensDocumentoFiscal | ICollection&lt;ItemDocumentoFiscal&gt; | Nao | — | Itens de documentos fiscais classificados nesta conta |
+
+---
+
+## Entidades de Referencia Externa (ImportacaoEditais)
+
+Entidades triviais mapeadas a views de banco de dados do sistema de Importacao de Editais (M002). Nao herdam de `BaseEntity`, nao possuem repositorio proprio e sao somente leitura.
+
+### ProjetoRef
+
+Namespace: `ConectaFapes.PrestacaoContas.Domain.Entities.ImportacaoEditais`
+
+| Atributo | Tipo | Nullable | Obrig. | Descricao |
+|---|---|---|---|---|
+| Id | Guid | Nao | Sim | Identificador do projeto na view externa |
+
+Referenciada por: `ContaBancaria.ContaBancariaProjetoId`, `Orcamento.OrcamentoProjetoId`.
+
+### AlocacaoBolsistaRef
+
+Namespace: `ConectaFapes.PrestacaoContas.Domain.Entities.ImportacaoEditais`
+
+| Atributo | Tipo | Nullable | Obrig. | Descricao |
+|---|---|---|---|---|
+| Id | Guid | Nao | Sim | Identificador da alocacao de bolsista na view externa |
+
+Referenciada por: `JustificativaDiaria.JustificativaDiariaAlocacaoBolsistaId`.
+
+---
+
+## Value Objects planejados (inativos)
+
+Os seguintes Value Objects existem em `src/Domain/ValueObjects/` mas estao integralmente comentados no codigo — **nao estao ativos**. Os campos correspondentes nas entidades usam tipos primitivos.
+
+| Value Object | Estado | Substituido por |
+|---|---|---|
+| `ChaveAcessoNF` | Comentado | `string` em `DocumentoFiscal.ChaveAcesso` (validacao de 44 digitos feita no servico SERPRO) |
+| `Moeda` | Comentado | Enum `TipoMoeda` em `JustificativaInvoice.Moeda` |
+| `AlocacaoBolsista` | Comentado | FK `Guid` em `JustificativaDiaria.JustificativaDiariaAlocacaoBolsistaId` apontando para `AlocacaoBolsistaRef` |
+| `ValueObject` (base) | Comentado | — |
 
 ---
 

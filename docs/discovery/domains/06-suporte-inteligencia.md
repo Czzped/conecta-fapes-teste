@@ -1,6 +1,6 @@
 # Domain 06 — Suporte e Inteligencia
 
-Servicos transversais de apoio, analise de dados, transparencia e comunicacao.
+Servicos transversais de apoio, analise de dados, transparencia e comunicacao. Glossario dos conceitos centrais em [../glossario.md](../glossario.md).
 
 **Modulos que implementam este domain:** M018, M019, M020
 

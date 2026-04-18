@@ -1,6 +1,6 @@
 # Domain 04 — Fomento Post-Award (Execucao e Acompanhamento)
 
-Fluxo de execucao do projeto contratado ate a sua finalizacao.
+Fluxo de execucao do projeto contratado ate a sua finalizacao. Glossario dos conceitos centrais em [../glossario.md](../glossario.md).
 
 **Modulos que implementam este domain:** M003, M009, M012, M013, M014, M015
 
@@ -62,20 +62,40 @@ Controle orcamentario do projeto em execucao: adicoes orcamentarias, inclusao de
 
 ## 4.4 Prestacao de Contas
 
-Fluxo de prestacao de contas do projeto: importacao de extratos bancarios, submissao eletronica pelo coordenador, analise pela agencia, auditoria pela SECONT e contestacao.
+Fluxo de prestacao de contas do projeto: backoffice FAPES prepara a base (extrato bancario, orcamento anual, contas contabeis, conta bancaria); o Coordenador monta a prestacao vinculando transacoes e registrando justificativas (NF, diaria ou invoice internacional); e o Responsavel FAPES analisa, aprovando, negando ou devolvendo para revisao. A edicao das entidades da prestacao e bloqueada enquanto o status e `EM_ANALISE`.
+
+**Implementado por:** [M014 — Prestacao de Contas](../../implementation/modules/M014-prestacao-contas/README.md)
+
+### Preparacao (Backoffice FAPES)
 
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|
-| 4.4.1 | Leitura do Extrato Bancario | Importar e conferir extrato bancario do projeto | Analista da Area Tecnica da Agencia | Art. 27, II |
-| 4.4.2 | Submeter Prestacao de Contas de Produto | Submissao composta pelo documento fiscal (nota fiscal) e pelos orcamentos que embasaram a aquisicao; o sistema valida o XML da nota fiscal junto ao SERPRO e rejeita o documento caso a nota ja tenha sido utilizada neste ou em qualquer outro projeto — cada nota fiscal so pode ser vinculada a um unico projeto e registrada uma unica vez | Coordenador | Art. 27, II; Art. 3, 1 |
-| 4.4.3 | Submeter Prestacao de Contas de Servico | Submissao composta pelo documento fiscal (nota fiscal de servico ou recibo) e pelos orcamentos que embasaram a contratacao | Coordenador | Art. 27, II; Art. 3, 1 |
-| 4.4.4 | Submeter Prestacao de Contas de Diarias | Submissao composta pela autorizacao de diaria e pelos comprovantes de hospedagem e alimentacao | Coordenador | Art. 27, II; Art. 3, 1 |
-| 4.4.5 | Submeter Prestacao de Contas de Passagens Aereas | Submissao composta pelo bilhete aereo, comprovante de embarque e pelos orcamentos que embasaram a aquisicao da passagem | Coordenador | Art. 27, II; Art. 3, 1 |
-| 4.4.6 | Analisar Documentacao da Prestacao de Contas | Analista verifica documentacao tecnica e financeira | Analista da Area Tecnica da Agencia | Art. 15, III |
-| 4.4.7 | Recusar Prestacao de Contas | Analista recusa a prestacao de contas informando o motivo da recusa; o coordenador e notificado e pode solicitar nova avaliacao apos correcao | Analista da Area Tecnica da Agencia | Art. 15, III |
-| 4.4.8 | Solicitar Reavaliacao da Prestacao de Contas | Coordenador corrige as pendencias apontadas e solicita nova rodada de analise da prestacao de contas recusada | Coordenador | Art. 27, II |
-| 4.4.9 | Auditar Prestacao de Contas | SECONT fiscaliza e audita as prestacoes de contas | SECONT | Art. 15, III; Art. 27, II |
-| 4.4.10 | Contestar Prestacao de Contas | Coordenador contesta parecer da analise | Coordenador | — |
+| 4.4.1 | Importar Extrato Bancario | Importar lancamentos do extrato bancario do projeto, criando `TransacaoFinanceira` (debito/credito) associadas a `ContaBancaria` | Responsavel FAPES | Art. 27, II |
+| 4.4.2 | Gerir Orcamento Anual e Contas Contabeis | Cadastrar orcamento anual (`Orcamento`) com `ValorBolsasPrevisto` e `ValorCapitalPrevisto`, e criar `ContaContabil` hierarquica com limites por rubrica | Responsavel FAPES | — |
+| 4.4.3 | Gerir Conta Bancaria do Projeto | Cadastrar/atualizar banco, agencia, numero e titular da `ContaBancaria` do projeto | Responsavel FAPES | — |
+
+### Montagem da Prestacao (Frontoffice Coordenador)
+
+| # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
+|---|---------------|-----------|---------|---------------------|
+| 4.4.4 | Criar Prestacao de Contas | Criar nova `Prestacao` em status `RASCUNHO` | Coordenador | Art. 27, II |
+| 4.4.5 | Vincular Transacao Financeira a Prestacao | Vincular `TransacaoFinanceira` do extrato a uma `Prestacao` em `RASCUNHO` ou `REVISAO` — uma transacao so pode estar vinculada a uma prestacao por vez | Coordenador | Art. 27, II |
+| 4.4.6 | Registrar Justificativa NF (produto/servico) | Cadastrar `JustificativaNF` com `DocumentoFiscal` validado via API SERPRO pela `ChaveAcesso` (44 digitos); cada item da nota e classificado em uma `ContaContabil` | Coordenador | Art. 27, II; Art. 3, 1 |
+| 4.4.7 | Registrar Justificativa de Diaria | Cadastrar `JustificativaDiaria` com `ValorDiaria`, `Quantidade` e bolsista beneficiario (`AlocacaoBolsistaRef`) | Coordenador | Art. 27, II; Art. 3, 1 |
+| 4.4.8 | Registrar Justificativa Invoice (internacional) | Cadastrar `JustificativaInvoice` para despesas em moeda estrangeira com `ValorCambio` e `TipoMoeda` | Coordenador | Art. 27, II; Art. 3, 1 |
+| 4.4.9 | Adicionar Orcamentos de Fornecedor | Cadastrar ate 3 `OrcamentoFornecedor` por justificativa como comprovacao de melhor preco; no maximo um pode ser marcado como escolhido | Coordenador | — |
+| 4.4.10 | Classificar Item de NF em Conta Contabil | Vincular cada `ItemDocumentoFiscal` a uma `ContaContabil`, permitindo apuracao de saldos por rubrica | Coordenador | — |
+| 4.4.11 | Submeter Prestacao | Transicionar `Prestacao` de `RASCUNHO` ou `REVISAO` para `EM_ANALISE`, bloqueando edicao das entidades do agregado | Coordenador | Art. 27, II |
+
+### Analise (Backoffice FAPES)
+
+| # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
+|---|---------------|-----------|---------|---------------------|
+| 4.4.12 | Analisar Prestacao | Consultar detalhes completos da prestacao em `EM_ANALISE` (justificativas, documentos fiscais, itens, orcamentos de fornecedor, transacoes e classificacao contabil) | Responsavel FAPES | Art. 15, III |
+| 4.4.13 | Aprovar Prestacao | Finalizar prestacao (`EM_ANALISE → FINALIZADO`); estado terminal irreversivel | Responsavel FAPES | Art. 15, III |
+| 4.4.14 | Negar Prestacao | Negar prestacao (`EM_ANALISE → NEGADO`); estado terminal irreversivel | Responsavel FAPES | Art. 15, III |
+| 4.4.15 | Solicitar Revisao | Devolver prestacao para correcao (`EM_ANALISE → REVISAO`), reabilitando edicao das entidades do agregado | Responsavel FAPES | Art. 15, III |
+| 4.4.16 | Corrigir e Resubmeter Prestacao | Corrigir pendencias em `REVISAO` e resubmeter (`REVISAO → EM_ANALISE`) | Coordenador | Art. 27, II |
 
 ## 4.5 Gestao de Bolsistas de Equipe
 

@@ -6,9 +6,10 @@ O ConectaFAPES e a plataforma digital da agencia de fomento (Fundacao de Amparo 
 
 ---
 
-## Personas
+## Referencias rapidas
 
-Ver [personas.md](personas.md)
+- **Personas**: [personas.md](personas.md)
+- **Glossario de conceitos**: [glossario.md](glossario.md)
 
 ---
 

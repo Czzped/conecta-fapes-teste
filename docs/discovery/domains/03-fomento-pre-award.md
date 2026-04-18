@@ -1,6 +1,6 @@
 # Domain 03 — Fomento Pre-Award (Captacao e Selecao)
 
-Fluxo desde a publicacao do edital ate a contratacao da iniciativa.
+Fluxo desde a publicacao do edital ate a contratacao da iniciativa. Glossario dos conceitos centrais em [../glossario.md](../glossario.md).
 
 **Modulos que implementam este domain:** M011, M002
 
