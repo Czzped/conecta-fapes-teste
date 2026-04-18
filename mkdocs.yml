@@ -112,6 +112,7 @@ nav:
           - EPA-04 Aditivos Suspensao: products/portal-admin/features/EPA-04-gestao-aditivos-suspensao.md
           - EPA-05 Gestao Financeira: products/portal-admin/features/EPA-05-gestao-financeira-contabil.md
           - EPA-06 Reajuste UNAC: products/portal-admin/features/EPA-06-reajuste-bolsas-unac.md
+          - EPA-07 Gestao de Parcerias: products/portal-admin/features/EPA-07-gestao-parcerias.md
       - Importador:
           - products/importador/README.md
           - Arquitetura: products/importador/architecture.md
@@ -210,11 +211,18 @@ nav:
           - Backlog: implementation/modules/M010-planejamento-estrategia/backlog.md
           - Contrato: implementation/modules/M010-planejamento-estrategia/contrato.md
           - Contrato API: implementation/modules/M010-planejamento-estrategia/contrato-api.md
-          - Modelo Estrutural: implementation/modules/M010-planejamento-estrategia/modelo-estrutural.md
-          - Modelo Comportamental: implementation/modules/M010-planejamento-estrategia/modelo-comportamental.md
-          - EPIC-001: implementation/modules/M010-planejamento-estrategia/epics/EPIC-M010-001.md
-          - EPIC-002: implementation/modules/M010-planejamento-estrategia/epics/EPIC-M010-002.md
-          - EPIC-003: implementation/modules/M010-planejamento-estrategia/epics/EPIC-M010-003.md
+          - Planejamento Estrategico:
+              - Modelo Estrutural: implementation/modules/M010-planejamento-estrategia/planejamento/modelo-estrutural.md
+              - Modelo Comportamental: implementation/modules/M010-planejamento-estrategia/planejamento/modelo-comportamental.md
+              - EPIC-M010-001 Plano: implementation/modules/M010-planejamento-estrategia/planejamento/epics/EPIC-M010-001.md
+          - Programas:
+              - Modelo Estrutural: implementation/modules/M010-planejamento-estrategia/programas/modelo-estrutural.md
+              - Modelo Comportamental: implementation/modules/M010-planejamento-estrategia/programas/modelo-comportamental.md
+              - EPIC-M010-003 Programas: implementation/modules/M010-planejamento-estrategia/programas/epics/EPIC-M010-003.md
+          - Parcerias:
+              - Modelo Estrutural: implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md
+              - Modelo Comportamental: implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md
+              - EPIC-M010-002 Parcerias: implementation/modules/M010-planejamento-estrategia/parcerias/epics/EPIC-M010-002.md
       - M011 Configuracao de Captacao:
           - implementation/modules/M011-configuracao-captacao/README.md
           - Backlog: implementation/modules/M011-configuracao-captacao/backlog.md
@@ -338,3 +346,6 @@ nav:
       - SPRINT-005: management/sprints/SPRINT-005.md
       - SPRINT-006: management/sprints/SPRINT-006.md
       - SPRINT-007: management/sprints/SPRINT-007.md
+
+  - Agentes e Skills:
+      - agentes/README.md
