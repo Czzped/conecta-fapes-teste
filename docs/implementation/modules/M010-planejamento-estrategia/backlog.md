@@ -18,6 +18,7 @@ Especificacao de referencia: [README.md](README.md)
 | EPIC-M010-002 | Gestao de Parcerias | UC02 | Must | In Progress | [EPIC-M010-002](parcerias/epics/EPIC-M010-002.md) / [GitHub #1724](https://github.com/leds-conectafapes/conectafapes-project/issues/1724) |
 | US-M010-018 | Relatorio Financeiro da Parceria | UC02 | Must | To Do | [EPIC-M010-002 — US-M010-018](parcerias/epics/EPIC-M010-002.md#us-m010-018-relatorio-financeiro-da-parceria) |
 | EPIC-M010-003 | Gestao de Programas | UC03 | Must | In Progress | [EPIC-M010-003](programas/epics/EPIC-M010-003.md) |
+| EPIC-M010-004 | Painel Financeiro de Parcerias | UC02 | Must | To Do | [EPIC-M010-004](parcerias/epics/EPIC-M010-004.md) |
 
 ---
 
@@ -46,6 +47,10 @@ EPIC-M010-002 (Gestao de Parcerias)  GitHub: #1724
 Issues fechadas (conceitos removidos):
   ├── #1741 Registrar Coordenacao   — Coordenacao removida do dominio M010
   └── #1742 Associar Finalidade     — Finalidade removida de Parceria (permanece em M008)
+
+EPIC-M010-004 (Painel Financeiro de Parcerias)  <- depende de EPIC-M010-002
+├── US-M010-019 Painel Geral de Parcerias (visao de portfolio)
+└── US-M010-018 Relatorio Financeiro por Parceria (ref. EPIC-M010-002)
 
 EPIC-M010-003 (Gestao de Programas)  <- depende de EPIC-M010-001
 ├── US-M010-020 Cadastrar Programa (inclui validacao RN13)
