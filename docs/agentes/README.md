@@ -219,6 +219,151 @@ ln -s ~/.agents/skills/<skill> .agents/skills/<skill>
 
 ---
 
+## 🚀 Instalacao de skills via skills.sh
+
+[skills.sh](https://skills.sh/) e o marketplace aberto de skills para Claude Code e outros agentes. Skills sao instaladas/atualizadas via a CLI `npx skills`, sem necessidade de instalacao permanente do pacote.
+
+### Pre-requisitos
+
+- **Node.js 18+** com `npm`/`npx` (o comando `npx skills` baixa e executa o pacote sob demanda)
+- Acesso a internet para baixar skills do GitHub
+- Para instalacao global (`-g`): permissao de escrita em `~/.agents/skills/`
+
+### Comandos principais
+
+| Comando | Proposito |
+|---------|-----------|
+| `npx skills find [termo]` | Pesquisar skills por palavra-chave (pode ser interativo sem termo) |
+| `npx skills add <owner/repo@skill>` | Instalar uma skill especifica |
+| `npx skills list` | Listar skills instaladas |
+| `npx skills check` | Verificar atualizacoes disponiveis |
+| `npx skills update` | Atualizar todas as skills instaladas |
+| `npx skills remove <skill>` | Remover skill instalada |
+
+### Flags uteis
+
+- `-g` / `--global` — instala em `~/.agents/skills/` (disponivel em qualquer projeto); **recomendado** para skills reutilizaveis
+- `-y` / `--yes` — pula prompts de confirmacao (uso nao interativo, CI, scripts)
+- `-l` / `--local` — instala em `.agents/skills/` do projeto atual (sobe pela raiz do repo)
+
+### Fluxo recomendado
+
+**1. Descobrir skills relevantes**
+
+Antes de instalar, consulte o [leaderboard do skills.sh](https://skills.sh/) — skills com muitos installs (10K+) e de fontes confiaveis (`anthropics`, `vercel-labs`, `antfu`, `nuxt`, `microsoft`) sao preferidas.
+
+Alternativamente, busque via CLI:
+
+```bash
+npx skills find nuxt           # busca por keyword
+npx skills find                # modo interativo (fuzzy search)
+```
+
+**2. Instalar a skill globalmente**
+
+```bash
+npx skills add antfu/skills@nuxt -g -y
+```
+
+Sintaxe: `<owner-github>/<repo>@<nome-da-skill>`. A skill e baixada para `~/.agents/skills/<nome-da-skill>/`.
+
+**3. Linkar no projeto para auto-documentacao**
+
+Este repo mantem symlinks em `.agents/skills/` para as skills globais efetivamente usadas. Isso torna explicita a dependencia do projeto sem duplicar arquivos:
+
+```bash
+ln -s ~/.agents/skills/nuxt .agents/skills/nuxt
+```
+
+**4. Registrar nesta pagina**
+
+Adicionar entrada na secao apropriada de [Skills](#-skills) com: origem, o que faz, quando usar e stack associada.
+
+**5. Commitar**
+
+```bash
+git add .agents/skills/nuxt docs/agentes/README.md
+git commit -m "[docs] Adicionar skill nuxt ao catalogo do projeto"
+```
+
+### Exemplos reais (deste projeto)
+
+```bash
+# Backend .NET
+npx skills add wshobson/agents@dotnet-backend-patterns -g -y
+npx skills add kevintsengtw/dotnet-testing-agent-skills@dotnet-testing-autodata-xunit-integration -g -y
+
+# Frontend Nuxt
+npx skills add antfu/skills@nuxt -g -y
+npx skills add nuxt/ui@nuxt-ui -g -y
+
+# Qualidade / Testes
+npx skills add obra/superpowers@test-driven-development -g -y
+npx skills add obra/superpowers@systematic-debugging -g -y
+
+# Arquitetura
+npx skills add sickn33/antigravity-awesome-skills@software-architecture -g -y
+```
+
+Depois de todas as instalacoes, criar os symlinks:
+
+```bash
+cd .agents/skills
+for s in dotnet-backend-patterns dotnet-testing-autodata-xunit-integration \
+         nuxt nuxt-ui test-driven-development systematic-debugging \
+         software-architecture; do
+  ln -s ~/.agents/skills/$s $s
+done
+```
+
+### Setup de novo dev (bootstrap)
+
+Para replicar o catalogo de skills deste projeto em uma maquina nova:
+
+```bash
+# 1. Instalar todas as skills globais usadas no projeto
+for s in wshobson/agents@dotnet-backend-patterns \
+         kevintsengtw/dotnet-testing-agent-skills@dotnet-testing-autodata-xunit-integration \
+         antfu/skills@nuxt \
+         nuxt/ui@nuxt-ui \
+         obra/superpowers@test-driven-development \
+         obra/superpowers@systematic-debugging \
+         sickn33/antigravity-awesome-skills@software-architecture; do
+  npx skills add "$s" -g -y
+done
+
+# 2. Os symlinks em .agents/skills/ ja vem no repo — nao precisa recriar
+# 3. Confirmar
+npx skills list
+ls -la .agents/skills/
+```
+
+### Manutencao
+
+```bash
+# Ver o que esta desatualizado
+npx skills check
+
+# Atualizar tudo
+npx skills update
+
+# Remover skill nao mais usada
+npx skills remove <nome-da-skill>
+rm .agents/skills/<nome-da-skill>    # remover symlink
+# depois: remover entrada deste README e commitar
+```
+
+### Troubleshooting
+
+| Problema | Causa provavel | Solucao |
+|----------|----------------|---------|
+| `command not found: skills` | Executou `skills` direto sem `npx` | Usar `npx skills ...` (nao precisa instalar globalmente) |
+| `Error: ENOENT ~/.agents/skills` | Diretorio ainda nao existe | O primeiro `npx skills add -g` cria automaticamente |
+| Symlink quebrado (`ls: cannot access`) | Skill removida globalmente mas symlink permanece | `rm .agents/skills/<skill-quebrada>` |
+| Skill nao ativa no Claude | Frontmatter `description:` muito generico | Editar `~/.agents/skills/<skill>/SKILL.md` — `description` deve mencionar keywords que o Claude detecta nos pedidos |
+
+---
+
 ## 📚 Referencias
 
 - Padrao `agents.md`: [https://agents.md/](https://agents.md/)
