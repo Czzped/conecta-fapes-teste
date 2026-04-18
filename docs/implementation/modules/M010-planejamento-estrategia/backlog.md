@@ -16,6 +16,7 @@ Especificacao de referencia: [README.md](README.md)
 |----|--------|-----------|------------|--------|-----------|
 | EPIC-M010-001 | Gestao do Plano Estrategico | UC01 | Must | To Do | [EPIC-M010-001](planejamento/epics/EPIC-M010-001.md) |
 | EPIC-M010-002 | Gestao de Parcerias | UC02 | Must | In Progress | [EPIC-M010-002](parcerias/epics/EPIC-M010-002.md) / [GitHub #1724](https://github.com/leds-conectafapes/conectafapes-project/issues/1724) |
+| US-M010-018 | Relatorio Financeiro da Parceria | UC02 | Must | To Do | [EPIC-M010-002 — US-M010-018](parcerias/epics/EPIC-M010-002.md#us-m010-018-relatorio-financeiro-da-parceria) |
 | EPIC-M010-003 | Gestao de Programas | UC03 | Must | In Progress | [EPIC-M010-003](programas/epics/EPIC-M010-003.md) |
 
 ---
@@ -39,7 +40,8 @@ EPIC-M010-002 (Gestao de Parcerias)  GitHub: #1724
 ├── US-M010-014 Registrar Aporte Financeiro da Parceria em Programa (N:N) #1794
 ├── US-M010-015 Validar Invariante Temporal Programa/Parceria (RN13)    #1795
 ├── US-M010-016 Consultar Saldo da Parceria (RN14)                      #1796
-└── US-M010-017 Remover Parceria (em caso de erro, RI3)                 #1797
+├── US-M010-017 Remover Parceria (em caso de erro, RI3)                 #1797
+└── US-M010-018 Relatorio Financeiro da Parceria (aportado/alocado/pago)
 
 Issues fechadas (conceitos removidos):
   ├── #1741 Registrar Coordenacao   — Coordenacao removida do dominio M010
