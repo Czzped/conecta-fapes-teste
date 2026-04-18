@@ -89,13 +89,13 @@
 | Registrar Aporte Financeiro (inflow, isAditivo) | [#1740](https://github.com/leds-conectafapes/conectafapes-project/issues/1740) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md), [Contrato](../../implementation/modules/M010-planejamento-estrategia/contrato.md) | ⚪ To Do |
 | Listar e Consultar Parcerias | [#1743](https://github.com/leds-conectafapes/conectafapes-project/issues/1743) | [Contrato](../../implementation/modules/M010-planejamento-estrategia/contrato.md), [Contrato API](../../implementation/modules/M010-planejamento-estrategia/contrato-api.md) | ⚪ To Do |
 | Encerrar Parceria (cascata RI2) | [#1744](https://github.com/leds-conectafapes/conectafapes-project/issues/1744) | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | ⚪ To Do |
-| Registrar Vigencia (Aditivo) | _a criar_ | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
-| Registrar Aditivo de Aporte Financeiro | _a criar_ | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
-| Anexar Documentos a Parceria | _a criar_ | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
-| Registrar Aporte Financeiro Parceria em Programa (N:N) | _a criar_ | [Programas — Estrutural](../../implementation/modules/M010-planejamento-estrategia/programas/modelo-estrutural.md) | ⚪ To Do |
-| Validar Invariante Temporal Programa/Parceria (RN13) | _a criar_ | [Programas — Comportamental](../../implementation/modules/M010-planejamento-estrategia/programas/modelo-comportamental.md) | ⚪ To Do |
-| Consultar Saldo da Parceria (RN14) | _a criar_ | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
-| Remover Parceria (RI3) | _a criar_ | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | ⚪ To Do |
+| Registrar Vigencia (Aditivo) | [#1791](https://github.com/leds-conectafapes/conectafapes-project/issues/1791) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
+| Registrar Aditivo de Aporte Financeiro | [#1792](https://github.com/leds-conectafapes/conectafapes-project/issues/1792) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
+| Anexar Documentos a Parceria | [#1793](https://github.com/leds-conectafapes/conectafapes-project/issues/1793) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
+| Registrar Aporte Financeiro Parceria em Programa (N:N) | [#1794](https://github.com/leds-conectafapes/conectafapes-project/issues/1794) | [Programas — Estrutural](../../implementation/modules/M010-planejamento-estrategia/programas/modelo-estrutural.md) | ⚪ To Do |
+| Validar Invariante Temporal Programa/Parceria (RN13) | [#1795](https://github.com/leds-conectafapes/conectafapes-project/issues/1795) | [Programas — Comportamental](../../implementation/modules/M010-planejamento-estrategia/programas/modelo-comportamental.md) | ⚪ To Do |
+| Consultar Saldo da Parceria (RN14) | [#1796](https://github.com/leds-conectafapes/conectafapes-project/issues/1796) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
+| Remover Parceria (RI3) | [#1797](https://github.com/leds-conectafapes/conectafapes-project/issues/1797) | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | ⚪ To Do |
 
 **Issues fechadas** (concepts removidos do dominio M010):
 - ~~[#1741](https://github.com/leds-conectafapes/conectafapes-project/issues/1741) Registrar Coordenacao~~ — `Coordenacao` removida de M010 (parcerias nao tem coordenador no dominio atual)
@@ -154,14 +154,21 @@
 6. #1751 Cadastrar Dirigente
 7. #1752 Listar e Consultar Instituicoes
 
-**Fase 2 — Parcerias (semana 2):**
+**Fase 2 — Parcerias (semana 2) — M010 refatorado:**
 
-1. #1739 Cadastrar Parceria (depende de #1749, #1750, #1746)
-2. #1740 Registrar Aporte Financeiro (depende de #1749)
-3. #1741 Registrar Coordenacao
-4. #1742 Associar Finalidade (depende de #1746, #1747)
-5. #1743 Listar e Consultar Parcerias
-6. #1744 Encerrar Parceria
+1. #1739 Cadastrar + Formalizar Parceria (RN19) (depende de #1749 Instituicao)
+2. #1791 Registrar Vigencia (Aditivo) (depende de #1739)
+3. #1793 Anexar Documentos a Parceria (pre-requisito RN19; depende de M008 Documento)
+4. #1740 Registrar Aporte Financeiro (inflow, isAditivo) (depende de #1739, #1749)
+5. #1792 Registrar Aditivo de Aporte (editar/remover RN18) (depende de #1740)
+6. #1796 Consultar Saldo da Parceria (depende de #1740)
+7. #1794 Registrar Aporte Parceria → Programa (depende de #1740 e Programa)
+8. #1795 Validar Invariante Temporal RN13 (atravessa #1794 e alteracoes de datas)
+9. #1743 Listar e Consultar Parcerias
+10. #1744 Encerrar Parceria (cascata RI2 + justificativa)
+11. #1797 Remover Parceria (RI3 — baixa prioridade)
+
+> #1741 (Coordenacao) e #1742 (Finalidade) **fechadas** — conceitos removidos do dominio.
 
 ### Manoel — M014 Prestacao de Contas
 
@@ -207,22 +214,22 @@
 
 | Metrica | Valor |
 |---------|-------|
-| **Total de issues** | 22 |
+| **Total de issues** | 27 |
 | **Desenvolvimento (M008)** | 8 |
-| **Desenvolvimento (M010)** | 6 |
+| **Desenvolvimento (M010 refatorado)** | 11 (4 atualizadas + 7 novas; 2 fechadas) |
 | **Desenvolvimento (M014)** | 5 |
 | **Design de Produto** | 2 |
 | **Discovery de Melhorias** | 1 |
 | **Concluidas** | 0 |
 | **Em andamento** | 0 |
-| **Pendentes** | 22 |
+| **Pendentes** | 27 |
 | **% Concluido** | 0% |
 
 ### Progresso por Responsavel
 
 | Responsavel | Total | Done | In Progress | To Do | % |
 |-------------|-------|------|-------------|-------|---|
-| Vinicius | 14 | 0 | 0 | 14 | 0% |
+| Vinicius | 19 | 0 | 0 | 19 | 0% |
 | Manoel | 5 | 0 | 0 | 5 | 0% |
 | Leticia | 2 | 0 | 0 | 2 | 0% |
 | Marcela + Leticia | 1 | 0 | 0 | 1 | 0% |
@@ -239,20 +246,25 @@
 | 6 | Vinicius | Listar e Consultar Instituicoes | #1752 | ⚪ To Do |
 | 7 | Vinicius | Cadastrar Finalidade | #1746 | ⚪ To Do |
 | 8 | Vinicius | Listar Finalidades | #1747 | ⚪ To Do |
-| 9 | Vinicius | Cadastrar Parceria | #1739 | ⚪ To Do |
-| 10 | Vinicius | Registrar Aporte Financeiro | #1740 | ⚪ To Do |
-| 11 | Vinicius | Registrar Coordenacao | #1741 | ⚪ To Do |
-| 12 | Vinicius | Associar Finalidade a Parceria | #1742 | ⚪ To Do |
-| 13 | Vinicius | Listar e Consultar Parcerias | #1743 | ⚪ To Do |
-| 14 | Vinicius | Encerrar Parceria | #1744 | ⚪ To Do |
-| 15 | Manoel | Extrato do Projeto (EPIC) | #1718 | ⚪ To Do |
-| 16 | Manoel | Listagem paginada do Extrato | #1721 | ⚪ To Do |
-| 17 | Manoel | Controle de Gastos do Projeto | #1719 | ⚪ To Do |
-| 18 | Manoel | Filtros do Extrato do Projeto | #1720 | ⚪ To Do |
-| 19 | Manoel | Detalhes do extrato conforme status | #1723 | ⚪ To Do |
-| 20 | Leticia | Discovery Prestacao de Contas | #1756 | ⚪ To Do |
-| 21 | Leticia | Discovery Captacao de Iniciativas | #1757 | ⚪ To Do |
-| 22 | Marcela + Leticia | Jornadas e melhorias de usuario | #1755 | ⚪ To Do |
+| 9 | Vinicius | Cadastrar e Formalizar Parceria (RN19) | #1739 | ⚪ To Do |
+| 10 | Vinicius | Registrar Aporte Financeiro (inflow) | #1740 | ⚪ To Do |
+| 11 | Vinicius | Listar e Consultar Parcerias | #1743 | ⚪ To Do |
+| 12 | Vinicius | Encerrar Parceria (cascata RI2) | #1744 | ⚪ To Do |
+| 13 | Vinicius | Registrar Vigencia (Aditivo) | #1791 | ⚪ To Do |
+| 14 | Vinicius | Registrar Aditivo de Aporte Financeiro | #1792 | ⚪ To Do |
+| 15 | Vinicius | Anexar Documentos a Parceria | #1793 | ⚪ To Do |
+| 16 | Vinicius | Registrar Aporte Parceria em Programa (N:N) | #1794 | ⚪ To Do |
+| 17 | Vinicius | Validar Invariante Temporal RN13 | #1795 | ⚪ To Do |
+| 18 | Vinicius | Consultar Saldo da Parceria | #1796 | ⚪ To Do |
+| 19 | Vinicius | Remover Parceria (RI3) | #1797 | ⚪ To Do |
+| 20 | Manoel | Extrato do Projeto (EPIC) | #1718 | ⚪ To Do |
+| 21 | Manoel | Listagem paginada do Extrato | #1721 | ⚪ To Do |
+| 22 | Manoel | Controle de Gastos do Projeto | #1719 | ⚪ To Do |
+| 23 | Manoel | Filtros do Extrato do Projeto | #1720 | ⚪ To Do |
+| 24 | Manoel | Detalhes do extrato conforme status | #1723 | ⚪ To Do |
+| 25 | Leticia | Discovery Prestacao de Contas | #1756 | ⚪ To Do |
+| 26 | Leticia | Discovery Captacao de Iniciativas | #1757 | ⚪ To Do |
+| 27 | Marcela + Leticia | Jornadas e melhorias de usuario | #1755 | ⚪ To Do |
 
 > **Legenda:** ⚪ To Do | 🔵 In Progress | 🟢 Done
 

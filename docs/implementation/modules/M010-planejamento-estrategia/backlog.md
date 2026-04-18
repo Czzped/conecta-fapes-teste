@@ -32,14 +32,18 @@ EPIC-M010-002 (Gestao de Parcerias)  GitHub: #1724
 ├── US-M010-004 Cadastrar e Formalizar Parceria (com Vigencia original) #1739
 ├── US-M010-005 Registrar Aporte Financeiro (Instituicao→Parceria)      #1740
 ├── US-M010-008 Listar e Consultar Parcerias                            #1743
-├── US-M010-009 Encerrar Parceria                                       #1744
-├── US-M010-010 Registrar Vigencia (Aditivo)
-├── US-M010-011 Registrar Aditivo de Aporte Financeiro (isAditivo)
-├── US-M010-012 Anexar Documentos a Parceria (Documento/TipoDocumento em M008)
-├── US-M010-014 Registrar Aporte Financeiro da Parceria em Programa
-├── US-M010-015 Validar Invariante Temporal Programa/Parceria (RN13)
-├── US-M010-016 Consultar Saldo da Parceria (RN14)
-└── US-M010-017 Remover Parceria (em caso de erro) (RI3)
+├── US-M010-009 Encerrar Parceria (cascata RI2 + justificativa)         #1744
+├── US-M010-010 Registrar Vigencia (Aditivo)                            #1791
+├── US-M010-011 Registrar Aditivo de Aporte Financeiro (isAditivo)      #1792
+├── US-M010-012 Anexar Documentos a Parceria (Documento/TipoDocumento em M008) #1793
+├── US-M010-014 Registrar Aporte Financeiro da Parceria em Programa (N:N) #1794
+├── US-M010-015 Validar Invariante Temporal Programa/Parceria (RN13)    #1795
+├── US-M010-016 Consultar Saldo da Parceria (RN14)                      #1796
+└── US-M010-017 Remover Parceria (em caso de erro, RI3)                 #1797
+
+Issues fechadas (conceitos removidos):
+  ├── #1741 Registrar Coordenacao   — Coordenacao removida do dominio M010
+  └── #1742 Associar Finalidade     — Finalidade removida de Parceria (permanece em M008)
 
 EPIC-M010-003 (Gestao de Programas)  <- depende de EPIC-M010-001
 ├── US-M010-020 Cadastrar Programa (inclui validacao RN13)
