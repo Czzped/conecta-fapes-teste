@@ -4,8 +4,8 @@
 
 | Atributo | Valor |
 |----------|-------|
-| **Periodo** | 2026-06-22 a 2026-06-30 |
-| **Milestone** | [MS-05 — Inteligencia e Transparencia](../milestones.md#ms-05--inteligencia-e-transparencia) / [MS-01 — Base Operacional](../milestones.md#ms-01--base-operacional) |
+| **Periodo** | 2026-06-29 a 2026-07-10 |
+| **Milestone** | [MS-05 — Inteligencia e Transparencia](../milestones/MS-05.md) / [MS-01 — Base Operacional](../milestones/MS-01.md) |
 | **GitHub Milestone** | `milestone: MS-05` |
 | **Goal** | Encerramento Q2: suporte operacional via NUTIC, sustentacao e itens transferidos do Q1 |
 

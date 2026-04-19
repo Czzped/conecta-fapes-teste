@@ -4,8 +4,8 @@
 
 | Atributo | Valor |
 |----------|-------|
-| **Periodo** | 2026-05-25 a 2026-06-05 |
-| **Milestone** | [MS-03 — Ciclo de Fomento Post-Award](../milestones.md#ms-03--ciclo-de-fomento-post-award) / [MS-02 — Ciclo de Fomento Pre-Award](../milestones.md#ms-02--ciclo-de-fomento-pre-award) |
+| **Periodo** | 2026-06-01 a 2026-06-12 |
+| **Milestone** | [MS-03 — Ciclo de Fomento Post-Award](../milestones/MS-03.md) / [MS-02 — Ciclo de Fomento Pre-Award](../milestones/MS-02.md) |
 | **GitHub Milestone** | `milestone: MS-03` |
 | **Goal** | Prazos excepcionais, fluxo de submissao, validacao de editais e escalonamento de projetos |
 

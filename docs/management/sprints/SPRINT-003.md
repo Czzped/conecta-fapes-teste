@@ -4,8 +4,8 @@
 
 | Atributo | Valor |
 |----------|-------|
-| **Periodo** | 2026-05-11 a 2026-05-22 |
-| **Milestone** | [MS-03 — Ciclo de Fomento Post-Award](../milestones.md#ms-03--ciclo-de-fomento-post-award) |
+| **Periodo** | 2026-05-18 a 2026-05-29 |
+| **Milestone** | [MS-03 — Ciclo de Fomento Post-Award](../milestones/MS-03.md) |
 | **GitHub Milestone** | `milestone: MS-03` |
 | **Goal** | Aditivos e gestao de bolsistas (Eduardo) — alteracoes de escopo, suspensao e permissoes |
 

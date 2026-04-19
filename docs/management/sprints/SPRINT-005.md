@@ -4,8 +4,8 @@
 
 | Atributo | Valor |
 |----------|-------|
-| **Periodo** | 2026-06-08 a 2026-06-19 |
-| **Milestone** | [MS-04 — Financeiro](../milestones.md#ms-04--financeiro) |
+| **Periodo** | 2026-06-15 a 2026-06-26 |
+| **Milestone** | [MS-04 — Financeiro](../milestones/MS-04.md) |
 | **GitHub Milestone** | `milestone: MS-04` |
 | **Goal** | Operacoes financeiras avancadas (compensacao, estorno, retroativo), expansao UNAC e consultas financeiras |
 

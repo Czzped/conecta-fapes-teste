@@ -4,8 +4,8 @@
 
 | Atributo | Valor |
 |----------|-------|
-| **Periodo** | 2026-04-13 a 2026-04-24 |
-| **Milestone** | [MS-03 — Ciclo de Fomento Post-Award](../milestones.md#ms-03--ciclo-de-fomento-post-award) |
+| **Periodo** | 2026-04-13 a 2026-04-17 |
+| **Milestone** | [MS-03 — Ciclo de Fomento Post-Award](../milestones/MS-03.md) |
 | **GitHub Milestone** | `milestone: MS-03` |
 | **Goal** | Prestacao de Contas completo (Front-Office + Back-Office) e colocar Portal do Coordenador em producao |
 
@@ -25,9 +25,8 @@
 
 | Feature | Produto | Modulo | Status |
 |---------|---------|--------|--------|
-| Ajustes no V1 da Prestacao de Contas Financeira | CONECTA FAPES | M014 | To Do |
+| ~~Ajustes no V1 da Prestacao de Contas Financeira~~ — Extrato do Projeto e evolucoes M014 entregues na **SPRINT-007** ([#1718](https://github.com/leds-conectafapes/conectafapes-project/issues/1718) [#1719](https://github.com/leds-conectafapes/conectafapes-project/issues/1719) [#1720](https://github.com/leds-conectafapes/conectafapes-project/issues/1720) [#1721](https://github.com/leds-conectafapes/conectafapes-project/issues/1721) [#1723](https://github.com/leds-conectafapes/conectafapes-project/issues/1723)) | CONECTA FAPES | M014 | ✅ Coberto pela SPRINT-007 |
 | Produtar / Iniciar Prestacao de Contas Tecnica | CONECTA FAPES | M014 | To Do |
-| Proposta de declaracao — exibir ao coordenador quando houver modelo disponivel | CONECTA FAPES | M009 | To Do |
 | Ajuste Fluxo de Submissao — bloqueio de envio a agencia de fomento quando ha pendencias documentais | PORTAL FAPES - COORDENADOR | M009 | To Do |
 | Controle de Reenvio (Reavaliacao) — prazo minimo de 24h para reenvio apos recusa | PORTAL FAPES - COORDENADOR | M009 | To Do |
 | Validacao de documentos por IA | PORTAL FAPES - COORDENADOR | M009 | To Do |
