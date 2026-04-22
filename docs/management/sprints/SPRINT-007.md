@@ -98,7 +98,7 @@
 
 | Feature | Issue | Produto | Documentacao | Status |
 |---------|-------|---------|--------------|--------|
-| Cadastrar Instituicao | [#1749](https://github.com/leds-conectafapes/conectafapes-project/issues/1749) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md) | ⚪ To Do |
+| Cadastrar Instituicao | [#1749](https://github.com/leds-conectafapes/conectafapes-project/issues/1749) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md) | 🔵 In Progress — [PR #261](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/261) |
 | Cadastrar Unidade Organizacional | [#1750](https://github.com/leds-conectafapes/conectafapes-project/issues/1750) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md) | ⚪ To Do |
 | Cadastrar Dirigente | [#1751](https://github.com/leds-conectafapes/conectafapes-project/issues/1751) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md) | ⚪ To Do |
 | Listar e Consultar Instituicoes | [#1752](https://github.com/leds-conectafapes/conectafapes-project/issues/1752) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md) | ⚪ To Do |
@@ -112,17 +112,17 @@
 
 | Feature | Issue | Produto | Documentacao | Status |
 |---------|-------|---------|--------------|--------|
-| Cadastrar e Formalizar Parceria (RN19) | [#1739](https://github.com/leds-conectafapes/conectafapes-project/issues/1739) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md), [EPIC](../../implementation/modules/M010-planejamento-estrategia/parcerias/epics/EPIC-M010-002.md) | ⚪ To Do |
-| Registrar Aporte Financeiro (inflow, isAditivo) | [#1740](https://github.com/leds-conectafapes/conectafapes-project/issues/1740) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
-| Listar e Consultar Parcerias | [#1743](https://github.com/leds-conectafapes/conectafapes-project/issues/1743) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Contrato API](../../implementation/modules/M010-planejamento-estrategia/contrato-api.md) | ⚪ To Do |
-| Encerrar Parceria (cascata RI2) | [#1744](https://github.com/leds-conectafapes/conectafapes-project/issues/1744) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | ⚪ To Do |
-| Registrar Vigencia (Aditivo) | [#1791](https://github.com/leds-conectafapes/conectafapes-project/issues/1791) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
-| Registrar Aditivo de Aporte Financeiro | [#1792](https://github.com/leds-conectafapes/conectafapes-project/issues/1792) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
-| Anexar Documentos a Parceria | [#1793](https://github.com/leds-conectafapes/conectafapes-project/issues/1793) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
-| Registrar Aporte Financeiro Parceria em Programa (N:N) | [#1794](https://github.com/leds-conectafapes/conectafapes-project/issues/1794) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Programas — Estrutural](../../implementation/modules/M010-planejamento-estrategia/programas/modelo-estrutural.md) | ⚪ To Do |
-| Validar Invariante Temporal Programa/Parceria (RN13) | [#1795](https://github.com/leds-conectafapes/conectafapes-project/issues/1795) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Programas — Comportamental](../../implementation/modules/M010-planejamento-estrategia/programas/modelo-comportamental.md) | ⚪ To Do |
-| Consultar Saldo da Parceria (RN14) | [#1796](https://github.com/leds-conectafapes/conectafapes-project/issues/1796) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ To Do |
-| Remover Parceria (RI3) | [#1797](https://github.com/leds-conectafapes/conectafapes-project/issues/1797) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | ⚪ To Do |
+| Cadastrar e Formalizar Parceria (RN19) | [#1739](https://github.com/leds-conectafapes/conectafapes-project/issues/1739) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md), [EPIC](../../implementation/modules/M010-planejamento-estrategia/parcerias/epics/EPIC-M010-002.md) | 🔵 In Progress — [PR #262](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/262) |
+| Registrar Aporte Financeiro (inflow, isAditivo) | [#1740](https://github.com/leds-conectafapes/conectafapes-project/issues/1740) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | 🔵 In Progress — [PR #264](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/264) |
+| Listar e Consultar Parcerias | [#1743](https://github.com/leds-conectafapes/conectafapes-project/issues/1743) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Contrato API](../../implementation/modules/M010-planejamento-estrategia/contrato-api.md) | 🔵 In Progress — [PR #267](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/267) |
+| Encerrar Parceria (cascata RI2) | [#1744](https://github.com/leds-conectafapes/conectafapes-project/issues/1744) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | 🔵 In Progress — [PR #267](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/267) |
+| Registrar Vigencia (Aditivo) | [#1791](https://github.com/leds-conectafapes/conectafapes-project/issues/1791) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | 🔵 In Progress — [PR #263](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/263) |
+| Registrar Aditivo de Aporte Financeiro | [#1792](https://github.com/leds-conectafapes/conectafapes-project/issues/1792) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | 🔵 In Progress — [PR #265](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/265) |
+| Anexar Documentos a Parceria | [#1793](https://github.com/leds-conectafapes/conectafapes-project/issues/1793) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | 🔴 Omitido — Documento fora do escopo deste sprint |
+| Registrar Aporte Financeiro Parceria em Programa (N:N) | [#1794](https://github.com/leds-conectafapes/conectafapes-project/issues/1794) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Programas — Estrutural](../../implementation/modules/M010-planejamento-estrategia/programas/modelo-estrutural.md) | 🔴 Adiado — aguarda M014 |
+| Validar Invariante Temporal Programa/Parceria (RN13) | [#1795](https://github.com/leds-conectafapes/conectafapes-project/issues/1795) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Programas — Comportamental](../../implementation/modules/M010-planejamento-estrategia/programas/modelo-comportamental.md) | 🔴 Adiado — aguarda #1794 |
+| Consultar Saldo da Parceria (RN14) | [#1796](https://github.com/leds-conectafapes/conectafapes-project/issues/1796) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | 🔵 In Progress — [PR #266](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/266) |
+| Remover Parceria (RI3) | [#1797](https://github.com/leds-conectafapes/conectafapes-project/issues/1797) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | 🔵 In Progress — [PR #267](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/267) |
 
 **Issues fechadas** (concepts removidos do dominio M010):
 - ~~[#1741](https://github.com/leds-conectafapes/conectafapes-project/issues/1741) Registrar Coordenacao~~ — `Coordenacao` removida de M010 (parcerias nao tem coordenador no dominio atual)
@@ -246,15 +246,15 @@
 | **Design de Produto** | 2 |
 | **Discovery de Melhorias** | 1 |
 | **Concluidas** | 0 |
-| **Em andamento** | 0 |
-| **Pendentes** | 25 |
+| **Em andamento** | 9 |
+| **Pendentes** | 16 |
 | **% Concluido** | 0% |
 
 ### Progresso por Responsavel
 
 | Responsavel | Total | Done | In Progress | To Do | % |
 |-------------|-------|------|-------------|-------|---|
-| Vinicius | 17 | 0 | 0 | 17 | 0% |
+| Vinicius | 17 | 0 | 9 | 8 | 0% |
 | Manoel | 5 | 0 | 0 | 5 | 0% |
 | Leticia | 2 | 0 | 0 | 2 | 0% |
 | Marcela + Leticia | 1 | 0 | 0 | 1 | 0% |
@@ -263,23 +263,23 @@
 
 | # | Responsavel | Feature | Issue | Produto | Status |
 |---|-------------|---------|-------|---------|--------|
-| 1 | Vinicius | Cadastrar Instituicao | #1749 | Portal Admin | ⚪ To Do |
+| 1 | Vinicius | Cadastrar Instituicao | #1749 | Portal Admin | 🔵 In Progress — [PR #261](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/261) |
 | 2 | Vinicius | Cadastrar Unidade Organizacional | #1750 | Portal Admin | ⚪ To Do |
 | 3 | Vinicius | Vincular Pessoa a Instituicao/Unidade | #1753 | Portal Admin | ⚪ To Do |
 | 4 | Vinicius | Cadastrar e Gerenciar Area Tecnica | #1754 | Portal Admin | ⚪ To Do |
 | 5 | Vinicius | Cadastrar Dirigente | #1751 | Portal Admin | ⚪ To Do |
 | 6 | Vinicius | Listar e Consultar Instituicoes | #1752 | Portal Admin | ⚪ To Do |
-| 7 | Vinicius | Cadastrar e Formalizar Parceria (RN19) | #1739 | Portal Admin / EPA-07 | ⚪ To Do |
-| 8 | Vinicius | Registrar Aporte Financeiro (inflow) | #1740 | Portal Admin / EPA-07 | ⚪ To Do |
-| 9 | Vinicius | Listar e Consultar Parcerias | #1743 | Portal Admin / EPA-07 | ⚪ To Do |
-| 10 | Vinicius | Encerrar Parceria (cascata RI2) | #1744 | Portal Admin / EPA-07 | ⚪ To Do |
-| 11 | Vinicius | Registrar Vigencia (Aditivo) | #1791 | Portal Admin / EPA-07 | ⚪ To Do |
-| 12 | Vinicius | Registrar Aditivo de Aporte Financeiro | #1792 | Portal Admin / EPA-07 | ⚪ To Do |
-| 13 | Vinicius | Anexar Documentos a Parceria | #1793 | Portal Admin / EPA-07 | ⚪ To Do |
-| 14 | Vinicius | Registrar Aporte Parceria em Programa (N:N) | #1794 | Portal Admin / EPA-07 | ⚪ To Do |
-| 15 | Vinicius | Validar Invariante Temporal RN13 | #1795 | Portal Admin / EPA-07 | ⚪ To Do |
-| 16 | Vinicius | Consultar Saldo da Parceria | #1796 | Portal Admin / EPA-07 | ⚪ To Do |
-| 17 | Vinicius | Remover Parceria (RI3) | #1797 | Portal Admin / EPA-07 | ⚪ To Do |
+| 7 | Vinicius | Cadastrar e Formalizar Parceria (RN19) | #1739 | Portal Admin / EPA-07 | 🔵 In Progress — [PR #262](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/262) |
+| 8 | Vinicius | Registrar Aporte Financeiro (inflow) | #1740 | Portal Admin / EPA-07 | 🔵 In Progress — [PR #264](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/264) |
+| 9 | Vinicius | Listar e Consultar Parcerias | #1743 | Portal Admin / EPA-07 | 🔵 In Progress — [PR #267](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/267) |
+| 10 | Vinicius | Encerrar Parceria (cascata RI2) | #1744 | Portal Admin / EPA-07 | 🔵 In Progress — [PR #267](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/267) |
+| 11 | Vinicius | Registrar Vigencia (Aditivo) | #1791 | Portal Admin / EPA-07 | 🔵 In Progress — [PR #263](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/263) |
+| 12 | Vinicius | Registrar Aditivo de Aporte Financeiro | #1792 | Portal Admin / EPA-07 | 🔵 In Progress — [PR #265](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/265) |
+| 13 | Vinicius | Anexar Documentos a Parceria | #1793 | Portal Admin / EPA-07 | 🔴 Omitido — Documento fora do escopo |
+| 14 | Vinicius | Registrar Aporte Parceria em Programa (N:N) | #1794 | Portal Admin / EPA-07 | 🔴 Adiado — aguarda M014 |
+| 15 | Vinicius | Validar Invariante Temporal RN13 | #1795 | Portal Admin / EPA-07 | 🔴 Adiado — aguarda #1794 |
+| 16 | Vinicius | Consultar Saldo da Parceria | #1796 | Portal Admin / EPA-07 | 🔵 In Progress — [PR #266](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/266) |
+| 17 | Vinicius | Remover Parceria (RI3) | #1797 | Portal Admin / EPA-07 | 🔵 In Progress — [PR #267](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/267) |
 | 18 | Manoel | Extrato do Projeto (EPIC) | #1718 | Portal Admin + Portal Coordenador | ⚪ To Do |
 | 19 | Manoel | Listagem paginada do Extrato | #1721 | Portal Admin + Portal Coordenador | ⚪ To Do |
 | 20 | Manoel | Controle de Gastos do Projeto | #1719 | Portal Admin + Portal Coordenador | ⚪ To Do |
@@ -289,7 +289,7 @@
 | 24 | Leticia | Discovery Captacao de Iniciativas | #1757 | Portal Admin | ⚪ To Do |
 | 25 | Marcela + Leticia | Jornadas e melhorias de usuario | #1755 | Cross-product | ⚪ To Do |
 
-> **Legenda:** ⚪ To Do | 🔵 In Progress | 🟢 Done
+> **Legenda:** ⚪ To Do | 🔵 In Progress | 🟢 Done | 🔴 Omitido/Adiado
 
 ---
 

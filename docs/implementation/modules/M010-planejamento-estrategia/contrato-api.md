@@ -14,6 +14,8 @@ Este documento especifica o contrato HTTP REST do modulo M010 (Planejamento e Es
 
 > **Nota**: as rotas nao expoem o identificador interno do modulo (`M010`). Os recursos sao expostos diretamente sob `/api/v1/` (ex.: `/parcerias`, `/programas`, `/planos-estrategicos`). A segmentacao por modulo e uma decisao interna de arquitetura e nao deve vazar para clientes externos.
 
+> **Implementacao atual (SPRINT-007)**: os endpoints de Parcerias estao sob `/api/parcerias` (sem prefixo `v1`). O prefixo `/api/v1` sera adicionado em sprint futura de versionamento.
+
 ### Convencoes Gerais
 
 | Aspecto | Convencao |
@@ -466,7 +468,7 @@ Encerra Programa (transicao de estado distinta de `DELETE /programas/{id}`). Blo
 
 ---
 
-### `POST /api/v1/parcerias/{id}/formalizar`
+### `PATCH /api/parcerias/{id}/formalizar`
 
 Transiciona a Parceria de `EmElaboracao` para `Vigente` (RN19).
 
@@ -475,12 +477,18 @@ Transiciona a Parceria de `EmElaboracao` para `Vigente` (RN19).
 - **Idempotencia:** Sim (rechamadas em estado `Vigente` retornam o estado atual)
 
 **Pre-condicoes (RN19)**
-1. `dataAssinatura` preenchida
+1. `dataAssinatura` preenchida no body
 2. Pelo menos 1 `AporteFinanceiro` registrado (original, `isAditivo = false`)
-3. Pelo menos 1 `Documento` anexado (tipicamente Termo de Cooperacao)
-4. Data atual em `[vigenciaInicioCorrente, vigenciaFimCorrente]`
+3. Data atual em `[vigenciaInicioCorrente, vigenciaFimCorrente]`
+4. ~~Pelo menos 1 `Documento` anexado~~ — omitido neste sprint (M008 Documento fora do escopo)
 
-**Request body**: vazio ou `{}`.
+**Request body**
+
+```json
+{
+  "dataAssinatura": "2026-03-01"
+}
+```
 
 **Response `200 OK`**
 
@@ -498,61 +506,37 @@ Transiciona a Parceria de `EmElaboracao` para `Vigente` (RN19).
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
 | `404` | `PARCERIA_NAO_ENCONTRADA` | Parceria nao encontrada. |
-| `422` | `FORMALIZACAO_DATA_ASSINATURA_AUSENTE` | `dataAssinatura` da Parceria nao preenchida (RN19). |
+| `422` | `FORMALIZACAO_DATA_ASSINATURA_AUSENTE` | `dataAssinatura` ausente no body (RN19). |
 | `422` | `FORMALIZACAO_SEM_APORTE` | Parceria nao possui AporteFinanceiro original registrado (RN19). |
-| `422` | `FORMALIZACAO_SEM_DOCUMENTO` | Parceria nao possui Documento anexado (RN19). |
 | `422` | `FORMALIZACAO_FORA_DA_VIGENCIA` | Data atual fora de `[vigenciaInicioCorrente, vigenciaFimCorrente]` (RN19). |
 
-### `POST /api/v1/parcerias/{id}/encerrar`
+### `PATCH /api/parcerias/{id}/encerrar`
 
-Encerra a Parceria. Gatilhos: (a) solicitacao do usuario; (b) expiracao automatica via job `VerificarVigenciaExpirada`. Em ambos os casos, encerra em cascata todos os Programas aportados, exigindo confirmacao explicita (RI2).
+Encerra a Parceria com justificativa obrigatoria (RI2).
 
-- **Autorizacao:** `ANALISTA_AGENCIA` (gatilho manual) | Sistema (gatilho automatico dispara notificacao ao usuario)
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Operacao de origem:** `EncerrarParceria`
+
+> **Implementacao atual (SPRINT-007)**: encerramento simples com justificativa. O fluxo de confirmacao de cascata (`confirmarCascata`) e encerramento automatico por expiracao serao implementados em sprint futura, junto com `AporteFinanceiroParceriaPrograma` (M014).
 
 **Request body**
 
 ```json
 {
-  "dataEncerramento": "2029-12-31",
-  "justificativa": "Cumprimento do plano de trabalho e conclusao de entregas.",
-  "origemGatilho": "USUARIO",
-  "confirmarCascata": false
+  "justificativa": "Cumprimento do plano de trabalho e conclusao de entregas."
 }
 ```
 
 | Campo | Tipo | Obrigatorio | Descricao |
 |-------|------|-------------|-----------|
-| `dataEncerramento` | date | Sim | Data efetiva do encerramento informada pelo usuario |
-| `justificativa` | string | **Sim** | Justificativa textual do encerramento (obrigatoria) |
-| `origemGatilho` | enum `USUARIO` / `EXPIRACAO_VIGENCIA` | Nao (default `USUARIO`) | Origem do pedido |
-| `confirmarCascata` | boolean | Nao (default `false`) | Confirma o encerramento em cascata dos Programas vinculados |
-
-**Fluxo**:
-1. `confirmarCascata = false` → retorna `422 CONFIRMACAO_CASCATA_OBRIGATORIA` com lista dos Programas aportados que serao encerrados.
-2. `confirmarCascata = true` → encerra em cascata todos os Programas (estado `ENCERRADO`), emite evento `ProgramaEncerradoPorCascata` por Programa, e em seguida encerra a Parceria.
+| `justificativa` | string | **Sim** | Justificativa textual do encerramento |
 
 **Response `200 OK`**
 
 ```json
 {
-  "parceria": { "id": "PAR-2026-03", "estado": "Encerrada", "dataEncerramento": "2029-12-31" },
-  "programasEncerradosEmCascata": ["PROG-2026-001", "PROG-2026-002"],
-  "mensagem": "Parceria e 2 Programas encerrados."
-}
-```
-
-**Response `422 Unprocessable Entity` (aguardando confirmacao)**
-
-```json
-{
-  "error": {
-    "code": "CONFIRMACAO_CASCATA_OBRIGATORIA",
-    "message": "Para encerrar a parceria, todos os Programas vinculados serao encerrados em cascata. Reenvie com `confirmarCascata = true`.",
-    "details": {
-      "programasAfetados": ["PROG-2026-001", "PROG-2026-002"],
-      "origemGatilho": "USUARIO"
-    }
-  }
+  "id": "PAR-2026-03",
+  "estado": "Encerrada"
 }
 ```
 
@@ -561,19 +545,20 @@ Encerra a Parceria. Gatilhos: (a) solicitacao do usuario; (b) expiracao automati
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
 | `404` | `PARCERIA_NAO_ENCONTRADA` | Parceria nao encontrada. |
-| `400` | `JUSTIFICATIVA_AUSENTE` | Justificativa de encerramento e obrigatoria. |
-| `422` | `CONFIRMACAO_CASCATA_OBRIGATORIA` | Aguardando confirmacao explicita do encerramento em cascata (RI2). |
+| `400` | `JUSTIFICATIVA_AUSENTE` | Justificativa de encerramento e obrigatoria (RI2). |
 
 ---
 
 ## 7. Vigencias da Parceria
 
-### `POST /api/v1/parcerias/{id}/vigencias`
+### `POST /api/parcerias/{id}/vigencias/aditivo`
 
 Registra **Vigencia aditivo** (`isAditivo = true`). A Vigencia original e criada automaticamente no cadastro da parceria.
 
-- **Operacao de origem:** `RegistrarVigencia`
+- **Operacao de origem:** `RegistrarVigenciaAditivo`
 - **Autorizacao:** `ANALISTA_AGENCIA`
+
+> **Implementacao atual (SPRINT-007)**: campo `documento` omitido — M008 Documento fora do escopo deste sprint.
 
 **Request body**
 
@@ -582,8 +567,7 @@ Registra **Vigencia aditivo** (`isAditivo = true`). A Vigencia original e criada
   "dataInicio": "2026-03-01",
   "dataFim": "2029-12-31",
   "dataAssinatura": "2027-10-15",
-  "justificativa": "Continuidade das atividades de pesquisa.",
-  "documento": "DOC-TA-2027-001"
+  "justificativa": "Continuidade das atividades de pesquisa."
 }
 ```
 
@@ -620,12 +604,14 @@ Lista todas as Vigencias da parceria (original + aditivos), ordenadas por `dataA
 
 ## 8. Aportes Financeiros Recebidos
 
-### `POST /api/v1/parcerias/{id}/aportes`
+### `POST /api/parcerias/{id}/aportes`
 
 Registra aporte recebido de Instituicao, formalizado por Documento tipo "Termo de Descentralizacao".
 
 - **Operacao de origem:** `RegistrarAporteFinanceiro`
 - **Autorizacao:** `ANALISTA_AGENCIA`
+
+> **Implementacao atual (SPRINT-007)**: campo `documentoTermoDescentralizacaoId` omitido — M008 Documento fora do escopo deste sprint.
 
 **Request body**
 
@@ -634,7 +620,6 @@ Registra aporte recebido de Instituicao, formalizado por Documento tipo "Termo d
   "instituicaoId": "INST-2026-010",
   "valorInvestido": 500000.0,
   "dataAporte": "2026-03-10",
-  "documentoTermoDescentralizacaoId": "DOC-TD-2026-001",
   "isAditivo": false
 }
 ```
@@ -877,31 +862,31 @@ Consulta consolidado. Filtros: `planoId`, `estadoPrograma`, `estadoParceria`.
 | `GET` | `/api/v1/programas/{id}/recursos` | ListarRecursosDoPrograma | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
 | `POST` | `/api/v1/programas/{id}/comite` | CadastrarComiteGovernanca | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/programas/{programaId}/aportes-parcerias` | ListarAportesRecebidosPorPrograma | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
-| `POST` | `/api/v1/parcerias` | CriarParceria | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/parcerias` | ListarParcerias | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
-| `GET` | `/api/v1/parcerias/{id}` | ConsultarParceria | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
-| `PUT` | `/api/v1/parcerias/{id}` | AtualizarParceria | ANALISTA_AGENCIA |
-| `DELETE` | `/api/v1/parcerias/{id}` | RemoverParceria (RI3) | ANALISTA_AGENCIA |
-| `POST` | `/api/v1/parcerias/{id}/formalizar` | FormalizarParceria (RN19) | ANALISTA_AGENCIA |
+| `POST` | `/api/parcerias` | CriarParceria | ANALISTA_AGENCIA |
+| `GET` | `/api/parcerias` | ListarParcerias | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `GET` | `/api/parcerias/{id}` | ConsultarParceria | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `PUT` | `/api/parcerias/{id}` | AtualizarParceria | ANALISTA_AGENCIA |
+| `DELETE` | `/api/parcerias/{id}` | RemoverParceria (RI3) | ANALISTA_AGENCIA |
+| `PATCH` | `/api/parcerias/{id}/formalizar` | FormalizarParceria (RN19) | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/parcerias/{id}/suspender` | SuspenderParceria | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/parcerias/{id}/reativar` | ReativarParceria | ANALISTA_AGENCIA |
-| `POST` | `/api/v1/parcerias/{id}/encerrar` | EncerrarParceria (RI2) | ANALISTA_AGENCIA |
+| `PATCH` | `/api/parcerias/{id}/encerrar` | EncerrarParceria (RI2) | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/programas/{id}/ativar` | AtivarPrograma | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/programas/{id}/suspender` | SuspenderPrograma | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/programas/{id}/reativar` | ReativarPrograma | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/programas/{id}/encerrar` | EncerrarPrograma (RI1) | ANALISTA_AGENCIA |
-| `POST` | `/api/v1/parcerias/{id}/vigencias` | RegistrarVigencia (aditivo) | ANALISTA_AGENCIA |
+| `POST` | `/api/parcerias/{id}/vigencias/aditivo` | RegistrarVigenciaAditivo | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/parcerias/{id}/vigencias` | ListarVigencias | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
-| `POST` | `/api/v1/parcerias/{id}/aportes` | RegistrarAporteFinanceiro | ANALISTA_AGENCIA |
+| `POST` | `/api/parcerias/{id}/aportes` | RegistrarAporteFinanceiro | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/parcerias/{id}/aportes` | ListarAportesFinanceiros | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
-| `PUT` | `/api/v1/parcerias/{id}/aportes/{aporteId}` | EditarAporteFinanceiroAditivo (RN18) | ANALISTA_AGENCIA |
-| `DELETE` | `/api/v1/parcerias/{id}/aportes/{aporteId}` | RemoverAporteFinanceiroAditivo (RN18) | ANALISTA_AGENCIA |
+| `PUT` | `/api/parcerias/{id}/aportes/{aporteId}` | EditarAporteFinanceiroAditivo (RN18) | ANALISTA_AGENCIA |
+| `DELETE` | `/api/parcerias/{id}/aportes/{aporteId}` | RemoverAporteFinanceiroAditivo (RN18) | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/parcerias/{parceriaId}/aportes-programas` | RegistrarAporteFinanceiroParceriaPrograma | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/parcerias/{parceriaId}/aportes-programas` | ListarAportesEmProgramas | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
 | `POST` | `/api/v1/parcerias/{id}/documentos` | AnexarDocumentoAParceria | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/parcerias/{id}/documentos` | ListarDocumentosDaParceria | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
 | `DELETE` | `/api/v1/parcerias/{id}/documentos/{documentoId}` | DesanexarDocumento | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/parcerias/{id}/saldo` | ConsultarSaldoParceria | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `GET` | `/api/parcerias/{id}/saldo` | ConsultarSaldoParceria | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
 | `GET` | `/api/v1/portfolio` | ConsultarPortfolioEstrategico | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
 
 ---
