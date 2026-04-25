@@ -4,7 +4,7 @@ Referencia de dominio e regras de negocio: [contrato.md](contrato.md) | [README.
 
 ## Visao Geral
 
-Este documento especifica o contrato HTTP REST do modulo M011 como bounded context responsavel pela configuracao de editais: cronograma, formularios de submissao e avaliacao, parametros de fomento e revisores ad hoc. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
+Este documento especifica o contrato HTTP REST do modulo M011 como bounded context responsavel pela configuracao de captacoes: cronograma, formularios de submissao e avaliacao, parametros de fomento e revisores ad hoc. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
 
 ### Base URL
 
@@ -19,7 +19,7 @@ Este documento especifica o contrato HTTP REST do modulo M011 como bounded conte
 | Formato de corpo | `application/json` |
 | Formato de data | ISO 8601 — `YYYY-MM-DD` |
 | Paginacao | Query params `?page=1&pageSize=20` (padrao: page=1, pageSize=20) |
-| Identificadores | Strings opacas (ex: `EDT-2026-001`, `CRON-2026-001`, `REV-2026-010`) |
+| Identificadores | Strings opacas (ex: `CAP-2026-001`, `CRON-2026-001`, `REV-2026-010`) |
 | Encoding | UTF-8 |
 | Idioma de erros | Portugues brasileiro |
 
@@ -30,7 +30,11 @@ Todas as rotas exigem autenticacao. O perfil do chamador determina o acesso:
 | Perfil | Descricao |
 |--------|-----------|
 | `ANALISTA_AGENCIA` | Analista da Agencia de Fomento — configura cronograma, formularios, parametros e revisores |
-| `MODULO_INTERNO` | Modulo interno autorizado (M003) — acesso restrito a consulta de prontidao |
+| `DIRETORIA_FAPES` | Diretoria da FAPES — pode instanciar processo de captacao a partir de configuracao publicada |
+| `AREA_TECNICA` | Area tecnica responsavel pela captacao — executa publicacao, avaliacao documental, distribuicao, consolidacao, revisao e resultados |
+| `PROPONENTE` | Pessoa ou instituicao que submete proposta e solicita revisao de resultado |
+| `REVISOR_AD_HOC` | Consultor externo que registra avaliacao de proposta distribuida |
+| `MODULO_INTERNO` | Modulo interno autorizado, especialmente M022 para consumo de propostas aprovadas — acesso restrito a consulta de prontidao e resultados |
 
 ---
 
@@ -44,7 +48,7 @@ Todas as respostas de erro seguem o envelope abaixo:
     "code": "CODIGO_DO_ERRO",
     "message": "Mensagem de erro legivel para operador ou modulo consumidor.",
     "details": {
-      "edital": "EDT-2026-001"
+      "captacao": "CAP-2026-001"
     }
   }
 }
@@ -63,21 +67,21 @@ Todas as respostas de erro seguem o envelope abaixo:
 
 ## Recursos
 
-### 1. Cronograma do Edital
+### 1. Cronograma da Captacao
 
-#### `POST /api/v1/m011/editais/{editalId}/cronograma`
+#### `POST /api/v1/m011/captacoes/{captacaoId}/cronograma`
 
-Registra ou versiona os periodos do cronograma de um edital.
+Registra ou versiona as fases do cronograma da captacao.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
-- **Operacao de origem:** `ConfigurarCronogramaDoEdital`
+- **Operacao de origem:** `ConfigurarCronogramaDaCaptacao`
 - **Idempotencia:** Nao
 
 **Path parameters**
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `editalId` | string | Identificador do edital em M003 (ex: `EDT-2026-001`) |
+| `captacaoId` | string | Identificador da captacao (ex: `CAP-2026-001`) |
 
 **Request body**
 
@@ -85,12 +89,12 @@ Registra ou versiona os periodos do cronograma de um edital.
 {
   "periodos": [
     {
-      "tipo": "SUBMISSAO",
+      "tipo": "RECEBIMENTO_PROPOSTAS",
       "inicio": "2026-06-01",
       "fim": "2026-06-30"
     },
     {
-      "tipo": "AVALIACAO_MERITO",
+      "tipo": "AVALIACAO_AD_HOC",
       "inicio": "2026-07-01",
       "fim": "2026-07-31"
     }
@@ -102,7 +106,7 @@ Registra ou versiona os periodos do cronograma de um edital.
 | Campo | Tipo | Obrigatorio | Descricao |
 |-------|------|-------------|-----------|
 | `periodos` | array | Sim | Lista de periodos do cronograma |
-| `periodos[].tipo` | string (enum) | Sim | Um de: `SUBMISSAO`, `AVALIACAO_MERITO`, `RESULTADO_PRELIMINAR`, `RECURSO`, `RESULTADO_FINAL`, `CONTRATACAO` |
+| `periodos[].tipo` | string (enum) | Sim | Um de: `PUBLICACAO_CAPTACAO`, `RECEBIMENTO_PROPOSTAS`, `AVALIACAO_DOCUMENTAL`, `AVALIACAO_AD_HOC`, `RESULTADO_PRELIMINAR`, `RECEBIMENTO_REVISAO`, `RESULTADO_APOS_REVISAO`, `RESULTADO_FINAL` |
 | `periodos[].inicio` | string (date) | Sim | Data de inicio do periodo |
 | `periodos[].fim` | string (date) | Sim | Data de fim do periodo |
 | `versao` | integer | Sim | Numero da versao do cronograma |
@@ -113,7 +117,7 @@ Registra ou versiona os periodos do cronograma de um edital.
 {
   "cronograma": {
     "id": "CRON-2026-001",
-    "editalId": "EDT-2026-001",
+    "captacaoId": "CAP-2026-001",
     "versao": 1,
     "totalPeriodos": 2
   }
@@ -124,16 +128,16 @@ Registra ou versiona os periodos do cronograma de um edital.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `EDITAL_NAO_ENCONTRADO` | O edital informado nao foi encontrado para configuracao do cronograma. |
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada para configuracao do cronograma. |
 | `400` | `CRONOGRAMA_DADOS_INVALIDOS` | Os dados obrigatorios do cronograma nao foram informados corretamente. |
-| `422` | `CRONOGRAMA_SEQUENCIA_INVALIDA` | Os periodos do cronograma nao respeitam a sequencia exigida pelo edital. |
-| `422` | `EDITAL_PUBLICADO_IMUTAVEL` | Um edital publicado nao pode ter sua configuracao alterada diretamente. |
+| `422` | `CRONOGRAMA_SEQUENCIA_INVALIDA` | Os periodos do cronograma nao respeitam a sequencia exigida pela captacao. |
+| `422` | `CONFIGURACAO_CAPTACAO_PUBLICADA_IMUTAVEL` | Uma configuracao de captacao publicada nao pode ser alterada diretamente. |
 
 ---
 
-#### `GET /api/v1/m011/editais/{editalId}/cronograma`
+#### `GET /api/v1/m011/captacoes/{captacaoId}/cronograma`
 
-Consulta o cronograma vigente de um edital.
+Consulta o cronograma vigente de uma captacao.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
 
@@ -141,7 +145,7 @@ Consulta o cronograma vigente de um edital.
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `editalId` | string | Identificador do edital |
+| `captacaoId` | string | Identificador da captacao |
 
 **Query parameters**
 
@@ -155,11 +159,11 @@ Consulta o cronograma vigente de um edital.
 {
   "cronograma": {
     "id": "CRON-2026-001",
-    "editalId": "EDT-2026-001",
+    "captacaoId": "CAP-2026-001",
     "versao": 1,
     "periodos": [
       {
-        "tipo": "SUBMISSAO",
+        "tipo": "RECEBIMENTO_PROPOSTAS",
         "inicio": "2026-06-01",
         "fim": "2026-06-30"
       }
@@ -172,55 +176,50 @@ Consulta o cronograma vigente de um edital.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `EDITAL_NAO_ENCONTRADO` | O edital informado nao foi encontrado. |
-| `404` | `CRONOGRAMA_NAO_ENCONTRADO` | O cronograma nao foi configurado para o edital informado. |
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
+| `404` | `CRONOGRAMA_NAO_ENCONTRADO` | O cronograma nao foi configurado para a captacao informada. |
 
 ---
 
 ### 2. Formularios de Submissao
 
-#### `POST /api/v1/m011/editais/{editalId}/formularios/submissao`
+#### `POST /api/v1/m011/captacoes/{captacaoId}/formularios/submissao`
 
-Publica nova versao do formulario de submissao de um edital.
+Seleciona uma versao publicada no M021 para ser usada como formulario de submissao de uma captacao.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
-- **Operacao de origem:** `PublicarVersaoFormularioSubmissao`
+- **Operacao de origem:** `SelecionarFormularioSubmissao`
 - **Idempotencia:** Nao
 
 **Path parameters**
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `editalId` | string | Identificador do edital |
+| `captacaoId` | string | Identificador da captacao |
 
 **Request body**
 
 ```json
 {
-  "versao": 2,
-  "campos": [
-    "titulo",
-    "resumo",
-    "orcamento"
-  ]
+  "formularioId": "FORM-2026-001",
+  "versaoFormularioId": "VF-2026-002"
 }
 ```
 
 | Campo | Tipo | Obrigatorio | Descricao |
 |-------|------|-------------|-----------|
-| `versao` | integer | Sim | Numero da versao do formulario |
-| `campos` | array (string) | Sim | Lista de identificadores dos campos do formulario |
+| `formularioId` | string | Sim | Identificador do formulario no M021 |
+| `versaoFormularioId` | string | Sim | Identificador da versao publicada do formulario no M021 |
 
 **Response `201 Created`**
 
 ```json
 {
-  "versaoFormulario": {
-    "id": "VFS-2026-002",
-    "editalId": "EDT-2026-001",
-    "tipo": "SUBMISSAO",
-    "versao": 2,
-    "publicada": true
+  "formularioSelecionado": {
+    "captacaoId": "CAP-2026-001",
+    "formularioId": "FORM-2026-001",
+    "versaoFormularioId": "VF-2026-002",
+    "tipo": "SUBMISSAO"
   }
 }
 ```
@@ -229,16 +228,17 @@ Publica nova versao do formulario de submissao de um edital.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `EDITAL_NAO_ENCONTRADO` | O edital informado nao foi encontrado para configuracao do formulario. |
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada para configuracao do formulario. |
+| `404` | `FORMULARIO_NAO_ENCONTRADO` | O formulario informado nao foi encontrado no M021. |
+| `422` | `VERSAO_FORMULARIO_NAO_PUBLICADA` | A versao informada nao esta publicada no M021. |
 | `409` | `FORMULARIO_SUBMISSAO_DUPLICADO` | Nao pode haver dois formularios de submissao ativos simultaneamente. |
-| `400` | `FORMULARIO_SUBMISSAO_INVALIDO` | A estrutura do formulario de submissao e invalida. |
-| `422` | `EDITAL_PUBLICADO_IMUTAVEL` | Um edital publicado nao pode ter sua configuracao alterada diretamente. |
+| `422` | `CONFIGURACAO_CAPTACAO_PUBLICADA_IMUTAVEL` | Uma configuracao de captacao publicada nao pode ser alterada diretamente. |
 
 ---
 
-#### `GET /api/v1/m011/editais/{editalId}/formularios/submissao`
+#### `GET /api/v1/m011/captacoes/{captacaoId}/formularios/submissao`
 
-Consulta a versao ativa do formulario de submissao de um edital.
+Consulta a versao ativa do formulario de submissao de uma captacao.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
 
@@ -246,18 +246,17 @@ Consulta a versao ativa do formulario de submissao de um edital.
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `editalId` | string | Identificador do edital |
+| `captacaoId` | string | Identificador da captacao |
 
 **Response `200 OK`**
 
 ```json
 {
-  "versaoFormulario": {
-    "id": "VFS-2026-002",
+  "formularioSelecionado": {
+    "formularioId": "FORM-2026-001",
+    "versaoFormularioId": "VF-2026-002",
     "tipo": "SUBMISSAO",
-    "versao": 2,
-    "publicada": true,
-    "campos": ["titulo", "resumo", "orcamento"]
+    "origem": "M021"
   }
 }
 ```
@@ -266,55 +265,50 @@ Consulta a versao ativa do formulario de submissao de um edital.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `EDITAL_NAO_ENCONTRADO` | O edital informado nao foi encontrado. |
-| `404` | `FORMULARIO_NAO_ENCONTRADO` | O formulario de submissao nao foi configurado para o edital informado. |
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
+| `404` | `FORMULARIO_NAO_ENCONTRADO` | O formulario de submissao nao foi configurado para a captacao informada. |
 
 ---
 
 ### 3. Formularios de Avaliacao
 
-#### `POST /api/v1/m011/editais/{editalId}/formularios/avaliacao`
+#### `POST /api/v1/m011/captacoes/{captacaoId}/formularios/avaliacao`
 
-Publica nova versao do formulario de avaliacao de um edital.
+Seleciona uma versao publicada no M021 para ser usada como formulario de avaliacao ad hoc de uma captacao.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
-- **Operacao de origem:** `PublicarVersaoFormularioAvaliacao`
+- **Operacao de origem:** `SelecionarFormularioAvaliacao`
 - **Idempotencia:** Nao
 
 **Path parameters**
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `editalId` | string | Identificador do edital |
+| `captacaoId` | string | Identificador da captacao |
 
 **Request body**
 
 ```json
 {
-  "versao": 1,
-  "campos": [
-    "aderencia",
-    "merito",
-    "viabilidade"
-  ]
+  "formularioId": "FORM-2026-010",
+  "versaoFormularioId": "VF-2026-015"
 }
 ```
 
 | Campo | Tipo | Obrigatorio | Descricao |
 |-------|------|-------------|-----------|
-| `versao` | integer | Sim | Numero da versao do formulario |
-| `campos` | array (string) | Sim | Lista de identificadores dos campos do formulario |
+| `formularioId` | string | Sim | Identificador do formulario no M021 |
+| `versaoFormularioId` | string | Sim | Identificador da versao publicada do formulario no M021 |
 
 **Response `201 Created`**
 
 ```json
 {
-  "versaoFormulario": {
-    "id": "VFA-2026-001",
-    "editalId": "EDT-2026-001",
-    "tipo": "AVALIACAO",
-    "versao": 1,
-    "publicada": true
+  "formularioSelecionado": {
+    "captacaoId": "CAP-2026-001",
+    "formularioId": "FORM-2026-010",
+    "versaoFormularioId": "VF-2026-015",
+    "tipo": "AVALIACAO_AD_HOC"
   }
 }
 ```
@@ -323,15 +317,16 @@ Publica nova versao do formulario de avaliacao de um edital.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `EDITAL_NAO_ENCONTRADO` | O edital informado nao foi encontrado para configuracao do formulario de avaliacao. |
-| `400` | `FORMULARIO_AVALIACAO_INVALIDO` | A estrutura do formulario de avaliacao e invalida. |
-| `422` | `EDITAL_PUBLICADO_IMUTAVEL` | Um edital publicado nao pode ter sua configuracao alterada diretamente. |
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada para configuracao do formulario de avaliacao. |
+| `404` | `FORMULARIO_NAO_ENCONTRADO` | O formulario informado nao foi encontrado no M021. |
+| `422` | `VERSAO_FORMULARIO_NAO_PUBLICADA` | A versao informada nao esta publicada no M021. |
+| `422` | `CONFIGURACAO_CAPTACAO_PUBLICADA_IMUTAVEL` | Uma configuracao de captacao publicada nao pode ser alterada diretamente. |
 
 ---
 
-#### `GET /api/v1/m011/editais/{editalId}/formularios/avaliacao`
+#### `GET /api/v1/m011/captacoes/{captacaoId}/formularios/avaliacao`
 
-Consulta a versao ativa do formulario de avaliacao de um edital.
+Consulta a versao ativa do formulario de avaliacao de uma captacao.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
 
@@ -339,18 +334,17 @@ Consulta a versao ativa do formulario de avaliacao de um edital.
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `editalId` | string | Identificador do edital |
+| `captacaoId` | string | Identificador da captacao |
 
 **Response `200 OK`**
 
 ```json
 {
-  "versaoFormulario": {
-    "id": "VFA-2026-001",
-    "tipo": "AVALIACAO",
-    "versao": 1,
-    "publicada": true,
-    "campos": ["aderencia", "merito", "viabilidade"]
+  "formularioSelecionado": {
+    "formularioId": "FORM-2026-010",
+    "versaoFormularioId": "VF-2026-015",
+    "tipo": "AVALIACAO_AD_HOC",
+    "origem": "M021"
   }
 }
 ```
@@ -359,16 +353,104 @@ Consulta a versao ativa do formulario de avaliacao de um edital.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `EDITAL_NAO_ENCONTRADO` | O edital informado nao foi encontrado. |
-| `404` | `FORMULARIO_NAO_ENCONTRADO` | O formulario de avaliacao nao foi configurado para o edital informado. |
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
+| `404` | `FORMULARIO_NAO_ENCONTRADO` | O formulario de avaliacao nao foi configurado para a captacao informada. |
 
 ---
 
-### 4. Parametros de Fomento
+### 4. Formulario de Revisao de Resultado
 
-#### `POST /api/v1/m011/editais/{editalId}/parametros-fomento`
+#### `POST /api/v1/m011/captacoes/{captacaoId}/formularios/revisao`
 
-Registra parametros de cota, orcamento e distribuicao por area do edital.
+Seleciona uma versao publicada no M021 para ser usada como formulario de revisao de resultado de uma captacao.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Operacao de origem:** `SelecionarFormularioRevisao`
+- **Idempotencia:** Nao
+
+**Path parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `captacaoId` | string | Identificador da captacao |
+
+**Request body**
+
+```json
+{
+  "formularioId": "FORM-2026-020",
+  "versaoFormularioId": "VF-2026-021"
+}
+```
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| `formularioId` | string | Sim | Identificador do formulario no M021 |
+| `versaoFormularioId` | string | Sim | Identificador da versao publicada do formulario no M021 |
+
+**Response `201 Created`**
+
+```json
+{
+  "formularioSelecionado": {
+    "captacaoId": "CAP-2026-001",
+    "formularioId": "FORM-2026-020",
+    "versaoFormularioId": "VF-2026-021",
+    "tipo": "REVISAO_RESULTADO"
+  }
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada para configuracao do formulario de revisao. |
+| `404` | `FORMULARIO_NAO_ENCONTRADO` | O formulario informado nao foi encontrado no M021. |
+| `422` | `VERSAO_FORMULARIO_NAO_PUBLICADA` | A versao informada nao esta publicada no M021. |
+| `422` | `CONFIGURACAO_CAPTACAO_PUBLICADA_IMUTAVEL` | Uma configuracao de captacao publicada nao pode ser alterada diretamente. |
+
+---
+
+#### `GET /api/v1/m011/captacoes/{captacaoId}/formularios/revisao`
+
+Consulta o formulario de revisao de resultado selecionado para uma captacao.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
+
+**Path parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `captacaoId` | string | Identificador da captacao |
+
+**Response `200 OK`**
+
+```json
+{
+  "formularioSelecionado": {
+    "formularioId": "FORM-2026-020",
+    "versaoFormularioId": "VF-2026-021",
+    "tipo": "REVISAO_RESULTADO",
+    "origem": "M021"
+  }
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
+| `404` | `FORMULARIO_NAO_ENCONTRADO` | O formulario de revisao nao foi configurado para a captacao informada. |
+
+---
+
+### 5. Parametros de Fomento
+
+#### `POST /api/v1/m011/captacoes/{captacaoId}/parametros-fomento`
+
+Registra parametros de cota, orcamento e distribuicao por area da captacao.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
 - **Operacao de origem:** `ConfigurarParametrosDeFomento`
@@ -378,7 +460,7 @@ Registra parametros de cota, orcamento e distribuicao por area do edital.
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `editalId` | string | Identificador do edital |
+| `captacaoId` | string | Identificador da captacao |
 
 **Request body**
 
@@ -403,20 +485,20 @@ Registra parametros de cota, orcamento e distribuicao por area do edital.
 
 | Campo | Tipo | Obrigatorio | Descricao |
 |-------|------|-------------|-----------|
-| `orcamentoTotal` | number | Sim | Orcamento total do edital |
+| `orcamentoTotal` | number | Sim | Orcamento total da captacao |
 | `valorMaximoPorProjeto` | number | Nao | Valor maximo aprovavel por projeto |
 | `cotasArea` | array | Nao | Lista de cotas por area do conhecimento |
 | `cotasArea[].area` | string | Sim | Nome da area |
 | `cotasArea[].valor` | number | Sim | Valor alocado para a area |
 | `parceriaId` | string | Nao | Identificador da parceria financiadora (M010) |
-| `valorParceria` | number | Condicional | Valor da parceria destinado ao edital (obrigatorio quando `parceriaId` informado) |
+| `valorParceria` | number | Condicional | Valor da parceria destinado a captacao (obrigatorio quando `parceriaId` informado) |
 
 **Response `201 Created`**
 
 ```json
 {
   "parametroFomento": {
-    "editalId": "EDT-2026-001",
+    "captacaoId": "CAP-2026-001",
     "orcamentoTotal": 800000.0,
     "valorMaximoPorProjeto": 200000.0
   }
@@ -427,16 +509,16 @@ Registra parametros de cota, orcamento e distribuicao por area do edital.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `EDITAL_NAO_ENCONTRADO` | O edital informado nao foi encontrado para configuracao de parametros. |
-| `422` | `ORCAMENTO_EDITAL_INSUFICIENTE` | O orcamento total do edital e inferior ao valor distribuido por area. |
-| `400` | `COTA_AREA_INVALIDA` | Uma ou mais cotas por area estao invalidas para o edital informado. |
-| `422` | `EDITAL_PUBLICADO_IMUTAVEL` | Um edital publicado nao pode ter sua configuracao alterada diretamente. |
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada para configuracao de parametros. |
+| `422` | `ORCAMENTO_CAPTACAO_INSUFICIENTE` | O orcamento total da captacao e inferior ao valor distribuido por area. |
+| `400` | `COTA_AREA_INVALIDA` | Uma ou mais cotas por area estao invalidas para a captacao informada. |
+| `422` | `CONFIGURACAO_CAPTACAO_PUBLICADA_IMUTAVEL` | Uma configuracao de captacao publicada nao pode ser alterada diretamente. |
 
 ---
 
-#### `GET /api/v1/m011/editais/{editalId}/parametros-fomento`
+#### `GET /api/v1/m011/captacoes/{captacaoId}/parametros-fomento`
 
-Consulta os parametros de fomento configurados para um edital.
+Consulta os parametros de fomento configurados para uma captacao.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
 
@@ -444,14 +526,14 @@ Consulta os parametros de fomento configurados para um edital.
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `editalId` | string | Identificador do edital |
+| `captacaoId` | string | Identificador da captacao |
 
 **Response `200 OK`**
 
 ```json
 {
   "parametroFomento": {
-    "editalId": "EDT-2026-001",
+    "captacaoId": "CAP-2026-001",
     "orcamentoTotal": 800000.0,
     "valorMaximoPorProjeto": 200000.0,
     "cotasArea": [
@@ -470,14 +552,14 @@ Consulta os parametros de fomento configurados para um edital.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `EDITAL_NAO_ENCONTRADO` | O edital informado nao foi encontrado. |
-| `404` | `PARAMETROS_NAO_ENCONTRADOS` | Os parametros de fomento nao foram configurados para o edital informado. |
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
+| `404` | `PARAMETROS_NAO_ENCONTRADOS` | Os parametros de fomento nao foram configurados para a captacao informada. |
 
 ---
 
-#### `PUT /api/v1/m011/editais/{editalId}/parametros-fomento`
+#### `PUT /api/v1/m011/captacoes/{captacaoId}/parametros-fomento`
 
-Atualiza os parametros de fomento de um edital nao publicado (US-M011-003).
+Atualiza os parametros de fomento de uma captacao nao publicado (US-M011-003).
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
 - **Idempotencia:** Sim
@@ -486,7 +568,7 @@ Atualiza os parametros de fomento de um edital nao publicado (US-M011-003).
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `editalId` | string | Identificador do edital |
+| `captacaoId` | string | Identificador da captacao |
 
 **Request body**
 
@@ -499,7 +581,7 @@ Atualiza os parametros de fomento de um edital nao publicado (US-M011-003).
 
 | Campo | Tipo | Obrigatorio | Descricao |
 |-------|------|-------------|-----------|
-| `orcamentoTotal` | number | Nao | Novo orcamento total do edital |
+| `orcamentoTotal` | number | Nao | Novo orcamento total da captacao |
 | `valorMaximoPorProjeto` | number | Nao | Novo valor maximo por projeto |
 | `cotasArea` | array | Nao | Nova lista de cotas por area (substitui a lista existente) |
 
@@ -508,7 +590,7 @@ Atualiza os parametros de fomento de um edital nao publicado (US-M011-003).
 ```json
 {
   "parametroFomento": {
-    "editalId": "EDT-2026-001",
+    "captacaoId": "CAP-2026-001",
     "orcamentoTotal": 900000.0,
     "valorMaximoPorProjeto": 250000.0
   }
@@ -519,17 +601,17 @@ Atualiza os parametros de fomento de um edital nao publicado (US-M011-003).
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `EDITAL_NAO_ENCONTRADO` | O edital informado nao foi encontrado. |
-| `422` | `ORCAMENTO_EDITAL_INSUFICIENTE` | O orcamento total do edital e inferior ao valor distribuido por area. |
-| `422` | `EDITAL_PUBLICADO_IMUTAVEL` | Um edital publicado nao pode ter sua configuracao alterada diretamente. |
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
+| `422` | `ORCAMENTO_CAPTACAO_INSUFICIENTE` | O orcamento total da captacao e inferior ao valor distribuido por area. |
+| `422` | `CONFIGURACAO_CAPTACAO_PUBLICADA_IMUTAVEL` | Uma configuracao de captacao publicada nao pode ser alterada diretamente. |
 
 ---
 
-### 5. Revisores Ad Hoc
+### 6. Revisores Ad Hoc
 
-#### `POST /api/v1/m011/editais/{editalId}/revisores`
+#### `POST /api/v1/m011/captacoes/{captacaoId}/revisores`
 
-Associa um revisor ad hoc ao edital com validacao de conflito de interesses.
+Associa um revisor ad hoc a captacao com validacao de conflito de interesses.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
 - **Operacao de origem:** `AssociarRevisorAdHoc`
@@ -539,7 +621,7 @@ Associa um revisor ad hoc ao edital com validacao de conflito de interesses.
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `editalId` | string | Identificador do edital |
+| `captacaoId` | string | Identificador da captacao |
 
 **Request body**
 
@@ -561,7 +643,7 @@ Associa um revisor ad hoc ao edital com validacao de conflito de interesses.
 {
   "revisorAdHoc": {
     "id": "REV-2026-010",
-    "editalId": "EDT-2026-001",
+    "captacaoId": "CAP-2026-001",
     "revisorCpf": "123.456.789-00",
     "instituicaoId": "INST-2026-090"
   }
@@ -572,15 +654,15 @@ Associa um revisor ad hoc ao edital com validacao de conflito de interesses.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `EDITAL_NAO_ENCONTRADO` | O edital informado nao foi encontrado para associacao de revisor. |
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada para associacao de revisor. |
 | `422` | `CONFLITO_INTERESSE_REVISOR` | O revisor ad hoc nao pode avaliar propostas da propria instituicao. |
-| `409` | `REVISOR_DUPLICADO_NO_EDITAL` | O revisor informado ja esta associado ao edital. |
+| `409` | `REVISOR_DUPLICADO_NA_CAPTACAO` | O revisor informado ja esta associado a captacao. |
 
 ---
 
-#### `GET /api/v1/m011/editais/{editalId}/revisores`
+#### `GET /api/v1/m011/captacoes/{captacaoId}/revisores`
 
-Lista os revisores ad hoc associados ao edital (US-M011-010).
+Lista os revisores ad hoc associados a captacao (US-M011-010).
 
 - **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
 
@@ -588,7 +670,7 @@ Lista os revisores ad hoc associados ao edital (US-M011-010).
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `editalId` | string | Identificador do edital |
+| `captacaoId` | string | Identificador da captacao |
 
 **Query parameters**
 
@@ -601,7 +683,7 @@ Lista os revisores ad hoc associados ao edital (US-M011-010).
 
 ```json
 {
-  "editalId": "EDT-2026-001",
+  "captacaoId": "CAP-2026-001",
   "items": [
     {
       "id": "REV-2026-010",
@@ -619,13 +701,13 @@ Lista os revisores ad hoc associados ao edital (US-M011-010).
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `EDITAL_NAO_ENCONTRADO` | O edital informado nao foi encontrado. |
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
 
 ---
 
-#### `DELETE /api/v1/m011/editais/{editalId}/revisores/{revisorId}`
+#### `DELETE /api/v1/m011/captacoes/{captacaoId}/revisores/{revisorId}`
 
-Remove a associacao de um revisor ad hoc do edital.
+Remove a associacao de um revisor ad hoc da captacao.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
 
@@ -633,7 +715,7 @@ Remove a associacao de um revisor ad hoc do edital.
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `editalId` | string | Identificador do edital |
+| `captacaoId` | string | Identificador da captacao |
 | `revisorId` | string | Identificador do revisor ad hoc |
 
 **Response `204 No Content`**
@@ -644,32 +726,32 @@ Sem corpo na resposta.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `EDITAL_NAO_ENCONTRADO` | O edital informado nao foi encontrado. |
-| `404` | `REVISOR_NAO_ENCONTRADO` | O revisor informado nao foi encontrado neste edital. |
-| `422` | `EDITAL_PUBLICADO_IMUTAVEL` | Um edital publicado nao pode ter sua configuracao alterada diretamente. |
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
+| `404` | `REVISOR_NAO_ENCONTRADO` | O revisor informado nao foi encontrado nesta captacao. |
+| `422` | `CONFIGURACAO_CAPTACAO_PUBLICADA_IMUTAVEL` | Uma configuracao de captacao publicada nao pode ser alterada diretamente. |
 
 ---
 
-### 6. Validacao de Prontidao
+### 7. Validacao de Prontidao
 
-#### `GET /api/v1/m011/editais/{editalId}/validar-configuracao`
+#### `GET /api/v1/m011/captacoes/{captacaoId}/validar-configuracao`
 
-Valida se o edital possui configuracao minima para publicacao operacional.
+Valida se a captacao possui configuracao minima para publicacao operacional.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
-- **Operacao de origem:** `ValidarConfiguracaoDoEdital`
+- **Operacao de origem:** `ValidarConfiguracaoDaCaptacao`
 
 **Path parameters**
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `editalId` | string | Identificador do edital |
+| `captacaoId` | string | Identificador da captacao |
 
 **Response `200 OK`**
 
 ```json
 {
-  "editalId": "EDT-2026-001",
+  "captacaoId": "CAP-2026-001",
   "prontoParaPublicacao": true,
   "pendencias": []
 }
@@ -679,11 +761,11 @@ Exemplo com pendencias:
 
 ```json
 {
-  "editalId": "EDT-2026-001",
+  "captacaoId": "CAP-2026-001",
   "prontoParaPublicacao": false,
   "pendencias": [
     "Cronograma nao configurado.",
-    "Formulario de submissao nao publicado."
+    "Formulario de submissao nao selecionado."
   ]
 }
 ```
@@ -692,8 +774,28 @@ Exemplo com pendencias:
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `EDITAL_NAO_ENCONTRADO` | O edital informado nao foi encontrado para validacao. |
-| `422` | `CONFIGURACAO_EDITAL_INCOMPLETA` | O edital ainda possui pendencias de cronograma, formulario ou parametro obrigatorio. |
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada para validacao. |
+| `422` | `CONFIGURACAO_CAPTACAO_INCOMPLETA` | A captacao ainda possui pendencias de cronograma, formulario ou parametro obrigatorio. |
+
+---
+
+### 8. Operacoes da Instancia da Captacao
+
+Estas rotas representam o processo operacional descrito em [process.md](process.md). O detalhamento completo de payload de cada formulario continua dependente das versoes selecionadas no M021.
+
+| Metodo | Path | Operacao | Autorizacao |
+|--------|------|----------|-------------|
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/instancias` | InstanciarProcessoCaptacao | DIRETORIA_FAPES, AREA_TECNICA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/publicacao` | PublicarCaptacao | AREA_TECNICA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/propostas` | SubmeterProposta | PROPONENTE |
+| `GET` | `/api/v1/m011/captacoes/{captacaoId}/propostas` | ListarPropostasDaCaptacao | AREA_TECNICA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/propostas/{propostaId}/avaliacao-documental` | RegistrarAvaliacaoDocumental | AREA_TECNICA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/propostas/{propostaId}/distribuicoes` | DistribuirPropostasParaRevisores | AREA_TECNICA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/propostas/{propostaId}/avaliacoes-ad-hoc` | AvaliarProposta | REVISOR_AD_HOC |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/resultados/preliminar` | PublicarResultado | AREA_TECNICA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/propostas/{propostaId}/revisoes` | SubmeterRevisaoResultado | PROPONENTE |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/revisoes/{revisaoId}/decisao` | AnalisarRevisaoResultado | AREA_TECNICA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/resultados/final` | PublicarResultado | AREA_TECNICA |
 
 ---
 
@@ -701,19 +803,32 @@ Exemplo com pendencias:
 
 | Metodo | Path | Operacao | Autorizacao |
 |--------|------|----------|-------------|
-| `POST` | `/api/v1/m011/editais/{editalId}/cronograma` | ConfigurarCronogramaDoEdital | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m011/editais/{editalId}/cronograma` | ConsultarCronogramaDoEdital | ANALISTA_AGENCIA, MODULO_INTERNO |
-| `POST` | `/api/v1/m011/editais/{editalId}/formularios/submissao` | PublicarVersaoFormularioSubmissao | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m011/editais/{editalId}/formularios/submissao` | ConsultarFormularioSubmissao | ANALISTA_AGENCIA, MODULO_INTERNO |
-| `POST` | `/api/v1/m011/editais/{editalId}/formularios/avaliacao` | PublicarVersaoFormularioAvaliacao | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m011/editais/{editalId}/formularios/avaliacao` | ConsultarFormularioAvaliacao | ANALISTA_AGENCIA, MODULO_INTERNO |
-| `POST` | `/api/v1/m011/editais/{editalId}/parametros-fomento` | ConfigurarParametrosDeFomento | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m011/editais/{editalId}/parametros-fomento` | ConsultarParametrosDeFomento | ANALISTA_AGENCIA, MODULO_INTERNO |
-| `PUT` | `/api/v1/m011/editais/{editalId}/parametros-fomento` | AtualizarParametrosDeFomento | ANALISTA_AGENCIA |
-| `POST` | `/api/v1/m011/editais/{editalId}/revisores` | AssociarRevisorAdHoc | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m011/editais/{editalId}/revisores` | ListarRevisoresAdHoc | ANALISTA_AGENCIA, MODULO_INTERNO |
-| `DELETE` | `/api/v1/m011/editais/{editalId}/revisores/{revisorId}` | RemoverRevisorAdHoc | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m011/editais/{editalId}/validar-configuracao` | ValidarConfiguracaoDoEdital | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/cronograma` | ConfigurarCronogramaDaCaptacao | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/m011/captacoes/{captacaoId}/cronograma` | ConsultarCronogramaDaCaptacao | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/formularios/submissao` | SelecionarFormularioSubmissao | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/m011/captacoes/{captacaoId}/formularios/submissao` | ConsultarFormularioSubmissao | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/formularios/avaliacao` | SelecionarFormularioAvaliacao | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/m011/captacoes/{captacaoId}/formularios/avaliacao` | ConsultarFormularioAvaliacao | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/formularios/revisao` | SelecionarFormularioRevisao | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/m011/captacoes/{captacaoId}/formularios/revisao` | ConsultarFormularioRevisao | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/parametros-fomento` | ConfigurarParametrosDeFomento | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/m011/captacoes/{captacaoId}/parametros-fomento` | ConsultarParametrosDeFomento | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `PUT` | `/api/v1/m011/captacoes/{captacaoId}/parametros-fomento` | AtualizarParametrosDeFomento | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/revisores` | AssociarRevisorAdHoc | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/m011/captacoes/{captacaoId}/revisores` | ListarRevisoresAdHoc | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `DELETE` | `/api/v1/m011/captacoes/{captacaoId}/revisores/{revisorId}` | RemoverRevisorAdHoc | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/m011/captacoes/{captacaoId}/validar-configuracao` | ValidarConfiguracaoDaCaptacao | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/instancias` | InstanciarProcessoCaptacao | DIRETORIA_FAPES, AREA_TECNICA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/publicacao` | PublicarCaptacao | AREA_TECNICA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/propostas` | SubmeterProposta | PROPONENTE |
+| `GET` | `/api/v1/m011/captacoes/{captacaoId}/propostas` | ListarPropostasDaCaptacao | AREA_TECNICA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/propostas/{propostaId}/avaliacao-documental` | RegistrarAvaliacaoDocumental | AREA_TECNICA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/propostas/{propostaId}/distribuicoes` | DistribuirPropostasParaRevisores | AREA_TECNICA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/propostas/{propostaId}/avaliacoes-ad-hoc` | AvaliarProposta | REVISOR_AD_HOC |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/resultados/preliminar` | PublicarResultado | AREA_TECNICA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/propostas/{propostaId}/revisoes` | SubmeterRevisaoResultado | PROPONENTE |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/revisoes/{revisaoId}/decisao` | AnalisarRevisaoResultado | AREA_TECNICA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/resultados/final` | PublicarResultado | AREA_TECNICA |
 
 ---
 
@@ -724,11 +839,11 @@ Exemplo com pendencias:
 ```json
 {
   "id": "string",
-  "editalId": "string",
+  "captacaoId": "string",
   "versao": "integer",
   "periodos": [
     {
-      "tipo": "SUBMISSAO | AVALIACAO_MERITO | RESULTADO_PRELIMINAR | RECURSO | RESULTADO_FINAL | CONTRATACAO",
+      "tipo": "PUBLICACAO_CAPTACAO | RECEBIMENTO_PROPOSTAS | AVALIACAO_DOCUMENTAL | AVALIACAO_AD_HOC | RESULTADO_PRELIMINAR | RECEBIMENTO_REVISAO | RESULTADO_APOS_REVISAO | RESULTADO_FINAL",
       "inicio": "string (YYYY-MM-DD)",
       "fim": "string (YYYY-MM-DD)"
     }
@@ -736,16 +851,15 @@ Exemplo com pendencias:
 }
 ```
 
-### VersaoFormulario
+### FormularioSelecionado
 
 ```json
 {
-  "id": "string",
-  "editalId": "string",
-  "tipo": "SUBMISSAO | AVALIACAO",
-  "versao": "integer",
-  "publicada": "boolean",
-  "campos": ["string"]
+  "captacaoId": "string",
+  "formularioId": "string",
+  "versaoFormularioId": "string",
+  "tipo": "SUBMISSAO | AVALIACAO_AD_HOC | REVISAO_RESULTADO",
+  "origem": "M021"
 }
 ```
 
@@ -753,7 +867,7 @@ Exemplo com pendencias:
 
 ```json
 {
-  "editalId": "string",
+  "captacaoId": "string",
   "orcamentoTotal": "number",
   "valorMaximoPorProjeto": "number (opcional)",
   "cotasArea": [
@@ -772,7 +886,7 @@ Exemplo com pendencias:
 ```json
 {
   "id": "string",
-  "editalId": "string",
+  "captacaoId": "string",
   "revisorCpf": "string",
   "instituicaoId": "string"
 }
@@ -782,7 +896,7 @@ Exemplo com pendencias:
 
 ```json
 {
-  "editalId": "string",
+  "captacaoId": "string",
   "prontoParaPublicacao": "boolean",
   "pendencias": ["string"]
 }
@@ -798,6 +912,6 @@ Exemplo com pendencias:
 | Dominio e regras de negocio | [README.md](README.md) |
 | Modelo estrutural | [modelo-estrutural.md](modelo-estrutural.md) |
 | Modelo comportamental | [modelo-comportamental.md](modelo-comportamental.md) |
-| EPIC-M011-001 (Configuracao do Edital) | [epics/EPIC-M011-001.md](epics/EPIC-M011-001.md) |
-| EPIC-M011-002 (Gestao de Formularios) | [epics/EPIC-M011-002.md](epics/EPIC-M011-002.md) |
-| EPIC-M011-003 (Gestao de Revisores Ad Hoc) | [epics/EPIC-M011-003.md](epics/EPIC-M011-003.md) |
+| EPIC-M011-001 (Configuracao da Captacao) | [epics/EPIC-M011-001.md](epics/EPIC-M011-001.md) |
+| EPIC-M011-002 (Selecao de Formularios) | [epics/EPIC-M011-002.md](epics/EPIC-M011-002.md) |
+| EPIC-M011-003 (Gestao de Pool de Revisores Ad Hoc) | [epics/EPIC-M011-003.md](epics/EPIC-M011-003.md) |

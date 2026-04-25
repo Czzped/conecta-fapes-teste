@@ -2,30 +2,37 @@
 
 Dominio e regras de negocio: ver [README.md](README.md)
 
-### Ciclo de Vida: Edital
+## Ciclo de Vida da Configuracao de Captacao
 
 ```mermaid
 stateDiagram-v2
-    [*] --> EmElaboracao : Criar Edital
-
-    EmElaboracao --> EmElaboracao : Definir Cronograma
-    EmElaboracao --> EmElaboracao : Configurar Parametros de Fomento
-    EmElaboracao --> EmElaboracao : Criar Formularios
-    EmElaboracao --> EmElaboracao : Associar Revisores
-    EmElaboracao --> Publicado : Publicar Edital [cronograma e formularios configurados]
-
-    Publicado --> EmAndamento : Data de inicio de submissao atingida
-    Publicado --> EmElaboracao : Retificar Edital [cria nova versao]
-
-    EmAndamento --> Encerrado : Todas as fases do cronograma concluidas
-
+    [*] --> EmAndamento : Criar configuracao
+    EmAndamento --> Publicado : Validar e publicar configuracao
+    EmAndamento --> NaoPublicado : Retirar configuracao antes da publicacao
+    Publicado --> NaoPublicado : Despublicar configuracao
+    Publicado --> Encerrado : Encerrar uso da configuracao
+    NaoPublicado --> EmAndamento : Reabrir para ajustes
     Encerrado --> [*]
-
-    state EmElaboracao : Edital em configuracao
-    state Publicado : Edital disponivel, aguardando inicio
-    state EmAndamento : Periodos do edital em execucao
-    state Encerrado : Todos os periodos finalizados
-
-    note right of Publicado : Edital publicado nao pode\nser editado (RN04), apenas\nretificado via nova versao
-    note right of EmAndamento : Transicao automatica quando\ndata de submissao e atingida (RN08)
 ```
+
+## Ciclo de Vida da Instancia de Captacao
+
+```mermaid
+stateDiagram-v2
+    [*] --> Criada
+    Criada --> Publicada : Data de publicacao da captacao atingida
+    Publicada --> RecebendoPropostas : Periodo de recebimento iniciado
+    RecebendoPropostas --> EmAvaliacaoDocumental : Periodo de recebimento encerrado
+    EmAvaliacaoDocumental --> EmAvaliacaoAdHoc : Propostas habilitadas enviadas aos revisores
+    EmAvaliacaoAdHoc --> ResultadoPreliminarPublicado : Pareceres consolidados
+    ResultadoPreliminarPublicado --> EmRevisaoResultado : Periodo de revisao iniciado
+    EmRevisaoResultado --> ResultadoFinalPublicado : Revisoes analisadas
+    ResultadoPreliminarPublicado --> ResultadoFinalPublicado : Sem revisoes admissiveis
+    ResultadoFinalPublicado --> [*]
+```
+
+## Observacoes
+
+- A instancia de captacao termina no M011 quando o resultado final e publicado.
+- Propostas aprovadas no resultado final ficam disponiveis para o M022 - Contratacao e Outorga.
+- A iniciativa somente passa ao M003 apos contratacao/outorga formalizada no M022.

@@ -49,9 +49,9 @@ O prototipo do backoffice (`prototype/backoffice/`) possui um modulo completo de
 ### 4. Regras de Submissao (FormularioEdital, secao 4)
 
 - Multiplas submissoes por proponente (permitido/nao permitido)
-- Coordenador pode ter outro projeto ativo (sim/nao)
+- Proponente pode ter outra iniciativa ativa (sim/nao)
 
-### 5. Requisitos do Coordenador (FormularioEdital, secao 5)
+### 5. Requisitos do Proponente (FormularioEdital, secao 5)
 
 - Vinculada a Instituicao (sim/nao)
 - Nivel Academico minimo (Graduacao, Mestrado, Doutorado)
@@ -105,30 +105,30 @@ O prototipo trata **toda a gestao de captacao** como um unico fluxo (componente 
 
 | Funcionalidade | M003 (Gestao de Iniciativas Captadas) | M011 (Config. Captacao) | Prototipo |
 |---------------|--------------------------|------------------------|-----------|
-| Criar/registrar edital | RegistrarEditalOperacional | US-M011-001 Criar Edital | FormularioEdital (unico formulario) |
-| Cronograma | Nao previsto | ConfigurarCronogramaDoEdital | Secao "Data Inicio/Fim" |
-| Formularios | Nao previsto | PublicarVersaoFormulario | Secao "Formularios" |
+| Criar/registrar captacao | Nao previsto | US-M011-001 Criar Configuracao de Captacao | FormularioEdital (unico formulario) |
+| Cronograma | Nao previsto | ConfigurarCronogramaDaCaptacao | Secao "Data Inicio/Fim" |
+| Formularios | Nao previsto | SelecionarFormulario no M021 | Secao "Formularios" |
 | Parametros de fomento | Nao previsto | ConfigurarParametrosDeFomento | Secoes "Parametrizacoes", "Recursos Financeiros", "Bolsas" |
 | Revisores/Avaliadores | Nao previsto | AssociarRevisorAdHoc | Modal "Enviar para Avaliacao" |
-| Inscricoes | Nao previsto | Nao previsto | Tab "Inscricoes" |
-| Avaliacao de merito | Nao previsto | Nao previsto | Tab "Avaliacao" |
-| Recurso | Nao previsto | Nao previsto | Tab "Recurso" |
-| Resultado final | Nao previsto | Nao previsto | Tab "Finalizado" |
+| Propostas | Nao previsto | EPIC-M011-004 Recebimento de Propostas | Tab "Inscricoes" |
+| Avaliacao documental e ad hoc | Nao previsto | EPIC-M011-005 Avaliacao Documental e Ad Hoc | Tab "Avaliacao" |
+| Revisao de resultado | Nao previsto | EPIC-M011-006 Revisao de Resultado | Tab "Recurso" |
+| Resultado final | Nao previsto | EPIC-M011-007 Publicacao de Resultado | Tab "Finalizado" |
 
-**Conclusao:** M003 cobre apenas o registro operacional do edital. M011 cobre configuracao (cronograma, formularios, parametros, revisores). Nenhum dos dois cobre inscricoes, avaliacao de merito, recursos e resultado final — funcionalidades presentes no prototipo mas **sem modulo atribuido**.
+**Conclusao:** M011 cobre o processo de captacao ate a publicacao do resultado final. M022 cobre a contratacao/outorga posterior. M003 assume a iniciativa apos a contratacao/outorga.
 
 ### I2. Funcionalidades do prototipo sem cobertura em nenhum modulo
 
 | Funcionalidade | Evidencia no prototipo | Modulo atual |
 |---------------|----------------------|--------------|
-| Submissao de proposta pelo proponente | FormularioInscricaoGeral | Nenhum |
-| Avaliacao de merito por revisores | Tab "Avaliacao" + FormularioAvaliacao | Nenhum |
-| Gestao de recursos/contestacao pre-award | Tab "Recurso" + FormularioRecurso | Nenhum |
-| Resultado final e publicacao | Tab "Finalizado" | Nenhum |
-| Requisitos do coordenador | FormularioEdital secao 5 | Nenhum |
+| Submissao de proposta pelo proponente | FormularioInscricaoGeral | M011 - EPIC-M011-004 |
+| Avaliacao por revisores | Tab "Avaliacao" + FormularioAvaliacao | M011 - EPIC-M011-005 |
+| Revisao de resultado | Tab "Recurso" + FormularioRecurso | M011 - EPIC-M011-006 |
+| Resultado final e publicacao | Tab "Finalizado" | M011 - EPIC-M011-007 |
+| Requisitos do proponente | FormularioEdital secao 5 | Nenhum |
 | Regras de submissao | FormularioEdital secao 4 | Nenhum |
 | Faixas de financiamento | FormularioEdital secao 3 | Parcial em M011 (ParametroFomento) |
-| Bolsas por captacao (modalidade, nivel, cotas) | FormularioEdital secao 8 | Parcial em M003 (CotaEdital) + M001 |
+| Bolsas por captacao (modalidade, nivel, cotas) | FormularioEdital secao 8 | Parcial em M009 + M001 |
 | Cadastro de instituicao parceira | FormularioInstituicaoParceira | Nenhum (M010 trata Parcerias estrategicas, nao por edital) |
 | KPIs da captacao | EditaisLight | Nenhum |
 
@@ -137,31 +137,31 @@ O prototipo trata **toda a gestao de captacao** como um unico fluxo (componente 
 | Entidade | Prototipo | M011 modelo-estrutural | M003 modelo-estrutural |
 |----------|-----------|----------------------|----------------------|
 | FaixaFinanciamento | Duracao, valor min, valor max | Ausente | Ausente |
-| RegraSubmissao | Multiplas submissoes, coordenador com outro projeto | Ausente | Ausente |
-| RequisitosCoordenador | Nivel academico, vinculo institucional, restricao empregaticia | Ausente | Ausente |
+| RegraSubmissao | Multiplas submissoes, proponente com outra iniciativa ativa | Ausente | Ausente |
+| RequisitosProponente | Nivel academico, vinculo institucional, restricao empregaticia | Ausente | Ausente |
 | RubricaPermitida | Lista de rubricas habilitadas para o edital | Ausente | Ausente |
 | OrigemRecurso | Tesouro Estadual, Convenio Federal, etc. | Ausente (parcial em ParametroFomento.valorParceria) | Ausente |
-| BolsaCaptacao | Modalidade, nivel, versao, max bolsistas, cotas, institucional | Ausente | Parcial (CotaEdital) |
-| Inscricao | Proponente, data envio, status | Ausente | Ausente |
+| BolsaCaptacao | Modalidade, nivel, versao, max bolsistas, cotas, institucional | Ausente | Parcial (M009) |
+| Proposta | Proponente, data envio, status | Prevista em M011 | Ausente |
 
 ### I4. Status do EPIC-M011-001 ("In Progress") vs cobertura real
 
-O EPIC-M011-001 (Configuracao do Edital) tem 4 user stories:
-- US-M011-001 Criar Edital
-- US-M011-002 Definir Cronograma
+O EPIC-M011-001 (Configuracao da Captacao) tem historias fundacionais:
+- US-M011-001 Criar Configuracao de Captacao
+- US-M011-002 Definir Cronograma da Captacao
 - US-M011-003 Configurar Parametros de Fomento
-- US-M011-004 Publicar Edital
+- US-M011-004 Publicar Configuracao de Captacao
 
-O prototipo mostra que a configuracao do edital e **muito mais abrangente** do que essas 4 stories cobrem. Faltam: faixas de financiamento, regras de submissao, requisitos do coordenador, rubricas permitidas, origens de recurso, bolsas da captacao.
+O prototipo mostra que a configuracao da captacao e mais abrangente do que as historias fundacionais. Pontos como faixas de financiamento, regras de submissao, requisitos do proponente, rubricas permitidas, origens de recurso e bolsas da captacao devem permanecer rastreados como detalhamento da configuracao.
 
 ---
 
 ## Recomendacoes
 
-1. **Expandir o escopo do M011** para cobrir todo o ciclo da captacao conforme o prototipo (configuracao + inscricoes + avaliacao + recurso + resultado)
-2. **Adicionar novas entidades** ao modelo estrutural: FaixaFinanciamento, RegraSubmissao, RequisitosCoordenador, RubricaPermitida, OrigemRecurso, BolsaCaptacao, Inscricao
-3. **Criar novos EPICs** para funcionalidades descobertas: Gestao de Inscricoes, Avaliacao de Merito, Gestao de Recursos Pre-Award, Publicacao de Resultado
+1. **Manter o escopo do M011** ate a publicacao do resultado final da captacao.
+2. **Manter M021 como dono dos formularios** e o M011 como consumidor de versoes publicadas.
+3. **Encaminhar propostas aprovadas ao M022** apos a publicacao do resultado final.
 4. **Esclarecer fronteira M003/M011** com a seguinte separacao:
-   - **M011 — Configuracao de Captacao**: cobre o ciclo de captacao de ponta a ponta (configuracao do edital, submissao de propostas, avaliacao de merito, recurso, resultado final)
-   - **M003 — Gestao de Iniciativas Captadas**: gerencia os dados operacionais *apos* a contratacao (edital operacional, projetos contratados, cotas, alocacoes de bolsistas). Renomear de "Gestao de Iniciativas Captadas" para "Gestao de Iniciativas Captadas" para refletir melhor seu papel pos-contratacao
-5. **Renomear M003** de "Gestao de Iniciativas Captadas" para **"Gestao de Iniciativas Captadas"** — o nome atual confunde com a funcionalidade de M011 e nao reflete que M003 trata de iniciativas ja contratadas
+   - **M011 — Configuracao de Captacao**: cobre configuracao, recebimento de propostas, avaliacao, revisao e resultado final.
+   - **M022 — Contratacao e Outorga**: formaliza propostas aprovadas.
+   - **M003 — Gestao de Iniciativas Captadas**: gerencia a iniciativa apos contratacao/outorga.
