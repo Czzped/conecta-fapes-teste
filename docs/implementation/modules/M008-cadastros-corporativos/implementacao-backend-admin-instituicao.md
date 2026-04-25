@@ -31,7 +31,6 @@ Autenticação: JWT Bearer (`Authorization: Bearer <token>`)
 {
   "cnpj": "11444777000161",
   "razaoSocial": "Universidade Federal Teste",
-  "nomeFantasia": "UFT",
   "isExterna": false,
   "tipoInstituicaoId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
 }
@@ -41,7 +40,6 @@ Autenticação: JWT Bearer (`Authorization: Bearer <token>`)
 |-------|------|-------------|--------|
 | `cnpj` | string | Sim | Exatamente 14 dígitos numéricos, dígitos verificadores válidos |
 | `razaoSocial` | string | Sim | Máximo 200 caracteres |
-| `nomeFantasia` | string | Não | Máximo 200 caracteres |
 | `isExterna` | boolean | Sim | Indica se a instituição é externa à agência |
 | `tipoInstituicaoId` | Guid | Sim | Id de um TipoInstituicao cadastrado |
 

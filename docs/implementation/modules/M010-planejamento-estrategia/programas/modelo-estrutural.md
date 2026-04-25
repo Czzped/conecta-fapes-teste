@@ -2,7 +2,7 @@
 
 [← Voltar ao M010](../README.md) | [Contrato M010](../contrato.md) | [Contrato API M010](../contrato-api.md)
 
-**Escopo**: Programa de fomento, seus recursos internos, comite de governanca e os aportes recebidos de Parcerias.
+**Escopo**: Programa de fomento, comite de governanca e os aportes recebidos de Parcerias.
 
 ---
 
@@ -29,22 +29,6 @@ classDiagram
         ATIVO
         SUSPENSO
         ENCERRADO
-    }
-
-    class RecursoPrograma {
-        <<M010-programas>>
-        +OrigemRecurso origem
-        +Decimal valor
-        +Date dataAporte
-        +String documento
-    }
-
-    class OrigemRecurso {
-        <<enumeration>>
-        LOA
-        TESOURO_ESTADUAL
-        FEDERAL
-        OUTRO
     }
 
     class ComiteGovernanca {
@@ -92,7 +76,6 @@ classDiagram
     %% Relacoes internas
     EixoEstrategico "*" --> "*" Programa : orienta programas
     Programa "0..*" --> "1" Instituicao : demandadoPor
-    Programa "1" --> "0..*" RecursoPrograma : possui
     Programa "1" --> "0..1" ComiteGovernanca : governadoPor
     ComiteGovernanca "1" --> "1..*" MembroComite : composto por
     MembroComite "*" --> "1" PessoaFisica : representa
@@ -114,10 +97,6 @@ classDiagram
 | | dataEncerramento | Data efetiva do encerramento (preenchida quando estado = `ENCERRADO`) | Condicional | Date | | | |
 | | estado | Estado atual | Gerado | EstadoPrograma | `EM_PLANEJAMENTO`/`ATIVO`/`SUSPENSO`/`ENCERRADO` | | |
 | | instituicaoDemandante (relacao) | Instituicao (M008) que demanda o programa (RN16) | Sim | FK → Instituicao (M008) | Via `demandadoPor` | | |
-| **RecursoPrograma** | origem | Origem da fonte de recursos | Sim | OrigemRecurso | `LOA`/`TESOURO_ESTADUAL`/`FEDERAL`/`OUTRO` | | |
-| | valor | Valor do recurso | Sim | Decimal | > 0 | | |
-| | dataAporte | Data do aporte | Sim | Date | | | |
-| | documento | Identificador do documento de descentralizacao | Sim | String | Ex: DOC-REC-2026-001 | 100 | |
 | **ComiteGovernanca** | nome | Nome do comite (ex: "Comite Gestor PRG-2026-001") | Sim | String | | 200 | |
 | **MembroComite** | papel | Papel do membro | Sim | PapelComite | `PRESIDENTE`/`MEMBRO`/`SUPLENTE` | | |
 | | dataInicio | Inicio da participacao | Sim | Date | | | |

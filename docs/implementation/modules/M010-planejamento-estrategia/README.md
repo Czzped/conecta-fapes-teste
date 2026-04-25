@@ -71,7 +71,7 @@ O sistema e estruturado em tres subdominios integrados (cada um com sua propria 
 
 **Planejamento** — A agencia define seu plano estrategico e eixos que orientam a criacao de programas. So pode haver um plano ativo por vez (RN09). Detalhes em [planejamento/](planejamento/).
 
-**Programas** — Programas sao o instrumento de execucao, demandados por uma Instituicao (RN16), orientados por eixos (RN01), com recursos internos (LOA, Tesouro, Federal), comite de governanca, e podem receber aportes de Parcerias via `AporteFinanceiroParceriaPrograma` (N:N, RN11). Detalhes em [programas/](programas/).
+**Programas** — Programas sao o instrumento de execucao, demandados por uma Instituicao (RN16), orientados por eixos (RN01), com comite de governanca, e podem receber aportes de uma ou mais Parcerias via `AporteFinanceiroParceriaPrograma` (N:N, RN11). Detalhes em [programas/](programas/).
 
 **Parcerias** — Instrumento formal com uma ou mais Instituicoes envolvidas, Vigencia (original + aditivos), aportes financeiros recebidos e Documentos regularizadores. Parcerias destinam aportes aos Programas (outflow). Detalhes em [parcerias/](parcerias/).
 

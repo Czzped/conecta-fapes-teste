@@ -8,8 +8,8 @@ Para facilitar a leitura, o modelo esta dividido em tres sub-modelos por area te
 
 | Sub-modelo | Entidades | Descricao |
 |------------|-----------|-----------|
-| [Pessoas](modelo-estrutural-pessoas.md) | PessoaFisica, Servidor, HistoricoPessoa | Cadastro de individuos e auditoria |
-| [Instituicoes e Unidades](modelo-estrutural-instituicoes.md) | Instituicao, TipoInstituicao, UnidadeOrganizacional, AreaTecnica, Dirigente | Organizacoes e estrutura hierarquica |
+| [Pessoas](modelo-estrutural-pessoas.md) | PessoaFisica, HistoricoPessoa | Cadastro de individuos e auditoria |
+| [Instituicoes](modelo-estrutural-instituicoes.md) | Instituicao, TipoInstituicao, Dirigente | Organizacoes, instituicoes, campi, filiais e setores internos |
 | [Cadastros de Referencia](modelo-estrutural-referencia.md) | AreaConhecimento, RubricaFinanceira, Cidade, Regiao, Finalidade | Tabelas de classificacao transversais |
 
 ---
@@ -37,14 +37,16 @@ classDiagram
     }
 
     class Instituicao {
+        +String nome
+        +String sigla
         +String cnpj
         +String razaoSocial
-        +String nomeFantasia
         +String email
         +String telefone
         +String endereco
         +boolean ativa
         +boolean isExterna
+        +boolean isPublica
     }
 
     class TipoInstituicao {
@@ -52,28 +54,10 @@ classDiagram
         +String descricao
     }
 
-    class UnidadeOrganizacional {
-        +String nome
-        +String sigla
-        +int nivel
-        +boolean ativa
-    }
-
-    class AreaTecnica {
-    }
-
     class Dirigente {
-        +TipoDirigente tipo
         +Date dataInicioMandato
         +Date dataFimMandato
         +boolean ativo
-    }
-
-    class TipoDirigente {
-        <<enumeration>>
-        REITOR
-        DIRETOR
-        CHEFE
     }
 
     class AreaConhecimento {
@@ -112,13 +96,6 @@ classDiagram
         +String descricao
     }
 
-    class Servidor {
-        +String nome
-        +String matricula
-        +String email
-        +boolean ativo
-    }
-
     class HistoricoPessoa {
         +Date data
         +TipoEventoPessoa tipo
@@ -134,23 +111,14 @@ classDiagram
         REATIVACAO
     }
 
-    Instituicao "0..*" --> "1" TipoInstituicao : classificadaComo
-    Instituicao "1" --> "0..*" PessoaFisica : possui
-    Instituicao "1" --> "1..*" UnidadeOrganizacional : possui
-    UnidadeOrganizacional "0..1" --> "*" UnidadeOrganizacional : subunidades
-    UnidadeOrganizacional <|-- AreaTecnica
-    UnidadeOrganizacional "1" --> "1" PessoaFisica : responsavel
-    UnidadeOrganizacional "1" --> "*" Dirigente : dirigentes
-    PessoaFisica "0..*" --> "1" UnidadeOrganizacional : trabalhaEm
-    Dirigente "*" --> "1" PessoaFisica : pessoa
+    Instituicao "0..1" --> "0..*" Instituicao : superior/subestruturas
+    Instituicao "1" --> "0..*" Dirigente : dirigentes
+    Instituicao "0..*" --> "0..1" TipoInstituicao : classificadaComo
+    PessoaFisica "1" --> "0..*" Dirigente : assume
     PessoaFisica "1" --> "*" HistoricoPessoa : historico
-
     AreaConhecimento "0..1" --> "*" AreaConhecimento : subareas
 
     Regiao "1" --> "*" Cidade : cidades
-
-    AreaTecnica "1" --> "*" Servidor : servidores
-    Servidor "*" --> "1" PessoaFisica : pessoa
 ```
 
 ## Dicionario de Dados
@@ -164,24 +132,26 @@ classDiagram
 | | dataNascimento | Data de nascimento | Sim | Date | | | |
 | | lattes | URL do curriculo Lattes | Nao | String | | 500 | |
 | | estado | Estado atual da pessoa | Gerado | EstadoPessoa | Ativa, Suspensa | | |
-| **Instituicao** | cnpj | CNPJ da instituicao (somente digitos) | Sim | String | Ex: 12345678000199 | 14 | Sim |
-| | razaoSocial | Razao social da instituicao | Sim | String | | 300 | Sim |
-| | nomeFantasia | Nome fantasia da instituicao | Nao | String | | 300 | |
-| | email | Email institucional | Sim | String | | 200 | |
-| | telefone | Telefone institucional | Nao | String | | 20 | |
-| | endereco | Endereco completo | Sim | String | | 500 | |
+| **Instituicao** | nome | Nome comum de exibicao da instituicao, filial, campus, unidade ou setor | Sim | String | Ex: UFES, IFES Campus Serra, Centro Tecnologico | 300 | |
+| | sigla | Sigla comum da instituicao ou setor | Nao | String | Ex: UFES, CT | 20 | |
+| | cnpj | CNPJ proprio da instituicao, quando ela for juridicamente identificavel (somente digitos) | Cond. | String | Ex: 12345678000199 | 14 | Sim quando informado |
+| | razaoSocial | Razao social da instituicao com CNPJ proprio | Cond. | String | Obrigatoria quando houver CNPJ | 300 | |
+| | email | Email institucional ou de contato | Cond. | String | Obrigatorio quando a instituicao atuar como entidade juridicamente identificavel | 200 | |
+| | telefone | Telefone institucional ou de contato | Nao | String | | 20 | |
+| | endereco | Endereco completo | Cond. | String | Obrigatorio quando a instituicao atuar como entidade juridicamente identificavel | 500 | |
 | | ativa | Indica se a instituicao esta ativa | Sim | Boolean | true/false | | |
-| | isExterna | Indica se e instituicao externa a agencia de fomento | Sim | Boolean | true/false | | |
+| | isExterna | Indica se a instituicao e externa a agencia de fomento | Sim | Boolean | true/false | | |
+| | isPublica | Indica se a instituicao e publica (`true`) ou privada (`false`) | Cond. | Boolean | Obrigatorio quando houver CNPJ | | |
+| | superior (relacao) | Instituicao superior, quando houver | Nao | FK → Instituicao | Via `superior/subestruturas` | | |
+| | dirigentes (relacao) | Vinculos de dirigente associados a esta instituicao | Nao | FK → Dirigente | Via `dirigentes` | | |
+| | tipoInstituicao (relacao) | Classificacao institucional, aplicavel principalmente quando houver CNPJ proprio | Cond. | FK → TipoInstituicao | Via `classificadaComo` | | |
 | **TipoInstituicao** | nome | Nome do tipo de instituicao | Sim | String | Ex: Ensino, Empresa, Agencia de Fomento | 200 | Sim |
 | | descricao | Descricao do tipo | Nao | String | | 500 | |
-| **UnidadeOrganizacional** | nome | Nome da unidade | Sim | String | Ex: Departamento de Informatica | 300 | |
-| | sigla | Sigla da unidade | Sim | String | Ex: DI | 20 | |
-| | nivel | Nivel hierarquico da unidade dentro da instituicao | Gerado | Int | Ex: 1, 2, 3 | | |
-| | ativa | Indica se a unidade esta ativa | Sim | Boolean | true/false | | |
-| **Dirigente** | tipo | Tipo do cargo de dirigente | Sim | TipoDirigente | Reitor, Diretor, Chefe | | |
-| | dataInicioMandato | Data de inicio do mandato | Sim | Date | | | |
+| **Dirigente** | dataInicioMandato | Data de inicio do mandato | Sim | Date | | | |
 | | dataFimMandato | Data de termino do mandato | Sim | Date | | | |
 | | ativo | Indica se o mandato esta vigente | Gerado | Boolean | true/false | | |
+| | pessoa (relacao) | Pessoa fisica que assume o papel de dirigente | Sim | FK → PessoaFisica | Via `assume` | | |
+| | instituicao (relacao) | Instituicao onde a pessoa assume o papel de dirigente | Sim | FK → Instituicao | Via `dirigentes` | | |
 | **AreaConhecimento** | codigo | Codigo da area conforme CNPq | Sim | String | Ex: 1.03.04 | 20 | Sim |
 | | nome | Nome da area de conhecimento | Sim | String | Ex: Ciencia da Computacao | 200 | |
 | | nivel | Nivel hierarquico da area | Sim | NivelArea | Grande Area, Area, Subarea, Especialidade | | |
@@ -195,10 +165,6 @@ classDiagram
 | | descricao | Descricao da regiao | Nao | String | | 500 | |
 | **Finalidade** | nome | Nome da finalidade | Sim | String | Ex: Pesquisa, Inovacao, Extensao | 200 | Sim |
 | | descricao | Descricao do proposito | Nao | String | | 500 | |
-| **Servidor** | nome | Nome do servidor | Sim | String | | 300 | |
-| | matricula | Matricula funcional do servidor | Sim | String | | 20 | Sim |
-| | email | Email institucional do servidor | Sim | String | | 200 | |
-| | ativo | Indica se o servidor esta ativo | Sim | Boolean | true/false | | |
 | **HistoricoPessoa** | data | Data do evento | Gerado | Date | | | |
 | | tipo | Tipo do evento registrado | Sim | TipoEventoPessoa | Cadastro, Atualizacao, Suspensao, Reativacao | | |
 | | descricao | Descricao textual do evento | Sim | String | | 500 | |
@@ -206,12 +172,14 @@ classDiagram
 
 ## Notas de Implementacao
 
-**Especializacao estrutural:**
-- `AreaTecnica` e uma especializacao de `UnidadeOrganizacional` usada para representar as unidades internas da instituicao agencia responsaveis pela gestao operacional dos modulos de negocio.
+**Hierarquia organizacional:**
+- `Instituicao` e a entidade unica para organizacoes, instituicoes, matrizes, filiais, campi e setores internos.
+- A relacao `superior/subestruturas` representa tanto vinculos juridicos entre instituicoes com CNPJ proprio quanto a hierarquia interna de setores sem CNPJ.
+- A diferenca entre instituicao/campus/filial e setor interno e definida por regra de negocio: com CNPJ proprio, a instituicao atua como entidade juridicamente identificavel; sem CNPJ proprio, atua como setor interno e deve ter uma superior.
 
 **Entidades externas:**
 - Acesso Cidadao (SSO): gerenciado por M005 (Autenticacao). A identidade autenticada e usada para vincular ao cadastro da pessoa.
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: Dirigente.pessoa: PessoaFisica)
-- Cardinalidade N: atributo lista do tipo da classe destino (ex: Instituicao.unidades: List<UnidadeOrganizacional>)
+- Cardinalidade N: atributo lista do tipo da classe destino (ex: Instituicao.subestruturas: List<Instituicao>)

@@ -32,7 +32,7 @@ stateDiagram-v2
 
     Encerrado --> [*]
 
-    state Ativo : Dirigente responsavel pela unidade
+    state Ativo : Dirigente vinculado a instituicao
     state Encerrado : Mandato finalizado, historico mantido
 ```
 

@@ -4,7 +4,7 @@ Dominio e regras de negocio: ver [README.md](README.md)
 
 ## Proposito do Contrato
 
-Este contrato documenta a superficie publica do modulo M008 como contexto responsavel pelos cadastros corporativos compartilhados da plataforma: pessoas, instituicoes, unidades organizacionais, areas tecnicas, dirigentes e referencias basicas.
+Este contrato documenta a superficie publica do modulo M008 como contexto responsavel pelos cadastros corporativos compartilhados da plataforma: pessoas, instituicoes, dirigentes e referencias basicas.
 
 ## Consumidores e Dependencias
 
@@ -12,7 +12,7 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 
 | Consumidor | Uso do contrato |
 |------------|-----------------|
-| Todos os modulos operacionais | Consultam pessoas, instituicoes, unidades, areas tecnicas e rubricas como referencia canonica |
+| Todos os modulos operacionais | Consultam pessoas, instituicoes, dirigentes e rubricas como referencia canonica |
 | Autenticacao / Acesso Cidadao | Sincroniza cadastros de pessoas por CPF |
 | Analista da Agencia de Fomento | Mantem a base cadastral corporativa |
 | [Portal Coordenador](../../../products/portal-coordenador/README.md) | Gestao de perfil e dados pessoais ([EP-04](../../../products/portal-coordenador/features/EP-04-gestao-perfil-usuario.md)) |
@@ -30,10 +30,10 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 |------------------|------|----------|---------|-------|---------------------|---------------|---------------|--------------|-------------|--------------------------|
 | CadastrarOuAtualizarPessoaFisica | Command | Criar ou atualizar pessoa fisica canonical da plataforma | cpf, nome, email, dados basicos | `PessoaFisica` criada/atualizada | RN01, RN05, RN10 | CPF informado | CPF duplicado, dados invalidos | Sim por CPF | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | AlterarEstadoPessoaFisica | Command | Suspender ou reativar pessoa com justificativa quando aplicavel | pessoa, novoEstado, justificativa | `PessoaFisica` atualizada | RN05, RI2 | Pessoa existente | Reativacao sem justificativa, pessoa inexistente | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
-| CadastrarInstituicaoComUnidadeOrganizacional | Command | Registrar instituicao e sua estrutura minima de unidade organizacional | cnpj, nome, unidades | `Instituicao` registrada | RN02, RN03, RN08 | CNPJ informado | CNPJ duplicado, hierarquia invalida | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
-| RegistrarDirigente | Command | Registrar dirigente com unidade e mandato | pessoa, unidade, tipoDirigente, dataInicio, dataFim | `Dirigente` criado/atualizado | RN04, RI1 | Pessoa e unidade existentes | Mandato sobreposto, unidade inexistente | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| CadastrarInstituicao | Command | Registrar instituicao com ou sem CNPJ proprio, incluindo natureza publica/privada quando aplicavel e eventual superior hierarquico | nome, sigla?, cnpj?, razaoSocial?, email?, telefone?, endereco?, isPublica?, isExterna, superiorId?, tipoInstituicaoId? | `Instituicao` registrada | RN02, RN03, RN12, RN13, RN14, RN15 | Nome informado; superior informado quando nao houver CNPJ | CNPJ duplicado, superior inexistente, instituicao sem CNPJ e sem superior, dados invalidos | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| RegistrarDirigente | Command | Registrar dirigente como vinculo temporal entre uma pessoa e uma instituicao | pessoaId, instituicaoId, dataInicio, dataFim | `Dirigente` criado/atualizado | RN04, RN11, RI1 | Pessoa e instituicao existentes | Mandato sobreposto, pessoa inexistente, instituicao inexistente | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | SincronizarPessoaViaAcessoCidadao | Event Consumed | Criar ou vincular pessoa automaticamente a partir do Acesso Cidadao | cpf, nome, email, origem | `PessoaFisica` criada/vinculada | RN10 | Evento recebido com CPF valido | CPF invalido, inconsistencias cadastrais | Sim por CPF e origem do evento | Sistema | Evento/mensagem interna a definir |
-| ConsultarCadastrosCorporativos | Query | Consultar pessoas, instituicoes, unidades, areas tecnicas e referencias basicas | tipoCadastro, filtros | Lista ou detalhe cadastral | RN01, RN02, RN03, RN08, RN09 | Filtro informado | Cadastro nao encontrado | N/A | Modulo interno autorizado ou analista | API interna a definir |
+| ConsultarCadastrosCorporativos | Query | Consultar pessoas, instituicoes, dirigentes e referencias basicas | tipoCadastro, filtros | Lista ou detalhe cadastral | RN01, RN02, RN03, RN09, RN11, RN12, RN13, RN14, RN15 | Filtro informado | Cadastro nao encontrado | N/A | Modulo interno autorizado ou analista | API interna a definir |
 
 ## Padrao de Payload e Erro
 
@@ -116,21 +116,20 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 | PESSOA_NAO_ENCONTRADA | A pessoa informada nao foi encontrada. |
 | REATIVACAO_SEM_JUSTIFICATIVA | Nao e permitido reativar pessoa suspensa sem justificativa registrada. |
 
-### CadastrarInstituicaoComUnidadeOrganizacional
+### CadastrarInstituicao
 
 **Exemplo de entrada**
 
 ```json
 {
   "cnpj": "12.345.678/0001-90",
-  "nome": "Agencia de Fomento do Estado",
-  "unidades": [
-    {
-      "codigo": "AT-DGPP-01",
-      "nome": "Area Tecnica DGPP",
-      "tipo": "AREA_TECNICA"
-    }
-  ]
+  "razaoSocial": "Universidade Federal do Espirito Santo",
+  "nome": "UFES",
+  "sigla": "UFES",
+  "email": "ufes@ufes.br",
+  "isPublica": true,
+  "isExterna": true,
+  "superiorId": null
 }
 ```
 
@@ -140,7 +139,9 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 {
   "instituicao": {
     "id": "INST-2026-010",
-    "nome": "Agencia de Fomento do Estado"
+    "nome": "UFES",
+    "cnpj": "12.345.678/0001-90",
+    "superiorId": null
   }
 }
 ```
@@ -150,7 +151,8 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 | Codigo | Mensagem de erro exemplo |
 |--------|---------------------------|
 | CNPJ_DUPLICADO | Ja existe uma instituicao cadastrada com o CNPJ informado. |
-| UNIDADE_HIERARQUIA_INVALIDA | A estrutura de unidades informada e invalida para a instituicao. |
+| INSTITUICAO_SUPERIOR_NAO_ENCONTRADA | A instituicao superior informada nao foi encontrada. |
+| INSTITUICAO_SEM_CNPJ_SEM_SUPERIOR | Instituicao sem CNPJ proprio deve possuir uma instituicao superior. |
 
 ### RegistrarDirigente
 
@@ -159,8 +161,7 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 ```json
 {
   "pessoaId": "PES-2026-001",
-  "unidadeId": "AT-DGPP-01",
-  "tipoDirigente": "DIRETOR",
+  "instituicaoId": "INST-2026-010",
   "dataInicio": "2026-01-01",
   "dataFim": "2026-12-31"
 }
@@ -172,7 +173,8 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 {
   "dirigente": {
     "id": "DIR-2026-003",
-    "tipoDirigente": "DIRETOR"
+    "instituicaoId": "INST-2026-010",
+    "ativo": true
   }
 }
 ```
@@ -181,8 +183,8 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 
 | Codigo | Mensagem de erro exemplo |
 |--------|---------------------------|
-| MANDATO_SOBREPOSTO | Ja existe mandato ativo para a mesma unidade no periodo informado. |
-| UNIDADE_ORGANIZACIONAL_NAO_ENCONTRADA | A unidade organizacional informada nao foi encontrada. |
+| MANDATO_SOBREPOSTO | Ja existe dirigente ativo na instituicao informada. |
+| INSTITUICAO_NAO_ENCONTRADA | A instituicao informada nao foi encontrada. |
 
 ### SincronizarPessoaViaAcessoCidadao
 
@@ -221,9 +223,9 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 
 ```json
 {
-  "tipoCadastro": "AREA_TECNICA",
+  "tipoCadastro": "INSTITUICAO",
   "filtros": {
-    "instituicaoId": "INST-2026-010"
+    "nome": "UFES"
   }
 }
 ```
@@ -234,8 +236,8 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 {
   "items": [
     {
-      "id": "AT-DGPP-01",
-      "nome": "Area Tecnica DGPP"
+      "id": "INST-2026-010",
+      "nome": "UFES"
     }
   ],
   "total": 1
@@ -257,7 +259,7 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 ## Eventos e Efeitos Colaterais
 
 - `AlterarEstadoPessoaFisica` afeta a elegibilidade de operacoes em modulos consumidores.
-- `CadastrarInstituicaoComUnidadeOrganizacional` consolida a hierarquia corporativa e a relacao entre instituicao, unidade e area tecnica.
+- `CadastrarInstituicao` consolida a hierarquia corporativa via `Instituicao.superior`.
 - `SincronizarPessoaViaAcessoCidadao` cria ou vincula pessoa pelo CPF sem duplicidade.
 
 ## Rastreabilidade

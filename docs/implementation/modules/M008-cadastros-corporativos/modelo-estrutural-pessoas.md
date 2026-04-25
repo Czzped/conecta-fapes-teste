@@ -26,13 +26,6 @@ classDiagram
         SUSPENSA
     }
 
-    class Servidor {
-        +String nome
-        +String matricula
-        +String email
-        +boolean ativo
-    }
-
     class HistoricoPessoa {
         +Date data
         +TipoEventoPessoa tipo
@@ -48,18 +41,7 @@ classDiagram
         REATIVACAO
     }
 
-    class UnidadeOrganizacional {
-        <<ver modelo-estrutural-instituicoes>>
-    }
-
-    class AreaTecnica {
-        <<ver modelo-estrutural-instituicoes>>
-    }
-
     PessoaFisica "1" --> "*" HistoricoPessoa : historico
-    PessoaFisica "0..*" --> "1" UnidadeOrganizacional : trabalhaEm
-    AreaTecnica "1" --> "*" Servidor : servidores
-    Servidor "*" --> "1" PessoaFisica : pessoa
 ```
 
 ### Dicionario de Dados
@@ -73,10 +55,6 @@ classDiagram
 | | dataNascimento | Data de nascimento | Sim | Date | | | |
 | | lattes | URL do curriculo Lattes | Nao | String | | 500 | |
 | | estado | Estado atual da pessoa | Gerado | EstadoPessoa | Ativa, Suspensa | | |
-| **Servidor** | nome | Nome do servidor | Sim | String | | 300 | |
-| | matricula | Matricula funcional do servidor | Sim | String | | 20 | Sim |
-| | email | Email institucional do servidor | Sim | String | | 200 | |
-| | ativo | Indica se o servidor esta ativo | Sim | Boolean | true/false | | |
 | **HistoricoPessoa** | data | Data do evento | Gerado | Date | | | |
 | | tipo | Tipo do evento registrado | Sim | TipoEventoPessoa | Cadastro, Atualizacao, Suspensao, Reativacao | | |
 | | descricao | Descricao textual do evento | Sim | String | | 500 | |
@@ -86,6 +64,5 @@ classDiagram
 
 - RN01: PessoaFisica identificada unicamente pelo CPF
 - RN05: Suspensao bloqueia todas as operacoes vinculadas
-- RN08: Servidor vinculado a exatamente uma AreaTecnica
 - RN10: Cadastro automatico via Acesso Cidadao vincula pelo CPF
 - RI2: Reativacao requer justificativa

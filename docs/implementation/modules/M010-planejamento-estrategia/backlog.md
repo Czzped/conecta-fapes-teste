@@ -55,7 +55,6 @@ EPIC-M010-004 (Painel Financeiro de Parcerias)  <- depende de EPIC-M010-002
 EPIC-M010-003 (Gestao de Programas)  <- depende de EPIC-M010-001
 ├── US-M010-020 Cadastrar Programa (inclui validacao RN13)
 ├── US-M010-021 Cadastrar Comite de Governanca
-├── US-M010-022 Registrar Recursos do Programa (fontes internas)
 ├── US-M010-023 Dashboard de Programas
 └── US-M010-024 Remover Programa (RI1)
 ```

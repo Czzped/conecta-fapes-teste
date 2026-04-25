@@ -4,7 +4,7 @@ Referencia de dominio e regras de negocio: [contrato.md](contrato.md) | [README.
 
 ## Visao Geral
 
-Este documento especifica o contrato HTTP REST do modulo M008 como bounded context responsavel pelos cadastros corporativos compartilhados da plataforma: pessoas, instituicoes, unidades organizacionais, areas tecnicas, dirigentes e referencias basicas. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
+Este documento especifica o contrato HTTP REST do modulo M008 como bounded context responsavel pelos cadastros corporativos compartilhados da plataforma: pessoas, instituicoes, dirigentes e referencias basicas. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
 
 ### Base URL
 
@@ -335,14 +335,14 @@ Reativa uma pessoa fisica suspensa.
 
 ---
 
-### 2. Instituicoes e Unidades Organizacionais
+### 2. Instituicoes
 
 #### `POST /api/v1/m008/instituicoes`
 
-Registra uma instituicao e sua estrutura minima de unidade organizacional.
+Registra uma instituicao com ou sem CNPJ proprio. Quando nao houver CNPJ, a instituicao representa um setor interno e deve informar `superiorId`.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
-- **Operacao de origem:** `CadastrarInstituicaoComUnidadeOrganizacional`
+- **Operacao de origem:** `CadastrarInstituicao`
 - **Idempotencia:** Nao
 
 **Request body**
@@ -350,26 +350,26 @@ Registra uma instituicao e sua estrutura minima de unidade organizacional.
 ```json
 {
   "cnpj": "12.345.678/0001-90",
-  "nome": "Agencia de Fomento do Estado",
-  "unidades": [
-    {
-      "codigo": "AT-DGPP-01",
-      "nome": "Area Tecnica DGPP",
-      "tipo": "AREA_TECNICA"
-    }
-  ]
+  "razaoSocial": "Universidade Federal do Espirito Santo",
+  "nome": "UFES",
+  "sigla": "UFES",
+  "email": "ufes@ufes.br",
+  "isPublica": true,
+  "isExterna": true,
+  "superiorId": null
 }
 ```
 
 | Campo | Tipo | Obrigatorio | Descricao |
 |-------|------|-------------|-----------|
-| `cnpj` | string | Sim | CNPJ da instituicao no formato `NN.NNN.NNN/NNNN-NN` |
-| `nome` | string | Sim | Nome oficial da instituicao |
-| `unidades` | array | Nao | Lista de unidades organizacionais iniciais |
-| `unidades[].codigo` | string | Sim | Codigo unico da unidade |
-| `unidades[].nome` | string | Sim | Nome da unidade organizacional |
-| `unidades[].tipo` | string (enum) | Sim | Tipo: `AREA_TECNICA`, `DEPARTAMENTO`, `DIRETORIA`, etc. |
-| `unidades[].unidadePaiId` | string | Nao | Identificador da unidade pai (para hierarquia) |
+| `cnpj` | string | Cond. | CNPJ da instituicao no formato `NN.NNN.NNN/NNNN-NN`; obrigatorio quando nao houver superior |
+| `razaoSocial` | string | Cond. | Razao social da instituicao; obrigatoria quando houver CNPJ |
+| `nome` | string | Sim | Nome comum de exibicao da instituicao, campus, filial ou setor |
+| `sigla` | string | Nao | Sigla comum da instituicao ou setor |
+| `email` | string | Cond. | Email institucional; obrigatorio quando houver CNPJ |
+| `isPublica` | boolean | Cond. | `true` para instituicao publica; `false` para privada; obrigatorio quando houver CNPJ |
+| `isExterna` | boolean | Sim | Indica se e externa a agencia de fomento |
+| `superiorId` | string | Cond. | Instituicao superior; obrigatoria quando nao houver CNPJ |
 
 **Response `201 Created`**
 
@@ -378,7 +378,10 @@ Registra uma instituicao e sua estrutura minima de unidade organizacional.
   "instituicao": {
     "id": "INST-2026-010",
     "cnpj": "12.345.678/0001-90",
-    "nome": "Agencia de Fomento do Estado"
+    "nome": "UFES",
+    "sigla": "UFES",
+    "isPublica": true,
+    "superiorId": null
   }
 }
 ```
@@ -388,7 +391,8 @@ Registra uma instituicao e sua estrutura minima de unidade organizacional.
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
 | `409` | `CNPJ_DUPLICADO` | Ja existe uma instituicao cadastrada com o CNPJ informado. |
-| `422` | `UNIDADE_HIERARQUIA_INVALIDA` | A estrutura de unidades informada e invalida para a instituicao. |
+| `404` | `INSTITUICAO_SUPERIOR_NAO_ENCONTRADA` | A instituicao superior informada nao foi encontrada. |
+| `422` | `INSTITUICAO_SEM_CNPJ_SEM_SUPERIOR` | Instituicao sem CNPJ proprio deve possuir uma instituicao superior. |
 | `400` | `INSTITUICAO_DADOS_INVALIDOS` | Os dados da instituicao sao invalidos ou incompletos. |
 
 ---
@@ -406,6 +410,8 @@ Lista e filtra instituicoes cadastradas.
 |-----------|------|-----------|
 | `cnpj` | string | Filtra pelo CNPJ exato |
 | `nome` | string | Busca textual no nome |
+| `isPublica` | boolean | Filtra por natureza publica/privada |
+| `superiorId` | string | Filtra por instituicao superior |
 | `page` | integer | Numero da pagina (padrao: 1) |
 | `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
 
@@ -417,7 +423,9 @@ Lista e filtra instituicoes cadastradas.
     {
       "id": "INST-2026-010",
       "cnpj": "12.345.678/0001-90",
-      "nome": "Agencia de Fomento do Estado"
+      "nome": "UFES",
+      "isPublica": true,
+      "superiorId": null
     }
   ],
   "total": 1,
@@ -447,7 +455,10 @@ Consulta o detalhe de uma instituicao pelo identificador.
   "instituicao": {
     "id": "INST-2026-010",
     "cnpj": "12.345.678/0001-90",
-    "nome": "Agencia de Fomento do Estado"
+    "nome": "UFES",
+    "sigla": "UFES",
+    "isPublica": true,
+    "superiorId": null
   }
 }
 ```
@@ -460,67 +471,12 @@ Consulta o detalhe de uma instituicao pelo identificador.
 
 ---
 
-#### `POST /api/v1/m008/instituicoes/{id}/unidades`
+#### `GET /api/v1/m008/instituicoes/{id}/subestruturas`
 
-Registra uma nova unidade organizacional em uma instituicao existente.
-
-- **Autorizacao:** `ANALISTA_AGENCIA`
-- **Idempotencia:** Nao
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `id` | string | Identificador da instituicao |
-
-**Request body**
-
-```json
-{
-  "codigo": "AT-DPCI-02",
-  "nome": "Diretoria de Prospeccao e Captacao de Investimentos",
-  "tipo": "DIRETORIA",
-  "unidadePaiId": null
-}
-```
-
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `codigo` | string | Sim | Codigo unico da unidade |
-| `nome` | string | Sim | Nome da unidade organizacional |
-| `tipo` | string (enum) | Sim | Tipo: `AREA_TECNICA`, `DEPARTAMENTO`, `DIRETORIA`, etc. |
-| `unidadePaiId` | string | Nao | Identificador da unidade pai na hierarquia |
-
-**Response `201 Created`**
-
-```json
-{
-  "unidadeOrganizacional": {
-    "id": "AT-DPCI-02",
-    "codigo": "AT-DPCI-02",
-    "nome": "Diretoria de Prospeccao e Captacao de Investimentos",
-    "tipo": "DIRETORIA",
-    "instituicaoId": "INST-2026-010"
-  }
-}
-```
-
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `INSTITUICAO_NAO_ENCONTRADA` | A instituicao informada nao foi encontrada. |
-| `409` | `UNIDADE_CODIGO_DUPLICADO` | Ja existe uma unidade com o codigo informado nesta instituicao. |
-| `422` | `UNIDADE_HIERARQUIA_INVALIDA` | A unidade pai informada nao pertence a esta instituicao. |
-
----
-
-#### `GET /api/v1/m008/instituicoes/{id}/unidades`
-
-Lista as unidades organizacionais de uma instituicao.
+Lista as instituicoes diretamente vinculadas a uma instituicao superior. O retorno pode conter campi/filiais com CNPJ proprio e setores internos sem CNPJ.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
-- **Operacao de origem:** `ConsultarCadastrosCorporativos` (tipoCadastro=UNIDADE_ORGANIZACIONAL)
+- **Operacao de origem:** `ConsultarCadastrosCorporativos` (tipoCadastro=INSTITUICAO, superiorId={id})
 
 **Path parameters**
 
@@ -532,7 +488,7 @@ Lista as unidades organizacionais de uma instituicao.
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `tipo` | string | Filtra pelo tipo da unidade |
+| `superiorId` | string | Filtra por instituicao superior |
 | `page` | integer | Numero da pagina (padrao: 1) |
 | `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
 
@@ -542,11 +498,11 @@ Lista as unidades organizacionais de uma instituicao.
 {
   "items": [
     {
-      "id": "AT-DGPP-01",
-      "codigo": "AT-DGPP-01",
-      "nome": "Area Tecnica DGPP",
-      "tipo": "AREA_TECNICA",
-      "unidadePaiId": null
+      "id": "INST-2026-011",
+      "nome": "Centro Tecnologico",
+      "sigla": "CT",
+      "cnpj": null,
+      "superiorId": "INST-2026-010"
     }
   ],
   "total": 1,
@@ -560,47 +516,6 @@ Lista as unidades organizacionais de uma instituicao.
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
 | `404` | `INSTITUICAO_NAO_ENCONTRADA` | A instituicao informada nao foi encontrada. |
-
----
-
-#### `GET /api/v1/m008/areas-tecnicas`
-
-Lista as areas tecnicas cadastradas como atalho de referencia para modulos consumidores.
-
-- **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
-- **Operacao de origem:** `ConsultarCadastrosCorporativos` (tipoCadastro=AREA_TECNICA)
-
-**Query parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `instituicaoId` | string | Filtra pela instituicao dona da area tecnica |
-| `nome` | string | Busca textual no nome |
-| `page` | integer | Numero da pagina (padrao: 1) |
-| `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
-
-**Response `200 OK`**
-
-```json
-{
-  "items": [
-    {
-      "id": "AT-DGPP-01",
-      "nome": "Area Tecnica DGPP",
-      "instituicaoId": "INST-2026-010"
-    }
-  ],
-  "total": 1,
-  "page": 1,
-  "pageSize": 20
-}
-```
-
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `400` | `FILTRO_AREA_TECNICA_INVALIDO` | Os filtros informados para consulta de areas tecnicas sao invalidos. |
 
 ---
 
@@ -608,7 +523,7 @@ Lista as areas tecnicas cadastradas como atalho de referencia para modulos consu
 
 #### `POST /api/v1/m008/dirigentes`
 
-Registra um dirigente com unidade e mandato.
+Registra um dirigente como vinculo temporal entre uma pessoa e uma instituicao.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
 - **Operacao de origem:** `RegistrarDirigente`
@@ -619,8 +534,7 @@ Registra um dirigente com unidade e mandato.
 ```json
 {
   "pessoaId": "PES-2026-001",
-  "unidadeId": "AT-DGPP-01",
-  "tipoDirigente": "DIRETOR",
+  "instituicaoId": "INST-2026-010",
   "dataInicio": "2026-01-01",
   "dataFim": "2026-12-31"
 }
@@ -629,8 +543,7 @@ Registra um dirigente com unidade e mandato.
 | Campo | Tipo | Obrigatorio | Descricao |
 |-------|------|-------------|-----------|
 | `pessoaId` | string | Sim | Identificador da pessoa fisica (M008) |
-| `unidadeId` | string | Sim | Identificador da unidade organizacional |
-| `tipoDirigente` | string (enum) | Sim | Tipo: `DIRETOR`, `REITOR`, `CHEFE`, etc. |
+| `instituicaoId` | string | Sim | Identificador da instituicao dirigida |
 | `dataInicio` | string (date) | Sim | Data de inicio do mandato |
 | `dataFim` | string (date) | Sim | Data de fim do mandato |
 
@@ -641,8 +554,8 @@ Registra um dirigente com unidade e mandato.
   "dirigente": {
     "id": "DIR-2026-003",
     "pessoaId": "PES-2026-001",
-    "unidadeId": "AT-DGPP-01",
-    "tipoDirigente": "DIRETOR",
+    "instituicaoId": "INST-2026-010",
+    "ativo": true,
     "dataInicio": "2026-01-01",
     "dataFim": "2026-12-31"
   }
@@ -654,8 +567,8 @@ Registra um dirigente com unidade e mandato.
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
 | `404` | `PESSOA_NAO_ENCONTRADA` | A pessoa informada nao foi encontrada. |
-| `404` | `UNIDADE_ORGANIZACIONAL_NAO_ENCONTRADA` | A unidade organizacional informada nao foi encontrada. |
-| `409` | `MANDATO_SOBREPOSTO` | Ja existe mandato ativo para a mesma unidade no periodo informado. |
+| `404` | `INSTITUICAO_NAO_ENCONTRADA` | A instituicao informada nao foi encontrada. |
+| `409` | `MANDATO_SOBREPOSTO` | Ja existe dirigente ativo na instituicao informada. |
 | `400` | `DIRIGENTE_DADOS_INVALIDOS` | Os dados do dirigente sao invalidos ou incompletos. |
 
 ---
@@ -671,8 +584,7 @@ Lista e filtra dirigentes cadastrados.
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
 | `pessoaId` | string | Filtra pelo identificador da pessoa |
-| `unidadeId` | string | Filtra pela unidade organizacional |
-| `tipoDirigente` | string | Filtra pelo tipo de dirigente |
+| `instituicaoId` | string | Filtra pela instituicao |
 | `ativo` | boolean | Quando `true`, retorna apenas dirigentes com mandato vigente |
 | `page` | integer | Numero da pagina (padrao: 1) |
 | `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
@@ -685,8 +597,8 @@ Lista e filtra dirigentes cadastrados.
     {
       "id": "DIR-2026-003",
       "pessoaId": "PES-2026-001",
-      "unidadeId": "AT-DGPP-01",
-      "tipoDirigente": "DIRETOR",
+      "instituicaoId": "INST-2026-010",
+      "ativo": true,
       "dataInicio": "2026-01-01",
       "dataFim": "2026-12-31"
     }
@@ -867,12 +779,10 @@ Cria ou vincula pessoa automaticamente a partir de evento do Acesso Cidadao.
 | `POST` | `/api/v1/m008/pessoas/{id}/suspender` | SuspenderPessoa | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m008/pessoas/{id}/reativar` | ReativarPessoa | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m008/pessoas/sincronizar-acesso-cidadao` | SincronizarPessoaViaAcessoCidadao | SISTEMA |
-| `POST` | `/api/v1/m008/instituicoes` | CadastrarInstituicaoComUnidadeOrganizacional | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m008/instituicoes` | CadastrarInstituicao | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/m008/instituicoes` | ListarInstituicoes | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `GET` | `/api/v1/m008/instituicoes/{id}` | ConsultarInstituicao | ANALISTA_AGENCIA, MODULO_INTERNO |
-| `POST` | `/api/v1/m008/instituicoes/{id}/unidades` | RegistrarUnidadeOrganizacional | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m008/instituicoes/{id}/unidades` | ListarUnidadesDaInstituicao | ANALISTA_AGENCIA, MODULO_INTERNO |
-| `GET` | `/api/v1/m008/areas-tecnicas` | ListarAreasTecnicas | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `GET` | `/api/v1/m008/instituicoes/{id}/subestruturas` | ListarSubestruturasDaInstituicao | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `POST` | `/api/v1/m008/dirigentes` | RegistrarDirigente | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/m008/dirigentes` | ListarDirigentes | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `GET` | `/api/v1/m008/areas-conhecimento` | ListarAreasDeConhecimento | ANALISTA_AGENCIA, MODULO_INTERNO |
@@ -900,21 +810,14 @@ Cria ou vincula pessoa automaticamente a partir de evento do Acesso Cidadao.
 ```json
 {
   "id": "string",
-  "cnpj": "string",
-  "nome": "string"
-}
-```
-
-### UnidadeOrganizacional
-
-```json
-{
-  "id": "string",
-  "codigo": "string",
+  "cnpj": "string | null",
+  "razaoSocial": "string | null",
   "nome": "string",
-  "tipo": "AREA_TECNICA | DEPARTAMENTO | DIRETORIA | ...",
-  "instituicaoId": "string",
-  "unidadePaiId": "string | null"
+  "sigla": "string",
+  "email": "string | null",
+  "isPublica": true,
+  "isExterna": true,
+  "superiorId": "string | null"
 }
 ```
 
@@ -924,8 +827,8 @@ Cria ou vincula pessoa automaticamente a partir de evento do Acesso Cidadao.
 {
   "id": "string",
   "pessoaId": "string",
-  "unidadeId": "string",
-  "tipoDirigente": "DIRETOR | REITOR | CHEFE | ...",
+  "instituicaoId": "string",
+  "ativo": true,
   "dataInicio": "string (YYYY-MM-DD)",
   "dataFim": "string (YYYY-MM-DD)"
 }
@@ -963,5 +866,5 @@ Cria ou vincula pessoa automaticamente a partir de evento do Acesso Cidadao.
 | Modelo estrutural | [modelo-estrutural.md](modelo-estrutural.md) |
 | Modelo comportamental | [modelo-comportamental.md](modelo-comportamental.md) |
 | EPIC-M008-001 (Cadastro de Pessoas Fisicas) | [epics/EPIC-M008-001.md](epics/EPIC-M008-001.md) |
-| EPIC-M008-002 (Cadastro de Instituicoes e Unidades) | [epics/EPIC-M008-002.md](epics/EPIC-M008-002.md) |
+| EPIC-M008-002 (Cadastro de Instituicoes) | [epics/EPIC-M008-002.md](epics/EPIC-M008-002.md) |
 | EPIC-M008-003 (Cadastros Basicos de Referencia) | [epics/EPIC-M008-003.md](epics/EPIC-M008-003.md) |

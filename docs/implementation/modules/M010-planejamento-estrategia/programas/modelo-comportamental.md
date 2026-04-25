@@ -11,7 +11,6 @@ stateDiagram-v2
     [*] --> EmPlanejamento : CriarPrograma (RN01, RN16)
 
     EmPlanejamento --> EmPlanejamento : AtualizarPrograma (RN13)
-    EmPlanejamento --> EmPlanejamento : RegistrarRecursoDePrograma
     EmPlanejamento --> EmPlanejamento : RegistrarAporteFinanceiroParceriaPrograma (RN11, RN13, RN14)
     EmPlanejamento --> EmPlanejamento : CadastrarComiteGovernanca
     EmPlanejamento --> Ativo : AtivarPrograma
@@ -31,7 +30,7 @@ stateDiagram-v2
 
 | Estado | Descricao |
 |--------|-----------|
-| **EM_PLANEJAMENTO** | Configuracao inicial. Recursos internos, aportes de Parcerias e comite podem ser registrados antes da ativacao. |
+| **EM_PLANEJAMENTO** | Configuracao inicial. Aportes de Parcerias e comite podem ser registrados antes da ativacao. |
 | **ATIVO** | Programa habilitado para criacao de editais em M011. |
 | **SUSPENSO** | Novos editais bloqueados temporariamente. |
 | **ENCERRADO** | Programa finalizado; historico preservado. |

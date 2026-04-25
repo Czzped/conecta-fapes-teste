@@ -274,32 +274,7 @@ Remove programa (RI1). **Autorizacao:** `ANALISTA_AGENCIA`.
 
 ---
 
-## 4. Recursos Internos do Programa
-
-Fontes internas como `LOA`, `TESOURO_ESTADUAL`, `FEDERAL`, `OUTRO`. Aportes oriundos de Parcerias usam o recurso 6 (`AporteFinanceiroParceriaPrograma`).
-
-### `POST /api/v1/programas/{id}/recursos`
-
-**Request body**
-
-```json
-{
-  "origem": "TESOURO_ESTADUAL",
-  "valor": 500000.0,
-  "dataAporte": "2026-02-01",
-  "documento": "DOC-REC-2026-001"
-}
-```
-
-**Response `201 Created`** — `{ recursoPrograma: { id, ... } }`.
-
-### `GET /api/v1/programas/{id}/recursos`
-
-Lista recursos do programa.
-
----
-
-## 5. Comite de Governanca
+## 4. Comite de Governanca
 
 ### `POST /api/v1/programas/{id}/comite`
 
@@ -318,7 +293,7 @@ Cadastra/atualiza membros. **Idempotencia:** Sim.
 
 ---
 
-## 6. Parcerias
+## 5. Parcerias
 
 ### `POST /api/v1/parcerias`
 
@@ -549,7 +524,7 @@ Encerra a Parceria com justificativa obrigatoria (RI2).
 
 ---
 
-## 7. Vigencias da Parceria
+## 6. Vigencias da Parceria
 
 ### `POST /api/parcerias/{id}/vigencias/aditivo`
 
@@ -602,7 +577,7 @@ Lista todas as Vigencias da parceria (original + aditivos), ordenadas por `dataA
 
 ---
 
-## 8. Aportes Financeiros Recebidos
+## 7. Aportes Financeiros Recebidos
 
 ### `POST /api/parcerias/{id}/aportes`
 
@@ -707,7 +682,7 @@ Remove aporte com `isAditivo = true` (RN18). Recalcula saldo.
 
 ---
 
-## 9. Aportes em Programas (N:N Parceria → Programa)
+## 8. Aportes em Programas (N:N Parceria → Programa)
 
 ### `POST /api/v1/parcerias/{parceriaId}/aportes-programas`
 
@@ -762,7 +737,7 @@ Lista aportes recebidos pelo programa (visao dual).
 
 ---
 
-## 10. Documentos da Parceria
+## 9. Documentos da Parceria
 
 ### `POST /api/v1/parcerias/{id}/documentos`
 
@@ -795,7 +770,7 @@ Desvincula Documento da parceria (nao remove o Documento de M008).
 
 ---
 
-## 11. Saldo da Parceria
+## 10. Saldo da Parceria
 
 ### `GET /api/v1/parcerias/{id}/saldo`
 
@@ -821,7 +796,7 @@ Consulta saldo corrente e composicao (RN14, RN15).
 
 ---
 
-## 12. Portfolio Estrategico
+## 11. Portfolio Estrategico
 
 ### `GET /api/v1/portfolio`
 
@@ -858,8 +833,6 @@ Consulta consolidado. Filtros: `planoId`, `estadoPrograma`, `estadoParceria`.
 | `GET` | `/api/v1/programas/{id}` | ConsultarPrograma | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
 | `PUT` | `/api/v1/programas/{id}` | AtualizarPrograma | ANALISTA_AGENCIA |
 | `DELETE` | `/api/v1/programas/{id}` | RemoverPrograma (RI1) | ANALISTA_AGENCIA |
-| `POST` | `/api/v1/programas/{id}/recursos` | RegistrarRecursoDePrograma | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/programas/{id}/recursos` | ListarRecursosDoPrograma | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
 | `POST` | `/api/v1/programas/{id}/comite` | CadastrarComiteGovernanca | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/programas/{programaId}/aportes-parcerias` | ListarAportesRecebidosPorPrograma | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
 | `POST` | `/api/parcerias` | CriarParceria | ANALISTA_AGENCIA |
