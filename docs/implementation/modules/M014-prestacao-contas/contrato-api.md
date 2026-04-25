@@ -4,7 +4,7 @@ Referencia de dominio e regras de negocio: [contrato.md](contrato.md) | [README.
 
 ## Visao Geral
 
-Este documento especifica o contrato HTTP REST do modulo M014 como bounded context responsavel pela prestacao de contas do projeto, incluindo documentos fiscais, extrato bancario, analise, contestacao e consulta do processo. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
+Este documento especifica o contrato HTTP REST do modulo M014 como bounded context responsavel pela prestacao de contas do projeto, incluindo documentos fiscais, importacoes de integracao, analise, contestacao e consulta do processo. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
 
 ### Base URL
 
@@ -29,7 +29,7 @@ Todas as rotas exigem autenticacao. O perfil do chamador determina o acesso:
 
 | Perfil | Descricao |
 |--------|-----------|
-| `COORDENADOR` | Coordenador do projeto — registra documentos, importa extratos, submete e contesta prestacoes |
+| `COORDENADOR` | Coordenador do projeto — registra documentos, submete e contesta prestacoes |
 | `ANALISTA_AGENCIA` | Area Tecnica da Agencia de Fomento — emite pareceres e acompanha analise |
 | `SECONT` | Controladora Estadual — solicita documentos e realiza auditoria |
 | `MODULO_INTERNO` | Modulo interno autorizado (M015) — consulta pendencias |
@@ -343,60 +343,15 @@ Sem corpo na resposta.
 
 ---
 
-### 3. Extrato Bancario
+### 3. Importacoes de Integracao
 
-#### `POST /api/v1/m014/prestacoes-contas/{prestacaoId}/extratos-bancarios`
+As importacoes de projeto/dados bancarios, orcamento planejado SIGFAPES e movimentos bancarios CNAB 240 sao executadas por jobs internos. Nao ha endpoint publico para upload manual de arquivo bancario por Coordenador ou Analista.
 
-Registra um extrato bancario e seus lancamentos para conciliacao.
-
-- **Autorizacao:** `COORDENADOR`, `ANALISTA_AGENCIA`
-- **Operacao de origem:** `ImportarExtratoBancario`
-- **Idempotencia:** Nao
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `prestacaoId` | string | Identificador da prestacao de contas |
-
-**Request body**
-
-```json
-{
-  "conta": "000123-4",
-  "arquivo": "extrato-abril-2026.pdf",
-  "periodoInicio": "2026-04-01",
-  "periodoFim": "2026-04-30"
-}
-```
-
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `conta` | string | Sim | Numero da conta bancaria |
-| `arquivo` | string | Sim | Nome ou referencia do arquivo de extrato |
-| `periodoInicio` | string (date) | Sim | Data de inicio do periodo do extrato |
-| `periodoFim` | string (date) | Sim | Data de fim do periodo do extrato |
-
-**Response `201 Created`**
-
-```json
-{
-  "extratoBancario": {
-    "id": "EXT-2026-005",
-    "prestacaoId": "PC-2026-013",
-    "conta": "000123-4",
-    "lancamentosImportados": 14
-  }
-}
-```
-
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `PRESTACAO_NAO_ENCONTRADA` | A prestacao de contas informada nao foi encontrada para importacao do extrato. |
-| `422` | `EXTRATO_BANCARIO_INVALIDO` | O extrato bancario informado nao pode ser processado. |
-| `409` | `EXTRATO_JA_IMPORTADO` | Ja existe um extrato bancario importado para esta conta e periodo. |
+| Job | Origem | Idempotencia | Observacao |
+|-----|--------|--------------|------------|
+| SincronizarProjetosDadosBancarios | Sistema de projetos/dados bancarios | Sim | Cria/atualiza ProjetoRef, IdentificadorBancario e ContaBancaria |
+| ImportarOrcamentoPlanejadoSIGFAPES | SIGFAPES | Sim | Carga unica por projeto; novas tentativas so ocorrem ate sucesso |
+| ImportarMovimentosBancariosCNAB240 | Sistema bancario | Sim | Executado diariamente em maquina de integracao; classifica creditos como Estorno, Rendimento ou pendente |
 
 ---
 
@@ -569,7 +524,6 @@ Lista as contestacoes de uma prestacao de contas.
 | `POST` | `/api/v1/m014/prestacoes-contas/{prestacaoId}/documentos-fiscais` | RegistrarDocumentoFiscal | COORDENADOR |
 | `GET` | `/api/v1/m014/prestacoes-contas/{prestacaoId}/documentos-fiscais` | ListarDocumentosFiscais | COORDENADOR, ANALISTA_AGENCIA, SECONT |
 | `DELETE` | `/api/v1/m014/prestacoes-contas/{prestacaoId}/documentos-fiscais/{documentoId}` | RemoverDocumentoFiscal | COORDENADOR |
-| `POST` | `/api/v1/m014/prestacoes-contas/{prestacaoId}/extratos-bancarios` | ImportarExtratoBancario | COORDENADOR, ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m014/prestacoes-contas/{prestacaoId}/parecer` | EmitirParecerPrestacaoContas | ANALISTA_AGENCIA, SECONT |
 | `POST` | `/api/v1/m014/prestacoes-contas/{prestacaoId}/contestacoes` | RegistrarContestacaoPrestacaoContas | COORDENADOR |
 | `GET` | `/api/v1/m014/prestacoes-contas/{prestacaoId}/contestacoes` | ListarContestacoes | COORDENADOR, ANALISTA_AGENCIA, SECONT |
@@ -654,6 +608,7 @@ Lista as contestacoes de uma prestacao de contas.
 | Dominio e regras de negocio | [README.md](README.md) |
 | Modelo estrutural | [modelo-estrutural.md](modelo-estrutural.md) |
 | Modelo comportamental | [modelo-comportamental.md](modelo-comportamental.md) |
+| EPIC-M014-010 (Importacao) | [epics/EPIC-M014-010.md](epics/EPIC-M014-010.md) |
 | EPIC-M014-001 (Submissao de Prestacao de Contas) | [epics/EPIC-M014-001.md](epics/EPIC-M014-001.md) |
 | EPIC-M014-002 (Analise de Prestacao de Contas) | [epics/EPIC-M014-002.md](epics/EPIC-M014-002.md) |
 | EPIC-M014-003 (Contestacao e Auditoria) | [epics/EPIC-M014-003.md](epics/EPIC-M014-003.md) |

@@ -4,7 +4,7 @@ Dominio e regras de negocio: ver [README.md](README.md)
 
 ## Proposito do Contrato
 
-Este contrato documenta a superficie publica do modulo M014 como contexto responsavel pela prestacao de contas do projeto, incluindo documentos fiscais, extrato bancario, analise, contestacao e consulta do processo.
+Este contrato documenta a superficie publica do modulo M014 como contexto responsavel pela prestacao de contas do projeto, incluindo documentos fiscais, importacoes de integracao, analise, contestacao e consulta do processo.
 
 ## Consumidores e Dependencias
 
@@ -23,6 +23,8 @@ Este contrato documenta a superficie publica do modulo M014 como contexto respon
 |-------------|------|------------|
 | M003 | Modulo interno | Fornece `Projeto` |
 | M013 | Modulo interno | Fornece `RubricaProjeto` e limites aprovados |
+| Sistema bancario | Sistema externo | Disponibiliza arquivos CNAB 240 para importacao diaria de movimentos bancarios |
+| SIGFAPES | Sistema externo | Fornece orcamento planejado do projeto para carga unica |
 | SERPRO | Sistema externo | Consulta de NF-e (Nota Fiscal Eletronica) via API OAuth2 — valida documentos fiscais |
 | MinIO | Sistema externo | Armazenamento de PDFs de orcamento de fornecedor e justificativas |
 
@@ -31,9 +33,11 @@ Este contrato documenta a superficie publica do modulo M014 como contexto respon
 | Nome da Operacao | Tipo | Objetivo | Entrada | Saida | Regras relacionadas | Pre-condicoes | Recusas/erros | Idempotencia | Autorizacao | Mapeamento de transporte |
 |------------------|------|----------|---------|-------|---------------------|---------------|---------------|--------------|-------------|--------------------------|
 | RegistrarDocumentoFiscal | Command | Registrar documento fiscal vinculado a rubrica do projeto | prestacao, rubrica, tipoDocumento, valor, url | `DocumentoFiscal` criado | RN01, RN07, RN08, RI2 | Projeto e rubrica validos | Rubrica invalida, documento fiscal invalido | Nao | Coordenador | API interna/backoffice a definir |
-| ImportarExtratoBancario | Command | Registrar extrato bancario e seus lancamentos para conciliacao | prestacao, arquivo, conta, lancamentos | `ExtratoBancario` importado | RN02 | Prestacao existente | Arquivo invalido, extrato inconsistente | Nao | Coordenador ou analista autorizado | API interna/backoffice a definir |
-| SubmeterPrestacaoContas | Command | Submeter prestacao de contas para analise | prestacao, periodo, declaracaoFinal | `PrestacaoContas` submetida | RN03, RI1, RI2 | Documentos e extrato carregados | Prestacao anterior pendente, saldo de rubrica excedido | Nao | Coordenador | API interna/backoffice a definir |
-| EmitirParecerPrestacaoContas | Command | Aprovar, reprovar ou solicitar complementacao da prestacao | prestacao, aprovado, justificativa | `ParecerPC` registrado | RN05, RN06, RN09 | Prestacao submetida | Prestacao inexistente, parecer invalido | Nao | Area Tecnica ou SECONT | API interna/backoffice a definir |
+| SincronizarProjetosDadosBancarios | Job | Criar/atualizar ProjetoRef, IdentificadorBancario e ContaBancaria obrigatoria por projeto | lote de projetos/dados bancarios | projetos/contas sincronizados | RN09 | Fonte de projetos disponivel | Dados bancarios ausentes ou inconsistentes | Sim | Sistema de integracao | Job interno |
+| ImportarOrcamentoPlanejadoSIGFAPES | Job | Executar carga unica do orcamento planejado do projeto | projeto, dados SIGFAPES | Orcamento e RubricaOrcamentaria criados | RN09, RI2 | Projeto e dados bancarios sincronizados | Orcamento inexistente, falha SIGFAPES | Sim | Sistema de integracao | Job interno |
+| ImportarMovimentosBancariosCNAB240 | Job | Importar movimentos bancarios diarios para conciliacao | arquivo CNAB 240 | TransacaoFinanceira importadas | RN02, RN09, RN11, RI1 | Projeto, ContaBancaria e Orcamento importados | CNAB invalido, conta nao encontrada | Sim | Sistema de integracao | Job interno |
+| SubmeterPrestacaoContas | Command | Submeter prestacao de contas para analise | prestacao, periodo, declaracaoFinal | `PrestacaoContas` submetida | RN01, RN02, RI1, RI2 | Documentos fiscais e movimentos bancarios carregados/conciliados | Prestacao anterior pendente, saldo de rubrica excedido | Nao | Coordenador | API interna/backoffice a definir |
+| EmitirParecerPrestacaoContas | Command | Aprovar, reprovar ou solicitar complementacao da prestacao | prestacao, aprovado, justificativa | `ParecerPC` registrado | RN09, RN10 | Prestacao em analise | Prestacao inexistente, parecer invalido | Nao | Area Tecnica ou SECONT | API interna/backoffice a definir |
 | RegistrarContestacaoPrestacaoContas | Command | Registrar contestacao da rejeicao com justificativa e anexos | prestacao, justificativa, documentos | `ContestacaoPrestacaoContas` criada | RN04 | Prestacao rejeitada e prazo vigente | Prazo expirado, contestacao sem justificativa | Nao | Coordenador | API interna/backoffice a definir |
 | ConsultarPrestacaoContas | Query | Consultar estado, documentos, conciliacao e pareceres da prestacao | prestacao, projeto, periodo | Detalhe ou lista de prestacoes | RN02, RN03, RN06 | Filtro informado | Prestacao nao encontrada | N/A | Usuario interno autorizado | API interna a definir |
 
@@ -90,15 +94,14 @@ Este contrato documenta a superficie publica do modulo M014 como contexto respon
 | DOCUMENTO_FISCAL_INVALIDO | O documento fiscal informado nao possui dados validos para registro. |
 | RUBRICA_PROJETO_INVALIDA | A rubrica informada nao pode receber o documento fiscal. |
 
-### ImportarExtratoBancario
+### ImportarMovimentosBancariosCNAB240
 
 **Exemplo de entrada**
 
 ```json
 {
-  "prestacaoId": "PC-2026-013",
-  "conta": "000123-4",
-  "arquivo": "extrato-abril-2026.pdf"
+  "arquivoCnab": "CNAB240_20260430_001.RET",
+  "dataProcessamento": "2026-04-30"
 }
 ```
 
@@ -106,9 +109,11 @@ Este contrato documenta a superficie publica do modulo M014 como contexto respon
 
 ```json
 {
-  "extratoBancario": {
-    "id": "EXT-2026-005",
-    "lancamentosImportados": 14
+  "importacaoCnab": {
+    "arquivo": "CNAB240_20260430_001.RET",
+    "lancamentosImportados": 14,
+    "lancamentosIgnorados": 0,
+    "status": "PROCESSADO"
   }
 }
 ```
@@ -117,8 +122,8 @@ Este contrato documenta a superficie publica do modulo M014 como contexto respon
 
 | Codigo | Mensagem de erro exemplo |
 |--------|---------------------------|
-| EXTRATO_BANCARIO_INVALIDO | O extrato bancario informado nao pode ser processado. |
-| PRESTACAO_NAO_ENCONTRADA | A prestacao de contas informada nao foi encontrada para importacao do extrato. |
+| CNAB240_INVALIDO | O arquivo CNAB 240 informado nao pode ser processado. |
+| CONTA_BANCARIA_NAO_ENCONTRADA | Nao existe conta bancaria cadastrada para os dados informados no CNAB 240. |
 
 ### SubmeterPrestacaoContas
 

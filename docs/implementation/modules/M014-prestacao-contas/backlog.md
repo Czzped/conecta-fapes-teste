@@ -4,7 +4,7 @@
 
 ## Sobre o Modulo
 
-Coordenadores devem submeter documentos fiscais que comprovem a aplicacao dos recursos do projeto. A agencia de fomento analisa e pode rejeitar documentos, e a SECONT realiza auditorias. Atualmente, esse processo e inteiramente baseado em papel e e-mail, sem fluxo digital, sem rastreabilidade e sem reconciliacao automatica entre extrato bancario e despesas declaradas. Este modulo visa resolver esse problema ao digitalizar todo o ciclo de prestacao de contas, desde a importacao do extrato bancario ate a auditoria da SECONT. O sucesso sera medido pela reducao do tempo medio de analise da prestacao de contas e pela taxa de prestacoes aprovadas na primeira submissao.
+Coordenadores devem submeter documentos fiscais que comprovem a aplicacao dos recursos do projeto. A agencia de fomento analisa e pode rejeitar documentos, e a SECONT realiza auditorias. Atualmente, esse processo e inteiramente baseado em papel e e-mail, sem fluxo digital, sem rastreabilidade e sem reconciliacao automatica entre movimentos bancarios e despesas declaradas. Este modulo visa resolver esse problema ao digitalizar todo o ciclo de prestacao de contas, desde as importacoes de projeto, orcamento planejado e movimentos CNAB 240 ate a auditoria da SECONT. O sucesso sera medido pela reducao do tempo medio de analise da prestacao de contas e pela taxa de prestacoes aprovadas na primeira submissao.
 
 Especificacao de referencia: [README.md](README.md)
 
@@ -16,28 +16,35 @@ Status: **Done** = implementado no backend atual. **To Do (Pos-MVP)** = document
 
 | ID | Titulo | Requisito | Prioridade | Status | Observacoes | Documento |
 |----|--------|-----------|------------|--------|-------------|-----------|
-| EPIC-M014-001 | Submissao de Prestacao de Contas | UC01 | Must | Done | — | [EPIC-M014-001](epics/EPIC-M014-001.md) |
+| EPIC-M014-010 | Importacao | UC10 | Must | To Do | Importa projeto/conta, orcamento planejado e movimentos CNAB 240 | [EPIC-M014-010](epics/EPIC-M014-010.md) |
+| EPIC-M014-001 | Submissao de Prestacao de Contas | UC01 | Must | To Do | Depende dos movimentos bancarios importados para submissao final | [EPIC-M014-001](epics/EPIC-M014-001.md) |
 | EPIC-M014-002 | Analise de Prestacao de Contas | UC02 | Must | To Do (Pos-MVP) | Recusa com justificativa detalhada, gatilho de contestacao (15d) | [EPIC-M014-002](epics/EPIC-M014-002.md) |
 | EPIC-M014-003 | Contestacao e Auditoria | UC03 | Must | To Do (Pos-MVP) | Contestacao (15d), reanalise, auditoria SECONT, 6 estados adicionais | [EPIC-M014-003](epics/EPIC-M014-003.md) |
 | EPIC-M014-004 | Justificativas de Despesa (NF, Diaria, Invoice) | UC04 | Must | Done | — | [EPIC-M014-004](epics/EPIC-M014-004.md) |
 | EPIC-M014-005 | Documentos Fiscais e Integracao SERPRO | UC05 | Must | Done | — | [EPIC-M014-005](epics/EPIC-M014-005.md) |
-| EPIC-M014-006 | Itens de Documento Fiscal e Associacao Contabil | UC06 | Must | Done | — | [EPIC-M014-006](epics/EPIC-M014-006.md) |
+| EPIC-M014-006 | Itens de Documento Fiscal e Associacao a Rubricas | UC06 | Must | To Do | Inclui atualizacao do balanco do projeto apos NF | [EPIC-M014-006](epics/EPIC-M014-006.md) |
 | EPIC-M014-007 | Orcamentos de Fornecedor | UC07 | Must | Done | — | [EPIC-M014-007](epics/EPIC-M014-007.md) |
 | EPIC-M014-008 | Fluxo de Submissao e Analise (V1) | UC08 | Must | Done | Ciclo nuclear RASCUNHO → EM_ANALISE → {FINALIZADO \| NEGADO \| REVISAO} | [EPIC-M014-008](epics/EPIC-M014-008.md) |
 | EPIC-M014-009 | Prazos Temporais da Prestacao | UC09 | Must | To Do (Pos-MVP) | Prazo 30d submissao + 30d reposicao + notificacoes T-7/T-3/T-0 | [EPIC-M014-009](epics/EPIC-M014-009.md) |
 
-> **Nota:** Os EPICs do legado EP-01 a EP-04 (Contas Bancarias, Orcamento, Contas Contabeis, Transacoes Financeiras) estao implementados no backend `ConectaFapes.PrestacaoContas` mas pertencem conceitualmente a M016 (Contabilidade e Financeiro). Ver [debito tecnico](#debito-tecnico). A maquina de estados expandida (11 estados) que habilita os EPICs Pos-MVP e rastreada em DT-M014-002.
+> **Nota:** Os EPICs do legado EP-01 a EP-04 (Contas Bancarias, Orcamento, Rubricas Orcamentarias, Transacoes Financeiras) estao implementados no backend `ConectaFapes.PrestacaoContas` mas pertencem conceitualmente a M016 (Contabilidade e Financeiro). Ver [debito tecnico](#debito-tecnico). A maquina de estados expandida (11 estados) que habilita os EPICs Pos-MVP e rastreada em DT-M014-002.
 
 ---
 
 ## Rastreabilidade
 
 ```
-EPIC-M014-001 (Submissao de Prestacao de Contas)
-├── US-M014-001 Importar Extrato Bancario
+EPIC-M014-010 (Importacao)
+├── US-M014-037 Importar Projetos e Dados Bancarios
+├── US-M014-036 Importar Orcamento Planejado do SIGFAPES
+└── US-M014-001 Importar Movimentos Bancarios CNAB 240  <- depende de US-M014-036
+
+EPIC-M014-001 (Submissao de Prestacao de Contas)  <- depende de EPIC-M014-010
 ├── US-M014-002 Submeter PC de Servico
 ├── US-M014-003 Submeter PC de Diarias
-└── US-M014-004 Submeter PC de Passagens
+├── US-M014-004 Submeter PC de Passagens
+├── US-M014-033 Submeter Compra de Produto por Nota Fiscal
+└── US-M014-034 Submeter Compra de Produto sem Nota Fiscal
 
 EPIC-M014-002 (Analise de Prestacao de Contas)  <- depende de EPIC-M014-001
 ├── US-M014-005 Analisar Documentos
@@ -62,9 +69,10 @@ EPIC-M014-005 (Documentos Fiscais e SERPRO)  <- depende de EPIC-M014-004
 └── US-M014-018 Extrair Chave de Acesso
 
 EPIC-M014-006 (Itens de Documento Fiscal)  <- depende de EPIC-M014-005
-├── US-M014-019 Vincular Item a Conta Contabil
-├── US-M014-020 Desvincular Item de Conta Contabil
-└── US-M014-021 Consultar Impacto no Saldo da Conta
+├── US-M014-019 Vincular Item a Rubrica Orcamentaria
+├── US-M014-020 Desvincular Item de Rubrica Orcamentaria
+├── US-M014-021 Consultar Impacto no Saldo da Rubrica
+└── US-M014-035 Apresentar Balanco do Projeto apos Nota Fiscal
 
 EPIC-M014-007 (Orcamentos de Fornecedor)  <- depende de EPIC-M014-004
 ├── US-M014-022 Criar Orcamentos em Lote
@@ -72,7 +80,7 @@ EPIC-M014-007 (Orcamentos de Fornecedor)  <- depende de EPIC-M014-004
 ├── US-M014-024 Selecionar Orcamento Vencedor
 └── US-M014-025 Listar e Editar Orcamentos
 
-EPIC-M014-008 (Fluxo de Submissao e Analise V1)  <- depende de todos os anteriores
+EPIC-M014-008 (Fluxo de Submissao e Analise V1)  <- depende de EPIC-M014-010 e dos EPICs M014-001 a M014-007
 ├── US-M014-026 Submeter Prestacao (RASCUNHO → EM_ANALISE)
 ├── US-M014-027 Aprovar Prestacao (EM_ANALISE → FINALIZADO)
 ├── US-M014-028 Negar Prestacao (EM_ANALISE → NEGADO)
@@ -94,8 +102,9 @@ Itens identificados na reconciliacao com a documentacao legada (`docs/deprecated
 
 | ID | Titulo | Status | Impacto |
 |----|--------|--------|---------|
-| DT-M014-001 | Entidades financeiras (ContaBancaria, Orcamento, ContaContabil, TransacaoFinanceira) estao implementadas no backend M014 mas pertencem conceitualmente a M016/M013 | To Do | Arquitetura, separacao de bounded contexts |
+| DT-M014-001 | Entidades financeiras (ContaBancaria, Orcamento, RubricaOrcamentaria, TransacaoFinanceira) estao implementadas no backend M014 mas pertencem conceitualmente a M016/M013 | To Do | Arquitetura, separacao de bounded contexts |
 | DT-M014-002 | Maquina de estados implementada (5 estados: RASCUNHO, EM_ANALISE, REVISAO, FINALIZADO, NEGADO) diverge da spec (11 estados com contestacao e auditoria SECONT) — alinhar progressivamente | To Do | modelo-comportamental.md |
+| DT-M014-005 | Renomear codigo e persistencia legados de `ContaContabil` para `RubricaOrcamentaria`, mantendo compatibilidade temporaria em migrations/adapters quando necessario | To Do | Linguagem ubiqua, consistencia entre dominio, modelo e backend |
 
 ### Prioridade Media
 

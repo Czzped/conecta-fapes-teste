@@ -270,7 +270,7 @@ Remove programa (RI1). **Autorizacao:** `ANALISTA_AGENCIA`.
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
 | `404` | `PROGRAMA_NAO_ENCONTRADO` | Programa nao encontrado. |
-| `422` | `PROGRAMA_COM_EDITAIS_VINCULADOS` | Existem editais vinculados (RI1). |
+| `422` | `PROGRAMA_COM_INICIATIVAS_VINCULADAS` | Existem Iniciativas vinculadas ao Programa (RI1). |
 
 ---
 
@@ -297,7 +297,7 @@ Cadastra/atualiza membros. **Idempotencia:** Sim.
 
 ### `POST /api/v1/parcerias`
 
-Registra parceria com Vigencia original e Instituicoes envolvidas (RN10, RN15).
+Registra parceria com Vigencia original e uma Instituicao vinculada (RN10, RN15).
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
 - **Operacao de origem:** `CriarParceria`
@@ -311,7 +311,7 @@ Registra parceria com Vigencia original e Instituicoes envolvidas (RN10, RN15).
   "numeroDProcesso": "PRC-2026-001",
   "dataAssinatura": "2026-03-01",
   "objetivo": "Apoiar iniciativas de pesquisa aplicada.",
-  "instituicoesIds": ["INST-2026-010", "INST-2026-020"],
+  "instituicaoId": "INST-2026-010",
   "vigenciaOriginal": {
     "dataInicio": "2026-03-01",
     "dataFim": "2028-12-31",
@@ -331,7 +331,7 @@ Registra parceria com Vigencia original e Instituicoes envolvidas (RN10, RN15).
     "vigenciaInicioCorrente": "2026-03-01",
     "vigenciaFimCorrente": "2028-12-31",
     "saldo": 0.0,
-    "instituicoes": ["INST-2026-010", "INST-2026-020"]
+    "instituicaoId": "INST-2026-010"
   }
 }
 ```
@@ -342,7 +342,7 @@ Registra parceria com Vigencia original e Instituicoes envolvidas (RN10, RN15).
 |------|--------|----------|
 | `400` | `PARCERIA_DADOS_INVALIDOS` | Dados obrigatorios ausentes. |
 | `400` | `VIGENCIA_ORIGINAL_AUSENTE` | `vigenciaOriginal` obrigatoria (RN15). |
-| `422` | `PARCERIA_SEM_INSTITUICAO` | Pelo menos uma Instituicao e obrigatoria (RN10). |
+| `422` | `PARCERIA_SEM_INSTITUICAO` | Exatamente uma Instituicao e obrigatoria (RN10). |
 | `422` | `VIGENCIA_ORIGINAL_INVALIDA` | `dataInicio` >= `dataFim` na Vigencia original. |
 | `404` | `INSTITUICAO_NAO_ENCONTRADA` | Instituicao informada nao encontrada em M008. |
 
@@ -374,7 +374,7 @@ Detalhe com Vigencias, aportes recebidos, aportes destinados a programas, docume
     "aportesEmProgramas": [
       { "id": "AFP-2026-001", "programaId": "PROG-2026-01", "valor": 150000.0 }
     ],
-    "instituicoes": ["INST-2026-010", "INST-2026-020"],
+    "instituicaoId": "INST-2026-010",
     "documentos": ["DOC-TC-2026-001", "DOC-ANEXO-2026-005"]
   }
 }
@@ -432,14 +432,14 @@ Reativa Programa Suspenso.
 
 ### `POST /api/v1/programas/{id}/encerrar`
 
-Encerra Programa (transicao de estado distinta de `DELETE /programas/{id}`). Bloqueado se houver editais em andamento (RI1).
+Encerra Programa (transicao de estado distinta de `DELETE /programas/{id}`). Bloqueado se houver Iniciativas em andamento que impedem o encerramento (RI1).
 
 **Request body**:
 ```json
 { "dataEncerramento": "2029-12-31", "justificativa": "..." }
 ```
 
-**Erros**: `404`, `422 PROGRAMA_COM_EDITAIS_EM_ANDAMENTO` (RI1).
+**Erros**: `404`, `422 PROGRAMA_COM_INICIATIVAS_EM_ANDAMENTO` (RI1).
 
 ---
 
@@ -879,7 +879,7 @@ Consulta consolidado. Filtros: `planoId`, `estadoPrograma`, `estadoParceria`.
   "vigenciaInicioCorrente": "YYYY-MM-DD",
   "vigenciaFimCorrente": "YYYY-MM-DD",
   "saldo": "number",
-  "instituicoes": ["string"]
+  "instituicaoId": "string"
 }
 ```
 

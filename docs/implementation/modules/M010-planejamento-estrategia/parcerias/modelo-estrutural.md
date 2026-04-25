@@ -2,7 +2,7 @@
 
 [← Voltar ao M010](../README.md) | [Contrato M010](../contrato.md) | [Contrato API M010](../contrato-api.md)
 
-**Escopo**: Parceria, sua vigencia (original e aditivos), aportes recebidos de Instituicoes e documentos regularizadores. Aportes de Parceria para Programa vivem em [programas/](../programas/modelo-estrutural.md) — esta visao apresenta apenas a relacao saindo da Parceria.
+**Escopo**: Parceria, sua vigencia (original e aditivos), Instituicao vinculada, aportes recebidos e documentos regularizadores. Aportes de Parceria para Programa vivem em [programas/](../programas/modelo-estrutural.md) — esta visao apresenta apenas a relacao saindo da Parceria.
 
 ---
 
@@ -19,6 +19,7 @@ classDiagram
         +Date dataAssinatura
         +String objetivo
         +EstadoParceria estado
+        +Instituicao instituicao
         /+Date vigenciaInicioCorrente
         /+Date vigenciaFimCorrente
         /+Decimal saldo
@@ -70,6 +71,10 @@ classDiagram
         <<fora do escopo - M010/programas>>
     }
 
+    class Iniciativa {
+        <<fora do escopo - M003>>
+    }
+
     class AporteFinanceiroParceriaPrograma {
         <<fora do escopo - M010/programas>>
     }
@@ -77,17 +82,18 @@ classDiagram
     %% Relacoes internas
     Parceria "1" --> "1..*" Vigencia : possui
     Parceria "1" --> "0..*" AporteFinanceiro : tem
+    Parceria "*" --> "1" Instituicao : vinculadaA
     AporteFinanceiro "1" --> "1" Instituicao : origem
     AporteFinanceiro "1" --> "1" Documento : regulariza
     AporteFinanceiro "*" --> "1" ContaBancaria : depositadoEm
     Vigencia "1..*" --> "1" Documento : formalizadoPor
     Parceria "1" --> "0..*" Documento : regulariza
     Documento "1..*" --> "1" TipoDocumento : classificadoComo
-    Parceria "1..*" --> "1..*" Instituicao : envolve
 
     %% Saida para programas (entidade AporteFinanceiroParceriaPrograma vive em programas/)
     Parceria "1" --> "0..*" AporteFinanceiroParceriaPrograma : origem
     AporteFinanceiroParceriaPrograma "*" --> "1" Programa : destinadoA
+    Parceria "1" --> "0..*" Iniciativa : impacta
 ```
 
 ## Dicionario de Dados
@@ -99,6 +105,7 @@ classDiagram
 | | dataAssinatura | Data da assinatura do instrumento | Sim | Date | | | |
 | | objetivo | Objetivo geral | Sim | String | | 2000 | |
 | | estado | Estado corrente | Gerado | EstadoParceria | `EmElaboracao`/`Vigente`/`Suspensa`/`Encerrada` | | |
+| | instituicao (relacao) | Instituicao unica vinculada a Parceria (RN10) | Sim | FK → Instituicao (M008) | Via `vinculadaA` | | |
 | | vigenciaInicioCorrente (derivado) | `MIN(Vigencia.dataInicio)` | Calculado | Date | | | |
 | | vigenciaFimCorrente (derivado) | `MAX(Vigencia.dataFim)` | Calculado | Date | | | |
 | | saldo (derivado) | `SUM(AporteFinanceiro.valorInvestido) − SUM(AporteFinanceiroParceriaPrograma.valor)` — sempre `>= 0` | Calculado | Decimal | ≥ 0 | | |
@@ -112,30 +119,20 @@ classDiagram
 | | dataAporte | Data do aporte | Sim | Date | | | |
 | | isAditivo | Original (`false`) ou aditivo (`true`); aditivo exige `dataAporte` posterior ao original (RN17) | Sim | Boolean | Padrao: `false` | | |
 | | documento (relacao) | Documento (M008) classificado como "Termo de Descentralizacao" (RN12) | Sim | FK → Documento | Via `regulariza` | | |
-| | instituicao (relacao) | Instituicao (M008) de origem | Sim | FK → Instituicao | Via `origem` | | |
+| | instituicao (relacao) | Instituicao (M008) de origem; deve ser a mesma Instituicao vinculada a Parceria (RN04/RN10) | Sim | FK → Instituicao | Via `origem` | | |
 | | contaBancariaDestino (relacao) | Conta bancaria (M016) da agencia de fomento que recebe o deposito do aporte | Sim | FK → ContaBancaria (M016) | Via `depositadoEm` | | |
 
-## Regras de Negocio Aplicaveis
+## Referencia de Regras
 
-- **RN03** — Aporte requer `dataAssinatura` da Parceria preenchida
-- **RN04** — Aporte tem origem em Instituicao (M008)
-- **RN06** — Nova Vigencia (aditivo): `dataAssinatura > original.dataAssinatura`; `dataFim > vigenciaFimCorrente anterior`
-- **RN10** — Parceria ≥1 Instituicao envolvida
-- **RN12** — AporteFinanceiro formalizado por Documento Termo de Descentralizacao
-- **RN14** — `saldo` sempre `>= 0`
-- **RN15** — Exatamente uma Vigencia com `isAditivo = false` (a original)
-- **RN17** — Primeiro AporteFinanceiro e original; aditivos exigem posteridade
-- **RN18** — Aditivos podem ser editados/removidos com recalculo de saldo
-- **RN19** — Transicao para `Vigente` exige: dataAssinatura + >=1 AporteFinanceiro original + >=1 Documento anexado + hoje em `[vigenciaInicioCorrente, vigenciaFimCorrente]`
-- **RI2** — Encerramento em cascata com confirmacao
-- **RI3** — Remocao bloqueada se houver `AporteFinanceiroParceriaPrograma` vinculado
+Regras aplicaveis ao modelo de Parcerias: `RN03`, `RN04`, `RN06`, `RN10`, `RN12`, `RN14`, `RN15`, `RN17`, `RN18`, `RN19`, `RI2`, `RI3`, `RI4`. As definicoes oficiais ficam em [M010 — Regras de Negocio](../README.md#regras-de-negocio-consolidadas).
 
 ## Relacoes com outros subdominios
 
 | Destino | Relacao | Observacao |
 |---------|---------|------------|
 | `programas/AporteFinanceiroParceriaPrograma` | Parceria → AporteFinanceiroParceriaPrograma → Programa | Entidade associativa vive em **programas/**; Parceria e a fonte |
-| `M008/Instituicao` | `origem` (N:1 via AporteFinanceiro) e `envolve` (N:N Parceria-Instituicao) | |
+| `M008/Instituicao` | `vinculadaA` (N:1 via Parceria) e `origem` (N:1 via AporteFinanceiro) | A Parceria possui exatamente uma Instituicao vinculada; aportes devem ter origem nessa mesma Instituicao |
+| `M003/Iniciativa` | Parceria → Iniciativa | Relacao externa para suspensao em cascata; ownership da Iniciativa permanece em M003 |
 | `M008/Documento` | `regulariza`, `formalizadoPor` | Termo de Cooperacao, Termo Aditivo, Termo de Descentralizacao, anexos |
 | `M008/TipoDocumento` | Classifica Documento | |
 | `M016/ContaBancaria` | `depositadoEm` (N:1 via AporteFinanceiro) | Conta bancaria da agencia que recebe o deposito; a conta pertence a um `FundoFinanceiro` gerido em M016 |

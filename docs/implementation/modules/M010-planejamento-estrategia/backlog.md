@@ -53,8 +53,13 @@ EPIC-M010-004 (Painel Financeiro de Parcerias)  <- depende de EPIC-M010-002
 └── US-M010-018 Relatorio Financeiro por Parceria (ref. EPIC-M010-002)
 
 EPIC-M010-003 (Gestao de Programas)  <- depende de EPIC-M010-001
-├── US-M010-020 Cadastrar Programa (inclui validacao RN13)
+├── US-M010-020 Cadastrar Programa (inclui RN01 e RN16)
 ├── US-M010-021 Cadastrar Comite de Governanca
+├── US-M010-025 Registrar Aditivo de Tempo do Programa
+├── US-M010-026 Solicitar Aditivo Financeiro do Programa
+├── US-M010-027 Retirar Aporte de Parceria do Programa
+├── US-M010-028 Suspender Programa
+├── US-M010-029 Reativar Programa
 ├── US-M010-023 Dashboard de Programas
-└── US-M010-024 Remover Programa (RI1)
+└── US-M010-024 Encerrar ou Remover Programa (RI1)
 ```

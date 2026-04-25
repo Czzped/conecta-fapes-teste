@@ -239,10 +239,27 @@ nav:
               - Modelo Comportamental: implementation/modules/M010-planejamento-estrategia/planejamento/modelo-comportamental.md
               - EPIC-M010-001 Plano: implementation/modules/M010-planejamento-estrategia/planejamento/epics/EPIC-M010-001.md
           - Programas:
+              - Visao Geral: implementation/modules/M010-planejamento-estrategia/programas/README.md
+              - Processo: implementation/modules/M010-planejamento-estrategia/programas/processo.md
+              - Jornadas:
+                  - Gestao do Programa: implementation/modules/M010-planejamento-estrategia/programas/jornada-gestao-programa.md
+                  - Criacao e Ativacao: implementation/modules/M010-planejamento-estrategia/programas/jornada-criacao-ativacao-programa.md
+                  - Aditivos: implementation/modules/M010-planejamento-estrategia/programas/jornada-aditivos-programa.md
+                  - Retirada de Aporte: implementation/modules/M010-planejamento-estrategia/programas/jornada-retirada-aporte-programa.md
+                  - Suspensao e Reativacao: implementation/modules/M010-planejamento-estrategia/programas/jornada-suspensao-reativacao-programa.md
+                  - Encerramento e Remocao: implementation/modules/M010-planejamento-estrategia/programas/jornada-encerramento-remocao-programa.md
+                  - Acompanhamento: implementation/modules/M010-planejamento-estrategia/programas/jornada-acompanhamento-programa.md
               - Modelo Estrutural: implementation/modules/M010-planejamento-estrategia/programas/modelo-estrutural.md
               - Modelo Comportamental: implementation/modules/M010-planejamento-estrategia/programas/modelo-comportamental.md
               - EPIC-M010-003 Programas: implementation/modules/M010-planejamento-estrategia/programas/epics/EPIC-M010-003.md
           - Parcerias:
+              - Visao Geral: implementation/modules/M010-planejamento-estrategia/parcerias/README.md
+              - Processo: implementation/modules/M010-planejamento-estrategia/parcerias/processo.md
+              - Jornadas:
+                  - Criacao da Parceria: implementation/modules/M010-planejamento-estrategia/parcerias/jornada-criacao-parceria.md
+                  - Aditivo da Parceria: implementation/modules/M010-planejamento-estrategia/parcerias/jornada-aditivo-parceria.md
+                  - Suspensao e Encerramento: implementation/modules/M010-planejamento-estrategia/parcerias/jornada-suspensao-encerramento-parceria.md
+                  - Suspensao em Cascata: implementation/modules/M010-planejamento-estrategia/parcerias/jornada-suspensao-cascata.md
               - Modelo Estrutural: implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md
               - Modelo Comportamental: implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md
               - EPIC-M010-002 Parcerias: implementation/modules/M010-planejamento-estrategia/parcerias/epics/EPIC-M010-002.md
@@ -289,6 +306,7 @@ nav:
           - Contrato API: implementation/modules/M014-prestacao-contas/contrato-api.md
           - Modelo Estrutural: implementation/modules/M014-prestacao-contas/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M014-prestacao-contas/modelo-comportamental.md
+          - EPIC-010 Importacao: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-010.md
           - EPIC-001: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-001.md
           - EPIC-002: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-002.md
           - EPIC-003: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-003.md

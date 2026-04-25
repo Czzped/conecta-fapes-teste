@@ -21,10 +21,10 @@ stateDiagram-v2
     Vigente --> Vigente : AnexarDocumento / DesanexarDocumento
     Vigente --> Vigente : EditarAporteFinanceiroAditivo (RN18)
     Vigente --> Vigente : RemoverAporteFinanceiroAditivo (RN18)
-    Vigente --> Suspensa : SuspenderParceria
+    Vigente --> Suspensa : SuspenderParceria (RI4)
     Vigente --> Encerrada : EncerrarParceria (RI2)
 
-    Suspensa --> Vigente : ReativarParceria
+    Suspensa --> Vigente : ReativarParceria (reativacao em cascata)
     Suspensa --> Encerrada : EncerrarParceria (RI2)
 
     Encerrada --> [*]
@@ -36,27 +36,26 @@ stateDiagram-v2
 |--------|-----------|
 | **EmElaboracao** | Parceria cadastrada com Vigencia original. Permanece aqui ate atender RN19. |
 | **Vigente** | Acordo assinado; aportes e aditivos permitidos. `hoje` em `[vigenciaInicioCorrente, vigenciaFimCorrente]`. |
-| **Suspensa** | Operacoes interrompidas temporariamente. Aportes bloqueados. |
-| **Encerrada** | Parceria encerrada formalmente apos cascata de encerramento dos Programas; imutavel. |
+| **Suspensa** | Operacoes interrompidas temporariamente. Aportes, aditivos e distribuicoes para Programas bloqueados; Programas aportados e Iniciativas vinculadas ficam suspensos em cascata (RI4). |
+| **Encerrada** | Parceria encerrada formalmente apos cascata de encerramento dos Programas aportados; imutavel. |
 
 ### Guards e regras por transicao
 
 | Transicao | Operacao | Pre-condicoes |
 |-----------|----------|---------------|
 | `[*] → EmElaboracao` | `CriarParceria` | Instituicao informada (RN10); Vigencia original valida (RN15) |
-| `EmElaboracao → Vigente` | `FormalizarParceria` | **RN19**: `dataAssinatura` + ao menos 1 `AporteFinanceiro` original + ao menos 1 `Documento` anexado + `hoje` no intervalo `[vigenciaInicioCorrente, vigenciaFimCorrente]` |
-| `Vigente → Suspensa` | `SuspenderParceria` | motivo informado |
-| `Suspensa → Vigente` | `ReativarParceria` | `hoje` no intervalo `[vigenciaInicioCorrente, vigenciaFimCorrente]` |
-| `Vigente → Encerrada` / `Suspensa → Encerrada` | `EncerrarParceria` | **RI2**: confirmacao explicita + justificativa + cascata de encerramento dos Programas aportados |
+| `EmElaboracao → Vigente` | `FormalizarParceria` | Ver `RN19` |
+| `Vigente → Suspensa` | `SuspenderParceria` | motivo informado + suspensao em cascata de Programas aportados e Iniciativas vinculadas (RI4) |
+| `Suspensa → Vigente` | `ReativarParceria` | `hoje` no intervalo `[vigenciaInicioCorrente, vigenciaFimCorrente]` + reativacao coordenada de Programas e Iniciativas impactadas |
+| `Vigente → Encerrada` / `Suspensa → Encerrada` | `EncerrarParceria` | Ver `RI2` |
 
 ### Gatilhos de encerramento
 
 1. **Manual**: usuario solicita `EncerrarParceria` com `origemGatilho = USUARIO`.
 2. **Automatico por expiracao**: job diario `VerificarVigenciaExpirada` detecta `vigenciaFimCorrente` < `hoje`, **notifica** o responsavel e abre pendencia de confirmacao. O sistema nao encerra sem confirmacao explicita.
 
-### Regras invariantes relevantes
+### Referencia de Regras
 
-- **RN13** (temporal): o periodo dos Programas aportados deve estar contido em `[vigenciaInicioCorrente, vigenciaFimCorrente]` sempre.
-- **RN14** (saldo): `saldo` derivado da Parceria nunca pode ficar negativo.
-- **RI2** (encerramento em cascata): ao encerrar a Parceria, todos os Programas aportados transitam para `ENCERRADO` apos confirmacao.
+Regras aplicaveis ao ciclo de vida de Parcerias: `RN13`, `RN14`, `RN19`, `RI2`, `RI4`. As definicoes oficiais ficam em [M010 — Regras de Negocio](../README.md#regras-de-negocio-consolidadas).
+
 - Prestacao de contas final: parte do processo de encerramento; criterios detalhados a serem definidos com o cliente.
