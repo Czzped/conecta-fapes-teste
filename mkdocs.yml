@@ -235,6 +235,8 @@ nav:
           - Contrato: implementation/modules/M010-planejamento-estrategia/contrato.md
           - Contrato API: implementation/modules/M010-planejamento-estrategia/contrato-api.md
           - Planejamento Estrategico:
+              - Processo: implementation/modules/M010-planejamento-estrategia/planejamento/processo.md
+              - Jornada: implementation/modules/M010-planejamento-estrategia/planejamento/jornada-gestao-planejamento.md
               - Modelo Estrutural: implementation/modules/M010-planejamento-estrategia/planejamento/modelo-estrutural.md
               - Modelo Comportamental: implementation/modules/M010-planejamento-estrategia/planejamento/modelo-comportamental.md
               - EPIC-M010-001 Plano: implementation/modules/M010-planejamento-estrategia/planejamento/epics/EPIC-M010-001.md

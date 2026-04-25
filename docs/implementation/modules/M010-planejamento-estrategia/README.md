@@ -15,6 +15,8 @@ M010-planejamento-estrategia/
 ├── contrato.md                   ← operacoes publicas (consolidado)
 ├── contrato-api.md               ← contrato HTTP REST (consolidado)
 ├── planejamento/                 ← Plano Estrategico + Eixos
+│   ├── processo.md
+│   ├── jornada-gestao-planejamento.md
 │   ├── modelo-estrutural.md
 │   ├── modelo-comportamental.md
 │   └── epics/EPIC-M010-001.md
@@ -50,7 +52,7 @@ M010-planejamento-estrategia/
 | [Contrato](contrato.md) | Superficie publica consolidada: comandos, consultas, jobs |
 | [Contrato API](contrato-api.md) | Contrato HTTP REST consolidado |
 | [Backlog](backlog.md) | EPICs, US e rastreabilidade |
-| [Planejamento — Estrutural](planejamento/modelo-estrutural.md) / [Comportamental](planejamento/modelo-comportamental.md) | Plano Estrategico + Eixos |
+| [Planejamento — Processo](planejamento/processo.md) / [Jornada](planejamento/jornada-gestao-planejamento.md) / [Estrutural](planejamento/modelo-estrutural.md) / [Comportamental](planejamento/modelo-comportamental.md) | Plano Estrategico + Eixos |
 | [Programas](programas/README.md) | Indice do subdominio, capacidades, jornadas, modelos e epic |
 | [Programas — Processo](programas/processo.md) / [Estrutural](programas/modelo-estrutural.md) / [Comportamental](programas/modelo-comportamental.md) | Programas + Recursos + Comite + AporteFinanceiroParceriaPrograma |
 | [Jornadas — Gestao do Programa](programas/jornada-gestao-programa.md) | Mapa das jornadas de Programas |
