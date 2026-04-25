@@ -25,7 +25,7 @@ Servicos expostos diretamente sem camada unificada de roteamento, autenticacao e
 - [architecture/02-modulos-e-integracoes.md](../../../architecture/02-modulos-e-integracoes.md) — diagrama de modulos (M005 → M007, M006 → M007)
 - [architecture/03-acesso-e-seguranca.md](../../../architecture/03-acesso-e-seguranca.md) — arquitetura de dois gateways (publico e interno)
 - [ADR-005](../../../architecture/adr/ADR-005-adocao-bff.md) — relacao BFF vs Gateway
-- [management/milestones.md](../../../management/milestones.md) — MS-01 (Base Operacional)
+- [management/milestones/README.md](../../../management/milestones/README.md) — MS-01 (Base Operacional)
 - [Portal Coordenador EP-02](../../../products/portal-coordenador/features/EP-02-shell-portal-contexto-projeto.md) — contexto de navegacao
 
 ## Proximos Passos

@@ -7,7 +7,7 @@ Backlog central do produto. Ponto de entrada unico para a visao executiva e nave
 | Documento relacionado | Descricao |
 |----------------------|-----------|
 | [product-vision.md](../discovery/product-vision.md) | Visao detalhada com fundamentacao legal |
-| [milestones.md](milestones.md) | Agrupamento dos domains em marcos de entrega |
+| [milestones/README.md](milestones/README.md) | Agrupamento dos domains em marcos de entrega |
 | [releases-2026.csv](releases-2026.csv) | Calendario de entregas 2026 por produto e trimestre |
 
 ---

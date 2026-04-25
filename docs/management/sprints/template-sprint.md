@@ -5,7 +5,7 @@
 | Atributo | Valor |
 |----------|-------|
 | **Periodo** | YYYY-MM-DD a YYYY-MM-DD |
-| **Milestone** | [MS-XX — Nome do Milestone](../milestones.md#ms-xx) |
+| **Milestone** | [MS-XX — Nome do Milestone](../milestones/README.md#ms-xx) |
 | **GitHub Milestone** | `milestone: MS-XX` |
 | **Goal** | Uma frase descrevendo o objetivo principal do sprint |
 

@@ -30,7 +30,7 @@ Plataforma digital da agencia de fomento para gestao do ciclo completo de foment
 |-----------|-----------|
 | [Management](management/README.md) | Hierarquia de planejamento: roadmap, milestones e sprints |
 | [Roadmap](management/roadmap.md) | Sequencia de entrega por domain e dependencias |
-| [Milestones](management/milestones.md) | Marcos de entrega agrupando domains |
+| [Milestones](management/milestones/README.md) | Marcos de entrega agrupando domains |
 | [Sprints](management/sprints/) | Iteracoes time-boxed com epics por domain |
 
 ## Arquitetura

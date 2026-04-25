@@ -24,7 +24,7 @@ Sem controle granular de acesso, qualquer usuario autenticado pode acessar dados
 ## Referenciado por
 
 - [architecture/03-acesso-e-seguranca.md](../../../architecture/03-acesso-e-seguranca.md) — fluxo de autenticacao
-- [management/milestones.md](../../../management/milestones.md) — MS-01 (Base Operacional)
+- [management/milestones/README.md](../../../management/milestones/README.md) — MS-01 (Base Operacional)
 - [M020/contrato.md](../M020-comunicacao/contrato.md) — dependencia para base de usuarios
 - [Portal Coordenador EP-01](../../../products/portal-coordenador/features/EP-01-autenticacao-acesso-cidadao.md) — login federado
 

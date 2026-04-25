@@ -39,7 +39,7 @@ As acoes concretas sao:
 
 7. **Depreciacao:** Adicionar nota de depreciacao em `deprecated/pagamento-bolsista/` redirecionando para `implementation/M004/`.
 
-8. **Management:** Atualizar `backlog-product.md` com M004 a 100% de desenvolvimento e `milestones.md` com nota de progresso do MS-04.
+8. **Management:** Atualizar `backlog-product.md` com M004 a 100% de desenvolvimento e `milestones/README.md` com nota de progresso do MS-04.
 
 ## Consequencias
 

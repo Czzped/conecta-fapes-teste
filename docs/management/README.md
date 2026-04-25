@@ -109,10 +109,11 @@ Cada US na tabela do epic inclui o numero da issue:
 | Arquivo | Descricao | Fonte de verdade |
 |---------|-----------|-----------------|
 | [backlog-product.md](backlog-product.md) | Dominios, modulos, capacidades e backlog futuro | Sim — definicao do produto |
-| [milestones.md](milestones.md) | Marcos de entrega agrupando domains | Sim — referencia backlog-product.md |
+| [milestones/](milestones/README.md) | Marcos de entrega agrupando domains | Sim — referencia backlog-product.md |
 | [roadmap.md](roadmap.md) | Visao operacional de entregas por trimestre e produto | Derivado de releases-2026.csv |
 | [releases-2026.csv](releases-2026.csv) | Dados brutos de entregas 2026 (produto, feature, status, dominio, modulo) | Sim — fonte do roadmap.md |
 | [sprints/](sprints/) | Um arquivo por sprint, referenciando features de releases-2026.csv | Sim — execucao do sprint |
+| [deliveries.md](deliveries.md) | Entregas comprometidas por sprint, organizadas por mes | Derivado dos sprints |
 | [technical-debt.md](technical-debt.md) | Indice consolidado de debito tecnico de todos os modulos | Derivado dos backlogs dos modulos |
 
 ## Relacao entre os arquivos
@@ -120,7 +121,7 @@ Cada US na tabela do epic inclui o numero da issue:
 ```
 backlog-product.md          → define dominios e modulos
     │
-    ├──▶ milestones.md      → agrupa domains em marcos de entrega
+    ├──▶ milestones/README.md      → agrupa domains em marcos de entrega
     │         │
     │         └──▶ sprints/ → executa epics de implementation/modules/
     │

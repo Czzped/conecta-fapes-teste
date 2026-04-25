@@ -32,7 +32,7 @@ M006 e operacionalizado pelo **[AuthRix](../../../products/authrix/README.md)**,
 - [products/authrix/README.md](../../../products/authrix/README.md) — Produto que implementa/consome o modulo
 - [architecture/03-acesso-e-seguranca.md](../../../architecture/03-acesso-e-seguranca.md) — modelo XACML (PAP, PIP, PDP, PEP)
 - [architecture/02-modulos-e-integracoes.md](../../../architecture/02-modulos-e-integracoes.md) — diagrama de modulos
-- [management/milestones.md](../../../management/milestones.md) — MS-01 (Base Operacional)
+- [management/milestones/README.md](../../../management/milestones/README.md) — MS-01 (Base Operacional)
 
 ## Proximos Passos
 

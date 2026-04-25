@@ -8,23 +8,23 @@ Visao markdown de leitura e navegacao das entregas de 2026. **Fonte de verdade: 
 
 ## Relacao com Milestones
 
-As entregas operacionais de 2026 mapeiam para os seguintes milestones estrategicos. Ver [milestones.md](milestones.md) para criterios de conclusao de cada marco.
+As entregas operacionais de 2026 mapeiam para os seguintes milestones estrategicos. Ver [milestones/README.md](milestones/README.md) para criterios de conclusao de cada marco.
 
 | Trimestre | Produto | Dominio principal | Milestone |
 |-----------|---------|-------------------|-----------|
-| Q1 | IMPORTADOR | 7 — Importacao SIGFAPES | [MS-01 Base Operacional](milestones.md#ms-01--base-operacional) |
-| Q1 | PORTAL FAPES - ADMIN | 7 — Importacao SIGFAPES | [MS-01 Base Operacional](milestones.md#ms-01--base-operacional) |
-| Q1 | PORTAL FAPES - ADMIN | 1 — Corporativo (IAM) | [MS-01 Base Operacional](milestones.md#ms-01--base-operacional) |
-| Q1 | PORTAL FAPES - ADMIN | 5 — Financeiro | [MS-04 Financeiro](milestones.md#ms-04--financeiro) |
-| Q1 | CONECTA FAPES | 4 — Fomento Post-Award | [MS-03 Ciclo de Fomento Post-Award](milestones.md#ms-03--ciclo-de-fomento-post-award) |
-| Q1 | CONECTA FAPES | 3 — Fomento Pre-Award | [MS-02 Ciclo de Fomento Pre-Award](milestones.md#ms-02--ciclo-de-fomento-pre-award) |
-| Q2 | PORTAL FAPES - ADMIN | 4 — Fomento Post-Award | [MS-03 Ciclo de Fomento Post-Award](milestones.md#ms-03--ciclo-de-fomento-post-award) |
-| Q2 | PORTAL FAPES - ADMIN | 5 — Financeiro | [MS-04 Financeiro](milestones.md#ms-04--financeiro) |
-| Q2 | PORTAL FAPES - COORDENADOR | 4 — Fomento Post-Award | [MS-03 Ciclo de Fomento Post-Award](milestones.md#ms-03--ciclo-de-fomento-post-award) |
-| Q2 | CONECTA FAPES | 2 — Planejamento e Estrategia | [MS-02 Ciclo de Fomento Pre-Award](milestones.md#ms-02--ciclo-de-fomento-pre-award) |
-| Q3 | PORTAL FAPES - ADMIN | 3 — Fomento Pre-Award | [MS-02 Ciclo de Fomento Pre-Award](milestones.md#ms-02--ciclo-de-fomento-pre-award) |
-| Q3 | PORTAL FAPES - ADMIN | 5 — Financeiro | [MS-04 Financeiro](milestones.md#ms-04--financeiro) |
-| Q4 | CONECTA FAPES | 6 — Suporte e Inteligencia | [MS-05 Inteligencia e Transparencia](milestones.md#ms-05--inteligencia-e-transparencia) |
+| Q1 | IMPORTADOR | 7 — Importacao SIGFAPES | [MS-01 Base Operacional](milestones/MS-01.md) |
+| Q1 | PORTAL FAPES - ADMIN | 7 — Importacao SIGFAPES | [MS-01 Base Operacional](milestones/MS-01.md) |
+| Q1 | PORTAL FAPES - ADMIN | 1 — Corporativo (IAM) | [MS-01 Base Operacional](milestones/MS-01.md) |
+| Q1 | PORTAL FAPES - ADMIN | 5 — Financeiro | [MS-04 Financeiro](milestones/MS-04.md) |
+| Q1 | CONECTA FAPES | 4 — Fomento Post-Award | [MS-03 Ciclo de Fomento Post-Award](milestones/MS-03.md) |
+| Q1 | CONECTA FAPES | 3 — Fomento Pre-Award | [MS-02 Ciclo de Fomento Pre-Award](milestones/MS-02.md) |
+| Q2 | PORTAL FAPES - ADMIN | 4 — Fomento Post-Award | [MS-03 Ciclo de Fomento Post-Award](milestones/MS-03.md) |
+| Q2 | PORTAL FAPES - ADMIN | 5 — Financeiro | [MS-04 Financeiro](milestones/MS-04.md) |
+| Q2 | PORTAL FAPES - COORDENADOR | 4 — Fomento Post-Award | [MS-03 Ciclo de Fomento Post-Award](milestones/MS-03.md) |
+| Q2 | CONECTA FAPES | 2 — Planejamento e Estrategia | [MS-02 Ciclo de Fomento Pre-Award](milestones/MS-02.md) |
+| Q3 | PORTAL FAPES - ADMIN | 3 — Fomento Pre-Award | [MS-02 Ciclo de Fomento Pre-Award](milestones/MS-02.md) |
+| Q3 | PORTAL FAPES - ADMIN | 5 — Financeiro | [MS-04 Financeiro](milestones/MS-04.md) |
+| Q4 | CONECTA FAPES | 6 — Suporte e Inteligencia | [MS-05 Inteligencia e Transparencia](milestones/MS-05.md) |
 
 ---
 
