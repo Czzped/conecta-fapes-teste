@@ -28,7 +28,7 @@
 | Frente | Responsavel | Objetivo | Issues |
 |--------|-------------|----------|--------|
 | **Cadastros Corporativos** | Vinicius Estevam | Implementar CRUD de Instituicao em modelo unico (com CNPJ para entidade juridica; sem CNPJ para setor interno), Dirigente simplificado e consultas — pre-requisito para Parcerias | 4 issues ativas (M008) + 2 removidas do escopo |
-| **Parcerias e Programas (M010 refatorado)** | Vinicius Estevam | Implementar cadastro + formalizacao (RN19), Vigencias (original + aditivos), aportes financeiros recebidos, saldo, encerramento e remocao; manter documentado o aporte Parceria→Programa N:N, sem `RecursoPrograma` interno | 11 issues (M010) |
+| **Parcerias e Programas (M010 refatorado)** | Vinicius Estevam | Implementar cadastro + formalizacao (RN19), Vigencias (original + aditivos), aportes financeiros recebidos, saldo, encerramento e remocao; Parceria depende de Instituicao; manter documentado o aporte Parceria→Programa N:N, sem `RecursoPrograma` interno | 11 issues (M010) |
 | **Prestacao de Contas** | Manoel | Entregar extrato do projeto com listagem paginada, controle de gastos e filtros | 5 issues (M014) |
 | **Design de Produto** | Leticia | Discovery dos modulos M014 (analise/contestacao) e M011 (captacao completa): jornadas, prototipos e criterios de aceitacao | 2 issues |
 | **Discovery de Melhorias** | Marcela + Leticia | Mapear jornadas de usuario em producao, coletar feedback e registrar melhorias e novas features | 1 issue |
@@ -179,18 +179,41 @@
 
 ## Ordem de Implementacao
 
+### Plano incremental acordado — Parceria, Programa e Instituicao
+
+**Diretriz:** nao incluir Captacao neste plano de implementacao. O impacto de Captacao deve ser tratado como analise de fronteira entre M011 (configuracao da captacao), M003 (Iniciativa/Projeto), M016/M014 (conta bancaria, saldo e prestacao de contas) e Importadores, antes de qualquer implementacao nessa frente.
+
+**Sequencia recomendada:**
+
+1. **Backend base de Instituicao (M008)** — entregar o minimo necessario para Parceria referenciar uma Instituicao valida.
+2. **Backend de Parceria e Programa (M010)** — construir os endpoints e regras do dominio ja considerando que Parceria precisa de Instituicao.
+3. **Frontend de Parceria** — priorizar o fluxo operacional principal, usando Instituicao como dependencia obrigatoria.
+4. **Frontend de Programa** — entregar cadastro/listagem/consulta de Programa e preparar a integracao futura com aportes de Parceria.
+5. **Frontend completo de Instituicao** — evoluir a tela de Instituicao apos Parceria/Programa estarem destravados.
+6. **Iniciativas com rubricas e acompanhamento financeiro** — manter fora da primeira versao; rubricas so fazem sentido vinculadas a Iniciativa/Projeto e entram em uma segunda entrega, depois do fluxo base de Instituicao, Parceria e Programa estar estavel.
+
+**Impactos obrigatorios antes da implementacao de Captacao/Iniciativas:**
+
+- Revisar M011 como configuracao da captacao: categorias multiplas, pool de revisores ad hoc e regras que determinam se a iniciativa exigira orcamento, rubricas e subrubricas.
+- Revisar M003 como dono da Iniciativa/Projeto pos-outorga: valor planejado/aprovado deve ficar na iniciativa ou em seu orcamento planejado, conforme a versao vigente do plano.
+- Revisar M016/M014 como donos dos dados financeiros realizados: conta bancaria, saldo em conta corrente, extratos, movimentacoes e prestacao de contas nao devem ser persistidos diretamente em M011.
+- Avaliar solicitacao do Importador CNAB 240 para importar movimentacoes/saldo da conta corrente do projeto, alimentando M016/M014.
+- Expor na Iniciativa uma visao financeira derivada com valor planejado/aprovado e valor em conta corrente quando houver conta bancaria vinculada e integracao CNAB 240 disponivel.
+- Mapear impacto nos importadores para garantir compatibilidade entre dados legados, M003, M011, M016/M014 e M010.
+- Registrar ajustes de contrato/API somente depois de validar o impacto entre M011, M003, M010, M016/M014 e Importadores.
+
 ### Vinicius Estevam — M008 + M010
 
-**Fase 1 — Cadastros Corporativos (semana 1):**
+**Fase 1 — Backend minimo de Instituicao (semana 1):**
 
-1. #1749 Cadastrar Instituicao
-2. #1750 Cadastrar Setor Interno (Instituicao sem CNPJ)
-3. #1751 Cadastrar Dirigente
-4. #1752 Listar e Consultar Instituicoes
+1. #1749 Cadastrar Instituicao — dependencia direta para Parceria
+2. #1752 Listar e Consultar Instituicoes — necessario para selecao/consulta em Parceria
+3. #1750 Cadastrar Setor Interno (Instituicao sem CNPJ)
+4. #1751 Cadastrar Dirigente
 
 > #1753 (Vincular Pessoa a Instituicao/Unidade) e #1754 (Area Tecnica) **removidas do escopo** — conceitos removidos do modelo M008 atual.
 
-**Fase 2 — Parcerias (semana 2) — M010 refatorado:**
+**Fase 2 — Backend de Parcerias e Programas (semana 2) — M010 refatorado:**
 
 1. #1739 Cadastrar + Formalizar Parceria (RN19) (depende de #1749 Instituicao)
 2. #1791 Registrar Vigencia (Aditivo) (depende de #1739)
@@ -205,6 +228,17 @@
 11. #1797 Remover Parceria (RI3 — baixa prioridade)
 
 > #1741 (Coordenacao) e #1742 (Finalidade) **fechadas** — conceitos removidos do dominio. `RecursoPrograma` tambem foi removido do escopo de Programas; #1794 e #1795 permanecem adiadas, mas o modelo ja documenta a relacao N:N Parceria→Programa.
+
+**Fase 3 — Frontend Parceria e Programa:**
+
+1. Tela de Parceria: cadastro, listagem, consulta, formalizacao, vigencias, aportes, saldo, encerramento e remocao.
+2. Tela de Programa: cadastro, listagem e consulta, preparada para receber a integracao futura de aportes de Parceria.
+3. Seletores de Instituicao: usar os endpoints de M008 para vincular Parceria a Instituicao.
+
+**Fase 4 — Frontend Instituicao:**
+
+1. Completar a experiencia de Instituicao apos o fluxo de Parceria e Programa estar operacional.
+2. Incluir melhorias de usabilidade identificadas no uso do seletor de Instituicao por Parceria.
 
 ### Manoel — M014 Prestacao de Contas
 
