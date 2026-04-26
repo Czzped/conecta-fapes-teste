@@ -32,17 +32,25 @@ Especificacao de referencia: [README.md](README.md)
 EPIC-M011-001 (Configuracao da Captacao)
 ├── US-M011-001 Criar Configuracao de Captacao
 ├── US-M011-002 Definir Cronograma da Captacao
-├── US-M011-003 Configurar Parametros de Fomento (faixas, orcamento, origens recurso)
+├── US-M011-035 Adiar Etapa do Cronograma da Captacao
+├── US-M011-003 Visualizar Total Financeiro da Captacao
 ├── US-M011-004 Publicar Configuracao de Captacao
 ├── US-M011-011 Definir Regras de Submissao
 ├── US-M011-012 Definir Requisitos do Proponente
 ├── US-M011-013 Configurar Rubricas e Subrubricas Permitidas
-└── US-M011-014 Configurar Versoes de Bolsas Permitidas
+├── US-M011-014 Configurar Versoes de Bolsas Permitidas
+├── US-M011-029 Definir Categorias de Iniciativas
+├── US-M011-030 Configurar Faixas de Financiamento
+├── US-M011-031 Configurar Documentos Exigidos do Proponente
+├── US-M011-032 Definir Prestacoes Exigidas
+├── US-M011-033 Configurar Aportes Financeiros da Captacao
+└── US-M011-034 Definir Proponentes Escolhidos
 
 EPIC-M011-002 (Selecao de Formularios)  <- depende de EPIC-M011-001, M021
 ├── US-M011-005 Selecionar Formulario de Submissao
 ├── US-M011-006 Selecionar Formulario de Avaliacao Ad Hoc
 ├── US-M011-007 Selecionar Formulario de Revisao de Resultado
+├── US-M011-015 Selecionar Formulario de Anexos
 └── US-M011-016 Consultar Versao Selecionada do Formulario
 
 EPIC-M011-003 (Gestao de Pool de Revisores Ad Hoc)  <- depende de EPIC-M011-001

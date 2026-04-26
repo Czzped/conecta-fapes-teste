@@ -4,10 +4,10 @@
 
 O M011 cobre o fluxo **pre-award** da captacao de iniciativas. Para deixar a modelagem simples, o processo foi dividido em dois momentos:
 
-1. **Configuracao do Processo de Captacao**: prepara as regras, o edital, o cronograma, os formularios e os parametros que serao usados na captacao.
+1. **Configuracao do Processo de Captacao**: prepara as regras, o edital, o cronograma, os formularios e as configuracoes que serao usadas na captacao.
 2. **Instancia do Processo de Captacao**: executa a captacao real, recebendo propostas, avaliando, tratando revisoes e publicando o resultado final.
 
-A captacao pode estar vinculada a um `Programa` ou a uma `Parceria` do M010 e pode ser classificada como `Chamada Publica` ou `Demanda Induzida`. Quando for `Demanda Induzida`, a captacao deve ser direcionada para uma instituicao especifica.
+A captacao pode receber aporte financeiro de um ou mais `Programa` ou `Parceria` do M010 e pode ser classificada como `Chamada Publica` ou `Demanda Induzida`. Quando for `Demanda Induzida`, a captacao deve ser direcionada para um `Ortogado` especifico.
 
 O M011 termina na publicacao do resultado final. A contratacao/outorga das propostas aprovadas pertence ao M022 - Contratacao e Outorga. Depois da contratacao/outorga, a iniciativa passa a ser tratada pelo M003.
 
@@ -15,9 +15,9 @@ O M011 termina na publicacao do resultado final. A contratacao/outorga das propo
 
 ## Processo 1: Configuracao do Processo de Captacao
 
-Este processo define a preparacao da captacao antes de sua publicacao. O resultado e uma `ConfiguracaoCaptacao` pronta para ser instanciada como processo real. As regras de captacao indicam quais informacoes serao exigidas ou orientadas para as propostas, como tipo de iniciativa, equipe, rubricas e subrubricas permitidas, modalidades e niveis de bolsa permitidos com ultima versao ativa resolvida no M001, cronograma da proposta, riscos e resultados. Esses elementos sao opcionais e devem ser ativados conforme a natureza da captacao.
+Este processo define a preparacao da captacao antes de sua publicacao. O resultado e uma `ConfiguracaoCaptacao` pronta para ser instanciada como processo real. As regras de captacao indicam quais informacoes serao exigidas ou orientadas para as propostas, como categorias e tipos de iniciativa, equipe, documentos exigidos do proponente, rubricas e subrubricas permitidas, faixas de financiamento, modalidades e niveis de bolsa permitidos quando a rubrica Bolsa estiver selecionada, cronograma da proposta, riscos, resultados e exigencia de prestacao tecnica ou financeira. Esses elementos sao opcionais e devem ser ativados conforme a natureza da captacao.
 
-A configuracao tambem define o **cronograma da captacao**, que controla a execucao da captacao. Esse cronograma deve possuir, no minimo:
+A configuracao tambem define o **cronograma da captacao**, que controla a execucao da captacao. Na tela, o cronograma deve ser montado como uma lista de cards, sendo um card para cada fase obrigatoria. Ao criar a captacao, o sistema deve validar se existe um card cadastrado para cada fase obrigatoria. Esse cronograma deve possuir, no minimo:
 
 - data de publicacao da captacao;
 - periodo de recebimento das propostas, com data inicial e data final;
@@ -29,35 +29,50 @@ A configuracao tambem define o **cronograma da captacao**, que controla a execuc
 - data de publicacao do resultado apos revisao;
 - data de publicacao do resultado final.
 
+Na edicao do cronograma, qualquer etapa pode ser adiada mediante informacao da quantidade de dias e justificativa. O sistema deve manter historico do adiamento, com datas originais e novas datas, e deve deslocar automaticamente todas as etapas posteriores pela mesma quantidade de dias para preservar a sequencia operacional da captacao.
+
 A configuracao tambem seleciona, a partir da base de formularios gerenciada pelo M021, os formularios que estruturam a coleta e a avaliacao das informacoes:
 
 - **Formulario de Submissao**: usado pelo proponente para registrar a proposta/iniciativa captada.
 - **Formulario de Avaliacao Ad Hoc**: usado pelos revisores ad hoc para registrar parecer, nota, recomendacao e justificativas.
 - **Formulario de Revisao do Resultado**: usado pelo proponente para solicitar revisao do resultado preliminar.
+- **Formulario de Anexos**: usado para orientar a coleta de anexos adicionais quando a captacao exigir documentos complementares.
+
+Quando o proponente for uma empresa ou instituicao, a submissao deve identificar a pessoa fisica representante responsavel por agir em nome desse proponente. Documentos institucionais recorrentes da pessoa juridica, como contrato social, balanco, certidoes e comprovantes de representacao, devem preferencialmente estar no cadastro corporativo do M008. A captacao deve apenas declarar quais documentos ou requisitos serao conferidos, solicitando novo envio somente quando o cadastro nao possuir documento valido ou quando a regra da captacao exigir versao especifica.
 
 ```mermaid
 flowchart TD
-    A[Diretoria identifica necessidade de captacao] --> B{Vinculo da captacao}
-    B --> C[Selecionar Programa]
-    B --> D[Selecionar Parceria]
-
-    C --> E[Definir area tecnica responsavel pela gestao das iniciativas]
-    D --> E
-    E --> EA[Definir tipo de captacao]
+    A[Diretoria identifica necessidade de captacao] --> B[Configurar aportes financeiros da captacao]
+    B --> C{Origem do aporte}
+    C --> D[Selecionar Programa e informar valor aportado]
+    C --> E[Selecionar Parceria e informar valor aportado]
+    D --> F[Adicionar novos aportes quando houver]
+    E --> F
+    F --> EA[Definir area tecnica responsavel e tipo de captacao]
 
     EA --> F{Tipo de captacao}
     F --> G[Chamada Publica]
     F --> H[Demanda Induzida]
-    H --> HA[Selecionar instituicao destinataria]
+    H --> HA[Selecionar ortogado destinatario]
 
-    G --> I[Definir tipos de iniciativas aceitos]
-    HA --> I
+    G --> IA[Definir categorias de iniciativas aceitas]
+    HA --> IA
+    IA --> I[Definir tipos de iniciativas aceitos]
 
     I --> K[Configurar se proposta exige equipe]
-    K --> L[Configurar rubricas e subrubricas permitidas quando aplicavel]
-    L --> LA[Selecionar modalidades e niveis de bolsa permitidos quando aplicavel]
-    LA --> LB[Resolver ultima versao ativa de cada nivel no M001]
-    LB --> M[Configurar se proposta exige cronograma]
+    K --> K1[Configurar regras de submissao]
+    K1 --> K1A{Submissao restrita a escolhidos?}
+    K1A -->|Sim| K1B[Selecionar instituicoes ou pessoas autorizadas]
+    K1A -->|Nao| K2[Configurar requisitos do proponente]
+    K1B --> K2
+    K2 --> K3[Configurar documentos exigidos do proponente]
+    K3 --> K4[Configurar faixas de financiamento e valor aportado por faixa]
+    K4 --> L[Selecionar lista de rubricas e subrubricas permitidas quando aplicavel]
+    L --> LA{Rubrica Bolsa selecionada?}
+    LA -->|Sim| LB[Selecionar modalidades e niveis de bolsa permitidos]
+    LB --> LC[Resolver ultima versao ativa de cada nivel no M001]
+    LA -->|Nao| M[Configurar se proposta exige cronograma]
+    LC --> M
     M --> N[Configurar se proposta exige riscos]
     N --> O[Configurar se proposta exige resultados esperados]
     O --> P[Definir regras da captacao]
@@ -66,9 +81,12 @@ flowchart TD
     R --> S[Selecionar formulario de submissao na base]
     S --> T[Selecionar formulario de avaliacao ad hoc na base]
     T --> U[Selecionar formulario de revisao do resultado na base]
-    U --> V[Selecionar pool de revisores ad hoc]
+    U --> U1[Selecionar formulario de anexos quando aplicavel]
+    U1 --> V[Selecionar pool de revisores ad hoc]
     V --> VA[Definir regras de distribuicao aos revisores]
-    VA --> W[Configurar data de publicacao da captacao]
+    VA --> VB[Definir quantidade minima de revisores ad hoc]
+    VB --> VC[Definir exigencia de prestacao tecnica e financeira]
+    VC --> W[Configurar data de publicacao da captacao]
     W --> X[Configurar periodo de recebimento das propostas]
     X --> Y[Definir regra de prorrogacao do recebimento]
     Y --> Z[Configurar periodo de avaliacao documental]
@@ -89,11 +107,18 @@ flowchart TD
 
 A configuracao aprovada deve conter, no minimo:
 
-- vinculo com `Programa` ou `Parceria`;
+- ao menos um aporte financeiro com origem em `Programa` ou `Parceria`;
 - area tecnica responsavel pela gestao das iniciativas captadas;
 - tipo de captacao: `Chamada Publica` ou `Demanda Induzida`;
-- instituicao destinataria, quando a captacao for `Demanda Induzida`;
+- ortogado destinatario, quando a captacao for `Demanda Induzida`;
+- categorias de iniciativas aceitas pela captacao;
 - tipos de iniciativas aceitos pela captacao;
+- descricao da captacao;
+- regras de submissao;
+- instituicoes ou pessoas autorizadas, quando a submissao for restrita a proponentes escolhidos;
+- requisitos do proponente, incluindo direcionamento aberto, para instituicao especifica ou para tipo de instituicao;
+- documentos exigidos do proponente, com formatos permitidos e obrigatoriedade;
+- faixas de financiamento, quando a captacao possuir duracoes, valores minimos/maximos e valores aportados diferentes;
 - indicacao se a proposta deve possuir equipe;
 - rubricas e subrubricas permitidas ou orientadoras, quando a captacao exigir orcamento por rubrica;
 - modalidades de bolsa e niveis de bolsa permitidos, com a ultima versao ativa de cada nivel resolvida a partir do M001, quando a captacao aceitar orcamento de bolsas na proposta/iniciativa;
@@ -106,8 +131,11 @@ A configuracao aprovada deve conter, no minimo:
 - formulario de submissao da proposta selecionado da base de formularios;
 - formulario de avaliacao ad hoc selecionado da base de formularios;
 - formulario de revisao do resultado preliminar selecionado da base de formularios;
+- formulario de anexos selecionado da base de formularios, quando aplicavel;
 - pool de revisores ad hoc selecionado;
 - regras de distribuicao das propostas aos revisores ad hoc;
+- quantidade minima de revisores ad hoc por proposta;
+- exigencia de prestacao tecnica e/ou financeira;
 - cronograma da captacao, incluindo publicacao, recebimento das propostas, avaliacao documental, avaliacao ad hoc, resultado preliminar, revisao de resultado e resultado final;
 - edital ou link do edital.
 
@@ -120,6 +148,7 @@ O cronograma da captacao pertence a configuracao da captacao e orienta a execuca
 | Data de publicacao da captacao | Obrigatoria | Define quando a captacao pode ser publicizada e quando a instancia passa a aceitar seu ciclo operacional. |
 | Periodo de recebimento das propostas | Obrigatorio | Deve possuir data inicial e data final. Propostas fora desse periodo nao devem ser recebidas. |
 | Prorrogacao do recebimento das propostas | Condicional | Pode alterar a data final de recebimento, mantendo historico da data original e justificativa da prorrogacao. |
+| Adiamento de etapa do cronograma | Condicional | Pode acrescentar dias a uma etapa mediante justificativa; as etapas posteriores devem ser deslocadas pela mesma quantidade de dias e o historico deve ser preservado. |
 | Periodo de avaliacao documental | Obrigatorio | Define quando a documentacao enviada sera conferida antes do envio das propostas habilitadas para avaliacao ad hoc. |
 | Periodo de avaliacao ad hoc | Obrigatorio | Define quando os revisores podem registrar pareceres e notas. |
 | Data de publicacao do resultado preliminar | Obrigatoria | Define quando a classificacao preliminar sera divulgada aos proponentes. |
@@ -227,6 +256,7 @@ flowchart TD
 | Data de publicacao da captacao | A captacao passa a ficar visivel e disponivel para os interessados. Antes dessa data, a instancia existe, mas nao deve aparecer como captacao aberta. |
 | Periodo de recebimento das propostas | Proponentes podem submeter propostas apenas entre a data inicial e a data final desse periodo. |
 | Prorrogacao do recebimento das propostas | Quando houver prorrogacao, a nova data final substitui a data final operacional, mantendo historico da data original e da justificativa. |
+| Adiamento de etapa | Quando uma etapa for adiada, a etapa alterada e todas as posteriores devem ter suas datas acrescidas pela mesma quantidade de dias. |
 | Periodo de avaliacao documental | A Area Tecnica associada ao edital confere a documentacao enviada e habilita ou inabilita propostas. |
 | Periodo de avaliacao ad hoc | Revisores ad hoc podem registrar pareceres e notas apenas dentro desse periodo. |
 | Data de publicacao do resultado preliminar | O resultado preliminar fica disponivel aos proponentes. |
@@ -327,7 +357,7 @@ stateDiagram-v2
 
 | ID | Regra |
 |----|-------|
-| RN01 | Toda configuracao de captacao deve estar vinculada a um Programa ou a uma Parceria. |
+| RN01 | Toda configuracao de captacao deve possuir ao menos um aporte financeiro originado de Programa ou Parceria. |
 | RN02 | Toda configuracao de captacao deve possuir tipo: `Chamada Publica` ou `Demanda Induzida`. |
 | RN03 | Toda configuracao de captacao deve definir os tipos de iniciativas aceitos. |
 | RN04 | Toda configuracao deve possuir edital ou link do edital antes de ser aprovada. |
@@ -338,7 +368,7 @@ stateDiagram-v2
 | RN09 | Toda configuracao de captacao deve selecionar, na base de formularios, um formulario de revisao. |
 | RN10 | A configuracao de captacao pode exigir ou dispensar informacao de equipe na proposta. |
 | RN11 | A configuracao de captacao pode definir rubricas e subrubricas permitidas ou orientadoras para o orcamento da proposta. |
-| RN12 | A configuracao de captacao pode definir modalidades e niveis de bolsa permitidos para a proposta/iniciativa. Para cada nivel selecionado, o processo deve recuperar automaticamente a ultima versao ativa do nivel no M001 e usar essa versao para cotas, limites de bolsistas e validacao das propostas. |
+| RN12 | Quando a rubrica Bolsa estiver permitida, a configuracao de captacao pode definir modalidades e niveis de bolsa permitidos para a proposta/iniciativa. Para cada nivel selecionado, o processo deve recuperar automaticamente a ultima versao ativa do nivel no M001 e usar essa versao para cotas, limites de bolsistas e validacao das propostas. |
 | RN13 | A configuracao de captacao pode exigir ou dispensar cronograma na proposta. |
 | RN14 | A configuracao de captacao pode exigir ou dispensar declaracao de riscos na proposta. |
 | RN15 | A configuracao de captacao pode exigir ou dispensar resultados esperados na proposta. |
@@ -356,7 +386,7 @@ stateDiagram-v2
 | RN27 | Toda configuracao de captacao deve definir o periodo de recebimento de revisoes. |
 | RN28 | Toda configuracao de captacao deve definir a data de publicacao do resultado apos revisao. |
 | RN29 | Toda configuracao de captacao deve definir a data de publicacao do resultado final. |
-| RN30 | Toda captacao do tipo `Demanda Induzida` deve ser direcionada para uma instituicao destinataria. |
+| RN30 | Toda captacao do tipo `Demanda Induzida` deve ser direcionada para um ortogado destinatario. |
 | RN31 | Toda configuracao de captacao deve selecionar um pool de revisores ad hoc. |
 | RN32 | Toda configuracao de captacao deve definir regras de distribuicao das propostas aos revisores. |
 | RN33 | A configuracao de captacao pode assumir os status `Em andamento`, `Publicado`, `Nao publicado` e `Encerrado`. |
@@ -364,12 +394,17 @@ stateDiagram-v2
 | RN35 | Uma instancia de captacao somente deve ficar visivel para os interessados a partir da data de publicacao da captacao definida no cronograma. |
 | RN36 | Cada atividade temporal da instancia deve respeitar a fase correspondente do cronograma da captacao. |
 | RN37 | Toda configuracao de captacao deve definir a area tecnica responsavel pela gestao das iniciativas captadas. |
+| RN38 | Cada aporte financeiro da captacao deve indicar exatamente uma origem, sendo `Programa` ou `Parceria`, e possuir valor aportado maior que zero. |
+| RN39 | Quando a submissao for restrita a proponentes escolhidos, a configuracao deve selecionar ao menos uma instituicao ou uma pessoa autorizada a submeter proposta. |
+| RN40 | A soma dos valores aportados nas faixas de financiamento nao deve ultrapassar o total financeiro calculado pelos aportes da captacao. |
+| RN41 | Qualquer etapa do cronograma pode ser adiada mediante justificativa, mantendo historico das datas originais e novas datas. |
+| RN42 | Ao adiar uma etapa, todas as etapas posteriores devem ser deslocadas pela mesma quantidade de dias para preservar a sequencia do cronograma. |
 
 ## Integracoes
 
 | Modulo | Papel no Processo |
 |--------|-------------------|
-| M010 | Fornece Programa ou Parceria vinculada a configuracao da captacao. |
+| M010 | Fornece Programa ou Parceria que podem aportar financeiramente na captacao. |
 | M022 | Consome propostas aprovadas no resultado final para formalizar a contratacao/outorga. |
 | M003 | Recebe a iniciativa apos contratacao/outorga; nao executa a contratacao dentro do M011. |
 | M008 | Fornece dados de instituicoes, pessoas e revisores quando aplicavel. |

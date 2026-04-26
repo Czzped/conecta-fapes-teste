@@ -4,7 +4,7 @@ Referencia de dominio e regras de negocio: [contrato.md](contrato.md) | [README.
 
 ## Visao Geral
 
-Este documento especifica o contrato HTTP REST do modulo M011 como bounded context responsavel pela configuracao de captacoes: cronograma, formularios de submissao e avaliacao, parametros de fomento e revisores ad hoc. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
+Este documento especifica o contrato HTTP REST do modulo M011 como bounded context responsavel pela configuracao de captacoes: cronograma, formularios de submissao, avaliacao, revisao e anexos, categorias de iniciativas, aportes financeiros, faixas de financiamento, regras e requisitos de submissao, documentos exigidos, prestacoes exigidas e revisores ad hoc. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
 
 ### Base URL
 
@@ -29,7 +29,7 @@ Todas as rotas exigem autenticacao. O perfil do chamador determina o acesso:
 
 | Perfil | Descricao |
 |--------|-----------|
-| `ANALISTA_AGENCIA` | Analista da Agencia de Fomento — configura cronograma, formularios, parametros e revisores |
+| `ANALISTA_AGENCIA` | Analista da Agencia de Fomento — configura cronograma, formularios, categorias, regras, requisitos, documentos exigidos e revisores |
 | `DIRETORIA_FAPES` | Diretoria da FAPES — pode instanciar processo de captacao a partir de configuracao publicada |
 | `AREA_TECNICA` | Area tecnica responsavel pela captacao — executa publicacao, avaliacao documental, distribuicao, consolidacao, revisao e resultados |
 | `PROPONENTE` | Pessoa ou instituicao que submete proposta e solicita revisao de resultado |
@@ -135,6 +135,55 @@ Registra ou versiona as fases do cronograma da captacao.
 
 ---
 
+#### `POST /api/v1/m011/captacoes/{captacaoId}/cronograma/adiamentos`
+
+Registra o adiamento de uma etapa do cronograma e desloca automaticamente as etapas posteriores pela mesma quantidade de dias.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Operacao de origem:** `AdiarEtapaCronogramaDaCaptacao`
+- **Idempotencia:** Nao
+
+**Request body**
+
+```json
+{
+  "tipoPeriodo": "AVALIACAO_DOCUMENTAL",
+  "dias": 5,
+  "justificativa": "Necessidade de tempo adicional para conferencia documental"
+}
+```
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| `tipoPeriodo` | string (enum) | Sim | Etapa do cronograma que sera adiada |
+| `dias` | integer | Sim | Quantidade de dias a acrescentar na etapa e nas etapas posteriores |
+| `justificativa` | string | Sim | Motivo do adiamento |
+
+**Response `201 Created`**
+
+```json
+{
+  "adiamento": {
+    "id": "ADI-2026-001",
+    "tipoPeriodo": "AVALIACAO_DOCUMENTAL",
+    "dias": 5,
+    "dataRegistro": "2026-06-10"
+  },
+  "cronogramaAtualizado": true
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `CRONOGRAMA_NAO_ENCONTRADO` | O cronograma nao foi configurado para a captacao informada. |
+| `404` | `ETAPA_CRONOGRAMA_NAO_ENCONTRADA` | A etapa informada nao existe no cronograma da captacao. |
+| `400` | `ADIAMENTO_DADOS_INVALIDOS` | O adiamento deve possuir quantidade de dias positiva e justificativa. |
+| `422` | `CRONOGRAMA_SEQUENCIA_INVALIDA` | O adiamento gerou uma sequencia invalida no cronograma. |
+
+---
+
 #### `GET /api/v1/m011/captacoes/{captacaoId}/cronograma`
 
 Consulta o cronograma vigente de uma captacao.
@@ -166,6 +215,15 @@ Consulta o cronograma vigente de uma captacao.
         "tipo": "RECEBIMENTO_PROPOSTAS",
         "inicio": "2026-06-01",
         "fim": "2026-06-30"
+      }
+    ],
+    "adiamentos": [
+      {
+        "id": "ADI-2026-001",
+        "tipoPeriodo": "AVALIACAO_DOCUMENTAL",
+        "dias": 5,
+        "justificativa": "Necessidade de tempo adicional para conferencia documental",
+        "dataRegistro": "2026-06-10"
       }
     ]
   }
@@ -446,168 +504,113 @@ Consulta o formulario de revisao de resultado selecionado para uma captacao.
 
 ---
 
-### 5. Parametros de Fomento
+### 5. Configuracoes Complementares da Captacao
 
-#### `POST /api/v1/m011/captacoes/{captacaoId}/parametros-fomento`
+As rotas abaixo mantem as configuracoes complementares descobertas no processo e no prototipo. Os payloads devem seguir o modelo estrutural do M011.
 
-Registra parametros de cota, orcamento e distribuicao por area da captacao.
+| Metodo | Path | Operacao | Payload principal |
+|--------|------|----------|-------------------|
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/formularios/anexos` | SelecionarFormularioAnexos | `formularioId`, `versaoFormularioId` |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/categorias-iniciativas` | ConfigurarCategoriasDeIniciativas | `categorias[]` |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/aportes-financeiros` | ConfigurarAportesFinanceirosCaptacao | origem Programa/Parceria e valor aportado |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/faixas-financiamento` | ConfigurarFaixasFinanciamento | `duracaoMaximaMeses`, `valorMinimo`, `valorMaximo`, `valorAportado` |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/regras-submissao` | ConfigurarRegrasSubmissao | flags de multiplas propostas, acumulo de bolsa e restricao a escolhidos |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/proponentes-escolhidos` | ConfigurarProponentesEscolhidos | tipo INSTITUICAO/PESSOA e IDs autorizados |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/requisitos-proponente` | ConfigurarRequisitosProponente | direcionamento, instituicao/tipo de instituicao, nivel academico minimo e restricoes |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/documentos-exigidos` | ConfigurarDocumentosExigidos | documentos, formatos permitidos e obrigatoriedade |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/prestacoes-exigidas` | ConfigurarPrestacoesExigidas | `exigePrestacaoTecnica`, `exigePrestacaoFinanceira` |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/regra-avaliacao` | ConfigurarRegraAvaliacao | `exigeAvaliacaoAdHoc`, `quantidadeMinimaRevisores` |
 
-- **Autorizacao:** `ANALISTA_AGENCIA`
-- **Operacao de origem:** `ConfigurarParametrosDeFomento`
-- **Idempotencia:** Nao
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `captacaoId` | string | Identificador da captacao |
-
-**Request body**
+**Exemplo: faixas de financiamento**
 
 ```json
 {
-  "orcamentoTotal": 800000.0,
-  "valorMaximoPorProjeto": 200000.0,
-  "cotasArea": [
+  "faixas": [
     {
-      "area": "Tecnologia",
-      "valor": 500000.0
+      "duracaoMaximaMeses": 24,
+      "valorMinimo": 50000.0,
+      "valorMaximo": 200000.0,
+      "valorAportado": 500000.0
+    }
+  ]
+}
+```
+
+**Exemplo: aportes financeiros**
+
+```json
+{
+  "aportes": [
+    {
+      "origemTipo": "PROGRAMA",
+      "programaId": "PROG-2026-001",
+      "valorAportado": 500000.0
     },
     {
-      "area": "Saude",
-      "valor": 300000.0
+      "origemTipo": "PARCERIA",
+      "parceriaId": "PAR-2026-003",
+      "valorAportado": 300000.0
     }
-  ],
-  "parceriaId": "PAR-2026-03",
-  "valorParceria": 300000.0
+  ]
 }
 ```
 
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `orcamentoTotal` | number | Sim | Orcamento total da captacao |
-| `valorMaximoPorProjeto` | number | Nao | Valor maximo aprovavel por projeto |
-| `cotasArea` | array | Nao | Lista de cotas por area do conhecimento |
-| `cotasArea[].area` | string | Sim | Nome da area |
-| `cotasArea[].valor` | number | Sim | Valor alocado para a area |
-| `parceriaId` | string | Nao | Identificador da parceria financiadora (M010) |
-| `valorParceria` | number | Condicional | Valor da parceria destinado a captacao (obrigatorio quando `parceriaId` informado) |
-
-**Response `201 Created`**
+**Exemplo: proponentes escolhidos**
 
 ```json
 {
-  "parametroFomento": {
-    "captacaoId": "CAP-2026-001",
-    "orcamentoTotal": 800000.0,
-    "valorMaximoPorProjeto": 200000.0
-  }
+  "tipo": "INSTITUICAO",
+  "instituicoesIds": [
+    "INST-UFES",
+    "INST-IFES"
+  ]
 }
 ```
 
-**Erros**
+**Exemplo: requisitos do proponente**
 
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada para configuracao de parametros. |
-| `422` | `ORCAMENTO_CAPTACAO_INSUFICIENTE` | O orcamento total da captacao e inferior ao valor distribuido por area. |
-| `400` | `COTA_AREA_INVALIDA` | Uma ou mais cotas por area estao invalidas para a captacao informada. |
-| `422` | `CONFIGURACAO_CAPTACAO_PUBLICADA_IMUTAVEL` | Uma configuracao de captacao publicada nao pode ser alterada diretamente. |
+```json
+{
+  "tipo": "PESSOA",
+  "pessoasCpfs": [
+    "12345678900",
+    "23456789011"
+  ]
+}
+```
+
+```json
+{
+  "direcionamento": "TIPO_INSTITUICAO",
+  "tipoInstituicaoId": "TIPO-INST-ENSINO",
+  "permiteParceriaInstituicoes": true,
+  "exigeVinculoEmpregaticio": false,
+  "exigeGestorInstitucional": true,
+  "nivelAcademicoMinimoId": "NIVEL-DOUTORADO"
+}
+```
+
+**Exemplo: documentos exigidos**
+
+```json
+{
+  "documentos": [
+    {
+      "documentoExigidoId": "DOC-CONTRATO-SOCIAL",
+      "obrigatorio": true,
+      "formatosPermitidos": ["PDF"],
+      "reutilizarCadastroCorporativo": true,
+      "exigirNovoEnvioSeVencido": true
+    }
+  ]
+}
+```
+
+Quando o documento exigido for institucional e o proponente for empresa ou instituicao, o consumidor deve verificar se ha representante legal e documento valido no cadastro corporativo do M008 antes de exigir novo envio na submissao.
 
 ---
 
-#### `GET /api/v1/m011/captacoes/{captacaoId}/parametros-fomento`
-
-Consulta os parametros de fomento configurados para uma captacao.
-
-- **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `captacaoId` | string | Identificador da captacao |
-
-**Response `200 OK`**
-
-```json
-{
-  "parametroFomento": {
-    "captacaoId": "CAP-2026-001",
-    "orcamentoTotal": 800000.0,
-    "valorMaximoPorProjeto": 200000.0,
-    "cotasArea": [
-      {
-        "area": "Tecnologia",
-        "valor": 500000.0
-      }
-    ],
-    "parceriaId": "PAR-2026-03",
-    "valorParceria": 300000.0
-  }
-}
-```
-
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
-| `404` | `PARAMETROS_NAO_ENCONTRADOS` | Os parametros de fomento nao foram configurados para a captacao informada. |
-
----
-
-#### `PUT /api/v1/m011/captacoes/{captacaoId}/parametros-fomento`
-
-Atualiza os parametros de fomento de uma captacao nao publicado (US-M011-003).
-
-- **Autorizacao:** `ANALISTA_AGENCIA`
-- **Idempotencia:** Sim
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `captacaoId` | string | Identificador da captacao |
-
-**Request body**
-
-```json
-{
-  "orcamentoTotal": 900000.0,
-  "valorMaximoPorProjeto": 250000.0
-}
-```
-
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `orcamentoTotal` | number | Nao | Novo orcamento total da captacao |
-| `valorMaximoPorProjeto` | number | Nao | Novo valor maximo por projeto |
-| `cotasArea` | array | Nao | Nova lista de cotas por area (substitui a lista existente) |
-
-**Response `200 OK`**
-
-```json
-{
-  "parametroFomento": {
-    "captacaoId": "CAP-2026-001",
-    "orcamentoTotal": 900000.0,
-    "valorMaximoPorProjeto": 250000.0
-  }
-}
-```
-
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
-| `422` | `ORCAMENTO_CAPTACAO_INSUFICIENTE` | O orcamento total da captacao e inferior ao valor distribuido por area. |
-| `422` | `CONFIGURACAO_CAPTACAO_PUBLICADA_IMUTAVEL` | Uma configuracao de captacao publicada nao pode ser alterada diretamente. |
-
----
-
-### 6. Revisores Ad Hoc
+### 7. Revisores Ad Hoc
 
 #### `POST /api/v1/m011/captacoes/{captacaoId}/revisores`
 
@@ -775,7 +778,7 @@ Exemplo com pendencias:
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
 | `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada para validacao. |
-| `422` | `CONFIGURACAO_CAPTACAO_INCOMPLETA` | A captacao ainda possui pendencias de cronograma, formulario ou parametro obrigatorio. |
+| `422` | `CONFIGURACAO_CAPTACAO_INCOMPLETA` | A captacao ainda possui pendencias de cronograma, formulario ou configuracao obrigatoria. |
 
 ---
 
@@ -804,6 +807,7 @@ Estas rotas representam o processo operacional descrito em [process.md](process.
 | Metodo | Path | Operacao | Autorizacao |
 |--------|------|----------|-------------|
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/cronograma` | ConfigurarCronogramaDaCaptacao | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/cronograma/adiamentos` | AdiarEtapaCronogramaDaCaptacao | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/m011/captacoes/{captacaoId}/cronograma` | ConsultarCronogramaDaCaptacao | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/formularios/submissao` | SelecionarFormularioSubmissao | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/m011/captacoes/{captacaoId}/formularios/submissao` | ConsultarFormularioSubmissao | ANALISTA_AGENCIA, MODULO_INTERNO |
@@ -811,9 +815,16 @@ Estas rotas representam o processo operacional descrito em [process.md](process.
 | `GET` | `/api/v1/m011/captacoes/{captacaoId}/formularios/avaliacao` | ConsultarFormularioAvaliacao | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/formularios/revisao` | SelecionarFormularioRevisao | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/m011/captacoes/{captacaoId}/formularios/revisao` | ConsultarFormularioRevisao | ANALISTA_AGENCIA, MODULO_INTERNO |
-| `POST` | `/api/v1/m011/captacoes/{captacaoId}/parametros-fomento` | ConfigurarParametrosDeFomento | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m011/captacoes/{captacaoId}/parametros-fomento` | ConsultarParametrosDeFomento | ANALISTA_AGENCIA, MODULO_INTERNO |
-| `PUT` | `/api/v1/m011/captacoes/{captacaoId}/parametros-fomento` | AtualizarParametrosDeFomento | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/formularios/anexos` | SelecionarFormularioAnexos | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/categorias-iniciativas` | ConfigurarCategoriasDeIniciativas | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/aportes-financeiros` | ConfigurarAportesFinanceirosCaptacao | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/faixas-financiamento` | ConfigurarFaixasFinanciamento | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/regras-submissao` | ConfigurarRegrasSubmissao | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/proponentes-escolhidos` | ConfigurarProponentesEscolhidos | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/requisitos-proponente` | ConfigurarRequisitosProponente | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/documentos-exigidos` | ConfigurarDocumentosExigidos | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/prestacoes-exigidas` | ConfigurarPrestacoesExigidas | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/regra-avaliacao` | ConfigurarRegraAvaliacao | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/revisores` | AssociarRevisorAdHoc | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/m011/captacoes/{captacaoId}/revisores` | ListarRevisoresAdHoc | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `DELETE` | `/api/v1/m011/captacoes/{captacaoId}/revisores/{revisorId}` | RemoverRevisorAdHoc | ANALISTA_AGENCIA |
@@ -860,24 +871,6 @@ Estas rotas representam o processo operacional descrito em [process.md](process.
   "versaoFormularioId": "string",
   "tipo": "SUBMISSAO | AVALIACAO_AD_HOC | REVISAO_RESULTADO",
   "origem": "M021"
-}
-```
-
-### ParametroFomento
-
-```json
-{
-  "captacaoId": "string",
-  "orcamentoTotal": "number",
-  "valorMaximoPorProjeto": "number (opcional)",
-  "cotasArea": [
-    {
-      "area": "string",
-      "valor": "number"
-    }
-  ],
-  "parceriaId": "string (opcional)",
-  "valorParceria": "number (opcional)"
 }
 ```
 

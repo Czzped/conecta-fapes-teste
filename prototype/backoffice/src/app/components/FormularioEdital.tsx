@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  ChevronRight, Home, ChevronDown, Save, Send, BookOpen, Plus, X, Trash2,
+  ChevronRight, Home, ChevronDown, Save, BookOpen, Plus, X, Trash2,
 } from 'lucide-react';
 
 /* ─── Shared style tokens ─────────────────────────────────── */
@@ -218,7 +218,10 @@ const InnerCard: React.FC<{ title: string; children: React.ReactNode }> = ({ tit
 );
 
 /* ─── Types ───────────────────────────────────────────────── */
-interface Props { onBack: () => void; }
+interface Props {
+  onBack: () => void;
+  mode?: 'create' | 'edit';
+}
 
 interface Bolsa {
   id: number;
@@ -235,12 +238,33 @@ interface Faixa {
   duracao: string;
   valorMin: string;
   valorMax: string;
+  valorAportado: string;
 }
 
-interface FormularioAdicional {
+interface EtapaCronograma {
   id: number;
   tipo: string;
-  formulario: string;
+  inicio: string;
+  fim: string;
+}
+
+interface AdiamentoCronograma {
+  id: number;
+  etapaTipo: string;
+  dias: number;
+  justificativa: string;
+  dataRegistro: string;
+  dataInicioOriginal: string;
+  dataFimOriginal: string;
+  dataInicioNova: string;
+  dataFimNova: string;
+}
+
+interface AporteFinanceiroCaptacao {
+  id: number;
+  origemTipo: 'programa' | 'parceria';
+  origemId: string;
+  valor: string;
 }
 
 const modalidadeOpts = [
@@ -335,28 +359,49 @@ const DocCheckRow: React.FC<{ label: string; checked: boolean; onToggle: () => v
 /* ═══════════════════════════════════════════════════════════
    Main Component
 ═══════════════════════════════════════════════════════════ */
-export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
+export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) => {
+  const isEditMode = mode === 'edit';
 
   /* ── Section 1 ── */
-  const [tipoCaptacao, setTipoCaptacao] = useState('');
+  const [tipoCaptacao, setTipoCaptacao] = useState(isEditMode ? 'chamada_publica' : '');
   const [coordenadorResponsavel, setCoordenadorResponsavel] = useState('');
   const [showCoordenadorDropdown, setShowCoordenadorDropdown] = useState(false);
   const coordenadorRef = useRef<HTMLDivElement>(null);
   const [vinculacaoPrograma, setVinculacaoPrograma] = useState('nao');
   const [programaVinculado, setProgramaVinculado] = useState('');
-  const [tituloCaptacao, setTituloCaptacao] = useState('');
+  const [tituloCaptacao, setTituloCaptacao] = useState(isEditMode ? 'Edital de Inovação Tecnológica 2026' : '');
   const [dataInicio, setDataInicio] = useState('');
   const [dataFim, setDataFim] = useState('');
-  const [numeroCaptacao, setNumeroCaptacao] = useState('');
-  const [setorResponsavel, setSetorResponsavel] = useState('');
+  const [numeroCaptacao, setNumeroCaptacao] = useState(isEditMode ? 'CAP-001/2026' : '');
+  const [linkEdital, setLinkEdital] = useState(isEditMode ? 'https://fapes.es.gov.br/editais/cap-001-2026' : '');
+  const [setorResponsavel, setSetorResponsavel] = useState(isEditMode ? 'geinov' : '');
   const [tipoFomento, setTipoFomento] = useState('');
+  const [categoriasIniciativa, setCategoriasIniciativa] = useState<Record<string, boolean>>({
+    capacitacao: false, difusao: false, extensao: false, inovacao: isEditMode, pesquisa: isEditMode,
+  });
+  const [tipoVinculoCaptacao, setTipoVinculoCaptacao] = useState<'programa' | 'parceria'>('programa');
+  const [vinculoCaptacao, setVinculoCaptacao] = useState('');
   const [programa, setPrograma] = useState('');
   const [formularioInscricao, setFormularioInscricao] = useState('');
   const [formularioAvaliacao, setFormularioAvaliacao] = useState('');
   const [formularioRecurso, setFormularioRecurso] = useState('');
-  const [formulariosAdicionais, setFormulariosAdicionais] = useState<FormularioAdicional[]>([]);
-  const nextFormularioId = useRef(1);
-  const [descricaoCaptacao, setDescricaoCaptacao] = useState('');
+  const [formularioAnexo, setFormularioAnexo] = useState('');
+  const [descricaoCaptacao, setDescricaoCaptacao] = useState(isEditMode ? 'Edital voltado para fomentar iniciativas de inovação tecnológica no Estado do Espírito Santo, com foco em soluções que promovam o desenvolvimento econômico e social sustentável.' : '');
+  const [cronogramaCaptacao, setCronogramaCaptacao] = useState<EtapaCronograma[]>(isEditMode ? [
+    { id: 1, tipo: 'publicacao', inicio: '2026-02-01', fim: '2026-02-01' },
+    { id: 2, tipo: 'recebimento', inicio: '2026-02-01', fim: '2026-03-31' },
+    { id: 3, tipo: 'documental', inicio: '2026-04-01', fim: '2026-04-15' },
+    { id: 4, tipo: 'adhoc', inicio: '2026-04-16', fim: '2026-05-31' },
+    { id: 5, tipo: 'preliminar', inicio: '2026-06-05', fim: '2026-06-05' },
+    { id: 6, tipo: 'revisao', inicio: '2026-06-06', fim: '2026-06-15' },
+    { id: 7, tipo: 'aposRevisao', inicio: '2026-06-20', fim: '2026-06-20' },
+    { id: 8, tipo: 'final', inicio: '2026-06-25', fim: '2026-06-25' },
+  ] : []);
+  const nextEtapaCronogramaId = useRef(isEditMode ? 9 : 1);
+  const [adiamentosCronograma, setAdiamentosCronograma] = useState<AdiamentoCronograma[]>([]);
+  const [diasAdiamentoPorEtapa, setDiasAdiamentoPorEtapa] = useState<Record<number, string>>({});
+  const [justificativaAdiamentoPorEtapa, setJustificativaAdiamentoPorEtapa] = useState<Record<number, string>>({});
+  const nextAdiamentoCronogramaId = useRef(1);
 
   /* ── Section 2 (Recursos Financeiros) ── */
   const [parceriaSelecionada, setParceriaSelecionada] = useState('');
@@ -364,50 +409,70 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
   const [origensRecurso, setOrigensRecurso] = useState<Record<string, boolean>>({
     tesouroEstadual: false, convenioFederal: false, parceriaPrivado: false,
   });
-  const [valorTotalDisponivel, setValorTotalDisponivel] = useState('');
+  const [aportesFinanceiros, setAportesFinanceiros] = useState<AporteFinanceiroCaptacao[]>(isEditMode ? [
+    { id: 1, origemTipo: 'programa', origemId: 'inovacao_tech', valor: 'R$ 3.000.000,00' },
+    { id: 2, origemTipo: 'parceria', origemId: 'parceria_1', valor: 'R$ 2.000.000,00' },
+  ] : [
+    { id: 1, origemTipo: 'programa', origemId: '', valor: '' },
+  ]);
+  const nextAporteId = useRef(isEditMode ? 3 : 2);
   const [showModalNovoRecurso, setShowModalNovoRecurso] = useState(false);
   const [novoRecursoOrigem, setNovoRecursoOrigem] = useState('');
-  const [habilitarFaixas, setHabilitarFaixas] = useState(false);
-  const [faixas, setFaixas] = useState<Faixa[]>([
-    { id: 1, duracao: '', valorMin: '', valorMax: '' }
+  const [habilitarFaixas, setHabilitarFaixas] = useState(isEditMode);
+  const [faixas, setFaixas] = useState<Faixa[]>(isEditMode ? [
+    { id: 1, duracao: '24', valorMin: 'R$ 50.000,00', valorMax: 'R$ 200.000,00', valorAportado: 'R$ 3.000.000,00' },
+    { id: 2, duracao: '36', valorMin: 'R$ 200.001,00', valorMax: 'R$ 500.000,00', valorAportado: 'R$ 2.000.000,00' },
+  ] : [
+    { id: 1, duracao: '', valorMin: '', valorMax: '', valorAportado: '' }
   ]);
-  const nextFaixaId = useRef(2);
+  const nextFaixaId = useRef(isEditMode ? 3 : 2);
 
   /* ── Section 3 (Parametrizações Gerais) ── */
   const [regrasParticipacao, setRegrasParticipacao] = useState({
-    multiplas: false, coordenadorOutro: false, coordenadorBolsa: false, apenasEscolhidos: false,
+    multiplas: isEditMode, coordenadorOutro: isEditMode, coordenadorBolsa: false, apenasEscolhidos: false,
   });
+  const [tipoProponenteEscolhido, setTipoProponenteEscolhido] = useState<'instituicoes' | 'pessoas'>('instituicoes');
+  const [instituicoesEscolhidas, setInstituicoesEscolhidas] = useState<Record<string, boolean>>({});
+  const [pessoasEscolhidas, setPessoasEscolhidas] = useState<Record<string, boolean>>({});
 
   /* ── Section 4 (Requisitos do Coordenador) ── */
   const [vinculadaInstituicao, setVinculadaInstituicao] = useState('nao');
-  const [restricaoEmpregaticio, setRestricaoEmpregaticio] = useState(false);
+  const [direcionamentoProposta, setDirecionamentoProposta] = useState('aberta');
+  const [instituicaoProponente, setInstituicaoProponente] = useState('');
+  const [tipoInstituicaoProponente, setTipoInstituicaoProponente] = useState('');
+  const [restricaoEmpregaticio, setRestricaoEmpregaticio] = useState(isEditMode);
   const [restricaoInstitucional, setRestricaoInstitucional] = useState(false);
-  const [gestorObrigatorio, setGestorObrigatorio] = useState(false);
-  const [nivelAcademico, setNivelAcademico] = useState('');
-  const [parceriaInstituicoes, setParceriaInstituicoes] = useState('nao');
+  const [gestorObrigatorio, setGestorObrigatorio] = useState(isEditMode);
+  const [nivelAcademico, setNivelAcademico] = useState(isEditMode ? 'doutorado' : '');
+  const [parceriaInstituicoes, setParceriaInstituicoes] = useState(isEditMode ? 'sim' : 'nao');
 
   /* ── Section 5 (Avaliação e Prestação de Contas) ── */
-  const [necessitaAvaliacao, setNecessitaAvaliacao] = useState('nao');
-  const [possuiPrestacaoTecnica, setPossuiPrestacaoTecnica] = useState('nao');
+  const [necessitaAvaliacao, setNecessitaAvaliacao] = useState('sim');
+  const [quantidadeMinimaRevisores, setQuantidadeMinimaRevisores] = useState('2');
+  const [revisoresAdHocSelecionados, setRevisoresAdHocSelecionados] = useState<Record<string, boolean>>(isEditMode ? { 'rev-001': true, 'rev-002': true } : {});
+  const [possuiPrestacaoTecnica, setPossuiPrestacaoTecnica] = useState(isEditMode ? 'sim' : 'nao');
+  const [possuiPrestacaoFinanceira, setPossuiPrestacaoFinanceira] = useState(isEditMode ? 'sim' : 'nao');
   const [rubricas, setRubricas] = useState<Record<string, boolean>>({
-    materialPermanente: false, materialConsumo: false, passagem: false,
-    diaria: false, pessoaFisica: false, pessoaJuridica: false,
+    materialPermanente: isEditMode, materialConsumo: isEditMode, passagem: false,
+    diaria: false, pessoaFisica: false, pessoaJuridica: false, bolsa: isEditMode,
   });
 
   /* ── Section 6 ── */
-  const [possuiBolsistas, setPossuiBolsistas] = useState('nao');
-  const [bolsas, setBolsas] = useState<Bolsa[]>([
+  const [bolsas, setBolsas] = useState<Bolsa[]>(isEditMode ? [
+    { id: 1, modalidade: 'ic', nivel: 'a', versao: 'Última versão ativa', maxBolsistas: '2', quantidadeCotas: '50', institucional: false },
+    { id: 2, modalidade: 'pesquisa', nivel: 'c', versao: 'Última versão ativa', maxBolsistas: '1', quantidadeCotas: '30', institucional: true },
+  ] : [
     { id: 1, modalidade: '', nivel: '', versao: '', maxBolsistas: '', quantidadeCotas: '', institucional: false },
   ]);
-  const nextBolsaId = useRef(2);
+  const nextBolsaId = useRef(isEditMode ? 3 : 2);
 
   /* ── Section 7 ── */
   const [docsSubmissao, setDocsSubmissao] = useState<Record<string, boolean>>({
-    curriculoLattes: false,
-    projetoPesquisa: false,
-    cartaAnuencia: false,
-    declaracaoVinculo: false,
-    orcamentoDetalhado: false,
+    contratoSocial: isEditMode,
+    balancoPatrimonial: false,
+    certidaoRegularidadeFiscal: false,
+    comprovanteRepresentanteLegal: isEditMode,
+    declaracaoCapacidadeTecnica: false,
   });
   const [arquivosPublicos, setArquivosPublicos] = useState<Record<string, boolean>>({
     editalCompleto: false,
@@ -426,10 +491,14 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
   /* ── helpers ── */
   const toggleParticipacao = (k: keyof typeof regrasParticipacao) =>
     setRegrasParticipacao(p => ({ ...p, [k]: !p[k] }));
+  const toggleInstituicaoEscolhida = (k: string) => setInstituicoesEscolhidas(p => ({ ...p, [k]: !p[k] }));
+  const togglePessoaEscolhida = (k: string) => setPessoasEscolhidas(p => ({ ...p, [k]: !p[k] }));
+  const toggleCategoriaIniciativa = (k: string) => setCategoriasIniciativa(p => ({ ...p, [k]: !p[k] }));
   const toggleRubrica = (k: string) => setRubricas(p => ({ ...p, [k]: !p[k] }));
   const toggleOrigem = (k: string) => setOrigensRecurso(p => ({ ...p, [k]: !p[k] }));
   const toggleDocSubmissao = (k: string) => setDocsSubmissao(p => ({ ...p, [k]: !p[k] }));
   const toggleArquivoPublico = (k: string) => setArquivosPublicos(p => ({ ...p, [k]: !p[k] }));
+  const toggleRevisorAdHoc = (k: string) => setRevisoresAdHocSelecionados(p => ({ ...p, [k]: !p[k] }));
 
   const addBolsa = () =>
     setBolsas(p => [...p, { id: nextBolsaId.current++, modalidade: '', nivel: '', versao: '', maxBolsistas: '', quantidadeCotas: '', institucional: false }]);
@@ -437,15 +506,99 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
   const updateBolsa = <K extends keyof Bolsa>(id: number, field: K, value: Bolsa[K]) =>
     setBolsas(p => p.map(b => b.id === id ? { ...b, [field]: value } : b));
 
-  const addFaixa = () => setFaixas(p => [...p, { id: nextFaixaId.current++, duracao: '', valorMin: '', valorMax: '' }]);
+  const addFaixa = () => setFaixas(p => [...p, { id: nextFaixaId.current++, duracao: '', valorMin: '', valorMax: '', valorAportado: '' }]);
   const removeFaixa = (id: number) => setFaixas(p => p.filter(f => f.id !== id));
   const updateFaixa = <K extends keyof Faixa>(id: number, field: K, value: Faixa[K]) =>
     setFaixas(p => p.map(f => f.id === id ? { ...f, [field]: value } : f));
 
-  const addFormularioAdicional = () => setFormulariosAdicionais(p => [...p, { id: nextFormularioId.current++, tipo: '', formulario: '' }]);
-  const removeFormularioAdicional = (id: number) => setFormulariosAdicionais(p => p.filter(f => f.id !== id));
-  const updateFormularioAdicional = <K extends keyof FormularioAdicional>(id: number, field: K, value: FormularioAdicional[K]) =>
-    setFormulariosAdicionais(p => p.map(f => f.id === id ? { ...f, [field]: value } : f));
+  const addAporteFinanceiro = () =>
+    setAportesFinanceiros(p => [...p, { id: nextAporteId.current++, origemTipo: 'programa', origemId: '', valor: '' }]);
+  const removeAporteFinanceiro = (id: number) => setAportesFinanceiros(p => p.filter(aporte => aporte.id !== id));
+  const updateAporteFinanceiro = <K extends keyof AporteFinanceiroCaptacao>(id: number, field: K, value: AporteFinanceiroCaptacao[K]) =>
+    setAportesFinanceiros(p => p.map(aporte => aporte.id === id ? { ...aporte, [field]: value } : aporte));
+
+  const addEtapaCronograma = () => {
+    const proximaFase = fasesCronograma.find(fase => !cronogramaCaptacao.some(etapa => etapa.tipo === fase.key));
+    if (!proximaFase) return;
+    setCronogramaCaptacao(p => [...p, { id: nextEtapaCronogramaId.current++, tipo: proximaFase.key, inicio: '', fim: '' }]);
+  };
+  const removeEtapaCronograma = (id: number) => setCronogramaCaptacao(p => p.filter(etapa => etapa.id !== id));
+  const updateCronograma = <K extends keyof EtapaCronograma>(id: number, campo: K, value: EtapaCronograma[K]) =>
+    setCronogramaCaptacao(p => p.map(etapa => etapa.id === id ? { ...etapa, [campo]: value } : etapa));
+
+  const addDaysToDate = (date: string, days: number) => {
+    if (!date) return date;
+    const parsed = new Date(`${date}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) return date;
+    parsed.setDate(parsed.getDate() + days);
+    return parsed.toISOString().slice(0, 10);
+  };
+
+  const formatDateLabel = (date: string) => {
+    if (!date) return 'sem data';
+    const parsed = new Date(`${date}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) return date;
+    return parsed.toLocaleDateString('pt-BR');
+  };
+
+  const aplicarAdiamentoCronograma = (etapa: EtapaCronograma) => {
+    const dias = Number(diasAdiamentoPorEtapa[etapa.id]);
+    const justificativa = (justificativaAdiamentoPorEtapa[etapa.id] || '').trim();
+    if (!Number.isFinite(dias) || dias <= 0) {
+      window.alert('Informe a quantidade de dias do adiamento.');
+      return;
+    }
+    if (!justificativa) {
+      window.alert('Informe a justificativa do adiamento.');
+      return;
+    }
+
+    const ordemEtapa = fasesCronograma.findIndex(fase => fase.key === etapa.tipo);
+    if (ordemEtapa < 0) {
+      window.alert('Selecione uma etapa válida para aplicar o adiamento.');
+      return;
+    }
+    const dataInicioNova = addDaysToDate(etapa.inicio, dias);
+    const dataFimNova = addDaysToDate(etapa.fim, dias);
+    setCronogramaCaptacao(p => p.map(item => {
+      const ordemItem = fasesCronograma.findIndex(fase => fase.key === item.tipo);
+      if (ordemItem < ordemEtapa || ordemItem < 0) return item;
+
+      return {
+        ...item,
+        inicio: addDaysToDate(item.inicio, dias),
+        fim: addDaysToDate(item.fim, dias),
+      };
+    }));
+    setAdiamentosCronograma(p => [
+      ...p,
+      {
+        id: nextAdiamentoCronogramaId.current++,
+        etapaTipo: etapa.tipo,
+        dias,
+        justificativa,
+        dataRegistro: new Date().toLocaleDateString('pt-BR'),
+        dataInicioOriginal: etapa.inicio,
+        dataFimOriginal: etapa.fim,
+        dataInicioNova,
+        dataFimNova,
+      },
+    ]);
+    setDiasAdiamentoPorEtapa(p => ({ ...p, [etapa.id]: '' }));
+    setJustificativaAdiamentoPorEtapa(p => ({ ...p, [etapa.id]: '' }));
+  };
+
+  const parseCurrency = (value: string) => {
+    const normalized = value.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.');
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
+  const formatCurrency = (value: number) =>
+    value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  const valorTotalAportado = aportesFinanceiros.reduce((total, aporte) => total + parseCurrency(aporte.valor), 0);
+  const valorTotalFaixas = faixas.reduce((total, faixa) => total + parseCurrency(faixa.valorAportado), 0);
 
   const nivelAcademicoOpts = [
     { value: 'graduacao', label: 'Graduação' },
@@ -471,6 +624,34 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
     { value: 'pesquisa', label: 'Pesquisa' },
   ];
 
+  const categoriaIniciativaOpts = tipoFomentoOpts;
+
+  const tipoInstituicaoOpts = [
+    { value: 'ensino', label: 'Instituição de ensino' },
+    { value: 'empresa', label: 'Empresa' },
+    { value: 'governo', label: 'Órgão de governo' },
+    { value: 'osc', label: 'Organização da sociedade civil' },
+  ];
+
+  const instituicaoOpts = [
+    { value: 'ufes', label: 'UFES - Universidade Federal do Espírito Santo' },
+    { value: 'ifes', label: 'IFES - Instituto Federal do Espírito Santo' },
+    { value: 'fapes', label: 'FAPES' },
+  ];
+
+  const fasesCronograma = [
+    { key: 'publicacao', label: 'Publicação da captação', periodo: false },
+    { key: 'recebimento', label: 'Recebimento das propostas', periodo: true },
+    { key: 'documental', label: 'Avaliação documental', periodo: true },
+    { key: 'adhoc', label: 'Avaliação ad hoc', periodo: true },
+    { key: 'preliminar', label: 'Publicação do resultado preliminar', periodo: false },
+    { key: 'revisao', label: 'Recebimento de revisão do resultado', periodo: true },
+    { key: 'aposRevisao', label: 'Publicação do resultado após revisão', periodo: false },
+    { key: 'final', label: 'Publicação do resultado final', periodo: false },
+  ];
+  const etapasCronogramaFaltantes = fasesCronograma.filter(fase => !cronogramaCaptacao.some(etapa => etapa.tipo === fase.key));
+  const cronogramaCompleto = etapasCronogramaFaltantes.length === 0;
+
   const programaOpts = [
     { value: 'nao_se_aplica', label: 'Não se aplica' },
     { value: 'bolsas_2026', label: 'Bolsas de Pesquisa 2026' },
@@ -485,6 +666,13 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
     { nome: 'João', sobrenome: 'Oliveira', cpf: '345.678.901-22' },
     { nome: 'Ana', sobrenome: 'Costa', cpf: '456.789.012-33' },
     { nome: 'Roberto', sobrenome: 'Lima', cpf: '567.890.123-44' },
+  ];
+
+  const revisoresAdHocData = [
+    { id: 'rev-001', nome: 'Dra. Helena Martins', area: 'Pesquisa em Saúde', titulacao: 'Doutorado', instituicao: 'UFES' },
+    { id: 'rev-002', nome: 'Dr. Rafael Nogueira', area: 'Inovação Tecnológica', titulacao: 'Doutorado', instituicao: 'IFES' },
+    { id: 'rev-003', nome: 'Dra. Livia Barbosa', area: 'Educação e Extensão', titulacao: 'Doutorado', instituicao: 'Ufes' },
+    { id: 'rev-004', nome: 'Dr. Marcos Teixeira', area: 'Ciências Agrárias', titulacao: 'Mestrado', instituicao: 'Incaper' },
   ];
 
   const parceriasData = [
@@ -541,7 +729,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
           </button>
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
           <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
-            Criar Captação
+            {isEditMode ? 'Editar Captação' : 'Criar Captação'}
           </span>
         </div>
 
@@ -551,8 +739,12 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
             <BookOpen size={18} style={{ color: '#00c1af' }} />
           </div>
           <div>
-            <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 4px' }}>Criar Captação</h1>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>Crie e configure uma nova chamada para projetos.</p>
+            <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 4px' }}>
+              {isEditMode ? 'Editar Captação' : 'Criar Captação'}
+            </h1>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+              {isEditMode ? 'Edite a configuração da captação usando os mesmos controles do cadastro.' : 'Crie e configure uma nova chamada para projetos.'}
+            </p>
           </div>
         </div>
         <div style={{ height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', margin: '20px 0 28px' }} />
@@ -562,25 +754,124 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
           <SectionHeader num="1" title="Identificação da Captação" subtitle="Informações básicas da captação" />
           <div style={divider} />
 
-          {/* Row 1: Título da Captação + Tipo de Captação */}
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginBottom: '20px' }}>
+          {/* Row 1: Código + Título da Captação + Tipo de Captação */}
+          <div style={{ display: 'grid', gridTemplateColumns: '180px 1.6fr 1fr', gap: '20px', marginBottom: '20px' }}>
+            <div>
+              <label style={labelStyle}>Código da Captação</label>
+              <input type="text" placeholder="CAP-001/2026" value={numeroCaptacao} onChange={e => setNumeroCaptacao(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
+            </div>
             <div>
               <label style={labelStyle}>Título da Captação</label>
               <input type="text" placeholder="Digite o título..." value={tituloCaptacao} onChange={e => setTituloCaptacao(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
             </div>
             <SelectField label="Tipo de Captação" value={tipoCaptacao} onChange={setTipoCaptacao} placeholder="Selecione o tipo..."
-              options={[{ value: 'edital_aberto', label: 'Edital Aberto' }, { value: 'demanda_induzida', label: 'Demanda Induzida' }]}
+              options={[{ value: 'chamada_publica', label: 'Chamada Pública' }, { value: 'demanda_induzida', label: 'Demanda Induzida' }]}
             />
           </div>
 
-          {/* Row 1b: Coordenador Responsável (apenas se Demanda Induzida) */}
+          <div style={{ marginBottom: '20px' }}>
+            <div>
+              <label style={labelStyle}>Link do Edital</label>
+              <input
+                type="url"
+                placeholder="https://..."
+                value={linkEdital}
+                onChange={e => setLinkEdital(e.target.value)}
+                style={inputStyle}
+                onFocus={focusTeal}
+                onBlur={blurGray}
+              />
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <label style={{ ...labelStyle, marginBottom: 0 }}>Descrição da Captação</label>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: descricaoCaptacao.length > 180 ? (descricaoCaptacao.length >= 200 ? '#ef4444' : '#fbbf24') : 'rgba(255,255,255,0.35)' }}>
+                {descricaoCaptacao.length}/200
+              </span>
+            </div>
+            <textarea placeholder="Descreva o objetivo e escopo desta captação..." value={descricaoCaptacao}
+              onChange={e => { if (e.target.value.length <= 200) setDescricaoCaptacao(e.target.value); }} rows={4}
+              maxLength={200}
+              style={{ ...inputStyle, resize: 'vertical', minHeight: '110px', lineHeight: '1.6' }}
+              onFocus={focusTeal} onBlur={blurGray}
+            />
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <SelectField
+              label="Área Técnica Responsável"
+              value={setorResponsavel}
+              onChange={setSetorResponsavel}
+              placeholder="Selecione a área..."
+              options={setorResponsavelOpts}
+            />
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <label style={{ ...labelStyle, marginBottom: 0 }}>Categorias de Iniciativas</label>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)' }}>
+                {categoriaIniciativaOpts.filter(item => categoriasIniciativa[item.value]).length} selecionada(s)
+              </span>
+            </div>
+            <div style={{
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: 'var(--radius)',
+              backgroundColor: 'rgba(15,23,42,0.35)',
+              overflow: 'hidden',
+            }}>
+              {categoriaIniciativaOpts.map(item => (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => toggleCategoriaIniciativa(item.value)}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '14px',
+                    padding: '13px 16px',
+                    border: 'none',
+                    borderBottom: item.value === categoriaIniciativaOpts[categoriaIniciativaOpts.length - 1].value ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                    backgroundColor: categoriasIniciativa[item.value] ? 'rgba(0,193,175,0.09)' : 'transparent',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
+                  <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>{item.label}</span>
+                  <span style={{
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '4px',
+                    border: `2px solid ${categoriasIniciativa[item.value] ? '#00c1af' : 'rgba(255,255,255,0.24)'}`,
+                    backgroundColor: categoriasIniciativa[item.value] ? '#00c1af' : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    {categoriasIniciativa[item.value] && (
+                      <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                        <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Row 1b: Ortogado destinatário (apenas se Demanda Induzida) */}
           {tipoCaptacao === 'demanda_induzida' && (
             <div style={{ marginBottom: '20px' }} ref={coordenadorRef}>
-              <label style={labelStyle}>Coordenador Responsável</label>
+              <label style={labelStyle}>Ortogado destinatário</label>
               <div style={{ position: 'relative' }}>
                 <input 
                   type="text" 
-                  placeholder="Digite ou selecione um coordenador..." 
+                  placeholder="Busque pelo nome ou CPF do ortogado..."
                   value={coordenadorResponsavel} 
                   onChange={e => setCoordenadorResponsavel(e.target.value)}
                   onFocus={(e) => {
@@ -644,281 +935,188 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
             </div>
           )}
 
-          {/* Row 2: Setor Responsável + Tipo de Fomento + Programa */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-            <SelectField 
-              label="Setor Responsável" 
-              value={setorResponsavel} 
-              onChange={setSetorResponsavel} 
-              placeholder="Selecione o setor..."
-              options={setorResponsavelOpts}
-            />
-            <SelectField 
-              label="Tipo de Fomento" 
-              value={tipoFomento} 
-              onChange={setTipoFomento} 
-              placeholder="Selecione o tipo..."
-              options={tipoFomentoOpts}
-            />
-            <SelectField 
-              label="Programa" 
-              value={programa} 
-              onChange={setPrograma} 
-              placeholder="Selecione o programa..."
-              options={programaOpts}
-            />
-          </div>
-
-          {/* Row 3: Número da Captação + Data de Início + Data de Fim */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-            <div>
-              <label style={labelStyle}>Número da Captação</label>
-              <input type="text" placeholder="001/2026" value={numeroCaptacao} onChange={e => setNumeroCaptacao(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
-            </div>
-            <div>
-              <label style={labelStyle}>Data de Início</label>
-              <input type="date" value={dataInicio} onChange={e => setDataInicio(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
-            </div>
-            <div>
-              <label style={labelStyle}>Data de Fim</label>
-              <input type="date" value={dataFim} onChange={e => setDataFim(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
-            </div>
-          </div>
-
-          {/* Row 4: Descrição da Captação */}
-          <div style={{ marginBottom: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <label style={{ ...labelStyle, marginBottom: 0 }}>Descrição da Captação</label>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: descricaoCaptacao.length > 180 ? (descricaoCaptacao.length >= 200 ? '#ef4444' : '#fbbf24') : 'rgba(255,255,255,0.35)' }}>
-                {descricaoCaptacao.length}/200
-              </span>
-            </div>
-            <textarea placeholder="Descreva o objetivo e escopo desta captação..." value={descricaoCaptacao}
-              onChange={e => { if (e.target.value.length <= 200) setDescricaoCaptacao(e.target.value); }} rows={4}
-              maxLength={200}
-              style={{ ...inputStyle, resize: 'vertical', minHeight: '110px', lineHeight: '1.6' }}
-              onFocus={focusTeal} onBlur={blurGray}
-            />
-          </div>
-
-          {/* Row 5: Formulários — Inscrição, Avaliação, Recurso */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-            <SelectField label="Formulário de Inscrição" value={formularioInscricao} onChange={setFormularioInscricao}
-              placeholder="Selecione o formulário..."
-              options={formularioOpts}
-            />
-            <SelectField label="Formulário de Avaliação" value={formularioAvaliacao} onChange={setFormularioAvaliacao}
-              placeholder="Selecione o formulário..."
-              options={formularioAvaliacaoOpts}
-            />
-            <SelectField label="Formulário do Recurso" value={formularioRecurso} onChange={setFormularioRecurso}
-              placeholder="Selecione o formulário..."
-              options={formularioRecursoOpts}
-            />
-          </div>
-
-          {/* Formulários Adicionais */}
-          {formulariosAdicionais.map((form) => (
-            <div key={form.id} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '20px', marginBottom: '20px', alignItems: 'end' }}>
-              <SelectField 
-                label="Formulário" 
-                value={form.formulario} 
-                onChange={v => updateFormularioAdicional(form.id, 'formulario', v)}
-                placeholder="Selecione o formulário..."
-                options={formularioOpts}
-              />
-              <button
-                type="button"
-                onClick={() => removeFormularioAdicional(form.id)}
-                style={{
-                  padding: '10px',
-                  backgroundColor: 'transparent',
-                  border: '1px solid rgba(239,68,68,0.3)',
-                  borderRadius: 'var(--radius)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'background-color 0.2s, border-color 0.2s',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.1)';
-                  e.currentTarget.style.borderColor = 'rgba(239,68,68,0.5)';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.borderColor = 'rgba(239,68,68,0.3)';
-                }}
-              >
-                <Trash2 size={16} style={{ color: '#ef4444' }} />
-              </button>
-            </div>
-          ))}
-
-          {/* Botão Adicionar Formulário */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <button
-              type="button"
-              onClick={addFormularioAdicional}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '10px 16px',
-                backgroundColor: 'rgba(0,193,175,0.1)',
-                border: '1px solid rgba(0,193,175,0.3)',
-                borderRadius: 'var(--radius)',
-                cursor: 'pointer',
-                fontFamily: 'var(--font-family)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)',
-                color: '#00c1af',
-                transition: 'background-color 0.2s, border-color 0.2s',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.15)';
-                e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.1)';
-                e.currentTarget.style.borderColor = 'rgba(0,193,175,0.3)';
-              }}
-            >
-              <Plus size={16} />
-              Adicionar Formulário
-            </button>
-          </div>
-        </div>
-
-        {/* ══════ SESSÃO 2 — Recursos Financeiros ══════ */}
-        <div style={sectionCard}>
-          <SectionHeader num="2" title="Recursos Financeiros" subtitle="Configure as fontes de recursos e valores disponíveis" />
-          <div style={divider} />
-
-          {/* Parceria */}
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginBottom: '20px' }}>
-            <SelectField 
-              label="Parceria" 
-              value={parceriaSelecionada} 
-              onChange={setParceriaSelecionada} 
-              placeholder="Selecione uma parceria..."
-              options={parceriasData}
-            />
-            <div>
-              <label style={labelStyle}>Valor da Parceria (R$)</label>
-              <input 
-                type="text" 
-                placeholder="Digite o valor..." 
-                value={valorParceria} 
-                onChange={e => setValorParceria(e.target.value)}
-                style={inputStyle} 
-                onFocus={focusTeal} 
-                onBlur={blurGray} 
-              />
-            </div>
-          </div>
-
-          {/* Habilitar Faixas de Financiamento */}
-          <div style={{ marginBottom: '20px' }}>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 8px' }}>
-              Habilitar Faixas de Financiamento
-            </p>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: '0 0 16px' }}>
-              Se a Captação precisar, informe quanto cada projeto participante deve receber e em qual período.
-            </p>
-            <div style={{ padding: '13px 0' }}>
-              <CheckboxField label="Habilitar Faixas de Financiamento" checked={habilitarFaixas} onChange={() => setHabilitarFaixas(!habilitarFaixas)} />
-            </div>
-          </div>
-
-          {/* Faixas - SEM CARD */}
-          <div style={{ marginBottom: '24px' }}>
-            {faixas.map((faixa, index) => (
-              <div key={faixa.id}>
-                {index > 0 && <div style={{ ...divider, margin: '16px 0' }} />}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '20px', alignItems: 'end' }}>
-                  <div>
-                    <label style={labelStyle}>Duração (meses)</label>
-                    <input 
-                      type="number" 
-                      placeholder="24" 
-                      value={faixa.duracao} 
-                      onChange={e => updateFaixa(faixa.id, 'duracao', e.target.value)} 
-                      style={{
-                        ...inputStyle,
-                        opacity: habilitarFaixas ? 1 : 0.5,
-                        cursor: habilitarFaixas ? 'text' : 'not-allowed'
-                      }} 
-                      disabled={!habilitarFaixas}
-                      onFocus={focusTeal} 
-                      onBlur={blurGray} 
-                    />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Valor Mínimo (R$)</label>
-                    <input 
-                      type="number" 
-                      placeholder="50000" 
-                      value={faixa.valorMin} 
-                      onChange={e => updateFaixa(faixa.id, 'valorMin', e.target.value)} 
-                      style={{
-                        ...inputStyle,
-                        opacity: habilitarFaixas ? 1 : 0.5,
-                        cursor: habilitarFaixas ? 'text' : 'not-allowed'
-                      }} 
-                      disabled={!habilitarFaixas}
-                      onFocus={focusTeal} 
-                      onBlur={blurGray} 
-                    />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Valor Máximo (R$)</label>
-                    <input 
-                      type="number" 
-                      placeholder="200000" 
-                      value={faixa.valorMax} 
-                      onChange={e => updateFaixa(faixa.id, 'valorMax', e.target.value)} 
-                      style={{
-                        ...inputStyle,
-                        opacity: habilitarFaixas ? 1 : 0.5,
-                        cursor: habilitarFaixas ? 'text' : 'not-allowed'
-                      }} 
-                      disabled={!habilitarFaixas}
-                      onFocus={focusTeal} 
-                      onBlur={blurGray} 
-                    />
-                  </div>
-                  {faixas.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeFaixa(faixa.id)}
-                      style={{
-                        padding: '10px',
-                        backgroundColor: 'transparent',
-                        border: '1px solid rgba(239,68,68,0.3)',
-                        borderRadius: 'var(--radius)',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        transition: 'background-color 0.2s, border-color 0.2s',
-                      }}
-                      onMouseEnter={e => {
-                        e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.1)';
-                        e.currentTarget.style.borderColor = 'rgba(239,68,68,0.5)';
-                      }}
-                      onMouseLeave={e => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.borderColor = 'rgba(239,68,68,0.3)';
-                      }}
-                    >
-                      <Trash2 size={16} style={{ color: '#ef4444' }} />
-                    </button>
-                  )}
+          <div style={{ ...innerCardStyle, marginBottom: '20px', backgroundColor: 'rgba(0,193,175,0.06)', borderColor: 'rgba(0,193,175,0.18)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
+              <div>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 6px' }}>
+                  Aportes Financeiros da Captação
+                </p>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                  Informe quais programas ou parcerias aportam recursos financeiros para esta captação.
+                </p>
+              </div>
+              <div style={{ minWidth: '180px', padding: '10px 14px', border: '1px solid rgba(0,193,175,0.24)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(15,23,42,0.38)', textAlign: 'right' }}>
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.48)', marginBottom: '4px' }}>
+                  Total dos aportes
+                </div>
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-semibold)', color: '#00c1af' }}>
+                  {formatCurrency(valorTotalAportado)}
                 </div>
               </div>
-            ))}
-            {habilitarFaixas && (
+            </div>
+            <div style={{ display: 'grid', gap: '16px' }}>
+              {aportesFinanceiros.map((aporte, index) => (
+                <div key={aporte.id}>
+                  {index > 0 && <div style={{ ...divider, margin: '0 0 16px' }} />}
+                  <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr 180px auto', gap: '16px', alignItems: 'end' }}>
+                    <RadioGroup
+                      value={aporte.origemTipo}
+                      onChange={(value) => {
+                        updateAporteFinanceiro(aporte.id, 'origemTipo', value as 'programa' | 'parceria');
+                        updateAporteFinanceiro(aporte.id, 'origemId', '');
+                      }}
+                      options={[
+                        { value: 'programa', label: 'Programa' },
+                        { value: 'parceria', label: 'Parceria' },
+                      ]}
+                    />
+                    <SelectField
+                      label={aporte.origemTipo === 'programa' ? 'Programa aportador' : 'Parceria aportadora'}
+                      value={aporte.origemId}
+                      onChange={value => updateAporteFinanceiro(aporte.id, 'origemId', value)}
+                      placeholder={aporte.origemTipo === 'programa' ? 'Selecione o programa...' : 'Selecione a parceria...'}
+                      options={aporte.origemTipo === 'programa' ? programaOpts.filter(option => option.value !== 'nao_se_aplica') : parceriasData}
+                    />
+                    <div>
+                      <label style={labelStyle}>Valor aportado (R$)</label>
+                      <input
+                        type="text"
+                        placeholder="0,00"
+                        value={aporte.valor}
+                        onChange={e => updateAporteFinanceiro(aporte.id, 'valor', e.target.value)}
+                        style={inputStyle}
+                        onFocus={focusTeal}
+                        onBlur={blurGray}
+                      />
+                    </div>
+                    {aportesFinanceiros.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeAporteFinanceiro(aporte.id)}
+                        style={{ padding: '10px', backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Trash2 size={16} style={{ color: '#ef4444' }} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={addAporteFinanceiro}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', backgroundColor: 'rgba(0,193,175,0.1)', border: '1px solid rgba(0,193,175,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#00c1af' }}
+                >
+                  <Plus size={16} />
+                  Adicionar Aporte
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ ...innerCardStyle, marginBottom: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '20px' }}>
+              <div>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 8px' }}>
+                  Faixas de Financiamento
+                </p>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                  Distribua o valor aportado em faixas com duração máxima e limites financeiros.
+                </p>
+              </div>
+              <div style={{ minWidth: '180px', padding: '10px 14px', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(15,23,42,0.38)', textAlign: 'right' }}>
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.48)', marginBottom: '4px' }}>
+                  Aportado nas faixas
+                </div>
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-semibold)', color: '#00c1af' }}>
+                  {formatCurrency(valorTotalFaixas)}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              {faixas.map((faixa, index) => (
+                <div key={faixa.id}>
+                  {index > 0 && <div style={{ ...divider, margin: '16px 0' }} />}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '20px', alignItems: 'end' }}>
+                    <div>
+                      <label style={labelStyle}>Duração máxima da iniciativa (meses)</label>
+                      <input
+                        type="number"
+                        placeholder="24"
+                        value={faixa.duracao}
+                        onChange={e => updateFaixa(faixa.id, 'duracao', e.target.value)}
+                        style={inputStyle}
+                        onFocus={focusTeal}
+                        onBlur={blurGray}
+                      />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Valor financeiro mínimo (R$)</label>
+                      <input
+                        type="number"
+                        placeholder="50000"
+                        value={faixa.valorMin}
+                        onChange={e => updateFaixa(faixa.id, 'valorMin', e.target.value)}
+                        style={inputStyle}
+                        onFocus={focusTeal}
+                        onBlur={blurGray}
+                      />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Valor financeiro máximo (R$)</label>
+                      <input
+                        type="number"
+                        placeholder="200000"
+                        value={faixa.valorMax}
+                        onChange={e => updateFaixa(faixa.id, 'valorMax', e.target.value)}
+                        style={inputStyle}
+                        onFocus={focusTeal}
+                        onBlur={blurGray}
+                      />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Valor aportado na faixa (R$)</label>
+                      <input
+                        type="number"
+                        placeholder="250000"
+                        value={faixa.valorAportado}
+                        onChange={e => updateFaixa(faixa.id, 'valorAportado', e.target.value)}
+                        style={inputStyle}
+                        onFocus={focusTeal}
+                        onBlur={blurGray}
+                      />
+                    </div>
+                    {faixas.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeFaixa(faixa.id)}
+                        style={{
+                          padding: '10px',
+                          backgroundColor: 'transparent',
+                          border: '1px solid rgba(239,68,68,0.3)',
+                          borderRadius: 'var(--radius)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'background-color 0.2s, border-color 0.2s',
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.1)';
+                          e.currentTarget.style.borderColor = 'rgba(239,68,68,0.5)';
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.borderColor = 'rgba(239,68,68,0.3)';
+                        }}
+                      >
+                        <Trash2 size={16} style={{ color: '#ef4444' }} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
                 <button
                   type="button"
@@ -951,7 +1149,243 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
                   Adicionar Faixa
                 </button>
               </div>
-            )}
+            </div>
+          </div>
+
+        </div>
+
+        {/* ══════ SESSÃO 2 — Cronograma da Captação ══════ */}
+        <div style={sectionCard}>
+          <SectionHeader num="2" title="Cronograma da Captação" subtitle="Configure as fases obrigatórias da captação" />
+          <div style={divider} />
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
+            <div>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 6px' }}>
+                Etapas do Cronograma
+              </p>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                Adicione um card para cada etapa obrigatória da captação.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={addEtapaCronograma}
+              disabled={cronogramaCompleto}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 16px',
+                backgroundColor: cronogramaCompleto ? 'rgba(255,255,255,0.06)' : 'rgba(0,193,175,0.1)',
+                border: `1px solid ${cronogramaCompleto ? 'rgba(255,255,255,0.12)' : 'rgba(0,193,175,0.3)'}`,
+                borderRadius: 'var(--radius)',
+                cursor: cronogramaCompleto ? 'not-allowed' : 'pointer',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                color: cronogramaCompleto ? 'rgba(255,255,255,0.4)' : '#00c1af',
+              }}
+            >
+              <Plus size={16} />
+              Adicionar Etapa
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '18px' }}>
+            {fasesCronograma.map(fase => {
+              const concluida = cronogramaCaptacao.some(etapa => etapa.tipo === fase.key);
+              return (
+                <span
+                  key={fase.key}
+                  style={{
+                    padding: '6px 10px',
+                    borderRadius: '999px',
+                    border: `1px solid ${concluida ? 'rgba(0,193,175,0.35)' : 'rgba(251,191,36,0.35)'}`,
+                    backgroundColor: concluida ? 'rgba(0,193,175,0.1)' : 'rgba(251,191,36,0.1)',
+                    color: concluida ? '#00c1af' : '#fbbf24',
+                    fontFamily: 'var(--font-family)',
+                    fontSize: 'var(--text-xs)',
+                  }}
+                >
+                  {fase.label}
+                </span>
+              );
+            })}
+          </div>
+
+          {!cronogramaCompleto && (
+            <div style={{ padding: '12px 14px', borderRadius: 'var(--radius)', border: '1px solid rgba(251,191,36,0.24)', backgroundColor: 'rgba(251,191,36,0.08)', marginBottom: '18px' }}>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#fbbf24', margin: 0 }}>
+                Faltam etapas obrigatórias: {etapasCronogramaFaltantes.map(fase => fase.label).join(', ')}.
+              </p>
+            </div>
+          )}
+
+          <div style={{ display: 'grid', gap: '16px' }}>
+            {cronogramaCaptacao.map((etapa, index) => {
+              const faseSelecionada = fasesCronograma.find(fase => fase.key === etapa.tipo);
+              return (
+                <div key={etapa.id} style={{ ...innerCardStyle, padding: '18px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: 0 }}>
+                      Etapa {index + 1}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => removeEtapaCronograma(etapa.id)}
+                      style={{ padding: '8px', backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <Trash2 size={15} style={{ color: '#ef4444' }} />
+                    </button>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: '16px', alignItems: 'end' }}>
+                    <SelectField
+                      label="Etapa obrigatória"
+                      value={etapa.tipo}
+                      onChange={value => updateCronograma(etapa.id, 'tipo', value)}
+                      placeholder="Selecione a etapa..."
+                      options={fasesCronograma
+                        .filter(fase => fase.key === etapa.tipo || !cronogramaCaptacao.some(item => item.tipo === fase.key))
+                        .map(fase => ({ value: fase.key, label: fase.label }))}
+                    />
+                    <div>
+                      <label style={labelStyle}>{faseSelecionada?.periodo ? 'Data inicial' : 'Data'}</label>
+                      <input
+                        type="date"
+                        value={etapa.inicio}
+                        onChange={e => updateCronograma(etapa.id, 'inicio', e.target.value)}
+                        style={inputStyle}
+                        onFocus={focusTeal}
+                        onBlur={blurGray}
+                      />
+                    </div>
+                    <div style={{ opacity: faseSelecionada?.periodo ? 1 : 0.35 }}>
+                      <label style={labelStyle}>Data final</label>
+                      <input
+                        type="date"
+                        value={etapa.fim}
+                        onChange={e => updateCronograma(etapa.id, 'fim', e.target.value)}
+                        style={inputStyle}
+                        disabled={!faseSelecionada?.periodo}
+                        onFocus={focusTeal}
+                        onBlur={blurGray}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ ...divider, margin: '18px 0' }} />
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr auto', gap: '16px', alignItems: 'end' }}>
+                    <div>
+                      <label style={labelStyle}>Adiar por dias</label>
+                      <input
+                        type="number"
+                        min="1"
+                        placeholder="Ex: 7"
+                        value={diasAdiamentoPorEtapa[etapa.id] || ''}
+                        onChange={e => setDiasAdiamentoPorEtapa(p => ({ ...p, [etapa.id]: e.target.value }))}
+                        style={inputStyle}
+                        onFocus={focusTeal}
+                        onBlur={blurGray}
+                      />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Justificativa do adiamento</label>
+                      <input
+                        type="text"
+                        placeholder="Informe o motivo do adiamento..."
+                        value={justificativaAdiamentoPorEtapa[etapa.id] || ''}
+                        onChange={e => setJustificativaAdiamentoPorEtapa(p => ({ ...p, [etapa.id]: e.target.value }))}
+                        style={inputStyle}
+                        onFocus={focusTeal}
+                        onBlur={blurGray}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => aplicarAdiamentoCronograma(etapa)}
+                      style={{
+                        padding: '11px 16px',
+                        backgroundColor: 'rgba(0,193,175,0.1)',
+                        border: '1px solid rgba(0,193,175,0.3)',
+                        borderRadius: 'var(--radius)',
+                        cursor: 'pointer',
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        color: '#00c1af',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      Aplicar adiamento
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {adiamentosCronograma.length > 0 && (
+            <div style={{ ...innerCardStyle, marginTop: '18px', backgroundColor: 'rgba(251,191,36,0.06)', borderColor: 'rgba(251,191,36,0.2)' }}>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 12px' }}>
+                Histórico de Adiamentos
+              </p>
+              <div style={{ display: 'grid', gap: '10px' }}>
+                {adiamentosCronograma.map(adiamento => {
+                  const fase = fasesCronograma.find(item => item.key === adiamento.etapaTipo);
+
+                  return (
+                    <div key={adiamento.id} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '14px', padding: '10px 0', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                          {fase?.label || 'Etapa'} adiada em {adiamento.dias} dia(s)
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#fbbf24', marginTop: '3px' }}>
+                          {formatDateLabel(adiamento.dataInicioOriginal)} → {formatDateLabel(adiamento.dataInicioNova)}
+                          {adiamento.dataFimOriginal && ` · fim: ${formatDateLabel(adiamento.dataFimOriginal)} → ${formatDateLabel(adiamento.dataFimNova)}`}
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginTop: '3px' }}>
+                          {adiamento.justificativa}
+                        </div>
+                      </div>
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#fbbf24', whiteSpace: 'nowrap' }}>
+                        {adiamento.dataRegistro}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div style={{ ...divider, margin: '24px 0' }} />
+
+          <div>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 6px' }}>
+              Formulários da Captação
+            </p>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: '0 0 16px' }}>
+              Selecione os formulários usados nas etapas de inscrição, avaliação, recurso e anexos.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '20px' }}>
+              <SelectField label="Formulário de Inscrição" value={formularioInscricao} onChange={setFormularioInscricao}
+                placeholder="Selecione o formulário..."
+                options={formularioOpts}
+              />
+              <SelectField label="Formulário de Avaliação" value={formularioAvaliacao} onChange={setFormularioAvaliacao}
+                placeholder="Selecione o formulário..."
+                options={formularioAvaliacaoOpts}
+              />
+              <SelectField label="Formulário do Recurso" value={formularioRecurso} onChange={setFormularioRecurso}
+                placeholder="Selecione o formulário..."
+                options={formularioRecursoOpts}
+              />
+              <SelectField label="Formulário de Anexos" value={formularioAnexo} onChange={setFormularioAnexo}
+                placeholder="Selecione o formulário..."
+                options={formularioOpts}
+              />
+            </div>
           </div>
         </div>
 
@@ -962,10 +1396,10 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
             {[
-              { key: 'multiplas', label: 'O pesquisador pode enviar mais de uma proposta para este edital' },
-              { key: 'coordenadorOutro', label: 'O coordenador pode estar como participante em outra proposta do mesmo edital' },
-              { key: 'coordenadorBolsa', label: 'O coordenador pode ter bolsas ativas em outros projetos' },
-              { key: 'apenasEscolhidos', label: 'Submissão restrita apenas a pesquisadores previamente escolhidos' }
+              { key: 'multiplas', label: 'Permitir múltiplas propostas por proponente' },
+              { key: 'coordenadorOutro', label: 'Coordenador pode ter outro projeto ou proposta ativa' },
+              { key: 'coordenadorBolsa', label: 'Coordenador pode acumular bolsa' },
+              { key: 'apenasEscolhidos', label: 'Apenas proponentes escolhidos podem submeter proposta' }
             ].map(item => (
               <div key={item.key} style={{ padding: '13px 0' }}>
                 <CheckboxField 
@@ -976,6 +1410,86 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
               </div>
             ))}
           </div>
+
+          {regrasParticipacao.apenasEscolhidos && (
+            <div style={{ ...innerCardStyle, marginTop: '20px', backgroundColor: 'rgba(0,193,175,0.06)', borderColor: 'rgba(0,193,175,0.18)' }}>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 6px' }}>
+                Proponentes Escolhidos
+              </p>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: '0 0 16px' }}>
+                Selecione quem poderá submeter proposta nesta captação.
+              </p>
+
+              <div style={{ marginBottom: '18px' }}>
+                <RadioGroup
+                  value={tipoProponenteEscolhido}
+                  onChange={(value) => setTipoProponenteEscolhido(value as 'instituicoes' | 'pessoas')}
+                  options={[
+                    { value: 'instituicoes', label: 'Instituições' },
+                    { value: 'pessoas', label: 'Pessoas' },
+                  ]}
+                />
+              </div>
+
+              <div style={{
+                border: '1px solid rgba(255,255,255,0.12)',
+                borderRadius: 'var(--radius)',
+                backgroundColor: 'rgba(15,23,42,0.35)',
+                overflow: 'hidden',
+              }}>
+                {(tipoProponenteEscolhido === 'instituicoes' ? instituicaoOpts : coordenadoresData.map(pessoa => ({
+                  value: pessoa.cpf,
+                  label: `${pessoa.nome} ${pessoa.sobrenome} - ${pessoa.cpf}`,
+                }))).map((item, index, arr) => {
+                  const checked = tipoProponenteEscolhido === 'instituicoes'
+                    ? Boolean(instituicoesEscolhidas[item.value])
+                    : Boolean(pessoasEscolhidas[item.value]);
+
+                  return (
+                    <button
+                      key={item.value}
+                      type="button"
+                      onClick={() => tipoProponenteEscolhido === 'instituicoes'
+                        ? toggleInstituicaoEscolhida(item.value)
+                        : togglePessoaEscolhida(item.value)}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '14px',
+                        padding: '13px 16px',
+                        border: 'none',
+                        borderBottom: index === arr.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                        backgroundColor: checked ? 'rgba(0,193,175,0.09)' : 'transparent',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                      }}
+                    >
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>{item.label}</span>
+                      <span style={{
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '4px',
+                        border: `2px solid ${checked ? '#00c1af' : 'rgba(255,255,255,0.24)'}`,
+                        backgroundColor: checked ? '#00c1af' : 'transparent',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}>
+                        {checked && (
+                          <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                            <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ══════ SESSÃO 4 — Requisitos e Restrições ══════ */}
@@ -984,13 +1498,29 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
           <div style={divider} />
 
           <div style={{ marginBottom: '24px' }}>
-            <label style={labelStyle}>A proposta precisa estar vinculada a uma instituição?</label>
+            <label style={labelStyle}>Direcionamento das propostas</label>
             <div style={{ paddingTop: '8px' }}>
-              <RadioGroup value={vinculadaInstituicao} onChange={setVinculadaInstituicao}
-                options={[{ value: 'sim', label: 'Sim' }, { value: 'nao', label: 'Não' }]}
+              <RadioGroup value={direcionamentoProposta} onChange={setDirecionamentoProposta}
+                options={[
+                  { value: 'aberta', label: 'Aberta' },
+                  { value: 'instituicao', label: 'Instituição específica' },
+                  { value: 'tipo_instituicao', label: 'Tipo de instituição' },
+                ]}
               />
             </div>
           </div>
+
+          {direcionamentoProposta === 'instituicao' && (
+            <div style={{ marginBottom: '24px' }}>
+              <SelectField label="Instituição permitida" value={instituicaoProponente} onChange={setInstituicaoProponente} placeholder="Selecione a instituição..." options={instituicaoOpts} />
+            </div>
+          )}
+
+          {direcionamentoProposta === 'tipo_instituicao' && (
+            <div style={{ marginBottom: '24px' }}>
+              <SelectField label="Tipo de instituição permitido" value={tipoInstituicaoProponente} onChange={setTipoInstituicaoProponente} placeholder="Selecione o tipo..." options={tipoInstituicaoOpts} />
+            </div>
+          )}
 
           <div style={{ marginBottom: '24px' }}>
             <label style={labelStyle}>Permite parceria entre instituições?</label>
@@ -1006,7 +1536,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
             <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.45)', margin: '0 0 16px' }}>Defina restrições sobre vínculo empregatício ou institucional</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
               {[
-                { key: 'restricaoEmpregaticio', label: 'Exigir vínculo empregatício ativo', checked: restricaoEmpregaticio, onChange: () => setRestricaoEmpregaticio(!restricaoEmpregaticio) },
+                { key: 'restricaoEmpregaticio', label: 'Restrições de vínculo empregatício', checked: restricaoEmpregaticio, onChange: () => setRestricaoEmpregaticio(!restricaoEmpregaticio) },
                 { key: 'gestorObrigatorio', label: 'Obrigar a indicação de um gestor institucional', checked: gestorObrigatorio, onChange: () => setGestorObrigatorio(!gestorObrigatorio) }
               ].map(item => (
                 <div key={item.key} style={{ padding: '13px 0' }}>
@@ -1018,7 +1548,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
 
           <div style={{ marginBottom: '24px' }}>
             <SelectField
-              label="Nível Acadêmico Mínimo Exigido do Coordenador do Projeto"
+              label="Nível acadêmico mínimo exigido do coordenador do projeto"
               value={nivelAcademico}
               onChange={setNivelAcademico}
               placeholder="Selecione o nível..."
@@ -1027,19 +1557,99 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
           </div>
         </div>
 
-        {/* ══════ SESSÃO 5 — Rubricas e Despesas Permitidas ══════ */}
+        {/* ══════ SESSÃO 5 — Rubricas, Avaliação e Prestações ══════ */}
         <div style={sectionCard}>
-          <SectionHeader num="5" title="Rubricas e Despesas Permitidas" subtitle="Configure quais categorias de despesa podem ser financiadas" />
+          <SectionHeader num="5" title="Rubricas, Avaliação e Prestações" subtitle="Configure rubricas, avaliação ad hoc e prestações exigidas" />
           <div style={divider} />
 
           <div style={{ marginBottom: '24px' }}>
-            <label style={labelStyle}>Este edital necessita de avaliação?</label>
+            <label style={labelStyle}>Esta captação necessita de avaliação ad hoc?</label>
             <div style={{ paddingTop: '8px' }}>
               <RadioGroup value={necessitaAvaliacao} onChange={setNecessitaAvaliacao}
                 options={[{ value: 'sim', label: 'Sim' }, { value: 'nao', label: 'Não' }]}
               />
             </div>
           </div>
+
+          {necessitaAvaliacao === 'sim' && (
+            <>
+              <div style={{ marginBottom: '24px' }}>
+                <label style={labelStyle}>Quantidade mínima de revisores ad hoc por proposta</label>
+                <input type="number" min="1" placeholder="2" value={quantidadeMinimaRevisores} onChange={e => setQuantidadeMinimaRevisores(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
+              </div>
+
+              <div style={{ ...innerCardStyle, marginBottom: '24px', backgroundColor: 'rgba(0,193,175,0.06)', borderColor: 'rgba(0,193,175,0.18)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '16px' }}>
+                  <div>
+                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 6px' }}>
+                      Pool de Revisores Ad Hoc
+                    </p>
+                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                      Selecione os revisores disponíveis para avaliar as propostas habilitadas.
+                    </p>
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#00c1af', padding: '6px 10px', borderRadius: '999px', border: '1px solid rgba(0,193,175,0.28)', backgroundColor: 'rgba(0,193,175,0.08)', whiteSpace: 'nowrap' }}>
+                    {revisoresAdHocData.filter(revisor => revisoresAdHocSelecionados[revisor.id]).length} selecionado(s)
+                  </div>
+                </div>
+
+                <div style={{
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: 'var(--radius)',
+                  backgroundColor: 'rgba(15,23,42,0.35)',
+                  overflow: 'hidden',
+                }}>
+                  {revisoresAdHocData.map((revisor, index) => {
+                    const checked = Boolean(revisoresAdHocSelecionados[revisor.id]);
+
+                    return (
+                      <button
+                        key={revisor.id}
+                        type="button"
+                        onClick={() => toggleRevisorAdHoc(revisor.id)}
+                        style={{
+                          width: '100%',
+                          display: 'grid',
+                          gridTemplateColumns: '1.3fr 1fr 0.8fr auto',
+                          alignItems: 'center',
+                          gap: '14px',
+                          padding: '13px 16px',
+                          border: 'none',
+                          borderBottom: index === revisoresAdHocData.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                          backgroundColor: checked ? 'rgba(0,193,175,0.09)' : 'transparent',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>{revisor.nome}</div>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginTop: '2px' }}>{revisor.instituicao}</div>
+                        </div>
+                        <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.68)' }}>{revisor.area}</span>
+                        <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.68)' }}>{revisor.titulacao}</span>
+                        <span style={{
+                          width: '18px',
+                          height: '18px',
+                          borderRadius: '4px',
+                          border: `2px solid ${checked ? '#00c1af' : 'rgba(255,255,255,0.24)'}`,
+                          backgroundColor: checked ? '#00c1af' : 'transparent',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                          {checked && (
+                            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                              <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          )}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
 
           <div style={{ marginBottom: '24px' }}>
             <label style={labelStyle}>Possui prestação de contas técnica?</label>
@@ -1050,42 +1660,95 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
             </div>
           </div>
 
-          <div>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 4px' }}>Rubricas Permitidas</p>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.45)', margin: '0 0 16px' }}>Selecione as rubricas de despesas que podem ser utilizadas</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-              {[
-                { key: 'materialPermanente', label: 'Material Permanente' },
-                { key: 'materialConsumo', label: 'Material de Consumo' },
-                { key: 'passagem', label: 'Passagens' },
-                { key: 'diaria', label: 'Diárias' },
-                { key: 'pessoaFisica', label: 'Pessoa Física' },
-                { key: 'pessoaJuridica', label: 'Pessoa Jurídica' }
-              ].map(item => (
-                <div key={item.key} style={{ padding: '13px 0' }}>
-                  <CheckboxField label={item.label} checked={rubricas[item.key]} onChange={() => toggleRubrica(item.key)} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* ══════ SESSÃO 6 — Bolsas ══════ */}
-        <div style={sectionCard}>
-          <SectionHeader num="6" title="Bolsas" subtitle="Configure modalidades e quantidades de bolsa. O valor das Bolsas consomem o valor total do projeto." />
-          <div style={divider} />
-
           <div style={{ marginBottom: '24px' }}>
-            <label style={labelStyle}>O projeto possui bolsistas?</label>
+            <label style={labelStyle}>Possui prestação de contas financeira?</label>
             <div style={{ paddingTop: '8px' }}>
-              <RadioGroup value={possuiBolsistas} onChange={setPossuiBolsistas}
+              <RadioGroup value={possuiPrestacaoFinanceira} onChange={setPossuiPrestacaoFinanceira}
                 options={[{ value: 'sim', label: 'Sim' }, { value: 'nao', label: 'Não' }]}
               />
             </div>
           </div>
 
-          {possuiBolsistas === 'sim' && (
-            <>
+          <div>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 4px' }}>Rubricas Permitidas</p>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.45)', margin: '0 0 16px' }}>Selecione as rubricas de despesas que podem ser utilizadas. Ao selecionar Bolsa, configure as modalidades e níveis permitidos.</p>
+            <div style={{
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: 'var(--radius)',
+              backgroundColor: 'rgba(15,23,42,0.35)',
+              overflow: 'hidden',
+            }}>
+              {[
+                { key: 'materialPermanente', label: 'Material Permanente', descricao: 'Bens permanentes e equipamentos.' },
+                { key: 'materialConsumo', label: 'Material de Consumo', descricao: 'Itens consumíveis usados na iniciativa.' },
+                { key: 'passagem', label: 'Passagens', descricao: 'Deslocamentos aéreos, terrestres ou similares.' },
+                { key: 'diaria', label: 'Diárias', descricao: 'Diárias vinculadas às atividades da iniciativa.' },
+                { key: 'pessoaFisica', label: 'Pessoa Física', descricao: 'Serviços ou pagamentos para pessoa física.' },
+                { key: 'pessoaJuridica', label: 'Pessoa Jurídica', descricao: 'Serviços contratados de pessoa jurídica.' },
+                { key: 'bolsa', label: 'Bolsa', descricao: 'Modalidades e níveis de bolsa permitidos na captação.' },
+              ].map((item, index, lista) => {
+                const checked = Boolean(rubricas[item.key]);
+
+                return (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() => toggleRubrica(item.key)}
+                    style={{
+                      width: '100%',
+                      display: 'grid',
+                      gridTemplateColumns: '1fr auto',
+                      alignItems: 'center',
+                      gap: '16px',
+                      padding: '14px 16px',
+                      border: 'none',
+                      borderBottom: index === lista.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                      backgroundColor: checked ? 'rgba(0,193,175,0.09)' : 'transparent',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <span>
+                      <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff' }}>
+                        {item.label}
+                      </span>
+                      <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginTop: '3px' }}>
+                        {item.descricao}
+                      </span>
+                    </span>
+                    <span style={{
+                      width: '18px',
+                      height: '18px',
+                      borderRadius: '4px',
+                      border: `2px solid ${checked ? '#00c1af' : 'rgba(255,255,255,0.24)'}`,
+                      backgroundColor: checked ? '#00c1af' : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                      {checked && (
+                        <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                          <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {rubricas.bolsa && (
+            <div style={{ ...innerCardStyle, marginTop: '20px', backgroundColor: 'rgba(0,193,175,0.06)', borderColor: 'rgba(0,193,175,0.18)' }}>
+              <div style={{ marginBottom: '18px' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 6px' }}>
+                  Modalidades e Níveis de Bolsa
+                </p>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                  Configure as modalidades e níveis aceitos quando a rubrica Bolsa estiver permitida.
+                </p>
+              </div>
+
               {bolsas.map((bolsa, idx) => (
                 <div key={bolsa.id}>
                   {idx > 0 && <div style={divider} />}
@@ -1138,10 +1801,133 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
             </div>
           ))}
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
+                <button
+                  type="button"
+                  onClick={addBolsa}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 16px',
+                    backgroundColor: 'rgba(0,193,175,0.1)',
+                    border: '1px solid rgba(0,193,175,0.3)',
+                    borderRadius: 'var(--radius)',
+                    cursor: 'pointer',
+                    fontFamily: 'var(--font-family)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    color: '#00c1af',
+                    transition: 'background-color 0.2s, border-color 0.2s',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.15)';
+                    e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.1)';
+                    e.currentTarget.style.borderColor = 'rgba(0,193,175,0.3)';
+                  }}
+                >
+                  <Plus size={16} />
+                  Adicionar Bolsa
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ══════ SESSÃO 6 — Documentos Exigidos ══════ */}
+        <div style={sectionCard}>
+          <SectionHeader num="6" title="Documentos Exigidos do Proponente" subtitle="Selecione documentos exigidos e cadastre novos parâmetros quando necessário" />
+          <div style={divider} />
+
+          <div style={{ padding: '12px 14px', borderRadius: 'var(--radius)', border: '1px solid rgba(251,191,36,0.24)', backgroundColor: 'rgba(251,191,36,0.08)', marginBottom: '18px' }}>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#fbbf24', margin: '0 0 4px' }}>
+              Observação
+            </p>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.68)', margin: 0, lineHeight: 1.45 }}>
+              Os documentos exigidos podem variar conforme o tipo de proponente. Por exemplo, quando o proponente for uma empresa privada, a captação pode exigir documentos como balanço da empresa, contrato social, certidões ou outros comprovantes institucionais.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gap: '12px', marginBottom: '20px' }}>
+            {[
+              { key: 'contratoSocial', label: 'Contrato social ou estatuto', descricao: 'Documento constitutivo da instituição ou empresa proponente.', formatos: 'PDF', obrigatorio: true },
+              { key: 'balancoPatrimonial', label: 'Balanço patrimonial', descricao: 'Demonstração contábil usada para comprovar capacidade econômico-financeira.', formatos: 'PDF ou XLSX', obrigatorio: false },
+              { key: 'certidaoRegularidadeFiscal', label: 'Certidões de regularidade fiscal', descricao: 'Comprovação de regularidade perante órgãos fiscais e trabalhistas, quando aplicável.', formatos: 'PDF', obrigatorio: false },
+              { key: 'comprovanteRepresentanteLegal', label: 'Comprovante do representante legal', descricao: 'Documento que comprova poderes de representação do responsável pela submissão.', formatos: 'PDF', obrigatorio: true },
+              { key: 'declaracaoCapacidadeTecnica', label: 'Declaração de capacidade técnica', descricao: 'Declaração institucional de que o proponente possui estrutura para executar a iniciativa.', formatos: 'PDF', obrigatorio: false },
+            ].map(item => {
+              const checked = Boolean(docsSubmissao[item.key]);
+
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => toggleDocSubmissao(item.key)}
+                  style={{
+                    width: '100%',
+                    display: 'grid',
+                    gridTemplateColumns: '1fr auto',
+                    gap: '16px',
+                    alignItems: 'center',
+                    padding: '16px',
+                    borderRadius: 'var(--radius)',
+                    border: `1px solid ${checked ? 'rgba(0,193,175,0.35)' : 'rgba(255,255,255,0.12)'}`,
+                    backgroundColor: checked ? 'rgba(0,193,175,0.08)' : 'rgba(15,23,42,0.35)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
+                  <span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff' }}>
+                        {item.label}
+                      </span>
+                      <span style={{
+                        padding: '3px 8px',
+                        borderRadius: '999px',
+                        border: `1px solid ${item.obrigatorio ? 'rgba(251,191,36,0.3)' : 'rgba(255,255,255,0.14)'}`,
+                        color: item.obrigatorio ? '#fbbf24' : 'rgba(255,255,255,0.55)',
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 'var(--text-xs)',
+                      }}>
+                        {item.obrigatorio ? 'Obrigatório' : 'Opcional'}
+                      </span>
+                    </span>
+                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', lineHeight: 1.45 }}>
+                      {item.descricao}
+                    </span>
+                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.38)', marginTop: '8px' }}>
+                      Formatos permitidos: {item.formatos}
+                    </span>
+                  </span>
+                  <span style={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '5px',
+                    border: `2px solid ${checked ? '#00c1af' : 'rgba(255,255,255,0.24)'}`,
+                    backgroundColor: checked ? '#00c1af' : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    {checked && (
+                      <svg width="11" height="9" viewBox="0 0 10 8" fill="none">
+                        <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <button
               type="button"
-              onClick={addBolsa}
+              onClick={() => setShowModalNovoArquivo(true)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -1155,23 +1941,12 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
                 fontSize: 'var(--text-sm)',
                 fontWeight: 'var(--font-weight-medium)',
                 color: '#00c1af',
-                transition: 'background-color 0.2s, border-color 0.2s',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.15)';
-                e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.1)';
-                e.currentTarget.style.borderColor = 'rgba(0,193,175,0.3)';
               }}
             >
               <Plus size={16} />
-              Adicionar Bolsa
+              Novo Documento Exigido
             </button>
           </div>
-            </>
-          )}
         </div>
 
         {/* Bottom buttons */}
@@ -1203,10 +1978,15 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
               e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
             }}
           >
-            Salvar Rascunho
+            {isEditMode ? 'Cancelar' : 'Salvar Rascunho'}
           </button>
           <button
             type="button"
+            onClick={() => {
+              if (!cronogramaCompleto) {
+                window.alert(`Inclua um card para cada etapa obrigatória do cronograma: ${etapasCronogramaFaltantes.map(fase => fase.label).join(', ')}.`);
+              }
+            }}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -1226,7 +2006,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack }) => {
             onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#00c1af'; }}
           >
             <Save size={16} />
-            Salvar Captação
+            {isEditMode ? 'Salvar Alterações' : 'Salvar Captação'}
           </button>
         </div>
       </div>

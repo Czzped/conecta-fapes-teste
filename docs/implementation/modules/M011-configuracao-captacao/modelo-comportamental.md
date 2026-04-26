@@ -36,3 +36,5 @@ stateDiagram-v2
 - A instancia de captacao termina no M011 quando o resultado final e publicado.
 - Propostas aprovadas no resultado final ficam disponiveis para o M022 - Contratacao e Outorga.
 - A iniciativa somente passa ao M003 apos contratacao/outorga formalizada no M022.
+- Alteracoes de cronograma por adiamento nao criam um novo estado da instancia; elas registram historico temporal e deslocam a etapa alterada e as etapas posteriores pela mesma quantidade de dias.
+- Quando o proponente for empresa ou instituicao, a proposta deve identificar uma pessoa fisica representante vinculada ao cadastro corporativo do M008. Documentos institucionais recorrentes devem ser reaproveitados do cadastro quando validos.
