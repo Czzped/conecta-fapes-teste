@@ -6,6 +6,11 @@ site/
 __pycache__/
 *.pyc
 
+# Backoffice
+prototype/backoffice/dist/
+prototype/backoffice/node_modules/
+prototype/backoffice/package-lock.json
+
 # IDEs
 .idea/
 .vscode/
