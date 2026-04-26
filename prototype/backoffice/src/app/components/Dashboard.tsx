@@ -10,6 +10,9 @@ import { Parceria } from './Parceria';
 import { PlanejamentoEstrategico } from './PlanejamentoEstrategico';
 import { Instituicoes } from './Instituicoes';
 import { Configuracoes } from './Configuracoes';
+import { PessoasFisicas } from './PessoasFisicas';
+import { ReferenciasCorporativas } from './ReferenciasCorporativas';
+import { DocumentosExigidos } from './DocumentosExigidos';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -20,7 +23,7 @@ type Contrast = 'normal' | 'high' | 'maximum';
 type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
 type Language = 'pt' | 'en' | 'es';
 type NotificationTab = 'avisos' | 'editais';
-type ActivePage = 'home' | 'dashboard' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'configuracoes';
+type ActivePage = 'home' | 'dashboard' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
 type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outro Exemplo de Projeto' | 'Mais um Exemplo de Projeto';
@@ -254,7 +257,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               { key: 'parceria' as ActivePage, Icon: Handshake, label: 'Parceria' },
               { key: 'programa' as ActivePage, Icon: FolderOpen, label: 'Programa' },
               { key: 'editais' as ActivePage, Icon: FileText, label: 'Captação' },
-              { key: 'formulario' as ActivePage, Icon: BookOpen, label: 'Formulário' },
             ]).map(({ key, Icon, label }, index) => {
               const active = activePage === key;
               return (
@@ -1405,9 +1407,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             onBack={() => setActivePage('home')}
             onOpenPlanejamento={() => setActivePage('planejamento')}
             onOpenInstituicoes={() => setActivePage('instituicoes')}
+            onOpenPessoas={() => setActivePage('pessoas')}
+            onOpenReferencias={() => setActivePage('referencias')}
+            onOpenDocumentos={() => setActivePage('documentos')}
+            onOpenFormularios={() => setActivePage('formulario')}
           />
         ) : activePage === 'planejamento' ? (
           <PlanejamentoEstrategico />
+        ) : activePage === 'pessoas' ? (
+          <PessoasFisicas onBack={() => setActivePage('configuracoes')} />
+        ) : activePage === 'referencias' ? (
+          <ReferenciasCorporativas onBack={() => setActivePage('configuracoes')} />
+        ) : activePage === 'documentos' ? (
+          <DocumentosExigidos onBack={() => setActivePage('configuracoes')} />
         ) : activePage === 'programa' ? (
           <Programa onBack={() => setActivePage('home')} />
         ) : activePage === 'parceria' ? (
@@ -1415,7 +1427,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         ) : activePage === 'instituicoes' ? (
           <Instituicoes onBack={() => setActivePage('home')} />
         ) : activePage === 'formulario' ? (
-          <Editais isFormularioMode={true} />
+          <Editais isFormularioMode={true} onBack={() => setActivePage('configuracoes')} />
         ) : (
           <div className="p-8">
             {/* Conteúdo da página inicial */}

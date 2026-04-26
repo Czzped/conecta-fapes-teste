@@ -1,10 +1,14 @@
 import React from 'react';
-import { ArrowLeft, Building2, ChevronRight, Settings, Target } from 'lucide-react';
+import { ArrowLeft, BookOpen, Building2, ChevronRight, Database, FileCheck2, Settings, Target, UserRound } from 'lucide-react';
 
 interface ConfiguracoesProps {
   onBack: () => void;
   onOpenPlanejamento: () => void;
   onOpenInstituicoes: () => void;
+  onOpenPessoas: () => void;
+  onOpenReferencias: () => void;
+  onOpenDocumentos: () => void;
+  onOpenFormularios: () => void;
 }
 
 const cardStyle: React.CSSProperties = {
@@ -29,15 +33,59 @@ const actions = [
     color: '#00c1af',
     key: 'instituicoes',
   },
+  {
+    title: 'Pessoas Físicas',
+    description: 'Cadastro de pessoas com CPF único, situação cadastral, contato e currículo Lattes.',
+    Icon: UserRound,
+    color: '#a855f7',
+    key: 'pessoas',
+  },
+  {
+    title: 'Referências Corporativas',
+    description: 'Áreas de conhecimento, rubricas financeiras, cidades, regiões e finalidades.',
+    Icon: Database,
+    color: '#f59e0b',
+    key: 'referencias',
+  },
+  {
+    title: 'Documentos Exigidos',
+    description: 'Base de documentos que podem ser exigidos dos proponentes em captações.',
+    Icon: FileCheck2,
+    color: '#22c55e',
+    key: 'documentos',
+  },
+  {
+    title: 'Formulários',
+    description: 'Biblioteca de formulários de inscrição, avaliação, recurso e anexos usados nas captações.',
+    Icon: BookOpen,
+    color: '#38bdf8',
+    key: 'formularios',
+  },
 ];
 
-export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlanejamento, onOpenInstituicoes }) => {
+export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlanejamento, onOpenInstituicoes, onOpenPessoas, onOpenReferencias, onOpenDocumentos, onOpenFormularios }) => {
   const handleOpen = (key: string) => {
     if (key === 'planejamento') {
       onOpenPlanejamento();
       return;
     }
-    onOpenInstituicoes();
+    if (key === 'instituicoes') {
+      onOpenInstituicoes();
+      return;
+    }
+    if (key === 'pessoas') {
+      onOpenPessoas();
+      return;
+    }
+    if (key === 'documentos') {
+      onOpenDocumentos();
+      return;
+    }
+    if (key === 'formularios') {
+      onOpenFormularios();
+      return;
+    }
+    onOpenReferencias();
   };
 
   return (

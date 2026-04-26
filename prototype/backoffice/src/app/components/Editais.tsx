@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, ChevronDown, FileText, Clock, Users, ClipboardList, ChevronRight, CheckCircle, Plus, Home, FolderOpen, BookOpen } from 'lucide-react';
+import { Search, ChevronDown, FileText, Clock, Users, ClipboardList, ChevronRight, CheckCircle, Plus, Home, FolderOpen, BookOpen, ArrowLeft } from 'lucide-react';
 import { FormularioInscricaoGeral } from './FormularioInscricaoGeral';
 import { Programa } from './Programa';
 import { FormularioPersonalizado } from './FormularioPersonalizado';
@@ -19,9 +19,9 @@ interface EditalInscricao {
 }
 
 type AreaFilter = 'Todas' | 'Carreira Científica' | 'Pesquisa' | 'Difusão do Conhecimento' | 'Extensão' | 'Inovação' | 'Internacional';
-type SetorFilter = 'Todos' | 'Enviado' | 'Em Avaliação' | 'Avaliado' | 'Aprovado' | 'Reprovado';
-type InstituicaoFilter = 'Todos' | 'Ufes' | 'Ifes';
-type ActiveTab = 'inscricoes' | 'avaliacao' | 'recurso' | 'finalizado';
+type SetorFilter = 'Todos' | 'Em andamento' | 'Publicado' | 'Não publicado' | 'Encerrado' | 'Enviado' | 'Em Avaliação' | 'Avaliado' | 'Aprovado' | 'Reprovado';
+type VinculoFilter = 'Todos' | 'Programa' | 'Parceria';
+type ActiveTab = 'dashboard' | 'captacoes' | 'inscricoes' | 'avaliacao' | 'recurso' | 'finalizado';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -31,10 +31,10 @@ const getStatusColor = (status: string) => {
     case 'Aprovado': return '#22c55e';
     case 'Reprovado': return '#ef4444';
     case 'Não Aprovado': return '#ef4444';
-    // Edital statuses
-    case 'Aberto': return '#22c55e';
-    case 'Em Andamento': return '#fbbf24';
-    case 'Fechado': return '#94a3b8';
+    case 'Em andamento': return '#fbbf24';
+    case 'Publicado': return '#22c55e';
+    case 'Não publicado': return '#94a3b8';
+    case 'Encerrado': return '#64748b';
     // Recurso statuses
     case 'Recebido': return '#fbbf24';
     case 'Recusado': return '#ef4444';
@@ -43,14 +43,17 @@ const getStatusColor = (status: string) => {
   }
 };
 
-interface EditalItem {
+interface CaptacaoItem {
   id: number;
-  programa: string;
-  edital: string;
-  projetosInscritos: number;
-  dataSubmissao: string;
+  codigo: string;
+  titulo: string;
+  tipo: 'Chamada Pública' | 'Demanda Induzida';
+  vinculoTipo: 'Programa' | 'Parceria';
+  vinculoNome: string;
+  propostasRecebidas: number;
+  dataPublicacao: string;
   area: string;
-  status: 'Aberto' | 'Em Andamento' | 'Fechado';
+  status: 'Em andamento' | 'Publicado' | 'Não publicado' | 'Encerrado';
 }
 
 const SelectField: React.FC<{
@@ -137,14 +140,15 @@ const SelectField: React.FC<{
 
 interface EditaisProps {
   isFormularioMode?: boolean;
+  onBack?: () => void;
 }
 
-export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false }) => {
+export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBack }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [dataFilter, setDataFilter] = useState('');
   const [areaFilter, setAreaFilter] = useState<AreaFilter>('Todas');
   const [setorFilter, setSetorFilter] = useState<SetorFilter>('Todos');
-  const [instituicaoFilter, setInstituicaoFilter] = useState<InstituicaoFilter>('Todos');
+  const [instituicaoFilter, setInstituicaoFilter] = useState<VinculoFilter>('Todos');
   const [showAreaDropdown, setShowAreaDropdown] = useState(false);
   const [showSetorDropdown, setShowSetorDropdown] = useState(false);
   const [showInstituicaoDropdown, setShowInstituicaoDropdown] = useState(false);
@@ -157,23 +161,51 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false }) =>
   const [showDetalhesCaptacao, setShowDetalhesCaptacao] = useState(false);
   const [showCriarPrograma, setShowCriarPrograma] = useState(false);
   const [showCriarEdital, setShowCriarEdital] = useState(false);
-  const [activeTab, setActiveTab] = useState<ActiveTab>('inscricoes');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('captacoes');
   const [formularioTab, setFormularioTab] = useState<'biblioteca' | 'criados'>('biblioteca');
   const [formularioPesquisa, setFormularioPesquisa] = useState('');
   const [formularioCategoria, setFormularioCategoria] = useState('');
 
   const areaOptions: AreaFilter[] = ['Todas', 'Carreira Científica', 'Pesquisa', 'Difusão do Conhecimento', 'Extensão', 'Inovação', 'Internacional'];
-  const setorOptions: SetorFilter[] = ['Todos', 'Enviado', 'Em Avaliação', 'Avaliado', 'Aprovado', 'Reprovado'];
-  const instituicaoOptions: InstituicaoFilter[] = ['Todos', 'Ufes', 'Ifes'];
+  const captacaoStatusOptions: SetorFilter[] = ['Todos', 'Em andamento', 'Publicado', 'Não publicado', 'Encerrado'];
+  const propostaStatusOptions: SetorFilter[] = ['Todos', 'Enviado', 'Em Avaliação', 'Avaliado', 'Aprovado', 'Reprovado'];
+  const setorOptions = activeTab === 'captacoes' ? captacaoStatusOptions : propostaStatusOptions;
+  const instituicaoOptions: VinculoFilter[] = ['Todos', 'Programa', 'Parceria'];
 
-  const editaisData: EditalItem[] = [
-    { id: 1, programa: 'Bolsas de Pesquisa', edital: '001/2026 - Bolsas de Pesquisa', projetosInscritos: 42, dataSubmissao: '31/03/2026', area: 'Pesquisa', status: 'Aberto' },
-    { id: 2, programa: 'Inovação Tecnológica', edital: '002/2026 - Inovação Tecnológica', projetosInscritos: 18, dataSubmissao: '15/04/2026', area: 'Inovação', status: 'Aberto' },
-    { id: 3, programa: 'Extensão Universitária', edital: '003/2026 - Extensão Universitária', projetosInscritos: 31, dataSubmissao: '10/02/2026', area: 'Extensão', status: 'Em Andamento' },
-    { id: 4, programa: 'Desenvolvimento Regional', edital: '004/2026 - Desenvolvimento Regional', projetosInscritos: 27, dataSubmissao: '28/02/2026', area: 'Difusão do Conhecimento', status: 'Em Andamento' },
-    { id: 5, programa: 'Carreira Científica', edital: '005/2026 - Carreira Científica', projetosInscritos: 56, dataSubmissao: '20/01/2026', area: 'Carreira Científica', status: 'Fechado' },
-    { id: 6, programa: 'Internacional', edital: '006/2026 - Difusão do Conhecimento', projetosInscritos: 14, dataSubmissao: '05/01/2026', area: 'Internacional', status: 'Fechado' },
+  const captacoesData: CaptacaoItem[] = [
+    { id: 1, codigo: 'CAP-001/2026', titulo: 'Bolsas de Pesquisa 2026', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Bolsas de Pesquisa 2026', propostasRecebidas: 42, dataPublicacao: '01/03/2026', area: 'Pesquisa', status: 'Publicado' },
+    { id: 2, codigo: 'CAP-002/2026', titulo: 'Inovação Tecnológica', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Inovação Tecnológica', propostasRecebidas: 18, dataPublicacao: '15/03/2026', area: 'Inovação', status: 'Publicado' },
+    { id: 3, codigo: 'CAP-003/2026', titulo: 'Demanda Induzida IFES', tipo: 'Demanda Induzida', vinculoTipo: 'Parceria', vinculoNome: 'Parceria FAPES-IFES', propostasRecebidas: 1, dataPublicacao: '20/03/2026', area: 'Extensão', status: 'Em andamento' },
+    { id: 4, codigo: 'CAP-004/2026', titulo: 'Desenvolvimento Regional', tipo: 'Chamada Pública', vinculoTipo: 'Parceria', vinculoNome: 'Parceria Desenvolvimento ES', propostasRecebidas: 27, dataPublicacao: '28/02/2026', area: 'Difusão do Conhecimento', status: 'Em andamento' },
+    { id: 5, codigo: 'CAP-005/2026', titulo: 'Carreira Científica', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Carreira Científica', propostasRecebidas: 56, dataPublicacao: '20/01/2026', area: 'Carreira Científica', status: 'Encerrado' },
+    { id: 6, codigo: 'CAP-006/2026', titulo: 'Difusão do Conhecimento', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Difusão do Conhecimento', propostasRecebidas: 14, dataPublicacao: '05/01/2026', area: 'Internacional', status: 'Não publicado' },
   ];
+  const statusCaptacaoDashboard = captacaoStatusOptions
+    .filter((status): status is CaptacaoItem['status'] => status !== 'Todos')
+    .map(status => {
+      const captacoes = captacoesData.filter(captacao => captacao.status === status);
+      return {
+        status,
+        captacoes,
+        quantidade: captacoes.length,
+        propostas: captacoes.reduce((total, captacao) => total + captacao.propostasRecebidas, 0),
+      };
+    });
+  const maiorQuantidadePorStatus = Math.max(...statusCaptacaoDashboard.map(item => item.quantidade), 1);
+  const financeiroCaptacaoDashboard = {
+    totalSolicitado: 12840000,
+    totalDisponivel: 5000000,
+    rubricas: [
+      { nome: 'Bolsas', valor: 4280000, quantidade: 64, cor: '#38bdf8' },
+      { nome: 'Capital', valor: 3560000, quantidade: 21, cor: '#a78bfa' },
+      { nome: 'Custeio', valor: 2870000, quantidade: 34, cor: '#22c55e' },
+      { nome: 'Serviços de terceiros', valor: 1490000, quantidade: 18, cor: '#fbbf24' },
+      { nome: 'Diárias e passagens', valor: 640000, quantidade: 12, cor: '#fb7185' },
+    ],
+  };
+  const maiorValorRubricaCaptacao = Math.max(...financeiroCaptacaoDashboard.rubricas.map(item => item.valor), 1);
+  const formatCurrency = (value: number) =>
+    value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   const avaliacaoData = [
     { id: 1, avaliador: 'Prof. Dr. Marcos Andrade', edital: '001/2026 - Bolsas de Pesquisa', dataEnvio: '15/03/2026', dataAvaliacao: '22/03/2026', area: 'Pesquisa', status: 'Avaliado' },
@@ -251,6 +283,25 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false }) =>
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+              {isFormularioMode && onBack && (
+                <button
+                  type="button"
+                  onClick={onBack}
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: 'var(--radius)',
+                    backgroundColor: 'rgba(30,41,59,0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
+                </button>
+              )}
               <div style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 width: '36px', height: '36px', flexShrink: 0,
@@ -583,7 +634,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false }) =>
                   Captação
                 </h1>
                 <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.6)', margin: 0, lineHeight: '1.5' }}>
-                  Acompanhe as chamadas para projetos
+                  Acompanhe as configurações e instâncias de captação
                 </p>
               </div>
             </div>
@@ -616,9 +667,9 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false }) =>
               <div style={{ backgroundColor: 'rgba(0, 193, 175, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <FileText size={18} style={{ color: '#00c1af' }} />
               </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 'var(--font-weight-normal)' }}>Editais Abertos</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 'var(--font-weight-normal)' }}>Captações publicadas</span>
             </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: '#ffffff', lineHeight: 1, textAlign: 'center' }}>6</div>
+            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: '#ffffff', lineHeight: 1, textAlign: 'center' }}>2</div>
           </div>
 
           <div style={{ backgroundColor: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', padding: '20px' }}>
@@ -626,9 +677,9 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false }) =>
               <div style={{ backgroundColor: 'rgba(251, 191, 36, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Clock size={18} style={{ color: '#fbbf24' }} />
               </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 'var(--font-weight-normal)' }}>Em Andamento</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 'var(--font-weight-normal)' }}>Em andamento</span>
             </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: '#ffffff', lineHeight: 1, textAlign: 'center' }}>4</div>
+            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: '#ffffff', lineHeight: 1, textAlign: 'center' }}>2</div>
           </div>
 
           <div style={{ backgroundColor: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', padding: '20px' }}>
@@ -636,9 +687,9 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false }) =>
               <div style={{ backgroundColor: 'rgba(59, 130, 246, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Users size={18} style={{ color: '#3b82f6' }} />
               </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 'var(--font-weight-normal)' }}>Em Avaliação</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 'var(--font-weight-normal)' }}>Propostas recebidas</span>
             </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: '#ffffff', lineHeight: 1, textAlign: 'center' }}>12</div>
+            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: '#ffffff', lineHeight: 1, textAlign: 'center' }}>158</div>
           </div>
 
           <div style={{ backgroundColor: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', padding: '20px' }}>
@@ -646,9 +697,9 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false }) =>
               <div style={{ backgroundColor: 'rgba(34, 197, 94, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <CheckCircle size={18} style={{ color: '#22c55e' }} />
               </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 'var(--font-weight-normal)' }}>Avaliados</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 'var(--font-weight-normal)' }}>Encerradas</span>
             </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: '#ffffff', lineHeight: 1, textAlign: 'center' }}>38</div>
+            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: '#ffffff', lineHeight: 1, textAlign: 'center' }}>1</div>
           </div>
 
           <div style={{ backgroundColor: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', padding: '20px' }}>
@@ -656,22 +707,25 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false }) =>
               <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <ClipboardList size={18} style={{ color: '#ef4444' }} />
               </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 'var(--font-weight-normal)' }}>Total de Inscrições</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 'var(--font-weight-normal)' }}>Não publicadas</span>
             </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: '#ffffff', lineHeight: 1, textAlign: 'center' }}>247</div>
+            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: '#ffffff', lineHeight: 1, textAlign: 'center' }}>1</div>
           </div>
         </div>
 
         {/* Tab Bar Link */}
         <div style={{ marginBottom: '24px' }}>
           <div style={{ display: 'flex', gap: '0' }}>
-            {(['inscricoes', 'avaliacao', 'recurso', 'finalizado'] as ActiveTab[]).map((tab) => {
+            {(['captacoes', 'inscricoes', 'avaliacao', 'recurso', 'finalizado', 'dashboard'] as ActiveTab[]).map((tab) => {
               const isActive = activeTab === tab;
-              const label = tab === 'inscricoes' ? 'Inscrições' : tab === 'avaliacao' ? 'Avaliação' : tab === 'recurso' ? 'Recurso' : 'Finalizado';
+              const label = tab === 'dashboard' ? 'Dashboard' : tab === 'captacoes' ? 'Captações' : tab === 'inscricoes' ? 'Propostas' : tab === 'avaliacao' ? 'Avaliação' : tab === 'recurso' ? 'Revisão' : 'Resultado final';
               return (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab)}
+                  onClick={() => {
+                    setActiveTab(tab);
+                    setSetorFilter('Todos');
+                  }}
                   style={{
                     padding: '0 0 12px 0',
                     marginRight: '28px',
@@ -696,7 +750,222 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false }) =>
           <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', marginTop: '-1px' }} />
         </div>
 
+        {activeTab === 'dashboard' && (
+          <div style={{
+            backgroundColor: 'rgba(30, 41, 59, 0.5)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '8px',
+            padding: '24px',
+            marginBottom: '24px',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '20px' }}>
+              <div>
+                <h2 style={{
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  color: '#00c1af',
+                  margin: '0 0 6px',
+                }}>
+                  Dashboard das Captações
+                </h2>
+                <p style={{
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-sm)',
+                  color: 'rgba(255,255,255,0.55)',
+                  margin: 0,
+                }}>
+                  Visão consolidada das captações agrupadas pelo status atual.
+                </p>
+              </div>
+              <div style={{
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-xs)',
+                color: '#00c1af',
+                padding: '6px 10px',
+                borderRadius: '999px',
+                border: '1px solid rgba(0,193,175,0.28)',
+                backgroundColor: 'rgba(0,193,175,0.08)',
+                whiteSpace: 'nowrap',
+              }}>
+                {captacoesData.length} captação(ões)
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px', marginBottom: '22px' }}>
+              {statusCaptacaoDashboard.map(item => {
+                const color = getStatusColor(item.status);
+                const percentual = Math.round((item.quantidade / maiorQuantidadePorStatus) * 100);
+
+                return (
+                  <button
+                    key={item.status}
+                    type="button"
+                    onClick={() => {
+                      setSetorFilter(item.status);
+                      setActiveTab('captacoes');
+                    }}
+                    style={{
+                      padding: '16px',
+                      border: setorFilter === item.status ? `1px solid ${color}` : '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '8px',
+                      backgroundColor: setorFilter === item.status ? `${color}12` : 'rgba(15,23,42,0.35)',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '12px' }}>
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', marginBottom: '3px' }}>
+                          {item.status}
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)' }}>
+                          {item.propostas} proposta(s)
+                        </div>
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color, fontWeight: 'var(--font-weight-medium)', lineHeight: 1 }}>
+                        {item.quantidade}
+                      </div>
+                    </div>
+                    <div style={{ height: '6px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                      <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: color }} />
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '16px', marginBottom: '22px' }}>
+              <div style={{
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '8px',
+                backgroundColor: 'rgba(15,23,42,0.35)',
+                padding: '18px',
+              }}>
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>
+                  Total financeiro solicitado pelas iniciativas
+                </div>
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', marginBottom: '10px' }}>
+                  {formatCurrency(financeiroCaptacaoDashboard.totalSolicitado)}
+                </div>
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', lineHeight: 1.45 }}>
+                  Disponível na captação: <span style={{ color: '#00c1af' }}>{formatCurrency(financeiroCaptacaoDashboard.totalDisponivel)}</span>
+                </div>
+              </div>
+
+              <div style={{
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '8px',
+                backgroundColor: 'rgba(15,23,42,0.35)',
+                padding: '18px',
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
+                    Totais solicitados por rubrica
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)' }}>
+                    {financeiroCaptacaoDashboard.rubricas.length} rubrica(s)
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gap: '12px' }}>
+                  {financeiroCaptacaoDashboard.rubricas.map(rubrica => {
+                    const percentual = Math.round((rubrica.valor / maiorValorRubricaCaptacao) * 100);
+
+                    return (
+                      <div key={rubrica.nome}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 160px 110px', gap: '12px', alignItems: 'center', marginBottom: '6px' }}>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                            {rubrica.nome}
+                          </div>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: rubrica.cor, textAlign: 'right' }}>
+                            {formatCurrency(rubrica.valor)}
+                          </div>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', textAlign: 'right' }}>
+                            {rubrica.quantidade} iniciativa(s)
+                          </div>
+                        </div>
+                        <div style={{ height: '7px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                          <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: rubrica.cor }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
+              {statusCaptacaoDashboard.map(item => {
+                const color = getStatusColor(item.status);
+
+                return (
+                  <div
+                    key={`lista-${item.status}`}
+                    style={{
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(15,23,42,0.35)',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '13px 14px',
+                      borderBottom: '1px solid rgba(255,255,255,0.08)',
+                    }}>
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
+                        {item.status}
+                      </span>
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color }}>
+                        {item.quantidade}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'grid' }}>
+                      {item.captacoes.length > 0 ? item.captacoes.map((captacao, index) => (
+                        <button
+                          key={captacao.codigo}
+                          type="button"
+                          onClick={() => setShowDetalhesCaptacao(true)}
+                          style={{
+                            width: '100%',
+                            padding: '13px 14px',
+                            border: 'none',
+                            borderBottom: index === item.captacoes.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                            backgroundColor: 'transparent',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                          }}
+                        >
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', lineHeight: 1.35, marginBottom: '4px' }}>
+                            {captacao.titulo}
+                          </div>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginBottom: '6px' }}>
+                            {captacao.codigo} · {captacao.vinculoTipo}
+                          </div>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.55)' }}>
+                            {captacao.propostasRecebidas} proposta(s) · {captacao.dataPublicacao}
+                          </div>
+                        </button>
+                      )) : (
+                        <div style={{ padding: '14px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.45)' }}>
+                          Nenhuma captação neste status.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Filtros */}
+        {activeTab !== 'dashboard' && (
         <div style={{ marginBottom: '24px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px' }}>
             {/* Pesquisar */}
@@ -708,7 +977,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false }) =>
                 <input
                   id="search-input"
                   type="text"
-                  placeholder="Buscar"
+                  placeholder="Buscar captação..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   style={{ width: '100%', backgroundColor: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '6px', padding: '10px 12px 10px 36px', color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', outline: 'none', boxSizing: 'border-box' }}
@@ -787,7 +1056,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false }) =>
             {/* Instituição */}
             <div style={{ position: 'relative' }}>
               <label htmlFor="category-filter" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
-                Instituição
+                Vínculo
               </label>
               <button
                 id="category-filter"
@@ -811,9 +1080,116 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false }) =>
             </div>
           </div>
         </div>
+        )}
 
         {/* Tab Content */}
-        {activeTab === 'inscricoes' ? (
+        {activeTab === 'dashboard' ? null : activeTab === 'captacoes' ? (
+          <div className="space-y-3">
+            {captacoesData
+              .filter((captacao) => {
+                const query = searchTerm.toLowerCase();
+                const matchSearch = !query || `${captacao.codigo} ${captacao.titulo} ${captacao.vinculoNome}`.toLowerCase().includes(query);
+                const matchArea = areaFilter === 'Todas' || captacao.area === areaFilter;
+                const matchVinculo = instituicaoFilter === 'Todos' || captacao.vinculoTipo === instituicaoFilter;
+                const matchStatus = setorFilter === 'Todos' || captacao.status === setorFilter;
+                return matchSearch && matchArea && matchVinculo && matchStatus;
+              })
+              .map((captacao) => (
+                <div
+                  key={captacao.id}
+                  className="rounded-lg"
+                  style={{
+                    backgroundColor: 'rgba(30, 41, 59, 0.6)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    padding: '20px',
+                    transition: 'background-color 0.2s',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.85)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.6)'; }}
+                  onClick={() => setShowDetalhesCaptacao(true)}
+                >
+                  <div className="flex items-center gap-6">
+                    <div
+                      className="flex-1"
+                      style={{ display: 'grid', gridTemplateColumns: '2.1fr 1.2fr 2fr 1.2fr 1fr 1fr', gap: '20px', alignItems: 'center' }}
+                    >
+                      <div>
+                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}>
+                          Captação
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
+                          {captacao.titulo}
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginTop: '2px' }}>
+                          {captacao.codigo}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}>
+                          Tipo
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                          {captacao.tipo}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}>
+                          {captacao.vinculoTipo}
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                          {captacao.vinculoNome}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}>
+                          Publicação
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                          {captacao.dataPublicacao}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}>
+                          Propostas
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                          {captacao.propostasRecebidas}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}>
+                          Status
+                        </div>
+                        <div
+                          className="inline-block rounded-full px-3 py-1"
+                          style={{
+                            backgroundColor: `${getStatusColor(captacao.status)}20`,
+                            border: `1px solid ${getStatusColor(captacao.status)}`,
+                            fontFamily: 'var(--font-family)',
+                            fontSize: 'var(--text-xs)',
+                            fontWeight: 'var(--font-weight-medium)',
+                            color: getStatusColor(captacao.status)
+                          }}
+                        >
+                          {captacao.status}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-center">
+                      <ChevronRight className="w-6 h-6" style={{ color: 'rgba(255, 255, 255, 0.5)' }} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        ) : activeTab === 'inscricoes' ? (
           <div className="space-y-3">
             {inscricoesData.map((inscricao) => (
               <div
