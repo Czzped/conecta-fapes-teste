@@ -1,0 +1,27 @@
+{% if page.meta.comments %}
+  {% set giscus = config.extra.giscus %}
+  {% if giscus.category and giscus.category_id %}
+    <h2 id="__comments">{{ lang.t("meta.comments") }}</h2>
+    <script
+      src="https://giscus.app/client.js"
+      data-repo="{{ giscus.repo }}"
+      data-repo-id="{{ giscus.repo_id }}"
+      data-category="{{ giscus.category }}"
+      data-category-id="{{ giscus.category_id }}"
+      data-mapping="{{ giscus.mapping | default('pathname') }}"
+      data-strict="0"
+      data-reactions-enabled="{{ giscus.reactions_enabled | default(1) }}"
+      data-emit-metadata="0"
+      data-input-position="{{ giscus.input_position | default('bottom') }}"
+      data-theme="preferred_color_scheme"
+      data-lang="{{ giscus.lang | default('pt') }}"
+      crossorigin="anonymous"
+      async>
+    </script>
+  {% else %}
+    <div class="admonition warning">
+      <p class="admonition-title">Comentarios em configuracao</p>
+      <p>Habilite GitHub Discussions, instale o Giscus e preencha <code>extra.giscus.category</code> e <code>extra.giscus.category_id</code> no <code>mkdocs.yml</code>.</p>
+    </div>
+  {% endif %}
+{% endif %}

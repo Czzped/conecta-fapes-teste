@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, FileEdit, Settings } from 'lucide-react';
 import { toast } from 'sonner';
-import logoSmall from 'figma:asset/db135b6708f6cc7f72f27c6a31dd02aa5500d030.png';
-import logoFull from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
+import conectaSymbol from 'figma:asset/db135b6708f6cc7f72f27c6a31dd02aa5500d030.png';
+import fapesLogo from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
 import { Editais } from './Editais';
 import { EditaisLight } from './EditaisLight';
 import { Programa } from './Programa';
@@ -26,7 +26,7 @@ type NotificationTab = 'avisos' | 'editais';
 type ActivePage = 'home' | 'dashboard' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
-type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outro Exemplo de Projeto' | 'Mais um Exemplo de Projeto';
+type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outra Iniciativa Exemplo' | 'Mais uma Iniciativa Exemplo';
 
 interface PagamentoCard {
   id: number;
@@ -44,7 +44,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
-  const [activePage, setActivePage] = useState<ActivePage>('home');
+  const [activePage, setActivePage] = useState<ActivePage>('dashboard');
   const [selectedPagamento, setSelectedPagamento] = useState<PagamentoCard | null>(null);
   
   const [theme, setTheme] = useState<Theme>('dark');
@@ -95,10 +95,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   /* ── Design tokens derivados do tema ─────────────────────────── */
   const isLight = theme === 'light';
   const T = {
-    bgPage:           isLight ? '#f1f5f9'                 : '#0f172b',
-    bgSidebar:        isLight ? '#ffffff'                 : 'rgba(30, 41, 59, 0.95)',
+    bgPage:           isLight ? '#f6f8fb'                 : '#0b1222',
+    bgSidebar:        isLight ? '#ffffff'                 : 'rgba(17, 28, 48, 0.96)',
     sidebarBorder:    isLight ? '#e2e8f0'                 : 'rgba(255, 255, 255, 0.1)',
-    bgHeader:         isLight ? 'rgba(255,255,255,0.92)'  : 'rgba(30, 41, 59, 0.8)',
+    bgHeader:         isLight ? 'rgba(255,255,255,0.92)'  : 'rgba(17, 28, 48, 0.82)',
     headerBorder:     isLight ? '#e2e8f0'                 : 'rgba(255, 255, 255, 0.1)',
     iconColor:        isLight ? '#475569'                 : '#ffffff',
     textPrimary:      isLight ? '#0f172a'                 : '#ffffff',
@@ -116,20 +116,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
   const statusOptions: StatusFilter[] = ['Todos', 'Pendente', 'Em Validação', 'Validado', 'Revisar', 'Reprovado'];
   const categoriaOptions: CategoriaFilter[] = ['Todos', 'Material Permanente', 'Material de Consumo', 'Passagem', 'Diária', 'Pessoa Física', 'Pessoa Jurídica'];
-  const projetoOptions: ProjetoFilter[] = ['Todos', 'Conecta Fapes', 'Outro Exemplo de Projeto', 'Mais um Exemplo de Projeto'];
+  const projetoOptions: ProjetoFilter[] = ['Todos', 'Conecta Fapes', 'Outra Iniciativa Exemplo', 'Mais uma Iniciativa Exemplo'];
 
   // Mock data para os cards de pagamento
   const pagamentosData: PagamentoCard[] = [
     { id: 1, tipo: 'Boleto', valor: 'R$ 3.456,70', data: '27/02/2026 - 09:35', cnpj: 'Magazine Luiza', projeto: 'Conecta Fapes', status: 'Em Validação' },
-    { id: 2, tipo: 'Pix', valor: 'R$ 4.567,90', data: '25/02/2026 - 10:05', cnpj: 'Magazine Luiza', projeto: 'Outro Exemplo', status: 'Em Validação' },
-    { id: 3, tipo: 'Pix', valor: 'R$ 789,00', data: '23/02/2026 - 12:50', cnpj: 'Kalunga', projeto: 'Mais um Exemplo', status: 'Em Validação' },
+    { id: 2, tipo: 'Pix', valor: 'R$ 4.567,90', data: '25/02/2026 - 10:05', cnpj: 'Magazine Luiza', projeto: 'Outra Iniciativa', status: 'Em Validação' },
+    { id: 3, tipo: 'Pix', valor: 'R$ 789,00', data: '23/02/2026 - 12:50', cnpj: 'Kalunga', projeto: 'Mais uma Iniciativa', status: 'Em Validação' },
     { id: 4, tipo: 'Boleto', valor: 'R$ 2.100,00', data: '22/02/2026 - 11:20', cnpj: 'Kalunga', projeto: 'Conecta Fapes', status: 'Em Validação' },
-    { id: 5, tipo: 'Boleto', valor: 'R$ 1.890,50', data: '20/02/2026 - 11:45', cnpj: 'Americanas', projeto: 'Outro Exemplo', status: 'Em Validação' },
-    { id: 6, tipo: 'Boleto', valor: 'R$ 2.345,60', data: '19/02/2026 - 17:25', cnpj: 'Americanas', projeto: 'Mais um Exemplo', status: 'Em Validação' },
+    { id: 5, tipo: 'Boleto', valor: 'R$ 1.890,50', data: '20/02/2026 - 11:45', cnpj: 'Americanas', projeto: 'Outra Iniciativa', status: 'Em Validação' },
+    { id: 6, tipo: 'Boleto', valor: 'R$ 2.345,60', data: '19/02/2026 - 17:25', cnpj: 'Americanas', projeto: 'Mais uma Iniciativa', status: 'Em Validação' },
     { id: 7, tipo: 'Pix', valor: 'R$ 567,80', data: '18/02/2026 - 16:45', cnpj: 'Americanas', projeto: 'Conecta Fapes', status: 'Em Validação' },
     { id: 8, tipo: 'Pix', valor: 'R$ 2.567,30', data: '15/02/2026 - 16:00', cnpj: 'Amazon', projeto: 'Conecta Fapes', status: 'Em Validação' },
-    { id: 9, tipo: 'Pix', valor: 'R$ 5.234,20', data: '14/02/2026 - 08:40', cnpj: 'Amazon', projeto: 'Outro Exemplo', status: 'Em Validação' },
-    { id: 10, tipo: 'Boleto', valor: 'R$ 3.690,00', data: '12/02/2026 - 08:15', cnpj: 'Amazon', projeto: 'Mais um Exemplo', status: 'Em Validação' },
+    { id: 9, tipo: 'Pix', valor: 'R$ 5.234,20', data: '14/02/2026 - 08:40', cnpj: 'Amazon', projeto: 'Outra Iniciativa', status: 'Em Validação' },
+    { id: 10, tipo: 'Boleto', valor: 'R$ 3.690,00', data: '12/02/2026 - 08:15', cnpj: 'Amazon', projeto: 'Mais uma Iniciativa', status: 'Em Validação' },
   ];
 
   const getStatusColor = (status: StatusFilter): string => {
@@ -167,11 +167,32 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       >
         <div className="flex h-full flex-col items-center py-6">
           {/* Logo */}
-          <div className="mb-6">
-            {sidebarExpanded ? (
-              <img src={logoFull} alt="FAPES" className="h-10 w-auto" />
-            ) : (
-              <img src={logoSmall} alt="FAPES" className="h-8 w-auto" />
+          <div
+            className="mb-6 flex h-12 items-center overflow-hidden"
+            style={{
+              justifyContent: sidebarExpanded ? 'flex-start' : 'center',
+              width: sidebarExpanded ? '180px' : '48px',
+            }}
+          >
+            <img
+              src={conectaSymbol}
+              alt=""
+              aria-hidden="true"
+              className="h-10 w-10 object-contain"
+            />
+            {sidebarExpanded && (
+              <span
+                className="ml-3"
+                style={{
+                  fontFamily: 'var(--font-family)',
+                  fontSize: '22px',
+                  fontWeight: 700,
+                  color: T.textPrimary,
+                  lineHeight: 1,
+                }}
+              >
+                Conecta
+              </span>
             )}
           </div>
 
@@ -179,6 +200,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <button
             onClick={() => setSidebarExpanded(!sidebarExpanded)}
             className={`flex items-center justify-center rounded-full transition-all duration-200 ${T.hoverClass}`}
+            aria-label={sidebarExpanded ? 'Recolher navegação lateral' : 'Expandir navegação lateral'}
             style={{
               width: '32px',
               height: '32px',
@@ -199,6 +221,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             {/* Dashboard */}
             <button
               className="flex items-center gap-3 rounded-lg transition-all duration-200"
+              aria-label="Dashboard"
               style={{
                 backgroundColor: activePage === 'dashboard' ? T.menuActiveBg : 'transparent',
                 padding: sidebarExpanded ? '12px 16px' : '12px',
@@ -263,6 +286,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 <button
                   key={key}
                   className={`flex items-center gap-3 rounded-lg transition-all duration-200 ${index > 0 ? 'mt-2' : ''}`}
+                  aria-label={label}
                   style={{
                     backgroundColor: active ? T.menuActiveBg : 'transparent',
                     padding: sidebarExpanded ? '12px 16px' : '12px',
@@ -321,6 +345,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             {/* Pagamento */}
             <button
               className="flex items-center gap-3 rounded-lg transition-all duration-200"
+              aria-label="Pagamento"
               style={{
                 backgroundColor: activePage === 'pagamento' ? T.menuActiveBg : 'transparent',
                 padding: sidebarExpanded ? '12px 16px' : '12px',
@@ -385,6 +410,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 <button
                   key={key}
                   className={`flex items-center gap-3 rounded-lg transition-all duration-200 ${index > 0 ? 'mt-2' : ''}`}
+                  aria-label={label}
                   style={{
                     backgroundColor: active ? T.menuActiveBg : 'transparent',
                     padding: sidebarExpanded ? '12px 16px' : '12px',
@@ -436,7 +462,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           transition: 'left 0.3s ease-in-out, background-color 0.3s, border-color 0.3s',
         }}
       >
-        <div className="flex items-center justify-end gap-1 h-16 px-4 md:px-8">
+        <div className="flex items-center justify-between gap-4 h-16 px-4 md:px-8">
+          <div className="h-9 w-[104px] overflow-hidden" aria-label="FAPES" role="img">
+            <img
+              src={fapesLogo}
+              alt=""
+              aria-hidden="true"
+              className="h-9 w-auto max-w-none"
+              style={{ transform: 'translateX(-36px)' }}
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-1">
           {/* Ícone de Configurações */}
           <button
             onClick={() => {
@@ -457,6 +494,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             onClick={() => setShowNotificationsSidebar(true)}
             className={`relative p-2 transition-colors rounded-lg ${T.hoverClass}`}
             style={{ color: T.iconColor }}
+            aria-label="Abrir notificações"
           >
             <Bell size={20} />
             <span 
@@ -474,6 +512,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               }}
               className={`p-2 transition-colors rounded-lg ${T.hoverClass}`}
               style={{ color: T.iconColor }}
+              aria-label="Selecionar idioma"
             >
               <Globe size={20} />
             </button>
@@ -523,6 +562,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               }}
               className={`p-2 transition-colors rounded-lg ${T.hoverClass}`}
               style={{ color: T.iconColor }}
+              aria-label="Abrir menu do usuário"
             >
               <User size={20} />
             </button>
@@ -552,6 +592,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 </button>
               </div>
             )}
+          </div>
           </div>
         </div>
       </header>
@@ -728,7 +769,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 {(['avisos', 'editais'] as NotificationTab[]).map((tab) => (
                   <button key={tab} onClick={() => setNotificationTab(tab)} className="rounded-lg px-4 py-2 transition-all"
                     style={{ backgroundColor: notificationTab === tab ? '#00c1af' : 'var(--dash-badge-bg)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: notificationTab === tab ? '#0f172b' : 'var(--dash-text-primary)' }}>
-                    {tab === 'avisos' ? 'Avisos (1)' : 'Editais (2)'}
+                    {tab === 'avisos' ? 'Avisos (1)' : 'Captação (2)'}
                   </button>
                 ))}
               </div>
@@ -757,7 +798,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   <>
                     {[
                       { mes: 'FEV', dia: '20', title: 'Inscrições Edital 04/2026',  desc: 'Data limite para submissão de propostas de inovação.' },
-                      { mes: 'MAR', dia: '15', title: 'Resultado Edital 27/2025',   desc: 'Divulgação dos projetos aprovados para apoio à publicação.' },
+                      { mes: 'MAR', dia: '15', title: 'Resultado da captação 27/2025',   desc: 'Divulgação das iniciativas aprovadas para apoio à publicação.' },
                     ].map(({ mes, dia, title, desc }) => (
                       <div key={title} className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
                         <div className="mb-3 flex items-start justify-between">
@@ -838,7 +879,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                       lineHeight: '1.5'
                     }}
                   >
-                    Acompanhe a comprovação dos gastos dos projetos
+                    Acompanhe a comprovação dos gastos das iniciativas
                   </p>
                 </div>
               </div>
@@ -857,7 +898,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             {/* Cards de Estatísticas */}
             <div className="grid grid-cols-4 gap-4 mb-6">
               {[
-                { label: 'Projetos Ativos', value: '12', Icon: FolderOpen, iconColor: '#14b8a6', iconBg: 'rgba(20,184,166,0.12)' },
+                { label: 'Iniciativas ativas', value: '12', Icon: FolderOpen, iconColor: '#14b8a6', iconBg: 'rgba(20,184,166,0.12)' },
                 { label: 'Pendente',         value: '8',  Icon: Clock,       iconColor: '#fbbf24', iconBg: 'rgba(251,191,36,0.12)' },
                 { label: 'Em Validação',     value: '5',  Icon: Eye,         iconColor: '#3b82f6', iconBg: 'rgba(59,130,246,0.12)'  },
                 { label: 'Revisão',          value: '3',  Icon: AlertTriangle,iconColor: '#ef4444', iconBg: 'rgba(239,68,68,0.12)'  },
@@ -936,7 +977,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
                 {/* Filtros de dropdown genéricos */}
                 {([
-                  { label: 'Projeto',    value: projetoFilter,   options: projetoOptions,   show: showProjetoDropdown,   setShow: setShowProjetoDropdown,   setValue: setProjetoFilter,   others: [setShowDateDropdown, setShowStatusDropdown, setShowCategoriaDropdown] },
+                  { label: 'Iniciativa',    value: projetoFilter,   options: projetoOptions,   show: showProjetoDropdown,   setShow: setShowProjetoDropdown,   setValue: setProjetoFilter,   others: [setShowDateDropdown, setShowStatusDropdown, setShowCategoriaDropdown] },
                   { label: 'Data',       value: dateFilter,      options: [] as string[],   show: false,                 setShow: () => {},                 setValue: setDateFilter,      others: [] },
                   { label: 'Status',     value: statusFilter,    options: statusOptions,    show: showStatusDropdown,    setShow: setShowStatusDropdown,    setValue: setStatusFilter,    others: [setShowDateDropdown, setShowCategoriaDropdown, setShowProjetoDropdown] },
                   { label: 'Categoria',  value: categoriaFilter, options: categoriaOptions, show: showCategoriaDropdown, setShow: setShowCategoriaDropdown, setValue: setCategoriaFilter, others: [setShowDateDropdown, setShowStatusDropdown, setShowProjetoDropdown] },
@@ -1019,7 +1060,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     >
                       <div className="grid grid-cols-6 gap-6 flex-1">
                         {[
-                          { label: 'Projeto',       value: pagamento.projeto, cls: '' },
+                          { label: 'Iniciativa',       value: pagamento.projeto, cls: '' },
                           { label: 'Pagamento',     value: pagamento.tipo,    cls: '' },
                           { label: 'Valor',         value: pagamento.valor,   cls: '' },
                           { label: 'Data de Envio', value: pagamento.data,    cls: '' },
@@ -1090,7 +1131,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             <div className="rounded-lg p-5" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
               <div className="grid grid-cols-6 gap-6">
                 {[
-                  { label: 'Projeto',       value: selectedPagamento.projeto, cls: '' },
+                  { label: 'Iniciativa',       value: selectedPagamento.projeto, cls: '' },
                   { label: 'Pagamento',     value: selectedPagamento.tipo,    cls: '' },
                   { label: 'Valor',         value: selectedPagamento.valor,   cls: '' },
                   { label: 'Data de Envio', value: selectedPagamento.data,    cls: '' },
@@ -1430,7 +1471,324 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <Editais isFormularioMode={true} onBack={() => setActivePage('configuracoes')} />
         ) : (
           <div className="p-8">
-            {/* Conteúdo da página inicial */}
+            <div className="mx-auto max-w-6xl">
+              <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                  <p
+                    className="mb-2"
+                    style={{
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-sm)',
+                      color: T.textMuted,
+                    }}
+                  >
+                    Portal administrativo
+                  </p>
+                  <h1
+                    style={{
+                      fontFamily: 'var(--font-family)',
+                      fontSize: '32px',
+                      fontWeight: 'var(--font-weight-semibold)',
+                      color: T.textPrimary,
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    Visão geral do Conecta
+                  </h1>
+                  <p
+                    className="mt-3 max-w-2xl"
+                    style={{
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-base)',
+                      color: T.textSecondary,
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    Acompanhe operações críticas, mantenha cadastros atualizados e acesse os fluxos mais usados do back-office.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={() => setActivePage('financeira')}
+                    className="flex items-center gap-2 rounded-lg px-4 py-3 transition-all hover:-translate-y-0.5"
+                    style={{
+                      backgroundColor: '#00c1af',
+                      color: '#07101f',
+                      boxShadow: 'var(--dash-shadow)',
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-semibold)',
+                    }}
+                  >
+                    <DollarSign size={18} />
+                    Financeiro
+                  </button>
+                  <button
+                    onClick={() => setActivePage('editais')}
+                    className={`flex items-center gap-2 rounded-lg px-4 py-3 transition-all ${T.hoverClass}`}
+                    style={{
+                      backgroundColor: 'var(--dash-card-bg)',
+                      border: '1px solid var(--dash-card-border)',
+                      color: T.textPrimary,
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                    }}
+                  >
+                    <FileText size={18} />
+                    Captação
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                {[
+                  { label: 'Captações em andamento', value: '18', Icon: FileText, tone: '#4f6fce' },
+                  { label: 'Parcerias ativas', value: '7', Icon: Handshake, tone: '#00c1af' },
+                  { label: 'Pagamentos em validação', value: '5', Icon: CreditCard, tone: '#3b82f6' },
+                  { label: 'Pendências críticas', value: '3', Icon: AlertTriangle, tone: '#f59e0b' },
+                ].map(({ label, value, Icon, tone }) => (
+                  <div
+                    key={label}
+                    className="rounded-lg p-5"
+                    style={{
+                      backgroundColor: 'var(--dash-card-bg)',
+                      border: '1px solid var(--dash-card-border)',
+                      boxShadow: 'var(--dash-shadow)',
+                    }}
+                  >
+                    <div className="mb-5 flex items-center justify-between">
+                      <div
+                        className="flex items-center justify-center rounded-lg"
+                        style={{ width: 40, height: 40, backgroundColor: `${tone}22` }}
+                      >
+                        <Icon size={20} style={{ color: tone }} />
+                      </div>
+                      <span style={{ color: T.textMuted, fontSize: '12px' }}>Atualizado hoje</span>
+                    </div>
+                    <p style={{ color: T.textSecondary, fontSize: '14px' }}>{label}</p>
+                    <p className="mt-2" style={{ color: T.textPrimary, fontSize: '30px', fontWeight: 600, lineHeight: 1 }}>
+                      {value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <section
+                className="mt-6 rounded-lg p-5"
+                style={{
+                  backgroundColor: 'var(--dash-card-bg)',
+                  border: '1px solid var(--dash-card-border)',
+                  boxShadow: 'var(--dash-shadow)',
+                }}
+              >
+                <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                  <div>
+                    <h2 style={{ color: T.textPrimary, fontSize: '20px', fontWeight: 600 }}>Área de controle operacional</h2>
+                    <p className="mt-1" style={{ color: T.textSecondary, fontSize: '14px' }}>
+                      Visão consolidada das pendências de bolsa, captação e avaliações que exigem acompanhamento.
+                    </p>
+                  </div>
+                  <span
+                    className="rounded-lg px-3 py-2"
+                    style={{
+                      backgroundColor: isLight ? '#eef6ff' : 'rgba(79, 111, 206, 0.16)',
+                      color: isLight ? '#264a99' : '#9db2ff',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    SLA crítico: 4 itens
+                  </span>
+                </div>
+
+                <div className="grid gap-4 xl:grid-cols-3">
+                  {[
+                    {
+                      title: 'Análise de bolsas',
+                      subtitle: 'Pendências por prioridade',
+                      Icon: BookOpen,
+                      tone: '#00c1af',
+                      action: 'Abrir bolsas',
+                      page: 'pagamento' as ActivePage,
+                      rows: [
+                        { label: 'Bolsas aguardando enquadramento', value: '9', meta: '3 vencem hoje', status: '#ef4444' },
+                        { label: 'Solicitações com documentação incompleta', value: '14', meta: 'aguardando coordenador', status: '#f59e0b' },
+                        { label: 'Renovações para parecer técnico', value: '6', meta: 'prazo médio 2 dias', status: '#3b82f6' },
+                      ],
+                    },
+                    {
+                      title: 'Processos de captação',
+                      subtitle: 'Captações e propostas em curso',
+                      Icon: FileText,
+                      tone: '#4f6fce',
+                      action: 'Abrir captação',
+                      page: 'editais' as ActivePage,
+                      rows: [
+                        { label: 'Captações em análise jurídica', value: '4', meta: '1 bloqueando publicação', status: '#ef4444' },
+                        { label: 'Propostas recebidas sem triagem', value: '27', meta: 'últimas 24h', status: '#f59e0b' },
+                        { label: 'Chamadas próximas da publicação', value: '3', meta: 'esta semana', status: '#3b82f6' },
+                      ],
+                    },
+                    {
+                      title: 'Avisos de avaliação',
+                      subtitle: 'Bolsas e iniciativas',
+                      Icon: Bell,
+                      tone: '#f59e0b',
+                      action: 'Ver avisos',
+                      page: 'financeira' as ActivePage,
+                      rows: [
+                        { label: 'Avaliação de bolsa sem parecer', value: '5', meta: 'responsável definido', status: '#ef4444' },
+                        { label: 'Iniciativas com avaliação parcial pendente', value: '8', meta: 'aguardando área técnica', status: '#f59e0b' },
+                        { label: 'Relatórios finais para homologação', value: '11', meta: 'fila regular', status: '#00c1af' },
+                      ],
+                    },
+                  ].map(({ title, subtitle, Icon, tone, action, page, rows }) => (
+                    <div
+                      key={title}
+                      className="rounded-lg p-3"
+                      style={{
+                        backgroundColor: isLight ? '#ffffff' : 'rgba(255, 255, 255, 0.035)',
+                        border: '1px solid var(--dash-card-border)',
+                      }}
+                    >
+                      <div className="mb-3 flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <div
+                            className="flex items-center justify-center rounded-lg"
+                            style={{ width: 34, height: 34, backgroundColor: `${tone}22`, color: tone }}
+                          >
+                            <Icon size={18} />
+                          </div>
+                          <div>
+                            <h3 style={{ color: T.textPrimary, fontSize: '14px', fontWeight: 700 }}>{title}</h3>
+                            <p className="mt-1" style={{ color: T.textMuted, fontSize: '13px' }}>{subtitle}</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setActivePage(page)}
+                          className={`rounded-lg px-2.5 py-1.5 ${T.hoverClass}`}
+                          style={{ color: tone, fontSize: '12px', fontWeight: 700, whiteSpace: 'nowrap' }}
+                        >
+                          {action}
+                        </button>
+                      </div>
+
+                      <div className="space-y-2">
+                        {rows.map((row) => (
+                          <button
+                            key={row.label}
+                            onClick={() => setActivePage(page)}
+                          className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${T.hoverClass}`}
+                            style={{
+                              backgroundColor: isLight ? '#f8fafc' : 'rgba(255,255,255,0.035)',
+                              border: '1px solid var(--dash-card-border)',
+                            }}
+                          >
+                            <span className="flex min-w-0 items-start gap-3">
+                              <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full" style={{ backgroundColor: row.status }} />
+                              <span className="min-w-0">
+                                <span style={{ display: 'block', color: T.textPrimary, fontSize: '12px', fontWeight: 600, lineHeight: 1.35 }}>
+                                  {row.label}
+                                </span>
+                                <span style={{ display: 'block', color: T.textMuted, fontSize: '11px', marginTop: 3 }}>
+                                  {row.meta}
+                                </span>
+                              </span>
+                            </span>
+                            <span style={{ color: T.textPrimary, fontSize: '20px', fontWeight: 700, lineHeight: 1 }}>
+                              {row.value}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <div className="mt-6 grid gap-4 xl:grid-cols-[1.3fr_0.7fr]">
+                <section
+                  className="rounded-lg p-6"
+                  style={{
+                    backgroundColor: 'var(--dash-card-bg)',
+                    border: '1px solid var(--dash-card-border)',
+                    boxShadow: 'var(--dash-shadow)',
+                  }}
+                >
+                  <div className="mb-5 flex items-center justify-between">
+                    <div>
+                      <h2 style={{ color: T.textPrimary, fontSize: '20px', fontWeight: 600 }}>Trabalho prioritário</h2>
+                      <p className="mt-1" style={{ color: T.textSecondary, fontSize: '14px' }}>Itens que precisam de decisão ou revisão.</p>
+                    </div>
+                    <button
+                      onClick={() => setActivePage('financeira')}
+                      className={`rounded-lg px-3 py-2 ${T.hoverClass}`}
+                      style={{ color: '#00c1af', fontSize: '14px', fontWeight: 600 }}
+                    >
+                      Ver fila
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {[
+                      { title: 'Prestações financeiras aguardando validação', meta: '5 itens', Icon: DollarSign },
+                      { title: 'Documentos obrigatórios pendentes de revisão', meta: '12 documentos', Icon: ClipboardCheck },
+                      { title: 'Captações com publicação próxima', meta: '2 captações', Icon: Calendar },
+                    ].map(({ title, meta, Icon }) => (
+                      <button
+                        key={title}
+                        onClick={() => setActivePage(title.includes('financeiras') ? 'financeira' : 'editais')}
+                        className={`flex w-full items-center justify-between rounded-lg p-4 text-left transition-all ${T.hoverClass}`}
+                        style={{
+                          backgroundColor: isLight ? '#ffffff' : 'rgba(255,255,255,0.035)',
+                          border: '1px solid var(--dash-card-border)',
+                        }}
+                      >
+                        <span className="flex items-center gap-3">
+                          <Icon size={18} style={{ color: '#00c1af' }} />
+                          <span>
+                            <span style={{ display: 'block', color: T.textPrimary, fontSize: '14px', fontWeight: 600 }}>{title}</span>
+                            <span style={{ display: 'block', color: T.textMuted, fontSize: '13px', marginTop: 2 }}>{meta}</span>
+                          </span>
+                        </span>
+                        <ChevronRight size={18} style={{ color: T.textMuted }} />
+                      </button>
+                    ))}
+                  </div>
+                </section>
+
+                <section
+                  className="rounded-lg p-6"
+                  style={{
+                    backgroundColor: 'var(--dash-card-bg)',
+                    border: '1px solid var(--dash-card-border)',
+                    boxShadow: 'var(--dash-shadow)',
+                  }}
+                >
+                  <h2 style={{ color: T.textPrimary, fontSize: '20px', fontWeight: 600 }}>Acessos rápidos</h2>
+                  <div className="mt-5 grid gap-3">
+                    {[
+                      { label: 'Programas', page: 'programa' as ActivePage, Icon: BookOpen },
+                      { label: 'Parcerias', page: 'parceria' as ActivePage, Icon: Handshake },
+                      { label: 'Instituições', page: 'instituicoes' as ActivePage, Icon: Home },
+                      { label: 'Configurações', page: 'configuracoes' as ActivePage, Icon: Settings },
+                    ].map(({ label, page, Icon }) => (
+                      <button
+                        key={label}
+                        onClick={() => setActivePage(page)}
+                        className={`flex items-center gap-3 rounded-lg p-3 text-left transition-colors ${T.hoverClass}`}
+                        style={{ color: T.textPrimary }}
+                      >
+                        <Icon size={18} style={{ color: '#00c1af' }} />
+                        <span style={{ fontSize: '14px', fontWeight: 600 }}>{label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              </div>
+            </div>
           </div>
         )}
       </div>

@@ -10,6 +10,7 @@ exclude_docs: |
 
 theme:
   name: material
+  custom_dir: overrides
   language: pt-BR
   palette:
     - scheme: default
@@ -36,7 +37,19 @@ plugins:
   - search:
       lang: pt
 
+extra:
+  giscus:
+    repo: leds-conectafapes/conectafapes-project
+    repo_id: R_kgDON0TQIg
+    category: General
+    category_id: DIC_kwDON0TQIs4C7v4-
+    mapping: pathname
+    reactions_enabled: 1
+    input_position: bottom
+    lang: pt
+
 markdown_extensions:
+  - meta
   - admonition
   - pymdownx.details
   - pymdownx.superfences:
@@ -52,6 +65,7 @@ markdown_extensions:
 
 nav:
   - Inicio: README.md
+  - Teste Giscus: giscus-test.md
 
   - Arquitetura:
       - architecture/README.md
@@ -146,6 +160,8 @@ nav:
       - AuthRix:
           - products/authrix/README.md
           - Backlog: products/authrix/backlog.md
+
+  - Design System: design-system.md
 
   - Modulos:
       - M001 Modalidade de Bolsa:
