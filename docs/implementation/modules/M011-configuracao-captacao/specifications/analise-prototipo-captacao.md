@@ -10,15 +10,16 @@ O prototipo do backoffice (`prototype/backoffice/`) possui um modulo completo de
 
 | Componente | Arquivo | Funcionalidade |
 |------------|---------|----------------|
-| Editais | `Editais.tsx` | Tela principal de captacao: listagem de editais/captacoes com filtros (area, status, instituicao), tabs de inscricoes/avaliacao/recurso/finalizado |
+| Editais | `Editais.tsx` | Tela principal de captacao: listagem de editais/captacoes com filtros (area, status, instituicao), tabs operacionais de propostas/avaliacao/recurso/finalizado e Dashboard como ultima aba |
 | EditaisLight | `EditaisLight.tsx` | Versao simplificada da listagem com KPIs (editais abertos, em andamento, em avaliacao, avaliados, total inscricoes) |
 | FormularioEdital | `FormularioEdital.tsx` | Formulario completo de criacao de captacao com 6 secoes |
-| DetalhesCaptacao | `DetalhesCaptacao.tsx` | Visualizacao detalhada de uma captacao com selecao de avaliadores |
+| DetalhesCaptacao | `DetalhesCaptacao.tsx` | Visualizacao detalhada de uma captacao, com aba Resumo e aba Dashboard para acompanhamento financeiro, fases, iniciativas e avaliadores |
 | FormularioAvaliacao | `FormularioAvaliacao.tsx` | Template de formulario de avaliacao com perguntas, justificativa, nota e peso |
 | FormularioRecurso | `FormularioRecurso.tsx` | Formulario de recurso do proponente |
 | FormularioInscricaoGeral | `FormularioInscricaoGeral.tsx` | Template de formulario de inscricao/submissao |
 | FormularioPersonalizado | `FormularioPersonalizado.tsx` | Builder de formulario personalizado |
 | FormularioInstituicaoParceira | `FormularioInstituicaoParceira.tsx` | Cadastro de instituicao parceira vinculada a captacao |
+| Configuracoes | `Configuracoes.tsx` | Hub de cadastros estruturantes; inclui o acesso a biblioteca/criacao de formularios e documentos exigidos |
 
 ## Funcionalidades Extraidas do Prototipo
 
@@ -41,6 +42,8 @@ O prototipo do backoffice (`prototype/backoffice/`) possui um modulo completo de
 - Selecao de Formulario de Recurso
 - Selecao de Formulario de Anexos
 - Opcao de criar formulario personalizado
+- A biblioteca e criacao de formularios ficam acessiveis pelo card **Formularios** dentro de **Configuracoes**, e nao mais como item direto do menu lateral de Projetos
+- A tela de formularios possui retorno para **Configuracoes**, reforcando seu papel como cadastro estruturante consumido pela captacao
 
 ### 3. Cronograma da Captacao (FormularioEdital, secao 2)
 
@@ -62,6 +65,10 @@ O prototipo do backoffice (`prototype/backoffice/`) possui um modulo completo de
 - Faixas de Financiamento
 - Para cada faixa: duracao maxima da iniciativa, valor minimo, valor maximo e valor aportado na faixa
 - Multiplas faixas com adicao/remocao dinamica
+- Na visao de detalhe da captacao, o painel financeiro apresenta:
+  - total solicitado pelas iniciativas e total disponivel da captacao
+  - totais solicitados por rubrica
+  - totais por faixa, incluindo valor total, quantidade de iniciativas e totais das rubricas dentro de cada faixa
 
 ### 5. Regras de Submissao (FormularioEdital, secao 3)
 
@@ -123,6 +130,14 @@ O prototipo do backoffice (`prototype/backoffice/`) possui um modulo completo de
 
 - Listagem de captacoes finalizadas
 
+### 14. Dashboard da Captacao
+
+- Na tela principal de captacao, o Dashboard e a ultima aba, apos Captacoes, Propostas, Avaliacao, Revisao e Resultado final.
+- A tela abre inicialmente em **Captacoes**, pois esse e o fluxo operacional primario.
+- O Dashboard consolida KPIs e visoes de acompanhamento, sem substituir as abas operacionais.
+- No detalhe da captacao, a aba Dashboard consolida fases das iniciativas, financeiro da captacao, iniciativas enviadas, detalhe da iniciativa selecionada, revisores ad hoc e avaliacoes dos revisores.
+- Em "Detalhes da Iniciativa Selecionada", os metadados da iniciativa ficam abaixo do nome e do resumo, em grade unica para leitura sequencial.
+
 ---
 
 ## Inconsistencias Identificadas
@@ -159,7 +174,7 @@ O prototipo trata **toda a gestao de captacao** como um unico fluxo (componente 
 | Faixas de financiamento | FormularioEdital secao 3 | M011 - `FaixaFinanciamento` |
 | Bolsas por captacao (modalidade, nivel, cotas) | FormularioEdital secao Rubricas Permitidas, quando rubrica Bolsa estiver selecionada | M011 referencia M001 por `BolsaPermitida` |
 | Documentos exigidos do proponente | FormularioEdital secao 6 e Configuracoes | M011 - `DocumentoExigido` |
-| KPIs da captacao | EditaisLight | M011 - EPIC-M011-007 |
+| KPIs da captacao | Editais/DetalhesCaptacao, Dashboard como ultima aba | M011 - EPIC-M011-007 |
 
 ### I3. Entidades do prototipo ausentes nos modelos estruturais
 

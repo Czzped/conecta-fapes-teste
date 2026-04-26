@@ -78,3 +78,10 @@ EPIC-M011-007 (Publicacao de Resultado)  <- depende de EPIC-M011-005, EPIC-M011-
 ├── US-M011-027 Publicar Resultado Final e Disponibilizar Aprovados ao M022
 └── US-M011-028 Dashboard KPIs da Captacao
 ```
+
+## Observacoes do Prototipo Backoffice
+
+- A tela principal de Captacao abre na aba **Captacoes**.
+- A ordem das abas operacionais e: **Captacoes**, **Propostas**, **Avaliacao**, **Revisao**, **Resultado final** e **Dashboard**.
+- O **Dashboard** e uma visao consolidada de acompanhamento e deve permanecer como ultima aba, apos o fluxo operacional.
+- A biblioteca/criacao de **Formularios** foi posicionada em **Configuracoes**, junto com outros cadastros estruturantes consumidos pela captacao.
