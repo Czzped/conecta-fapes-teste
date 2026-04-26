@@ -1,0 +1,477 @@
+import React, { useMemo, useState } from 'react';
+import { ArrowLeft, Building2, ChevronDown, ChevronRight, Plus, Save, Search, Trash2 } from 'lucide-react';
+
+type NaturezaJuridica = 'Publica' | 'Privada';
+type SituacaoInstituicao = 'Ativa' | 'Inativa';
+type ActiveTab = 'listagem' | 'dashboard';
+
+interface InstituicaoItem {
+  id: number;
+  nome: string;
+  sigla: string;
+  cnpj: string;
+  razaoSocial: string;
+  email: string;
+  telefone: string;
+  endereco: string;
+  natureza: NaturezaJuridica;
+  municipio: string;
+  uf: string;
+  dirigente: string;
+  dataInicioMandato: string;
+  dataFimMandato: string;
+  superior?: string;
+  situacao: SituacaoInstituicao;
+}
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  backgroundColor: 'rgba(30,41,59,0.5)',
+  border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: '6px',
+  padding: '10px 12px',
+  color: '#ffffff',
+  fontFamily: 'var(--font-family)',
+  fontSize: 'var(--text-sm)',
+  outline: 'none',
+  boxSizing: 'border-box',
+};
+
+const labelStyle: React.CSSProperties = {
+  display: 'block',
+  fontFamily: 'var(--font-family)',
+  fontSize: 'var(--text-sm)',
+  color: 'rgba(255,255,255,0.7)',
+  marginBottom: '8px',
+};
+
+const cardStyle = (): React.CSSProperties => ({
+  backgroundColor: 'rgba(30, 41, 59, 0.5)',
+  border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: '10px',
+  padding: '20px',
+});
+
+const sectionTitleStyle: React.CSSProperties = {
+  fontFamily: 'var(--font-family)',
+  fontSize: 'var(--text-sm)',
+  color: '#ffffff',
+  fontWeight: 'var(--font-weight-medium)',
+  margin: '0 0 6px',
+};
+
+const sectionSubtitleStyle: React.CSSProperties = {
+  fontFamily: 'var(--font-family)',
+  fontSize: 'var(--text-sm)',
+  color: 'rgba(255,255,255,0.55)',
+  margin: 0,
+};
+
+const statusColor = (situacao: SituacaoInstituicao) => situacao === 'Ativa' ? '#22c55e' : '#94a3b8';
+
+const maskCnpj = (value: string) => {
+  const digits = value.replace(/\D/g, '').slice(0, 14);
+  return digits
+    .replace(/^(\d{2})(\d)/, '$1.$2')
+    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+    .replace(/\.(\d{3})(\d)/, '.$1/$2')
+    .replace(/(\d{4})(\d)/, '$1-$2');
+};
+
+const emptyInstituicao: InstituicaoItem = {
+  id: 0,
+  nome: '',
+  sigla: '',
+  cnpj: '',
+  razaoSocial: '',
+  email: '',
+  telefone: '',
+  endereco: '',
+  natureza: 'Publica',
+  municipio: '',
+  uf: 'ES',
+  dirigente: '',
+  dataInicioMandato: '',
+  dataFimMandato: '',
+  superior: '',
+  situacao: 'Ativa',
+};
+
+const initialInstituicoes: InstituicaoItem[] = [
+  { id: 1, nome: 'Universidade Federal do Espírito Santo', sigla: 'UFES', cnpj: '32.479.123/0001-43', razaoSocial: 'Universidade Federal do Espírito Santo', email: 'gabinete@ufes.br', telefone: '(27) 4009-2000', endereco: 'Av. Fernando Ferrari, 514 - Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', dirigente: 'Prof. Paulo Vargas', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', situacao: 'Ativa' },
+  { id: 2, nome: 'Centro Tecnológico da UFES', sigla: 'CT-UFES', cnpj: '', razaoSocial: '', email: 'ct@ufes.br', telefone: '(27) 4009-2600', endereco: 'Campus Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', dirigente: 'Prof. Ana Ribeiro', dataInicioMandato: '2023-03-01', dataFimMandato: '2027-02-28', superior: 'Universidade Federal do Espírito Santo', situacao: 'Ativa' },
+  { id: 3, nome: 'Instituto Federal do Espírito Santo', sigla: 'IFES', cnpj: '10.838.653/0001-06', razaoSocial: 'Instituto Federal de Educação, Ciência e Tecnologia do Espírito Santo', email: 'reitoria@ifes.edu.br', telefone: '(27) 3357-7500', endereco: 'Av. Rio Branco, 50 - Santa Lúcia', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', dirigente: 'Jadir Pela', dataInicioMandato: '2021-10-01', dataFimMandato: '2025-09-30', situacao: 'Ativa' },
+  { id: 4, nome: 'IFES Campus Serra', sigla: 'IFES Serra', cnpj: '10.838.653/0010-99', razaoSocial: 'Instituto Federal do Espírito Santo - Campus Serra', email: 'campus.serra@ifes.edu.br', telefone: '(27) 3348-9200', endereco: 'Rodovia ES-010, Km 6,5 - Manguinhos', natureza: 'Publica', municipio: 'Serra', uf: 'ES', dirigente: 'Marta Souza', dataInicioMandato: '2022-01-01', dataFimMandato: '2026-12-31', superior: 'Instituto Federal do Espírito Santo', situacao: 'Ativa' },
+  { id: 5, nome: 'Fucape Business School', sigla: 'FUCAPE', cnpj: '03.389.451/0001-66', razaoSocial: 'Fundação Instituto Capixaba de Pesquisas em Contabilidade, Economia e Finanças', email: 'contato@fucape.br', telefone: '(27) 4009-4444', endereco: 'Av. Fernando Ferrari, 1358 - Boa Vista', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', dirigente: 'Valcemiro Nossa', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', situacao: 'Ativa' },
+  { id: 6, nome: 'Departamento de Pesquisa Aplicada', sigla: 'DPA', cnpj: '', razaoSocial: '', email: 'pesquisa@fucape.br', telefone: '(27) 4009-4450', endereco: 'Sede Fucape', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', dirigente: 'Carla Mendes', dataInicioMandato: '2024-02-01', dataFimMandato: '2026-01-31', superior: 'Fucape Business School', situacao: 'Inativa' },
+];
+
+const getClassificacao = (item: Pick<InstituicaoItem, 'cnpj' | 'superior'>) => {
+  if (!item.cnpj) return 'Setor sem CNPJ';
+  return item.superior ? 'Unidade com CNPJ' : 'Instituição raiz';
+};
+
+export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  const [activeTab, setActiveTab] = useState<ActiveTab>('listagem');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [naturezaFilter, setNaturezaFilter] = useState<'Todos' | NaturezaJuridica>('Todos');
+  const [showNaturezaDropdown, setShowNaturezaDropdown] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [selected, setSelected] = useState<InstituicaoItem | null>(null);
+  const [draft, setDraft] = useState<InstituicaoItem>(emptyInstituicao);
+  const [instituicoes, setInstituicoes] = useState<InstituicaoItem[]>(initialInstituicoes);
+
+  const filtered = instituicoes.filter(item => {
+    const query = searchTerm.toLowerCase();
+    const matchSearch =
+      item.nome.toLowerCase().includes(query) ||
+      item.sigla.toLowerCase().includes(query) ||
+      item.razaoSocial.toLowerCase().includes(query) ||
+      item.email.toLowerCase().includes(query) ||
+      item.cnpj.toLowerCase().includes(query);
+    const matchNatureza = naturezaFilter === 'Todos' || item.natureza === naturezaFilter;
+    return matchSearch && matchNatureza;
+  });
+
+  const totalPublicas = instituicoes.filter(item => item.natureza === 'Publica').length;
+  const totalPrivadas = instituicoes.filter(item => item.natureza === 'Privada').length;
+  const totalComCnpj = instituicoes.filter(item => item.cnpj).length;
+  const totalSemCnpj = instituicoes.filter(item => !item.cnpj).length;
+  const instituicoesRaiz = instituicoes.filter(item => !item.superior).length;
+  const estruturasPorTipo = useMemo(() => ([
+    { nome: 'Instituições raiz', valor: instituicoes.filter(item => item.cnpj && !item.superior).length, color: '#38bdf8' },
+    { nome: 'Unidades com CNPJ', valor: instituicoes.filter(item => item.cnpj && item.superior).length, color: '#22c55e' },
+    { nome: 'Setores sem CNPJ', valor: instituicoes.filter(item => !item.cnpj).length, color: '#f59e0b' },
+  ]), [instituicoes]);
+
+  const openNew = () => {
+    setDraft({ ...emptyInstituicao, id: Date.now() });
+    setShowForm(true);
+    setSelected(null);
+  };
+
+  const openDetails = (item: InstituicaoItem) => {
+    setDraft({ ...item });
+    setSelected(item);
+    setShowForm(false);
+  };
+
+  const updateDraft = (field: keyof InstituicaoItem, value: string | boolean) => {
+    setDraft(prev => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const saveDraft = () => {
+    const isSetorSemCnpj = !draft.cnpj;
+    const saved = {
+      ...draft,
+      razaoSocial: isSetorSemCnpj ? '' : draft.razaoSocial,
+    };
+    setInstituicoes(prev => {
+      const exists = prev.some(item => item.id === saved.id);
+      return exists ? prev.map(item => item.id === saved.id ? saved : item) : [...prev, saved];
+    });
+    setShowForm(false);
+    setSelected(saved);
+  };
+
+  const removeDraft = () => {
+    if (!selected) return;
+    setInstituicoes(prev => prev.filter(item => item.id !== selected.id));
+    setSelected(null);
+    setShowForm(false);
+  };
+
+  if (showForm || selected) {
+    const isSetorSemCnpj = !draft.cnpj;
+    return (
+      <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+        <div className="pt-8 px-8 pb-8">
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '28px' }}>
+            <button
+              onClick={() => { setShowForm(false); setSelected(null); }}
+              style={{ width: '36px', height: '36px', border: 'none', borderRadius: 'var(--radius)', backgroundColor: 'rgba(0,193,175,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            >
+              <ArrowLeft size={18} style={{ color: '#00c1af' }} />
+            </button>
+            <div style={{ flex: 1 }}>
+              <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 8px' }}>
+                {showForm ? 'Nova Instituição' : draft.nome}
+              </h1>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                Cadastre instituições, unidades com CNPJ e setores sem CNPJ na mesma estrutura organizacional.
+              </p>
+            </div>
+            {selected && (
+              <button
+                type="button"
+                onClick={openNew}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(0,193,175,0.12)', border: '1px solid rgba(0,193,175,0.35)', borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', cursor: 'pointer' }}
+              >
+                <Plus size={15} />
+                Nova Instituição
+              </button>
+            )}
+          </div>
+
+          <FormSection number="1" title="Identificação" subtitle="Dados básicos da instituição ou setor. A estrutura é inferida pelo CNPJ e pelo vínculo superior.">
+            <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 0.6fr', gap: '16px', marginBottom: '16px' }}>
+              <Field label="Nome" value={draft.nome} onChange={value => updateDraft('nome', value)} placeholder="Nome da instituição ou unidade" />
+              <Field label="Sigla" value={draft.sigla} onChange={value => updateDraft('sigla', value)} placeholder="Sigla" />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '16px', marginBottom: '16px' }}>
+              <Field label={isSetorSemCnpj ? 'Razão social' : 'Razão social obrigatória'} value={draft.razaoSocial} onChange={value => updateDraft('razaoSocial', value)} placeholder={isSetorSemCnpj ? 'Não se aplica a setor interno' : 'Razão social da instituição'} disabled={isSetorSemCnpj} />
+              <Field label="CNPJ" value={draft.cnpj} onChange={value => updateDraft('cnpj', maskCnpj(value))} placeholder="Deixe vazio para setor sem CNPJ" />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
+              <Select label="Natureza" value={draft.natureza} onChange={value => updateDraft('natureza', value)} options={['Publica', 'Privada']} />
+            </div>
+          </FormSection>
+
+          <FormSection number="2" title="Contato" subtitle="Dados de contato exigidos principalmente para instituições com CNPJ próprio.">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 0.6fr', gap: '16px', marginBottom: '16px' }}>
+              <Field label="Email institucional" value={draft.email} onChange={value => updateDraft('email', value)} placeholder="email@instituicao.br" />
+              <Field label="Telefone" value={draft.telefone} onChange={value => updateDraft('telefone', value)} placeholder="(00) 0000-0000" />
+            </div>
+            <Field label="Endereço" value={draft.endereco} onChange={value => updateDraft('endereco', value)} placeholder="Endereço completo ou localização do setor" />
+          </FormSection>
+
+          <FormSection number="3" title="Estrutura Organizacional" subtitle="Vínculo hierárquico e localização. Instituição sem CNPJ deve possuir superior.">
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 0.3fr', gap: '16px' }}>
+              <Select label="Instituição superior" value={draft.superior || ''} onChange={value => updateDraft('superior', value)} options={['', 'Universidade Federal do Espírito Santo', 'Instituto Federal do Espírito Santo', 'Fucape Business School']} />
+              <Field label="Município" value={draft.municipio} onChange={value => updateDraft('municipio', value)} placeholder="Município" />
+              <Field label="UF" value={draft.uf} onChange={value => updateDraft('uf', value.toUpperCase().slice(0, 2))} placeholder="UF" />
+            </div>
+          </FormSection>
+
+          <FormSection number="4" title="Dirigente" subtitle="Dirigente é o vínculo temporal entre uma Pessoa Física e uma Instituição, com mandato definido.">
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.5fr 0.5fr 0.5fr', gap: '16px' }}>
+              <Select label="Pessoa dirigente" value={draft.dirigente} onChange={value => updateDraft('dirigente', value)} options={['', 'Prof. Paulo Vargas', 'Prof. Ana Ribeiro', 'Jadir Pela', 'Marta Souza', 'Valcemiro Nossa', 'Carla Mendes']} />
+              <Field label="Início do mandato" value={draft.dataInicioMandato} onChange={value => updateDraft('dataInicioMandato', value)} placeholder="AAAA-MM-DD" />
+              <Field label="Fim do mandato" value={draft.dataFimMandato} onChange={value => updateDraft('dataFimMandato', value)} placeholder="AAAA-MM-DD" />
+              <Select label="Situação" value={draft.situacao} onChange={value => updateDraft('situacao', value)} options={['Ativa', 'Inativa']} />
+            </div>
+          </FormSection>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
+            {selected && (
+              <button type="button" onClick={removeDraft} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.35)', borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#f87171', cursor: 'pointer' }}>
+                <Trash2 size={15} />
+                Remover
+              </button>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', flex: 1 }}>
+              <button type="button" onClick={() => { setShowForm(false); setSelected(null); }} style={{ backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.75)', cursor: 'pointer' }}>
+                Cancelar
+              </button>
+              <button type="button" onClick={saveDraft} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#0f172a', cursor: 'pointer' }}>
+                <Save size={15} />
+                Salvar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+      <div className="pt-8 px-8 pb-8">
+        <div className="mb-6">
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', flex: 1 }}>
+              <button onClick={onBack} style={{ width: '36px', height: '36px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(30,41,59,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
+              </button>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', flexShrink: 0, backgroundColor: 'rgba(0,193,175,0.15)', borderRadius: 'var(--radius)' }}>
+                <Building2 size={18} style={{ color: '#00c1af' }} />
+              </div>
+              <div style={{ flex: 1, marginTop: '6px' }}>
+                <h1 className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: '#ffffff', lineHeight: '1.5' }}>
+                  Instituições
+                </h1>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: '1.5' }}>
+                  Gerencie instituições públicas e privadas, unidades com CNPJ e setores sem CNPJ.
+                </p>
+              </div>
+            </div>
+            <button onClick={openNew} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', padding: '10px 18px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#0f172a', cursor: 'pointer', flexShrink: 0 }}>
+              <Plus size={16} />
+              Nova Instituição
+            </button>
+          </div>
+        </div>
+
+        <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', margin: '20px 0 28px' }} />
+
+        <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '28px' }}>
+          {[
+            { id: 'listagem' as ActiveTab, label: 'Instituições' },
+            { id: 'dashboard' as ActiveTab, label: 'Dashboard' },
+          ].map(tab => (
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === tab.id ? '2px solid #00c1af' : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: activeTab === tab.id ? '#00c1af' : 'rgba(255,255,255,0.6)', cursor: 'pointer', marginBottom: '-1px' }}>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'dashboard' && (
+          <div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+              <Metric label="Total de instituições" value={String(instituicoes.length)} color="#ffffff" bg="rgba(255,255,255,0.08)" />
+              <Metric label="Públicas" value={String(totalPublicas)} color="#38bdf8" bg="rgba(56,189,248,0.12)" />
+              <Metric label="Privadas" value={String(totalPrivadas)} color="#a855f7" bg="rgba(168,85,247,0.12)" />
+              <Metric label="Raiz" value={String(instituicoesRaiz)} color="#f59e0b" bg="rgba(245,158,11,0.12)" />
+            </div>
+
+            <div style={cardStyle()}>
+              <h2 style={sectionTitleStyle}>Estruturas por tipo</h2>
+              <p style={{ ...sectionSubtitleStyle, marginBottom: '20px' }}>
+                Distribuição entre instituições raiz, unidades que possuem CNPJ e setores sem CNPJ.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {estruturasPorTipo.map(item => {
+                  const percentual = instituicoes.length > 0 ? (item.valor / instituicoes.length) * 100 : 0;
+                  return (
+                    <div key={item.nome} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.6fr 0.8fr', gap: '16px', marginBottom: '12px' }}>
+                        <ListCell label="Tipo" value={item.nome} strong />
+                        <ListCell label="Quantidade" value={String(item.valor)} highlight />
+                        <ListCell label="Participação" value={`${percentual.toFixed(2).replace('.', ',')}%`} />
+                      </div>
+                      <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                        <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: item.color }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={{ ...cardStyle(), marginTop: '24px' }}>
+              <h2 style={sectionTitleStyle}>Identificação fiscal</h2>
+              <p style={{ ...sectionSubtitleStyle, marginBottom: '20px' }}>
+                Controle de estruturas que possuem CNPJ próprio e estruturas internas cadastradas como setores.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <Metric label="Com CNPJ" value={String(totalComCnpj)} color="#22c55e" bg="rgba(34,197,94,0.12)" />
+                <Metric label="Sem CNPJ" value={String(totalSemCnpj)} color="#f59e0b" bg="rgba(245,158,11,0.12)" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'listagem' && (
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', marginBottom: '24px' }}>
+              <div>
+                <label style={labelStyle}>Pesquisar</label>
+                <div style={{ position: 'relative' }}>
+                  <input type="text" placeholder="Buscar por nome, sigla ou CNPJ..." value={searchTerm} onChange={event => setSearchTerm(event.target.value)} style={{ ...inputStyle, paddingLeft: '36px' }} />
+                  <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
+                </div>
+              </div>
+              <DropdownFilter label="Natureza" value={naturezaFilter} options={['Todos', 'Publica', 'Privada']} open={showNaturezaDropdown} setOpen={setShowNaturezaDropdown} onSelect={value => setNaturezaFilter(value as typeof naturezaFilter)} />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {filtered.map(item => (
+                <button key={item.id} onClick={() => openDetails(item)} style={{ textAlign: 'left', backgroundColor: 'rgba(30,41,59,0.6)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '18px 20px', cursor: 'pointer' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 0.8fr 1fr 1.2fr 1fr 0.7fr auto', gap: '18px', alignItems: 'start' }}>
+                    <ListCell label="Instituição" value={`${item.sigla} · ${item.nome}`} strong />
+                    <ListCell label="Natureza" value={item.natureza === 'Publica' ? 'Pública' : 'Privada'} />
+                    <ListCell label="Classificação" value={getClassificacao(item)} />
+                    <ListCell label="CNPJ" value={item.cnpj || 'Não possui'} detail={item.superior ? `Superior: ${item.superior}` : 'Sem superior'} />
+                    <ListCell label="Dirigente" value={item.dirigente} detail={`${item.dataInicioMandato || '-'} a ${item.dataFimMandato || '-'}`} />
+                    <div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>Situação</div>
+                      <span style={{ display: 'inline-block', backgroundColor: `${statusColor(item.situacao)}20`, border: `1px solid ${statusColor(item.situacao)}`, borderRadius: '999px', padding: '3px 12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: statusColor(item.situacao) }}>
+                        {item.situacao}
+                      </span>
+                    </div>
+                    <ChevronRight size={18} style={{ color: 'rgba(255,255,255,0.3)', marginTop: '20px' }} />
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const Field: React.FC<{ label: string; value: string; onChange: (value: string) => void; placeholder?: string; disabled?: boolean }> = ({ label, value, onChange, placeholder, disabled }) => (
+  <div>
+    <label style={labelStyle}>{label}</label>
+    <input type="text" value={disabled ? '' : value} placeholder={placeholder} disabled={disabled} onChange={event => onChange(event.target.value)} style={{ ...inputStyle, opacity: disabled ? 0.55 : 1 }} />
+  </div>
+);
+
+const Select: React.FC<{ label: string; value: string; onChange: (value: string) => void; options: string[]; disabled?: boolean }> = ({ label, value, onChange, options, disabled }) => (
+  <div>
+    <label style={labelStyle}>{label}</label>
+    <select value={disabled ? '' : value} disabled={disabled} onChange={event => onChange(event.target.value)} style={{ ...inputStyle, colorScheme: 'dark', opacity: disabled ? 0.55 : 1 }}>
+      {options.map(option => (
+        <option key={option} value={option}>{option || 'Nenhuma'}</option>
+      ))}
+    </select>
+  </div>
+);
+
+const FormSection: React.FC<{ number: string; title: string; subtitle: string; children: React.ReactNode }> = ({ number, title, subtitle, children }) => (
+  <div style={{ ...cardStyle(), marginBottom: '24px' }}>
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', marginBottom: '20px' }}>
+      <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'rgba(0,193,175,0.15)', color: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>
+        {number}
+      </div>
+      <div>
+        <h2 style={sectionTitleStyle}>{title}</h2>
+        <p style={sectionSubtitleStyle}>{subtitle}</p>
+      </div>
+    </div>
+    {children}
+  </div>
+);
+
+const Metric: React.FC<{ label: string; value: string; color: string; bg: string }> = ({ label, value, color, bg }) => (
+  <div style={cardStyle()}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: bg, borderRadius: 'var(--radius)', flexShrink: 0 }}>
+        <Building2 size={20} style={{ color }} />
+      </div>
+      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', margin: 0 }}>{label}</p>
+    </div>
+    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: '#ffffff', textAlign: 'center', margin: 0 }}>{value}</p>
+  </div>
+);
+
+const ListCell: React.FC<{ label: string; value: string; detail?: string; strong?: boolean; highlight?: boolean }> = ({ label, value, detail, strong, highlight }) => (
+  <div>
+    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>{label}</div>
+    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: highlight ? '#22c55e' : strong ? '#ffffff' : 'rgba(255,255,255,0.75)', fontWeight: strong ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', lineHeight: 1.4 }}>{value || '-'}</div>
+    {detail && <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginTop: '4px' }}>{detail}</div>}
+  </div>
+);
+
+const DropdownFilter: React.FC<{ label: string; value: string; options: string[]; open: boolean; setOpen: (open: boolean) => void; onSelect: (value: string) => void; onBeforeOpen?: () => void }> = ({ label, value, options, open, setOpen, onSelect, onBeforeOpen }) => (
+  <div style={{ position: 'relative' }}>
+    <label style={labelStyle}>{label}</label>
+    <button onClick={() => { onBeforeOpen?.(); setOpen(!open); }} style={{ width: '100%', backgroundColor: 'rgba(30,41,59,0.5)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', padding: '10px 12px', color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+      <span>{value}</span>
+      <ChevronDown size={16} style={{ color: 'rgba(255,255,255,0.5)', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+    </button>
+    {open && (
+      <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', overflow: 'hidden', zIndex: 100 }}>
+        {options.map(option => (
+          <button key={option} onClick={() => { onSelect(option); setOpen(false); }} style={{ width: '100%', padding: '10px 12px', textAlign: 'left', backgroundColor: value === option ? 'rgba(0,193,175,0.1)' : 'transparent', color: value === option ? '#00c1af' : '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', border: 'none', cursor: 'pointer' }}>
+            {option}
+          </button>
+        ))}
+      </div>
+    )}
+  </div>
+);
