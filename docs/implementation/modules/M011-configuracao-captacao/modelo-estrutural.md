@@ -55,6 +55,7 @@ classDiagram
     class CategoriaIniciativa {
         +String nome
         +String descricao
+        +boolean selecionavelNoCadastro
     }
 
     class PessoaFisica {
@@ -290,6 +291,7 @@ classDiagram
 | **TipoIniciativa** | nome | Tipo de iniciativa aceito pela captacao | Sim | String | | 200 | |
 | **CategoriaIniciativa** | nome | Categoria de iniciativa aceita pela captacao | Sim | String | Ex: Pesquisa, Inovacao, Extensao, Difusao, Capacitacao | 200 | Sim |
 | | descricao | Descricao da categoria | Nao | String | | 500 | |
+| | selecionavelNoCadastro | Indica se a categoria esta disponivel para selecao multipla no cadastro da captacao | Sim | Boolean | true/false | | |
 | **PessoaFisica** | cpf | CPF da pessoa no cadastro corporativo | Sim | String | Gerenciado pelo M008 | 11 | Sim |
 | | nome | Nome completo da pessoa | Sim | String | Gerenciado pelo M008 | 300 | |
 | | email | Email de contato da pessoa | Sim | String | Gerenciado pelo M008 | 200 | |
@@ -341,7 +343,7 @@ classDiagram
 | | reutilizarCadastroCorporativo | Indica se o documento deve ser reaproveitado do cadastro corporativo quando existir e estiver valido | Sim | Boolean | true/false | | |
 | | exigirNovoEnvioSeVencido | Indica se o proponente deve reenviar o documento quando o cadastro corporativo possuir documento vencido ou invalido | Sim | Boolean | true/false | | |
 | **FormatoArquivo** | extensao | Extensao de arquivo permitida para o documento | Sim | String | Ex: PDF, DOCX, XLSX | 20 | |
-| **RevisorAdHoc** | pessoa (relacao) | Pessoa fisica que assume o papel de revisor ad hoc na captacao | Sim | FK → PessoaFisica | Via M008 | | |
+| **RevisorAdHoc** | pessoa (relacao) | Pessoa fisica que assume o papel de revisor ad hoc na captacao; na interface e localizada por CPF ou nome | Sim | FK → PessoaFisica | Via M008 | | |
 | | dataInclusao | Data em que a pessoa foi incluida no pool de revisores da captacao | Gerado | Date | | | |
 | | areaAtuacao | Area de conhecimento considerada para distribuicao das propostas | Sim | String | | 200 | |
 | | titulacao | Titulacao academica do revisor | Sim | String | Ex: Doutor, Mestre | 100 | |
@@ -351,7 +353,7 @@ classDiagram
 | | permiteSubrubricas | Indica se a rubrica pode possuir subrubricas permitidas na captacao | Sim | Boolean | true/false | | |
 | | obrigatoria | Indica se a proposta deve usar esta rubrica quando informar orcamento | Sim | Boolean | true/false | | |
 | | observacao | Orientacao de uso da rubrica na captacao | Nao | String | | 500 | |
-| | rubricaPai (relacao) | Rubrica permitida pai quando o registro representar uma subrubrica | Cond. | FK → RubricaPermitida | Nulo para rubrica raiz | | |
+| | rubricaPai (relacao) | Rubrica permitida pai quando o registro representar uma subrubrica selecionada dentro de uma rubrica principal | Cond. | FK → RubricaPermitida | Nulo para rubrica raiz | | |
 | **VersaoNivel** | valor | Valor monetario vigente para o nivel de bolsa selecionado | Sim | Double | M001 | | |
 | **BolsaPermitida** | versaoNivel (relacao) | Versao do nivel de bolsa permitida na captacao | Sim | FK → VersaoNivel | Via M001 | | |
 | | rubricaPermitida (relacao) | Rubrica Bolsa que habilita a configuracao de modalidades e niveis | Sim | FK → RubricaPermitida | Deve apontar para a rubrica Bolsa | | |
@@ -371,9 +373,10 @@ classDiagram
 - CronogramaCaptacao: cada `PeriodoCronograma` representa um card operacional do cronograma. A configuracao deve possuir exatamente um card para cada `TipoPeriodo` obrigatorio antes da criacao/publicacao da captacao. Na edicao, uma etapa pode ser adiada mediante justificativa; o adiamento deve ser registrado em `AdiamentoPeriodoCronograma` e as etapas posteriores devem ser deslocadas pela mesma quantidade de dias.
 - ProponenteEscolhido: usado somente quando `RegraSubmissao.submissaoRestritaAEscolhidos = true`. Cada registro deve apontar para exatamente uma `Instituicao` ou uma `PessoaFisica`, conforme o tipo selecionado.
 - Formularios: gerenciados por M021 (Gestao de Formularios). O M011 referencia apenas `formularioId` e `versaoFormularioId` publicados para submissao, avaliacao ad hoc e revisao de resultado.
-- PessoaFisica e NivelAcademico: gerenciados por M008 (Cadastros Corporativos). O M011 usa `RevisorAdHoc` como papel operacional assumido por uma `PessoaFisica`, `OrtogadoDestinatario` para indicar a pessoa destinataria de uma demanda induzida e `NivelAcademico` como requisito minimo do proponente.
+- CategoriaIniciativa: a captacao deve permitir selecao multipla de categorias. Cada categoria marcada no cadastro gera uma associacao da captacao com a categoria correspondente.
+- PessoaFisica e NivelAcademico: gerenciados por M008 (Cadastros Corporativos). O M011 usa `RevisorAdHoc` como papel operacional assumido por uma `PessoaFisica`, localizada por CPF ou nome na tela de cadastro; `OrtogadoDestinatario` indica a pessoa destinataria de uma demanda induzida; `NivelAcademico` representa requisito minimo do proponente.
 - Instituicao e TipoInstituicao: gerenciados por M008. A captacao pode aceitar propostas abertas, direcionadas a uma instituicao especifica ou direcionadas a um tipo de instituicao.
-- RubricaFinanceira: gerenciada por M008 (Cadastros Corporativos). O M011 seleciona rubricas e subrubricas permitidas para orientar o orcamento das propostas; a execucao orcamentaria fica nos modulos posteriores do ciclo da iniciativa. Quando a rubrica selecionada for Bolsa, o M011 tambem habilita a configuracao de modalidades e niveis de bolsa permitidos.
+- RubricaFinanceira: gerenciada por M008 (Cadastros Corporativos). O M011 seleciona rubricas e subrubricas permitidas para orientar o orcamento das propostas; quando uma rubrica principal e selecionada, a interface deve permitir selecionar uma ou mais subrubricas vinculadas a ela. A execucao orcamentaria fica nos modulos posteriores do ciclo da iniciativa. Quando a rubrica selecionada for Bolsa, o M011 tambem habilita a configuracao de modalidades e niveis de bolsa permitidos.
 - VersaoNivel: gerenciada por M001 (Modalidade Bolsa). O M011 seleciona quais versoes de niveis de bolsa podem ser usadas na captacao e define limites operacionais, como cotas e maximo de bolsistas.
 - DocumentoExigido: gerenciado como item reutilizavel de configuracao, mas associado a captacao para definir documentos exigidos do proponente, formatos permitidos, obrigatoriedade e regra de reaproveitamento do cadastro corporativo.
 - Duvida em aberto: validar se todo comprovante deve ser `DocumentoExigido` ou se parte deles deve ser derivada de `RequisitoProponente` como evidencia documental de um requisito.

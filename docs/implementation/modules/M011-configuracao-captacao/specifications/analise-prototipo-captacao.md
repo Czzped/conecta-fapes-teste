@@ -29,7 +29,7 @@ O prototipo do backoffice (`prototype/backoffice/`) possui um modulo completo de
 - Tipo de Captacao (`Chamada Publica` ou `Demanda Induzida`)
 - Ortogado destinatario, quando for `Demanda Induzida`
 - Area Tecnica Responsavel
-- Categorias de Iniciativas aceitas (Capacitacao, Difusao, Extensao, Inovacao, Pesquisa)
+- Categorias de Iniciativas aceitas (Capacitacao, Difusao, Extensao, Inovacao, Pesquisa), selecionadas em campo multi-opcao com chips das categorias marcadas
 - Tipos de Iniciativas aceitos
 - Codigo da Captacao
 - Aportes financeiros de Programa ou Parceria
@@ -89,9 +89,11 @@ O prototipo do backoffice (`prototype/backoffice/`) possui um modulo completo de
 
 - Necessita Avaliacao (sim/nao)
 - Quantidade minima de revisores ad hoc por proposta
+- Pool de revisores ad hoc em card proprio, com busca por CPF ou nome, adicao ao pool e remocao de revisores selecionados
 - Possui Prestacao Tecnica (sim/nao)
 - Possui Prestacao Financeira (sim/nao)
 - Rubricas Permitidas em lista (selecao: Material Permanente, Material de Consumo, Pessoa Fisica, Pessoa Juridica, Passagem, Diaria, Bolsa)
+- Ao selecionar uma rubrica, a tela abre as subrubricas correspondentes para selecao multipla
 - Ao selecionar a rubrica Bolsa, exibe modalidades e niveis de bolsa permitidos
 
 ### 8. Bolsas (dentro de Rubricas Permitidas)

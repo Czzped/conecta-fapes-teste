@@ -379,6 +379,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
   const [categoriasIniciativa, setCategoriasIniciativa] = useState<Record<string, boolean>>({
     capacitacao: false, difusao: false, extensao: false, inovacao: isEditMode, pesquisa: isEditMode,
   });
+  const [showCategoriasDropdown, setShowCategoriasDropdown] = useState(false);
   const [tipoVinculoCaptacao, setTipoVinculoCaptacao] = useState<'programa' | 'parceria'>('programa');
   const [vinculoCaptacao, setVinculoCaptacao] = useState('');
   const [programa, setPrograma] = useState('');
@@ -450,11 +451,29 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
   const [necessitaAvaliacao, setNecessitaAvaliacao] = useState('sim');
   const [quantidadeMinimaRevisores, setQuantidadeMinimaRevisores] = useState('2');
   const [revisoresAdHocSelecionados, setRevisoresAdHocSelecionados] = useState<Record<string, boolean>>(isEditMode ? { 'rev-001': true, 'rev-002': true } : {});
+  const [cpfRevisorAdHoc, setCpfRevisorAdHoc] = useState('');
   const [possuiPrestacaoTecnica, setPossuiPrestacaoTecnica] = useState(isEditMode ? 'sim' : 'nao');
   const [possuiPrestacaoFinanceira, setPossuiPrestacaoFinanceira] = useState(isEditMode ? 'sim' : 'nao');
   const [rubricas, setRubricas] = useState<Record<string, boolean>>({
     materialPermanente: isEditMode, materialConsumo: isEditMode, passagem: false,
     diaria: false, pessoaFisica: false, pessoaJuridica: false, bolsa: isEditMode,
+  });
+  const [subRubricas, setSubRubricas] = useState<Record<string, boolean>>({
+    equipamentosLaboratorio: isEditMode,
+    mobiliarioTecnico: false,
+    reagentes: isEditMode,
+    materialGrafico: false,
+    passagemAerea: false,
+    passagemTerrestre: false,
+    diariaNacional: false,
+    diariaInternacional: false,
+    consultoriaPf: false,
+    servicoTecnicoPf: false,
+    consultoriaPj: false,
+    softwareServico: false,
+    bolsaIc: isEditMode,
+    bolsaMestrado: false,
+    bolsaDoutorado: false,
   });
 
   /* ── Section 6 ── */
@@ -495,10 +514,11 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
   const togglePessoaEscolhida = (k: string) => setPessoasEscolhidas(p => ({ ...p, [k]: !p[k] }));
   const toggleCategoriaIniciativa = (k: string) => setCategoriasIniciativa(p => ({ ...p, [k]: !p[k] }));
   const toggleRubrica = (k: string) => setRubricas(p => ({ ...p, [k]: !p[k] }));
+  const toggleSubRubrica = (k: string) => setSubRubricas(p => ({ ...p, [k]: !p[k] }));
   const toggleOrigem = (k: string) => setOrigensRecurso(p => ({ ...p, [k]: !p[k] }));
   const toggleDocSubmissao = (k: string) => setDocsSubmissao(p => ({ ...p, [k]: !p[k] }));
   const toggleArquivoPublico = (k: string) => setArquivosPublicos(p => ({ ...p, [k]: !p[k] }));
-  const toggleRevisorAdHoc = (k: string) => setRevisoresAdHocSelecionados(p => ({ ...p, [k]: !p[k] }));
+  const removerRevisorAdHoc = (k: string) => setRevisoresAdHocSelecionados(p => ({ ...p, [k]: false }));
 
   const addBolsa = () =>
     setBolsas(p => [...p, { id: nextBolsaId.current++, modalidade: '', nivel: '', versao: '', maxBolsistas: '', quantidadeCotas: '', institucional: false }]);
@@ -625,6 +645,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
   ];
 
   const categoriaIniciativaOpts = tipoFomentoOpts;
+  const categoriasSelecionadas = categoriaIniciativaOpts.filter(item => categoriasIniciativa[item.value]);
 
   const tipoInstituicaoOpts = [
     { value: 'ensino', label: 'Instituição de ensino' },
@@ -669,11 +690,25 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
   ];
 
   const revisoresAdHocData = [
-    { id: 'rev-001', nome: 'Dra. Helena Martins', area: 'Pesquisa em Saúde', titulacao: 'Doutorado', instituicao: 'UFES' },
-    { id: 'rev-002', nome: 'Dr. Rafael Nogueira', area: 'Inovação Tecnológica', titulacao: 'Doutorado', instituicao: 'IFES' },
-    { id: 'rev-003', nome: 'Dra. Livia Barbosa', area: 'Educação e Extensão', titulacao: 'Doutorado', instituicao: 'Ufes' },
-    { id: 'rev-004', nome: 'Dr. Marcos Teixeira', area: 'Ciências Agrárias', titulacao: 'Mestrado', instituicao: 'Incaper' },
+    { id: 'rev-001', nome: 'Dra. Helena Martins', cpf: '123.456.789-00', area: 'Pesquisa em Saúde', titulacao: 'Doutorado', instituicao: 'UFES' },
+    { id: 'rev-002', nome: 'Dr. Rafael Nogueira', cpf: '234.567.890-11', area: 'Inovação Tecnológica', titulacao: 'Doutorado', instituicao: 'IFES' },
+    { id: 'rev-003', nome: 'Dra. Livia Barbosa', cpf: '345.678.901-22', area: 'Educação e Extensão', titulacao: 'Doutorado', instituicao: 'Ufes' },
+    { id: 'rev-004', nome: 'Dr. Marcos Teixeira', cpf: '456.789.012-33', area: 'Ciências Agrárias', titulacao: 'Mestrado', instituicao: 'Incaper' },
   ];
+  const termoBuscaRevisor = cpfRevisorAdHoc.trim().toLowerCase();
+  const revisoresFiltradosAdHoc = revisoresAdHocData.filter(revisor =>
+    !revisoresAdHocSelecionados[revisor.id] && (
+      !termoBuscaRevisor ||
+      revisor.cpf.includes(cpfRevisorAdHoc.trim()) ||
+      revisor.nome.toLowerCase().includes(termoBuscaRevisor)
+    )
+  );
+  const revisoresSelecionadosAdHoc = revisoresAdHocData.filter(revisor => revisoresAdHocSelecionados[revisor.id]);
+
+  const selecionarRevisorAdHoc = (id: string) => {
+    setRevisoresAdHocSelecionados(p => ({ ...p, [id]: true }));
+    setCpfRevisorAdHoc('');
+  };
 
   const parceriasData = [
     { value: 'parceria_1', label: 'Cooperação Ufes-CNPq' },
@@ -699,6 +734,73 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
     { value: 'nao_se_aplica', label: 'Não se aplica' },
     { value: 'recurso_padrao', label: 'Recurso Padrão' },
     { value: 'recurso_tecnico', label: 'Recurso Técnico' }
+  ];
+
+  const rubricasPermitidasData = [
+    {
+      key: 'materialPermanente',
+      label: 'Material Permanente',
+      descricao: 'Bens permanentes e equipamentos.',
+      subRubricas: [
+        { key: 'equipamentosLaboratorio', label: 'Equipamentos de laboratório' },
+        { key: 'mobiliarioTecnico', label: 'Mobiliário técnico' },
+      ],
+    },
+    {
+      key: 'materialConsumo',
+      label: 'Material de Consumo',
+      descricao: 'Itens consumíveis usados na iniciativa.',
+      subRubricas: [
+        { key: 'reagentes', label: 'Reagentes e insumos laboratoriais' },
+        { key: 'materialGrafico', label: 'Material gráfico e expediente' },
+      ],
+    },
+    {
+      key: 'passagem',
+      label: 'Passagens',
+      descricao: 'Deslocamentos aéreos, terrestres ou similares.',
+      subRubricas: [
+        { key: 'passagemAerea', label: 'Passagem aérea' },
+        { key: 'passagemTerrestre', label: 'Passagem terrestre' },
+      ],
+    },
+    {
+      key: 'diaria',
+      label: 'Diárias',
+      descricao: 'Diárias vinculadas às atividades da iniciativa.',
+      subRubricas: [
+        { key: 'diariaNacional', label: 'Diária nacional' },
+        { key: 'diariaInternacional', label: 'Diária internacional' },
+      ],
+    },
+    {
+      key: 'pessoaFisica',
+      label: 'Pessoa Física',
+      descricao: 'Serviços ou pagamentos para pessoa física.',
+      subRubricas: [
+        { key: 'consultoriaPf', label: 'Consultoria pessoa física' },
+        { key: 'servicoTecnicoPf', label: 'Serviço técnico especializado' },
+      ],
+    },
+    {
+      key: 'pessoaJuridica',
+      label: 'Pessoa Jurídica',
+      descricao: 'Serviços contratados de pessoa jurídica.',
+      subRubricas: [
+        { key: 'consultoriaPj', label: 'Consultoria pessoa jurídica' },
+        { key: 'softwareServico', label: 'Software e serviços digitais' },
+      ],
+    },
+    {
+      key: 'bolsa',
+      label: 'Bolsa',
+      descricao: 'Modalidades e níveis de bolsa permitidos na captação.',
+      subRubricas: [
+        { key: 'bolsaIc', label: 'Iniciação científica' },
+        { key: 'bolsaMestrado', label: 'Mestrado' },
+        { key: 'bolsaDoutorado', label: 'Doutorado' },
+      ],
+    },
   ];
 
   const focusTeal = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -813,16 +915,67 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
               <label style={{ ...labelStyle, marginBottom: 0 }}>Categorias de Iniciativas</label>
               <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)' }}>
-                {categoriaIniciativaOpts.filter(item => categoriasIniciativa[item.value]).length} selecionada(s)
+                {categoriasSelecionadas.length} selecionada(s)
               </span>
             </div>
-            <div style={{
-              border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: 'var(--radius)',
-              backgroundColor: 'rgba(15,23,42,0.35)',
-              overflow: 'hidden',
-            }}>
-              {categoriaIniciativaOpts.map(item => (
+            <div style={{ position: 'relative' }}>
+              <button
+                type="button"
+                onClick={() => setShowCategoriasDropdown(!showCategoriasDropdown)}
+                style={{
+                  width: '100%',
+                  minHeight: '44px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '12px',
+                  backgroundColor: 'rgba(30, 41, 59, 0.7)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: 'var(--radius)',
+                  padding: '8px 12px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <span style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', flex: 1 }}>
+                  {categoriasSelecionadas.length === 0 ? (
+                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.42)' }}>
+                      Selecione uma ou mais categorias...
+                    </span>
+                  ) : categoriasSelecionadas.map(item => (
+                    <span
+                      key={item.value}
+                      style={{
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 'var(--text-xs)',
+                        color: '#00c1af',
+                        padding: '5px 9px',
+                        borderRadius: '999px',
+                        border: '1px solid rgba(0,193,175,0.28)',
+                        backgroundColor: 'rgba(0,193,175,0.08)',
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                  ))}
+                </span>
+                <ChevronDown size={16} style={{ color: 'rgba(255,255,255,0.55)', flexShrink: 0, transform: showCategoriasDropdown ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+              </button>
+
+              {showCategoriasDropdown && (
+                <div style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 6px)',
+                  left: 0,
+                  right: 0,
+                  zIndex: 30,
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: 'var(--radius)',
+                  backgroundColor: 'rgba(15,23,42,0.98)',
+                  overflow: 'hidden',
+                  boxShadow: '0 18px 45px rgba(0,0,0,0.35)',
+                }}>
+                  {categoriaIniciativaOpts.map((item, index) => (
                 <button
                   key={item.value}
                   type="button"
@@ -835,7 +988,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                     gap: '14px',
                     padding: '13px 16px',
                     border: 'none',
-                    borderBottom: item.value === categoriaIniciativaOpts[categoriaIniciativaOpts.length - 1].value ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                    borderBottom: index === categoriaIniciativaOpts.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.08)',
                     backgroundColor: categoriasIniciativa[item.value] ? 'rgba(0,193,175,0.09)' : 'transparent',
                     cursor: 'pointer',
                     textAlign: 'left',
@@ -860,7 +1013,9 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                     )}
                   </span>
                 </button>
-              ))}
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -1585,38 +1740,76 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                       Pool de Revisores Ad Hoc
                     </p>
                     <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
-                      Selecione os revisores disponíveis para avaliar as propostas habilitadas.
+                      Informe o CPF para localizar e adicionar revisores ao pool desta captação.
                     </p>
                   </div>
                   <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#00c1af', padding: '6px 10px', borderRadius: '999px', border: '1px solid rgba(0,193,175,0.28)', backgroundColor: 'rgba(0,193,175,0.08)', whiteSpace: 'nowrap' }}>
-                    {revisoresAdHocData.filter(revisor => revisoresAdHocSelecionados[revisor.id]).length} selecionado(s)
+                    {revisoresSelecionadosAdHoc.length} selecionado(s)
                   </div>
                 </div>
 
-                <div style={{
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  borderRadius: 'var(--radius)',
-                  backgroundColor: 'rgba(15,23,42,0.35)',
-                  overflow: 'hidden',
-                }}>
-                  {revisoresAdHocData.map((revisor, index) => {
-                    const checked = Boolean(revisoresAdHocSelecionados[revisor.id]);
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '12px', alignItems: 'end', marginBottom: '14px' }}>
+                  <div>
+                    <label style={labelStyle}>CPF do revisor</label>
+                    <input
+                      type="text"
+                      placeholder="Digite o CPF ou nome do revisor"
+                      value={cpfRevisorAdHoc}
+                      onChange={e => setCpfRevisorAdHoc(e.target.value)}
+                      style={inputStyle}
+                      onFocus={focusTeal}
+                      onBlur={blurGray}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (revisoresFiltradosAdHoc[0]) selecionarRevisorAdHoc(revisoresFiltradosAdHoc[0].id);
+                    }}
+                    disabled={!revisoresFiltradosAdHoc[0]}
+                    style={{
+                      height: '42px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '0 16px',
+                      border: 'none',
+                      borderRadius: 'var(--radius)',
+                      backgroundColor: revisoresFiltradosAdHoc[0] ? '#00c1af' : 'rgba(255,255,255,0.08)',
+                      color: revisoresFiltradosAdHoc[0] ? '#0f172a' : 'rgba(255,255,255,0.35)',
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      cursor: revisoresFiltradosAdHoc[0] ? 'pointer' : 'not-allowed',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    <Plus size={16} />
+                    Adicionar
+                  </button>
+                </div>
 
-                    return (
+                {cpfRevisorAdHoc.trim() && (
+                  <div style={{
+                    display: 'grid',
+                    gap: '8px',
+                    marginBottom: '16px',
+                  }}>
+                    {revisoresFiltradosAdHoc.slice(0, 3).map(revisor => (
                       <button
                         key={revisor.id}
                         type="button"
-                        onClick={() => toggleRevisorAdHoc(revisor.id)}
+                        onClick={() => selecionarRevisorAdHoc(revisor.id)}
                         style={{
                           width: '100%',
                           display: 'grid',
-                          gridTemplateColumns: '1.3fr 1fr 0.8fr auto',
+                          gridTemplateColumns: '1fr 150px 120px',
+                          gap: '12px',
                           alignItems: 'center',
-                          gap: '14px',
-                          padding: '13px 16px',
-                          border: 'none',
-                          borderBottom: index === revisoresAdHocData.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.08)',
-                          backgroundColor: checked ? 'rgba(0,193,175,0.09)' : 'transparent',
+                          padding: '11px 12px',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          borderRadius: 'var(--radius)',
+                          backgroundColor: 'rgba(15,23,42,0.45)',
                           cursor: 'pointer',
                           textAlign: 'left',
                         }}
@@ -1625,27 +1818,64 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                           <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>{revisor.nome}</div>
                           <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginTop: '2px' }}>{revisor.instituicao}</div>
                         </div>
-                        <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.68)' }}>{revisor.area}</span>
-                        <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.68)' }}>{revisor.titulacao}</span>
-                        <span style={{
-                          width: '18px',
-                          height: '18px',
-                          borderRadius: '4px',
-                          border: `2px solid ${checked ? '#00c1af' : 'rgba(255,255,255,0.24)'}`,
-                          backgroundColor: checked ? '#00c1af' : 'transparent',
+                        <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af' }}>{revisor.cpf}</span>
+                        <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.55)', textAlign: 'right' }}>Selecionar</span>
+                      </button>
+                    ))}
+                    {revisoresFiltradosAdHoc.length === 0 && (
+                      <div style={{ padding: '12px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(15,23,42,0.35)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)' }}>
+                        Nenhum revisor disponível encontrado para este CPF.
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div style={{ display: 'grid', gap: '12px' }}>
+                  {revisoresSelecionadosAdHoc.length === 0 ? (
+                    <div style={{ padding: '16px', border: '1px dashed rgba(255,255,255,0.18)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(15,23,42,0.25)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)' }}>
+                      Nenhum revisor ad hoc selecionado.
+                    </div>
+                  ) : revisoresSelecionadosAdHoc.map(revisor => (
+                    <div
+                      key={revisor.id}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1.3fr 160px 1fr 120px auto',
+                        gap: '12px',
+                        alignItems: 'center',
+                        padding: '14px',
+                        border: '1px solid rgba(0,193,175,0.22)',
+                        borderRadius: 'var(--radius)',
+                        backgroundColor: 'rgba(15,23,42,0.42)',
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>{revisor.nome}</div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginTop: '2px' }}>{revisor.instituicao}</div>
+                      </div>
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af' }}>{revisor.cpf}</span>
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.68)' }}>{revisor.area}</span>
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.68)' }}>{revisor.titulacao}</span>
+                      <button
+                        type="button"
+                        onClick={() => removerRevisorAdHoc(revisor.id)}
+                        style={{
+                          width: '32px',
+                          height: '32px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                        }}>
-                          {checked && (
-                            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                              <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                          )}
-                        </span>
+                          border: '1px solid rgba(239,68,68,0.28)',
+                          borderRadius: 'var(--radius)',
+                          backgroundColor: 'rgba(239,68,68,0.08)',
+                          color: '#ef4444',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <X size={15} />
                       </button>
-                    );
-                  })}
+                    </div>
+                  ))}
                 </div>
               </div>
             </>
@@ -1670,72 +1900,131 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
           </div>
 
           <div>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 4px' }}>Rubricas Permitidas</p>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.45)', margin: '0 0 16px' }}>Selecione as rubricas de despesas que podem ser utilizadas. Ao selecionar Bolsa, configure as modalidades e níveis permitidos.</p>
-            <div style={{
-              border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: 'var(--radius)',
-              backgroundColor: 'rgba(15,23,42,0.35)',
-              overflow: 'hidden',
-            }}>
-              {[
-                { key: 'materialPermanente', label: 'Material Permanente', descricao: 'Bens permanentes e equipamentos.' },
-                { key: 'materialConsumo', label: 'Material de Consumo', descricao: 'Itens consumíveis usados na iniciativa.' },
-                { key: 'passagem', label: 'Passagens', descricao: 'Deslocamentos aéreos, terrestres ou similares.' },
-                { key: 'diaria', label: 'Diárias', descricao: 'Diárias vinculadas às atividades da iniciativa.' },
-                { key: 'pessoaFisica', label: 'Pessoa Física', descricao: 'Serviços ou pagamentos para pessoa física.' },
-                { key: 'pessoaJuridica', label: 'Pessoa Jurídica', descricao: 'Serviços contratados de pessoa jurídica.' },
-                { key: 'bolsa', label: 'Bolsa', descricao: 'Modalidades e níveis de bolsa permitidos na captação.' },
-              ].map((item, index, lista) => {
-                const checked = Boolean(rubricas[item.key]);
+	            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 4px' }}>Rubricas Permitidas</p>
+	            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.45)', margin: '0 0 16px' }}>Selecione as rubricas de despesas que podem ser utilizadas. Ao selecionar uma rubrica, informe também quais sub-rubricas ficam permitidas.</p>
+	            <div style={{
+	              border: '1px solid rgba(255,255,255,0.12)',
+	              borderRadius: 'var(--radius)',
+	              backgroundColor: 'rgba(15,23,42,0.35)',
+	              overflow: 'hidden',
+	            }}>
+	              {rubricasPermitidasData.map((item, index, lista) => {
+	                const checked = Boolean(rubricas[item.key]);
+                  const totalSubRubricasSelecionadas = item.subRubricas.filter(subRubrica => subRubricas[subRubrica.key]).length;
+	
+	                return (
+	                  <div
+	                    key={item.key}
+	                    style={{
+	                      borderBottom: index === lista.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.08)',
+	                      backgroundColor: checked ? 'rgba(0,193,175,0.07)' : 'transparent',
+	                    }}
+	                  >
+	                    <button
+	                      type="button"
+	                      onClick={() => toggleRubrica(item.key)}
+	                      style={{
+	                        width: '100%',
+	                        display: 'grid',
+	                        gridTemplateColumns: '1fr auto auto',
+	                        alignItems: 'center',
+	                        gap: '14px',
+	                        padding: '14px 16px',
+	                        border: 'none',
+	                        backgroundColor: 'transparent',
+	                        cursor: 'pointer',
+	                        textAlign: 'left',
+	                      }}
+	                    >
+	                      <span>
+	                        <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff' }}>
+	                          {item.label}
+	                        </span>
+	                        <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginTop: '3px' }}>
+	                          {item.descricao}
+	                        </span>
+	                      </span>
+	                      {checked && (
+	                        <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#00c1af', padding: '5px 9px', borderRadius: '999px', border: '1px solid rgba(0,193,175,0.28)', backgroundColor: 'rgba(0,193,175,0.08)', whiteSpace: 'nowrap' }}>
+	                          {totalSubRubricasSelecionadas} sub-rubrica(s)
+	                        </span>
+	                      )}
+	                      <span style={{
+	                        width: '18px',
+	                        height: '18px',
+	                        borderRadius: '4px',
+	                        border: `2px solid ${checked ? '#00c1af' : 'rgba(255,255,255,0.24)'}`,
+	                        backgroundColor: checked ? '#00c1af' : 'transparent',
+	                        display: 'flex',
+	                        alignItems: 'center',
+	                        justifyContent: 'center',
+	                      }}>
+	                        {checked && (
+	                          <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+	                            <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+	                          </svg>
+	                        )}
+	                      </span>
+	                    </button>
 
-                return (
-                  <button
-                    key={item.key}
-                    type="button"
-                    onClick={() => toggleRubrica(item.key)}
-                    style={{
-                      width: '100%',
-                      display: 'grid',
-                      gridTemplateColumns: '1fr auto',
-                      alignItems: 'center',
-                      gap: '16px',
-                      padding: '14px 16px',
-                      border: 'none',
-                      borderBottom: index === lista.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.08)',
-                      backgroundColor: checked ? 'rgba(0,193,175,0.09)' : 'transparent',
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                    }}
-                  >
-                    <span>
-                      <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff' }}>
-                        {item.label}
-                      </span>
-                      <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginTop: '3px' }}>
-                        {item.descricao}
-                      </span>
-                    </span>
-                    <span style={{
-                      width: '18px',
-                      height: '18px',
-                      borderRadius: '4px',
-                      border: `2px solid ${checked ? '#00c1af' : 'rgba(255,255,255,0.24)'}`,
-                      backgroundColor: checked ? '#00c1af' : 'transparent',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                      {checked && (
-                        <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                          <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      )}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+	                    {checked && (
+	                      <div style={{
+	                        padding: '0 16px 16px 16px',
+	                        display: 'grid',
+	                        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+	                        gap: '10px',
+	                      }}>
+	                        {item.subRubricas.map(subRubrica => {
+	                          const subChecked = Boolean(subRubricas[subRubrica.key]);
+
+	                          return (
+	                            <button
+	                              key={subRubrica.key}
+	                              type="button"
+	                              onClick={() => toggleSubRubrica(subRubrica.key)}
+	                              style={{
+	                                display: 'flex',
+	                                alignItems: 'center',
+	                                justifyContent: 'space-between',
+	                                gap: '12px',
+	                                minHeight: '42px',
+	                                padding: '10px 12px',
+	                                border: `1px solid ${subChecked ? 'rgba(0,193,175,0.34)' : 'rgba(255,255,255,0.1)'}`,
+	                                borderRadius: 'var(--radius)',
+	                                backgroundColor: subChecked ? 'rgba(0,193,175,0.1)' : 'rgba(15,23,42,0.35)',
+	                                cursor: 'pointer',
+	                                textAlign: 'left',
+	                              }}
+	                            >
+	                              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: subChecked ? '#ffffff' : 'rgba(255,255,255,0.7)' }}>
+	                                {subRubrica.label}
+	                              </span>
+	                              <span style={{
+	                                width: '16px',
+	                                height: '16px',
+	                                borderRadius: '4px',
+	                                border: `2px solid ${subChecked ? '#00c1af' : 'rgba(255,255,255,0.24)'}`,
+	                                backgroundColor: subChecked ? '#00c1af' : 'transparent',
+	                                display: 'flex',
+	                                alignItems: 'center',
+	                                justifyContent: 'center',
+	                                flexShrink: 0,
+	                              }}>
+	                                {subChecked && (
+	                                  <svg width="9" height="7" viewBox="0 0 10 8" fill="none">
+	                                    <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+	                                  </svg>
+	                                )}
+	                              </span>
+	                            </button>
+	                          );
+	                        })}
+	                      </div>
+	                    )}
+	                  </div>
+	                );
+	              })}
+	            </div>
           </div>
 
           {rubricas.bolsa && (
