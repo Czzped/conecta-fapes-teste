@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronRight, Home, ArrowLeft, ChevronDown, X, Send, Save } from 'lucide-react';
+import { ChevronRight, Home, ArrowLeft, ChevronDown, X, Save } from 'lucide-react';
+import { FormularioEdital } from './FormularioEdital';
 
 interface Props {
   onBack: () => void;
@@ -69,7 +70,81 @@ const avaliadores = [
   { id: 8, nome: 'Juliana Menezes Rocha', cpf: '890.123.456-77' },
 ];
 
+const fasesIniciativas = [
+  { fase: 'Submetida', quantidade: 42, cor: '#38bdf8' },
+  { fase: 'Habilitação documental', quantidade: 31, cor: '#fbbf24' },
+  { fase: 'Avaliação ad hoc', quantidade: 24, cor: '#a78bfa' },
+  { fase: 'Resultado preliminar', quantidade: 18, cor: '#fb7185' },
+  { fase: 'Revisão de resultado', quantidade: 6, cor: '#f97316' },
+  { fase: 'Resultado final', quantidade: 12, cor: '#22c55e' },
+];
+
+const iniciativasEnviadas = [
+  { codigo: 'INI-2026-001', titulo: 'Plataforma inteligente de monitoramento hídrico', proponente: 'Instituto Federal do Espírito Santo', ortogado: 'Mariana Lopes', fase: 'Avaliação ad hoc', data: '12/02/2026', categoria: 'Inovação', faixa: 'Faixa 2', valorSolicitado: 'R$ 420.000,00', valorNumerico: 420000, resumo: 'Solução para monitorar bacias hidrográficas com sensores conectados e painéis de alerta.', rubricas: [{ nome: 'Bolsas', valor: 140000, cor: '#38bdf8' }, { nome: 'Capital', valor: 180000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 100000, cor: '#22c55e' }] },
+  { codigo: 'INI-2026-002', titulo: 'Bioinsumos para agricultura de precisão', proponente: 'Universidade Federal do Espírito Santo', ortogado: 'André Carvalho', fase: 'Habilitação documental', data: '14/02/2026', categoria: 'Pesquisa', faixa: 'Faixa 1', valorSolicitado: 'R$ 180.000,00', valorNumerico: 180000, resumo: 'Pesquisa aplicada para validação de bioinsumos em cadeias produtivas regionais.', rubricas: [{ nome: 'Bolsas', valor: 90000, cor: '#38bdf8' }, { nome: 'Custeio', valor: 70000, cor: '#22c55e' }, { nome: 'Diárias e passagens', valor: 20000, cor: '#fb7185' }] },
+  { codigo: 'INI-2026-003', titulo: 'Sistema de rastreabilidade para cadeias produtivas', proponente: 'Findes Lab', ortogado: 'Patrícia Almeida', fase: 'Resultado preliminar', data: '20/02/2026', categoria: 'Inovação', faixa: 'Faixa 2', valorSolicitado: 'R$ 390.000,00', valorNumerico: 390000, resumo: 'Plataforma para rastrear origem, qualidade e movimentação de produtos industriais.', rubricas: [{ nome: 'Capital', valor: 170000, cor: '#a78bfa' }, { nome: 'Serviços de terceiros', valor: 150000, cor: '#fbbf24' }, { nome: 'Custeio', valor: 70000, cor: '#22c55e' }] },
+  { codigo: 'INI-2026-004', titulo: 'Tecnologia assistiva para educação inclusiva', proponente: 'Instituto Capixaba de Tecnologia', ortogado: 'Lucas Rocha', fase: 'Revisão de resultado', data: '22/02/2026', categoria: 'Extensão', faixa: 'Faixa 1', valorSolicitado: 'R$ 150.000,00', valorNumerico: 150000, resumo: 'Ferramentas digitais e dispositivos de apoio para estudantes com deficiência.', rubricas: [{ nome: 'Bolsas', valor: 60000, cor: '#38bdf8' }, { nome: 'Capital', valor: 50000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 40000, cor: '#22c55e' }] },
+  { codigo: 'INI-2026-005', titulo: 'Observatório de inovação em saúde pública', proponente: 'Hospital Universitário Cassiano Antônio Moraes', ortogado: 'Fernanda Costa', fase: 'Resultado final', data: '25/02/2026', categoria: 'Pesquisa', faixa: 'Faixa 2', valorSolicitado: 'R$ 480.000,00', valorNumerico: 480000, resumo: 'Observatório para consolidar indicadores, evidências e iniciativas de inovação em saúde.', rubricas: [{ nome: 'Bolsas', valor: 180000, cor: '#38bdf8' }, { nome: 'Capital', valor: 160000, cor: '#a78bfa' }, { nome: 'Serviços de terceiros', valor: 90000, cor: '#fbbf24' }, { nome: 'Custeio', valor: 50000, cor: '#22c55e' }] },
+  { codigo: 'INI-2026-006', titulo: 'Rede de sensores para cidades resilientes', proponente: 'Prefeitura Municipal de Vitória', ortogado: 'Ricardo Torres', fase: 'Submetida', data: '28/02/2026', categoria: 'Inovação', faixa: 'Faixa 1', valorSolicitado: 'R$ 210.000,00', valorNumerico: 210000, resumo: 'Rede de sensores urbanos para apoiar resposta rápida a eventos climáticos.', rubricas: [{ nome: 'Capital', valor: 130000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 50000, cor: '#22c55e' }, { nome: 'Diárias e passagens', valor: 30000, cor: '#fb7185' }] },
+];
+
+const avaliacoesAdHoc = [
+  { iniciativaCodigo: 'INI-2026-001', revisor: 'Dra. Helena Martins', area: 'Pesquisa em Saúde', status: 'Concluída', nota: '88', parecer: 'Proposta consistente, com boa clareza metodológica e impacto regional relevante.' },
+  { iniciativaCodigo: 'INI-2026-001', revisor: 'Dr. Rafael Nogueira', area: 'Inovação Tecnológica', status: 'Em avaliação', nota: '-', parecer: 'Avaliação técnica em andamento.' },
+  { iniciativaCodigo: 'INI-2026-003', revisor: 'Dra. Livia Barbosa', area: 'Educação e Extensão', status: 'Concluída', nota: '81', parecer: 'Boa aderência ao edital, com necessidade de detalhar indicadores de adoção.' },
+  { iniciativaCodigo: 'INI-2026-004', revisor: 'Dr. Marcos Teixeira', area: 'Ciências Agrárias', status: 'Solicitada revisão', nota: '74', parecer: 'Revisão solicitada para esclarecer plano de execução e orçamento.' },
+  { iniciativaCodigo: 'INI-2026-005', revisor: 'Dra. Helena Martins', area: 'Pesquisa em Saúde', status: 'Concluída', nota: '92', parecer: 'Excelente alinhamento com a política pública e boa capacidade de execução.' },
+];
+
+const revisoresAdHocDashboard = [
+  { nome: 'Dra. Helena Martins', area: 'Pesquisa em Saúde', titulacao: 'Doutorado', instituicao: 'UFES', status: 'Ativa' },
+  { nome: 'Dr. Rafael Nogueira', area: 'Inovação Tecnológica', titulacao: 'Doutorado', instituicao: 'IFES', status: 'Ativo' },
+  { nome: 'Dra. Livia Barbosa', area: 'Educação e Extensão', titulacao: 'Doutorado', instituicao: 'UFES', status: 'Ativa' },
+  { nome: 'Dr. Marcos Teixeira', area: 'Ciências Agrárias', titulacao: 'Mestrado', instituicao: 'Incaper', status: 'Ativo' },
+];
+
+const financeiroCaptacaoDetalhe = {
+  totalSolicitado: iniciativasEnviadas.reduce((total, iniciativa) => total + iniciativa.valorNumerico, 0),
+  totalDisponivel: 5000000,
+  rubricas: [
+    { nome: 'Bolsas', valor: 620000, quantidade: 4, cor: '#38bdf8' },
+    { nome: 'Capital', valor: 510000, quantidade: 3, cor: '#a78bfa' },
+    { nome: 'Custeio', valor: 430000, quantidade: 5, cor: '#22c55e' },
+    { nome: 'Serviços de terceiros', valor: 190000, quantidade: 2, cor: '#fbbf24' },
+    { nome: 'Diárias e passagens', valor: 80000, quantidade: 1, cor: '#fb7185' },
+  ],
+};
+
+const financeiroPorFaixaCaptacao = Array.from(new Set(iniciativasEnviadas.map(iniciativa => iniciativa.faixa))).map(faixa => {
+  const iniciativasDaFaixa = iniciativasEnviadas.filter(iniciativa => iniciativa.faixa === faixa);
+  const rubricas = iniciativasDaFaixa.reduce<Array<{ nome: string; valor: number; quantidade: number; cor: string }>>((totais, iniciativa) => {
+    iniciativa.rubricas.forEach(rubrica => {
+      const totalExistente = totais.find(item => item.nome === rubrica.nome);
+
+      if (totalExistente) {
+        totalExistente.valor += rubrica.valor;
+        totalExistente.quantidade += 1;
+      } else {
+        totais.push({ nome: rubrica.nome, valor: rubrica.valor, quantidade: 1, cor: rubrica.cor });
+      }
+    });
+
+    return totais;
+  }, []);
+
+  return {
+    faixa,
+    quantidadeIniciativas: iniciativasDaFaixa.length,
+    valorTotal: iniciativasDaFaixa.reduce((total, iniciativa) => total + iniciativa.valorNumerico, 0),
+    rubricas,
+  };
+});
+
 export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
+  const [activeTab, setActiveTab] = useState<'resumo' | 'dashboard'>('resumo');
+  const [editingResumo, setEditingResumo] = useState(false);
+  const [showFormularioEdicao, setShowFormularioEdicao] = useState(false);
+  const [iniciativaSelecionadaCodigo, setIniciativaSelecionadaCodigo] = useState(iniciativasEnviadas[0].codigo);
   const [showModal, setShowModal] = useState(false);
   const [avaliador1, setAvaliador1] = useState('');
   const [avaliador2, setAvaliador2] = useState('');
@@ -77,6 +152,19 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
   const [showDropdown1, setShowDropdown1] = useState(false);
   const [showDropdown2, setShowDropdown2] = useState(false);
   const [showDropdown3, setShowDropdown3] = useState(false);
+  const resumoInputStyle: React.CSSProperties = {
+    ...inputStyle,
+    backgroundColor: editingResumo ? 'rgba(15,23,42,0.95)' : inputStyle.backgroundColor,
+    border: editingResumo ? '1px solid rgba(0,193,175,0.42)' : inputStyle.border,
+  };
+  const iniciativaSelecionada = iniciativasEnviadas.find(item => item.codigo === iniciativaSelecionadaCodigo) || iniciativasEnviadas[0];
+  const maiorValorRubricaDetalhe = Math.max(...financeiroCaptacaoDetalhe.rubricas.map(item => item.valor), 1);
+  const formatCurrency = (value: number) =>
+    value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  if (showFormularioEdicao) {
+    return <FormularioEdital mode="edit" onBack={() => setShowFormularioEdicao(false)} />;
+  }
 
   const renderModal = () => {
     if (!showModal) return null;
@@ -415,252 +503,486 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
           </span>
         </div>
 
-        {/* Header com botão Voltar e botão Enviar Para Avaliação */}
+        {/* Header com botão Voltar */}
         <div className="mb-6">
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', flex: 1 }}>
-              <button
-                onClick={onBack}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '36px',
-                  height: '36px',
-                  flexShrink: 0,
-                  backgroundColor: 'rgba(0,193,175,0.15)',
-                  borderRadius: 'var(--radius)',
-                  border: 'none',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s',
-                }}
-                onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.25)'}
-                onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.15)'}
-              >
-                <ArrowLeft size={18} style={{ color: '#00c1af' }} />
-              </button>
-              <div style={{ flex: 1 }}>
-                <h1 style={{
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--text-md)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  color: '#ffffff',
-                  margin: '0 0 8px',
-                  lineHeight: '1.4',
-                }}>
-                  Captação
-                </h1>
-                <p style={{
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--text-sm)',
-                  color: 'rgba(255,255,255,0.55)',
-                  margin: 0,
-                }}>
-                  Verifique as informações dessa Captação.
-                </p>
-              </div>
-            </div>
-
-            {/* Botão Enviar Para Avaliação */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
             <button
-              onClick={() => setShowModal(true)}
+              onClick={onBack}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '10px 18px',
-                backgroundColor: '#00c1af',
-                border: 'none',
-                borderRadius: 'var(--radius)',
-                color: '#0f172a',
-                fontFamily: 'var(--font-family)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)',
-                cursor: 'pointer',
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px',
                 flexShrink: 0,
+                backgroundColor: 'rgba(0,193,175,0.15)',
+                borderRadius: 'var(--radius)',
+                border: 'none',
+                cursor: 'pointer',
                 transition: 'background-color 0.2s',
               }}
-              onMouseEnter={e => e.currentTarget.style.backgroundColor = '#00a89a'}
-              onMouseLeave={e => e.currentTarget.style.backgroundColor = '#00c1af'}
+              onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.25)'}
+              onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.15)'}
             >
-              <Send size={16} />
-              Enviar Para Avaliação
+              <ArrowLeft size={18} style={{ color: '#00c1af' }} />
             </button>
+            <div style={{ flex: 1 }}>
+              <h1 style={{
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-md)',
+                fontWeight: 'var(--font-weight-medium)',
+                color: '#ffffff',
+                margin: '0 0 8px',
+                lineHeight: '1.4',
+              }}>
+                Captação
+              </h1>
+              <p style={{
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+                color: 'rgba(255,255,255,0.55)',
+                margin: 0,
+              }}>
+                Verifique as informações dessa Captação.
+              </p>
+            </div>
           </div>
           <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', marginTop: '24px' }} />
         </div>
 
-        {/* Identificação da Captação */}
+        <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '24px' }}>
+          {[
+            { id: 'resumo', label: 'Resumo' },
+            { id: 'dashboard', label: 'Dashboard' },
+          ].map(tab => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id as typeof activeTab)}
+              style={{
+                padding: '12px 24px',
+                background: 'none',
+                border: 'none',
+                borderBottom: activeTab === tab.id ? '2px solid #00c1af' : '2px solid transparent',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                color: activeTab === tab.id ? '#00c1af' : 'rgba(255,255,255,0.6)',
+                cursor: 'pointer',
+                marginBottom: '-1px',
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'resumo' && (
+          <>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+          <button
+            type="button"
+            onClick={() => setShowFormularioEdicao(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 18px',
+              backgroundColor: 'rgba(0,193,175,0.1)',
+              border: '1px solid rgba(0,193,175,0.3)',
+              borderRadius: 'var(--radius)',
+              color: '#00c1af',
+              fontFamily: 'var(--font-family)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              cursor: 'pointer',
+            }}
+          >
+            Editar captação
+          </button>
+        </div>
+
+        {/* SESSÃO 1 — Identificação da Captação */}
         <div style={cardStyle}>
-          <h2 style={sectionTitleStyle}>Identificação da Captação</h2>
+          <h2 style={sectionTitleStyle}>1. Identificação da Captação</h2>
           
           <div style={{ display: 'grid', gap: '16px' }}>
-            {/* Título da Captação */}
-            <div>
-              <label style={labelStyle}>Título da Captação</label>
-              <input type="text" value="Edital de Inovação Tecnológica 2026" readOnly style={inputStyle} />
-            </div>
-
-            {/* Tipo de Captação e Setor Responsável */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '180px 1.6fr 1fr', gap: '16px' }}>
+              <div>
+                <label style={labelStyle}>Código da Captação</label>
+                <input type="text" defaultValue="CAP-001/2026" readOnly={!editingResumo} style={resumoInputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Título da Captação</label>
+                <input type="text" defaultValue="Edital de Inovação Tecnológica 2026" readOnly={!editingResumo} style={resumoInputStyle} />
+              </div>
               <div>
                 <label style={labelStyle}>Tipo de Captação</label>
-                <input type="text" value="Edital Aberto" readOnly style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Setor Responsável</label>
-                <input type="text" value="GEINOV" readOnly style={inputStyle} />
+                <input type="text" defaultValue="Chamada Pública" readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
             </div>
 
-            {/* Tipo de Fomento e Número da Captação */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <div>
-                <label style={labelStyle}>Tipo de Fomento</label>
-                <input type="text" value="Inovação" readOnly style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Número da Captação</label>
-                <input type="text" value="001/2026" readOnly style={inputStyle} />
-              </div>
+            <div>
+              <label style={labelStyle}>Link do Edital</label>
+              <input type="text" defaultValue="https://fapes.es.gov.br/editais/cap-001-2026" readOnly={!editingResumo} style={resumoInputStyle} />
             </div>
 
-            {/* Data de Início e Data de Fim */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <div>
-                <label style={labelStyle}>Data de Início</label>
-                <input type="text" value="01/02/2026" readOnly style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Data de Fim</label>
-                <input type="text" value="31/12/2026" readOnly style={inputStyle} />
-              </div>
-            </div>
-
-            {/* Descrição da Captação */}
             <div>
               <label style={labelStyle}>Descrição da Captação</label>
               <textarea
-                value="Edital voltado para fomentar projetos de inovação tecnológica no Estado do Espírito Santo, com foco em soluções que promovam o desenvolvimento econômico e social sustentável."
-                readOnly
+                defaultValue="Edital voltado para fomentar iniciativas de inovação tecnológica no Estado do Espírito Santo, com foco em soluções que promovam o desenvolvimento econômico e social sustentável."
+                readOnly={!editingResumo}
                 rows={3}
                 style={{
-                  ...inputStyle,
+                  ...resumoInputStyle,
                   resize: 'vertical',
                   lineHeight: '1.6',
                 }}
               />
             </div>
 
-            {/* Formulários */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={labelStyle}>Formulário de Inscrição</label>
-                <input type="text" value="Formulário de Inovação" readOnly style={inputStyle} />
+                <label style={labelStyle}>Área Técnica Responsável</label>
+                <input type="text" defaultValue="GEINOV" readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
               <div>
-                <label style={labelStyle}>Formulário de Avaliação</label>
-                <input type="text" value="Avaliação de Inovação" readOnly style={inputStyle} />
+                <label style={labelStyle}>Categorias de Iniciativas</label>
+                <input type="text" defaultValue="Inovação, Pesquisa" readOnly={!editingResumo} style={resumoInputStyle} />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div>
+                <label style={labelStyle}>Tipos de Iniciativas Aceitos</label>
+                <input type="text" defaultValue="Projeto de inovação, Projeto de pesquisa" readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
               <div>
-                <label style={labelStyle}>Formulário do Recurso</label>
-                <input type="text" value="Recurso Padrão" readOnly style={inputStyle} />
+                <label style={labelStyle}>Status da Configuração</label>
+                <input type="text" defaultValue="Publicado" readOnly={!editingResumo} style={{ ...resumoInputStyle, color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }} />
+              </div>
+            </div>
+
+            <div style={dividerStyle} />
+
+            <div>
+              <h3 style={subSectionTitleStyle}>Aportes Financeiros da Captação</h3>
+              <div style={{ display: 'grid', gap: '12px' }}>
+                {[
+                  { origem: 'Programa de Inovação Tecnológica', tipo: 'Programa', valor: 'R$ 3.000.000,00' },
+                  { origem: 'Parceria FAPES/Findes', tipo: 'Parceria', valor: 'R$ 2.000.000,00' },
+                ].map((aporte, index) => (
+                  <div key={aporte.origem} style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 140px 170px',
+                    gap: '16px',
+                    padding: '14px 16px',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: 'var(--radius)',
+                    backgroundColor: 'rgba(15,23,42,0.32)',
+                  }}>
+                    <div>
+                      <label style={labelStyle}>Origem {index + 1}</label>
+                      <input type="text" defaultValue={aporte.origem} readOnly={!editingResumo} style={resumoInputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Tipo</label>
+                      <input type="text" defaultValue={aporte.tipo} readOnly={!editingResumo} style={resumoInputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Valor aportado</label>
+                      <input type="text" defaultValue={aporte.valor} readOnly={!editingResumo} style={resumoInputStyle} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '16px' }}>
+              <div>
+                <label style={labelStyle}>Total Financeiro</label>
+                <input type="text" defaultValue="R$ 5.000.000,00" readOnly={!editingResumo} style={{ ...resumoInputStyle, color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }} />
+              </div>
+              <div>
+                <label style={labelStyle}>Total por Faixas</label>
+                <input type="text" defaultValue="R$ 5.000.000,00" readOnly={!editingResumo} style={resumoInputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Saldo sem faixa</label>
+                <input type="text" defaultValue="R$ 0,00" readOnly={!editingResumo} style={resumoInputStyle} />
+              </div>
+            </div>
+
+            <div>
+              <h3 style={subSectionTitleStyle}>Faixas de Financiamento</h3>
+              <div style={{ display: 'grid', gap: '12px' }}>
+                {[
+                  { nome: 'Faixa 1', duracao: '24 meses', minimo: 'R$ 50.000,00', maximo: 'R$ 200.000,00', aportado: 'R$ 3.000.000,00' },
+                  { nome: 'Faixa 2', duracao: '36 meses', minimo: 'R$ 200.001,00', maximo: 'R$ 500.000,00', aportado: 'R$ 2.000.000,00' },
+                ].map(faixa => (
+                  <div key={faixa.nome} style={{
+                    padding: '16px',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: 'var(--radius)',
+                    backgroundColor: 'rgba(15,23,42,0.32)',
+                  }}>
+                    <h4 style={{ ...subSectionTitleStyle, marginBottom: '12px' }}>{faixa.nome}</h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
+                      <div>
+                        <label style={labelStyle}>Duração máxima</label>
+                        <input type="text" defaultValue={faixa.duracao} readOnly={!editingResumo} style={resumoInputStyle} />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>Valor mínimo</label>
+                        <input type="text" defaultValue={faixa.minimo} readOnly={!editingResumo} style={resumoInputStyle} />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>Valor máximo</label>
+                        <input type="text" defaultValue={faixa.maximo} readOnly={!editingResumo} style={resumoInputStyle} />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>Valor aportado</label>
+                        <input type="text" defaultValue={faixa.aportado} readOnly={!editingResumo} style={resumoInputStyle} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Parametrizações Gerais */}
+        {/* SESSÃO 2 — Cronograma da Captação */}
         <div style={cardStyle}>
-          <h2 style={sectionTitleStyle}>Parametrizações Gerais</h2>
+          <h2 style={sectionTitleStyle}>2. Cronograma da Captação</h2>
 
           <div style={{ display: 'grid', gap: '16px' }}>
-            {/* Faixas de Financiamento */}
-            <div>
-              <label style={labelStyle}>Faixas de Financiamento</label>
-              <input type="text" value="Habilitado" readOnly style={inputStyle} />
-            </div>
+            {[
+              { etapa: 'Publicação da captação', inicio: '01/02/2026', fim: '01/02/2026' },
+              { etapa: 'Recebimento das propostas', inicio: '01/02/2026', fim: '31/03/2026' },
+              { etapa: 'Avaliação documental', inicio: '01/04/2026', fim: '15/04/2026' },
+              { etapa: 'Avaliação ad hoc', inicio: '16/04/2026', fim: '31/05/2026' },
+              { etapa: 'Publicação do resultado preliminar', inicio: '05/06/2026', fim: '05/06/2026' },
+              { etapa: 'Recebimento de revisão do resultado', inicio: '06/06/2026', fim: '15/06/2026' },
+              { etapa: 'Publicação do resultado após revisão', inicio: '20/06/2026', fim: '20/06/2026' },
+              { etapa: 'Publicação do resultado final', inicio: '25/06/2026', fim: '25/06/2026' },
+            ].map((item, index) => (
+              <div key={item.etapa} style={{
+                display: 'grid',
+                gridTemplateColumns: '42px 1fr 160px 160px',
+                gap: '16px',
+                alignItems: 'center',
+                padding: '14px 16px',
+                borderRadius: 'var(--radius)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                backgroundColor: 'rgba(15,23,42,0.32)',
+              }}>
+                <div style={{
+                  width: '30px',
+                  height: '30px',
+                  borderRadius: '999px',
+                  backgroundColor: 'rgba(0,193,175,0.12)',
+                  color: '#00c1af',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 'var(--font-weight-medium)',
+                }}>
+                  {index + 1}
+                </div>
+                <div>
+                  <label style={labelStyle}>Etapa obrigatória</label>
+                  <input type="text" defaultValue={item.etapa} readOnly={!editingResumo} style={resumoInputStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Data inicial</label>
+                  <input type="text" defaultValue={item.inicio} readOnly={!editingResumo} style={resumoInputStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Data final</label>
+                  <input type="text" defaultValue={item.fim} readOnly={!editingResumo} style={resumoInputStyle} />
+                </div>
+              </div>
+            ))}
 
-            {/* Faixa 1 - SEM CARD */}
+            <div style={dividerStyle} />
+
             <div>
-              <h3 style={{ ...subSectionTitleStyle, marginBottom: '12px' }}>Faixa 1</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
-                <div>
-                  <label style={labelStyle}>Duração (meses)</label>
-                  <input type="text" value="24" readOnly style={inputStyle} />
+              <h3 style={subSectionTitleStyle}>Histórico de Adiamentos</h3>
+              <div style={{
+                padding: '14px 16px',
+                borderRadius: 'var(--radius)',
+                border: '1px solid rgba(251,191,36,0.22)',
+                backgroundColor: 'rgba(251,191,36,0.06)',
+              }}>
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', marginBottom: '4px' }}>
+                  Avaliação documental adiada em 5 dia(s)
                 </div>
-                <div>
-                  <label style={labelStyle}>Valor Mínimo (R$)</label>
-                  <input type="text" value="R$ 50.000,00" readOnly style={inputStyle} />
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#fbbf24', marginBottom: '4px' }}>
+                  01/04/2026 → 06/04/2026 · fim: 15/04/2026 → 20/04/2026
                 </div>
-                <div>
-                  <label style={labelStyle}>Valor Máximo (R$)</label>
-                  <input type="text" value="R$ 200.000,00" readOnly style={inputStyle} />
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.55)' }}>
+                  Necessidade de tempo adicional para conferência documental.
+                </div>
+              </div>
+
+              <div style={{
+                marginTop: '18px',
+                paddingTop: '18px',
+                borderTop: '1px solid rgba(255,255,255,0.08)',
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
+                    Rubricas da iniciativa selecionada
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)' }}>
+                    Total: {iniciativaSelecionada.valorSolicitado}
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gap: '12px' }}>
+                  {iniciativaSelecionada.rubricas.map(rubrica => {
+                    const percentual = Math.round((rubrica.valor / iniciativaSelecionada.valorNumerico) * 100);
+
+                    return (
+                      <div key={`${iniciativaSelecionada.codigo}-${rubrica.nome}`}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 160px 80px', gap: '12px', alignItems: 'center', marginBottom: '6px' }}>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                            {rubrica.nome}
+                          </div>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: rubrica.cor, textAlign: 'right' }}>
+                            {formatCurrency(rubrica.valor)}
+                          </div>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', textAlign: 'right' }}>
+                            {percentual}%
+                          </div>
+                        </div>
+                        <div style={{ height: '7px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                          <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: rubrica.cor }} />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
             <div style={dividerStyle} />
 
-            {/* Regras Gerais de Submissão */}
             <div>
-              <h3 style={subSectionTitleStyle}>Regras Gerais de Submissão</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <h3 style={subSectionTitleStyle}>Formulários da Captação</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
                 <div>
-                  <label style={labelStyle}>Múltiplas Submissões</label>
-                  <input type="text" value="Permitidas" readOnly style={inputStyle} />
+                  <label style={labelStyle}>Formulário de Inscrição</label>
+                  <input type="text" defaultValue="Formulário de Inovação" readOnly={!editingResumo} style={resumoInputStyle} />
                 </div>
                 <div>
-                  <label style={labelStyle}>Coordenador pode ter outro projeto</label>
-                  <input type="text" value="Sim" readOnly style={inputStyle} />
+                  <label style={labelStyle}>Formulário de Avaliação</label>
+                  <input type="text" defaultValue="Avaliação de Inovação" readOnly={!editingResumo} style={resumoInputStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Formulário do Recurso</label>
+                  <input type="text" defaultValue="Recurso Padrão" readOnly={!editingResumo} style={resumoInputStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Formulário de Anexos</label>
+                  <input type="text" defaultValue="Anexos institucionais" readOnly={!editingResumo} style={resumoInputStyle} />
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Requisitos do Coordenador */}
+        {/* SESSÃO 3 — Parametrizações Gerais */}
         <div style={cardStyle}>
-          <h2 style={sectionTitleStyle}>Requisitos do Coordenador</h2>
+          <h2 style={sectionTitleStyle}>3. Parametrizações Gerais</h2>
 
           <div style={{ display: 'grid', gap: '16px' }}>
+            <h3 style={subSectionTitleStyle}>Regras de Submissão</h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={labelStyle}>Vinculada a Instituição</label>
-                <input type="text" value="Sim" readOnly style={inputStyle} />
+                <label style={labelStyle}>Permitir múltiplas propostas por proponente</label>
+                <input type="text" defaultValue="Sim" readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
               <div>
-                <label style={labelStyle}>Nível Acadêmico</label>
-                <input type="text" value="Doutorado" readOnly style={inputStyle} />
+                <label style={labelStyle}>Coordenador pode ter outro projeto ativo</label>
+                <input type="text" defaultValue="Sim" readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
             </div>
-
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={labelStyle}>Restrição de Vínculo Empregatício</label>
-                <input type="text" value="Sim" readOnly style={inputStyle} />
+                <label style={labelStyle}>Coordenador pode acumular bolsa</label>
+                <input type="text" defaultValue="Não" readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
               <div>
-                <label style={labelStyle}>Parceria com Instituições</label>
-                <input type="text" value="Permitida" readOnly style={inputStyle} />
+                <label style={labelStyle}>Apenas proponentes escolhidos</label>
+                <input type="text" defaultValue="Não" readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Avaliação e Prestação de Contas */}
+        {/* SESSÃO 4 — Requisitos e Restrições */}
         <div style={cardStyle}>
-          <h2 style={sectionTitleStyle}>Avaliação e Prestação de Contas</h2>
+          <h2 style={sectionTitleStyle}>4. Requisitos e Restrições</h2>
 
           <div style={{ display: 'grid', gap: '16px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={labelStyle}>Necessita Avaliação</label>
-                <input type="text" value="Sim" readOnly style={inputStyle} />
+                <label style={labelStyle}>Direcionamento da proposta</label>
+                <input type="text" defaultValue="Aberta" readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
               <div>
-                <label style={labelStyle}>Possui Prestação Técnica</label>
-                <input type="text" value="Sim" readOnly style={inputStyle} />
+                <label style={labelStyle}>Proposta vinculada à instituição</label>
+                <input type="text" defaultValue="Sim" readOnly={!editingResumo} style={resumoInputStyle} />
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div>
+                <label style={labelStyle}>Nível acadêmico mínimo</label>
+                <input type="text" defaultValue="Doutorado" readOnly={!editingResumo} style={resumoInputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Gestor institucional obrigatório</label>
+                <input type="text" defaultValue="Sim" readOnly={!editingResumo} style={resumoInputStyle} />
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div>
+                <label style={labelStyle}>Restrição de vínculo empregatício</label>
+                <input type="text" defaultValue="Sim" readOnly={!editingResumo} style={resumoInputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Permite parceria entre instituições</label>
+                <input type="text" defaultValue="Sim" readOnly={!editingResumo} style={resumoInputStyle} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* SESSÃO 5 — Rubricas, Avaliação e Prestações */}
+        <div style={cardStyle}>
+          <h2 style={sectionTitleStyle}>5. Rubricas, Avaliação e Prestações</h2>
+
+          <div style={{ display: 'grid', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
+              <div>
+                <label style={labelStyle}>Necessita avaliação ad hoc?</label>
+                <input type="text" defaultValue="Sim" readOnly={!editingResumo} style={resumoInputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Mínimo de revisores por proposta</label>
+                <input type="text" defaultValue="2" readOnly={!editingResumo} style={resumoInputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Prestação técnica</label>
+                <input type="text" defaultValue="Sim" readOnly={!editingResumo} style={resumoInputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Prestação financeira</label>
+                <input type="text" defaultValue="Sim" readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
             </div>
 
@@ -668,111 +990,616 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
 
             <div>
               <h3 style={subSectionTitleStyle}>Rubricas Permitidas</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
-                <div>
-                  <label style={labelStyle}>Rubrica 1</label>
-                  <input type="text" value="Material Permanente" readOnly style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Rubrica 2</label>
-                  <input type="text" value="Material de Consumo" readOnly style={inputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Rubrica 3</label>
-                  <input type="text" value="Pessoa Física" readOnly style={inputStyle} />
-                </div>
+              <div style={{ display: 'grid', gap: '12px' }}>
+                {[
+                  { label: 'Material Permanente', descricao: 'Bens permanentes e equipamentos.' },
+                  { label: 'Material de Consumo', descricao: 'Itens consumíveis usados na iniciativa.' },
+                  { label: 'Bolsa', descricao: 'Modalidades e níveis de bolsa permitidos na captação.' },
+                ].map(rubrica => (
+                  <div key={rubrica.label} style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr auto',
+                    alignItems: 'center',
+                    gap: '16px',
+                    padding: '14px 16px',
+                    border: '1px solid rgba(0,193,175,0.24)',
+                    borderRadius: 'var(--radius)',
+                    backgroundColor: 'rgba(0,193,175,0.07)',
+                  }}>
+                    <div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', marginBottom: '3px' }}>
+                        {rubrica.label}
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)' }}>
+                        {rubrica.descricao}
+                      </div>
+                    </div>
+                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#00c1af' }}>Permitida</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{
+              padding: '16px',
+              border: '1px solid rgba(0,193,175,0.18)',
+              borderRadius: 'var(--radius)',
+              backgroundColor: 'rgba(0,193,175,0.06)',
+            }}>
+              <h3 style={subSectionTitleStyle}>Modalidades e Níveis de Bolsa</h3>
+              <div style={{ display: 'grid', gap: '12px' }}>
+                {[
+                  { modalidade: 'Iniciação Científica', nivel: 'Nível A', versao: 'Última versão ativa', maximo: '2', cotas: '50', institucional: 'Não' },
+                  { modalidade: 'Pesquisa', nivel: 'Nível C', versao: 'Última versão ativa', maximo: '1', cotas: '30', institucional: 'Sim' },
+                ].map((bolsa, index) => (
+                  <div key={`${bolsa.modalidade}-${bolsa.nivel}`} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 110px 110px 120px', gap: '12px' }}>
+                    <div>
+                      <label style={labelStyle}>Modalidade {index + 1}</label>
+                      <input type="text" defaultValue={bolsa.modalidade} readOnly={!editingResumo} style={resumoInputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Nível</label>
+                      <input type="text" defaultValue={bolsa.nivel} readOnly={!editingResumo} style={resumoInputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Versão</label>
+                      <input type="text" defaultValue={bolsa.versao} readOnly={!editingResumo} style={resumoInputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Máx.</label>
+                      <input type="text" defaultValue={bolsa.maximo} readOnly={!editingResumo} style={resumoInputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Cotas</label>
+                      <input type="text" defaultValue={bolsa.cotas} readOnly={!editingResumo} style={resumoInputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Institucional</label>
+                      <input type="text" defaultValue={bolsa.institucional} readOnly={!editingResumo} style={resumoInputStyle} />
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Recursos Financeiros */}
+        {/* SESSÃO 6 — Documentos Exigidos */}
         <div style={cardStyle}>
-          <h2 style={sectionTitleStyle}>Recursos Financeiros</h2>
+          <h2 style={sectionTitleStyle}>6. Documentos Exigidos do Proponente</h2>
 
-          <div style={{ display: 'grid', gap: '16px' }}>
-            <div>
-              <h3 style={subSectionTitleStyle}>Origens de Recurso</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div style={{ padding: '12px 14px', borderRadius: 'var(--radius)', border: '1px solid rgba(251,191,36,0.24)', backgroundColor: 'rgba(251,191,36,0.08)', marginBottom: '18px' }}>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#fbbf24', margin: '0 0 4px' }}>
+              Observação
+            </p>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.68)', margin: 0, lineHeight: 1.45 }}>
+              Quando o proponente for empresa ou instituição, documentos recorrentes devem ser reaproveitados do cadastro corporativo quando estiverem válidos e houver representante legal vinculado.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gap: '12px' }}>
+            {[
+              { label: 'Contrato social ou estatuto', descricao: 'Documento constitutivo da instituição ou empresa proponente.', obrigatorio: 'Obrigatório', formatos: 'PDF' },
+              { label: 'Balanço patrimonial', descricao: 'Demonstração contábil usada para comprovar capacidade econômico-financeira.', obrigatorio: 'Opcional', formatos: 'PDF ou XLSX' },
+              { label: 'Certidões de regularidade fiscal', descricao: 'Comprovação de regularidade perante órgãos fiscais e trabalhistas.', obrigatorio: 'Opcional', formatos: 'PDF' },
+              { label: 'Comprovante do representante legal', descricao: 'Comprova poderes de representação do responsável pela submissão.', obrigatorio: 'Obrigatório', formatos: 'PDF' },
+            ].map(documento => (
+              <div key={documento.label} style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 130px 130px',
+                gap: '16px',
+                alignItems: 'center',
+                padding: '16px',
+                borderRadius: 'var(--radius)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                backgroundColor: 'rgba(15,23,42,0.35)',
+              }}>
                 <div>
-                  <label style={labelStyle}>Origem 1</label>
-                  <input type="text" value="Tesouro Estadual" readOnly style={inputStyle} />
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', marginBottom: '4px' }}>
+                    {documento.label}
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', lineHeight: 1.45 }}>
+                    {documento.descricao}
+                  </div>
                 </div>
                 <div>
-                  <label style={labelStyle}>Origem 2</label>
-                  <input type="text" value="Convênio Federal" readOnly style={inputStyle} />
+                  <label style={labelStyle}>Obrigatoriedade</label>
+                  <input type="text" defaultValue={documento.obrigatorio} readOnly={!editingResumo} style={resumoInputStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Formatos</label>
+                  <input type="text" defaultValue={documento.formatos} readOnly={!editingResumo} style={resumoInputStyle} />
                 </div>
               </div>
-            </div>
-
-            <div style={dividerStyle} />
-
-            <div>
-              <label style={labelStyle}>Valor Total Disponível</label>
-              <input 
-                type="text" 
-                value="R$ 5.000.000,00" 
-                readOnly 
-                style={{
-                  ...inputStyle,
-                  color: '#00c1af',
-                  fontWeight: 'var(--font-weight-medium)',
-                }}
-              />
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Bolsas - SEM CARD */}
-        <div style={cardStyle}>
-          <h2 style={sectionTitleStyle}>Bolsas</h2>
+          </>
+        )}
 
-          <div style={{ marginBottom: '20px' }}>
-            <h3 style={{ ...subSectionTitleStyle, marginBottom: '12px' }}>Bolsa 1</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '16px' }}>
-              <div>
-                <label style={labelStyle}>Modalidade</label>
-                <input type="text" value="IC" readOnly style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Nível</label>
-                <input type="text" value="Graduação" readOnly style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Máx. Bolsistas</label>
-                <input type="text" value="2" readOnly style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Quantidade Cotas</label>
-                <input type="text" value="50" readOnly style={inputStyle} />
+        {activeTab === 'dashboard' && (
+          <>
+            <div style={cardStyle}>
+              <h2 style={sectionTitleStyle}>Dashboard da Captação</h2>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '16px' }}>
+                {fasesIniciativas.map(fase => {
+                  const maiorQuantidade = Math.max(...fasesIniciativas.map(item => item.quantidade));
+                  const percentual = Math.round((fase.quantidade / maiorQuantidade) * 100);
+
+                  return (
+                    <div
+                      key={fase.fase}
+                      style={{
+                        padding: '18px',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: 'var(--radius)',
+                        backgroundColor: 'rgba(15,23,42,0.35)',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+                        <div>
+                          <div style={{
+                            fontFamily: 'var(--font-family)',
+                            fontSize: 'var(--text-sm)',
+                            fontWeight: 'var(--font-weight-medium)',
+                            color: '#ffffff',
+                            marginBottom: '4px',
+                          }}>
+                            {fase.fase}
+                          </div>
+                          <div style={{
+                            fontFamily: 'var(--font-family)',
+                            fontSize: 'var(--text-xs)',
+                            color: 'rgba(255,255,255,0.5)',
+                          }}>
+                            iniciativas na fase
+                          </div>
+                        </div>
+                        <div style={{
+                          fontFamily: 'var(--font-family)',
+                          fontSize: 'var(--text-md)',
+                          fontWeight: 'var(--font-weight-medium)',
+                          color: fase.cor,
+                          lineHeight: 1,
+                        }}>
+                          {fase.quantidade}
+                        </div>
+                      </div>
+
+                      <div style={{
+                        height: '6px',
+                        backgroundColor: 'rgba(255,255,255,0.08)',
+                        borderRadius: '999px',
+                        marginTop: '16px',
+                        overflow: 'hidden',
+                      }}>
+                        <div style={{
+                          width: `${percentual}%`,
+                          height: '100%',
+                          backgroundColor: fase.cor,
+                          borderRadius: '999px',
+                        }} />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          </div>
 
-          <div style={dividerStyle} />
+            <div style={cardStyle}>
+              <h2 style={sectionTitleStyle}>Financeiro da Captação</h2>
 
-          <div>
-            <h3 style={{ ...subSectionTitleStyle, marginBottom: '12px' }}>Bolsa 2</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '16px' }}>
-              <div>
-                <label style={labelStyle}>Modalidade</label>
-                <input type="text" value="Mestrado" readOnly style={inputStyle} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '16px' }}>
+                <div style={{
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: 'var(--radius)',
+                  backgroundColor: 'rgba(15,23,42,0.35)',
+                  padding: '18px',
+                }}>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>
+                    Total financeiro solicitado pelas iniciativas
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', marginBottom: '10px' }}>
+                    {formatCurrency(financeiroCaptacaoDetalhe.totalSolicitado)}
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', lineHeight: 1.45 }}>
+                    Disponível na captação: <span style={{ color: '#00c1af' }}>{formatCurrency(financeiroCaptacaoDetalhe.totalDisponivel)}</span>
+                  </div>
+                </div>
+
+                <div style={{
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: 'var(--radius)',
+                  backgroundColor: 'rgba(15,23,42,0.35)',
+                  padding: '18px',
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+                    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
+                      Totais solicitados por rubrica
+                    </div>
+                    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)' }}>
+                      {financeiroCaptacaoDetalhe.rubricas.length} rubrica(s)
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gap: '12px' }}>
+                    {financeiroCaptacaoDetalhe.rubricas.map(rubrica => {
+                      const percentual = Math.round((rubrica.valor / maiorValorRubricaDetalhe) * 100);
+
+                      return (
+                        <div key={rubrica.nome}>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 160px 110px', gap: '12px', alignItems: 'center', marginBottom: '6px' }}>
+                            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                              {rubrica.nome}
+                            </div>
+                            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: rubrica.cor, textAlign: 'right' }}>
+                              {formatCurrency(rubrica.valor)}
+                            </div>
+                            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', textAlign: 'right' }}>
+                              {rubrica.quantidade} iniciativa(s)
+                            </div>
+                          </div>
+                          <div style={{ height: '7px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                            <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: rubrica.cor }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-              <div>
-                <label style={labelStyle}>Nível</label>
-                <input type="text" value="Pós-Graduação" readOnly style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Máx. Bolsistas</label>
-                <input type="text" value="1" readOnly style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Quantidade Cotas</label>
-                <input type="text" value="30" readOnly style={inputStyle} />
+
+              <div style={{ marginTop: '18px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
+                    Totais por faixa
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)' }}>
+                    {financeiroPorFaixaCaptacao.length} faixa(s)
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '16px' }}>
+                  {financeiroPorFaixaCaptacao.map(faixa => {
+                    const maiorValorRubricaFaixa = Math.max(...faixa.rubricas.map(rubrica => rubrica.valor), 1);
+
+                    return (
+                      <div
+                        key={faixa.faixa}
+                        style={{
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          borderRadius: 'var(--radius)',
+                          backgroundColor: 'rgba(15,23,42,0.35)',
+                          padding: '18px',
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
+                          <div>
+                            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', marginBottom: '4px' }}>
+                              {faixa.faixa}
+                            </div>
+                            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)' }}>
+                              {faixa.quantidadeIniciativas} iniciativa(s)
+                            </div>
+                          </div>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: '#00c1af', fontWeight: 'var(--font-weight-medium)', textAlign: 'right' }}>
+                            {formatCurrency(faixa.valorTotal)}
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'grid', gap: '12px' }}>
+                          {faixa.rubricas.map(rubrica => {
+                            const percentual = Math.round((rubrica.valor / maiorValorRubricaFaixa) * 100);
+
+                            return (
+                              <div key={`${faixa.faixa}-${rubrica.nome}`}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px 100px', gap: '12px', alignItems: 'center', marginBottom: '6px' }}>
+                                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                                    {rubrica.nome}
+                                  </div>
+                                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: rubrica.cor, textAlign: 'right' }}>
+                                    {formatCurrency(rubrica.valor)}
+                                  </div>
+                                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', textAlign: 'right' }}>
+                                    {rubrica.quantidade} item(ns)
+                                  </div>
+                                </div>
+                                <div style={{ height: '7px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                                  <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: rubrica.cor }} />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+
+            <div style={cardStyle}>
+              <h2 style={sectionTitleStyle}>Iniciativas Enviadas</h2>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '130px 1.4fr 1.1fr 170px 210px 110px',
+                gap: '16px',
+                padding: '0 16px 10px',
+                borderBottom: '1px solid rgba(255,255,255,0.08)',
+                marginBottom: '8px',
+              }}>
+                {['Código', 'Iniciativa', 'Proponente', 'Valor solicitado', 'Fase atual', 'Envio'].map(coluna => (
+                  <div
+                    key={coluna}
+                    style={{
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-xs)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      color: 'rgba(255,255,255,0.5)',
+                    }}
+                  >
+                    {coluna}
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: 'grid', gap: '10px' }}>
+                {iniciativasEnviadas.map(iniciativa => {
+                  const fase = fasesIniciativas.find(item => item.fase === iniciativa.fase);
+                  const selecionada = iniciativa.codigo === iniciativaSelecionada.codigo;
+
+                  return (
+                    <button
+                      key={iniciativa.codigo}
+                      type="button"
+                      onClick={() => setIniciativaSelecionadaCodigo(iniciativa.codigo)}
+                      style={{
+                        width: '100%',
+                        display: 'grid',
+                        gridTemplateColumns: '130px 1.4fr 1.1fr 170px 210px 110px',
+                        gap: '16px',
+                        alignItems: 'center',
+                        padding: '14px 16px',
+                        border: selecionada ? '1px solid rgba(0,193,175,0.42)' : '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: 'var(--radius)',
+                        backgroundColor: selecionada ? 'rgba(0,193,175,0.08)' : 'rgba(15,23,42,0.35)',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                      }}
+                    >
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af' }}>
+                        {iniciativa.codigo}
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', lineHeight: 1.45 }}>
+                        {iniciativa.titulo}
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', lineHeight: 1.45 }}>
+                        {iniciativa.proponente}
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>
+                        {iniciativa.valorSolicitado}
+                      </div>
+                      <div>
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          padding: '6px 10px',
+                          borderRadius: '999px',
+                          backgroundColor: fase ? `${fase.cor}1f` : 'rgba(255,255,255,0.08)',
+                          color: fase?.cor || 'rgba(255,255,255,0.7)',
+                          fontFamily: 'var(--font-family)',
+                          fontSize: 'var(--text-xs)',
+                          fontWeight: 'var(--font-weight-medium)',
+                        }}>
+                          {iniciativa.fase}
+                        </span>
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.65)' }}>
+                        {iniciativa.data}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={cardStyle}>
+              <h2 style={sectionTitleStyle}>Detalhes da Iniciativa Selecionada</h2>
+
+              <div style={{ display: 'grid', gap: '18px' }}>
+                <div>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', marginBottom: '8px' }}>
+                    {iniciativaSelecionada.titulo}
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.62)', lineHeight: 1.55 }}>
+                    {iniciativaSelecionada.resumo}
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '12px' }}>
+                  {[
+                    { label: 'Código', value: iniciativaSelecionada.codigo },
+                    { label: 'Fase atual', value: iniciativaSelecionada.fase },
+                    { label: 'Proponente', value: iniciativaSelecionada.proponente },
+                    { label: 'Ortogado', value: iniciativaSelecionada.ortogado },
+                    { label: 'Categoria', value: iniciativaSelecionada.categoria },
+                    { label: 'Faixa', value: iniciativaSelecionada.faixa },
+                    { label: 'Valor solicitado', value: iniciativaSelecionada.valorSolicitado },
+                    { label: 'Data de envio', value: iniciativaSelecionada.data },
+                  ].map(item => (
+                    <div
+                      key={item.label}
+                      style={{
+                        padding: '12px',
+                        borderRadius: 'var(--radius)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        backgroundColor: 'rgba(15,23,42,0.35)',
+                      }}
+                    >
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginBottom: '4px' }}>
+                        {item.label}
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', lineHeight: 1.35 }}>
+                        {item.value}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div style={cardStyle}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
+                <div>
+                  <h2 style={{ ...sectionTitleStyle, marginBottom: '6px' }}>Revisores Ad Hoc</h2>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                    Pool de revisores disponível para avaliação das iniciativas desta captação.
+                  </p>
+                </div>
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#00c1af', padding: '6px 10px', borderRadius: '999px', border: '1px solid rgba(0,193,175,0.28)', backgroundColor: 'rgba(0,193,175,0.08)', whiteSpace: 'nowrap' }}>
+                  {revisoresAdHocDashboard.length} revisor(es)
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gap: '10px' }}>
+                {revisoresAdHocDashboard.map(revisor => {
+                  const quantidadeAvaliacoes = avaliacoesAdHoc.filter(avaliacao => avaliacao.revisor === revisor.nome).length;
+
+                  return (
+                    <div
+                      key={revisor.nome}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1.2fr 1fr 0.8fr 140px 120px',
+                        gap: '16px',
+                        alignItems: 'center',
+                        padding: '14px 16px',
+                        borderRadius: 'var(--radius)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        backgroundColor: 'rgba(15,23,42,0.35)',
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', marginBottom: '3px' }}>
+                          {revisor.nome}
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)' }}>
+                          {revisor.instituicao}
+                        </div>
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>
+                        {revisor.area}
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>
+                        {revisor.titulacao}
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af' }}>
+                        {quantidadeAvaliacoes} avaliação(ões)
+                      </div>
+                      <div>
+                        <span style={{
+                          display: 'inline-flex',
+                          padding: '6px 10px',
+                          borderRadius: '999px',
+                          backgroundColor: 'rgba(34,197,94,0.12)',
+                          color: '#22c55e',
+                          fontFamily: 'var(--font-family)',
+                          fontSize: 'var(--text-xs)',
+                          fontWeight: 'var(--font-weight-medium)',
+                        }}>
+                          {revisor.status}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={cardStyle}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
+                <div>
+                  <h2 style={{ ...sectionTitleStyle, marginBottom: '6px' }}>Avaliações dos Revisores</h2>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                    Pareceres registrados por revisor, com a iniciativa avaliada e situação atual.
+                  </p>
+                </div>
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#00c1af', padding: '6px 10px', borderRadius: '999px', border: '1px solid rgba(0,193,175,0.28)', backgroundColor: 'rgba(0,193,175,0.08)', whiteSpace: 'nowrap' }}>
+                  {avaliacoesAdHoc.length} avaliação(ões)
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gap: '12px' }}>
+                {avaliacoesAdHoc.map(avaliacao => {
+                  const iniciativaAvaliada = iniciativasEnviadas.find(item => item.codigo === avaliacao.iniciativaCodigo);
+
+                  return (
+                    <div
+                      key={`${avaliacao.iniciativaCodigo}-${avaliacao.revisor}`}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1.1fr 1.3fr 150px 90px',
+                        gap: '16px',
+                        padding: '16px',
+                        borderRadius: 'var(--radius)',
+                        border: avaliacao.iniciativaCodigo === iniciativaSelecionada.codigo ? '1px solid rgba(0,193,175,0.38)' : '1px solid rgba(255,255,255,0.1)',
+                        backgroundColor: avaliacao.iniciativaCodigo === iniciativaSelecionada.codigo ? 'rgba(0,193,175,0.07)' : 'rgba(15,23,42,0.35)',
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', marginBottom: '3px' }}>
+                          {avaliacao.revisor}
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)' }}>
+                          {avaliacao.area}
+                        </div>
+                      </div>
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', marginBottom: '3px' }}>
+                          {iniciativaAvaliada?.titulo || avaliacao.iniciativaCodigo}
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginBottom: '8px' }}>
+                          {avaliacao.iniciativaCodigo}
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.65)', lineHeight: 1.5 }}>
+                          {avaliacao.parecer}
+                        </div>
+                      </div>
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginBottom: '6px' }}>
+                          Status
+                        </div>
+                        <span style={{
+                          display: 'inline-flex',
+                          padding: '6px 10px',
+                          borderRadius: '999px',
+                          backgroundColor: avaliacao.status === 'Concluída' ? 'rgba(34,197,94,0.12)' : avaliacao.status === 'Em avaliação' ? 'rgba(167,139,250,0.14)' : 'rgba(251,191,36,0.12)',
+                          color: avaliacao.status === 'Concluída' ? '#22c55e' : avaliacao.status === 'Em avaliação' ? '#a78bfa' : '#fbbf24',
+                          fontFamily: 'var(--font-family)',
+                          fontSize: 'var(--text-xs)',
+                          fontWeight: 'var(--font-weight-medium)',
+                        }}>
+                          {avaliacao.status}
+                        </span>
+                      </div>
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginBottom: '6px' }}>
+                          Nota
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>
+                          {avaliacao.nota}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
 
       </div>
 
