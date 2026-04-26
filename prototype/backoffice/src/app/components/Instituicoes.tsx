@@ -24,6 +24,13 @@ interface InstituicaoItem {
   situacao: SituacaoInstituicao;
 }
 
+interface SubestruturaDraft {
+  id: number;
+  nome: string;
+  sigla: string;
+  cnpj: string;
+}
+
 const inputStyle: React.CSSProperties = {
   width: '100%',
   backgroundColor: 'rgba(30,41,59,0.5)',
@@ -119,6 +126,7 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [showForm, setShowForm] = useState(false);
   const [selected, setSelected] = useState<InstituicaoItem | null>(null);
   const [draft, setDraft] = useState<InstituicaoItem>(emptyInstituicao);
+  const [draftSubestruturas, setDraftSubestruturas] = useState<SubestruturaDraft[]>([]);
   const [instituicoes, setInstituicoes] = useState<InstituicaoItem[]>(initialInstituicoes);
 
   const filtered = instituicoes.filter(item => {
@@ -146,12 +154,23 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   const openNew = () => {
     setDraft({ ...emptyInstituicao, id: Date.now() });
+    setDraftSubestruturas([]);
     setShowForm(true);
     setSelected(null);
   };
 
   const openDetails = (item: InstituicaoItem) => {
     setDraft({ ...item });
+    setDraftSubestruturas(
+      instituicoes
+        .filter(instituicao => instituicao.superior === item.nome)
+        .map(instituicao => ({
+          id: instituicao.id,
+          nome: instituicao.nome,
+          sigla: instituicao.sigla,
+          cnpj: instituicao.cnpj,
+        }))
+    );
     setSelected(item);
     setShowForm(false);
   };
@@ -163,15 +182,46 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     }));
   };
 
+  const addSubestrutura = () => {
+    setDraftSubestruturas(prev => [
+      ...prev,
+      { id: Date.now() + prev.length, nome: '', sigla: '', cnpj: '' },
+    ]);
+  };
+
+  const updateSubestrutura = (id: number, field: keyof SubestruturaDraft, value: string) => {
+    setDraftSubestruturas(prev => prev.map(item => item.id === id ? { ...item, [field]: value } : item));
+  };
+
+  const removeSubestrutura = (id: number) => {
+    setDraftSubestruturas(prev => prev.filter(item => item.id !== id));
+  };
+
   const saveDraft = () => {
     const isSetorSemCnpj = !draft.cnpj;
     const saved = {
       ...draft,
       razaoSocial: isSetorSemCnpj ? '' : draft.razaoSocial,
     };
+    const previousParentName = selected?.nome || saved.nome;
+    const subestruturas: InstituicaoItem[] = draftSubestruturas
+      .filter(item => item.nome.trim())
+      .map(item => ({
+        ...emptyInstituicao,
+        id: item.id,
+        nome: item.nome.trim(),
+        sigla: item.sigla.trim(),
+        cnpj: item.cnpj,
+        natureza: saved.natureza,
+        municipio: saved.municipio,
+        uf: saved.uf,
+        superior: saved.nome,
+        situacao: 'Ativa',
+      }));
+
     setInstituicoes(prev => {
-      const exists = prev.some(item => item.id === saved.id);
-      return exists ? prev.map(item => item.id === saved.id ? saved : item) : [...prev, saved];
+      const remaining = prev.filter(item => item.id !== saved.id && item.superior !== previousParentName);
+      return [...remaining, saved, ...subestruturas];
     });
     setShowForm(false);
     setSelected(saved);
@@ -186,6 +236,13 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   if (showForm || selected) {
     const isSetorSemCnpj = !draft.cnpj;
+    const superiorOptions = [
+      '',
+      ...instituicoes
+        .filter(item => item.id !== draft.id)
+        .map(item => item.nome),
+    ];
+
     return (
       <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
         <div className="pt-8 px-8 pb-8">
@@ -239,10 +296,55 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </FormSection>
 
           <FormSection number="3" title="Estrutura Organizacional" subtitle="Vínculo hierárquico e localização. Instituição sem CNPJ deve possuir superior.">
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 0.3fr', gap: '16px' }}>
-              <Select label="Instituição superior" value={draft.superior || ''} onChange={value => updateDraft('superior', value)} options={['', 'Universidade Federal do Espírito Santo', 'Instituto Federal do Espírito Santo', 'Fucape Business School']} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 0.3fr', gap: '16px', marginBottom: '20px' }}>
+              <Select label="Instituição superior" value={draft.superior || ''} onChange={value => updateDraft('superior', value)} options={superiorOptions} />
               <Field label="Município" value={draft.municipio} onChange={value => updateDraft('municipio', value)} placeholder="Município" />
               <Field label="UF" value={draft.uf} onChange={value => updateDraft('uf', value.toUpperCase().slice(0, 2))} placeholder="UF" />
+            </div>
+
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '18px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '14px' }}>
+                <div>
+                  <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 4px' }}>
+                    Subestruturas
+                  </h3>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                    Cadastre unidades com CNPJ ou setores sem CNPJ vinculados a esta instituição.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={addSubestrutura}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(0,193,175,0.12)', border: '1px solid rgba(0,193,175,0.35)', borderRadius: 'var(--radius)', padding: '8px 12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', cursor: 'pointer', flexShrink: 0 }}
+                >
+                  <Plus size={14} />
+                  Adicionar
+                </button>
+              </div>
+
+              {draftSubestruturas.length === 0 ? (
+                <div style={{ border: '1px dashed rgba(255,255,255,0.14)', borderRadius: '8px', padding: '16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)' }}>
+                  Nenhuma subestrutura cadastrada nesta instituição.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {draftSubestruturas.map(item => (
+                    <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.5fr 0.7fr auto', gap: '12px', alignItems: 'end', padding: '14px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+                      <Field label="Nome" value={item.nome} onChange={value => updateSubestrutura(item.id, 'nome', value)} placeholder="Nome da unidade ou setor" />
+                      <Field label="Sigla" value={item.sigla} onChange={value => updateSubestrutura(item.id, 'sigla', value)} placeholder="Sigla" />
+                      <Field label="CNPJ" value={item.cnpj} onChange={value => updateSubestrutura(item.id, 'cnpj', maskCnpj(value))} placeholder="Opcional" />
+                      <button
+                        type="button"
+                        onClick={() => removeSubestrutura(item.id)}
+                        style={{ width: '38px', height: '38px', border: '1px solid rgba(239,68,68,0.35)', borderRadius: 'var(--radius)', backgroundColor: 'transparent', color: '#f87171', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                        aria-label="Remover subestrutura"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </FormSection>
 

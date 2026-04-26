@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, FileEdit, Target, Building2 } from 'lucide-react';
+import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, FileEdit, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import logoSmall from 'figma:asset/db135b6708f6cc7f72f27c6a31dd02aa5500d030.png';
 import logoFull from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
@@ -9,6 +9,7 @@ import { Programa } from './Programa';
 import { Parceria } from './Parceria';
 import { PlanejamentoEstrategico } from './PlanejamentoEstrategico';
 import { Instituicoes } from './Instituicoes';
+import { Configuracoes } from './Configuracoes';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -19,7 +20,7 @@ type Contrast = 'normal' | 'high' | 'maximum';
 type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
 type Language = 'pt' | 'en' | 'es';
 type NotificationTab = 'avisos' | 'editais';
-type ActivePage = 'home' | 'dashboard' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes';
+type ActivePage = 'home' | 'dashboard' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'configuracoes';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
 type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outro Exemplo de Projeto' | 'Mais um Exemplo de Projeto';
@@ -250,74 +251,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             
             {/* Itens do menu PROJETOS */}
             {([
-              { key: 'planejamento' as ActivePage, Icon: Target, label: 'Planejamento' },
               { key: 'parceria' as ActivePage, Icon: Handshake, label: 'Parceria' },
               { key: 'programa' as ActivePage, Icon: FolderOpen, label: 'Programa' },
               { key: 'editais' as ActivePage, Icon: FileText, label: 'Captação' },
               { key: 'formulario' as ActivePage, Icon: BookOpen, label: 'Formulário' },
-            ]).map(({ key, Icon, label }, index) => {
-              const active = activePage === key;
-              return (
-                <button
-                  key={key}
-                  className={`flex items-center gap-3 rounded-lg transition-all duration-200 ${index > 0 ? 'mt-2' : ''}`}
-                  style={{
-                    backgroundColor: active ? T.menuActiveBg : 'transparent',
-                    padding: sidebarExpanded ? '12px 16px' : '12px',
-                    width: sidebarExpanded ? '100%' : '48px',
-                    justifyContent: sidebarExpanded ? 'flex-start' : 'center',
-                  }}
-                  onClick={() => setActivePage(key)}
-                  onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.07)'; }}
-                  onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'transparent'; }}
-                >
-                  <Icon
-                    size={20}
-                    style={{
-                      color: active ? T.menuActiveText : T.menuInactiveText,
-                      flexShrink: 0,
-                      transition: 'color 0.3s',
-                    }}
-                  />
-                  {sidebarExpanded && (
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-family)',
-                        fontSize: 'var(--text-sm)',
-                        fontWeight: 'var(--font-weight-medium)',
-                        color: active ? T.menuActiveText : T.menuInactiveText,
-                        transition: 'color 0.3s',
-                      }}
-                    >
-                      {label}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-
-            {/* Espaçamento entre seções */}
-            <div style={{ height: '24px' }} />
-
-            {/* Seção M008 */}
-            {sidebarExpanded && (
-              <h3
-                className="mb-3 px-2"
-                style={{
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--text-xs)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  color: T.textMuted,
-                  letterSpacing: '0.05em',
-                  transition: 'color 0.3s',
-                }}
-              >
-                CADASTROS
-              </h3>
-            )}
-
-            {([
-              { key: 'instituicoes' as ActivePage, Icon: Building2, label: 'Instituições' },
             ]).map(({ key, Icon, label }, index) => {
               const active = activePage === key;
               return (
@@ -480,6 +417,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 </button>
               );
             })}
+
           </div>
         </div>
       </aside>
@@ -497,6 +435,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         }}
       >
         <div className="flex items-center justify-end gap-1 h-16 px-4 md:px-8">
+          {/* Ícone de Configurações */}
+          <button
+            onClick={() => {
+              setActivePage('configuracoes');
+              setShowLanguageDropdown(false);
+              setShowUserDropdown(false);
+            }}
+            className={`p-2 transition-colors rounded-lg ${T.hoverClass}`}
+            style={{ color: activePage === 'configuracoes' ? '#00c1af' : T.iconColor }}
+            title="Configurações"
+            aria-label="Configurações"
+          >
+            <Settings size={20} />
+          </button>
 
           {/* Ícone de Notificações */}
           <button 
@@ -1448,6 +1400,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <Editais />
         ) : activePage === 'editais-light' ? (
           <EditaisLight />
+        ) : activePage === 'configuracoes' ? (
+          <Configuracoes
+            onBack={() => setActivePage('home')}
+            onOpenPlanejamento={() => setActivePage('planejamento')}
+            onOpenInstituicoes={() => setActivePage('instituicoes')}
+          />
         ) : activePage === 'planejamento' ? (
           <PlanejamentoEstrategico />
         ) : activePage === 'programa' ? (
