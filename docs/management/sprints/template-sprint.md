@@ -5,7 +5,7 @@
 | Atributo | Valor |
 |----------|-------|
 | **Periodo** | YYYY-MM-DD a YYYY-MM-DD |
-| **Milestone** | [MS-XX — Nome do Milestone](../milestones/README.md#ms-xx) |
+| **Milestone** | `MS-XX — Nome do Milestone` |
 | **GitHub Milestone** | `milestone: MS-XX` |
 | **Goal** | Uma frase descrevendo o objetivo principal do sprint |
 
@@ -20,13 +20,13 @@
 
 | Epic | Modulo | GitHub Issue | Status |
 |------|--------|-------------|--------|
-| [EPIC-MXXX-001](../../implementation/modules/MXXX/epics/EPIC-MXXX-001.md) | MXXX | #000 | To Do / In Progress / Done |
+| `EPIC-MXXX-001` | MXXX | #000 | To Do / In Progress / Done |
 
 ### Domain {NN} — {Nome do Domain}
 
 | Epic | Modulo | GitHub Issue | Status |
 |------|--------|-------------|--------|
-| [EPIC-MXXX-001](../../implementation/modules/MXXX/epics/EPIC-MXXX-001.md) | MXXX | #000 | To Do / In Progress / Done |
+| `EPIC-MXXX-001` | MXXX | #000 | To Do / In Progress / Done |
 
 ---
 

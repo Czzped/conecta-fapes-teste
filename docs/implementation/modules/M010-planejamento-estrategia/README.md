@@ -70,7 +70,7 @@ M010-planejamento-estrategia/
 | Diretoria da Agencia de Fomento | Mantem Plano Estrategico e Eixos |
 | Servidor da Area Tecnica (Agencia de Fomento) | Mantem Programas (recursos, comite, aportes recebidos) |
 | Servidor da Area de Parcerias (Agencia de Fomento) | Mantem Parcerias (vigencias, aportes, documentos) |
-| Gestor da Parceria / Diretoria | Consulta relatorios financeiros de parcerias (EPIC-M010-004) |
+| Gestor da Parceria / Diretoria | Consulta dashboards financeiros de parcerias (EPIC-M010-004) |
 
 ## Dependencias
 
@@ -78,8 +78,8 @@ M010-planejamento-estrategia/
 |-------------|------|------------|
 | M008 | Modulo interno | Fornece `Instituicao`, `Documento` e `TipoDocumento` |
 | M016 | Modulo interno | Fornece `ContaBancaria` como destino do deposito em `RegistrarAporteFinanceiro` — deferido para pos-M014 |
-| M013 | Modulo interno | Fornece `ConsultarExecucaoPorPrograma` para calculo de `valorExecutado` nos relatorios financeiros de parcerias |
-| M003 | Modulo interno | Fornece `ConsultarProjetosPorPrograma` para navegacao Projeto ↔ Programa nos relatorios |
+| M003 | Modulo interno | Fornece `ConsultarIniciativasPorPrograma` e consumo consolidado por iniciativa |
+| M014 | Modulo interno | Fornece movimentacoes e prestacoes de contas que alimentam consolidacoes de consumo |
 
 ---
 
@@ -93,17 +93,19 @@ Atualmente, o planejamento estrategico, a gestao de parcerias e a gestao de prog
 
 O sistema e estruturado em tres subdominios integrados (cada um com sua propria pasta):
 
-**Planejamento** — A agencia define seu plano estrategico e eixos que orientam a criacao de programas. So pode haver um plano ativo por vez (RN09). Detalhes em [planejamento/](planejamento/).
+**Planejamento** — A agencia define seus planejamentos estrategicos e eixos que orientam a criacao de programas. Pode haver mais de um planejamento cadastrado para ciclos diferentes, mas so pode haver um plano ativo por vez (RN09). Detalhes em [planejamento](planejamento/processo.md).
 
-**Programas** — Programas sao o instrumento de execucao, demandados por uma Instituicao (RN16), orientados por eixos (RN01), com comite de governanca, e podem receber aportes de uma ou mais Parcerias via `AporteFinanceiroParceriaPrograma` (N:N, RN11). Detalhes em [programas/](programas/).
+**Programas** — Programas sao o instrumento de execucao, demandados por uma Instituicao (RN16), orientados por eixos (RN01), com comite de governanca, e podem receber aportes de uma ou mais Parcerias via `AporteFinanceiroParceriaPrograma` (N:N, RN11). Detalhes em [programas](programas/README.md).
 
-**Parcerias** — Instrumento formal vinculado a exatamente uma Instituicao, com Vigencia (original + aditivos), aportes financeiros recebidos e Documentos regularizadores. Parcerias destinam aportes aos Programas (outflow). Detalhes em [parcerias/](parcerias/).
+**Parcerias** — Instrumento formal vinculado a exatamente uma Instituicao, com Vigencia (original + aditivos), aportes financeiros recebidos e Documentos regularizadores. Parcerias destinam aportes aos Programas (outflow). Detalhes em [parcerias](parcerias/README.md).
 
-> Editais sao configurados em M011 e gerenciados operacionalmente em M003 apos contratacao.
+> Editais sao configurados e gerenciados em M011. Apos a contratacao/outorga, o M003 gerencia a iniciativa resultante.
 
 ---
 
-## Regras de Negocio (consolidadas)
+<a id="regras-de-negocio"></a>
+
+## Regras de Negocio Consolidadas
 
 | ID | Descricao | Prioridade | Subdominio |
 |----|-----------|------------|------------|

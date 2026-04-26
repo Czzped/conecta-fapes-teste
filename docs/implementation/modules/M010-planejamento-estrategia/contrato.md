@@ -15,7 +15,7 @@ Este contrato documenta a superficie publica do modulo M010 como contexto respon
 | Diretoria da Agencia de Fomento | Mantem planejamento estrategico |
 | Servidor da Area Tecnica (Agencia de Fomento) | Mantem programas de fomento |
 | Servidor da Area de Parcerias (Agencia de Fomento) | Mantem parcerias, aportes e documentacao regularizadora |
-| M003 e M011 | Referenciam programa e parceria no ciclo de edital |
+| M003 e M011 | Referenciam programa e parceria no ciclo de iniciativa e edital |
 | M016, M018 e M019 | Consomem referencias para contabilidade, BI e transparencia |
 
 ### Dependencias
@@ -24,8 +24,8 @@ Este contrato documenta a superficie publica do modulo M010 como contexto respon
 |-------------|------|------------|
 | M008 | Modulo interno | Fornece `Instituicao`, `Documento` e `TipoDocumento` |
 | M016 | Modulo interno | Fornece `ContaBancaria` como destino do deposito em `RegistrarAporteFinanceiro` (`contaBancariaDestinoId`) — implementacao deferida para pos-M014 |
-| M013 | Modulo interno | Fornece `ConsultarExecucaoPorPrograma` — valor executado por programa, consumido por `GerarRelatorioParceria` e `ConsultarPainelFinanceiroParcerias` |
-| M003 | Modulo interno | Fornece `ConsultarProjetosPorPrograma` — navegacao Projeto ↔ Programa, necessaria para agregar valorExecutado por programa |
+| M003 | Modulo interno | Fornece `ConsultarIniciativasPorPrograma` e consumo consolidado por iniciativa |
+| M014 | Modulo interno | Fornece movimentacoes e prestacoes de contas que alimentam consolidacoes de consumo por iniciativa |
 
 ## Operacoes Publicas
 
@@ -45,8 +45,8 @@ Este contrato documenta a superficie publica do modulo M010 como contexto respon
 | AnexarDocumentoAParceria | Command | Vincular a uma parceria um Documento classificado por TipoDocumento (catalogos em M008) | parceriaId, documentoId | `Documento` anexado a Parceria | — | Parceria, Documento e TipoDocumento existentes em M008 | Parceria inexistente, Documento inexistente | Nao | Servidor da Area de Parcerias (Agencia de Fomento) | API interna/backoffice a definir |
 | RegistrarAporteFinanceiroParceriaPrograma | Command | Registrar aporte financeiro de uma Parceria em um Programa | parceriaId, programaId, valor, dataAporte | `AporteFinanceiroParceriaPrograma` registrado | RN11, RN13, RN14 | Parceria e Programa existentes; Parceria Vigente; `valor >= 0`; `valor <= saldo corrente`; periodo do Programa em `[vigenciaInicioCorrente, vigenciaFimCorrente]` da Parceria | Parceria/Programa inexistente, parceria nao vigente, valor negativo, saldo insuficiente, periodo do Programa fora da vigencia da Parceria | Nao | Servidor da Area de Parcerias (Agencia de Fomento) | API interna/backoffice a definir |
 | ConsultarSaldoParceria | Query | Consultar saldo financeiro corrente de uma Parceria e composicao (aportes recebidos e aportes realizados em programas) | parceriaId | `{ saldo, totalRecebido, totalAportadoEmProgramas, vigenciaFimCorrente }` | RN14, RN15 | Parceria existente | Parceria inexistente | N/A | Diretoria, Analista da Agencia de Fomento | API interna/backoffice a definir |
-| GerarRelatorioParceria | Query | Gerar relatorio financeiro consolidado da parceria com valor total aportado (recebido de Instituicoes), valor alocado (destinado a Programas) e valor executado/pago (RubricaProjeto.valorExecutado via M013), com detalhamento por programa e percentual de execucao | parceriaId | `{ resumoFinanceiro: { valorTotalAportado, valorAlocado, saldoNaoAlocado, valorExecutado, saldoNaoExecutado, percentualExecutado }, porPrograma: [{ programaId, nomePrograma, valorAlocado, valorExecutado, saldoNaoExecutado }] }` | RN14 | Parceria existente | Parceria inexistente | N/A | Gestor da Parceria, Diretoria | API interna/backoffice a definir |
-| ConsultarPainelFinanceiroParcerias | Query | Consultar painel geral de parcerias com KPIs financeiros por linha (valorTotalAportado, valorAlocado, saldoNaoAlocado, valorExecutado, saldoNaoExecutado, percentualExecutado) e consolidado agregado; suporta filtros combinaveis (estado, instituicaoId, programaId, vigenciaAtiva), ordenacao por qualquer coluna financeira e paginacao com consolidado sobre o total filtrado | estado?, instituicaoId?, programaId?, vigenciaAtiva?, orderBy?, orderDir?, page?, pageSize? | `{ consolidado: { totalParcerias, valorTotalAportado, valorAlocado, saldoNaoAlocado, valorExecutado, saldoNaoExecutado, percentualExecutado }, parcerias: [...], paginacao: { page, pageSize, total } }` | RN14 | — | Filtro invalido | N/A | Gestor da Parceria, Diretoria | API interna/backoffice a definir |
+| ConsultarDashboardLocalParceria | Query | Consultar dashboard local da parceria com valor total investido, valor aportado, valor alocado, valor consumido, saldo disponivel e detalhamento por programa, rubrica e instituicao parceira | parceriaId | `{ resumoFinanceiro: { valorTotalInvestido, valorAportado, valorAlocado, valorConsumido, saldoDisponivel, percentualAportado, percentualAlocado, percentualConsumido, percentualDisponivel }, porPrograma: [{ programaId, nomePrograma, valorAportado, valorAlocado, valorConsumido, saldoDisponivel, percentualConsumido }], porRubrica: [...] }` | RN14 | Parceria existente | Parceria inexistente | N/A | Gestor da Parceria, Diretoria | API interna/backoffice a definir |
+| ConsultarDashboardGlobalParcerias | Query | Consultar dashboard global de parcerias com KPIs financeiros consolidados (valorTotalInvestido, valorAportado, valorAlocado, valorConsumido, saldoDisponivel e percentuais), consumo por programa, consumo por rubrica e instituicoes parceiras; suporta filtros combinaveis (estado, instituicaoId, programaId, vigenciaAtiva), ordenacao por coluna financeira e paginacao quando houver listagem associada | estado?, instituicaoId?, programaId?, vigenciaAtiva?, orderBy?, orderDir?, page?, pageSize? | `{ consolidado: { valorTotalInvestido, valorAportado, valorAlocado, valorConsumido, saldoDisponivel, percentualAportado, percentualAlocado, percentualConsumido, percentualDisponivel }, consumoPorPrograma: [...], consumoPorRubrica: [...], instituicoesParceiras: [...], paginacao?: { page, pageSize, total } }` | RN14 | — | Filtro invalido | N/A | Gestor da Parceria, Diretoria | API interna/backoffice a definir |
 | EncerrarParceria | Command | Encerrar Parceria (gatilho manual ou automatico por expiracao) com encerramento em cascata dos Programas vinculados, apos confirmacao explicita do usuario. Exige justificativa. | parceriaId, confirmarCascata (boolean, default false), dataEncerramento, justificativa, origemGatilho (`USUARIO` ou `EXPIRACAO_VIGENCIA`) | `Parceria` no estado `Encerrada`; todos os Programas vinculados encerrados; evento `ProgramaEncerradoPorCascata` emitido por Programa | RI2 | Parceria existente; justificativa informada; usuario deve confirmar cascata apos ver lista de Programas afetados | Parceria inexistente; justificativa ausente; `confirmarCascata = false` (retorna lista dos Programas a encerrar para confirmacao) | Nao | Servidor da Area de Parcerias (Agencia de Fomento) | API interna/backoffice a definir |
 | RemoverParceria | Command | Remover uma Parceria em caso de erro de cadastro; bloqueada se houver vinculo com Programas | parceriaId | Parceria removida junto com suas Vigencias, AporteFinanceiros e vinculos de Documento | RI3 | Parceria existente; `nenhum AporteFinanceiroParceriaPrograma` vinculado | Parceria inexistente; vinculada a um ou mais Programas (lista retornada) | Nao | Servidor da Area de Parcerias (Agencia de Fomento) | API interna/backoffice a definir |
 | VerificarVigenciaExpirada | Job | Executado periodicamente (diariamente); para cada Parceria `Vigente` ou `Suspensa` com `vigenciaFimCorrente < hoje`, notifica o usuario responsavel e abre fluxo de confirmacao de encerramento (nao encerra automaticamente sem confirmacao) | — | Notificacoes enviadas; pendencias de confirmacao criadas | RI2 | — | — | Sim | Sistema (agendado) | Scheduler interno |
@@ -338,7 +338,7 @@ Este contrato documenta a superficie publica do modulo M010 como contexto respon
 | PARCERIA_NAO_ENCONTRADA | A parceria informada nao foi encontrada. |
 | DOCUMENTO_NAO_ENCONTRADO | O Documento informado nao foi encontrado em M008. |
 
-### GerarRelatorioParceria
+### ConsultarDashboardLocalParceria
 
 **Exemplo de entrada**
 
@@ -356,40 +356,57 @@ Este contrato documenta a superficie publica do modulo M010 como contexto respon
   "vigenciaFimCorrente": "2028-12-31",
   "estado": "Vigente",
   "resumoFinanceiro": {
-    "valorTotalAportado": 700000.0,
+    "valorTotalInvestido": 700000.0,
+    "valorAportado": 190000.0,
     "valorAlocado": 230000.0,
-    "saldoNaoAlocado": 470000.0,
-    "valorExecutado": 140000.0,
-    "saldoNaoExecutado": 90000.0,
-    "percentualExecutado": 60.87
+    "valorConsumido": 140000.0,
+    "saldoDisponivel": 470000.0,
+    "percentualAportado": 82.61,
+    "percentualAlocado": 32.86,
+    "percentualConsumido": 60.87,
+    "percentualDisponivel": 67.14
   },
   "porPrograma": [
     {
       "programaId": "PRG-2026-001",
       "nomePrograma": "Programa de Dados Publicos",
+      "valorAportado": 120000.0,
       "valorAlocado": 150000.0,
-      "valorExecutado": 90000.0,
-      "saldoNaoExecutado": 60000.0
+      "valorConsumido": 90000.0,
+      "saldoDisponivel": 60000.0,
+      "percentualConsumido": 60.0
     },
     {
       "programaId": "PRG-2026-002",
       "nomePrograma": "Programa de Inovacao",
+      "valorAportado": 70000.0,
       "valorAlocado": 80000.0,
-      "valorExecutado": 50000.0,
-      "saldoNaoExecutado": 30000.0
+      "valorConsumido": 50000.0,
+      "saldoDisponivel": 30000.0,
+      "percentualConsumido": 62.5
+    }
+  ],
+  "porRubrica": [
+    {
+      "rubrica": "Bolsas",
+      "valorAportado": 90000.0,
+      "valorAlocado": 120000.0,
+      "valorConsumido": 76000.0,
+      "saldoDisponivel": 44000.0,
+      "percentualConsumido": 63.33
     }
   ]
 }
 ```
 
-> **Nota de integracao:** `valorExecutado` e calculado por `SUM(RubricaProjeto.valorExecutado)` de todos os projetos vinculados a cada programa via M003, consultado em M013. A operacao agrega dados cross-modulo; o modulo M013 deve expor `ConsultarExecucaoPorPrograma(programaId)` para consumo interno.
+> **Nota de integracao:** `valorConsumido` e calculado pela soma do consumo consolidado das iniciativas vinculadas a cada programa, consultado em M003. As movimentacoes detalhadas permanecem no M014 e podem alimentar a visao consolidada do M003.
 
 **Excecoes e mensagens**
 
 | Codigo | Mensagem de erro exemplo |
 |--------|---------------------------|
 | PARCERIA_NAO_ENCONTRADA | A parceria informada nao foi encontrada. |
-| ACESSO_NEGADO | O usuario nao possui permissao para acessar o relatorio desta parceria. |
+| ACESSO_NEGADO | O usuario nao possui permissao para acessar o dashboard desta parceria. |
 
 ---
 
@@ -437,7 +454,7 @@ Este contrato documenta a superficie publica do modulo M010 como contexto respon
 {
   "programas": 4,
   "parcerias": 3,
-  "valorTotalAportado": 620000.0
+  "valorTotalInvestido": 620000.0
 }
 ```
 

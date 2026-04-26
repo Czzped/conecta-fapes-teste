@@ -22,9 +22,9 @@ O acompanhamento do ciclo de vida das bolsas -- desde a alocacao, passando pela 
 
 ## Dominio
 
-A agencia de fomento concede bolsas de pesquisa a estudantes e pesquisadores por meio de projetos vinculados a editais. O processo de concessao de bolsa inicia-se com a alocacao de bolsas em um projeto e envolve multiplos atores: Coordenador do Programa, Orientador, Bolsista, Area Tecnica da agencia de fomento e SUCON.
+A agencia de fomento concede bolsas de pesquisa a estudantes e pesquisadores vinculadas a iniciativas e chamadas de fomento. O processo de concessao de bolsa inicia-se com a indicacao de bolsista para uma oportunidade/cota de bolsa e envolve multiplos atores: Coordenador do Programa, Orientador, Bolsista, Area Tecnica da agencia de fomento e SUCON.
 
-Um Edital gerenciado operacionalmente em M003, eventualmente originado por sincronizacao do legado em M002, define cotas de bolsas por tipo (mestrado, doutorado, iniciacao cientifica). Cada Universidade possui Programas de Pos-graduacao (PPG) que participam dos editais e concorrem pelas cotas disponibilizadas. Um Coordenador e responsavel por um PPG e pode indicar bolsistas para as cotas do programa.
+Um edital ou chamada gerenciado em M011 define regras e oportunidades de bolsas. Cada Universidade possui Programas de Pos-graduacao (PPG) que participam das chamadas e concorrem pelas cotas disponibilizadas. Um Coordenador e responsavel por um PPG e pode indicar bolsistas para as cotas do programa.
 
 O fluxo de concessao segue as seguintes etapas: (1) o Coordenador do Programa indica o bolsista, informando orientador, quantidade de cotas, tema de pesquisa, periodo da bolsa e periodo previsto do curso; (2) o Orientador assina o termo de aceite; (3) o Bolsista insere os documentos exigidos; (4) a Area Tecnica da agencia de fomento avalia a documentacao; (5) caso aprovada, a Area Tecnica gera os termos de compromisso; (6) os termos sao assinados pelo Coordenador, Orientador, Bolsista, DIRAF e DIPRE; (7) a SUCON publica no Diario Oficial; (8) a Area Tecnica implementa a bolsa.
 
@@ -32,7 +32,7 @@ Caso a documentacao seja reprovada, o bolsista e notificado e pode reenviar os d
 
 Uma bolsa implementada possui vigencia definida e pode ser renovada, suspensa ou encerrada. A renovacao exige nova avaliacao documental. O encerramento pode ocorrer por conclusao do curso, desistencia do bolsista, corte de recursos ou descumprimento de requisitos.
 
-> Projetos, editais, cotas e alocacoes sao gerenciados por M003. O modulo M002 apenas sincroniza dados legados quando necessario. Este modulo consome essas informacoes para operacionalizar a gestao das bolsas.
+> Iniciativas sao gerenciadas por M003. Editais e chamadas sao gerenciados por M011. Bolsas, indicacoes, implementacoes e alocacoes sao gerenciadas por M009.
 
 ---
 

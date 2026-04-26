@@ -26,7 +26,7 @@ A agencia de fomento administra multiplos programas de fomento, cada um contendo
 
 Diferentes perfis da organizacao necessitam de visoes distintas: a Diretoria (DIPRE, DIRAF) precisa de visao consolidada de todos os programas para planejamento estrategico; a Area Tecnica precisa de visao operacional dos editais, iniciativas e bolsas sob sua responsabilidade; e gestores de programa precisam acompanhar indicadores especificos de suas areas.
 
-> Iniciativas e editais sao gerenciados por M003, com `Iniciativa` como abstracao estrutural comum para analises transversais. Programas e parcerias sao gerenciados por M010 — o M010 tambem produz relatorios financeiros de parcerias (valorAportado, valorAlocado, valorExecutado) que podem ser consumidos por paineis de BI. Bolsas sao gerenciadas por M009.
+> Iniciativas sao gerenciadas por M003, com `Iniciativa` como abstracao estrutural comum para analises transversais. Editais e chamadas sao gerenciados por M011. Programas e parcerias sao gerenciados por M010 — o M010 tambem produz relatorios financeiros de parcerias (valorAportado, valorAlocado, valorExecutado) que podem ser consumidos por paineis de BI. Bolsas sao gerenciadas por M009.
 
 Os paineis devem permitir filtragem por periodo, programa, edital e instituicao, alem de exportacao para PDF e Excel para distribuicao em reunioes e relatorios oficiais. Os dados sao consolidados diariamente a partir das informacoes transacionais dos demais modulos.
 

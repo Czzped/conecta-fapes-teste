@@ -6,30 +6,30 @@
 
 ## Visao Geral
 
-O processo de Planejamento Estrategico organiza a criacao e manutencao do Plano Estrategico da agencia e de seus Eixos Estrategicos. O Plano orienta os Programas de fomento; por isso, o fluxo deve garantir que exista apenas um Plano ativo por vez e que cada Eixo pertenca a exatamente um Plano.
+O processo de Planejamento Estrategico organiza a criacao e manutencao dos Planejamentos Estrategicos da agencia e de seus Eixos Estrategicos. Pode haver mais de um Planejamento cadastrado para representar ciclos diferentes, mas o fluxo deve garantir que exista apenas um Plano ativo por vez e que cada Eixo pertenca a exatamente um Plano.
 
 1. **Criacao do Plano Estrategico** — cadastro da vigencia, objetivos e definicao de ativacao.
-2. **Gestao de Eixos Estrategicos** — cadastro, atualizacao, priorizacao e remocao de eixos vinculados ao Plano.
+2. **Gestao de Eixos Estrategicos** — cadastro, atualizacao e remocao de eixos vinculados ao Plano.
 3. **Ativacao ou substituicao do Plano** — troca controlada do Plano ativo, respeitando unicidade.
-4. **Acompanhamento do Plano** — consulta consolidada dos eixos e Programas vinculados.
+4. **Acompanhamento do Plano** — consulta consolidada dos eixos, Programas vinculados, valor investido por Eixo e detalhamento dos Programas associados ao Eixo selecionado.
 
 ---
 
 ## Fluxo 1 — Criacao do Plano Estrategico
 
-Este fluxo inicia quando a Area Tecnica cadastra um novo Plano Estrategico. O Plano pode nascer ativo quando nao houver outro Plano ativo; caso contrario, deve ser salvo como inativo ate que a ativacao seja solicitada em fluxo proprio.
+Este fluxo inicia quando a Area Tecnica cadastra um novo Plano Estrategico. O Plano pode nascer ativo quando nao houver outro Plano ativo; caso contrario, deve ser salvo em elaboracao ate que a ativacao seja solicitada em fluxo proprio.
 
 ```mermaid
 flowchart TB
     inicio((Inicio))
     fim1((Plano cadastrado ativo))
-    fim2((Plano cadastrado inativo))
+    fim2((Plano cadastrado em elaboracao))
 
     subgraph area["Area Tecnica"]
         A1["Cadastrar Plano Estrategico"]
         A2["Informar nome, descricao e vigencia"]
         A3["Solicitar cadastro como ativo"]
-        A4["Salvar Plano como inativo"]
+        A4["Salvar Plano em elaboracao"]
         A5["Complementar dados obrigatorios"]
     end
 
@@ -56,7 +56,7 @@ flowchart TB
 | 2 | Informar dados obrigatorios | Area Tecnica | Nome, descricao, data de inicio e data de fim preenchidos. |
 | 3 | Validar dados obrigatorios | Planejamento / M010 | Cadastro rejeitado se houver campos obrigatorios ausentes. |
 | 4 | Verificar Plano ativo | Planejamento / M010 | Garante que so exista um Plano ativo por vez (RN09). |
-| 5 | Ativar ou salvar inativo | Area Tecnica / Planejamento | Plano criado como ativo quando permitido ou mantido inativo para ativacao posterior. |
+| 5 | Ativar ou salvar em elaboracao | Area Tecnica / Planejamento | Plano criado como ativo quando permitido ou mantido em elaboracao para ativacao posterior. |
 
 ---
 
@@ -74,14 +74,14 @@ flowchart TB
     subgraph area["Area Tecnica"]
         A1["Selecionar Plano Estrategico"]
         A2["Cadastrar ou atualizar Eixo Estrategico"]
-        A3["Informar nome, descricao e prioridade"]
+        A3["Informar nome e descricao"]
         A4["Solicitar remocao do Eixo"]
         A5["Revisar dados do Eixo"]
     end
 
     subgraph planejamento["Planejamento / M010"]
         P1["Validar vinculo com Plano"]
-        P2["Validar prioridade e dados obrigatorios"]
+        P2["Validar dados obrigatorios"]
         G1{"Eixo valido?"}
         P3["Salvar Eixo no Plano"]
         P4["Verificar Programas vinculados"]
@@ -103,7 +103,7 @@ flowchart TB
 | # | Atividade | Responsavel | Resultado |
 |---|-----------|-------------|-----------|
 | 1 | Selecionar Plano | Area Tecnica | Plano que recebera o Eixo identificado. |
-| 2 | Cadastrar ou atualizar Eixo | Area Tecnica | Nome, descricao e prioridade informados. |
+| 2 | Cadastrar ou atualizar Eixo | Area Tecnica | Nome e descricao informados. |
 | 3 | Validar vinculo com Plano | Planejamento / M010 | Eixo vinculado a exatamente um Plano (RN08). |
 | 4 | Salvar Eixo | Planejamento / M010 | Eixo criado ou atualizado no Plano. |
 | 5 | Solicitar remocao | Area Tecnica | Pedido de remocao avaliado. |
@@ -151,13 +151,13 @@ flowchart TB
 | 2 | Validar vigencia | Planejamento / M010 | Datas do Plano avaliadas. |
 | 3 | Identificar Plano ativo atual | Planejamento / M010 | Verifica se ha outro Plano ativo (RN09). |
 | 4 | Confirmar substituicao | Area Tecnica | Troca do Plano ativo confirmada quando necessario. |
-| 5 | Ativar Plano selecionado | Planejamento / M010 | Plano selecionado fica ativo e os demais ficam inativos. |
+| 5 | Ativar Plano selecionado | Planejamento / M010 | Plano selecionado fica ativo e os demais ficam em elaboracao ou encerrados, conforme o ciclo correspondente. |
 
 ---
 
 ## Fluxo 4 — Acompanhamento do Plano Estrategico
 
-Este fluxo permite acompanhar o alinhamento entre Plano, Eixos e Programas. O objetivo e dar visibilidade de quais Programas executam cada diretriz estrategica.
+Este fluxo permite acompanhar o alinhamento entre Plano, Eixos e Programas. O objetivo e dar visibilidade de quantos Programas executam cada diretriz estrategica, quanto investimento esta associado a cada Eixo e quais Programas compoem o Eixo selecionado.
 
 ```mermaid
 flowchart TB
@@ -167,21 +167,25 @@ flowchart TB
     subgraph area["Area Tecnica"]
         A1["Acessar dashboard do Plano"]
         A2["Selecionar Plano ativo ou historico"]
-        A3["Filtrar por Eixo Estrategico"]
-        A4["Analisar alinhamento estrategico"]
+        A3["Comparar Eixos por Programas e investimento"]
+        A4["Selecionar Eixo Estrategico"]
+        A5["Analisar Programas associados ao Eixo"]
     end
 
     subgraph planejamento["Planejamento / M010"]
         P1["Listar dados do Plano"]
         P2["Listar Eixos Estrategicos"]
+        P3["Calcular percentual de participacao por Eixo"]
+        P4["Destacar Eixo selecionado"]
     end
 
     subgraph programas["Programas / M010"]
         PR1["Consultar Programas vinculados aos Eixos"]
-        PR2["Consolidar estado dos Programas"]
+        PR2["Consolidar quantidade de Programas e valor investido"]
+        PR3["Listar Programas do Eixo selecionado"]
     end
 
-    inicio --> A1 --> A2 --> P1 --> P2 --> PR1 --> PR2 --> A3 --> A4 --> fim
+    inicio --> A1 --> A2 --> P1 --> P2 --> PR1 --> PR2 --> P3 --> A3 --> A4 --> P4 --> PR3 --> A5 --> fim
 ```
 
 ### Atividades do acompanhamento
@@ -191,8 +195,11 @@ flowchart TB
 | 1 | Acessar dashboard | Area Tecnica | Consulta ao Plano iniciada. |
 | 2 | Selecionar Plano | Area Tecnica | Plano ativo ou historico selecionado. |
 | 3 | Listar Eixos | Planejamento / M010 | Eixos do Plano apresentados. |
-| 4 | Consultar Programas vinculados | Programas / M010 | Programas orientados por cada Eixo exibidos com estado. |
-| 5 | Analisar alinhamento | Area Tecnica | Visao consolidada da execucao estrategica disponivel. |
+| 4 | Consultar Programas vinculados | Programas / M010 | Quantidade de Programas e valor investido consolidados por Eixo. |
+| 5 | Calcular participacao | Planejamento / M010 | Percentual de cada Eixo no investimento total do Plano calculado. |
+| 6 | Selecionar Eixo | Area Tecnica | Eixo escolhido para detalhamento. |
+| 7 | Listar Programas do Eixo | Programas / M010 | Programas associados ao Eixo exibidos com nome, estado e valor investido. |
+| 8 | Analisar alinhamento | Area Tecnica | Visao consolidada e detalhada da execucao estrategica disponivel. |
 
 ## Referencia de Regras
 

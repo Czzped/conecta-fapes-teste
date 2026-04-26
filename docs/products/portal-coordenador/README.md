@@ -50,4 +50,4 @@ O Portal Coordenador e a interface principal para coordenadores de projetos de p
 ## Relacao com Management
 
 - Entregas rastreadas em [releases-2026.csv](../../management/releases-2026.csv) como produto "PORTAL FAPES - COORDENADOR"
-- [Roadmap Q2](../../management/roadmap.md#q2--abril-a-junho-trimestre-atual) lista features planejadas para o trimestre atual
+- [Roadmap Q2](../../management/roadmap.md#q2-abril-a-junho-trimestre-atual) lista features planejadas para o trimestre atual

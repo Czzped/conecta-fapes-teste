@@ -21,7 +21,8 @@ Este contrato documenta a superficie publica do modulo M018 como contexto analit
 | Dependencia | Tipo | Observacao |
 |-------------|------|------------|
 | M010 | Modulo interno | Fornece `Programa` |
-| M003 | Modulo interno | Fornece `Edital` e `Iniciativa` |
+| M003 | Modulo interno | Fornece `Iniciativa` e sua visao consolidada |
+| M011 | Modulo interno | Fornece `Edital` e dados de captacao |
 | M009 | Modulo interno | Fornece `BolsaPesquisa` |
 
 ## Operacoes Publicas

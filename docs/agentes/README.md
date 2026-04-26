@@ -2,7 +2,7 @@
 
 [← Voltar aos Docs](../README.md)
 
-Documentacao humana dos **agents** (personas especializadas) e **skills** (capacidades) disponiveis para a equipe do Conecta FAPES. O conteudo funcional (frontmatter, definicoes) vive em [`/.agents/`](../../.agents/) na raiz do repositorio; este documento explica **o que cada um faz, quando usar e como se relacionam**.
+Documentacao humana dos **agents** (personas especializadas) e **skills** (capacidades) disponiveis para a equipe do Conecta FAPES. O conteudo funcional (frontmatter, definicoes) vive em `.agents/` na raiz do repositorio; este documento explica **o que cada um faz, quando usar e como se relacionam**.
 
 ---
 
@@ -46,7 +46,7 @@ As **skills globais** (instaladas em `~/.agents/skills/` via `npx skills add`) s
 
 ### Product Owner
 
-Ver definicao em [`.agents/product-owner/AGENT.md`](../../.agents/product-owner/AGENT.md).
+Ver definicao em `.agents/product-owner/AGENT.md`.
 
 **Responsabilidades**:
 - Manter o [backlog central do produto](../management/backlog-product.md) e a rastreabilidade entre EPICs, US e issues
@@ -61,7 +61,7 @@ Ver definicao em [`.agents/product-owner/AGENT.md`](../../.agents/product-owner/
 - Decidir onde um conceito novo deve ser modelado
 
 **Workflows associados**:
-- [`.agents/product-owner/documentation-module.md`](../../.agents/product-owner/documentation-module.md) — roteiro passo a passo de documentacao de modulo
+- `.agents/product-owner/documentation-module.md` — roteiro passo a passo de documentacao de modulo
 
 ---
 
@@ -74,7 +74,7 @@ Skills aparecem no catalogo do Claude com seu **frontmatter YAML** (campos `name
 Arquivos de `SKILL.md` reais dentro de `.agents/skills/`, mantidos como parte do repositorio.
 
 #### `ddd` — Domain-Driven Design aplicado a documentacao de modulo
-Ver [`.agents/skills/ddd/SKILL.md`](../../.agents/skills/ddd/SKILL.md).
+Ver `.agents/skills/ddd/SKILL.md`.
 
 - **O que faz**: aplica DDD na modelagem de modulos — bounded context, ubiquitous language, classificacao de conceitos (entidade, value object, aggregate, domain service, policy), invariantes.
 - **Quando usar**: ao criar/revisar modulo; ao modelar entidades ou agregados; ao definir limites entre modulos (ex.: `parcerias/` vs `programas/` dentro de M010); ao auditar consistencia de linguagem.
@@ -277,7 +277,7 @@ ln -s ~/.agents/skills/nuxt .agents/skills/nuxt
 
 **4. Registrar nesta pagina**
 
-Adicionar entrada na secao apropriada de [Skills](#-skills) com: origem, o que faz, quando usar e stack associada.
+Adicionar entrada na secao apropriada de [Skills](#skills) com: origem, o que faz, quando usar e stack associada.
 
 **5. Commitar**
 

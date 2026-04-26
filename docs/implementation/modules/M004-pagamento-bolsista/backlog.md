@@ -106,22 +106,22 @@ Itens identificados na [analise de DDD e modularidade](specifications/analise-dd
 
 | ID | Titulo | Problema | Status | Impacto |
 |----|--------|----------|--------|---------|
-| DT-M004-001 | Identificar Aggregate Roots e fronteiras transacionais | [P2](specifications/analise-ddd-modularidade.md#p2--aggregates-nao-identificados) | To Do | modelo-estrutural.md |
-| DT-M004-002 | Resolver ownership de AlocacaoBolsista (entidade local vs Shared Kernel) | [P1](specifications/analise-ddd-modularidade.md#p1--escrita-em-entidades-fora-do-escopo) | To Do | modelo-estrutural.md, contrato.md, M003/M009 |
-| DT-M004-003 | Formalizar Domain Events no contrato | [P6](specifications/analise-ddd-modularidade.md#p6--ausencia-de-domain-events-formalizados) | To Do | contrato.md |
+| DT-M004-001 | Identificar Aggregate Roots e fronteiras transacionais | [P2](specifications/analise-ddd-modularidade.md#p2-aggregates-nao-identificados) | To Do | modelo-estrutural.md |
+| DT-M004-002 | Resolver ownership de AlocacaoBolsista (entidade local vs Shared Kernel) | [P1](specifications/analise-ddd-modularidade.md#p1-escrita-em-entidades-fora-do-escopo) | To Do | modelo-estrutural.md, contrato.md, M003/M009 |
+| DT-M004-003 | Formalizar Domain Events no contrato | [P6](specifications/analise-ddd-modularidade.md#p6-ausencia-de-domain-events-formalizados) | To Do | contrato.md |
 
 ### Prioridade Media
 
 | ID | Titulo | Problema | Status | Impacto |
 |----|--------|----------|--------|---------|
-| DT-M004-004 | Remover ciclo de vida de AlocacaoBolsista do modelo comportamental | [P3](specifications/analise-ddd-modularidade.md#p3--modelo-comportamental-inclui-alocacaobolsista) | To Do | modelo-comportamental.md |
-| DT-M004-005 | Classificar Value Objects (DecisaoLiberacao, DecisaoFolha, Erros) | [P4](specifications/analise-ddd-modularidade.md#p4--value-objects-nao-identificados) | To Do | modelo-estrutural.md |
-| DT-M004-006 | Abstrair referencias a infraestrutura no modelo de dominio | [P5](specifications/analise-ddd-modularidade.md#p5--vazamento-de-infraestrutura-no-dominio) | To Do | modelo-estrutural.md, contrato.md |
+| DT-M004-004 | Remover ciclo de vida de AlocacaoBolsista do modelo comportamental | [P3](specifications/analise-ddd-modularidade.md#p3-modelo-comportamental-inclui-alocacaobolsista) | To Do | modelo-comportamental.md |
+| DT-M004-005 | Classificar Value Objects (DecisaoLiberacao, DecisaoFolha, Erros) | [P4](specifications/analise-ddd-modularidade.md#p4-value-objects-nao-identificados) | To Do | modelo-estrutural.md |
+| DT-M004-006 | Abstrair referencias a infraestrutura no modelo de dominio | [P5](specifications/analise-ddd-modularidade.md#p5-vazamento-de-infraestrutura-no-dominio) | To Do | modelo-estrutural.md, contrato.md |
 
 ### Prioridade Baixa
 
 | ID | Titulo | Problema | Status | Impacto |
 |----|--------|----------|--------|---------|
-| DT-M004-007 | Marcar Usuario como fora do escopo ou criar VO local | [P7](specifications/analise-ddd-modularidade.md#p7--usuario-replicado-como-entidade-completa) | To Do | modelo-estrutural.md |
-| DT-M004-008 | Documentar relacao de Contratante com Remessa | [P8](specifications/analise-ddd-modularidade.md#p8--contratante-orfao-no-modelo) | To Do | modelo-estrutural.md |
-| DT-M004-009 | Documentar estrategia de campos computados em EditalCompetencia | [P9](specifications/analise-ddd-modularidade.md#p9--campos-computados-sem-documentacao-de-estrategia) | To Do | modelo-estrutural.md |
+| DT-M004-007 | Marcar Usuario como fora do escopo ou criar VO local | [P7](specifications/analise-ddd-modularidade.md#p7-usuario-replicado-como-entidade-completa) | To Do | modelo-estrutural.md |
+| DT-M004-008 | Documentar relacao de Contratante com Remessa | [P8](specifications/analise-ddd-modularidade.md#p8-contratante-orfao-no-modelo) | To Do | modelo-estrutural.md |
+| DT-M004-009 | Documentar estrategia de campos computados em EditalCompetencia | [P9](specifications/analise-ddd-modularidade.md#p9-campos-computados-sem-documentacao-de-estrategia) | To Do | modelo-estrutural.md |

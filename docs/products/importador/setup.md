@@ -71,7 +71,7 @@ USE_CASES_ENABLED=0
 
 > **Atencao:** se `LOCKS_ENABLED=1`, aplique antes a migration `20260227_create_resource_locks.sql` no Supabase. O mesmo vale para `ASYNC_JOBS_ENABLED=1` com `20260402_create_import_jobs.sql`.
 
-Referencia completa das variaveis em [deployment.md](deployment.md#variaveis-de-ambiente).
+Referencia complementar das variaveis esta nos documentos de [tecnologia](technology.md) e [integracao](integration.md).
 
 ---
 
@@ -177,7 +177,7 @@ importacao-conecta-backend/
 
 ## 8. Fluxo completo em ambiente local
 
-1. Aplicar migrations Supabase listadas em [deployment.md](deployment.md#migrations) (apenas se for habilitar features por flag).
+1. Aplicar migrations Supabase listadas em [tecnologia](technology.md#migrations-sql-supabase) (apenas se for habilitar features por flag).
 2. Garantir que o bucket S3 contenha um dump completo em `SIGFAPES_DUMP_PREFIX/<dd_mm_yyyy>/` com `editais.json`, `editais.parquet`, `projetos_por_edital.parquet`, `bolsistas_projeto.parquet` e o marcador `dump_complete.json`.
 3. Rodar backend (`uvicorn`) + frontend (`npm run dev`).
 4. Logar na UI, escolher um edital em `/editais`, gerar a planilha (`POST /cria-planilha-edital`), corrigir na tela, salvar (`POST /upload-planilha-corrigida`) e gerar JSONLs (`POST /gerar-jsonl`).

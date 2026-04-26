@@ -65,7 +65,7 @@ O dominio M010 foi refatorado com as seguintes mudancas importantes:
 ## Prototipos de referencia
 
 - [Back-office (Figma)](https://bucket-lake-78647159.figma.site/) — Telas de Parcerias
-- [Prototipo Backoffice (codigo)](../../../prototype/backoffice/) — `Parceria.tsx`, `DetalhesParceria.tsx`, `FormularioParceria.tsx`
+- Prototipo Backoffice (codigo): `prototype/backoffice/` — `Parceria.tsx`, `DetalhesParceria.tsx`, `FormularioParceria.tsx`
 
 ## Documentacao M010
 

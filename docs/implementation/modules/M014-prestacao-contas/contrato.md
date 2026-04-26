@@ -4,7 +4,7 @@ Dominio e regras de negocio: ver [README.md](README.md)
 
 ## Proposito do Contrato
 
-Este contrato documenta a superficie publica do modulo M014 como contexto responsavel pela prestacao de contas do projeto, incluindo documentos fiscais, importacoes de integracao, analise, contestacao e consulta do processo.
+Este contrato documenta a superficie publica do modulo M014 como contexto responsavel pela prestacao de contas da iniciativa, incluindo documentos fiscais, importacoes de integracao, analise, contestacao e consulta do processo.
 
 ## Consumidores e Dependencias
 
@@ -14,17 +14,16 @@ Este contrato documenta a superficie publica do modulo M014 como contexto respon
 |------------|-----------------|
 | Coordenador | Registra documentos e submete a prestacao de contas |
 | Area Tecnica / SECONT | Analisa, solicita complementos e acompanha auditoria |
-| M015 | Consulta pendencias antes do encerramento do projeto |
+| M015 | Consulta pendencias antes do encerramento da iniciativa |
 | [Portal Coordenador](../../../products/portal-coordenador/README.md) | Prestacao financeira ([EP-11](../../../products/portal-coordenador/features/EP-11-prestacao-financeira.md)) |
 
 ### Dependencias
 
 | Dependencia | Tipo | Observacao |
 |-------------|------|------------|
-| M003 | Modulo interno | Fornece `Projeto` |
-| M013 | Modulo interno | Fornece `RubricaProjeto` e limites aprovados |
+| M003 | Modulo interno | Fornece `Iniciativa` e pode consumir visao consolidada de execucao |
 | Sistema bancario | Sistema externo | Disponibiliza arquivos CNAB 240 para importacao diaria de movimentos bancarios |
-| SIGFAPES | Sistema externo | Fornece orcamento planejado do projeto para carga unica |
+| SIGFAPES | Sistema externo | Fornece orcamento planejado da iniciativa para carga unica |
 | SERPRO | Sistema externo | Consulta de NF-e (Nota Fiscal Eletronica) via API OAuth2 — valida documentos fiscais |
 | MinIO | Sistema externo | Armazenamento de PDFs de orcamento de fornecedor e justificativas |
 
@@ -32,10 +31,10 @@ Este contrato documenta a superficie publica do modulo M014 como contexto respon
 
 | Nome da Operacao | Tipo | Objetivo | Entrada | Saida | Regras relacionadas | Pre-condicoes | Recusas/erros | Idempotencia | Autorizacao | Mapeamento de transporte |
 |------------------|------|----------|---------|-------|---------------------|---------------|---------------|--------------|-------------|--------------------------|
-| RegistrarDocumentoFiscal | Command | Registrar documento fiscal vinculado a rubrica do projeto | prestacao, rubrica, tipoDocumento, valor, url | `DocumentoFiscal` criado | RN01, RN07, RN08, RI2 | Projeto e rubrica validos | Rubrica invalida, documento fiscal invalido | Nao | Coordenador | API interna/backoffice a definir |
-| SincronizarProjetosDadosBancarios | Job | Criar/atualizar ProjetoRef, IdentificadorBancario e ContaBancaria obrigatoria por projeto | lote de projetos/dados bancarios | projetos/contas sincronizados | RN09 | Fonte de projetos disponivel | Dados bancarios ausentes ou inconsistentes | Sim | Sistema de integracao | Job interno |
-| ImportarOrcamentoPlanejadoSIGFAPES | Job | Executar carga unica do orcamento planejado do projeto | projeto, dados SIGFAPES | Orcamento e RubricaOrcamentaria criados | RN09, RI2 | Projeto e dados bancarios sincronizados | Orcamento inexistente, falha SIGFAPES | Sim | Sistema de integracao | Job interno |
-| ImportarMovimentosBancariosCNAB240 | Job | Importar movimentos bancarios diarios para conciliacao | arquivo CNAB 240 | TransacaoFinanceira importadas | RN02, RN09, RN11, RI1 | Projeto, ContaBancaria e Orcamento importados | CNAB invalido, conta nao encontrada | Sim | Sistema de integracao | Job interno |
+| RegistrarDocumentoFiscal | Command | Registrar documento fiscal vinculado a rubrica da iniciativa | prestacao, rubrica, tipoDocumento, valor, url | `DocumentoFiscal` criado | RN01, RN07, RN08, RI2 | Iniciativa e rubrica validas | Rubrica invalida, documento fiscal invalido | Nao | Coordenador/Ortogado | API interna/backoffice a definir |
+| SincronizarIniciativasDadosBancarios | Job | Criar/atualizar referencia de iniciativa, identificador bancario e ContaBancaria obrigatoria por iniciativa | lote de iniciativas/dados bancarios | iniciativas/contas sincronizadas | RN09 | Fonte de iniciativas disponivel | Dados bancarios ausentes ou inconsistentes | Sim | Sistema de integracao | Job interno |
+| ImportarOrcamentoPlanejadoSIGFAPES | Job | Executar carga unica do orcamento planejado da iniciativa | iniciativa, dados SIGFAPES | Orcamento e RubricaOrcamentaria criados | RN09, RI2 | Iniciativa e dados bancarios sincronizados | Orcamento inexistente, falha SIGFAPES | Sim | Sistema de integracao | Job interno |
+| ImportarMovimentosBancariosCNAB240 | Job | Importar movimentos bancarios diarios para conciliacao | arquivo CNAB 240 | TransacaoFinanceira importadas | RN02, RN09, RN11, RI1 | Iniciativa, ContaBancaria e Orcamento importados | CNAB invalido, conta nao encontrada | Sim | Sistema de integracao | Job interno |
 | SubmeterPrestacaoContas | Command | Submeter prestacao de contas para analise | prestacao, periodo, declaracaoFinal | `PrestacaoContas` submetida | RN01, RN02, RI1, RI2 | Documentos fiscais e movimentos bancarios carregados/conciliados | Prestacao anterior pendente, saldo de rubrica excedido | Nao | Coordenador | API interna/backoffice a definir |
 | EmitirParecerPrestacaoContas | Command | Aprovar, reprovar ou solicitar complementacao da prestacao | prestacao, aprovado, justificativa | `ParecerPC` registrado | RN09, RN10 | Prestacao em analise | Prestacao inexistente, parecer invalido | Nao | Area Tecnica ou SECONT | API interna/backoffice a definir |
 | RegistrarContestacaoPrestacaoContas | Command | Registrar contestacao da rejeicao com justificativa e anexos | prestacao, justificativa, documentos | `ContestacaoPrestacaoContas` criada | RN04 | Prestacao rejeitada e prazo vigente | Prazo expirado, contestacao sem justificativa | Nao | Coordenador | API interna/backoffice a definir |

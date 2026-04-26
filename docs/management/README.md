@@ -2,7 +2,7 @@
 
 Artefatos de planejamento e acompanhamento do produto. Responde a **quando** e **em que ordem** o produto e entregue.
 
-[← Voltar ao README do projeto](../../README.md)
+[← Voltar ao inicio](../README.md)
 
 ---
 
@@ -112,7 +112,7 @@ Cada US na tabela do epic inclui o numero da issue:
 | [milestones/](milestones/README.md) | Marcos de entrega agrupando domains | Sim — referencia backlog-product.md |
 | [roadmap.md](roadmap.md) | Visao operacional de entregas por trimestre e produto | Derivado de releases-2026.csv |
 | [releases-2026.csv](releases-2026.csv) | Dados brutos de entregas 2026 (produto, feature, status, dominio, modulo) | Sim — fonte do roadmap.md |
-| [sprints/](sprints/) | Um arquivo por sprint, referenciando features de releases-2026.csv | Sim — execucao do sprint |
+| [sprints](sprints/SPRINT-007.md) | Um arquivo por sprint, referenciando features de releases-2026.csv | Sim — execucao do sprint |
 | [deliveries.md](deliveries.md) | Entregas comprometidas por sprint, organizadas por mes | Derivado dos sprints |
 | [technical-debt.md](technical-debt.md) | Indice consolidado de debito tecnico de todos os modulos | Derivado dos backlogs dos modulos |
 

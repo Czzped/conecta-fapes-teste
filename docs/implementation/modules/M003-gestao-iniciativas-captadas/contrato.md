@@ -4,7 +4,9 @@ Dominio e regras de negocio: ver [README.md](README.md)
 
 ## Proposito do Contrato
 
-Este contrato documenta a superficie publica do modulo M003 como bounded context operacional de edital, iniciativa, projeto, cota e alocacao de bolsista. O foco aqui e explicitar comandos e consultas do modulo sem redefinir o dominio ja descrito no `README.md`.
+Este contrato documenta a superficie publica do M003 como bounded context de gestao pos-contratacao da `Iniciativa`. O modulo registra a iniciativa outorgada, mantem seu plano versionado, controla alteracoes de rubrica e oferece consultas consolidadas para programas, parcerias, acompanhamento de resultados, suspensao/finalizacao, BI e transparencia.
+
+O M003 nao publica comandos para criar edital, cota de edital, alocacao de bolsista ou documento de prestacao de contas. Esses objetos pertencem aos modulos M011, M009 e M014.
 
 ## Consumidores e Dependencias
 
@@ -12,35 +14,43 @@ Este contrato documenta a superficie publica do modulo M003 como bounded context
 
 | Consumidor | Uso do contrato |
 |------------|-----------------|
-| Analista da Agencia de Fomento | Registra editais, projetos, cotas e alocacoes operacionais |
-| M002 | Sincroniza dados legados do SigFapes para entidades canonicamente gerenciadas por M003 |
-| M011, M012, M015 e modulos correlatos | Consultam edital, projeto e alocacao como referencias operacionais |
-| M010 | Usa `ConsultarProjetosPorPrograma` para agregar `valorExecutado` no relatorio financeiro de parcerias |
-| [Portal Coordenador](../../../products/portal-coordenador/README.md) | Contexto de projeto, equipe, cadastro de bolsista ([EP-02](../../../products/portal-coordenador/features/EP-02-shell-portal-contexto-projeto.md), [EP-06](../../../products/portal-coordenador/features/EP-06-meu-projeto.md), [EP-07](../../../products/portal-coordenador/features/EP-07-minha-equipe-acompanhamento-bolsas.md), [EP-08](../../../products/portal-coordenador/features/EP-08-cadastro-edicao-bolsista.md)) |
+| Analista da Agencia de Fomento | Registra e acompanha iniciativas contratadas |
+| Ortogado | Consulta a iniciativa e solicita alteracao de rubrica |
+| M010 | Consulta iniciativas vinculadas a programas e parcerias |
+| M012 | Consulta resultados, beneficios e objetivos da iniciativa |
+| M014 | Envia ou disponibiliza lancamentos de execucao financeira para consolidacao |
+| M015 | Consulta estado da iniciativa para suspensao, reativacao e encerramento |
+| M018/M019 | Consomem visoes consolidadas para BI, transparencia e auditoria |
+| Portal Coordenador | Exibe contexto da iniciativa, plano, equipe, cronograma e orcamento |
 
 ### Dependencias
 
 | Dependencia | Tipo | Observacao |
 |-------------|------|------------|
-| M010 | Modulo interno | Fornece `Programa` e `Parceria` como referencias externas do edital |
-| M008 | Modulo interno | Fornece `AreaTecnica` e `PessoaFisica` |
-| M001 | Modulo interno | Fornece `VersaoNivel` referenciada por `CotaEdital` |
+| M008 | Modulo interno | Fornece `PessoaFisica` para o papel de `Ortogado` e membros da equipe |
+| M010 | Modulo interno | Fornece referencias de `Programa` e `Parceria` associadas a iniciativa |
+| M011 | Modulo interno | Dono de `Edital`; M003 pode guardar referencia de origem da captacao, mas nao gerencia edital |
+| M014 | Modulo interno | Dono da execucao financeira detalhada e prestacao de contas |
 
 ## Operacoes Publicas
 
-| Nome da Operacao | Tipo | Objetivo | Entrada | Saida | Regras relacionadas | Pre-condicoes | Recusas/erros | Idempotencia | Autorizacao | Mapeamento de transporte |
-|------------------|------|----------|---------|-------|---------------------|---------------|---------------|--------------|-------------|--------------------------|
-| RegistrarEditalOperacional | Command | Criar ou atualizar o edital operacional com sua area tecnica e vinculos de programa/parceria | codigo, titulo, tipo, areaTecnica, programa, parceria | `Edital` persistido | RN01, RN07 | AreaTecnica informada | AreaTecnica inexistente, edital inconsistente | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
-| RegistrarProjetoDoEdital | Command | Registrar o projeto concreto vinculado a um edital | editalId, titulo, resumo, coordenador, datas | `Projeto` criado | RN02, RN03, RN06 | Edital existente | Edital inexistente, coordenador invalido | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
-| RegistrarCotaEdital | Command | Cadastrar cotas de bolsa do edital por versao de nivel | editalId, versaoNivel, quantidadeTotal | `CotaEdital` criada | RN04 | Edital existente e versao de nivel valida | VersaoNivel inexistente, quantidade invalida | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
-| RegistrarAlocacaoBolsista | Command | Registrar a alocacao operacional de um bolsista consumindo uma cota do edital | projetoId, cotaEdital, orientador, bolsista, datas | `AlocacaoBolsista` criada | RN05, RN06 | Projeto e cota existentes | Cota indisponivel, orientador invalido, bolsista invalido | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
-| ConsultarVisaoOperacionalDoEdital | Query | Consultar a visao consolidada do edital com projetos, cotas e alocacoes | editalId ou codigo | Visao operacional do edital | RN01, RN02, RN04, RN05 | Edital existente | Edital nao encontrado | N/A | Analista da Agencia de Fomento ou modulo interno autorizado | API interna a definir |
-| ConsultarProjetosPorPrograma | Query | Listar projetos vinculados a um programa (via edital); consumido por M010 para agregar valorExecutado no relatorio financeiro de parcerias | programaId | `[{ projetoId, titulo }]` | — | Programa existente | Programa nao encontrado | N/A | Modulo interno autorizado (M010) | API interna a definir |
+| Nome da Operacao | Tipo | Objetivo | Entrada | Saida | Regras relacionadas | Pre-condicoes | Recusas/erros | Idempotencia | Autorizacao |
+|------------------|------|----------|---------|-------|---------------------|---------------|---------------|--------------|-------------|
+| RegistrarIniciativaContratada | Command | Criar a iniciativa apos contratacao/outorga | tipoIniciativaId, titulo, resumo, datas, valorAprovado, ortogadoId, referencias externas | `Iniciativa` criada | RN01-RN04, RN13 | TipoIniciativa e PessoaFisica existentes | Tipo inexistente, ortogado invalido, referencia externa inconsistente | Nao | Analista da Agencia |
+| CriarVersaoPlanoIniciativa | Command | Criar versao inicial ou nova versao do plano | iniciativaId, justificativa, objetivos, resultados, riscos, beneficios, equipe, cronograma, orcamento | `VersaoPlanoIniciativa` criada | RN04-RN09 | Iniciativa existente | Plano invalido, objetivo geral ausente, resultado sem vinculo | Nao | Analista da Agencia |
+| AtivarVersaoPlanoIniciativa | Command | Tornar uma versao de plano vigente | iniciativaId, versaoId, dataVigenciaInicio | Versao `VIGENTE` | RN04, RN08 | Versao criada e valida | Mais de uma versao vigente, versao incompleta | Nao | Analista da Agencia |
+| SolicitarAlteracaoRubrica | Command | Registrar solicitacao de inclusao ou retirada de rubrica | iniciativaId, ortogadoId, rubricaId, tipoAlteracao, justificativa | `SolicitacaoAlteracaoRubrica` criada | RN09, RN11, RN12 | Ortogado ativo da iniciativa | Ortogado invalido, rubrica inexistente, retirada impedida | Nao | Ortogado |
+| DecidirSolicitacaoAlteracaoRubrica | Command | Aprovar ou rejeitar solicitacao de rubrica | solicitacaoId, decisao, justificativa, versaoPlanoGeradaId | Solicitacao decidida | RN08, RN11, RN12 | Solicitacao em analise | Solicitacao encerrada, retirada impedida, versao ausente quando obrigatoria | Nao | Analista da Agencia |
+| RegistrarLancamentoExecucao | Command | Registrar lancamento recebido de integracao financeira | iniciativaId, rubricaId, data, valor, tipo, origem | `LancamentoExecucao` criado | RN09, RN10, RN15 | Iniciativa e rubrica existentes | Lancamento duplicado, rubrica invalida, valor invalido | Sim, por chave de origem | Modulo interno autorizado |
+| ConsultarIniciativaConsolidada | Query | Consultar dados completos da iniciativa e plano vigente | iniciativaId | Visao consolidada da iniciativa | RN01-RN15 | Iniciativa existente | Iniciativa nao encontrada | N/A | Usuario autorizado ou modulo interno |
+| ConsultarIniciativasPorPrograma | Query | Listar iniciativas vinculadas a um programa | programaId | Lista de iniciativas | RN01 | Programa existente | Programa sem iniciativas | N/A | M010/modulo interno |
+| ConsultarIniciativasPorParceria | Query | Listar iniciativas vinculadas a uma parceria | parceriaId | Lista de iniciativas | RN01 | Parceria existente | Parceria sem iniciativas | N/A | M010/modulo interno |
+| ConsultarExecucaoConsolidadaIniciativa | Query | Consultar valores planejados, executados e saldo por rubrica | iniciativaId | Resumo financeiro consolidado | RN09, RN10 | Iniciativa existente | Execucao indisponivel | N/A | Usuario autorizado ou modulo interno |
 
 ## Padrao de Payload e Erro
 
 - Os JSON abaixo sao exemplos ilustrativos do contrato de aplicacao do modulo.
-- Os exemplos mostram a intencao operacional do bounded context; endpoint, handler e serializacao concreta continuam `a definir`.
+- O contrato explicita a intencao funcional; endpoint, handler e serializacao concreta ficam no [contrato-api.md](contrato-api.md).
 
 **Envelope de erro sugerido**
 
@@ -58,177 +68,109 @@ Este contrato documenta a superficie publica do modulo M003 como bounded context
 
 ## Exemplos JSON por Operacao
 
-### RegistrarEditalOperacional
-
-**Exemplo de entrada**
+### RegistrarIniciativaContratada
 
 ```json
 {
-  "codigo": "EDT-2026-001",
-  "titulo": "Edital Pesquisa Aplicada 2026",
-  "tipo": "DEMANDA_PUBLICA",
-  "areaTecnicaId": "AT-DGPP-01",
-  "programaId": "PROG-2026-01",
-  "parceriaId": "PAR-2026-03"
-}
-```
-
-**Exemplo de saida**
-
-```json
-{
-  "edital": {
-    "id": "EDT-2026-001",
-    "estado": "EM_CONFIGURACAO"
-  }
-}
-```
-
-**Excecoes e mensagens**
-
-| Codigo | Mensagem de erro exemplo |
-|--------|---------------------------|
-| AREA_TECNICA_NAO_ENCONTRADA | A area tecnica informada para o edital nao foi encontrada. |
-| EDITAL_OPERACIONAL_INVALIDO | Os dados operacionais do edital sao invalidos ou incompletos. |
-
-### RegistrarProjetoDoEdital
-
-**Exemplo de entrada**
-
-```json
-{
-  "editalId": "EDT-2026-001",
-  "titulo": "Projeto Laboratorio de Dados Publicos",
-  "resumo": "Projeto para estruturacao de laboratorio institucional.",
-  "coordenadorId": "COD-2026-011",
-  "dataInicio": "2026-05-01",
-  "dataFim": "2027-04-30"
-}
-```
-
-**Exemplo de saida**
-
-```json
-{
-  "projeto": {
-    "id": "PROJ-2026-014",
-    "estado": "CONTRATADA"
-  }
-}
-```
-
-**Excecoes e mensagens**
-
-| Codigo | Mensagem de erro exemplo |
-|--------|---------------------------|
-| EDITAL_NAO_ENCONTRADO | O edital informado para o projeto nao foi encontrado. |
-| COORDENADOR_INVALIDO | O coordenador informado nao e valido para o contexto operacional. |
-
-### RegistrarCotaEdital
-
-**Exemplo de entrada**
-
-```json
-{
-  "editalId": "EDT-2026-001",
-  "versaoNivelId": "VN-BPIG-I-2026-02",
-  "quantidadeTotal": 12
-}
-```
-
-**Exemplo de saida**
-
-```json
-{
-  "cotaEdital": {
-    "id": "COT-2026-001",
-    "quantidadeDisponivel": 12
-  }
-}
-```
-
-**Excecoes e mensagens**
-
-| Codigo | Mensagem de erro exemplo |
-|--------|---------------------------|
-| VERSAO_NIVEL_NAO_ENCONTRADA | A versao de nivel informada para a cota nao foi encontrada. |
-| COTA_EDITAL_QUANTIDADE_INVALIDA | A quantidade total da cota deve ser maior que zero. |
-
-### RegistrarAlocacaoBolsista
-
-**Exemplo de entrada**
-
-```json
-{
-  "projetoId": "PROJ-2026-014",
-  "cotaEditalId": "COT-2026-001",
-  "orientadorId": "ORI-2026-004",
-  "bolsistaId": "BOL-2026-009",
+  "tipoIniciativaId": "TIPO-PESQUISA",
+  "titulo": "Laboratorio de Dados Publicos",
+  "resumo": "Iniciativa para estruturacao de laboratorio institucional.",
+  "dataContratacao": "2026-05-01",
   "dataInicio": "2026-06-01",
-  "dataFimPrevista": "2027-05-31"
+  "dataFim": "2027-05-31",
+  "valorAprovado": 250000.00,
+  "ortogadoPessoaFisicaId": "PF-2026-011",
+  "programaId": "PROG-2026-01",
+  "parceriaId": "PAR-2026-03",
+  "origemCaptacaoId": "EDITAL-M011-2026-001"
 }
 ```
 
-**Exemplo de saida**
+### CriarVersaoPlanoIniciativa
 
 ```json
 {
-  "alocacaoBolsista": {
-    "id": "ALC-2026-020",
-    "estado": "EM_ANALISE"
+  "iniciativaId": "INI-2026-014",
+  "justificativa": "Plano inicial aprovado na contratacao.",
+  "objetivoGeral": {
+    "descricao": "Estruturar ambiente institucional de dados para apoio a politicas publicas."
+  },
+  "objetivosEspecificos": [
+    {
+      "descricao": "Implantar infraestrutura minima do laboratorio.",
+      "percentualImportancia": 60,
+      "resultadoIds": ["RES-2026-001"]
+    }
+  ],
+  "orcamentoPlanejado": {
+    "valorTotal": 250000.00,
+    "valorBolsas": 120000.00,
+    "valorCapital": 130000.00
   }
 }
 ```
 
-**Excecoes e mensagens**
-
-| Codigo | Mensagem de erro exemplo |
-|--------|---------------------------|
-| COTA_EDITAL_INDISPONIVEL | A cota informada nao possui disponibilidade para nova alocacao. |
-| PAPEL_OPERACIONAL_INVALIDO | O orientador ou bolsista informado nao e valido para a alocacao. |
-
-### ConsultarVisaoOperacionalDoEdital
-
-**Exemplo de entrada**
+### SolicitarAlteracaoRubrica
 
 ```json
 {
-  "editalId": "EDT-2026-001"
+  "iniciativaId": "INI-2026-014",
+  "ortogadoId": "ORT-2026-001",
+  "rubricaId": "RUB-CAPITAL",
+  "tipoAlteracao": "INCLUSAO",
+  "justificativa": "Necessidade de compra de equipamento nao previsto no plano vigente."
 }
 ```
 
-**Exemplo de saida**
+### RegistrarLancamentoExecucao
 
 ```json
 {
-  "edital": {
-    "id": "EDT-2026-001",
-    "titulo": "Edital Pesquisa Aplicada 2026"
+  "iniciativaId": "INI-2026-014",
+  "rubricaId": "RUB-CAPITAL",
+  "data": "2026-08-10",
+  "descricao": "Nota fiscal de equipamento de processamento",
+  "valor": 18400.00,
+  "tipo": "EXECUCAO",
+  "origem": "M014:DocumentoFiscal:DF-2026-223"
+}
+```
+
+### ConsultarIniciativaConsolidada
+
+```json
+{
+  "iniciativa": {
+    "id": "INI-2026-014",
+    "titulo": "Laboratorio de Dados Publicos",
+    "tipo": "Projeto de Pesquisa",
+    "estado": "EM_EXECUCAO",
+    "ortogado": {
+      "id": "ORT-2026-001",
+      "pessoaFisicaId": "PF-2026-011"
+    }
   },
-  "projetos": 8,
-  "cotas": 3,
-  "alocacoes": 14
+  "planoVigente": {
+    "versao": 1,
+    "objetivosEspecificos": 3,
+    "resultados": 4,
+    "atividades": 9
+  },
+  "orcamento": {
+    "valorPlanejado": 250000.00,
+    "valorExecutado": 18400.00,
+    "saldo": 231600.00
+  }
 }
 ```
-
-**Excecoes e mensagens**
-
-| Codigo | Mensagem de erro exemplo |
-|--------|---------------------------|
-| EDITAL_NAO_ENCONTRADO | O edital informado nao foi encontrado para consulta operacional. |
-| VISAO_OPERACIONAL_INDISPONIVEL | Nao foi possivel montar a visao operacional do edital neste momento. |
-
-## Mapeamento de Transporte
-
-- Todas as operacoes deste contrato ficam mapeadas como `API interna/backoffice a definir`.
-- O contrato nao fixa endpoint HTTP, controller ou classe concreta.
 
 ## Eventos e Efeitos Colaterais
 
-- `RegistrarEditalOperacional` consolida o ownership do edital em M003 mesmo quando houver origem legada em M002.
-- `RegistrarProjetoDoEdital` cria a iniciativa concreta `Projeto` dentro do bounded context.
-- `RegistrarCotaEdital` disponibiliza cotas consumidas por alocacoes e, posteriormente, por bolsas em M009.
-- `RegistrarAlocacaoBolsista` reduz a disponibilidade operacional da cota correspondente.
+- `IniciativaContratadaRegistrada`: emitido apos criacao da iniciativa.
+- `VersaoPlanoIniciativaAtivada`: emitido quando uma nova versao passa a ser vigente.
+- `SolicitacaoAlteracaoRubricaCriada`: emitido quando o ortogado solicita inclusao ou retirada de rubrica.
+- `SolicitacaoAlteracaoRubricaAprovada`: emitido quando a alteracao e aprovada e, quando aplicavel, gera nova versao do plano.
+- `LancamentoExecucaoRegistrado`: emitido quando um lancamento de execucao financeira e incorporado a visao consolidada.
 
 ## Rastreabilidade
 

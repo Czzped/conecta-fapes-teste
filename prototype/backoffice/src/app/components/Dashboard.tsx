@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, FileEdit } from 'lucide-react';
+import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, FileEdit, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import logoSmall from 'figma:asset/db135b6708f6cc7f72f27c6a31dd02aa5500d030.png';
 import logoFull from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
@@ -7,6 +7,7 @@ import { Editais } from './Editais';
 import { EditaisLight } from './EditaisLight';
 import { Programa } from './Programa';
 import { Parceria } from './Parceria';
+import { PlanejamentoEstrategico } from './PlanejamentoEstrategico';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -17,7 +18,7 @@ type Contrast = 'normal' | 'high' | 'maximum';
 type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
 type Language = 'pt' | 'en' | 'es';
 type NotificationTab = 'avisos' | 'editais';
-type ActivePage = 'home' | 'dashboard' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'detalhes' | 'editais' | 'editais-light' | 'programa' | 'parceria' | 'formulario';
+type ActivePage = 'home' | 'dashboard' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
 type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outro Exemplo de Projeto' | 'Mais um Exemplo de Projeto';
@@ -248,6 +249,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             
             {/* Itens do menu PROJETOS */}
             {([
+              { key: 'planejamento' as ActivePage, Icon: Target, label: 'Planejamento' },
               { key: 'parceria' as ActivePage, Icon: Handshake, label: 'Parceria' },
               { key: 'programa' as ActivePage, Icon: FolderOpen, label: 'Programa' },
               { key: 'editais' as ActivePage, Icon: FileText, label: 'Captação' },
@@ -1382,6 +1384,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <Editais />
         ) : activePage === 'editais-light' ? (
           <EditaisLight />
+        ) : activePage === 'planejamento' ? (
+          <PlanejamentoEstrategico />
         ) : activePage === 'programa' ? (
           <Programa onBack={() => setActivePage('home')} />
         ) : activePage === 'parceria' ? (

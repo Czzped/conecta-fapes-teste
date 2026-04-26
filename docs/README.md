@@ -31,7 +31,7 @@ Plataforma digital da agencia de fomento para gestao do ciclo completo de foment
 | [Management](management/README.md) | Hierarquia de planejamento: roadmap, milestones e sprints |
 | [Roadmap](management/roadmap.md) | Sequencia de entrega por domain e dependencias |
 | [Milestones](management/milestones/README.md) | Marcos de entrega agrupando domains |
-| [Sprints](management/sprints/) | Iteracoes time-boxed com epics por domain |
+| [Sprints](management/sprints/SPRINT-007.md) | Iteracoes time-boxed com epics por domain |
 
 ## Arquitetura
 
@@ -40,7 +40,7 @@ Plataforma digital da agencia de fomento para gestao do ciclo completo de foment
 | [Visao Geral](architecture/README.md) | Contexto do sistema, stack tecnologica, integracoes e operacao |
 | [ADRs](architecture/adr/README.md) | Decisoes de arquitetura registradas |
 
-> **Nota:** A pasta `documentation_old/` na raiz do repositorio e uma versao antiga da documentacao e nao deve ser utilizada como referencia. A pasta [deprecated/](deprecated/README.md) contem documentacao legada migrada (`pagamento-bolsista`, `portal-fapes`, `prestacao-de-contas`) — consulte `products/` e `implementation/modules/` para a documentacao atual.
+> **Nota:** A pasta `documentation_old/` na raiz do repositorio e uma versao antiga da documentacao e nao deve ser utilizada como referencia. A pasta `docs/deprecated/` contem documentacao legada migrada (`pagamento-bolsista`, `portal-fapes`, `prestacao-de-contas`) — consulte `products/` e `implementation/modules/` para a documentacao atual.
 
 ## Produtos
 
@@ -77,3 +77,5 @@ Canais de entrega frontend que compoem funcionalidades de multiplos modulos back
 | M018 | Business Intelligence | [README](implementation/modules/M018-business-intelligence/README.md) |
 | M019 | Transparencia e Auditoria | [README](implementation/modules/M019-transparencia-auditoria/README.md) |
 | M020 | Comunicacao | [README](implementation/modules/M020-comunicacao/README.md) |
+| M021 | Gestao de Formularios | [README](implementation/modules/M021-gestao-formularios/README.md) |
+| M022 | Contratacao e Outorga | [README](implementation/modules/M022-contratacao-outorga/README.md) |

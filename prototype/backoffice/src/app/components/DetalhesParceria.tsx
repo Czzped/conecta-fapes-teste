@@ -1,36 +1,37 @@
 import React, { useState } from 'react';
-import { ChevronRight, Home, ArrowLeft, FileText, Plus, ChevronDown, Search, Handshake, FolderOpen, Briefcase, Users, DollarSign } from 'lucide-react';
-
-type StatusFilter = 'Todos' | 'Ativo' | 'Finalizado' | 'Em Andamento' | 'Aprovado' | 'Em Análise' | 'Enviado' | 'Avaliado' | 'Aberto';
-type AreaFilter = 'Todas' | 'Carreira Científica' | 'Pesquisa' | 'Difusão do Conhecimento' | 'Extensão' | 'Inovação' | 'Internacional' | 'Ciências da Computação' | 'Saúde Pública';
-type InstituicaoFilter = 'Todos' | 'Ufes' | 'Ifes' | 'UFMG' | 'USP' | 'CNPq' | 'Fapesp';
-type TipoFilter = 'Captação' | 'Programa';
-
-interface ParceriaItem {
-  id: number;
-  nome: string;
-  instituicaoParceira: string;
-  dataEnvio: string;
-  aditivo: 'Sim' | 'Não';
-  area: string;
-  status: string;
-  investimento: string;
-  dataAssinatura: string;
-  vigenciaInicio: string;
-  vigenciaFim: string;
-  numeroProcesso: string;
-  objetivo: string;
-  coordenadorNome: string;
-  coordenadorEmail: string;
-  coordenadorCelular: string;
-  pontoFocalFapes: string;
-  gerenciaResponsavel: string;
-}
+import { Archive, ArrowLeft, ChevronDown, ChevronRight, DollarSign, Edit3, FileText, FolderOpen, Handshake, Home, PauseCircle, Plus, RotateCcw, Save, Search, Trash2, Upload, X } from 'lucide-react';
+import type { ParceriaItem } from './Parceria';
 
 interface Props {
   parceria: ParceriaItem;
   onBack: () => void;
+  onOpenPrograma?: (programa: { codigo: string; nome: string }) => void;
 }
+
+const statusLabel: Record<ParceriaItem['status'], string> = {
+  EmElaboracao: 'Em elaboração',
+  Vigente: 'Vigente',
+  Suspensa: 'Suspensa',
+  Encerrada: 'Encerrada',
+};
+
+const statusColor = (status: ParceriaItem['status']) => {
+  switch (status) {
+    case 'EmElaboracao': return '#f59e0b';
+    case 'Vigente': return '#22c55e';
+    case 'Suspensa': return '#f97316';
+    case 'Encerrada': return '#94a3b8';
+    default: return '#94a3b8';
+  }
+};
+
+const formatCurrency = (value: number) => (
+  `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+);
+
+const formatPercent = (value: number) => (
+  `${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
+);
 
 const cardStyle: React.CSSProperties = {
   backgroundColor: 'rgba(30, 41, 59, 0.5)',
@@ -40,12 +41,25 @@ const cardStyle: React.CSSProperties = {
   marginBottom: '24px',
 };
 
+const metricCardStyle: React.CSSProperties = {
+  backgroundColor: 'rgba(30, 41, 59, 0.6)',
+  border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: '10px',
+  padding: '24px',
+};
+
 const labelStyle: React.CSSProperties = {
-  display: 'block',
+  fontFamily: 'var(--font-family)',
+  fontSize: 'var(--text-xs)',
+  color: 'rgba(255,255,255,0.5)',
+  marginBottom: '6px',
+};
+
+const valueStyle: React.CSSProperties = {
   fontFamily: 'var(--font-family)',
   fontSize: 'var(--text-sm)',
-  color: 'rgba(255,255,255,0.7)',
-  marginBottom: '6px',
+  color: '#ffffff',
+  margin: 0,
 };
 
 const inputStyle: React.CSSProperties = {
@@ -61,1074 +75,1195 @@ const inputStyle: React.CSSProperties = {
   boxSizing: 'border-box' as const,
 };
 
-const metricCardStyle: React.CSSProperties = {
-  backgroundColor: 'rgba(30, 41, 59, 0.6)',
-  border: '1px solid rgba(255,255,255,0.1)',
-  borderRadius: '10px',
-  padding: '24px',
+const instituicoesOptions = [
+  { value: 'Ufes', label: 'Universidade Federal do Espírito Santo (Ufes)', cnpj: '32.479.123/0001-43' },
+  { value: 'Ifes', label: 'Instituto Federal do Espírito Santo (Ifes)', cnpj: '10.838.653/0001-06' },
+  { value: 'CNPq', label: 'Conselho Nacional de Desenvolvimento Científico e Tecnológico (CNPq)', cnpj: '33.654.831/0001-36' },
+  { value: 'Fapesp', label: 'Fundação de Amparo à Pesquisa do Estado de São Paulo (Fapesp)', cnpj: '43.828.151/0001-45' },
+  { value: 'UFMG', label: 'Universidade Federal de Minas Gerais (UFMG)', cnpj: '17.217.985/0001-04' },
+  { value: 'USP', label: 'Universidade de São Paulo (USP)', cnpj: '63.025.530/0001-04' },
+  { value: 'MIT', label: 'Massachusetts Institute of Technology (MIT)', cnpj: 'Exterior' },
+];
+
+const maskDate = (value: string) => {
+  const digits = value.replace(/\D/g, '').slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
 };
 
-// Mock data - mistura de programas e captação (20 linhas)
-const mockData = [
-  { type: 'programa', id: 1, programa: 'Programa de Bolsas de Pesquisa 2026', eixo: 'Ciência e Tecnologia', dataVigencia: '01/01/2026 - 31/12/2026', status: 'Aberto' },
-  { type: 'captacao', id: 2, edital: '002/2026 - Inovação Tecnológica', proponente: 'Maria Santos', dataEnvio: '14/03/2026 - 16:45', area: 'Inovação', status: 'Enviado' },
-  { type: 'programa', id: 3, programa: 'Programa de Inovação Tecnológica', eixo: 'Inovação e Desenvolvimento', dataVigencia: '15/02/2026 - 14/02/2027', status: 'Aberto' },
-  { type: 'captacao', id: 4, edital: '003/2026 - Extensão Universitária', proponente: 'Carlos Lima', dataEnvio: '13/03/2026 - 10:20', area: 'Extensão', status: 'Avaliado' },
-  { type: 'programa', id: 5, programa: 'Programa de Desenvolvimento Sustentável', eixo: 'Meio Ambiente', dataVigencia: '10/02/2026 - 09/02/2027', status: 'Em Andamento' },
-  { type: 'captacao', id: 6, edital: '001/2026 - Pesquisa Científica', proponente: 'Dr. João Silva', dataEnvio: '20/03/2026 - 14:30', area: 'Ciências da Computação', status: 'Aprovado' },
-  { type: 'programa', id: 7, programa: 'Programa de Extensão Comunitária', eixo: 'Extensão', dataVigencia: '05/03/2026 - 04/03/2027', status: 'Aberto' },
-  { type: 'captacao', id: 8, edital: '004/2026 - PPSUS', proponente: 'Dra. Maria Santos', dataEnvio: '15/03/2026 - 09:15', area: 'Saúde Pública', status: 'Em Análise' },
-  { type: 'programa', id: 9, programa: 'Programa de Internacionalização', eixo: 'Internacional', dataVigencia: '01/04/2026 - 31/03/2027', status: 'Em Andamento' },
-  { type: 'captacao', id: 10, edital: '005/2026 - Difusão Cultural', proponente: 'Prof. Ana Costa', dataEnvio: '18/03/2026 - 11:00', area: 'Difusão do Conhecimento', status: 'Enviado' },
-  { type: 'programa', id: 11, programa: 'Programa de Apoio à Carreira', eixo: 'Carreira Científica', dataVigencia: '10/01/2026 - 09/01/2027', status: 'Aberto' },
-  { type: 'captacao', id: 12, edital: '006/2026 - Universal', proponente: 'Dr. Pedro Alves', dataEnvio: '22/03/2026 - 15:20', area: 'Pesquisa', status: 'Aprovado' },
-  { type: 'programa', id: 13, programa: 'Programa de Fomento à Inovação', eixo: 'Inovação', dataVigencia: '15/03/2026 - 14/03/2027', status: 'Em Andamento' },
-  { type: 'captacao', id: 14, edital: '007/2026 - Tecnologia Social', proponente: 'Dra. Beatriz Rocha', dataEnvio: '25/03/2026 - 10:45', area: 'Extensão', status: 'Em Análise' },
-  { type: 'programa', id: 15, programa: 'Programa de Pesquisa Aplicada', eixo: 'Pesquisa', dataVigencia: '20/02/2026 - 19/02/2027', status: 'Aberto' },
-  { type: 'captacao', id: 16, edital: '008/2026 - Jovem Pesquisador', proponente: 'Lucas Fernandes', dataEnvio: '27/03/2026 - 16:30', area: 'Carreira Científica', status: 'Enviado' },
-  { type: 'programa', id: 17, programa: 'Programa de Cooperação Internacional', eixo: 'Internacional', dataVigencia: '01/05/2026 - 30/04/2027', status: 'Em Andamento' },
-  { type: 'captacao', id: 18, edital: '009/2026 - Inovação Aberta', proponente: 'Mariana Oliveira', dataEnvio: '28/03/2026 - 14:15', area: 'Inovação', status: 'Avaliado' },
-  { type: 'programa', id: 19, programa: 'Programa de Educação Continuada', eixo: 'Difusão do Conhecimento', dataVigencia: '10/03/2026 - 09/03/2027', status: 'Aberto' },
-  { type: 'captacao', id: 20, edital: '010/2026 - Mestrado e Doutorado', proponente: 'Rafael Costa', dataEnvio: '30/03/2026 - 11:50', area: 'Carreira Científica', status: 'Aprovado' },
-];
-
-// Mock data - 10 linhas de cada tipo
-const mockProgramas = [
-  { type: 'programa', id: 1, programa: 'Programa de Bolsas de Pesquisa 2026', eixo: 'Ciência e Tecnologia', dataVigencia: '01/01/2026 - 31/12/2026', status: 'Aberto' },
-  { type: 'programa', id: 3, programa: 'Programa de Inovação Tecnológica', eixo: 'Inovação e Desenvolvimento', dataVigencia: '15/02/2026 - 14/02/2027', status: 'Aberto' },
-  { type: 'programa', id: 5, programa: 'Programa de Desenvolvimento Sustentável', eixo: 'Meio Ambiente', dataVigencia: '10/02/2026 - 09/02/2027', status: 'Em Andamento' },
-  { type: 'programa', id: 7, programa: 'Programa de Extensão Comunitária', eixo: 'Extensão', dataVigencia: '05/03/2026 - 04/03/2027', status: 'Aberto' },
-  { type: 'programa', id: 9, programa: 'Programa de Internacionalização', eixo: 'Internacional', dataVigencia: '01/04/2026 - 31/03/2027', status: 'Em Andamento' },
-  { type: 'programa', id: 11, programa: 'Programa de Apoio à Carreira', eixo: 'Carreira Científica', dataVigencia: '10/01/2026 - 09/01/2027', status: 'Aberto' },
-  { type: 'programa', id: 13, programa: 'Programa de Fomento à Inovação', eixo: 'Inovação', dataVigencia: '15/03/2026 - 14/03/2027', status: 'Em Andamento' },
-  { type: 'programa', id: 15, programa: 'Programa de Pesquisa Aplicada', eixo: 'Pesquisa', dataVigencia: '20/02/2026 - 19/02/2027', status: 'Aberto' },
-  { type: 'programa', id: 17, programa: 'Programa de Cooperação Internacional', eixo: 'Internacional', dataVigencia: '01/05/2026 - 30/04/2027', status: 'Em Andamento' },
-  { type: 'programa', id: 19, programa: 'Programa de Educação Continuada', eixo: 'Difusão do Conhecimento', dataVigencia: '10/03/2026 - 09/03/2027', status: 'Aberto' },
-];
-
-const mockCaptacao = [
-  { type: 'captacao', id: 2, edital: '002/2026 - Inovação Tecnológica', proponente: 'Maria Santos', dataEnvio: '14/03/2026 - 16:45', area: 'Inovação', status: 'Enviado' },
-  { type: 'captacao', id: 4, edital: '003/2026 - Extensão Universitária', proponente: 'Carlos Lima', dataEnvio: '13/03/2026 - 10:20', area: 'Extensão', status: 'Avaliado' },
-  { type: 'captacao', id: 6, edital: '001/2026 - Pesquisa Científica', proponente: 'Dr. João Silva', dataEnvio: '20/03/2026 - 14:30', area: 'Ciências da Computação', status: 'Aprovado' },
-  { type: 'captacao', id: 8, edital: '004/2026 - PPSUS', proponente: 'Dra. Maria Santos', dataEnvio: '15/03/2026 - 09:15', area: 'Saúde Pública', status: 'Em Análise' },
-  { type: 'captacao', id: 10, edital: '005/2026 - Difusão Cultural', proponente: 'Prof. Ana Costa', dataEnvio: '18/03/2026 - 11:00', area: 'Difusão do Conhecimento', status: 'Enviado' },
-  { type: 'captacao', id: 12, edital: '006/2026 - Universal', proponente: 'Dr. Pedro Alves', dataEnvio: '22/03/2026 - 15:20', area: 'Pesquisa', status: 'Aprovado' },
-  { type: 'captacao', id: 14, edital: '007/2026 - Tecnologia Social', proponente: 'Dra. Beatriz Rocha', dataEnvio: '25/03/2026 - 10:45', area: 'Extensão', status: 'Em Análise' },
-  { type: 'captacao', id: 16, edital: '008/2026 - Jovem Pesquisador', proponente: 'Lucas Fernandes', dataEnvio: '27/03/2026 - 16:30', area: 'Carreira Científica', status: 'Enviado' },
-  { type: 'captacao', id: 18, edital: '009/2026 - Inovação Aberta', proponente: 'Mariana Oliveira', dataEnvio: '28/03/2026 - 14:15', area: 'Inovação', status: 'Avaliado' },
-  { type: 'captacao', id: 20, edital: '010/2026 - Mestrado e Doutorado', proponente: 'Rafael Costa', dataEnvio: '30/03/2026 - 11:50', area: 'Carreira Científica', status: 'Aprovado' },
-];
-
-const statusColor = (s: string) => {
-  switch (s) {
-    case 'Aberto': return '#22c55e';
-    case 'Em Andamento': return '#3b82f6';
-    case 'Aprovado': return '#22c55e';
-    case 'Em Análise': return '#fbbf24';
-    case 'Enviado': return '#3b82f6';
-    case 'Avaliado': return '#a855f7';
-    default: return '#94a3b8';
-  }
+const maskCurrency = (value: string) => {
+  const digits = value.replace(/\D/g, '');
+  if (!digits) return '';
+  const numberValue = Number(digits) / 100;
+  return numberValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 
-export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack }) => {
-  const [activeTab, setActiveTab] = useState<'geral' | 'parceria'>('geral');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [instituicaoFilter, setInstituicaoFilter] = useState<InstituicaoFilter>('Todos');
-  const [showInstituicaoDropdown, setShowInstituicaoDropdown] = useState(false);
-  const [dataFilter, setDataFilter] = useState('');
-  const [areaFilter, setAreaFilter] = useState<AreaFilter>('Todas');
-  const [showAreaDropdown, setShowAreaDropdown] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('Todos');
-  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
-  const [tipoFilter, setTipoFilter] = useState<TipoFilter>('Captação');
-  const [showTipoDropdown, setShowTipoDropdown] = useState(false);
+const parseCurrency = (value: string) => Number(value.replace(/\./g, '').replace(',', '.')) || 0;
 
-  const statusOptions: StatusFilter[] = ['Todos', 'Aberto', 'Em Andamento', 'Aprovado', 'Em Análise', 'Enviado', 'Avaliado'];
-  const areaOptions: AreaFilter[] = ['Todas', 'Carreira Científica', 'Pesquisa', 'Difusão do Conhecimento', 'Extensão', 'Inovação', 'Internacional', 'Ciências da Computação', 'Saúde Pública'];
-  const instituicaoOptions: InstituicaoFilter[] = ['Todos', 'Ufes', 'Ifes', 'UFMG', 'USP', 'CNPq', 'Fapesp'];
-  const tipoOptions: TipoFilter[] = ['Captação', 'Programa'];
+const tipoDocumentoOptions = [
+  'Termo de Cooperação',
+  'Termo de Descentralização',
+  'Termo Aditivo',
+  'Anexo',
+  'Portaria',
+  'Procuração',
+];
 
-  const renderTabBar = () => (
-    <div style={{ 
-      display: 'flex', 
-      gap: '4px',
-      borderBottom: '1px solid rgba(255,255,255,0.1)',
-      marginBottom: '28px',
-    }}>
-      <button
-        onClick={() => setActiveTab('geral')}
-        style={{
-          flex: '0 0 auto',
-          padding: '12px 24px',
-          background: 'none',
-          border: 'none',
-          borderBottom: activeTab === 'geral' ? '2px solid #00c1af' : '2px solid transparent',
-          fontFamily: 'var(--font-family)',
-          fontSize: 'var(--text-sm)',
-          fontWeight: 'var(--font-weight-medium)',
-          color: activeTab === 'geral' ? '#00c1af' : 'rgba(255,255,255,0.6)',
-          cursor: 'pointer',
-          transition: 'color 0.2s, border-color 0.2s',
-          marginBottom: '-1px',
-        }}
-        onMouseEnter={e => {
-          if (activeTab !== 'geral') e.currentTarget.style.color = 'rgba(255,255,255,0.8)';
-        }}
-        onMouseLeave={e => {
-          if (activeTab !== 'geral') e.currentTarget.style.color = 'rgba(255,255,255,0.6)';
-        }}
-      >
-        Informações Gerais
-      </button>
-      <button
-        onClick={() => setActiveTab('parceria')}
-        style={{
-          flex: '0 0 auto',
-          padding: '12px 24px',
-          background: 'none',
-          border: 'none',
-          borderBottom: activeTab === 'parceria' ? '2px solid #00c1af' : '2px solid transparent',
-          fontFamily: 'var(--font-family)',
-          fontSize: 'var(--text-sm)',
-          fontWeight: 'var(--font-weight-medium)',
-          color: activeTab === 'parceria' ? '#00c1af' : 'rgba(255,255,255,0.6)',
-          cursor: 'pointer',
-          transition: 'color 0.2s, border-color 0.2s',
-          marginBottom: '-1px',
-        }}
-        onMouseEnter={e => {
-          if (activeTab !== 'parceria') e.currentTarget.style.color = 'rgba(255,255,255,0.8)';
-        }}
-        onMouseLeave={e => {
-          if (activeTab !== 'parceria') e.currentTarget.style.color = 'rgba(255,255,255,0.6)';
-        }}
-      >
-        Informações da Parceria
-      </button>
-    </div>
+export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenPrograma }) => {
+  const [activeTab, setActiveTab] = useState<'resumo' | 'financeiro' | 'dashboard' | 'documentos'>('resumo');
+  const [currentStatus, setCurrentStatus] = useState<ParceriaItem['status']>(parceria.status);
+  const [editingCadastro, setEditingCadastro] = useState(false);
+  const [showAditivo, setShowAditivo] = useState(false);
+  const [showSuspensao, setShowSuspensao] = useState(false);
+  const [showEncerramento, setShowEncerramento] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [suspensao, setSuspensao] = useState({ origem: 'Área de Parcerias', motivo: '' });
+  const [suspensaoRegistrada, setSuspensaoRegistrada] = useState<{ origem: string; motivo: string } | null>(null);
+  const [encerramento, setEncerramento] = useState({ justificativa: '' });
+  const [encerramentoRegistrado, setEncerramentoRegistrado] = useState<{ justificativa: string; programasAfetados: string[] } | null>(null);
+  const [aditivoTipo, setAditivoTipo] = useState<'financeiro' | 'tempo'>('financeiro');
+  const [temAditivo, setTemAditivo] = useState(parceria.aditivo === 'Sim');
+  const [aditivosFinanceiros, setAditivosFinanceiros] = useState<Array<{ data: string; valor: number; documento: string }>>(
+    parceria.aditivo === 'Sim' ? [{ data: '15/03/2026', valor: 500000, documento: 'Termo de descentralização aditivo' }] : []
   );
+  const [aditivosTempo, setAditivosTempo] = useState<Array<{ vigenciaFimAnterior: string; vigenciaFim: string; documento: string }>>([]);
+  const [aditivoFinanceiro, setAditivoFinanceiro] = useState({ valor: '', data: '', documento: '' });
+  const [aditivoTempo, setAditivoTempo] = useState({ vigenciaFim: '', documento: '' });
+  const [filtroTipoDocumento, setFiltroTipoDocumento] = useState('Todos');
+  const [cadastroData, setCadastroData] = useState({
+    nome: parceria.nome,
+    instituicaoParceira: parceria.instituicaoParceira,
+    numeroProcesso: parceria.numeroProcesso,
+    dataAssinatura: parceria.dataAssinatura,
+    vigenciaInicio: parceria.vigenciaInicio,
+    vigenciaFim: parceria.vigenciaFim,
+    objetivo: parceria.objetivo,
+    contaBancariaDestino: parceria.contaBancariaDestino,
+    aporteTotal: parceria.aporteTotal,
+    valorAlocado: parceria.valorAlocado,
+  });
+  const [draftCadastroData, setDraftCadastroData] = useState(cadastroData);
+  const [documentos, setDocumentos] = useState([
+    { id: 'DOC-001', tipo: 'Termo de Cooperação', descricao: 'Documento formalizador da parceria', dataEmissao: parceria.dataAssinatura || parceria.dataEnvio, arquivo: parceria.documentoFormalizador },
+    { id: 'DOC-002', tipo: 'Termo de Descentralização', descricao: 'Aporte financeiro original da parceria', dataEmissao: parceria.dataEnvio, arquivo: parceria.termoDescentralizacao },
+    ...(parceria.aditivo === 'Sim' ? [{ id: 'DOC-003', tipo: 'Termo Aditivo', descricao: 'Documento de aditivo financeiro registrado', dataEmissao: '15/03/2026', arquivo: 'Termo aditivo 001/2026' }] : []),
+  ]);
+  const [novoDocumento, setNovoDocumento] = useState({
+    tipo: 'Anexo',
+    descricao: '',
+    dataEmissao: '',
+    arquivo: '',
+  });
 
-  const renderInformacoesGerais = () => (
-    <>
-      {/* Cards de métricas - estilo igual ao da tela Parceria */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-        {[
-          { label: 'Programas Relacionados', value: '2', Icon: FolderOpen, iconColor: '#3b82f6', iconBg: 'rgba(59,130,246,0.12)' },
-          { label: 'Projetos Relacionados', value: '8', Icon: Briefcase, iconColor: '#fbbf24', iconBg: 'rgba(251,191,36,0.12)' },
-          { label: 'Investimento Total', value: parceria.investimento, Icon: DollarSign, iconColor: '#22c55e', iconBg: 'rgba(34,197,94,0.12)' },
-          { label: 'Investimento Utilizado', value: 'R$ 85.000,00', Icon: DollarSign, iconColor: '#00c1af', iconBg: 'rgba(0,193,175,0.12)' },
-        ].map(({ label, value, Icon, iconColor, iconBg }) => (
-          <div
-            key={label}
-            style={{
-              ...metricCardStyle,
-              transition: 'background-color 0.3s, border-color 0.3s',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  width: '40px', 
-                  height: '40px', 
-                  backgroundColor: iconBg, 
-                  borderRadius: 'var(--radius)',
-                  flexShrink: 0,
-                }}
-              >
-                <Icon size={20} style={{ color: iconColor }} />
-              </div>
-              <p style={{ 
-                fontFamily: 'var(--font-family)', 
-                fontSize: 'var(--text-sm)', 
-                color: 'rgba(255,255,255,0.7)',
-                fontWeight: 'var(--font-weight-normal)',
-                margin: 0,
-              }}>
-                {label}
-              </p>
-            </div>
-            <p style={{ 
-              fontFamily: 'var(--font-family)', 
-              fontSize: label.includes('Investimento') ? 'var(--text-lg)' : 'var(--text-2xl)', 
-              color: '#ffffff',
-              textAlign: 'center',
-              margin: 0,
-            }}>
-              {value}
-            </p>
-          </div>
-        ))}
-      </div>
+  const documentosFiltrados = filtroTipoDocumento === 'Todos'
+    ? documentos
+    : documentos.filter(documento => documento.tipo === filtroTipoDocumento);
 
-      {/* Filtros - sem card em volta - todos na mesma linha */}
-      <div className="mb-6">
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr', gap: '16px' }}>
-          {/* Campo de Pesquisa */}
-          <div>
-            <label htmlFor="search-input" style={{
-              display: 'block',
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--text-sm)',
-              color: 'rgba(255,255,255,0.7)',
-              marginBottom: '8px',
-              fontWeight: 'var(--font-weight-normal)',
-            }}>
-              Pesquisar
-            </label>
-            <div style={{ position: 'relative' }}>
-              <input
-                id="search-input"
-                type="text"
-                placeholder="Buscar"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={{
-                  ...inputStyle,
-                  paddingLeft: '38px',
-                }}
-              />
-              <Search
-                size={15}
-                style={{
-                  position: 'absolute',
-                  left: '14px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: 'rgba(255,255,255,0.4)',
-                  pointerEvents: 'none',
-                }}
-              />
-            </div>
-          </div>
+  const anexarDocumento = () => {
+    if (!novoDocumento.tipo || !novoDocumento.arquivo) return;
+    setDocumentos(prev => [
+      ...prev,
+      {
+        id: `DOC-${String(prev.length + 1).padStart(3, '0')}`,
+        tipo: novoDocumento.tipo,
+        descricao: novoDocumento.descricao || novoDocumento.arquivo,
+        dataEmissao: novoDocumento.dataEmissao || 'Pendente',
+        arquivo: novoDocumento.arquivo,
+      },
+    ]);
+    setNovoDocumento({ tipo: 'Anexo', descricao: '', dataEmissao: '', arquivo: '' });
+    setFiltroTipoDocumento('Todos');
+  };
 
-          {/* Filtro Tipo */}
-          <div style={{ position: 'relative' }}>
-            <label htmlFor="tipo-filter" style={{
-              display: 'block',
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--text-sm)',
-              color: 'rgba(255,255,255,0.7)',
-              marginBottom: '8px',
-              fontWeight: 'var(--font-weight-normal)',
-            }}>
-              Tipo
-            </label>
-            <button
-              id="tipo-filter"
-              onClick={() => {
-                setShowTipoDropdown(!showTipoDropdown);
-                setShowStatusDropdown(false);
-                setShowAreaDropdown(false);
-                setShowInstituicaoDropdown(false);
-              }}
-              style={{
-                ...inputStyle,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                cursor: 'pointer',
-              }}
-            >
-              <span>{tipoFilter}</span>
-              <ChevronDown size={16} style={{ color: 'rgba(255,255,255,0.5)' }} />
-            </button>
-            {showTipoDropdown && (
-              <div style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                right: 0,
-                backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: 'var(--radius)',
-                marginTop: '4px',
-                zIndex: 10,
-                maxHeight: '200px',
-                overflowY: 'auto',
-              }}>
-                {tipoOptions.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => {
-                      setTipoFilter(opt);
-                      setShowTipoDropdown(false);
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '10px 14px',
-                      backgroundColor: tipoFilter === opt ? 'rgba(0,193,175,0.1)' : 'transparent',
-                      border: 'none',
-                      textAlign: 'left',
-                      fontFamily: 'var(--font-family)',
-                      fontSize: 'var(--text-sm)',
-                      color: tipoFilter === opt ? '#00c1af' : '#ffffff',
-                      cursor: 'pointer',
-                      transition: 'background-color 0.2s',
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.15)'}
-                    onMouseLeave={e => e.currentTarget.style.backgroundColor = tipoFilter === opt ? 'rgba(0,193,175,0.1)' : 'transparent'}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+  const startEditingCadastro = () => {
+    setDraftCadastroData(cadastroData);
+    setEditingCadastro(true);
+  };
 
-          {/* Filtro Instituição */}
-          <div style={{ position: 'relative' }}>
-            <label htmlFor="instituicao-filter" style={{
-              display: 'block',
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--text-sm)',
-              color: 'rgba(255,255,255,0.7)',
-              marginBottom: '8px',
-              fontWeight: 'var(--font-weight-normal)',
-            }}>
-              Instituição
-            </label>
-            <button
-              id="instituicao-filter"
-              onClick={() => {
-                setShowInstituicaoDropdown(!showInstituicaoDropdown);
-                setShowStatusDropdown(false);
-                setShowAreaDropdown(false);
-                setShowTipoDropdown(false);
-              }}
-              style={{
-                ...inputStyle,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                cursor: 'pointer',
-              }}
-            >
-              <span>{instituicaoFilter}</span>
-              <ChevronDown size={16} style={{ color: 'rgba(255,255,255,0.5)' }} />
-            </button>
-            {showInstituicaoDropdown && (
-              <div style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                right: 0,
-                backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: 'var(--radius)',
-                marginTop: '4px',
-                zIndex: 10,
-                maxHeight: '200px',
-                overflowY: 'auto',
-              }}>
-                {instituicaoOptions.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => {
-                      setInstituicaoFilter(opt);
-                      setShowInstituicaoDropdown(false);
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '10px 14px',
-                      backgroundColor: instituicaoFilter === opt ? 'rgba(0,193,175,0.1)' : 'transparent',
-                      border: 'none',
-                      textAlign: 'left',
-                      fontFamily: 'var(--font-family)',
-                      fontSize: 'var(--text-sm)',
-                      color: instituicaoFilter === opt ? '#00c1af' : '#ffffff',
-                      cursor: 'pointer',
-                      transition: 'background-color 0.2s',
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.15)'}
-                    onMouseLeave={e => e.currentTarget.style.backgroundColor = instituicaoFilter === opt ? 'rgba(0,193,175,0.1)' : 'transparent'}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+  const saveCadastroData = () => {
+    setCadastroData(draftCadastroData);
+    setEditingCadastro(false);
+  };
 
-          {/* Filtro Data */}
-          <div>
-            <label htmlFor="data-filter" style={{
-              display: 'block',
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--text-sm)',
-              color: 'rgba(255,255,255,0.7)',
-              marginBottom: '8px',
-              fontWeight: 'var(--font-weight-normal)',
-            }}>
-              Data
-            </label>
-            <input
-              id="data-filter"
-              type="text"
-              placeholder="Selecionar data"
-              value={dataFilter}
-              onChange={(e) => setDataFilter(e.target.value)}
-              style={inputStyle}
-            />
-          </div>
+  const saldoDisponivel = Math.max(cadastroData.aporteTotal - cadastroData.valorAlocado, 0);
+  const totalAditivosFinanceiros = aditivosFinanceiros.reduce((total, aditivo) => total + aditivo.valor, 0);
 
-          {/* Filtro Área */}
-          <div style={{ position: 'relative' }}>
-            <label htmlFor="area-filter" style={{
-              display: 'block',
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--text-sm)',
-              color: 'rgba(255,255,255,0.7)',
-              marginBottom: '8px',
-              fontWeight: 'var(--font-weight-normal)',
-            }}>
-              Área
-            </label>
-            <button
-              id="area-filter"
-              onClick={() => {
-                setShowAreaDropdown(!showAreaDropdown);
-                setShowStatusDropdown(false);
-                setShowInstituicaoDropdown(false);
-                setShowTipoDropdown(false);
-              }}
-              style={{
-                ...inputStyle,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                cursor: 'pointer',
-              }}
-            >
-              <span>{areaFilter}</span>
-              <ChevronDown size={16} style={{ color: 'rgba(255,255,255,0.5)' }} />
-            </button>
-            {showAreaDropdown && (
-              <div style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                right: 0,
-                backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: 'var(--radius)',
-                marginTop: '4px',
-                zIndex: 10,
-                maxHeight: '200px',
-                overflowY: 'auto',
-              }}>
-                {areaOptions.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => {
-                      setAreaFilter(opt);
-                      setShowAreaDropdown(false);
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '10px 14px',
-                      backgroundColor: areaFilter === opt ? 'rgba(0,193,175,0.1)' : 'transparent',
-                      border: 'none',
-                      textAlign: 'left',
-                      fontFamily: 'var(--font-family)',
-                      fontSize: 'var(--text-sm)',
-                      color: areaFilter === opt ? '#00c1af' : '#ffffff',
-                      cursor: 'pointer',
-                      transition: 'background-color 0.2s',
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.15)'}
-                    onMouseLeave={e => e.currentTarget.style.backgroundColor = areaFilter === opt ? 'rgba(0,193,175,0.1)' : 'transparent'}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+  const aportes = [
+    { tipo: 'Original', data: cadastroData.dataAssinatura || parceria.dataEnvio, valor: cadastroData.aporteTotal - totalAditivosFinanceiros, conta: cadastroData.contaBancariaDestino, documento: parceria.termoDescentralizacao },
+    ...aditivosFinanceiros.map((aditivo, index) => ({ tipo: `Aditivo financeiro ${index + 1}`, data: aditivo.data, valor: aditivo.valor, conta: cadastroData.contaBancariaDestino, documento: aditivo.documento || 'Pendente' })),
+  ];
 
-          {/* Filtro Status */}
-          <div style={{ position: 'relative' }}>
-            <label htmlFor="status-filter" style={{
-              display: 'block',
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--text-sm)',
-              color: 'rgba(255,255,255,0.7)',
-              marginBottom: '8px',
-              fontWeight: 'var(--font-weight-normal)',
-            }}>
-              Status
-            </label>
-            <button
-              id="status-filter"
-              onClick={() => {
-                setShowStatusDropdown(!showStatusDropdown);
-                setShowAreaDropdown(false);
-                setShowInstituicaoDropdown(false);
-                setShowTipoDropdown(false);
-              }}
-              style={{
-                ...inputStyle,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                cursor: 'pointer',
-              }}
-            >
-              <span>{statusFilter}</span>
-              <ChevronDown size={16} style={{ color: 'rgba(255,255,255,0.5)' }} />
-            </button>
-            {showStatusDropdown && (
-              <div style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                right: 0,
-                backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: 'var(--radius)',
-                marginTop: '4px',
-                zIndex: 10,
-                maxHeight: '200px',
-                overflowY: 'auto',
-              }}>
-                {statusOptions.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => {
-                      setStatusFilter(opt);
-                      setShowStatusDropdown(false);
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '10px 14px',
-                      backgroundColor: statusFilter === opt ? 'rgba(0,193,175,0.1)' : 'transparent',
-                      border: 'none',
-                      textAlign: 'left',
-                      fontFamily: 'var(--font-family)',
-                      fontSize: 'var(--text-sm)',
-                      color: statusFilter === opt ? '#00c1af' : '#ffffff',
-                      cursor: 'pointer',
-                      transition: 'background-color 0.2s',
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.15)'}
-                    onMouseLeave={e => e.currentTarget.style.backgroundColor = statusFilter === opt ? 'rgba(0,193,175,0.1)' : 'transparent'}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+  const registrarAditivo = () => {
+    if (currentStatus === 'Suspensa' || currentStatus === 'Encerrada') return;
+    if (aditivoTipo === 'financeiro') {
+      const valor = parseCurrency(aditivoFinanceiro.valor);
+      if (valor > 0) {
+        setCadastroData(prev => ({ ...prev, aporteTotal: prev.aporteTotal + valor }));
+        setAditivosFinanceiros(prev => [...prev, { data: aditivoFinanceiro.data, valor, documento: aditivoFinanceiro.documento }]);
+      }
+      setAditivoFinanceiro({ valor: '', data: '', documento: '' });
+    } else {
+      const vigenciaFimAnterior = cadastroData.vigenciaFim;
+      setCadastroData(prev => ({
+        ...prev,
+        vigenciaFim: aditivoTempo.vigenciaFim || prev.vigenciaFim,
+      }));
+      if (aditivoTempo.vigenciaFim) {
+        setAditivosTempo(prev => [...prev, { vigenciaFimAnterior, vigenciaFim: aditivoTempo.vigenciaFim, documento: aditivoTempo.documento }]);
+      }
+      setAditivoTempo({ vigenciaFim: '', documento: '' });
+    }
+    setTemAditivo(true);
+    setShowAditivo(false);
+  };
 
-      {/* Lista unificada de Programas e Captação - 20 linhas alternadas */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        {(tipoFilter === 'Captação' ? mockCaptacao : mockProgramas).map((item: any) => {
-          if (item.type === 'programa') {
-            return (
-              <div
-                key={`programa-${item.id}`}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '2.5fr 1.5fr 1.5fr 0.8fr 40px',
-                  gap: '16px',
-                  alignItems: 'center',
-                  padding: '20px 24px',
-                  backgroundColor: 'rgba(30, 41, 59, 0.5)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '10px',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s, border-color 0.2s',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.7)';
-                  e.currentTarget.style.borderColor = 'rgba(0,193,175,0.3)';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.5)';
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                }}
-              >
-                <div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>
-                    Programa
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
-                    {item.programa}
-                  </div>
-                </div>
-                <div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>
-                    Eixo Estratégico
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>
-                    {item.eixo}
-                  </div>
-                </div>
-                <div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>
-                    Data de Vigência
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>
-                    {item.dataVigencia}
-                  </div>
-                </div>
-                <div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>
-                    Status
-                  </div>
-                  <span style={{
-                    display: 'inline-block',
-                    padding: '4px 10px',
-                    borderRadius: '12px',
-                    fontFamily: 'var(--font-family)',
-                    fontSize: 'var(--text-xs)',
-                    fontWeight: 'var(--font-weight-medium)',
-                    backgroundColor: `${statusColor(item.status)}20`,
-                    color: statusColor(item.status),
-                  }}>
-                    {item.status}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'center' }}>
-                  <ChevronRight size={18} style={{ color: 'rgba(255,255,255,0.4)' }} />
-                </div>
-              </div>
-            );
-          } else {
-            return (
-              <div
-                key={`captacao-${item.id}`}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '2fr 1.5fr 1.2fr 1fr 0.8fr 40px',
-                  gap: '16px',
-                  alignItems: 'center',
-                  padding: '20px 24px',
-                  backgroundColor: 'rgba(30, 41, 59, 0.5)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '10px',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s, border-color 0.2s',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.7)';
-                  e.currentTarget.style.borderColor = 'rgba(0,193,175,0.3)';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.5)';
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                }}
-              >
-                <div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>
-                    Edital
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
-                    {item.edital}
-                  </div>
-                </div>
-                <div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>
-                    Proponente
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>
-                    {item.proponente}
-                  </div>
-                </div>
-                <div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>
-                    Data de Envio
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>
-                    {item.dataEnvio}
-                  </div>
-                </div>
-                <div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>
-                    Área
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>
-                    {item.area}
-                  </div>
-                </div>
-                <div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>
-                    Status
-                  </div>
-                  <span style={{
-                    display: 'inline-block',
-                    padding: '4px 10px',
-                    borderRadius: '12px',
-                    fontFamily: 'var(--font-family)',
-                    fontSize: 'var(--text-xs)',
-                    fontWeight: 'var(--font-weight-medium)',
-                    backgroundColor: `${statusColor(item.status)}20`,
-                    color: statusColor(item.status),
-                  }}>
-                    {item.status}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'center' }}>
-                  <ChevronRight size={18} style={{ color: 'rgba(255,255,255,0.4)' }} />
-                </div>
-              </div>
-            );
-          }
-        })}
-      </div>
-    </>
-  );
+  const removerAditivoFinanceiro = (index: number) => {
+    const aditivo = aditivosFinanceiros[index];
+    if (!aditivo) return;
+    const proximosAditivos = aditivosFinanceiros.filter((_, currentIndex) => currentIndex !== index);
+    setAditivosFinanceiros(proximosAditivos);
+    setCadastroData(prev => ({ ...prev, aporteTotal: Math.max(prev.aporteTotal - aditivo.valor, 0) }));
+    setTemAditivo(proximosAditivos.length > 0 || aditivosTempo.length > 0);
+  };
 
-  const renderInformacoesParceria = () => (
-    <>
-      {/* Card único com todas as informações */}
-      <div style={cardStyle}>
-        <h2 style={{
-          fontFamily: 'var(--font-family)',
-          fontSize: 'var(--text-sm)',
-          fontWeight: 'var(--font-weight-medium)',
-          color: '#00c1af',
-          margin: '0 0 20px',
-        }}>
-          Identificação da Parceria
-        </h2>
+  const removerAditivoTempo = (index: number) => {
+    const proximosAditivos = aditivosTempo.filter((_, currentIndex) => currentIndex !== index);
+    const ultimoAditivo = proximosAditivos[proximosAditivos.length - 1];
+    const novaVigenciaFim = ultimoAditivo?.vigenciaFim || parceria.vigenciaFim;
+    setAditivosTempo(proximosAditivos);
+    setCadastroData(prev => ({ ...prev, vigenciaFim: novaVigenciaFim }));
+    setTemAditivo(aditivosFinanceiros.length > 0 || proximosAditivos.length > 0);
+  };
 
-        <div style={{ display: 'grid', gap: '16px' }}>
-          {/* Nome da Parceria */}
-          <div>
-            <label style={labelStyle}>Nome da Parceria</label>
-            <input type="text" value={parceria.nome} readOnly style={inputStyle} />
-          </div>
+  const programas = [
+    { nome: 'Programa de Pesquisa Aplicada', valor: Math.min(cadastroData.valorAlocado, 950000), estado: currentStatus === 'Encerrada' ? 'Encerrado' : currentStatus === 'Suspensa' ? 'Suspenso' : 'Vigente' },
+    { nome: 'Programa de Inovação Regional', valor: Math.max(cadastroData.valorAlocado - 950000, 0), estado: currentStatus === 'Encerrada' ? 'Encerrado' : currentStatus === 'Suspensa' ? 'Suspenso' : 'Vigente' },
+  ].filter(p => p.valor > 0);
+  const dashboardPorPrograma = programas.map((programa, index) => {
+    const fatorAportado = index === 0 ? 0.62 : 0.38;
+    const valorAportado = Math.min(programa.valor * fatorAportado, programa.valor);
+    const valorConsumido = Math.min(programa.valor * (fatorAportado + 0.18), programa.valor);
+    const saldoDisponivelPrograma = Math.max(programa.valor - valorConsumido, 0);
+    const percentualConsumido = programa.valor > 0 ? (valorConsumido / programa.valor) * 100 : 0;
+    return {
+      ...programa,
+      codigo: index === 0 ? 'PRG-2026-001' : 'PRG-2026-002',
+      valorAportado,
+      valorConsumido,
+      saldoDisponivelPrograma,
+      percentualConsumido,
+    };
+  });
+  const valorAportado = dashboardPorPrograma.reduce((total, programa) => total + programa.valorAportado, 0);
+  const valorConsumido = dashboardPorPrograma.reduce((total, programa) => total + programa.valorConsumido, 0);
+  const percentualConsumido = cadastroData.valorAlocado > 0 ? (valorConsumido / cadastroData.valorAlocado) * 100 : 0;
+  const dashboardRubricas = dashboardPorPrograma.flatMap((programa, programaIndex) => {
+    const itens = programaIndex === 0 ? [
+      { rubrica: 'Bolsas', subrubrica: 'Bolsas de mestrado', iniciativa: 'Iniciativa Pesquisa Aplicada em Saúde', peso: 0.36 },
+      { rubrica: 'Capital', subrubrica: 'Equipamentos de laboratório', iniciativa: 'Iniciativa Pesquisa Aplicada em Saúde', peso: 0.42 },
+      { rubrica: 'Custeio', subrubrica: 'Material de consumo', iniciativa: 'Iniciativa Formação Científica Integrada', peso: 0.22 },
+    ] : [
+      { rubrica: 'Bolsas', subrubrica: 'Bolsas de inovação', iniciativa: 'Iniciativa Laboratório de Inovação Regional', peso: 0.30 },
+      { rubrica: 'Capital', subrubrica: 'Protótipos e equipamentos', iniciativa: 'Iniciativa Laboratório de Inovação Regional', peso: 0.50 },
+      { rubrica: 'Custeio', subrubrica: 'Serviços de terceiros', iniciativa: 'Iniciativa Formação Científica Integrada', peso: 0.20 },
+    ];
 
-          {/* Instituição Parceira e Valor Investido */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div>
-              <label style={labelStyle}>Instituição Parceira</label>
-              <input type="text" value={parceria.instituicaoParceira} readOnly style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Valor Investido (R$)</label>
-              <input 
-                type="text" 
-                value={parceria.investimento} 
-                readOnly 
-                style={{
-                  ...inputStyle,
-                  color: '#00c1af',
-                  fontWeight: 'var(--font-weight-medium)',
-                }}
-              />
-            </div>
-          </div>
+    return itens.map(item => {
+      const alocado = programa.valor * item.peso;
+      const aportado = programa.valorAportado * item.peso;
+      const consumido = programa.valorConsumido * item.peso;
+      const disponivel = Math.max(alocado - consumido, 0);
+      return {
+        programa: programa.nome,
+        iniciativa: item.iniciativa,
+        rubrica: item.rubrica,
+        subrubrica: item.subrubrica,
+        alocado,
+        aportado,
+        consumido,
+        disponivel,
+        percentualConsumido: alocado > 0 ? (consumido / alocado) * 100 : 0,
+      };
+    });
+  });
+  const rubricasConsolidadas = Object.values(dashboardRubricas.reduce<Record<string, { rubrica: string; aportado: number; alocado: number; consumido: number; disponivel: number; programas: Set<string> }>>((acc, item) => {
+    if (!acc[item.rubrica]) {
+      acc[item.rubrica] = { rubrica: item.rubrica, aportado: 0, alocado: 0, consumido: 0, disponivel: 0, programas: new Set<string>() };
+    }
+    acc[item.rubrica].aportado += item.aportado;
+    acc[item.rubrica].alocado += item.alocado;
+    acc[item.rubrica].consumido += item.consumido;
+    acc[item.rubrica].disponivel += item.disponivel;
+    acc[item.rubrica].programas.add(item.programa);
+    return acc;
+  }, {}));
+  const programasAfetados = programas.map(programa => programa.nome);
+  const iniciativasAfetadas = [
+    'Iniciativa Pesquisa Aplicada em Saúde',
+    'Iniciativa Laboratório de Inovação Regional',
+    'Iniciativa Formação Científica Integrada',
+  ];
 
-          {/* Área e Número do Processo */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div>
-              <label style={labelStyle}>Área</label>
-              <input type="text" value={parceria.area} readOnly style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Número do Processo</label>
-              <input type="text" value={parceria.numeroProcesso} readOnly style={inputStyle} />
-            </div>
-          </div>
+  const confirmarSuspensao = () => {
+    if (!suspensao.motivo.trim()) return;
+    setCurrentStatus('Suspensa');
+    setSuspensaoRegistrada(suspensao);
+    setShowSuspensao(false);
+    setShowAditivo(false);
+  };
 
-          {/* Data de Assinatura, Vigência Início e Fim */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
-            <div>
-              <label style={labelStyle}>Data da Assinatura</label>
-              <input type="text" value={parceria.dataAssinatura} readOnly style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Data de Vigência (Início)</label>
-              <input type="text" value={parceria.vigenciaInicio} readOnly style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Data de Vigência (Fim)</label>
-              <input type="text" value={parceria.vigenciaFim} readOnly style={inputStyle} />
-            </div>
-          </div>
+  const reativarParceria = () => {
+    setCurrentStatus('Vigente');
+    setSuspensaoRegistrada(null);
+  };
 
-          {/* Objetivo */}
-          <div>
-            <label style={labelStyle}>Objetivo</label>
-            <textarea
-              value={parceria.objetivo}
-              readOnly
-              rows={3}
-              style={{
-                ...inputStyle,
-                resize: 'vertical',
-                lineHeight: '1.6',
-              }}
-            />
-          </div>
-
-          {/* Divisor */}
-          <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.08)', margin: '8px 0' }} />
-
-          {/* Coordenador */}
-          <div>
-            <h3 style={{
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-medium)',
-              color: 'rgba(255,255,255,0.9)',
-              margin: '0 0 16px',
-            }}>
-              Coordenador
-            </h3>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
-              <div>
-                <label style={labelStyle}>Nome</label>
-                <input type="text" value={parceria.coordenadorNome} readOnly style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>E-mail</label>
-                <input type="text" value={parceria.coordenadorEmail} readOnly style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Celular</label>
-                <input type="text" value={parceria.coordenadorCelular} readOnly style={inputStyle} />
-              </div>
-            </div>
-          </div>
-
-          {/* Divisor */}
-          <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.08)', margin: '8px 0' }} />
-
-          {/* Gestão */}
-          <div>
-            <h3 style={{
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-medium)',
-              color: 'rgba(255,255,255,0.9)',
-              margin: '0 0 16px',
-            }}>
-              Gestão
-            </h3>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <div>
-                <label style={labelStyle}>Ponto Focal Fapes</label>
-                <input type="text" value={parceria.pontoFocalFapes} readOnly style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Gerência Responsável</label>
-                <input type="text" value={parceria.gerenciaResponsavel} readOnly style={inputStyle} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Documentos Relacionados */}
-      <div style={cardStyle}>
-        <h2 style={{
-          fontFamily: 'var(--font-family)',
-          fontSize: 'var(--text-sm)',
-          fontWeight: 'var(--font-weight-medium)',
-          color: '#00c1af',
-          margin: '0 0 20px',
-        }}>
-          Documentos Relacionados
-        </h2>
-
-        <div style={{ display: 'grid', gap: '12px' }}>
-          {[
-            { nome: 'Formulário de Monitoramento', data: '15/03/2026', tipo: 'PDF' },
-            { nome: 'Termo de Cooperação', data: parceria.dataAssinatura, tipo: 'PDF' },
-          ].map((doc, idx) => (
-            <button
-              key={idx}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '16px',
-                backgroundColor: 'rgba(30, 41, 59, 0.6)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '8px',
-                padding: '16px 20px',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'border-color 0.2s, background-color 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(0,193,175,0.4)';
-                e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.8)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.6)';
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '36px',
-                  height: '36px',
-                  backgroundColor: 'rgba(0,193,175,0.12)',
-                  borderRadius: 'var(--radius)',
-                }}>
-                  <FileText size={18} style={{ color: '#00c1af' }} />
-                </div>
-                <div>
-                  <div style={{
-                    fontFamily: 'var(--font-family)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-weight-medium)',
-                    color: '#ffffff',
-                    marginBottom: '4px',
-                  }}>
-                    {doc.nome}
-                  </div>
-                  <div style={{
-                    fontFamily: 'var(--font-family)',
-                    fontSize: 'var(--text-xs)',
-                    color: 'rgba(255,255,255,0.5)',
-                  }}>
-                    {doc.tipo} • Atualizado em {doc.data}
-                  </div>
-                </div>
-              </div>
-              <ChevronDown size={18} style={{ color: 'rgba(255,255,255,0.4)', flexShrink: 0 }} />
-            </button>
-          ))}
-        </div>
-      </div>
-    </>
-  );
+  const confirmarEncerramento = () => {
+    if (!encerramento.justificativa.trim()) return;
+    setCurrentStatus('Encerrada');
+    setEncerramentoRegistrado({ justificativa: encerramento.justificativa, programasAfetados });
+    setShowEncerramento(false);
+    setShowSuspensao(false);
+    setShowAditivo(false);
+    setConfirmDelete(false);
+    setSuspensaoRegistrada(null);
+    setEncerramento({ justificativa: '' });
+  };
 
   return (
     <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
-      <div className="pt-8 px-8 pb-8">
-        {/* Breadcrumb */}
+      <div className="pt-8 px-8 pb-16">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
           <Home size={15} style={{ color: 'rgba(255,255,255,0.5)' }} />
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
-          <button
-            onClick={onBack}
-            style={{
-              background: 'none',
-              border: 'none',
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--text-sm)',
-              color: 'rgba(255,255,255,0.5)',
-              cursor: 'pointer',
-              padding: 0,
-            }}
-          >
-            Parceria
+          <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)' }}>
+            Parcerias
           </button>
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
-          <span style={{
-            fontFamily: 'var(--font-family)',
-            fontSize: 'var(--text-sm)',
-            color: '#00c1af',
-            fontWeight: 'var(--font-weight-medium)',
-          }}>
+          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
             Detalhes da Parceria
           </span>
         </div>
 
-        {/* Header com botão Voltar e Adicionar Aditivo (condicional) */}
-        <div className="mb-6">
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', flex: 1 }}>
-              <button
-                onClick={onBack}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '36px',
-                  height: '36px',
-                  flexShrink: 0,
-                  backgroundColor: 'rgba(0,193,175,0.15)',
-                  borderRadius: 'var(--radius)',
-                  border: 'none',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s',
-                }}
-                onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.25)'}
-                onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.15)'}
-              >
-                <ArrowLeft size={18} style={{ color: '#00c1af' }} />
-              </button>
-              <div style={{ flex: 1 }}>
-                <h1 style={{
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--text-md)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  color: '#ffffff',
-                  margin: '0 0 8px',
-                  lineHeight: '1.4',
-                }}>
-                  Detalhes da Parceria
+        <div style={{ marginBottom: '28px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+            <button
+              onClick={onBack}
+              title="Voltar"
+              style={{ width: '36px', height: '36px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(30,41,59,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            >
+              <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
+            </button>
+            <div style={{ width: '36px', height: '36px', borderRadius: 'var(--radius)', backgroundColor: 'rgba(0,193,175,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Handshake size={18} style={{ color: '#00c1af' }} />
+            </div>
+            <div style={{ flex: 1, marginTop: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: 0 }}>
+                  {cadastroData.nome}
                 </h1>
-                <p style={{
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--text-sm)',
-                  color: 'rgba(255,255,255,0.55)',
-                  margin: 0,
-                }}>
-                  Verifique as informações dessa Parceria.
+                <span style={{ display: 'inline-block', padding: '4px 10px', borderRadius: '12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', backgroundColor: `${statusColor(currentStatus)}20`, color: statusColor(currentStatus) }}>
+                  {statusLabel[currentStatus]}
+                </span>
+              </div>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                Instituição vinculada: {cadastroData.instituicaoParceira} · Processo {cadastroData.numeroProcesso}
+              </p>
+            </div>
+            <ActionButton icon={<Plus size={15} />} label="Aditivo" muted={currentStatus === 'Suspensa' || currentStatus === 'Encerrada'} onClick={() => currentStatus !== 'Suspensa' && currentStatus !== 'Encerrada' && setShowAditivo(true)} />
+            {currentStatus === 'Suspensa' ? (
+              <ActionButton icon={<RotateCcw size={15} />} label="Reativar" onClick={reativarParceria} />
+            ) : currentStatus === 'Encerrada' ? (
+              <ActionButton icon={<PauseCircle size={15} />} label="Suspender" muted />
+            ) : (
+              <ActionButton icon={<PauseCircle size={15} />} label="Suspender" onClick={() => setShowSuspensao(true)} />
+            )}
+            <ActionButton icon={<Archive size={15} />} label="Encerrar" muted={currentStatus === 'Encerrada'} onClick={() => currentStatus !== 'Encerrada' && setShowEncerramento(true)} />
+            <ActionButton icon={<Trash2 size={15} />} label="Deletar" danger onClick={() => setConfirmDelete(true)} />
+          </div>
+          <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', marginTop: '20px' }} />
+        </div>
+
+        {confirmDelete && (
+          <div style={cardStyle}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: programas.length > 0 ? '20px' : 0 }}>
+              <div>
+                <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+                  {programas.length > 0 ? 'Remoção bloqueada' : 'Confirmar exclusão da parceria'}
+                </h2>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                  {programas.length > 0
+                    ? 'A parceria não pode ser removida porque possui aporte financeiro em programas.'
+                    : 'Esta ação remove a parceria cadastrada por erro e registra a remoção no histórico de auditoria.'}
                 </p>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <SmallButton icon={<X size={14} />} label={programas.length > 0 ? 'Fechar' : 'Cancelar'} onClick={() => setConfirmDelete(false)} muted />
+                {programas.length === 0 && (
+                  <SmallButton icon={<Trash2 size={14} />} label="Confirmar deleção" onClick={onBack} danger />
+                )}
+              </div>
+            </div>
+            {programas.length > 0 && (
+              <ImpactList title="Programas que impedem a remoção" items={programas.map(programa => `${programa.nome} (${formatCurrency(programa.valor)})`)} />
+            )}
+          </div>
+        )}
+
+        {showEncerramento && (
+          <div style={cardStyle}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
+              <div>
+                <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+                  Encerrar parceria
+                </h2>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                  {programasAfetados.length > 0
+                    ? 'O encerramento finaliza a parceria e encerra os programas aportados em cascata.'
+                    : 'Esta parceria não possui programas aportados e pode ser encerrada diretamente.'}
+                </p>
+              </div>
+              <SmallButton icon={<X size={14} />} label="Fechar" onClick={() => setShowEncerramento(false)} muted />
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <TextAreaEditField label="Justificativa do encerramento" value={encerramento.justificativa} onChange={(justificativa) => setEncerramento({ justificativa })} />
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <ImpactList title="Programas que serão encerrados" items={programasAfetados} />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+              <SmallButton icon={<X size={14} />} label="Cancelar" onClick={() => setShowEncerramento(false)} muted />
+              <SmallButton icon={<Archive size={14} />} label="Confirmar encerramento" onClick={confirmarEncerramento} danger />
+            </div>
+          </div>
+        )}
+
+        {showSuspensao && (
+          <div style={cardStyle}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
+              <div>
+                <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+                  Suspender parceria em cascata
+                </h2>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                  A suspensão afeta os programas aportados e as iniciativas vinculadas.
+                </p>
+              </div>
+              <SmallButton icon={<X size={14} />} label="Fechar" onClick={() => setShowSuspensao(false)} muted />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '16px', marginBottom: '20px' }}>
+              <div>
+                <div style={labelStyle}>Origem da solicitação</div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {['Área de Parcerias', 'Instituição vinculada'].map(origem => (
+                    <button
+                      key={origem}
+                      type="button"
+                      onClick={() => setSuspensao(prev => ({ ...prev, origem }))}
+                      style={{
+                        padding: '9px 12px',
+                        borderRadius: 'var(--radius)',
+                        border: suspensao.origem === origem ? '1px solid rgba(0,193,175,0.55)' : '1px solid rgba(255,255,255,0.12)',
+                        backgroundColor: suspensao.origem === origem ? 'rgba(0,193,175,0.12)' : 'rgba(15,23,42,0.35)',
+                        color: suspensao.origem === origem ? '#00c1af' : 'rgba(255,255,255,0.72)',
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 'var(--text-sm)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {origem}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <TextAreaEditField label="Motivo da suspensão" value={suspensao.motivo} onChange={(motivo) => setSuspensao(prev => ({ ...prev, motivo }))} />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+              <ImpactList title="Programas que serão suspensos" items={programasAfetados} />
+              <ImpactList title="Iniciativas que serão suspensas" items={iniciativasAfetadas} />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+              <SmallButton icon={<X size={14} />} label="Cancelar" onClick={() => setShowSuspensao(false)} muted />
+              <SmallButton icon={<PauseCircle size={14} />} label="Confirmar suspensão" onClick={confirmarSuspensao} danger />
+            </div>
+          </div>
+        )}
+
+        {suspensaoRegistrada && currentStatus === 'Suspensa' && (
+          <div style={{ ...cardStyle, borderColor: 'rgba(249,115,22,0.35)', backgroundColor: 'rgba(249,115,22,0.08)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: '16px', alignItems: 'center' }}>
+              <Info label="Origem da suspensão" value={suspensaoRegistrada.origem} />
+              <Info label="Motivo registrado" value={suspensaoRegistrada.motivo} />
+              <Info label="Operações bloqueadas" value="Aditivos e novos aportes" />
+            </div>
+          </div>
+        )}
+
+        {encerramentoRegistrado && currentStatus === 'Encerrada' && (
+          <div style={{ ...cardStyle, borderColor: 'rgba(148,163,184,0.35)', backgroundColor: 'rgba(148,163,184,0.08)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '16px', alignItems: 'center' }}>
+              <Info label="Justificativa do encerramento" value={encerramentoRegistrado.justificativa} />
+              <Info label="Programas encerrados" value={String(encerramentoRegistrado.programasAfetados.length)} />
+              <Info label="Operações bloqueadas" value="Aditivos e suspensão" />
+            </div>
+          </div>
+        )}
+
+        {showAditivo && (
+          <div style={cardStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '20px' }}>
+              <div>
+                <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 4px' }}>
+                  Registrar aditivo
+                </h2>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                  Escolha se o aditivo altera o valor financeiro ou a vigência da parceria.
+                </p>
+              </div>
+              <SmallButton icon={<X size={14} />} label="Fechar" onClick={() => setShowAditivo(false)} muted />
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
+              {[
+                { id: 'financeiro', label: 'Aditivo financeiro' },
+                { id: 'tempo', label: 'Aditivo de tempo' },
+              ].map(option => (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => setAditivoTipo(option.id as 'financeiro' | 'tempo')}
+                  style={{
+                    padding: '9px 14px',
+                    borderRadius: 'var(--radius)',
+                    border: aditivoTipo === option.id ? '1px solid rgba(0,193,175,0.55)' : '1px solid rgba(255,255,255,0.12)',
+                    backgroundColor: aditivoTipo === option.id ? 'rgba(0,193,175,0.12)' : 'rgba(15,23,42,0.35)',
+                    color: aditivoTipo === option.id ? '#00c1af' : 'rgba(255,255,255,0.72)',
+                    fontFamily: 'var(--font-family)',
+                    fontSize: 'var(--text-sm)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+
+            {aditivoTipo === 'financeiro' ? (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', alignItems: 'end' }}>
+                <CurrencyEditField label="Valor do aditivo financeiro" value={aditivoFinanceiro.valor} onChange={(valor) => setAditivoFinanceiro(prev => ({ ...prev, valor }))} />
+                <DateMaskEditField label="Data do aporte" value={aditivoFinanceiro.data} onChange={(data) => setAditivoFinanceiro(prev => ({ ...prev, data }))} />
+                <UploadEditField label="Documento de descentralização" fileName={aditivoFinanceiro.documento} onChange={(documento) => setAditivoFinanceiro(prev => ({ ...prev, documento }))} />
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignItems: 'end' }}>
+                <DateMaskEditField label="Nova data fim da parceria" value={aditivoTempo.vigenciaFim} onChange={(vigenciaFim) => setAditivoTempo(prev => ({ ...prev, vigenciaFim }))} />
+                <UploadEditField label="Documento do aditivo de tempo" fileName={aditivoTempo.documento} onChange={(documento) => setAditivoTempo(prev => ({ ...prev, documento }))} />
+              </div>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '20px' }}>
+              <SmallButton icon={<X size={14} />} label="Cancelar" onClick={() => setShowAditivo(false)} muted />
+              <SmallButton icon={<Save size={14} />} label="Registrar aditivo" onClick={registrarAditivo} />
+            </div>
+          </div>
+        )}
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px', marginBottom: '24px' }}>
+          {[
+            { label: 'Total Investido', value: formatCurrency(cadastroData.aporteTotal), Icon: DollarSign, color: '#a855f7', bg: 'rgba(168,85,247,0.12)' },
+            { label: 'Total Aportado', value: formatCurrency(valorAportado), Icon: Handshake, color: '#38bdf8', bg: 'rgba(56,189,248,0.12)' },
+            { label: 'Total Alocado', value: formatCurrency(cadastroData.valorAlocado), Icon: FolderOpen, color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
+            { label: 'Total Consumido', value: formatCurrency(valorConsumido), Icon: DollarSign, color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
+            { label: 'Saldo disponível', value: formatCurrency(saldoDisponivel), Icon: DollarSign, color: '#00c1af', bg: 'rgba(0,193,175,0.12)' },
+          ].map(({ label, value, Icon, color, bg }) => (
+            <div key={label} style={metricCardStyle}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: bg, borderRadius: 'var(--radius)', flexShrink: 0 }}>
+                  <Icon size={20} style={{ color }} />
+                </div>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', margin: 0 }}>
+                  {label}
+                </p>
+              </div>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: label.includes('impactados') || label.includes('induzidas') ? 'var(--text-2xl)' : 'var(--text-lg)', color: '#ffffff', textAlign: 'center', margin: 0 }}>
+                {value}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '28px' }}>
+          {[
+            { id: 'resumo', label: 'Resumo' },
+            { id: 'financeiro', label: 'Financeiro' },
+            { id: 'dashboard', label: 'Dashboard' },
+            { id: 'documentos', label: 'Documentos' },
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as typeof activeTab)}
+              style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === tab.id ? '2px solid #00c1af' : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: activeTab === tab.id ? '#00c1af' : 'rgba(255,255,255,0.6)', cursor: 'pointer', marginBottom: '-1px' }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'resumo' && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '16px' }}>
+              <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+                Cadastro da parceria
+              </h2>
+              {editingCadastro ? (
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <SmallButton icon={<X size={14} />} label="Cancelar" onClick={() => setEditingCadastro(false)} muted />
+                  <SmallButton icon={<Save size={14} />} label="Salvar" onClick={saveCadastroData} />
+                </div>
+              ) : (
+                <SmallButton icon={<Edit3 size={14} />} label="Editar cadastro" onClick={startEditingCadastro} />
+              )}
+            </div>
+
+            <SummarySection number="1" title="Identificação da Parceria" subtitle="Dados básicos do processo e da instituição vinculada">
+              {editingCadastro ? (
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                  <TextEditField label="Nome da parceria" value={draftCadastroData.nome} onChange={(nome) => setDraftCadastroData(prev => ({ ...prev, nome }))} />
+                  <TextEditField label="Número do processo" value={draftCadastroData.numeroProcesso} onChange={(numeroProcesso) => setDraftCadastroData(prev => ({ ...prev, numeroProcesso }))} />
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginBottom: '16px' }}>
+                  <Info label="Nome da parceria" value={cadastroData.nome} />
+                  <Info label="Número do processo" value={cadastroData.numeroProcesso} />
+                </div>
+              )}
+              <div style={{ marginBottom: '16px' }}>
+                {editingCadastro ? (
+                  <InstitutionEditField label="Instituição vinculada" value={draftCadastroData.instituicaoParceira} onChange={(instituicaoParceira) => setDraftCadastroData(prev => ({ ...prev, instituicaoParceira }))} />
+                ) : (
+                  <Info label="Instituição vinculada" value={cadastroData.instituicaoParceira} />
+                )}
+              </div>
+              {editingCadastro ? (
+                <TextAreaEditField label="Objetivo" value={draftCadastroData.objetivo} onChange={(objetivo) => setDraftCadastroData(prev => ({ ...prev, objetivo }))} />
+              ) : (
+                <Info label="Objetivo" value={cadastroData.objetivo} full />
+              )}
+            </SummarySection>
+
+            <SummarySection number="2" title="Vigência Original" subtitle="Período inicial de validade da parceria">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+                {editingCadastro ? (
+                  <>
+                    <TextEditField label="Data de assinatura" value={draftCadastroData.dataAssinatura} onChange={(dataAssinatura) => setDraftCadastroData(prev => ({ ...prev, dataAssinatura }))} />
+                    <TextEditField label="Início da vigência" value={draftCadastroData.vigenciaInicio} onChange={(vigenciaInicio) => setDraftCadastroData(prev => ({ ...prev, vigenciaInicio }))} />
+                    <TextEditField label="Fim da vigência" value={draftCadastroData.vigenciaFim} onChange={(vigenciaFim) => setDraftCadastroData(prev => ({ ...prev, vigenciaFim }))} />
+                  </>
+                ) : (
+                  <>
+                    <Info label="Data de assinatura" value={cadastroData.dataAssinatura || 'Pendente'} />
+                    <Info label="Início da vigência" value={cadastroData.vigenciaInicio} />
+                    <Info label="Fim da vigência" value={cadastroData.vigenciaFim} />
+                  </>
+                )}
+              </div>
+              {aditivosTempo.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '18px' }}>
+                  {aditivosTempo.map((aditivo, index) => (
+                    <Row key={`${aditivo.vigenciaFim}-${index}`}>
+                      <Info label="Aditivo de tempo" value={`Aditivo ${index + 1}`} />
+                      <Info label="Fim anterior" value={aditivo.vigenciaFimAnterior} />
+                      <Info label="Novo fim" value={aditivo.vigenciaFim} />
+                      <Info label="Documento" value={aditivo.documento || 'Pendente'} />
+                      <RemoveButton label="Remover" onClick={() => removerAditivoTempo(index)} />
+                    </Row>
+                  ))}
+                </div>
+              )}
+            </SummarySection>
+
+            <SummarySection number="3" title="Aporte Financeiro Original" subtitle="Valor investido pela instituição vinculada e conta de destino">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '16px' }}>
+                {editingCadastro ? (
+                  <>
+                    <NumberEditField label="Total investido" value={draftCadastroData.aporteTotal} onChange={(aporteTotal) => setDraftCadastroData(prev => ({ ...prev, aporteTotal }))} />
+                    <Info label="Estado atual" value={statusLabel[currentStatus]} />
+                  </>
+                ) : (
+                  <>
+                    <Info label="Total investido" value={formatCurrency(cadastroData.aporteTotal)} />
+                    <Info label="Estado atual" value={statusLabel[currentStatus]} />
+                  </>
+                )}
+              </div>
+              {editingCadastro ? (
+                <TextEditField label="Conta bancária de destino" value={draftCadastroData.contaBancariaDestino} onChange={(contaBancariaDestino) => setDraftCadastroData(prev => ({ ...prev, contaBancariaDestino }))} />
+              ) : (
+                <Info label="Conta bancária de destino" value={cadastroData.contaBancariaDestino} />
+              )}
+            </SummarySection>
+          </div>
+        )}
+
+        {activeTab === 'financeiro' && (
+          <>
+            <div style={cardStyle}>
+              <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 20px' }}>
+                Aportes financeiros
+              </h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {aportes.map((aporte, index) => (
+                  <Row key={`${aporte.tipo}-${aporte.data}`}>
+                    <Info label="Tipo" value={aporte.tipo} />
+                    <Info label="Data" value={aporte.data} />
+                    <Info label="Valor" value={formatCurrency(aporte.valor)} />
+                    <Info label="Conta destino" value={aporte.conta} />
+                    <Info label="Documento" value={aporte.documento} />
+                    {index === 0 ? <Info label="Ação" value="-" /> : <RemoveButton label="Remover" onClick={() => removerAditivoFinanceiro(index - 1)} />}
+                  </Row>
+                ))}
               </div>
             </div>
 
-            {/* Botão Adicionar Aditivo - aparece apenas na tab "Informações da Parceria" */}
-            {activeTab === 'parceria' && (
-              <button
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '10px 18px',
-                  backgroundColor: 'transparent',
-                  border: '1px solid rgba(0,193,175,0.4)',
-                  borderRadius: 'var(--radius)',
-                  color: '#00c1af',
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                  transition: 'background-color 0.2s, border-color 0.2s',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.08)';
-                  e.currentTarget.style.borderColor = '#00c1af';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.borderColor = 'rgba(0,193,175,0.4)';
-                }}
-              >
-                <Plus size={16} />
-                Adicionar Aditivo
-              </button>
-            )}
-          </div>
-        </div>
+            <div style={cardStyle}>
+              <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 20px' }}>
+                Alocação em programas
+              </h2>
+              {programas.length === 0 ? (
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                  Nenhum programa recebeu aporte desta parceria.
+                </p>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {programas.map(programa => (
+                    <Row key={programa.nome}>
+                      <Info label="Programa" value={programa.nome} />
+                      <Info label="Valor alocado" value={formatCurrency(programa.valor)} />
+                      <Info label="Estado" value={programa.estado} />
+                    </Row>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
 
-        {/* Tab Bar */}
-        {renderTabBar()}
+        {activeTab === 'dashboard' && (
+          <>
+            <div style={{ ...cardStyle, padding: '16px 18px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: 0, whiteSpace: 'nowrap' }}>
+                  Impactos da parceria
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '10px', flex: 1 }}>
+                  {[
+                    { label: 'Programas', value: String(parceria.programasRelacionados), Icon: FolderOpen, color: '#38bdf8', bg: 'rgba(56,189,248,0.10)' },
+                    { label: 'Demandas induzidas', value: String(Math.max(1, Math.floor(parceria.programasRelacionados / 2))), Icon: Handshake, color: '#fb7185', bg: 'rgba(251,113,133,0.10)' },
+                    { label: 'Iniciativas', value: String(parceria.iniciativasImpactadas), Icon: Handshake, color: '#fbbf24', bg: 'rgba(251,191,36,0.10)' },
+                  ].map(({ label, value, Icon, color, bg }) => (
+                    <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.28)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '30px', height: '30px', backgroundColor: bg, borderRadius: '7px', flexShrink: 0 }}>
+                        <Icon size={16} style={{ color }} />
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '2px' }}>
+                          {label}
+                        </div>
+                        <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+                          {value}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-        {/* Conteúdo das Tabs */}
-        {activeTab === 'geral' ? renderInformacoesGerais() : renderInformacoesParceria()}
+            <div style={cardStyle}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
+                <div>
+                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+                    Dashboard financeiro da parceria
+                  </h2>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                    Consolidação do recurso investido, aportado, alocado e consumido pelas iniciativas vinculadas.
+                  </p>
+                </div>
+                <span style={{ padding: '6px 10px', borderRadius: '999px', backgroundColor: 'rgba(0,193,175,0.12)', border: '1px solid rgba(0,193,175,0.28)', color: '#00c1af', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', flexShrink: 0 }}>
+                  {formatPercent(percentualConsumido)} consumido
+                </span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '22px' }}>
+                {[
+                  { label: 'Total investido', value: formatCurrency(cadastroData.aporteTotal), color: '#a855f7' },
+                  { label: 'Total aportado', value: formatCurrency(valorAportado), color: '#38bdf8' },
+                  { label: 'Total alocado', value: formatCurrency(cadastroData.valorAlocado), color: '#3b82f6' },
+                  { label: 'Total consumido', value: formatCurrency(valorConsumido), color: '#22c55e' },
+                  { label: 'Saldo disponível', value: formatCurrency(saldoDisponivel), color: '#00c1af' },
+                  { label: 'Percentual consumido', value: formatPercent(percentualConsumido), color: '#f59e0b' },
+                ].map(item => (
+                  <div key={item.label} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+                    <div style={labelStyle}>{item.label}</div>
+                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: item.color, fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+                      {item.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '16px', marginBottom: '14px' }}>
+                <div>
+                  <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+                    Detalhamento por programa
+                  </h3>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                    Acompanhamento do recurso aportado, alocado, consumido e disponível em cada programa.
+                  </p>
+                </div>
+              </div>
+
+              {dashboardPorPrograma.length === 0 ? (
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                  Nenhum programa recebeu aporte desta parceria.
+                </p>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {dashboardPorPrograma.map(programa => (
+                    <div
+                      key={programa.codigo}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => onOpenPrograma?.({ codigo: programa.codigo, nome: programa.nome })}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          onOpenPrograma?.({ codigo: programa.codigo, nome: programa.nome });
+                        }
+                      }}
+                      style={{
+                        padding: '16px',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '8px',
+                        backgroundColor: 'rgba(15,23,42,0.35)',
+                        cursor: onOpenPrograma ? 'pointer' : 'default',
+                        outline: 'none',
+                      }}
+                    >
+                      <div style={{ display: 'grid', gridTemplateColumns: '1.6fr repeat(4, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
+                        <Info label="Programa" value={`${programa.codigo} · ${programa.nome}`} />
+                        <Info label="Aportado" value={formatCurrency(programa.valorAportado)} />
+                        <Info label="Alocado" value={formatCurrency(programa.valor)} />
+                        <Info label="Consumido" value={formatCurrency(programa.valorConsumido)} />
+                        <Info label="Disponível" value={formatCurrency(programa.saldoDisponivelPrograma)} />
+                      </div>
+                      <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                        <div style={{ width: `${Math.min(programa.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: programa.percentualConsumido < 50 ? '#f59e0b' : '#22c55e' }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div style={{ height: '1px', backgroundColor: 'rgba(255,255,255,0.08)', margin: '26px 0' }} />
+
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '16px' }}>
+                <div>
+                  <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+                    Consumo por rubricas
+                  </h3>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                    Somatória de cada rubrica em todos os programas aportados por esta parceria.
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '22px' }}>
+                {rubricasConsolidadas.map(rubrica => {
+                  const percentual = rubrica.alocado > 0 ? (rubrica.consumido / rubrica.alocado) * 100 : 0;
+                  return (
+                    <div key={rubrica.rubrica} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr repeat(6, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
+                        <Info label="Rubrica" value={rubrica.rubrica} />
+                        <Info label="Programas com rubrica" value={String(rubrica.programas.size)} />
+                        <Info label="Aportado total" value={formatCurrency(rubrica.aportado)} />
+                        <Info label="Alocado total" value={formatCurrency(rubrica.alocado)} />
+                        <Info label="Consumido total" value={formatCurrency(rubrica.consumido)} />
+                        <Info label="Disponível total" value={formatCurrency(rubrica.disponivel)} />
+                        <Info label="Consumo" value={formatPercent(percentual)} />
+                      </div>
+                      <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                        <div style={{ width: `${Math.min(percentual, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: percentual < 50 ? '#f59e0b' : '#22c55e' }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+            </div>
+          </>
+        )}
+
+        {activeTab === 'documentos' && (
+          <>
+            <div style={cardStyle}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
+                <div>
+                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+                    Anexar documento
+                  </h2>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                    Faça upload do arquivo e classifique o documento por tipo.
+                  </p>
+                </div>
+                <SmallButton icon={<Plus size={14} />} label="Anexar" onClick={anexarDocumento} />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 1fr 1.2fr', gap: '16px', alignItems: 'end' }}>
+                <SelectEditField
+                  label="Tipo do documento"
+                  value={novoDocumento.tipo}
+                  options={tipoDocumentoOptions}
+                  onChange={(tipo) => setNovoDocumento(prev => ({ ...prev, tipo }))}
+                />
+                <TextEditField
+                  label="Descrição"
+                  value={novoDocumento.descricao}
+                  onChange={(descricao) => setNovoDocumento(prev => ({ ...prev, descricao }))}
+                />
+                <DateMaskEditField
+                  label="Data de emissão"
+                  value={novoDocumento.dataEmissao}
+                  onChange={(dataEmissao) => setNovoDocumento(prev => ({ ...prev, dataEmissao }))}
+                />
+                <UploadEditField
+                  label="Arquivo"
+                  fileName={novoDocumento.arquivo}
+                  onChange={(arquivo) => setNovoDocumento(prev => ({ ...prev, arquivo }))}
+                />
+              </div>
+            </div>
+
+            <div style={cardStyle}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
+                <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+                  Documentos da parceria
+                </h2>
+                <div style={{ width: '240px' }}>
+                  <SelectEditField
+                    label="Filtrar por tipo"
+                    value={filtroTipoDocumento}
+                    options={['Todos', ...tipoDocumentoOptions]}
+                    onChange={setFiltroTipoDocumento}
+                  />
+                </div>
+              </div>
+
+              {documentosFiltrados.length === 0 ? (
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                  Nenhum documento encontrado para o filtro selecionado.
+                </p>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {documentosFiltrados.map(documento => (
+                    <Row key={documento.id}>
+                      <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                        <FileText size={18} style={{ color: '#00c1af', flexShrink: 0, marginTop: '2px' }} />
+                        <Info label="Identificador" value={documento.id} />
+                      </div>
+                      <Info label="Tipo" value={documento.tipo} />
+                      <Info label="Descrição" value={documento.descricao} />
+                      <Info label="Data de emissão" value={documento.dataEmissao} />
+                      <Info label="Arquivo" value={documento.arquivo} />
+                    </Row>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
 };
+
+const ActionButton: React.FC<{ icon: React.ReactNode; label: string; muted?: boolean; danger?: boolean; onClick?: () => void }> = ({ icon, label, muted, danger, onClick }) => (
+  <button
+    onClick={onClick}
+    style={{ display: 'flex', alignItems: 'center', gap: '8px', height: '38px', padding: '0 14px', backgroundColor: danger ? 'rgba(239,68,68,0.08)' : muted ? 'transparent' : 'rgba(0,193,175,0.12)', border: danger ? '1px solid rgba(239,68,68,0.28)' : muted ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(0,193,175,0.35)', borderRadius: 'var(--radius)', color: danger ? '#f87171' : muted ? 'rgba(255,255,255,0.7)' : '#00c1af', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer', flexShrink: 0 }}
+  >
+    {icon}
+    {label}
+  </button>
+);
+
+const SummarySection: React.FC<{ number: string; title: string; subtitle: string; children: React.ReactNode }> = ({ number, title, subtitle, children }) => (
+  <div style={cardStyle}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+      <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#0f172a' }}>{number}</span>
+      </div>
+      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: 0 }}>
+        {title}
+      </p>
+    </div>
+    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: '0 0 24px' }}>
+      {subtitle}
+    </p>
+    {children}
+  </div>
+);
+
+const SmallButton: React.FC<{ icon: React.ReactNode; label: string; onClick: () => void; muted?: boolean; danger?: boolean }> = ({ icon, label, onClick, muted, danger }) => (
+  <button
+    onClick={onClick}
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      height: '34px',
+      padding: '0 12px',
+      backgroundColor: danger ? 'rgba(239,68,68,0.08)' : muted ? 'transparent' : 'rgba(0,193,175,0.12)',
+      border: danger ? '1px solid rgba(239,68,68,0.28)' : muted ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(0,193,175,0.35)',
+      borderRadius: 'var(--radius)',
+      color: danger ? '#f87171' : muted ? 'rgba(255,255,255,0.7)' : '#00c1af',
+      fontFamily: 'var(--font-family)',
+      fontSize: 'var(--text-xs)',
+      cursor: 'pointer',
+    }}
+  >
+    {icon}
+    {label}
+  </button>
+);
+
+const ImpactList: React.FC<{ title: string; items: string[] }> = ({ title, items }) => (
+  <div style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', marginBottom: '12px' }}>
+      {title}
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      {items.length === 0 ? (
+        <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+          Nenhum item afetado.
+        </p>
+      ) : items.map(item => (
+        <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.72)' }}>
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#f97316', flexShrink: 0 }} />
+          {item}
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const RemoveButton: React.FC<{ label: string; onClick: () => void }> = ({ label, onClick }) => (
+  <div>
+    <div style={labelStyle}>Ação</div>
+    <button
+      onClick={onClick}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        height: '34px',
+        padding: '0 12px',
+        backgroundColor: 'rgba(239,68,68,0.08)',
+        border: '1px solid rgba(239,68,68,0.28)',
+        borderRadius: 'var(--radius)',
+        color: '#f87171',
+        fontFamily: 'var(--font-family)',
+        fontSize: 'var(--text-xs)',
+        cursor: 'pointer',
+      }}
+    >
+      <Trash2 size={14} />
+      {label}
+    </button>
+  </div>
+);
+
+const TextEditField: React.FC<{ label: string; value: string; onChange: (value: string) => void }> = ({ label, value, onChange }) => (
+  <div>
+    <div style={labelStyle}>{label}</div>
+    <input value={value} onChange={event => onChange(event.target.value)} style={inputStyle} />
+  </div>
+);
+
+const SelectEditField: React.FC<{ label: string; value: string; options: string[]; onChange: (value: string) => void }> = ({ label, value, options, onChange }) => (
+  <div>
+    <div style={labelStyle}>{label}</div>
+    <select value={value} onChange={event => onChange(event.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+      {options.map(option => (
+        <option key={option} value={option} style={{ backgroundColor: '#1e293b', color: '#ffffff' }}>
+          {option}
+        </option>
+      ))}
+    </select>
+  </div>
+);
+
+const DateMaskEditField: React.FC<{ label: string; value: string; onChange: (value: string) => void }> = ({ label, value, onChange }) => (
+  <div>
+    <div style={labelStyle}>{label}</div>
+    <input
+      value={value}
+      onChange={event => onChange(maskDate(event.target.value))}
+      placeholder="dd/mm/aaaa"
+      maxLength={10}
+      inputMode="numeric"
+      style={inputStyle}
+    />
+  </div>
+);
+
+const CurrencyEditField: React.FC<{ label: string; value: string; onChange: (value: string) => void }> = ({ label, value, onChange }) => (
+  <div>
+    <div style={labelStyle}>{label}</div>
+    <div style={{ position: 'relative' }}>
+      <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.45)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>
+        R$
+      </span>
+      <input
+        value={value}
+        onChange={event => onChange(maskCurrency(event.target.value))}
+        placeholder="0,00"
+        inputMode="decimal"
+        style={{ ...inputStyle, paddingLeft: '38px' }}
+      />
+    </div>
+  </div>
+);
+
+const NumberEditField: React.FC<{ label: string; value: number; onChange: (value: number) => void }> = ({ label, value, onChange }) => (
+  <div>
+    <div style={labelStyle}>{label}</div>
+    <input
+      type="number"
+      min="0"
+      step="1000"
+      value={value}
+      onChange={event => onChange(Number(event.target.value))}
+      style={inputStyle}
+    />
+  </div>
+);
+
+const TextAreaEditField: React.FC<{ label: string; value: string; onChange: (value: string) => void }> = ({ label, value, onChange }) => (
+  <div style={{ gridColumn: '1 / -1' }}>
+    <div style={labelStyle}>{label}</div>
+    <textarea
+      value={value}
+      onChange={event => onChange(event.target.value)}
+      style={{ ...inputStyle, minHeight: '96px', resize: 'vertical', lineHeight: '1.5' }}
+    />
+  </div>
+);
+
+const UploadEditField: React.FC<{ label: string; fileName: string; onChange: (fileName: string) => void }> = ({ label, fileName, onChange }) => (
+  <div>
+    <div style={labelStyle}>{label}</div>
+    <label
+      style={{
+        ...inputStyle,
+        minHeight: '40px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '12px',
+        cursor: 'pointer',
+        color: fileName ? '#ffffff' : 'rgba(255,255,255,0.45)',
+      }}
+    >
+      <span>{fileName || 'Selecionar arquivo'}</span>
+      <Upload size={15} style={{ color: '#00c1af', flexShrink: 0 }} />
+      <input
+        type="file"
+        accept=".pdf,.doc,.docx,.odt"
+        onChange={event => onChange(event.target.files?.[0]?.name || '')}
+        style={{ display: 'none' }}
+      />
+    </label>
+  </div>
+);
+
+const InstitutionEditField: React.FC<{ label: string; value: string; onChange: (value: string) => void }> = ({ label, value, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const selected = instituicoesOptions.find(option => option.value === value);
+  const normalizedQuery = query.toLowerCase().replace(/\D/g, '');
+  const filtered = instituicoesOptions.filter(option => {
+    const labelMatch = option.label.toLowerCase().includes(query.toLowerCase());
+    const cnpjMatch = option.cnpj.replace(/\D/g, '').includes(normalizedQuery);
+    return query.length === 0 || labelMatch || cnpjMatch;
+  });
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <div style={labelStyle}>{label}</div>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        style={{ ...inputStyle, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', textAlign: 'left' }}
+      >
+        <span>{selected ? `${selected.label} · ${selected.cnpj}` : value}</span>
+        <ChevronDown size={15} style={{ color: 'rgba(255,255,255,0.4)', flexShrink: 0 }} />
+      </button>
+      {open && (
+        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius)', zIndex: 350, overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
+          <div style={{ position: 'relative', padding: '10px' }}>
+            <input
+              autoFocus
+              type="text"
+              value={query}
+              onChange={event => setQuery(event.target.value)}
+              placeholder="Digite nome ou CNPJ"
+              style={{ ...inputStyle, paddingLeft: '36px', backgroundColor: 'rgba(15,23,42,0.8)' }}
+            />
+            <Search size={15} style={{ position: 'absolute', left: '22px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
+          </div>
+          <div style={{ maxHeight: '220px', overflowY: 'auto' }}>
+            {filtered.map(option => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => {
+                  onChange(option.value);
+                  setQuery('');
+                  setOpen(false);
+                }}
+                style={{ width: '100%', padding: '10px 14px', textAlign: 'left', border: 'none', backgroundColor: value === option.value ? 'rgba(0,193,175,0.1)' : 'transparent', color: value === option.value ? '#00c1af' : '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}
+              >
+                <span style={{ display: 'block' }}>{option.label}</span>
+                <span style={{ display: 'block', marginTop: '3px', color: 'rgba(255,255,255,0.45)', fontSize: 'var(--text-xs)' }}>
+                  CNPJ {option.cnpj}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Info: React.FC<{ label: string; value: string; full?: boolean }> = ({ label, value, full }) => (
+  <div style={{ gridColumn: full ? '1 / -1' : undefined }}>
+    <div style={labelStyle}>{label}</div>
+    <p style={{ ...valueStyle, color: value === 'Pendente' ? '#f59e0b' : valueStyle.color, lineHeight: '1.5' }}>
+      {value}
+    </p>
+  </div>
+);
+
+const Row: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '16px', padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+    {children}
+  </div>
+);

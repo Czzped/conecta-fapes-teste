@@ -2,6 +2,8 @@
 
 [← Voltar para Arquitetura](README.md)
 
+As decisoes arquiteturais relacionadas a estes modulos ficam registradas nas [ADRs](adr/README.md).
+
 ## Modulos
 
 ```mermaid
@@ -139,4 +141,4 @@ A implementacao atual **ainda nao possui BFF** — os frontends chamam diretamen
 
 ## Decisoes de Arquitetura
 
-As decisoes de arquitetura sao registradas como ADRs (Architecture Decision Records) na pasta [`adr/`](adr/).
+As decisoes de arquitetura sao registradas como ADRs (Architecture Decision Records) em [ADRs](adr/README.md).

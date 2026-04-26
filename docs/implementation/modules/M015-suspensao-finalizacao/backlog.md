@@ -1,10 +1,10 @@
 # Sub-Backlog: M015 - Suspensao e Finalizacao
 
-[<< Voltar ao Backlog Central](../../../management/backlog-product.md)
+[← Voltar ao Backlog Central](../../../management/backlog-product.md)
 
 ## Sobre o Modulo
 
-Projetos podem necessitar de suspensao temporaria (por solicitacao do coordenador ou decisao da agencia de fomento) ou de encerramento definitivo. Atualmente, nao existe um fluxo de trabalho estruturado para essas operacoes -- suspensoes e encerramentos sao comunicados informalmente, sem garantia de que pagamentos sejam bloqueados, bolsas sejam encerradas ou prestacoes de contas sejam exigidas. Este modulo visa resolver esse problema ao prover um fluxo digital completo para suspensao e finalizacao de projetos, garantindo que todas as pendencias sejam verificadas antes do encerramento. O sucesso sera medido pela taxa de projetos encerrados com todas as pendencias resolvidas e pelo tempo medio de processamento de suspensoes.
+Iniciativas podem necessitar de suspensao temporaria, reativacao ou encerramento definitivo. O M015 coordena esses fluxos, verificando pendencias em pagamentos, bolsas e prestacao de contas antes de permitir a conclusao do processo.
 
 Especificacao de referencia: [README.md](README.md)
 
@@ -14,21 +14,21 @@ Especificacao de referencia: [README.md](README.md)
 
 | ID | Titulo | Requisito | Prioridade | Status | Documento |
 |----|--------|-----------|------------|--------|-----------|
-| EPIC-M015-001 | Suspensao de Projeto | UC01 | Must | To Do | [EPIC-M015-001](epics/EPIC-M015-001.md) |
-| EPIC-M015-002 | Finalizacao de Projeto | UC02 | Must | To Do | [EPIC-M015-002](epics/EPIC-M015-002.md) |
+| EPIC-M015-001 | Suspensao e Reativacao de Iniciativa | RN01, RN02, RN03, RN07, RN08, RI1, RI2 | Must | To Do | [EPIC-M015-001](epics/EPIC-M015-001.md) |
+| EPIC-M015-002 | Finalizacao de Iniciativa | RN04, RN05, RN06, RN07 | Must | To Do | [EPIC-M015-002](epics/EPIC-M015-002.md) |
 
 ---
 
 ## Rastreabilidade
 
-```
-EPIC-M015-001 (Suspensao de Projeto)
+```text
+EPIC-M015-001 (Suspensao e Reativacao de Iniciativa)
 ├── US-M015-001 Solicitar Suspensao
 ├── US-M015-002 Analisar Suspensao
-└── US-M015-003 Reativar Projeto
+└── US-M015-003 Reativar Iniciativa
 
-EPIC-M015-002 (Finalizacao de Projeto)  <- depende de EPIC-M015-001
-├── US-M015-004 Solicitar Encerramento
+EPIC-M015-002 (Finalizacao de Iniciativa)
+├── US-M015-004 Solicitar Finalizacao
 ├── US-M015-005 Verificar Pendencias
-└── US-M015-006 Encerrar Projeto
+└── US-M015-006 Encerrar Iniciativa
 ```

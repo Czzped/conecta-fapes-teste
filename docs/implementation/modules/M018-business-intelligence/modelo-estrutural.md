@@ -116,7 +116,8 @@ classDiagram
 
 **Entidades externas:**
 - Programa: gerenciado por M010 (Planejamento e Estrategia).
-- Edital e Iniciativa: gerenciados por M003 (Gestao de Iniciativas Captadas). Iniciativa e a abstracao estrutural para analises transversais.
+- Iniciativa: gerenciada por M003 (Gestao de Iniciativas Captadas) como abstracao estrutural para analises transversais.
+- Edital: gerenciado por M011 (Configuracao da Captacao).
 - BolsaPesquisa: gerenciada por M009 (Gestao Bolsa Pesquisa).
 
 **Navegabilidade:**

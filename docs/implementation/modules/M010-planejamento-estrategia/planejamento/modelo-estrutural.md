@@ -18,14 +18,20 @@ classDiagram
         +String descricao
         +Date dataInicio
         +Date dataFim
-        +boolean ativo
+        +EstadoPlanoEstrategico estado
     }
 
     class EixoEstrategico {
         <<M010-planejamento>>
         +String nome
         +String descricao
-        +int prioridade
+    }
+
+    class EstadoPlanoEstrategico {
+        <<enumeration>>
+        EmElaboracao
+        Ativo
+        Encerrado
     }
 
     class Programa {
@@ -33,6 +39,7 @@ classDiagram
     }
 
     PlanoEstrategico "1" --> "*" EixoEstrategico : possui eixos
+    PlanoEstrategico --> EstadoPlanoEstrategico : possui estado
     EixoEstrategico "*" --> "*" Programa : orienta programas
 ```
 
@@ -44,10 +51,30 @@ classDiagram
 | | descricao | Descricao dos objetivos do plano | Sim | String | | 2000 | |
 | | dataInicio | Data de inicio da vigencia do plano | Sim | Date | | | |
 | | dataFim | Data de fim da vigencia do plano | Sim | Date | | | |
-| | ativo | Indica se o plano esta ativo (so pode haver um ativo por vez — RN09) | Gerado | Boolean | true/false | | |
+| | estado | Estado do planejamento estrategico | Sim | Enum | EmElaboracao, Ativo, Encerrado | | |
 | **EixoEstrategico** | nome | Nome do eixo estrategico | Sim | String | Ex: Formacao de Recursos Humanos | 300 | |
 | | descricao | Descricao do escopo e objetivos do eixo | Sim | String | | 2000 | |
-| | prioridade | Ordem de prioridade do eixo no plano | Sim | Int | Ex: 1, 2, 3 | | |
+
+## Indicadores Derivados para Dashboard
+
+Os indicadores do dashboard nao sao atributos persistidos do Eixo; sao consolidacoes calculadas a partir dos Programas vinculados e dos valores financeiros associados aos Programas.
+
+| Indicador | Definicao |
+|-----------|-----------|
+| Quantidade de Programas por Eixo | Contagem dos Programas vinculados ao Eixo Estrategico no plano selecionado. |
+| Valor Investido por Eixo | Soma dos valores investidos nos Programas vinculados ao Eixo Estrategico. |
+| Percentual de Participacao do Eixo | `Valor Investido por Eixo / Valor Investido Total do Plano`. |
+| Valor Investido Total do Plano | Soma dos valores investidos em todos os Programas vinculados aos Eixos do Plano. |
+
+## Consultas Derivadas para Dashboard
+
+| Consulta | Definicao | Origem |
+|----------|-----------|--------|
+| Programas associados ao Eixo | Lista dos Programas vinculados ao Eixo selecionado no dashboard. | `programas/Programa` |
+| Estado do Programa | Estado atual do Programa associado ao Eixo. | `programas/Programa` |
+| Valor investido do Programa | Valor investido consolidado para o Programa associado ao Eixo. | `programas/Programa` e relacoes financeiras do M010 |
+
+> O Planejamento nao duplica os dados do Programa. A tela apenas consulta e consolida os Programas associados ao Eixo selecionado.
 
 ## Regras de Negocio Aplicaveis
 

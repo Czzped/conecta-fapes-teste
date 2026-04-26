@@ -136,20 +136,20 @@ classDiagram
         <<fora do escopo - M003>>
     }
 
-    class Projeto {
+    class Iniciativa {
         <<fora do escopo - M003>>
     }
 
-    class CotaEdital {
-        <<fora do escopo - M003>>
+    class CotaBolsa {
+        +int quantidadeDisponivel
     }
 
     class VersaoNivel {
         <<fora do escopo - M001>>
     }
 
-    BolsaPesquisa "*" --> "1" Projeto : vinculada a
-    BolsaPesquisa "*" --> "1" CotaEdital : consome
+    BolsaPesquisa "*" --> "1" Iniciativa : vinculada a
+    BolsaPesquisa "*" --> "1" CotaBolsa : consome
     BolsaPesquisa "*" --> "1" Coordenador : indicada por
     BolsaPesquisa "*" --> "1" Orientador : orientada por
     BolsaPesquisa "*" --> "1" Bolsista : concedida a
@@ -204,7 +204,9 @@ classDiagram
 ## Notas de Implementacao
 
 **Entidades externas:**
-- Coordenador, Orientador, Bolsista, Projeto e CotaEdital: gerenciados por M003 (Gestao de Iniciativas Captadas).
+- Iniciativa: gerenciada por M003 (Gestao de Iniciativas Captadas).
+- Edital/chamada: gerenciado por M011 (Configuracao da Captacao), quando aplicavel.
+- Coordenador, Orientador e Bolsista: papeis operacionais do fluxo de bolsas no M009, referenciando PessoaFisica quando necessario.
 - VersaoNivel: gerenciado por M001 (Modalidade de Bolsa).
 
 **Navegabilidade:**

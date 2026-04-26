@@ -29,7 +29,7 @@ Uma Parceria pertence a exatamente uma Instituicao e pode aportar recursos em um
 | [Modelo Estrutural](modelo-estrutural.md) | Classes, atributos e relacionamentos do subdominio. |
 | [Modelo Comportamental](modelo-comportamental.md) | Estados, transicoes e regras de comportamento da Parceria. |
 | [EPIC-M010-002 — Gestao de Parcerias](epics/EPIC-M010-002.md) | Backlog principal de gestao de parcerias. |
-| [EPIC-M010-004 — Painel Financeiro](epics/EPIC-M010-004.md) | Backlog de consultas e relatorios financeiros da Parceria. |
+| [EPIC-M010-004 — Dashboard de Parcerias](epics/EPIC-M010-004.md) | Backlog dos dashboards global e local da Parceria. |
 
 ## Capacidades Principais
 
@@ -39,7 +39,7 @@ Uma Parceria pertence a exatamente uma Instituicao e pode aportar recursos em um
 | Registrar aportes financeiros | Controlar valores investidos pela Instituicao vinculada, com documento formalizador. |
 | Registrar aditivos | Preservar historico de nova vigencia ou novo aporte sem sobrescrever a Parceria original. |
 | Alocar recursos em Programas | Destinar parte do saldo da Parceria a Programas, mantendo rastreabilidade financeira. |
-| Consultar saldo e relatorios | Responder quanto foi investido, quanto ja foi alocado e quanto permanece disponivel. |
+| Consultar dashboards e saldo | Responder quanto foi investido, aportado, alocado, consumido e quanto permanece disponivel. |
 | Suspender ou encerrar Parceria | Controlar impacto sobre Programas e Iniciativas vinculadas. |
 
 ## Regras de Negocio

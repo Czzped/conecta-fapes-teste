@@ -2,101 +2,43 @@
 
 Dominio e regras de negocio: ver [README.md](README.md)
 
-### Diagrama de Classes
+## Diagrama de Classes
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
+
+    class Iniciativa {
+        <<fora do escopo - M003>>
+    }
 
     class SolicitacaoSuspensao {
         +String codigo
         +OrigemSuspensao origem
         +String justificativa
-        +Date dataSolicitacao
-        +Date dataAprovacao
         +EstadoSolicitacaoSuspensao estado
-    }
-
-    class OrigemSuspensao {
-        <<enumeration>>
-        COORDENADOR
-        AGENCIA_FOMENTO
-    }
-
-    class EstadoSolicitacaoSuspensao {
-        <<enumeration>>
-        SUBMETIDA
-        EM_ANALISE
-        APROVADA
-        REJEITADA
+        +Date dataSolicitacao
     }
 
     class SolicitacaoFinalizacao {
         +String codigo
         +MotivoFinalizacao motivo
         +String justificativa
-        +Date dataSolicitacao
         +EstadoSolicitacaoFinalizacao estado
-    }
-
-    class MotivoFinalizacao {
-        <<enumeration>>
-        CONCLUSAO_NATURAL
-        DECISAO_COORDENADOR
-        DETERMINACAO_AGENCIA
-    }
-
-    class EstadoSolicitacaoFinalizacao {
-        <<enumeration>>
-        SUBMETIDA
-        VERIFICANDO_PENDENCIAS
-        PENDENCIAS_RESOLVIDAS
-        PENDENCIAS_PENDENTES
-        ENCERRADA
+        +Date dataSolicitacao
     }
 
     class VerificacaoPendencia {
         +TipoPendencia tipo
         +String descricao
+        +boolean impeditiva
         +boolean resolvida
-        +Date dataVerificacao
     }
 
-    class TipoPendencia {
-        <<enumeration>>
-        PRESTACAO_CONTAS_PENDENTE
-        BOLSA_ATIVA
-        PAGAMENTO_PENDENTE
-        DOCUMENTO_PENDENTE
-    }
-
-    class ParecerSuspensao {
-        +Date dataAnalise
-        +boolean aprovado
-        +String justificativa
-        +String analistaResponsavel
-    }
-
-    class HistoricoProjetoSF {
+    class HistoricoIniciativaSF {
         +Date data
-        +TipoEventoSF tipo
+        +String evento
         +String descricao
-    }
-
-    class TipoEventoSF {
-        <<enumeration>>
-        SOLICITACAO_SUSPENSAO
-        APROVACAO_SUSPENSAO
-        REJEICAO_SUSPENSAO
-        SUSPENSAO_EFETIVADA
-        REATIVACAO
-        SOLICITACAO_ENCERRAMENTO
-        VERIFICACAO_PENDENCIAS
-        ENCERRAMENTO_EFETIVADO
-    }
-
-    class Projeto {
-        <<fora do escopo - M003>>
     }
 
     class BolsaPesquisa {
@@ -107,49 +49,44 @@ classDiagram
         <<fora do escopo - M014>>
     }
 
-    SolicitacaoSuspensao "*" --> "1" Projeto : vinculada a
-    SolicitacaoSuspensao "1" --> "0..1" ParecerSuspensao : parecer
-    SolicitacaoFinalizacao "*" --> "1" Projeto : vinculada a
-    SolicitacaoFinalizacao "1" --> "*" VerificacaoPendencia : pendencias verificadas
-    Projeto "1" --> "*" HistoricoProjetoSF : historico suspensao/finalizacao
-    Projeto "1" --> "*" BolsaPesquisa : bolsas do projeto
-    Projeto "1" --> "*" PrestacaoContas : prestacoes do projeto
+    Iniciativa "1" --> "*" SolicitacaoSuspensao : suspensoes
+    Iniciativa "1" --> "*" SolicitacaoFinalizacao : finalizacoes
+    Iniciativa "1" --> "*" HistoricoIniciativaSF : historico
+    SolicitacaoFinalizacao "1" --> "*" VerificacaoPendencia : pendencias
+    Iniciativa "1" --> "*" BolsaPesquisa : bolsas
+    Iniciativa "1" --> "*" PrestacaoContas : prestacoes
 ```
 
 ## Dicionario de Dados
 
-| Classe | Atributo | Definicao | Obrig. | Tipo | Dominio | Tamanho | Unico |
-|--------|----------|-----------|--------|------|---------|---------|-------|
-| **SolicitacaoSuspensao** | codigo | Codigo de identificacao unica da solicitacao | Gerado | String | Ex: SS-2026-001 | | Sim |
-| | origem | Indica se a suspensao foi solicitada pelo coordenador ou pela agencia de fomento | Sim | OrigemSuspensao | Ver enumeracao | | |
-| | justificativa | Justificativa para a suspensao | Sim | String | | 2000 | |
-| | dataSolicitacao | Data em que a solicitacao foi registrada | Gerado | Date | | | |
-| | dataAprovacao | Data em que a suspensao foi aprovada | Cond. | Date | Preenchida ao aprovar | | |
-| | estado | Estado atual da solicitacao | Gerado | EstadoSolicitacaoSuspensao | Ver enumeracao | | |
-| **SolicitacaoFinalizacao** | codigo | Codigo de identificacao unica da solicitacao de encerramento | Gerado | String | Ex: SF-2026-001 | | Sim |
-| | motivo | Motivo do encerramento do projeto | Sim | MotivoFinalizacao | Ver enumeracao | | |
-| | justificativa | Justificativa detalhada para o encerramento | Sim | String | | 2000 | |
-| | dataSolicitacao | Data em que a solicitacao foi registrada | Gerado | Date | | | |
-| | estado | Estado atual da solicitacao de encerramento | Gerado | EstadoSolicitacaoFinalizacao | Ver enumeracao | | |
-| **VerificacaoPendencia** | tipo | Tipo de pendencia verificada | Sim | TipoPendencia | Ver enumeracao | | |
-| | descricao | Descricao da pendencia encontrada | Sim | String | Ex: PC do periodo 2025-S2 nao submetida | 500 | |
-| | resolvida | Indica se a pendencia foi resolvida | Gerado | Boolean | true/false | | |
-| | dataVerificacao | Data da verificacao | Gerado | Date | | | |
-| **ParecerSuspensao** | dataAnalise | Data em que o parecer foi emitido | Sim | Date | | | |
-| | aprovado | Indica se a suspensao foi aprovada | Sim | Boolean | true/false | | |
-| | justificativa | Justificativa do parecer | Sim | String | | 1000 | |
-| | analistaResponsavel | Nome do analista que emitiu o parecer | Sim | String | | 200 | |
-| **HistoricoProjetoSF** | data | Data do evento | Gerado | Date | | | |
-| | tipo | Tipo do evento registrado | Sim | TipoEventoSF | Ver enumeracao | | |
-| | descricao | Descricao textual do evento | Sim | String | | 500 | |
+| Classe | Atributo | Definicao | Obrig. | Tipo | Dominio |
+|--------|----------|-----------|--------|------|---------|
+| **SolicitacaoSuspensao** | codigo | Codigo da solicitacao | Gerado | String | Ex: SS-2026-001 |
+| | origem | Origem da suspensao | Sim | OrigemSuspensao | ORTOGADO, AGENCIA_FOMENTO |
+| | justificativa | Justificativa da suspensao | Sim | String | |
+| | estado | Estado da solicitacao | Gerado | EstadoSolicitacaoSuspensao | SUBMETIDA, EM_ANALISE, APROVADA, REJEITADA |
+| | dataSolicitacao | Data da solicitacao | Gerado | Date | |
+| **SolicitacaoFinalizacao** | codigo | Codigo da solicitacao | Gerado | String | Ex: SF-2026-001 |
+| | motivo | Motivo da finalizacao | Sim | MotivoFinalizacao | CONCLUSAO_NATURAL, DESISTENCIA_ORTOGADO, DETERMINACAO_AGENCIA |
+| | justificativa | Justificativa da finalizacao | Sim | String | |
+| | estado | Estado da solicitacao | Gerado | EstadoSolicitacaoFinalizacao | SUBMETIDA, EM_ANALISE, PENDENTE, APROVADA, REJEITADA, ENCERRADA |
+| | dataSolicitacao | Data da solicitacao | Gerado | Date | |
+| **VerificacaoPendencia** | tipo | Tipo de pendencia | Sim | TipoPendencia | BOLSA_ATIVA, PRESTACAO_PENDENTE, PAGAMENTO_PENDENTE |
+| | descricao | Descricao da pendencia encontrada | Sim | String | |
+| | impeditiva | Indica se bloqueia a finalizacao | Sim | Boolean | true/false |
+| | resolvida | Indica se a pendencia foi resolvida | Sim | Boolean | true/false |
+| **HistoricoIniciativaSF** | data | Data do evento | Gerado | Date | |
+| | evento | Nome do evento | Sim | String | |
+| | descricao | Descricao do evento | Nao | String | |
 
 ## Notas de Implementacao
 
 **Entidades externas:**
-- Projeto: gerenciado por M003 (Gestao de Iniciativas Captadas).
-- BolsaPesquisa: gerenciada por M009 (Gestao Bolsa Pesquisa).
-- PrestacaoContas: gerenciada por M014 (Prestacao de Contas).
+- Iniciativa: gerenciada por M003.
+- BolsaPesquisa: gerenciada por M009.
+- PrestacaoContas: gerenciada por M014.
 
-**Navegabilidade:**
-- Cardinalidade 1: atributo do tipo da classe destino (ex: SolicitacaoSuspensao.projeto: Projeto)
-- Cardinalidade N: atributo lista do tipo da classe destino (ex: SolicitacaoFinalizacao.pendencias: List<VerificacaoPendencia>)
+**Restricoes estruturais:**
+- Toda solicitacao deve estar vinculada a uma iniciativa.
+- A finalizacao deve verificar pendencias em M009, M014 e M004.
+- Iniciativa encerrada e estado terminal para o fluxo do M015.

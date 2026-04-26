@@ -36,7 +36,7 @@ graph TB
 
 ## Diagrama de Containers (C4 - Level 2)
 
-O detalhamento formal dos containers ainda nao foi consolidado neste documento. Nesta rodada, a referencia arquitetural de containers permanece distribuida entre a stack tecnologica abaixo, as ADRs da pasta [`adr/`](adr/) e os documentos complementares desta pasta. A evolucao proposta para composicao orientada a tela via BFF, preservando o gateway tecnico como camada de seguranca e roteamento, esta registrada em [ADR-005](adr/ADR-005-adocao-bff.md).
+O detalhamento formal dos containers ainda nao foi consolidado neste documento. Nesta rodada, a referencia arquitetural de containers permanece distribuida entre a stack tecnologica abaixo, as [ADRs](adr/README.md) e os documentos complementares desta pasta. A evolucao proposta para composicao orientada a tela via BFF, preservando o gateway tecnico como camada de seguranca e roteamento, esta registrada em [ADR-005](adr/ADR-005-adocao-bff.md).
 
 ## Stack Tecnologico
 

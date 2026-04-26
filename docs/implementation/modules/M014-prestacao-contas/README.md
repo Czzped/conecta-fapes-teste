@@ -20,7 +20,7 @@
 
 ## Sobre o Modulo
 
-Coordenadores submetem documentos fiscais que comprovam a aplicacao dos recursos do projeto, e a agencia de fomento (Responsavel FAPES) analisa e aprova, nega ou devolve para revisao. O modulo digitaliza todo o ciclo de prestacao de contas — desde as importacoes de integracao (projeto/conta bancaria, orcamento planejado do SIGFAPES e movimentos bancarios CNAB 240) ate a analise final — substituindo o processo atual baseado em papel e e-mail por um fluxo rastreavel com reconciliacao entre movimentos bancarios e despesas declaradas. O sucesso sera medido pela reducao do tempo medio de analise e pela taxa de prestacoes aprovadas na primeira submissao.
+Coordenadores ou ortogados submetem documentos fiscais que comprovam a aplicacao dos recursos da iniciativa, e a agencia de fomento (Responsavel FAPES) analisa e aprova, nega ou devolve para revisao. O modulo digitaliza todo o ciclo de prestacao de contas — desde as importacoes de integracao (iniciativa/conta bancaria, orcamento planejado do SIGFAPES e movimentos bancarios CNAB 240) ate a analise final — substituindo o processo atual baseado em papel e e-mail por um fluxo rastreavel com reconciliacao entre movimentos bancarios e despesas declaradas. O sucesso sera medido pela reducao do tempo medio de analise e pela taxa de prestacoes aprovadas na primeira submissao.
 
 ---
 
@@ -30,14 +30,14 @@ A prestacao de contas e organizada como um agregado `Prestacao` que agrupa `Just
 
 O fluxo opera em duas frentes:
 
-- **Backoffice / Integracoes**: jobs de integracao importam movimentos bancarios do projeto, orcamento planejado e rubricas orcamentarias hierarquicas com limites. Todo projeto possui uma `ContaBancaria` obrigatoria vinculada ao `ProjetoRef`.
+- **Backoffice / Integracoes**: jobs de integracao importam movimentos bancarios da iniciativa, orcamento planejado e rubricas orcamentarias hierarquicas com limites. Toda iniciativa possui uma `ContaBancaria` obrigatoria vinculada a uma referencia operacional.
 - **Frontoffice (Coordenador)**: cria a `Prestacao` em RASCUNHO, vincula transacoes bancarias, registra justificativas, anexa orcamentos de fornecedor, classifica itens de nota fiscal em rubricas orcamentarias e submete para analise.
 
 O ciclo de estados da prestacao e `RASCUNHO → EM_ANALISE → {FINALIZADO | NEGADO | REVISAO → EM_ANALISE}`. Enquanto a prestacao esta `EM_ANALISE`, toda edicao e exclusao das entidades do agregado e bloqueada para preservar a integridade da analise. `FINALIZADO` e `NEGADO` sao estados terminais.
 
 Notas fiscais eletronicas (NF-e) sao validadas via API SERPRO pela `ChaveAcesso` de 44 digitos; NFS-e sao processadas a partir do XML. O `Status` de `TransacaoFinanceira` e derivado do `Status` da `Prestacao` vinculada (ou `PENDENTE` se nao vinculada). O `Saldo` da prestacao e calculado como `ValorTotalTransacoes - ValorTotalJustificativas`.
 
-> Projetos e editais sao gerenciados por M003 (referenciados via `ProjetoRef` e `AlocacaoBolsistaRef` como views externas). Orcamento, RubricaOrcamentaria, ContaBancaria e TransacaoFinanceira pertencem conceitualmente a M013/M016 mas estao implementados neste backend como debito tecnico — ver [backlog.md](backlog.md#debito-tecnico).
+> Iniciativas sao gerenciadas por M003. Editais e chamadas sao gerenciados por M011. A prestacao de contas detalhada, documentos fiscais, extratos e transacoes pertencem ao M014; a visao consolidada de execucao pode alimentar o M003.
 
 ---
 

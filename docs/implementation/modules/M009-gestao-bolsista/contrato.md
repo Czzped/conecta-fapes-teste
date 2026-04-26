@@ -21,7 +21,8 @@ Este contrato documenta a superficie publica do modulo M009 como contexto respon
 
 | Dependencia | Tipo | Observacao |
 |-------------|------|------------|
-| M003 | Modulo interno | Fornece `Projeto`, `Coordenador`, `Orientador`, `Bolsista` e `CotaEdital` |
+| M003 | Modulo interno | Fornece `Iniciativa` como referencia pos-contratacao |
+| M011 | Modulo interno | Fornece edital/chamada e regras de origem, quando aplicavel |
 | M001 | Modulo interno | Fornece `VersaoNivel` |
 | Diario Oficial / assinatura | Sistema externo | Suporta publicacao e assinatura quando aplicavel |
 

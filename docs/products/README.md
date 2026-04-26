@@ -66,5 +66,5 @@ graph LR
 |----------|---------|
 | [management/roadmap.md](../management/roadmap.md) | Rastreia entregas por produto e trimestre |
 | [management/releases-2026.csv](../management/releases-2026.csv) | Fonte de verdade de entregas — coluna "Produto" |
-| [implementation/modules/](../implementation/modules/) | Modulos backend consumidos pelos produtos |
+| `docs/implementation/modules/` | Modulos backend consumidos pelos produtos |
 | [architecture/](../architecture/README.md) | Decisoes tecnicas transversais (backend, infra, seguranca) |

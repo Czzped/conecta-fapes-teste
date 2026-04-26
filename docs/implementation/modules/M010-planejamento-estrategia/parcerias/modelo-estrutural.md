@@ -96,6 +96,18 @@ classDiagram
     Parceria "1" --> "0..*" Iniciativa : impacta
 ```
 
+## Conceitos Financeiros Normalizados
+
+| Conceito | Definicao | Fonte principal |
+|----------|-----------|-----------------|
+| Valor investido | Valor recebido pela Parceria a partir da Instituicao vinculada. | `AporteFinanceiro.valorInvestido` |
+| Valor alocado | Parcela do valor investido reservada para um Programa. | `AporteFinanceiroParceriaPrograma.valor` |
+| Valor aportado | Parcela da alocacao efetivamente disponibilizada para Programas, Rubricas ou Iniciativas. | Consolidacao M010/M003 |
+| Valor consumido | Parcela da alocacao ja comprometida ou utilizada pelas Iniciativas, incluindo pagamentos e compromissos reconhecidos. | M003 alimentado por M014 |
+| Saldo disponivel | No nivel da Parceria: `valorInvestido - valorAlocado`. No nivel de Programa/Rubrica: `valorAlocado - valorConsumido`. | Derivado |
+
+> Esses termos devem ser usados de forma consistente nos dashboards, epicos, contratos e telas. Evitar os termos "pago", "executado", "saldo nao alocado" e "saldo nao executado" nas telas de Parcerias quando o objetivo for acompanhamento gerencial do recurso.
+
 ## Dicionario de Dados
 
 | Classe | Atributo | Definicao | Obrig. | Tipo | Dominio | Tamanho | Unico |

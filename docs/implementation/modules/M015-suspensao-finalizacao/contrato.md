@@ -4,7 +4,7 @@ Dominio e regras de negocio: ver [README.md](README.md)
 
 ## Proposito do Contrato
 
-Este contrato documenta a superficie publica do modulo M015 como contexto coordenador dos fluxos de suspensao, reativacao e finalizacao de projetos, com verificacao de pendencias em modulos vizinhos.
+Este contrato documenta a superficie publica do modulo M015 como contexto coordenador dos fluxos de suspensao, reativacao e finalizacao de iniciativas, com verificacao de pendencias em modulos vizinhos.
 
 ## Consumidores e Dependencias
 
@@ -12,7 +12,7 @@ Este contrato documenta a superficie publica do modulo M015 como contexto coorde
 
 | Consumidor | Uso do contrato |
 |------------|-----------------|
-| Coordenador | Solicita suspensao e finalizacao do projeto |
+| Ortogado | Solicita suspensao e finalizacao da iniciativa |
 | Area Tecnica da Agencia de Fomento | Analisa suspensoes e acompanha encerramentos |
 | M004, M009 e M014 | Sofrem efeitos colaterais de bloqueio, pendencia ou validacao para encerramento |
 
@@ -20,7 +20,7 @@ Este contrato documenta a superficie publica do modulo M015 como contexto coorde
 
 | Dependencia | Tipo | Observacao |
 |-------------|------|------------|
-| M003 | Modulo interno | Fornece `Projeto` |
+| M003 | Modulo interno | Fornece `Iniciativa` |
 | M009 | Modulo interno | Fornece estado de `BolsaPesquisa` |
 | M014 | Modulo interno | Fornece estado de `PrestacaoContas` |
 | M004 | Modulo interno | Deve bloquear pagamentos quando a suspensao for efetivada |
@@ -29,12 +29,12 @@ Este contrato documenta a superficie publica do modulo M015 como contexto coorde
 
 | Nome da Operacao | Tipo | Objetivo | Entrada | Saida | Regras relacionadas | Pre-condicoes | Recusas/erros | Idempotencia | Autorizacao | Mapeamento de transporte |
 |------------------|------|----------|---------|-------|---------------------|---------------|---------------|--------------|-------------|--------------------------|
-| SolicitarSuspensaoProjeto | Command | Registrar solicitacao de suspensao de projeto | projeto, origem, justificativa | `SolicitacaoSuspensao` criada | RN01, RN08, RI1, RI2 | Projeto existente | Projeto ja suspenso, justificativa ausente | Nao | Coordenador ou agencia de fomento | API interna/backoffice a definir |
+| SolicitarSuspensaoIniciativa | Command | Registrar solicitacao de suspensao de iniciativa | iniciativa, origem, justificativa | `SolicitacaoSuspensao` criada | RN01, RN08, RI1, RI2 | Iniciativa existente | Iniciativa ja suspensa, justificativa ausente | Nao | Ortogado ou agencia de fomento | API interna/backoffice a definir |
 | DecidirSolicitacaoSuspensao | Command | Aprovar ou rejeitar a solicitacao de suspensao | solicitacao, aprovado, justificativa | `SolicitacaoSuspensao` decidida | RN02, RN03, RN07 | Solicitacao existente | Solicitacao inexistente, estado invalido | Nao | Area Tecnica da Agencia de Fomento | API interna/backoffice a definir |
-| ReativarProjetoSuspenso | Command | Reativar projeto suspenso apos aprovacao da area tecnica | projeto, justificativa | Projeto reativado | RN03 | Projeto suspenso | Projeto nao suspenso, reativacao nao permitida | Nao | Area Tecnica da Agencia de Fomento | API interna/backoffice a definir |
-| SolicitarFinalizacaoProjeto | Command | Registrar pedido de encerramento definitivo do projeto | projeto, motivo, justificativa | `SolicitacaoFinalizacao` criada | RN04, RN05, RN06, RI2 | Projeto existente | Projeto em processo incompatível, justificativa ausente | Nao | Coordenador ou agencia de fomento | API interna/backoffice a definir |
-| ConcluirFinalizacaoProjeto | Command | Encerrar o projeto apos resolver ou validar pendencias | solicitacaoFinalizacao | Projeto encerrado | RN04, RN05, RN06, RN07 | Pendencias verificadas | Pendencias pendentes, projeto nao elegivel | Nao | Area Tecnica da Agencia de Fomento | API interna/backoffice a definir |
-| ConsultarPendenciasDeFinalizacao | Query | Consultar pendencias impeditivas ao encerramento do projeto | projeto | Lista de `VerificacaoPendencia` | RN04, RN05 | Projeto existente | Projeto nao encontrado | N/A | Coordenador ou area tecnica autorizada | API interna a definir |
+| ReativarIniciativaSuspensa | Command | Reativar iniciativa suspensa apos aprovacao da area tecnica | iniciativa, justificativa | Iniciativa reativada | RN03 | Iniciativa suspensa | Iniciativa nao suspensa, reativacao nao permitida | Nao | Area Tecnica da Agencia de Fomento | API interna/backoffice a definir |
+| SolicitarFinalizacaoIniciativa | Command | Registrar pedido de encerramento definitivo da iniciativa | iniciativa, motivo, justificativa | `SolicitacaoFinalizacao` criada | RN04, RN05, RN06, RI2 | Iniciativa existente | Iniciativa em processo incompatível, justificativa ausente | Nao | Ortogado ou agencia de fomento | API interna/backoffice a definir |
+| ConcluirFinalizacaoIniciativa | Command | Encerrar a iniciativa apos resolver ou validar pendencias | solicitacaoFinalizacao | Iniciativa encerrada | RN04, RN05, RN06, RN07 | Pendencias verificadas | Pendencias pendentes, iniciativa nao elegivel | Nao | Area Tecnica da Agencia de Fomento | API interna/backoffice a definir |
+| ConsultarPendenciasDeFinalizacao | Query | Consultar pendencias impeditivas ao encerramento da iniciativa | iniciativa | Lista de `VerificacaoPendencia` | RN04, RN05 | Iniciativa existente | Iniciativa nao encontrada | N/A | Ortogado ou area tecnica autorizada | API interna a definir |
 
 ## Padrao de Payload e Erro
 
@@ -49,7 +49,7 @@ Este contrato documenta a superficie publica do modulo M015 como contexto coorde
     "code": "CODIGO_DO_ERRO",
     "message": "Mensagem de erro legivel para operador ou modulo consumidor.",
     "details": {
-      "projeto": "PROJ-2026-014"
+      "iniciativa": "INI-2026-014"
     }
   }
 }
@@ -57,15 +57,15 @@ Este contrato documenta a superficie publica do modulo M015 como contexto coorde
 
 ## Exemplos JSON por Operacao
 
-### SolicitarSuspensaoProjeto
+### SolicitarSuspensaoIniciativa
 
 **Exemplo de entrada**
 
 ```json
 {
-  "projetoId": "PROJ-2026-014",
-  "origem": "COORDENADOR",
-  "justificativa": "Projeto em replanejamento metodologico."
+  "iniciativaId": "INI-2026-014",
+  "origem": "ORTOGADO",
+  "justificativa": "Iniciativa em replanejamento metodologico."
 }
 ```
 
@@ -85,7 +85,7 @@ Este contrato documenta a superficie publica do modulo M015 como contexto coorde
 | Codigo | Mensagem de erro exemplo |
 |--------|---------------------------|
 | JUSTIFICATIVA_SUSPENSAO_OBRIGATORIA | Toda solicitacao de suspensao deve conter justificativa. |
-| PROJETO_JA_SUSPENSO | O projeto informado ja se encontra suspenso e nao pode ser suspenso novamente. |
+| INICIATIVA_JA_SUSPENSA | A iniciativa informada ja se encontra suspensa e nao pode ser suspensa novamente. |
 
 ### DecidirSolicitacaoSuspensao
 
@@ -117,14 +117,14 @@ Este contrato documenta a superficie publica do modulo M015 como contexto coorde
 | SOLICITACAO_SUSPENSAO_NAO_ENCONTRADA | A solicitacao de suspensao nao foi encontrada para decisao. |
 | ESTADO_SUSPENSAO_INVALIDO | A solicitacao de suspensao nao esta em estado valido para decisao. |
 
-### ReativarProjetoSuspenso
+### ReativarIniciativaSuspensa
 
 **Exemplo de entrada**
 
 ```json
 {
-  "projetoId": "PROJ-2026-014",
-  "justificativa": "Pendencias regularizadas e projeto apto a retomar execucao."
+  "iniciativaId": "INI-2026-014",
+  "justificativa": "Pendencias regularizadas e iniciativa apto a retomar execucao."
 }
 ```
 
@@ -132,8 +132,8 @@ Este contrato documenta a superficie publica do modulo M015 como contexto coorde
 
 ```json
 {
-  "projeto": {
-    "id": "PROJ-2026-014",
+  "iniciativa": {
+    "id": "INI-2026-014",
     "estado": "EM_EXECUCAO"
   }
 }
@@ -143,18 +143,18 @@ Este contrato documenta a superficie publica do modulo M015 como contexto coorde
 
 | Codigo | Mensagem de erro exemplo |
 |--------|---------------------------|
-| PROJETO_NAO_SUSPENSO | O projeto informado nao esta suspenso para reativacao. |
-| REATIVACAO_PROJETO_NAO_PERMITIDA | A reativacao do projeto nao foi autorizada pela area tecnica. |
+| INICIATIVA_NAO_SUSPENSA | A iniciativa informada nao esta suspensa para reativacao. |
+| REATIVACAO_INICIATIVA_NAO_PERMITIDA | A reativacao da iniciativa nao foi autorizada pela area tecnica. |
 
-### SolicitarFinalizacaoProjeto
+### SolicitarFinalizacaoIniciativa
 
 **Exemplo de entrada**
 
 ```json
 {
-  "projetoId": "PROJ-2026-014",
+  "iniciativaId": "INI-2026-014",
   "motivo": "CONCLUSAO_NATURAL",
-  "justificativa": "Metas executadas e projeto concluido."
+  "justificativa": "Metas executadas e iniciativa concluido."
 }
 ```
 
@@ -173,10 +173,10 @@ Este contrato documenta a superficie publica do modulo M015 como contexto coorde
 
 | Codigo | Mensagem de erro exemplo |
 |--------|---------------------------|
-| PROJETO_ENCERRAMENTO_INVALIDO | O projeto nao pode iniciar finalizacao no estado atual. |
+| INICIATIVA_ENCERRAMENTO_INVALIDO | A iniciativa nao pode iniciar finalizacao no estado atual. |
 | JUSTIFICATIVA_FINALIZACAO_OBRIGATORIA | A solicitacao de finalizacao exige justificativa detalhada. |
 
-### ConcluirFinalizacaoProjeto
+### ConcluirFinalizacaoIniciativa
 
 **Exemplo de entrada**
 
@@ -201,8 +201,8 @@ Este contrato documenta a superficie publica do modulo M015 como contexto coorde
 
 | Codigo | Mensagem de erro exemplo |
 |--------|---------------------------|
-| PENDENCIAS_FINALIZACAO_ABERTAS | Ainda existem pendencias de bolsas, pagamentos ou prestacao de contas para o projeto. |
-| PROJETO_ENCERRADO_IRREVERSIVEL | O projeto ja foi encerrado e nao aceita nova operacao de finalizacao. |
+| PENDENCIAS_FINALIZACAO_ABERTAS | Ainda existem pendencias de bolsas, pagamentos ou prestacao de contas para a iniciativa. |
+| INICIATIVA_ENCERRADA_IRREVERSIVEL | A iniciativa ja foi encerrada e nao aceita nova operacao de finalizacao. |
 
 ### ConsultarPendenciasDeFinalizacao
 
@@ -210,7 +210,7 @@ Este contrato documenta a superficie publica do modulo M015 como contexto coorde
 
 ```json
 {
-  "projetoId": "PROJ-2026-014"
+  "iniciativaId": "INI-2026-014"
 }
 ```
 
@@ -231,7 +231,7 @@ Este contrato documenta a superficie publica do modulo M015 como contexto coorde
 
 | Codigo | Mensagem de erro exemplo |
 |--------|---------------------------|
-| PROJETO_NAO_ENCONTRADO | O projeto informado nao foi encontrado para consulta de pendencias. |
+| INICIATIVA_NAO_ENCONTRADA | A iniciativa informada nao foi encontrada para consulta de pendencias. |
 | CONSULTA_PENDENCIA_INVALIDA | Os filtros informados para consulta de pendencias sao invalidos. |
 
 ## Mapeamento de Transporte
@@ -242,7 +242,7 @@ Este contrato documenta a superficie publica do modulo M015 como contexto coorde
 ## Eventos e Efeitos Colaterais
 
 - `DecidirSolicitacaoSuspensao` deve bloquear pagamentos em M004 e impedir novas alocacoes em M009 quando aprovada.
-- `ConcluirFinalizacaoProjeto` depende do fechamento das pendencias verificadas em M009 e M014.
+- `ConcluirFinalizacaoIniciativa` depende do fechamento das pendencias verificadas em M009 e M014.
 - `ConsultarPendenciasDeFinalizacao` consolida informacoes de modulos vizinhos sem alterar ownership.
 
 ## Rastreabilidade

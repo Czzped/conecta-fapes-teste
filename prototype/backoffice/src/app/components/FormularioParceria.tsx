@@ -1,20 +1,15 @@
 import React, { useState } from 'react';
-import { ChevronRight, Home, Save, Send, Plus, Trash2, ChevronDown } from 'lucide-react';
+import { ChevronDown, ChevronRight, Home, Plus, Save, Search, Send, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Props {
   onBack: () => void;
 }
 
-interface InstituicaoParceira {
-  id: number;
-  instituicao: string;
-  valorInvestido: string;
-}
-
-interface Formulario {
+interface Documento {
   id: number;
   tipo: string;
+  arquivo: string;
 }
 
 const inputStyle: React.CSSProperties = {
@@ -72,7 +67,7 @@ const SelectField: React.FC<{
   const [open, setOpen] = useState(false);
   return (
     <div style={{ position: 'relative' }}>
-      {label && label.length > 0 && <label style={labelStyle}>{label}</label>}
+      {label && <label style={labelStyle}>{label}</label>}
       <button
         type="button"
         onClick={() => setOpen(!open)}
@@ -101,8 +96,6 @@ const SelectField: React.FC<{
                 color: value === opt.value ? '#00c1af' : '#ffffff',
                 fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer',
               }}
-              onMouseEnter={e => { if (value !== opt.value) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'; }}
-              onMouseLeave={e => { if (value !== opt.value) e.currentTarget.style.backgroundColor = 'transparent'; }}
             >
               {opt.label}
             </button>
@@ -113,89 +106,123 @@ const SelectField: React.FC<{
   );
 };
 
+const SearchableInstitutionField: React.FC<{
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string; cnpj: string }[];
+  placeholder?: string;
+}> = ({ label, value, onChange, options, placeholder }) => {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const selected = options.find(o => o.value === value);
+  const normalizedQuery = query.toLowerCase().replace(/\D/g, '');
+  const filtered = options.filter(option => {
+    const labelMatch = option.label.toLowerCase().includes(query.toLowerCase());
+    const cnpjMatch = option.cnpj.replace(/\D/g, '').includes(normalizedQuery);
+    return query.length === 0 || labelMatch || cnpjMatch;
+  });
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <label style={labelStyle}>{label}</label>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        style={{ ...inputStyle, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', textAlign: 'left' }}
+      >
+        <span style={{ color: selected ? '#ffffff' : 'rgba(255,255,255,0.3)' }}>
+          {selected ? `${selected.label} · ${selected.cnpj}` : (placeholder || 'Busque por nome ou CNPJ')}
+        </span>
+        <ChevronDown size={15} style={{ color: 'rgba(255,255,255,0.4)', flexShrink: 0, transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+      </button>
+      {open && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%',
+          backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.12)',
+          borderRadius: 'var(--radius)', zIndex: 350, overflow: 'hidden',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+        }}>
+          <div style={{ position: 'relative', padding: '10px' }}>
+            <input
+              autoFocus
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Digite nome ou CNPJ"
+              style={{ ...inputStyle, paddingLeft: '36px', backgroundColor: 'rgba(15,23,42,0.8)' }}
+            />
+            <Search size={15} style={{ position: 'absolute', left: '22px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
+          </div>
+          <div style={{ maxHeight: '240px', overflowY: 'auto' }}>
+            {filtered.map(opt => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => {
+                  onChange(opt.value);
+                  setQuery('');
+                  setOpen(false);
+                }}
+                style={{
+                  width: '100%', padding: '10px 14px', textAlign: 'left', border: 'none',
+                  backgroundColor: value === opt.value ? 'rgba(0,193,175,0.1)' : 'transparent',
+                  color: value === opt.value ? '#00c1af' : '#ffffff',
+                  fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer',
+                }}
+              >
+                <span style={{ display: 'block' }}>{opt.label}</span>
+                <span style={{ display: 'block', marginTop: '3px', color: 'rgba(255,255,255,0.45)', fontSize: 'var(--text-xs)' }}>
+                  CNPJ {opt.cnpj}
+                </span>
+              </button>
+            ))}
+            {filtered.length === 0 && (
+              <div style={{ padding: '12px 14px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)' }}>
+                Nenhuma instituição encontrada.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
   const [nomeParceria, setNomeParceria] = useState('');
-  const [instituicoes, setInstituicoes] = useState<InstituicaoParceira[]>([{ id: 1, instituicao: '', valorInvestido: '' }]);
-  const [area, setArea] = useState('');
+  const [instituicaoVinculada, setInstituicaoVinculada] = useState('');
   const [numeroProcesso, setNumeroProcesso] = useState('');
   const [dataAssinatura, setDataAssinatura] = useState('');
   const [dataVigenciaInicio, setDataVigenciaInicio] = useState('');
   const [dataVigenciaFim, setDataVigenciaFim] = useState('');
   const [objetivo, setObjetivo] = useState('');
-  const [coordenadorNome, setCoordenadorNome] = useState('');
-  const [coordenadorEmail, setCoordenadorEmail] = useState('');
-  const [coordenadorCelular, setCoordenadorCelular] = useState('');
-  const [pontoFocalFapes, setPontoFocalFapes] = useState('');
-  const [gerenciaResponsavel, setGerenciaResponsavel] = useState('');
-  const [formularios, setFormularios] = useState<Formulario[]>([{ id: 1, tipo: '' }]);
+  const [valorAporteOriginal, setValorAporteOriginal] = useState('');
+  const [dataAporteOriginal, setDataAporteOriginal] = useState('');
+  const [contaBancariaDestino, setContaBancariaDestino] = useState('');
+  const [documentos, setDocumentos] = useState<Documento[]>([{ id: 1, tipo: '', arquivo: '' }]);
 
   const instituicoesOptions = [
-    { value: 'ufes', label: 'Universidade Federal do Espírito Santo (Ufes)' },
-    { value: 'ifes', label: 'Instituto Federal do Espírito Santo (Ifes)' },
-    { value: 'cnpq', label: 'Conselho Nacional de Desenvolvimento Científico e Tecnológico (CNPq)' },
-    { value: 'fapesp', label: 'Fundação de Amparo à Pesquisa do Estado de São Paulo (Fapesp)' },
-    { value: 'ufmg', label: 'Universidade Federal de Minas Gerais (UFMG)' },
-    { value: 'usp', label: 'Universidade de São Paulo (USP)' },
-    { value: 'capes', label: 'Coordenação de Aperfeiçoamento de Pessoal de Nível Superior (Capes)' },
+    { value: 'ufes', label: 'Universidade Federal do Espírito Santo (Ufes)', cnpj: '32.479.123/0001-43' },
+    { value: 'ifes', label: 'Instituto Federal do Espírito Santo (Ifes)', cnpj: '10.838.653/0001-06' },
+    { value: 'cnpq', label: 'Conselho Nacional de Desenvolvimento Científico e Tecnológico (CNPq)', cnpj: '33.654.831/0001-36' },
+    { value: 'fapesp', label: 'Fundação de Amparo à Pesquisa do Estado de São Paulo (Fapesp)', cnpj: '43.828.151/0001-45' },
+    { value: 'ufmg', label: 'Universidade Federal de Minas Gerais (UFMG)', cnpj: '17.217.985/0001-04' },
+    { value: 'usp', label: 'Universidade de São Paulo (USP)', cnpj: '63.025.530/0001-04' },
+    { value: 'capes', label: 'Coordenação de Aperfeiçoamento de Pessoal de Nível Superior (Capes)', cnpj: '00.889.834/0001-08' },
   ];
 
-  const areaOptions = [
-    { value: 'carreira', label: 'Carreira Científica' },
-    { value: 'pesquisa', label: 'Pesquisa' },
-    { value: 'difusao', label: 'Difusão do Conhecimento' },
-    { value: 'extensao', label: 'Extensão' },
-    { value: 'inovacao', label: 'Inovação' },
-    { value: 'internacional', label: 'Internacional' },
+  const documentoOptions = [
+    { value: 'termo-cooperacao', label: 'Termo de Cooperação' },
+    { value: 'termo-descentralizacao', label: 'Termo de Descentralização' },
   ];
 
-  const formularioOptions = [
-    { value: 'monitoramento', label: 'Monitoramento' },
-    { value: 'termo', label: 'Termo de Cooperação' },
-    { value: 'avaliacao', label: 'Avaliação' },
-    { value: 'relatorio', label: 'Relatório' },
-  ];
-
-  const gerenciaOptions = [
-    { value: 'geaf', label: 'GEAF' },
-    { value: 'gecap', label: 'GECAP' },
-    { value: 'geinov', label: 'GEINOV' },
-    { value: 'geop', label: 'GEOP' },
-    { value: 'geped', label: 'GEPED' },
-  ];
-
-  const pesquisadoresOptions = [
-    { value: 'marcos', label: 'Prof. Dr. Marcos Andrade' },
-    { value: 'fernanda', label: 'Dra. Fernanda Rocha' },
-    { value: 'eduardo', label: 'Prof. Eduardo Martins' },
-    { value: 'carla', label: 'Dra. Carla Vasconcelos' },
-  ];
-
-  const addInstituicao = () => {
-    setInstituicoes(prev => [...prev, { id: Date.now(), instituicao: '', valorInvestido: '' }]);
+  const addDocumento = () => {
+    setDocumentos(prev => [...prev, { id: Date.now(), tipo: '', arquivo: '' }]);
   };
 
-  const removeInstituicao = (id: number) => {
-    if (instituicoes.length > 1) {
-      setInstituicoes(prev => prev.filter(i => i.id !== id));
-    }
-  };
-
-  const updateInstituicao = (id: number, field: 'instituicao' | 'valorInvestido', value: string) => {
-    setInstituicoes(prev => prev.map(i => i.id === id ? { ...i, [field]: value } : i));
-  };
-
-  const addFormulario = () => {
-    setFormularios(prev => [...prev, { id: Date.now(), tipo: '' }]);
-  };
-
-  const removeFormulario = (id: number) => {
-    if (formularios.length > 1) {
-      setFormularios(prev => prev.filter(f => f.id !== id));
-    }
-  };
-
-  const updateFormulario = (id: number, tipo: string) => {
-    setFormularios(prev => prev.map(f => f.id === id ? { ...f, tipo } : f));
+  const updateDocumento = (id: number, field: 'tipo' | 'arquivo', value: string) => {
+    setDocumentos(prev => prev.map(doc => doc.id === id ? { ...doc, [field]: value } : doc));
   };
 
   const textareaStyle: React.CSSProperties = {
@@ -205,18 +232,19 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
     lineHeight: '1.6',
   };
 
-  const handlePublicarParceria = () => {
-    toast.success('Parceria cadastrada com sucesso!');
-    setTimeout(() => {
-      onBack();
-    }, 1000);
+  const handleSalvarElaboracao = () => {
+    toast.success('Parceria salva em elaboração.');
+    setTimeout(onBack, 800);
+  };
+
+  const handleFormalizarParceria = () => {
+    toast.success('Parceria formalizada como vigente.');
+    setTimeout(onBack, 800);
   };
 
   return (
     <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-16">
-
-        {/* Breadcrumb */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
           <Home size={15} style={{ color: 'rgba(255,255,255,0.5)' }} />
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
@@ -224,7 +252,7 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
             onClick={onBack}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)' }}
           >
-            Parceria
+            Parcerias
           </button>
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
           <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
@@ -232,14 +260,9 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
           </span>
         </div>
 
-        {/* Título da tela */}
         <div style={{ marginBottom: '32px' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-            <div style={{
-              width: '36px', height: '36px', borderRadius: 'var(--radius)',
-              backgroundColor: 'rgba(0,193,175,0.15)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: 'var(--radius)', backgroundColor: 'rgba(0,193,175,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Plus size={18} style={{ color: '#00c1af' }} />
             </div>
             <div style={{ flex: 1, marginTop: '6px' }}>
@@ -247,316 +270,70 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
                 Nova Parceria
               </h1>
               <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
-                Preencha as informações abaixo para criar uma nova parceria.
+                Registre a solicitação, a instituição única, a vigência original e o aporte financeiro da parceria.
               </p>
             </div>
           </div>
           <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', marginTop: '20px' }} />
         </div>
 
-        {/* Seção 1: Identificação da Parceria */}
-        <div style={sectionCardStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-            <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#0f172a' }}>1</span>
-            </div>
-            <p style={sectionTitleStyle}>Identificação da Parceria</p>
+        <Section number="1" title="Identificação da Parceria" subtitle="Dados básicos da solicitação e do processo administrativo">
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', marginBottom: '16px' }}>
+            <Field label="Nome da Parceria" value={nomeParceria} onChange={setNomeParceria} placeholder="Digite o nome da parceria" />
+            <Field label="Número do Processo" value={numeroProcesso} onChange={setNumeroProcesso} placeholder="Ex: 2026-AB12F" />
           </div>
-          <p style={sectionSubtitleStyle}>Informações básicas da cooperação</p>
-
-          {/* Nome da Parceria */}
           <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>Nome da Parceria</label>
-            <input 
-              type="text" 
-              placeholder="Digite o nome da parceria" 
-              value={nomeParceria} 
-              onChange={e => setNomeParceria(e.target.value)} 
-              style={inputStyle}
-              onFocus={e => e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)'}
-              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'}
+            <SearchableInstitutionField
+              label="Instituição vinculada"
+              value={instituicaoVinculada}
+              onChange={setInstituicaoVinculada}
+              options={instituicoesOptions}
+              placeholder="Busque por nome ou CNPJ"
             />
           </div>
+          <label style={labelStyle}>Objetivo</label>
+          <textarea
+            placeholder="Descreva o objetivo da parceria"
+            value={objetivo}
+            onChange={e => setObjetivo(e.target.value)}
+            style={textareaStyle}
+          />
+        </Section>
 
-          {/* Área e Número do Processo */}
+        <Section number="2" title="Vigência Original" subtitle="Período inicial de validade da parceria">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+            <DateField label="Data da Assinatura" value={dataAssinatura} onChange={setDataAssinatura} />
+            <DateField label="Início da Vigência" value={dataVigenciaInicio} onChange={setDataVigenciaInicio} />
+            <DateField label="Fim da Vigência" value={dataVigenciaFim} onChange={setDataVigenciaFim} />
+          </div>
+        </Section>
+
+        <Section number="3" title="Aporte Financeiro Original" subtitle="Valor investido pela instituição vinculada e conta de destino">
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-            <SelectField
-              label="Área"
-              value={area}
-              onChange={setArea}
-              options={areaOptions}
-              placeholder="Selecione a área"
-            />
-            
-            <div>
-              <label style={labelStyle}>Número do Processo</label>
-              <input 
-                type="text" 
-                placeholder="Digite o número do processo" 
-                value={numeroProcesso} 
-                onChange={e => setNumeroProcesso(e.target.value)} 
-                style={inputStyle}
-                onFocus={e => e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)'}
-                onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'}
-              />
-            </div>
+            <Field label="Valor do Aporte Original (R$)" value={valorAporteOriginal} onChange={setValorAporteOriginal} placeholder="Ex: 1.000.000,00" />
+            <DateField label="Data do Aporte" value={dataAporteOriginal} onChange={setDataAporteOriginal} />
           </div>
-
-          {/* Data da Assinatura e Data de Vigência */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-            <div>
-              <label style={labelStyle}>Data da Assinatura</label>
-              <input 
-                type="date" 
-                value={dataAssinatura} 
-                onChange={e => setDataAssinatura(e.target.value)} 
-                style={{ ...inputStyle, colorScheme: 'dark' }}
-                onFocus={e => e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)'}
-                onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>Data de Vigência (Início)</label>
-              <input 
-                type="date" 
-                value={dataVigenciaInicio} 
-                onChange={e => setDataVigenciaInicio(e.target.value)} 
-                style={{ ...inputStyle, colorScheme: 'dark' }}
-                onFocus={e => e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)'}
-                onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>Data de Vigência (Fim)</label>
-              <input 
-                type="date" 
-                value={dataVigenciaFim} 
-                onChange={e => setDataVigenciaFim(e.target.value)} 
-                style={{ ...inputStyle, colorScheme: 'dark' }}
-                onFocus={e => e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)'}
-                onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'}
-              />
-            </div>
-          </div>
-
-          {/* Objetivo */}
-          <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>Objetivo</label>
-            <textarea
-              placeholder="Descreva os objetivos da parceria"
-              value={objetivo}
-              onChange={e => setObjetivo(e.target.value)}
-              style={textareaStyle}
-              onFocus={e => e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)'}
-              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'}
-            />
-          </div>
-
-          {/* Instituições Parceiras */}
           <div>
-            <label style={{ ...labelStyle, marginBottom: '6px' }}>Instituição Parceira</label>
-            
-            {instituicoes.map((inst, idx) => (
-              <div key={inst.id} style={{ marginBottom: '12px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '12px', alignItems: 'end' }}>
-                  <SelectField
-                    label=""
-                    value={inst.instituicao}
-                    onChange={(v) => updateInstituicao(inst.id, 'instituicao', v)}
-                    options={instituicoesOptions}
-                    placeholder="Selecione a instituição"
-                  />
-                  
-                  <div>
-                    {idx === 0 && <label style={labelStyle}>Valor Investido (R$)</label>}
-                    <input
-                      type="text"
-                      placeholder="Ex: 1.000.000,00"
-                      value={inst.valorInvestido}
-                      onChange={e => updateInstituicao(inst.id, 'valorInvestido', e.target.value)}
-                      style={inputStyle}
-                      onFocus={e => e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)'}
-                      onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'}
-                    />
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => removeInstituicao(inst.id)}
-                    disabled={instituicoes.length === 1}
-                    style={{
-                      width: '36px',
-                      height: '38px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      border: instituicoes.length === 1 ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(239,68,68,0.3)',
-                      borderRadius: 'var(--radius)',
-                      background: 'transparent',
-                      cursor: instituicoes.length === 1 ? 'not-allowed' : 'pointer',
-                      flexShrink: 0,
-                      transition: 'background-color 0.15s',
-                      opacity: instituicoes.length === 1 ? 0.3 : 1,
-                    }}
-                    onMouseEnter={e => { if (instituicoes.length > 1) e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.1)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-                  >
-                    <Trash2 size={14} style={{ color: instituicoes.length === 1 ? 'rgba(255,255,255,0.3)' : 'rgba(239,68,68,0.7)' }} />
-                  </button>
-                </div>
-              </div>
-            ))}
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <button
-                type="button"
-                onClick={addInstituicao}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  backgroundColor: 'transparent',
-                  border: '1px solid rgba(0,193,175,0.4)',
-                  borderRadius: 'var(--radius)',
-                  padding: '8px 14px',
-                  color: '#00c1af',
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--text-sm)',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s, border-color 0.2s',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.08)'; e.currentTarget.style.borderColor = '#00c1af'; }}
-                onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.borderColor = 'rgba(0,193,175,0.4)'; }}
-              >
-                <Plus size={14} />
-                Adicionar Instituição
-              </button>
-            </div>
+            <Field label="Conta Bancária de Destino" value={contaBancariaDestino} onChange={setContaBancariaDestino} placeholder="Banco / agência / conta" />
           </div>
-        </div>
+        </Section>
 
-        {/* Seção 2: Coordenador */}
-        <div style={sectionCardStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-            <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#0f172a' }}>2</span>
-            </div>
-            <p style={sectionTitleStyle}>Coordenador</p>
-          </div>
-          <p style={sectionSubtitleStyle}>Informações do coordenador da parceria</p>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
-            <div>
-              <label style={labelStyle}>Nome</label>
-              <input 
-                type="text" 
-                placeholder="Nome do coordenador" 
-                value={coordenadorNome} 
-                onChange={e => setCoordenadorNome(e.target.value)} 
-                style={inputStyle}
-                onFocus={e => e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)'}
-                onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>E-mail</label>
-              <input 
-                type="email" 
-                placeholder="email@exemplo.com" 
-                value={coordenadorEmail} 
-                onChange={e => setCoordenadorEmail(e.target.value)} 
-                style={inputStyle}
-                onFocus={e => e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)'}
-                onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>Celular</label>
-              <input 
-                type="tel" 
-                placeholder="(00) 00000-0000" 
-                value={coordenadorCelular} 
-                onChange={e => setCoordenadorCelular(e.target.value)} 
-                style={inputStyle}
-                onFocus={e => e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)'}
-                onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Seção 3: Gestão */}
-        <div style={sectionCardStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-            <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#0f172a' }}>3</span>
-            </div>
-            <p style={sectionTitleStyle}>Gestão</p>
-          </div>
-          <p style={sectionSubtitleStyle}>Informações de gestão da parceria</p>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <SelectField
-              label="Ponto Focal Fapes"
-              value={pontoFocalFapes}
-              onChange={setPontoFocalFapes}
-              options={pesquisadoresOptions}
-              placeholder="Selecione o ponto focal"
-            />
-            <SelectField
-              label="Gerência Responsável"
-              value={gerenciaResponsavel}
-              onChange={setGerenciaResponsavel}
-              options={gerenciaOptions}
-              placeholder="Selecione a gerência"
-            />
-          </div>
-        </div>
-
-        {/* Seção 4: Formulários */}
-        <div style={sectionCardStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-            <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#0f172a' }}>4</span>
-            </div>
-            <p style={sectionTitleStyle}>Formulários</p>
-          </div>
-          <p style={sectionSubtitleStyle}>Documentos e formulários relacionados à parceria</p>
-
-          {formularios.map((form, idx) => (
-            <div key={form.id} style={{ marginBottom: '12px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '12px', alignItems: 'end' }}>
-                <SelectField
-                  label={idx === 0 ? 'Tipo de Formulário' : ''}
-                  value={form.tipo}
-                  onChange={(v) => updateFormulario(form.id, v)}
-                  options={formularioOptions}
-                  placeholder="Selecione o tipo"
+        <Section number="4" title="Documentos" subtitle="Documentos que sustentam a formalização da parceria">
+          {documentos.map((documento, index) => (
+            <div key={documento.id} style={{ marginBottom: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignItems: 'end' }}>
+                <UploadField
+                  label={index === 0 ? 'Arquivo' : 'Arquivo'}
+                  fileName={documento.arquivo}
+                  onChange={(fileName) => updateDocumento(documento.id, 'arquivo', fileName)}
                 />
-
-                <button
-                  type="button"
-                  onClick={() => removeFormulario(form.id)}
-                  disabled={formularios.length === 1}
-                  style={{
-                    width: '36px',
-                    height: '38px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    border: formularios.length === 1 ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(239,68,68,0.3)',
-                    borderRadius: 'var(--radius)',
-                    background: 'transparent',
-                    cursor: formularios.length === 1 ? 'not-allowed' : 'pointer',
-                    flexShrink: 0,
-                    transition: 'background-color 0.15s',
-                    opacity: formularios.length === 1 ? 0.3 : 1,
-                  }}
-                  onMouseEnter={e => { if (formularios.length > 1) e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.1)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-                >
-                  <Trash2 size={14} style={{ color: formularios.length === 1 ? 'rgba(255,255,255,0.3)' : 'rgba(239,68,68,0.7)' }} />
-                </button>
+                <SelectField
+                  label={index === 0 ? 'Classificação do documento' : 'Classificação do documento'}
+                  value={documento.tipo}
+                  onChange={(v) => updateDocumento(documento.id, 'tipo', v)}
+                  options={documentoOptions}
+                  placeholder="Classifique o documento"
+                />
               </div>
             </div>
           ))}
@@ -564,78 +341,86 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <button
               type="button"
-              onClick={addFormulario}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                backgroundColor: 'transparent',
-                border: '1px solid rgba(0,193,175,0.4)',
-                borderRadius: 'var(--radius)',
-                padding: '8px 14px',
-                color: '#00c1af',
-                fontFamily: 'var(--font-family)',
-                fontSize: 'var(--text-sm)',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s, border-color 0.2s',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.08)'; e.currentTarget.style.borderColor = '#00c1af'; }}
-              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.borderColor = 'rgba(0,193,175,0.4)'; }}
+              onClick={addDocumento}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: 'transparent', border: '1px solid rgba(0,193,175,0.4)', borderRadius: 'var(--radius)', padding: '8px 14px', color: '#00c1af', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}
             >
               <Plus size={14} />
-              Adicionar Formulário
+              Adicionar Documento
             </button>
           </div>
-        </div>
+        </Section>
 
-        {/* Botões de Ação */}
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '8px' }}>
           <button
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '10px 20px',
-              backgroundColor: 'transparent',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: 'var(--radius)',
-              color: '#ffffff',
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--text-sm)',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
-            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+            onClick={handleSalvarElaboracao}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 'var(--radius)', color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}
           >
             <Save size={16} />
-            Salvar Rascunho
+            Salvar em elaboração
           </button>
           <button
-            onClick={handlePublicarParceria}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '10px 20px',
-              backgroundColor: '#00c1af',
-              border: 'none',
-              borderRadius: 'var(--radius)',
-              color: '#0f172a',
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-medium)',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.backgroundColor = '#00a99a'}
-            onMouseLeave={e => e.currentTarget.style.backgroundColor = '#00c1af'}
+            onClick={handleFormalizarParceria}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', color: '#0f172a', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}
           >
             <Send size={16} />
-            Publicar Parceria
+            Formalizar parceria
           </button>
         </div>
       </div>
     </div>
   );
 };
+
+const Section: React.FC<{ number: string; title: string; subtitle: string; children: React.ReactNode }> = ({ number, title, subtitle, children }) => (
+  <div style={sectionCardStyle}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+      <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#0f172a' }}>{number}</span>
+      </div>
+      <p style={sectionTitleStyle}>{title}</p>
+    </div>
+    <p style={sectionSubtitleStyle}>{subtitle}</p>
+    {children}
+  </div>
+);
+
+const Field: React.FC<{ label: string; value: string; onChange: (value: string) => void; placeholder?: string }> = ({ label, value, onChange, placeholder }) => (
+  <div>
+    <label style={labelStyle}>{label}</label>
+    <input type="text" placeholder={placeholder} value={value} onChange={e => onChange(e.target.value)} style={inputStyle} />
+  </div>
+);
+
+const DateField: React.FC<{ label: string; value: string; onChange: (value: string) => void }> = ({ label, value, onChange }) => (
+  <div>
+    <label style={labelStyle}>{label}</label>
+    <input type="date" value={value} onChange={e => onChange(e.target.value)} style={{ ...inputStyle, colorScheme: 'dark' }} />
+  </div>
+);
+
+const UploadField: React.FC<{ label: string; fileName: string; onChange: (fileName: string) => void }> = ({ label, fileName, onChange }) => (
+  <div>
+    <label style={labelStyle}>{label}</label>
+    <label
+      style={{
+        ...inputStyle,
+        minHeight: '40px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '12px',
+        cursor: 'pointer',
+        color: fileName ? '#ffffff' : 'rgba(255,255,255,0.45)',
+      }}
+    >
+      <span>{fileName || 'Selecionar arquivo'}</span>
+      <Upload size={15} style={{ color: '#00c1af', flexShrink: 0 }} />
+      <input
+        type="file"
+        accept=".pdf,.doc,.docx,.odt"
+        onChange={event => onChange(event.target.files?.[0]?.name || '')}
+        style={{ display: 'none' }}
+      />
+    </label>
+  </div>
+);

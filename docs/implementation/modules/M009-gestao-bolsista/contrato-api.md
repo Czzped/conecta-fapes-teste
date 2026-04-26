@@ -91,8 +91,8 @@ Registra a indicacao inicial de um bolsista para uma cota do projeto.
 
 | Campo | Tipo | Obrigatorio | Descricao |
 |-------|------|-------------|-----------|
-| `projetoId` | string | Sim | Identificador do projeto em M003 |
-| `cotaEditalId` | string | Sim | Identificador da cota do edital em M003 |
+| `iniciativaId` | string | Sim | Identificador da iniciativa em M003 |
+| `cotaBolsaId` | string | Sim | Identificador da cota/oportunidade de bolsa gerenciada no M009 |
 | `coordenadorId` | string | Sim | Identificador do coordenador responsavel |
 | `orientadorId` | string | Sim | Identificador do orientador do bolsista |
 | `bolsistaId` | string | Sim | Identificador do bolsista indicado |

@@ -34,6 +34,8 @@
 | **Discovery de Melhorias** | Marcela + Leticia | Mapear jornadas de usuario em producao, coletar feedback e registrar melhorias e novas features | 1 issue |
 | **Importacao SIGFAPES** | Mateus Lannes | Documentar sistema de importacao e monitorar execucao, integridade e proximos passos | 1 issue |
 
+> Prototipo de referencia: `prototype/backoffice/`.
+
 ---
 
 ## Produtos Impactados
@@ -90,7 +92,7 @@
 **Prototipos de referencia:**
 - [Back-office (Figma)](https://bucket-lake-78647159.figma.site/) — Telas de Parcerias, Instituicoes e Cadastros
 - [Front-office (Figma)](https://rate-snort-02856207.figma.site/)
-- [Prototipo Backoffice (codigo)](../../prototype/backoffice/) — Parceria.tsx, DetalhesParceria.tsx, FormularioParceria.tsx
+- Prototipo Backoffice (codigo): `prototype/backoffice/` — Parceria.tsx, DetalhesParceria.tsx, FormularioParceria.tsx
 
 ### Vinicius Estevam — Cadastros Corporativos (M008)
 

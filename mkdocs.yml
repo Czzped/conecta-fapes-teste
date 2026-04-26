@@ -268,6 +268,7 @@ nav:
               - EPIC-M010-004 Painel Financeiro: implementation/modules/M010-planejamento-estrategia/parcerias/epics/EPIC-M010-004.md
       - M011 Configuracao de Captacao:
           - implementation/modules/M011-configuracao-captacao/README.md
+          - Processo: implementation/modules/M011-configuracao-captacao/process.md
           - Backlog: implementation/modules/M011-configuracao-captacao/backlog.md
           - Contrato: implementation/modules/M011-configuracao-captacao/contrato.md
           - Contrato API: implementation/modules/M011-configuracao-captacao/contrato-api.md
@@ -375,11 +376,37 @@ nav:
           - Modelo Comportamental: implementation/modules/M020-comunicacao/modelo-comportamental.md
           - EPIC-001: implementation/modules/M020-comunicacao/epics/EPIC-M020-001.md
           - EPIC-002: implementation/modules/M020-comunicacao/epics/EPIC-M020-002.md
+      - M021 Gestao de Formularios:
+          - implementation/modules/M021-gestao-formularios/README.md
+          - Backlog: implementation/modules/M021-gestao-formularios/backlog.md
+          - Contrato: implementation/modules/M021-gestao-formularios/contrato.md
+          - Contrato API: implementation/modules/M021-gestao-formularios/contrato-api.md
+          - Modelo Estrutural: implementation/modules/M021-gestao-formularios/modelo-estrutural.md
+          - Modelo Comportamental: implementation/modules/M021-gestao-formularios/modelo-comportamental.md
+          - EPIC-001: implementation/modules/M021-gestao-formularios/epics/EPIC-M021-001.md
+          - EPIC-002: implementation/modules/M021-gestao-formularios/epics/EPIC-M021-002.md
+          - EPIC-003: implementation/modules/M021-gestao-formularios/epics/EPIC-M021-003.md
+          - EPIC-004: implementation/modules/M021-gestao-formularios/epics/EPIC-M021-004.md
+      - M022 Contratacao e Outorga:
+          - implementation/modules/M022-contratacao-outorga/README.md
+          - Backlog: implementation/modules/M022-contratacao-outorga/backlog.md
+          - Contrato: implementation/modules/M022-contratacao-outorga/contrato.md
+          - Contrato API: implementation/modules/M022-contratacao-outorga/contrato-api.md
+          - Modelo Estrutural: implementation/modules/M022-contratacao-outorga/modelo-estrutural.md
+          - Modelo Comportamental: implementation/modules/M022-contratacao-outorga/modelo-comportamental.md
+          - EPIC-001: implementation/modules/M022-contratacao-outorga/epics/EPIC-M022-001.md
+          - EPIC-002: implementation/modules/M022-contratacao-outorga/epics/EPIC-M022-002.md
+          - EPIC-003: implementation/modules/M022-contratacao-outorga/epics/EPIC-M022-003.md
 
   - Gestao:
       - management/README.md
       - Roadmap: management/roadmap.md
-      - Milestones: management/milestones.md
+      - Milestones: management/milestones/README.md
+      - MS-01 Base Operacional: management/milestones/MS-01.md
+      - MS-02 Pre-Award: management/milestones/MS-02.md
+      - MS-03 Post-Award: management/milestones/MS-03.md
+      - MS-04 Financeiro: management/milestones/MS-04.md
+      - MS-05 Inteligencia: management/milestones/MS-05.md
       - Backlog do Produto: management/backlog-product.md
       - Divida Tecnica: management/technical-debt.md
       - Definition of Ready e Done: management/definition-of-ready-done.md

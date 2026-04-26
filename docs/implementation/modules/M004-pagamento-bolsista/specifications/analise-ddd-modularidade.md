@@ -17,15 +17,15 @@ Este documento registra a analise do modulo M004 sob a otica de Domain-Driven De
 
 | # | Problema | Gravidade | Artefato(s) impactado(s) |
 |---|---------|-----------|--------------------------|
-| P1 | [Escrita em entidades fora do escopo](#p1--escrita-em-entidades-fora-do-escopo) | Alta | modelo-estrutural, contrato |
-| P2 | [Aggregates nao identificados](#p2--aggregates-nao-identificados) | Alta | modelo-estrutural |
-| P3 | [Modelo comportamental inclui AlocacaoBolsista](#p3--modelo-comportamental-inclui-alocacaobolsista) | Media | modelo-comportamental |
-| P4 | [Value Objects nao identificados](#p4--value-objects-nao-identificados) | Media | modelo-estrutural |
-| P5 | [Vazamento de infraestrutura no dominio](#p5--vazamento-de-infraestrutura-no-dominio) | Media | modelo-estrutural, contrato |
-| P6 | [Ausencia de Domain Events formalizados](#p6--ausencia-de-domain-events-formalizados) | Media | contrato |
-| P7 | [Usuario replicado como entidade completa](#p7--usuario-replicado-como-entidade-completa) | Baixa | modelo-estrutural |
-| P8 | [Contratante orfao no modelo](#p8--contratante-orfao-no-modelo) | Baixa | modelo-estrutural |
-| P9 | [Campos computados sem documentacao de estrategia](#p9--campos-computados-sem-documentacao-de-estrategia) | Baixa | modelo-estrutural |
+| P1 | [Escrita em entidades fora do escopo](#p1-escrita-em-entidades-fora-do-escopo) | Alta | modelo-estrutural, contrato |
+| P2 | [Aggregates nao identificados](#p2-aggregates-nao-identificados) | Alta | modelo-estrutural |
+| P3 | [Modelo comportamental inclui AlocacaoBolsista](#p3-modelo-comportamental-inclui-alocacaobolsista) | Media | modelo-comportamental |
+| P4 | [Value Objects nao identificados](#p4-value-objects-nao-identificados) | Media | modelo-estrutural |
+| P5 | [Vazamento de infraestrutura no dominio](#p5-vazamento-de-infraestrutura-no-dominio) | Media | modelo-estrutural, contrato |
+| P6 | [Ausencia de Domain Events formalizados](#p6-ausencia-de-domain-events-formalizados) | Media | contrato |
+| P7 | [Usuario replicado como entidade completa](#p7-usuario-replicado-como-entidade-completa) | Baixa | modelo-estrutural |
+| P8 | [Contratante orfao no modelo](#p8-contratante-orfao-no-modelo) | Baixa | modelo-estrutural |
+| P9 | [Campos computados sem documentacao de estrategia](#p9-campos-computados-sem-documentacao-de-estrategia) | Baixa | modelo-estrutural |
 
 ---
 

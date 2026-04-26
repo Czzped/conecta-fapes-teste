@@ -952,6 +952,6 @@ Consulta consolidado. Filtros: `planoId`, `estadoPrograma`, `estadoParceria`.
 | Modelo estrutural — Parcerias | [parcerias/modelo-estrutural.md](parcerias/modelo-estrutural.md) |
 | Modelo comportamental — Programas | [programas/modelo-comportamental.md](programas/modelo-comportamental.md) |
 | Modelo comportamental — Parcerias | [parcerias/modelo-comportamental.md](parcerias/modelo-comportamental.md) |
-| EPIC-M010-001 (Plano Estrategico) | [epics/EPIC-M010-001.md](epics/EPIC-M010-001.md) |
-| EPIC-M010-002 (Parcerias) | [epics/EPIC-M010-002.md](epics/EPIC-M010-002.md) |
-| EPIC-M010-003 (Programas) | [epics/EPIC-M010-003.md](epics/EPIC-M010-003.md) |
+| EPIC-M010-001 (Plano Estrategico) | [planejamento/epics/EPIC-M010-001.md](planejamento/epics/EPIC-M010-001.md) |
+| EPIC-M010-002 (Parcerias) | [parcerias/epics/EPIC-M010-002.md](parcerias/epics/EPIC-M010-002.md) |
+| EPIC-M010-003 (Programas) | [programas/epics/EPIC-M010-003.md](programas/epics/EPIC-M010-003.md) |

@@ -16,9 +16,9 @@ Especificacao de referencia: [README.md](README.md)
 |----|--------|-----------|------------|--------|-----------|
 | EPIC-M010-001 | Gestao do Plano Estrategico | UC01 | Must | To Do | [EPIC-M010-001](planejamento/epics/EPIC-M010-001.md) |
 | EPIC-M010-002 | Gestao de Parcerias | UC02 | Must | In Progress | [EPIC-M010-002](parcerias/epics/EPIC-M010-002.md) / [GitHub #1724](https://github.com/leds-conectafapes/conectafapes-project/issues/1724) |
-| US-M010-018 | Relatorio Financeiro da Parceria | UC02 | Must | To Do | [EPIC-M010-002 — US-M010-018](parcerias/epics/EPIC-M010-002.md#us-m010-018-relatorio-financeiro-da-parceria) |
+| US-M010-018 | Dashboard Local da Parceria | UC02 | Must | To Do | [EPIC-M010-004 — US-M010-018](parcerias/epics/EPIC-M010-004.md#us-m010-018-dashboard-local-da-parceria) |
 | EPIC-M010-003 | Gestao de Programas | UC03 | Must | In Progress | [EPIC-M010-003](programas/epics/EPIC-M010-003.md) |
-| EPIC-M010-004 | Painel Financeiro de Parcerias | UC02 | Must | To Do | [EPIC-M010-004](parcerias/epics/EPIC-M010-004.md) |
+| EPIC-M010-004 | Dashboard de Parcerias | UC02 | Must | To Do | [EPIC-M010-004](parcerias/epics/EPIC-M010-004.md) |
 
 ---
 
@@ -38,28 +38,30 @@ EPIC-M010-002 (Gestao de Parcerias)  GitHub: #1724
 ├── US-M010-010 Registrar Vigencia (Aditivo)                            #1791
 ├── US-M010-011 Registrar Aditivo de Aporte Financeiro (isAditivo)      #1792
 ├── US-M010-012 Anexar Documentos a Parceria (Documento/TipoDocumento em M008) #1793
+├── US-M010-013 Suspender Parceria em Cascata
 ├── US-M010-014 Registrar Aporte Financeiro da Parceria em Programa (N:N) #1794
 ├── US-M010-015 Validar Invariante Temporal Programa/Parceria (RN13)    #1795
 ├── US-M010-016 Consultar Saldo da Parceria (RN14)                      #1796
 ├── US-M010-017 Remover Parceria (em caso de erro, RI3)                 #1797
-└── US-M010-018 Relatorio Financeiro da Parceria (aportado/alocado/pago)
+└── US-M010-018 Dashboard Local da Parceria (impactos, investido, aportado, alocado, consumido, disponivel e rubricas)
 
 Issues fechadas (conceitos removidos):
   ├── #1741 Registrar Coordenacao   — Coordenacao removida do dominio M010
   └── #1742 Associar Finalidade     — Finalidade removida de Parceria (permanece em M008)
 
-EPIC-M010-004 (Painel Financeiro de Parcerias)  <- depende de EPIC-M010-002
-├── US-M010-019 Painel Geral de Parcerias (visao de portfolio)
-└── US-M010-018 Relatorio Financeiro por Parceria (ref. EPIC-M010-002)
+EPIC-M010-004 (Dashboard de Parcerias)  <- depende de EPIC-M010-002
+├── US-M010-019 Dashboard Global de Parcerias (visao de portfolio)
+└── US-M010-018 Dashboard Local da Parceria (ref. EPIC-M010-002)
 
 EPIC-M010-003 (Gestao de Programas)  <- depende de EPIC-M010-001
 ├── US-M010-020 Cadastrar Programa (inclui RN01 e RN16)
 ├── US-M010-021 Cadastrar Comite de Governanca
 ├── US-M010-025 Registrar Aditivo de Tempo do Programa
-├── US-M010-026 Solicitar Aditivo Financeiro do Programa
+├── US-M010-026 Solicitar Reforco Financeiro do Programa
 ├── US-M010-027 Retirar Aporte de Parceria do Programa
 ├── US-M010-028 Suspender Programa
 ├── US-M010-029 Reativar Programa
-├── US-M010-023 Dashboard de Programas
+├── US-M010-030 Dashboard Global de Programas
+├── US-M010-023 Dashboard Local do Programa
 └── US-M010-024 Encerrar ou Remover Programa (RI1)
 ```
