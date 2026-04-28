@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, ChevronRight, FolderOpen, ChevronDown, Plus, Handshake, DollarSign } from 'lucide-react';
 import { FormularioPrograma } from './FormularioPrograma';
 import { DetalhesPrograma } from './DetalhesPrograma';
+import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
 type StatusFilter = 'Todos' | 'Em planejamento' | 'Ativo' | 'Suspenso' | 'Encerrado';
 type ProgramaStatus = 'Em planejamento' | 'Ativo' | 'Suspenso' | 'Encerrado';
@@ -39,9 +40,9 @@ const formatPercent = (value: number) => (
   `${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
 );
 
-const cardStyle = (): React.CSSProperties => ({
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
-  border: '1px solid rgba(255,255,255,0.1)',
+const buildCardStyle = (T: ThemeTokens): React.CSSProperties => ({
+  backgroundColor: T.bgCard,
+  border: `1px solid ${T.borderSubtle}`,
   borderRadius: '10px',
   padding: '20px',
 });
@@ -51,6 +52,9 @@ interface Props {
 }
 
 export const Programa: React.FC<Props> = ({ onBack }) => {
+  const { T } = useThemeTokens();
+  const cardStyle = buildCardStyle(T);
+
   const [activeTab, setActiveTab] = useState<ActiveTab>('listagem');
   const [searchTerm, setSearchTerm] = useState('');
   const [dataFilter, setDataFilter] = useState('');
@@ -126,22 +130,42 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
     };
   });
 
+  const inputBaseStyle: React.CSSProperties = {
+    width: '100%',
+    backgroundColor: T.bgInput,
+    border: `1px solid ${T.borderDefault}`,
+    borderRadius: '6px',
+    padding: '10px 12px',
+    color: T.textPrimary,
+    fontFamily: 'var(--font-family)',
+    fontSize: 'var(--text-sm)',
+    outline: 'none',
+    boxSizing: 'border-box',
+  };
+  const filterLabelStyle: React.CSSProperties = {
+    fontFamily: 'var(--font-family)',
+    fontSize: 'var(--text-sm)',
+    color: T.textSecondary,
+    display: 'block',
+    marginBottom: '8px',
+  };
+
   return (
-    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
 
         {/* Header */}
         <div className="mb-6">
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', flexShrink: 0, backgroundColor: 'rgba(0,193,175,0.15)', borderRadius: 'var(--radius)' }}>
-                <FolderOpen size={18} style={{ color: '#00c1af' }} />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', flexShrink: 0, backgroundColor: T.accentSoft, borderRadius: 'var(--radius)' }}>
+                <FolderOpen size={18} style={{ color: T.accent }} />
               </div>
               <div style={{ flex: 1, marginTop: '6px' }}>
-                <h1 className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: '#ffffff', lineHeight: '1.5' }}>
+                <h1 className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: T.textPrimary, lineHeight: '1.5' }}>
                   Programa
                 </h1>
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: '1.5' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0, lineHeight: '1.5' }}>
                   Crie e gerencie um conjunto organizado de iniciativas e editais voltados a um objetivo estratégico de fomento.
                 </p>
               </div>
@@ -151,14 +175,14 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
               onClick={() => setShowFormulario(true)}
               style={{
                 display: 'flex', alignItems: 'center', gap: '8px',
-                backgroundColor: '#00c1af', border: 'none',
+                backgroundColor: T.accent, border: 'none',
                 borderRadius: 'var(--radius)', padding: '10px 18px',
                 fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)', color: '#0f172a',
+                fontWeight: 'var(--font-weight-medium)', color: T.accentText,
                 cursor: 'pointer', flexShrink: 0, transition: 'background-color 0.2s',
               }}
               onMouseEnter={e => e.currentTarget.style.backgroundColor = '#00a99a'}
-              onMouseLeave={e => e.currentTarget.style.backgroundColor = '#00c1af'}
+              onMouseLeave={e => e.currentTarget.style.backgroundColor = T.accent}
             >
               <Plus size={16} />
               Novo Programa
@@ -166,9 +190,9 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
           </div>
         </div>
 
-        <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', margin: '20px 0 28px' }} />
+        <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, margin: '20px 0 28px' }} />
 
-        <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '28px' }}>
+        <div style={{ display: 'flex', gap: '4px', borderBottom: `1px solid ${T.borderSubtle}`, marginBottom: '28px' }}>
           {[
             { id: 'listagem' as ActiveTab, label: 'Programas' },
             { id: 'dashboard' as ActiveTab, label: 'Dashboard' },
@@ -176,7 +200,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === tab.id ? '2px solid #00c1af' : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: activeTab === tab.id ? '#00c1af' : 'rgba(255,255,255,0.6)', cursor: 'pointer', marginBottom: '-1px' }}
+              style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === tab.id ? `2px solid ${T.accent}` : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: activeTab === tab.id ? T.accent : T.textSecondary, cursor: 'pointer', marginBottom: '-1px' }}
             >
               {tab.label}
             </button>
@@ -193,20 +217,20 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
                 { label: 'Total Consumido', value: formatCurrency(totalConsumido), detail: `${formatPercent(percentualConsumido)} do aportado`, Icon: DollarSign, color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
                 { label: 'Saldo disponível', value: formatCurrency(saldoDisponivel), detail: `${formatPercent(percentualDisponivel)} do investido`, Icon: DollarSign, color: '#00c1af', bg: 'rgba(0,193,175,0.12)' },
               ].map(({ label, value, detail, Icon, color, bg }) => (
-                <div key={label} style={cardStyle()}>
+                <div key={label} style={cardStyle}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: bg, borderRadius: 'var(--radius)', flexShrink: 0 }}>
                       <Icon size={20} style={{ color }} />
                     </div>
-                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', margin: 0 }}>
+                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
                       {label}
                     </p>
                   </div>
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: '#ffffff', textAlign: 'center', margin: 0 }}>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: T.textPrimary, textAlign: 'center', margin: 0 }}>
                     {value}
                   </p>
                   {detail && (
-                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', textAlign: 'center', margin: '6px 0 0' }}>
+                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, textAlign: 'center', margin: '6px 0 0' }}>
                       {detail}
                     </p>
                   )}
@@ -214,20 +238,20 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
               ))}
             </div>
 
-            <div style={cardStyle()}>
+            <div style={cardStyle}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
                 <div>
-                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
                     Consumo por programa
                   </h2>
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
                     Quanto cada programa recebeu de aporte, alocou, consumiu e ainda possui disponível.
                   </p>
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {programasPortfolio.map(programa => (
-                  <div key={programa.id} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+                  <div key={programa.id} style={{ padding: '16px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1.6fr repeat(4, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
                       <ListCell label="Programa" value={programa.nome} strong />
                       <ListCell label="Aportado" value={formatCurrency(programa.valorAportado)} highlight detail={`${formatPercent(programa.percentualAportado)} do alocado`} />
@@ -235,7 +259,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
                       <ListCell label="Consumido" value={formatCurrency(programa.valorConsumido)} detail={`${formatPercent(programa.percentualConsumido)} do aportado`} />
                       <ListCell label="Disponível" value={formatCurrency(programa.saldo)} detail={`${formatPercent(programa.percentualDisponivel)} do investido`} />
                     </div>
-                    <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                    <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: T.bgChip, overflow: 'hidden' }}>
                       <div style={{ width: `${Math.min(programa.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: programa.percentualConsumido < 50 ? '#f59e0b' : '#22c55e' }} />
                     </div>
                   </div>
@@ -243,16 +267,16 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
               </div>
             </div>
 
-            <div style={{ ...cardStyle(), marginTop: '24px' }}>
-              <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+            <div style={{ ...cardStyle, marginTop: '24px' }}>
+              <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
                 Consumo por rubrica
               </h2>
-              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: '0 0 20px' }}>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: '0 0 20px' }}>
                 Somatória por rubrica em todos os programas cadastrados.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {rubricasPortfolio.map(rubrica => (
-                  <div key={rubrica.nome} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+                  <div key={rubrica.nome} style={{ padding: '16px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1.6fr repeat(4, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
                       <ListCell label="Rubrica" value={rubrica.nome} strong />
                       <ListCell label="Aportado" value={formatCurrency(rubrica.aportado)} highlight detail={`${formatPercent(rubrica.percentualAportado)} do alocado`} />
@@ -260,7 +284,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
                       <ListCell label="Consumido" value={formatCurrency(rubrica.consumido)} detail={`${formatPercent(rubrica.percentualConsumido)} da rubrica`} />
                       <ListCell label="Disponível" value={formatCurrency(rubrica.saldo)} detail={`${formatPercent(rubrica.percentualDisponivel)} da rubrica`} />
                     </div>
-                    <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                    <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: T.bgChip, overflow: 'hidden' }}>
                       <div style={{ width: `${Math.min(rubrica.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: rubrica.percentualConsumido < 50 ? '#f59e0b' : '#22c55e' }} />
                     </div>
                   </div>
@@ -277,7 +301,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
 
           {/* Pesquisar */}
           <div>
-            <label style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', display: 'block', marginBottom: '8px' }}>
+            <label style={filterLabelStyle}>
               Pesquisar
             </label>
             <div style={{ position: 'relative' }}>
@@ -286,43 +310,35 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
                 placeholder="Buscar programa..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                style={{
-                  width: '100%', backgroundColor: 'rgba(30,41,59,0.5)',
-                  border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px',
-                  padding: '10px 12px 10px 36px', color: '#ffffff',
-                  fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
-                  outline: 'none', boxSizing: 'border-box',
-                }}
+                style={{ ...inputBaseStyle, padding: '10px 12px 10px 36px' }}
               />
-              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
             </div>
           </div>
 
           {/* Eixo Estratégico */}
           <div style={{ position: 'relative' }}>
-            <label style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', display: 'block', marginBottom: '8px' }}>
+            <label style={filterLabelStyle}>
               Eixo Estratégico
             </label>
             <button
               onClick={() => { setShowEixoDropdown(!showEixoDropdown); setShowStatusDropdown(false); }}
               style={{
-                width: '100%', backgroundColor: 'rgba(30,41,59,0.5)',
-                border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px',
-                padding: '10px 12px', color: eixoFilter === 'Todos' ? 'rgba(255,255,255,0.4)' : '#ffffff',
-                fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
+                ...inputBaseStyle,
+                color: eixoFilter === 'Todos' ? T.iconSubdued : T.textPrimary,
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer',
               }}
             >
               <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {eixoFilter === 'Todos' ? 'Selecionar eixo...' : eixoFilter}
               </span>
-              <ChevronDown size={16} style={{ color: 'rgba(255,255,255,0.5)', flexShrink: 0, transform: showEixoDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+              <ChevronDown size={16} style={{ color: T.iconSubdued, flexShrink: 0, transform: showEixoDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
             </button>
             {showEixoDropdown && (
               <div style={{
                 position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%',
-                backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '6px', overflow: 'hidden', zIndex: 100,
+                backgroundColor: T.bgSurface, border: `1px solid ${T.borderDefault}`,
+                borderRadius: '6px', overflow: 'hidden', zIndex: 100, boxShadow: T.shadowMd,
               }}>
                 {['Todos', 'Ciência e Tecnologia', 'Formação de Recursos Humanos', 'Infraestrutura de Pesquisa', 'Inovação e Desenvolvimento'].map(opt => (
                   <button
@@ -330,12 +346,12 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
                     onClick={() => { setEixoFilter(opt); setShowEixoDropdown(false); }}
                     style={{
                       width: '100%', padding: '10px 12px', textAlign: 'left',
-                      backgroundColor: eixoFilter === opt ? 'rgba(0,193,175,0.1)' : 'transparent',
-                      color: eixoFilter === opt ? '#00c1af' : '#ffffff',
+                      backgroundColor: eixoFilter === opt ? T.accentSoft : 'transparent',
+                      color: eixoFilter === opt ? T.accent : T.textPrimary,
                       fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
                       border: 'none', cursor: 'pointer',
                     }}
-                    onMouseEnter={e => { if (eixoFilter !== opt) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'; }}
+                    onMouseEnter={e => { if (eixoFilter !== opt) e.currentTarget.style.backgroundColor = T.bgHover; }}
                     onMouseLeave={e => { if (eixoFilter !== opt) e.currentTarget.style.backgroundColor = 'transparent'; }}
                   >
                     {opt === 'Todos' ? 'Todos' : opt}
@@ -347,7 +363,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
 
           {/* Data */}
           <div>
-            <label style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', display: 'block', marginBottom: '8px' }}>
+            <label style={filterLabelStyle}>
               Vigência
             </label>
             <input
@@ -355,39 +371,30 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
               placeholder="dd/mm/aaaa"
               value={dataFilter}
               onChange={e => setDataFilter(e.target.value)}
-              style={{
-                width: '100%', backgroundColor: 'rgba(30,41,59,0.5)',
-                border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px',
-                padding: '10px 12px', color: '#ffffff',
-                fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
-                outline: 'none', boxSizing: 'border-box',
-              }}
+              style={inputBaseStyle}
             />
           </div>
 
           {/* Status */}
           <div style={{ position: 'relative' }}>
-            <label style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', display: 'block', marginBottom: '8px' }}>
+            <label style={filterLabelStyle}>
               Estado
             </label>
             <button
               onClick={() => { setShowStatusDropdown(!showStatusDropdown); setShowEixoDropdown(false); }}
               style={{
-                width: '100%', backgroundColor: 'rgba(30,41,59,0.5)',
-                border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px',
-                padding: '10px 12px', color: '#ffffff',
-                fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
+                ...inputBaseStyle,
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer',
               }}
             >
               <span>{statusFilter}</span>
-              <ChevronDown size={16} style={{ color: 'rgba(255,255,255,0.5)', transform: showStatusDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+              <ChevronDown size={16} style={{ color: T.iconSubdued, transform: showStatusDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
             </button>
             {showStatusDropdown && (
               <div style={{
                 position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%',
-                backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '6px', overflow: 'hidden', zIndex: 100,
+                backgroundColor: T.bgSurface, border: `1px solid ${T.borderDefault}`,
+                borderRadius: '6px', overflow: 'hidden', zIndex: 100, boxShadow: T.shadowMd,
               }}>
                 {statusOptions.map(opt => (
                   <button
@@ -395,12 +402,12 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
                     onClick={() => { setStatusFilter(opt); setShowStatusDropdown(false); }}
                     style={{
                       width: '100%', padding: '10px 12px', textAlign: 'left',
-                      backgroundColor: statusFilter === opt ? 'rgba(0,193,175,0.1)' : 'transparent',
-                      color: statusFilter === opt ? '#00c1af' : '#ffffff',
+                      backgroundColor: statusFilter === opt ? T.accentSoft : 'transparent',
+                      color: statusFilter === opt ? T.accent : T.textPrimary,
                       fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
                       border: 'none', cursor: 'pointer',
                     }}
-                    onMouseEnter={e => { if (statusFilter !== opt) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'; }}
+                    onMouseEnter={e => { if (statusFilter !== opt) e.currentTarget.style.backgroundColor = T.bgHover; }}
                     onMouseLeave={e => { if (statusFilter !== opt) e.currentTarget.style.backgroundColor = 'transparent'; }}
                   >
                     {opt}
@@ -412,14 +419,12 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
         </div>
 
         {/* Lista de Programas */}
-        {/* Header da lista — removido; títulos agora ficam dentro de cada card */}
-
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {filtered.length === 0 ? (
             <div style={{
               textAlign: 'center', padding: '48px 20px',
-              border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '10px',
-              fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.3)',
+              border: `1px dashed ${T.borderSubtle}`, borderRadius: '10px',
+              fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textMuted,
             }}>
               Nenhum programa encontrado.
             </div>
@@ -427,60 +432,56 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
             <div
               key={prog.id}
               style={{
-                backgroundColor: 'rgba(30,41,59,0.6)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                backgroundColor: T.bgCard,
+                border: `1px solid ${T.borderSubtle}`,
                 borderRadius: '10px', padding: '18px 20px',
                 cursor: 'pointer', transition: 'background-color 0.2s, border-color 0.2s',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.backgroundColor = 'rgba(30,41,59,0.85)';
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)';
+                e.currentTarget.style.backgroundColor = T.bgHover;
+                e.currentTarget.style.borderColor = T.borderDefault;
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.backgroundColor = 'rgba(30,41,59,0.6)';
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                e.currentTarget.style.backgroundColor = T.bgCard;
+                e.currentTarget.style.borderColor = T.borderSubtle;
               }}
               onClick={() => setSelectedPrograma(prog)}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.5fr 1fr', gap: '24px', alignItems: 'start' }}>
 
-                  {/* Programa */}
                   <div>
-                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.4)', marginBottom: '6px' }}>
+                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '6px' }}>
                       Programa
                     </span>
-                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                       {prog.nome}
                     </span>
                   </div>
 
-                  {/* Eixo Estratégico */}
                   <div>
-                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.4)', marginBottom: '6px' }}>
+                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '6px' }}>
                       Eixo / Instituição
                     </span>
-                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.78)', marginBottom: '4px' }}>
+                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, marginBottom: '4px' }}>
                       {prog.eixo}
                     </span>
-                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.46)' }}>
+                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
                       {prog.instituicaoDemandante}
                     </span>
                   </div>
 
-                  {/* Data de Vigência */}
                   <div>
-                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.4)', marginBottom: '6px' }}>
+                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '6px' }}>
                       Data de Vigência
                     </span>
-                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>
+                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary }}>
                       {prog.dataVigencia}
                     </span>
                   </div>
 
-                  {/* Status */}
                   <div>
-                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.4)', marginBottom: '6px' }}>
+                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '6px' }}>
                       Estado
                     </span>
                     <div style={{
@@ -497,7 +498,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
                   </div>
 
                 </div>
-                <ChevronRight size={18} style={{ color: 'rgba(255,255,255,0.3)', flexShrink: 0 }} />
+                <ChevronRight size={18} style={{ color: T.iconSubdued, flexShrink: 0 }} />
               </div>
             </div>
           ))}
@@ -510,24 +511,27 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
   );
 };
 
-const ListCell: React.FC<{ label: string; value: string; detail?: string; strong?: boolean; highlight?: boolean }> = ({ label, value, detail, strong, highlight }) => (
-  <div>
-    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>
-      {label}
-    </div>
-    <div style={{
-      fontFamily: 'var(--font-family)',
-      fontSize: 'var(--text-sm)',
-      color: highlight ? '#22c55e' : strong ? '#ffffff' : 'rgba(255,255,255,0.75)',
-      fontWeight: strong ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
-      lineHeight: 1.4,
-    }}>
-      {value}
-    </div>
-    {detail && (
-      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginTop: '4px' }}>
-        {detail}
+const ListCell: React.FC<{ label: string; value: string; detail?: string; strong?: boolean; highlight?: boolean }> = ({ label, value, detail, strong, highlight }) => {
+  const { T } = useThemeTokens();
+  return (
+    <div>
+      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>
+        {label}
       </div>
-    )}
-  </div>
-);
+      <div style={{
+        fontFamily: 'var(--font-family)',
+        fontSize: 'var(--text-sm)',
+        color: highlight ? '#22c55e' : strong ? T.textPrimary : T.textSecondary,
+        fontWeight: strong ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
+        lineHeight: 1.4,
+      }}>
+        {value}
+      </div>
+      {detail && (
+        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginTop: '4px' }}>
+          {detail}
+        </div>
+      )}
+    </div>
+  );
+};

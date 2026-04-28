@@ -8,6 +8,7 @@ import { FormularioAvaliacao } from './FormularioAvaliacao';
 import { FormularioRecurso } from './FormularioRecurso';
 import { FormularioInstituicaoParceira } from './FormularioInstituicaoParceira';
 import { DetalhesCaptacao } from './DetalhesCaptacao';
+import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
 interface EditalInscricao {
   id: number;
@@ -62,6 +63,7 @@ const SelectField: React.FC<{
   placeholder?: string;
   options: { value: string; label: string }[];
 }> = ({ value, onChange, options, placeholder }) => {
+  const { T } = useThemeTokens();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -80,11 +82,11 @@ const SelectField: React.FC<{
         onClick={() => setOpen(!open)}
         style={{
           width: '100%',
-          backgroundColor: 'rgba(30, 41, 59, 0.7)',
-          border: '1px solid rgba(255,255,255,0.12)',
+          backgroundColor: T.bgInput,
+          border: `1px solid ${T.borderDefault}`,
           borderRadius: 'var(--radius)',
           padding: '10px 14px',
-          color: '#ffffff',
+          color: T.textPrimary,
           fontFamily: 'var(--font-family)',
           fontSize: 'var(--text-sm)',
           outline: 'none',
@@ -97,13 +99,13 @@ const SelectField: React.FC<{
           textAlign: 'left',
         }}
       >
-        <span style={{ color: value ? '#ffffff' : 'rgba(255,255,255,0.3)' }}>
+        <span style={{ color: value ? T.textPrimary : T.iconSubdued }}>
           {value ? options.find(o => o.value === value)?.label : (placeholder || 'Selecione...')}
         </span>
         <ChevronDown
           size={15}
           style={{
-            color: 'rgba(255,255,255,0.4)', flexShrink: 0,
+            color: T.iconSubdued, flexShrink: 0,
             transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s',
           }}
         />
@@ -111,9 +113,9 @@ const SelectField: React.FC<{
       {open && (
         <div style={{
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%',
-          backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.12)',
+          backgroundColor: T.bgSurface, border: `1px solid ${T.borderDefault}`,
           borderRadius: 'var(--radius)', zIndex: 400, overflow: 'hidden',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+          boxShadow: T.shadowMd,
         }}>
           {options.map(opt => (
             <button
@@ -122,11 +124,11 @@ const SelectField: React.FC<{
               onClick={() => { onChange(opt.value); setOpen(false); }}
               style={{
                 width: '100%', padding: '10px 14px', textAlign: 'left', border: 'none',
-                backgroundColor: value === opt.value ? 'rgba(0,193,175,0.1)' : 'transparent',
-                color: value === opt.value ? '#00c1af' : '#ffffff',
+                backgroundColor: value === opt.value ? T.accentSoft : 'transparent',
+                color: value === opt.value ? T.accent : T.textPrimary,
                 fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer',
               }}
-              onMouseEnter={e => { if (value !== opt.value) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'; }}
+              onMouseEnter={e => { if (value !== opt.value) e.currentTarget.style.backgroundColor = T.bgHover; }}
               onMouseLeave={e => { if (value !== opt.value) e.currentTarget.style.backgroundColor = 'transparent'; }}
             >
               {opt.label}
@@ -144,6 +146,7 @@ interface EditaisProps {
 }
 
 export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBack }) => {
+  const { T } = useThemeTokens();
   const [searchTerm, setSearchTerm] = useState('');
   const [dataFilter, setDataFilter] = useState('');
   const [areaFilter, setAreaFilter] = useState<AreaFilter>('Todas');
@@ -277,7 +280,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
   // Se estiver em modo Formulário, mostrar automaticamente a tela de Formulário
   if (isFormularioMode || showFormulario) {
     return (
-      <div className="flex-1" style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+      <div className="flex-1" style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
         <div className="pt-8 px-8 pb-8">
 
           {/* Header */}
@@ -290,37 +293,37 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                   style={{
                     width: '36px',
                     height: '36px',
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    border: `1px solid ${T.borderSubtle}`,
                     borderRadius: 'var(--radius)',
-                    backgroundColor: 'rgba(30,41,59,0.5)',
+                    backgroundColor: T.bgCard,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
                   }}
                 >
-                  <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
+                  <ArrowLeft size={16} style={{ color: T.textSecondary }} />
                 </button>
               )}
               <div style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 width: '36px', height: '36px', flexShrink: 0,
-                backgroundColor: 'rgba(0, 193, 175, 0.15)',
+                backgroundColor: T.accentSoft,
                 borderRadius: 'var(--radius)',
               }}>
-                <Plus size={18} style={{ color: '#00c1af' }} />
+                <Plus size={18} style={{ color: T.accent }} />
               </div>
               <div>
                 <h1 style={{
                   fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)',
-                  fontWeight: 'var(--font-weight-medium)', color: '#ffffff',
+                  fontWeight: 'var(--font-weight-medium)', color: T.textPrimary,
                   margin: '0 0 4px', lineHeight: '1.4',
                 }}>
                   Formulário
                 </h1>
                 <p style={{
                   fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
-                  color: 'rgba(255,255,255,0.55)', margin: 0,
+                  color: T.textMuted, margin: 0,
                 }}>
                   Selecione um formulário já produzido ou crie um novo.
                 </p>
@@ -331,10 +334,10 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
             <button
               style={{
                 display: 'flex', alignItems: 'center', gap: '8px',
-                backgroundColor: '#00c1af', border: 'none',
+                backgroundColor: T.accent, border: 'none',
                 borderRadius: 'var(--radius)', padding: '10px 18px',
                 fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)', color: '#0f172a',
+                fontWeight: 'var(--font-weight-medium)', color: T.accentText,
                 cursor: 'pointer', flexShrink: 0, transition: 'background-color 0.2s',
               }}
               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#00a99a'; }}
@@ -347,10 +350,10 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
           </div>
 
           {/* Divider */}
-          <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', marginBottom: '24px', marginTop: '20px' }} />
+          <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, marginBottom: '24px', marginTop: '20px' }} />
 
           {/* Tab Bar Link */}
-          <div style={{ display: 'flex', gap: '24px', marginBottom: '24px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ display: 'flex', gap: '24px', marginBottom: '24px', borderBottom: `1px solid ${T.borderSubtle}` }}>
             <button
               onClick={() => setFormularioTab('biblioteca')}
               style={{
@@ -361,7 +364,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                 fontFamily: 'var(--font-family)',
                 fontSize: 'var(--text-sm)',
                 fontWeight: 'var(--font-weight-medium)',
-                color: formularioTab === 'biblioteca' ? '#00c1af' : 'rgba(255,255,255,0.5)',
+                color: formularioTab === 'biblioteca' ? '#00c1af' : T.textMuted,
                 borderBottom: formularioTab === 'biblioteca' ? '2px solid #00c1af' : '2px solid transparent',
                 transition: 'color 0.2s, border-color 0.2s',
               }}
@@ -378,7 +381,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                 fontFamily: 'var(--font-family)',
                 fontSize: 'var(--text-sm)',
                 fontWeight: 'var(--font-weight-medium)',
-                color: formularioTab === 'criados' ? '#00c1af' : 'rgba(255,255,255,0.5)',
+                color: formularioTab === 'criados' ? '#00c1af' : T.textMuted,
                 borderBottom: formularioTab === 'criados' ? '2px solid #00c1af' : '2px solid transparent',
                 transition: 'color 0.2s, border-color 0.2s',
               }}
@@ -393,7 +396,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               <label style={{
                 fontFamily: 'var(--font-family)',
                 fontSize: 'var(--text-sm)',
-                color: 'rgba(255,255,255,0.7)',
+                color: T.textSecondary,
                 display: 'block',
                 marginBottom: '6px',
               }}>
@@ -407,27 +410,27 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                   onChange={(e) => setFormularioPesquisa(e.target.value)}
                   style={{
                     width: '100%',
-                    backgroundColor: 'rgba(30, 41, 59, 0.7)',
-                    border: '1px solid rgba(255,255,255,0.12)',
+                    backgroundColor: T.bgInput,
+                    border: `1px solid ${T.borderDefault}`,
                     borderRadius: 'var(--radius)',
                     padding: '10px 14px 10px 38px',
-                    color: '#ffffff',
+                    color: T.textPrimary,
                     fontFamily: 'var(--font-family)',
                     fontSize: 'var(--text-sm)',
                     outline: 'none',
                     transition: 'border-color 0.2s',
                   }}
-                  onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)'; }}
-                  onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = T.accent; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = T.borderDefault; }}
                 />
-                <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
+                <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
               </div>
             </div>
             <div>
               <label style={{
                 fontFamily: 'var(--font-family)',
                 fontSize: 'var(--text-sm)',
-                color: 'rgba(255,255,255,0.7)',
+                color: T.textSecondary,
                 display: 'block',
                 marginBottom: '6px',
               }}>
@@ -456,39 +459,39 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center',
                   justifyContent: 'space-between', gap: '16px',
-                  backgroundColor: 'rgba(30, 41, 59, 0.6)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  backgroundColor: T.bgCard,
+                  border: `1px solid ${T.borderSubtle}`,
                   borderRadius: '10px', padding: '24px 28px',
                   cursor: 'pointer', textAlign: 'left',
                   transition: 'border-color 0.2s, background-color 0.2s',
                   marginBottom: '16px',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(0,193,175,0.4)';
-                  e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.8)';
+                  e.currentTarget.style.borderColor = T.accent;
+                  e.currentTarget.style.backgroundColor = T.bgHover;
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                  e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.6)';
+                  e.currentTarget.style.borderColor = T.borderSubtle;
+                  e.currentTarget.style.backgroundColor = T.bgCard;
                 }}
                 onClick={() => setShowFormularioGeral(true)}
               >
                 <div>
                   <p style={{
                     fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)',
-                    fontWeight: 'var(--font-weight-medium)', color: '#ffffff',
+                    fontWeight: 'var(--font-weight-medium)', color: T.textPrimary,
                     margin: '0 0 6px',
                   }}>
                     Template - Formulário de Inscrição
                   </p>
                   <p style={{
                     fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
-                    color: 'rgba(255,255,255,0.5)', margin: 0,
+                    color: T.textMuted, margin: 0,
                   }}>
                     Clique para acessar o formulário de submissão
                   </p>
                 </div>
-                <ChevronRight size={20} style={{ color: 'rgba(255,255,255,0.4)', flexShrink: 0 }} />
+                <ChevronRight size={20} style={{ color: T.iconSubdued, flexShrink: 0 }} />
               </button>
 
               {/* Card — Template - Formulário de Avaliação */}
@@ -496,39 +499,39 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center',
                   justifyContent: 'space-between', gap: '16px',
-                  backgroundColor: 'rgba(30, 41, 59, 0.6)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  backgroundColor: T.bgCard,
+                  border: `1px solid ${T.borderSubtle}`,
                   borderRadius: '10px', padding: '24px 28px',
                   cursor: 'pointer', textAlign: 'left',
                   transition: 'border-color 0.2s, background-color 0.2s',
                   marginBottom: '16px',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(0,193,175,0.4)';
-                  e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.8)';
+                  e.currentTarget.style.borderColor = T.accent;
+                  e.currentTarget.style.backgroundColor = T.bgHover;
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                  e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.6)';
+                  e.currentTarget.style.borderColor = T.borderSubtle;
+                  e.currentTarget.style.backgroundColor = T.bgCard;
                 }}
                 onClick={() => setShowFormularioAvaliacao(true)}
               >
                 <div>
                   <p style={{
                     fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)',
-                    fontWeight: 'var(--font-weight-medium)', color: '#ffffff',
+                    fontWeight: 'var(--font-weight-medium)', color: T.textPrimary,
                     margin: '0 0 6px',
                   }}>
                     Template - Formulário de Avaliação
                   </p>
                   <p style={{
                     fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
-                    color: 'rgba(255,255,255,0.5)', margin: 0,
+                    color: T.textMuted, margin: 0,
                   }}>
                     Clique para acessar o formulário de avaliação
                   </p>
                 </div>
-                <ChevronRight size={20} style={{ color: 'rgba(255,255,255,0.4)', flexShrink: 0 }} />
+                <ChevronRight size={20} style={{ color: T.iconSubdued, flexShrink: 0 }} />
               </button>
 
               {/* Card — Template - Formulário de Recurso */}
@@ -536,39 +539,39 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center',
                   justifyContent: 'space-between', gap: '16px',
-                  backgroundColor: 'rgba(30, 41, 59, 0.6)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  backgroundColor: T.bgCard,
+                  border: `1px solid ${T.borderSubtle}`,
                   borderRadius: '10px', padding: '24px 28px',
                   cursor: 'pointer', textAlign: 'left',
                   transition: 'border-color 0.2s, background-color 0.2s',
                   marginBottom: '16px',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(0,193,175,0.4)';
-                  e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.8)';
+                  e.currentTarget.style.borderColor = T.accent;
+                  e.currentTarget.style.backgroundColor = T.bgHover;
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                  e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.6)';
+                  e.currentTarget.style.borderColor = T.borderSubtle;
+                  e.currentTarget.style.backgroundColor = T.bgCard;
                 }}
                 onClick={() => setShowFormularioRecurso(true)}
               >
                 <div>
                   <p style={{
                     fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)',
-                    fontWeight: 'var(--font-weight-medium)', color: '#ffffff',
+                    fontWeight: 'var(--font-weight-medium)', color: T.textPrimary,
                     margin: '0 0 6px',
                   }}>
                     Template - Formulário de Recurso
                   </p>
                   <p style={{
                     fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
-                    color: 'rgba(255,255,255,0.5)', margin: 0,
+                    color: T.textMuted, margin: 0,
                   }}>
                     Clique para acessar o formulário de recurso
                   </p>
                 </div>
-                <ChevronRight size={20} style={{ color: 'rgba(255,255,255,0.4)', flexShrink: 0 }} />
+                <ChevronRight size={20} style={{ color: T.iconSubdued, flexShrink: 0 }} />
               </button>
 
               {/* Card — Template - Instituição Parceira */}
@@ -576,39 +579,39 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center',
                   justifyContent: 'space-between', gap: '16px',
-                  backgroundColor: 'rgba(30, 41, 59, 0.6)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  backgroundColor: T.bgCard,
+                  border: `1px solid ${T.borderSubtle}`,
                   borderRadius: '10px', padding: '24px 28px',
                   cursor: 'pointer', textAlign: 'left',
                   transition: 'border-color 0.2s, background-color 0.2s',
                   marginBottom: '16px',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(0,193,175,0.4)';
-                  e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.8)';
+                  e.currentTarget.style.borderColor = T.accent;
+                  e.currentTarget.style.backgroundColor = T.bgHover;
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                  e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.6)';
+                  e.currentTarget.style.borderColor = T.borderSubtle;
+                  e.currentTarget.style.backgroundColor = T.bgCard;
                 }}
                 onClick={() => setShowFormularioInstituicaoParceira(true)}
               >
                 <div>
                   <p style={{
                     fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)',
-                    fontWeight: 'var(--font-weight-medium)', color: '#ffffff',
+                    fontWeight: 'var(--font-weight-medium)', color: T.textPrimary,
                     margin: '0 0 6px',
                   }}>
                     Template - Instituição Parceira
                   </p>
                   <p style={{
                     fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
-                    color: 'rgba(255,255,255,0.5)', margin: 0,
+                    color: T.textMuted, margin: 0,
                   }}>
                     Clique para acessar o formulário de instituição parceira
                   </p>
                 </div>
-                <ChevronRight size={20} style={{ color: 'rgba(255,255,255,0.4)', flexShrink: 0 }} />
+                <ChevronRight size={20} style={{ color: T.iconSubdued, flexShrink: 0 }} />
               </button>
             </>
           )}
@@ -619,21 +622,21 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
   }
 
   return (
-    <div className="flex-1" style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div className="flex-1" style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
 
         {/* Título */}
         <div className="mb-6">
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'start', gap: '12px', flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, width: '36px', height: '36px', backgroundColor: 'rgba(0, 193, 175, 0.1)', borderRadius: 'var(--radius)' }}>
-                <ClipboardList size={20} style={{ color: '#00c1af' }} />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, width: '36px', height: '36px', backgroundColor: T.accentSoft, borderRadius: 'var(--radius)' }}>
+                <ClipboardList size={20} style={{ color: T.accent }} />
               </div>
               <div style={{ flex: 1, marginTop: '6px' }}>
-                <h1 className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: '#ffffff', lineHeight: '1.5' }}>
+                <h1 className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: T.textPrimary, lineHeight: '1.5' }}>
                   Captação
                 </h1>
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.6)', margin: 0, lineHeight: '1.5' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0, lineHeight: '1.5' }}>
                   Acompanhe as configurações e instâncias de captação
                 </p>
               </div>
@@ -644,10 +647,10 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               onClick={() => setShowCriarEdital(true)}
               style={{
                 display: 'flex', alignItems: 'center', gap: '8px',
-                backgroundColor: '#00c1af', border: 'none',
+                backgroundColor: T.accent, border: 'none',
                 borderRadius: 'var(--radius)', padding: '10px 18px',
                 fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)', color: '#0f172a',
+                fontWeight: 'var(--font-weight-medium)', color: T.accentText,
                 cursor: 'pointer', transition: 'background-color 0.2s', flexShrink: 0,
               }}
               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#00a99a'; }}
@@ -657,59 +660,59 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               Nova Captação
             </button>
           </div>
-          <div className="mt-6" style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />
+          <div className="mt-6" style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle }} />
         </div>
 
         {/* Cards de Estatísticas */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px', marginBottom: '24px' }}>
-          <div style={{ backgroundColor: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', padding: '20px' }}>
+          <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ backgroundColor: 'rgba(0, 193, 175, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <FileText size={18} style={{ color: '#00c1af' }} />
+              <div style={{ backgroundColor: T.accentSoft, borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <FileText size={18} style={{ color: T.accent }} />
               </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 'var(--font-weight-normal)' }}>Captações publicadas</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Captações publicadas</span>
             </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: '#ffffff', lineHeight: 1, textAlign: 'center' }}>2</div>
+            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>2</div>
           </div>
 
-          <div style={{ backgroundColor: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', padding: '20px' }}>
+          <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               <div style={{ backgroundColor: 'rgba(251, 191, 36, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Clock size={18} style={{ color: '#fbbf24' }} />
               </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 'var(--font-weight-normal)' }}>Em andamento</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Em andamento</span>
             </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: '#ffffff', lineHeight: 1, textAlign: 'center' }}>2</div>
+            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>2</div>
           </div>
 
-          <div style={{ backgroundColor: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', padding: '20px' }}>
+          <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               <div style={{ backgroundColor: 'rgba(59, 130, 246, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Users size={18} style={{ color: '#3b82f6' }} />
               </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 'var(--font-weight-normal)' }}>Propostas recebidas</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Propostas recebidas</span>
             </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: '#ffffff', lineHeight: 1, textAlign: 'center' }}>158</div>
+            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>158</div>
           </div>
 
-          <div style={{ backgroundColor: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', padding: '20px' }}>
+          <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               <div style={{ backgroundColor: 'rgba(34, 197, 94, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <CheckCircle size={18} style={{ color: '#22c55e' }} />
               </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 'var(--font-weight-normal)' }}>Encerradas</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Encerradas</span>
             </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: '#ffffff', lineHeight: 1, textAlign: 'center' }}>1</div>
+            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>1</div>
           </div>
 
-          <div style={{ backgroundColor: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', padding: '20px' }}>
+          <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <ClipboardList size={18} style={{ color: '#ef4444' }} />
               </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 'var(--font-weight-normal)' }}>Não publicadas</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Não publicadas</span>
             </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: '#ffffff', lineHeight: 1, textAlign: 'center' }}>1</div>
+            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>1</div>
           </div>
         </div>
 
@@ -736,24 +739,24 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     fontFamily: 'var(--font-family)',
                     fontSize: 'var(--text-sm)',
                     fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
-                    color: isActive ? '#00c1af' : 'rgba(255,255,255,0.5)',
+                    color: isActive ? '#00c1af' : T.textMuted,
                     transition: 'color 0.2s, border-color 0.2s',
                   }}
-                  onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = 'rgba(255,255,255,0.8)'; }}
-                  onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; }}
+                  onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = T.textPrimary; }}
+                  onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = T.textMuted; }}
                 >
                   {label}
                 </button>
               );
             })}
           </div>
-          <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', marginTop: '-1px' }} />
+          <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, marginTop: '-1px' }} />
         </div>
 
         {activeTab === 'dashboard' && (
           <div style={{
-            backgroundColor: 'rgba(30, 41, 59, 0.5)',
-            border: '1px solid rgba(255,255,255,0.1)',
+            backgroundColor: T.bgCard,
+            border: `1px solid ${T.borderSubtle}`,
             borderRadius: '8px',
             padding: '24px',
             marginBottom: '24px',
@@ -764,7 +767,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                   fontFamily: 'var(--font-family)',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
-                  color: '#00c1af',
+                  color: T.accent,
                   margin: '0 0 6px',
                 }}>
                   Dashboard das Captações
@@ -772,7 +775,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                 <p style={{
                   fontFamily: 'var(--font-family)',
                   fontSize: 'var(--text-sm)',
-                  color: 'rgba(255,255,255,0.55)',
+                  color: T.textMuted,
                   margin: 0,
                 }}>
                   Visão consolidada das captações agrupadas pelo status atual.
@@ -781,11 +784,11 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               <div style={{
                 fontFamily: 'var(--font-family)',
                 fontSize: 'var(--text-xs)',
-                color: '#00c1af',
+                color: T.accent,
                 padding: '6px 10px',
                 borderRadius: '999px',
                 border: '1px solid rgba(0,193,175,0.28)',
-                backgroundColor: 'rgba(0,193,175,0.08)',
+                backgroundColor: T.accentSoft,
                 whiteSpace: 'nowrap',
               }}>
                 {captacoesData.length} captação(ões)
@@ -807,19 +810,19 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     }}
                     style={{
                       padding: '16px',
-                      border: setorFilter === item.status ? `1px solid ${color}` : '1px solid rgba(255,255,255,0.1)',
+                      border: setorFilter === item.status ? `1px solid ${color}` : `1px solid ${T.borderSubtle}`,
                       borderRadius: '8px',
-                      backgroundColor: setorFilter === item.status ? `${color}12` : 'rgba(15,23,42,0.35)',
+                      backgroundColor: setorFilter === item.status ? `${color}12` : T.bgSurfaceMuted,
                       cursor: 'pointer',
                       textAlign: 'left',
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '12px' }}>
                       <div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', marginBottom: '3px' }}>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', marginBottom: '3px' }}>
                           {item.status}
                         </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)' }}>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
                           {item.propostas} proposta(s)
                         </div>
                       </div>
@@ -827,7 +830,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                         {item.quantidade}
                       </div>
                     </div>
-                    <div style={{ height: '6px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                    <div style={{ height: '6px', borderRadius: '999px', backgroundColor: T.borderSubtle, overflow: 'hidden' }}>
                       <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: color }} />
                     </div>
                   </button>
@@ -837,33 +840,33 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '16px', marginBottom: '22px' }}>
               <div style={{
-                border: '1px solid rgba(255,255,255,0.1)',
+                border: `1px solid ${T.borderSubtle}`,
                 borderRadius: '8px',
-                backgroundColor: 'rgba(15,23,42,0.35)',
+                backgroundColor: T.bgSurfaceMuted,
                 padding: '18px',
               }}>
-                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '8px' }}>
                   Total financeiro solicitado pelas iniciativas
                 </div>
-                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', marginBottom: '10px' }}>
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', marginBottom: '10px' }}>
                   {formatCurrency(financeiroCaptacaoDashboard.totalSolicitado)}
                 </div>
-                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', lineHeight: 1.45 }}>
-                  Disponível na captação: <span style={{ color: '#00c1af' }}>{formatCurrency(financeiroCaptacaoDashboard.totalDisponivel)}</span>
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textMuted, lineHeight: 1.45 }}>
+                  Disponível na captação: <span style={{ color: T.accent }}>{formatCurrency(financeiroCaptacaoDashboard.totalDisponivel)}</span>
                 </div>
               </div>
 
               <div style={{
-                border: '1px solid rgba(255,255,255,0.1)',
+                border: `1px solid ${T.borderSubtle}`,
                 borderRadius: '8px',
-                backgroundColor: 'rgba(15,23,42,0.35)',
+                backgroundColor: T.bgSurfaceMuted,
                 padding: '18px',
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)' }}>
                     Totais solicitados por rubrica
                   </div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)' }}>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
                     {financeiroCaptacaoDashboard.rubricas.length} rubrica(s)
                   </div>
                 </div>
@@ -875,17 +878,17 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     return (
                       <div key={rubrica.nome}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 160px 110px', gap: '12px', alignItems: 'center', marginBottom: '6px' }}>
-                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                             {rubrica.nome}
                           </div>
                           <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: rubrica.cor, textAlign: 'right' }}>
                             {formatCurrency(rubrica.valor)}
                           </div>
-                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', textAlign: 'right' }}>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, textAlign: 'right' }}>
                             {rubrica.quantidade} iniciativa(s)
                           </div>
                         </div>
-                        <div style={{ height: '7px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                        <div style={{ height: '7px', borderRadius: '999px', backgroundColor: T.borderSubtle, overflow: 'hidden' }}>
                           <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: rubrica.cor }} />
                         </div>
                       </div>
@@ -903,9 +906,9 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                   <div
                     key={`lista-${item.status}`}
                     style={{
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      border: `1px solid ${T.borderSubtle}`,
                       borderRadius: '8px',
-                      backgroundColor: 'rgba(15,23,42,0.35)',
+                      backgroundColor: T.bgSurfaceMuted,
                       overflow: 'hidden',
                     }}
                   >
@@ -915,9 +918,9 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                       alignItems: 'center',
                       gap: '12px',
                       padding: '13px 14px',
-                      borderBottom: '1px solid rgba(255,255,255,0.08)',
+                      borderBottom: `1px solid ${T.borderSubtle}`,
                     }}>
-                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)' }}>
                         {item.status}
                       </span>
                       <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color }}>
@@ -935,24 +938,24 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                             width: '100%',
                             padding: '13px 14px',
                             border: 'none',
-                            borderBottom: index === item.captacoes.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                            borderBottom: index === item.captacoes.length - 1 ? 'none' : `1px solid ${T.borderSubtle}`,
                             backgroundColor: 'transparent',
                             cursor: 'pointer',
                             textAlign: 'left',
                           }}
                         >
-                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', lineHeight: 1.35, marginBottom: '4px' }}>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, lineHeight: 1.35, marginBottom: '4px' }}>
                             {captacao.titulo}
                           </div>
-                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginBottom: '6px' }}>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '6px' }}>
                             {captacao.codigo} · {captacao.vinculoTipo}
                           </div>
-                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.55)' }}>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
                             {captacao.propostasRecebidas} proposta(s) · {captacao.dataPublicacao}
                           </div>
                         </button>
                       )) : (
-                        <div style={{ padding: '14px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.45)' }}>
+                        <div style={{ padding: '14px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textMuted }}>
                           Nenhuma captação neste status.
                         </div>
                       )}
@@ -970,7 +973,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px' }}>
             {/* Pesquisar */}
             <div>
-              <label htmlFor="search-input" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
+              <label htmlFor="search-input" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
                 Pesquisar
               </label>
               <div style={{ position: 'relative' }}>
@@ -980,15 +983,15 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                   placeholder="Buscar captação..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  style={{ width: '100%', backgroundColor: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '6px', padding: '10px 12px 10px 36px', color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', outline: 'none', boxSizing: 'border-box' }}
+                  style={{ width: '100%', backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '6px', padding: '10px 12px 10px 36px', color: T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', outline: 'none', boxSizing: 'border-box' }}
                 />
-                <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255, 255, 255, 0.4)' }} />
+                <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
               </div>
             </div>
 
             {/* Data */}
             <div>
-              <label htmlFor="date-filter" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
+              <label htmlFor="date-filter" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
                 Data
               </label>
               <input
@@ -997,29 +1000,29 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                 placeholder="dd/mm/yyyy"
                 value={dataFilter}
                 onChange={(e) => setDataFilter(e.target.value)}
-                style={{ width: '100%', backgroundColor: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '6px', padding: '10px 12px', color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', outline: 'none', boxSizing: 'border-box' }}
+                style={{ width: '100%', backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '6px', padding: '10px 12px', color: T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', outline: 'none', boxSizing: 'border-box' }}
               />
             </div>
 
             {/* Área */}
             <div style={{ position: 'relative' }}>
-              <label htmlFor="area-filter" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
+              <label htmlFor="area-filter" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
                 Área
               </label>
               <button
                 id="area-filter"
                 onClick={() => { setShowAreaDropdown(!showAreaDropdown); setShowSetorDropdown(false); setShowInstituicaoDropdown(false); }}
-                style={{ width: '100%', backgroundColor: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '6px', padding: '10px 12px', color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                style={{ width: '100%', backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '6px', padding: '10px 12px', color: T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
               >
                 <span>{areaFilter}</span>
-                <ChevronDown size={16} style={{ color: 'rgba(255, 255, 255, 0.6)' }} />
+                <ChevronDown size={16} style={{ color: T.textSecondary }} />
               </button>
               {showAreaDropdown && (
-                <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', marginTop: '4px', backgroundColor: '#1e293b', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '6px', overflow: 'hidden', zIndex: 100 }}>
+                <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', marginTop: '4px', backgroundColor: T.bgSurface, border: `1px solid ${T.borderSubtle}`, borderRadius: '6px', overflow: 'hidden', zIndex: 100 }}>
                   {areaOptions.map((option) => (
                     <button key={option} onClick={() => { setAreaFilter(option); setShowAreaDropdown(false); }}
-                      style={{ width: '100%', padding: '10px 12px', textAlign: 'left', backgroundColor: areaFilter === option ? 'rgba(0, 193, 175, 0.1)' : 'transparent', color: areaFilter === option ? '#00c1af' : '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', border: 'none', cursor: 'pointer' }}
-                      onMouseEnter={(e) => { if (areaFilter !== option) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'; }}
+                      style={{ width: '100%', padding: '10px 12px', textAlign: 'left', backgroundColor: areaFilter === option ? T.accentSoft : 'transparent', color: areaFilter === option ? T.accent : T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', border: 'none', cursor: 'pointer' }}
+                      onMouseEnter={(e) => { if (areaFilter !== option) e.currentTarget.style.backgroundColor = T.bgHover; }}
                       onMouseLeave={(e) => { if (areaFilter !== option) e.currentTarget.style.backgroundColor = 'transparent'; }}
                     >{option}</button>
                   ))}
@@ -1029,23 +1032,23 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
 
             {/* Status */}
             <div style={{ position: 'relative' }}>
-              <label htmlFor="status-filter" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
+              <label htmlFor="status-filter" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
                 Status
               </label>
               <button
                 id="status-filter"
                 onClick={() => { setShowSetorDropdown(!showSetorDropdown); setShowAreaDropdown(false); setShowInstituicaoDropdown(false); }}
-                style={{ width: '100%', backgroundColor: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '6px', padding: '10px 12px', color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                style={{ width: '100%', backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '6px', padding: '10px 12px', color: T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
               >
                 <span>{setorFilter}</span>
-                <ChevronDown size={16} style={{ color: 'rgba(255, 255, 255, 0.6)' }} />
+                <ChevronDown size={16} style={{ color: T.textSecondary }} />
               </button>
               {showSetorDropdown && (
-                <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', marginTop: '4px', backgroundColor: '#1e293b', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '6px', overflow: 'hidden', zIndex: 100 }}>
+                <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', marginTop: '4px', backgroundColor: T.bgSurface, border: `1px solid ${T.borderSubtle}`, borderRadius: '6px', overflow: 'hidden', zIndex: 100 }}>
                   {setorOptions.map((option) => (
                     <button key={option} onClick={() => { setSetorFilter(option); setShowSetorDropdown(false); }}
-                      style={{ width: '100%', padding: '10px 12px', textAlign: 'left', backgroundColor: setorFilter === option ? 'rgba(0, 193, 175, 0.1)' : 'transparent', color: setorFilter === option ? '#00c1af' : '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', border: 'none', cursor: 'pointer' }}
-                      onMouseEnter={(e) => { if (setorFilter !== option) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'; }}
+                      style={{ width: '100%', padding: '10px 12px', textAlign: 'left', backgroundColor: setorFilter === option ? T.accentSoft : 'transparent', color: setorFilter === option ? T.accent : T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', border: 'none', cursor: 'pointer' }}
+                      onMouseEnter={(e) => { if (setorFilter !== option) e.currentTarget.style.backgroundColor = T.bgHover; }}
                       onMouseLeave={(e) => { if (setorFilter !== option) e.currentTarget.style.backgroundColor = 'transparent'; }}
                     >{option}</button>
                   ))}
@@ -1055,23 +1058,23 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
 
             {/* Instituição */}
             <div style={{ position: 'relative' }}>
-              <label htmlFor="category-filter" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255, 255, 255, 0.7)', display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
+              <label htmlFor="category-filter" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
                 Vínculo
               </label>
               <button
                 id="category-filter"
                 onClick={() => { setShowInstituicaoDropdown(!showInstituicaoDropdown); setShowAreaDropdown(false); setShowSetorDropdown(false); }}
-                style={{ width: '100%', backgroundColor: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '6px', padding: '10px 12px', color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                style={{ width: '100%', backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '6px', padding: '10px 12px', color: T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
               >
                 <span>{instituicaoFilter}</span>
-                <ChevronDown size={16} style={{ color: 'rgba(255, 255, 255, 0.6)' }} />
+                <ChevronDown size={16} style={{ color: T.textSecondary }} />
               </button>
               {showInstituicaoDropdown && (
-                <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', marginTop: '4px', backgroundColor: '#1e293b', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '6px', overflow: 'hidden', zIndex: 100 }}>
+                <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', marginTop: '4px', backgroundColor: T.bgSurface, border: `1px solid ${T.borderSubtle}`, borderRadius: '6px', overflow: 'hidden', zIndex: 100 }}>
                   {instituicaoOptions.map((option) => (
                     <button key={option} onClick={() => { setInstituicaoFilter(option); setShowInstituicaoDropdown(false); }}
-                      style={{ width: '100%', padding: '10px 12px', textAlign: 'left', backgroundColor: instituicaoFilter === option ? 'rgba(0, 193, 175, 0.1)' : 'transparent', color: instituicaoFilter === option ? '#00c1af' : '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', border: 'none', cursor: 'pointer' }}
-                      onMouseEnter={(e) => { if (instituicaoFilter !== option) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'; }}
+                      style={{ width: '100%', padding: '10px 12px', textAlign: 'left', backgroundColor: instituicaoFilter === option ? T.accentSoft : 'transparent', color: instituicaoFilter === option ? T.accent : T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', border: 'none', cursor: 'pointer' }}
+                      onMouseEnter={(e) => { if (instituicaoFilter !== option) e.currentTarget.style.backgroundColor = T.bgHover; }}
                       onMouseLeave={(e) => { if (instituicaoFilter !== option) e.currentTarget.style.backgroundColor = 'transparent'; }}
                     >{option}</button>
                   ))}
@@ -1099,14 +1102,14 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                   key={captacao.id}
                   className="rounded-lg"
                   style={{
-                    backgroundColor: 'rgba(30, 41, 59, 0.6)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    backgroundColor: T.bgCard,
+                    border: `1px solid ${T.borderSubtle}`,
                     padding: '20px',
                     transition: 'background-color 0.2s',
                     cursor: 'pointer'
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.85)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.6)'; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = T.bgHover; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = T.bgCard; }}
                   onClick={() => setShowDetalhesCaptacao(true)}
                 >
                   <div className="flex items-center gap-6">
@@ -1115,55 +1118,55 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                       style={{ display: 'grid', gridTemplateColumns: '2.1fr 1.2fr 2fr 1.2fr 1fr 1fr', gap: '20px', alignItems: 'center' }}
                     >
                       <div>
-                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}>
+                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
                           Captação
                         </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)' }}>
                           {captacao.titulo}
                         </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginTop: '2px' }}>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginTop: '2px' }}>
                           {captacao.codigo}
                         </div>
                       </div>
 
                       <div>
-                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}>
+                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
                           Tipo
                         </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                           {captacao.tipo}
                         </div>
                       </div>
 
                       <div>
-                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}>
+                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
                           {captacao.vinculoTipo}
                         </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                           {captacao.vinculoNome}
                         </div>
                       </div>
 
                       <div>
-                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}>
+                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
                           Publicação
                         </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                           {captacao.dataPublicacao}
                         </div>
                       </div>
 
                       <div>
-                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}>
+                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
                           Propostas
                         </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                           {captacao.propostasRecebidas}
                         </div>
                       </div>
 
                       <div>
-                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}>
+                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
                           Status
                         </div>
                         <div
@@ -1183,7 +1186,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     </div>
 
                     <div className="flex items-center justify-center">
-                      <ChevronRight className="w-6 h-6" style={{ color: 'rgba(255, 255, 255, 0.5)' }} />
+                      <ChevronRight className="w-6 h-6" style={{ color: T.textMuted }} />
                     </div>
                   </div>
                 </div>
@@ -1196,14 +1199,14 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                 key={inscricao.id}
                 className="rounded-lg"
                 style={{
-                  backgroundColor: 'rgba(30, 41, 59, 0.6)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  backgroundColor: T.bgCard,
+                  border: `1px solid ${T.borderSubtle}`,
                   padding: '20px',
                   transition: 'background-color 0.2s',
                   cursor: 'pointer'
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.85)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.6)'; }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = T.bgHover; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = T.bgCard; }}
                 onClick={() => setShowDetalhesCaptacao(true)}
               >
                 <div className="flex items-center gap-6">
@@ -1217,11 +1220,11 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     <div>
                       <div
                         className="mb-1"
-                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}
+                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}
                       >
                         Edital
                       </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                         {inscricao.edital}
                       </div>
                     </div>
@@ -1230,11 +1233,11 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     <div>
                       <div
                         className="mb-1"
-                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}
+                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}
                       >
                         Proponente
                       </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                         {inscricao.proponente}
                       </div>
                     </div>
@@ -1243,11 +1246,11 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     <div>
                       <div
                         className="mb-1"
-                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}
+                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}
                       >
                         Data de Envio
                       </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                         {inscricao.dataEnvio}
                       </div>
                     </div>
@@ -1256,11 +1259,11 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     <div>
                       <div
                         className="mb-1"
-                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}
+                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}
                       >
                         Área
                       </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                         {inscricao.setor}
                       </div>
                     </div>
@@ -1269,7 +1272,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     <div>
                       <div
                         className="mb-1"
-                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}
+                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}
                       >
                         Status
                       </div>
@@ -1292,7 +1295,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
 
                   {/* Ícone de seta */}
                   <div className="flex items-center justify-center">
-                    <ChevronRight className="w-6 h-6" style={{ color: 'rgba(255, 255, 255, 0.5)' }} />
+                    <ChevronRight className="w-6 h-6" style={{ color: T.textMuted }} />
                   </div>
                 </div>
               </div>
@@ -1305,46 +1308,46 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                 key={item.id}
                 className="rounded-lg"
                 style={{
-                  backgroundColor: 'rgba(30, 41, 59, 0.6)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  backgroundColor: T.bgCard,
+                  border: `1px solid ${T.borderSubtle}`,
                   padding: '20px',
                   transition: 'background-color 0.2s',
                   cursor: 'pointer',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.85)'; }}
-                onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.6)'; }}
+                onMouseEnter={e => { e.currentTarget.style.backgroundColor = T.bgHover; }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = T.bgCard; }}
                 onClick={() => setShowDetalhesCaptacao(true)}
               >
                 <div className="flex items-center gap-6">
                   <div className="flex-1" style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1.2fr 1.2fr 1.4fr 1fr', gap: '24px' }}>
                     {/* Avaliador */}
                     <div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>Avaliador</div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>{item.avaliador}</div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>Avaliador</div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>{item.avaliador}</div>
                     </div>
                     {/* Edital */}
                     <div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>Edital</div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>{item.edital}</div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>Edital</div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>{item.edital}</div>
                     </div>
                     {/* Data de Envio */}
                     <div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>Data de Envio</div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>{item.dataEnvio}</div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>Data de Envio</div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>{item.dataEnvio}</div>
                     </div>
                     {/* Data de Avaliação */}
                     <div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>Data de Avaliação</div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: item.dataAvaliacao === '—' ? 'rgba(255,255,255,0.3)' : '#ffffff' }}>{item.dataAvaliacao}</div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>Data de Avaliação</div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: item.dataAvaliacao === '—' ? T.iconSubdued : T.textPrimary }}>{item.dataAvaliacao}</div>
                     </div>
                     {/* Área */}
                     <div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>Área</div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>{item.area}</div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>Área</div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>{item.area}</div>
                     </div>
                     {/* Status */}
                     <div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>Status</div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>Status</div>
                       <div
                         style={{
                           display: 'inline-block',
@@ -1362,7 +1365,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                       </div>
                     </div>
                   </div>
-                  <ChevronRight size={20} style={{ color: 'rgba(255,255,255,0.4)', flexShrink: 0 }} />
+                  <ChevronRight size={20} style={{ color: T.iconSubdued, flexShrink: 0 }} />
                 </div>
               </div>
             ))}
@@ -1375,14 +1378,14 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                 key={inscricao.id}
                 className="rounded-lg"
                 style={{
-                  backgroundColor: 'rgba(30, 41, 59, 0.6)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  backgroundColor: T.bgCard,
+                  border: `1px solid ${T.borderSubtle}`,
                   padding: '20px',
                   transition: 'background-color 0.2s',
                   cursor: 'pointer'
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.85)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.6)'; }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = T.bgHover; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = T.bgCard; }}
                 onClick={() => setShowDetalhesCaptacao(true)}
               >
                 <div className="flex items-center gap-6">
@@ -1396,11 +1399,11 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     <div>
                       <div
                         className="mb-1"
-                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}
+                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}
                       >
                         Edital
                       </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                         {inscricao.edital}
                       </div>
                     </div>
@@ -1409,11 +1412,11 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     <div>
                       <div
                         className="mb-1"
-                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}
+                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}
                       >
                         Proponente
                       </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                         {inscricao.proponente}
                       </div>
                     </div>
@@ -1422,11 +1425,11 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     <div>
                       <div
                         className="mb-1"
-                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}
+                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}
                       >
                         Data de Envio
                       </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                         {inscricao.dataEnvio}
                       </div>
                     </div>
@@ -1435,11 +1438,11 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     <div>
                       <div
                         className="mb-1"
-                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}
+                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}
                       >
                         Área
                       </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                         {inscricao.setor}
                       </div>
                     </div>
@@ -1448,7 +1451,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     <div>
                       <div
                         className="mb-1"
-                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255, 255, 255, 0.5)' }}
+                        style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}
                       >
                         Status
                       </div>
@@ -1471,7 +1474,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
 
                   {/* Ícone de seta */}
                   <div className="flex items-center justify-center">
-                    <ChevronRight className="w-6 h-6" style={{ color: 'rgba(255, 255, 255, 0.5)' }} />
+                    <ChevronRight className="w-6 h-6" style={{ color: T.textMuted }} />
                   </div>
                 </div>
               </div>

@@ -3,6 +3,7 @@ import { ArrowLeft, ChevronDown, ChevronRight, DollarSign, FolderOpen, Handshake
 import { FormularioParceria } from './FormularioParceria';
 import { DetalhesParceria } from './DetalhesParceria';
 import { DetalhesPrograma } from './DetalhesPrograma';
+import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
 type StatusFilter = 'Todos' | 'EmElaboracao' | 'Vigente' | 'Suspensa' | 'Encerrada';
 type ParceriaStatus = Exclude<StatusFilter, 'Todos'>;
@@ -60,9 +61,9 @@ const formatPercent = (value: number) => (
   `${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
 );
 
-const cardStyle = (): React.CSSProperties => ({
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
-  border: '1px solid rgba(255,255,255,0.1)',
+const buildCardStyle = (T: ThemeTokens): React.CSSProperties => ({
+  backgroundColor: T.bgCard,
+  border: `1px solid ${T.borderSubtle}`,
   borderRadius: '10px',
   padding: '20px',
 });
@@ -72,6 +73,9 @@ interface Props {
 }
 
 export const Parceria: React.FC<Props> = ({ onBack }) => {
+  const { T } = useThemeTokens();
+  const cardStyle = buildCardStyle(T);
+
   const [activeTab, setActiveTab] = useState<'dashboard' | 'listagem'>('listagem');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('Todos');
@@ -334,7 +338,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
   }
 
   return (
-    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
         <div className="mb-6">
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
@@ -345,25 +349,25 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
                 style={{
                   width: '36px',
                   height: '36px',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  border: `1px solid ${T.borderSubtle}`,
                   borderRadius: 'var(--radius)',
-                  backgroundColor: 'rgba(30,41,59,0.5)',
+                  backgroundColor: T.bgCard,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
                 }}
               >
-                <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
+                <ArrowLeft size={16} style={{ color: T.textSecondary }} />
               </button>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', flexShrink: 0, backgroundColor: 'rgba(0,193,175,0.15)', borderRadius: 'var(--radius)' }}>
-                <Handshake size={18} style={{ color: '#00c1af' }} />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', flexShrink: 0, backgroundColor: T.accentSoft, borderRadius: 'var(--radius)' }}>
+                <Handshake size={18} style={{ color: T.accent }} />
               </div>
               <div style={{ flex: 1, marginTop: '6px' }}>
-                <h1 className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: '#ffffff', lineHeight: '1.5' }}>
+                <h1 className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: T.textPrimary, lineHeight: '1.5' }}>
                   Parcerias
                 </h1>
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: '1.5' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0, lineHeight: '1.5' }}>
                   Acompanhe a formalização, vigência, aportes e saldo disponível de cada parceria institucional.
                 </p>
               </div>
@@ -373,10 +377,10 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
               onClick={() => setShowNovaParceria(true)}
               style={{
                 display: 'flex', alignItems: 'center', gap: '8px',
-                backgroundColor: '#00c1af', border: 'none',
+                backgroundColor: T.accent, border: 'none',
                 borderRadius: 'var(--radius)', padding: '10px 18px',
                 fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)', color: '#0f172a',
+                fontWeight: 'var(--font-weight-medium)', color: T.accentText,
                 cursor: 'pointer', flexShrink: 0,
               }}
             >
@@ -385,10 +389,10 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
             </button>
           </div>
 
-          <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', marginTop: '24px' }} />
+          <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, marginTop: '24px' }} />
         </div>
 
-        <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '28px' }}>
+        <div style={{ display: 'flex', gap: '4px', borderBottom: `1px solid ${T.borderSubtle}`, marginBottom: '28px' }}>
           {[
             { id: 'listagem', label: 'Parcerias' },
             { id: 'dashboard', label: 'Dashboard' },
@@ -396,7 +400,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === tab.id ? '2px solid #00c1af' : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: activeTab === tab.id ? '#00c1af' : 'rgba(255,255,255,0.6)', cursor: 'pointer', marginBottom: '-1px' }}
+              style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === tab.id ? `2px solid ${T.accent}` : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: activeTab === tab.id ? T.accent : T.textSecondary, cursor: 'pointer', marginBottom: '-1px' }}
             >
               {tab.label}
             </button>
@@ -413,20 +417,20 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
               { label: 'Total Consumido', value: formatCurrency(totalConsumidoPortfolio), detail: `${formatPercent(percentualConsumidoPortfolio)} do alocado`, Icon: DollarSign, color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
               { label: 'Saldo disponível', value: formatCurrency(saldoTotal), detail: `${formatPercent(percentualDisponivelPortfolio)} do investido`, Icon: DollarSign, color: '#00c1af', bg: 'rgba(0,193,175,0.12)' },
             ].map(({ label, value, detail, Icon, color, bg }) => (
-              <div key={label} style={cardStyle()}>
+              <div key={label} style={cardStyle}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: bg, borderRadius: 'var(--radius)', flexShrink: 0 }}>
                     <Icon size={20} style={{ color }} />
                   </div>
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', margin: 0 }}>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
                     {label}
                   </p>
                 </div>
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: '#ffffff', textAlign: 'center', margin: 0 }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: T.textPrimary, textAlign: 'center', margin: 0 }}>
                   {value}
                 </p>
                 {detail && (
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', textAlign: 'center', margin: '6px 0 0' }}>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, textAlign: 'center', margin: '6px 0 0' }}>
                     {detail}
                   </p>
                 )}
@@ -434,20 +438,20 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
             ))}
           </div>
 
-          <div style={cardStyle()}>
+          <div style={cardStyle}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
               <div>
-                <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+                <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
                   Consumo por programa
                 </h2>
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
                   Quanto cada programa recebeu de aporte, alocou, consumiu e ainda possui disponível.
                 </p>
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {programasPortfolio.map(programa => (
-                <div key={programa.nome} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+                <div key={programa.nome} style={{ padding: '16px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1.6fr repeat(4, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
                     <ListCell label="Programa" value={programa.nome} strong />
                     <ListCell label="Aportado" value={formatCurrency(programa.aportado)} highlight />
@@ -455,7 +459,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
                     <ListCell label="Consumido" value={formatCurrency(programa.consumido)} detail={`${formatPercent(programa.percentualConsumido)} do programa`} />
                     <ListCell label="Disponível" value={formatCurrency(programa.saldo)} detail={`${formatPercent(programa.percentualDisponivel)} do programa`} />
                   </div>
-                  <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                  <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: T.bgChip, overflow: 'hidden' }}>
                     <div style={{ width: `${Math.min(programa.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: programa.percentualConsumido < 50 ? '#f59e0b' : '#22c55e' }} />
                   </div>
                 </div>
@@ -463,16 +467,16 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
             </div>
           </div>
 
-          <div style={{ ...cardStyle(), marginTop: '24px' }}>
-            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+          <div style={{ ...cardStyle, marginTop: '24px' }}>
+            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
               Consumo por rubrica
             </h2>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: '0 0 20px' }}>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: '0 0 20px' }}>
               Somatória por rubrica em todos os programas aportados pelas parcerias.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {rubricasPortfolio.map(rubrica => (
-                <div key={rubrica.nome} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+                <div key={rubrica.nome} style={{ padding: '16px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1.6fr repeat(4, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
                     <ListCell label="Rubrica" value={rubrica.nome} strong />
                     <ListCell label="Aportado" value={formatCurrency(rubrica.aportado)} highlight />
@@ -480,7 +484,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
                     <ListCell label="Consumido" value={formatCurrency(rubrica.consumido)} detail={`${formatPercent(rubrica.percentualConsumido)} da rubrica`} />
                     <ListCell label="Disponível" value={formatCurrency(rubrica.saldo)} detail={`${formatPercent(rubrica.percentualDisponivel)} da rubrica`} />
                   </div>
-                  <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                  <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: T.bgChip, overflow: 'hidden' }}>
                     <div style={{ width: `${Math.min(rubrica.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: rubrica.percentualConsumido < 50 ? '#f59e0b' : '#22c55e' }} />
                   </div>
                 </div>
@@ -488,18 +492,18 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
             </div>
           </div>
 
-          <div style={{ ...cardStyle(), marginTop: '24px' }}>
-            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+          <div style={{ ...cardStyle, marginTop: '24px' }}>
+            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
               Instituições parceiras
             </h2>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: '0 0 18px' }}>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: '0 0 18px' }}>
               Total investido por instituição parceira.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {instituicoesParceiras.map(instituicao => {
                 const percentualInvestido = totalInvestido > 0 ? (instituicao.totalInvestido / totalInvestido) * 100 : 0;
                 return (
-                  <div key={instituicao.nome} style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '16px', alignItems: 'center', padding: '14px 16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+                  <div key={instituicao.nome} style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '16px', alignItems: 'center', padding: '14px 16px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
                     <ListCell label="Instituição" value={instituicao.nome} strong />
                     <ListCell label="Total investido" value={formatCurrency(instituicao.totalInvestido)} detail={`${formatPercent(percentualInvestido)} do total`} highlight />
                   </div>
@@ -515,7 +519,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
         <div className="mb-6">
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '16px' }}>
             <div>
-              <label htmlFor="search-input" style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', marginBottom: '8px' }}>
+              <label htmlFor="search-input" style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, marginBottom: '8px' }}>
                 Pesquisar
               </label>
               <div style={{ position: 'relative' }}>
@@ -527,18 +531,18 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   style={{
                     width: '100%',
-                    backgroundColor: 'rgba(30, 41, 59, 0.7)',
-                    border: '1px solid rgba(255,255,255,0.12)',
+                    backgroundColor: T.bgInput,
+                    border: `1px solid ${T.borderDefault}`,
                     borderRadius: 'var(--radius)',
                     padding: '10px 14px 10px 38px',
-                    color: '#ffffff',
+                    color: T.textPrimary,
                     fontFamily: 'var(--font-family)',
                     fontSize: 'var(--text-sm)',
                     outline: 'none',
                     boxSizing: 'border-box',
                   }}
                 />
-                <Search size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)', pointerEvents: 'none' }} />
+                <Search size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued, pointerEvents: 'none' }} />
               </div>
             </div>
 
@@ -578,8 +582,8 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
                 alignItems: 'center',
                 width: '100%',
                 padding: '20px 24px',
-                backgroundColor: 'rgba(30, 41, 59, 0.5)',
-                border: '1px solid rgba(255,255,255,0.08)',
+                backgroundColor: T.bgCard,
+                border: `1px solid ${T.borderSubtle}`,
                 borderRadius: '10px',
                 cursor: 'pointer',
                 textAlign: 'left',
@@ -588,7 +592,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
               <ListCell label="Parceria" value={parceria.nome} strong />
               <ListCell label="Instituição única" value={parceria.instituicaoParceira} />
               <div>
-                <div style={cellLabelStyle}>Estado</div>
+                <CellLabel label="Estado" />
                 <span style={{ display: 'inline-block', padding: '4px 10px', borderRadius: '12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', backgroundColor: `${statusColor(parceria.status)}20`, color: statusColor(parceria.status) }}>
                   {statusLabel[parceria.status]}
                 </span>
@@ -597,7 +601,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
               <ListCell label="Aporte total" value={formatCurrency(parceria.aporteTotal)} />
               <ListCell label="Saldo" value={formatCurrency(parceria.saldoDisponivel)} highlight={parceria.saldoDisponivel > 0} />
               <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <ChevronRight size={18} style={{ color: 'rgba(255,255,255,0.4)' }} />
+                <ChevronRight size={18} style={{ color: T.iconSubdued }} />
               </div>
             </button>
           ))}
@@ -609,26 +613,29 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
   );
 };
 
-const cellLabelStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-family)',
-  fontSize: 'var(--text-xs)',
-  color: 'rgba(255,255,255,0.5)',
-  marginBottom: '4px',
+const CellLabel: React.FC<{ label: string }> = ({ label }) => {
+  const { T } = useThemeTokens();
+  return (
+    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>{label}</div>
+  );
 };
 
-const ListCell: React.FC<{ label: string; value: string; detail?: string; strong?: boolean; highlight?: boolean }> = ({ label, value, detail, strong, highlight }) => (
-  <div>
-    <div style={cellLabelStyle}>{label}</div>
-    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: highlight ? '#22c55e' : strong ? '#ffffff' : 'rgba(255,255,255,0.75)', fontWeight: strong ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)' }}>
-      {value}
-    </div>
-    {detail && (
-      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginTop: '4px' }}>
-        {detail}
+const ListCell: React.FC<{ label: string; value: string; detail?: string; strong?: boolean; highlight?: boolean }> = ({ label, value, detail, strong, highlight }) => {
+  const { T } = useThemeTokens();
+  return (
+    <div>
+      <CellLabel label={label} />
+      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: highlight ? '#22c55e' : strong ? T.textPrimary : T.textSecondary, fontWeight: strong ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)' }}>
+        {value}
       </div>
-    )}
-  </div>
-);
+      {detail && (
+        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginTop: '4px' }}>
+          {detail}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const DropdownFilter: React.FC<{
   label: string;
@@ -640,59 +647,62 @@ const DropdownFilter: React.FC<{
   setOpen: (open: boolean) => void;
   onSelect: (value: string) => void;
   onBeforeOpen?: () => void;
-}> = ({ label, value, displayValue, options, optionLabel, open, setOpen, onSelect, onBeforeOpen }) => (
-  <div style={{ position: 'relative' }}>
-    <label style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', marginBottom: '8px' }}>
-      {label}
-    </label>
-    <button
-      onClick={() => {
-        onBeforeOpen?.();
-        setOpen(!open);
-      }}
-      style={{
-        width: '100%',
-        backgroundColor: 'rgba(30, 41, 59, 0.7)',
-        border: '1px solid rgba(255,255,255,0.12)',
-        borderRadius: 'var(--radius)',
-        padding: '10px 14px',
-        color: '#ffffff',
-        fontFamily: 'var(--font-family)',
-        fontSize: 'var(--text-sm)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        cursor: 'pointer',
-      }}
-    >
-      <span>{displayValue || value}</span>
-      <ChevronDown size={15} style={{ color: 'rgba(255,255,255,0.4)' }} />
-    </button>
-    {open && (
-      <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius)', zIndex: 400, overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
-        {options.map(opt => (
-          <button
-            key={opt}
-            onClick={() => {
-              onSelect(opt);
-              setOpen(false);
-            }}
-            style={{
-              width: '100%',
-              padding: '10px 14px',
-              textAlign: 'left',
-              border: 'none',
-              backgroundColor: value === opt ? 'rgba(0,193,175,0.1)' : 'transparent',
-              color: value === opt ? '#00c1af' : '#ffffff',
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--text-sm)',
-              cursor: 'pointer',
-            }}
-          >
-            {optionLabel ? optionLabel(opt) : opt}
-          </button>
-        ))}
-      </div>
-    )}
-  </div>
-);
+}> = ({ label, value, displayValue, options, optionLabel, open, setOpen, onSelect, onBeforeOpen }) => {
+  const { T, isLight } = useThemeTokens();
+  return (
+    <div style={{ position: 'relative' }}>
+      <label style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, marginBottom: '8px' }}>
+        {label}
+      </label>
+      <button
+        onClick={() => {
+          onBeforeOpen?.();
+          setOpen(!open);
+        }}
+        style={{
+          width: '100%',
+          backgroundColor: T.bgInput,
+          border: `1px solid ${T.borderDefault}`,
+          borderRadius: 'var(--radius)',
+          padding: '10px 14px',
+          color: T.textPrimary,
+          fontFamily: 'var(--font-family)',
+          fontSize: 'var(--text-sm)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+        }}
+      >
+        <span>{displayValue || value}</span>
+        <ChevronDown size={15} style={{ color: T.iconSubdued }} />
+      </button>
+      {open && (
+        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: T.bgSurface, border: `1px solid ${T.borderDefault}`, borderRadius: 'var(--radius)', zIndex: 400, overflow: 'hidden', boxShadow: T.shadowMd }}>
+          {options.map(opt => (
+            <button
+              key={opt}
+              onClick={() => {
+                onSelect(opt);
+                setOpen(false);
+              }}
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                textAlign: 'left',
+                border: 'none',
+                backgroundColor: value === opt ? T.accentSoft : 'transparent',
+                color: value === opt ? T.accent : T.textPrimary,
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+                cursor: 'pointer',
+              }}
+            >
+              {optionLabel ? optionLabel(opt) : opt}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};

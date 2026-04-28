@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Calendar, CheckCircle, ChevronRight, DollarSign, Edit3, Flag, Plus, Save, Search, Target, Trash2, X } from 'lucide-react';
+import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
 type EstadoPlano = 'Ativo' | 'Em elaboração' | 'Encerrado';
 
@@ -29,33 +30,39 @@ interface PlanoEstrategico {
   eixos: EixoEstrategico[];
 }
 
-const cardStyle: React.CSSProperties = {
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
-  border: '1px solid rgba(255,255,255,0.1)',
-  borderRadius: '10px',
-  padding: '24px',
-};
-
-const labelStyle: React.CSSProperties = {
-  display: 'block',
-  fontFamily: 'var(--font-family)',
-  fontSize: 'var(--text-sm)',
-  color: 'rgba(255,255,255,0.7)',
-  marginBottom: '8px',
-};
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  backgroundColor: 'rgba(15, 23, 42, 0.55)',
-  border: '1px solid rgba(255,255,255,0.12)',
-  borderRadius: 'var(--radius)',
-  padding: '10px 12px',
-  color: '#ffffff',
-  fontFamily: 'var(--font-family)',
-  fontSize: 'var(--text-sm)',
-  outline: 'none',
-  boxSizing: 'border-box',
-};
+const buildStyles = (T: ThemeTokens) => ({
+  card: {
+    backgroundColor: T.bgCard,
+    border: `1px solid ${T.borderSubtle}`,
+    borderRadius: '10px',
+    padding: '24px',
+  } as React.CSSProperties,
+  label: {
+    display: 'block',
+    fontFamily: 'var(--font-family)',
+    fontSize: 'var(--text-sm)',
+    color: T.textSecondary,
+    marginBottom: '8px',
+  } as React.CSSProperties,
+  input: {
+    width: '100%',
+    backgroundColor: T.bgInput,
+    border: `1px solid ${T.borderDefault}`,
+    borderRadius: 'var(--radius)',
+    padding: '10px 12px',
+    color: T.textPrimary,
+    fontFamily: 'var(--font-family)',
+    fontSize: 'var(--text-sm)',
+    outline: 'none',
+    boxSizing: 'border-box',
+  } as React.CSSProperties,
+  cellLabel: {
+    fontFamily: 'var(--font-family)',
+    fontSize: 'var(--text-xs)',
+    color: T.textMuted,
+    marginBottom: '4px',
+  } as React.CSSProperties,
+});
 
 const estadoColor = (estado: EstadoPlano) => {
   if (estado === 'Ativo') return '#22c55e';
@@ -183,6 +190,9 @@ const planosIniciais: PlanoEstrategico[] = [
 const planoSemEixos = ({ eixos: _eixos, ...plano }: PlanoEstrategico): Omit<PlanoEstrategico, 'eixos'> => plano;
 
 export const PlanejamentoEstrategico: React.FC = () => {
+  const { T } = useThemeTokens();
+  const S = buildStyles(T);
+
   const [planos, setPlanos] = useState<PlanoEstrategico[]>(planosIniciais);
   const [selectedPlanoId, setSelectedPlanoId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -317,22 +327,22 @@ export const PlanejamentoEstrategico: React.FC = () => {
           <MetricCard icon={<Calendar size={20} />} label="Em elaboração" value={String(planos.filter(plano => plano.estado === 'Em elaboração').length)} color="#a855f7" />
         </div>
 
-        <div style={{ ...cardStyle, marginBottom: '24px' }}>
+        <div style={{ ...S.card, marginBottom: '24px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px' }}>
             <div>
-              <label style={labelStyle}>Pesquisar</label>
+              <label style={S.label}>Pesquisar</label>
               <div style={{ position: 'relative' }}>
                 <input
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
                   placeholder="Buscar por nome ou descrição"
-                  style={{ ...inputStyle, paddingRight: '40px' }}
+                  style={{ ...S.input, paddingRight: '40px' }}
                 />
-                <Search size={17} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
+                <Search size={17} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
               </div>
             </div>
             <Field label="Estado">
-              <select value={estadoFilter} onChange={(event) => setEstadoFilter(event.target.value as EstadoPlano | 'Todos')} style={inputStyle}>
+              <select value={estadoFilter} onChange={(event) => setEstadoFilter(event.target.value as EstadoPlano | 'Todos')} style={S.input}>
                 <option>Todos</option>
                 <option>Ativo</option>
                 <option>Em elaboração</option>
@@ -354,8 +364,8 @@ export const PlanejamentoEstrategico: React.FC = () => {
                 alignItems: 'center',
                 width: '100%',
                 padding: '20px 24px',
-                backgroundColor: 'rgba(30, 41, 59, 0.5)',
-                border: '1px solid rgba(255,255,255,0.08)',
+                backgroundColor: T.bgCard,
+                border: `1px solid ${T.borderSubtle}`,
                 borderRadius: '10px',
                 cursor: 'pointer',
                 textAlign: 'left',
@@ -363,13 +373,13 @@ export const PlanejamentoEstrategico: React.FC = () => {
             >
               <ReadCell label="Planejamento" value={plano.nome} strong />
               <div>
-                <div style={cellLabelStyle}>Estado</div>
+                <div style={S.cellLabel}>Estado</div>
                 <StatusBadge label={plano.estado} color={estadoColor(plano.estado)} />
               </div>
               <ReadCell label="Vigência" value={`${plano.dataInicio || 'Pendente'} - ${plano.dataFim || 'Pendente'}`} />
               <ReadCell label="Eixos" value={String(plano.eixos.length)} />
               <ReadCell label="Programas vinculados" value={String(plano.eixos.reduce((total, eixo) => total + totalProgramasEixo(eixo), 0))} />
-              <ChevronRight size={18} style={{ color: 'rgba(255,255,255,0.4)', justifySelf: 'center' }} />
+              <ChevronRight size={18} style={{ color: T.iconSubdued, justifySelf: 'center' }} />
             </button>
           ))}
         </div>
@@ -408,7 +418,7 @@ export const PlanejamentoEstrategico: React.FC = () => {
         <MetricCard icon={<DollarSign size={20} />} label="Valor investido" value={formatCurrency(totalInvestido)} color="#a855f7" />
       </div>
 
-      <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', gap: '4px', borderBottom: `1px solid ${T.borderSubtle}`, marginBottom: '24px' }}>
         {[
           { id: 'cadastro', label: 'Cadastro' },
           { id: 'dashboard', label: 'Dashboard' },
@@ -416,7 +426,7 @@ export const PlanejamentoEstrategico: React.FC = () => {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as typeof activeTab)}
-            style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === tab.id ? '2px solid #00c1af' : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: activeTab === tab.id ? '#00c1af' : 'rgba(255,255,255,0.6)', cursor: 'pointer', marginBottom: '-1px' }}
+            style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === tab.id ? `2px solid ${T.accent}` : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: activeTab === tab.id ? T.accent : T.textSecondary, cursor: 'pointer', marginBottom: '-1px' }}
           >
             {tab.label}
           </button>
@@ -425,36 +435,36 @@ export const PlanejamentoEstrategico: React.FC = () => {
 
       {activeTab === 'cadastro' && (
         <>
-          <div style={{ ...cardStyle, marginBottom: '24px' }}>
-            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 20px' }}>
+          <div style={{ ...S.card, marginBottom: '24px' }}>
+            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 20px' }}>
               Cadastro do plano
             </h2>
 
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>
               <Field label="Nome">
                 {editing ? (
-                  <input value={currentDraft.nome} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, nome: event.target.value } : prev)} style={inputStyle} />
+                  <input value={currentDraft.nome} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, nome: event.target.value } : prev)} style={S.input} />
                 ) : (
                   <ReadValue value={selectedPlano.nome} />
                 )}
               </Field>
               <Field label="Início">
                 {editing ? (
-                  <input value={currentDraft.dataInicio} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, dataInicio: event.target.value } : prev)} style={inputStyle} />
+                  <input value={currentDraft.dataInicio} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, dataInicio: event.target.value } : prev)} style={S.input} />
                 ) : (
                   <ReadValue value={selectedPlano.dataInicio || 'Pendente'} />
                 )}
               </Field>
               <Field label="Fim">
                 {editing ? (
-                  <input value={currentDraft.dataFim} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, dataFim: event.target.value } : prev)} style={inputStyle} />
+                  <input value={currentDraft.dataFim} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, dataFim: event.target.value } : prev)} style={S.input} />
                 ) : (
                   <ReadValue value={selectedPlano.dataFim || 'Pendente'} />
                 )}
               </Field>
               <Field label="Estado">
                 {editing ? (
-                  <select value={currentDraft.estado} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, estado: event.target.value as EstadoPlano } : prev)} style={inputStyle}>
+                  <select value={currentDraft.estado} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, estado: event.target.value as EstadoPlano } : prev)} style={S.input}>
                     <option>Ativo</option>
                     <option>Em elaboração</option>
                     <option>Encerrado</option>
@@ -467,30 +477,30 @@ export const PlanejamentoEstrategico: React.FC = () => {
 
             <Field label="Descrição">
               {editing ? (
-                <textarea value={currentDraft.descricao} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, descricao: event.target.value } : prev)} rows={4} style={{ ...inputStyle, resize: 'vertical' }} />
+                <textarea value={currentDraft.descricao} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, descricao: event.target.value } : prev)} rows={4} style={{ ...S.input, resize: 'vertical' }} />
               ) : (
                 <ReadValue value={selectedPlano.descricao} />
               )}
             </Field>
           </div>
 
-          <div style={{ ...cardStyle, marginBottom: '24px' }}>
-            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 20px' }}>
+          <div style={{ ...S.card, marginBottom: '24px' }}>
+            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 20px' }}>
               Novo eixo estratégico
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr auto', gap: '16px', alignItems: 'end' }}>
               <Field label="Nome do eixo">
-                <input value={novoEixo.nome} onChange={(event) => setNovoEixo(prev => ({ ...prev, nome: event.target.value }))} placeholder="Ex.: Saúde e bem-estar" style={inputStyle} />
+                <input value={novoEixo.nome} onChange={(event) => setNovoEixo(prev => ({ ...prev, nome: event.target.value }))} placeholder="Ex.: Saúde e bem-estar" style={S.input} />
               </Field>
               <Field label="Descrição">
-                <input value={novoEixo.descricao} onChange={(event) => setNovoEixo(prev => ({ ...prev, descricao: event.target.value }))} placeholder="Orientação estratégica do eixo" style={inputStyle} />
+                <input value={novoEixo.descricao} onChange={(event) => setNovoEixo(prev => ({ ...prev, descricao: event.target.value }))} placeholder="Orientação estratégica do eixo" style={S.input} />
               </Field>
               <SmallButton icon={<Plus size={14} />} label="Adicionar" onClick={adicionarEixo} />
             </div>
           </div>
 
-          <div style={cardStyle}>
-            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 20px' }}>
+          <div style={S.card}>
+            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 20px' }}>
               Eixos estratégicos cadastrados
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -505,14 +515,14 @@ export const PlanejamentoEstrategico: React.FC = () => {
                       gap: '16px',
                       alignItems: 'center',
                       padding: '16px',
-                      backgroundColor: 'rgba(15,23,42,0.35)',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      backgroundColor: T.bgSurfaceMuted,
+                      border: `1px solid ${T.borderSubtle}`,
                       borderRadius: '8px',
                     }}
                   >
                     <Field label="Eixo">
                       {isEditingEixo ? (
-                        <input value={draftEixo.nome} onChange={(event) => setDraftEixo(prev => ({ ...prev, nome: event.target.value }))} style={inputStyle} />
+                        <input value={draftEixo.nome} onChange={(event) => setDraftEixo(prev => ({ ...prev, nome: event.target.value }))} style={S.input} />
                       ) : (
                         <ReadValue value={eixo.nome} />
                       )}
@@ -521,7 +531,7 @@ export const PlanejamentoEstrategico: React.FC = () => {
                     <ReadCell label="Valor investido" value={formatCurrency(eixo.valorInvestido)} />
                     <Field label="Descrição">
                       {isEditingEixo ? (
-                        <input value={draftEixo.descricao} onChange={(event) => setDraftEixo(prev => ({ ...prev, descricao: event.target.value }))} style={inputStyle} />
+                        <input value={draftEixo.descricao} onChange={(event) => setDraftEixo(prev => ({ ...prev, descricao: event.target.value }))} style={S.input} />
                       ) : (
                         <ReadValue value={eixo.descricao} />
                       )}
@@ -548,19 +558,19 @@ export const PlanejamentoEstrategico: React.FC = () => {
       )}
 
       {activeTab === 'dashboard' && (
-        <div style={cardStyle}>
+        <div style={S.card}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '22px' }}>
             <div>
-              <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+              <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
                 Investimento por eixo estratégico
               </h2>
-              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
                 Distribuição dos programas e do valor investido nos eixos do planejamento selecionado.
               </p>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <div style={cellLabelStyle}>Valor total investido</div>
-              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: '#ffffff', margin: 0 }}>
+              <div style={S.cellLabel}>Valor total investido</div>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: T.textPrimary, margin: 0 }}>
                 {formatCurrency(totalInvestido)}
               </p>
             </div>
@@ -578,8 +588,8 @@ export const PlanejamentoEstrategico: React.FC = () => {
                   style={{
                     width: '100%',
                     padding: '16px',
-                    backgroundColor: isSelected ? 'rgba(0,193,175,0.1)' : 'rgba(15,23,42,0.35)',
-                    border: isSelected ? '1px solid rgba(0,193,175,0.45)' : '1px solid rgba(255,255,255,0.08)',
+                    backgroundColor: isSelected ? T.accentSoft : T.bgSurfaceMuted,
+                    border: isSelected ? `1px solid ${T.accent}` : `1px solid ${T.borderSubtle}`,
                     borderRadius: '8px',
                     cursor: 'pointer',
                     textAlign: 'left',
@@ -591,16 +601,16 @@ export const PlanejamentoEstrategico: React.FC = () => {
                     <ReadCell label="Valor investido" value={formatCurrency(eixo.valorInvestido)} />
                     <ReadCell label="Participação" value={formatPercent(percentualInvestido)} />
                   </div>
-                  <div style={{ height: '10px', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '999px', overflow: 'hidden' }}>
-                    <div style={{ width: `${larguraBarra}%`, height: '100%', backgroundColor: '#00c1af', borderRadius: '999px' }} />
+                  <div style={{ height: '10px', backgroundColor: T.bgSurfaceMuted, borderRadius: '999px', overflow: 'hidden' }}>
+                    <div style={{ width: `${larguraBarra}%`, height: '100%', backgroundColor: T.accent, borderRadius: '999px' }} />
                   </div>
                 </button>
               );
             })}
           </div>
 
-          <div style={{ marginTop: '24px', paddingTop: '22px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-            <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 14px' }}>
+          <div style={{ marginTop: '24px', paddingTop: '22px', borderTop: `1px solid ${T.borderSubtle}` }}>
+            <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 14px' }}>
               Programas associados ao eixo
             </h3>
             {selectedEixoDashboard ? (
@@ -615,8 +625,8 @@ export const PlanejamentoEstrategico: React.FC = () => {
                         gap: '16px',
                         alignItems: 'center',
                         padding: '14px 16px',
-                        backgroundColor: 'rgba(15,23,42,0.35)',
-                        border: '1px solid rgba(255,255,255,0.08)',
+                        backgroundColor: T.bgSurfaceMuted,
+                        border: `1px solid ${T.borderSubtle}`,
                         borderRadius: '8px',
                       }}
                     >
@@ -639,84 +649,103 @@ export const PlanejamentoEstrategico: React.FC = () => {
   );
 };
 
-const Header: React.FC<{ title: string; subtitle: string; action: React.ReactNode }> = ({ title, subtitle, action }) => (
-  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '20px', marginBottom: '28px' }}>
-    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: 'rgba(0,193,175,0.12)', borderRadius: 'var(--radius)' }}>
-        <Target size={22} style={{ color: '#00c1af' }} />
+const Header: React.FC<{ title: string; subtitle: string; action: React.ReactNode }> = ({ title, subtitle, action }) => {
+  const { T } = useThemeTokens();
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '20px', marginBottom: '28px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: T.accentSoft, borderRadius: 'var(--radius)' }}>
+          <Target size={22} style={{ color: T.accent }} />
+        </div>
+        <div>
+          <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: T.textPrimary, margin: '0 0 8px' }}>
+            {title}
+          </h1>
+          <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
+            {subtitle}
+          </p>
+        </div>
       </div>
-      <div>
-        <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 8px' }}>
-          {title}
-        </h1>
-        <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
-          {subtitle}
+      {action}
+    </div>
+  );
+};
+
+const Field: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => {
+  const { T } = useThemeTokens();
+  const S = buildStyles(T);
+  return (
+    <label>
+      <span style={S.label}>{label}</span>
+      {children}
+    </label>
+  );
+};
+
+const ReadValue: React.FC<{ value: string }> = ({ value }) => {
+  const { T } = useThemeTokens();
+  const S = buildStyles(T);
+  return (
+    <div style={{ ...S.input, minHeight: '42px', backgroundColor: T.bgSurfaceMuted, color: T.textPrimary }}>
+      {value}
+    </div>
+  );
+};
+
+const MetricCard: React.FC<{ icon: React.ReactNode; label: string; value: string; color: string }> = ({ icon, label, value, color }) => {
+  const { T } = useThemeTokens();
+  const S = buildStyles(T);
+  return (
+    <div style={S.card}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: `${color}1f`, borderRadius: 'var(--radius)', color }}>
+          {icon}
+        </div>
+        <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
+          {label}
         </p>
       </div>
-    </div>
-    {action}
-  </div>
-);
-
-const Field: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
-  <label>
-    <span style={labelStyle}>{label}</span>
-    {children}
-  </label>
-);
-
-const ReadValue: React.FC<{ value: string }> = ({ value }) => (
-  <div style={{ ...inputStyle, minHeight: '42px', backgroundColor: 'rgba(15,23,42,0.28)', color: 'rgba(255,255,255,0.82)' }}>
-    {value}
-  </div>
-);
-
-const MetricCard: React.FC<{ icon: React.ReactNode; label: string; value: string; color: string }> = ({ icon, label, value, color }) => (
-  <div style={cardStyle}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: `${color}1f`, borderRadius: 'var(--radius)', color }}>
-        {icon}
-      </div>
-      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.68)', margin: 0 }}>
-        {label}
+      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: T.textPrimary, margin: 0, textAlign: 'center', lineHeight: 1.35 }}>
+        {value}
       </p>
     </div>
-    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: '#ffffff', margin: 0, textAlign: 'center', lineHeight: 1.35 }}>
-      {value}
-    </p>
-  </div>
-);
+  );
+};
 
-const SmallButton: React.FC<{ icon: React.ReactNode; label: string; onClick: () => void; muted?: boolean }> = ({ icon, label, onClick, muted }) => (
-  <button
-    onClick={onClick}
-    style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '8px',
-      minHeight: '38px',
-      padding: '9px 13px',
-      borderRadius: 'var(--radius)',
-      border: muted ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(0,193,175,0.42)',
-      backgroundColor: muted ? 'rgba(15,23,42,0.35)' : 'rgba(0,193,175,0.12)',
-      color: muted ? 'rgba(255,255,255,0.7)' : '#00c1af',
-      fontFamily: 'var(--font-family)',
-      fontSize: 'var(--text-sm)',
-      fontWeight: 'var(--font-weight-medium)',
-      cursor: 'pointer',
-      whiteSpace: 'nowrap',
-    }}
-  >
-    {icon}
-    {label}
-  </button>
-);
+const SmallButton: React.FC<{ icon: React.ReactNode; label: string; onClick: () => void; muted?: boolean }> = ({ icon, label, onClick, muted }) => {
+  const { T } = useThemeTokens();
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '8px',
+        minHeight: '38px',
+        padding: '9px 13px',
+        borderRadius: 'var(--radius)',
+        border: muted ? `1px solid ${T.borderDefault}` : `1px solid ${T.accent}`,
+        backgroundColor: muted ? T.bgSurfaceMuted : T.accentSoft,
+        color: muted ? T.textSecondary : T.accent,
+        fontFamily: 'var(--font-family)',
+        fontSize: 'var(--text-sm)',
+        fontWeight: 'var(--font-weight-medium)',
+        cursor: 'pointer',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+};
 
 const IconButton: React.FC<{ icon: React.ReactNode; label: string; onClick: () => void; muted?: boolean; danger?: boolean }> = ({ icon, label, onClick, muted, danger }) => {
-  const color = danger ? '#ef4444' : muted ? 'rgba(255,255,255,0.68)' : '#00c1af';
-  const borderColor = danger ? 'rgba(239,68,68,0.25)' : muted ? 'rgba(255,255,255,0.12)' : 'rgba(0,193,175,0.35)';
-  const backgroundColor = danger ? 'rgba(239,68,68,0.08)' : muted ? 'rgba(15,23,42,0.35)' : 'rgba(0,193,175,0.1)';
+  const { T } = useThemeTokens();
+  const color = danger ? T.danger : muted ? T.textSecondary : T.accent;
+  const borderColor = danger ? 'rgba(239,68,68,0.25)' : muted ? T.borderDefault : T.accent;
+  const backgroundColor = danger ? T.dangerSoft : muted ? T.bgSurfaceMuted : T.accentSoft;
 
   return (
     <button
@@ -742,29 +771,29 @@ const IconButton: React.FC<{ icon: React.ReactNode; label: string; onClick: () =
   );
 };
 
-const cellLabelStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-family)',
-  fontSize: 'var(--text-xs)',
-  color: 'rgba(255,255,255,0.46)',
-  marginBottom: '4px',
+const ReadCell: React.FC<{ label: string; value: string; strong?: boolean }> = ({ label, value, strong }) => {
+  const { T } = useThemeTokens();
+  const S = buildStyles(T);
+  return (
+    <div style={{ minWidth: 0 }}>
+      <div style={S.cellLabel}>{label}</div>
+      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: strong ? T.textPrimary : T.textSecondary, fontWeight: strong ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        {value}
+      </p>
+    </div>
+  );
 };
 
-const ReadCell: React.FC<{ label: string; value: string; strong?: boolean }> = ({ label, value, strong }) => (
-  <div style={{ minWidth: 0 }}>
-    <div style={cellLabelStyle}>{label}</div>
-    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: strong ? '#ffffff' : 'rgba(255,255,255,0.76)', fontWeight: strong ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-      {value}
-    </p>
-  </div>
-);
-
-const EmptyMessage: React.FC<{ text: string }> = ({ text }) => (
-  <div style={{ padding: '18px', borderRadius: '8px', border: '1px dashed rgba(255,255,255,0.14)', backgroundColor: 'rgba(15,23,42,0.28)' }}>
-    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.58)', margin: 0 }}>
-      {text}
-    </p>
-  </div>
-);
+const EmptyMessage: React.FC<{ text: string }> = ({ text }) => {
+  const { T } = useThemeTokens();
+  return (
+    <div style={{ padding: '18px', borderRadius: '8px', border: `1px dashed ${T.borderDefault}`, backgroundColor: T.bgSurfaceMuted }}>
+      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textMuted, margin: 0 }}>
+        {text}
+      </p>
+    </div>
+  );
+};
 
 const StatusBadge: React.FC<{ label: string; color: string }> = ({ label, color }) => (
   <span style={{ display: 'inline-block', padding: '4px 10px', borderRadius: '999px', backgroundColor: `${color}1f`, color, border: `1px solid ${color}55`, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>
