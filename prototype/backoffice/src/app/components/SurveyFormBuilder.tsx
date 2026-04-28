@@ -156,6 +156,172 @@ const createInitialForm = (): StoredForm => ({
   json: defaultSurveyJson,
 });
 
+const weightedEvaluationJson = {
+  title: 'Avaliacao Ponderada de Proposta',
+  description: 'Informe a nota e o peso de cada criterio. A nota final e calculada automaticamente.',
+  pages: [
+    {
+      name: 'criterios_avaliacao',
+      title: 'Criterios de avaliacao',
+      description: 'Use pesos em percentual. A soma esperada dos pesos e 100.',
+      elements: [
+        {
+          type: 'panel',
+          name: 'aderencia_edital',
+          title: 'Aderencia ao edital',
+          elements: [
+            {
+              type: 'text',
+              name: 'nota_aderencia',
+              title: 'Nota',
+              inputType: 'number',
+              defaultValue: 0,
+              isRequired: true,
+              validators: [{ type: 'numeric', minValue: 0, maxValue: 10 }],
+            },
+            {
+              type: 'text',
+              name: 'peso_aderencia',
+              title: 'Peso (%)',
+              inputType: 'number',
+              defaultValue: 30,
+              isRequired: true,
+              validators: [{ type: 'numeric', minValue: 0, maxValue: 100 }],
+            },
+            {
+              type: 'comment',
+              name: 'justificativa_aderencia',
+              title: 'Justificativa',
+            },
+          ],
+        },
+        {
+          type: 'panel',
+          name: 'merito_tecnico',
+          title: 'Merito tecnico-cientifico',
+          elements: [
+            {
+              type: 'text',
+              name: 'nota_merito',
+              title: 'Nota',
+              inputType: 'number',
+              defaultValue: 0,
+              isRequired: true,
+              validators: [{ type: 'numeric', minValue: 0, maxValue: 10 }],
+            },
+            {
+              type: 'text',
+              name: 'peso_merito',
+              title: 'Peso (%)',
+              inputType: 'number',
+              defaultValue: 25,
+              isRequired: true,
+              validators: [{ type: 'numeric', minValue: 0, maxValue: 100 }],
+            },
+            {
+              type: 'comment',
+              name: 'justificativa_merito',
+              title: 'Justificativa',
+            },
+          ],
+        },
+        {
+          type: 'panel',
+          name: 'viabilidade_execucao',
+          title: 'Viabilidade de execucao',
+          elements: [
+            {
+              type: 'text',
+              name: 'nota_viabilidade',
+              title: 'Nota',
+              inputType: 'number',
+              defaultValue: 0,
+              isRequired: true,
+              validators: [{ type: 'numeric', minValue: 0, maxValue: 10 }],
+            },
+            {
+              type: 'text',
+              name: 'peso_viabilidade',
+              title: 'Peso (%)',
+              inputType: 'number',
+              defaultValue: 25,
+              isRequired: true,
+              validators: [{ type: 'numeric', minValue: 0, maxValue: 100 }],
+            },
+            {
+              type: 'comment',
+              name: 'justificativa_viabilidade',
+              title: 'Justificativa',
+            },
+          ],
+        },
+        {
+          type: 'panel',
+          name: 'impacto_resultados',
+          title: 'Impacto e resultados esperados',
+          elements: [
+            {
+              type: 'text',
+              name: 'nota_impacto',
+              title: 'Nota',
+              inputType: 'number',
+              defaultValue: 0,
+              isRequired: true,
+              validators: [{ type: 'numeric', minValue: 0, maxValue: 10 }],
+            },
+            {
+              type: 'text',
+              name: 'peso_impacto',
+              title: 'Peso (%)',
+              inputType: 'number',
+              defaultValue: 20,
+              isRequired: true,
+              validators: [{ type: 'numeric', minValue: 0, maxValue: 100 }],
+            },
+            {
+              type: 'comment',
+              name: 'justificativa_impacto',
+              title: 'Justificativa',
+            },
+          ],
+        },
+        {
+          type: 'panel',
+          name: 'resultado_calculado',
+          title: 'Resultado calculado',
+          elements: [
+            {
+              type: 'expression',
+              name: 'soma_pesos',
+              title: 'Soma dos pesos',
+              expression: '{peso_aderencia} + {peso_merito} + {peso_viabilidade} + {peso_impacto}',
+            },
+            {
+              type: 'expression',
+              name: 'nota_final',
+              title: 'Nota final ponderada',
+              expression: '({nota_aderencia} * {peso_aderencia} + {nota_merito} * {peso_merito} + {nota_viabilidade} * {peso_viabilidade} + {nota_impacto} * {peso_impacto}) / 100',
+            },
+            {
+              type: 'comment',
+              name: 'parecer_final',
+              title: 'Parecer final',
+              isRequired: true,
+            },
+            {
+              type: 'radiogroup',
+              name: 'recomendacao',
+              title: 'Recomendacao',
+              isRequired: true,
+              choices: ['Recomendar aprovacao', 'Recomendar ajustes', 'Nao recomendar aprovacao'],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
 const createSeedForms = (): StoredForm[] => [
   {
     id: 'FORM-SUBMISSAO-2026-001',
@@ -189,6 +355,16 @@ const createSeedForms = (): StoredForm[] => [
         },
       ],
     },
+  },
+  {
+    id: 'FORM-AVALIACAO-PESOS-2026-001',
+    name: 'Avaliacao Ponderada de Proposta',
+    description: 'Formulario de avaliacao com pesos por criterio e nota final calculada automaticamente.',
+    category: 'Avaliacao',
+    status: 'Publicado',
+    version: 1,
+    updatedAt: '2026-04-24T14:00:00.000Z',
+    json: weightedEvaluationJson,
   },
   {
     id: 'FORM-RECURSO-2026-001',
@@ -236,6 +412,12 @@ const createSeedForms = (): StoredForm[] => [
   },
 ];
 
+const mergeSeedForms = (stored: StoredForm[]) => {
+  const storedIds = new Set(stored.map((form) => form.id));
+  const missingSeeds = createSeedForms().filter((form) => !storedIds.has(form.id));
+  return [...stored, ...missingSeeds];
+};
+
 const formatDate = (value: string) =>
   new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
@@ -248,7 +430,7 @@ const formatDate = (value: string) =>
 export const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onBack }) => {
   const [forms, setForms] = useState<StoredForm[]>(() => {
     const stored = readForms();
-    return stored.length > 0 ? stored : createSeedForms();
+    return stored.length > 0 ? mergeSeedForms(stored) : createSeedForms();
   });
   const [selectedId, setSelectedId] = useState(() => forms[0]?.id ?? '');
   const [showJson, setShowJson] = useState(false);
