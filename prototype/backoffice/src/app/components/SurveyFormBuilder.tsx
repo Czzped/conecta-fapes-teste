@@ -418,6 +418,17 @@ const mergeSeedForms = (stored: StoredForm[]) => {
   return [...stored, ...missingSeeds];
 };
 
+const initializeForms = () => {
+  const stored = readForms();
+  const forms = stored.length > 0 ? mergeSeedForms(stored) : createSeedForms();
+
+  if (typeof window !== 'undefined' && forms.length !== stored.length) {
+    writeForms(forms);
+  }
+
+  return forms;
+};
+
 const formatDate = (value: string) =>
   new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
@@ -428,10 +439,7 @@ const formatDate = (value: string) =>
   }).format(new Date(value));
 
 export const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onBack }) => {
-  const [forms, setForms] = useState<StoredForm[]>(() => {
-    const stored = readForms();
-    return stored.length > 0 ? mergeSeedForms(stored) : createSeedForms();
-  });
+  const [forms, setForms] = useState<StoredForm[]>(initializeForms);
   const [selectedId, setSelectedId] = useState(() => forms[0]?.id ?? '');
   const [showJson, setShowJson] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
