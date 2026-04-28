@@ -13,6 +13,7 @@ import { Configuracoes } from './Configuracoes';
 import { PessoasFisicas } from './PessoasFisicas';
 import { ReferenciasCorporativas } from './ReferenciasCorporativas';
 import { DocumentosExigidos } from './DocumentosExigidos';
+import { SurveyFormBuilder } from './SurveyFormBuilder';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -1468,7 +1469,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         ) : activePage === 'instituicoes' ? (
           <Instituicoes onBack={() => setActivePage('home')} />
         ) : activePage === 'formulario' ? (
-          <Editais isFormularioMode={true} onBack={() => setActivePage('configuracoes')} />
+          <SurveyFormBuilder onBack={() => setActivePage('configuracoes')} />
         ) : (
           <div className="p-8">
             <div className="mx-auto max-w-6xl">

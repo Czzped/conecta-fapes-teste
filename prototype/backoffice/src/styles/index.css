@@ -1,3 +1,400 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+
+.survey-form-builder {
+  font-family: var(--font-family);
+}
+
+.survey-form-builder .svc-creator {
+  --sjs-font-family: var(--font-family);
+  --sjs-primary-backcolor: #00c1af;
+  --sjs-primary-backcolor-light: rgba(0, 193, 175, 0.14);
+  --sjs-primary-backcolor-dark: #00a99a;
+  --sjs-primary-forecolor: #0b1222;
+  --sjs-general-backcolor: #111c30;
+  --sjs-general-backcolor-dim: #0b1222;
+  --sjs-general-backcolor-dim-light: #17233a;
+  --sjs-general-forecolor: #ffffff;
+  --sjs-general-forecolor-light: rgba(255, 255, 255, 0.66);
+  --sjs-border-default: rgba(255, 255, 255, 0.16);
+  --sjs-border-light: rgba(255, 255, 255, 0.1);
+  min-height: calc(100vh - 148px);
+}
+
+.survey-form-builder .svc-creator,
+.survey-form-builder .svc-tab-designer,
+.survey-form-builder .svc-side-bar,
+.survey-form-builder .svc-toolbox,
+.survey-form-builder .svc-property-grid,
+.survey-form-builder .svc-creator__content-wrapper {
+  background: #0b1222;
+}
+
+.survey-form-builder .svc-tabbed-menu-wrapper,
+.survey-form-builder .svc-toolbar-wrapper,
+.survey-form-builder .svc-side-bar__container-header,
+.survey-form-builder .svc-toolbox__panel,
+.survey-form-builder .spg-panel__content {
+  background: #111c30;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.survey-form-builder .svc-tabbed-menu-item,
+.survey-form-builder .svc-page__content,
+.survey-form-builder .svc-question__content,
+.survey-form-builder .svc-toolbox__item-title,
+.survey-form-builder .spg-title,
+.survey-form-builder .spg-question__title,
+.survey-form-builder .spg-input,
+.survey-form-builder .spg-dropdown {
+  color: #ffffff;
+  font-family: var(--font-family);
+}
+
+.survey-form-builder .svc-question__content,
+.survey-form-builder .svc-page,
+.survey-form-builder .svc-page__content {
+  background: rgba(30, 41, 59, 0.78);
+  border-color: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+}
+
+.survey-form-builder .svc-question__content--selected,
+.survey-form-builder .svc-page__content--selected {
+  box-shadow: 0 0 0 2px rgba(0, 193, 175, 0.42);
+}
+
+.survey-form-builder .spg-input,
+.survey-form-builder .spg-dropdown,
+.survey-form-builder .spg-comment {
+  background: rgba(15, 23, 42, 0.82);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.survey-form-builder .survey-action-button,
+.survey-form-builder .survey-json-toggle,
+.survey-form-builder .survey-remove-button {
+  align-items: center;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 600;
+  gap: 8px;
+  min-height: 36px;
+  padding: 8px 12px;
+  transition: background-color 0.16s, border-color 0.16s, color 0.16s;
+}
+
+.survey-form-builder .survey-action-button.primary {
+  background: #00c1af;
+  border: 1px solid #00c1af;
+  color: #0b1222;
+}
+
+.survey-form-builder .survey-action-button.primary:hover {
+  background: #0fd6c3;
+}
+
+.survey-form-builder .survey-action-button.secondary,
+.survey-form-builder .survey-json-toggle {
+  background: rgba(30, 41, 59, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.survey-form-builder .survey-action-button.secondary:hover,
+.survey-form-builder .survey-json-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.survey-form-builder .survey-remove-button {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.24);
+  color: #f87171;
+  margin-top: 12px;
+  width: 100%;
+}
+
+.survey-form-builder .survey-remove-button:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.42);
+}
+
+.survey-form-builder .survey-status {
+  border-radius: 999px;
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 5px 7px;
+}
+
+.survey-form-builder .survey-status.published {
+  background: rgba(0, 193, 175, 0.15);
+  color: #5eead4;
+}
+
+.survey-form-builder .survey-status.draft {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fbbf24;
+}
+
+.survey-form-builder .survey-field-label {
+  color: rgba(255, 255, 255, 0.55);
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin: 12px 0 6px;
+}
+
+.survey-form-builder .survey-field-input {
+  background: rgba(15, 23, 42, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius);
+  color: #ffffff;
+  font-size: 13px;
+  outline: none;
+  padding: 10px 11px;
+  width: 100%;
+}
+
+.survey-form-builder .survey-field-input:focus {
+  border-color: rgba(0, 193, 175, 0.72);
+  box-shadow: 0 0 0 3px rgba(0, 193, 175, 0.12);
+}
+
+.survey-form-builder .survey-list-search {
+  align-items: center;
+  background: rgba(15, 23, 42, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius);
+  color: rgba(255, 255, 255, 0.52);
+  display: flex;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 11px;
+  width: min(280px, 100%);
+}
+
+.survey-form-builder .survey-list-search input {
+  background: transparent;
+  border: 0;
+  color: #ffffff;
+  font-size: 13px;
+  min-width: 0;
+  outline: 0;
+  width: 100%;
+}
+
+.survey-form-builder .survey-list-search input::placeholder {
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.survey-form-builder .survey-list-filter {
+  background: rgba(15, 23, 42, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius);
+  color: #ffffff;
+  font-size: 13px;
+  min-height: 38px;
+  outline: 0;
+  padding: 0 10px;
+}
+
+.survey-form-builder .survey-forms-table {
+  overflow: hidden;
+}
+
+.survey-form-builder .survey-forms-table-header,
+.survey-form-builder .survey-forms-row {
+  align-items: center;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(220px, 1.6fr) minmax(130px, 0.7fr) minmax(94px, 0.5fr) 72px minmax(132px, 0.7fr) 172px;
+}
+
+.survey-form-builder .survey-forms-table-header {
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0 12px 8px;
+  text-transform: uppercase;
+}
+
+.survey-form-builder .survey-forms-row {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  color: rgba(255, 255, 255, 0.66);
+  cursor: pointer;
+  font-size: 12px;
+  margin-top: 8px;
+  padding: 12px;
+  text-align: left;
+  transition: background-color 0.16s, border-color 0.16s;
+  width: 100%;
+}
+
+.survey-form-builder .survey-forms-row:hover,
+.survey-form-builder .survey-forms-row.active {
+  background: rgba(0, 193, 175, 0.11);
+  border-color: rgba(0, 193, 175, 0.36);
+}
+
+.survey-form-builder .survey-forms-row-title,
+.survey-form-builder .survey-forms-row-description {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.survey-form-builder .survey-forms-row-title {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.survey-form-builder .survey-forms-row-description {
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.survey-form-builder .survey-row-actions {
+  display: inline-flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.survey-form-builder .survey-row-action {
+  align-items: center;
+  background: transparent;
+  border: 1px solid rgba(94, 234, 212, 0.22);
+  border-radius: var(--radius);
+  color: #5eead4;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 700;
+  gap: 6px;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 9px;
+}
+
+.survey-form-builder .survey-row-action:hover {
+  background: rgba(0, 193, 175, 0.1);
+  border-color: rgba(94, 234, 212, 0.42);
+}
+
+.survey-form-builder .survey-empty-list {
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius);
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 13px;
+  padding: 18px;
+  text-align: center;
+}
+
+@media (max-width: 1120px) {
+  .survey-form-builder .survey-forms-table-header {
+    display: none;
+  }
+
+  .survey-form-builder .survey-forms-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .survey-form-builder .survey-row-actions {
+    justify-content: flex-start;
+  }
+}
+
+.survey-form-builder .survey-runtime-panel {
+  background: #0b1222;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.survey-form-builder .survey-runtime-header {
+  align-items: flex-start;
+  background: #111c30;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 18px 22px;
+}
+
+.survey-form-builder .survey-runtime-header h2 {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.survey-form-builder .survey-runtime-header p {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 13px;
+  margin: 4px 0 0;
+}
+
+.survey-form-builder .survey-runtime-surface {
+  --sjs-font-family: var(--font-family);
+  --sjs-primary-backcolor: #00c1af;
+  --sjs-primary-backcolor-light: rgba(0, 193, 175, 0.14);
+  --sjs-primary-backcolor-dark: #00a99a;
+  --sjs-primary-forecolor: #0b1222;
+  --sjs-general-backcolor: #111c30;
+  --sjs-general-backcolor-dim: #0b1222;
+  --sjs-general-backcolor-dim-light: #17233a;
+  --sjs-general-forecolor: #ffffff;
+  --sjs-general-forecolor-light: rgba(255, 255, 255, 0.66);
+  --sjs-border-default: rgba(255, 255, 255, 0.16);
+  --sjs-border-light: rgba(255, 255, 255, 0.1);
+  background: #0b1222;
+  min-height: 560px;
+  padding: 12px;
+}
+
+.survey-form-builder .survey-usage-context {
+  display: grid;
+  gap: 8px;
+}
+
+.survey-form-builder .survey-usage-context span {
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.survey-form-builder .survey-usage-context strong {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.survey-form-builder .survey-usage-step {
+  align-items: flex-start;
+  color: rgba(255, 255, 255, 0.72);
+  display: flex;
+  font-size: 13px;
+  gap: 9px;
+  line-height: 1.4;
+  margin-top: 12px;
+}
+
+.survey-form-builder .survey-usage-step svg {
+  color: #00c1af;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
