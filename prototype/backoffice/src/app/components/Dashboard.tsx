@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, FileEdit, Settings } from 'lucide-react';
+import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, FileEdit, Settings, Inbox } from 'lucide-react';
 import { toast } from 'sonner';
 import conectaSymbol from 'figma:asset/db135b6708f6cc7f72f27c6a31dd02aa5500d030.png';
 import fapesLogo from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
@@ -14,6 +14,7 @@ import { PessoasFisicas } from './PessoasFisicas';
 import { ReferenciasCorporativas } from './ReferenciasCorporativas';
 import { DocumentosExigidos } from './DocumentosExigidos';
 import { SurveyFormBuilder } from './SurveyFormBuilder';
+import { CaixaEntrada } from './CaixaEntrada';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -24,7 +25,7 @@ type Contrast = 'normal' | 'high' | 'maximum';
 type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
 type Language = 'pt' | 'en' | 'es';
 type NotificationTab = 'avisos' | 'editais';
-type ActivePage = 'home' | 'dashboard' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos';
+type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
 type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outra Iniciativa Exemplo' | 'Mais uma Iniciativa Exemplo';
@@ -48,7 +49,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [activePage, setActivePage] = useState<ActivePage>('dashboard');
   const [selectedPagamento, setSelectedPagamento] = useState<PagamentoCard | null>(null);
   
-  const [theme, setTheme] = useState<Theme>('dark');
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === 'undefined') return 'dark';
+    const saved = window.localStorage.getItem('conecta-theme');
+    return saved === 'light' || saved === 'dark' || saved === 'auto' ? (saved as Theme) : 'dark';
+  });
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('conecta-theme', theme);
+    }
+  }, [theme]);
   const [contrast, setContrast] = useState<Contrast>('normal');
   const [fontSize, setFontSize] = useState<FontSize>('medium');
   const [language, setLanguage] = useState<Language>('pt');
@@ -219,6 +230,45 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
           {/* Menu */}
           <div className={`mt-6 transition-all duration-300 ${sidebarExpanded ? 'w-full px-4' : 'w-auto'}`}>
+            {/* Caixa de Entrada */}
+            <button
+              className="flex items-center gap-3 rounded-lg transition-all duration-200"
+              aria-label="Caixa de Entrada"
+              style={{
+                backgroundColor: activePage === 'caixa-entrada' ? T.menuActiveBg : 'transparent',
+                padding: sidebarExpanded ? '12px 16px' : '12px',
+                width: sidebarExpanded ? '100%' : '48px',
+                justifyContent: sidebarExpanded ? 'flex-start' : 'center',
+              }}
+              onClick={() => setActivePage('caixa-entrada')}
+              onMouseEnter={(e) => { if (activePage !== 'caixa-entrada') e.currentTarget.style.backgroundColor = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.07)'; }}
+              onMouseLeave={(e) => { if (activePage !== 'caixa-entrada') e.currentTarget.style.backgroundColor = 'transparent'; }}
+            >
+              <Inbox
+                size={20}
+                style={{
+                  color: activePage === 'caixa-entrada' ? T.menuActiveText : T.menuInactiveText,
+                  flexShrink: 0,
+                  transition: 'color 0.3s',
+                }}
+              />
+              {sidebarExpanded && (
+                <span
+                  style={{
+                    fontFamily: 'var(--font-family)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    color: activePage === 'caixa-entrada' ? T.menuActiveText : T.menuInactiveText,
+                    transition: 'color 0.3s',
+                  }}
+                >
+                  Caixa de Entrada
+                </span>
+              )}
+            </button>
+
+            <div style={{ height: '8px' }} />
+
             {/* Dashboard */}
             <button
               className="flex items-center gap-3 rounded-lg transition-all duration-200"
@@ -475,6 +525,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           </div>
 
           <div className="flex items-center justify-end gap-1">
+          {/* Toggle de Tema (Claro/Escuro) */}
+          <button
+            onClick={() => setTheme(isLight ? 'dark' : 'light')}
+            className={`p-2 transition-colors rounded-lg ${T.hoverClass}`}
+            style={{ color: T.iconColor }}
+            title={isLight ? 'Mudar para tema escuro' : 'Mudar para tema claro'}
+            aria-label={isLight ? 'Mudar para tema escuro' : 'Mudar para tema claro'}
+          >
+            {isLight ? <Moon size={20} /> : <Sun size={20} />}
+          </button>
+
           {/* Ícone de Configurações */}
           <button
             onClick={() => {
@@ -1440,6 +1501,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               )}
             </div>
           </div>
+        ) : activePage === 'caixa-entrada' ? (
+          <CaixaEntrada
+            isLight={isLight}
+            onNavigate={(destino) => setActivePage(destino as ActivePage)}
+          />
         ) : activePage === 'editais' ? (
           <Editais />
         ) : activePage === 'editais-light' ? (
