@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { ArrowLeft, Building2, ChevronDown, ChevronRight, Plus, Save, Search, Trash2 } from 'lucide-react';
+import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
 type NaturezaJuridica = 'Publica' | 'Privada';
 type SituacaoInstituicao = 'Ativa' | 'Inativa';
@@ -31,48 +32,46 @@ interface SubestruturaDraft {
   cnpj: string;
 }
 
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  backgroundColor: 'rgba(30,41,59,0.5)',
-  border: '1px solid rgba(255,255,255,0.1)',
-  borderRadius: '6px',
-  padding: '10px 12px',
-  color: '#ffffff',
-  fontFamily: 'var(--font-family)',
-  fontSize: 'var(--text-sm)',
-  outline: 'none',
-  boxSizing: 'border-box',
-};
-
-const labelStyle: React.CSSProperties = {
-  display: 'block',
-  fontFamily: 'var(--font-family)',
-  fontSize: 'var(--text-sm)',
-  color: 'rgba(255,255,255,0.7)',
-  marginBottom: '8px',
-};
-
-const cardStyle = (): React.CSSProperties => ({
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
-  border: '1px solid rgba(255,255,255,0.1)',
-  borderRadius: '10px',
-  padding: '20px',
+const buildStyles = (T: ThemeTokens) => ({
+  input: {
+    width: '100%',
+    backgroundColor: T.bgInput,
+    border: `1px solid ${T.borderDefault}`,
+    borderRadius: '6px',
+    padding: '10px 12px',
+    color: T.textPrimary,
+    fontFamily: 'var(--font-family)',
+    fontSize: 'var(--text-sm)',
+    outline: 'none',
+    boxSizing: 'border-box',
+  } as React.CSSProperties,
+  label: {
+    display: 'block',
+    fontFamily: 'var(--font-family)',
+    fontSize: 'var(--text-sm)',
+    color: T.textSecondary,
+    marginBottom: '8px',
+  } as React.CSSProperties,
+  card: {
+    backgroundColor: T.bgCard,
+    border: `1px solid ${T.borderSubtle}`,
+    borderRadius: '10px',
+    padding: '20px',
+  } as React.CSSProperties,
+  sectionTitle: {
+    fontFamily: 'var(--font-family)',
+    fontSize: 'var(--text-sm)',
+    color: T.textPrimary,
+    fontWeight: 'var(--font-weight-medium)',
+    margin: '0 0 6px',
+  } as React.CSSProperties,
+  sectionSubtitle: {
+    fontFamily: 'var(--font-family)',
+    fontSize: 'var(--text-sm)',
+    color: T.textSecondary,
+    margin: 0,
+  } as React.CSSProperties,
 });
-
-const sectionTitleStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-family)',
-  fontSize: 'var(--text-sm)',
-  color: '#ffffff',
-  fontWeight: 'var(--font-weight-medium)',
-  margin: '0 0 6px',
-};
-
-const sectionSubtitleStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-family)',
-  fontSize: 'var(--text-sm)',
-  color: 'rgba(255,255,255,0.55)',
-  margin: 0,
-};
 
 const statusColor = (situacao: SituacaoInstituicao) => situacao === 'Ativa' ? '#22c55e' : '#94a3b8';
 
@@ -119,6 +118,9 @@ const getClassificacao = (item: Pick<InstituicaoItem, 'cnpj' | 'superior'>) => {
 };
 
 export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  const { T } = useThemeTokens();
+  const S = buildStyles(T);
+
   const [activeTab, setActiveTab] = useState<ActiveTab>('listagem');
   const [searchTerm, setSearchTerm] = useState('');
   const [naturezaFilter, setNaturezaFilter] = useState<'Todos' | NaturezaJuridica>('Todos');
@@ -176,17 +178,11 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   };
 
   const updateDraft = (field: keyof InstituicaoItem, value: string | boolean) => {
-    setDraft(prev => ({
-      ...prev,
-      [field]: value,
-    }));
+    setDraft(prev => ({ ...prev, [field]: value }));
   };
 
   const addSubestrutura = () => {
-    setDraftSubestruturas(prev => [
-      ...prev,
-      { id: Date.now() + prev.length, nome: '', sigla: '', cnpj: '' },
-    ]);
+    setDraftSubestruturas(prev => [...prev, { id: Date.now() + prev.length, nome: '', sigla: '', cnpj: '' }]);
   };
 
   const updateSubestrutura = (id: number, field: keyof SubestruturaDraft, value: string) => {
@@ -199,10 +195,7 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   const saveDraft = () => {
     const isSetorSemCnpj = !draft.cnpj;
-    const saved = {
-      ...draft,
-      razaoSocial: isSetorSemCnpj ? '' : draft.razaoSocial,
-    };
+    const saved = { ...draft, razaoSocial: isSetorSemCnpj ? '' : draft.razaoSocial };
     const previousParentName = selected?.nome || saved.nome;
     const subestruturas: InstituicaoItem[] = draftSubestruturas
       .filter(item => item.nome.trim())
@@ -236,28 +229,23 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   if (showForm || selected) {
     const isSetorSemCnpj = !draft.cnpj;
-    const superiorOptions = [
-      '',
-      ...instituicoes
-        .filter(item => item.id !== draft.id)
-        .map(item => item.nome),
-    ];
+    const superiorOptions = ['', ...instituicoes.filter(item => item.id !== draft.id).map(item => item.nome)];
 
     return (
-      <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+      <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
         <div className="pt-8 px-8 pb-8">
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '28px' }}>
             <button
               onClick={() => { setShowForm(false); setSelected(null); }}
-              style={{ width: '36px', height: '36px', border: 'none', borderRadius: 'var(--radius)', backgroundColor: 'rgba(0,193,175,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+              style={{ width: '36px', height: '36px', border: 'none', borderRadius: 'var(--radius)', backgroundColor: T.accentSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
             >
-              <ArrowLeft size={18} style={{ color: '#00c1af' }} />
+              <ArrowLeft size={18} style={{ color: T.accent }} />
             </button>
             <div style={{ flex: 1 }}>
-              <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 8px' }}>
+              <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 8px' }}>
                 {showForm ? 'Nova Instituição' : draft.nome}
               </h1>
-              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
                 Cadastre instituições, unidades com CNPJ e setores sem CNPJ na mesma estrutura organizacional.
               </p>
             </div>
@@ -265,7 +253,7 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <button
                 type="button"
                 onClick={openNew}
-                style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(0,193,175,0.12)', border: '1px solid rgba(0,193,175,0.35)', borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', cursor: 'pointer' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: T.accentSoft, border: `1px solid ${T.accent}`, borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.accent, cursor: 'pointer' }}
               >
                 <Plus size={15} />
                 Nova Instituição
@@ -302,20 +290,20 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <Field label="UF" value={draft.uf} onChange={value => updateDraft('uf', value.toUpperCase().slice(0, 2))} placeholder="UF" />
             </div>
 
-            <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '18px' }}>
+            <div style={{ borderTop: `1px solid ${T.borderSubtle}`, paddingTop: '18px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '14px' }}>
                 <div>
-                  <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 4px' }}>
+                  <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 4px' }}>
                     Subestruturas
                   </h3>
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, margin: 0 }}>
                     Cadastre unidades com CNPJ ou setores sem CNPJ vinculados a esta instituição.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={addSubestrutura}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(0,193,175,0.12)', border: '1px solid rgba(0,193,175,0.35)', borderRadius: 'var(--radius)', padding: '8px 12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', cursor: 'pointer', flexShrink: 0 }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: T.accentSoft, border: `1px solid ${T.accent}`, borderRadius: 'var(--radius)', padding: '8px 12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.accent, cursor: 'pointer', flexShrink: 0 }}
                 >
                   <Plus size={14} />
                   Adicionar
@@ -323,20 +311,20 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               </div>
 
               {draftSubestruturas.length === 0 ? (
-                <div style={{ border: '1px dashed rgba(255,255,255,0.14)', borderRadius: '8px', padding: '16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)' }}>
+                <div style={{ border: `1px dashed ${T.borderDefault}`, borderRadius: '8px', padding: '16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textMuted }}>
                   Nenhuma subestrutura cadastrada nesta instituição.
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {draftSubestruturas.map(item => (
-                    <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.5fr 0.7fr auto', gap: '12px', alignItems: 'end', padding: '14px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+                    <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.5fr 0.7fr auto', gap: '12px', alignItems: 'end', padding: '14px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
                       <Field label="Nome" value={item.nome} onChange={value => updateSubestrutura(item.id, 'nome', value)} placeholder="Nome da unidade ou setor" />
                       <Field label="Sigla" value={item.sigla} onChange={value => updateSubestrutura(item.id, 'sigla', value)} placeholder="Sigla" />
                       <Field label="CNPJ" value={item.cnpj} onChange={value => updateSubestrutura(item.id, 'cnpj', maskCnpj(value))} placeholder="Opcional" />
                       <button
                         type="button"
                         onClick={() => removeSubestrutura(item.id)}
-                        style={{ width: '38px', height: '38px', border: '1px solid rgba(239,68,68,0.35)', borderRadius: 'var(--radius)', backgroundColor: 'transparent', color: '#f87171', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                        style={{ width: '38px', height: '38px', border: '1px solid rgba(239,68,68,0.35)', borderRadius: 'var(--radius)', backgroundColor: 'transparent', color: T.danger, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
                         aria-label="Remover subestrutura"
                       >
                         <Trash2 size={15} />
@@ -359,16 +347,16 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
             {selected && (
-              <button type="button" onClick={removeDraft} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.35)', borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#f87171', cursor: 'pointer' }}>
+              <button type="button" onClick={removeDraft} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.35)', borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.danger, cursor: 'pointer' }}>
                 <Trash2 size={15} />
                 Remover
               </button>
             )}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', flex: 1 }}>
-              <button type="button" onClick={() => { setShowForm(false); setSelected(null); }} style={{ backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.75)', cursor: 'pointer' }}>
+              <button type="button" onClick={() => { setShowForm(false); setSelected(null); }} style={{ backgroundColor: 'transparent', border: `1px solid ${T.borderStrong}`, borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, cursor: 'pointer' }}>
                 Cancelar
               </button>
-              <button type="button" onClick={saveDraft} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#0f172a', cursor: 'pointer' }}>
+              <button type="button" onClick={saveDraft} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: T.accent, border: 'none', borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: T.accentText, cursor: 'pointer' }}>
                 <Save size={15} />
                 Salvar
               </button>
@@ -380,41 +368,41 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   }
 
   return (
-    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
         <div className="mb-6">
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', flex: 1 }}>
-              <button onClick={onBack} style={{ width: '36px', height: '36px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(30,41,59,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
+              <button onClick={onBack} style={{ width: '36px', height: '36px', border: `1px solid ${T.borderSubtle}`, borderRadius: 'var(--radius)', backgroundColor: T.bgCard, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                <ArrowLeft size={16} style={{ color: T.textSecondary }} />
               </button>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', flexShrink: 0, backgroundColor: 'rgba(0,193,175,0.15)', borderRadius: 'var(--radius)' }}>
-                <Building2 size={18} style={{ color: '#00c1af' }} />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', flexShrink: 0, backgroundColor: T.accentSoft, borderRadius: 'var(--radius)' }}>
+                <Building2 size={18} style={{ color: T.accent }} />
               </div>
               <div style={{ flex: 1, marginTop: '6px' }}>
-                <h1 className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: '#ffffff', lineHeight: '1.5' }}>
+                <h1 className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: T.textPrimary, lineHeight: '1.5' }}>
                   Instituições
                 </h1>
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: '1.5' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0, lineHeight: '1.5' }}>
                   Gerencie instituições públicas e privadas, unidades com CNPJ e setores sem CNPJ.
                 </p>
               </div>
             </div>
-            <button onClick={openNew} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', padding: '10px 18px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#0f172a', cursor: 'pointer', flexShrink: 0 }}>
+            <button onClick={openNew} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: T.accent, border: 'none', borderRadius: 'var(--radius)', padding: '10px 18px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: T.accentText, cursor: 'pointer', flexShrink: 0 }}>
               <Plus size={16} />
               Nova Instituição
             </button>
           </div>
         </div>
 
-        <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', margin: '20px 0 28px' }} />
+        <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, margin: '20px 0 28px' }} />
 
-        <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '28px' }}>
+        <div style={{ display: 'flex', gap: '4px', borderBottom: `1px solid ${T.borderSubtle}`, marginBottom: '28px' }}>
           {[
             { id: 'listagem' as ActiveTab, label: 'Instituições' },
             { id: 'dashboard' as ActiveTab, label: 'Dashboard' },
           ].map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === tab.id ? '2px solid #00c1af' : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: activeTab === tab.id ? '#00c1af' : 'rgba(255,255,255,0.6)', cursor: 'pointer', marginBottom: '-1px' }}>
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === tab.id ? `2px solid ${T.accent}` : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: activeTab === tab.id ? T.accent : T.textSecondary, cursor: 'pointer', marginBottom: '-1px' }}>
               {tab.label}
             </button>
           ))}
@@ -423,28 +411,28 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         {activeTab === 'dashboard' && (
           <div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-              <Metric label="Total de instituições" value={String(instituicoes.length)} color="#ffffff" bg="rgba(255,255,255,0.08)" />
+              <Metric label="Total de instituições" value={String(instituicoes.length)} color={T.textPrimary} bg={T.bgChip} />
               <Metric label="Públicas" value={String(totalPublicas)} color="#38bdf8" bg="rgba(56,189,248,0.12)" />
               <Metric label="Privadas" value={String(totalPrivadas)} color="#a855f7" bg="rgba(168,85,247,0.12)" />
               <Metric label="Raiz" value={String(instituicoesRaiz)} color="#f59e0b" bg="rgba(245,158,11,0.12)" />
             </div>
 
-            <div style={cardStyle()}>
-              <h2 style={sectionTitleStyle}>Estruturas por tipo</h2>
-              <p style={{ ...sectionSubtitleStyle, marginBottom: '20px' }}>
+            <div style={S.card}>
+              <h2 style={S.sectionTitle}>Estruturas por tipo</h2>
+              <p style={{ ...S.sectionSubtitle, marginBottom: '20px' }}>
                 Distribuição entre instituições raiz, unidades que possuem CNPJ e setores sem CNPJ.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {estruturasPorTipo.map(item => {
                   const percentual = instituicoes.length > 0 ? (item.valor / instituicoes.length) * 100 : 0;
                   return (
-                    <div key={item.nome} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+                    <div key={item.nome} style={{ padding: '16px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
                       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.6fr 0.8fr', gap: '16px', marginBottom: '12px' }}>
                         <ListCell label="Tipo" value={item.nome} strong />
                         <ListCell label="Quantidade" value={String(item.valor)} highlight />
                         <ListCell label="Participação" value={`${percentual.toFixed(2).replace('.', ',')}%`} />
                       </div>
-                      <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                      <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: T.bgChip, overflow: 'hidden' }}>
                         <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: item.color }} />
                       </div>
                     </div>
@@ -453,9 +441,9 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               </div>
             </div>
 
-            <div style={{ ...cardStyle(), marginTop: '24px' }}>
-              <h2 style={sectionTitleStyle}>Identificação fiscal</h2>
-              <p style={{ ...sectionSubtitleStyle, marginBottom: '20px' }}>
+            <div style={{ ...S.card, marginTop: '24px' }}>
+              <h2 style={S.sectionTitle}>Identificação fiscal</h2>
+              <p style={{ ...S.sectionSubtitle, marginBottom: '20px' }}>
                 Controle de estruturas que possuem CNPJ próprio e estruturas internas cadastradas como setores.
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
@@ -470,10 +458,10 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           <>
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', marginBottom: '24px' }}>
               <div>
-                <label style={labelStyle}>Pesquisar</label>
+                <label style={S.label}>Pesquisar</label>
                 <div style={{ position: 'relative' }}>
-                  <input type="text" placeholder="Buscar por nome, sigla ou CNPJ..." value={searchTerm} onChange={event => setSearchTerm(event.target.value)} style={{ ...inputStyle, paddingLeft: '36px' }} />
-                  <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
+                  <input type="text" placeholder="Buscar por nome, sigla ou CNPJ..." value={searchTerm} onChange={event => setSearchTerm(event.target.value)} style={{ ...S.input, paddingLeft: '36px' }} />
+                  <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
                 </div>
               </div>
               <DropdownFilter label="Natureza" value={naturezaFilter} options={['Todos', 'Publica', 'Privada']} open={showNaturezaDropdown} setOpen={setShowNaturezaDropdown} onSelect={value => setNaturezaFilter(value as typeof naturezaFilter)} />
@@ -481,7 +469,7 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {filtered.map(item => (
-                <button key={item.id} onClick={() => openDetails(item)} style={{ textAlign: 'left', backgroundColor: 'rgba(30,41,59,0.6)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '18px 20px', cursor: 'pointer' }}>
+                <button key={item.id} onClick={() => openDetails(item)} style={{ textAlign: 'left', backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '10px', padding: '18px 20px', cursor: 'pointer' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '2fr 0.8fr 1fr 1.2fr 1fr 0.7fr auto', gap: '18px', alignItems: 'start' }}>
                     <ListCell label="Instituição" value={`${item.sigla} · ${item.nome}`} strong />
                     <ListCell label="Natureza" value={item.natureza === 'Publica' ? 'Pública' : 'Privada'} />
@@ -489,12 +477,12 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <ListCell label="CNPJ" value={item.cnpj || 'Não possui'} detail={item.superior ? `Superior: ${item.superior}` : 'Sem superior'} />
                     <ListCell label="Dirigente" value={item.dirigente} detail={`${item.dataInicioMandato || '-'} a ${item.dataFimMandato || '-'}`} />
                     <div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>Situação</div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>Situação</div>
                       <span style={{ display: 'inline-block', backgroundColor: `${statusColor(item.situacao)}20`, border: `1px solid ${statusColor(item.situacao)}`, borderRadius: '999px', padding: '3px 12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: statusColor(item.situacao) }}>
                         {item.situacao}
                       </span>
                     </div>
-                    <ChevronRight size={18} style={{ color: 'rgba(255,255,255,0.3)', marginTop: '20px' }} />
+                    <ChevronRight size={18} style={{ color: T.iconSubdued, marginTop: '20px' }} />
                   </div>
                 </button>
               ))}
@@ -506,74 +494,97 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   );
 };
 
-const Field: React.FC<{ label: string; value: string; onChange: (value: string) => void; placeholder?: string; disabled?: boolean }> = ({ label, value, onChange, placeholder, disabled }) => (
-  <div>
-    <label style={labelStyle}>{label}</label>
-    <input type="text" value={disabled ? '' : value} placeholder={placeholder} disabled={disabled} onChange={event => onChange(event.target.value)} style={{ ...inputStyle, opacity: disabled ? 0.55 : 1 }} />
-  </div>
-);
-
-const Select: React.FC<{ label: string; value: string; onChange: (value: string) => void; options: string[]; disabled?: boolean }> = ({ label, value, onChange, options, disabled }) => (
-  <div>
-    <label style={labelStyle}>{label}</label>
-    <select value={disabled ? '' : value} disabled={disabled} onChange={event => onChange(event.target.value)} style={{ ...inputStyle, colorScheme: 'dark', opacity: disabled ? 0.55 : 1 }}>
-      {options.map(option => (
-        <option key={option} value={option}>{option || 'Nenhuma'}</option>
-      ))}
-    </select>
-  </div>
-);
-
-const FormSection: React.FC<{ number: string; title: string; subtitle: string; children: React.ReactNode }> = ({ number, title, subtitle, children }) => (
-  <div style={{ ...cardStyle(), marginBottom: '24px' }}>
-    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', marginBottom: '20px' }}>
-      <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'rgba(0,193,175,0.15)', color: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>
-        {number}
-      </div>
-      <div>
-        <h2 style={sectionTitleStyle}>{title}</h2>
-        <p style={sectionSubtitleStyle}>{subtitle}</p>
-      </div>
+const Field: React.FC<{ label: string; value: string; onChange: (value: string) => void; placeholder?: string; disabled?: boolean }> = ({ label, value, onChange, placeholder, disabled }) => {
+  const { T } = useThemeTokens();
+  const S = buildStyles(T);
+  return (
+    <div>
+      <label style={S.label}>{label}</label>
+      <input type="text" value={disabled ? '' : value} placeholder={placeholder} disabled={disabled} onChange={event => onChange(event.target.value)} style={{ ...S.input, opacity: disabled ? 0.55 : 1 }} />
     </div>
-    {children}
-  </div>
-);
+  );
+};
 
-const Metric: React.FC<{ label: string; value: string; color: string; bg: string }> = ({ label, value, color, bg }) => (
-  <div style={cardStyle()}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: bg, borderRadius: 'var(--radius)', flexShrink: 0 }}>
-        <Building2 size={20} style={{ color }} />
-      </div>
-      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', margin: 0 }}>{label}</p>
-    </div>
-    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: '#ffffff', textAlign: 'center', margin: 0 }}>{value}</p>
-  </div>
-);
-
-const ListCell: React.FC<{ label: string; value: string; detail?: string; strong?: boolean; highlight?: boolean }> = ({ label, value, detail, strong, highlight }) => (
-  <div>
-    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>{label}</div>
-    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: highlight ? '#22c55e' : strong ? '#ffffff' : 'rgba(255,255,255,0.75)', fontWeight: strong ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', lineHeight: 1.4 }}>{value || '-'}</div>
-    {detail && <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginTop: '4px' }}>{detail}</div>}
-  </div>
-);
-
-const DropdownFilter: React.FC<{ label: string; value: string; options: string[]; open: boolean; setOpen: (open: boolean) => void; onSelect: (value: string) => void; onBeforeOpen?: () => void }> = ({ label, value, options, open, setOpen, onSelect, onBeforeOpen }) => (
-  <div style={{ position: 'relative' }}>
-    <label style={labelStyle}>{label}</label>
-    <button onClick={() => { onBeforeOpen?.(); setOpen(!open); }} style={{ width: '100%', backgroundColor: 'rgba(30,41,59,0.5)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', padding: '10px 12px', color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-      <span>{value}</span>
-      <ChevronDown size={16} style={{ color: 'rgba(255,255,255,0.5)', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
-    </button>
-    {open && (
-      <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', overflow: 'hidden', zIndex: 100 }}>
+const Select: React.FC<{ label: string; value: string; onChange: (value: string) => void; options: string[]; disabled?: boolean }> = ({ label, value, onChange, options, disabled }) => {
+  const { T, isLight } = useThemeTokens();
+  const S = buildStyles(T);
+  return (
+    <div>
+      <label style={S.label}>{label}</label>
+      <select value={disabled ? '' : value} disabled={disabled} onChange={event => onChange(event.target.value)} style={{ ...S.input, colorScheme: isLight ? 'light' : 'dark', opacity: disabled ? 0.55 : 1 }}>
         {options.map(option => (
-          <button key={option} onClick={() => { onSelect(option); setOpen(false); }} style={{ width: '100%', padding: '10px 12px', textAlign: 'left', backgroundColor: value === option ? 'rgba(0,193,175,0.1)' : 'transparent', color: value === option ? '#00c1af' : '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', border: 'none', cursor: 'pointer' }}>
-            {option}
-          </button>
+          <option key={option} value={option}>{option || 'Nenhuma'}</option>
         ))}
+      </select>
+    </div>
+  );
+};
+
+const FormSection: React.FC<{ number: string; title: string; subtitle: string; children: React.ReactNode }> = ({ number, title, subtitle, children }) => {
+  const { T } = useThemeTokens();
+  const S = buildStyles(T);
+  return (
+    <div style={{ ...S.card, marginBottom: '24px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', marginBottom: '20px' }}>
+        <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: T.accentSoft, color: T.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>
+          {number}
+        </div>
+        <div>
+          <h2 style={S.sectionTitle}>{title}</h2>
+          <p style={S.sectionSubtitle}>{subtitle}</p>
+        </div>
       </div>
-    )}
-  </div>
-);
+      {children}
+    </div>
+  );
+};
+
+const Metric: React.FC<{ label: string; value: string; color: string; bg: string }> = ({ label, value, color, bg }) => {
+  const { T } = useThemeTokens();
+  const S = buildStyles(T);
+  return (
+    <div style={S.card}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: bg, borderRadius: 'var(--radius)', flexShrink: 0 }}>
+          <Building2 size={20} style={{ color }} />
+        </div>
+        <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>{label}</p>
+      </div>
+      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: T.textPrimary, textAlign: 'center', margin: 0 }}>{value}</p>
+    </div>
+  );
+};
+
+const ListCell: React.FC<{ label: string; value: string; detail?: string; strong?: boolean; highlight?: boolean }> = ({ label, value, detail, strong, highlight }) => {
+  const { T } = useThemeTokens();
+  return (
+    <div>
+      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>{label}</div>
+      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: highlight ? '#22c55e' : strong ? T.textPrimary : T.textSecondary, fontWeight: strong ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', lineHeight: 1.4 }}>{value || '-'}</div>
+      {detail && <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginTop: '4px' }}>{detail}</div>}
+    </div>
+  );
+};
+
+const DropdownFilter: React.FC<{ label: string; value: string; options: string[]; open: boolean; setOpen: (open: boolean) => void; onSelect: (value: string) => void; onBeforeOpen?: () => void }> = ({ label, value, options, open, setOpen, onSelect, onBeforeOpen }) => {
+  const { T } = useThemeTokens();
+  const S = buildStyles(T);
+  return (
+    <div style={{ position: 'relative' }}>
+      <label style={S.label}>{label}</label>
+      <button onClick={() => { onBeforeOpen?.(); setOpen(!open); }} style={{ width: '100%', backgroundColor: T.bgInput, border: `1px solid ${T.borderDefault}`, borderRadius: '6px', padding: '10px 12px', color: T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+        <span>{value}</span>
+        <ChevronDown size={16} style={{ color: T.iconSubdued, transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+      </button>
+      {open && (
+        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: T.bgSurface, border: `1px solid ${T.borderDefault}`, borderRadius: '6px', overflow: 'hidden', zIndex: 100, boxShadow: T.shadowMd }}>
+          {options.map(option => (
+            <button key={option} onClick={() => { onSelect(option); setOpen(false); }} style={{ width: '100%', padding: '10px 12px', textAlign: 'left', backgroundColor: value === option ? T.accentSoft : 'transparent', color: value === option ? T.accent : T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', border: 'none', cursor: 'pointer' }}>
+              {option}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};

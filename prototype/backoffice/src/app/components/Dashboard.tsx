@@ -15,6 +15,7 @@ import { ReferenciasCorporativas } from './ReferenciasCorporativas';
 import { DocumentosExigidos } from './DocumentosExigidos';
 import { SurveyFormBuilder } from './SurveyFormBuilder';
 import { CaixaEntrada } from './CaixaEntrada';
+import { ThemeProvider } from '../theme/ThemeContext';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -162,6 +163,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   };
 
   return (
+    <ThemeProvider isLight={isLight}>
     <div
       className="min-h-screen"
       data-theme={theme === 'auto' ? 'dark' : theme}
@@ -1959,5 +1961,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         </div>
       )}
     </div>
+    </ThemeProvider>
   );
 };

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowLeft, BookOpen, Building2, ChevronRight, Database, FileCheck2, Settings, Target, UserRound } from 'lucide-react';
+import { useThemeTokens } from '../theme/ThemeContext';
 
 interface ConfiguracoesProps {
   onBack: () => void;
@@ -10,13 +11,6 @@ interface ConfiguracoesProps {
   onOpenDocumentos: () => void;
   onOpenFormularios: () => void;
 }
-
-const cardStyle: React.CSSProperties = {
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
-  border: '1px solid rgba(255,255,255,0.1)',
-  borderRadius: '10px',
-  padding: '22px',
-};
 
 const actions = [
   {
@@ -64,6 +58,15 @@ const actions = [
 ];
 
 export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlanejamento, onOpenInstituicoes, onOpenPessoas, onOpenReferencias, onOpenDocumentos, onOpenFormularios }) => {
+  const { T } = useThemeTokens();
+
+  const cardStyle: React.CSSProperties = {
+    backgroundColor: T.bgCard,
+    border: `1px solid ${T.borderSubtle}`,
+    borderRadius: '10px',
+    padding: '22px',
+  };
+
   const handleOpen = (key: string) => {
     if (key === 'planejamento') {
       onOpenPlanejamento();
@@ -89,35 +92,35 @@ export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlan
   };
 
   return (
-    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '28px' }}>
           <button
             onClick={onBack}
-            style={{ width: '36px', height: '36px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(30,41,59,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            style={{ width: '36px', height: '36px', border: `1px solid ${T.borderSubtle}`, borderRadius: 'var(--radius)', backgroundColor: T.bgCard, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
           >
-            <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
+            <ArrowLeft size={16} style={{ color: T.textSecondary }} />
           </button>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', flexShrink: 0, backgroundColor: 'rgba(0,193,175,0.15)', borderRadius: 'var(--radius)' }}>
-            <Settings size={18} style={{ color: '#00c1af' }} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', flexShrink: 0, backgroundColor: T.accentSoft, borderRadius: 'var(--radius)' }}>
+            <Settings size={18} style={{ color: T.accent }} />
           </div>
           <div style={{ flex: 1, marginTop: '4px' }}>
-            <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: '#ffffff', margin: '0 0 8px', lineHeight: '1.5' }}>
+            <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: T.textPrimary, margin: '0 0 8px', lineHeight: '1.5' }}>
               Configurações
             </h1>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: '1.5' }}>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0, lineHeight: '1.5' }}>
               Acesse cadastros estruturantes e rotinas usadas com menor frequência no backoffice.
             </p>
           </div>
         </div>
 
-        <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', margin: '20px 0 28px' }} />
+        <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, margin: '20px 0 28px' }} />
 
         <div style={{ ...cardStyle, marginBottom: '24px' }}>
-          <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+          <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
             Cadastros e Parâmetros
           </h2>
-          <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+          <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
             Use esta área para manter dados de base que dão suporte aos módulos operacionais.
           </p>
         </div>
@@ -134,14 +137,14 @@ export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlan
                 <Icon size={22} style={{ color }} />
               </div>
               <div style={{ flex: 1 }}>
-                <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 8px' }}>
+                <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 8px' }}>
                   {title}
                 </h3>
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.58)', margin: 0, lineHeight: 1.5 }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0, lineHeight: 1.5 }}>
                   {description}
                 </p>
               </div>
-              <ChevronRight size={18} style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0 }} />
+              <ChevronRight size={18} style={{ color: T.iconSubdued, flexShrink: 0 }} />
             </button>
           ))}
         </div>
