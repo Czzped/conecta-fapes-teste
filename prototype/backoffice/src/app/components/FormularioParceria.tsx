@@ -74,6 +74,13 @@ const calcularPercentualAcaoTransversal = (valor: number) => {
   return 3;
 };
 
+const definirFaixaAcaoTransversal = (valor: number) => {
+  if (valor < 50000) return 'Sem retenção';
+  if (valor <= 2000000) return 'Faixa 1';
+  if (valor <= 5000000) return 'Faixa 2';
+  return 'Faixa 3';
+};
+
 const SelectField: React.FC<{
   label?: string;
   value: string;
@@ -217,9 +224,11 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
   const [valorAporteOriginal, setValorAporteOriginal] = useState('');
   const [dataAporteOriginal, setDataAporteOriginal] = useState('');
   const [contaBancariaDestino, setContaBancariaDestino] = useState('');
+  const [contaBancariaAcaoTransversal, setContaBancariaAcaoTransversal] = useState('');
   const [documentos, setDocumentos] = useState<Documento[]>([{ id: 1, tipo: '', arquivo: '' }]);
   const valorAporteOriginalNumerico = parseCurrencyValue(valorAporteOriginal);
   const percentualAcaoTransversal = calcularPercentualAcaoTransversal(valorAporteOriginalNumerico);
+  const faixaAcaoTransversal = definirFaixaAcaoTransversal(valorAporteOriginalNumerico);
   const valorReservaAcaoTransversal = valorAporteOriginalNumerico * percentualAcaoTransversal / 100;
   const saldoAlocavelEmProgramas = Math.max(valorAporteOriginalNumerico - valorReservaAcaoTransversal, 0);
 
@@ -334,14 +343,16 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
             <Field label="Valor do Aporte Original (R$)" value={valorAporteOriginal} onChange={setValorAporteOriginal} placeholder="Ex: 1.000.000,00" />
             <DateField label="Data do Aporte" value={dataAporteOriginal} onChange={setDataAporteOriginal} />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '16px', padding: '16px', border: '1px solid rgba(245,158,11,0.28)', borderRadius: '8px', backgroundColor: 'rgba(245,158,11,0.08)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: '12px', marginBottom: '16px', padding: '16px', border: '1px solid rgba(245,158,11,0.28)', borderRadius: '8px', backgroundColor: 'rgba(245,158,11,0.08)' }}>
             <Metric label="Política" value="Res. CCAF 334/2023" />
+            <Metric label="Faixa aplicada" value={faixaAcaoTransversal} />
             <Metric label="Percentual Ação Transversal" value={formatPercent(percentualAcaoTransversal)} />
             <Metric label="Reserva Ação Transversal" value={formatCurrency(valorReservaAcaoTransversal)} highlight />
             <Metric label="Saldo alocável em programas" value={formatCurrency(saldoAlocavelEmProgramas)} />
           </div>
-          <div>
-            <Field label="Conta Bancária de Destino" value={contaBancariaDestino} onChange={setContaBancariaDestino} placeholder="Banco / agência / conta" />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <Field label="Conta Bancária de Destino da Parceria" value={contaBancariaDestino} onChange={setContaBancariaDestino} placeholder="Banco / agência / conta" />
+            <Field label="Conta Ação Transversal" value={contaBancariaAcaoTransversal} onChange={setContaBancariaAcaoTransversal} placeholder="BANESTES / agência / conta específica" />
           </div>
         </Section>
 

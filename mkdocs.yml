@@ -98,6 +98,7 @@ nav:
       - Financeiro: discovery/domains/05-financeiro.md
       - Suporte e Inteligencia: discovery/domains/06-suporte-inteligencia.md
       - Importacao SIGFAPES: discovery/domains/07-importacao-sigfapes.md
+      - Acao Transversal: discovery/domains/08-acao-transversal.md
 
   - Produtos:
       - products/README.md
@@ -353,9 +354,17 @@ nav:
           - Modelo Comportamental: implementation/modules/M016-contabilidade-financeiro/modelo-comportamental.md
           - Acao Transversal:
               - Visao Geral: implementation/modules/M016-contabilidade-financeiro/acao-transversal/README.md
+              - Modelo: implementation/modules/M016-contabilidade-financeiro/acao-transversal/modelo/README.md
               - Processo: implementation/modules/M016-contabilidade-financeiro/acao-transversal/processo.md
               - Proposta de Tela e Impacto no Codigo: implementation/modules/M016-contabilidade-financeiro/acao-transversal/proposta-tela-e-impacto-codigo.md
-              - EPIC-005: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-005.md
+              - Epicos:
+                  - implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/README.md
+                  - EPIC-005 Politicas e Faixas: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-005.md
+                  - EPIC-006 Reserva: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-006.md
+                  - EPIC-007 Outorga e Repasse: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-007.md
+                  - EPIC-008 Plano e Execucao: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-008.md
+                  - EPIC-009 Prestacao Financeira: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-009.md
+                  - EPIC-010 Dashboard: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-010.md
           - EPIC-001: implementation/modules/M016-contabilidade-financeiro/epics/EPIC-M016-001.md
           - EPIC-002: implementation/modules/M016-contabilidade-financeiro/epics/EPIC-M016-002.md
           - EPIC-003: implementation/modules/M016-contabilidade-financeiro/epics/EPIC-M016-003.md

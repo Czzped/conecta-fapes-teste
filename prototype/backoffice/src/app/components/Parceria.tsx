@@ -29,7 +29,9 @@ export interface ParceriaItem {
   valorAlocado: number;
   saldoDisponivel: number;
   percentualAcaoTransversal: number;
+  faixaAcaoTransversal: string;
   valorReservaAcaoTransversal: number;
+  contaBancariaAcaoTransversal: string;
   saldoAlocavelEmProgramas: number;
   programasRelacionados: number;
   iniciativasImpactadas: number;
@@ -76,6 +78,36 @@ const calcularReservaAcaoTransversal = (valor: number) => {
   return {
     percentual,
     reserva: Math.round(valor * percentual) / 100,
+  };
+};
+
+const definirFaixaAcaoTransversal = (valor: number) => {
+  if (valor < 50000) return 'Sem retenção';
+  if (valor <= 2000000) return 'Faixa 1';
+  if (valor <= 5000000) return 'Faixa 2';
+  return 'Faixa 3';
+};
+
+const calcularReservaConsolidada = (valorTotal: number, aditivo: 'Sim' | 'Não') => {
+  const parcelas = aditivo === 'Sim' ? [Math.max(valorTotal - 500000, 0), 500000] : [valorTotal];
+  const reservas = parcelas.map(valor => {
+    const { percentual, reserva } = calcularReservaAcaoTransversal(valor);
+    return {
+      valor,
+      percentual,
+      reserva,
+      faixa: definirFaixaAcaoTransversal(valor),
+    };
+  });
+  const reservaTotal = reservas.reduce((total, item) => total + item.reserva, 0);
+  const percentualEfetivo = valorTotal > 0 ? (reservaTotal / valorTotal) * 100 : 0;
+  const faixas = Array.from(new Set(reservas.map(item => item.faixa)));
+  const faixaLabel = reservas.length > 1 ? `${faixas.join(' + ')} (${reservas.length} aportes)` : faixas[0];
+
+  return {
+    percentual: percentualEfetivo,
+    reserva: reservaTotal,
+    faixa: faixaLabel,
   };
 };
 
@@ -132,6 +164,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       documentoFormalizador: 'Termo de Cooperação 004/2026',
       termoDescentralizacao: 'TED 018/2026',
       contaBancariaDestino: 'Banco 001 / Ag. 1234 / CC 98765-0',
+      contaBancariaAcaoTransversal: 'BANESTES / Ag. 0192 / CC AT-000123-4',
     },
     {
       id: 2,
@@ -159,6 +192,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       documentoFormalizador: 'Termo de Cooperação 009/2026',
       termoDescentralizacao: 'TED 027/2026',
       contaBancariaDestino: 'Banco 104 / Ag. 0221 / CC 45678-2',
+      contaBancariaAcaoTransversal: 'BANESTES / Ag. 0192 / CC AT-000124-2',
     },
     {
       id: 3,
@@ -186,6 +220,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       documentoFormalizador: 'Pendente',
       termoDescentralizacao: 'Pendente',
       contaBancariaDestino: 'A definir',
+      contaBancariaAcaoTransversal: 'A definir',
     },
     {
       id: 4,
@@ -213,6 +248,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       documentoFormalizador: 'Termo de Cooperação 032/2025',
       termoDescentralizacao: 'TED 091/2025',
       contaBancariaDestino: 'Banco 001 / Ag. 4410 / CC 11223-9',
+      contaBancariaAcaoTransversal: 'BANESTES / Ag. 0192 / CC AT-000118-8',
     },
     {
       id: 5,
@@ -240,14 +276,16 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       documentoFormalizador: 'Cooperation Agreement 011/2025',
       termoDescentralizacao: 'Não aplicável',
       contaBancariaDestino: 'International transfer account',
+      contaBancariaAcaoTransversal: 'BANESTES / Ag. 0192 / CC AT-000109-9',
     },
   ];
 
   const parceriasData: ParceriaItem[] = parceriasBase.map(parceria => {
-    const { percentual, reserva } = calcularReservaAcaoTransversal(parceria.aporteTotal);
+    const { percentual, reserva, faixa } = calcularReservaConsolidada(parceria.aporteTotal, parceria.aditivo);
     return {
       ...parceria,
       percentualAcaoTransversal: percentual,
+      faixaAcaoTransversal: faixa,
       valorReservaAcaoTransversal: reserva,
       saldoDisponivel: Math.max(parceria.aporteTotal - reserva - parceria.valorAlocado, 0),
       saldoAlocavelEmProgramas: Math.max(parceria.aporteTotal - reserva - parceria.valorAlocado, 0),
@@ -608,7 +646,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
               onClick={() => setSelectedParceria(parceria)}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '2fr 1.1fr 1fr 1.2fr 1fr 1fr 1fr 40px',
+                gridTemplateColumns: '2fr 1fr 0.9fr 1.1fr 0.9fr 0.9fr 1.15fr 0.9fr 40px',
                 gap: '16px',
                 alignItems: 'center',
                 width: '100%',
@@ -630,7 +668,8 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
               </div>
               <ListCell label="Vigência corrente" value={`${parceria.vigenciaInicio} - ${parceria.vigenciaFim}`} />
               <ListCell label="Aporte total" value={formatCurrency(parceria.aporteTotal)} />
-              <ListCell label="Ação Transversal" value={formatCurrency(parceria.valorReservaAcaoTransversal)} detail={`${formatPercent(parceria.percentualAcaoTransversal)} reservado`} />
+              <ListCell label="Faixa aplicada" value={parceria.faixaAcaoTransversal} detail={`${formatPercent(parceria.percentualAcaoTransversal)} reservado`} />
+              <ListCell label="Conta Ação Transversal" value={parceria.contaBancariaAcaoTransversal} detail={formatCurrency(parceria.valorReservaAcaoTransversal)} />
               <ListCell label="Saldo programas" value={formatCurrency(parceria.saldoAlocavelEmProgramas)} highlight={parceria.saldoAlocavelEmProgramas > 0} />
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <ChevronRight size={18} style={{ color: T.iconSubdued }} />

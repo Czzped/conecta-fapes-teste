@@ -73,6 +73,22 @@ Reserva calculada na Parceria
 
 A reserva nao e uma rubrica unica. Ela e reconhecida contabilmente no M016 e depois distribuida em rubricas no plano de aplicacao.
 
+### Conta Bancaria Especifica
+
+Quando houver repasse ao Coordenador Outorgado, a Acao Transversal tambem precisa de controle bancario. Pela Resolucao CCAF nº 334/2023, a transferencia deve ocorrer em conta bancaria especifica, aberta pela FAPES em nome do Coordenador Outorgado, no BANESTES.
+
+Essa conta bancaria e diferente da conta contabil. A conta contabil classifica a natureza do recurso ou despesa; a conta bancaria e onde o dinheiro e efetivamente creditado e movimentado. Portanto, o M016 deve manter as duas perspectivas:
+
+```text
+ReservaAcaoTransversal
+  -> Conta contabil / Fundo financeiro / Centro de custo
+  -> OutorgaAcaoTransversal
+  -> ContaBancariaAcaoTransversal
+  -> RepasseAcaoTransversal
+```
+
+A conta especifica nao deve ser modelada como uma conta unica global da FAPES para toda Acao Transversal. Tambem nao deve ser travada como exatamente uma conta por parceria. Ela deve estar vinculada ao escopo formal da outorga ou do repasse, podendo cobrir uma reserva, uma parceria, um conjunto de reservas ou outro agrupamento definido no Termo de Outorga.
+
 ## Regras
 
 | ID | Descricao | Prioridade |
@@ -85,6 +101,7 @@ A reserva nao e uma rubrica unica. Ela e reconhecida contabilmente no M016 e dep
 | RN-AT-06 | A prestacao financeira institucional da Acao Transversal nao se confunde com a prestacao de contas da Iniciativa no M014. | Must |
 | RN-AT-07 | A reserva de um aditivo financeiro usa como base de calculo o valor do proprio aditivo; reservas anteriores nao sao recalculadas retroativamente, salvo determinacao normativa explicita. | Must |
 | RN-AT-08 | O plano de aplicacao nao pode superar o valor reservado disponivel e seus itens devem usar rubricas permitidas para Acao Transversal. | Must |
+| RN-AT-09 | Quando houver repasse, a conta bancaria deve ser especifica para o escopo autorizado no Termo de Outorga ou no repasse, aberta pela FAPES em nome do Coordenador Outorgado no BANESTES. | Must |
 
 ## Fluxo Macro
 
@@ -108,12 +125,18 @@ M016 Acao Transversal
 
 | ID | Titulo | Prioridade | Documento |
 |----|--------|------------|-----------|
-| EPIC-M016-005 | Gestao Financeira da Acao Transversal | Must | [EPIC-M016-005](epics/EPIC-M016-005.md) |
+| EPIC-M016-005 | Politicas e Faixas de Acao Transversal | Must | [EPIC-M016-005](epics/EPIC-M016-005.md) |
+| EPIC-M016-006 | Recebimento e Classificacao da Reserva | Must | [EPIC-M016-006](epics/EPIC-M016-006.md) |
+| EPIC-M016-007 | Outorga, Conta Especifica e Repasse | Must | [EPIC-M016-007](epics/EPIC-M016-007.md) |
+| EPIC-M016-008 | Plano de Aplicacao e Execucao de Despesas | Must | [EPIC-M016-008](epics/EPIC-M016-008.md) |
+| EPIC-M016-009 | Prestacao Financeira Institucional | Must | [EPIC-M016-009](epics/EPIC-M016-009.md) |
+| EPIC-M016-010 | Dashboard e Relatorios da Acao Transversal | Should | [EPIC-M016-010](epics/EPIC-M016-010.md) |
 
 ## Documentos
 
 | Documento | Descricao |
 |-----------|-----------|
+| [Modelo](modelo/README.md) | Diagrama e regras estruturais da reserva, outorga, conta especifica, repasse, plano, despesa e prestacao financeira. |
 | [Processo](processo.md) | Fluxos de recebimento/classificacao da reserva, plano por rubrica, execucao e prestacao financeira institucional. |
 | [Proposta de Tela e Impacto no Codigo](proposta-tela-e-impacto-codigo.md) | Analise do impacto no prototipo de Parcerias e desenho da tela do M016 para Acao Transversal. |
-| [EPIC-M016-005](epics/EPIC-M016-005.md) | Backlog funcional da Gestao Financeira da Acao Transversal. |
+| [Epicos](epics/README.md) | Backlog funcional detalhado da Acao Transversal. |

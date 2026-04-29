@@ -153,6 +153,50 @@ classDiagram
         +Date dataCalculo
     }
 
+    class OutorgaAcaoTransversal {
+        +String numeroTermo
+        +String atoAutorizacao
+        +Date dataAssinatura
+        +Date vigenciaInicio
+        +Date vigenciaFim
+        +EstadoOutorgaAcaoTransversal estado
+        +String escopoGestao
+    }
+
+    class EstadoOutorgaAcaoTransversal {
+        <<enumeration>>
+        EM_ELABORACAO
+        VIGENTE
+        SUSPENSA
+        ENCERRADA
+        CANCELADA
+    }
+
+    class RepasseAcaoTransversal {
+        +double valor
+        +Date dataPrevista
+        +Date dataRepasse
+        +EstadoRepasseAcaoTransversal estado
+        +String observacao
+    }
+
+    class EstadoRepasseAcaoTransversal {
+        <<enumeration>>
+        PREVISTO
+        REPASSADO
+        CANCELADO
+    }
+
+    class ContaBancariaAcaoTransversal {
+        +String banco
+        +String agencia
+        +String numeroConta
+        +String titular
+        +String finalidade
+        +boolean abertaPelaFapes
+        +boolean ativa
+    }
+
     class TipoOrigemReservaAcaoTransversal {
         <<enumeration>>
         APORTE_ORIGINAL
@@ -205,6 +249,10 @@ classDiagram
         <<fora do escopo - M008>>
     }
 
+    class PessoaFisica {
+        <<fora do escopo - M008>>
+    }
+
     ContaContabil "1" --> "*" AssociacaoConta : associacoes
     ContaContabil "1" --> "*" ContaContabil : subcontas
     AssociacaoConta "*" --> "0..1" Iniciativa : iniciativa
@@ -227,6 +275,12 @@ classDiagram
     ReservaAcaoTransversal "*" --> "1" ContaContabil : classificadaEm
     ReservaAcaoTransversal "*" --> "1" FundoFinanceiro : vinculadaAoFundo
     ReservaAcaoTransversal "*" --> "1" CentroCusto : vinculadaAoCentro
+    ReservaAcaoTransversal "1" --> "0..*" OutorgaAcaoTransversal : outorgas
+    OutorgaAcaoTransversal "*" --> "1" PessoaFisica : coordenador outorgado
+    OutorgaAcaoTransversal "*" --> "1" Documento : termo de outorga
+    OutorgaAcaoTransversal "1" --> "1" ContaBancariaAcaoTransversal : conta especifica
+    OutorgaAcaoTransversal "1" --> "*" RepasseAcaoTransversal : repasses
+    RepasseAcaoTransversal "*" --> "1" ReservaAcaoTransversal : consome reserva
     ReservaAcaoTransversal "1" --> "0..1" PlanoAplicacaoAcaoTransversal : planejada por
     PlanoAplicacaoAcaoTransversal "1" --> "*" ItemPlanoAplicacaoAcaoTransversal : itens
     ItemPlanoAplicacaoAcaoTransversal "*" --> "1" RubricaFinanceira : rubrica
@@ -308,6 +362,27 @@ classDiagram
 | | contaContabil (relacao) | Conta contabil institucional onde a reserva e reconhecida | Sim | FK → ContaContabil | Ex: Recursos de Acao Transversal | | |
 | | fundoFinanceiro (relacao) | Fundo/carteira financeira que concentra a reserva | Sim | FK → FundoFinanceiro | | | |
 | | centroCusto (relacao) | Centro de custo responsavel pela gestao institucional da reserva | Sim | FK → CentroCusto | | | |
+| **OutorgaAcaoTransversal** | numeroTermo | Numero ou identificador do Termo de Outorga que autoriza a gestao do recurso | Sim | String | | 80 | Sim |
+| | atoAutorizacao | Ato/decisao da Diretoria Executiva que autorizou a outorga | Sim | String | | 300 | |
+| | dataAssinatura | Data de assinatura do Termo de Outorga | Sim | Date | | | |
+| | vigenciaInicio | Inicio da autorizacao de gestao | Sim | Date | | | |
+| | vigenciaFim | Fim da autorizacao de gestao | Sim | Date | >= vigenciaInicio | | |
+| | estado | Estado da outorga | Gerado | EstadoOutorgaAcaoTransversal | EmElaboracao, Vigente, Suspensa, Encerrada, Cancelada | | |
+| | escopoGestao | Texto que delimita o recurso, reserva, parceria ou finalidade abrangida pelo TO | Sim | String | | 1000 | |
+| | coordenadorOutorgado (relacao) | Servidor publico vinculado a FAPES autorizado a gerir o recurso | Sim | FK → PessoaFisica (M008) | Deve possuir vinculo ativo com FAPES | | |
+| | termoOutorga (relacao) | Documento formal do Termo de Outorga | Sim | FK → Documento (M008) | TipoDocumento = Termo de Outorga | | |
+| **ContaBancariaAcaoTransversal** | banco | Banco da conta especifica | Sim | String | BANESTES | 100 | |
+| | agencia | Agencia bancaria | Sim | String | | 10 | |
+| | numeroConta | Numero da conta especifica | Sim | String | | 20 | Sim |
+| | titular | Titular da conta, em nome do Coordenador Outorgado | Sim | String | | 200 | |
+| | finalidade | Finalidade da conta especifica de Acao Transversal | Sim | String | | 300 | |
+| | abertaPelaFapes | Indica que a conta foi aberta pela FAPES conforme Resolucao CCAF nº 334/2023 | Sim | Boolean | true | | |
+| | ativa | Indica se a conta esta ativa para movimentacao | Sim | Boolean | | | |
+| **RepasseAcaoTransversal** | valor | Valor repassado ao Coordenador Outorgado | Sim | Double | > 0 e <= saldo disponivel da reserva | | |
+| | dataPrevista | Data prevista no cronograma de desembolso | Nao | Date | | | |
+| | dataRepasse | Data efetiva do credito em conta especifica | Cond. | Date | Obrigatoria quando estado = Repassado | | |
+| | estado | Estado do repasse | Gerado | EstadoRepasseAcaoTransversal | Previsto, Repassado, Cancelado | | |
+| | observacao | Observacoes do repasse | Nao | String | | 1000 | |
 | **PlanoAplicacaoAcaoTransversal** | dataCadastro | Data do plano | Gerado | Date | | | |
 | | estado | Estado do plano | Gerado | EstadoPlanoAplicacao | EmElaboracao, Aprovado, Substituido | | |
 | **ItemPlanoAplicacaoAcaoTransversal** | valorPrevisto | Valor previsto para a rubrica | Sim | Double | ≥ 0 | | |
@@ -328,7 +403,7 @@ classDiagram
 **Entidades externas:**
 - Iniciativa: gerenciada por M003 (Gestao de Iniciativas Captadas) como abstracao estrutural de iniciativas apoiadas.
 - Programa e Parceria: gerenciados por M010 (Planejamento e Estrategia).
-- RubricaFinanceira e Documento: gerenciados por M008 (Cadastros Corporativos).
+- PessoaFisica, RubricaFinanceira e Documento: gerenciados por M008 (Cadastros Corporativos).
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: MovimentacaoFinanceira.contaContabil: ContaContabil)

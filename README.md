@@ -30,7 +30,7 @@ conectafapes-project/
 │   ├── discovery/              # POR QUE — visao do produto, personas, domains
 │   │   ├── product-vision.md
 │   │   ├── personas.md
-│   │   └── domains/            # Um arquivo por domain de negocio (01-07)
+│   │   └── domains/            # Um arquivo por domain de negocio (01-08)
 │   ├── architecture/           # COMO — decisoes tecnicas de arquitetura
 │   │   ├── README.md           # Visao geral, stack, diagramas C4
 │   │   └── adr/                # Architecture Decision Records (ADR-001 a ADR-010)

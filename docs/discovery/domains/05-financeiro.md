@@ -20,6 +20,18 @@ Escrituracao contabil da agencia: cadastro de contas, vinculacao a programas e p
 
 Controle de contas bancarias, fluxo de caixa e gestao financeira dos recursos da agencia, programas, projetos e parcerias.
 
+### Acao Transversal
+
+A Acao Transversal e uma reserva financeira institucional calculada sobre o valor de uma parceria, projeto ou programa para custear despesas operacionais e administrativas relacionadas a execucao dos programas e projetos da FAPES. Conforme a Resolucao CCAF nº 334/2023, esses recursos apoiam, estruturam, organizam e capacitam as areas meio e finalisticas da Fundacao, podendo cobrir despesas como diarias, passagens, publicacoes, material permanente, servicos de terceiros e outras despesas internas vinculadas a essas atividades.
+
+Quando houver repasse ao outorgado, a resolucao determina que a transferencia ocorra em conta bancaria especifica, aberta pela FAPES em nome do coordenador, no Banco do Estado do Espirito Santo - BANESTES. Esse coordenador e um servidor publico vinculado a FAPES, autorizado pela Diretoria Executiva por meio de Termo de Outorga (TO), e nao deve ser confundido automaticamente com o coordenador do projeto ou da parceria. No contexto da Acao Transversal, ele representa o Coordenador Outorgado responsavel pela gestao, movimentacao, utilizacao e prestacao de contas do recurso.
+
+#### Coordenador Outorgado da Acao Transversal
+
+O Coordenador Outorgado da Acao Transversal e o servidor publico vinculado a FAPES que recebe autorizacao formal da Diretoria Executiva para gerir os recursos da Acao Transversal por meio de Termo de Outorga. Esse papel existe para operacionalizar a movimentacao e a utilizacao dos recursos institucionais reservados, mantendo responsabilidade sobre a prestacao de contas correspondente.
+
+Esse coordenador nao deve ser inferido automaticamente a partir do coordenador da parceria, do programa ou do projeto apoiado. A definicao do outorgado depende do ato de autorizacao da Diretoria Executiva e do respectivo Termo de Outorga. Quando necessario, o Coordenador Outorgado pode indicar membros para executar atividades previstas no TO, mas a responsabilidade pela gestao e pela prestacao de contas permanece vinculada ao outorgado.
+
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|
 | 5.2.1 | Cadastro de Contas Bancarias | Registrar e manter contas bancarias vinculadas a agencia, programas, projetos e parcerias | Analista da Area Tecnica da Agencia | Art. 25, I; Art. 27, II |

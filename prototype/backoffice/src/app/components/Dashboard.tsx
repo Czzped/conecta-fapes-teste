@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, FileEdit, Settings, Inbox, Landmark } from 'lucide-react';
+import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, FileEdit, Settings, Inbox, Landmark, Building2, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 import conectaSymbol from 'figma:asset/db135b6708f6cc7f72f27c6a31dd02aa5500d030.png';
 import fapesLogo from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
@@ -16,6 +16,7 @@ import { DocumentosExigidos } from './DocumentosExigidos';
 import { SurveyFormBuilder } from './SurveyFormBuilder';
 import { CaixaEntrada } from './CaixaEntrada';
 import { AcaoTransversalFinanceiro } from './AcaoTransversalFinanceiro';
+import { RegrasAcaoTransversal } from './RegrasAcaoTransversal';
 import { ThemeProvider } from '../theme/ThemeContext';
 
 interface DashboardProps {
@@ -27,7 +28,7 @@ type Contrast = 'normal' | 'high' | 'maximum';
 type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
 type Language = 'pt' | 'en' | 'es';
 type NotificationTab = 'avisos' | 'editais';
-type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos';
+type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
 type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outra Iniciativa Exemplo' | 'Mais uma Iniciativa Exemplo';
@@ -375,6 +376,72 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 </button>
               );
             })}
+
+            {/* Espaçamento entre seções */}
+            <div style={{ height: '24px' }} />
+
+            {/* Seção CADASTROS */}
+            {sidebarExpanded && (
+              <h3
+                className="mb-3 px-2"
+                style={{
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  color: T.textMuted,
+                  letterSpacing: '0.05em',
+                  transition: 'color 0.3s',
+                }}
+              >
+                CADASTROS
+              </h3>
+            )}
+
+            {/* Itens do menu CADASTROS */}
+            {([
+              { key: 'instituicoes' as ActivePage, Icon: Building2, label: 'Instituições' },
+              { key: 'pessoas' as ActivePage, Icon: UserRound, label: 'Pessoas' },
+            ]).map(({ key, Icon, label }, index) => {
+              const active = activePage === key;
+              return (
+                <button
+                  key={key}
+                  className={`flex items-center gap-3 rounded-lg transition-all duration-200 ${index > 0 ? 'mt-2' : ''}`}
+                  aria-label={label}
+                  style={{
+                    backgroundColor: active ? T.menuActiveBg : 'transparent',
+                    padding: sidebarExpanded ? '12px 16px' : '12px',
+                    width: sidebarExpanded ? '100%' : '48px',
+                    justifyContent: sidebarExpanded ? 'flex-start' : 'center',
+                  }}
+                  onClick={() => setActivePage(key)}
+                  onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.07)'; }}
+                  onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                >
+                  <Icon
+                    size={20}
+                    style={{
+                      color: active ? T.menuActiveText : T.menuInactiveText,
+                      flexShrink: 0,
+                      transition: 'color 0.3s',
+                    }}
+                  />
+                  {sidebarExpanded && (
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        color: active ? T.menuActiveText : T.menuInactiveText,
+                        transition: 'color 0.3s',
+                      }}
+                    >
+                      {label}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
             
             {/* Espaçamento entre seções */}
             <div style={{ height: '24px' }} />
@@ -454,7 +521,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             )}
 
             {([
-              { key: 'contabilidade-financeiro' as ActivePage, Icon: Landmark, label: 'Ação Transversal', caption: 'Contabilidade e financeiro' },
+              { key: 'contabilidade-financeiro' as ActivePage, Icon: Landmark, label: 'Contabilidade e Financeiro', caption: 'Ação Transversal' },
             ]).map(({ key, Icon, label, caption }) => {
               const active = activePage === key;
               return (
@@ -1604,6 +1671,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             onOpenReferencias={() => setActivePage('referencias')}
             onOpenDocumentos={() => setActivePage('documentos')}
             onOpenFormularios={() => setActivePage('formulario')}
+            onOpenRegrasAcaoTransversal={() => setActivePage('regras-acao-transversal')}
           />
         ) : activePage === 'planejamento' ? (
           <PlanejamentoEstrategico />
@@ -1613,6 +1681,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <ReferenciasCorporativas onBack={() => setActivePage('configuracoes')} />
         ) : activePage === 'documentos' ? (
           <DocumentosExigidos onBack={() => setActivePage('configuracoes')} />
+        ) : activePage === 'regras-acao-transversal' ? (
+          <RegrasAcaoTransversal onBack={() => setActivePage('configuracoes')} />
         ) : activePage === 'programa' ? (
           <Programa onBack={() => setActivePage('home')} />
         ) : activePage === 'parceria' ? (

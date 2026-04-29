@@ -26,6 +26,7 @@ Cada domain define uma capacidade de negocio. Um modulo e a implementacao de um 
 | 05 | [Financeiro](domains/05-financeiro.md) | Contabilidade, contas bancarias, pagamentos e PLD | M004, M016, M017 |
 | 06 | [Suporte e Inteligencia](domains/06-suporte-inteligencia.md) | BI, transparencia, auditoria e comunicacao | M018, M019, M020 |
 | 07 | [Importacao SIGFAPES](domains/07-importacao-sigfapes.md) | Migracao de editais, projetos, pessoas e pagamentos do sistema legado | M002 |
+| 08 | [Acao Transversal](domains/08-acao-transversal.md) | Reserva normativa institucional, outorga, conta especifica, execucao e prestacao financeira | M010, M016 |
 
 ---
 
@@ -58,7 +59,7 @@ Este documento e os domains referenciam artigos da **LEC 978/2021** — Lei Comp
 | Artigo | Tema | Domains Relacionados |
 |--------|------|----------------------|
 | Art. 2 | Finalidades da agencia de fomento | 01 |
-| Art. 3 | Publicidade, prestacao de contas e acompanhamento | 01, 03, 04, 05, 06 |
+| Art. 3 | Publicidade, prestacao de contas e acompanhamento | 01, 03, 04, 05, 06, 08 |
 | Art. 4 | Apoio financeiro, habilitacao e avaliacao de merito | 01, 03, 04 |
 | Art. 5 | Registros, programas e escrituracao contabil | 05, 06 |
 | Art. 6, par. unico | Motivacao e transparencia dos atos | 02, 03, 04 |
@@ -67,8 +68,8 @@ Este documento e os domains referenciam artigos da **LEC 978/2021** — Lei Comp
 | Art. 15 | Editais, pareceres e prestacao de contas | 03, 04 |
 | Art. 16 | Autorizacao de pagamentos | 05 |
 | Art. 18 | Relatorios tecnicos | 04, 06 |
-| Art. 25 e 26 | Registros contabeis e ajustes orcamentarios | 04, 05 |
-| Art. 27 | Prestacao de contas financeira | 04, 05, 07 |
-| Art. 28 | Instrumentos de fomento e liberacao de recursos | 02, 03, 05 |
+| Art. 25 e 26 | Registros contabeis e ajustes orcamentarios | 04, 05, 08 |
+| Art. 27 | Prestacao de contas financeira | 04, 05, 07, 08 |
+| Art. 28 | Instrumentos de fomento e liberacao de recursos | 02, 03, 05, 08 |
 | Art. 30 | Recursos humanos e movimentacoes | 01 |
 | Art. 37 | Politicas de capacitacao | 01 |

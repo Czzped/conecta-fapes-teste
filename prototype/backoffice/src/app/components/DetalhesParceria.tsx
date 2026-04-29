@@ -42,6 +42,13 @@ const calcularPercentualAcaoTransversal = (valor: number) => {
 
 const calcularReservaAcaoTransversal = (valor: number) => valor * calcularPercentualAcaoTransversal(valor) / 100;
 
+const definirFaixaAcaoTransversal = (valor: number) => {
+  if (valor < 50000) return 'Sem retenção';
+  if (valor <= 2000000) return 'Faixa 1';
+  if (valor <= 5000000) return 'Faixa 2';
+  return 'Faixa 3';
+};
+
 const cardStyle: React.CSSProperties = {
   backgroundColor: 'rgba(30, 41, 59, 0.5)',
   border: '1px solid rgba(255,255,255,0.1)',
@@ -149,6 +156,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
     vigenciaFim: parceria.vigenciaFim,
     objetivo: parceria.objetivo,
     contaBancariaDestino: parceria.contaBancariaDestino,
+    contaBancariaAcaoTransversal: parceria.contaBancariaAcaoTransversal,
     aporteTotal: parceria.aporteTotal,
     valorAlocado: parceria.valorAlocado,
   });
@@ -204,9 +212,11 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
   ];
   const reservasAcaoTransversal = aportes.map(aporte => ({
     ...aporte,
+    faixa: definirFaixaAcaoTransversal(aporte.valor),
     percentual: calcularPercentualAcaoTransversal(aporte.valor),
     valorReserva: calcularReservaAcaoTransversal(aporte.valor),
     saldoLiquido: Math.max(aporte.valor - calcularReservaAcaoTransversal(aporte.valor), 0),
+    contaAcaoTransversal: cadastroData.contaBancariaAcaoTransversal,
   }));
   const valorReservaAcaoTransversal = reservasAcaoTransversal.reduce((total, reserva) => total + reserva.valorReserva, 0);
   const saldoDisponivel = Math.max(cadastroData.aporteTotal - valorReservaAcaoTransversal - cadastroData.valorAlocado, 0);
@@ -733,17 +743,27 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                 )}
               </div>
               {editingCadastro ? (
-                <TextEditField label="Conta bancária de destino" value={draftCadastroData.contaBancariaDestino} onChange={(contaBancariaDestino) => setDraftCadastroData(prev => ({ ...prev, contaBancariaDestino }))} />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+                  <TextEditField label="Conta bancária de destino da parceria" value={draftCadastroData.contaBancariaDestino} onChange={(contaBancariaDestino) => setDraftCadastroData(prev => ({ ...prev, contaBancariaDestino }))} />
+                  <TextEditField label="Conta Ação Transversal" value={draftCadastroData.contaBancariaAcaoTransversal} onChange={(contaBancariaAcaoTransversal) => setDraftCadastroData(prev => ({ ...prev, contaBancariaAcaoTransversal }))} />
+                </div>
               ) : (
-                <Info label="Conta bancária de destino" value={cadastroData.contaBancariaDestino} />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+                  <Info label="Conta bancária de destino da parceria" value={cadastroData.contaBancariaDestino} />
+                  <Info label="Conta Ação Transversal" value={cadastroData.contaBancariaAcaoTransversal} />
+                </div>
               )}
             </SummarySection>
 
             <SummarySection number="4" title="Ação Transversal" subtitle="Reserva normativa bloqueada para gestão contábil e financeira">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: '16px', marginBottom: '16px' }}>
                 <Info label="Política aplicada" value="Res. CCAF 334/2023" />
+                <Info label="Faixa aplicada" value={definirFaixaAcaoTransversal(cadastroData.aporteTotal)} />
                 <Info label="Percentual médio reservado" value={formatPercent(percentualReservaTotal)} />
                 <Info label="Valor reservado" value={formatCurrency(valorReservaAcaoTransversal)} />
+                <Info label="Conta destino" value={cadastroData.contaBancariaAcaoTransversal} />
+              </div>
+              <div style={{ marginBottom: '16px' }}>
                 <Info label="Saldo alocável em programas" value={formatCurrency(saldoDisponivel)} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -751,8 +771,10 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                   <Row key={`${reserva.tipo}-${index}`}>
                     <Info label="Origem" value={reserva.tipo} />
                     <Info label="Base de cálculo" value={formatCurrency(reserva.valor)} />
+                    <Info label="Faixa aplicada" value={reserva.faixa} />
                     <Info label="Percentual" value={formatPercent(reserva.percentual)} />
                     <Info label="Reserva financeira" value={formatCurrency(reserva.valorReserva)} />
+                    <Info label="Conta destino" value={reserva.contaAcaoTransversal} />
                     <Info label="Líquido programas" value={formatCurrency(reserva.saldoLiquido)} />
                   </Row>
                 ))}
@@ -790,9 +812,10 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                   <Row key={`${reserva.tipo}-${reserva.data}-${index}`}>
                     <Info label="Origem" value={reserva.tipo} />
                     <Info label="Valor base" value={formatCurrency(reserva.valor)} />
+                    <Info label="Faixa aplicada" value={reserva.faixa} />
                     <Info label="Percentual" value={formatPercent(reserva.percentual)} />
                     <Info label="Valor reservado" value={formatCurrency(reserva.valorReserva)} />
-                    <Info label="Destino" value="Ação Transversal" />
+                    <Info label="Conta destino" value={reserva.contaAcaoTransversal} />
                   </Row>
                 ))}
               </div>

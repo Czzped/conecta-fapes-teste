@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, BookOpen, Building2, ChevronRight, Database, FileCheck2, Settings, Target, UserRound } from 'lucide-react';
+import { ArrowLeft, BookOpen, Building2, ChevronRight, ClipboardList, Database, FileCheck2, Settings, Target, UserRound } from 'lucide-react';
 import { useThemeTokens } from '../theme/ThemeContext';
 
 interface ConfiguracoesProps {
@@ -10,6 +10,7 @@ interface ConfiguracoesProps {
   onOpenReferencias: () => void;
   onOpenDocumentos: () => void;
   onOpenFormularios: () => void;
+  onOpenRegrasAcaoTransversal: () => void;
 }
 
 const actions = [
@@ -55,9 +56,16 @@ const actions = [
     color: '#38bdf8',
     key: 'formularios',
   },
+  {
+    title: 'Regras de Ação Transversal',
+    description: 'Políticas, vigências, faixas percentuais e rubricas permitidas para a reserva normativa.',
+    Icon: ClipboardList,
+    color: '#f97316',
+    key: 'regras-acao-transversal',
+  },
 ];
 
-export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlanejamento, onOpenInstituicoes, onOpenPessoas, onOpenReferencias, onOpenDocumentos, onOpenFormularios }) => {
+export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlanejamento, onOpenInstituicoes, onOpenPessoas, onOpenReferencias, onOpenDocumentos, onOpenFormularios, onOpenRegrasAcaoTransversal }) => {
   const { T } = useThemeTokens();
 
   const cardStyle: React.CSSProperties = {
@@ -86,6 +94,10 @@ export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlan
     }
     if (key === 'formularios') {
       onOpenFormularios();
+      return;
+    }
+    if (key === 'regras-acao-transversal') {
+      onOpenRegrasAcaoTransversal();
       return;
     }
     onOpenReferencias();
