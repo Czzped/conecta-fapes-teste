@@ -47,3 +47,51 @@ stateDiagram-v2
     state Bloqueada : Saldo negativo detectado, aguardando autorizacao
     state Inativa : Conta desativada, sem novas movimentacoes
 ```
+
+### Ciclo de Vida: ReservaAcaoTransversal
+
+```mermaid
+stateDiagram-v2
+    [*] --> Recebida : ReceberReservaAcaoTransversal
+
+    Recebida --> Classificada : Vincular conta contabil, fundo e centro de custo
+    Classificada --> Planejada : Cadastrar plano de aplicacao por rubrica
+    Planejada --> EmExecucao : Registrar primeira despesa
+    EmExecucao --> EmExecucao : Registrar nova despesa
+    EmExecucao --> EmPrestacaoFinanceira : Submeter prestacao financeira institucional
+    EmPrestacaoFinanceira --> Encerrada : Aprovar sem pendencias
+    EmPrestacaoFinanceira --> EncerradaComGlosa : Aprovar com glosa
+    EmPrestacaoFinanceira --> Planejada : Solicitar ajuste
+    EmPrestacaoFinanceira --> Reprovada : Reprovar prestacao
+
+    Encerrada --> [*]
+    EncerradaComGlosa --> [*]
+    Reprovada --> [*]
+
+    state Recebida : Reserva recebida do M010, ainda sem classificacao completa
+    state Classificada : Reserva vinculada a ContaContabil, FundoFinanceiro e CentroCusto
+    state Planejada : Plano de aplicacao por rubricas criado
+    state EmExecucao : Despesas institucionais registradas
+    state EmPrestacaoFinanceira : Despesas em analise financeira institucional
+    state Encerrada : Prestacao financeira aprovada
+    state EncerradaComGlosa : Prestacao aprovada com valores glosados
+    state Reprovada : Prestacao financeira reprovada
+```
+
+### Ciclo de Vida: PlanoAplicacaoAcaoTransversal
+
+```mermaid
+stateDiagram-v2
+    [*] --> EmElaboracao : Criar plano
+    EmElaboracao --> Aprovado : Aprovar plano [total <= saldo da reserva]
+    EmElaboracao --> Cancelado : Cancelar plano
+    Aprovado --> Substituido : Criar novo plano substitutivo
+    Aprovado --> [*]
+    Cancelado --> [*]
+    Substituido --> [*]
+
+    state EmElaboracao : Itens por rubrica em edicao
+    state Aprovado : Plano apto a orientar despesas
+    state Cancelado : Plano descartado antes da execucao
+    state Substituido : Plano preservado historicamente, mas nao vigente
+```

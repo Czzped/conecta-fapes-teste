@@ -43,6 +43,8 @@ Notas fiscais eletronicas (NF-e) sao validadas via API SERPRO pela `ChaveAcesso`
 
 > Iniciativas sao gerenciadas por M003. Editais e chamadas sao gerenciados por M011. A prestacao de contas detalhada, documentos fiscais, extratos e transacoes pertencem ao M014; a visao consolidada de execucao pode alimentar o M003.
 
+> **Fronteira com Acao Transversal:** a prestacao financeira institucional da Acao Transversal pertence ao M016, pois trata de despesas internas da agencia de fomento vinculadas a reserva calculada na Parceria. O M014 nao deve criar prestacao de contas de Iniciativa para despesas de Acao Transversal.
+
 ---
 
 ## Regras de Negocio

@@ -4,7 +4,7 @@ Referencia de dominio e regras de negocio: [contrato.md](contrato.md) | [README.
 
 ## Visao Geral
 
-Este documento especifica o contrato HTTP REST do modulo M016 como bounded context responsavel por plano de contas, contas bancarias, movimentacoes financeiras, conciliacao e fluxo de caixa da plataforma. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
+Este documento especifica o contrato HTTP REST do modulo M016 como bounded context responsavel por plano de contas, contas bancarias, movimentacoes financeiras, conciliacao, fluxo de caixa e gestao financeira institucional da Acao Transversal. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
 
 ### Base URL
 
@@ -30,7 +30,7 @@ Todas as rotas exigem autenticacao. O perfil do chamador determina o acesso:
 | Perfil | Descricao |
 |--------|-----------|
 | `GESTOR_FINANCEIRO` | Gestor financeiro da agencia — acesso completo de leitura e escrita |
-| `MODULO_INTERNO` | Modulo interno autorizado (M017, M018, M019) — acesso restrito a consultas |
+| `MODULO_INTERNO` | Modulo interno autorizado (M010, M017, M018, M019) — acesso conforme contrato |
 
 ---
 
@@ -58,6 +58,99 @@ Todas as respostas de erro seguem o envelope abaixo:
 | `404 Not Found` | Recurso inexistente | Identificador nao encontrado |
 | `409 Conflict` | Conflito de estado ou duplicata | Conta contabil ou bancaria duplicada, conciliacao em andamento |
 | `422 Unprocessable Entity` | Violacao de regra de negocio | Saldo negativo nao autorizado, associacao obrigatoria ausente, conta com lancamentos |
+
+---
+
+## Acao Transversal
+
+Referencia normativa inicial: [Resolucao CCAF nº 334/2023 - FAPES](https://fapes.es.gov.br/Media/fapes/Resolu%C3%A7%C3%B5es/Resolu%C3%A7%C3%A3o_CCAF_n%C2%BA_334.2023_-_utiliza%C3%A7%C3%A3o_recursos_financeiros_de_projetos_e-ou_programas_em_parcerias_destinados_a_A%C3%A7%C3%A3o_Transversal_para_a_FAPES..pdf).
+
+### `POST /api/v1/m016/acao-transversal/politicas`
+
+Cadastra politica e faixas percentuais de Acao Transversal.
+
+- **Autorizacao:** `GESTOR_FINANCEIRO`
+- **Operacao de origem:** `ParametrizarPoliticaAcaoTransversal`
+
+**Request body**
+
+```json
+{
+  "nome": "Resolucao CCAF 334/2023",
+  "baseLegal": "Resolucao CCAF nº 334/2023",
+  "dataInicioVigencia": "2023-01-01",
+  "faixas": [
+    { "valorMinimo": 50000.0, "valorMaximo": 2000000.0, "percentual": 5.0 },
+    { "valorMinimo": 2000000.01, "valorMaximo": 5000000.0, "percentual": 4.0 },
+    { "valorMinimo": 5000000.01, "valorMaximo": null, "percentual": 3.0 }
+  ]
+}
+```
+
+### `POST /api/v1/m016/acao-transversal/reservas`
+
+Recebe do M010 a reserva calculada na Parceria.
+
+- **Autorizacao:** `MODULO_INTERNO` (`M010`)
+- **Operacao de origem:** `ReceberReservaAcaoTransversal`
+
+**Request body**
+
+```json
+{
+  "parceriaId": "PAR-2026-03",
+  "aporteFinanceiroOrigemId": "APO-2026-001",
+  "tipoOrigem": "APORTE_ORIGINAL",
+  "politicaId": "PAT-2023-334",
+  "valorBaseCalculo": 500000.0,
+  "percentualAplicado": 5.0,
+  "valorReservado": 25000.0,
+  "contaContabilId": "CTB-ACAO-TRANSVERSAL",
+  "fundoFinanceiroId": "FF-ACAO-TRANSVERSAL",
+  "centroCustoId": "CC-GESTAO-PARCERIAS",
+  "documentoReferenciaId": "DOC-TD-2026-001"
+}
+```
+
+Para aditivos financeiros, `tipoOrigem` deve ser `APORTE_ADITIVO` e `valorBaseCalculo` deve conter o valor do proprio aditivo, sem recalculo retroativo das reservas anteriores.
+
+### `POST /api/v1/m016/acao-transversal/reservas/{reservaId}/plano-aplicacao`
+
+Cadastra plano de aplicacao por rubrica.
+
+**Request body**
+
+```json
+{
+  "itens": [
+    { "rubricaId": "RUB-DIARIAS", "valorPrevisto": 10000.0, "justificativa": "Acompanhamento tecnico" },
+    { "rubricaId": "RUB-PASSAGENS", "valorPrevisto": 12000.0, "justificativa": "Deslocamentos institucionais" }
+  ]
+}
+```
+
+### `POST /api/v1/m016/acao-transversal/reservas/{reservaId}/despesas`
+
+Registra despesa institucional da Acao Transversal.
+
+**Request body**
+
+```json
+{
+  "itemPlanoAplicacaoId": "IPA-2026-001",
+  "rubricaId": "RUB-DIARIAS",
+  "valor": 3000.0,
+  "dataDespesa": "2026-05-10",
+  "documentoId": "DOC-COMP-2026-010",
+  "justificativa": "Visita tecnica vinculada ao acompanhamento da parceria."
+}
+```
+
+### `GET /api/v1/m016/acao-transversal/dashboard`
+
+Consulta consolidado por parceria, rubrica e periodo.
+
+**Query parameters:** `parceriaId`, `rubricaId`, `dataInicio`, `dataFim`, `estadoPrestacao`.
 
 ---
 

@@ -22,6 +22,16 @@ Durante a execucao de um projeto, coordenadores precisam solicitar adicoes orcam
 
 ## Dominio
 
+O orcamento do projeto nao e uma conta contabil. O M013 gerencia o planejamento/limite aprovado por rubricas da Iniciativa/Projeto. O M016 gerencia contas contabeis, fundos financeiros, contas bancarias, centros de custo, lancamentos, saldos financeiros e conciliacao.
+
+| Conceito | Dono | Exemplo |
+|----------|------|---------|
+| Orcamento do projeto | M013 | Projeto com R$ 100.000,00 aprovados. |
+| Rubrica orcamentaria do projeto | M013/M008 | Bolsas, diarias, material de consumo. |
+| Conta contabil | M016 | Despesa com servicos de terceiros, receita de parceria. |
+| Fundo financeiro | M016 | Carteira/fonte de recursos segregada. |
+| Centro de custo | M016 | Area ou finalidade interna responsavel pelo gasto. |
+
 A agencia de fomento concede recursos financeiros a projetos de pesquisa por meio de editais. Cada projeto possui um orcamento aprovado, distribuido em rubricas (categorias de despesa como diarias, passagens, material de consumo, servicos de terceiros, bolsas). Durante a execucao do projeto, e comum que o coordenador identifique a necessidade de ajustar o orcamento.
 
 As principais operacoes orcamentarias sao: (1) adicoes orcamentarias, quando recursos adicionais sao solicitados a agencia de fomento; (2) inclusao de novas rubricas que nao estavam previstas originalmente no projeto; (3) remanejamento entre rubricas, quando recursos sao transferidos de uma categoria para outra; (4) realocacao de bolsas, quando cotas de bolsa sao redistribuidas entre modalidades ou niveis.

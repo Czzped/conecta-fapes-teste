@@ -45,6 +45,14 @@ M010-planejamento-estrategia/
     └── epics/EPIC-M010-002.md
 ```
 
+## Fronteira com Acao Transversal
+
+A Acao Transversal e calculada uma unica vez na Parceria, antes da distribuicao de recursos para Programas. O M010 e dono do calculo aplicado sobre a Parceria, da reserva e do bloqueio desse valor para aportes em Programas. A gestao financeira institucional da reserva, incluindo plano de aplicacao, despesas, documentos, glosas e prestacao financeira da agencia, pertence ao [M016 - Contabilidade e Financeiro](../M016-contabilidade-financeiro/acao-transversal/README.md).
+
+O M014 permanece como contexto de prestacao de contas da Iniciativa/Projeto. Portanto, a prestacao financeira da Acao Transversal nao deve ser modelada no M014.
+
+Referencia normativa: [Resolucao CCAF nº 334/2023 - FAPES](https://fapes.es.gov.br/Media/fapes/Resolu%C3%A7%C3%B5es/Resolu%C3%A7%C3%A3o_CCAF_n%C2%BA_334.2023_-_utiliza%C3%A7%C3%A3o_recursos_financeiros_de_projetos_e-ou_programas_em_parcerias_destinados_a_A%C3%A7%C3%A3o_Transversal_para_a_FAPES..pdf). Os percentuais e faixas dessa resolucao devem ser parametrizados no M016 e apenas consumidos pelo M010 no momento de calcular a reserva da Parceria.
+
 ## Indice de Documentos
 
 | Documento | Descricao |
@@ -80,6 +88,7 @@ M010-planejamento-estrategia/
 | M016 | Modulo interno | Fornece `ContaBancaria` como destino do deposito em `RegistrarAporteFinanceiro` — deferido para pos-M014 |
 | M003 | Modulo interno | Fornece `ConsultarIniciativasPorPrograma` e consumo consolidado por iniciativa |
 | M014 | Modulo interno | Fornece movimentacoes e prestacoes de contas que alimentam consolidacoes de consumo |
+| M016 / Acao Transversal | Modulo interno | Fornece politica/faixas de Acao Transversal e recebe a reserva financeira institucional calculada na Parceria |
 
 ---
 
@@ -120,12 +129,17 @@ O sistema e estruturado em tres subdominios integrados (cada um com sua propria 
 | RN11 | Uma Parceria pode aportar em um ou mais Programas; um Programa pode receber aportes de uma ou mais Parcerias. Cada aporte exige valor nao-negativo (`>= 0`, admite zero) e Parceria vigente. Aportes com valor negativo sao rejeitados. | Must | programas |
 | RN12 | Todo AporteFinanceiro deve estar formalizado por um `Documento`. No ato do registro do aporte, o sistema sempre classifica esse Documento com `TipoDocumento = "Termo de Descentralizacao"`. | Must | parcerias |
 | RN13 | Um Programa nao pode comecar antes da `vigenciaInicioCorrente` (RN15) de nenhuma Parceria que nele aporte, nem terminar depois da `vigenciaFimCorrente`. Invariante estrutural: validar ao registrar aporte, ao alterar datas do Programa e ao registrar nova Vigencia. | Must | programas / parcerias |
-| RN14 | A Parceria possui `saldo = SUM(AporteFinanceiro.valorInvestido) - SUM(AporteFinanceiroParceriaPrograma.valor em estado ATIVO)`, sempre `>= 0`. Aportes retirados do Programa nao compoem o total alocado e devolvem saldo a Parceria. | Must | parcerias / programas |
+| RN14 | A Parceria deve manter saldos financeiros nao negativos. Quando houver Acao Transversal, o saldo operacional para Programas deve considerar a reserva transversal antes de permitir novos aportes. Aportes retirados do Programa nao compoem o total alocado e devolvem saldo alocavel a Parceria. | Must | parcerias / programas |
 | RN15 | A vigencia efetiva da Parceria e derivada das instancias de `Vigencia`: `vigenciaInicioCorrente = MIN(Vigencia.dataInicio)` e `vigenciaFimCorrente = MAX(Vigencia.dataFim)`. Toda Parceria deve ter exatamente uma Vigencia com `isAditivo = false`. | Must | parcerias |
 | RN16 | Todo Programa deve ter exatamente uma `Instituicao` demandante (relacao `demandadoPor`). | Must | programas |
 | RN17 | O primeiro `AporteFinanceiro` de uma Parceria tem `isAditivo = false` (original). Um aditivo so pode ser registrado apos existir pelo menos um original, com `dataAporte` posterior. | Must | parcerias |
 | RN18 | Um `AporteFinanceiro` com `isAditivo = true` pode ser editado ou removido, e o `saldo` e recalculado. A operacao e rejeitada se o saldo resultante ficar negativo (mantem RN14). | Must | parcerias |
 | RN19 | Transicao `EmElaboracao → Vigente` exige: `dataAssinatura` + >=1 `AporteFinanceiro` original + Vigencia original + >=1 `Documento` anexado + hoje em `[vigenciaInicioCorrente, vigenciaFimCorrente]` (inclusivo). | Must | parcerias |
+| RN20 | A Acao Transversal e calculada uma unica vez na Parceria, com base na politica vigente parametrizada no M016; Programas nao recalculam Acao Transversal sobre aportes recebidos. | Must | parcerias / financeiro |
+| RN21 | O valor reservado para Acao Transversal nao compoe o saldo alocavel em Programas. | Must | parcerias / programas |
+| RN22 | O saldo alocavel em Programas e `SUM(AporteFinanceiro.valorInvestido) - valorReservadoAcaoTransversal - SUM(AporteFinanceiroParceriaPrograma.valor em estado ATIVO)`, sempre `>= 0`. | Must | parcerias / programas |
+| RN23 | Cada AporteFinanceiro sujeito a Acao Transversal gera sua propria reserva: o aporte original calcula sobre o valor original e cada aditivo financeiro calcula sobre o valor do proprio aditivo, mantendo snapshot da politica, faixa, percentual, base de calculo e valor reservado. Nao se recalcula retroativamente a reserva dos aportes anteriores, salvo determinacao normativa explicita. | Must | parcerias / financeiro |
+| RN24 | A prestacao financeira da Acao Transversal pertence ao M016; a prestacao de contas da Iniciativa/Projeto permanece no M014. | Must | financeiro / prestacao de contas |
 | RI1 | Um Programa pode ser removido sem impacto quando nao possui nenhuma Iniciativa vinculada. Se ja houver Iniciativa vinculada, a remocao e bloqueada e o Programa deve ser encerrado para preservar historico. | Must | programas |
 | RI2 | Uma Parceria transita para `Encerrada` em dois gatilhos: solicitacao do usuario ou expiracao automatica (`vigenciaFimCorrente < hoje`). Em ambos os casos, exige `justificativa` obrigatoria e encerra em cascata todos os Programas aportados, apos confirmacao explicita. | Must | parcerias |
 | RI3 | Uma Parceria so pode ser removida se nao estiver vinculada a nenhum Programa (sem `AporteFinanceiroParceriaPrograma`). | Must | parcerias |

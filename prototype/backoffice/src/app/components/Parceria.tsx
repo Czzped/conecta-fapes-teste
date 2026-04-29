@@ -28,6 +28,9 @@ export interface ParceriaItem {
   aporteTotal: number;
   valorAlocado: number;
   saldoDisponivel: number;
+  percentualAcaoTransversal: number;
+  valorReservaAcaoTransversal: number;
+  saldoAlocavelEmProgramas: number;
   programasRelacionados: number;
   iniciativasImpactadas: number;
   documentoSolicitacao: string;
@@ -61,6 +64,21 @@ const formatPercent = (value: number) => (
   `${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
 );
 
+const calcularPercentualAcaoTransversal = (valor: number) => {
+  if (valor < 50000) return 0;
+  if (valor <= 2000000) return 5;
+  if (valor <= 5000000) return 4;
+  return 3;
+};
+
+const calcularReservaAcaoTransversal = (valor: number) => {
+  const percentual = calcularPercentualAcaoTransversal(valor);
+  return {
+    percentual,
+    reserva: Math.round(valor * percentual) / 100,
+  };
+};
+
 const buildCardStyle = (T: ThemeTokens): React.CSSProperties => ({
   backgroundColor: T.bgCard,
   border: `1px solid ${T.borderSubtle}`,
@@ -87,7 +105,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
   const [selectedProgramaFromParceria, setSelectedProgramaFromParceria] = useState<{ codigo: string; nome: string } | null>(null);
 
   const statusOptions: StatusFilter[] = ['Todos', 'EmElaboracao', 'Vigente', 'Suspensa', 'Encerrada'];
-  const parceriasData: ParceriaItem[] = [
+  const parceriasBase = [
     {
       id: 1,
       nome: 'Cooperação Fapes-Ufes em Pesquisa Aplicada',
@@ -225,6 +243,17 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
     },
   ];
 
+  const parceriasData: ParceriaItem[] = parceriasBase.map(parceria => {
+    const { percentual, reserva } = calcularReservaAcaoTransversal(parceria.aporteTotal);
+    return {
+      ...parceria,
+      percentualAcaoTransversal: percentual,
+      valorReservaAcaoTransversal: reserva,
+      saldoDisponivel: Math.max(parceria.aporteTotal - reserva - parceria.valorAlocado, 0),
+      saldoAlocavelEmProgramas: Math.max(parceria.aporteTotal - reserva - parceria.valorAlocado, 0),
+    };
+  });
+
   const instituicaoOptions = ['Todos', ...Array.from(new Set(parceriasData.map(p => p.instituicaoParceira)))];
 
   const filtered = parceriasData.filter(p => {
@@ -239,8 +268,9 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
   });
 
   const totalInvestido = parceriasData.reduce((acc, p) => acc + p.aporteTotal, 0);
+  const totalAcaoTransversal = parceriasData.reduce((acc, p) => acc + p.valorReservaAcaoTransversal, 0);
   const totalAlocado = parceriasData.reduce((acc, p) => acc + p.valorAlocado, 0);
-  const saldoTotal = parceriasData.reduce((acc, p) => acc + p.saldoDisponivel, 0);
+  const saldoTotal = parceriasData.reduce((acc, p) => acc + p.saldoAlocavelEmProgramas, 0);
   const totalAportado = parceriasData.reduce((acc, p) => {
     const fatorAportado = p.status === 'Encerrada' ? 0.92 : p.status === 'Suspensa' ? 0.44 : p.status === 'EmElaboracao' ? 0 : 0.58;
     return acc + Math.min(p.valorAlocado * fatorAportado, p.valorAlocado);
@@ -409,13 +439,14 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
 
         {activeTab === 'dashboard' && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px', marginBottom: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '16px', marginBottom: '24px' }}>
             {[
               { label: 'Total Investido', value: formatCurrency(totalInvestido), Icon: DollarSign, color: '#a855f7', bg: 'rgba(168,85,247,0.12)' },
+              { label: 'Ação Transversal', value: formatCurrency(totalAcaoTransversal), detail: 'Reserva normativa', Icon: Handshake, color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
               { label: 'Total Aportado', value: formatCurrency(totalAportado), detail: `${formatPercent(percentualAportadoPortfolio)} do alocado`, Icon: Handshake, color: '#38bdf8', bg: 'rgba(56,189,248,0.12)' },
               { label: 'Total Alocado', value: formatCurrency(totalAlocado), detail: `${formatPercent(percentualAlocadoPortfolio)} do investido`, Icon: FolderOpen, color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
               { label: 'Total Consumido', value: formatCurrency(totalConsumidoPortfolio), detail: `${formatPercent(percentualConsumidoPortfolio)} do alocado`, Icon: DollarSign, color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
-              { label: 'Saldo disponível', value: formatCurrency(saldoTotal), detail: `${formatPercent(percentualDisponivelPortfolio)} do investido`, Icon: DollarSign, color: '#00c1af', bg: 'rgba(0,193,175,0.12)' },
+              { label: 'Saldo para programas', value: formatCurrency(saldoTotal), detail: `${formatPercent(percentualDisponivelPortfolio)} do investido`, Icon: DollarSign, color: '#00c1af', bg: 'rgba(0,193,175,0.12)' },
             ].map(({ label, value, detail, Icon, color, bg }) => (
               <div key={label} style={cardStyle}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
@@ -577,7 +608,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
               onClick={() => setSelectedParceria(parceria)}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '2fr 1.1fr 1fr 1.2fr 1.1fr 1.1fr 40px',
+                gridTemplateColumns: '2fr 1.1fr 1fr 1.2fr 1fr 1fr 1fr 40px',
                 gap: '16px',
                 alignItems: 'center',
                 width: '100%',
@@ -599,7 +630,8 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
               </div>
               <ListCell label="Vigência corrente" value={`${parceria.vigenciaInicio} - ${parceria.vigenciaFim}`} />
               <ListCell label="Aporte total" value={formatCurrency(parceria.aporteTotal)} />
-              <ListCell label="Saldo" value={formatCurrency(parceria.saldoDisponivel)} highlight={parceria.saldoDisponivel > 0} />
+              <ListCell label="Ação Transversal" value={formatCurrency(parceria.valorReservaAcaoTransversal)} detail={`${formatPercent(parceria.percentualAcaoTransversal)} reservado`} />
+              <ListCell label="Saldo programas" value={formatCurrency(parceria.saldoAlocavelEmProgramas)} highlight={parceria.saldoAlocavelEmProgramas > 0} />
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <ChevronRight size={18} style={{ color: T.iconSubdued }} />
               </div>

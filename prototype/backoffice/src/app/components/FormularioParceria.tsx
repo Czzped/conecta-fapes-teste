@@ -57,6 +57,23 @@ const sectionSubtitleStyle: React.CSSProperties = {
   margin: '0 0 24px',
 };
 
+const parseCurrencyValue = (value: string) => Number(value.replace(/\./g, '').replace(',', '.')) || 0;
+
+const formatCurrency = (value: number) => (
+  `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+);
+
+const formatPercent = (value: number) => (
+  `${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
+);
+
+const calcularPercentualAcaoTransversal = (valor: number) => {
+  if (valor < 50000) return 0;
+  if (valor <= 2000000) return 5;
+  if (valor <= 5000000) return 4;
+  return 3;
+};
+
 const SelectField: React.FC<{
   label?: string;
   value: string;
@@ -201,6 +218,10 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
   const [dataAporteOriginal, setDataAporteOriginal] = useState('');
   const [contaBancariaDestino, setContaBancariaDestino] = useState('');
   const [documentos, setDocumentos] = useState<Documento[]>([{ id: 1, tipo: '', arquivo: '' }]);
+  const valorAporteOriginalNumerico = parseCurrencyValue(valorAporteOriginal);
+  const percentualAcaoTransversal = calcularPercentualAcaoTransversal(valorAporteOriginalNumerico);
+  const valorReservaAcaoTransversal = valorAporteOriginalNumerico * percentualAcaoTransversal / 100;
+  const saldoAlocavelEmProgramas = Math.max(valorAporteOriginalNumerico - valorReservaAcaoTransversal, 0);
 
   const instituicoesOptions = [
     { value: 'ufes', label: 'Universidade Federal do Espírito Santo (Ufes)', cnpj: '32.479.123/0001-43' },
@@ -313,6 +334,12 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
             <Field label="Valor do Aporte Original (R$)" value={valorAporteOriginal} onChange={setValorAporteOriginal} placeholder="Ex: 1.000.000,00" />
             <DateField label="Data do Aporte" value={dataAporteOriginal} onChange={setDataAporteOriginal} />
           </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '16px', padding: '16px', border: '1px solid rgba(245,158,11,0.28)', borderRadius: '8px', backgroundColor: 'rgba(245,158,11,0.08)' }}>
+            <Metric label="Política" value="Res. CCAF 334/2023" />
+            <Metric label="Percentual Ação Transversal" value={formatPercent(percentualAcaoTransversal)} />
+            <Metric label="Reserva Ação Transversal" value={formatCurrency(valorReservaAcaoTransversal)} highlight />
+            <Metric label="Saldo alocável em programas" value={formatCurrency(saldoAlocavelEmProgramas)} />
+          </div>
           <div>
             <Field label="Conta Bancária de Destino" value={contaBancariaDestino} onChange={setContaBancariaDestino} placeholder="Banco / agência / conta" />
           </div>
@@ -388,6 +415,15 @@ const Field: React.FC<{ label: string; value: string; onChange: (value: string) 
   <div>
     <label style={labelStyle}>{label}</label>
     <input type="text" placeholder={placeholder} value={value} onChange={e => onChange(e.target.value)} style={inputStyle} />
+  </div>
+);
+
+const Metric: React.FC<{ label: string; value: string; highlight?: boolean }> = ({ label, value, highlight }) => (
+  <div>
+    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '5px' }}>{label}</div>
+    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: highlight ? '#f59e0b' : '#ffffff', fontWeight: highlight ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', margin: 0 }}>
+      {value}
+    </p>
   </div>
 );
 

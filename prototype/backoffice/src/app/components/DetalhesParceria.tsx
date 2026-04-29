@@ -33,6 +33,15 @@ const formatPercent = (value: number) => (
   `${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
 );
 
+const calcularPercentualAcaoTransversal = (valor: number) => {
+  if (valor < 50000) return 0;
+  if (valor <= 2000000) return 5;
+  if (valor <= 5000000) return 4;
+  return 3;
+};
+
+const calcularReservaAcaoTransversal = (valor: number) => valor * calcularPercentualAcaoTransversal(valor) / 100;
+
 const cardStyle: React.CSSProperties = {
   backgroundColor: 'rgba(30, 41, 59, 0.5)',
   border: '1px solid rgba(255,255,255,0.1)',
@@ -186,13 +195,25 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
     setEditingCadastro(false);
   };
 
-  const saldoDisponivel = Math.max(cadastroData.aporteTotal - cadastroData.valorAlocado, 0);
   const totalAditivosFinanceiros = aditivosFinanceiros.reduce((total, aditivo) => total + aditivo.valor, 0);
+  const aporteOriginal = Math.max(cadastroData.aporteTotal - totalAditivosFinanceiros, 0);
 
   const aportes = [
-    { tipo: 'Original', data: cadastroData.dataAssinatura || parceria.dataEnvio, valor: cadastroData.aporteTotal - totalAditivosFinanceiros, conta: cadastroData.contaBancariaDestino, documento: parceria.termoDescentralizacao },
+    { tipo: 'Original', data: cadastroData.dataAssinatura || parceria.dataEnvio, valor: aporteOriginal, conta: cadastroData.contaBancariaDestino, documento: parceria.termoDescentralizacao },
     ...aditivosFinanceiros.map((aditivo, index) => ({ tipo: `Aditivo financeiro ${index + 1}`, data: aditivo.data, valor: aditivo.valor, conta: cadastroData.contaBancariaDestino, documento: aditivo.documento || 'Pendente' })),
   ];
+  const reservasAcaoTransversal = aportes.map(aporte => ({
+    ...aporte,
+    percentual: calcularPercentualAcaoTransversal(aporte.valor),
+    valorReserva: calcularReservaAcaoTransversal(aporte.valor),
+    saldoLiquido: Math.max(aporte.valor - calcularReservaAcaoTransversal(aporte.valor), 0),
+  }));
+  const valorReservaAcaoTransversal = reservasAcaoTransversal.reduce((total, reserva) => total + reserva.valorReserva, 0);
+  const saldoDisponivel = Math.max(cadastroData.aporteTotal - valorReservaAcaoTransversal - cadastroData.valorAlocado, 0);
+  const percentualReservaTotal = cadastroData.aporteTotal > 0 ? (valorReservaAcaoTransversal / cadastroData.aporteTotal) * 100 : 0;
+  const valorAditivoPreview = parseCurrency(aditivoFinanceiro.valor);
+  const percentualAditivoPreview = calcularPercentualAcaoTransversal(valorAditivoPreview);
+  const reservaAditivoPreview = calcularReservaAcaoTransversal(valorAditivoPreview);
 
   const registrarAditivo = () => {
     if (currentStatus === 'Suspensa' || currentStatus === 'Encerrada') return;
@@ -555,11 +576,19 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
             </div>
 
             {aditivoTipo === 'financeiro' ? (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', alignItems: 'end' }}>
-                <CurrencyEditField label="Valor do aditivo financeiro" value={aditivoFinanceiro.valor} onChange={(valor) => setAditivoFinanceiro(prev => ({ ...prev, valor }))} />
-                <DateMaskEditField label="Data do aporte" value={aditivoFinanceiro.data} onChange={(data) => setAditivoFinanceiro(prev => ({ ...prev, data }))} />
-                <UploadEditField label="Documento de descentralização" fileName={aditivoFinanceiro.documento} onChange={(documento) => setAditivoFinanceiro(prev => ({ ...prev, documento }))} />
-              </div>
+              <>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', alignItems: 'end' }}>
+                  <CurrencyEditField label="Valor do aditivo financeiro" value={aditivoFinanceiro.valor} onChange={(valor) => setAditivoFinanceiro(prev => ({ ...prev, valor }))} />
+                  <DateMaskEditField label="Data do aporte" value={aditivoFinanceiro.data} onChange={(data) => setAditivoFinanceiro(prev => ({ ...prev, data }))} />
+                  <UploadEditField label="Documento de descentralização" fileName={aditivoFinanceiro.documento} onChange={(documento) => setAditivoFinanceiro(prev => ({ ...prev, documento }))} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginTop: '16px', padding: '14px', border: '1px solid rgba(245,158,11,0.28)', borderRadius: '8px', backgroundColor: 'rgba(245,158,11,0.08)' }}>
+                  <Info label="Política" value="Res. CCAF 334/2023" />
+                  <Info label="Percentual no aditivo" value={formatPercent(percentualAditivoPreview)} />
+                  <Info label="Reserva do aditivo" value={formatCurrency(reservaAditivoPreview)} />
+                  <Info label="Líquido para programas" value={formatCurrency(Math.max(valorAditivoPreview - reservaAditivoPreview, 0))} />
+                </div>
+              </>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignItems: 'end' }}>
                 <DateMaskEditField label="Nova data fim da parceria" value={aditivoTempo.vigenciaFim} onChange={(vigenciaFim) => setAditivoTempo(prev => ({ ...prev, vigenciaFim }))} />
@@ -574,13 +603,14 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
           </div>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px', marginBottom: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '16px', marginBottom: '24px' }}>
           {[
             { label: 'Total Investido', value: formatCurrency(cadastroData.aporteTotal), Icon: DollarSign, color: '#a855f7', bg: 'rgba(168,85,247,0.12)' },
+            { label: 'Ação Transversal', value: formatCurrency(valorReservaAcaoTransversal), Icon: Handshake, color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
             { label: 'Total Aportado', value: formatCurrency(valorAportado), Icon: Handshake, color: '#38bdf8', bg: 'rgba(56,189,248,0.12)' },
             { label: 'Total Alocado', value: formatCurrency(cadastroData.valorAlocado), Icon: FolderOpen, color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
             { label: 'Total Consumido', value: formatCurrency(valorConsumido), Icon: DollarSign, color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
-            { label: 'Saldo disponível', value: formatCurrency(saldoDisponivel), Icon: DollarSign, color: '#00c1af', bg: 'rgba(0,193,175,0.12)' },
+            { label: 'Saldo programas', value: formatCurrency(saldoDisponivel), Icon: DollarSign, color: '#00c1af', bg: 'rgba(0,193,175,0.12)' },
           ].map(({ label, value, Icon, color, bg }) => (
             <div key={label} style={metricCardStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
@@ -708,6 +738,26 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                 <Info label="Conta bancária de destino" value={cadastroData.contaBancariaDestino} />
               )}
             </SummarySection>
+
+            <SummarySection number="4" title="Ação Transversal" subtitle="Reserva normativa bloqueada para gestão contábil e financeira">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '16px' }}>
+                <Info label="Política aplicada" value="Res. CCAF 334/2023" />
+                <Info label="Percentual médio reservado" value={formatPercent(percentualReservaTotal)} />
+                <Info label="Valor reservado" value={formatCurrency(valorReservaAcaoTransversal)} />
+                <Info label="Saldo alocável em programas" value={formatCurrency(saldoDisponivel)} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {reservasAcaoTransversal.map((reserva, index) => (
+                  <Row key={`${reserva.tipo}-${index}`}>
+                    <Info label="Origem" value={reserva.tipo} />
+                    <Info label="Base de cálculo" value={formatCurrency(reserva.valor)} />
+                    <Info label="Percentual" value={formatPercent(reserva.percentual)} />
+                    <Info label="Reserva financeira" value={formatCurrency(reserva.valorReserva)} />
+                    <Info label="Líquido programas" value={formatCurrency(reserva.saldoLiquido)} />
+                  </Row>
+                ))}
+              </div>
+            </SummarySection>
           </div>
         )}
 
@@ -726,6 +776,23 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                     <Info label="Conta destino" value={aporte.conta} />
                     <Info label="Documento" value={aporte.documento} />
                     {index === 0 ? <Info label="Ação" value="-" /> : <RemoveButton label="Remover" onClick={() => removerAditivoFinanceiro(index - 1)} />}
+                  </Row>
+                ))}
+              </div>
+            </div>
+
+            <div style={cardStyle}>
+              <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 20px' }}>
+                Reserva de Ação Transversal
+              </h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {reservasAcaoTransversal.map((reserva, index) => (
+                  <Row key={`${reserva.tipo}-${reserva.data}-${index}`}>
+                    <Info label="Origem" value={reserva.tipo} />
+                    <Info label="Valor base" value={formatCurrency(reserva.valor)} />
+                    <Info label="Percentual" value={formatPercent(reserva.percentual)} />
+                    <Info label="Valor reservado" value={formatCurrency(reserva.valorReserva)} />
+                    <Info label="Destino" value="Ação Transversal" />
                   </Row>
                 ))}
               </div>
@@ -803,10 +870,11 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '22px' }}>
                 {[
                   { label: 'Total investido', value: formatCurrency(cadastroData.aporteTotal), color: '#a855f7' },
+                  { label: 'Ação Transversal', value: formatCurrency(valorReservaAcaoTransversal), color: '#f59e0b' },
                   { label: 'Total aportado', value: formatCurrency(valorAportado), color: '#38bdf8' },
                   { label: 'Total alocado', value: formatCurrency(cadastroData.valorAlocado), color: '#3b82f6' },
                   { label: 'Total consumido', value: formatCurrency(valorConsumido), color: '#22c55e' },
-                  { label: 'Saldo disponível', value: formatCurrency(saldoDisponivel), color: '#00c1af' },
+                  { label: 'Saldo programas', value: formatCurrency(saldoDisponivel), color: '#00c1af' },
                   { label: 'Percentual consumido', value: formatPercent(percentualConsumido), color: '#f59e0b' },
                 ].map(item => (
                   <div key={item.label} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>

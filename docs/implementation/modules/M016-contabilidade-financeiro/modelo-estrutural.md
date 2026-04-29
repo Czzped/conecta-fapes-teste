@@ -121,6 +121,70 @@ classDiagram
         +Date dataAtualizacao
     }
 
+    class CentroCusto {
+        +String codigo
+        +String nome
+        +String descricao
+        +boolean ativo
+    }
+
+    class PoliticaAcaoTransversal {
+        +String nome
+        +String baseLegal
+        +Date dataInicioVigencia
+        +Date dataFimVigencia
+        +boolean ativa
+    }
+
+    class FaixaAcaoTransversal {
+        +double valorMinimo
+        +double valorMaximo
+        +double percentual
+    }
+
+    class ReservaAcaoTransversal {
+        +String aporteFinanceiroOrigemId
+        +TipoOrigemReservaAcaoTransversal tipoOrigem
+        +double valorBaseCalculo
+        +double percentualAplicado
+        +double valorReservado
+        +double valorExecutado
+        +double saldo
+        +Date dataCalculo
+    }
+
+    class TipoOrigemReservaAcaoTransversal {
+        <<enumeration>>
+        APORTE_ORIGINAL
+        APORTE_ADITIVO
+        AJUSTE
+    }
+
+    class PlanoAplicacaoAcaoTransversal {
+        +Date dataCadastro
+        +EstadoPlanoAplicacao estado
+    }
+
+    class ItemPlanoAplicacaoAcaoTransversal {
+        +double valorPrevisto
+        +String justificativa
+    }
+
+    class DespesaAcaoTransversal {
+        +double valor
+        +Date dataDespesa
+        +String justificativa
+        +EstadoDespesaAcaoTransversal estado
+    }
+
+    class PrestacaoFinanceiraAcaoTransversal {
+        +Date dataSubmissao
+        +Date dataEncerramento
+        +EstadoPrestacaoFinanceira estado
+        +double valorAprovado
+        +double valorGlosado
+    }
+
     class Iniciativa {
         <<fora do escopo - M003>>
     }
@@ -131,6 +195,14 @@ classDiagram
 
     class Parceria {
         <<fora do escopo - M010>>
+    }
+
+    class RubricaFinanceira {
+        <<fora do escopo - M008>>
+    }
+
+    class Documento {
+        <<fora do escopo - M008>>
     }
 
     ContaContabil "1" --> "*" AssociacaoConta : associacoes
@@ -149,6 +221,20 @@ classDiagram
     ItemConciliacao "*" --> "0..1" MovimentacaoFinanceira : registro sistema
     MovimentacaoFinanceira "*" --> "1" ContaContabil : classificacao contabil
     FluxoCaixa "*" --> "1" ContaBancaria : conta
+    PoliticaAcaoTransversal "1" --> "*" FaixaAcaoTransversal : faixas
+    ReservaAcaoTransversal "*" --> "1" PoliticaAcaoTransversal : regra aplicada
+    ReservaAcaoTransversal "*" --> "1" Parceria : origem
+    ReservaAcaoTransversal "*" --> "1" ContaContabil : classificadaEm
+    ReservaAcaoTransversal "*" --> "1" FundoFinanceiro : vinculadaAoFundo
+    ReservaAcaoTransversal "*" --> "1" CentroCusto : vinculadaAoCentro
+    ReservaAcaoTransversal "1" --> "0..1" PlanoAplicacaoAcaoTransversal : planejada por
+    PlanoAplicacaoAcaoTransversal "1" --> "*" ItemPlanoAplicacaoAcaoTransversal : itens
+    ItemPlanoAplicacaoAcaoTransversal "*" --> "1" RubricaFinanceira : rubrica
+    ReservaAcaoTransversal "1" --> "*" DespesaAcaoTransversal : despesas
+    DespesaAcaoTransversal "*" --> "0..1" ItemPlanoAplicacaoAcaoTransversal : executaItem
+    DespesaAcaoTransversal "*" --> "1" RubricaFinanceira : rubrica
+    DespesaAcaoTransversal "*" --> "1" Documento : comprovante
+    PrestacaoFinanceiraAcaoTransversal "1" --> "*" DespesaAcaoTransversal : analisa
 ```
 
 ## Dicionario de Dados
@@ -199,12 +285,50 @@ classDiagram
 | | saldoFinal | Saldo no final do periodo | Gerado | Double | | | |
 | **SaldoConta** | saldoAtual | Saldo atual da conta bancaria | Gerado | Double | | | |
 | | dataAtualizacao | Data e hora da ultima atualizacao do saldo | Gerado | Date | | | |
+| **CentroCusto** | codigo | Codigo do centro de custo institucional | Sim | String | Ex: CC-AT-001 | 50 | Sim |
+| | nome | Nome do centro de custo | Sim | String | Ex: Gestao Institucional de Parcerias | 200 | |
+| | descricao | Finalidade do centro de custo | Nao | String | | 500 | |
+| | ativo | Indica se o centro de custo esta ativo | Sim | Boolean | | | |
+| **PoliticaAcaoTransversal** | nome | Nome da politica normativa | Sim | String | Ex: Resolucao CCAF 334/2023 | 200 | |
+| | baseLegal | Referencia normativa | Sim | String | | 300 | |
+| | dataInicioVigencia | Inicio da vigencia da politica | Sim | Date | | | |
+| | dataFimVigencia | Fim da vigencia da politica | Nao | Date | | | |
+| | ativa | Indica se a politica pode ser usada pelo M010 | Sim | Boolean | | | |
+| **FaixaAcaoTransversal** | valorMinimo | Limite inferior da faixa | Sim | Double | ≥ 0 | | |
+| | valorMaximo | Limite superior da faixa; vazio para faixa aberta | Nao | Double | ≥ valorMinimo | | |
+| | percentual | Percentual aplicado na faixa | Sim | Double | > 0 | | |
+| **ReservaAcaoTransversal** | valorBaseCalculo | Valor bruto usado pelo M010 para calculo | Sim | Double | ≥ 0 | | |
+| | aporteFinanceiroOrigemId | Identificador do AporteFinanceiro do M010 que originou a reserva | Sim | String | Aporte original ou aditivo | | |
+| | tipoOrigem | Origem da reserva | Sim | TipoOrigemReservaAcaoTransversal | `APORTE_ORIGINAL`, `APORTE_ADITIVO`, `AJUSTE` | | |
+| | percentualAplicado | Percentual selecionado pela politica | Sim | Double | > 0 | | |
+| | valorReservado | Valor reservado para gestao financeira institucional | Sim | Double | ≥ 0 | | |
+| | valorExecutado | Total de despesas registradas contra a reserva | Gerado | Double | ≥ 0 | | |
+| | saldo | `valorReservado - valorExecutado` | Gerado | Double | ≥ 0 | | |
+| | dataCalculo | Data em que o M010 calculou/enviou a reserva | Sim | Date | | | |
+| | contaContabil (relacao) | Conta contabil institucional onde a reserva e reconhecida | Sim | FK → ContaContabil | Ex: Recursos de Acao Transversal | | |
+| | fundoFinanceiro (relacao) | Fundo/carteira financeira que concentra a reserva | Sim | FK → FundoFinanceiro | | | |
+| | centroCusto (relacao) | Centro de custo responsavel pela gestao institucional da reserva | Sim | FK → CentroCusto | | | |
+| **PlanoAplicacaoAcaoTransversal** | dataCadastro | Data do plano | Gerado | Date | | | |
+| | estado | Estado do plano | Gerado | EstadoPlanoAplicacao | EmElaboracao, Aprovado, Substituido | | |
+| **ItemPlanoAplicacaoAcaoTransversal** | valorPrevisto | Valor previsto para a rubrica | Sim | Double | ≥ 0 | | |
+| | justificativa | Justificativa da previsao de uso | Sim | String | | 1000 | |
+| **DespesaAcaoTransversal** | valor | Valor da despesa institucional | Sim | Double | ≥ 0 | | |
+| | dataDespesa | Data da despesa | Sim | Date | | | |
+| | justificativa | Justificativa da despesa | Sim | String | | 1000 | |
+| | estado | Estado da despesa | Gerado | EstadoDespesaAcaoTransversal | EmAnalise, Aprovada, Glosada, Reprovada | | |
+| | itemPlanoAplicacao (relacao) | Item planejado que a despesa executa | Cond. | FK → ItemPlanoAplicacaoAcaoTransversal | Obrigatorio quando houver plano aprovado | | |
+| **PrestacaoFinanceiraAcaoTransversal** | dataSubmissao | Data de envio para analise | Cond. | Date | | | |
+| | dataEncerramento | Data de encerramento da analise | Cond. | Date | | | |
+| | estado | Estado da prestacao financeira institucional | Gerado | EstadoPrestacaoFinanceira | Rascunho, EmAnalise, Aprovada, AprovadaComGlosa, Reprovada, Encerrada | | |
+| | valorAprovado | Total aprovado | Gerado | Double | ≥ 0 | | |
+| | valorGlosado | Total glosado | Gerado | Double | ≥ 0 | | |
 
 ## Notas de Implementacao
 
 **Entidades externas:**
 - Iniciativa: gerenciada por M003 (Gestao de Iniciativas Captadas) como abstracao estrutural de iniciativas apoiadas.
 - Programa e Parceria: gerenciados por M010 (Planejamento e Estrategia).
+- RubricaFinanceira e Documento: gerenciados por M008 (Cadastros Corporativos).
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: MovimentacaoFinanceira.contaContabil: ContaContabil)

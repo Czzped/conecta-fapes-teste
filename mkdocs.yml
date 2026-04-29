@@ -351,6 +351,11 @@ nav:
           - Contrato API: implementation/modules/M016-contabilidade-financeiro/contrato-api.md
           - Modelo Estrutural: implementation/modules/M016-contabilidade-financeiro/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M016-contabilidade-financeiro/modelo-comportamental.md
+          - Acao Transversal:
+              - Visao Geral: implementation/modules/M016-contabilidade-financeiro/acao-transversal/README.md
+              - Processo: implementation/modules/M016-contabilidade-financeiro/acao-transversal/processo.md
+              - Proposta de Tela e Impacto no Codigo: implementation/modules/M016-contabilidade-financeiro/acao-transversal/proposta-tela-e-impacto-codigo.md
+              - EPIC-005: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-005.md
           - EPIC-001: implementation/modules/M016-contabilidade-financeiro/epics/EPIC-M016-001.md
           - EPIC-002: implementation/modules/M016-contabilidade-financeiro/epics/EPIC-M016-002.md
           - EPIC-003: implementation/modules/M016-contabilidade-financeiro/epics/EPIC-M016-003.md

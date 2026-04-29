@@ -11,6 +11,7 @@
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclo de vida da ConciliacaoBancaria |
+| [Acao Transversal](acao-transversal/README.md) | Gestao financeira institucional da reserva de Acao Transversal vinculada a Parcerias |
 
 ---
 
@@ -32,6 +33,24 @@ Dashboards financeiros fornecem visao consolidada de saldos, movimentacoes e pro
 
 > Iniciativas sao gerenciadas por M003 como abstracao estrutural, enquanto programas e parcerias sao gerenciados por M010. Este modulo consome esses contextos para operacionalizar a gestao contabil e financeira. O M010 tambem consome este modulo: a operacao `RegistrarAporteFinanceiro` referencia `ContaBancaria` (M016) como destino do deposito via `contaBancariaDestinoId`.
 
+## Conceitos Financeiros
+
+| Conceito | Pergunta que responde | Definicao | Exemplos |
+|----------|-----------------------|-----------|----------|
+| Conta contabil | Que natureza contabil tem este recurso ou despesa? | Classificacao do plano de contas usada para registrar receitas, despesas, ativos, passivos e demais lancamentos contabeis. | Receita de parcerias, despesa com diarias, despesa com servicos de terceiros. |
+| Fundo financeiro | Em qual carteira/fonte segregada este dinheiro esta? | Agrupador financeiro que separa uma massa de recursos para controle de saldo, origem, disponibilidade e conciliacao. | Carteira Acao Transversal FAPES, Fundo de Parcerias Institucionais, Fundo de Pesquisa e Inovacao. |
+| Centro de custo | Qual area, unidade ou finalidade interna e responsavel pelo consumo? | Estrutura gerencial que atribui responsabilidade pelo uso do recurso a uma area/finalidade institucional. | Gerencia de Parcerias, Diretoria Tecnico-Cientifica, Gestao Institucional de Programas. |
+| Rubrica | Em que categoria de gasto o recurso sera planejado ou executado? | Categoria orcamentaria/despesa usada no planejamento e na execucao do gasto. No ConectaFAPES, rubricas de referencia sao fornecidas por M008 e orcamentos de projeto sao geridos no M013. | Diarias, passagens, publicacoes, servicos de terceiros, material permanente. |
+| Orcamento do projeto | Qual limite aprovado o projeto pode gastar por rubrica? | Planejamento/limite financeiro aprovado para uma Iniciativa/Projeto. Nao e conta contabil. | Orcamento de R$ 100.000,00 distribuido entre bolsas, custeio, capital e diarias. |
+
+Resumo operacional: **orcamento** define limite planejado; **rubrica** classifica a categoria do gasto; **conta contabil** registra a natureza contabil; **fundo financeiro** segrega a carteira/fonte; **centro de custo** indica quem responde pelo consumo.
+
+### Acao Transversal
+
+A Acao Transversal e tratada neste modulo como gestao financeira institucional da agencia de fomento. O M010 calcula e reserva o percentual na Parceria, bloqueando esse valor para aportes em Programas. A partir dessa reserva, o M016 controla o plano de aplicacao, a execucao financeira, documentos comprobatórios, glosas, estornos, saldos e a prestacao financeira institucional.
+
+Essa prestacao financeira institucional **nao** substitui nem pertence ao M014. O M014 continua sendo o contexto dono da prestacao de contas da Iniciativa/Projeto, feita pelo coordenador ou outorgado sobre os recursos executados na iniciativa. A Acao Transversal pertence a gestao financeira interna da agencia, pois cobre despesas operacionais e administrativas da propria FAPES/agencia.
+
 ---
 
 ## Regras de Negocio
@@ -48,5 +67,10 @@ Dashboards financeiros fornecem visao consolidada de saldos, movimentacoes e pro
 | RN08 | Uma conciliacao so pode ser iniciada se nao houver outra em andamento para a mesma conta bancaria. | Should |
 | RN09 | Divergencias identificadas na conciliacao devem ser registradas e tratadas antes do fechamento. | Must |
 | RN10 | O fluxo de caixa deve consolidar movimentacoes realizadas e projetadas. | Should |
+| RN11 | Toda reserva de Acao Transversal recebida do M010 deve manter rastreabilidade com a Parceria de origem, aporte financeiro de origem, politica aplicada, percentual, valor base e valor reservado. | Must |
+| RN12 | Toda reserva de Acao Transversal deve ser classificada em conta contabil, fundo financeiro e centro de custo institucional antes do plano de aplicacao por rubricas. | Must |
+| RN13 | Despesas de Acao Transversal devem estar vinculadas a reserva, rubrica, documento comprobatório e unidade/centro financeiro responsavel. | Must |
+| RN14 | A prestacao financeira institucional da Acao Transversal consolida despesas internas da agencia e nao pode ser usada para prestar contas de Iniciativas ou Projetos, que pertencem ao M014. | Must |
+| RN15 | O plano de aplicacao da Acao Transversal deve distribuir o valor reservado em rubricas permitidas e nao pode ultrapassar o saldo da reserva. | Must |
 | RI1 | Uma conta contabil nao pode ser excluida se possuir lancamentos associados. | Must |
 | RI2 | Uma conta bancaria nao pode ser excluida se possuir movimentacoes registradas. | Must |

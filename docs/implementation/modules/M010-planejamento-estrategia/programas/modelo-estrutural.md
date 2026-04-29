@@ -120,7 +120,9 @@ Leitura da relacao `demandadoPor`: uma Instituicao pode demandar zero ou muitos 
 
 ## Referencia de Regras
 
-Regras aplicaveis ao modelo de Programas: `RN01`, `RN02`, `RN11`, `RN13`, `RN14`, `RN16`, `RI1`, `RI2`, `RI4`. As definicoes oficiais ficam em [M010 — Regras de Negocio](../README.md#regras-de-negocio-consolidadas).
+O valor de `AporteFinanceiroParceriaPrograma` consome o saldo liquido alocavel da Parceria. O Programa nao recalcula Acao Transversal sobre aportes recebidos; a reserva transversal ja foi calculada na Parceria e bloqueada antes da alocacao.
+
+Regras aplicaveis ao modelo de Programas: `RN01`, `RN02`, `RN11`, `RN13`, `RN14`, `RN16`, `RN20`, `RN21`, `RN22`, `RI1`, `RI2`, `RI4`. As definicoes oficiais ficam em [M010 — Regras de Negocio](../README.md#regras-de-negocio-consolidadas).
 
 ## Relacoes com outros subdominios
 

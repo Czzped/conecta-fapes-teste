@@ -4,7 +4,7 @@ Dominio e regras de negocio: ver [README.md](README.md)
 
 ## Proposito do Contrato
 
-Este contrato documenta a superficie publica do modulo M016 como contexto responsavel por plano de contas, contas bancarias, movimentacoes financeiras, conciliacao e fluxo de caixa da plataforma.
+Este contrato documenta a superficie publica do modulo M016 como contexto responsavel por plano de contas, contas bancarias, movimentacoes financeiras, conciliacao, fluxo de caixa e gestao financeira institucional da Acao Transversal.
 
 ## Consumidores e Dependencias
 
@@ -13,7 +13,7 @@ Este contrato documenta a superficie publica do modulo M016 como contexto respon
 | Consumidor | Uso do contrato |
 |------------|-----------------|
 | Gestor financeiro | Mantem contas, lancamentos e conciliacoes |
-| M010 | Referencia `ContaBancaria` como destino de aporte financeiro em `RegistrarAporteFinanceiro` (campo `contaBancariaDestinoId`) |
+| M010 | Referencia `ContaBancaria` como destino de aporte financeiro em `RegistrarAporteFinanceiro` (campo `contaBancariaDestinoId`) e envia reservas de Acao Transversal calculadas na Parceria |
 | M017 | Consome movimentacoes para monitoramento PLD |
 | M018 e M019 | Consultam saldos, fluxo e dados consolidados para analise e auditoria |
 
@@ -23,6 +23,7 @@ Este contrato documenta a superficie publica do modulo M016 como contexto respon
 |-------------|------|------------|
 | M003 | Modulo interno | Fornece `Iniciativa` como entidade externa do escopo financeiro |
 | M010 | Modulo interno | Fornece `Programa` e `Parceria` |
+| M008 | Modulo interno | Fornece rubricas financeiras, documentos e tipos documentais usados na Acao Transversal |
 | Extrato bancario / sistema financeiro | Sistema externo | Pode alimentar conciliacao e dados de conta bancaria |
 
 ## Operacoes Publicas
@@ -36,6 +37,12 @@ Este contrato documenta a superficie publica do modulo M016 como contexto respon
 | RegistrarMovimentacaoFinanceira | Command | Registrar lancamento financeiro em conta contabil e bancaria | contaContabil, contaBancaria, tipoMovimentacao, valor, data | `MovimentacaoFinanceira` registrada | RN05, RN06, RN07 | Associacoes existentes | Saldo negativo nao autorizado, conta invalida | Nao | Gestor financeiro | API interna/backoffice a definir |
 | ExecutarConciliacaoBancaria | Async Job | Comparar extrato bancario com lancamentos do sistema e registrar divergencias | contaBancaria, periodo | `ConciliacaoBancaria` executada | RN04, RN08, RN09 | Conta bancaria existente | Conciliacao em andamento, extrato indisponivel | Sim por conta e periodo | Sistema ou gestor financeiro | Job/fila a definir |
 | ConsultarFluxoCaixaESaldos | Query | Consultar fluxo de caixa e saldos por conta, programa ou iniciativa | conta, programa, parceria, periodo | `FluxoCaixa` e `SaldoConta` consolidados | RN05, RN10 | Filtro informado | Consulta sem dados | N/A | Gestor financeiro ou perfil autorizado | API interna a definir |
+| ParametrizarPoliticaAcaoTransversal | Command | Cadastrar politica e faixas percentuais de Acao Transversal | nome, baseLegal, vigencia, faixas | `PoliticaAcaoTransversal` ativa ou em elaboracao | RN11 | Faixas validas e sem sobreposicao | Politica sobreposta, faixa invalida | Nao | Gestor financeiro | API interna/backoffice a definir |
+| ReceberReservaAcaoTransversal | Command | Receber do M010 a reserva calculada na Parceria para um aporte original, aditivo ou ajuste e classificar em conta contabil/fundo/centro de custo | parceriaId, aporteFinanceiroOrigemId, tipoOrigem, politicaId, valorBaseCalculo, percentualAplicado, valorReservado, contaContabilId, fundoFinanceiroId, centroCustoId, documentoReferenciaId | `ReservaAcaoTransversal` registrada e classificada | RN11, RN12, RN14 | Parceria existente em M010; politica conhecida; aporte de origem informado; conta, fundo e centro de custo validos | Reserva duplicada, politica inexistente, valor invalido, aporte de origem ausente, classificacao contabil ausente | Sim por chave de origem | M010 / MODULO_INTERNO | API interna/evento a definir |
+| CadastrarPlanoAplicacaoAcaoTransversal | Command | Planejar uso da reserva por rubricas permitidas | reservaId, itens[{rubricaId, valorPrevisto, justificativa}] | `PlanoAplicacaoAcaoTransversal` criado | RN12, RN15 | Reserva existente, classificada contabilmente e com saldo disponivel | Plano excede reserva, rubrica invalida, reserva sem classificacao contabil | Nao | Gestor financeiro | API interna/backoffice a definir |
+| RegistrarDespesaAcaoTransversal | Command | Registrar despesa institucional vinculada a reserva e a item/rubrica planejada | reservaId, itemPlanoAplicacaoId?, rubricaId, valor, data, documentoId, justificativa | `DespesaAcaoTransversal` registrada | RN13, RN14 | Reserva e rubrica validas; documento informado; item do plano informado quando houver plano aprovado | Rubrica nao permitida, saldo insuficiente, documento ausente, item do plano invalido | Nao | Gestor financeiro | API interna/backoffice a definir |
+| AnalisarPrestacaoFinanceiraAcaoTransversal | Command | Aprovar, glosar, solicitar ajuste ou reprovar despesas da Acao Transversal | prestacaoId, decisao, itensGlosados?, parecer | Prestacao financeira atualizada | RN13, RN14 | Prestacao em analise | Estado invalido, parecer ausente | Nao | Analista financeiro | API interna/backoffice a definir |
+| ConsultarDashboardAcaoTransversal | Query | Consultar reservado, planejado, executado, aprovado, glosado e saldo por parceria, rubrica e periodo | filtros | Consolidado de Acao Transversal | RN11, RN12, RN13 | — | Filtro invalido | N/A | Gestor financeiro, Diretoria, M018, M019 | API interna/backoffice a definir |
 
 ## Padrao de Payload e Erro
 

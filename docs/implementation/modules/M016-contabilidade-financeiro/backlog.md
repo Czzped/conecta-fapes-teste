@@ -18,6 +18,7 @@ Especificacao de referencia: [README.md](README.md)
 | EPIC-M016-002 | Gestao de Contas Bancarias | UC02 | Must | To Do | [EPIC-M016-002](epics/EPIC-M016-002.md) |
 | EPIC-M016-003 | Fluxo de Caixa e Conciliacao | UC03 | Must | To Do | [EPIC-M016-003](epics/EPIC-M016-003.md) |
 | EPIC-M016-004 | Gestao de Fundos Financeiros | UC02 | Must | Deferido (pos-M014) | — |
+| EPIC-M016-005 | Gestao Financeira da Acao Transversal | UC04 | Must | To Do | [EPIC-M016-005](acao-transversal/epics/EPIC-M016-005.md) |
 
 ---
 
@@ -43,4 +44,12 @@ EPIC-M016-004 (Gestao de Fundos Financeiros)  <- deferido para pos-M014
 ├── US-M016-010 Criar Fundo Financeiro
 ├── US-M016-011 Associar Conta Bancaria a Fundo (N:1)
 └── US-M016-012 Consultar Saldo Consolidado por Fundo
+
+EPIC-M016-005 (Gestao Financeira da Acao Transversal)
+├── US-M016-020 Parametrizar Politica de Acao Transversal
+├── US-M016-021 Receber e Classificar Reserva de Acao Transversal do M010
+├── US-M016-022 Cadastrar Plano de Aplicacao da Acao Transversal
+├── US-M016-023 Registrar Despesa de Acao Transversal
+├── US-M016-024 Analisar Prestacao Financeira Institucional
+└── US-M016-025 Dashboard da Acao Transversal
 ```

@@ -43,7 +43,9 @@ EPIC-M010-002 (Gestao de Parcerias)  GitHub: #1724
 ├── US-M010-015 Validar Invariante Temporal Programa/Parceria (RN13)    #1795
 ├── US-M010-016 Consultar Saldo da Parceria (RN14)                      #1796
 ├── US-M010-017 Remover Parceria (em caso de erro, RI3)                 #1797
-└── US-M010-018 Dashboard Local da Parceria (impactos, investido, aportado, alocado, consumido, disponivel e rubricas)
+├── US-M010-018 Dashboard Local da Parceria (impactos, investido, aportado, alocado, consumido, disponivel e rubricas)
+├── US-M010-031 Calcular Reserva de Acao Transversal da Parceria
+└── US-M010-032 Enviar Reserva de Acao Transversal para M016
 
 Issues fechadas (conceitos removidos):
   ├── #1741 Registrar Coordenacao   — Coordenacao removida do dominio M010

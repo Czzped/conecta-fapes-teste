@@ -314,9 +314,9 @@ Registra parceria com Vigencia original e uma Instituicao vinculada (RN10, RN15)
   "instituicaoId": "INST-2026-010",
   "vigenciaOriginal": {
     "dataInicio": "2026-03-01",
-    "dataFim": "2028-12-31",
-    "dataAssinatura": "2026-03-01",
-    "documento": "DOC-TC-2026-001"
+      "dataFim": "2028-12-31",
+      "dataAssinatura": "2026-03-01",
+      "documento": "DOC-TC-2026-001"
   }
 }
 ```
@@ -330,7 +330,9 @@ Registra parceria com Vigencia original e uma Instituicao vinculada (RN10, RN15)
     "estado": "EmElaboracao",
     "vigenciaInicioCorrente": "2026-03-01",
     "vigenciaFimCorrente": "2028-12-31",
-    "saldo": 0.0,
+    "valorBrutoRecebido": 0.0,
+    "valorReservadoAcaoTransversal": 0.0,
+    "saldoAlocavelEmProgramas": 0.0,
     "instituicaoId": "INST-2026-010"
   }
 }
@@ -352,7 +354,7 @@ Filtros: `nome`, `estado` (`EmElaboracao`/`Vigente`/`Suspensa`/`Encerrada`), `in
 
 ### `GET /api/v1/parcerias/{id}`
 
-Detalhe com Vigencias, aportes recebidos, aportes destinados a programas, documentos, saldo.
+Detalhe com Vigencias, aportes recebidos, reserva de Acao Transversal, aportes destinados a programas, documentos e saldo alocavel em Programas.
 
 **Response `200 OK`**
 
@@ -363,7 +365,9 @@ Detalhe com Vigencias, aportes recebidos, aportes destinados a programas, docume
     "estado": "Vigente",
     "vigenciaInicioCorrente": "2026-03-01",
     "vigenciaFimCorrente": "2029-12-31",
-    "saldo": 350000.0,
+    "valorBrutoRecebido": 500000.0,
+    "valorReservadoAcaoTransversal": 25000.0,
+    "saldoAlocavelEmProgramas": 325000.0,
     "vigencias": [
       { "id": "VIG-2026-001", "isAditivo": false, "dataInicio": "2026-03-01", "dataFim": "2028-12-31" },
       { "id": "VIG-2027-002", "isAditivo": true, "dataInicio": "2026-03-01", "dataFim": "2029-12-31" }
@@ -382,7 +386,7 @@ Detalhe com Vigencias, aportes recebidos, aportes destinados a programas, docume
 
 ### `PUT /api/v1/parcerias/{id}`
 
-Atualiza dados cadastrais (nome, objetivo, processo). **Nao altera Vigencia nem saldo.**
+Atualiza dados cadastrais (nome, objetivo, processo). **Nao altera Vigencia, reserva de Acao Transversal nem saldo alocavel.**
 
 ### `DELETE /api/v1/parcerias/{id}`
 
@@ -492,7 +496,7 @@ Encerra a Parceria com justificativa obrigatoria (RI2).
 - **Autorizacao:** `ANALISTA_AGENCIA`
 - **Operacao de origem:** `EncerrarParceria`
 
-> **Implementacao atual (SPRINT-007)**: encerramento simples com justificativa. O fluxo de confirmacao de cascata (`confirmarCascata`) e encerramento automatico por expiracao serao implementados em sprint futura, junto com `AporteFinanceiroParceriaPrograma` (M014).
+> **Implementacao atual (SPRINT-007)**: encerramento simples com justificativa. O fluxo de confirmacao de cascata (`confirmarCascata`) e encerramento automatico por expiracao serao implementados em sprint futura, junto com `AporteFinanceiroParceriaPrograma`. A prestacao de contas de Iniciativas permanece no M014; a prestacao financeira institucional da Acao Transversal pertence ao M016.
 
 **Request body**
 
@@ -610,7 +614,13 @@ Registra aporte recebido de Instituicao, formalizado por Documento tipo "Termo d
     "valorInvestido": 500000.0,
     "isAditivo": false
   },
-  "saldoCorrente": 500000.0
+  "acaoTransversal": {
+    "valorBaseCalculo": 500000.0,
+    "percentualAplicado": 5.0,
+    "valorReservado": 25000.0,
+    "moduloDestino": "M016"
+  },
+  "saldoAlocavelEmProgramas": 475000.0
 }
 ```
 
@@ -632,7 +642,7 @@ Lista aportes recebidos. Filtros: `isAditivo`, `instituicaoId`, `page`, `pageSiz
 
 ### `PUT /api/v1/parcerias/{id}/aportes/{aporteId}`
 
-Edita aporte com `isAditivo = true` (RN18). Recalcula saldo.
+Edita aporte com `isAditivo = true` (RN18). Recalcula reserva de Acao Transversal quando aplicavel e saldo alocavel em Programas.
 
 - **Operacao de origem:** `EditarAporteFinanceiroAditivo`
 - **Autorizacao:** `ANALISTA_AGENCIA`
@@ -653,7 +663,7 @@ Edita aporte com `isAditivo = true` (RN18). Recalcula saldo.
 ```json
 {
   "aporteFinanceiro": { "id": "APO-2026-007", "valorInvestido": 180000.0, "isAditivo": true },
-  "saldoCorrente": 380000.0
+  "saldoAlocavelEmProgramas": 380000.0
 }
 ```
 
@@ -663,11 +673,11 @@ Edita aporte com `isAditivo = true` (RN18). Recalcula saldo.
 |------|--------|----------|
 | `404` | `APORTE_NAO_ENCONTRADO` | AporteFinanceiro nao encontrado. |
 | `422` | `APORTE_ORIGINAL_IMUTAVEL` | Aporte com `isAditivo = false` nao pode ser editado por esta operacao (RN18). |
-| `422` | `SALDO_RESULTANTE_INSUFICIENTE` | Edicao tornaria saldo insuficiente para cobrir aportes em Programas (RN14, RN18). |
+| `422` | `SALDO_RESULTANTE_INSUFICIENTE` | Edicao tornaria saldo alocavel insuficiente para cobrir aportes em Programas (RN14, RN18, RN22). |
 
 ### `DELETE /api/v1/parcerias/{id}/aportes/{aporteId}`
 
-Remove aporte com `isAditivo = true` (RN18). Recalcula saldo.
+Remove aporte com `isAditivo = true` (RN18). Recalcula reserva de Acao Transversal quando aplicavel e saldo alocavel em Programas.
 
 - **Operacao de origem:** `RemoverAporteFinanceiroAditivo`
 - **Autorizacao:** `ANALISTA_AGENCIA`
@@ -675,7 +685,7 @@ Remove aporte com `isAditivo = true` (RN18). Recalcula saldo.
 **Response `200 OK`**
 
 ```json
-{ "removido": true, "saldoCorrente": 200000.0 }
+{ "removido": true, "saldoAlocavelEmProgramas": 200000.0 }
 ```
 
 **Erros**: mesmos de PUT acima (`APORTE_NAO_ENCONTRADO`, `APORTE_ORIGINAL_IMUTAVEL`, `SALDO_RESULTANTE_INSUFICIENTE`).
@@ -712,7 +722,7 @@ Registra aporte da Parceria em Programa (RN11, RN13, RN14).
     "valor": 150000.0,
     "dataAporte": "2026-04-10"
   },
-  "saldoCorrente": 350000.0
+  "saldoAlocavelEmProgramas": 325000.0
 }
 ```
 
@@ -774,7 +784,7 @@ Desvincula Documento da parceria (nao remove o Documento de M008).
 
 ### `GET /api/v1/parcerias/{id}/saldo`
 
-Consulta saldo corrente e composicao (RN14, RN15).
+Consulta saldo corrente e composicao, separando valor bruto, reserva de Acao Transversal e saldo alocavel em Programas (RN14, RN15, RN20, RN21, RN22).
 
 - **Operacao de origem:** `ConsultarSaldoParceria`
 - **Autorizacao:** `DIRETORIA`, `ANALISTA_AGENCIA`, `MODULO_INTERNO`
@@ -784,8 +794,9 @@ Consulta saldo corrente e composicao (RN14, RN15).
 ```json
 {
   "parceriaId": "PAR-2026-03",
-  "saldo": 350000.0,
-  "totalRecebido": 500000.0,
+  "valorBrutoRecebido": 500000.0,
+  "valorReservadoAcaoTransversal": 25000.0,
+  "saldoAlocavelEmProgramas": 325000.0,
   "totalAportadoEmProgramas": 150000.0,
   "vigenciaInicioCorrente": "2026-03-01",
   "vigenciaFimCorrente": "2028-12-31"
@@ -878,7 +889,9 @@ Consulta consolidado. Filtros: `planoId`, `estadoPrograma`, `estadoParceria`.
   "estado": "EmElaboracao | Vigente | Suspensa | Encerrada",
   "vigenciaInicioCorrente": "YYYY-MM-DD",
   "vigenciaFimCorrente": "YYYY-MM-DD",
-  "saldo": "number",
+  "valorBrutoRecebido": "number",
+  "valorReservadoAcaoTransversal": "number",
+  "saldoAlocavelEmProgramas": "number",
   "instituicaoId": "string"
 }
 ```
