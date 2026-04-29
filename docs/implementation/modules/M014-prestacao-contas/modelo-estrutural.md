@@ -93,6 +93,17 @@ classDiagram
         +TipoMoeda Moeda
     }
 
+    class JustificativaProdutoSemNota {
+        +string Fornecedor
+        +string? IdentificadorFornecedor
+        +DateTime DataCompra
+        +Guid JustificativaProdutoSemNotaRubricaOrcamentariaId
+        +RubricaOrcamentaria RubricaOrcamentaria
+        +string JustificativaAusenciaNota
+        +string UrlComprovanteAlternativo
+        +bool AnaliseObrigatoria
+    }
+
     %% Documento Fiscal
     class DocumentoFiscal {
         +Guid Id
@@ -193,9 +204,11 @@ classDiagram
     JustificativaDespesa <|-- JustificativaNF : herda
     JustificativaDespesa <|-- JustificativaDiaria : herda
     JustificativaDespesa <|-- JustificativaInvoice : herda
+    JustificativaDespesa <|-- JustificativaProdutoSemNota : herda
 
     JustificativaDespesa "1" --> "*" OrcamentoFornecedor : possui
     JustificativaNF "1" --> "1" DocumentoFiscal : associada a
+    JustificativaProdutoSemNota "*" --> "1" RubricaOrcamentaria : classificada em
 
     DocumentoFiscal "1" --> "*" ItemDocumentoFiscal : contem
 
@@ -268,7 +281,7 @@ Todas as entidades herdam de `BaseEntity` (`ConectaFapes.Common.Domain.BaseEntit
 
 ### JustificativaDespesa (classe base)
 
-Classe base concreta (nao declarada `abstract` no codigo, porem com construtor `protected` — instancia-se apenas atraves de `JustificativaNF`, `JustificativaDiaria` ou `JustificativaInvoice`).
+Classe base concreta (nao declarada `abstract` no codigo, porem com construtor `protected` — instancia-se apenas atraves de `JustificativaNF`, `JustificativaDiaria`, `JustificativaInvoice` ou `JustificativaProdutoSemNota`).
 
 | Atributo | Tipo | Nullable | Obrig. | Descricao |
 |---|---|---|---|---|
@@ -305,6 +318,21 @@ Herda todos os atributos de `JustificativaDespesa`. Usada para despesas realizad
 |---|---|---|---|---|
 | ValorCambio | decimal | Nao | Sim | Taxa de cambio aplicada na conversao para BRL |
 | Moeda | TipoMoeda | Nao | Sim | Moeda estrangeira utilizada — ver enumeracoes |
+
+### JustificativaProdutoSemNota
+
+Herda todos os atributos de `JustificativaDespesa`. Usada para compra excepcional de produto sem nota fiscal, com justificativa formal, comprovante alternativo e analise obrigatoria pela Area Tecnica.
+
+| Atributo | Tipo | Nullable | Obrig. | Descricao |
+|---|---|---|---|---|
+| Fornecedor | string | Nao | Sim | Nome ou razao social do fornecedor da compra |
+| IdentificadorFornecedor | string? | Sim | Nao | CPF ou CNPJ do fornecedor, quando informado |
+| DataCompra | DateTime | Nao | Sim | Data da compra sem nota fiscal |
+| RubricaOrcamentaria | RubricaOrcamentaria | Nao | Sim | Rubrica orcamentaria usada para classificar a despesa |
+| JustificativaProdutoSemNotaRubricaOrcamentariaId | Guid | Nao | Sim | FK para RubricaOrcamentaria |
+| JustificativaAusenciaNota | string | Nao | Sim | Justificativa formal para ausencia da nota fiscal |
+| UrlComprovanteAlternativo | string | Nao | Sim | URL do comprovante alternativo armazenado no MinIO |
+| AnaliseObrigatoria | bool | Nao | Gerado | Indica que a despesa deve ser destacada para analise obrigatoria pela Area Tecnica |
 
 ### OrcamentoFornecedor
 
@@ -431,7 +459,7 @@ Os seguintes Value Objects existem em `src/Domain/ValueObjects/` mas estao integ
 | TipoNota | DocumentoFiscal | PRODUTO (1), SERVICO (2) |
 | TipoDocumentoFiscal | DocumentoFiscal | NFE_PRODUTO (1), NFSE_SERVICO (2) |
 | TipoMoeda | JustificativaInvoice | BRL, USD, EUR, GBP |
-| TipoJustificativa | JustificativaDespesa | NF, INVOICE, DIARIA |
+| TipoJustificativa | JustificativaDespesa | NF, INVOICE, DIARIA, PRODUTO_SEM_NOTA |
 | TipoArquivoNfe | (processamento interno SERPRO) | XML (1), PDF (2), Imagem (3) |
 
 ---
@@ -457,7 +485,7 @@ Todas as entidades herdam de `BaseEntity` (`ConectaFapes.Common.Domain.BaseEntit
 `DocumentoFiscal` e processado via API SERPRO para NF-e (consulta por `ChaveAcesso` de 44 digitos) ou por upload direto para NFS-e. A autenticacao usa OAuth2 com cache de token em `SerproTokenService`. O tipo do arquivo (XML, PDF ou imagem) e detectado automaticamente por `TipoArquivoIdentifierService`.
 
 **Armazenamento MinIO:**
-`UrlArquivo` em `JustificativaDespesa` e `UrlArquivoPDF` em `OrcamentoFornecedor` referenciam objetos armazenados no MinIO. O upload e feito via URL pre-assinada gerada pelo `MinioService` — o cliente faz o upload diretamente, sem passar pelo backend.
+`UrlArquivo` em `JustificativaDespesa`, `UrlComprovanteAlternativo` em `JustificativaProdutoSemNota` e `UrlArquivoPDF` em `OrcamentoFornecedor` referenciam objetos armazenados no MinIO. A API de Prestacao de Contas orquestra o registro dos metadados na Base M014 e o armazenamento dos arquivos no MinIO, retornando as URLs para persistencia no agregado.
 
 **StatusTransacao como estado derivado:**
 O `Status` de `TransacaoFinanceira` nao e persistido diretamente — e uma propriedade calculada que reflete o `Status` da `Prestacao` a qual a transacao esta vinculada. Transacoes sem vinculo ficam com status `PENDENTE`.
