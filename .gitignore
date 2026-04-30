@@ -12,8 +12,8 @@ prototype/backoffice/node_modules/
 prototype/backoffice/package-lock.json
 
 # Frontoffice
-prototype/frontOfiice/dist/
-prototype/frontOfiice/node_modules/
+prototype/frontOffice/dist/
+prototype/frontOffice/node_modules/
 
 # IDEs
 .idea/
