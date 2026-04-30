@@ -1,0 +1,597 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  --font-family: 'Poppins', sans-serif;
+  /* Typography size variables */
+  --text-7xl: 72px;
+  --text-2xl: 24px;
+  --text-xl: 20px;
+  --text-lg: 18px;
+  --text-base: 16px;
+  --text-sm: 14px;
+  --text-xs: 12px;
+  /* The default background color for the application. */
+  --background: rgba(255, 255, 255, 1.00);
+  /* The default color for elements or text that appears on top of the background. */
+  --foreground: rgba(15, 23, 43, 1.00);
+  /* The background color for cards, modals, and other containers. */
+  --card: rgba(255, 255, 255, 1.00);
+  /* RGB values for card background (used for transparency effects) */
+  --card-rgb: 255, 255, 255;
+  /* The default color for text or elements that appear on top of cards, modals and other background containers. */
+  --card-foreground: rgba(15, 23, 43, 1.00);
+  /* The background color for dropdowns and tooltips. */
+  --popover: rgba(255, 255, 255, 1.00);
+  /* The default color for text or elements that appear on top of dropdowns and tooltips. */
+  --popover-foreground: rgba(15, 23, 43, 1.00);
+  /* The primary color used for buttons, links, and other interactive elements. */
+  --primary: #06b6d4;
+  /* The default color for text or elements that appear on top of primary colored elements. */
+  --primary-foreground: rgba(255, 255, 255, 1.00);
+  /* The secondary color used for secondary(but NOT-DESTRUCTIVE) buttons and interactive elements. */
+  --secondary: rgba(0, 0, 0, 0);
+  /* The default color for text or elements that appear on top of secondary colored elements. */
+  --secondary-foreground: rgba(49, 65, 88, 1.00);
+  /* The muted color used for less prominent elements, such as disabled buttons or disabled text. */
+  --muted: rgba(248, 250, 252, 1.00);
+  /* The default color for text or elements that appear on top of muted colored elements. */
+  --muted-foreground: rgba(98, 116, 142, 1.00);
+  /* The accent color used for highlights, links, and other interactive elements. */
+  --accent: #06b6d4;
+  /* The default color for text or elements that appear on top of accent colored elements. */
+  --accent-foreground: rgba(255, 255, 255, 1.00);
+  /* The color used for background in destructive actions, such as delete buttons or error messages. */
+  --destructive: rgba(0, 0, 0, 0);
+  /* The default color for text or elements that appear on top of destructive colored elements. */
+  --destructive-foreground: rgba(251, 44, 54, 1.00);
+  /* The default border color for elements such as inputs, buttons, and other containers. */
+  --border: rgba(226, 232, 240, 1.00);
+  /* The default background color for input fields once the text has been filled. Should be either transparent or match the input-background. */
+  --input: rgba(255, 255, 255, 1.00);
+  /* The default background color for input fields, text areas, and other input elements. */
+  --input-background: rgba(255, 255, 255, 1.00);
+  /* The default font weight for medium text. */
+  --font-weight-medium: 500;
+  /* The default font weight for normal text. */
+  --font-weight-normal: 400;
+  /* The default font weight for semibold text. */
+  --font-weight-semibold: 600;
+  /* The default font weight for bold text. */
+  --font-weight-bold: 700;
+  /* The color for focus rings, outlines, and other focus indicators. */
+  --ring: #0891b2;
+  /* Shadow for small elevations, such as cards or modals. */
+  --elevation-sm: 0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px 0px rgba(0, 0, 0, 0.06);
+  /* The color for chart elements, such as a bar or line in a chart. */
+  --chart-1: #06b6d4;
+  /* The color for another chart element, such as a bar or line in a chart. */
+  --chart-2: #0891b2;
+  /* The color for another chart element, such as a bar or line in a chart. */
+  --chart-3: #22d3ee;
+  /* The color for another chart element, such as a bar or line in a chart. */
+  --chart-4: #67e8f9;
+  /* The color for another chart element, such as a bar or line in a chart. */
+  --chart-5: #cffafe;
+  /* The default border radius for elements such as buttons, tooltip, and other containers. */
+  --radius: 6px;
+  /* The smaller border radius variant. */
+  --radius-sm: 4px;
+  /* The larger border radius variant. */
+  --radius-lg: 8px;
+  /* The background color for sidebars, navigation menus, and other persistent elements. */
+  --sidebar: rgba(255, 255, 255, 1.00);
+  /* The default color for text or elements that appear on top of sidebars, navigation menus, and other persistent elements. */
+  --sidebar-foreground: rgba(15, 23, 43, 1.00);
+  /* The primary color used for buttons, links, and other interactive elements in sidebars and navigation menus. */
+  --sidebar-primary: #06b6d4;
+  /* The default color for text or elements that appear on top of primary colored elements in sidebars and navigation menus. */
+  --sidebar-primary-foreground: rgba(255, 255, 255, 1.00);
+  /* The accent color used for highlights, links, and other interactive elements in sidebars and navigation menus. */
+  --sidebar-accent: #06b6d4;
+  /* The default color for text or elements that appear on top of accent colored elements in sidebars and navigation menus. */
+  --sidebar-accent-foreground: rgba(255, 255, 255, 1.00);
+  /* The default border color for elements in sidebars and navigation menus. */
+  --sidebar-border: rgba(226, 232, 240, 1.00);
+  /* The default color for focus rings, outlines, and other focus indicators in sidebars and navigation menus. */
+  --sidebar-ring: #06b6d4;
+}
+
+.dark {
+  /* The default background color for the application. */
+  --background: rgba(15, 23, 43, 1.00);
+  /* The default color for elements or text that appears on top of the background. */
+  --foreground: rgba(255, 255, 255, 1.00);
+  /* The background color for cards, modals, and other containers. */
+  --card: rgba(30, 41, 59, 1.00);
+  /* RGB values for card background (used for transparency effects) */
+  --card-rgb: 30, 41, 59;
+  /* The default color for text or elements that appear on top of cards, modals and other background containers. */
+  --card-foreground: rgba(255, 255, 255, 1.00);
+  /* The background color for dropdowns and tooltips. */
+  --popover: rgba(30, 41, 59, 1.00);
+  /* The default color for text or elements that appear on top of dropdowns and tooltips. */
+  --popover-foreground: rgba(255, 255, 255, 1.00);
+  /* The primary color used for buttons, links, and other interactive elements. */
+  --primary: #22d3ee;
+  /* The default color for text or elements that appear on top of primary colored elements. */
+  --primary-foreground: rgba(15, 23, 43, 1.00);
+  /* The secondary color used for secondary(but NOT-DESTRUCTIVE) buttons and interactive elements. */
+  --secondary: rgba(0, 0, 0, 0);
+  /* The default color for text or elements that appear on top of secondary colored elements. */
+  --secondary-foreground: rgba(203, 213, 225, 1.00);
+  /* The muted color used for less prominent elements, such as disabled buttons or disabled text. */
+  --muted: rgba(51, 65, 85, 1.00);
+  /* The default color for text or elements that appear on top of muted colored elements. */
+  --muted-foreground: rgba(148, 163, 184, 1.00);
+  /* The accent color used for highlights, links, and other interactive elements. */
+  --accent: #22d3ee;
+  /* The default color for text or elements that appear on top of accent colored elements. */
+  --accent-foreground: rgba(15, 23, 43, 1.00);
+  /* The color used for background in destructive actions, such as delete buttons or error messages. */
+  --destructive: rgba(0, 0, 0, 0);
+  /* The default color for text or elements that appear on top of destructive colored elements. */
+  --destructive-foreground: rgba(251, 44, 54, 1.00);
+  /* The default border color for elements such as inputs, buttons, and other containers. */
+  --border: rgba(51, 65, 85, 1.00);
+  /* The default background color for input fields once the text has been filled. Should be either transparent or match the input-background. */
+  --input: rgba(30, 41, 59, 1.00);
+  /* The default background color for input fields, text areas, and other input elements. */
+  --input-background: rgba(30, 41, 59, 1.00);
+  /* The color for focus rings, outlines, and other focus indicators. */
+  --ring: #22d3ee;
+  /* Shadow for small elevations, such as cards or modals. */
+  --elevation-sm: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+  /* The background color for sidebars, navigation menus, and other persistent elements. */
+  --sidebar: rgba(30, 41, 59, 1.00);
+  /* The default color for text or elements that appear on top of sidebars, navigation menus, and other persistent elements. */
+  --sidebar-foreground: rgba(255, 255, 255, 1.00);
+  /* The primary color used for buttons, links, and other interactive elements in sidebars and navigation menus. */
+  --sidebar-primary: #22d3ee;
+  /* The default color for text or elements that appear on top of primary colored elements in sidebars and navigation menus. */
+  --sidebar-primary-foreground: rgba(15, 23, 43, 1.00);
+  /* The accent color used for highlights, links, and other interactive elements in sidebars and navigation menus. */
+  --sidebar-accent: #22d3ee;
+  /* The default color for text or elements that appear on top of accent colored elements in sidebars and navigation menus. */
+  --sidebar-accent-foreground: rgba(15, 23, 43, 1.00);
+  /* The default border color for elements in sidebars and navigation menus. */
+  --sidebar-border: rgba(51, 65, 85, 1.00);
+  /* The default color for focus rings, outlines, and other focus indicators in sidebars and navigation menus. */
+  --sidebar-ring: #22d3ee;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-family);
+  }
+}
+
+/**
+ * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    h1 {
+      font-size: var(--text-7xl);
+      font-weight: var(--font-weight-bold);
+      line-height: 1.2;
+      font-family: var(--font-family);
+    }
+
+    h2 {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-weight-bold);
+      line-height: 1.5;
+      font-family: var(--font-family);
+    }
+
+    h3 {
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-semibold);
+      line-height: 1.5;
+      font-family: var(--font-family);
+    }
+
+    h4 {
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-bold);
+      line-height: 1.5;
+      font-family: var(--font-family);
+    }
+
+    p {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+      font-family: var(--font-family);
+    }
+
+    label {
+      font-size: var(--text-sm);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+      font-family: var(--font-family);
+    }
+
+    button {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+      font-family: var(--font-family);
+    }
+
+    input {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+      font-family: var(--font-family);
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+}
+
+/* Sonner Toast Customization */
+[data-sonner-toast] {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--card-foreground) !important;
+}
+
+[data-sonner-toast][data-styled=true] {
+  padding: 16px !important;
+  gap: 8px !important;
+}
+
+[data-sonner-toast] [data-icon] {
+  margin-right: 8px !important;
+}
+
+[data-sonner-toast] [data-content] {
+  color: var(--card-foreground) !important;
+}
+
+[data-sonner-toast] [data-title] {
+  color: var(--card-foreground) !important;
+  font-size: var(--text-sm) !important;
+  font-weight: var(--font-weight-medium) !important;
+}
+
+[data-sonner-toast] [data-description] {
+  color: var(--muted-foreground) !important;
+  font-size: var(--text-sm) !important;
+}
+
+[data-sonner-toast] [data-button] {
+  background: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+}
+
+[data-sonner-toast] [data-cancel-button] {
+  background: var(--muted) !important;
+  color: var(--muted-foreground) !important;
+}
+
+/* Success toast - dark mode */
+.dark [data-sonner-toast][data-type="success"] {
+  background: rgba(30, 41, 59, 1.00) !important;
+  border-color: rgba(34, 197, 94, 0.3) !important;
+}
+
+.dark [data-sonner-toast][data-type="success"] [data-icon] {
+  color: rgba(34, 197, 94, 1.00) !important;
+}
+
+.dark [data-sonner-toast][data-type="success"] [data-title],
+.dark [data-sonner-toast][data-type="success"] [data-content] {
+  color: rgba(167, 243, 208, 1.00) !important;
+}
+
+/* Success toast - light mode */
+:root:not(.dark) [data-sonner-toast][data-type="success"] {
+  background: rgba(220, 252, 231, 1.00) !important;
+  border-color: rgba(34, 197, 94, 0.3) !important;
+  color: rgba(21, 128, 61, 1.00) !important;
+}
+
+:root:not(.dark) [data-sonner-toast][data-type="success"] [data-icon] {
+  color: rgba(34, 197, 94, 1.00) !important;
+}
+
+:root:not(.dark) [data-sonner-toast][data-type="success"] [data-title],
+:root:not(.dark) [data-sonner-toast][data-type="success"] [data-content] {
+  color: rgba(21, 128, 61, 1.00) !important;
+}
+
+/* Date Input Customization for NuxtUI style */
+input[type="date"] {
+  position: relative;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+input[type="date"]:hover::-webkit-calendar-picker-indicator {
+  opacity: 1;
+}
+
+/* Light mode date picker icon */
+:root:not(.dark) input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.4);
+}
+
+/* Dark mode date picker icon */
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8) brightness(1.2);
+}
+
+/* Date input text fields styling */
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: inherit;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+/* When date input is empty, show placeholder color */
+input[type="date"]:not(:focus)::-webkit-datetime-edit {
+  color: var(--muted-foreground);
+}
+
+/* When date input has value */
+input[type="date"]:focus::-webkit-datetime-edit,
+input[type="date"]:valid::-webkit-datetime-edit {
+  color: var(--foreground);
+}
+
+/* Focus state for date inputs */
+input[type="date"]:focus {
+  outline: none;
+  border-color: var(--ring) !important;
+  box-shadow: 0 0 0 1px var(--ring);
+}
+
+/* Custom DatePicker Styling - NuxtUI Pattern */
+.custom-datepicker-container {
+  min-width: 300px;
+}
+
+.custom-datepicker {
+  --rdp-cell-size: 40px;
+  --rdp-accent-color: var(--primary);
+  --rdp-background-color: var(--muted);
+  font-family: var(--font-family);
+}
+
+.custom-datepicker .rdp-months {
+  background-color: rgba(51, 65, 85, 1);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.custom-datepicker .rdp-month {
+  width: 100%;
+}
+
+.custom-datepicker .rdp-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.custom-datepicker .rdp-caption_label {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.custom-datepicker .rdp-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.custom-datepicker .rdp-nav_button {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background-color: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.custom-datepicker .rdp-nav_button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.custom-datepicker .rdp-nav_button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.custom-datepicker .rdp-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.custom-datepicker .rdp-head_cell {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
+  text-transform: uppercase;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.custom-datepicker .rdp-cell {
+  padding: 2px;
+}
+
+.custom-datepicker .rdp-day {
+  width: 40px;
+  height: 40px;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-normal);
+  color: var(--foreground);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.custom-datepicker .rdp-day:hover:not(.rdp-day_selected):not(.rdp-day_disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.custom-datepicker .rdp-day_selected {
+  background-color: #67e8f9 !important;
+  color: #0f172b !important;
+  font-weight: var(--font-weight-semibold);
+}
+
+.custom-datepicker .rdp-day_today:not(.rdp-day_selected) {
+  background-color: rgba(103, 232, 249, 0.2);
+  color: var(--foreground);
+}
+
+.custom-datepicker .rdp-day_outside {
+  color: var(--muted-foreground);
+  opacity: 0.5;
+}
+
+.custom-datepicker .rdp-day_disabled {
+  color: var(--muted-foreground);
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Light mode adjustments */
+:root:not(.dark) .custom-datepicker .rdp-months {
+  background-color: rgba(226, 232, 240, 1);
+}
+
+:root:not(.dark) .custom-datepicker .rdp-day_selected {
+  background-color: #06b6d4 !important;
+  color: #ffffff !important;
+}
+
+:root:not(.dark) .custom-datepicker .rdp-day:hover:not(.rdp-day_selected):not(.rdp-day_disabled) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+:root:not(.dark) .custom-datepicker .rdp-nav_button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+:root:not(.dark) .custom-datepicker .rdp-day_today:not(.rdp-day_selected) {
+  background-color: rgba(6, 182, 212, 0.2);
+}
+
+/* Select dropdown styling for NuxtUI pattern */
+select {
+  cursor: pointer;
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--ring);
+}
+
+/* Style for dropdown options in dark mode */
+.dark select option {
+  background-color: #1e293b;
+  color: #ffffff;
+  padding: 0.625rem 1rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.dark select option:hover {
+  background-color: rgba(34, 211, 238, 0.1);
+}
+
+.dark select option:checked {
+  background-color: rgba(34, 211, 238, 0.2);
+  color: #22d3ee;
+  font-weight: 500;
+}
+
+/* Style for dropdown options in light mode */
+:root:not(.dark) select option {
+  background-color: #ffffff;
+  color: #0f172b;
+  padding: 0.625rem 1rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+:root:not(.dark) select option:hover {
+  background-color: rgba(6, 182, 212, 0.1);
+}
+
+:root:not(.dark) select option:checked {
+  background-color: rgba(6, 182, 212, 0.15);
+  color: #06b6d4;
+  font-weight: 500;
+}

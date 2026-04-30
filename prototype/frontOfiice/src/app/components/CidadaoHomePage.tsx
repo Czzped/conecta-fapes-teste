@@ -1,0 +1,559 @@
+import { useState, useRef } from 'react';
+import { Search, Calendar, ArrowRight } from 'lucide-react';
+import fapesLogo from 'figma:asset/aec6ed8eb7cf2782d52002e0d4c19150c79afd78.png';
+
+interface CidadaoHomePageProps {
+  onLogin?: () => void;
+  onVerEdital?: (editalId: number) => void;
+}
+
+const editais = [
+  {
+    id: 1,
+    titulo: 'Iniciação Científica 2025',
+    programa: 'PIBIC',
+    area: 'Carreira Científica',
+    prazo: '30/04/2025',
+    status: 'Ativo',
+    vagas: 120,
+    valor: 'R$ 7.000',
+    descricao: 'Programa de bolsas de iniciação científica para estudantes de graduação em parceria com universidades capixabas.',
+  },
+  {
+    id: 2,
+    titulo: 'Pesquisa e Inovação Tecnológica',
+    programa: 'BPIG',
+    area: 'Pesquisa',
+    prazo: '15/05/2025',
+    status: 'Ativo',
+    vagas: 80,
+    valor: 'R$ 1.200.000',
+    descricao: 'Apoio a projetos de pesquisa aplicada voltados para inovação tecnológica nas empresas do Espírito Santo.',
+  },
+  {
+    id: 3,
+    titulo: 'Extensão Universitária',
+    programa: 'ProExt',
+    area: 'Extensão',
+    prazo: '20/05/2025',
+    status: 'Ativo',
+    vagas: 60,
+    valor: 'R$ 5.000',
+    descricao: 'Fomento a projetos de extensão que promovam a integração entre universidade e comunidade local.',
+  },
+  {
+    id: 4,
+    titulo: 'Desenvolvimento Científico Regional',
+    programa: 'DCR',
+    area: 'Internacional',
+    prazo: '10/06/2025',
+    status: 'Ativo',
+    vagas: 40,
+    valor: 'R$ 18.000',
+    descricao: 'Atração de pesquisadores para desenvolvimento de projetos científicos em instituições do interior do estado.',
+  },
+  {
+    id: 5,
+    titulo: 'Apoio a Grupos de Pesquisa',
+    programa: 'Universal',
+    area: 'Difusão do Conhecimento',
+    prazo: '25/06/2025',
+    status: 'Ativo',
+    vagas: 200,
+    valor: 'Até R$ 50.000',
+    descricao: 'Apoio financeiro a grupos de pesquisa consolidados em todas as áreas do conhecimento.',
+  },
+  {
+    id: 6,
+    titulo: 'Pós-Doutorado em ES',
+    programa: 'PRODOC',
+    area: 'Inovação',
+    prazo: '05/07/2025',
+    status: 'Ativo',
+    vagas: 25,
+    valor: 'R$ 41.000',
+    descricao: 'Bolsas de pós-doutorado para pesquisadores sênior em instituições públicas do Espírito Santo.',
+  },
+];
+
+const areaColors: Record<string, { bg: string; color: string }> = {
+  'Carreira Científica':     { bg: 'rgba(203,213,225,0.12)', color: '#cbd5e1' },
+  'Pesquisa':                { bg: 'rgba(203,213,225,0.12)', color: '#cbd5e1' },
+  'Extensão':                { bg: 'rgba(203,213,225,0.12)', color: '#cbd5e1' },
+  'Internacional':           { bg: 'rgba(203,213,225,0.12)', color: '#cbd5e1' },
+  'Difusão do Conhecimento': { bg: 'rgba(203,213,225,0.12)', color: '#cbd5e1' },
+  'Inovação':                { bg: 'rgba(203,213,225,0.12)', color: '#cbd5e1' },
+};
+
+/* Shared max-width + horizontal padding — matches across all sections */
+const CONTAINER: React.CSSProperties = {
+  maxWidth: '1200px',
+  margin: '0 auto',
+  padding: '0 1.5rem',
+};
+
+export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedArea, setSelectedArea] = useState('Todas');
+  const [selectedTab, setSelectedTab] = useState('Aberto');
+
+  const oportunidadesRef = useRef<HTMLElement>(null);
+
+  const scrollToOportunidades = () => {
+    if (!oportunidadesRef.current) return;
+    const top = oportunidadesRef.current.getBoundingClientRect().top + window.scrollY - 64;
+    window.scrollTo({ top, behavior: 'smooth' });
+  };
+
+  const areas = ['Todas', 'Carreira Científica', 'Pesquisa', 'Difusão do Conhecimento', 'Extensão', 'Inovação', 'Internacional'];
+  const tabs = ['Aberto', 'Em Andamento', 'Finalizado'];
+
+  const filtered = editais.filter(e => {
+    const matchSearch =
+      e.titulo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      e.programa.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchArea = selectedArea === 'Todas' || e.area === selectedArea;
+    const matchStatus = selectedTab === 'Aberto' || e.status === selectedTab;
+    return matchSearch && matchArea && matchStatus;
+  });
+
+  return (
+    <div className="min-h-screen" style={{ backgroundColor: '#083344', color: '#f0f9ff' }}>
+
+      {/* ── HEADER ── */}
+      <header
+        className="sticky top-0 z-50"
+        style={{
+          backgroundColor: 'rgba(15,23,42,0.8)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: '1px solid var(--border)',
+        }}
+      >
+        <div
+          style={{
+            ...CONTAINER,
+            height: '64px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          {/* Logo */}
+          <div className="flex items-center gap-3">
+            <img src={fapesLogo} alt="FAPES" style={{ height: '36px', objectFit: 'contain' }} />
+          </div>
+
+          {/* Nav Actions */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onLogin}
+              style={{
+                padding: '0.45rem 1.1rem',
+                borderRadius: '9999px',
+                border: 'none',
+                backgroundColor: 'var(--primary)',
+                color: 'var(--primary-foreground)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                fontFamily: 'var(--font-family)',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.opacity = '0.85'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)'; }}
+            >
+              Entrar com Acesso Cidadão
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* ── HERO SECTION ── */}
+      <section
+        className="relative overflow-hidden"
+        style={{
+          backgroundColor: '#071f2e',
+          padding: '6rem 0 5rem',
+          minHeight: '520px',
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        {/* Background glow blobs */}
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 70% 80% at 80% 40%, rgba(6,100,140,0.55) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 40% 50% at 90% 20%, rgba(6,182,212,0.18) 0%, transparent 65%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 30% 40% at 5% 80%, rgba(6,182,212,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '120px', background: 'linear-gradient(to bottom, transparent, rgba(15,23,42,0.8))', pointerEvents: 'none', zIndex: 5 }} />
+
+        <div style={{ ...CONTAINER, width: '100%', position: 'relative', zIndex: 10 }}>
+          {/* Badge */}
+          <div
+            className="inline-flex items-center gap-2"
+            style={{
+              padding: '0.35rem 0.875rem',
+              borderRadius: '9999px',
+              backgroundColor: 'rgba(6,182,212,0.15)',
+              border: '1px solid rgba(6,182,212,0.4)',
+              marginBottom: '2rem',
+            }}
+          >
+            <span style={{ color: '#22d3ee', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '0.08em', fontFamily: 'var(--font-family)' }}>
+              TRANSPARÊNCIA &amp; CIÊNCIA
+            </span>
+          </div>
+
+          {/* Heading */}
+          <h1
+            style={{
+              fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
+              fontWeight: 'var(--font-weight-bold)',
+              color: '#ffffff',
+              lineHeight: 1.1,
+              marginBottom: '1.5rem',
+              maxWidth: '700px',
+              fontFamily: 'var(--font-family)',
+            }}
+          >
+            Simplicidade no acesso a{' '}
+            <span style={{ color: '#22d3ee' }}>Editais</span>.
+          </h1>
+
+          {/* Subtitle */}
+          <p
+            style={{
+              fontSize: 'var(--text-base)',
+              color: 'rgba(203,213,225,0.85)',
+              maxWidth: '640px',
+              lineHeight: 1.7,
+              marginBottom: '2.5rem',
+              fontFamily: 'var(--font-family)',
+            }}
+          >
+            Acompanhe as chamadas de captação da FAPES - Fundação de Amparo à Pesquisa e Inovação do Espírito Santo para projetos científicos, tecnológicos e de inovação. Informação clara para quem constrói o futuro.
+          </p>
+
+          {/* CTA */}
+          <div className="flex flex-wrap items-center gap-4">
+            <button
+              onClick={scrollToOportunidades}
+              style={{
+                padding: '0.75rem 1.75rem',
+                borderRadius: 'var(--radius)',
+                border: 'none',
+                backgroundColor: '#06b6d4',
+                color: 'rgba(15,23,42,1)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-semibold)',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                fontFamily: 'var(--font-family)',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#0891b2'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#06b6d4'; e.currentTarget.style.transform = 'translateY(0)'; }}
+            >
+              Analisar Oportunidades
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ── OPORTUNIDADES SECTION ── */}
+      <section ref={oportunidadesRef} style={{ padding: '4rem 0 5rem', backgroundColor: 'rgba(15,23,42,0.8)' }}>
+        <div style={{ ...CONTAINER }}>
+
+          {/* Section header */}
+          <div style={{ marginBottom: '2rem' }}>
+            <h2
+              style={{
+                fontSize: 'var(--text-2xl)',
+                fontWeight: 'var(--font-weight-semibold)',
+                color: '#f0f9ff',
+                marginBottom: '0.375rem',
+                fontFamily: 'var(--font-family)',
+              }}
+            >
+              Oportunidades
+            </h2>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(186,230,253,0.7)', fontFamily: 'var(--font-family)' }}>
+              Explore os editais disponíveis.
+            </p>
+          </div>
+
+          {/* Search + Filters */}
+          <div className="flex flex-col" style={{ marginBottom: '2rem', gap: '1.25rem' }}>
+
+            {/* Search */}
+            <div
+              className="flex items-center gap-2"
+              style={{
+                backgroundColor: 'rgba(6,182,212,0.08)',
+                border: '1px solid rgba(6,182,212,0.22)',
+                borderRadius: 'var(--radius)',
+                padding: '0 1.125rem',
+                maxWidth: '360px',
+              }}
+            >
+              <Search size={18} style={{ color: 'rgba(186,230,253,0.6)', flexShrink: 0 }} />
+              <input
+                type="text"
+                placeholder="Buscar por edital ou palavra-chave"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                style={{
+                  flex: 1,
+                  border: 'none',
+                  outline: 'none',
+                  backgroundColor: 'transparent',
+                  color: '#f0f9ff',
+                  fontSize: 'var(--text-sm)',
+                  padding: '0.5rem 0',
+                  fontFamily: 'var(--font-family)',
+                }}
+              />
+            </div>
+
+            {/* Area filter pills */}
+            <div className="flex flex-wrap gap-2" style={{ marginTop: '0.75rem' }}>
+              {areas.map(area => (
+                <button
+                  key={area}
+                  onClick={() => setSelectedArea(area)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    borderRadius: '9999px',
+                    border: '1px solid',
+                    borderColor: selectedArea === area ? '#22d3ee' : 'rgba(6,182,212,0.25)',
+                    backgroundColor: selectedArea === area ? 'rgba(6,182,212,0.25)' : 'rgba(6,182,212,0.08)',
+                    color: selectedArea === area ? '#22d3ee' : 'rgba(186,230,253,0.7)',
+                    fontSize: 'var(--text-xs)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    fontFamily: 'var(--font-family)',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {area}
+                </button>
+              ))}
+            </div>
+
+            {/* Tab Bar */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                borderBottom: '1px solid rgba(6,182,212,0.2)',
+                width: 'fit-content',
+              }}
+            >
+              {tabs.map(tab => {
+                const isActive = selectedTab === tab;
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setSelectedTab(tab)}
+                    style={{
+                      position: 'relative',
+                      padding: '0.625rem 1.25rem',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: isActive ? '#22d3ee' : 'rgba(186,230,253,0.55)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: isActive ? 'var(--font-weight-semibold)' : 'var(--font-weight-medium)',
+                      fontFamily: 'var(--font-family)',
+                      transition: 'color 0.2s',
+                      outline: 'none',
+                      whiteSpace: 'nowrap',
+                    }}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = 'rgba(186,230,253,0.9)'; }}
+                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = 'rgba(186,230,253,0.55)'; }}
+                  >
+                    {tab}
+                    {isActive && (
+                      <span
+                        style={{
+                          position: 'absolute',
+                          bottom: '-1px',
+                          left: 0,
+                          right: 0,
+                          height: '2px',
+                          backgroundColor: '#22d3ee',
+                          borderRadius: '2px 2px 0 0',
+                        }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Editais Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filtered.map(edital => {
+              const areaColor = areaColors[edital.area] ?? { bg: 'rgba(6,182,212,0.12)', color: '#22d3ee' };
+              return (
+                <div
+                  key={edital.id}
+                  style={{
+                    backgroundColor: 'rgba(6,182,212,0.06)',
+                    border: '1px solid rgba(6,182,212,0.18)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: '1.5rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1rem',
+                    transition: 'all 0.2s',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = 'rgba(34,211,238,0.45)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(6,182,212,0.1)';
+                    e.currentTarget.style.backgroundColor = 'rgba(6,182,212,0.1)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = 'rgba(6,182,212,0.18)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.backgroundColor = 'rgba(6,182,212,0.06)';
+                  }}
+                >
+                  {/* Header row */}
+                  <div className="flex items-start justify-between gap-2">
+                    <span
+                      style={{
+                        fontSize: 'var(--text-xs)',
+                        fontWeight: 'var(--font-weight-semibold)',
+                        color: '#67e8f9',
+                        letterSpacing: '0.06em',
+                        fontFamily: 'var(--font-family)',
+                      }}
+                    >
+                      {edital.programa}
+                    </span>
+                    <span
+                      style={{
+                        padding: '0.25rem 0.625rem',
+                        borderRadius: '9999px',
+                        backgroundColor: areaColor.bg,
+                        color: areaColor.color,
+                        fontSize: 'var(--text-xs)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        fontFamily: 'var(--font-family)',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {edital.area}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h3
+                    style={{
+                      fontSize: 'var(--text-base)',
+                      fontWeight: 'var(--font-weight-semibold)',
+                      color: '#f0f9ff',
+                      lineHeight: 1.4,
+                      fontFamily: 'var(--font-family)',
+                    }}
+                  >
+                    {edital.titulo}
+                  </h3>
+
+                  {/* Description */}
+                  <p
+                    style={{
+                      fontSize: 'var(--text-sm)',
+                      color: 'rgba(186,230,253,0.7)',
+                      lineHeight: 1.6,
+                      flex: 1,
+                      fontFamily: 'var(--font-family)',
+                    }}
+                  >
+                    {edital.descricao}
+                  </p>
+
+                  {/* Meta info */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '0.75rem',
+                      paddingTop: '0.75rem',
+                      borderTop: '1px solid rgba(6,182,212,0.18)',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(186,230,253,0.6)', marginBottom: '0.25rem', fontFamily: 'var(--font-family)' }}>
+                        Inscrição até
+                      </div>
+                      <div
+                        className="flex items-center gap-1"
+                        style={{ fontSize: 'var(--text-sm)', color: '#f0f9ff', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}
+                      >
+                        <Calendar size={13} style={{ color: 'rgba(186,230,253,0.6)' }} />
+                        {edital.prazo}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(186,230,253,0.6)', marginBottom: '0.25rem', fontFamily: 'var(--font-family)' }}>
+                        Valor total
+                      </div>
+                      <div style={{ fontSize: 'var(--text-sm)', color: '#f0f9ff', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
+                        {edital.valor}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <button
+                    onClick={() => onVerEdital?.(edital.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      padding: '0.625rem 1rem',
+                      borderRadius: 'var(--radius)',
+                      border: '1px solid rgba(6,182,212,0.35)',
+                      backgroundColor: 'rgba(6,182,212,0.12)',
+                      color: '#22d3ee',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      width: '100%',
+                      fontFamily: 'var(--font-family)',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(6,182,212,0.22)'; e.currentTarget.style.borderColor = 'rgba(6,182,212,0.55)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(6,182,212,0.12)'; e.currentTarget.style.borderColor = 'rgba(6,182,212,0.35)'; }}
+                  >
+                    Ver Edital
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+
+          {filtered.length === 0 && (
+            <div
+              className="flex flex-col items-center justify-center py-16 gap-3"
+              style={{ color: 'rgba(186,230,253,0.6)' }}
+            >
+              <Search size={40} style={{ opacity: 0.4 }} />
+              <p style={{ fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
+                Nenhum edital encontrado com esses filtros.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}

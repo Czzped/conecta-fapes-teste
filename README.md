@@ -153,8 +153,10 @@ A pasta `prototype/` concentra os prototipos navegaveis da aplicacao.
 | Caminho | Objetivo |
 |---------|----------|
 | [prototype/backoffice](prototype/backoffice) | Prototipo do backoffice (React + Vite) |
+| [prototype/frontOfiice](prototype/frontOfiice) | Prototipo do front-office (React + Vite) |
 | [Figma Front-office](https://rate-snort-02856207.figma.site/) | Prototipo do portal do coordenador |
 | [Figma Back-office](https://bucket-lake-78647159.figma.site/) | Prototipo do portal administrativo |
+| [Vercel Front-office](https://portal-fapes-frontoffice.vercel.app/) | Deploy navegavel do prototipo front-office |
 | [Vercel Back-office](https://backoffice-beta-ten.vercel.app/) | Deploy navegavel do prototipo administrativo |
 
 ---
