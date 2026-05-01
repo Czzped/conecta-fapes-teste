@@ -248,7 +248,7 @@ sequenceDiagram
     API->>MinIO: Salva comprovante alternativo
     MinIO-->>API: Retorna URLs dos arquivos
     API->>DB: Atualiza URLs dos arquivos
-    Coord->>API: Informa fornecedor, data, valor e descricao dos produtos
+    Coord->>API: Informa fornecedor, data, valor e descricao dos produtos, quando houver
     Coord->>API: Informa justificativa para ausencia da nota fiscal
     Coord->>API: Vincula transacao bancaria correspondente
     API->>DB: Verifica transacao vinculada a Prestacao

@@ -228,7 +228,7 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
     .slice(0, 4);
 
   /* ── derived flags ──────────────────────────── */
-  const isStep1Complete = selectedDocumento !== '' && descricao.trim().length > 0;
+  const isStep1Complete = selectedDocumento !== '';
   const isStep2Complete = uploadedFiles.length > 0;
   const showStep3 = isStep2Complete;
   const allowMultipleFiles = ['Diária', 'Passagem', 'Invoice (Pagamento Internacional)'].includes(selectedDocumento);
@@ -830,11 +830,11 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
               </div>
             )}
 
-            {/* Descrição — sempre mostrada quando documento selecionado */}
+            {/* Descrição — opcional na prestação de contas */}
             {selectedDocumento !== '' && (
               <div>
                 <label style={labelSt}>
-                  Descrição <span style={{ color: 'rgb(239,68,68)' }}>*</span>
+                  Descrição
                 </label>
                 <textarea
                   value={descricao}

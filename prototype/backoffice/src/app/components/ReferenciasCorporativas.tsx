@@ -26,7 +26,7 @@ interface ValorDiaria {
   valor: string;
   fracaoCalculo: string;
   vigenciaInicio: string;
-  situacao: string;
+  situacao: boolean;
 }
 
 interface TipoViagem {
@@ -94,9 +94,9 @@ const initialRubricas: RubricaFinanceira[] = [
 ];
 
 const initialDiarias: ValorDiaria[] = [
-  { id: 1, codigo: 'DIA-2026-001', tipoViagem: 'Dentro do Estado', valor: 'R$ 260,00', fracaoCalculo: '12h', vigenciaInicio: '05/01/2026', situacao: 'Ativo' },
-  { id: 2, codigo: 'DIA-2026-002', tipoViagem: 'Fora do Estado', valor: 'R$ 320,00', fracaoCalculo: '12h', vigenciaInicio: '05/01/2026', situacao: 'Ativo' },
-  { id: 3, codigo: 'DIA-2026-003', tipoViagem: 'Internacional', valor: 'US$ 210,00', fracaoCalculo: '24h', vigenciaInicio: '05/01/2026', situacao: 'Ativo' },
+  { id: 1, codigo: 'DIA-2026-001', tipoViagem: 'Dentro do Estado', valor: 'R$ 260,00', fracaoCalculo: '12h', vigenciaInicio: '05/01/2026', situacao: true },
+  { id: 2, codigo: 'DIA-2026-002', tipoViagem: 'Fora do Estado', valor: 'R$ 320,00', fracaoCalculo: '12h', vigenciaInicio: '05/01/2026', situacao: true },
+  { id: 3, codigo: 'DIA-2026-003', tipoViagem: 'Internacional', valor: 'US$ 210,00', fracaoCalculo: '24h', vigenciaInicio: '05/01/2026', situacao: true },
 ];
 
 const initialTiposViagem: TipoViagem[] = [
@@ -128,14 +128,14 @@ export const ReferenciasCorporativas: React.FC<{ onBack: () => void }> = ({ onBa
   const [finalidades, setFinalidades] = useState<Finalidade[]>(initialFinalidades);
   const [areaDraft, setAreaDraft] = useState<AreaConhecimento>({ id: 0, codigo: '', nome: '', nivel: 'Grande Área', superior: '' });
   const [rubricaDraft, setRubricaDraft] = useState<RubricaFinanceira>({ id: 0, codigo: '', descricao: '', categoriaOrcamentaria: '', ativa: true });
-  const [diariaDraft, setDiariaDraft] = useState<ValorDiaria>({ id: 0, codigo: '', tipoViagem: 'Dentro do Estado', valor: '', fracaoCalculo: '12h', vigenciaInicio: '', situacao: 'Ativo' });
+  const [diariaDraft, setDiariaDraft] = useState<ValorDiaria>({ id: 0, codigo: '', tipoViagem: 'Dentro do Estado', valor: '', fracaoCalculo: '12h', vigenciaInicio: '', situacao: true });
   const [tipoViagemDraft, setTipoViagemDraft] = useState<TipoViagem>({ id: 0, codigo: '', nome: '', abrangencia: 'Nacional', descricao: '', situacao: 'Ativo' });
   const [regiaoDraft, setRegiaoDraft] = useState<RegiaoCidade>({ id: 0, regiao: '', descricao: '', cidade: '', codigoIBGE: '' });
   const [finalidadeDraft, setFinalidadeDraft] = useState<Finalidade>({ id: 0, nome: '', descricao: '' });
 
   const filteredAreas = areas.filter(item => matches(searchTerm, [item.codigo, item.nome, item.nivel, item.superior]));
   const filteredRubricas = rubricas.filter(item => matches(searchTerm, [item.codigo, item.descricao, item.categoriaOrcamentaria]));
-  const filteredDiarias = diarias.filter(item => matches(searchTerm, [item.codigo, item.tipoViagem, item.valor, item.fracaoCalculo, item.vigenciaInicio, item.situacao]));
+  const filteredDiarias = diarias.filter(item => matches(searchTerm, [item.codigo, item.tipoViagem, item.valor, item.fracaoCalculo, item.vigenciaInicio, item.situacao ? 'Ativo' : 'Inativo']));
   const filteredTiposViagem = tiposViagem.filter(item => matches(searchTerm, [item.codigo, item.nome, item.abrangencia, item.descricao, item.situacao]));
   const filteredRegioes = regioes.filter(item => matches(searchTerm, [item.regiao, item.cidade, item.codigoIBGE]));
   const filteredFinalidades = finalidades.filter(item => matches(searchTerm, [item.nome, item.descricao]));
@@ -165,7 +165,7 @@ export const ReferenciasCorporativas: React.FC<{ onBack: () => void }> = ({ onBa
   const saveDiaria = () => {
     const item = { ...diariaDraft, id: diariaDraft.id || Date.now() };
     setDiarias(prev => upsert(prev, item));
-    setDiariaDraft({ id: 0, codigo: '', tipoViagem: 'Dentro do Estado', valor: '', fracaoCalculo: '12h', vigenciaInicio: '', situacao: 'Ativo' });
+    setDiariaDraft({ id: 0, codigo: '', tipoViagem: 'Dentro do Estado', valor: '', fracaoCalculo: '12h', vigenciaInicio: '', situacao: true });
   };
 
   const saveTipoViagem = () => {
@@ -258,10 +258,10 @@ export const ReferenciasCorporativas: React.FC<{ onBack: () => void }> = ({ onBa
               <Field label="Valor" value={diariaDraft.valor} onChange={value => setDiariaDraft(prev => ({ ...prev, valor: value }))} placeholder="R$ 260,00" />
               <Select label="Fração cálculo" value={diariaDraft.fracaoCalculo} onChange={value => setDiariaDraft(prev => ({ ...prev, fracaoCalculo: value }))} options={['12h', '24h']} />
               <Field label="Vigência inicial" value={diariaDraft.vigenciaInicio} onChange={value => setDiariaDraft(prev => ({ ...prev, vigenciaInicio: value }))} placeholder="05/01/2026" />
-              <Select label="Situação" value={diariaDraft.situacao} onChange={value => setDiariaDraft(prev => ({ ...prev, situacao: value }))} options={['Ativo', 'Inativo']} />
+              <Select label="Situação" value={diariaDraft.situacao ? 'Ativo' : 'Inativo'} onChange={value => setDiariaDraft(prev => ({ ...prev, situacao: value === 'Ativo' }))} options={['Ativo', 'Inativo']} />
               <SaveButton onClick={saveDiaria} />
             </div>
-            <ReferenceList items={filteredDiarias.map(item => ({ id: item.id, cols: [item.codigo, item.tipoViagem, item.valor, item.fracaoCalculo, item.vigenciaInicio, item.situacao], onEdit: () => setDiariaDraft(item), onRemove: () => setDiarias(prev => prev.filter(row => row.id !== item.id)) }))} labels={['Código', 'Tipo de viagem', 'Valor', 'Fração cálculo', 'Vigência inicial', 'Situação']} />
+            <ReferenceList items={filteredDiarias.map(item => ({ id: item.id, cols: [item.codigo, item.tipoViagem, item.valor, item.fracaoCalculo, item.vigenciaInicio, item.situacao ? 'Ativo' : 'Inativo'], onEdit: () => setDiariaDraft(item), onRemove: () => setDiarias(prev => prev.filter(row => row.id !== item.id)) }))} labels={['Código', 'Tipo de viagem', 'Valor', 'Fração cálculo', 'Vigência inicial', 'Situação']} />
           </ReferenceSection>
         )}
 

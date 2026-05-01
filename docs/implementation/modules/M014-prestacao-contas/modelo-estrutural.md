@@ -287,7 +287,7 @@ Classe base concreta (nao declarada `abstract` no codigo, porem com construtor `
 |---|---|---|---|---|
 | Prestacao | Prestacao | Nao | Sim | Navegacao para a prestacao proprietaria |
 | JustificativaDespesaPrestacaoId | Guid | Nao | Sim | FK para Prestacao |
-| Descricao | string | Nao | Sim | Descricao textual da despesa justificada |
+| Descricao | string? | Sim | Nao | Descricao textual opcional da despesa justificada |
 | ValorTotal | decimal | Nao | Gerado | Valor total da despesa (>= 0) — atualizado por `AtualizarValorTotal()` |
 | UrlArquivo | string? | Sim | Nao | URL do arquivo comprovante armazenado no MinIO — atualizado por `AtualizarUrlArquivo()` |
 | Orcamentos | ICollection&lt;OrcamentoFornecedor&gt; | Nao | — | Orcamentos de fornecedor vinculados |
