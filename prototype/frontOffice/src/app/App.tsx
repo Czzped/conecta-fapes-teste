@@ -83,7 +83,7 @@ export default function App() {
       case 'pagamentos':
         return <PaymentsPage />;
       case 'certificados':
-        return <CertificatesPage />;
+        return <CertificatesPage accessType={accessType} />;
       case 'prestacao-contas-tecnica':
         return <PrestacaoContasTecnica onBack={() => handleNavigate('inicio')} />;
       case 'financeira':

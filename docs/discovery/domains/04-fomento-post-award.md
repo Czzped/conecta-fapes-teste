@@ -8,17 +8,20 @@ Fluxo de execucao do projeto contratado ate a sua finalizacao. Glossario dos con
 
 ## 4.0 Gestao de Iniciativas Captadas
 
-Apos a contratacao, as iniciativas aprovadas passam a ser gerenciadas operacionalmente pelo M003. Este sub-dominio concentra o ownership de editais operacionais, projetos contratados, cotas de bolsa e alocacoes de bolsistas.
+Apos a contratacao, as iniciativas aprovadas passam a ser gerenciadas operacionalmente pelo M003. Este sub-dominio concentra o ownership da `Iniciativa` pos-outorga, seu plano vigente, execucao consolidada, alteracoes operacionais e solicitacoes de diaria. Editais e captacao pertencem ao M011; bolsas, cotas e alocacoes pertencem ao M009; prestacao de contas detalhada pertence ao M014.
+
+O M003 tambem oferece a leitura consolidada do `CicloFomentoIniciativa`, uma timeline transversal que exibe marcos de pre-award, award e post-award sem transferir ownership dos eventos de origem.
 
 **Implementado por:** [M003 — Gestao de Iniciativas Captadas](../../implementation/modules/M003-gestao-iniciativas-captadas/README.md)
 
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|
-| 4.0.1 | Registrar Edital Operacional | Registrar edital com area tecnica e vinculos de programa/parceria | Analista da Area Tecnica da Agencia | Art. 15, I |
-| 4.0.2 | Registrar Projeto Contratado | Registrar projeto vinculado a edital com coordenador e datas | Analista da Area Tecnica da Agencia | Art. 28, I |
-| 4.0.3 | Gestao de Cotas de Bolsa | Cadastrar cotas por versao de nivel de bolsa no edital | Analista da Area Tecnica da Agencia | Art. 3, VII |
-| 4.0.4 | Alocacao Operacional de Bolsistas | Registrar alocacao consumindo cota do edital, vinculando bolsista e orientador | Analista da Area Tecnica da Agencia | Art. 3, VII; Art. 14, VIII |
-| 4.0.5 | Visao Operacional Consolidada | Consultar visao do edital com projetos, cotas e alocacoes | Analista da Area Tecnica da Agencia | Art. 3, II |
+| 4.0.1 | Registrar Iniciativa Contratada | Registrar a iniciativa apos contratacao/outorga, com referencias externas de captacao e termo de outorga | Analista da Area Tecnica da Agencia | Art. 28, I |
+| 4.0.2 | Gerir Plano da Iniciativa | Manter plano vigente, objetivos, resultados, riscos, beneficios, equipe planejada e cronograma | Coordenador, Analista da Area Tecnica da Agencia | Art. 27, II |
+| 4.0.3 | Gerir Orcamento Planejado e Rubricas | Registrar orcamento planejado por rubrica e controlar alteracoes aprovadas | Coordenador, Analista da Area Tecnica da Agencia | Art. 25; Art. 27, II |
+| 4.0.4 | Consolidar Execucao Financeira | Consolidar lancamentos de execucao recebidos de integracoes e exibir planejado versus executado | Analista da Area Tecnica da Agencia | Art. 3, II |
+| 4.0.5 | Consultar Ciclo de Fomento da Iniciativa | Exibir timeline transversal com marcos de submissao, avaliacao, contratacao, execucao, prestacao de contas, conclusao ou cancelamento | Coordenador, Analista da Area Tecnica da Agencia | Art. 3, II |
+| 4.0.6 | Solicitar Diaria da Iniciativa | Coordenador solicita diaria para um ou mais bolsistas alocados, informando tipo de viagem, partida, chegada, destino e motivo; o sistema calcula o valor com base no tipo de diaria vigente cadastrado pela FAPES, com valor, vigencia e fracao de calculo, coleta aceite individual dos bolsistas e, quando aprovado pela FAPES, gera debito na rubrica de Diarias e Passagens; o coordenador pode cancelar diaria aprovada com justificativa, gerando credito na rubrica | Coordenador, Bolsista, Analista da Area Tecnica da Agencia | Art. 27, II; Art. 3, 1 |
 
 ---
 
@@ -81,7 +84,7 @@ Fluxo de prestacao de contas do projeto: backoffice FAPES prepara a base (extrat
 | 4.4.4 | Criar Prestacao de Contas | Criar nova `Prestacao` em status `RASCUNHO` | Coordenador | Art. 27, II |
 | 4.4.5 | Vincular Transacao Financeira a Prestacao | Vincular `TransacaoFinanceira` do extrato a uma `Prestacao` em `RASCUNHO` ou `REVISAO` — uma transacao so pode estar vinculada a uma prestacao por vez | Coordenador | Art. 27, II |
 | 4.4.6 | Registrar Justificativa NF (produto/servico) | Cadastrar `JustificativaNF` com `DocumentoFiscal` validado via API SERPRO pela `ChaveAcesso` (44 digitos); cada item da nota e classificado em uma `ContaContabil` | Coordenador | Art. 27, II; Art. 3, 1 |
-| 4.4.7 | Registrar Justificativa de Diaria | Cadastrar `JustificativaDiaria` com `ValorDiaria`, `Quantidade` e bolsista beneficiario (`AlocacaoBolsistaRef`) | Coordenador | Art. 27, II; Art. 3, 1 |
+| 4.4.7 | Registrar Justificativa de Diaria | Cadastrar `JustificativaDiaria` vinculada a uma solicitacao de diaria aprovada do M003, usando `tipoDiariaRef`, valor calculado, quantidade, bolsista beneficiario (`AlocacaoBolsistaRef`) e comprovante de pagamento | Coordenador | Art. 27, II; Art. 3, 1 |
 | 4.4.8 | Registrar Justificativa Invoice (internacional) | Cadastrar `JustificativaInvoice` para despesas em moeda estrangeira com `ValorCambio` e `TipoMoeda` | Coordenador | Art. 27, II; Art. 3, 1 |
 | 4.4.9 | Adicionar Orcamentos de Fornecedor | Cadastrar ate 3 `OrcamentoFornecedor` por justificativa como comprovacao de melhor preco; no maximo um pode ser marcado como escolhido | Coordenador | — |
 | 4.4.10 | Classificar Item de NF em Conta Contabil | Vincular cada `ItemDocumentoFiscal` a uma `ContaContabil`, permitindo apuracao de saldos por rubrica | Coordenador | — |

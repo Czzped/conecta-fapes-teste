@@ -295,26 +295,35 @@ sequenceDiagram
 
 ### Fluxo 3.6 - Diarias
 
-Diarias nao passam pelo SERPRO. O Coordenador deve informar a solicitacao de diaria e o PIX do pagamento antes do registro da despesa. A API valida a solicitacao, beneficiario, quantidade, valor da diaria e comprovante PIX, armazena os comprovantes e registra a justificativa.
+Diarias nao passam pelo SERPRO. A solicitacao operacional de diaria pertence ao M003 e deve estar aprovada pela FAPES antes da comprovacao. No M014, o Coordenador escolhe a diaria em uma lista de solicitacoes aprovadas que ainda nao foram prestadas contas, informa o PIX do pagamento, anexa o comprovante de pagamento da diaria e registra a despesa. A API valida a solicitacao no M003, beneficiario, quantidade, valor calculado da diaria, debito na rubrica de Diarias e Passagens, ausencia de JustificativaDiaria anterior e comprovante PIX/pagamento, armazena os comprovantes e registra a justificativa.
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor Coord as Coordenador / Outorgado
     participant API as API Prestacao de Contas
+    participant M003 as M003 Iniciativas
     participant DB as Base M014
     participant MinIO as MinIO
 
-    Coord->>API: Informa solicitacao de diaria
-    API->>DB: Consulta solicitacao de diaria
-    API-->>Coord: Retorna dados da solicitacao
+    Coord->>API: Solicita diarias disponiveis para prestacao
+    API->>M003: Consulta solicitacoes de diaria aprovadas
+    API->>DB: Exclui solicitacoes ja vinculadas a JustificativaDiaria
+    API-->>Coord: Retorna lista de diarias elegiveis
+    alt Diaria nao existe na lista
+        Coord->>API: Informa dados no modal reutilizando a experiencia de Solicitacao de Diarias
+        API->>M003: Cria SolicitacaoDiaria operacional
+        M003-->>API: Retorna SolicitacaoDiaria criada
+        API-->>Coord: Inclui diaria criada na lista e seleciona
+    end
+    Coord->>API: Seleciona diaria da lista
     Coord->>API: Registra diaria, PIX do pagamento e arquivos
     API->>DB: Registra metadados dos arquivos
     API->>MinIO: Salva arquivos enviados
     MinIO-->>API: Retorna URLs dos arquivos
     API->>DB: Atualiza URLs dos arquivos
     Coord->>API: Informa beneficiario, quantidade e valor
-    API->>API: Valida solicitacao, beneficiario, quantidade, valor e PIX
+    API->>API: Valida solicitacao M003, beneficiario, quantidade, valor, PIX e nao reutilizacao
     API->>DB: Persiste JustificativaDiaria
     Coord->>API: Define rubrica da diaria
     API->>DB: Valida rubrica e limite orcamentario
@@ -324,7 +333,7 @@ sequenceDiagram
 
 ### Fluxo 3.7 - Passagens
 
-Passagens nao passam pelo SERPRO. O Coordenador deve informar os dados da viagem, o PIX do pagamento e o PDF da compra da passagem. A API valida os comprovantes, o PDF da compra, os dados da viagem e o comprovante PIX, armazena os arquivos e registra a despesa na rubrica definida pelo Coordenador ou Outorgado.
+Passagens nao passam pelo SERPRO. O Coordenador deve informar os dados da viagem, anexar o comprovante de pagamento da passagem e anexar o comprovante de realizacao da viagem. O comprovante de realizacao pode ser cartao de embarque, declaracao de participacao, certificado, carta de aceite de artigo ou declaracao de reuniao/visita tecnica. A API valida os comprovantes obrigatorios, os dados da viagem e o pagamento, armazena os arquivos e registra a despesa na rubrica definida pelo Coordenador ou Outorgado.
 
 ```mermaid
 sequenceDiagram
@@ -334,13 +343,13 @@ sequenceDiagram
     participant DB as Base M014
     participant MinIO as MinIO
 
-    Coord->>API: Registra passagem, PIX do pagamento e PDF da compra
+    Coord->>API: Registra passagem, comprovante de pagamento e comprovante da viagem
     API->>DB: Registra metadados dos arquivos
     API->>MinIO: Salva arquivos enviados
     MinIO-->>API: Retorna URLs dos arquivos
     API->>DB: Atualiza URLs dos arquivos
     Coord->>API: Informa dados da viagem e comprovantes
-    API->>API: Valida dados da passagem, PDF da compra e PIX
+    API->>API: Valida dados da passagem, pagamento e realizacao da viagem
     API->>DB: Persiste justificativa de passagem
     Coord->>API: Define rubrica da passagem
     API->>DB: Valida rubrica e limite orcamentario
@@ -360,8 +369,8 @@ sequenceDiagram
 | 4 | Registrar nota fiscal de servico | Coordenador / Outorgado | Despesa segue por biblioteca interna no fluxo atual; validacao via SERPRO fica prevista como evolucao futura. |
 | 5 | Registrar produto sem nota fiscal | Coordenador / Outorgado | Despesa excepcional registrada com justificativa, comprovante alternativo, rubrica e analise obrigatoria pela Area Tecnica. |
 | 6 | Registrar invoice | Coordenador / Outorgado | Despesa internacional registrada com moeda, valor e cambio, sem chamada ao SERPRO. |
-| 7 | Registrar diaria | Coordenador / Outorgado | Diaria registrada a partir da solicitacao de diaria, com beneficiario, quantidade, valor e PIX do pagamento, sem chamada ao SERPRO. |
-| 8 | Registrar passagem | Coordenador / Outorgado | Passagem registrada com dados da viagem, PDF da compra da passagem e PIX do pagamento, sem chamada ao SERPRO. |
+| 7 | Registrar diaria | Coordenador / Outorgado | Diaria registrada a partir da solicitacao de diaria aprovada do M003, com beneficiario, quantidade, valor calculado e comprovante de pagamento da diaria, sem chamada ao SERPRO. |
+| 8 | Registrar passagem | Coordenador / Outorgado | Passagem registrada com dados da viagem, comprovante de pagamento da passagem e comprovante de realizacao da viagem, sem chamada ao SERPRO. |
 | 9 | Enviar arquivos | Coordenador / Outorgado / MinIO | Arquivos comprobatorios armazenados no MinIO e vinculados a despesa. |
 | 10 | Definir rubrica | Coordenador / Outorgado | Despesa classificada na rubrica orcamentaria correspondente. |
 | 11 | Informar orcamentos | Coordenador / Outorgado | Orcamentos cadastrados quando aplicavel e, quando necessario, um orcamento marcado como escolhido. |

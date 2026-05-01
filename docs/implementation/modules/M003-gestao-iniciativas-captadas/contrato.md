@@ -4,9 +4,9 @@ Dominio e regras de negocio: ver [README.md](README.md)
 
 ## Proposito do Contrato
 
-Este contrato documenta a superficie publica do M003 como bounded context de gestao pos-contratacao da `Iniciativa`. O modulo registra a iniciativa outorgada, mantem seu plano versionado, controla alteracoes de rubrica e oferece consultas consolidadas para programas, parcerias, acompanhamento de resultados, suspensao/finalizacao, BI e transparencia.
+Este contrato documenta a superficie publica do M003 como bounded context de gestao pos-contratacao da `Iniciativa`. O modulo registra a iniciativa outorgada, mantem seu plano versionado, controla alteracoes de rubrica, solicita diarias operacionais para bolsistas alocados e oferece consultas consolidadas para programas, parcerias, acompanhamento de resultados, suspensao/finalizacao, BI e transparencia.
 
-O M003 nao publica comandos para criar edital, cota de edital, alocacao de bolsista ou documento de prestacao de contas. Esses objetos pertencem aos modulos M011, M009 e M014.
+O M003 nao publica comandos para criar edital, cota de edital, alocacao de bolsista ou documento de prestacao de contas. Esses objetos pertencem aos modulos M011, M009 e M014. A solicitacao de diaria pertence ao M003; a comprovacao financeira posterior pertence ao M014.
 
 ## Consumidores e Dependencias
 
@@ -19,6 +19,7 @@ O M003 nao publica comandos para criar edital, cota de edital, alocacao de bolsi
 | M010 | Consulta iniciativas vinculadas a programas e parcerias |
 | M012 | Consulta resultados, beneficios e objetivos da iniciativa |
 | M014 | Envia ou disponibiliza lancamentos de execucao financeira para consolidacao |
+| M014 | Consulta solicitacoes de diaria aprovadas para registrar justificativas e comprovantes na prestacao de contas |
 | M015 | Consulta estado da iniciativa para suspensao, reativacao e encerramento |
 | M018/M019 | Consomem visoes consolidadas para BI, transparencia e auditoria |
 | Portal Coordenador | Exibe contexto da iniciativa, plano, equipe, cronograma e orcamento |
@@ -27,25 +28,37 @@ O M003 nao publica comandos para criar edital, cota de edital, alocacao de bolsi
 
 | Dependencia | Tipo | Observacao |
 |-------------|------|------------|
-| M008 | Modulo interno | Fornece `PessoaFisica` para o papel de `Ortogado` e membros da equipe |
+| M008 | Modulo interno | Fornece `PessoaFisica` para o papel de `Ortogado`, membros da equipe e dados bancarios confirmados no aceite de diaria |
+| M009 | Modulo interno | Fornece e valida alocacoes de bolsistas usadas como beneficiarios de diaria |
 | M010 | Modulo interno | Fornece referencias de `Programa` e `Parceria` associadas a iniciativa |
 | M011 | Modulo interno | Dono de `Edital`; M003 pode guardar referencia de origem da captacao, mas nao gerencia edital |
 | M014 | Modulo interno | Dono da execucao financeira detalhada e prestacao de contas |
+| M020 | Modulo interno | Envia notificacoes aos bolsistas para assinatura do termo de aceite de diaria |
 
 ## Operacoes Publicas
 
 | Nome da Operacao | Tipo | Objetivo | Entrada | Saida | Regras relacionadas | Pre-condicoes | Recusas/erros | Idempotencia | Autorizacao |
 |------------------|------|----------|---------|-------|---------------------|---------------|---------------|--------------|-------------|
 | RegistrarIniciativaContratada | Command | Criar a iniciativa apos contratacao/outorga | tipoIniciativaId, titulo, resumo, datas, valorAprovado, ortogadoId, referencias externas | `Iniciativa` criada | RN01-RN04, RN13 | TipoIniciativa e PessoaFisica existentes | Tipo inexistente, ortogado invalido, referencia externa inconsistente | Nao | Analista da Agencia |
+| CadastrarTipoDiaria | Command | Cadastrar ou atualizar o tipo de diaria usado nos calculos | tipoViagemRef, valorUnitario, fracaoCalculo, vigenciaInicio, vigenciaFim, ativo | `TipoDiaria` cadastrado | RN24, RN28 | Valor maior que zero, fracao informada, tipo de viagem existente e vigencia valida | Vigencia sobreposta, tipo de viagem ausente, valor invalido | Nao | Analista da Agencia |
 | CriarVersaoPlanoIniciativa | Command | Criar versao inicial ou nova versao do plano | iniciativaId, justificativa, objetivos, resultados, riscos, beneficios, equipe, cronograma, orcamento | `VersaoPlanoIniciativa` criada | RN04-RN09 | Iniciativa existente | Plano invalido, objetivo geral ausente, resultado sem vinculo | Nao | Analista da Agencia |
 | AtivarVersaoPlanoIniciativa | Command | Tornar uma versao de plano vigente | iniciativaId, versaoId, dataVigenciaInicio | Versao `VIGENTE` | RN04, RN08 | Versao criada e valida | Mais de uma versao vigente, versao incompleta | Nao | Analista da Agencia |
 | SolicitarAlteracaoRubrica | Command | Registrar solicitacao de inclusao ou retirada de rubrica | iniciativaId, ortogadoId, rubricaId, tipoAlteracao, justificativa | `SolicitacaoAlteracaoRubrica` criada | RN09, RN11, RN12 | Ortogado ativo da iniciativa | Ortogado invalido, rubrica inexistente, retirada impedida | Nao | Ortogado |
 | DecidirSolicitacaoAlteracaoRubrica | Command | Aprovar ou rejeitar solicitacao de rubrica | solicitacaoId, decisao, justificativa, versaoPlanoGeradaId | Solicitacao decidida | RN08, RN11, RN12 | Solicitacao em analise | Solicitacao encerrada, retirada impedida, versao ausente quando obrigatoria | Nao | Analista da Agencia |
+| SolicitarDiaria | Command | Registrar solicitacao operacional de diaria para um ou mais bolsistas da iniciativa | iniciativaId, ortogadoId, tipoViagemRef, dataHoraPartida, dataHoraChegada, destino, motivo, beneficiarios | `SolicitacaoDiaria` criada com valores calculados | RN22-RN25, RN28 | Iniciativa ativa, ortogado ativo, beneficiarios validos em M009, tipo de diaria vigente | Periodo invalido, beneficiario invalido, tipo de diaria vigente ausente | Nao | Ortogado |
+| SubmeterSolicitacaoDiariaParaAceite | Command | Enviar solicitacao aos bolsistas para assinatura do termo de aceite | solicitacaoDiariaId | Solicitacao em `AGUARDANDO_ACEITES` e notificacoes emitidas | RN22-RN26 | Solicitacao em rascunho e beneficiarios calculados | Solicitacao invalida, sem beneficiarios, termo indisponivel | Nao | Ortogado |
+| AssinarTermoAceiteDiaria | Command | Registrar assinatura do bolsista no termo de aceite da diaria | solicitacaoDiariaId, beneficiarioId, pessoaFisicaId, contaBancariaConfirmada | `TermoAceiteDiaria` assinado | RN26, RN29 | Beneficiario pendente e usuario corresponde ao bolsista | Beneficiario invalido, aceite ja registrado, conta bancaria ausente | Nao | Bolsista |
+| RecusarTermoAceiteDiaria | Command | Registrar recusa do bolsista com justificativa obrigatoria | solicitacaoDiariaId, beneficiarioId, pessoaFisicaId, justificativa | `TermoAceiteDiaria` recusado e solicitacao em `RECUSADA` quando aplicavel | RN26, RN29 | Beneficiario pendente e usuario corresponde ao bolsista | Beneficiario invalido, aceite ja registrado, justificativa ausente | Nao | Bolsista |
+| DecidirSolicitacaoDiaria | Command | Aprovar ou rejeitar solicitacao de diaria apos aceites dos bolsistas | solicitacaoDiariaId, decisao, justificativa, rubricaDiariasPassagensId | Solicitacao aprovada/rejeitada e debito gerado quando aprovada | RN29-RN31 | Todos os aceites obrigatorios assinados; justificativa obrigatoria quando rejeitar | Aceites pendentes, rubrica invalida, saldo insuficiente, justificativa ausente na rejeicao | Nao | Analista da Agencia |
+| CancelarSolicitacaoDiaria | Command | Cancelar solicitacao de diaria com justificativa, revertendo o debito quando ja aprovada | solicitacaoDiariaId, justificativa | Solicitacao cancelada e credito gerado quando havia debito | RN22-RN33 | Justificativa informada; solicitacao nao vinculada a prestacao finalizada | Justificativa ausente, prestacao finalizada, estado invalido | Nao | Ortogado |
 | RegistrarLancamentoExecucao | Command | Registrar lancamento recebido de integracao financeira | iniciativaId, rubricaId, data, valor, tipo, origem | `LancamentoExecucao` criado | RN09, RN10, RN15 | Iniciativa e rubrica existentes | Lancamento duplicado, rubrica invalida, valor invalido | Sim, por chave de origem | Modulo interno autorizado |
 | ConsultarIniciativaConsolidada | Query | Consultar dados completos da iniciativa e plano vigente | iniciativaId | Visao consolidada da iniciativa | RN01-RN15 | Iniciativa existente | Iniciativa nao encontrada | N/A | Usuario autorizado ou modulo interno |
 | ConsultarIniciativasPorPrograma | Query | Listar iniciativas vinculadas a um programa | programaId | Lista de iniciativas | RN01 | Programa existente | Programa sem iniciativas | N/A | M010/modulo interno |
 | ConsultarIniciativasPorParceria | Query | Listar iniciativas vinculadas a uma parceria | parceriaId | Lista de iniciativas | RN01 | Parceria existente | Parceria sem iniciativas | N/A | M010/modulo interno |
 | ConsultarExecucaoConsolidadaIniciativa | Query | Consultar valores planejados, executados e saldo por rubrica | iniciativaId | Resumo financeiro consolidado | RN09, RN10 | Iniciativa existente | Execucao indisponivel | N/A | Usuario autorizado ou modulo interno |
+| ConsultarCicloFomentoIniciativa | Query | Consultar timeline transversal de pre-award, award e post-award | iniciativaId ou propostaId | Lista ordenada de `EstagioCicloFomento` | RN16-RN19 | Iniciativa ou proposta existente | Ciclo nao encontrado | N/A | Usuario autorizado ou modulo interno |
+| ConsultarSolicitacoesDiaria | Query | Listar solicitacoes de diaria da iniciativa | iniciativaId, busca, estado, periodoPartida, pagina, tamanhoPagina | Lista paginada de `SolicitacaoDiaria` | RN22-RN27 | Iniciativa existente | Iniciativa nao encontrada | N/A | Usuario autorizado ou modulo interno |
+| ConsultarSolicitacaoDiaria | Query | Consultar detalhe da solicitacao de diaria, beneficiarios, calculo e aceites | solicitacaoDiariaId | Detalhe de `SolicitacaoDiaria` | RN22-RN27 | Solicitacao existente | Solicitacao nao encontrada | N/A | Usuario autorizado ou modulo interno |
 
 ## Padrao de Payload e Erro
 
@@ -122,6 +135,156 @@ O M003 nao publica comandos para criar edital, cota de edital, alocacao de bolsi
 }
 ```
 
+### CadastrarTipoDiaria
+
+```json
+{
+  "tipoViagemRef": "TVI-001",
+  "valorUnitario": 260.00,
+  "fracaoCalculo": "12H",
+  "vigenciaInicio": "2026-01-01",
+  "vigenciaFim": null,
+  "ativo": true
+}
+```
+
+### SolicitarDiaria
+
+```json
+{
+  "iniciativaId": "INI-2026-014",
+  "ortogadoId": "ORT-2026-001",
+  "tipoViagemRef": "TVI-001",
+  "dataHoraPartida": "2026-06-10T08:00:00-03:00",
+  "dataHoraChegada": "2026-06-12T18:00:00-03:00",
+  "destino": "Vitoria/ES - evento de acompanhamento tecnico",
+  "motivo": "Participacao dos bolsistas na apresentacao de resultados parciais da iniciativa.",
+  "beneficiarios": [
+    {
+      "alocacaoBolsistaRef": "ALOC-M009-2026-031",
+      "pessoaFisicaRef": "PF-2026-045"
+    },
+    {
+      "alocacaoBolsistaRef": "ALOC-M009-2026-032",
+      "pessoaFisicaRef": "PF-2026-046"
+    }
+  ]
+}
+```
+
+Saida esperada:
+
+```json
+{
+  "solicitacaoDiaria": {
+    "id": "SD-2026-001",
+    "codigo": "SD-2026-001",
+    "estado": "RASCUNHO",
+    "quantidadeDiariasCalculada": 2.5,
+    "tipoViagemRef": "TVI-001",
+    "tipoDiariaRef": "DIA-2026-001",
+    "valorUnitarioDiaria": 260.00,
+    "fracaoCalculoSnapshot": "12H",
+    "valorTotalCalculado": 1300.00,
+    "beneficiarios": [
+      {
+        "beneficiarioId": "BD-2026-001",
+        "pessoaFisicaRef": "PF-2026-045",
+        "quantidadeDiariasCalculada": 2.5,
+        "valorCalculado": 650.00,
+        "aceite": "PENDENTE"
+      },
+      {
+        "beneficiarioId": "BD-2026-002",
+        "pessoaFisicaRef": "PF-2026-046",
+        "quantidadeDiariasCalculada": 2.5,
+        "valorCalculado": 650.00,
+        "aceite": "PENDENTE"
+      }
+    ]
+  }
+}
+```
+
+### AssinarTermoAceiteDiaria
+
+```json
+{
+  "solicitacaoDiariaId": "SD-2026-001",
+  "beneficiarioId": "BD-2026-001",
+  "pessoaFisicaId": "PF-2026-045",
+  "aceite": true,
+  "contaBancariaConfirmada": {
+    "banco": "021",
+    "agencia": "0001",
+    "conta": "12345-6",
+    "tipo": "CONTA_CORRENTE"
+  }
+}
+```
+
+### DecidirSolicitacaoDiaria
+
+A `justificativa` e obrigatoria quando a decisao for `REJEITADA`. Nesse caso, nenhum lancamento de debito deve ser gerado.
+
+```json
+{
+  "solicitacaoDiariaId": "SD-2026-001",
+  "decisao": "APROVADA",
+  "justificativa": "Solicitacao aderente ao plano de trabalho e com aceites assinados.",
+  "rubricaDiariasPassagensId": "RUB-DIARIAS-PASSAGENS"
+}
+```
+
+Saida esperada:
+
+```json
+{
+  "solicitacaoDiaria": {
+    "id": "SD-2026-001",
+    "estado": "APROVADA",
+    "valorTotalAprovado": 1600.00,
+    "rubricaDebitoRef": "RUB-DIARIAS-PASSAGENS",
+    "lancamentoDebitoRef": "LEX-2026-045"
+  },
+  "lancamentoExecucao": {
+    "id": "LEX-2026-045",
+    "tipo": "DEBITO",
+    "valor": 1600.00,
+    "origem": "M003:SolicitacaoDiaria:SD-2026-001"
+  }
+}
+```
+
+### CancelarSolicitacaoDiaria
+
+```json
+{
+  "solicitacaoDiariaId": "SD-2026-001",
+  "justificativa": "Viagem cancelada por alteracao na agenda da atividade."
+}
+```
+
+Saida esperada quando a solicitacao ja estava aprovada:
+
+```json
+{
+  "solicitacaoDiaria": {
+    "id": "SD-2026-001",
+    "estado": "CANCELADA",
+    "justificativaCancelamento": "Viagem cancelada por alteracao na agenda da atividade.",
+    "lancamentoCreditoRef": "LEX-2026-046"
+  },
+  "lancamentoExecucao": {
+    "id": "LEX-2026-046",
+    "tipo": "CREDITO",
+    "valor": 1600.00,
+    "rubricaId": "RUB-DIARIAS-PASSAGENS",
+    "origem": "M003:SolicitacaoDiariaCancelada:SD-2026-001"
+  }
+}
+```
+
 ### RegistrarLancamentoExecucao
 
 ```json
@@ -161,6 +324,100 @@ O M003 nao publica comandos para criar edital, cota de edital, alocacao de bolsi
     "valorExecutado": 18400.00,
     "saldo": 231600.00
   }
+}
+```
+
+### ConsultarCicloFomentoIniciativa
+
+```json
+{
+  "iniciativaId": "INI-2026-014",
+  "propostaId": "PROP-2026-088",
+  "marcoAtual": "EM_EXECUCAO",
+  "estagios": [
+    {
+      "ordem": 1,
+      "fase": "PRE_AWARD",
+      "marco": "SUBMISSAO",
+      "estado": "CONCLUIDO",
+      "dataInicio": "2024-01-15",
+      "moduloOrigem": "M011",
+      "referenciaOrigemId": "PROP-2026-088"
+    },
+    {
+      "ordem": 2,
+      "fase": "PRE_AWARD",
+      "marco": "AVALIACAO_DOCUMENTOS",
+      "estado": "CONCLUIDO",
+      "dataInicio": "2024-01-20",
+      "moduloOrigem": "M011",
+      "referenciaOrigemId": "HAB-2026-021"
+    },
+    {
+      "ordem": 3,
+      "fase": "PRE_AWARD",
+      "marco": "AVALIACAO_AD_HOC",
+      "estado": "CONCLUIDO",
+      "dataInicio": "2024-02-05",
+      "moduloOrigem": "M011",
+      "referenciaOrigemId": "AVAL-2026-044"
+    },
+    {
+      "ordem": 4,
+      "fase": "AWARD",
+      "marco": "EM_CONTRATACAO",
+      "estado": "CONCLUIDO",
+      "dataInicio": "2024-02-20",
+      "moduloOrigem": "M022",
+      "referenciaOrigemId": "TO-2026-014"
+    },
+    {
+      "ordem": 5,
+      "fase": "AWARD",
+      "marco": "CONTRATADO",
+      "estado": "CONCLUIDO",
+      "dataInicio": "2024-03-01",
+      "moduloOrigem": "M003",
+      "referenciaOrigemId": "INI-2026-014"
+    },
+    {
+      "ordem": 6,
+      "fase": "POST_AWARD",
+      "marco": "EM_EXECUCAO",
+      "estado": "ATUAL",
+      "dataInicio": "2024-03-16",
+      "moduloOrigem": "M003",
+      "referenciaOrigemId": "INI-2026-014"
+    },
+    {
+      "ordem": 7,
+      "fase": "POST_AWARD",
+      "marco": "SUSPENSA",
+      "estado": "PENDENTE",
+      "moduloOrigem": "M015"
+    },
+    {
+      "ordem": 8,
+      "fase": "POST_AWARD",
+      "marco": "EM_APROVACAO_CONTAS",
+      "estado": "PENDENTE",
+      "moduloOrigem": "M014"
+    },
+    {
+      "ordem": 9,
+      "fase": "POST_AWARD",
+      "marco": "CONCLUIDO",
+      "estado": "PENDENTE",
+      "moduloOrigem": "M015"
+    },
+    {
+      "ordem": 10,
+      "fase": "POST_AWARD",
+      "marco": "CANCELADA",
+      "estado": "PENDENTE",
+      "moduloOrigem": "M015"
+    }
+  ]
 }
 ```
 

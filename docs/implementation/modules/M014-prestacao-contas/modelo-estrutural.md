@@ -309,6 +309,12 @@ Herda todos os atributos de `JustificativaDespesa`.
 | ValorDiaria | decimal | Nao | Sim | Valor unitario de cada diaria (>= 0) |
 | Quantidade | int | Nao | Sim | Numero de diarias (> 0) |
 | JustificativaDiariaAlocacaoBolsistaId | Guid | Nao | Sim | FK para AlocacaoBolsistaRef — bolsista beneficiario da diaria |
+| SolicitacaoDiariaRef | string/Guid | Nao | Sim | Referencia externa da solicitacao de diaria aprovada no M003 |
+
+Regras estruturais:
+
+- `SolicitacaoDiariaRef` deve ser unica entre `JustificativaDiaria` ativas, impedindo que a mesma diaria seja prestada contas mais de uma vez.
+- A lista de selecao de diarias deve consultar o M003 e remover solicitacoes ja vinculadas a `JustificativaDiaria`.
 
 ### JustificativaInvoice
 

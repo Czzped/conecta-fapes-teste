@@ -18,14 +18,77 @@ interface FinanceiraDetalhesProps {
   onBack: () => void;
 }
 
+interface DiariaPrestacao {
+  solicitacaoRef: string;
+  nome: string;
+  tipo: string;
+  valorUnit: string;
+  numDiarias: string;
+  valorTotal: string;
+  destino: string;
+  dataSaida: string;
+  horarioSaida: string;
+  dataChegada: string;
+  horarioChegada: string;
+  status: string;
+  prestadaContas: boolean;
+}
+
 // Mock data para tabela de diárias
-const mockDiarias = [
-  { nome: 'Ana Carolina Silva', tipo: 'Nacional - Dentro do Estado', valorUnit: 'R$ 320,00', numDiarias: '3', valorTotal: 'R$ 960,00', destino: 'Vitória', dataSaida: '15/03/2026', horarioSaida: '08:00', dataChegada: '18/03/2026', horarioChegada: '17:00' },
-  { nome: 'Carlos Eduardo Rocha', tipo: 'Nacional - Fora do Estado', valorUnit: 'R$ 320,00', numDiarias: '5', valorTotal: 'R$ 1.600,00', destino: 'São Paulo', dataSaida: '20/03/2026', horarioSaida: '06:30', dataChegada: '25/03/2026', horarioChegada: '20:00' },
-  { nome: 'Fernanda Martins', tipo: 'Internacional', valorUnit: 'R$ 320,00', numDiarias: '7', valorTotal: 'R$ 2.240,00', destino: 'Lisboa', dataSaida: '10/04/2026', horarioSaida: '14:00', dataChegada: '17/04/2026', horarioChegada: '22:30' },
-  { nome: 'Roberto Oliveira', tipo: 'Nacional - Fora do Estado', valorUnit: 'R$ 320,00', numDiarias: '4', valorTotal: 'R$ 1.280,00', destino: 'Rio de Janeiro', dataSaida: '05/05/2026', horarioSaida: '07:00', dataChegada: '09/05/2026', horarioChegada: '19:00' },
-  { nome: 'Beatriz Costa', tipo: 'Nacional - Dentro do Estado', valorUnit: 'R$ 320,00', numDiarias: '2', valorTotal: 'R$ 640,00', destino: 'Cachoeiro', dataSaida: '12/05/2026', horarioSaida: '09:00', dataChegada: '14/05/2026', horarioChegada: '16:00' },
+const mockDiarias: DiariaPrestacao[] = [
+  { solicitacaoRef: 'SD-2026-001', nome: 'Ana Carolina Silva', tipo: 'Nacional - Dentro do Estado', valorUnit: 'R$ 260,00', numDiarias: '3', valorTotal: 'R$ 780,00', destino: 'Vitória', dataSaida: '15/03/2026', horarioSaida: '08:00', dataChegada: '18/03/2026', horarioChegada: '17:00', status: 'Aprovada', prestadaContas: false },
+  { solicitacaoRef: 'SD-2026-002', nome: 'Carlos Eduardo Rocha', tipo: 'Nacional - Fora do Estado', valorUnit: 'R$ 320,00', numDiarias: '5', valorTotal: 'R$ 1.600,00', destino: 'São Paulo', dataSaida: '20/03/2026', horarioSaida: '06:30', dataChegada: '25/03/2026', horarioChegada: '20:00', status: 'Aprovada', prestadaContas: false },
+  { solicitacaoRef: 'SD-2026-003', nome: 'Fernanda Martins', tipo: 'Internacional', valorUnit: 'R$ 620,00', numDiarias: '7', valorTotal: 'R$ 4.340,00', destino: 'Lisboa', dataSaida: '10/04/2026', horarioSaida: '14:00', dataChegada: '17/04/2026', horarioChegada: '22:30', status: 'Aprovada', prestadaContas: true },
+  { solicitacaoRef: 'SD-2026-004', nome: 'Roberto Oliveira', tipo: 'Nacional - Fora do Estado', valorUnit: 'R$ 320,00', numDiarias: '4', valorTotal: 'R$ 1.280,00', destino: 'Rio de Janeiro', dataSaida: '05/05/2026', horarioSaida: '07:00', dataChegada: '09/05/2026', horarioChegada: '19:00', status: 'Aprovada', prestadaContas: false },
+  { solicitacaoRef: 'SD-2026-005', nome: 'Beatriz Costa', tipo: 'Nacional - Dentro do Estado', valorUnit: 'R$ 260,00', numDiarias: '2', valorTotal: 'R$ 520,00', destino: 'Cachoeiro', dataSaida: '12/05/2026', horarioSaida: '09:00', dataChegada: '14/05/2026', horarioChegada: '16:00', status: 'Aprovada', prestadaContas: false },
 ];
+
+const tiposViagemDiaria = [
+  { codigo: 'TVI-001', nome: 'Dentro do Estado', abrangencia: 'Nacional' },
+  { codigo: 'TVI-002', nome: 'Fora do Estado', abrangencia: 'Nacional' },
+  { codigo: 'TVI-003', nome: 'Internacional', abrangencia: 'Internacional' },
+];
+
+const diariasVigentesPrestacao = [
+  { codigo: 'DIA-2026-001', tipoViagem: 'Dentro do Estado', valor: 260, fracaoCalculo: '12h' },
+  { codigo: 'DIA-2026-002', tipoViagem: 'Fora do Estado', valor: 320, fracaoCalculo: '12h' },
+  { codigo: 'DIA-2026-003', tipoViagem: 'Internacional', valor: 620, fracaoCalculo: '24h' },
+];
+
+function calcularQuantidadeDiarias(partida: string, chegada: string) {
+  if (!partida || !chegada) return 0;
+
+  const inicioData = new Date(partida);
+  const fimData = new Date(chegada);
+  const inicio = inicioData.getTime();
+  const fim = fimData.getTime();
+  if (!Number.isFinite(inicio) || !Number.isFinite(fim) || fim <= inicio) return 0;
+
+  const horas = (fim - inicio) / 36e5;
+  if (horas < 6) return 0;
+
+  const diaInicio = new Date(inicioData.getFullYear(), inicioData.getMonth(), inicioData.getDate()).getTime();
+  const diaFim = new Date(fimData.getFullYear(), fimData.getMonth(), fimData.getDate()).getTime();
+  const diasFora = Math.round((diaFim - diaInicio) / 86400000);
+
+  if (diasFora <= 0) return 0.5;
+
+  const horaRetorno = fimData.getHours() + fimData.getMinutes() / 60;
+
+  return diasFora + (horaRetorno > 14 ? 0.5 : 0);
+}
+
+function formatarData(value: string) {
+  return new Intl.DateTimeFormat('pt-BR').format(new Date(value));
+}
+
+function formatarHora(value: string) {
+  return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(new Date(value));
+}
+
+function formatarMoeda(value: number) {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+}
 
 /* ─── helpers ──────────────────────────────────────────────── */
 const PESSOAS_FICTICIAS = [
@@ -71,6 +134,15 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
 
   // Diária
   const [selectedDiariaIdx, setSelectedDiariaIdx] = useState<number | null>(null);
+  const [diariasPrestacao, setDiariasPrestacao] = useState<DiariaPrestacao[]>(mockDiarias);
+  const [isCriarDiariaModalOpen, setIsCriarDiariaModalOpen] = useState(false);
+  const [novaDiariaBolsistas, setNovaDiariaBolsistas] = useState<string[]>([PESSOAS_FICTICIAS[0]]);
+  const [novaDiariaBeneficiarioSearch, setNovaDiariaBeneficiarioSearch] = useState('');
+  const [novaDiariaTipo, setNovaDiariaTipo] = useState('Dentro do Estado');
+  const [novaDiariaPartida, setNovaDiariaPartida] = useState('2026-06-20T08:00');
+  const [novaDiariaChegada, setNovaDiariaChegada] = useState('2026-06-21T18:00');
+  const [novaDiariaDestino, setNovaDiariaDestino] = useState('Vitória');
+  const [novaDiariaMotivo, setNovaDiariaMotivo] = useState('');
 
   // Passagem
   const [passQuery,    setPassQuery]    = useState('');
@@ -140,6 +212,20 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
     'Webcam Logitech Brio 4K',
   ];
   const passagFiltrado = PESSOAS_FICTICIAS.filter(n => n.toLowerCase().includes(passQuery.toLowerCase()));
+  const diariasElegiveisPrestacao = diariasPrestacao
+    .map((diaria, originalIndex) => ({ ...diaria, originalIndex }))
+    .filter(diaria => diaria.status === 'Aprovada' && !diaria.prestadaContas);
+  const totalDiariasJaPrestadas = diariasPrestacao.length - diariasElegiveisPrestacao.length;
+  const diariaSelecionada = selectedDiariaIdx === null ? null : diariasPrestacao[selectedDiariaIdx];
+  const tipoViagemNovaDiaria = tiposViagemDiaria.find((tipo) => tipo.nome === novaDiariaTipo) ?? tiposViagemDiaria[0];
+  const diariaVigenteNovaDiaria = diariasVigentesPrestacao.find((diaria) => diaria.tipoViagem === tipoViagemNovaDiaria.nome) ?? diariasVigentesPrestacao[0];
+  const quantidadeNovaDiaria = calcularQuantidadeDiarias(novaDiariaPartida, novaDiariaChegada);
+  const valorBeneficiarioNovaDiaria = quantidadeNovaDiaria * diariaVigenteNovaDiaria.valor;
+  const valorTotalNovaDiaria = valorBeneficiarioNovaDiaria * novaDiariaBolsistas.length;
+  const beneficiariosNovaDiariaEncontrados = PESSOAS_FICTICIAS
+    .filter((nome) => !novaDiariaBolsistas.includes(nome))
+    .filter((nome) => nome.toLowerCase().includes(novaDiariaBeneficiarioSearch.trim().toLowerCase()))
+    .slice(0, 4);
 
   /* ── derived flags ──────────────────────────── */
   const isStep1Complete = selectedDocumento !== '' && descricao.trim().length > 0;
@@ -148,8 +234,24 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
   const allowMultipleFiles = ['Diária', 'Passagem', 'Invoice (Pagamento Internacional)'].includes(selectedDocumento);
   const showCotacao = ['Nota Fiscal (Produto ou Serviço)', 'Invoice (Pagamento Internacional)', 'Passagem'].includes(selectedDocumento);
 
-  const step2Title    = 'Anexar Documento Fiscal';
-  const step2Subtitle = 'Inclua o Documento Fiscal que justifique esse pagamento.';
+  const step2Title =
+    selectedDocumento === 'Diária'
+      ? 'Anexar Comprovante da Diária'
+      : selectedDocumento === 'Passagem'
+        ? 'Anexar Comprovantes da Passagem'
+        : 'Anexar Documento Fiscal';
+  const step2Subtitle =
+    selectedDocumento === 'Diária'
+      ? 'Inclua o comprovante de pagamento da diária.'
+      : selectedDocumento === 'Passagem'
+        ? 'Inclua o comprovante de pagamento da passagem e o comprovante de realização da viagem.'
+        : 'Inclua o Documento Fiscal que justifique esse pagamento.';
+  const step2ButtonLabel =
+    selectedDocumento === 'Diária'
+      ? 'Anexar Comprovante da Diária'
+      : selectedDocumento === 'Passagem'
+        ? 'Anexar Comprovantes da Passagem'
+        : 'Anexar Documento Fiscal';
 
   /* reset specific fields on document change */
   const handleDocumentoChange = (doc: string) => {
@@ -163,6 +265,35 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
     setPassQuery(''); setPassageiro(''); setLocalizador(''); setDataEmissao('');
     setPassOrigem(''); setPassDestino('');
     setDataSaida(''); setHoraSaida(''); setDataChegada(''); setHoraChegada('');
+  };
+
+  const criarDiariaPrestacao = () => {
+    if (novaDiariaBolsistas.length === 0 || !novaDiariaDestino.trim() || !novaDiariaMotivo.trim() || quantidadeNovaDiaria <= 0) return;
+
+    const novasDiarias: DiariaPrestacao[] = novaDiariaBolsistas.map((nome, index) => ({
+      solicitacaoRef: `SD-2026-${String(diariasPrestacao.length + index + 1).padStart(3, '0')}`,
+      nome,
+      tipo: novaDiariaTipo,
+      valorUnit: formatarMoeda(diariaVigenteNovaDiaria.valor),
+      numDiarias: quantidadeNovaDiaria.toLocaleString('pt-BR'),
+      valorTotal: formatarMoeda(valorBeneficiarioNovaDiaria),
+      destino: novaDiariaDestino,
+      dataSaida: formatarData(novaDiariaPartida),
+      horarioSaida: formatarHora(novaDiariaPartida),
+      dataChegada: formatarData(novaDiariaChegada),
+      horarioChegada: formatarHora(novaDiariaChegada),
+      status: 'Aprovada',
+      prestadaContas: false,
+    }));
+
+    setDiariasPrestacao((current) => {
+      const next = [...novasDiarias, ...current];
+      setSelectedDiariaIdx(0);
+      return next;
+    });
+    setIsCriarDiariaModalOpen(false);
+    setNovaDiariaMotivo('');
+    setNovaDiariaBeneficiarioSearch('');
   };
 
   /* ── prefill for read-only ─────────────────── */
@@ -569,12 +700,114 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
 
             {/* DIÁRIA */}
             {selectedDocumento === 'Diária' && (
-              <div style={infoBox()}>
-                <Info size={16} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
-                <p style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: 0, lineHeight: '1.6' }}>
-                  Aceitamos apenas diárias com até 15 dias consecutivos por viagem. Na descrição, escreva as atividades realizadas na viagem e no próximo passo anexe o comprovante da atividade, que pode ser certificado de participação, crachá ou fotos.
-                </p>
-              </div>
+              <>
+                <div style={{ ...infoBox(), alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+                  <div className="flex items-start gap-3">
+                    <Info size={16} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
+                    <p style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: 0, lineHeight: '1.6' }}>
+                      Aceitamos apenas diárias com até 15 dias consecutivos por viagem. Selecione uma diária já cadastrada ou crie uma nova diária operacional para associar a esta prestação de contas.
+                    </p>
+                  </div>
+                  {!isReadOnly && (
+                    <button
+                      type="button"
+                      onClick={() => setIsCriarDiariaModalOpen(true)}
+                      className="px-4 py-2 flex items-center justify-center gap-2"
+                      style={{
+                        backgroundColor: 'var(--primary)',
+                        color: 'var(--primary-foreground)',
+                        border: 'none',
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        fontFamily: 'var(--font-family)',
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Plus size={16} />
+                      Criar diária
+                    </button>
+                  )}
+                </div>
+
+                <div className="mb-4 space-y-3">
+                  <div
+                    className="flex flex-wrap items-center gap-2 p-3"
+                    style={{
+                      backgroundColor: 'var(--muted)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius)',
+                      color: 'var(--muted-foreground)',
+                      fontSize: 'var(--text-sm)',
+                      fontFamily: 'var(--font-family)',
+                    }}
+                  >
+                    <span>{diariasElegiveisPrestacao.length} diárias disponíveis para prestação de contas</span>
+                    <span>•</span>
+                    <span>{totalDiariasJaPrestadas} já prestada(s) não aparecem na lista</span>
+                  </div>
+
+                  {diariaSelecionada && (
+                    <div
+                      className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4"
+                      style={{
+                        backgroundColor: 'color-mix(in srgb, var(--primary) 6%, var(--background))',
+                        border: '1px solid color-mix(in srgb, var(--primary) 24%, var(--border))',
+                        borderRadius: 'var(--radius)',
+                        fontFamily: 'var(--font-family)',
+                      }}
+                    >
+                      <div>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>Diária selecionada</div>
+                        <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{diariaSelecionada.solicitacaoRef}</strong>
+                      </div>
+                      <div>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>Bolsista</div>
+                        <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{diariaSelecionada.nome}</strong>
+                      </div>
+                      <div>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>Valor da diária</div>
+                        <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{diariaSelecionada.valorTotal}</strong>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {diariasElegiveisPrestacao.map((diaria) => (
+                      <button
+                        key={diaria.solicitacaoRef}
+                        type="button"
+                        disabled={isReadOnly}
+                        onClick={() => setSelectedDiariaIdx(diaria.originalIndex)}
+                        className="p-4 text-left"
+                        style={{
+                          backgroundColor: selectedDiariaIdx === diaria.originalIndex ? 'color-mix(in srgb, var(--primary) 8%, var(--card))' : 'var(--card)',
+                          border: `1px solid ${selectedDiariaIdx === diaria.originalIndex ? 'var(--primary)' : 'var(--border)'}`,
+                          borderRadius: 'var(--radius)',
+                          color: 'var(--foreground)',
+                          cursor: isReadOnly ? 'default' : 'pointer',
+                          fontFamily: 'var(--font-family)',
+                        }}
+                      >
+                        <div className="flex items-start justify-between gap-3 mb-3">
+                          <div>
+                            <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{diaria.solicitacaoRef}</strong>
+                            <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.25rem' }}>{diaria.nome}</div>
+                          </div>
+                          <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>{diaria.valorTotal}</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
+                          <span>{diaria.destino}</span>
+                          <span>{diaria.numDiarias} diária(s)</span>
+                          <span>{diaria.dataSaida}</span>
+                          <span>{diaria.dataChegada}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
             )}
 
             {/* PASSAGEM */}
@@ -582,7 +815,7 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
               <div style={infoBox()}>
                 <Info size={16} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
                 <p style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: 0, lineHeight: '1.6' }}>
-                  Envie o comprovante de pagamento, cartão de embarque (se houver) e comprovante da atividade que justifique a viagem, como certificado de participação em evento, carta de aceite de artigo ou declaração de reunião ou visita técnica.
+                  Envie o comprovante de pagamento da passagem e o comprovante de realização da viagem. O comprovante de realização pode ser cartão de embarque, declaração de participação, certificado, carta de aceite de artigo ou declaração de reunião ou visita técnica.
                 </p>
               </div>
             )}
@@ -647,7 +880,7 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
                   onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--muted)'; }}
                   onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                 >
-                  <Paperclip size={16} />Anexar Documento Fiscal
+                  <Paperclip size={16} />{step2ButtonLabel}
                 </button>
               </div>
             )}
@@ -1226,20 +1459,82 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
             )}
 
             {/* DIÁRIA: Associar Diária */}
-            {selectedDocumento === 'Diária' && (
+            {false && selectedDocumento === 'Diária' && (
               <section className="mb-8">
                 <div className="flex items-start gap-3 mb-1">
                   <div style={stepCircle}>3</div>
                   <h2 style={stepTitle}>Associar Diária</h2>
                 </div>
-                <p style={stepSubtitle}>Selecione a diária correspondente ao pagamento realizado.</p>
+                <p style={stepSubtitle}>Selecione uma diária aprovada que ainda não foi prestada contas.</p>
 
                 <div style={{ marginLeft: '36px' }} className="space-y-3">
-                  {mockDiarias.map((diaria, idx) => (
+                  <div
+                    className="flex flex-wrap items-center gap-2 p-3"
+                    style={{
+                      backgroundColor: 'var(--muted)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius)',
+                      color: 'var(--muted-foreground)',
+                      fontSize: 'var(--text-sm)',
+                      fontFamily: 'var(--font-family)',
+                    }}
+                  >
+                    <span>{diariasElegiveisPrestacao.length} diárias disponíveis para prestação de contas</span>
+                    <span>•</span>
+                    <span>{totalDiariasJaPrestadas} já prestada(s) não aparecem na lista</span>
+                    {!isReadOnly && (
+                      <button
+                        type="button"
+                        onClick={() => setIsCriarDiariaModalOpen(true)}
+                        className="px-3 py-2 flex items-center gap-2"
+                        style={{
+                          marginLeft: 'auto',
+                          backgroundColor: 'var(--primary)',
+                          color: 'var(--primary-foreground)',
+                          border: 'none',
+                          borderRadius: 'var(--radius)',
+                          fontSize: 'var(--text-sm)',
+                          fontWeight: 'var(--font-weight-medium)',
+                          fontFamily: 'var(--font-family)',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <Plus size={16} />
+                        Criar diária
+                      </button>
+                    )}
+                  </div>
+
+                  {diariaSelecionada && (
                     <div
-                      key={idx}
+                      className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4"
+                      style={{
+                        backgroundColor: 'color-mix(in srgb, var(--primary) 6%, var(--background))',
+                        border: '1px solid color-mix(in srgb, var(--primary) 24%, var(--border))',
+                        borderRadius: 'var(--radius)',
+                        fontFamily: 'var(--font-family)',
+                      }}
+                    >
+                      <div>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>Diária selecionada</div>
+                        <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{diariaSelecionada.solicitacaoRef}</strong>
+                      </div>
+                      <div>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>Bolsista</div>
+                        <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{diariaSelecionada.nome}</strong>
+                      </div>
+                      <div>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>Valor da diária</div>
+                        <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{diariaSelecionada.valorTotal}</strong>
+                      </div>
+                    </div>
+                  )}
+
+                  {diariasElegiveisPrestacao.map((diaria) => (
+                    <div
+                      key={diaria.solicitacaoRef}
                       className="p-4"
-                      onClick={() => { if (!isReadOnly) setSelectedDiariaIdx(idx); }}
+                      onClick={() => { if (!isReadOnly) setSelectedDiariaIdx(diaria.originalIndex); }}
                       style={{
                         backgroundColor: 'var(--card)',
                         border: '1px solid var(--border)',
@@ -1254,14 +1549,14 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
                           disabled={isReadOnly}
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (!isReadOnly) setSelectedDiariaIdx(idx);
+                            if (!isReadOnly) setSelectedDiariaIdx(diaria.originalIndex);
                           }}
                           style={{
                             width: '20px',
                             height: '20px',
                             borderRadius: '50%',
-                            border: `2px solid ${selectedDiariaIdx === idx ? 'var(--primary)' : 'var(--border)'}`,
-                            backgroundColor: selectedDiariaIdx === idx ? 'var(--primary)' : 'transparent',
+                            border: `2px solid ${selectedDiariaIdx === diaria.originalIndex ? 'var(--primary)' : 'var(--border)'}`,
+                            backgroundColor: selectedDiariaIdx === diaria.originalIndex ? 'var(--primary)' : 'transparent',
                             cursor: isReadOnly ? 'not-allowed' : 'pointer',
                             display: 'flex',
                             alignItems: 'center',
@@ -1271,7 +1566,7 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
                             marginTop: '0.25rem',
                           }}
                         >
-                          {selectedDiariaIdx === idx && (
+                          {selectedDiariaIdx === diaria.originalIndex && (
                             <div
                               style={{
                                 width: '8px',
@@ -1285,6 +1580,24 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
 
                         {/* Card content */}
                         <div className="flex-1 space-y-4">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 600, fontFamily: 'var(--font-family)' }}>
+                              {diaria.solicitacaoRef}
+                            </span>
+                            <span
+                              style={{
+                                padding: '0.25rem 0.5rem',
+                                borderRadius: '999px',
+                                backgroundColor: 'var(--secondary)',
+                                color: 'var(--secondary-foreground)',
+                                fontSize: 'var(--text-xs)',
+                                fontFamily: 'var(--font-family)',
+                              }}
+                            >
+                              Não prestada
+                            </span>
+                          </div>
+
                           {/* Primeira linha */}
                           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                             <div>
@@ -1337,6 +1650,296 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
                     </div>
                   ))}
                 </div>
+
+                {false && isCriarDiariaModalOpen && (
+                  <>
+                    <div
+                      style={{
+                        position: 'fixed',
+                        inset: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        zIndex: 90,
+                      }}
+                      onClick={() => setIsCriarDiariaModalOpen(false)}
+                    />
+                    <div
+                      role="dialog"
+                      aria-modal="true"
+                      aria-labelledby="criar-diaria-title"
+                      style={{
+                        position: 'fixed',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        zIndex: 100,
+                        width: 'min(720px, calc(100vw - 2rem))',
+                        maxHeight: 'calc(100vh - 2rem)',
+                        overflowY: 'auto',
+                        backgroundColor: 'var(--card)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        boxShadow: '0 20px 45px rgba(0, 0, 0, 0.24)',
+                        padding: '1.25rem',
+                      }}
+                    >
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        <div>
+                          <h3
+                            id="criar-diaria-title"
+                            style={{
+                              color: 'var(--foreground)',
+                              fontSize: 'var(--text-lg)',
+                              fontWeight: 'var(--font-weight-semibold)',
+                              fontFamily: 'var(--font-family)',
+                              margin: 0,
+                            }}
+                          >
+                            Solicitação de Diárias
+                          </h3>
+                          <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: '0.35rem 0 0' }}>
+                            Use o mesmo formulário de solicitação para criar a diária operacional e associá-la a esta prestação de contas.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setIsCriarDiariaModalOpen(false)}
+                          aria-label="Fechar"
+                          style={{
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: 'var(--radius)',
+                            border: '1px solid var(--border)',
+                            backgroundColor: 'transparent',
+                            color: 'var(--foreground)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
+
+                      <div
+                        className="mb-4 p-3"
+                        style={{
+                          backgroundColor: 'color-mix(in srgb, var(--primary) 6%, var(--background))',
+                          border: '1px solid color-mix(in srgb, var(--primary) 20%, var(--border))',
+                          borderRadius: 'var(--radius)',
+                          color: 'var(--muted-foreground)',
+                          fontSize: 'var(--text-sm)',
+                          fontFamily: 'var(--font-family)',
+                        }}
+                      >
+                        Diária vigente: {diariaVigenteNovaDiaria.codigo} · {formatarMoeda(diariaVigenteNovaDiaria.valor)} · fração {diariaVigenteNovaDiaria.fracaoCalculo} · cálculo pela normativa FAPES
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <label style={labelSt}>Partida</label>
+                          <input
+                            type="datetime-local"
+                            value={novaDiariaPartida}
+                            onChange={(event) => setNovaDiariaPartida(event.target.value)}
+                            style={inputSt(false)}
+                          />
+                        </div>
+                        <div>
+                          <label style={labelSt}>Chegada</label>
+                          <input
+                            type="datetime-local"
+                            value={novaDiariaChegada}
+                            onChange={(event) => setNovaDiariaChegada(event.target.value)}
+                            style={inputSt(false)}
+                          />
+                        </div>
+                        <div>
+                          <label style={labelSt}>Destino</label>
+                          <input
+                            value={novaDiariaDestino}
+                            onChange={(event) => setNovaDiariaDestino(event.target.value)}
+                            placeholder="Ex.: Vitória/ES"
+                            style={inputSt(false)}
+                          />
+                        </div>
+                        <div>
+                          <label style={labelSt}>Tipo de viagem</label>
+                          <select
+                            value={novaDiariaTipo}
+                            onChange={(event) => setNovaDiariaTipo(event.target.value)}
+                            style={inputSt(false)}
+                          >
+                            {tiposViagemDiaria.map((tipo) => (
+                              <option key={tipo.codigo} value={tipo.nome}>
+                                {tipo.nome} · {tipo.abrangencia}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="md:col-span-2">
+                          <label style={labelSt}>Beneficiários</label>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Search size={16} style={{ color: 'var(--muted-foreground)' }} />
+                            <input
+                              value={novaDiariaBeneficiarioSearch}
+                              onChange={(event) => setNovaDiariaBeneficiarioSearch(event.target.value)}
+                              placeholder="Buscar bolsista do projeto"
+                              style={inputSt(false)}
+                            />
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+                            {beneficiariosNovaDiariaEncontrados.map((nome) => (
+                              <button
+                                key={nome}
+                                type="button"
+                                onClick={() => {
+                                  setNovaDiariaBolsistas((current) => [...current, nome]);
+                                  setNovaDiariaBeneficiarioSearch('');
+                                }}
+                                className="px-3 py-2 flex items-center gap-2"
+                                style={{
+                                  border: '1px solid var(--border)',
+                                  borderRadius: 'var(--radius)',
+                                  backgroundColor: 'var(--background)',
+                                  color: 'var(--foreground)',
+                                  fontSize: 'var(--text-sm)',
+                                  fontFamily: 'var(--font-family)',
+                                  textAlign: 'left',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                <Plus size={16} style={{ color: 'var(--muted-foreground)' }} />
+                                {nome}
+                              </button>
+                            ))}
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {novaDiariaBolsistas.map((nome) => (
+                              <span
+                                key={nome}
+                                className="px-3 py-2 flex items-center gap-2"
+                                style={{
+                                  border: '1px solid var(--primary)',
+                                  borderRadius: '999px',
+                                  backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
+                                  color: 'var(--foreground)',
+                                  fontSize: 'var(--text-sm)',
+                                  fontFamily: 'var(--font-family)',
+                                }}
+                              >
+                                {nome}
+                                <button
+                                  type="button"
+                                  onClick={() => setNovaDiariaBolsistas((current) => current.length === 1 ? current : current.filter((item) => item !== nome))}
+                                  aria-label={`Remover ${nome}`}
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    backgroundColor: 'transparent',
+                                    border: 'none',
+                                    color: 'var(--muted-foreground)',
+                                    padding: 0,
+                                    cursor: novaDiariaBolsistas.length === 1 ? 'not-allowed' : 'pointer',
+                                  }}
+                                >
+                                  <X size={14} />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="md:col-span-2">
+                          <label style={labelSt}>Motivo</label>
+                          <textarea
+                            value={novaDiariaMotivo}
+                            onChange={(event) => setNovaDiariaMotivo(event.target.value)}
+                            rows={3}
+                            placeholder="Descreva a atividade vinculada à viagem"
+                            style={{
+                              ...inputSt(false),
+                              resize: 'vertical',
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <div
+                        className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-5 p-4"
+                        style={{
+                          backgroundColor: 'var(--background)',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius)',
+                        }}
+                      >
+                        <div>
+                          <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)' }}>Diárias</span>
+                          <strong className="block mt-1" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
+                            {quantidadeNovaDiaria.toLocaleString('pt-BR')}
+                          </strong>
+                        </div>
+                        <div>
+                          <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)' }}>Beneficiários</span>
+                          <strong className="block mt-1" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
+                            {novaDiariaBolsistas.length}
+                          </strong>
+                        </div>
+                        <div>
+                          <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)' }}>Valor por bolsista</span>
+                          <strong className="block mt-1" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
+                            {formatarMoeda(valorBeneficiarioNovaDiaria)}
+                          </strong>
+                        </div>
+                        <div>
+                          <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)' }}>Valor total</span>
+                          <strong className="block mt-1" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
+                            {formatarMoeda(valorTotalNovaDiaria)}
+                          </strong>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row justify-end gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setIsCriarDiariaModalOpen(false)}
+                          className="px-4 py-2"
+                          style={{
+                            backgroundColor: 'transparent',
+                            color: 'var(--foreground)',
+                            border: '1px solid var(--border)',
+                            borderRadius: 'var(--radius)',
+                            fontSize: 'var(--text-sm)',
+                            fontWeight: 'var(--font-weight-medium)',
+                            fontFamily: 'var(--font-family)',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={criarDiariaPrestacao}
+                          className="px-4 py-2 flex items-center justify-center gap-2"
+                          disabled={novaDiariaBolsistas.length === 0 || !novaDiariaDestino.trim() || !novaDiariaMotivo.trim() || quantidadeNovaDiaria <= 0}
+                          style={{
+                            backgroundColor: (novaDiariaBolsistas.length === 0 || !novaDiariaDestino.trim() || !novaDiariaMotivo.trim() || quantidadeNovaDiaria <= 0) ? 'var(--muted)' : 'var(--primary)',
+                            color: (novaDiariaBolsistas.length === 0 || !novaDiariaDestino.trim() || !novaDiariaMotivo.trim() || quantidadeNovaDiaria <= 0) ? 'var(--muted-foreground)' : 'var(--primary-foreground)',
+                            border: 'none',
+                            borderRadius: 'var(--radius)',
+                            fontSize: 'var(--text-sm)',
+                            fontWeight: 'var(--font-weight-medium)',
+                            fontFamily: 'var(--font-family)',
+                            cursor: (novaDiariaBolsistas.length === 0 || !novaDiariaDestino.trim() || !novaDiariaMotivo.trim() || quantidadeNovaDiaria <= 0) ? 'not-allowed' : 'pointer',
+                          }}
+                        >
+                          <Save size={16} />
+                          Solicitar e selecionar diária
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </section>
             )}
 
@@ -1520,6 +2123,160 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
           </>
         )}
       </div>
+
+      {selectedDocumento === 'Diária' && isCriarDiariaModalOpen && (
+        <>
+          <div
+            style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 90 }}
+            onClick={() => setIsCriarDiariaModalOpen(false)}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="criar-diaria-prestacao-title"
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 100,
+              width: 'min(760px, calc(100vw - 2rem))',
+              maxHeight: 'calc(100vh - 2rem)',
+              overflowY: 'auto',
+              backgroundColor: 'var(--card)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              boxShadow: '0 20px 45px rgba(0, 0, 0, 0.24)',
+              padding: '1.25rem',
+            }}
+          >
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h3 id="criar-diaria-prestacao-title" style={{ color: 'var(--foreground)', fontSize: 'var(--text-lg)', fontWeight: 'var(--font-weight-semibold)', fontFamily: 'var(--font-family)', margin: 0 }}>
+                  Solicitação de Diárias
+                </h3>
+                <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: '0.35rem 0 0' }}>
+                  Crie a diária operacional usando o mesmo formulário de solicitação e associe-a a esta prestação de contas.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCriarDiariaModalOpen(false)}
+                aria-label="Fechar"
+                style={{ width: '36px', height: '36px', borderRadius: 'var(--radius)', border: '1px solid var(--border)', backgroundColor: 'transparent', color: 'var(--foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="mb-4 p-3" style={{ backgroundColor: 'color-mix(in srgb, var(--primary) 6%, var(--background))', border: '1px solid color-mix(in srgb, var(--primary) 20%, var(--border))', borderRadius: 'var(--radius)', color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
+              Diária vigente: {diariaVigenteNovaDiaria.codigo} · {formatarMoeda(diariaVigenteNovaDiaria.valor)} · fração {diariaVigenteNovaDiaria.fracaoCalculo} · cálculo pela normativa FAPES
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label style={labelSt}>Partida</label>
+                <input type="datetime-local" value={novaDiariaPartida} onChange={(event) => setNovaDiariaPartida(event.target.value)} style={inputSt(false)} />
+              </div>
+              <div>
+                <label style={labelSt}>Chegada</label>
+                <input type="datetime-local" value={novaDiariaChegada} onChange={(event) => setNovaDiariaChegada(event.target.value)} style={inputSt(false)} />
+              </div>
+              <div>
+                <label style={labelSt}>Destino</label>
+                <input value={novaDiariaDestino} onChange={(event) => setNovaDiariaDestino(event.target.value)} placeholder="Ex.: Vitória/ES" style={inputSt(false)} />
+              </div>
+              <div>
+                <label style={labelSt}>Tipo de viagem</label>
+                <select value={novaDiariaTipo} onChange={(event) => setNovaDiariaTipo(event.target.value)} style={inputSt(false)}>
+                  {tiposViagemDiaria.map((tipo) => (
+                    <option key={tipo.codigo} value={tipo.nome}>
+                      {tipo.nome} · {tipo.abrangencia}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label style={labelSt}>Beneficiários</label>
+                <div className="flex items-center gap-2 mb-2">
+                  <Search size={16} style={{ color: 'var(--muted-foreground)' }} />
+                  <input value={novaDiariaBeneficiarioSearch} onChange={(event) => setNovaDiariaBeneficiarioSearch(event.target.value)} placeholder="Buscar bolsista do projeto" style={inputSt(false)} />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+                  {beneficiariosNovaDiariaEncontrados.map((nome) => (
+                    <button
+                      key={nome}
+                      type="button"
+                      onClick={() => {
+                        setNovaDiariaBolsistas((current) => [...current, nome]);
+                        setNovaDiariaBeneficiarioSearch('');
+                      }}
+                      className="px-3 py-2 flex items-center gap-2"
+                      style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius)', backgroundColor: 'var(--background)', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', textAlign: 'left', cursor: 'pointer' }}
+                    >
+                      <Plus size={16} style={{ color: 'var(--muted-foreground)' }} />
+                      {nome}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {novaDiariaBolsistas.map((nome) => (
+                    <span key={nome} className="px-3 py-2 flex items-center gap-2" style={{ border: '1px solid var(--primary)', borderRadius: '999px', backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
+                      {nome}
+                      <button type="button" onClick={() => setNovaDiariaBolsistas((current) => current.length === 1 ? current : current.filter((item) => item !== nome))} aria-label={`Remover ${nome}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent', border: 'none', color: 'var(--muted-foreground)', padding: 0, cursor: novaDiariaBolsistas.length === 1 ? 'not-allowed' : 'pointer' }}>
+                        <X size={14} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="md:col-span-2">
+                <label style={labelSt}>Motivo</label>
+                <textarea value={novaDiariaMotivo} onChange={(event) => setNovaDiariaMotivo(event.target.value)} rows={3} placeholder="Descreva a atividade vinculada à viagem" style={{ ...inputSt(false), resize: 'vertical' }} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-5 p-4" style={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
+              {[
+                { label: 'Diárias', value: quantidadeNovaDiaria.toLocaleString('pt-BR') },
+                { label: 'Beneficiários', value: String(novaDiariaBolsistas.length) },
+                { label: 'Valor por bolsista', value: formatarMoeda(valorBeneficiarioNovaDiaria) },
+                { label: 'Valor total', value: formatarMoeda(valorTotalNovaDiaria) },
+              ].map((item) => (
+                <div key={item.label}>
+                  <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)' }}>{item.label}</span>
+                  <strong className="block mt-1" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>{item.value}</strong>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col sm:flex-row justify-end gap-3">
+              <button type="button" onClick={() => setIsCriarDiariaModalOpen(false)} className="px-4 py-2" style={{ backgroundColor: 'transparent', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)', cursor: 'pointer' }}>
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={criarDiariaPrestacao}
+                className="px-4 py-2 flex items-center justify-center gap-2"
+                disabled={novaDiariaBolsistas.length === 0 || !novaDiariaDestino.trim() || !novaDiariaMotivo.trim() || quantidadeNovaDiaria <= 0}
+                style={{
+                  backgroundColor: (novaDiariaBolsistas.length === 0 || !novaDiariaDestino.trim() || !novaDiariaMotivo.trim() || quantidadeNovaDiaria <= 0) ? 'var(--muted)' : 'var(--primary)',
+                  color: (novaDiariaBolsistas.length === 0 || !novaDiariaDestino.trim() || !novaDiariaMotivo.trim() || quantidadeNovaDiaria <= 0) ? 'var(--muted-foreground)' : 'var(--primary-foreground)',
+                  border: 'none',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontFamily: 'var(--font-family)',
+                  cursor: (novaDiariaBolsistas.length === 0 || !novaDiariaDestino.trim() || !novaDiariaMotivo.trim() || quantidadeNovaDiaria <= 0) ? 'not-allowed' : 'pointer',
+                }}
+              >
+                <Save size={16} />
+                Solicitar e selecionar diária
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Botões Salvar Rascunho e Enviar */}
       {showStep3 && !isReadOnly && (

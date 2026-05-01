@@ -1,4 +1,4 @@
-import { FolderKanban, ChevronDown, Tag, ListChecks, Target, Zap, Clock, Send, FileText, UserCheck, FileEdit, CheckCircle, PlayCircle, Award, Wallet, GraduationCap, Package, Box, Plane, Hotel, Building2, PiggyBank, Receipt, Info, DollarSign } from 'lucide-react';
+import { FolderKanban, ChevronDown, Tag, ListChecks, Target, Zap, Clock, Send, FileText, UserCheck, FileEdit, CheckCircle, PlayCircle, Award, Wallet, GraduationCap, Package, Box, Plane, Hotel, Building2, PiggyBank, Receipt, Info, DollarSign, PauseCircle, XCircle, CalendarDays } from 'lucide-react';
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -13,16 +13,19 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
   const { t } = useLanguage();
   const [isWorkPlanExpanded, setIsWorkPlanExpanded] = useState(false);
   const [isDoaciTooltipVisible, setIsDoaciTooltipVisible] = useState(false);
+  const [activeTermTab, setActiveTermTab] = useState<'resumo' | 'aditivos'>('resumo');
 
   const projectStages = [
-    { id: 1, label: 'Submissão', date: '15/01/2024', icon: Send, status: 'completed' },
-    { id: 2, label: 'Avaliação de Documentos', date: '20/01/2024', icon: FileText, status: 'completed' },
-    { id: 3, label: 'Avaliação Ad Hoc', date: '05/02/2024', icon: UserCheck, status: 'completed' },
-    { id: 4, label: 'Em Contratação', date: '20/02/2024', icon: FileEdit, status: 'completed' },
-    { id: 5, label: 'Contratado', date: '01/03/2024', icon: CheckCircle, status: 'completed' },
-    { id: 6, label: 'Em Execução', date: '16/03/2024', icon: PlayCircle, status: 'current' },
-    { id: 7, label: 'Em Aprovação de Contas', date: '', icon: DollarSign, status: 'pending' },
-    { id: 8, label: 'Concluído', date: '', icon: Award, status: 'pending' },
+    { id: 1, label: 'Submissão', phase: 'Pre-award', source: 'M011', date: '15/01/2024', icon: Send, status: 'completed' },
+    { id: 2, label: 'Avaliação de Documentos', phase: 'Pre-award', source: 'M011', date: '20/01/2024', icon: FileText, status: 'completed' },
+    { id: 3, label: 'Avaliação Ad Hoc', phase: 'Pre-award', source: 'M011', date: '05/02/2024', icon: UserCheck, status: 'completed' },
+    { id: 4, label: 'Em Contratação', phase: 'Award', source: 'M022', date: '20/02/2024', icon: FileEdit, status: 'completed' },
+    { id: 5, label: 'Contratado', phase: 'Award', source: 'M003', date: '01/03/2024', icon: CheckCircle, status: 'completed' },
+    { id: 6, label: 'Em Execução', phase: 'Post-award', source: 'M003', date: '16/03/2024', icon: PlayCircle, status: 'current' },
+    { id: 7, label: 'Suspensa', phase: 'Post-award', source: 'M015', date: '', icon: PauseCircle, status: 'pending' },
+    { id: 8, label: 'Em Aprovação de Contas', phase: 'Post-award', source: 'M014', date: '', icon: DollarSign, status: 'pending' },
+    { id: 9, label: 'Concluído', phase: 'Post-award', source: 'M015', date: '', icon: Award, status: 'pending' },
+    { id: 10, label: 'Cancelada', phase: 'Post-award', source: 'M015', date: '', icon: XCircle, status: 'pending' },
   ];
 
   const projectData = [
@@ -30,6 +33,75 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
     { label: 'Valor', value: 'R$ 700,00' },
     { label: 'Período de Vigência', value: '01/06/2025 - 01/06/2026' },
     { label: 'Status da Bolsa', value: 'Ativa', badge: true },
+  ];
+
+  const projectTermData = {
+    dataAprovacaoOriginal: '20/02/2024',
+    orcamentoOriginal: 'R$ 1.250.000,00',
+    dataInicio: '01/03/2024',
+    dataFimOriginal: '28/02/2026',
+    dataFimVigente: '31/08/2026',
+    possuiAditivoTempo: true,
+    diasAditados: 184,
+    possuiAditivoFinanceiro: true,
+    valorAditivado: 'R$ 250.000,00',
+    documentoReferencia: 'TA-2026-014',
+  };
+
+  const termCards = [
+    {
+      label: 'Data inicial do projeto',
+      value: projectTermData.dataInicio,
+      helper: 'Inicio formal da iniciativa',
+      icon: PlayCircle,
+    },
+    {
+      label: 'Data final vigente',
+      value: projectTermData.dataFimVigente,
+      helper: `Original: ${projectTermData.dataFimOriginal}`,
+      icon: Clock,
+    },
+    {
+      label: 'Aditivo de tempo',
+      value: projectTermData.possuiAditivoTempo ? 'Sim' : 'Não',
+      helper: projectTermData.possuiAditivoTempo
+        ? `Prorrogado em ${projectTermData.diasAditados} dias`
+        : 'Sem prorrogacao de prazo',
+      icon: FileEdit,
+      badge: projectTermData.possuiAditivoTempo,
+    },
+    {
+      label: 'Aditivo financeiro',
+      value: projectTermData.possuiAditivoFinanceiro ? 'Sim' : 'Não',
+      helper: projectTermData.possuiAditivoFinanceiro
+        ? `${projectTermData.valorAditivado} · ${projectTermData.documentoReferencia}`
+        : 'Sem acrescimo financeiro',
+      icon: Wallet,
+      badge: projectTermData.possuiAditivoFinanceiro,
+    },
+  ];
+
+  const aditivos = [
+    {
+      id: 'TA-2026-014',
+      tipo: 'Tempo e financeiro',
+      situacao: 'Aprovado',
+      data: '15/02/2026',
+      prazo: '28/02/2026 -> 31/08/2026',
+      valor: 'R$ 250.000,00',
+      documento: 'Termo Aditivo 014/2026',
+      observacao: 'Prorrogação de vigência e suplementação para continuidade das entregas previstas.',
+    },
+    {
+      id: 'TA-2025-009',
+      tipo: 'Financeiro',
+      situacao: 'Aprovado',
+      data: '10/09/2025',
+      prazo: 'Sem alteração',
+      valor: 'R$ 80.000,00',
+      documento: 'Termo Aditivo 009/2025',
+      observacao: 'Acréscimo financeiro para ampliação de rubricas de execução do projeto.',
+    },
   ];
 
   const activities = [
@@ -110,6 +182,261 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
         </>
       )}
 
+      <section className="mb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <div
+            className="p-2 transition-colors"
+            style={{
+              color: 'var(--primary)',
+              borderRadius: 'var(--radius)',
+              backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
+            }}
+          >
+            <Clock size={20} />
+          </div>
+          <div>
+            <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', margin: 0 }}>
+              Vigência e aditivos
+            </h2>
+            <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', margin: '0.25rem 0 0' }}>
+              Datas formais do projeto e alterações aprovadas de prazo ou recurso.
+            </p>
+          </div>
+        </div>
+
+        <div
+          className="flex gap-6 mb-4"
+          style={{ borderBottom: '1px solid var(--border)' }}
+        >
+          {[
+            { key: 'resumo', label: 'Resumo' },
+            { key: 'aditivos', label: 'Dados dos aditivos' },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveTermTab(tab.key as 'resumo' | 'aditivos')}
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: '0.75rem 0',
+                color: activeTermTab === tab.key ? 'var(--primary)' : 'var(--muted-foreground)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+                position: 'relative',
+                fontFamily: 'var(--font-family)',
+              }}
+            >
+              {tab.label}
+              {activeTermTab === tab.key && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    bottom: '-1px',
+                    height: '2px',
+                    backgroundColor: 'var(--primary)',
+                  }}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+
+        {activeTermTab === 'resumo' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            {termCards.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <div
+                  key={item.label}
+                  className="p-4"
+                  style={{
+                    backgroundColor: 'color-mix(in srgb, var(--primary) 3%, transparent)',
+                    border: '1px solid color-mix(in srgb, var(--primary) 12%, transparent)',
+                    borderRadius: 'var(--radius)',
+                  }}
+                >
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>{item.label}</span>
+                    <Icon size={18} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+                  </div>
+                  {item.badge ? (
+                    <span
+                      className="inline-flex items-center px-2.5 py-1 mb-2"
+                      style={{
+                        backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
+                        color: 'var(--primary)',
+                        border: '1px solid color-mix(in srgb, var(--primary) 24%, transparent)',
+                        borderRadius: '9999px',
+                        fontSize: 'var(--text-xs)',
+                        fontWeight: 'var(--font-weight-medium)',
+                      }}
+                    >
+                      {item.value}
+                    </span>
+                  ) : (
+                    <strong style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-lg)', marginBottom: '0.5rem' }}>
+                      {item.value}
+                    </strong>
+                  )}
+                  <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', lineHeight: '1.5', margin: 0 }}>
+                    {item.helper}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {activeTermTab === 'aditivos' && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div
+                className="p-4"
+                style={{
+                  backgroundColor: 'color-mix(in srgb, var(--primary) 3%, transparent)',
+                  border: '1px solid color-mix(in srgb, var(--primary) 12%, transparent)',
+                  borderRadius: 'var(--radius)',
+                }}
+              >
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>Data de aprovação original</span>
+                  <CalendarDays size={18} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+                </div>
+                <strong style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-lg)', marginBottom: '0.5rem' }}>
+                  {projectTermData.dataAprovacaoOriginal}
+                </strong>
+                <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', lineHeight: '1.5', margin: 0 }}>
+                  Aprovação inicial do projeto antes de qualquer aditivo
+                </p>
+              </div>
+
+              <div
+                className="p-4"
+                style={{
+                  backgroundColor: 'color-mix(in srgb, var(--primary) 3%, transparent)',
+                  border: '1px solid color-mix(in srgb, var(--primary) 12%, transparent)',
+                  borderRadius: 'var(--radius)',
+                }}
+              >
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>Orçamento original</span>
+                  <Wallet size={18} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+                </div>
+                <strong style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-lg)', marginBottom: '0.5rem' }}>
+                  {projectTermData.orcamentoOriginal}
+                </strong>
+                <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', lineHeight: '1.5', margin: 0 }}>
+                  Valor aprovado na contratação original da iniciativa
+                </p>
+              </div>
+            </div>
+
+            {aditivos.length > 0 ? (
+              aditivos.map((aditivo) => (
+                <div
+                  key={aditivo.id}
+                  className="p-4"
+                  style={{
+                    backgroundColor: 'color-mix(in srgb, var(--primary) 3%, transparent)',
+                    border: '1px solid color-mix(in srgb, var(--primary) 12%, transparent)',
+                    borderRadius: 'var(--radius)',
+                  }}
+                >
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)' }}>
+                          {aditivo.id}
+                        </strong>
+                        <span
+                          className="inline-flex items-center gap-1 px-2.5 py-1"
+                          style={{
+                            color: 'var(--primary)',
+                            backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
+                            border: '1px solid color-mix(in srgb, var(--primary) 24%, transparent)',
+                            borderRadius: '9999px',
+                            fontSize: 'var(--text-xs)',
+                            fontWeight: 'var(--font-weight-medium)',
+                          }}
+                        >
+                          <CheckCircle size={13} />
+                          {aditivo.situacao}
+                        </span>
+                      </div>
+                      <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', lineHeight: '1.6', margin: 0 }}>
+                        {aditivo.observacao}
+                      </p>
+                    </div>
+
+                    <div
+                      className="px-3 py-2"
+                      style={{
+                        color: 'var(--foreground)',
+                        backgroundColor: 'var(--background)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-sm)',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {aditivo.documento}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+                    <div className="flex items-start gap-2">
+                      <FileText size={16} style={{ color: 'var(--primary)', marginTop: 2 }} />
+                      <div>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Tipo</div>
+                        <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>{aditivo.tipo}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CalendarDays size={16} style={{ color: 'var(--primary)', marginTop: 2 }} />
+                      <div>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Formalização</div>
+                        <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>{aditivo.data}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Clock size={16} style={{ color: 'var(--primary)', marginTop: 2 }} />
+                      <div>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Prazo</div>
+                        <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>{aditivo.prazo}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Wallet size={16} style={{ color: 'var(--primary)', marginTop: 2 }} />
+                      <div>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Valor aditivado</div>
+                        <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>{aditivo.valor}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div
+                className="p-6 text-center"
+                style={{
+                  color: 'var(--muted-foreground)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                  backgroundColor: 'var(--card)',
+                }}
+              >
+                Este projeto não possui aditivos registrados.
+              </div>
+            )}
+          </div>
+        )}
+      </section>
+
       {/* Estágio do Projeto - Only for Coordenador */}
       {accessType === 'coordenador' && (
       <div className="mb-12">
@@ -131,7 +458,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
               margin: 0,
             }}
           >
-            Estágio do Projeto
+            Ciclo de Fomento
           </h1>
         </div>
         <p 
@@ -143,7 +470,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
             marginBottom: '1.5rem',
           }}
         >
-          Acompanhe o progresso do projeto
+          Acompanhe a jornada consolidada da iniciativa
         </p>
 
         {/* Card Container - Only Timeline */}
@@ -240,6 +567,18 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                           {stage.date}
                         </p>
                       )}
+                      <p
+                        className="mt-1 text-center"
+                        style={{
+                          color: 'var(--muted-foreground)',
+                          fontSize: 'var(--text-xs)',
+                          fontWeight: 'var(--font-weight-normal)',
+                          maxWidth: '96px',
+                          lineHeight: '1.3',
+                        }}
+                      >
+                        {stage.phase} · {stage.source}
+                      </p>
                     </div>
                   );
                 })}
@@ -322,6 +661,15 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                             {stage.date}
                           </p>
                         )}
+                        <p
+                          style={{
+                            color: 'var(--muted-foreground)',
+                            fontSize: 'var(--text-xs)',
+                            fontWeight: 'var(--font-weight-normal)',
+                          }}
+                        >
+                          {stage.phase} · {stage.source}
+                        </p>
                       </div>
                     </div>
                   );

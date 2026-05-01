@@ -15,7 +15,7 @@ O backend atual esta **parcialmente adequado** ao processo revisado. Ele cobre b
 Estimativa de aderencia:
 
 - **Alta aderencia** para o ciclo base de `Prestacao`, justificativas de NF/diaria/invoice, documentos fiscais, itens de documento fiscal, transacoes financeiras, SERPRO para NF-e, extracao interna de NFS-e e armazenamento em MinIO.
-- **Baixa aderencia** para os fluxos novos ou refinados: produto sem nota fiscal, passagens, PIX em diaria/passagem, solicitacao de diaria, CNAB 240 com EDI Banestes e processamento em fila, e migracao de `ContaContabil` para `RubricaOrcamentaria`.
+- **Baixa aderencia** para os fluxos novos ou refinados: produto sem nota fiscal, passagens, PIX em diaria/passagem, referencia a solicitacao de diaria aprovada do M003, CNAB 240 com EDI Banestes e processamento em fila, e migracao de `ContaContabil` para `RubricaOrcamentaria`.
 
 Como referencia pratica, o backend atual parece cerca de **60% alinhado** ao processo documentado depois das revisoes mais recentes. Ele esta mais proximo do modelo MVP anterior do que do processo completo atual.
 
@@ -122,15 +122,16 @@ Lacunas:
 
 Impacto: o processo separa passagens como fluxo proprio, mas o backend atual nao apresenta esse tipo como conceito explicito.
 
-### Diarias com Solicitacao e PIX
+### Diarias com Solicitacao M003 e PIX
 
-`JustificativaDiaria` possui valor unitario, quantidade e alocacao do bolsista, mas nao possui os campos exigidos pelo processo revisado:
+`JustificativaDiaria` possui valor unitario, quantidade e alocacao do bolsista, mas nao possui os campos exigidos pelo processo revisado de comprovacao:
 
-- solicitacao de diaria
+- referencia a solicitacao de diaria aprovada do M003
+- bloqueio de reutilizacao de solicitacao de diaria ja prestada contas
 - comprovante PIX do pagamento
 - metadados do pagamento
 
-Impacto: a entidade atende ao MVP antigo, mas nao ao fluxo atual de diarias.
+Impacto: a entidade atende ao MVP antigo, mas nao ao fluxo atual de diarias, no qual a solicitacao e aceite pertencem ao M003 e a prestacao de contas apenas comprova o pagamento.
 
 ### Importacao CNAB 240 com EDI, MinIO, Fila e Workers
 
@@ -198,7 +199,7 @@ Impacto: hoje existe base para classificar itens, mas nao foi identificado motor
 | Fluxo 3.3 - NF de servico | Boa para o momento atual | Extracao interna de NFS-e existe. SERPRO para servico fica como evolucao futura. |
 | Fluxo 3.4 - Produto sem nota fiscal | Baixa | Nao ha suporte identificado. |
 | Fluxo 3.5 - Invoice | Parcial | Entidade existe, mas ainda e generica. |
-| Fluxo 3.6 - Diarias | Parcial | Entidade existe, mas faltam solicitacao de diaria e PIX. |
+| Fluxo 3.6 - Diarias | Parcial | Entidade existe, mas faltam referencia a solicitacao de diaria aprovada do M003 e PIX. |
 | Fluxo 3.7 - Passagens | Baixa | Nao ha tipo/fluxo proprio identificado. |
 | Fluxo 4 - Submissao e analise | Boa para MVP | Ciclo de submissao e analise esta implementado. |
 | Fluxo 5 - Revisao | Boa para MVP | Estado `REVISAO` e ressubmissao existem. |
@@ -211,7 +212,7 @@ Implementar:
 
 - `JustificativaProdutoSemNota`
 - tipo especifico para passagens ou decisao documentada de modelar passagens como subtipo existente
-- campos de solicitacao de diaria e PIX em diarias
+- campos de referencia a solicitacao de diaria aprovada do M003 e PIX em diarias
 - campos de PIX e PDF de compra em passagens
 - enum `TipoJustificativa.PRODUTO_SEM_NOTA`
 
@@ -253,7 +254,7 @@ O backend atual e uma boa base para M014 e ja implementa as partes mais importan
 - produto sem nota fiscal
 - passagens
 - PIX em diaria e passagem
-- solicitacao de diaria
+- referencia a solicitacao de diaria aprovada do M003
 - rubricas como linguagem de dominio
 - sugestao automatica de rubricas a partir dos dados fiscais
 

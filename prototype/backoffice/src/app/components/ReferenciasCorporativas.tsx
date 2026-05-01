@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { ArrowLeft, Database, Plus, Save, Search, Trash2 } from 'lucide-react';
 
-type ReferenceTab = 'areas' | 'rubricas' | 'regioes' | 'finalidades';
+type ReferenceTab = 'areas' | 'rubricas' | 'diarias' | 'tiposViagem' | 'regioes' | 'finalidades';
 
 interface AreaConhecimento {
   id: number;
@@ -17,6 +17,25 @@ interface RubricaFinanceira {
   descricao: string;
   categoriaOrcamentaria: string;
   ativa: boolean;
+}
+
+interface ValorDiaria {
+  id: number;
+  codigo: string;
+  tipoViagem: string;
+  valor: string;
+  fracaoCalculo: string;
+  vigenciaInicio: string;
+  situacao: string;
+}
+
+interface TipoViagem {
+  id: number;
+  codigo: string;
+  nome: string;
+  abrangencia: string;
+  descricao: string;
+  situacao: string;
 }
 
 interface RegiaoCidade {
@@ -35,11 +54,11 @@ interface Finalidade {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  backgroundColor: 'rgba(30,41,59,0.5)',
-  border: '1px solid rgba(255,255,255,0.1)',
+  backgroundColor: 'var(--dash-input-bg)',
+  border: '1px solid var(--dash-input-border)',
   borderRadius: '6px',
   padding: '10px 12px',
-  color: '#ffffff',
+  color: 'var(--dash-text-primary)',
   fontFamily: 'var(--font-family)',
   fontSize: 'var(--text-sm)',
   outline: 'none',
@@ -50,15 +69,16 @@ const labelStyle: React.CSSProperties = {
   display: 'block',
   fontFamily: 'var(--font-family)',
   fontSize: 'var(--text-sm)',
-  color: 'rgba(255,255,255,0.7)',
+  color: 'var(--dash-text-secondary)',
   marginBottom: '8px',
 };
 
 const cardStyle = (): React.CSSProperties => ({
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
-  border: '1px solid rgba(255,255,255,0.1)',
+  backgroundColor: 'var(--dash-card-bg)',
+  border: '1px solid var(--dash-card-border)',
   borderRadius: '10px',
   padding: '20px',
+  boxShadow: 'var(--dash-shadow)',
 });
 
 const initialAreas: AreaConhecimento[] = [
@@ -71,6 +91,18 @@ const initialRubricas: RubricaFinanceira[] = [
   { id: 1, codigo: '339018', descricao: 'Auxílio financeiro a estudantes', categoriaOrcamentaria: 'Bolsas', ativa: true },
   { id: 2, codigo: '339030', descricao: 'Material de consumo', categoriaOrcamentaria: 'Capital', ativa: true },
   { id: 3, codigo: '449052', descricao: 'Equipamentos e material permanente', categoriaOrcamentaria: 'Capital', ativa: true },
+];
+
+const initialDiarias: ValorDiaria[] = [
+  { id: 1, codigo: 'DIA-2026-001', tipoViagem: 'Dentro do Estado', valor: 'R$ 260,00', fracaoCalculo: '12h', vigenciaInicio: '05/01/2026', situacao: 'Ativo' },
+  { id: 2, codigo: 'DIA-2026-002', tipoViagem: 'Fora do Estado', valor: 'R$ 320,00', fracaoCalculo: '12h', vigenciaInicio: '05/01/2026', situacao: 'Ativo' },
+  { id: 3, codigo: 'DIA-2026-003', tipoViagem: 'Internacional', valor: 'US$ 210,00', fracaoCalculo: '24h', vigenciaInicio: '05/01/2026', situacao: 'Ativo' },
+];
+
+const initialTiposViagem: TipoViagem[] = [
+  { id: 1, codigo: 'TVI-001', nome: 'Dentro do Estado', abrangencia: 'Nacional', descricao: 'Deslocamento dentro do Espírito Santo.', situacao: 'Ativo' },
+  { id: 2, codigo: 'TVI-002', nome: 'Fora do Estado', abrangencia: 'Nacional', descricao: 'Deslocamento nacional para fora do Espírito Santo.', situacao: 'Ativo' },
+  { id: 3, codigo: 'TVI-003', nome: 'Internacional', abrangencia: 'Internacional', descricao: 'Deslocamento para fora do Brasil.', situacao: 'Ativo' },
 ];
 
 const initialRegioes: RegiaoCidade[] = [
@@ -90,25 +122,33 @@ export const ReferenciasCorporativas: React.FC<{ onBack: () => void }> = ({ onBa
   const [searchTerm, setSearchTerm] = useState('');
   const [areas, setAreas] = useState<AreaConhecimento[]>(initialAreas);
   const [rubricas, setRubricas] = useState<RubricaFinanceira[]>(initialRubricas);
+  const [diarias, setDiarias] = useState<ValorDiaria[]>(initialDiarias);
+  const [tiposViagem, setTiposViagem] = useState<TipoViagem[]>(initialTiposViagem);
   const [regioes, setRegioes] = useState<RegiaoCidade[]>(initialRegioes);
   const [finalidades, setFinalidades] = useState<Finalidade[]>(initialFinalidades);
   const [areaDraft, setAreaDraft] = useState<AreaConhecimento>({ id: 0, codigo: '', nome: '', nivel: 'Grande Área', superior: '' });
   const [rubricaDraft, setRubricaDraft] = useState<RubricaFinanceira>({ id: 0, codigo: '', descricao: '', categoriaOrcamentaria: '', ativa: true });
+  const [diariaDraft, setDiariaDraft] = useState<ValorDiaria>({ id: 0, codigo: '', tipoViagem: 'Dentro do Estado', valor: '', fracaoCalculo: '12h', vigenciaInicio: '', situacao: 'Ativo' });
+  const [tipoViagemDraft, setTipoViagemDraft] = useState<TipoViagem>({ id: 0, codigo: '', nome: '', abrangencia: 'Nacional', descricao: '', situacao: 'Ativo' });
   const [regiaoDraft, setRegiaoDraft] = useState<RegiaoCidade>({ id: 0, regiao: '', descricao: '', cidade: '', codigoIBGE: '' });
   const [finalidadeDraft, setFinalidadeDraft] = useState<Finalidade>({ id: 0, nome: '', descricao: '' });
 
   const filteredAreas = areas.filter(item => matches(searchTerm, [item.codigo, item.nome, item.nivel, item.superior]));
   const filteredRubricas = rubricas.filter(item => matches(searchTerm, [item.codigo, item.descricao, item.categoriaOrcamentaria]));
+  const filteredDiarias = diarias.filter(item => matches(searchTerm, [item.codigo, item.tipoViagem, item.valor, item.fracaoCalculo, item.vigenciaInicio, item.situacao]));
+  const filteredTiposViagem = tiposViagem.filter(item => matches(searchTerm, [item.codigo, item.nome, item.abrangencia, item.descricao, item.situacao]));
   const filteredRegioes = regioes.filter(item => matches(searchTerm, [item.regiao, item.cidade, item.codigoIBGE]));
   const filteredFinalidades = finalidades.filter(item => matches(searchTerm, [item.nome, item.descricao]));
 
   const metrics = useMemo(() => ({
     areas: areas.length,
     rubricas: rubricas.length,
+    diarias: diarias.length,
+    tiposViagem: tiposViagem.length,
     regioes: new Set(regioes.map(item => item.regiao)).size,
     cidades: regioes.length,
     finalidades: finalidades.length,
-  }), [areas, rubricas, regioes, finalidades]);
+  }), [areas, rubricas, diarias, tiposViagem, regioes, finalidades]);
 
   const saveArea = () => {
     const item = { ...areaDraft, id: areaDraft.id || Date.now() };
@@ -120,6 +160,18 @@ export const ReferenciasCorporativas: React.FC<{ onBack: () => void }> = ({ onBa
     const item = { ...rubricaDraft, id: rubricaDraft.id || Date.now() };
     setRubricas(prev => upsert(prev, item));
     setRubricaDraft({ id: 0, codigo: '', descricao: '', categoriaOrcamentaria: '', ativa: true });
+  };
+
+  const saveDiaria = () => {
+    const item = { ...diariaDraft, id: diariaDraft.id || Date.now() };
+    setDiarias(prev => upsert(prev, item));
+    setDiariaDraft({ id: 0, codigo: '', tipoViagem: 'Dentro do Estado', valor: '', fracaoCalculo: '12h', vigenciaInicio: '', situacao: 'Ativo' });
+  };
+
+  const saveTipoViagem = () => {
+    const item = { ...tipoViagemDraft, id: tipoViagemDraft.id || Date.now() };
+    setTiposViagem(prev => upsert(prev, item));
+    setTipoViagemDraft({ id: 0, codigo: '', nome: '', abrangencia: 'Nacional', descricao: '', situacao: 'Ativo' });
   };
 
   const saveRegiao = () => {
@@ -135,26 +187,30 @@ export const ReferenciasCorporativas: React.FC<{ onBack: () => void }> = ({ onBa
   };
 
   return (
-    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: 'var(--dash-page-bg)', minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
-        <PageHeader title="Referências Corporativas" subtitle="Gerencie áreas de conhecimento, rubricas financeiras, cidades/regiões e finalidades." onBack={onBack} />
+        <PageHeader title="Referências Corporativas" subtitle="Gerencie áreas de conhecimento, rubricas financeiras, diárias por tipo de viagem, cidades/regiões e finalidades." onBack={onBack} />
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '14px', marginBottom: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '14px', marginBottom: '24px' }}>
           <Metric label="Áreas" value={String(metrics.areas)} />
           <Metric label="Rubricas" value={String(metrics.rubricas)} />
+          <Metric label="Diárias" value={String(metrics.diarias)} />
+          <Metric label="Tipos de Viagem" value={String(metrics.tiposViagem)} />
           <Metric label="Regiões" value={String(metrics.regioes)} />
           <Metric label="Cidades" value={String(metrics.cidades)} />
           <Metric label="Finalidades" value={String(metrics.finalidades)} />
         </div>
 
-        <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid var(--dash-divider)', marginBottom: '24px' }}>
           {[
             ['areas', 'Áreas de Conhecimento'],
             ['rubricas', 'Rubricas Financeiras'],
+            ['diarias', 'Diárias'],
+            ['tiposViagem', 'Tipos de Viagem'],
             ['regioes', 'Cidades e Regiões'],
             ['finalidades', 'Finalidades'],
           ].map(([id, label]) => (
-            <button key={id} onClick={() => setActiveTab(id as ReferenceTab)} style={{ padding: '12px 20px', background: 'none', border: 'none', borderBottom: activeTab === id ? '2px solid #00c1af' : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: activeTab === id ? '#00c1af' : 'rgba(255,255,255,0.6)', cursor: 'pointer', marginBottom: '-1px' }}>
+            <button key={id} onClick={() => setActiveTab(id as ReferenceTab)} style={{ padding: '12px 20px', background: 'none', border: 'none', borderBottom: activeTab === id ? '2px solid #00c1af' : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: activeTab === id ? '#00c1af' : 'var(--dash-text-secondary)', cursor: 'pointer', marginBottom: '-1px' }}>
               {label}
             </button>
           ))}
@@ -164,7 +220,7 @@ export const ReferenciasCorporativas: React.FC<{ onBack: () => void }> = ({ onBa
           <label style={labelStyle}>Pesquisar</label>
           <div style={{ position: 'relative' }}>
             <input type="text" placeholder="Buscar no cadastro selecionado..." value={searchTerm} onChange={event => setSearchTerm(event.target.value)} style={{ ...inputStyle, paddingLeft: '36px' }} />
-            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
+            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--dash-icon-subdued)' }} />
           </div>
         </div>
 
@@ -191,6 +247,35 @@ export const ReferenciasCorporativas: React.FC<{ onBack: () => void }> = ({ onBa
               <SaveButton onClick={saveRubrica} />
             </div>
             <ReferenceList items={filteredRubricas.map(item => ({ id: item.id, cols: [item.codigo, item.descricao, item.categoriaOrcamentaria, item.ativa ? 'Ativa' : 'Inativa'], onEdit: () => setRubricaDraft(item), onRemove: () => setRubricas(prev => prev.filter(row => row.id !== item.id)) }))} labels={['Código', 'Descrição', 'Categoria', 'Situação']} />
+          </ReferenceSection>
+        )}
+
+        {activeTab === 'diarias' && (
+          <ReferenceSection title="Diárias" subtitle="Cadastre o valor vigente da diária para cada tipo de viagem. O cálculo segue a normativa da FAPES.">
+            <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1fr 0.7fr 0.65fr 0.7fr 0.5fr auto', gap: '12px', alignItems: 'end', marginBottom: '18px' }}>
+              <Field label="Código" value={diariaDraft.codigo} onChange={value => setDiariaDraft(prev => ({ ...prev, codigo: value }))} placeholder="DIA-2026-001" />
+              <Select label="Tipo de viagem" value={diariaDraft.tipoViagem} onChange={value => setDiariaDraft(prev => ({ ...prev, tipoViagem: value }))} options={tiposViagem.map(item => item.nome)} />
+              <Field label="Valor" value={diariaDraft.valor} onChange={value => setDiariaDraft(prev => ({ ...prev, valor: value }))} placeholder="R$ 260,00" />
+              <Select label="Fração cálculo" value={diariaDraft.fracaoCalculo} onChange={value => setDiariaDraft(prev => ({ ...prev, fracaoCalculo: value }))} options={['12h', '24h']} />
+              <Field label="Vigência inicial" value={diariaDraft.vigenciaInicio} onChange={value => setDiariaDraft(prev => ({ ...prev, vigenciaInicio: value }))} placeholder="05/01/2026" />
+              <Select label="Situação" value={diariaDraft.situacao} onChange={value => setDiariaDraft(prev => ({ ...prev, situacao: value }))} options={['Ativo', 'Inativo']} />
+              <SaveButton onClick={saveDiaria} />
+            </div>
+            <ReferenceList items={filteredDiarias.map(item => ({ id: item.id, cols: [item.codigo, item.tipoViagem, item.valor, item.fracaoCalculo, item.vigenciaInicio, item.situacao], onEdit: () => setDiariaDraft(item), onRemove: () => setDiarias(prev => prev.filter(row => row.id !== item.id)) }))} labels={['Código', 'Tipo de viagem', 'Valor', 'Fração cálculo', 'Vigência inicial', 'Situação']} />
+          </ReferenceSection>
+        )}
+
+        {activeTab === 'tiposViagem' && (
+          <ReferenceSection title="Tipos de Viagem" subtitle="Classifique o deslocamento operacional usado para vincular os valores de diária.">
+            <div style={{ display: 'grid', gridTemplateColumns: '0.7fr 0.9fr 0.7fr 1.4fr 0.5fr auto', gap: '12px', alignItems: 'end', marginBottom: '18px' }}>
+              <Field label="Código" value={tipoViagemDraft.codigo} onChange={value => setTipoViagemDraft(prev => ({ ...prev, codigo: value }))} placeholder="TVI-001" />
+              <Field label="Nome" value={tipoViagemDraft.nome} onChange={value => setTipoViagemDraft(prev => ({ ...prev, nome: value }))} placeholder="Dentro do Estado" />
+              <Select label="Abrangência" value={tipoViagemDraft.abrangencia} onChange={value => setTipoViagemDraft(prev => ({ ...prev, abrangencia: value }))} options={['Nacional', 'Internacional']} />
+              <Field label="Descrição" value={tipoViagemDraft.descricao} onChange={value => setTipoViagemDraft(prev => ({ ...prev, descricao: value }))} placeholder="Descrição do tipo de viagem" />
+              <Select label="Situação" value={tipoViagemDraft.situacao} onChange={value => setTipoViagemDraft(prev => ({ ...prev, situacao: value }))} options={['Ativo', 'Inativo']} />
+              <SaveButton onClick={saveTipoViagem} />
+            </div>
+            <ReferenceList items={filteredTiposViagem.map(item => ({ id: item.id, cols: [item.codigo, item.nome, item.abrangencia, item.descricao || '-', item.situacao], onEdit: () => setTipoViagemDraft(item), onRemove: () => setTiposViagem(prev => prev.filter(row => row.id !== item.id)) }))} labels={['Código', 'Nome', 'Abrangência', 'Descrição', 'Situação']} />
           </ReferenceSection>
         )}
 
@@ -236,26 +321,26 @@ const PageHeader: React.FC<{ title: string; subtitle: string; onBack: () => void
   <>
     <div className="mb-6">
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-        <button onClick={onBack} style={{ width: '36px', height: '36px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(30,41,59,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-          <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
+        <button onClick={onBack} style={{ width: '36px', height: '36px', border: '1px solid var(--dash-card-border)', borderRadius: 'var(--radius)', backgroundColor: 'var(--dash-card-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+          <ArrowLeft size={16} style={{ color: 'var(--dash-text-secondary)' }} />
         </button>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', flexShrink: 0, backgroundColor: 'rgba(0,193,175,0.15)', borderRadius: 'var(--radius)' }}>
           <Database size={18} style={{ color: '#00c1af' }} />
         </div>
         <div style={{ flex: 1, marginTop: '6px' }}>
-          <h1 className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: '#ffffff', lineHeight: '1.5' }}>{title}</h1>
-          <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: '1.5' }}>{subtitle}</p>
+          <h1 className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: 'var(--dash-text-primary)', lineHeight: '1.5' }}>{title}</h1>
+          <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', margin: 0, lineHeight: '1.5' }}>{subtitle}</p>
         </div>
       </div>
     </div>
-    <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', margin: '20px 0 28px' }} />
+    <div style={{ width: '100%', height: '1px', backgroundColor: 'var(--dash-divider)', margin: '20px 0 28px' }} />
   </>
 );
 
 const ReferenceSection: React.FC<{ title: string; subtitle: string; children: React.ReactNode }> = ({ title, subtitle, children }) => (
   <div style={cardStyle()}>
-    <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>{title}</h2>
-    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: '0 0 20px' }}>{subtitle}</p>
+    <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>{title}</h2>
+    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', margin: '0 0 20px' }}>{subtitle}</p>
     {children}
   </div>
 );
@@ -270,7 +355,7 @@ const Field: React.FC<{ label: string; value: string; onChange: (value: string) 
 const Select: React.FC<{ label: string; value: string; onChange: (value: string) => void; options: string[] }> = ({ label, value, onChange, options }) => (
   <div>
     <label style={labelStyle}>{label}</label>
-    <select value={value} onChange={event => onChange(event.target.value)} style={{ ...inputStyle, colorScheme: 'dark' }}>
+    <select value={value} onChange={event => onChange(event.target.value)} style={inputStyle}>
       {options.map(option => <option key={option} value={option}>{option}</option>)}
     </select>
   </div>
@@ -285,8 +370,8 @@ const SaveButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
 
 const Metric: React.FC<{ label: string; value: string }> = ({ label, value }) => (
   <div style={cardStyle()}>
-    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.62)', margin: '0 0 12px' }}>{label}</p>
-    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: '#ffffff', margin: 0 }}>{value}</p>
+    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', margin: '0 0 12px' }}>{label}</p>
+    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: 'var(--dash-text-primary)', margin: 0 }}>{value}</p>
   </div>
 );
 
@@ -294,14 +379,14 @@ const ReferenceList: React.FC<{ labels: string[]; items: Array<{ id: number; col
   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
     <div style={{ display: 'grid', gridTemplateColumns: `${labels.map(() => '1fr').join(' ')} 88px`, gap: '12px', padding: '0 12px' }}>
       {labels.map(label => (
-        <div key={label} style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)' }}>{label}</div>
+        <div key={label} style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)' }}>{label}</div>
       ))}
       <div />
     </div>
     {items.map(item => (
-      <div key={item.id} style={{ display: 'grid', gridTemplateColumns: `${item.cols.map(() => '1fr').join(' ')} 88px`, gap: '12px', alignItems: 'center', padding: '14px 12px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+      <div key={item.id} style={{ display: 'grid', gridTemplateColumns: `${item.cols.map(() => '1fr').join(' ')} 88px`, gap: '12px', alignItems: 'center', padding: '14px 12px', border: '1px solid var(--dash-card-border)', borderRadius: '8px', backgroundColor: 'var(--dash-input-bg)' }}>
         {item.cols.map((col, index) => (
-          <div key={`${item.id}-${index}`} style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: index === 0 ? '#ffffff' : 'rgba(255,255,255,0.72)', lineHeight: 1.4 }}>{col}</div>
+          <div key={`${item.id}-${index}`} style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: index === 0 ? 'var(--dash-text-primary)' : 'var(--dash-text-secondary)', lineHeight: 1.4 }}>{col}</div>
         ))}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
           <button type="button" onClick={item.onEdit} style={{ width: '34px', height: '34px', border: '1px solid rgba(0,193,175,0.35)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(0,193,175,0.1)', color: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} aria-label="Editar">

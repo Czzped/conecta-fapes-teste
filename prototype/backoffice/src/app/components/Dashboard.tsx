@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, FileEdit, Settings, Inbox, Landmark, Building2, UserRound } from 'lucide-react';
+import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, FileEdit, Settings, Inbox, Landmark, Building2, UserRound, PlaneTakeoff } from 'lucide-react';
 import { toast } from 'sonner';
 import conectaSymbol from 'figma:asset/db135b6708f6cc7f72f27c6a31dd02aa5500d030.png';
 import fapesLogo from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
@@ -16,7 +16,9 @@ import { DocumentosExigidos } from './DocumentosExigidos';
 import { SurveyFormBuilder } from './SurveyFormBuilder';
 import { CaixaEntrada } from './CaixaEntrada';
 import { AcaoTransversalFinanceiro } from './AcaoTransversalFinanceiro';
+import { SolicitacoesDiarias } from './SolicitacoesDiarias';
 import { RegrasAcaoTransversal } from './RegrasAcaoTransversal';
+import { Iniciativas } from './Iniciativas';
 import { ThemeProvider } from '../theme/ThemeContext';
 
 interface DashboardProps {
@@ -28,7 +30,7 @@ type Contrast = 'normal' | 'high' | 'maximum';
 type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
 type Language = 'pt' | 'en' | 'es';
 type NotificationTab = 'avisos' | 'editais';
-type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal';
+type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'contabilidade-financeiro' | 'solicitacoes-diaria' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
 type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outra Iniciativa Exemplo' | 'Mais uma Iniciativa Exemplo';
@@ -335,6 +337,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               { key: 'parceria' as ActivePage, Icon: Handshake, label: 'Parceria' },
               { key: 'programa' as ActivePage, Icon: FolderOpen, label: 'Programa' },
               { key: 'editais' as ActivePage, Icon: FileText, label: 'Captação' },
+              { key: 'solicitacoes-diaria' as ActivePage, Icon: PlaneTakeoff, label: 'Diárias' },
             ]).map(({ key, Icon, label }, index) => {
               const active = activePage === key;
               return (
@@ -399,6 +402,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
             {/* Itens do menu CADASTROS */}
             {([
+              { key: 'iniciativas' as ActivePage, Icon: FolderOpen, label: 'Iniciativas' },
               { key: 'instituicoes' as ActivePage, Icon: Building2, label: 'Instituições' },
               { key: 'pessoas' as ActivePage, Icon: UserRound, label: 'Pessoas' },
             ]).map(({ key, Icon, label }, index) => {
@@ -1658,6 +1662,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           />
         ) : activePage === 'contabilidade-financeiro' ? (
           <AcaoTransversalFinanceiro onBack={() => setActivePage('home')} />
+        ) : activePage === 'solicitacoes-diaria' ? (
+          <SolicitacoesDiarias />
+        ) : activePage === 'iniciativas' ? (
+          <Iniciativas />
         ) : activePage === 'editais' ? (
           <Editais />
         ) : activePage === 'editais-light' ? (
@@ -1666,8 +1674,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <Configuracoes
             onBack={() => setActivePage('home')}
             onOpenPlanejamento={() => setActivePage('planejamento')}
-            onOpenInstituicoes={() => setActivePage('instituicoes')}
-            onOpenPessoas={() => setActivePage('pessoas')}
             onOpenReferencias={() => setActivePage('referencias')}
             onOpenDocumentos={() => setActivePage('documentos')}
             onOpenFormularios={() => setActivePage('formulario')}

@@ -10,6 +10,9 @@
 | [Contrato API](contrato-api.md) | Especificacao HTTP REST concreta: endpoints, payloads, erros e autorizacao |
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Entidades de iniciativa, plano, resultados, equipe, orcamento e execucao consolidada |
+| [Proposta: Ciclo de Fomento da Iniciativa](specifications/proposta-ciclo-fomento-iniciativa.md) | Proposta de timeline pre-award, award e post-award como read model transversal |
+| [Diarias da Iniciativa](diarias/README.md) | Subfluxo dedicado para tipo de diaria, solicitacao, aceite, aprovacao, debito e cancelamento de diarias |
+| [Aditivos da Iniciativa](aditivos/README.md) | Subfluxo dedicado para vigencia, orcamento original e dados dos aditivos da iniciativa |
 
 ---
 
@@ -21,9 +24,9 @@ O M003 concentra a gestao pos-contratacao da `Iniciativa`. Ele nao e dono de edi
 
 > **Fronteira com M011:** `Edital`, chamada, inscricao, avaliacao, recurso, resultado e configuracao da captacao sao responsabilidade do M011. O M003 assume a iniciativa depois da contratacao/outorga.
 
-> **Fronteira com M009:** bolsas, bolsistas, indicacoes, implementacoes e alocacoes de bolsa sao responsabilidade do M009. O M003 pode informar o orcamento planejado de bolsas e os papeis previstos da equipe, mas nao executa a gestao de bolsas.
+> **Fronteira com M009:** bolsas, bolsistas, indicacoes, implementacoes e alocacoes de bolsa sao responsabilidade do M009. O M003 pode informar o orcamento planejado de bolsas, os papeis previstos da equipe e solicitar diarias para bolsistas alocados, mas nao executa a gestao de bolsas.
 
-> **Fronteira com M014:** documentos fiscais, extratos bancarios, transacoes, prestacao de contas e execucao financeira detalhada sao responsabilidade do M014. O M003 mantem uma visao consolidada de `OrcamentoExecutado`, alimentada por lancamentos ou integracoes financeiras.
+> **Fronteira com M014:** documentos fiscais, extratos bancarios, transacoes, prestacao de contas e execucao financeira detalhada sao responsabilidade do M014. O M003 mantem uma visao consolidada de `OrcamentoExecutado`, alimentada por lancamentos ou integracoes financeiras. A solicitacao operacional de diaria nasce no M003; a prestacao de contas apenas referencia essa solicitacao para registrar `JustificativaDiaria` e comprovantes de pagamento.
 
 ---
 
@@ -36,6 +39,10 @@ A `Iniciativa` possui um `Ortogado`, que e o papel assumido por uma `PessoaFisic
 Os elementos planejaveis da iniciativa ficam em `VersaoPlanoIniciativa`. Resultados, objetivos, riscos, beneficios, equipe, cronograma e orcamento planejado pertencem a uma versao do plano. Alteracoes relevantes geram nova versao, preservando historico.
 
 O `OrcamentoPlanejado` registra a previsao aprovada de recursos para executar a iniciativa. O `OrcamentoExecutado` e uma visao consolidada e historica da execucao, calculada a partir de `LancamentoExecucao` e integrada aos modulos financeiros quando necessario.
+
+A `SolicitacaoDiaria` registra o pedido operacional de diaria feito pelo ortogado/coordenador para um ou mais bolsistas alocados na iniciativa. A FAPES cadastra o `TipoDiaria` vigente em **Configuracoes > Referencias Corporativas > Diarias**, informando valor, vigencia, fracao de calculo e tipo de viagem. O coordenador informa tipo de viagem, partida, chegada, destino e motivo; o sistema localiza o tipo de diaria vigente, calcula automaticamente a quantidade e o valor da diaria e grava os snapshots de valor e fracao de calculo. Cada bolsista beneficiario deve assinar um `TermoAceiteDiaria`, declarando ciencia da diaria e aceite de recebimento na conta bancaria cadastrada. Apos os aceites, a FAPES analisa a solicitacao. Quando aprovada, a solicitacao gera um debito/comprometimento na rubrica de **Diarias e Passagens** e fica disponivel para pagamento e posterior comprovacao em M014.
+
+A consulta de vigencia e aditivos preserva a data de aprovacao original, a data inicial, a data final original, a data final vigente e o orcamento original da iniciativa. A data final vigente so muda por aditivo de tempo aprovado; o orcamento original permanece historico mesmo quando houver aditivo financeiro. A tela **Meu Projeto** deve exibir o bloco **Vigencia e aditivos** com abas **Resumo** e **Dados dos aditivos**; a area **Projetos** pode expor uma aba **Aditivos** para consulta dos mesmos registros.
 
 ---
 
@@ -58,3 +65,29 @@ O `OrcamentoPlanejado` registra a previsao aprovada de recursos para executar a 
 | RN13 | O M003 nao gerencia `Edital`; o ownership de edital e do M011. | Must |
 | RN14 | O M003 nao gerencia cotas, bolsistas ou alocacoes de bolsa; o ownership desses conceitos e do M009. | Must |
 | RN15 | O M003 nao gerencia documentos fiscais, extratos ou prestacao de contas detalhada; o ownership desses conceitos e do M014. | Must |
+| RN16 | A iniciativa pode possuir uma timeline transversal em `EstagioCicloFomento`, com marcos de pre-award, award e post-award. | Must |
+| RN17 | Cada `EstagioCicloFomento` deve registrar fase, marco, estado, datas previstas/efetivas, modulo de origem e referencia de origem quando disponivel. | Must |
+| RN18 | A timeline deve preservar ownership: M011 para pre-award, M022 para contratacao/outorga, M003 para execucao, M014 para prestacao de contas e M015 para conclusao/finalizacao. | Must |
+| RN19 | Apenas um estagio da timeline pode estar `ATUAL` por iniciativa. | Must |
+| RN20 | `CONCLUIDO` e `CANCELADA` sao marcos terminais alternativos do ciclo; a iniciativa nao pode finalizar simultaneamente nos dois. | Must |
+| RN21 | `SUSPENSA` e um marco intermediario do post-award e deve manter data de inicio/fim da suspensao quando houver reativacao, cancelamento ou finalizacao. | Must |
+| RN22 | O M003 e dono da solicitacao operacional de diaria da iniciativa, incluindo beneficiarios, periodo de deslocamento, calculo automatico e aceite dos bolsistas. | Must |
+| RN23 | A solicitacao de diaria deve estar vinculada a uma iniciativa ativa e a bolsistas/alocacoes validas consultadas em M009. | Must |
+| RN24 | O coordenador informa tipo de viagem, data/hora de partida e chegada; o sistema calcula quantidade de diarias e valor total usando o tipo de diaria vigente no momento da solicitacao. | Must |
+| RN25 | O valor calculado da diaria deve ser persistido na solicitacao para preservar historico mesmo que a tabela de valores seja alterada posteriormente. | Must |
+| RN26 | Cada bolsista beneficiario deve assinar termo de aceite antes da solicitacao seguir para aprovacao da FAPES, declarando ciencia e aceite de recebimento na conta bancaria cadastrada. | Must |
+| RN27 | A prestacao de contas em M014 deve referenciar a solicitacao de diaria do M003 ao registrar `JustificativaDiaria`, evitando comprovacao sem pedido operacional rastreavel. | Should |
+| RN28 | A FAPES deve cadastrar o tipo de diaria com vigencia, valor unitario, fracao de calculo, tipo de viagem e status ativo em **Configuracoes > Referencias Corporativas > Diarias** antes de permitir o calculo de novas solicitacoes. | Must |
+| RN29 | A solicitacao de diaria, apos aceite dos bolsistas, deve ser analisada pela FAPES antes de ser aprovada ou rejeitada; a rejeicao exige justificativa obrigatoria. | Must |
+| RN30 | Quando a solicitacao de diaria for aprovada, o M003 deve gerar debito/comprometimento na rubrica de Diarias e Passagens pelo valor total aprovado. | Must |
+| RN31 | O debito gerado pela aprovacao da diaria deve ser rastreavel ate a `SolicitacaoDiaria` e compor a execucao consolidada da iniciativa. | Must |
+| RN32 | O coordenador pode cancelar uma solicitacao de diaria ja aprovada desde que informe justificativa e ela ainda nao esteja vinculada a prestacao de contas finalizada. | Must |
+| RN33 | O cancelamento de solicitacao de diaria aprovada deve gerar credito de reversao na rubrica de Diarias e Passagens, rastreavel ate a `SolicitacaoDiaria`. | Must |
+| RN34 | Toda iniciativa deve preservar data de aprovacao original, data inicial, data final original, data final vigente e orcamento original para consulta historica. | Must |
+| RN35 | A data final vigente deve ser igual a data final original quando nao houver aditivo de tempo aprovado. | Must |
+| RN36 | Quando houver aditivo de tempo aprovado, a data final vigente deve refletir a ultima data final aprovada. | Must |
+| RN37 | A existencia de aditivo financeiro nao altera por si so a data final vigente. | Must |
+| RN38 | A existencia de aditivo de tempo nao altera por si so o orcamento original da iniciativa. | Must |
+| RN39 | O bloco **Vigencia e aditivos** em **Meu Projeto** deve possuir abas **Resumo** e **Dados dos aditivos**. | Must |
+| RN40 | A aba **Dados dos aditivos** deve exibir data de aprovacao original, orcamento original e lista de aditivos vinculados ao projeto, quando existirem. | Must |
+| RN41 | Quando nao houver aditivos, a aba **Dados dos aditivos** deve exibir estado vazio objetivo. | Must |

@@ -1,6 +1,6 @@
 # Domain 03 — Fomento Pre-Award (Captacao e Selecao)
 
-Fluxo desde a publicacao do edital ate a contratacao da iniciativa. Glossario dos conceitos centrais em [../glossario.md](../glossario.md).
+Fluxo desde a publicacao do edital ate a homologacao do resultado da iniciativa. Glossario dos conceitos centrais em [../glossario.md](../glossario.md).
 
 **Modulos que implementam este domain:** M011, M002
 
@@ -12,7 +12,7 @@ Preparacao e configuracao dos instrumentos necessarios para a captacao de inicia
 
 **Ciclo de vida da Captacao:**
 
-A captacao percorre os seguintes estados em sequencia: **(1) Em Elaboracao** — captacao criada e sendo configurada internamente; **(2) Aberta** — edital publicado e periodo de submissao de propostas em andamento; **(3) Em Analise** — submissao encerrada e propostas em avaliacao documental e de merito; **(4) Publicada** — resultado final homologado e divulgado; **(5) Em Execucao** — iniciativas aprovadas contratadas e em andamento; **(6) Fechada** — captacao encerrada apos conclusao de todas as iniciativas.
+A captacao percorre os seguintes estados em sequencia: **(1) Em Elaboracao** — captacao criada e sendo configurada internamente; **(2) Aberta** — edital publicado e periodo de submissao de propostas em andamento; **(3) Em Analise** — submissao encerrada e propostas em avaliacao documental e de merito; **(4) Publicada** — resultado final homologado e divulgado; **(5) Encaminhada para Contratacao** — propostas aprovadas sao enviadas ao fluxo de outorga; **(6) Fechada** — captacao encerrada para novas decisoes de selecao.
 
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|
@@ -32,7 +32,9 @@ A captacao percorre os seguintes estados em sequencia: **(1) Em Elaboracao** —
 
 ## 3.2 Fases da Captacao de Iniciativas
 
-Uma iniciativa e qualquer proposta de trabalho apoiada pela agencia: projeto de pesquisa, visita tecnica, publicacao de livro, participacao em evento cientifico, organizacao de evento cientifico, entre outros tipos. Uma captacao possui as seguintes fases executadas em sequencia: **Submissao → Analise Documental → Analise de Merito → Contratacao → Deposito do Aporte**. Aplica-se tanto a Chamadas Publicas quanto a Demandas Induzidas.
+Uma iniciativa e qualquer proposta de trabalho apoiada pela agencia: projeto de pesquisa, visita tecnica, publicacao de livro, participacao em evento cientifico, organizacao de evento cientifico, entre outros tipos. Na fase pre-award, a captacao possui as seguintes fases executadas em sequencia: **Submissao → Analise Documental → Analise de Merito → Resultado Homologado**. Apos a homologacao, a proposta aprovada segue para a macrofase **Award**, onde ocorre contratacao/outorga.
+
+Para exibicao ao usuario, esses marcos alimentam a timeline transversal `CicloFomentoIniciativa` consultada pelo M003. O ownership dos marcos pre-award permanece em M011.
 
 ### Fase 1: Periodo de Submissao
 
@@ -72,20 +74,18 @@ Avaliacao tecnico-cientifica das propostas habilitadas por consultores ad hoc e 
 | 3.2.16 | Publicar Resultado Final | Divulgar resultado definitivo homologado da captacao | Analista da Area Tecnica da Agencia | Art. 14, IX; Art. 3, 3 |
 | 3.2.17 | Receber/Responder Recurso do Resultado Final | Processar recursos administrativos interpostos contra o resultado final homologado e publicar a resposta oficial | Analista da Area Tecnica da Agencia | Art. 14, IX; Art. 6, par. unico |
 
-### Fase 4: Contratacao
+### Macrofase seguinte: Award
 
-Formalizacao das iniciativas aprovadas: emissao e assinatura do termo de outorga e abertura de conta bancaria.
+Formalizacao das iniciativas aprovadas: emissao e assinatura do termo de outorga e abertura de conta bancaria. Esta macrofase e separada do pre-award e deve ser tratada pelo modulo de contratacao/outorga (M022, quando formalizado), com criacao operacional da iniciativa no M003 apos a outorga.
 
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|
-| 3.2.18 | Gerar Termo de Outorga | Emitir o instrumento formal de fomento para a iniciativa aprovada | Analista da Area Tecnica da Agencia | Art. 28, I |
-| 3.2.19 | Assinar Termo de Outorga | Coordenador assina o termo formalizando o compromisso | Coordenador | Art. 28, I; Art. 3, X |
-| 3.2.20 | Mudar Status para Contratada | Alterar o status da iniciativa para contratada apos assinatura | Analista da Area Tecnica da Agencia | — |
-| 3.2.21 | Abrir Conta da Iniciativa no Banco | Coordenador providencia a abertura de conta bancaria da iniciativa contratada | Coordenador | — |
+| 3.2.18 | Encaminhar Proposta para Outorga | Enviar proposta aprovada e homologada para formalizacao do termo de outorga | Analista da Area Tecnica da Agencia | Art. 28, I |
+| 3.2.19 | Projetar Marco Em Contratacao | Publicar evento para timeline transversal indicando que a proposta entrou em contratacao | Analista da Area Tecnica da Agencia | Art. 28, I; Art. 3, X |
 
-### Fase 5: Deposito do Aporte Financeiro
+### Macrofase seguinte: Aporte e Execucao
 
-Transferencia dos recursos financeiros para a conta da iniciativa, quando aplicavel. Esta fase so ocorre se a captacao possuir aporte financeiro definido.
+Transferencia dos recursos financeiros para a conta da iniciativa e execucao operacional ocorrem apos a contratacao. A visao consolidada desses marcos aparece na timeline do ciclo, mas nao altera o ownership do M011 sobre captacao e selecao.
 
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|

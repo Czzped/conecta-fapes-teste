@@ -19,8 +19,11 @@ Especificacao de referencia: [README.md](README.md)
 | EPIC-M003-003 | Gerir Orcamento Planejado e Rubricas | RN08, RN09, RN11, RN12 | Must | To Do | [EPIC-M003-003](epics/EPIC-M003-003.md) |
 | EPIC-M003-004 | Consolidar Execucao Financeira da Iniciativa | RN09, RN10, RN15 | Must | To Do | [EPIC-M003-004](epics/EPIC-M003-004.md) |
 | EPIC-M003-005 | Consultar Visao Consolidada da Iniciativa | RN01-RN15 | Must | To Do | [EPIC-M003-005](epics/EPIC-M003-005.md) |
+| EPIC-M003-006 | Solicitar Diarias da Iniciativa | RN22-RN33 | Must | To Do | [EPIC-M003-006](diarias/epics/EPIC-M003-006.md) |
+| EPIC-M003-007 | Consultar Ciclo de Fomento da Iniciativa | RN16-RN21 | Must | To Do | [EPIC-M003-007](epics/EPIC-M003-007.md) |
+| EPIC-M003-008 | Consultar Vigencia e Aditivos da Iniciativa | RN34-RN41 | Must | To Do | [EPIC-M003-008](aditivos/epics/EPIC-M003-008.md) |
 
-> **Nota de fronteira:** Edital pertence ao M011; bolsas, cotas e alocacoes pertencem ao M009; prestacao de contas detalhada pertence ao M014. O M003 referencia esses contextos quando necessario, mas nao e o contexto dono deles.
+> **Nota de fronteira:** Edital pertence ao M011; bolsas, cotas e alocacoes pertencem ao M009; prestacao de contas detalhada pertence ao M014. Solicitacao operacional de diaria pertence ao M003 e e referenciada por M014 na comprovacao.
 
 ---
 
@@ -56,4 +59,31 @@ EPIC-M003-005 (Consultar Visao Consolidada da Iniciativa)
 ├── US-M003-018 Listar iniciativas por programa
 ├── US-M003-019 Listar iniciativas por parceria
 └── US-M003-020 Listar iniciativas por estado
+
+EPIC-M003-006 (Solicitar Diarias da Iniciativa)
+├── US-M003-021 Cadastrar tipo de diaria com valor, vigencia, fracao de calculo e tipo de viagem
+├── US-M003-022 Criar solicitacao de diaria para beneficiarios da iniciativa
+├── US-M003-023 Associar solicitacao ao tipo de diaria vigente
+├── US-M003-024 Calcular quantidade e valor da diaria automaticamente
+├── US-M003-025 Submeter solicitacao para aceite dos bolsistas
+├── US-M003-026 Assinar termo de aceite da diaria
+├── US-M003-027 Aprovar ou rejeitar solicitacao de diaria
+├── US-M003-028 Gerar debito na rubrica de Diarias e Passagens
+├── US-M003-029 Cancelar diaria aprovada e gerar credito
+├── US-M003-030 Consultar solicitacoes de diaria da iniciativa
+├── US-M003-031 Aprovar automaticamente diaria propria do coordenador
+├── US-M003-032 Visualizar, aceitar ou recusar diaria pelo bolsista
+└── US-M003-033 Filtrar e paginar diarias no Backoffice
+
+EPIC-M003-007 (Consultar Ciclo de Fomento da Iniciativa)
+├── US-M003-034 Consultar timeline consolidada da iniciativa
+├── US-M003-035 Identificar origem de cada marco
+├── US-M003-036 Exibir marco atual da iniciativa
+└── US-M003-037 Consultar ciclo por proposta antes da iniciativa operacional
+
+EPIC-M003-008 (Consultar Vigencia e Aditivos da Iniciativa)
+├── US-M003-038 Consultar vigencia da iniciativa
+├── US-M003-039 Identificar aditivo de tempo
+├── US-M003-040 Identificar aditivo financeiro
+└── US-M003-041 Listar dados dos aditivos no bloco Vigencia e aditivos
 ```

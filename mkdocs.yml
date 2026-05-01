@@ -196,6 +196,25 @@ nav:
           - EPIC-003: implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-003.md
           - EPIC-004: implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-004.md
           - EPIC-005: implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-005.md
+          - EPIC-006 Diarias: implementation/modules/M003-gestao-iniciativas-captadas/diarias/epics/EPIC-M003-006.md
+          - EPIC-007 Ciclo de Fomento: implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-007.md
+          - EPIC-008 Vigencia e Aditivos: implementation/modules/M003-gestao-iniciativas-captadas/aditivos/epics/EPIC-M003-008.md
+          - Diarias:
+              - implementation/modules/M003-gestao-iniciativas-captadas/diarias/README.md
+              - Backlog: implementation/modules/M003-gestao-iniciativas-captadas/diarias/backlog.md
+              - Contrato: implementation/modules/M003-gestao-iniciativas-captadas/diarias/contrato.md
+              - Contrato API: implementation/modules/M003-gestao-iniciativas-captadas/diarias/contrato-api.md
+              - Modelo Estrutural: implementation/modules/M003-gestao-iniciativas-captadas/diarias/modelo-estrutural.md
+              - Processo: implementation/modules/M003-gestao-iniciativas-captadas/diarias/processo.md
+          - Aditivos:
+              - implementation/modules/M003-gestao-iniciativas-captadas/aditivos/README.md
+              - Backlog: implementation/modules/M003-gestao-iniciativas-captadas/aditivos/backlog.md
+              - Contrato: implementation/modules/M003-gestao-iniciativas-captadas/aditivos/contrato.md
+              - Contrato API: implementation/modules/M003-gestao-iniciativas-captadas/aditivos/contrato-api.md
+              - Modelo Estrutural: implementation/modules/M003-gestao-iniciativas-captadas/aditivos/modelo-estrutural.md
+              - Processo: implementation/modules/M003-gestao-iniciativas-captadas/aditivos/processo.md
+          - Especificacoes:
+              - Proposta Ciclo de Fomento: implementation/modules/M003-gestao-iniciativas-captadas/specifications/proposta-ciclo-fomento-iniciativa.md
       - M004 Pagamento de Bolsistas:
           - implementation/modules/M004-pagamento-bolsista/README.md
           - Backlog: implementation/modules/M004-pagamento-bolsista/backlog.md

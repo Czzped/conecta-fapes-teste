@@ -4,6 +4,7 @@ Plataforma digital da FAPES para gestao do ciclo completo de fomento a pesquisa,
 
 ## Links Rapidos
 
+- **Site:** [Documentacao MkDocs](https://leds-conectafapes.github.io/conectafapes-project/)
 - **Board do Projeto:** [Conecta Fapes (GitHub Project #43)](https://github.com/orgs/leds-conectafapes/projects/43)
 - **Documentacao:** [docs/README.md](docs/README.md)
 - **Sprint Atual:** [SPRINT-007](docs/management/sprints/SPRINT-007.md)

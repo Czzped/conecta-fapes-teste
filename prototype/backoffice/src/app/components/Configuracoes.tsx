@@ -1,12 +1,10 @@
 import React from 'react';
-import { ArrowLeft, BookOpen, Building2, ChevronRight, ClipboardList, Database, FileCheck2, Settings, Target, UserRound } from 'lucide-react';
+import { ArrowLeft, BookOpen, ChevronRight, ClipboardList, Database, FileCheck2, Settings, Target } from 'lucide-react';
 import { useThemeTokens } from '../theme/ThemeContext';
 
 interface ConfiguracoesProps {
   onBack: () => void;
   onOpenPlanejamento: () => void;
-  onOpenInstituicoes: () => void;
-  onOpenPessoas: () => void;
   onOpenReferencias: () => void;
   onOpenDocumentos: () => void;
   onOpenFormularios: () => void;
@@ -22,22 +20,8 @@ const actions = [
     key: 'planejamento',
   },
   {
-    title: 'Instituições',
-    description: 'Cadastro corporativo de instituições, unidades com CNPJ, setores sem CNPJ e dirigentes.',
-    Icon: Building2,
-    color: '#00c1af',
-    key: 'instituicoes',
-  },
-  {
-    title: 'Pessoas Físicas',
-    description: 'Cadastro de pessoas com CPF único, situação cadastral, contato e currículo Lattes.',
-    Icon: UserRound,
-    color: '#a855f7',
-    key: 'pessoas',
-  },
-  {
     title: 'Referências Corporativas',
-    description: 'Áreas de conhecimento, rubricas financeiras, cidades, regiões e finalidades.',
+    description: 'Áreas de conhecimento, rubricas financeiras, diárias, cidades, regiões e finalidades.',
     Icon: Database,
     color: '#f59e0b',
     key: 'referencias',
@@ -65,7 +49,7 @@ const actions = [
   },
 ];
 
-export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlanejamento, onOpenInstituicoes, onOpenPessoas, onOpenReferencias, onOpenDocumentos, onOpenFormularios, onOpenRegrasAcaoTransversal }) => {
+export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlanejamento, onOpenReferencias, onOpenDocumentos, onOpenFormularios, onOpenRegrasAcaoTransversal }) => {
   const { T } = useThemeTokens();
 
   const cardStyle: React.CSSProperties = {
@@ -78,14 +62,6 @@ export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlan
   const handleOpen = (key: string) => {
     if (key === 'planejamento') {
       onOpenPlanejamento();
-      return;
-    }
-    if (key === 'instituicoes') {
-      onOpenInstituicoes();
-      return;
-    }
-    if (key === 'pessoas') {
-      onOpenPessoas();
       return;
     }
     if (key === 'documentos') {
