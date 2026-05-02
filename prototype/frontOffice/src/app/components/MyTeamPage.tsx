@@ -638,7 +638,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               </div>
             </div>
 
-            {/* Planejado */}
+            {/* Alocado */}
             <div
               style={{
                 backgroundColor: 'color-mix(in srgb, var(--primary) 5%, transparent)',
@@ -658,7 +658,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                   marginBottom: '0.5rem',
                 }}
               >
-                Planejadas
+                Alocadas
               </p>
               <div
                 style={{

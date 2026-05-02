@@ -159,6 +159,7 @@ function FilterMultiSelect({ selectedValues, onChange, options, summaryLabel = '
 
 export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
+  const [selectedBeneficiaries, setSelectedBeneficiaries] = useState<string[]>([]);
   const [selectedYears, setSelectedYears] = useState<string[]>([]);
   const [selectedModalities, setSelectedModalities] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
@@ -355,6 +356,24 @@ export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
     ? 'Acompanhe todos os pagamentos do projeto.'
     : 'Acompanhe o histórico dos seus pagamentos de bolsa.';
   const shouldShowBeneficiary = scope === 'project';
+  const shouldShowProjectFilter = scope !== 'project';
+  const bankAccountsByBeneficiary: Record<string, { agency: string; account: string }> = {
+    'Ana Souza': { agency: '0912', account: '12345-6' },
+    'Bruno Lima': { agency: '0874', account: '98765-1' },
+    'Carolina Martins': { agency: '1120', account: '45678-9' },
+    'Diego Almeida': { agency: '0715', account: '74125-0' },
+    'Fernanda Rocha': { agency: '1044', account: '85236-7' },
+    'Gabriel Costa': { agency: '0631', account: '96325-4' },
+    'Helena Dias': { agency: '0988', account: '15973-2' },
+    'Igor Nascimento': { agency: '0750', account: '35791-8' },
+    'Juliana Freitas': { agency: '0816', account: '24680-3' },
+    'Paulo Sérgio Junior': { agency: '0921', account: '123456-7' },
+  };
+
+  const getBankAccount = (beneficiary: string) => bankAccountsByBeneficiary[beneficiary] ?? {
+    agency: 'Não informada',
+    account: 'Não informada',
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -375,6 +394,10 @@ export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
     .sort((a, b) => a.localeCompare(b, 'pt-BR'))
     .map((project) => ({ value: project, label: project }));
 
+  const beneficiaryOptions = Array.from(new Set(payments.map((payment) => payment.beneficiary)))
+    .sort((a, b) => a.localeCompare(b, 'pt-BR'))
+    .map((beneficiary) => ({ value: beneficiary, label: beneficiary }));
+
   const yearOptions = Array.from(new Set(payments.map((payment) => getPaymentYear(payment.paymentDate))))
     .sort((a, b) => Number(b) - Number(a))
     .map((year) => ({ value: year, label: year }));
@@ -389,11 +412,12 @@ export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
 
   const filteredPayments = payments.filter((payment) => {
     const projectMatches = selectedProjects.length === 0 || selectedProjects.includes(payment.project);
+    const beneficiaryMatches = selectedBeneficiaries.length === 0 || selectedBeneficiaries.includes(payment.beneficiary);
     const yearMatches = selectedYears.length === 0 || selectedYears.includes(getPaymentYear(payment.paymentDate));
     const modalityMatches = selectedModalities.length === 0 || selectedModalities.includes(payment.scholarship);
     const statusMatches = selectedStatuses.length === 0 || selectedStatuses.includes(payment.status);
 
-    return projectMatches && yearMatches && modalityMatches && statusMatches;
+    return projectMatches && beneficiaryMatches && yearMatches && modalityMatches && statusMatches;
   });
 
   return (
@@ -439,27 +463,50 @@ export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
       <section className="mb-8 mt-6">
         {/* Filters Section */}
         <div className="mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Filter by Project */}
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  color: 'var(--foreground)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  marginBottom: '0.5rem',
-                }}
-              >
-                Projeto
-              </label>
-              <FilterMultiSelect
-                selectedValues={selectedProjects}
-                onChange={setSelectedProjects}
-                options={projectOptions}
-                summaryLabel="projetos"
-              />
-            </div>
+          <div className={`grid grid-cols-1 ${shouldShowProjectFilter ? 'md:grid-cols-4' : 'md:grid-cols-4'} gap-4`}>
+            {shouldShowProjectFilter && (
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    color: 'var(--foreground)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    marginBottom: '0.5rem',
+                  }}
+                >
+                  Projeto
+                </label>
+                <FilterMultiSelect
+                  selectedValues={selectedProjects}
+                  onChange={setSelectedProjects}
+                  options={projectOptions}
+                  summaryLabel="projetos"
+                />
+              </div>
+            )}
+
+            {shouldShowBeneficiary && (
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    color: 'var(--foreground)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    marginBottom: '0.5rem',
+                  }}
+                >
+                  Bolsista
+                </label>
+                <FilterMultiSelect
+                  selectedValues={selectedBeneficiaries}
+                  onChange={setSelectedBeneficiaries}
+                  options={beneficiaryOptions}
+                  summaryLabel="bolsistas"
+                />
+              </div>
+            )}
 
             {/* Filter by Year */}
             <div>
@@ -532,6 +579,7 @@ export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
           <div className="hidden md:grid md:grid-cols-1 gap-4">
             {filteredPayments.map((payment, index) => {
               const statusColors = getStatusColor(payment.status);
+              const bankAccount = getBankAccount(payment.beneficiary);
               
               return (
                 <div 
@@ -547,21 +595,11 @@ export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
                     className="grid gap-4"
                     style={{
                       gridTemplateColumns: shouldShowBeneficiary
-                        ? '1fr 1.3fr 1.35fr 1.05fr 1.45fr 0.8fr 0.9fr'
-                        : '1fr 1.4fr 1.15fr 1.8fr 0.85fr 0.9fr',
+                        ? '1.15fr 1.2fr 1fr 1.15fr 1.35fr 0.8fr 0.8fr'
+                        : '1.25fr 1fr 1.15fr 1.65fr 0.8fr 0.8fr',
                       alignItems: 'start',
                     }}
                   >
-                    {/* Referência */}
-                    <div>
-                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
-                        Referência
-                      </div>
-                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', wordBreak: 'break-word' }}>
-                        {payment.reference}
-                      </div>
-                    </div>
-
                     {/* Projeto */}
                     <div>
                       <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
@@ -600,6 +638,19 @@ export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
                       </div>
                       <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', wordBreak: 'break-word' }}>
                         {payment.scholarship}
+                      </div>
+                    </div>
+
+                    {/* Dados bancários */}
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                        Dados bancários
+                      </div>
+                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', wordBreak: 'break-word' }}>
+                        Agência {bankAccount.agency}
+                      </div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.25rem', wordBreak: 'break-word' }}>
+                        Conta {bankAccount.account}
                       </div>
                     </div>
 
@@ -642,6 +693,7 @@ export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
           <div className="md:hidden space-y-4">
             {filteredPayments.map((payment, index) => {
               const statusColors = getStatusColor(payment.status);
+              const bankAccount = getBankAccount(payment.beneficiary);
               
               return (
                 <div 
@@ -657,16 +709,6 @@ export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
                   <div className="grid grid-cols-2 gap-4">
                     {/* Left Column */}
                     <div className="space-y-3">
-                      {/* Referência */}
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
-                          Referência
-                        </div>
-                        <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
-                          {payment.reference}
-                        </div>
-                      </div>
-
                       {/* Projeto */}
                       <div>
                         <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
@@ -695,6 +737,19 @@ export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
                         </div>
                         <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
                           {payment.paymentDate}
+                        </div>
+                      </div>
+
+                      {/* Dados bancários */}
+                      <div>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
+                          Dados bancários
+                        </div>
+                        <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                          Agência {bankAccount.agency}
+                        </div>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
+                          Conta {bankAccount.account}
                         </div>
                       </div>
                     </div>
