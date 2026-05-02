@@ -62,13 +62,13 @@ EPIC-M003-005 (Consultar Visao Consolidada da Iniciativa)
 
 EPIC-M003-006 (Solicitar Diarias da Iniciativa)
 ├── US-M003-021 Validar referencias externas na criacao da solicitacao de diaria
-├── US-M003-022 Criar solicitacao de diaria para beneficiarios da iniciativa
-├── US-M003-023 Associar solicitacao de diaria ao tipo de diaria vigente do tipo de viagem
+├── US-M003-022 Criar solicitacao de diaria vinculada a AlocacaoBolsista
+├── US-M003-023 Associar solicitacao de diaria ao tipo de diaria e parametros vigentes da abrangencia
 ├── US-M003-024 Calcular quantidade e valor da solicitacao de diaria automaticamente
 ├── US-M003-025 Notificar bolsistas para aceite da diaria solicitada
-├── US-M003-026 Assinar termo de aceite da diaria
+├── US-M003-026 Registrar aceite da diaria na solicitacao
 ├── US-M003-027 Validar saldo e comprometer rubrica ao criar solicitacao de diaria
-├── US-M003-028 Registrar transacao da solicitacao na RubricaProjeto do tipo de viagem
+├── US-M003-028 Registrar transacao da solicitacao na RubricaProjeto da abrangencia
 ├── US-M003-029 Remover solicitacao de diaria alocada/aprovada antes do inicio e gerar reversao
 ├── US-M003-030 Consultar solicitacoes de diaria da iniciativa
 ├── US-M003-031 Concluir solicitacao de diaria automaticamente apos aceite ou quando propria do coordenador

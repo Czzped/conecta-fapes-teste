@@ -18,7 +18,7 @@ Especificacao de referencia: [README.md](README.md)
 | EPIC-M008-002 | Cadastro de Instituicoes | UC02 | Must | In Progress | [Instituicoes](instituicoes/backlog.md) |
 | EPIC-M008-003 | Classificacoes Corporativas | UC03 | Must | In Progress | [Classificacoes](classificacoes/backlog.md) |
 | EPIC-M008-004 | Catalogo de Rubricas | UC04 | Must | To Do | [Rubricas](rubricas/backlog.md) |
-| EPIC-M008-005 | Cadastros Corporativos de Diarias | UC05 | Must | To Do | [Diarias](diarias/backlog.md) |
+| EPIC-M008-005 | Gestao Corporativa de Diarias | UC05 | Must | To Do | [Diarias](diarias/backlog.md) |
 | EPIC-M008-006 | Cadastros Geograficos | UC06 | Should | To Do | [Geografia](geografia/backlog.md) |
 
 ---
@@ -51,8 +51,14 @@ EPIC-M008-004 (Catalogo de Rubricas)
 ├── US-M008-019 Definir Mapeamento Contabil da Rubrica
 └── US-M008-020 Consultar Catalogo de Rubricas
 
-EPIC-M008-005 (Cadastros Corporativos de Diarias)
-└── US-M008-021 Gerenciar cadastro corporativo de diarias
+EPIC-M008-005 (Gestao Corporativa de Diarias)
+├── US-M008-021 Gerenciar valores vigentes de diaria por abrangencia
+├── US-M008-022 Gerenciar abrangencias de diaria
+├── US-M008-023 Bloquear vigencias sobrepostas para a mesma abrangencia
+├── US-M008-024 Consultar diaria vigente para consumo do M003
+├── US-M008-025 Ativar e inativar valores de diaria preservando historico
+├── US-M008-026 Auditar alteracoes dos cadastros de diaria
+└── US-M008-027 Gerenciar parametros normativos de calculo de diaria
 
 EPIC-M008-006 (Cadastros Geograficos)
 └── US-M008-011 Gerenciar Cidades e Regioes

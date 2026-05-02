@@ -29,12 +29,12 @@ O M003 nao publica comandos para criar edital, cota de edital, alocacao de bolsi
 | Dependencia | Tipo | Observacao |
 |-------------|------|------------|
 | M008 | Modulo interno | Fornece `PessoaFisica` para o papel de `Ortogado`, membros da equipe e dados bancarios confirmados no aceite de diaria |
-| M008 | Modulo interno | Dono dos cadastros corporativos `TipoViagem` e `TipoDiaria`, consumidos pelo M003 no calculo de solicitacoes de diaria |
-| M009 | Modulo interno | Fornece e valida alocacoes de bolsistas usadas como beneficiarios de diaria |
+| M008 | Modulo interno | Dono dos cadastros corporativos `Abrangencia`, `TipoDiaria` e `ParametroCalculoDiaria`, consumidos pelo M003 no calculo de solicitacoes de diaria |
+| M009 | Modulo interno | Fornece e valida `AlocacaoBolsista` usada na solicitacao de diaria |
 | M010 | Modulo interno | Fornece referencias de `Programa` e `Parceria` associadas a iniciativa |
 | M011 | Modulo interno | Dono de `Edital`; M003 pode guardar referencia de origem da captacao, mas nao gerencia edital |
 | M014 | Modulo interno | Dono da execucao financeira detalhada e prestacao de contas |
-| M020 | Modulo interno | Envia notificacoes aos bolsistas para assinatura do termo de aceite de diaria |
+| M020 | Modulo interno | Envia notificacoes aos bolsistas para aceite de diaria |
 
 ## Operacoes Publicas
 
@@ -45,9 +45,9 @@ O M003 nao publica comandos para criar edital, cota de edital, alocacao de bolsi
 | AtivarVersaoPlanoIniciativa | Command | Tornar uma versao de plano vigente | iniciativaId, versaoId, dataVigenciaInicio | Versao `VIGENTE` | RN04, RN08 | Versao criada e valida | Mais de uma versao vigente, versao incompleta | Nao | Analista da Agencia |
 | SolicitarAlteracaoRubrica | Command | Registrar solicitacao de inclusao ou retirada de rubrica | iniciativaId, ortogadoId, rubricaId, tipoAlteracao, justificativa | `SolicitacaoAlteracaoRubrica` criada | RN09, RN11, RN12 | Ortogado ativo da iniciativa | Ortogado invalido, rubrica inexistente, retirada impedida | Nao | Ortogado |
 | DecidirSolicitacaoAlteracaoRubrica | Command | Aprovar ou rejeitar solicitacao de rubrica | solicitacaoId, decisao, justificativa, versaoPlanoGeradaId | Solicitacao decidida | RN08, RN11, RN12 | Solicitacao em analise | Solicitacao encerrada, retirada impedida, versao ausente quando obrigatoria | Nao | Analista da Agencia |
-| SolicitarDiaria | Command | Registrar solicitacao operacional de diaria para um ou mais bolsistas da iniciativa, validar saldo, alocar/comprometer valor e notificar beneficiarios quando houver aceite pendente | iniciativaId, ortogadoId, tipoViagemRef, dataHoraPartida, dataHoraChegada, destino, motivo, beneficiarios | `SolicitacaoDiaria` em `ALOCADA` ou `APROVADA` | RN22-RN31 | Iniciativa ativa, ortogado ativo, beneficiarios validos em M009, tipo de diaria vigente no M008, rubrica de diaria com saldo | Periodo invalido, beneficiario invalido, tipo de diaria vigente ausente, rubrica ausente, saldo insuficiente | Nao | Ortogado |
-| AssinarTermoAceiteDiaria | Command | Registrar assinatura do bolsista no termo de aceite da diaria | solicitacaoDiariaId, beneficiarioId, pessoaFisicaId, contaBancariaConfirmada | `TermoAceiteDiaria` assinado; solicitacao `APROVADA` quando todos os aceites forem assinados | RN26, RN29 | Beneficiario pendente e usuario corresponde ao bolsista | Beneficiario invalido, aceite ja registrado, conta bancaria ausente | Nao | Bolsista |
-| RecusarTermoAceiteDiaria | Command | Registrar recusa do bolsista com justificativa obrigatoria e reverter comprometimento quando aplicavel | solicitacaoDiariaId, beneficiarioId, pessoaFisicaId, justificativa | `TermoAceiteDiaria` recusado, solicitacao em `RECUSADA` e credito gerado quando havia debito | RN26, RN29 | Beneficiario pendente e usuario corresponde ao bolsista | Beneficiario invalido, aceite ja registrado, justificativa ausente | Nao | Bolsista |
+| SolicitarDiaria | Command | Registrar solicitacao operacional de diaria para uma alocacao de bolsista da iniciativa, validar saldo, alocar/comprometer valor e notificar quando houver aceite pendente | iniciativaId, ortogadoId, alocacaoBolsistaRef, abrangenciaRef, dataHoraPartida, dataHoraChegada, destino, motivo | `SolicitacaoDiaria` em `ALOCADA` ou `APROVADA` | RN22-RN31 | Iniciativa ativa, ortogado ativo, alocacao valida em M009, abrangencia ativa, tipo de diaria e parametros vigentes no M008, rubrica de diaria com saldo | Periodo invalido, alocacao invalida, tipo de diaria vigente ausente, parametros ausentes, rubrica ausente, saldo insuficiente | Nao | Ortogado |
+| RegistrarAceiteDiaria | Command | Registrar aceite do bolsista na propria solicitacao de diaria | solicitacaoDiariaId, contaBancariaConfirmada | Solicitacao com aceite assinado e estado `APROVADA` | RN26, RN29 | Aceite pendente e usuario corresponde ao bolsista da alocacao | Alocacao invalida, aceite ja registrado, conta bancaria ausente | Nao | Bolsista |
+| RegistrarRecusaDiaria | Command | Registrar recusa do bolsista com justificativa obrigatoria e reverter comprometimento quando aplicavel | solicitacaoDiariaId, justificativa | Solicitacao em `RECUSADA` e credito gerado quando havia debito | RN26, RN29 | Aceite pendente e usuario corresponde ao bolsista da alocacao | Alocacao invalida, aceite ja registrado, justificativa ausente | Nao | Bolsista |
 | RemoverSolicitacaoDiaria | Command | Remover diaria alocada ou aprovada com justificativa antes do inicio da viagem, revertendo o comprometimento quando houver | solicitacaoDiariaId, justificativa | Solicitacao cancelada e credito gerado quando havia debito | RN22-RN33 | Justificativa informada; data/hora atual anterior a partida | Justificativa ausente, viagem ja iniciada, estado invalido | Nao | Ortogado |
 | RegularizarDiariaNaoUtilizada | Command | Regularizar diaria nao utilizada quando a data/hora de partida ja passou, sem apagar a solicitacao | solicitacaoDiariaId, justificativa | Solicitacao regularizada e credito gerado quando cabivel | RN22-RN33 | Justificativa informada; viagem ja iniciada; diaria sem prestacao finalizada | Justificativa ausente, prestacao finalizada, estado invalido | Nao | Ortogado |
 | RegistrarLancamentoExecucao | Command | Registrar lancamento recebido de integracao financeira | iniciativaId, rubricaId, data, valor, tipo, origem | `LancamentoExecucao` criado | RN09, RN10, RN15 | Iniciativa e rubrica existentes | Lancamento duplicado, rubrica invalida, valor invalido | Sim, por chave de origem | Modulo interno autorizado |
@@ -57,7 +57,7 @@ O M003 nao publica comandos para criar edital, cota de edital, alocacao de bolsi
 | ConsultarExecucaoConsolidadaIniciativa | Query | Consultar valores planejados, executados e saldo por rubrica | iniciativaId | Resumo financeiro consolidado | RN09, RN10 | Iniciativa existente | Execucao indisponivel | N/A | Usuario autorizado ou modulo interno |
 | ConsultarCicloFomentoIniciativa | Query | Consultar timeline transversal de pre-award, award e post-award | iniciativaId ou propostaId | Lista ordenada de `EstagioCicloFomento` | RN16-RN19 | Iniciativa ou proposta existente | Ciclo nao encontrado | N/A | Usuario autorizado ou modulo interno |
 | ConsultarSolicitacoesDiaria | Query | Listar solicitacoes de diaria da iniciativa | iniciativaId, busca, estado, periodoPartida, pagina, tamanhoPagina | Lista paginada de `SolicitacaoDiaria` | RN22-RN27 | Iniciativa existente | Iniciativa nao encontrada | N/A | Usuario autorizado ou modulo interno |
-| ConsultarSolicitacaoDiaria | Query | Consultar detalhe da solicitacao de diaria, beneficiarios, calculo e aceites | solicitacaoDiariaId | Detalhe de `SolicitacaoDiaria` | RN22-RN27 | Solicitacao existente | Solicitacao nao encontrada | N/A | Usuario autorizado ou modulo interno |
+| ConsultarSolicitacaoDiaria | Query | Consultar detalhe da solicitacao de diaria, alocacao, calculo e aceite | solicitacaoDiariaId | Detalhe de `SolicitacaoDiaria` | RN22-RN27 | Solicitacao existente | Solicitacao nao encontrada | N/A | Usuario autorizado ou modulo interno |
 
 ## Padrao de Payload e Erro
 
@@ -140,21 +140,12 @@ O M003 nao publica comandos para criar edital, cota de edital, alocacao de bolsi
 {
   "iniciativaId": "INI-2026-014",
   "ortogadoId": "ORT-2026-001",
-  "tipoViagemRef": "TVI-001",
+  "alocacaoBolsistaRef": "ALOC-M009-2026-031",
+  "abrangenciaRef": "ABR-2026-001",
   "dataHoraPartida": "2026-06-10T08:00:00-03:00",
   "dataHoraChegada": "2026-06-12T18:00:00-03:00",
   "destino": "Vitoria/ES - evento de acompanhamento tecnico",
-  "motivo": "Participacao dos bolsistas na apresentacao de resultados parciais da iniciativa.",
-  "beneficiarios": [
-    {
-      "alocacaoBolsistaRef": "ALOC-M009-2026-031",
-      "pessoaFisicaRef": "PF-2026-045"
-    },
-    {
-      "alocacaoBolsistaRef": "ALOC-M009-2026-032",
-      "pessoaFisicaRef": "PF-2026-046"
-    }
-  ]
+  "motivo": "Participacao na apresentacao de resultados parciais da iniciativa."
 }
 ```
 
@@ -166,41 +157,34 @@ Saida esperada:
     "id": "SD-2026-001",
     "codigo": "SD-2026-001",
     "estado": "ALOCADA",
+    "alocacaoBolsistaRef": "ALOC-M009-2026-031",
     "quantidadeDiariasCalculada": 2.5,
-    "tipoViagemRef": "TVI-001",
+    "abrangenciaRef": "ABR-2026-001",
+    "abrangenciaSnapshot": {
+      "codigo": "DENTRO_ESTADO",
+      "nome": "Dentro do Estado"
+    },
     "tipoDiariaRef": "DIA-2026-001",
+    "parametroCalculoDiariaRef": "PCD-2026-001",
     "valorUnitarioDiaria": 260.00,
-    "fracaoCalculoSnapshot": "12H",
-    "valorTotalCalculado": 1300.00,
+    "memoriaCalculoSnapshot": {
+      "normaReferencia": "Decreto ES no 5533-R/2023",
+      "horasMinimasSemPernoite": 6,
+      "percentualDiariaSemPernoite": 0.5
+    },
+    "valorTotalCalculado": 650.00,
     "rubricaDebitoRef": "RUB-DIARIAS-PASSAGENS",
     "lancamentoDebitoRef": "LEX-2026-045",
-    "beneficiarios": [
-      {
-        "beneficiarioId": "BD-2026-001",
-        "pessoaFisicaRef": "PF-2026-045",
-        "quantidadeDiariasCalculada": 2.5,
-        "valorCalculado": 650.00,
-        "aceite": "PENDENTE"
-      },
-      {
-        "beneficiarioId": "BD-2026-002",
-        "pessoaFisicaRef": "PF-2026-046",
-        "quantidadeDiariasCalculada": 2.5,
-        "valorCalculado": 650.00,
-        "aceite": "PENDENTE"
-      }
-    ]
+    "estadoAceite": "PENDENTE"
   }
 }
 ```
 
-### AssinarTermoAceiteDiaria
+### RegistrarAceiteDiaria
 
 ```json
 {
   "solicitacaoDiariaId": "SD-2026-001",
-  "beneficiarioId": "BD-2026-001",
-  "pessoaFisicaId": "PF-2026-045",
   "aceite": true,
   "contaBancariaConfirmada": {
     "banco": "021",

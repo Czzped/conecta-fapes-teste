@@ -10,21 +10,25 @@ import {
 } from 'lucide-react';
 
 type StatusSolicitacaoDiaria = 'ALOCADA' | 'APROVADA' | 'CANCELADA' | 'RECUSADA';
+type EstadoAceiteDiaria = 'PENDENTE' | 'ASSINADO' | 'RECUSADO' | 'CANCELADO';
 
 interface SolicitacaoDiaria {
   id: string;
   iniciativa: string;
   coordenador: string;
-  bolsistas: string[];
+  alocacaoBolsistaRef: string;
+  bolsistaNome: string;
   destino: string;
   partida: string;
   chegada: string;
   motivo: string;
   status: StatusSolicitacaoDiaria;
+  estadoAceite: EstadoAceiteDiaria;
   quantidade: number;
   valorUnitario: number;
   valorTotal: number;
   tipoDiariaRef: string;
+  parametroCalculoDiariaRef: string;
   transacaoComprometimentoRef?: string;
   transacaoReversaoRef?: string;
   justificativaCancelamento?: string;
@@ -53,70 +57,125 @@ const statusOptions: Array<{ value: StatusFilter; label: string }> = [
   { value: 'RECUSADA', label: statusConfig.RECUSADA.label },
 ];
 
-export const SolicitacoesDiarias: React.FC = () => {
+interface SolicitacoesDiariasProps {
+  embedded?: boolean;
+  iniciativaFiltro?: string;
+}
+
+export const SolicitacoesDiarias: React.FC<SolicitacoesDiariasProps> = ({ embedded = false, iniciativaFiltro }) => {
   const [solicitacoes] = useState<SolicitacaoDiaria[]>([
     {
       id: 'SD-2026-002',
       iniciativa: 'Conecta Fapes',
       coordenador: 'Marina Costa',
-      bolsistas: ['Carla Nunes', 'Diego Rocha'],
+      alocacaoBolsistaRef: 'ALO-2026-003',
+      bolsistaNome: 'Carla Nunes',
       destino: 'Linhares/ES',
       partida: '2026-06-18T07:00',
       chegada: '2026-06-19T19:00',
       motivo: 'Coleta de evidências de execução da atividade de campo.',
       status: 'APROVADA',
+      estadoAceite: 'ASSINADO',
       quantidade: 1.5,
       valorUnitario: 260,
-      valorTotal: 780,
+      valorTotal: 390,
       tipoDiariaRef: 'DIA-2026-001',
+      parametroCalculoDiariaRef: 'PCD-2026-001',
       transacaoComprometimentoRef: 'TR-2026-047',
+    },
+    {
+      id: 'SD-2026-005',
+      iniciativa: 'Conecta Fapes',
+      coordenador: 'Marina Costa',
+      alocacaoBolsistaRef: 'ALO-2026-004',
+      bolsistaNome: 'Diego Rocha',
+      destino: 'Linhares/ES',
+      partida: '2026-06-18T07:00',
+      chegada: '2026-06-19T19:00',
+      motivo: 'Coleta de evidências de execução da atividade de campo.',
+      status: 'APROVADA',
+      estadoAceite: 'ASSINADO',
+      quantidade: 1.5,
+      valorUnitario: 260,
+      valorTotal: 390,
+      tipoDiariaRef: 'DIA-2026-001',
+      parametroCalculoDiariaRef: 'PCD-2026-001',
+      transacaoComprometimentoRef: 'TR-2026-052',
     },
     {
       id: 'SD-2026-003',
       iniciativa: 'Bioinsumos para agricultura de precisão',
       coordenador: 'André Carvalho',
-      bolsistas: ['Fernanda Alves'],
+      alocacaoBolsistaRef: 'ALO-2026-005',
+      bolsistaNome: 'Fernanda Alves',
       destino: 'Colatina/ES',
       partida: '2026-06-24T06:30',
       chegada: '2026-06-25T18:30',
       motivo: 'Visita técnica para levantamento de dados junto aos parceiros locais.',
       status: 'ALOCADA',
+      estadoAceite: 'PENDENTE',
       quantidade: 1.5,
       valorUnitario: 260,
       valorTotal: 390,
       tipoDiariaRef: 'DIA-2026-001',
+      parametroCalculoDiariaRef: 'PCD-2026-001',
       transacaoComprometimentoRef: 'TR-2026-048',
     },
     {
       id: 'SD-2026-001',
       iniciativa: 'Conecta Fapes',
       coordenador: 'Marina Costa',
-      bolsistas: ['Ana Souza', 'Bruno Lima'],
+      alocacaoBolsistaRef: 'ALO-2026-001',
+      bolsistaNome: 'Ana Souza',
       destino: 'Vitória/ES',
       partida: '2026-06-10T08:00',
       chegada: '2026-06-12T18:00',
       motivo: 'Participação em reunião técnica do projeto.',
       status: 'APROVADA',
+      estadoAceite: 'ASSINADO',
       quantidade: 2.5,
       valorUnitario: 260,
-      valorTotal: 1300,
+      valorTotal: 650,
       tipoDiariaRef: 'DIA-2026-001',
+      parametroCalculoDiariaRef: 'PCD-2026-001',
       transacaoComprometimentoRef: 'TR-2026-045',
+    },
+    {
+      id: 'SD-2026-006',
+      iniciativa: 'Conecta Fapes',
+      coordenador: 'Marina Costa',
+      alocacaoBolsistaRef: 'ALO-2026-002',
+      bolsistaNome: 'Bruno Lima',
+      destino: 'Vitória/ES',
+      partida: '2026-06-10T08:00',
+      chegada: '2026-06-12T18:00',
+      motivo: 'Participação em reunião técnica do projeto.',
+      status: 'APROVADA',
+      estadoAceite: 'ASSINADO',
+      quantidade: 2.5,
+      valorUnitario: 260,
+      valorTotal: 650,
+      tipoDiariaRef: 'DIA-2026-001',
+      parametroCalculoDiariaRef: 'PCD-2026-001',
+      transacaoComprometimentoRef: 'TR-2026-053',
     },
     {
       id: 'SD-2026-000',
       iniciativa: 'Conecta Fapes',
       coordenador: 'Marina Costa',
-      bolsistas: ['Ana Souza'],
+      alocacaoBolsistaRef: 'ALO-2026-001',
+      bolsistaNome: 'Ana Souza',
       destino: 'Serra/ES',
       partida: '2026-05-20T09:00',
       chegada: '2026-05-20T18:00',
       motivo: 'Agenda técnica cancelada pelo parceiro.',
       status: 'CANCELADA',
+      estadoAceite: 'CANCELADO',
       quantidade: 0.5,
       valorUnitario: 260,
       valorTotal: 130,
       tipoDiariaRef: 'DIA-2026-001',
+      parametroCalculoDiariaRef: 'PCD-2026-001',
       transacaoComprometimentoRef: 'TR-2026-031',
       transacaoReversaoRef: 'TR-2026-036',
       justificativaCancelamento: 'Agenda cancelada antes do início da viagem.',
@@ -125,16 +184,19 @@ export const SolicitacoesDiarias: React.FC = () => {
       id: 'SD-2026-004',
       iniciativa: 'Rede de sensores para cidades resilientes',
       coordenador: 'Ricardo Torres',
-      bolsistas: ['Juliana Martins'],
+      alocacaoBolsistaRef: 'ALO-2026-009',
+      bolsistaNome: 'Juliana Martins',
       destino: 'Cachoeiro de Itapemirim/ES',
       partida: '2026-05-28T08:00',
       chegada: '2026-05-29T17:00',
       motivo: 'Oficina presencial de validação com equipe municipal.',
       status: 'RECUSADA',
+      estadoAceite: 'RECUSADO',
       quantidade: 1.5,
       valorUnitario: 260,
       valorTotal: 390,
       tipoDiariaRef: 'DIA-2026-001',
+      parametroCalculoDiariaRef: 'PCD-2026-001',
       transacaoComprometimentoRef: 'TR-2026-049',
       transacaoReversaoRef: 'TR-2026-050',
       justificativaRecusa: 'Beneficiária recusou a viagem por conflito de agenda acadêmica.',
@@ -146,9 +208,13 @@ export const SolicitacoesDiarias: React.FC = () => {
   const [dataFim, setDataFim] = useState('');
   const [pageSize, setPageSize] = useState(2);
   const [currentPage, setCurrentPage] = useState(1);
+  const solicitacoesEscopo = useMemo(
+    () => iniciativaFiltro ? solicitacoes.filter((solicitacao) => solicitacao.iniciativa === iniciativaFiltro) : solicitacoes,
+    [iniciativaFiltro, solicitacoes],
+  );
   const pendentes = useMemo(
-    () => solicitacoes.filter((solicitacao) => solicitacao.status === 'ALOCADA').length,
-    [solicitacoes],
+    () => solicitacoesEscopo.filter((solicitacao) => solicitacao.status === 'ALOCADA').length,
+    [solicitacoesEscopo],
   );
 
   const filteredSolicitacoes = useMemo(() => {
@@ -156,7 +222,7 @@ export const SolicitacoesDiarias: React.FC = () => {
     const startDate = dataInicio ? new Date(`${dataInicio}T00:00:00`) : null;
     const endDate = dataFim ? new Date(`${dataFim}T23:59:59`) : null;
 
-    return solicitacoes.filter((solicitacao) => {
+    return solicitacoesEscopo.filter((solicitacao) => {
       const searchable = [
         solicitacao.id,
         solicitacao.iniciativa,
@@ -164,7 +230,9 @@ export const SolicitacoesDiarias: React.FC = () => {
         solicitacao.destino,
         solicitacao.motivo,
         solicitacao.tipoDiariaRef,
-        ...solicitacao.bolsistas,
+        solicitacao.parametroCalculoDiariaRef,
+        solicitacao.alocacaoBolsistaRef,
+        solicitacao.bolsistaNome,
       ].join(' ').toLowerCase();
       const departureDate = new Date(solicitacao.partida);
 
@@ -175,7 +243,7 @@ export const SolicitacoesDiarias: React.FC = () => {
 
       return matchesSearch && matchesStatus && matchesStart && matchesEnd;
     });
-  }, [dataFim, dataInicio, searchTerm, solicitacoes, statusFilter]);
+  }, [dataFim, dataInicio, searchTerm, solicitacoesEscopo, statusFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filteredSolicitacoes.length / pageSize));
   const startIndex = (currentPage - 1) * pageSize;
@@ -210,7 +278,8 @@ export const SolicitacoesDiarias: React.FC = () => {
   };
 
   return (
-    <div className="pt-8 px-8 pb-10">
+    <div className={embedded ? '' : 'pt-8 px-8 pb-10'}>
+      {!embedded && (
       <div className="mb-6">
         <div className="flex items-start gap-3">
           <div
@@ -244,6 +313,7 @@ export const SolicitacoesDiarias: React.FC = () => {
         </div>
         <div className="mt-6" style={{ width: '100%', height: '1px', backgroundColor: 'var(--dash-divider)' }} />
       </div>
+      )}
 
       <section className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -289,7 +359,7 @@ export const SolicitacoesDiarias: React.FC = () => {
                 Filtros
               </h2>
               <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', margin: 0 }}>
-                Refine por solicitação, projeto, beneficiário, status ou período de partida.
+                Refine por solicitação, projeto, bolsista, status ou período de partida.
               </p>
             </div>
           </div>
@@ -395,7 +465,7 @@ export const SolicitacoesDiarias: React.FC = () => {
                     </h2>
                   </div>
                   <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', margin: 0 }}>
-                    {solicitacao.coordenador} · {solicitacao.destino} · {solicitacao.bolsistas.join(', ')}
+                    {solicitacao.coordenador} · {solicitacao.destino} · {solicitacao.bolsistaNome}
                   </p>
                 </div>
                 <span
@@ -417,7 +487,7 @@ export const SolicitacoesDiarias: React.FC = () => {
                   { label: 'Período', value: `${new Date(solicitacao.partida).toLocaleString('pt-BR')} até ${new Date(solicitacao.chegada).toLocaleString('pt-BR')}` },
                   { label: 'Diárias', value: solicitacao.quantidade.toLocaleString('pt-BR') },
                   { label: 'Valor unitário', value: currency.format(solicitacao.valorUnitario) },
-                  { label: 'Tipo de diária', value: solicitacao.tipoDiariaRef },
+                  { label: 'Cadastro/Parâmetro', value: `${solicitacao.tipoDiariaRef} · ${solicitacao.parametroCalculoDiariaRef}` },
                   { label: 'Total', value: currency.format(solicitacao.valorTotal) },
                 ].map(({ label, value }) => (
                   <div key={label}>

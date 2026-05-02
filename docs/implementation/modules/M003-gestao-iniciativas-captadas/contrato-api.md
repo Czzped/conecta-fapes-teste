@@ -71,7 +71,7 @@ Contrato funcional: ver [contrato.md](contrato.md)
 | 422 | RETIRADA_RUBRICA_IMPEDIDA | Rubrica possui lancamento impeditivo para retirada |
 | 422 | PERIODO_DIARIA_INVALIDO | Data/hora de chegada deve ser posterior a partida |
 | 422 | BENEFICIARIO_DIARIA_INVALIDO | Beneficiario nao possui alocacao valida na iniciativa |
-| 422 | TIPO_DIARIA_VIGENTE_AUSENTE | Nao ha tipo de diaria vigente para o tipo de viagem informado |
+| 422 | TIPO_DIARIA_VIGENTE_AUSENTE | Nao ha tipo de diaria vigente para a abrangencia informada |
 | 422 | ACEITES_DIARIA_PENDENTES | Solicitacao ainda possui aceites obrigatorios pendentes |
 | 422 | RUBRICA_DIARIAS_PASSAGENS_INVALIDA | Rubrica de Diarias e Passagens ausente ou invalida |
 | 422 | JUSTIFICATIVA_CANCELAMENTO_DIARIA_OBRIGATORIA | Remocao/cancelamento de diaria exige justificativa |
@@ -332,14 +332,14 @@ Registra a decisao sobre solicitacao de rubrica. Quando a decisao aprovada alter
 
 ## POST `/iniciativas/{id}/solicitacoes-diaria`
 
-Cria solicitacao operacional de diaria para um ou mais bolsistas alocados na iniciativa. O valor nao e informado pelo coordenador; o sistema calcula quantidade a partir do periodo informado, consulta o M008 para validar o tipo de viagem e localizar o tipo de diaria vigente, e usa valor unitario e fracao de calculo desse cadastro no snapshot da solicitacao.
+Cria solicitacao operacional de diaria para um ou mais bolsistas alocados na iniciativa. O valor nao e informado pelo coordenador; o sistema calcula quantidade a partir do periodo informado, consulta o M008 para validar a abrangencia, localizar o tipo de diaria vigente e obter os parametros de calculo vinculados, e usa valor unitario e memoria de calculo no snapshot da solicitacao.
 
 ### Request
 
 ```json
 {
   "ortogadoId": "ORT-2026-001",
-  "tipoViagemRef": "TVI-001",
+  "abrangenciaRef": "ABR-2026-001",
   "dataHoraPartida": "2026-06-10T08:00:00-03:00",
   "dataHoraChegada": "2026-06-12T18:00:00-03:00",
   "destino": "Vitoria/ES - evento de acompanhamento tecnico",
@@ -362,10 +362,19 @@ Cria solicitacao operacional de diaria para um ou mais bolsistas alocados na ini
     "codigo": "SD-2026-001",
     "estado": "ALOCADA",
     "quantidadeDiariasCalculada": 2.5,
-    "tipoViagemRef": "TVI-001",
+    "abrangenciaRef": "ABR-2026-001",
+    "abrangenciaSnapshot": {
+      "codigo": "DENTRO_ESTADO",
+      "nome": "Dentro do Estado"
+    },
     "tipoDiariaRef": "DIA-2026-001",
+    "parametroCalculoDiariaRef": "PCD-2026-001",
     "valorUnitarioDiaria": 260.00,
-    "fracaoCalculoSnapshot": "12H",
+    "memoriaCalculoSnapshot": {
+      "normaReferencia": "Decreto ES no 5533-R/2023",
+      "horasMinimasSemPernoite": 6,
+      "percentualDiariaSemPernoite": 0.5
+    },
     "valorTotalCalculado": 650.00,
     "rubricaDebitoRef": "RUB-DIARIAS-PASSAGENS",
     "lancamentoDebitoRef": "LEX-2026-045",
@@ -391,7 +400,6 @@ Registra assinatura do termo de aceite pelo bolsista beneficiario.
 
 ```json
 {
-  "pessoaFisicaId": "PF-2026-045",
   "aceite": true,
   "contaBancariaConfirmada": {
     "banco": "021",
@@ -406,27 +414,24 @@ Registra assinatura do termo de aceite pelo bolsista beneficiario.
 
 ```json
 {
-  "termoAceite": {
-    "estado": "ASSINADO",
-    "dataAssinatura": "2026-06-01T14:30:00-03:00",
-    "versaoTermo": "2026.1"
-  },
   "solicitacaoDiaria": {
     "id": "SD-2026-001",
-    "estado": "APROVADA"
+    "estado": "APROVADA",
+    "estadoAceite": "ASSINADO",
+    "dataAssinaturaAceite": "2026-06-01T14:30:00-03:00",
+    "versaoAceite": "2026.1"
   }
 }
 ```
 
-## POST `/solicitacoes-diaria/{id}/beneficiarios/{beneficiarioId}/recusa`
+## POST `/solicitacoes-diaria/{id}/recusa`
 
-Registra recusa da viagem pelo bolsista beneficiario. A justificativa e obrigatoria.
+Registra recusa da viagem pelo bolsista da `alocacaoBolsistaRef` vinculada a solicitacao. A justificativa e obrigatoria.
 
 ### Request
 
 ```json
 {
-  "pessoaFisicaId": "PF-2026-045",
   "justificativa": "Conflito de agenda academica no periodo da viagem."
 }
 ```
@@ -435,13 +440,11 @@ Registra recusa da viagem pelo bolsista beneficiario. A justificativa e obrigato
 
 ```json
 {
-  "termoAceite": {
-    "estado": "RECUSADO",
-    "dataRecusa": "2026-06-01T14:45:00-03:00"
-  },
   "solicitacaoDiaria": {
     "id": "SD-2026-001",
-    "estado": "RECUSADA"
+    "estado": "RECUSADA",
+    "estadoAceite": "RECUSADO",
+    "dataRecusaAceite": "2026-06-01T14:45:00-03:00"
   }
 }
 ```
@@ -454,7 +457,7 @@ Lista solicitacoes de diaria da iniciativa, com filtros opcionais por busca livr
 
 | Parametro | Obrigatorio | Descricao |
 |-----------|-------------|-----------|
-| `busca` | Nao | Busca por codigo, iniciativa, coordenador, beneficiario, destino, motivo ou referencia da diaria corrente. |
+| `busca` | Nao | Busca por codigo, iniciativa, coordenador, alocacao do bolsista, destino, motivo ou referencia da diaria corrente. |
 | `estado` | Nao | Estado da solicitacao: `ALOCADA`, `APROVADA`, `CANCELADA`, `RECUSADA` ou `REGULARIZADA_NAO_UTILIZADA`. |
 | `partidaInicio` | Nao | Data inicial do periodo de partida. |
 | `partidaFim` | Nao | Data final do periodo de partida. |
@@ -485,7 +488,7 @@ Lista solicitacoes de diaria da iniciativa, com filtros opcionais por busca livr
 
 ## GET `/solicitacoes-diaria/{id}`
 
-Consulta detalhe da solicitacao, incluindo beneficiarios, calculo aplicado e termos de aceite.
+Consulta detalhe da solicitacao, incluindo alocacao do bolsista, calculo aplicado e aceite.
 
 ### Response `200`
 
@@ -495,30 +498,31 @@ Consulta detalhe da solicitacao, incluindo beneficiarios, calculo aplicado e ter
     "id": "SD-2026-001",
     "codigo": "SD-2026-001",
     "estado": "APROVADA",
+    "alocacaoBolsistaRef": "ALO-2026-001",
     "dataHoraPartida": "2026-06-10T08:00:00-03:00",
     "dataHoraChegada": "2026-06-12T18:00:00-03:00",
     "destino": "Vitoria/ES - evento de acompanhamento tecnico",
     "motivo": "Participacao dos bolsistas na apresentacao de resultados parciais da iniciativa.",
     "quantidadeDiariasCalculada": 2.5,
-    "tipoViagemRef": "TVI-001",
+    "abrangenciaRef": "ABR-2026-001",
+    "abrangenciaSnapshot": {
+      "codigo": "DENTRO_ESTADO",
+      "nome": "Dentro do Estado"
+    },
     "tipoDiariaRef": "DIA-2026-001",
+    "parametroCalculoDiariaRef": "PCD-2026-001",
     "valorUnitarioDiaria": 260.00,
-    "fracaoCalculoSnapshot": "12H",
+    "memoriaCalculoSnapshot": {
+      "normaReferencia": "Decreto ES no 5533-R/2023",
+      "horasMinimasSemPernoite": 6,
+      "percentualDiariaSemPernoite": 0.5
+    },
     "valorTotalCalculado": 650.00,
+    "estadoAceite": "ASSINADO",
+    "dataAssinaturaAceite": "2026-06-01T14:30:00-03:00",
+    "versaoAceite": "2026.1",
     "rubricaDebitoRef": "RUB-DIARIAS-PASSAGENS",
-    "lancamentoDebitoRef": "LEX-2026-045",
-    "beneficiarios": [
-      {
-        "id": "BD-2026-001",
-        "pessoaFisicaRef": "PF-2026-045",
-        "valorCalculado": 650.00,
-        "termoAceite": {
-          "estado": "ASSINADO",
-          "dataAssinatura": "2026-06-01T14:30:00-03:00",
-          "versaoTermo": "2026.1"
-        }
-      }
-    ]
+    "lancamentoDebitoRef": "LEX-2026-045"
   }
 }
 ```

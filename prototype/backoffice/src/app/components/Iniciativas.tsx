@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { CheckCircle, Clock, FileText, FolderKanban, PauseCircle, PlayCircle, Search, XCircle } from 'lucide-react';
+import { SolicitacoesDiarias } from './SolicitacoesDiarias';
 
 type StatusIniciativa = 'Submetida' | 'Aprovada' | 'Em contratação' | 'Em execução' | 'Suspensa' | 'Concluída' | 'Cancelada';
 
@@ -100,6 +101,7 @@ const statusStyle: Record<StatusIniciativa, { color: string; bg: string; Icon: R
 const filtros: Array<'Todas' | StatusIniciativa> = ['Todas', 'Submetida', 'Aprovada', 'Em contratação', 'Em execução', 'Suspensa', 'Concluída', 'Cancelada'];
 
 export const Iniciativas: React.FC = () => {
+  const [iniciativaSelecionada, setIniciativaSelecionada] = useState<Iniciativa | null>(null);
   const [statusFiltro, setStatusFiltro] = useState<'Todas' | StatusIniciativa>('Todas');
   const [busca, setBusca] = useState('');
 
@@ -143,6 +145,46 @@ export const Iniciativas: React.FC = () => {
         <div className="mt-6" style={{ width: '100%', height: '1px', backgroundColor: 'var(--dash-divider)' }} />
       </div>
 
+      {iniciativaSelecionada ? (
+        <section>
+          <nav className="mb-5" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>
+            <button
+              type="button"
+              onClick={() => setIniciativaSelecionada(null)}
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                color: 'var(--dash-text-secondary)',
+                cursor: 'pointer',
+              }}
+            >
+              Iniciativas
+            </button>
+            <span style={{ color: 'var(--dash-text-muted)', margin: '0 8px' }}>/</span>
+            <span style={{ color: 'var(--dash-text-primary)' }}>{iniciativaSelecionada.codigo}</span>
+          </nav>
+
+          <div className="rounded-lg p-5 mb-6" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
+            <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_180px_180px_170px] gap-5">
+              <div>
+                <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', color: 'var(--dash-text-primary)', margin: '0 0 8px' }}>
+                  {iniciativaSelecionada.codigo} · {iniciativaSelecionada.titulo}
+                </h2>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', margin: 0 }}>
+                  {iniciativaSelecionada.proponente} · Coordenador: {iniciativaSelecionada.coordenador}
+                </p>
+              </div>
+              <Info label="Edital" value={iniciativaSelecionada.edital} />
+              <Info label="Status" value={iniciativaSelecionada.status} />
+              <Info label="Valor aprovado" value={iniciativaSelecionada.valorAprovado} />
+            </div>
+          </div>
+
+          <SolicitacoesDiarias embedded iniciativaFiltro={iniciativaSelecionada.titulo} />
+        </section>
+      ) : (
+        <>
       <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
         {[
           { label: 'Submetidas', value: totalPorStatus('Submetida'), status: 'Submetida' as StatusIniciativa },
@@ -226,7 +268,16 @@ export const Iniciativas: React.FC = () => {
             <article
               key={iniciativa.codigo}
               className="rounded-lg p-5"
-              style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}
+              role="button"
+              tabIndex={0}
+              onClick={() => setIniciativaSelecionada(iniciativa)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  setIniciativaSelecionada(iniciativa);
+                }
+              }}
+              style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)', cursor: 'pointer' }}
             >
               <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_180px_170px] gap-5">
                 <div>
@@ -264,6 +315,15 @@ export const Iniciativas: React.FC = () => {
           );
         })}
       </section>
+        </>
+      )}
     </div>
   );
 };
+
+const Info: React.FC<{ label: string; value: string }> = ({ label, value }) => (
+  <div>
+    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', margin: '0 0 5px' }}>{label}</p>
+    <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{value}</strong>
+  </div>
+);

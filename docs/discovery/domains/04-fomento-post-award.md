@@ -10,7 +10,7 @@ Fluxo de execucao do projeto contratado ate a sua finalizacao. Glossario dos con
 
 Apos a contratacao, as iniciativas aprovadas passam a ser gerenciadas operacionalmente pelo M003. Este sub-dominio concentra o ownership da `Iniciativa` pos-outorga, seu plano vigente, execucao consolidada, alteracoes operacionais e solicitacoes de diaria. Editais e captacao pertencem ao M011; bolsas, cotas e alocacoes pertencem ao M009; prestacao de contas detalhada pertence ao M014.
 
-O M003 tambem oferece a leitura consolidada do `CicloFomentoIniciativa`, uma timeline transversal que exibe marcos de pre-award, award e post-award sem transferir ownership dos eventos de origem. A estrutura de rubricas e subrubricas deve seguir o catalogo de discovery em [Rubricas e Subrubricas FAPES](../rubricas-subrubricas-fapes.md), sempre filtrado pelo edital, termo de outorga, plano aprovado e aditivos da iniciativa.
+O M003 tambem oferece a leitura consolidada do `CicloFomentoIniciativa`, uma timeline transversal que exibe marcos de pre-award, award e post-award sem transferir ownership dos eventos de origem. A estrutura de rubricas e subrubricas deve seguir o catalogo de discovery em [Rubricas e Subrubricas FAPES](../rubricas-subrubricas-fapes.md), sempre filtrado pelo edital, termo de outorga, plano aprovado e aditivos da iniciativa. As regras operacionais de calculo de diaria devem seguir o discovery em [Regras de Calculo de Diarias - ES](../regras-calculo-diarias-es.md), versionadas pela norma vigente.
 
 **Implementado por:** [M003 — Gestao de Iniciativas Captadas](../../implementation/modules/M003-gestao-iniciativas-captadas/README.md)
 
@@ -21,7 +21,32 @@ O M003 tambem oferece a leitura consolidada do `CicloFomentoIniciativa`, uma tim
 | 4.0.3 | Gerir Orcamento Planejado e Rubricas | Registrar orcamento planejado por rubrica e controlar alteracoes aprovadas | Coordenador, Analista da Area Tecnica da Agencia | Art. 25; Art. 27, II |
 | 4.0.4 | Consolidar Execucao Financeira | Consolidar lancamentos de execucao recebidos de integracoes e exibir planejado versus executado | Analista da Area Tecnica da Agencia | Art. 3, II |
 | 4.0.5 | Consultar Ciclo de Fomento da Iniciativa | Exibir timeline transversal com marcos de submissao, avaliacao, contratacao, execucao, prestacao de contas, conclusao ou cancelamento | Coordenador, Analista da Area Tecnica da Agencia | Art. 3, II |
-| 4.0.6 | Solicitar Diaria da Iniciativa | Coordenador solicita diaria para um ou mais bolsistas alocados, informando tipo de viagem, partida, chegada, destino e motivo; o sistema calcula o valor com base no tipo de diaria vigente cadastrado pela FAPES, valida saldo na rubrica de Diarias e Passagens, gera alocacao/comprometimento sem aprovacao manual da FAPES, coleta aceite individual dos bolsistas, permite remocao com justificativa antes do inicio e regularizacao auditavel quando a diaria nao for utilizada apos o inicio previsto | Coordenador, Bolsista, Analista da Area Tecnica da Agencia | Art. 27, II; Art. 3, 1 |
+| 4.0.6 | Solicitar Diaria da Iniciativa | Coordenador solicita diaria para um ou mais bolsistas alocados, informando abrangencia, origem, destino, partida, chegada e motivo; o sistema calcula o valor com base no tipo de diaria vigente cadastrado pela FAPES e nas regras normativas de calculo, usando distancia automatica somente para viagens dentro do Estado, valida saldo na rubrica de diaria, gera alocacao/comprometimento sem aprovacao manual da FAPES, coleta aceite individual dos bolsistas, permite remocao com justificativa antes do inicio e regularizacao auditavel quando a diaria nao for utilizada apos o inicio previsto | Coordenador, Bolsista, Analista da Area Tecnica da Agencia | Art. 27, II; Art. 3, 1; Decretos ES no 5533-R/2023, 5669-R/2024 e 6202-R/2025 |
+
+### 4.0.6.1 Regras de Calculo de Diarias
+
+As regras de calculo de diarias pertencem ao subdominio de **Gestao de Iniciativas Captadas**, pois sao aplicadas no ato da solicitacao operacional da diaria e precisam ser preservadas como snapshot para prestacao de contas e auditoria. O discovery detalhado esta em [Regras de Calculo de Diarias - ES](../regras-calculo-diarias-es.md).
+
+| Conceito | Definicao no Dominio |
+|----------|----------------------|
+| Norma de referencia | Decretos ES no 5533-R/2023, 5669-R/2024 e 6202-R/2025, alem da Calculadora de Diarias da SEP como referencia operacional |
+| Valor vigente | Mantido no M008 em `TipoDiaria`, por abrangencia e vigencia |
+| Parametros normativos | Mantidos no M008 em `ParametroCalculoDiaria`, sempre vinculados ao `TipoDiaria` vigente usado na solicitacao |
+| Regra de calculo | Aplicada no M003 conforme normativa vigente, datas/horarios, origem, destino, pernoite e excecoes; distancia automatica so compoe elegibilidade em viagens dentro do Estado |
+| Snapshot | A `SolicitacaoDiaria` deve registrar valor unitario, quantidade calculada, valor total, parametros considerados, memoria de calculo e norma aplicada |
+| Prestacao de contas | M014 referencia a diaria aprovada e seus snapshots; nao recalcula a diaria por mudancas posteriores no cadastro |
+
+Regras-chave do dominio:
+
+- O coordenador nao informa valor manualmente.
+- Origem e destino devem ser selecionados em lista controlada de localidades; destino deve aceitar opcoes especiais como **(Fora do Estado)** e **(Fora do Pais)** para ajustar a abrangencia automaticamente, seguindo o padrao da calculadora oficial da SEP.
+- Sem pernoite, afastamento inferior a 6 horas nao gera diaria.
+- Sem pernoite, afastamento igual ou superior a 6 horas gera diaria parcial conforme norma vigente.
+- Havendo pernoite, o sistema calcula diaria conforme quantidade de pernoites/dias de afastamento.
+- Retorno apos 14h pode gerar acrescimo conforme norma vigente.
+- Regiao Metropolitana, municipios limitrofes e distancia inferior a 150 km podem bloquear diaria dentro do Estado quando nao houver pernoite ou excecao normativa.
+- Complemento de transporte e reducoes por custeio de terceiros devem ser calculados conforme a norma vigente.
+- O sistema deve preservar memoria de calculo e decreto/versao normativa aplicada.
 
 ---
 

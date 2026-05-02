@@ -24,7 +24,7 @@ O `OrcamentoExecutado` representa uma visao consolidada da execucao financeira d
 
 O `Ortogado` pode solicitar a inclusao ou retirada de rubrica por meio de `SolicitacaoAlteracaoRubrica`. Essa solicitacao nao altera automaticamente o orcamento planejado; ela passa por analise e, quando aprovada, deve gerar uma nova `VersaoPlanoIniciativa` para refletir a mudanca autorizada no planejamento de recursos.
 
-O submodelo estrutural de diarias foi isolado em [diarias/modelo-estrutural.md](diarias/modelo-estrutural.md). Em resumo, a `SolicitacaoDiaria` nasce no M003 durante a execucao da iniciativa, usa o tipo de viagem selecionado pelo coordenador, calcula o valor a partir do `TipoDiaria` vigente consultado no M008, valida saldo na rubrica de diaria e gera alocacao/comprometimento sem aprovacao manual da FAPES. Diarias futuras ficam `ALOCADA` ate os aceites obrigatorios, podem ser removidas com justificativa antes do inicio da viagem, e, depois do inicio previsto, devem seguir regularizacao auditavel quando nao utilizadas. `TipoViagem` e `TipoDiaria` nao sao entidades do M003; sao referencias corporativas do M008.
+O submodelo estrutural de diarias foi isolado em [diarias/modelo-estrutural.md](diarias/modelo-estrutural.md). Em resumo, a `SolicitacaoDiaria` nasce no M003 durante a execucao da iniciativa, usa a abrangencia selecionada pelo coordenador, calcula o valor a partir do `TipoDiaria` vigente e do `ParametroCalculoDiaria` vinculado consultados no M008, valida saldo na rubrica de diaria e gera alocacao/comprometimento sem aprovacao manual da FAPES. Diarias futuras ficam `ALOCADA` ate os aceites obrigatorios, podem ser removidas com justificativa antes do inicio da viagem, e, depois do inicio previsto, devem seguir regularizacao auditavel quando nao utilizadas. `Abrangencia`, `TipoDiaria` e `ParametroCalculoDiaria` nao sao entidades do M003; sao referencias corporativas do M008.
 
 A equipe e planejada por `PapelEquipe`, que define o papel esperado e a quantidade prevista de pessoas para esse papel. Depois, `MembroEquipe` associa pessoas reais (`PessoaFisica`) aos papeis planejados. Dessa forma, primeiro se define a necessidade da equipe e depois se preenche essa necessidade com pessoas.
 
@@ -178,6 +178,7 @@ classDiagram
 
     class SolicitacaoDiaria {
         +String codigo
+        +String alocacaoBolsistaRef
         +DateTime dataHoraPartida
         +DateTime dataHoraChegada
         +String destino
@@ -185,21 +186,13 @@ classDiagram
         +double quantidadeDiariasCalculada
         +double valorUnitarioDiaria
         +double valorTotalCalculado
+        +String contaBancariaSnapshot
+        +EstadoAceiteDiaria estadoAceite
+        +DateTime dataAssinaturaAceite
+        +String versaoAceite
+        +String hashAceite
         +String justificativaCancelamento
         +EstadoSolicitacaoDiaria estado
-    }
-
-    class BeneficiarioDiaria {
-        +double quantidadeDiariasCalculada
-        +double valorCalculado
-        +String contaBancariaSnapshot
-    }
-
-    class TermoAceiteDiaria {
-        +DateTime dataAssinatura
-        +String versaoTermo
-        +String hashTermo
-        +EstadoAceiteDiaria estado
     }
 
     class EstadoSolicitacaoDiaria {
@@ -323,9 +316,8 @@ classDiagram
     SolicitacaoAlteracaoRubrica "*" --> "1" RubricaOrcamentaria : rubrica
     SolicitacaoAlteracaoRubrica "1" --> "0..1" VersaoPlanoIniciativa : gera versao
     SolicitacaoDiaria "*" --> "1" Ortogado : solicitada por
+    SolicitacaoDiaria "*" --> "1" AlocacaoBolsista : M009
     SolicitacaoDiaria "1" --> "0..*" LancamentoExecucao : gera debito/credito
-    SolicitacaoDiaria "1" --> "*" BeneficiarioDiaria : beneficiarios
-    BeneficiarioDiaria "1" --> "1" TermoAceiteDiaria : aceite
     VersaoPlanoIniciativa "1" --> "*" AtividadeCronograma : cronograma
     AtividadeCronograma "*" --> "0..1" PapelEquipe : papel responsavel
     AtividadeCronograma "*" --> "*" Resultado : constroi
@@ -347,33 +339,26 @@ classDiagram
 
     class SolicitacaoDiaria {
         +String codigo
-        +String tipoViagemRef
+        +String alocacaoBolsistaRef
+        +String abrangenciaRef
+        +Object abrangenciaSnapshot
         +String tipoDiariaRef
+        +String parametroCalculoDiariaRef
         +DateTime dataHoraPartida
         +DateTime dataHoraChegada
         +String destino
         +String motivo
         +double quantidadeDiariasCalculada
         +double valorUnitarioDiaria
-        +String fracaoCalculoSnapshot
+        +Object memoriaCalculoSnapshot
         +double valorTotalCalculado
+        +String contaBancariaSnapshot
+        +EstadoAceiteDiaria estadoAceite
+        +DateTime dataAssinaturaAceite
+        +String versaoAceite
+        +String hashAceite
         +String justificativaCancelamento
         +EstadoSolicitacaoDiaria estado
-    }
-
-    class BeneficiarioDiaria {
-        +double quantidadeDiariasCalculada
-        +double valorCalculado
-        +String alocacaoBolsistaRef
-        +String pessoaFisicaRef
-        +String contaBancariaSnapshot
-    }
-
-    class TermoAceiteDiaria {
-        +DateTime dataAssinatura
-        +String versaoTermo
-        +String hashTermo
-        +EstadoAceiteDiaria estado
     }
 
     class AlocacaoBolsista {
@@ -404,11 +389,8 @@ classDiagram
     }
 
     Iniciativa "1" --> "*" SolicitacaoDiaria : possui
-    SolicitacaoDiaria "1" --> "*" BeneficiarioDiaria : beneficiarios
+    SolicitacaoDiaria "*" --> "1" AlocacaoBolsista : referencia
     SolicitacaoDiaria "1" --> "0..*" LancamentoExecucao : gera debito/credito
-    BeneficiarioDiaria "*" --> "1" AlocacaoBolsista : referencia
-    BeneficiarioDiaria "*" --> "1" ContaBancariaPessoa : snapshot
-    BeneficiarioDiaria "1" --> "1" TermoAceiteDiaria : aceite
 ```
 
 #### Ciclo de Fomento
@@ -681,7 +663,7 @@ Na coluna **Obrig.**, o valor `Cond.` indica obrigatoriedade condicional: o camp
 | | dataContratacao | Data em que a iniciativa foi formalmente contratada | Sim | Date | | | |
 | | valorAprovado | Valor financeiro aprovado para a iniciativa, quando aplicavel | Nao | Double | | | |
 | | estado | Estado atual da iniciativa no ciclo operacional | Gerado | EstadoIniciativa | Ver enumeracao | | |
-| **DiariasDaIniciativa** | modeloDetalhado | As estruturas de SolicitacaoDiaria, BeneficiarioDiaria e TermoAceiteDiaria foram movidas para a pasta propria de diarias; TipoDiaria e TipoViagem pertencem ao M008 | Sim | Documento | [diarias/modelo-estrutural.md](diarias/modelo-estrutural.md) | | |
+| **DiariasDaIniciativa** | modeloDetalhado | A estrutura detalhada de SolicitacaoDiaria foi movida para a pasta propria de diarias; Abrangencia, TipoDiaria e ParametroCalculoDiaria pertencem ao M008; AlocacaoBolsista pertence ao M009 | Sim | Documento | [diarias/modelo-estrutural.md](diarias/modelo-estrutural.md) | | |
 | **EstagioCicloFomento** | ordem | Posicao do estagio na timeline da iniciativa | Sim | Int | Sequencia iniciando em 1 | | Sim por iniciativa |
 | | fase | Macrofase do ciclo de fomento | Sim | FaseCicloFomento | `PRE_AWARD`/`AWARD`/`POST_AWARD` | | |
 | | marco | Marco especifico exibido na timeline | Sim | MarcoCicloFomento | `SUBMISSAO`/`AVALIACAO_DOCUMENTOS`/`AVALIACAO_AD_HOC`/`EM_CONTRATACAO`/`CONTRATADO`/`EM_EXECUCAO`/`SUSPENSA`/`EM_APROVACAO_CONTAS`/`CONCLUIDO`/`CANCELADA` | | Sim por iniciativa |
@@ -784,23 +766,23 @@ Na coluna **Obrig.**, o valor `Cond.` indica obrigatoriedade condicional: o camp
 - O orcamento executado pertence a iniciativa e deve ser calculado a partir dos lancamentos de execucao financeira.
 - Todo lancamento de execucao deve estar associado a uma rubrica orcamentaria.
 - O valor executado consolidado deve considerar os lancamentos do tipo `EXECUCAO` e `DEBITO`, deduzir `CREDITO` e `ESTORNO` e preservar `COMPROMETIMENTO` e `RENDIMENTO` como movimentos identificaveis para acompanhamento financeiro.
-- A FAPES deve cadastrar `TipoDiaria` no M008 antes de permitir o calculo de novas solicitacoes de diaria.
-- Apenas um `TipoDiaria` ativo no M008 deve ser aplicavel para uma mesma data de referencia e tipo de viagem.
+- A FAPES deve cadastrar `Abrangencia`, `TipoDiaria` e `ParametroCalculoDiaria` no M008 antes de permitir o calculo de novas solicitacoes de diaria.
+- Apenas um `TipoDiaria` ativo no M008 deve ser aplicavel para uma mesma data de referencia e abrangencia.
 - Solicitacao de diaria deve estar associada a uma iniciativa ativa e ser solicitada pelo `Ortogado` ativo.
-- Solicitacao de diaria deve possuir ao menos um beneficiario vinculado a alocacao de bolsista valida em M009.
+- Solicitacao de diaria deve possuir exatamente uma `alocacaoBolsistaRef` valida em M009.
 - `dataHoraChegada` deve ser posterior a `dataHoraPartida`.
-- Quantidade de diarias deve ser calculada pelo sistema a partir do periodo informado e da fracao de calculo; o valor unitario deve vir do `TipoDiaria` vigente do M008 para o tipo de viagem no momento da criacao da solicitacao.
-- `valorUnitarioDiaria`, `fracaoCalculoSnapshot`, `quantidadeDiariasCalculada`, `valorCalculado` por beneficiario e `valorTotalCalculado` devem ser preservados como snapshot da solicitacao.
+- Quantidade de diarias deve ser calculada pelo sistema a partir do periodo informado e dos parametros de calculo vigentes; o valor unitario deve vir do `TipoDiaria` vigente do M008 para a abrangencia no momento da criacao da solicitacao.
+- `abrangenciaSnapshot`, `valorUnitarioDiaria`, `memoriaCalculoSnapshot`, `quantidadeDiariasCalculada` e `valorTotalCalculado` devem ser preservados como snapshot da solicitacao.
 - A solicitacao de diaria nao depende de permissao ou aprovacao manual da FAPES; o bloqueio ocorre por ausencia de rubrica ou saldo.
 - Quando criada com saldo suficiente, a solicitacao deve gerar `LancamentoExecucao` do tipo `DEBITO` ou `COMPROMETIMENTO` na rubrica de Diarias e Passagens, usando `origem = M003:SolicitacaoDiaria:{id}`.
-- Cada beneficiario deve possuir um `TermoAceiteDiaria`; a solicitacao passa automaticamente para `APROVADA` quando todos os termos obrigatorios estiverem `ASSINADO`.
+- O aceite deve ficar registrado na propria `SolicitacaoDiaria`; a solicitacao passa automaticamente para `APROVADA` quando `estadoAceite = ASSINADO`.
 - O debito gerado pelo comprometimento deve reduzir o saldo disponivel da rubrica de Diarias e Passagens na execucao consolidada.
 - O coordenador pode remover solicitacao de diaria `ALOCADA` ou `APROVADA` com justificativa obrigatoria somente antes da data/hora de partida.
 - Depois da data/hora de partida, diaria nao utilizada deve seguir regularizacao auditavel, sem exclusao fisica.
 - A remocao ou regularizacao deve gerar `LancamentoExecucao` do tipo `CREDITO` na rubrica de Diarias e Passagens quando havia comprometimento anterior.
 - O credito gerado deve recompor o saldo disponivel da rubrica de Diarias e Passagens na execucao consolidada.
-- Recusa de aceite por qualquer beneficiario deve registrar justificativa e gerar credito de reversao quando houver debito/comprometimento anterior.
-- O aceite deve preservar a versao do termo e a conta bancaria usada no momento da assinatura.
+- Recusa de aceite pelo bolsista deve registrar justificativa e gerar credito de reversao quando houver debito/comprometimento anterior.
+- O aceite deve preservar a versao do aceite e a conta bancaria usada no momento da assinatura.
 - M014 deve referenciar a `SolicitacaoDiaria` ao registrar `JustificativaDiaria` e comprovantes de pagamento.
 - Somente o `Ortogado` ativo da iniciativa pode solicitar inclusao ou retirada de rubrica orcamentaria.
 - Toda solicitacao de alteracao de rubrica deve possuir justificativa e estar associada a uma rubrica.

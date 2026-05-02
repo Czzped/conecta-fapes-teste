@@ -711,20 +711,19 @@ Cria uma Rubrica canonica no cadastro corporativo.
 
 ---
 
-#### `POST /api/v1/m008/tipos-viagem`
+#### `POST /api/v1/m008/abrangencias-diaria`
 
-Cria ou atualiza tipo de viagem usado por solicitacoes de diaria.
+Cria ou atualiza uma abrangencia corporativa de diaria.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
-- **Operacao de origem:** `CadastrarTipoViagem`
+- **Operacao de origem:** `CadastrarAbrangenciaDiaria`
 
 **Request body**
 
 ```json
 {
-  "codigo": "TVI-001",
+  "codigo": "DENTRO_ESTADO",
   "nome": "Dentro do Estado",
-  "abrangencia": "DENTRO_ESTADO",
   "descricao": "Deslocamento dentro do Espirito Santo.",
   "ativo": true
 }
@@ -734,40 +733,28 @@ Cria ou atualiza tipo de viagem usado por solicitacoes de diaria.
 
 ```json
 {
-  "tipoViagem": {
-    "id": "TVI-001",
-    "codigo": "TVI-001",
+  "abrangencia": {
+    "id": "ABR-2026-001",
+    "codigo": "DENTRO_ESTADO",
     "nome": "Dentro do Estado",
-    "abrangencia": "DENTRO_ESTADO",
+    "descricao": "Deslocamento dentro do Espirito Santo.",
     "ativo": true
   }
 }
 ```
 
----
+**Erros**
 
-#### `GET /api/v1/m008/tipos-viagem`
-
-Lista tipos de viagem ativos ou historicos.
-
-- **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
-- **Operacao de origem:** `ConsultarCadastrosCorporativos` (tipoCadastro=TIPO_VIAGEM)
-
-**Query parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `ativo` | boolean | Filtra por situacao |
-| `abrangencia` | string | Filtra por `DENTRO_ESTADO`, `NACIONAL` ou `INTERNACIONAL` |
-| `busca` | string | Busca textual por codigo ou nome |
-| `page` | integer | Numero da pagina |
-| `pageSize` | integer | Itens por pagina |
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `409` | `ABRANGENCIA_CODIGO_DUPLICADO` | Ja existe abrangencia cadastrada com o codigo informado. |
+| `422` | `ABRANGENCIA_DADOS_INVALIDOS` | Os dados da abrangencia sao invalidos ou incompletos. |
 
 ---
 
 #### `POST /api/v1/m008/tipos-diaria`
 
-Cria valor vigente de diaria por tipo de viagem.
+Cria valor vigente de diaria por abrangencia.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
 - **Operacao de origem:** `CadastrarTipoDiaria`
@@ -776,10 +763,8 @@ Cria valor vigente de diaria por tipo de viagem.
 
 ```json
 {
-  "codigo": "DIA-2026-001",
-  "tipoViagemId": "TVI-001",
+  "abrangenciaId": "ABR-2026-001",
   "valorUnitario": 260.0,
-  "fracaoCalculo": "12H",
   "vigenciaInicio": "2026-05-01",
   "vigenciaFim": null,
   "ativo": true
@@ -792,10 +777,12 @@ Cria valor vigente de diaria por tipo de viagem.
 {
   "tipoDiaria": {
     "id": "DIA-2026-001",
-    "codigo": "DIA-2026-001",
-    "tipoViagemId": "TVI-001",
+    "abrangenciaId": "ABR-2026-001",
+    "abrangencia": {
+      "codigo": "DENTRO_ESTADO",
+      "nome": "Dentro do Estado"
+    },
     "valorUnitario": 260.0,
-    "fracaoCalculo": "12H",
     "vigenciaInicio": "2026-05-01",
     "vigenciaFim": null,
     "ativo": true
@@ -807,15 +794,79 @@ Cria valor vigente de diaria por tipo de viagem.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `TIPO_VIAGEM_NAO_ENCONTRADO` | O tipo de viagem informado nao foi encontrado. |
-| `409` | `TIPO_DIARIA_VIGENCIA_SOBREPOSTA` | Ja existe tipo de diaria ativo para o tipo de viagem e periodo informados. |
+| `409` | `TIPO_DIARIA_VIGENCIA_SOBREPOSTA` | Ja existe tipo de diaria ativo para a abrangencia e periodo informados. |
+| `404` | `ABRANGENCIA_NAO_ENCONTRADA` | A abrangencia informada nao foi encontrada. |
 | `422` | `TIPO_DIARIA_VALOR_INVALIDO` | O valor unitario deve ser maior que zero. |
+
+---
+
+#### `POST /api/v1/m008/tipos-diaria/{tipoDiariaId}/parametros-calculo`
+
+Cria parametros normativos vigentes vinculados a um tipo de diaria.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Operacao de origem:** `CadastrarParametroCalculoDiaria`
+
+**Request body**
+
+```json
+{
+  "normaReferencia": "Decreto ES no 5533-R/2023",
+  "percentualDiariaSemPernoite": 0.4,
+  "horasMinimasSemPernoite": 6,
+  "horaLimiteRetornoAcrescimo": 14,
+  "percentualAcrescimoRetorno": 0.5,
+  "distanciaMinimaKm": 150,
+  "limiteDiasConsecutivos": 15,
+  "limiteDiariasMes": 15,
+  "percentualComplementoTransporte": 0.2,
+  "bloqueiaRegiaoMetropolitanaSemPernoite": true,
+  "bloqueiaMunicipioLimitrofeSemPernoite": true,
+  "vigenciaInicio": "2026-05-01",
+  "vigenciaFim": null,
+  "ativo": true
+}
+```
+
+**Response `201 Created`**
+
+```json
+{
+  "parametroCalculoDiaria": {
+    "id": "PCD-2026-001",
+    "tipoDiariaId": "DIA-2026-001",
+    "normaReferencia": "Decreto ES no 5533-R/2023",
+    "percentualDiariaSemPernoite": 0.4,
+    "horasMinimasSemPernoite": 6,
+    "horaLimiteRetornoAcrescimo": 14,
+    "percentualAcrescimoRetorno": 0.5,
+    "distanciaMinimaKm": 150,
+    "limiteDiasConsecutivos": 15,
+    "limiteDiariasMes": 15,
+    "percentualComplementoTransporte": 0.2,
+    "bloqueiaRegiaoMetropolitanaSemPernoite": true,
+    "bloqueiaMunicipioLimitrofeSemPernoite": true,
+    "vigenciaInicio": "2026-05-01",
+    "vigenciaFim": null,
+    "ativo": true
+  }
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `TIPO_DIARIA_NAO_ENCONTRADO` | O tipo de diaria informado nao foi encontrado. |
+| `409` | `PARAMETROS_DIARIA_VIGENCIA_SOBREPOSTA` | Ja existem parametros ativos para o tipo de diaria e periodo informados. |
+| `422` | `PARAMETROS_DIARIA_VALOR_INVALIDO` | Os percentuais, limites ou bloqueios informados sao invalidos. |
+| `422` | `PARAMETROS_DIARIA_NORMA_OBRIGATORIA` | A norma de referencia deve ser informada. |
 
 ---
 
 #### `GET /api/v1/m008/tipos-diaria/vigente`
 
-Consulta o tipo de diaria vigente para um tipo de viagem e data de referencia.
+Consulta o tipo de diaria e os parametros normativos vigentes vinculados a ele para uma abrangencia e data de referencia.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
 - **Operacao de origem:** `ConsultarTipoDiariaVigente`
@@ -824,7 +875,7 @@ Consulta o tipo de diaria vigente para um tipo de viagem e data de referencia.
 
 | Parametro | Tipo | Obrigatorio | Descricao |
 |-----------|------|-------------|-----------|
-| `tipoViagemId` | string | Sim | Tipo de viagem selecionado na solicitacao |
+| `abrangenciaId` | string | Sim | Identificador da abrangencia corporativa |
 | `dataReferencia` | date | Sim | Data usada para localizar a vigencia |
 
 **Response `200 OK`**
@@ -833,9 +884,29 @@ Consulta o tipo de diaria vigente para um tipo de viagem e data de referencia.
 {
   "tipoDiaria": {
     "id": "DIA-2026-001",
-    "tipoViagemId": "TVI-001",
+    "abrangenciaId": "ABR-2026-001",
+    "abrangencia": {
+      "codigo": "DENTRO_ESTADO",
+      "nome": "Dentro do Estado"
+    },
     "valorUnitario": 260.0,
-    "fracaoCalculo": "12H",
+    "vigenciaInicio": "2026-05-01",
+    "vigenciaFim": null
+  },
+  "parametroCalculoDiaria": {
+    "id": "PCD-2026-001",
+    "tipoDiariaId": "DIA-2026-001",
+    "normaReferencia": "Decreto ES no 5533-R/2023",
+    "percentualDiariaSemPernoite": 0.4,
+    "horasMinimasSemPernoite": 6,
+    "horaLimiteRetornoAcrescimo": 14,
+    "percentualAcrescimoRetorno": 0.5,
+    "distanciaMinimaKm": 150,
+    "limiteDiasConsecutivos": 15,
+    "limiteDiariasMes": 15,
+    "percentualComplementoTransporte": 0.2,
+    "bloqueiaRegiaoMetropolitanaSemPernoite": true,
+    "bloqueiaMunicipioLimitrofeSemPernoite": true,
     "vigenciaInicio": "2026-05-01",
     "vigenciaFim": null
   }
@@ -1133,9 +1204,9 @@ Cria ou vincula pessoa automaticamente a partir de evento do Acesso Cidadao.
 | `POST` | `/api/v1/m008/dirigentes` | RegistrarDirigente | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/m008/dirigentes` | ListarDirigentes | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `GET` | `/api/v1/m008/areas-conhecimento` | ListarAreasDeConhecimento | ANALISTA_AGENCIA, MODULO_INTERNO |
-| `POST` | `/api/v1/m008/tipos-viagem` | CadastrarTipoViagem | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m008/tipos-viagem` | ListarTiposViagem | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/m008/abrangencias-diaria` | CadastrarAbrangenciaDiaria | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m008/tipos-diaria` | CadastrarTipoDiaria | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m008/tipos-diaria/{tipoDiariaId}/parametros-calculo` | CadastrarParametroCalculoDiaria | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/m008/tipos-diaria/vigente` | ConsultarTipoDiariaVigente | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `POST` | `/api/v1/m008/rubricas` | CadastrarRubrica | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/m008/rubricas` | ListarRubricas | ANALISTA_AGENCIA, MODULO_INTERNO |
@@ -1202,14 +1273,13 @@ Cria ou vincula pessoa automaticamente a partir de evento do Acesso Cidadao.
 }
 ```
 
-### TipoViagem
+### Abrangencia
 
 ```json
 {
   "id": "string",
-  "codigo": "string",
+  "codigo": "DENTRO_ESTADO | NACIONAL | INTERNACIONAL",
   "nome": "string",
-  "abrangencia": "DENTRO_ESTADO | NACIONAL | INTERNACIONAL",
   "descricao": "string | null",
   "ativo": true
 }
@@ -1220,10 +1290,31 @@ Cria ou vincula pessoa automaticamente a partir de evento do Acesso Cidadao.
 ```json
 {
   "id": "string",
-  "codigo": "string",
-  "tipoViagemId": "string",
+  "abrangenciaId": "string",
   "valorUnitario": 260.0,
-  "fracaoCalculo": "12H | 24H",
+  "vigenciaInicio": "string (YYYY-MM-DD)",
+  "vigenciaFim": "string (YYYY-MM-DD) | null",
+  "ativo": true
+}
+```
+
+### ParametroCalculoDiaria
+
+```json
+{
+  "id": "string",
+  "tipoDiariaId": "string",
+  "normaReferencia": "string",
+  "percentualDiariaSemPernoite": 0.4,
+  "horasMinimasSemPernoite": 6,
+  "horaLimiteRetornoAcrescimo": 14,
+  "percentualAcrescimoRetorno": 0.5,
+  "distanciaMinimaKm": 150,
+  "limiteDiasConsecutivos": 15,
+  "limiteDiariasMes": 15,
+  "percentualComplementoTransporte": 0.2,
+  "bloqueiaRegiaoMetropolitanaSemPernoite": true,
+  "bloqueiaMunicipioLimitrofeSemPernoite": true,
   "vigenciaInicio": "string (YYYY-MM-DD)",
   "vigenciaFim": "string (YYYY-MM-DD) | null",
   "ativo": true
@@ -1290,5 +1381,5 @@ Cria ou vincula pessoa automaticamente a partir de evento do Acesso Cidadao.
 | EPIC-M008-002 (Cadastro de Instituicoes) | [instituicoes/epics/EPIC-M008-002.md](instituicoes/epics/EPIC-M008-002.md) |
 | EPIC-M008-003 (Classificacoes Corporativas) | [classificacoes/epics/EPIC-M008-003.md](classificacoes/epics/EPIC-M008-003.md) |
 | EPIC-M008-004 (Catalogo de Rubricas) | [rubricas/epics/EPIC-M008-004.md](rubricas/epics/EPIC-M008-004.md) |
-| EPIC-M008-005 (Cadastros Corporativos de Diarias) | [diarias/epics/EPIC-M008-005.md](diarias/epics/EPIC-M008-005.md) |
+| EPIC-M008-005 (Gestao Corporativa de Diarias) | [diarias/epics/EPIC-M008-005.md](diarias/epics/EPIC-M008-005.md) |
 | EPIC-M008-006 (Cadastros Geograficos) | [geografia/epics/EPIC-M008-006.md](geografia/epics/EPIC-M008-006.md) |

@@ -1,0 +1,1773 @@
+{
+  "metadata": {
+    "nome": "municipios-limitrofes-es",
+    "descricao": "Matriz de municipios limitrofes do Espirito Santo para apoio ao bloqueio de diaria sem pernoite.",
+    "uf": "ES",
+    "totalMunicipios": 78,
+    "totalPares": 195,
+    "direcional": false,
+    "uso": "Calcular automaticamente municipioLimitrofe na solicitacao de diaria dentro do Estado, especialmente para regra sem pernoite.",
+    "fonte": "https://planejamento.es.gov.br/calculadora-de-diarias-2-3",
+    "fonteScript": "https://planejamento.es.gov.br/Media/Sep/Scripts/regrasDecretoDiariasES.js",
+    "geradoEm": "2026-05-02"
+  },
+  "municipios": [
+    {
+      "indiceSep": 0,
+      "nome": "Afonso Cláudio",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 1,
+      "nome": "Água Doce do Norte",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 2,
+      "nome": "Águia Branca",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 3,
+      "nome": "Alegre",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 4,
+      "nome": "Alfredo Chaves",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 5,
+      "nome": "Alto Rio Novo",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 6,
+      "nome": "Anchieta",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 7,
+      "nome": "Apiacá",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 8,
+      "nome": "Aracruz",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 9,
+      "nome": "Atílio Vivacqua",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 10,
+      "nome": "Baixo Guandu",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 11,
+      "nome": "Barra de São Francisco",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 12,
+      "nome": "Boa Esperança",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 13,
+      "nome": "Bom Jesus do Norte",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 14,
+      "nome": "Brejetuba",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 15,
+      "nome": "Cachoeiro de Itapemirim",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 16,
+      "nome": "Cariacica",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 17,
+      "nome": "Castelo",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 18,
+      "nome": "Colatina",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 19,
+      "nome": "Conceição da Barra",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 20,
+      "nome": "Conceição do Castelo",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 21,
+      "nome": "Divino de São Lourenço",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 22,
+      "nome": "Domingos Martins",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 23,
+      "nome": "Dores do Rio Preto",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 24,
+      "nome": "Ecoporanga",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 25,
+      "nome": "Fundão",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 26,
+      "nome": "Governador Lindenberg",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 27,
+      "nome": "Guaçuí",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 28,
+      "nome": "Guarapari",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 29,
+      "nome": "Ibatiba",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 30,
+      "nome": "Ibiraçu",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 31,
+      "nome": "Ibitirama",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 32,
+      "nome": "Iconha",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 33,
+      "nome": "Irupi",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 34,
+      "nome": "Itaguaçu",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 35,
+      "nome": "Itapemirim",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 36,
+      "nome": "Itarana",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 37,
+      "nome": "Iúna",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 38,
+      "nome": "Jaguaré",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 39,
+      "nome": "Jerônimo Monteiro",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 40,
+      "nome": "João Neiva",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 41,
+      "nome": "Laranja da Terra",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 42,
+      "nome": "Linhares",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 43,
+      "nome": "Mantenópolis",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 44,
+      "nome": "Marataízes",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 45,
+      "nome": "Marechal Floriano",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 46,
+      "nome": "Marilândia",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 47,
+      "nome": "Mimoso do Sul",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 48,
+      "nome": "Montanha",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 49,
+      "nome": "Mucurici",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 50,
+      "nome": "Muniz Freire",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 51,
+      "nome": "Muqui",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 52,
+      "nome": "Nova Venécia",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 53,
+      "nome": "Pancas",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 54,
+      "nome": "Pedro Canário",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 55,
+      "nome": "Pinheiros",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 56,
+      "nome": "Piúma",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 57,
+      "nome": "Ponto Belo",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 58,
+      "nome": "Presidente Kennedy",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 59,
+      "nome": "Rio Bananal",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 60,
+      "nome": "Rio Novo do Sul",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 61,
+      "nome": "Santa Leopoldina",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 62,
+      "nome": "Santa Maria de Jetibá",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 63,
+      "nome": "Santa Teresa",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 64,
+      "nome": "São Domingos do Norte",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 65,
+      "nome": "São Gabriel da Palha",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 66,
+      "nome": "São José do Calçado",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 67,
+      "nome": "São Mateus",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 68,
+      "nome": "São Roque do Canaã",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 69,
+      "nome": "Serra",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 70,
+      "nome": "Sooretama",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 71,
+      "nome": "Vargem Alta",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 72,
+      "nome": "Venda Nova do Imigrante",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 73,
+      "nome": "Viana",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 74,
+      "nome": "Vila Pavão",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 75,
+      "nome": "Vila Valério",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 76,
+      "nome": "Vila Velha",
+      "uf": "ES"
+    },
+    {
+      "indiceSep": 77,
+      "nome": "Vitória",
+      "uf": "ES"
+    }
+  ],
+  "limitrofes": [
+    {
+      "origemIndiceSep": 0,
+      "origemNome": "Afonso Cláudio",
+      "destinoIndiceSep": 14,
+      "destinoNome": "Brejetuba",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 0,
+      "origemNome": "Afonso Cláudio",
+      "destinoIndiceSep": 20,
+      "destinoNome": "Conceição do Castelo",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 0,
+      "origemNome": "Afonso Cláudio",
+      "destinoIndiceSep": 22,
+      "destinoNome": "Domingos Martins",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 0,
+      "origemNome": "Afonso Cláudio",
+      "destinoIndiceSep": 36,
+      "destinoNome": "Itarana",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 0,
+      "origemNome": "Afonso Cláudio",
+      "destinoIndiceSep": 41,
+      "destinoNome": "Laranja da Terra",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 0,
+      "origemNome": "Afonso Cláudio",
+      "destinoIndiceSep": 62,
+      "destinoNome": "Santa Maria de Jetibá",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 0,
+      "origemNome": "Afonso Cláudio",
+      "destinoIndiceSep": 72,
+      "destinoNome": "Venda Nova do Imigrante",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 3,
+      "origemNome": "Alegre",
+      "destinoIndiceSep": 15,
+      "destinoNome": "Cachoeiro de Itapemirim",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 3,
+      "origemNome": "Alegre",
+      "destinoIndiceSep": 17,
+      "destinoNome": "Castelo",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 3,
+      "origemNome": "Alegre",
+      "destinoIndiceSep": 27,
+      "destinoNome": "Guaçuí",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 3,
+      "origemNome": "Alegre",
+      "destinoIndiceSep": 31,
+      "destinoNome": "Ibitirama",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 3,
+      "origemNome": "Alegre",
+      "destinoIndiceSep": 39,
+      "destinoNome": "Jerônimo Monteiro",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 3,
+      "origemNome": "Alegre",
+      "destinoIndiceSep": 47,
+      "destinoNome": "Mimoso do Sul",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 3,
+      "origemNome": "Alegre",
+      "destinoIndiceSep": 50,
+      "destinoNome": "Muniz Freire",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 3,
+      "origemNome": "Alegre",
+      "destinoIndiceSep": 66,
+      "destinoNome": "São José do Calçado",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 4,
+      "origemNome": "Alfredo Chaves",
+      "destinoIndiceSep": 6,
+      "destinoNome": "Anchieta",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 4,
+      "origemNome": "Alfredo Chaves",
+      "destinoIndiceSep": 22,
+      "destinoNome": "Domingos Martins",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 4,
+      "origemNome": "Alfredo Chaves",
+      "destinoIndiceSep": 28,
+      "destinoNome": "Guarapari",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 4,
+      "origemNome": "Alfredo Chaves",
+      "destinoIndiceSep": 32,
+      "destinoNome": "Iconha",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 4,
+      "origemNome": "Alfredo Chaves",
+      "destinoIndiceSep": 45,
+      "destinoNome": "Marechal Floriano",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 4,
+      "origemNome": "Alfredo Chaves",
+      "destinoIndiceSep": 60,
+      "destinoNome": "Rio Novo do Sul",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 4,
+      "origemNome": "Alfredo Chaves",
+      "destinoIndiceSep": 71,
+      "destinoNome": "Vargem Alta",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 5,
+      "origemNome": "Alto Rio Novo",
+      "destinoIndiceSep": 43,
+      "destinoNome": "Mantenópolis",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 5,
+      "origemNome": "Alto Rio Novo",
+      "destinoIndiceSep": 53,
+      "destinoNome": "Pancas",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 6,
+      "origemNome": "Anchieta",
+      "destinoIndiceSep": 28,
+      "destinoNome": "Guarapari",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 6,
+      "origemNome": "Anchieta",
+      "destinoIndiceSep": 32,
+      "destinoNome": "Iconha",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 6,
+      "origemNome": "Anchieta",
+      "destinoIndiceSep": 56,
+      "destinoNome": "Piúma",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 7,
+      "origemNome": "Apiacá",
+      "destinoIndiceSep": 13,
+      "destinoNome": "Bom Jesus do Norte",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 7,
+      "origemNome": "Apiacá",
+      "destinoIndiceSep": 47,
+      "destinoNome": "Mimoso do Sul",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 7,
+      "origemNome": "Apiacá",
+      "destinoIndiceSep": 66,
+      "destinoNome": "São José do Calçado",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 8,
+      "origemNome": "Aracruz",
+      "destinoIndiceSep": 25,
+      "destinoNome": "Fundão",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 8,
+      "origemNome": "Aracruz",
+      "destinoIndiceSep": 30,
+      "destinoNome": "Ibiraçu",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 8,
+      "origemNome": "Aracruz",
+      "destinoIndiceSep": 40,
+      "destinoNome": "João Neiva",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 8,
+      "origemNome": "Aracruz",
+      "destinoIndiceSep": 42,
+      "destinoNome": "Linhares",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 9,
+      "origemNome": "Atílio Vivacqua",
+      "destinoIndiceSep": 15,
+      "destinoNome": "Cachoeiro de Itapemirim",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 9,
+      "origemNome": "Atílio Vivacqua",
+      "destinoIndiceSep": 35,
+      "destinoNome": "Itapemirim",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 9,
+      "origemNome": "Atílio Vivacqua",
+      "destinoIndiceSep": 47,
+      "destinoNome": "Mimoso do Sul",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 9,
+      "origemNome": "Atílio Vivacqua",
+      "destinoIndiceSep": 51,
+      "destinoNome": "Muqui",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 9,
+      "origemNome": "Atílio Vivacqua",
+      "destinoIndiceSep": 58,
+      "destinoNome": "Presidente Kennedy",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 10,
+      "origemNome": "Baixo Guandu",
+      "destinoIndiceSep": 18,
+      "destinoNome": "Colatina",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 10,
+      "origemNome": "Baixo Guandu",
+      "destinoIndiceSep": 34,
+      "destinoNome": "Itaguaçu",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 10,
+      "origemNome": "Baixo Guandu",
+      "destinoIndiceSep": 41,
+      "destinoNome": "Laranja da Terra",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 10,
+      "origemNome": "Baixo Guandu",
+      "destinoIndiceSep": 53,
+      "destinoNome": "Pancas",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 11,
+      "origemNome": "Barra de São Francisco",
+      "destinoIndiceSep": 24,
+      "destinoNome": "Ecoporanga",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 11,
+      "origemNome": "Barra de São Francisco",
+      "destinoIndiceSep": 43,
+      "destinoNome": "Mantenópolis",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 11,
+      "origemNome": "Barra de São Francisco",
+      "destinoIndiceSep": 52,
+      "destinoNome": "Nova Venécia",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 11,
+      "origemNome": "Barra de São Francisco",
+      "destinoIndiceSep": 74,
+      "destinoNome": "Vila Pavão",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 12,
+      "origemNome": "Boa Esperança",
+      "destinoIndiceSep": 52,
+      "destinoNome": "Nova Venécia",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 12,
+      "origemNome": "Boa Esperança",
+      "destinoIndiceSep": 55,
+      "destinoNome": "Pinheiros",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 12,
+      "origemNome": "Boa Esperança",
+      "destinoIndiceSep": 57,
+      "destinoNome": "Ponto Belo",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 12,
+      "origemNome": "Boa Esperança",
+      "destinoIndiceSep": 67,
+      "destinoNome": "São Mateus",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 13,
+      "origemNome": "Bom Jesus do Norte",
+      "destinoIndiceSep": 66,
+      "destinoNome": "São José do Calçado",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 14,
+      "origemNome": "Brejetuba",
+      "destinoIndiceSep": 20,
+      "destinoNome": "Conceição do Castelo",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 14,
+      "origemNome": "Brejetuba",
+      "destinoIndiceSep": 29,
+      "destinoNome": "Ibatiba",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 14,
+      "origemNome": "Brejetuba",
+      "destinoIndiceSep": 50,
+      "destinoNome": "Muniz Freire",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 15,
+      "origemNome": "Cachoeiro de Itapemirim",
+      "destinoIndiceSep": 17,
+      "destinoNome": "Castelo",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 15,
+      "origemNome": "Cachoeiro de Itapemirim",
+      "destinoIndiceSep": 35,
+      "destinoNome": "Itapemirim",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 15,
+      "origemNome": "Cachoeiro de Itapemirim",
+      "destinoIndiceSep": 39,
+      "destinoNome": "Jerônimo Monteiro",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 15,
+      "origemNome": "Cachoeiro de Itapemirim",
+      "destinoIndiceSep": 51,
+      "destinoNome": "Muqui",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 15,
+      "origemNome": "Cachoeiro de Itapemirim",
+      "destinoIndiceSep": 71,
+      "destinoNome": "Vargem Alta",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 16,
+      "origemNome": "Cariacica",
+      "destinoIndiceSep": 22,
+      "destinoNome": "Domingos Martins",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 16,
+      "origemNome": "Cariacica",
+      "destinoIndiceSep": 61,
+      "destinoNome": "Santa Leopoldina",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 16,
+      "origemNome": "Cariacica",
+      "destinoIndiceSep": 69,
+      "destinoNome": "Serra",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 16,
+      "origemNome": "Cariacica",
+      "destinoIndiceSep": 73,
+      "destinoNome": "Viana",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 16,
+      "origemNome": "Cariacica",
+      "destinoIndiceSep": 76,
+      "destinoNome": "Vila Velha",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 16,
+      "origemNome": "Cariacica",
+      "destinoIndiceSep": 77,
+      "destinoNome": "Vitória",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 17,
+      "origemNome": "Castelo",
+      "destinoIndiceSep": 20,
+      "destinoNome": "Conceição do Castelo",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 17,
+      "origemNome": "Castelo",
+      "destinoIndiceSep": 22,
+      "destinoNome": "Domingos Martins",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 17,
+      "origemNome": "Castelo",
+      "destinoIndiceSep": 50,
+      "destinoNome": "Muniz Freire",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 17,
+      "origemNome": "Castelo",
+      "destinoIndiceSep": 71,
+      "destinoNome": "Vargem Alta",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 17,
+      "origemNome": "Castelo",
+      "destinoIndiceSep": 72,
+      "destinoNome": "Venda Nova do Imigrante",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 18,
+      "origemNome": "Colatina",
+      "destinoIndiceSep": 26,
+      "destinoNome": "Governador Lindenberg",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 18,
+      "origemNome": "Colatina",
+      "destinoIndiceSep": 34,
+      "destinoNome": "Itaguaçu",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 18,
+      "origemNome": "Colatina",
+      "destinoIndiceSep": 40,
+      "destinoNome": "João Neiva",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 18,
+      "origemNome": "Colatina",
+      "destinoIndiceSep": 42,
+      "destinoNome": "Linhares",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 18,
+      "origemNome": "Colatina",
+      "destinoIndiceSep": 46,
+      "destinoNome": "Marilândia",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 18,
+      "origemNome": "Colatina",
+      "destinoIndiceSep": 53,
+      "destinoNome": "Pancas",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 18,
+      "origemNome": "Colatina",
+      "destinoIndiceSep": 64,
+      "destinoNome": "São Domingos do Norte",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 18,
+      "origemNome": "Colatina",
+      "destinoIndiceSep": 68,
+      "destinoNome": "São Roque do Canaã",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 19,
+      "origemNome": "Conceição da Barra",
+      "destinoIndiceSep": 54,
+      "destinoNome": "Pedro Canário",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 19,
+      "origemNome": "Conceição da Barra",
+      "destinoIndiceSep": 55,
+      "destinoNome": "Pinheiros",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 19,
+      "origemNome": "Conceição da Barra",
+      "destinoIndiceSep": 67,
+      "destinoNome": "São Mateus",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 20,
+      "origemNome": "Conceição do Castelo",
+      "destinoIndiceSep": 50,
+      "destinoNome": "Muniz Freire",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 20,
+      "origemNome": "Conceição do Castelo",
+      "destinoIndiceSep": 72,
+      "destinoNome": "Venda Nova do Imigrante",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 21,
+      "origemNome": "Divino de São Lourenço",
+      "destinoIndiceSep": 23,
+      "destinoNome": "Dores do Rio Preto",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 21,
+      "origemNome": "Divino de São Lourenço",
+      "destinoIndiceSep": 27,
+      "destinoNome": "Guaçuí",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 21,
+      "origemNome": "Divino de São Lourenço",
+      "destinoIndiceSep": 31,
+      "destinoNome": "Ibitirama",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 22,
+      "origemNome": "Domingos Martins",
+      "destinoIndiceSep": 45,
+      "destinoNome": "Marechal Floriano",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 22,
+      "origemNome": "Domingos Martins",
+      "destinoIndiceSep": 61,
+      "destinoNome": "Santa Leopoldina",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 22,
+      "origemNome": "Domingos Martins",
+      "destinoIndiceSep": 62,
+      "destinoNome": "Santa Maria de Jetibá",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 22,
+      "origemNome": "Domingos Martins",
+      "destinoIndiceSep": 71,
+      "destinoNome": "Vargem Alta",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 22,
+      "origemNome": "Domingos Martins",
+      "destinoIndiceSep": 72,
+      "destinoNome": "Venda Nova do Imigrante",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 22,
+      "origemNome": "Domingos Martins",
+      "destinoIndiceSep": 73,
+      "destinoNome": "Viana",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 23,
+      "origemNome": "Dores do Rio Preto",
+      "destinoIndiceSep": 27,
+      "destinoNome": "Guaçuí",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 23,
+      "origemNome": "Dores do Rio Preto",
+      "destinoIndiceSep": 31,
+      "destinoNome": "Ibitirama",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 24,
+      "origemNome": "Ecoporanga",
+      "destinoIndiceSep": 49,
+      "destinoNome": "Mucurici",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 24,
+      "origemNome": "Ecoporanga",
+      "destinoIndiceSep": 52,
+      "destinoNome": "Nova Venécia",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 24,
+      "origemNome": "Ecoporanga",
+      "destinoIndiceSep": 57,
+      "destinoNome": "Ponto Belo",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 24,
+      "origemNome": "Ecoporanga",
+      "destinoIndiceSep": 74,
+      "destinoNome": "Vila Pavão",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 25,
+      "origemNome": "Fundão",
+      "destinoIndiceSep": 30,
+      "destinoNome": "Ibiraçu",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 25,
+      "origemNome": "Fundão",
+      "destinoIndiceSep": 61,
+      "destinoNome": "Santa Leopoldina",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 25,
+      "origemNome": "Fundão",
+      "destinoIndiceSep": 63,
+      "destinoNome": "Santa Teresa",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 25,
+      "origemNome": "Fundão",
+      "destinoIndiceSep": 69,
+      "destinoNome": "Serra",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 26,
+      "origemNome": "Governador Lindenberg",
+      "destinoIndiceSep": 42,
+      "destinoNome": "Linhares",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 26,
+      "origemNome": "Governador Lindenberg",
+      "destinoIndiceSep": 46,
+      "destinoNome": "Marilândia",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 26,
+      "origemNome": "Governador Lindenberg",
+      "destinoIndiceSep": 59,
+      "destinoNome": "Rio Bananal",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 26,
+      "origemNome": "Governador Lindenberg",
+      "destinoIndiceSep": 64,
+      "destinoNome": "São Domingos do Norte",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 26,
+      "origemNome": "Governador Lindenberg",
+      "destinoIndiceSep": 75,
+      "destinoNome": "Vila Valério",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 28,
+      "origemNome": "Guarapari",
+      "destinoIndiceSep": 45,
+      "destinoNome": "Marechal Floriano",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 28,
+      "origemNome": "Guarapari",
+      "destinoIndiceSep": 73,
+      "destinoNome": "Viana",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 28,
+      "origemNome": "Guarapari",
+      "destinoIndiceSep": 76,
+      "destinoNome": "Vila Velha",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 27,
+      "origemNome": "Guaçuí",
+      "destinoIndiceSep": 31,
+      "destinoNome": "Ibitirama",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 27,
+      "origemNome": "Guaçuí",
+      "destinoIndiceSep": 66,
+      "destinoNome": "São José do Calçado",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 29,
+      "origemNome": "Ibatiba",
+      "destinoIndiceSep": 33,
+      "destinoNome": "Irupi",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 29,
+      "origemNome": "Ibatiba",
+      "destinoIndiceSep": 37,
+      "destinoNome": "Iúna",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 29,
+      "origemNome": "Ibatiba",
+      "destinoIndiceSep": 50,
+      "destinoNome": "Muniz Freire",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 30,
+      "origemNome": "Ibiraçu",
+      "destinoIndiceSep": 40,
+      "destinoNome": "João Neiva",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 30,
+      "origemNome": "Ibiraçu",
+      "destinoIndiceSep": 63,
+      "destinoNome": "Santa Teresa",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 31,
+      "origemNome": "Ibitirama",
+      "destinoIndiceSep": 37,
+      "destinoNome": "Iúna",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 31,
+      "origemNome": "Ibitirama",
+      "destinoIndiceSep": 50,
+      "destinoNome": "Muniz Freire",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 32,
+      "origemNome": "Iconha",
+      "destinoIndiceSep": 56,
+      "destinoNome": "Piúma",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 32,
+      "origemNome": "Iconha",
+      "destinoIndiceSep": 60,
+      "destinoNome": "Rio Novo do Sul",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 33,
+      "origemNome": "Irupi",
+      "destinoIndiceSep": 37,
+      "destinoNome": "Iúna",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 34,
+      "origemNome": "Itaguaçu",
+      "destinoIndiceSep": 36,
+      "destinoNome": "Itarana",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 34,
+      "origemNome": "Itaguaçu",
+      "destinoIndiceSep": 41,
+      "destinoNome": "Laranja da Terra",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 34,
+      "origemNome": "Itaguaçu",
+      "destinoIndiceSep": 63,
+      "destinoNome": "Santa Teresa",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 34,
+      "origemNome": "Itaguaçu",
+      "destinoIndiceSep": 68,
+      "destinoNome": "São Roque do Canaã",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 35,
+      "origemNome": "Itapemirim",
+      "destinoIndiceSep": 44,
+      "destinoNome": "Marataízes",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 35,
+      "origemNome": "Itapemirim",
+      "destinoIndiceSep": 56,
+      "destinoNome": "Piúma",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 35,
+      "origemNome": "Itapemirim",
+      "destinoIndiceSep": 58,
+      "destinoNome": "Presidente Kennedy",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 35,
+      "origemNome": "Itapemirim",
+      "destinoIndiceSep": 60,
+      "destinoNome": "Rio Novo do Sul",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 35,
+      "origemNome": "Itapemirim",
+      "destinoIndiceSep": 71,
+      "destinoNome": "Vargem Alta",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 36,
+      "origemNome": "Itarana",
+      "destinoIndiceSep": 41,
+      "destinoNome": "Laranja da Terra",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 36,
+      "origemNome": "Itarana",
+      "destinoIndiceSep": 62,
+      "destinoNome": "Santa Maria de Jetibá",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 36,
+      "origemNome": "Itarana",
+      "destinoIndiceSep": 63,
+      "destinoNome": "Santa Teresa",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 37,
+      "origemNome": "Iúna",
+      "destinoIndiceSep": 50,
+      "destinoNome": "Muniz Freire",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 38,
+      "origemNome": "Jaguaré",
+      "destinoIndiceSep": 42,
+      "destinoNome": "Linhares",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 38,
+      "origemNome": "Jaguaré",
+      "destinoIndiceSep": 70,
+      "destinoNome": "Sooretama",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 38,
+      "origemNome": "Jaguaré",
+      "destinoIndiceSep": 67,
+      "destinoNome": "São Mateus",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 38,
+      "origemNome": "Jaguaré",
+      "destinoIndiceSep": 75,
+      "destinoNome": "Vila Valério",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 39,
+      "origemNome": "Jerônimo Monteiro",
+      "destinoIndiceSep": 47,
+      "destinoNome": "Mimoso do Sul",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 39,
+      "origemNome": "Jerônimo Monteiro",
+      "destinoIndiceSep": 51,
+      "destinoNome": "Muqui",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 40,
+      "origemNome": "João Neiva",
+      "destinoIndiceSep": 42,
+      "destinoNome": "Linhares",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 40,
+      "origemNome": "João Neiva",
+      "destinoIndiceSep": 63,
+      "destinoNome": "Santa Teresa",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 40,
+      "origemNome": "João Neiva",
+      "destinoIndiceSep": 68,
+      "destinoNome": "São Roque do Canaã",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 42,
+      "origemNome": "Linhares",
+      "destinoIndiceSep": 46,
+      "destinoNome": "Marilândia",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 42,
+      "origemNome": "Linhares",
+      "destinoIndiceSep": 59,
+      "destinoNome": "Rio Bananal",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 42,
+      "origemNome": "Linhares",
+      "destinoIndiceSep": 70,
+      "destinoNome": "Sooretama",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 42,
+      "origemNome": "Linhares",
+      "destinoIndiceSep": 67,
+      "destinoNome": "São Mateus",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 43,
+      "origemNome": "Mantenópolis",
+      "destinoIndiceSep": 53,
+      "destinoNome": "Pancas",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 44,
+      "origemNome": "Marataízes",
+      "destinoIndiceSep": 58,
+      "destinoNome": "Presidente Kennedy",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 45,
+      "origemNome": "Marechal Floriano",
+      "destinoIndiceSep": 73,
+      "destinoNome": "Viana",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 47,
+      "origemNome": "Mimoso do Sul",
+      "destinoIndiceSep": 51,
+      "destinoNome": "Muqui",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 47,
+      "origemNome": "Mimoso do Sul",
+      "destinoIndiceSep": 58,
+      "destinoNome": "Presidente Kennedy",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 47,
+      "origemNome": "Mimoso do Sul",
+      "destinoIndiceSep": 66,
+      "destinoNome": "São José do Calçado",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 48,
+      "origemNome": "Montanha",
+      "destinoIndiceSep": 49,
+      "destinoNome": "Mucurici",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 48,
+      "origemNome": "Montanha",
+      "destinoIndiceSep": 54,
+      "destinoNome": "Pedro Canário",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 48,
+      "origemNome": "Montanha",
+      "destinoIndiceSep": 55,
+      "destinoNome": "Pinheiros",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 48,
+      "origemNome": "Montanha",
+      "destinoIndiceSep": 57,
+      "destinoNome": "Ponto Belo",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 49,
+      "origemNome": "Mucurici",
+      "destinoIndiceSep": 57,
+      "destinoNome": "Ponto Belo",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 52,
+      "origemNome": "Nova Venécia",
+      "destinoIndiceSep": 57,
+      "destinoNome": "Ponto Belo",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 52,
+      "origemNome": "Nova Venécia",
+      "destinoIndiceSep": 65,
+      "destinoNome": "São Gabriel da Palha",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 52,
+      "origemNome": "Nova Venécia",
+      "destinoIndiceSep": 67,
+      "destinoNome": "São Mateus",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 52,
+      "origemNome": "Nova Venécia",
+      "destinoIndiceSep": 74,
+      "destinoNome": "Vila Pavão",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 53,
+      "origemNome": "Pancas",
+      "destinoIndiceSep": 64,
+      "destinoNome": "São Domingos do Norte",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 54,
+      "origemNome": "Pedro Canário",
+      "destinoIndiceSep": 55,
+      "destinoNome": "Pinheiros",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 55,
+      "origemNome": "Pinheiros",
+      "destinoIndiceSep": 57,
+      "destinoNome": "Ponto Belo",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 55,
+      "origemNome": "Pinheiros",
+      "destinoIndiceSep": 67,
+      "destinoNome": "São Mateus",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 56,
+      "origemNome": "Piúma",
+      "destinoIndiceSep": 60,
+      "destinoNome": "Rio Novo do Sul",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 59,
+      "origemNome": "Rio Bananal",
+      "destinoIndiceSep": 70,
+      "destinoNome": "Sooretama",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 59,
+      "origemNome": "Rio Bananal",
+      "destinoIndiceSep": 64,
+      "destinoNome": "São Domingos do Norte",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 59,
+      "origemNome": "Rio Bananal",
+      "destinoIndiceSep": 75,
+      "destinoNome": "Vila Valério",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 60,
+      "origemNome": "Rio Novo do Sul",
+      "destinoIndiceSep": 71,
+      "destinoNome": "Vargem Alta",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 61,
+      "origemNome": "Santa Leopoldina",
+      "destinoIndiceSep": 62,
+      "destinoNome": "Santa Maria de Jetibá",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 61,
+      "origemNome": "Santa Leopoldina",
+      "destinoIndiceSep": 63,
+      "destinoNome": "Santa Teresa",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 61,
+      "origemNome": "Santa Leopoldina",
+      "destinoIndiceSep": 69,
+      "destinoNome": "Serra",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 62,
+      "origemNome": "Santa Maria de Jetibá",
+      "destinoIndiceSep": 63,
+      "destinoNome": "Santa Teresa",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 63,
+      "origemNome": "Santa Teresa",
+      "destinoIndiceSep": 68,
+      "destinoNome": "São Roque do Canaã",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 69,
+      "origemNome": "Serra",
+      "destinoIndiceSep": 77,
+      "destinoNome": "Vitória",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 70,
+      "origemNome": "Sooretama",
+      "destinoIndiceSep": 75,
+      "destinoNome": "Vila Valério",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 64,
+      "origemNome": "São Domingos do Norte",
+      "destinoIndiceSep": 65,
+      "destinoNome": "São Gabriel da Palha",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 64,
+      "origemNome": "São Domingos do Norte",
+      "destinoIndiceSep": 75,
+      "destinoNome": "Vila Valério",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 65,
+      "origemNome": "São Gabriel da Palha",
+      "destinoIndiceSep": 67,
+      "destinoNome": "São Mateus",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 65,
+      "origemNome": "São Gabriel da Palha",
+      "destinoIndiceSep": 75,
+      "destinoNome": "Vila Valério",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 67,
+      "origemNome": "São Mateus",
+      "destinoIndiceSep": 75,
+      "destinoNome": "Vila Valério",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 73,
+      "origemNome": "Viana",
+      "destinoIndiceSep": 76,
+      "destinoNome": "Vila Velha",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 76,
+      "origemNome": "Vila Velha",
+      "destinoIndiceSep": 77,
+      "destinoNome": "Vitória",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 1,
+      "origemNome": "Água Doce do Norte",
+      "destinoIndiceSep": 11,
+      "destinoNome": "Barra de São Francisco",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 1,
+      "origemNome": "Água Doce do Norte",
+      "destinoIndiceSep": 24,
+      "destinoNome": "Ecoporanga",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 2,
+      "origemNome": "Águia Branca",
+      "destinoIndiceSep": 11,
+      "destinoNome": "Barra de São Francisco",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 2,
+      "origemNome": "Águia Branca",
+      "destinoIndiceSep": 43,
+      "destinoNome": "Mantenópolis",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 2,
+      "origemNome": "Águia Branca",
+      "destinoIndiceSep": 52,
+      "destinoNome": "Nova Venécia",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 2,
+      "origemNome": "Águia Branca",
+      "destinoIndiceSep": 53,
+      "destinoNome": "Pancas",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 2,
+      "origemNome": "Águia Branca",
+      "destinoIndiceSep": 64,
+      "destinoNome": "São Domingos do Norte",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    },
+    {
+      "origemIndiceSep": 2,
+      "origemNome": "Águia Branca",
+      "destinoIndiceSep": 65,
+      "destinoNome": "São Gabriel da Palha",
+      "tipoRelacao": "MUNICIPIO_LIMITROFE"
+    }
+  ]
+}

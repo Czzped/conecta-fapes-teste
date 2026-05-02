@@ -10,7 +10,7 @@ Para facilitar a leitura, o modelo esta dividido em contextos de negocio. Cada c
 |------------|-----------|-----------|
 | [Pessoas](pessoas/modelo-estrutural.md) | PessoaFisica, NivelAcademico, HistoricoPessoa | Cadastro de individuos, titulacao e auditoria |
 | [Instituicoes](instituicoes/modelo-estrutural.md) | Instituicao, TipoInstituicao, Dirigente | Organizacoes, instituicoes, campi, filiais, setores internos e seus dirigentes |
-| [Diarias](diarias/modelo-estrutural.md) | TipoViagem, TipoDiaria | Cadastros corporativos para calculo de diarias |
+| [Diarias](diarias/modelo-estrutural.md) | Abrangencia, TipoDiaria, ParametroCalculoDiaria | Cadastros corporativos para calculo de diarias por abrangencia e parametros normativos |
 | [Rubricas](rubricas/modelo-estrutural.md) | Rubrica, SinonimoRubrica, MapeamentoContabilRubrica | Catalogo de rubricas e referencias contabeis |
 | [Geografia](geografia/modelo-estrutural.md) | Cidade, Regiao | Tabelas territoriais |
 | [Classificacoes](classificacoes/modelo-estrutural.md) | AreaConhecimento, Finalidade | Classificacoes transversais |
@@ -22,7 +22,7 @@ Para facilitar a leitura, o modelo esta dividido em contextos de negocio. Cada c
 |----------|-----------|
 | [Pessoas](pessoas/README.md) | [PessoaFisica](pessoas/pessoa-fisica/README.md), [NivelAcademico](pessoas/nivel-academico/README.md), [HistoricoPessoa](pessoas/historico-pessoa/README.md) |
 | [Instituicoes](instituicoes/README.md) | Instituicao, TipoInstituicao, Dirigente |
-| [Diarias](diarias/README.md) | TipoViagem, TipoDiaria |
+| [Diarias](diarias/README.md) | Abrangencia, TipoDiaria, ParametroCalculoDiaria |
 | [Rubricas](rubricas/README.md) | [Rubrica](rubricas/rubrica/README.md), [SinonimoRubrica](rubricas/sinonimo-rubrica/README.md), [MapeamentoContabilRubrica](rubricas/mapeamento-contabil-rubrica/README.md) |
 | [Geografia](geografia/README.md) | [Cidade](geografia/cidade/README.md), [Regiao](geografia/regiao/README.md) |
 | [Classificacoes](classificacoes/README.md) | [AreaConhecimento](classificacoes/area-conhecimento/README.md), [Finalidade](classificacoes/finalidade/README.md) |
@@ -108,34 +108,37 @@ classDiagram
         +boolean ativa
     }
 
-    class TipoViagem {
-        +String codigo
-        +String nome
-        +AbrangenciaViagem abrangencia
-        +String descricao
-        +boolean ativo
-    }
-
     class TipoDiaria {
-        +String codigo
+        +Abrangencia abrangencia
         +Decimal valorUnitario
-        +FracaoCalculoDiaria fracaoCalculo
         +Date vigenciaInicio
         +Date vigenciaFim
         +boolean ativo
     }
 
-    class AbrangenciaViagem {
-        <<enumeration>>
-        DENTRO_ESTADO
-        NACIONAL
-        INTERNACIONAL
+    class ParametroCalculoDiaria {
+        +TipoDiaria tipoDiaria
+        +String normaReferencia
+        +Decimal percentualDiariaSemPernoite
+        +Integer horasMinimasSemPernoite
+        +Integer horaLimiteRetornoAcrescimo
+        +Decimal percentualAcrescimoRetorno
+        +Integer distanciaMinimaKm
+        +Integer limiteDiasConsecutivos
+        +Integer limiteDiariasMes
+        +Decimal percentualComplementoTransporte
+        +boolean bloqueiaRegiaoMetropolitanaSemPernoite
+        +boolean bloqueiaMunicipioLimitrofeSemPernoite
+        +boolean ativo
+        +Date vigenciaInicio
+        +Date vigenciaFim
     }
 
-    class FracaoCalculoDiaria {
-        <<enumeration>>
-        12H
-        24H
+    class Abrangencia {
+        +String codigo
+        +String nome
+        +String descricao
+        +boolean ativo
     }
 
     class SinonimoRubrica {
@@ -195,10 +198,11 @@ classDiagram
     PessoaFisica "1" --> "*" HistoricoPessoa : historico
     PessoaFisica "0..1" --> "1" NivelAcademico : nivel academico
     AreaConhecimento "0..1" --> "*" AreaConhecimento : subareas
-    TipoViagem "1" --> "*" TipoDiaria : valores vigentes
     Rubrica "0..1" --> "*" Rubrica : subrubricas
     Rubrica "1" --> "*" SinonimoRubrica : sinonimos
     Rubrica "1" --> "*" MapeamentoContabilRubrica : mapeamentos contabeis
+    Abrangencia "1" --> "*" TipoDiaria : tipos
+    TipoDiaria "1" --> "*" ParametroCalculoDiaria : parametros
 
     Regiao "1" --> "*" Cidade : cidades
 ```
@@ -240,18 +244,30 @@ classDiagram
 | **AreaConhecimento** | codigo | Codigo da area conforme CNPq | Sim | String | Ex: 1.03.04 | 20 | Sim |
 | | nome | Nome da area de conhecimento | Sim | String | Ex: Ciencia da Computacao | 200 | |
 | | nivel | Nivel hierarquico da area | Sim | NivelArea | Grande Area, Area, Subarea, Especialidade | | |
-| **TipoViagem** | codigo | Codigo canonico do tipo de viagem | Sim | String | Ex: TVI-001 | 40 | Sim |
-| | nome | Nome de exibicao do tipo de viagem | Sim | String | Ex: Dentro do Estado, Nacional, Internacional | 150 | |
-| | abrangencia | Abrangencia administrativa do deslocamento | Sim | AbrangenciaViagem | DENTRO_ESTADO, NACIONAL, INTERNACIONAL | | |
-| | descricao | Descricao administrativa do tipo | Nao | String | | 500 | |
-| | ativo | Indica se o tipo esta disponivel para novas solicitacoes | Sim | Boolean | true/false | | |
-| **TipoDiaria** | codigo | Codigo canonico do tipo de diaria | Sim | String | Ex: DIA-2026-001 | 40 | Sim |
-| | tipoViagem (relacao) | Tipo de viagem ao qual o valor se aplica | Sim | FK -> TipoViagem | Via `valores vigentes` | | |
+| **Abrangencia** | codigo | Codigo canonico da abrangencia | Sim | String | DENTRO_ESTADO, NACIONAL, INTERNACIONAL | 40 | Sim |
+| | nome | Nome de exibicao da abrangencia | Sim | String | Ex: Dentro do Estado | 150 | |
+| | descricao | Descricao da abrangencia | Nao | String | | 500 | |
+| | ativo | Indica se a abrangencia esta ativa para novos tipos de diaria | Sim | Boolean | true/false | | |
+| **TipoDiaria** | abrangencia | Abrangencia administrativa do deslocamento | Sim | FK -> Abrangencia | Via `tipos` | | |
 | | valorUnitario | Valor unitario vigente da diaria | Sim | Decimal | Maior que zero | | |
-| | fracaoCalculo | Fracao usada no calculo | Sim | FracaoCalculoDiaria | 12H, 24H | | |
 | | vigenciaInicio | Inicio da vigencia | Sim | Date | | | |
 | | vigenciaFim | Fim da vigencia | Nao | Date | | | |
 | | ativo | Indica se o cadastro esta ativo | Sim | Boolean | true/false | | |
+| **ParametroCalculoDiaria** | tipoDiaria (relacao) | Tipo de diaria ao qual os parametros pertencem | Sim | FK -> TipoDiaria | Via `parametros` | | |
+| | normaReferencia | Decreto, resolucao ou ato normativo que fundamenta os parametros | Sim | String | Ex: Decreto ES no 5533-R/2023 | 200 | |
+| | percentualDiariaSemPernoite | Percentual aplicado em diaria sem pernoite, quando previsto na norma | Sim | Decimal | Ex: 0.40 | | |
+| | horasMinimasSemPernoite | Quantidade minima de horas para caracterizar diaria sem pernoite | Sim | Integer | Ex: 6 | | |
+| | horaLimiteRetornoAcrescimo | Hora limite de retorno que gera acrescimo, quando previsto | Nao | Integer | 0 a 23 | | |
+| | percentualAcrescimoRetorno | Percentual de acrescimo aplicado pelo retorno apos hora limite | Nao | Decimal | Ex: 0.50 | | |
+| | distanciaMinimaKm | Distancia minima em quilometros para elegibilidade, quando prevista | Nao | Integer | Maior ou igual a zero | | |
+| | limiteDiasConsecutivos | Limite de dias consecutivos por viagem, quando previsto | Nao | Integer | Maior que zero | | |
+| | limiteDiariasMes | Limite mensal de diarias, quando previsto | Nao | Integer | Maior que zero | | |
+| | percentualComplementoTransporte | Percentual de complemento de transporte, quando previsto | Nao | Decimal | Ex: 0.20 | | |
+| | bloqueiaRegiaoMetropolitanaSemPernoite | Indica se deslocamentos em regiao metropolitana sem pernoite sao bloqueados | Sim | Boolean | true/false | | |
+| | bloqueiaMunicipioLimitrofeSemPernoite | Indica se municipios limitrofes sem pernoite sao bloqueados | Sim | Boolean | true/false | | |
+| | ativo | Indica se os parametros estao vigentes para novas consultas | Sim | Boolean | true/false | | |
+| | vigenciaInicio | Inicio da vigencia dos parametros | Sim | Date | | | |
+| | vigenciaFim | Fim da vigencia dos parametros | Nao | Date | | | |
 | **Rubrica** | codigo | Codigo canonico da rubrica | Sim | String | Ex: RUB-DIARIAS | 40 | Sim |
 | | nome | Nome de exibicao da rubrica | Sim | String | Ex: Diarias | 150 | |
 | | descricao | Descricao da rubrica | Sim | String | | 500 | |

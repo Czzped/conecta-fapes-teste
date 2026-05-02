@@ -34,7 +34,7 @@ Rubrica e dado mestre de classificacao. Ela nao representa o movimento em si: a 
 
 No cadastro corporativo, a Rubrica possui `codigo`, `nome`, `descricao` e hierarquia opcional por `rubricaPai`/`subrubricas`. Subrubrica nao e entidade separada: e uma Rubrica filha de outra Rubrica.
 
-Tambem pertencem ao M008 os cadastros corporativos usados pelo fluxo de diarias: `TipoViagem`, que classifica o deslocamento, e `TipoDiaria`, que mantem valor vigente, vigencia e fracao de calculo por tipo de viagem. Os dois ficam no [contexto Diarias](diarias/README.md). O M003 apenas referencia esses cadastros ao criar uma solicitacao e grava snapshots para preservar o calculo historico.
+Tambem pertencem ao M008 os cadastros corporativos usados pelo fluxo de diarias: `Abrangencia`, que classifica o deslocamento, `TipoDiaria`, que mantem valor vigente, vigencia e abrangencia da viagem, e `ParametroCalculoDiaria`, que versiona os parametros normativos de calculo vinculados ao tipo de diaria, como percentuais, limites, bloqueios e norma de referencia. Esses dados ficam no [contexto Diarias](diarias/README.md). O M003 apenas referencia os cadastros vigentes ao criar uma solicitacao e grava snapshots para preservar o calculo historico.
 
 Os documentos detalhados do M008 sao organizados por contexto de negocio, nao por uma pasta generica de entidades:
 
@@ -42,7 +42,7 @@ Os documentos detalhados do M008 sao organizados por contexto de negocio, nao po
 |----------|-----------|
 | [Pessoas](pessoas/README.md) | PessoaFisica, NivelAcademico, HistoricoPessoa |
 | [Instituicoes](instituicoes/README.md) | Instituicao, TipoInstituicao, Dirigente |
-| [Diarias](diarias/README.md) | TipoViagem, TipoDiaria |
+| [Diarias](diarias/README.md) | Abrangencia, TipoDiaria, ParametroCalculoDiaria |
 | [Rubricas](rubricas/README.md) | Rubrica, SinonimoRubrica, MapeamentoContabilRubrica |
 | [Geografia](geografia/README.md) | Cidade, Regiao |
 | [Classificacoes](classificacoes/README.md) | AreaConhecimento, Finalidade |
@@ -77,7 +77,8 @@ Cada contexto e dono do seu `README.md`, `modelo-estrutural.md`, `backlog.md` e 
 | RN19 | Sinonimos de rubrica devem apontar para uma Rubrica canonica e apoiar importacao/normalizacao sem substituir o nome oficial. | Should |
 | RN20 | Mapeamento contabil de Rubrica e opcional, versionado por vigencia e referencia contas do M016 sem transformar Rubrica em conta contabil. | Should |
 | RN21 | Rubrica nao deve armazenar transacoes financeiras nem movimentos de saldo; deve ser referenciada por `Transacao` e movimentos bancarios apenas como classificacao. | Must |
-| RN22 | TipoViagem deve possuir codigo unico, nome, abrangencia e situacao ativa/inativa; nao armazena valor unitario. | Must |
-| RN23 | TipoDiaria deve possuir codigo unico, tipo de viagem, valor unitario, fracao de calculo, vigencia e situacao ativa/inativa, sem vigencias sobrepostas para o mesmo tipo de viagem. | Must |
+| RN22 | Abrangencia da diaria e classe corporativa com codigo canonico unico, nome, descricao e situacao ativa/inativa. | Must |
+| RN23 | TipoDiaria deve possuir abrangencia, valor unitario, vigencia e situacao ativa/inativa, sem vigencias sobrepostas para a mesma abrangencia. | Must |
+| RN24 | ParametroCalculoDiaria deve estar vinculado a um TipoDiaria e possuir norma de referencia, percentuais, limites, bloqueios, vigencia e situacao ativa/inativa, sem vigencias sobrepostas para o mesmo TipoDiaria. | Must |
 | RI1 | Uma instituicao so pode ter um dirigente ativo ao mesmo tempo. | Must |
 | RI2 | Uma pessoa suspensa nao pode ser reativada sem justificativa registrada. | Must |
