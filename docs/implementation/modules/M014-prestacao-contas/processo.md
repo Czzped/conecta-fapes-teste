@@ -127,6 +127,8 @@ sequenceDiagram
 
 Este fluxo inicia quando o Coordenador cria a prestacao em `RASCUNHO` e vincula as transacoes bancarias importadas. A partir dessa base comum, a elaboracao se divide em modelos separados por tipo de despesa: nota fiscal de produto, produto sem nota fiscal, nota fiscal de servico, invoice, diarias e passagens. Nota fiscal de produto passa pela integracao SERPRO. Nota fiscal de servico, no fluxo atual, e validada por biblioteca interna; a validacao por SERPRO fica prevista como evolucao futura. Os demais tipos seguem por validacoes internas, armazenamento dos arquivos e classificacao em rubricas.
 
+**Separacao obrigatoria:** `RubricaProjeto` e `TransacaoFinanceira` nao sao a mesma coisa. A rubrica classifica a despesa contra o orcamento aprovado; a transacao financeira representa o movimento bancario que sera conciliado. A tela e a API devem permitir selecionar/validar esses dois objetos separadamente, exceto quando a rubrica vier herdada de um objeto operacional anterior, como uma `SolicitacaoDiaria` do M003.
+
 ### Fluxo 3.1 - Base da Prestacao
 
 ```mermaid
@@ -295,7 +297,7 @@ sequenceDiagram
 
 ### Fluxo 3.6 - Diarias
 
-Diarias nao passam pelo SERPRO. A solicitacao operacional de diaria pertence ao M003 e deve estar aprovada pela FAPES antes da comprovacao. No M014, o Coordenador escolhe a diaria em uma lista de solicitacoes aprovadas que ainda nao foram prestadas contas, informa o PIX do pagamento, anexa o comprovante de pagamento da diaria e registra a despesa. A API valida a solicitacao no M003, beneficiario, quantidade, valor calculado da diaria, debito na rubrica de Diarias e Passagens, ausencia de JustificativaDiaria anterior e comprovante PIX/pagamento, armazena os comprovantes e registra a justificativa.
+Diarias nao passam pelo SERPRO. A solicitacao operacional de diaria pertence ao M003 e nao exige aprovacao manual da FAPES: ela nasce quando ha saldo na RubricaProjeto aplicavel, gera comprometimento e segue aceite/recusa do beneficiario quando houver bolsista. No M014, o Coordenador escolhe a diaria em uma lista de solicitacoes elegiveis que ainda nao foram prestadas contas, informa o PIX do pagamento quando aplicavel, anexa o comprovante de pagamento da diaria e registra a despesa. A API valida a solicitacao no M003, beneficiario, quantidade, valor calculado da diaria, comprometimento na RubricaProjeto de Diarias e Passagens, ausencia de JustificativaDiaria anterior e comprovante PIX/pagamento, armazena os comprovantes e registra a justificativa.
 
 ```mermaid
 sequenceDiagram
@@ -307,7 +309,7 @@ sequenceDiagram
     participant MinIO as MinIO
 
     Coord->>API: Solicita diarias disponiveis para prestacao
-    API->>M003: Consulta solicitacoes de diaria aprovadas
+    API->>M003: Consulta solicitacoes de diaria elegiveis
     API->>DB: Exclui solicitacoes ja vinculadas a JustificativaDiaria
     API-->>Coord: Retorna lista de diarias elegiveis
     alt Diaria nao existe na lista
@@ -325,15 +327,15 @@ sequenceDiagram
     Coord->>API: Informa beneficiario, quantidade e valor
     API->>API: Valida solicitacao M003, beneficiario, quantidade, valor, PIX e nao reutilizacao
     API->>DB: Persiste JustificativaDiaria
-    Coord->>API: Define rubrica da diaria
-    API->>DB: Valida rubrica e limite orcamentario
+    Coord->>API: Confirma RubricaProjeto da diaria
+    API->>DB: Valida RubricaProjeto e limite orcamentario
     API->>DB: Calcula saldo da prestacao
     API-->>Coord: Confirma diaria registrada
 ```
 
 ### Fluxo 3.7 - Passagens
 
-Passagens nao passam pelo SERPRO. O Coordenador deve informar os dados da viagem, anexar o comprovante de pagamento da passagem e anexar o comprovante de realizacao da viagem. O comprovante de realizacao pode ser cartao de embarque, declaracao de participacao, certificado, carta de aceite de artigo ou declaracao de reuniao/visita tecnica. A API valida os comprovantes obrigatorios, os dados da viagem e o pagamento, armazena os arquivos e registra a despesa na rubrica definida pelo Coordenador ou Outorgado.
+Passagens nao passam pelo SERPRO. O Coordenador deve informar os dados da viagem, anexar o comprovante de pagamento da passagem e anexar o comprovante de realizacao da viagem. O comprovante de realizacao pode ser cartao de embarque, declaracao de participacao, certificado, carta de aceite de artigo ou declaracao de reuniao/visita tecnica. A API valida os comprovantes obrigatorios, os dados da viagem e o pagamento, armazena os arquivos e registra a despesa na RubricaProjeto definida pelo Coordenador ou Outorgado.
 
 ```mermaid
 sequenceDiagram
@@ -351,8 +353,8 @@ sequenceDiagram
     Coord->>API: Informa dados da viagem e comprovantes
     API->>API: Valida dados da passagem, pagamento e realizacao da viagem
     API->>DB: Persiste justificativa de passagem
-    Coord->>API: Define rubrica da passagem
-    API->>DB: Valida rubrica e limite orcamentario
+    Coord->>API: Define RubricaProjeto da passagem
+    API->>DB: Valida RubricaProjeto e limite orcamentario
     Coord->>API: Informa orcamentos quando aplicavel
     API->>DB: Persiste OrcamentoFornecedor
     API->>DB: Calcula saldo da prestacao
@@ -372,9 +374,10 @@ sequenceDiagram
 | 7 | Registrar diaria | Coordenador / Outorgado | Diaria registrada a partir da solicitacao de diaria aprovada do M003, com beneficiario, quantidade, valor calculado e comprovante de pagamento da diaria, sem chamada ao SERPRO. |
 | 8 | Registrar passagem | Coordenador / Outorgado | Passagem registrada com dados da viagem, comprovante de pagamento da passagem e comprovante de realizacao da viagem, sem chamada ao SERPRO. |
 | 9 | Enviar arquivos | Coordenador / Outorgado / MinIO | Arquivos comprobatorios armazenados no MinIO e vinculados a despesa. |
-| 10 | Definir rubrica | Coordenador / Outorgado | Despesa classificada na rubrica orcamentaria correspondente. |
+| 10 | Definir rubrica | Coordenador / Outorgado | Despesa classificada na rubrica orcamentaria correspondente, separada da transacao bancaria. |
 | 11 | Informar orcamentos | Coordenador / Outorgado | Orcamentos cadastrados quando aplicavel e, quando necessario, um orcamento marcado como escolhido. |
-| 12 | Calcular saldo | Modulo M014 | Saldo calculado por `ValorTotalTransacoes - ValorTotalJustificativas`. |
+| 12 | Conciliar transacoes | Modulo M014 | Diferenca da prestacao calculada por `ValorTotalTransacoes - ValorTotalJustificativas`. |
+| 13 | Atualizar execucao orcamentaria | M014 / M013 | Quando aplicavel, M013 registra `Transacao` de execucao na `RubricaProjeto`; a `TransacaoFinanceira` fica apenas como referencia de conciliacao. |
 
 ---
 

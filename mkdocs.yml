@@ -91,6 +91,7 @@ nav:
       - Visao do Produto: discovery/product-vision.md
       - Personas: discovery/personas.md
       - Glossario: discovery/glossario.md
+      - Rubricas e Subrubricas FAPES: discovery/rubricas-subrubricas-fapes.md
       - Corporativo: discovery/domains/01-corporativo.md
       - Planejamento: discovery/domains/02-planejamento.md
       - Fomento Pre-Award: discovery/domains/03-fomento-pre-award.md
@@ -247,13 +248,54 @@ nav:
           - Contrato: implementation/modules/M008-cadastros-corporativos/contrato.md
           - Contrato API: implementation/modules/M008-cadastros-corporativos/contrato-api.md
           - Modelo Estrutural: implementation/modules/M008-cadastros-corporativos/modelo-estrutural.md
-          - Pessoas: implementation/modules/M008-cadastros-corporativos/modelo-estrutural-pessoas.md
-          - Instituicoes e Unidades: implementation/modules/M008-cadastros-corporativos/modelo-estrutural-instituicoes.md
           - Cadastros de Referencia: implementation/modules/M008-cadastros-corporativos/modelo-estrutural-referencia.md
+          - Contextos:
+              - Pessoas:
+                  - Visao Geral: implementation/modules/M008-cadastros-corporativos/pessoas/README.md
+                  - Backlog: implementation/modules/M008-cadastros-corporativos/pessoas/backlog.md
+                  - Modelo Estrutural: implementation/modules/M008-cadastros-corporativos/pessoas/modelo-estrutural.md
+                  - PessoaFisica: implementation/modules/M008-cadastros-corporativos/pessoas/pessoa-fisica/README.md
+                  - NivelAcademico: implementation/modules/M008-cadastros-corporativos/pessoas/nivel-academico/README.md
+                  - HistoricoPessoa: implementation/modules/M008-cadastros-corporativos/pessoas/historico-pessoa/README.md
+                  - EPIC-001: implementation/modules/M008-cadastros-corporativos/pessoas/epics/EPIC-M008-001.md
+              - Instituicoes:
+                  - Visao Geral: implementation/modules/M008-cadastros-corporativos/instituicoes/README.md
+                  - Backlog: implementation/modules/M008-cadastros-corporativos/instituicoes/backlog.md
+                  - Modelo Estrutural: implementation/modules/M008-cadastros-corporativos/instituicoes/modelo-estrutural.md
+                  - Instituicao: implementation/modules/M008-cadastros-corporativos/instituicoes/instituicao/README.md
+                  - TipoInstituicao: implementation/modules/M008-cadastros-corporativos/instituicoes/tipo-instituicao/README.md
+                  - Dirigente: implementation/modules/M008-cadastros-corporativos/instituicoes/dirigente/README.md
+                  - EPIC-002: implementation/modules/M008-cadastros-corporativos/instituicoes/epics/EPIC-M008-002.md
+              - Diarias:
+                  - Visao Geral: implementation/modules/M008-cadastros-corporativos/diarias/README.md
+                  - Backlog: implementation/modules/M008-cadastros-corporativos/diarias/backlog.md
+                  - Modelo Estrutural: implementation/modules/M008-cadastros-corporativos/diarias/modelo-estrutural.md
+                  - TipoViagem: implementation/modules/M008-cadastros-corporativos/diarias/tipo-viagem/README.md
+                  - TipoDiaria: implementation/modules/M008-cadastros-corporativos/diarias/tipo-diaria/README.md
+                  - EPIC-005: implementation/modules/M008-cadastros-corporativos/diarias/epics/EPIC-M008-005.md
+              - Rubricas:
+                  - Visao Geral: implementation/modules/M008-cadastros-corporativos/rubricas/README.md
+                  - Backlog: implementation/modules/M008-cadastros-corporativos/rubricas/backlog.md
+                  - Modelo Estrutural: implementation/modules/M008-cadastros-corporativos/rubricas/modelo-estrutural.md
+                  - Rubrica: implementation/modules/M008-cadastros-corporativos/rubricas/rubrica/README.md
+                  - SinonimoRubrica: implementation/modules/M008-cadastros-corporativos/rubricas/sinonimo-rubrica/README.md
+                  - MapeamentoContabilRubrica: implementation/modules/M008-cadastros-corporativos/rubricas/mapeamento-contabil-rubrica/README.md
+                  - EPIC-004: implementation/modules/M008-cadastros-corporativos/rubricas/epics/EPIC-M008-004.md
+              - Geografia:
+                  - Visao Geral: implementation/modules/M008-cadastros-corporativos/geografia/README.md
+                  - Backlog: implementation/modules/M008-cadastros-corporativos/geografia/backlog.md
+                  - Modelo Estrutural: implementation/modules/M008-cadastros-corporativos/geografia/modelo-estrutural.md
+                  - Cidade: implementation/modules/M008-cadastros-corporativos/geografia/cidade/README.md
+                  - Regiao: implementation/modules/M008-cadastros-corporativos/geografia/regiao/README.md
+                  - EPIC-006: implementation/modules/M008-cadastros-corporativos/geografia/epics/EPIC-M008-006.md
+              - Classificacoes:
+                  - Visao Geral: implementation/modules/M008-cadastros-corporativos/classificacoes/README.md
+                  - Backlog: implementation/modules/M008-cadastros-corporativos/classificacoes/backlog.md
+                  - Modelo Estrutural: implementation/modules/M008-cadastros-corporativos/classificacoes/modelo-estrutural.md
+                  - AreaConhecimento: implementation/modules/M008-cadastros-corporativos/classificacoes/area-conhecimento/README.md
+                  - Finalidade: implementation/modules/M008-cadastros-corporativos/classificacoes/finalidade/README.md
+                  - EPIC-003: implementation/modules/M008-cadastros-corporativos/classificacoes/epics/EPIC-M008-003.md
           - Modelo Comportamental: implementation/modules/M008-cadastros-corporativos/modelo-comportamental.md
-          - EPIC-001: implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-001.md
-          - EPIC-002: implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-002.md
-          - EPIC-003: implementation/modules/M008-cadastros-corporativos/epics/EPIC-M008-003.md
       - M009 Gestao Bolsa Pesquisa:
           - implementation/modules/M009-gestao-bolsista/README.md
           - Backlog: implementation/modules/M009-gestao-bolsista/backlog.md
@@ -318,6 +360,7 @@ nav:
           - EPIC-005: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-005.md
           - EPIC-006: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-006.md
           - EPIC-007: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-007.md
+          - EPIC-008 Rubricas Permitidas: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-008.md
       - M012 Acompanhamento e Resultados:
           - implementation/modules/M012-acompanhamento-resultados/README.md
           - Backlog: implementation/modules/M012-acompanhamento-resultados/backlog.md
@@ -338,13 +381,16 @@ nav:
           - EPIC-001: implementation/modules/M013-gestao-orcamentaria-projeto/epics/EPIC-M013-001.md
           - EPIC-002: implementation/modules/M013-gestao-orcamentaria-projeto/epics/EPIC-M013-002.md
           - EPIC-003: implementation/modules/M013-gestao-orcamentaria-projeto/epics/EPIC-M013-003.md
+          - EPIC-004 Rubrica Aprovada: implementation/modules/M013-gestao-orcamentaria-projeto/epics/EPIC-M013-004.md
       - M014 Prestacao de Contas:
           - implementation/modules/M014-prestacao-contas/README.md
           - Backlog: implementation/modules/M014-prestacao-contas/backlog.md
           - Contrato: implementation/modules/M014-prestacao-contas/contrato.md
           - Contrato API: implementation/modules/M014-prestacao-contas/contrato-api.md
+          - Arquitetura: implementation/modules/M014-prestacao-contas/arquitetura.md
           - Modelo Estrutural: implementation/modules/M014-prestacao-contas/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M014-prestacao-contas/modelo-comportamental.md
+          - Processo: implementation/modules/M014-prestacao-contas/processo.md
           - EPIC-010 Importacao: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-010.md
           - EPIC-001: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-001.md
           - EPIC-002: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-002.md
@@ -355,6 +401,7 @@ nav:
           - EPIC-007: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-007.md
           - EPIC-008: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-008.md
           - EPIC-009 (Pos-MVP) Prazos Temporais: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-009.md
+          - EPIC-011 Rubrica do Projeto: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-011.md
       - M015 Suspensao e Finalizacao:
           - implementation/modules/M015-suspensao-finalizacao/README.md
           - Backlog: implementation/modules/M015-suspensao-finalizacao/backlog.md

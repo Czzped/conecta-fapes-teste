@@ -34,7 +34,7 @@ Cadastro e manutencao de pessoas fisicas (beneficiarios, pesquisadores, consulto
 
 ## 1.3 Cadastros Basicos
 
-Dados de referencia e parametros do sistema: estrutura organizacional da agencia (areas tecnicas e servidores), tabelas geograficas, areas de conhecimento e rubricas financeiras.
+Dados de referencia e parametros do sistema: estrutura organizacional da agencia (areas tecnicas e servidores), tabelas geograficas, areas de conhecimento e rubricas.
 
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|
@@ -44,7 +44,7 @@ Dados de referencia e parametros do sistema: estrutura organizacional da agencia
 | 1.3.4 | Cadastro de Cidades | Manter cadastro de cidades do estado | Analista da Area Tecnica da Agencia | — |
 | 1.3.5 | Cadastro de Regioes | Manter cadastro de regioes (agrupamento de cidades) | Analista da Area Tecnica da Agencia | — |
 | 1.3.6 | Cadastro de Areas de Conhecimento | Manter tabela de areas de conhecimento (ex: Ciencias Exatas e da Terra) | Analista da Area Tecnica da Agencia | — |
-| 1.3.7 | Rubricas Financeiras | Manter cadastro de rubricas para classificacao de despesas | Analista da Area Tecnica da Agencia | — |
+| 1.3.7 | Rubricas | Manter cadastro de Rubricas para classificacao de despesas, com natureza, relacao pai/filha, fonte normativa, sinonimos e mapeamento contabil opcional | Analista da Area Tecnica da Agencia | — |
 | 1.3.8 | Definir Minimo de Avaliadores Ad Hoc | Configurar o numero minimo padrao de avaliacoes exigidas por iniciativa em nivel de sistema; este valor pode ser substituido pelo parametro especifico definido na configuracao de cada captacao | Analista da Area Tecnica da Agencia | Art. 4, 2; Art. 12 |
 
 ## 1.4 Modalidades de Bolsa

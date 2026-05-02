@@ -11,7 +11,7 @@
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Entidades de iniciativa, plano, resultados, equipe, orcamento e execucao consolidada |
 | [Proposta: Ciclo de Fomento da Iniciativa](specifications/proposta-ciclo-fomento-iniciativa.md) | Proposta de timeline pre-award, award e post-award como read model transversal |
-| [Diarias da Iniciativa](diarias/README.md) | Subfluxo dedicado para tipo de diaria, solicitacao, aceite, aprovacao, debito e cancelamento de diarias |
+| [Diarias da Iniciativa](diarias/README.md) | Subfluxo dedicado para solicitacao, aceite, alocacao, remocao antes do inicio e regularizacao de diarias; tipos de diaria e viagem sao referencias do M008 |
 | [Aditivos da Iniciativa](aditivos/README.md) | Subfluxo dedicado para vigencia, orcamento original e dados dos aditivos da iniciativa |
 
 ---
@@ -40,7 +40,7 @@ Os elementos planejaveis da iniciativa ficam em `VersaoPlanoIniciativa`. Resulta
 
 O `OrcamentoPlanejado` registra a previsao aprovada de recursos para executar a iniciativa. O `OrcamentoExecutado` e uma visao consolidada e historica da execucao, calculada a partir de `LancamentoExecucao` e integrada aos modulos financeiros quando necessario.
 
-A `SolicitacaoDiaria` registra o pedido operacional de diaria feito pelo ortogado/coordenador para um ou mais bolsistas alocados na iniciativa. A FAPES cadastra o `TipoDiaria` vigente em **Configuracoes > Referencias Corporativas > Diarias**, informando valor, vigencia, fracao de calculo e tipo de viagem. O coordenador informa tipo de viagem, partida, chegada, destino e motivo; o sistema localiza o tipo de diaria vigente, calcula automaticamente a quantidade e o valor da diaria e grava os snapshots de valor e fracao de calculo. Cada bolsista beneficiario deve assinar um `TermoAceiteDiaria`, declarando ciencia da diaria e aceite de recebimento na conta bancaria cadastrada. Apos os aceites, a FAPES analisa a solicitacao. Quando aprovada, a solicitacao gera um debito/comprometimento na rubrica de **Diarias e Passagens** e fica disponivel para pagamento e posterior comprovacao em M014.
+A `SolicitacaoDiaria` registra o pedido operacional de diaria feito pelo ortogado/coordenador para um ou mais bolsistas alocados na iniciativa. O coordenador informa tipo de viagem, partida, chegada, destino e motivo; o sistema consulta o M008 para validar o `TipoViagem` e localizar o `TipoDiaria` vigente, calcula automaticamente a quantidade e o valor da diaria e grava os snapshots de valor e fracao de calculo. A solicitacao nao passa por aprovacao manual da FAPES: se houver rubrica de diaria e saldo suficiente, o valor e alocado/comprometido na criacao. Cada bolsista beneficiario deve assinar um `TermoAceiteDiaria`, declarando ciencia da diaria e aceite de recebimento na conta bancaria cadastrada. Apos todos os aceites obrigatorios, a solicitacao passa automaticamente para aprovada e fica disponivel para comprovacao em M014.
 
 A consulta de vigencia e aditivos preserva a data de aprovacao original, a data inicial, a data final original, a data final vigente e o orcamento original da iniciativa. A data final vigente so muda por aditivo de tempo aprovado; o orcamento original permanece historico mesmo quando houver aditivo financeiro. A tela **Meu Projeto** deve exibir o bloco **Vigencia e aditivos** com abas **Resumo** e **Dados dos aditivos**; a area **Projetos** pode expor uma aba **Aditivos** para consulta dos mesmos registros.
 
@@ -75,14 +75,14 @@ A consulta de vigencia e aditivos preserva a data de aprovacao original, a data 
 | RN23 | A solicitacao de diaria deve estar vinculada a uma iniciativa ativa e a bolsistas/alocacoes validas consultadas em M009. | Must |
 | RN24 | O coordenador informa tipo de viagem, data/hora de partida e chegada; o sistema calcula quantidade de diarias e valor total usando o tipo de diaria vigente no momento da solicitacao. | Must |
 | RN25 | O valor calculado da diaria deve ser persistido na solicitacao para preservar historico mesmo que a tabela de valores seja alterada posteriormente. | Must |
-| RN26 | Cada bolsista beneficiario deve assinar termo de aceite antes da solicitacao seguir para aprovacao da FAPES, declarando ciencia e aceite de recebimento na conta bancaria cadastrada. | Must |
+| RN26 | Cada bolsista beneficiario deve assinar termo de aceite; apos todos os aceites obrigatorios, a solicitacao passa automaticamente para aprovada, declarando ciencia e aceite de recebimento na conta bancaria cadastrada. | Must |
 | RN27 | A prestacao de contas em M014 deve referenciar a solicitacao de diaria do M003 ao registrar `JustificativaDiaria`, evitando comprovacao sem pedido operacional rastreavel. | Should |
-| RN28 | A FAPES deve cadastrar o tipo de diaria com vigencia, valor unitario, fracao de calculo, tipo de viagem e status ativo em **Configuracoes > Referencias Corporativas > Diarias** antes de permitir o calculo de novas solicitacoes. | Must |
-| RN29 | A solicitacao de diaria, apos aceite dos bolsistas, deve ser analisada pela FAPES antes de ser aprovada ou rejeitada; a rejeicao exige justificativa obrigatoria. | Must |
-| RN30 | Quando a solicitacao de diaria for aprovada, o M003 deve gerar debito/comprometimento na rubrica de Diarias e Passagens pelo valor total aprovado. | Must |
-| RN31 | O debito gerado pela aprovacao da diaria deve ser rastreavel ate a `SolicitacaoDiaria` e compor a execucao consolidada da iniciativa. | Must |
-| RN32 | O coordenador pode cancelar uma solicitacao de diaria ja aprovada desde que informe justificativa e ela ainda nao esteja vinculada a prestacao de contas finalizada. | Must |
-| RN33 | O cancelamento de solicitacao de diaria aprovada deve gerar credito de reversao na rubrica de Diarias e Passagens, rastreavel ate a `SolicitacaoDiaria`. | Must |
+| RN28 | O M003 deve consumir do M008 o tipo de diaria vigente, com valor unitario, fracao de calculo, tipo de viagem e status ativo, antes de permitir o calculo de novas solicitacoes. | Must |
+| RN29 | A solicitacao de diaria nao depende de permissao ou aprovacao manual da FAPES; a criacao deve ser bloqueada quando nao houver rubrica de Diarias e Passagens ou saldo suficiente. | Must |
+| RN30 | Quando a solicitacao de diaria for criada com saldo suficiente, o M003 deve gerar debito/comprometimento na rubrica de Diarias e Passagens pelo valor total calculado. | Must |
+| RN31 | O debito gerado pelo comprometimento da diaria deve ser rastreavel ate a `SolicitacaoDiaria` e compor a execucao consolidada da iniciativa. | Must |
+| RN32 | O coordenador pode remover uma solicitacao de diaria `ALOCADA` ou `APROVADA` com justificativa somente antes da data/hora de partida. | Must |
+| RN33 | A remocao ou regularizacao de diaria nao utilizada deve gerar credito de reversao na rubrica de Diarias e Passagens, rastreavel ate a `SolicitacaoDiaria`, quando houver comprometimento anterior. | Must |
 | RN34 | Toda iniciativa deve preservar data de aprovacao original, data inicial, data final original, data final vigente e orcamento original para consulta historica. | Must |
 | RN35 | A data final vigente deve ser igual a data final original quando nao houver aditivo de tempo aprovado. | Must |
 | RN36 | Quando houver aditivo de tempo aprovado, a data final vigente deve refletir a ultima data final aprovada. | Must |

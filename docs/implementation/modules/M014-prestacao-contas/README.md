@@ -16,6 +16,10 @@
 
 > **Nota sobre implementacao:** Este modulo possui um backend independente (`ConectaFapes.PrestacaoContas.*`) com AppDbContext, SQL Server e integracoes proprias (SERPRO, MinIO). Detalhes de infraestrutura em [architecture/04-dados-e-operacao.md](../../../architecture/04-dados-e-operacao.md). Entidades financeiras (ContaBancaria, Orcamento, RubricaOrcamentaria, TransacaoFinanceira) estao implementadas neste backend mas pertencem conceitualmente a M016/M013 — ver [debito tecnico](backlog.md#debito-tecnico).
 
+> **Linguagem de Rubricas:** No modelo conceitual alvo, o M014 classifica despesas contra a `RubricaProjeto` do M013. O termo `RubricaOrcamentaria` permanece documentado como compatibilidade do backend atual/legado ate a migracao, mas nao deve ser confundido com a Rubrica canonica do M008 nem com conta contabil do M016.
+
+> **Rubrica x transacao:** `RubricaProjeto` classifica a despesa no orcamento aprovado; `Transacao` movimenta o saldo dessa rubrica no M013. `TransacaoFinanceira` representa o movimento bancario importado/conciliado. A prestacao deve manter esses conceitos separados: selecionar/validar rubrica para a despesa e selecionar/validar movimento bancario/transacao financeira para o pagamento.
+
 > **Dependencia de M016 — FundoFinanceiro:** A entidade `FundoFinanceiro` e a relacao N:1 entre `ContaBancaria` e `FundoFinanceiro` estao modeladas em M016 mas sua implementacao esta deferida ate que M014 (Prestacao de Contas) esteja concluido, pois os requisitos de segregacao de fundos surgem naturalmente do fluxo de prestacao de contas. Ver [M016 backlog](../M016-contabilidade-financeiro/backlog.md).
 
 > **Aderencia do backend atual:** A API `leds-conectafapes-prestacao-de-contas` em `develop` esta adequada para uma V1 nuclear de prestacao de contas, com `Prestacao`, `JustificativaNF`, `JustificativaDiaria`, `JustificativaInvoice`, `DocumentoFiscal`, `ItemDocumentoFiscal`, `TransacaoFinanceira`, SERPRO para NF-e, extracao interna de NFS-e e MinIO. Ela ainda nao cobre completamente o processo revisado deste modulo: faltam `JustificativaProdutoSemNota`, fluxo proprio de passagens, campos de PIX, referencia a solicitacao de diaria aprovada no M003, bloqueio de reutilizacao de diaria ja prestada contas, importacao CNAB 240 com EDI Banestes -> API/Base M014 -> MinIO -> fila -> workers, e migracao conceitual de `ContaContabil` para `RubricaOrcamentaria`. Ver avaliacao completa em [arquitetura.md](arquitetura.md).
@@ -30,7 +34,7 @@ Coordenadores ou ortogados submetem documentos fiscais que comprovam a aplicacao
 
 ## Dominio
 
-A prestacao de contas e organizada como um agregado `Prestacao` que agrupa `JustificativaDespesa` (de tipos NF, Diaria, Invoice internacional ou Produto sem Nota Fiscal) e `TransacaoFinanceira` (movimentos bancarios importados via CNAB 240 e vinculados a prestacao). Cada justificativa pode ter ate tres `OrcamentoFornecedor` como comprovacao de melhor preco, dos quais no maximo um e marcado como escolhido.
+A prestacao de contas e organizada como um agregado `Prestacao` que agrupa `JustificativaDespesa` (de tipos NF, Diaria, Invoice internacional ou Produto sem Nota Fiscal) e `TransacaoFinanceira` (movimentos bancarios importados via CNAB 240 e vinculados a prestacao). Cada justificativa pode ter ate tres `OrcamentoFornecedor` como comprovacao de melhor preco, dos quais no maximo um e marcado como escolhido. A classificacao orcamentaria da despesa fica na justificativa/item/rubrica do projeto, nao na transacao.
 
 O fluxo opera em duas frentes:
 

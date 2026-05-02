@@ -262,10 +262,10 @@ PRs sem testes unitarios e de integracao serao **automaticamente reprovados** no
 | Criterio | DoR | Status |
 |----------|-----|--------|
 | M003 (Projeto) | 80% | OK |
-| M008 (RubricaFinanceira) | 40% | Bloqueio (RN03) |
+| M008 (Rubrica) | 40% | Bloqueio (RN03) |
 | M001 (VersaoNivel) | 80% | OK |
 
-**Pendencias para Ready:** M008 precisa completar rubricas financeiras corporativas.
+**Pendencias para Ready:** M008 precisa completar rubricas corporativas.
 
 ---
 

@@ -1,6 +1,16 @@
 # Modelo Estrutural — Instituicoes
 
-Sub-modelo do M008. Modelo consolidado: [modelo-estrutural.md](modelo-estrutural.md) | Dominio: [README.md](README.md)
+Submodulo do M008. Modelo consolidado: [../modelo-estrutural.md](../modelo-estrutural.md) | Contexto: [README.md](README.md)
+
+---
+
+### Entidades do Contexto
+
+| Entidade | Documento |
+|----------|-----------|
+| Instituicao | [Contexto Instituicoes](README.md#instituicao) |
+| TipoInstituicao | [Contexto Instituicoes](README.md#tipoinstituicao) |
+| Dirigente | [Contexto Instituicoes](README.md#dirigente) |
 
 ---
 
@@ -35,7 +45,7 @@ classDiagram
     }
 
     class PessoaFisica {
-        <<ver modelo-estrutural-pessoas>>
+        <<ver contexto Pessoas>>
     }
 
     Instituicao "0..1" --> "0..*" Instituicao : superior/subestruturas

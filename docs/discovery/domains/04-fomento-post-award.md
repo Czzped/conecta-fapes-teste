@@ -10,7 +10,7 @@ Fluxo de execucao do projeto contratado ate a sua finalizacao. Glossario dos con
 
 Apos a contratacao, as iniciativas aprovadas passam a ser gerenciadas operacionalmente pelo M003. Este sub-dominio concentra o ownership da `Iniciativa` pos-outorga, seu plano vigente, execucao consolidada, alteracoes operacionais e solicitacoes de diaria. Editais e captacao pertencem ao M011; bolsas, cotas e alocacoes pertencem ao M009; prestacao de contas detalhada pertence ao M014.
 
-O M003 tambem oferece a leitura consolidada do `CicloFomentoIniciativa`, uma timeline transversal que exibe marcos de pre-award, award e post-award sem transferir ownership dos eventos de origem.
+O M003 tambem oferece a leitura consolidada do `CicloFomentoIniciativa`, uma timeline transversal que exibe marcos de pre-award, award e post-award sem transferir ownership dos eventos de origem. A estrutura de rubricas e subrubricas deve seguir o catalogo de discovery em [Rubricas e Subrubricas FAPES](../rubricas-subrubricas-fapes.md), sempre filtrado pelo edital, termo de outorga, plano aprovado e aditivos da iniciativa.
 
 **Implementado por:** [M003 — Gestao de Iniciativas Captadas](../../implementation/modules/M003-gestao-iniciativas-captadas/README.md)
 
@@ -21,7 +21,7 @@ O M003 tambem oferece a leitura consolidada do `CicloFomentoIniciativa`, uma tim
 | 4.0.3 | Gerir Orcamento Planejado e Rubricas | Registrar orcamento planejado por rubrica e controlar alteracoes aprovadas | Coordenador, Analista da Area Tecnica da Agencia | Art. 25; Art. 27, II |
 | 4.0.4 | Consolidar Execucao Financeira | Consolidar lancamentos de execucao recebidos de integracoes e exibir planejado versus executado | Analista da Area Tecnica da Agencia | Art. 3, II |
 | 4.0.5 | Consultar Ciclo de Fomento da Iniciativa | Exibir timeline transversal com marcos de submissao, avaliacao, contratacao, execucao, prestacao de contas, conclusao ou cancelamento | Coordenador, Analista da Area Tecnica da Agencia | Art. 3, II |
-| 4.0.6 | Solicitar Diaria da Iniciativa | Coordenador solicita diaria para um ou mais bolsistas alocados, informando tipo de viagem, partida, chegada, destino e motivo; o sistema calcula o valor com base no tipo de diaria vigente cadastrado pela FAPES, com valor, vigencia e fracao de calculo, coleta aceite individual dos bolsistas e, quando aprovado pela FAPES, gera debito na rubrica de Diarias e Passagens; o coordenador pode cancelar diaria aprovada com justificativa, gerando credito na rubrica | Coordenador, Bolsista, Analista da Area Tecnica da Agencia | Art. 27, II; Art. 3, 1 |
+| 4.0.6 | Solicitar Diaria da Iniciativa | Coordenador solicita diaria para um ou mais bolsistas alocados, informando tipo de viagem, partida, chegada, destino e motivo; o sistema calcula o valor com base no tipo de diaria vigente cadastrado pela FAPES, valida saldo na rubrica de Diarias e Passagens, gera alocacao/comprometimento sem aprovacao manual da FAPES, coleta aceite individual dos bolsistas, permite remocao com justificativa antes do inicio e regularizacao auditavel quando a diaria nao for utilizada apos o inicio previsto | Coordenador, Bolsista, Analista da Area Tecnica da Agencia | Art. 27, II; Art. 3, 1 |
 
 ---
 
@@ -51,6 +51,8 @@ Gestao dos resultados esperados e entregues pelo projeto: solicitacao de mudanca
 
 Controle orcamentario do projeto em execucao: adicoes orcamentarias, inclusao de rubricas de despesa e remanejamento de recursos entre rubricas.
 
+A hierarquia de rubricas/subrubricas deve usar o catalogo de discovery em [Rubricas e Subrubricas FAPES](../rubricas-subrubricas-fapes.md), mas sempre limitada pelo edital, termo de outorga, plano aprovado e aditivos. Para diarias, a rubrica agregadora operacional pode aparecer como **Diarias e Passagens**, mantendo subrubricas analiticas para diarias, passagens, hospedagem e taxas quando o edital exigir.
+
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|
 | 4.3.1 | Solicitar Adicao Orcamentaria | Coordenador solicita aumento do orcamento do projeto | Coordenador | Art. 25 e 26 |
@@ -65,7 +67,7 @@ Controle orcamentario do projeto em execucao: adicoes orcamentarias, inclusao de
 
 ## 4.4 Prestacao de Contas
 
-Fluxo de prestacao de contas do projeto: backoffice FAPES prepara a base (extrato bancario, orcamento anual, contas contabeis, conta bancaria); o Coordenador monta a prestacao vinculando transacoes e registrando justificativas (NF, diaria ou invoice internacional); e o Responsavel FAPES analisa, aprovando, negando ou devolvendo para revisao. A edicao das entidades da prestacao e bloqueada enquanto o status e `EM_ANALISE`.
+Fluxo de prestacao de contas do projeto: backoffice FAPES prepara a base operacional (extrato bancario, conta bancaria e orcamento do projeto por Rubrica), o Coordenador monta a prestacao vinculando transacoes e registrando justificativas (NF, diaria, passagem ou invoice internacional), e o Responsavel FAPES analisa, aprovando, negando ou devolvendo para revisao. A edicao das entidades da prestacao e bloqueada enquanto o status e `EM_ANALISE`. A classificacao contabil final pertence ao M016; o M014 classifica despesas contra a Rubrica do projeto aprovada no M013.
 
 **Implementado por:** [M014 — Prestacao de Contas](../../implementation/modules/M014-prestacao-contas/README.md)
 
@@ -74,7 +76,7 @@ Fluxo de prestacao de contas do projeto: backoffice FAPES prepara a base (extrat
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|
 | 4.4.1 | Importar Extrato Bancario | Importar lancamentos do extrato bancario do projeto, criando `TransacaoFinanceira` (debito/credito) associadas a `ContaBancaria` | Responsavel FAPES | Art. 27, II |
-| 4.4.2 | Gerir Orcamento Anual e Contas Contabeis | Cadastrar orcamento anual (`Orcamento`) com `ValorBolsasPrevisto` e `ValorCapitalPrevisto`, e criar `ContaContabil` hierarquica com limites por rubrica | Responsavel FAPES | — |
+| 4.4.2 | Gerir Orcamento e Rubricas do Projeto | Consultar orcamento aprovado por `RubricaProjeto`, com limites, utilizado, comprometido e saldo, consumindo a gestao orcamentaria do M013 | Responsavel FAPES | — |
 | 4.4.3 | Gerir Conta Bancaria do Projeto | Cadastrar/atualizar banco, agencia, numero e titular da `ContaBancaria` do projeto | Responsavel FAPES | — |
 
 ### Montagem da Prestacao (Frontoffice Coordenador)
@@ -83,11 +85,11 @@ Fluxo de prestacao de contas do projeto: backoffice FAPES prepara a base (extrat
 |---|---------------|-----------|---------|---------------------|
 | 4.4.4 | Criar Prestacao de Contas | Criar nova `Prestacao` em status `RASCUNHO` | Coordenador | Art. 27, II |
 | 4.4.5 | Vincular Transacao Financeira a Prestacao | Vincular `TransacaoFinanceira` do extrato a uma `Prestacao` em `RASCUNHO` ou `REVISAO` — uma transacao so pode estar vinculada a uma prestacao por vez | Coordenador | Art. 27, II |
-| 4.4.6 | Registrar Justificativa NF (produto/servico) | Cadastrar `JustificativaNF` com `DocumentoFiscal` validado via API SERPRO pela `ChaveAcesso` (44 digitos); cada item da nota e classificado em uma `ContaContabil` | Coordenador | Art. 27, II; Art. 3, 1 |
+| 4.4.6 | Registrar Justificativa NF (produto/servico) | Cadastrar `JustificativaNF` com `DocumentoFiscal` validado via API SERPRO pela `ChaveAcesso` (44 digitos); cada item da nota e classificado em uma `RubricaProjeto` | Coordenador | Art. 27, II; Art. 3, 1 |
 | 4.4.7 | Registrar Justificativa de Diaria | Cadastrar `JustificativaDiaria` vinculada a uma solicitacao de diaria aprovada do M003, usando `tipoDiariaRef`, valor calculado, quantidade, bolsista beneficiario (`AlocacaoBolsistaRef`) e comprovante de pagamento | Coordenador | Art. 27, II; Art. 3, 1 |
 | 4.4.8 | Registrar Justificativa Invoice (internacional) | Cadastrar `JustificativaInvoice` para despesas em moeda estrangeira com `ValorCambio` e `TipoMoeda` | Coordenador | Art. 27, II; Art. 3, 1 |
 | 4.4.9 | Adicionar Orcamentos de Fornecedor | Cadastrar ate 3 `OrcamentoFornecedor` por justificativa como comprovacao de melhor preco; no maximo um pode ser marcado como escolhido | Coordenador | — |
-| 4.4.10 | Classificar Item de NF em Conta Contabil | Vincular cada `ItemDocumentoFiscal` a uma `ContaContabil`, permitindo apuracao de saldos por rubrica | Coordenador | — |
+| 4.4.10 | Classificar Item de NF em Rubrica do Projeto | Vincular cada `ItemDocumentoFiscal` a uma `RubricaProjeto`, permitindo apuracao de saldos por rubrica aprovada | Coordenador | — |
 | 4.4.11 | Submeter Prestacao | Transicionar `Prestacao` de `RASCUNHO` ou `REVISAO` para `EM_ANALISE`, bloqueando edicao das entidades do agregado | Coordenador | Art. 27, II |
 
 ### Analise (Backoffice FAPES)

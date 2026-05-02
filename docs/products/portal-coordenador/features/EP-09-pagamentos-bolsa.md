@@ -8,7 +8,7 @@
 
 ## Jornada
 
-O usuario consulta historico de pagamentos do projeto com filtros por data, modalidade e status.
+O coordenador consulta todos os pagamentos do projeto no grupo Gerenciamento. O bolsista consulta seus proprios pagamentos no grupo Meu Perfil. As duas visoes usam filtros multisselecao por ano de pagamento, modalidade e status.
 
 ## EPICs de implementacao
 
@@ -19,4 +19,6 @@ O usuario consulta historico de pagamentos do projeto com filtros por data, moda
 ## Cenarios de aceitacao do produto
 
 - **Exibir estado vazio**: quando nao ha pagamentos, exibir mensagem orientativa
-- **Filtrar por data, modalidade e status**: campos de filtro com atualizacao reativa da listagem
+- **Filtrar por anos, modalidades e status**: os filtros funcionam por multisselecao e permitem combinar um ou mais anos, modalidades e status; a tela nao exibe filtro de projeto porque opera no projeto selecionado no portal
+- **Visualizar pagamentos do projeto**: no menu Gerenciamento, o coordenador acessa Pagamentos e visualiza uma linha por pagamento com referencia, projeto, bolsista, data, modalidade, valor e status
+- **Visualizar meus pagamentos**: no menu Meu Perfil, o bolsista acessa Meus Pagamentos e visualiza apenas os pagamentos vinculados a ele

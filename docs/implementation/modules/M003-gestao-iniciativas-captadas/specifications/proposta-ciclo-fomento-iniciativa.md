@@ -227,36 +227,29 @@ Saida esperada:
 
 ### 5. Incluir solicitacao operacional de diaria no M003
 
-A solicitacao de diaria deve pertencer ao M003 por nascer da execucao operacional da iniciativa, antes da prestacao de contas. A FAPES cadastra o tipo de diaria usado no calculo, com valor, vigencia, fracao de calculo e tipo de viagem. O M014 deve apenas consumir a solicitacao aprovada quando o coordenador comprovar o pagamento da diaria.
+A solicitacao de diaria deve pertencer ao M003 por nascer da execucao operacional da iniciativa, antes da prestacao de contas. Os cadastros de `TipoViagem` e `TipoDiaria` usados no calculo pertencem ao M008; o M003 apenas referencia esses cadastros e grava snapshots na solicitacao. O M014 deve apenas consumir a solicitacao aprovada quando o coordenador comprovar o pagamento da diaria.
 
 Fluxo proposto:
 
-1. FAPES cadastra `TipoDiaria` com valor unitario, vigencia, fracao de calculo, tipo de viagem e status ativo.
-2. Coordenador/ortogado cria `SolicitacaoDiaria` na iniciativa.
+1. FAPES mantem `TipoViagem` e `TipoDiaria` no M008, com valor unitario, vigencia, fracao de calculo, tipo de viagem e status ativo.
+2. Coordenador/ortogado solicita `SolicitacaoDiaria` na iniciativa.
 3. Informa tipo de viagem, data/hora de partida, data/hora de chegada, destino e motivo.
 4. Seleciona um ou mais bolsistas/alocacoes validas da iniciativa.
-5. M003 consulta M009 para validar alocacoes e M008 para dados bancarios.
+5. M003 consulta M009 para validar alocacoes e M008 para validar tipo de viagem, localizar tipo de diaria vigente e consultar dados bancarios.
 6. Sistema calcula automaticamente a quantidade de diarias e usa o tipo de diaria vigente no momento da solicitacao.
-7. Sistema persiste o tipo de diaria, valor unitario, fracao de calculo, quantidade e total calculado como snapshot da solicitacao.
-8. Cada bolsista assina `TermoAceiteDiaria`, declarando aceite da diaria na conta bancaria cadastrada.
-9. A FAPES aprova ou rejeita a solicitacao apos os aceites.
-10. Quando aprovada, a solicitacao gera debito/comprometimento na rubrica de Diarias e Passagens.
-11. Solicitacao aprovada fica disponivel para referencia posterior em M014 na `JustificativaDiaria`.
-12. Coordenador pode cancelar uma solicitacao aprovada com justificativa.
-13. Quando uma solicitacao aprovada e cancelada, o M003 gera credito de reversao na rubrica de Diarias e Passagens.
+7. Sistema persiste `tipoViagemRef`, `tipoDiariaRef`, valor unitario, fracao de calculo, quantidade e total calculado como snapshot da solicitacao.
+8. Sistema valida existencia e saldo da rubrica de Diarias e Passagens.
+9. Quando houver saldo, a solicitacao gera debito/comprometimento na rubrica de Diarias e Passagens sem permissao ou aprovacao manual da FAPES.
+10. Cada bolsista assina `TermoAceiteDiaria`, declarando aceite da diaria na conta bancaria cadastrada.
+11. Quando todos os aceites obrigatorios forem assinados, a solicitacao passa automaticamente para aprovada.
+12. Solicitacao aprovada fica disponivel para referencia posterior em M014 na `JustificativaDiaria`.
+13. Coordenador pode remover uma solicitacao alocada ou aprovada com justificativa somente antes da data/hora de inicio da viagem.
+14. Quando uma solicitacao alocada/aprovada e removida, ou quando houver recusa de bolsista em solicitacao ja comprometida, o M003 gera credito de reversao na rubrica de Diarias e Passagens.
+15. Depois da data/hora de inicio da viagem, diaria nao utilizada deve seguir regularizacao com justificativa e auditoria, sem exclusao fisica.
 
-Entidades sugeridas:
+Entidades do M003 e referencias externas:
 
 ```text
-TipoDiaria
-- codigo
-- tipoViagemRef
-- valorUnitario
-- fracaoCalculo
-- vigenciaInicio
-- vigenciaFim
-- ativo
-
 SolicitacaoDiaria
 - codigo
 - iniciativaId
@@ -274,6 +267,7 @@ SolicitacaoDiaria
 - rubricaDebitoRef
 - lancamentoDebitoRef
 - justificativaCancelamento
+- justificativaRegularizacao
 - lancamentoCreditoRef
 - estado
 
@@ -291,30 +285,39 @@ TermoAceiteDiaria
 - dataAssinatura
 - versaoTermo
 - hashTermo
+
+Referencias externas
+- TipoViagemRef -> M008
+- TipoDiariaRef -> M008
+- PessoaFisicaRef/ContaBancariaSnapshot -> M008
+- AlocacaoBolsistaRef -> M009
 ```
 
 Estados sugeridos para `SolicitacaoDiaria`:
 
 ```text
-RASCUNHO
+ALOCADA
 AGUARDANDO_ACEITES
-AGUARDANDO_APROVACAO
 APROVADA
-REJEITADA
 CANCELADA
+RECUSADA
+REGULARIZADA_NAO_UTILIZADA
 DISPONIVEL_PRESTACAO
 ```
 
 Regras principais:
 
 - O coordenador nao informa manualmente o valor da diaria.
-- O valor deve ser calculado a partir do tipo de diaria cadastrado pela FAPES e vigente para o tipo de viagem no momento da solicitacao.
+- O valor deve ser calculado a partir do `TipoDiaria` vigente no M008 para o tipo de viagem no momento da solicitacao.
 - O calculo deve ser preservado como snapshot para manter historico.
 - A solicitacao deve possuir ao menos um beneficiario.
-- Todos os beneficiarios obrigatorios devem assinar o termo para a solicitacao seguir para aprovacao da FAPES.
-- A aprovacao da FAPES deve gerar debito na rubrica de Diarias e Passagens.
-- O cancelamento de diaria aprovada exige justificativa do coordenador.
-- O cancelamento de diaria aprovada deve gerar credito na rubrica de Diarias e Passagens pelo valor debitado.
+- A solicitacao somente pode ser criada quando houver rubrica de Diarias e Passagens e saldo suficiente.
+- A criacao com saldo suficiente deve gerar debito/comprometimento na rubrica de Diarias e Passagens sem aprovacao manual da FAPES.
+- Todos os beneficiarios obrigatorios devem assinar o termo para a solicitacao passar automaticamente para aprovada.
+- Diaria com saldo comprometido e viagem futura deve ficar `ALOCADA` ate os aceites obrigatorios ou remocao.
+- A remocao de diaria `ALOCADA` ou `APROVADA` exige justificativa do coordenador e so pode ocorrer antes da data/hora de partida.
+- Depois da data/hora de partida, diaria nao utilizada deve seguir regularizacao auditavel, sem exclusao fisica.
+- A remocao, regularizacao ou recusa de bolsista deve gerar credito na rubrica de Diarias e Passagens pelo valor debitado, quando houver debito anterior.
 - M014 deve exigir referencia da solicitacao aprovada ao registrar a comprovacao da diaria.
 
 ## Impacto na documentacao

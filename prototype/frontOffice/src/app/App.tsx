@@ -33,6 +33,7 @@ export default function App() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
+  const [certificatesInitialFlow, setCertificatesInitialFlow] = useState<'diarias' | null>(null);
 
   // Cidadão sub-navigation
   const [cidadaoPage, setCidadaoPage] = useState<CidadaoPage>('home');
@@ -66,6 +67,14 @@ export default function App() {
   };
 
   const handleNavigate = (page: string) => {
+    if (page === 'certificados-diarias') {
+      setCertificatesInitialFlow('diarias');
+      setCurrentPage('certificados');
+      setIsMobileMenuOpen(false);
+      return;
+    }
+
+    setCertificatesInitialFlow(null);
     setCurrentPage(page);
     setIsMobileMenuOpen(false); // Close mobile menu after navigation
   };
@@ -80,10 +89,12 @@ export default function App() {
         return <MyProjectsPage accessType={accessType} />;
       case 'minha-equipe':
         return <MyTeamPage accessType={accessType} onNavigate={handleNavigate} />;
+      case 'pagamentos-projeto':
+        return <PaymentsPage scope="project" />;
       case 'pagamentos':
-        return <PaymentsPage />;
+        return <PaymentsPage scope="personal" />;
       case 'certificados':
-        return <CertificatesPage accessType={accessType} />;
+        return <CertificatesPage accessType={accessType} initialFlow={certificatesInitialFlow} />;
       case 'prestacao-contas-tecnica':
         return <PrestacaoContasTecnica onBack={() => handleNavigate('inicio')} />;
       case 'financeira':
@@ -210,6 +221,7 @@ export default function App() {
               onToggleMobileMenu={toggleMobileMenu} 
               isMobileMenuOpen={isMobileMenuOpen}
               onLogout={handleLogout}
+              onNavigate={handleNavigate}
               accessType={accessType}
             />
             <main className="flex-1" style={{ backgroundColor: 'var(--background)' }}>

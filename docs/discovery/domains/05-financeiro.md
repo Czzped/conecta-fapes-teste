@@ -20,6 +20,12 @@ Escrituracao contabil da agencia: cadastro de contas, vinculacao a programas e p
 
 Controle de contas bancarias, fluxo de caixa e gestao financeira dos recursos da agencia, programas, projetos e parcerias.
 
+### Rubricas e Subrubricas FAPES
+
+O catalogo de Rubricas usado para planejamento, execucao e prestacao de contas deve partir da base normativa da FAPES e ser restringido por edital/instrumento. O discovery canonico esta em [Rubricas e Subrubricas FAPES](../rubricas-subrubricas-fapes.md). Essa classificacao nao substitui conta contabil nem movimento bancario: Rubrica organiza o orcamento aprovado do projeto; `Transacao` movimenta o saldo da rubrica; conta contabil organiza escrituracao e demonstrativos; transacao financeira registra movimento bancario para conciliacao.
+
+As naturezas principais sao **Custeio** e **Capital**. Em custeio, o catalogo contempla bolsas, auxilios, material de consumo, servicos de terceiros, despesa de locomocao, diarias, adequacao de espaco fisico, DOACI, vencimentos/vantagens fixas e obrigacoes patronais. Em capital, contempla equipamentos e material permanente, material bibliografico e software. A Rubrica possui `codigo`, `nome`, `descricao` e hierarquia por `rubricaPai`/`subrubricas`; subrubrica e sempre Rubrica filha, sem campo de nivel. O sistema deve preservar a Rubrica aprovada e o documento fonte/restricao do edital para que M013/M014 consigam controlar saldo, comprovantes e prestacao de contas de forma rastreavel.
+
 ### Acao Transversal
 
 A Acao Transversal e uma reserva financeira institucional calculada sobre o valor de uma parceria, projeto ou programa para custear despesas operacionais e administrativas relacionadas a execucao dos programas e projetos da FAPES. Conforme a Resolucao CCAF nº 334/2023, esses recursos apoiam, estruturam, organizam e capacitam as areas meio e finalisticas da Fundacao, podendo cobrir despesas como diarias, passagens, publicacoes, material permanente, servicos de terceiros e outras despesas internas vinculadas a essas atividades.

@@ -1,25 +1,173 @@
-import { CreditCard, Filter, ChevronDown, FileText } from 'lucide-react';
-import { useState } from 'react';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { DatePicker } from '@/app/components/DatePicker';
-import { Dropdown } from '@/app/components/Dropdown';
+import { Check, ChevronDown, CreditCard } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
-interface DateRange {
-  start: Date | null;
-  end: Date | null;
+interface MultiSelectOption {
+  value: string;
+  label: string;
 }
 
-export function PaymentsPage() {
-  const { t } = useLanguage();
-  const [selectedProject, setSelectedProject] = useState('all');
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedModality, setSelectedModality] = useState('all');
-  const [selectedStatus, setSelectedStatus] = useState('all');
+interface FilterMultiSelectProps {
+  selectedValues: string[];
+  onChange: (values: string[]) => void;
+  options: MultiSelectOption[];
+  summaryLabel?: string;
+}
 
-  const payments = [
+interface PaymentsPageProps {
+  scope?: 'personal' | 'project';
+}
+
+function FilterMultiSelect({ selectedValues, onChange, options, summaryLabel = 'itens' }: FilterMultiSelectProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const selectedOptions = options.filter((option) => selectedValues.includes(option.value));
+  const displayText = selectedOptions.length === 0
+    ? 'Todos'
+    : selectedOptions.length <= 2
+      ? selectedOptions.map((option) => option.label).join(', ')
+      : `${selectedOptions.length} ${summaryLabel}`;
+
+  const toggleValue = (value: string) => {
+    const nextValues = selectedValues.includes(value)
+      ? selectedValues.filter((selectedValue) => selectedValue !== value)
+      : [...selectedValues, value];
+
+    onChange(nextValues);
+  };
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-3 py-2 pr-10 text-left transition-colors"
+        style={{
+          backgroundColor: 'var(--input-background)',
+          color: 'var(--foreground)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius)',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 'var(--font-weight-normal)',
+          cursor: 'pointer',
+        }}
+      >
+        {displayText}
+      </button>
+
+      <ChevronDown
+        size={16}
+        style={{
+          position: 'absolute',
+          right: '12px',
+          top: '50%',
+          transform: isOpen ? 'translateY(-50%) rotate(180deg)' : 'translateY(-50%)',
+          color: 'var(--muted-foreground)',
+          pointerEvents: 'none',
+          transition: 'transform 0.2s',
+        }}
+      />
+
+      {isOpen && (
+        <div
+          className="absolute z-50 w-full mt-1 overflow-hidden"
+          style={{
+            backgroundColor: 'var(--popover)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius)',
+            boxShadow: 'var(--elevation-sm)',
+            maxHeight: '300px',
+            overflowY: 'auto',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => onChange([])}
+            className="w-full px-3 py-2.5 text-left transition-colors"
+            style={{
+              backgroundColor: selectedValues.length === 0 ? 'var(--primary)' : 'transparent',
+              color: selectedValues.length === 0 ? 'var(--background)' : 'var(--foreground)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-normal)',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            Todos
+          </button>
+
+          {options.map((option) => {
+            const isSelected = selectedValues.includes(option.value);
+
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => toggleValue(option.value)}
+                className="w-full px-3 py-2.5 text-left transition-colors flex items-center gap-2"
+                style={{
+                  backgroundColor: isSelected ? 'color-mix(in srgb, var(--primary) 12%, transparent)' : 'transparent',
+                  color: 'var(--foreground)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-normal)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                }}
+              >
+                <span
+                  aria-hidden="true"
+                  className="flex items-center justify-center"
+                  style={{
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '4px',
+                    border: `1px solid ${isSelected ? 'var(--primary)' : 'var(--border)'}`,
+                    backgroundColor: isSelected ? 'var(--primary)' : 'transparent',
+                    color: 'var(--background)',
+                    flexShrink: 0,
+                  }}
+                >
+                  {isSelected && <Check size={12} />}
+                </span>
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
+  const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
+  const [selectedYears, setSelectedYears] = useState<string[]>([]);
+  const [selectedModalities, setSelectedModalities] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+
+  const personalPayments = [
     {
       reference: 'IC-2026-002',
       project: 'Conecta Fapes',
+      beneficiary: 'Paulo Sérgio Junior',
       scholarship: 'Iniciação Científica',
       value: 'R$ 700,00',
       paymentDate: '05/02/2026',
@@ -28,6 +176,7 @@ export function PaymentsPage() {
     {
       reference: 'IC-2026-001',
       project: 'Conecta Fapes',
+      beneficiary: 'Paulo Sérgio Junior',
       scholarship: 'Iniciação Científica',
       value: 'R$ 700,00',
       paymentDate: '05/01/2026',
@@ -36,6 +185,7 @@ export function PaymentsPage() {
     {
       reference: 'IC-2025-008',
       project: 'Conecta Fapes',
+      beneficiary: 'Paulo Sérgio Junior',
       scholarship: 'Iniciação Científica',
       value: 'R$ 700,00',
       paymentDate: '05/01/2026',
@@ -44,6 +194,7 @@ export function PaymentsPage() {
     {
       reference: 'IC-2025-007',
       project: 'Conecta Fapes',
+      beneficiary: 'Paulo Sérgio Junior',
       scholarship: 'Iniciação Científica',
       value: 'R$ 700,00',
       paymentDate: '05/12/2025',
@@ -52,6 +203,7 @@ export function PaymentsPage() {
     {
       reference: 'IC-2025-006',
       project: 'Conecta Fapes',
+      beneficiary: 'Paulo Sérgio Junior',
       scholarship: 'Iniciação Científica',
       value: 'R$ 700,00',
       paymentDate: '05/11/2025',
@@ -60,6 +212,7 @@ export function PaymentsPage() {
     {
       reference: 'IC-2025-005',
       project: 'Conecta Fapes',
+      beneficiary: 'Paulo Sérgio Junior',
       scholarship: 'Iniciação Científica',
       value: 'R$ 700,00',
       paymentDate: '05/10/2025',
@@ -68,6 +221,7 @@ export function PaymentsPage() {
     {
       reference: 'IC-2025-004',
       project: 'Conecta Fapes',
+      beneficiary: 'Paulo Sérgio Junior',
       scholarship: 'Iniciação Científica',
       value: 'R$ 700,00',
       paymentDate: '05/09/2025',
@@ -76,6 +230,7 @@ export function PaymentsPage() {
     {
       reference: 'IC-2025-003',
       project: 'Conecta Fapes',
+      beneficiary: 'Paulo Sérgio Junior',
       scholarship: 'Iniciação Científica',
       value: 'R$ 700,00',
       paymentDate: '05/08/2025',
@@ -84,6 +239,7 @@ export function PaymentsPage() {
     {
       reference: 'IC-2025-002',
       project: 'Conecta Fapes',
+      beneficiary: 'Paulo Sérgio Junior',
       scholarship: 'Iniciação Científica',
       value: 'R$ 700,00',
       paymentDate: '05/07/2025',
@@ -92,12 +248,113 @@ export function PaymentsPage() {
     {
       reference: 'IC-2025-001',
       project: 'Conecta Fapes',
+      beneficiary: 'Paulo Sérgio Junior',
       scholarship: 'Iniciação Científica',
       value: 'R$ 700,00',
       paymentDate: '05/06/2025',
       status: 'Pago',
     },
   ];
+
+  const projectPayments = [
+    {
+      reference: 'IC-2026-014',
+      project: 'Conecta Fapes',
+      beneficiary: 'Ana Souza',
+      scholarship: 'Iniciação Científica',
+      value: 'R$ 700,00',
+      paymentDate: '05/02/2026',
+      status: 'Pendente',
+    },
+    {
+      reference: 'IC-2026-013',
+      project: 'Conecta Fapes',
+      beneficiary: 'Bruno Lima',
+      scholarship: 'Iniciação Científica',
+      value: 'R$ 700,00',
+      paymentDate: '05/02/2026',
+      status: 'Pago',
+    },
+    {
+      reference: 'IC-2026-012',
+      project: 'Conecta Fapes',
+      beneficiary: 'Carolina Martins',
+      scholarship: 'Mestrado',
+      value: 'R$ 2.100,00',
+      paymentDate: '05/01/2026',
+      status: 'Pago',
+    },
+    {
+      reference: 'IC-2026-011',
+      project: 'Conecta Fapes',
+      beneficiary: 'Diego Almeida',
+      scholarship: 'Iniciação Científica',
+      value: 'R$ 700,00',
+      paymentDate: '05/01/2026',
+      status: 'Bônus',
+    },
+    {
+      reference: 'IC-2025-021',
+      project: 'Conecta Fapes',
+      beneficiary: 'Fernanda Rocha',
+      scholarship: 'Doutorado',
+      value: 'R$ 3.100,00',
+      paymentDate: '05/12/2025',
+      status: 'Pago',
+    },
+    {
+      reference: 'IC-2025-020',
+      project: 'Conecta Fapes',
+      beneficiary: 'Gabriel Costa',
+      scholarship: 'Iniciação Científica',
+      value: 'R$ 700,00',
+      paymentDate: '05/11/2025',
+      status: 'Pago',
+    },
+    {
+      reference: 'IC-2025-019',
+      project: 'Conecta Fapes',
+      beneficiary: 'Helena Dias',
+      scholarship: 'Apoio Técnico',
+      value: 'R$ 1.200,00',
+      paymentDate: '05/10/2025',
+      status: 'Pago',
+    },
+    {
+      reference: 'IC-2025-018',
+      project: 'Conecta Fapes',
+      beneficiary: 'Igor Nascimento',
+      scholarship: 'Mestrado',
+      value: 'R$ 2.100,00',
+      paymentDate: '05/09/2025',
+      status: 'Pago',
+    },
+    {
+      reference: 'IC-2025-017',
+      project: 'Conecta Fapes',
+      beneficiary: 'Juliana Freitas',
+      scholarship: 'Iniciação Científica',
+      value: 'R$ 700,00',
+      paymentDate: '05/08/2025',
+      status: 'Pago',
+    },
+    {
+      reference: 'IC-2025-016',
+      project: 'Conecta Fapes',
+      beneficiary: 'Paulo Sérgio Junior',
+      scholarship: 'Iniciação Científica',
+      value: 'R$ 700,00',
+      paymentDate: '05/07/2025',
+      status: 'Pago',
+    },
+  ];
+
+  const payments = scope === 'project' ? projectPayments : personalPayments;
+  const pageTitle = scope === 'project' ? 'Pagamentos' : 'Meus Pagamentos';
+  const pageSubtitle = scope === 'project'
+    ? 'Acompanhe todos os pagamentos do projeto.'
+    : 'Acompanhe o histórico dos seus pagamentos de bolsa.';
+  const shouldShowBeneficiary = scope === 'project';
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -111,6 +368,33 @@ export function PaymentsPage() {
         return { bg: 'var(--muted)', color: 'var(--muted-foreground)', border: 'var(--border)' };
     }
   };
+
+  const getPaymentYear = (date: string) => date.split('/')[2];
+
+  const projectOptions = Array.from(new Set(payments.map((payment) => payment.project)))
+    .sort((a, b) => a.localeCompare(b, 'pt-BR'))
+    .map((project) => ({ value: project, label: project }));
+
+  const yearOptions = Array.from(new Set(payments.map((payment) => getPaymentYear(payment.paymentDate))))
+    .sort((a, b) => Number(b) - Number(a))
+    .map((year) => ({ value: year, label: year }));
+
+  const modalityOptions = Array.from(new Set(payments.map((payment) => payment.scholarship)))
+    .sort((a, b) => a.localeCompare(b, 'pt-BR'))
+    .map((modality) => ({ value: modality, label: modality }));
+
+  const statusOptions = Array.from(new Set(payments.map((payment) => payment.status)))
+    .sort((a, b) => a.localeCompare(b, 'pt-BR'))
+    .map((status) => ({ value: status, label: status }));
+
+  const filteredPayments = payments.filter((payment) => {
+    const projectMatches = selectedProjects.length === 0 || selectedProjects.includes(payment.project);
+    const yearMatches = selectedYears.length === 0 || selectedYears.includes(getPaymentYear(payment.paymentDate));
+    const modalityMatches = selectedModalities.length === 0 || selectedModalities.includes(payment.scholarship);
+    const statusMatches = selectedStatuses.length === 0 || selectedStatuses.includes(payment.status);
+
+    return projectMatches && yearMatches && modalityMatches && statusMatches;
+  });
 
   return (
     <div className="w-full px-4 md:px-8 py-8">
@@ -127,7 +411,7 @@ export function PaymentsPage() {
           <CreditCard size={20} />
         </div>
         <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
-          Pagamentos
+          {pageTitle}
         </h1>
       </div>
 
@@ -139,7 +423,7 @@ export function PaymentsPage() {
         marginLeft: 'calc(32px + 0.75rem)', // Aligns with title (icon size + gap)
         marginBottom: '1.5rem',
       }}>
-        Acompanhe o histórico dos pagamentos da sua bolsa.
+        {pageSubtitle}
       </p>
 
       {/* Divider */}
@@ -155,12 +439,10 @@ export function PaymentsPage() {
       <section className="mb-8 mt-6">
         {/* Filters Section */}
         <div className="mb-6">
-          <div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-          >
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Filter by Project */}
             <div>
-              <label 
+              <label
                 style={{
                   display: 'block',
                   color: 'var(--foreground)',
@@ -171,17 +453,15 @@ export function PaymentsPage() {
               >
                 Projeto
               </label>
-              <Dropdown
-                value={selectedProject}
-                onChange={setSelectedProject}
-                options={[
-                  { value: 'all', label: 'Todos' },
-                  { value: 'conecta', label: 'Conecta' },
-                ]}
+              <FilterMultiSelect
+                selectedValues={selectedProjects}
+                onChange={setSelectedProjects}
+                options={projectOptions}
+                summaryLabel="projetos"
               />
             </div>
 
-            {/* Filter by Date */}
+            {/* Filter by Year */}
             <div>
               <label 
                 style={{
@@ -192,12 +472,13 @@ export function PaymentsPage() {
                   marginBottom: '0.5rem',
                 }}
               >
-                Data
+                Ano
               </label>
-              <DatePicker
-                value={selectedDate}
-                onChange={(date) => setSelectedDate(date)}
-                placeholder="Todos"
+              <FilterMultiSelect
+                selectedValues={selectedYears}
+                onChange={setSelectedYears}
+                options={yearOptions}
+                summaryLabel="anos"
               />
             </div>
 
@@ -214,13 +495,11 @@ export function PaymentsPage() {
               >
                 Modalidade
               </label>
-              <Dropdown
-                value={selectedModality}
-                onChange={setSelectedModality}
-                options={[
-                  { value: 'all', label: 'Todos' },
-                  { value: 'iniciacao', label: 'Iniciação Científica' },
-                ]}
+              <FilterMultiSelect
+                selectedValues={selectedModalities}
+                onChange={setSelectedModalities}
+                options={modalityOptions}
+                summaryLabel="modalidades"
               />
             </div>
 
@@ -237,14 +516,11 @@ export function PaymentsPage() {
               >
                 Status
               </label>
-              <Dropdown
-                value={selectedStatus}
-                onChange={setSelectedStatus}
-                options={[
-                  { value: 'all', label: 'Todos' },
-                  { value: 'pago', label: 'Pago' },
-                  { value: 'pendente', label: 'Pendente' },
-                ]}
+              <FilterMultiSelect
+                selectedValues={selectedStatuses}
+                onChange={setSelectedStatuses}
+                options={statusOptions}
+                summaryLabel="status"
               />
             </div>
           </div>
@@ -254,7 +530,7 @@ export function PaymentsPage() {
         <div className="relative">
           {/* Desktop Cards */}
           <div className="hidden md:grid md:grid-cols-1 gap-4">
-            {payments.map((payment, index) => {
+            {filteredPayments.map((payment, index) => {
               const statusColors = getStatusColor(payment.status);
               
               return (
@@ -267,9 +543,17 @@ export function PaymentsPage() {
                     borderRadius: 'var(--radius)',
                   }}
                 >
-                  <div className="grid grid-cols-12 gap-4">
+                  <div
+                    className="grid gap-4"
+                    style={{
+                      gridTemplateColumns: shouldShowBeneficiary
+                        ? '1fr 1.3fr 1.35fr 1.05fr 1.45fr 0.8fr 0.9fr'
+                        : '1fr 1.4fr 1.15fr 1.8fr 0.85fr 0.9fr',
+                      alignItems: 'start',
+                    }}
+                  >
                     {/* Referência */}
-                    <div className="col-span-2">
+                    <div>
                       <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                         Referência
                       </div>
@@ -279,7 +563,7 @@ export function PaymentsPage() {
                     </div>
 
                     {/* Projeto */}
-                    <div className="col-span-2">
+                    <div>
                       <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                         Projeto
                       </div>
@@ -288,8 +572,19 @@ export function PaymentsPage() {
                       </div>
                     </div>
 
+                    {shouldShowBeneficiary && (
+                      <div>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                          Bolsista
+                        </div>
+                        <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', wordBreak: 'break-word' }}>
+                          {payment.beneficiary}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Data do Pagamento */}
-                    <div className="col-span-2">
+                    <div>
                       <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                         Data do Pagamento
                       </div>
@@ -299,7 +594,7 @@ export function PaymentsPage() {
                     </div>
 
                     {/* Modalidade da Bolsa */}
-                    <div className="col-span-3" style={{ marginLeft: '2rem' }}>
+                    <div>
                       <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                         Modalidade da Bolsa
                       </div>
@@ -309,7 +604,7 @@ export function PaymentsPage() {
                     </div>
 
                     {/* Valor */}
-                    <div className="col-span-2">
+                    <div>
                       <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                         Valor
                       </div>
@@ -319,7 +614,7 @@ export function PaymentsPage() {
                     </div>
 
                     {/* Status */}
-                    <div className="col-span-1">
+                    <div>
                       <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                         Status
                       </div>
@@ -345,7 +640,7 @@ export function PaymentsPage() {
 
           {/* Mobile Cards - Hidden on desktop */}
           <div className="md:hidden space-y-4">
-            {payments.map((payment, index) => {
+            {filteredPayments.map((payment, index) => {
               const statusColors = getStatusColor(payment.status);
               
               return (
@@ -381,6 +676,17 @@ export function PaymentsPage() {
                           {payment.project}
                         </div>
                       </div>
+
+                      {shouldShowBeneficiary && (
+                        <div>
+                          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
+                            Bolsista
+                          </div>
+                          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                            {payment.beneficiary}
+                          </div>
+                        </div>
+                      )}
 
                       {/* Data do Pagamento */}
                       <div>
@@ -440,6 +746,21 @@ export function PaymentsPage() {
               );
             })}
           </div>
+
+          {filteredPayments.length === 0 && (
+            <div
+              className="p-5 text-center"
+              style={{
+                backgroundColor: 'var(--card)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
+                color: 'var(--muted-foreground)',
+                fontSize: 'var(--text-sm)',
+              }}
+            >
+              Nenhum pagamento encontrado para os filtros selecionados.
+            </div>
+          )}
         </div>
       </section>
     </div>

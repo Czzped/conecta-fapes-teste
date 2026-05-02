@@ -41,9 +41,16 @@ Dashboards financeiros fornecem visao consolidada de saldos, movimentacoes e pro
 | Fundo financeiro | Em qual carteira/fonte segregada este dinheiro esta? | Agrupador financeiro que separa uma massa de recursos para controle de saldo, origem, disponibilidade e conciliacao. | Carteira Acao Transversal FAPES, Fundo de Parcerias Institucionais, Fundo de Pesquisa e Inovacao. |
 | Centro de custo | Qual area, unidade ou finalidade interna e responsavel pelo consumo? | Estrutura gerencial que atribui responsabilidade pelo uso do recurso a uma area/finalidade institucional. | Gerencia de Parcerias, Diretoria Tecnico-Cientifica, Gestao Institucional de Programas. |
 | Rubrica | Em que categoria de gasto o recurso sera planejado ou executado? | Categoria orcamentaria/despesa usada no planejamento e na execucao do gasto. No ConectaFAPES, rubricas de referencia sao fornecidas por M008 e orcamentos de projeto sao geridos no M013. | Diarias, passagens, publicacoes, servicos de terceiros, material permanente. |
+| Lancamento/Transacao financeira | Que movimento financeiro ocorreu? | Fato financeiro ou bancario com data, valor, tipo, conta e origem. Pode referenciar rubrica para classificacao/conciliacao, mas nao e a rubrica. | PIX de pagamento, credito de rendimento, estorno, TED. |
 | Orcamento do projeto | Qual limite aprovado o projeto pode gastar por rubrica? | Planejamento/limite financeiro aprovado para uma Iniciativa/Projeto. Nao e conta contabil. | Orcamento de R$ 100.000,00 distribuido entre bolsas, custeio, capital e diarias. |
 
-Resumo operacional: **orcamento** define limite planejado; **rubrica** classifica a categoria do gasto; **conta contabil** registra a natureza contabil; **fundo financeiro** segrega a carteira/fonte; **centro de custo** indica quem responde pelo consumo.
+Resumo operacional: **orcamento** define limite planejado; **rubrica** classifica a categoria do gasto; **lancamento/transacao** registra o movimento ocorrido; **conta contabil** registra a natureza contabil; **fundo financeiro** segrega a carteira/fonte; **centro de custo** indica quem responde pelo consumo.
+
+### Mapeamento entre Rubrica e Conta Contabil
+
+O M016 e dono do plano de contas e das contas contabeis. O M008 e dono do catalogo de Rubricas. Quando uma Rubrica precisar sugerir classificacao contabil padrao, o mapeamento deve referenciar uma conta contabil do M016 por vigencia, sem copiar a conta para o M008 e sem transformar Rubrica em conta contabil.
+
+Esse mapeamento apoia classificacao, relatorios e integracoes, mas o lancamento contabil final continua pertencendo ao M016. Ja o orcamento do projeto por Rubrica pertence ao M013, e a prestacao de contas da iniciativa pertence ao M014.
 
 ### Acao Transversal
 

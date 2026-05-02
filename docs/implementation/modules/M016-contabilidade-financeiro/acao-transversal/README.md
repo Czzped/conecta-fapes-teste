@@ -29,7 +29,7 @@ Esses percentuais devem ser cadastrados como `PoliticaAcaoTransversal` e `FaixaA
 | M010 - Planejamento e Estrategia | Calcula a reserva na Parceria, desconta do saldo alocavel em Programas e registra a origem normativa. |
 | M016 - Contabilidade e Financeiro | Recebe a reserva em conta contabil/fundo/centro financeiro institucional, planeja por rubricas, executa, controla e presta financeiramente a reserva de Acao Transversal. |
 | M014 - Prestacao de Contas | Presta contas da Iniciativa/Projeto. Nao e dono da prestacao financeira institucional da Acao Transversal. |
-| M008 - Cadastros Corporativos | Fornece documentos, tipos documentais, instituicoes e rubricas financeiras de referencia. |
+| M008 - Cadastros Corporativos | Fornece documentos, tipos documentais, instituicoes e rubricas de referencia. |
 
 ## Capacidades
 

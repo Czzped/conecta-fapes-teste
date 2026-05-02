@@ -26,6 +26,7 @@ Status: **Done** = implementado no backend atual. **To Do (Pos-MVP)** = document
 | EPIC-M014-007 | Orcamentos de Fornecedor | UC07 | Must | Done | — | [EPIC-M014-007](epics/EPIC-M014-007.md) |
 | EPIC-M014-008 | Fluxo de Submissao e Analise (V1) | UC08 | Must | Done | Ciclo nuclear RASCUNHO → EM_ANALISE → {FINALIZADO \| NEGADO \| REVISAO} | [EPIC-M014-008](epics/EPIC-M014-008.md) |
 | EPIC-M014-009 | Prazos Temporais da Prestacao | UC09 | Must | To Do (Pos-MVP) | Prazo 30d submissao + 30d reposicao + notificacoes T-7/T-3/T-0 | [EPIC-M014-009](epics/EPIC-M014-009.md) |
+| EPIC-M014-011 | Prestacao de Contas por Rubrica do Projeto | UC11 | Must | To Do | Usa RubricaProjeto do M013; inclui selecao de diaria ainda nao prestada | [EPIC-M014-011](epics/EPIC-M014-011.md) |
 
 > **Nota:** Os EPICs do legado EP-01 a EP-04 (Contas Bancarias, Orcamento, Rubricas Orcamentarias, Transacoes Financeiras) estao implementados no backend `ConectaFapes.PrestacaoContas` mas pertencem conceitualmente a M016 (Contabilidade e Financeiro). Ver [debito tecnico](#debito-tecnico). A maquina de estados expandida (11 estados) que habilita os EPICs Pos-MVP e rastreada em DT-M014-002.
 
@@ -90,6 +91,13 @@ EPIC-M014-009 (Prazos Temporais)  [Pos-MVP]  <- depende de EPIC-M014-008
 ├── US-M014-030 Validar Prazo de Submissao (30 dias)
 ├── US-M014-031 Validar e Registrar Reposicao de Valor (30 dias)
 └── US-M014-032 Notificar Coordenador dos Prazos em Aberto
+
+EPIC-M014-011 (Prestacao de Contas por Rubrica do Projeto)  <- depende de M013, M003 Diarias, EPIC-M014-001
+├── US-M014-038 Selecionar Rubrica do Projeto na Prestacao
+├── US-M014-039 Selecionar Diaria ainda nao Prestada
+├── US-M014-040 Criar Diaria pelo Modal Compartilhado quando Ausente
+├── US-M014-041 Validar Comprovantes por Rubrica
+└── US-M014-042 Atualizar Impacto no Saldo da Rubrica
 ```
 
 ---

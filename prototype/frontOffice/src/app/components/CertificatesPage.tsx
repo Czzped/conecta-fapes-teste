@@ -26,7 +26,7 @@ import {
 } from '@/app/components/ui/breadcrumb';
 
 type DocumentoSolicitacao = 'declaracao' | 'informe' | 'termo' | null;
-type StatusDiaria = 'AGUARDANDO_ACEITES' | 'AGUARDANDO_APROVACAO' | 'APROVADA' | 'REJEITADA' | 'CANCELADA' | 'RECUSADA';
+type StatusDiaria = 'ALOCADA' | 'APROVADA' | 'CANCELADA' | 'RECUSADA';
 type DiariaTab = 'solicitadas' | 'nova' | 'minhas';
 type AccessType = 'cidadao' | 'voluntario' | 'bolsista' | 'coordenador' | 'diretor' | 'reitor';
 type TipoDiariaCodigo = 'NACIONAL' | 'INTERNACIONAL';
@@ -39,6 +39,7 @@ type DiariaBeneficiarioItem = DiariaRequest & {
 
 interface CertificatesPageProps {
   accessType?: AccessType;
+  initialFlow?: 'diarias' | null;
 }
 
 interface DiariaRequest {
@@ -56,26 +57,29 @@ interface DiariaRequest {
   tipoDiaria: TipoDiariaCodigo;
   tipoViagem: TipoViagemCodigo;
   regraCalculo: string;
-  debitoRef?: string;
-  creditoRef?: string;
+  transacaoComprometimentoRef?: string;
+  transacaoReversaoRef?: string;
   justificativaCancelamento?: string;
   justificativaRecusa?: string;
-  justificativaRejeicao?: string;
 }
 
 const coordenadorAtual = 'Mariana Costa';
 const bolsistaAtual = 'Ana Souza';
 const bolsistasDoProjeto = ['Ana Souza', 'Bruno Lima', 'Carla Nunes', 'Diego Rocha', 'Fernanda Alves', 'João Pedro Martins'];
 const beneficiariosDoProjeto = [coordenadorAtual, ...bolsistasDoProjeto];
-const orcamentoRubricaDiarias = 10000;
+const orcamentosRubricasDiarias: Record<TipoViagemCodigo, number> = {
+  DENTRO_ESTADO: 5000,
+  FORA_ESTADO: 3000,
+  INTERNACIONAL: 2000,
+};
 const tiposDiaria = [
   { codigo: 'NACIONAL' as const, nome: 'Nacional', regra: 'Normativa FAPES', descricao: 'Diária por pernoite, meia diária para afastamento sem pernoite igual ou superior a 6h e meia adicional no retorno após 14h.' },
   { codigo: 'INTERNACIONAL' as const, nome: 'Internacional', regra: 'Normativa FAPES', descricao: 'Diária por pernoite, meia diária para afastamento sem pernoite igual ou superior a 6h e meia adicional no retorno após 14h.' },
 ];
 const tiposViagem = [
-  { codigo: 'DENTRO_ESTADO' as const, nome: 'Dentro do Estado', abrangencia: 'Nacional', referencia: 'TVI-001' },
-  { codigo: 'FORA_ESTADO' as const, nome: 'Fora do Estado', abrangencia: 'Nacional', referencia: 'TVI-002' },
-  { codigo: 'INTERNACIONAL' as const, nome: 'Internacional', abrangencia: 'Internacional', referencia: 'TVI-003' },
+  { codigo: 'DENTRO_ESTADO' as const, nome: 'Dentro do Estado', rubrica: 'Diária dentro do Estado', abrangencia: 'Nacional', referencia: 'RUB-DIA-DE' },
+  { codigo: 'FORA_ESTADO' as const, nome: 'Nacional', rubrica: 'Diária nacional', abrangencia: 'Nacional', referencia: 'RUB-DIA-NAC' },
+  { codigo: 'INTERNACIONAL' as const, nome: 'Internacional', rubrica: 'Diária internacional', abrangencia: 'Internacional', referencia: 'RUB-DIA-INT' },
 ];
 const diariasVigentes = [
   { referencia: 'DIA-2026-001', tipoViagem: 'DENTRO_ESTADO' as const, valor: 260, fracaoCalculo: '12h', vigenciaInicio: '05/01/2026' },
@@ -114,10 +118,8 @@ function calcularDiarias(partida: string, chegada: string) {
 
 function statusLabel(status: StatusDiaria) {
   const labels = {
-    AGUARDANDO_ACEITES: 'Aguardando aceites',
-    AGUARDANDO_APROVACAO: 'Aguardando aprovação',
+    ALOCADA: 'Alocada',
     APROVADA: 'Aprovada',
-    REJEITADA: 'Rejeitada',
     CANCELADA: 'Cancelada',
     RECUSADA: 'Recusada',
   };
@@ -125,9 +127,18 @@ function statusLabel(status: StatusDiaria) {
   return labels[status];
 }
 
-export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPageProps) {
+function statusPendenteAceite(status: StatusDiaria) {
+  return status === 'ALOCADA';
+}
+
+function dataInicioAindaNaoPassou(partida: string) {
+  const inicio = new Date(partida).getTime();
+  return Number.isFinite(inicio) && inicio > Date.now();
+}
+
+export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }: CertificatesPageProps) {
   const [selectedOption, setSelectedOption] = useState<DocumentoSolicitacao>(null);
-  const [activeFlow, setActiveFlow] = useState<'diarias' | null>(null);
+  const [activeFlow, setActiveFlow] = useState<'diarias' | null>(initialFlow);
   const [activeDiariaTab, setActiveDiariaTab] = useState<DiariaTab>('solicitadas');
   const [selectedYear, setSelectedYear] = useState('2024');
   const [selectedBolsistas, setSelectedBolsistas] = useState<string[]>(['Ana Souza']);
@@ -155,7 +166,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
       chegada: '2026-08-06T17:00',
       destino: 'Cachoeiro de Itapemirim/ES',
       motivo: 'Participação como bolsista em atividade técnica de projeto parceiro.',
-      status: 'AGUARDANDO_ACEITES',
+      status: 'ALOCADA',
       quantidade: 1.5,
       valorUnitario: 260,
       valorTotal: 390,
@@ -163,6 +174,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
       tipoDiaria: 'NACIONAL',
       tipoViagem: 'DENTRO_ESTADO',
       regraCalculo: 'Normativa FAPES',
+      transacaoComprometimentoRef: 'TR-2026-044',
     },
     {
       id: 'SD-2026-002',
@@ -171,7 +183,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
       chegada: '2026-07-04T19:00',
       destino: 'Linhares/ES',
       motivo: 'Coleta de dados em campo prevista no plano de trabalho.',
-      status: 'AGUARDANDO_ACEITES',
+      status: 'ALOCADA',
       quantidade: 1.5,
       valorUnitario: 260,
       valorTotal: 390,
@@ -179,6 +191,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
       tipoDiaria: 'NACIONAL',
       tipoViagem: 'DENTRO_ESTADO',
       regraCalculo: 'Normativa FAPES',
+      transacaoComprometimentoRef: 'TR-2026-043',
     },
     {
       id: 'SD-2026-001',
@@ -195,7 +208,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
       tipoDiaria: 'NACIONAL',
       tipoViagem: 'DENTRO_ESTADO',
       regraCalculo: 'Normativa FAPES',
-      debitoRef: 'LEX-2026-045',
+      transacaoComprometimentoRef: 'TR-2026-045',
     },
     {
       id: 'SD-2026-000',
@@ -204,7 +217,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
       chegada: '2026-05-23T18:00',
       destino: 'Serra/ES',
       motivo: 'Acompanhamento presencial de oficina técnica.',
-      status: 'REJEITADA',
+      status: 'RECUSADA',
       quantidade: 1.5,
       valorUnitario: 260,
       valorTotal: 390,
@@ -212,11 +225,17 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
       tipoDiaria: 'NACIONAL',
       tipoViagem: 'DENTRO_ESTADO',
       regraCalculo: 'Normativa FAPES',
-      justificativaRejeicao: 'Solicitação rejeitada pela FAPES por ausência de saldo disponível na rubrica.',
+      transacaoComprometimentoRef: 'TR-2026-040',
+      transacaoReversaoRef: 'TR-2026-041',
+      justificativaRecusa: 'Beneficiária recusou a viagem por conflito de agenda.',
     },
   ]);
 
-  const tipoViagemAtual = tiposViagem.find((tipo) => tipo.codigo === tipoViagemSelecionado) ?? tiposViagem[0];
+  const tiposViagemComOrcamento = tiposViagem.filter((tipo) => (orcamentosRubricasDiarias[tipo.codigo] ?? 0) > 0);
+  const tipoViagemAtual =
+    tiposViagemComOrcamento.find((tipo) => tipo.codigo === tipoViagemSelecionado) ??
+    tiposViagemComOrcamento[0] ??
+    tiposViagem[0];
   const diariaVigenteAtual = diariasVigentes.find((diaria) => diaria.tipoViagem === tipoViagemAtual.codigo) ?? diariasVigentes[0];
   const tipoDiariaCalculado = tipoViagemAtual.abrangencia === 'Internacional' ? 'INTERNACIONAL' : 'NACIONAL';
   const tipoDiariaAtual = tiposDiaria.find((tipo) => tipo.codigo === tipoDiariaCalculado) ?? tiposDiaria[0];
@@ -249,13 +268,46 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
       ),
     [diariasFiltradas],
   );
-  const totalAprovado = solicitacoesDiaria
-    .filter((solicitacao) => solicitacao.status === 'APROVADA')
+  const totalComprometido = solicitacoesDiaria
+    .filter((solicitacao) => solicitacao.status === 'APROVADA' || statusPendenteAceite(solicitacao.status))
     .reduce((total, solicitacao) => total + solicitacao.valorTotal, 0);
-  const totalCancelado = solicitacoesDiaria
-    .filter((solicitacao) => solicitacao.status === 'CANCELADA')
+  const rubricasDashboard = tiposViagem
+    .map((tipo) => {
+      const total = orcamentosRubricasDiarias[tipo.codigo] ?? 0;
+      const solicitacoesDaRubrica = solicitacoesDiaria.filter((solicitacao) => solicitacao.tipoViagem === tipo.codigo);
+      const alocado = solicitacoesDaRubrica
+        .filter((solicitacao) => statusPendenteAceite(solicitacao.status))
+        .reduce((subtotal, solicitacao) => subtotal + solicitacao.valorTotal, 0);
+      const utilizado = solicitacoesDaRubrica
+        .filter((solicitacao) => solicitacao.status === 'APROVADA')
+        .reduce((subtotal, solicitacao) => subtotal + solicitacao.valorTotal, 0);
+      const aceitesPendentes = solicitacoesDaRubrica
+        .filter((solicitacao) => statusPendenteAceite(solicitacao.status))
+        .reduce((subtotal, solicitacao) => subtotal + solicitacao.bolsistas.length, 0);
+      const diaria = diariasVigentes.find((item) => item.tipoViagem === tipo.codigo) ?? diariasVigentes[0];
+
+      return {
+        codigo: tipo.referencia,
+        nome: tipo.rubrica,
+        tipoViagem: tipo.nome,
+        total,
+        alocado,
+        utilizado,
+        saldo: Math.max(0, total - alocado - utilizado),
+        aceitesPendentes,
+        diariaVigente: `${diaria.referencia} · ${currency.format(diaria.valor)} · fração ${diaria.fracaoCalculo}`,
+      };
+    })
+    .filter((rubrica) => rubrica.total > 0);
+  const orcamentoRubricaSelecionada = orcamentosRubricasDiarias[tipoViagemAtual.codigo] ?? 0;
+  const totalComprometidoRubricaSelecionada = solicitacoesDiaria
+    .filter(
+      (solicitacao) =>
+        solicitacao.tipoViagem === tipoViagemAtual.codigo &&
+        (solicitacao.status === 'APROVADA' || statusPendenteAceite(solicitacao.status)),
+    )
     .reduce((total, solicitacao) => total + solicitacao.valorTotal, 0);
-  const saldoDisponivelDiarias = Math.max(0, orcamentoRubricaDiarias - totalAprovado);
+  const saldoDisponivelDiarias = Math.max(0, orcamentoRubricaSelecionada - totalComprometidoRubricaSelecionada);
   const saldoAposSolicitacao = saldoDisponivelDiarias - valorTotalCalculado;
   const solicitacaoExcedeSaldo = valorTotalCalculado > saldoDisponivelDiarias;
   const beneficiarioLogado = accessType === 'coordenador' ? coordenadorAtual : bolsistaAtual;
@@ -273,8 +325,8 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
         solicitacao.motivo.toLowerCase().includes(query);
       const matchesFilter =
         minhasDiariasFilter === 'TODAS' ||
-        (minhasDiariasFilter === 'NOVAS' && solicitacao.status === 'AGUARDANDO_ACEITES') ||
-        (minhasDiariasFilter === 'HISTORICO' && solicitacao.status !== 'AGUARDANDO_ACEITES');
+        (minhasDiariasFilter === 'NOVAS' && statusPendenteAceite(solicitacao.status)) ||
+        (minhasDiariasFilter === 'HISTORICO' && !statusPendenteAceite(solicitacao.status));
 
       return matchesSearch && matchesFilter;
     });
@@ -307,7 +359,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
       chegada,
       destino,
       motivo,
-      status: solicitacaoPropriaCoordenador ? 'APROVADA' : 'AGUARDANDO_ACEITES',
+      status: solicitacaoPropriaCoordenador ? 'APROVADA' : 'ALOCADA',
       quantidade: quantidadeCalculada,
       valorUnitario: diariaVigenteAtual.valor,
       valorTotal: valorTotalCalculado,
@@ -315,7 +367,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
       tipoDiaria: tipoDiariaAtual.codigo,
       tipoViagem: tipoViagemAtual.codigo,
       regraCalculo: tipoDiariaAtual.regra,
-      debitoRef: solicitacaoPropriaCoordenador ? `LEX-2026-${String(45 + solicitacoesDiaria.length + 1).padStart(3, '0')}` : undefined,
+      transacaoComprometimentoRef: `TR-2026-${String(45 + solicitacoesDiaria.length + 1).padStart(3, '0')}`,
     };
 
     setSolicitacoesDiaria((current) => [novaSolicitacao, ...current]);
@@ -327,11 +379,11 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
 
     setSolicitacoesDiaria((current) =>
       current.map((solicitacao) =>
-        solicitacao.id === id
+        solicitacao.id === id && dataInicioAindaNaoPassou(solicitacao.partida)
           ? {
               ...solicitacao,
               status: 'CANCELADA',
-              creditoRef: 'LEX-2026-046',
+              transacaoReversaoRef: 'TR-2026-046',
               justificativaCancelamento,
             }
           : solicitacao,
@@ -348,7 +400,8 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
         solicitacao.id === id
           ? {
               ...solicitacao,
-              status: 'AGUARDANDO_APROVACAO',
+              status: 'APROVADA',
+              transacaoComprometimentoRef: solicitacao.transacaoComprometimentoRef ?? `TR-2026-${String(45 + solicitacoesDiaria.length + 1).padStart(3, '0')}`,
             }
           : solicitacao,
       ),
@@ -366,6 +419,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
               ...solicitacao,
               status: 'RECUSADA',
               justificativaRecusa,
+              transacaoReversaoRef: solicitacao.transacaoComprometimentoRef ? 'TR-2026-047' : solicitacao.transacaoReversaoRef,
             }
           : solicitacao,
       ),
@@ -403,7 +457,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-5" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-5" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
               {[
                 { label: 'Solicitação', value: diariaEmResumo.id },
                 { label: 'Destino', value: diariaEmResumo.destino },
@@ -495,30 +549,9 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
           </select>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-          {[
-            { label: 'Total', value: String(minhasDiarias.length) },
-            { label: 'Novas', value: String(minhasDiarias.filter((solicitacao) => solicitacao.status === 'AGUARDANDO_ACEITES').length) },
-            { label: 'Histórico', value: String(minhasDiarias.filter((solicitacao) => solicitacao.status !== 'AGUARDANDO_ACEITES').length) },
-          ].map((item) => (
-            <div
-              key={item.label}
-              style={{
-                backgroundColor: 'color-mix(in srgb, var(--primary) 4%, transparent)',
-                border: '1px solid color-mix(in srgb, var(--primary) 12%, transparent)',
-                borderRadius: 'var(--radius)',
-                padding: '0.875rem',
-              }}
-            >
-              <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>{item.label}</span>
-              <strong className="block mt-1">{item.value}</strong>
-            </div>
-          ))}
-        </div>
-
         <div className="space-y-3">
         {minhasDiariasFiltradas.map((solicitacao) => {
-        const jaRespondida = diariasAceitas.includes(solicitacao.id) || solicitacao.status !== 'AGUARDANDO_ACEITES';
+        const jaRespondida = diariasAceitas.includes(solicitacao.id) || !statusPendenteAceite(solicitacao.status);
 
         return (
           <article
@@ -539,11 +572,11 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
                     style={{
                       borderRadius: '999px',
                       backgroundColor:
-                        solicitacao.status === 'CANCELADA' || solicitacao.status === 'RECUSADA' || solicitacao.status === 'REJEITADA'
+                        solicitacao.status === 'CANCELADA' || solicitacao.status === 'RECUSADA'
                           ? 'rgba(239, 68, 68, 0.12)'
                           : 'color-mix(in srgb, var(--primary) 12%, transparent)',
                       color:
-                        solicitacao.status === 'CANCELADA' || solicitacao.status === 'RECUSADA' || solicitacao.status === 'REJEITADA'
+                        solicitacao.status === 'CANCELADA' || solicitacao.status === 'RECUSADA'
                           ? '#dc2626'
                           : 'var(--primary)',
                       fontSize: 'var(--text-xs)',
@@ -582,13 +615,9 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
 
             {jaRespondida ? (
               <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', margin: '0.9rem 0 0' }}>
-                {solicitacao.status === 'AGUARDANDO_APROVACAO'
-                  ? 'Termo aceito. A solicitação aguarda aprovação da FAPES.'
-                  : solicitacao.status === 'RECUSADA'
+                {solicitacao.status === 'RECUSADA'
                     ? `Viagem recusada. Justificativa: ${solicitacao.justificativaRecusa}`
-                    : solicitacao.status === 'REJEITADA'
-                      ? `Diária rejeitada pela FAPES. Justificativa: ${solicitacao.justificativaRejeicao}`
-                      : 'Termo aceito ou diária já processada.'}
+                    : 'Termo aceito ou diária já processada.'}
               </p>
             ) : recusandoId === solicitacao.id ? (
               <div className="mt-4">
@@ -949,7 +978,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
         }}
       >
         {activeFlow === 'diarias'
-          ? 'Controle solicitações, aceites, aprovações e cancelamentos de diárias da iniciativa.'
+          ? 'Controle solicitações, aceites e remoções de diárias da iniciativa.'
           : 'Solicite diárias, acompanhe aceites e emita documentos da iniciativa.'}
       </p>
 
@@ -990,7 +1019,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
                     Painel de controle
                   </h2>
                   <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', lineHeight: '1.6', margin: 0 }}>
-                    O coordenador solicita diárias, acompanha os termos de aceite dos bolsistas e visualiza os débitos e créditos da rubrica.
+                    O coordenador solicita diárias quando há saldo na rubrica, acompanha os termos de aceite dos bolsistas e visualiza as transações.
                   </p>
                 </div>
               </div>
@@ -1013,32 +1042,80 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-5">
-              {[
-                { label: 'Tipo de viagem', value: tipoViagemAtual.nome, helper: `${diariaVigenteAtual.referencia} · ${currency.format(diariaVigenteAtual.valor)} · fração ${diariaVigenteAtual.fracaoCalculo}` },
-                { label: 'Rubrica', value: 'Diárias e passagens', helper: currency.format(orcamentoRubricaDiarias) },
-                { label: 'Utilizado', value: currency.format(totalAprovado), helper: 'Já comprometido' },
-                { label: 'Saldo disponível', value: currency.format(saldoDisponivelDiarias), helper: 'Para novas diárias' },
-                { label: 'Pendentes', value: String(solicitacoesDiaria.filter((item) => item.status !== 'APROVADA' && item.status !== 'REJEITADA' && item.status !== 'CANCELADA' && item.status !== 'RECUSADA').length), helper: 'Aceites ou aprovação' },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  style={{
-                    backgroundColor: 'var(--background)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius)',
-                    padding: '0.875rem',
-                  }}
-                >
-                  <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>{item.label}</span>
-                  <strong className="block mt-1" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                    {item.value}
-                  </strong>
-                  <span className="block mt-1" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
-                    {item.helper}
-                  </span>
-                </div>
-              ))}
+            <div
+              className="mt-5 overflow-x-auto"
+              style={{
+                backgroundColor: 'var(--background)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
+              }}
+            >
+              <table
+                style={{
+                  width: '100%',
+                  minWidth: '920px',
+                  borderCollapse: 'collapse',
+                  color: 'var(--foreground)',
+                  fontSize: 'var(--text-sm)',
+                }}
+              >
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    {['Rubrica', 'Total', 'Alocado', 'Utilizado', 'Saldo', 'Aceites pendentes'].map((header) => (
+                      <th
+                        key={header}
+                        style={{
+                          padding: '0.75rem 0.875rem',
+                          textAlign: header === 'Rubrica' ? 'left' : 'right',
+                          color: 'var(--muted-foreground)',
+                          fontSize: 'var(--text-xs)',
+                          fontWeight: 'var(--font-weight-medium)',
+                        }}
+                      >
+                        {header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {rubricasDashboard.map((rubrica) => (
+                    <tr key={rubrica.codigo}>
+                      <td style={{ padding: '0.875rem', verticalAlign: 'top', borderBottom: '1px solid var(--border)' }}>
+                        <strong style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                          {rubrica.nome}
+                        </strong>
+                        <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
+                          {rubrica.codigo}
+                        </span>
+                        <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.35rem' }}>
+                          Tipo de viagem: {rubrica.tipoViagem} · {rubrica.diariaVigente}
+                        </span>
+                      </td>
+                      {[
+                        currency.format(rubrica.total),
+                        currency.format(rubrica.alocado),
+                        currency.format(rubrica.utilizado),
+                        currency.format(rubrica.saldo),
+                        String(rubrica.aceitesPendentes),
+                      ].map((value, index) => (
+                        <td
+                          key={`${rubrica.codigo}-${index}`}
+                          style={{
+                            padding: '0.875rem',
+                            textAlign: 'right',
+                            verticalAlign: 'top',
+                            borderBottom: '1px solid var(--border)',
+                            fontWeight: 'var(--font-weight-semibold)',
+                            color: index === 3 ? 'var(--primary)' : 'var(--foreground)',
+                          }}
+                        >
+                          {value}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </section>
 
@@ -1073,13 +1150,12 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
             ))}
           </div>
 
-          {activeDiariaTab !== 'nova' && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          {activeDiariaTab === 'solicitadas' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               {[
                 { label: 'Solicitadas', value: String(solicitacoesDiaria.length), color: 'var(--foreground)' },
                 { label: 'Aprovadas', value: String(solicitacoesDiaria.filter((item) => item.status === 'APROVADA').length), color: 'var(--primary)' },
-                { label: 'Comprometido', value: currency.format(totalAprovado), color: 'var(--primary)' },
-                { label: 'Estornado', value: currency.format(totalCancelado), color: '#16a34a' },
+                { label: 'Comprometido', value: currency.format(totalComprometido), color: 'var(--primary)' },
               ].map((metric) => (
                 <div
                   key={metric.label}
@@ -1127,7 +1203,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
                   Solicitação de Diárias
                 </h2>
                 <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', margin: 0 }}>
-                  Viagem selecionada: {tipoViagemAtual.nome} · {currency.format(diariaVigenteAtual.valor)} · fração {diariaVigenteAtual.fracaoCalculo} · cálculo pela normativa FAPES
+                  Rubrica: {tipoViagemAtual.rubrica} · {currency.format(diariaVigenteAtual.valor)} · fração {diariaVigenteAtual.fracaoCalculo}
                 </p>
               </div>
             </div>
@@ -1149,12 +1225,12 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
                   fontSize: 'var(--text-sm)',
                 }}
               >
-                {tiposViagem.map((tipo) => {
+                {tiposViagemComOrcamento.map((tipo) => {
                   const diaria = diariasVigentes.find((item) => item.tipoViagem === tipo.codigo) ?? diariasVigentes[0];
 
                   return (
                     <option key={tipo.codigo} value={tipo.codigo}>
-                      {tipo.nome} · {tipo.abrangencia} · {currency.format(diaria.valor)} · {diaria.fracaoCalculo}
+                      {tipo.nome} · {tipo.rubrica} · {currency.format(diaria.valor)} · {diaria.fracaoCalculo}
                     </option>
                   );
                 })}
@@ -1302,7 +1378,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
               </div>
               {solicitacaoPropriaCoordenador && (
                 <p style={{ color: 'var(--primary)', fontSize: 'var(--text-xs)', margin: '0.75rem 0 0' }}>
-                  Solicitação própria do coordenador: aprovação automática e débito imediato na rubrica de Diárias e Passagens.
+                  Solicitação própria do coordenador: transação de comprometimento imediata na rubrica de Diárias.
                 </p>
               )}
             </div>
@@ -1335,8 +1411,8 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
               <strong className="block mt-1">{quantidadeCalculada.toLocaleString('pt-BR')}</strong>
             </div>
             <div>
-              <span style={{ color: 'var(--muted-foreground)' }}>Viagem</span>
-              <strong className="block mt-1">{tipoViagemAtual.nome}</strong>
+              <span style={{ color: 'var(--muted-foreground)' }}>Rubrica</span>
+              <strong className="block mt-1">{tipoViagemAtual.rubrica}</strong>
             </div>
             <div>
               <span style={{ color: 'var(--muted-foreground)' }}>Valor unitário</span>
@@ -1369,8 +1445,8 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
             }}
           >
             {solicitacaoExcedeSaldo
-              ? `Saldo insuficiente na rubrica de Diárias e Passagens. Faltam ${currency.format(Math.abs(saldoAposSolicitacao))} para esta solicitação.`
-              : `Após esta solicitação, o saldo estimado de diárias será ${currency.format(saldoAposSolicitacao)}.`}
+              ? `Saldo insuficiente na rubrica ${tipoViagemAtual.rubrica}. Faltam ${currency.format(Math.abs(saldoAposSolicitacao))} para esta solicitação.`
+              : `Após esta solicitação, o saldo estimado da rubrica ${tipoViagemAtual.rubrica} será ${currency.format(saldoAposSolicitacao)}.`}
           </div>
 
           <button
@@ -1426,10 +1502,8 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
                   }}
                 >
                   <option value="TODOS">Todos os status</option>
-                  <option value="AGUARDANDO_ACEITES">Aguardando aceites</option>
-                  <option value="AGUARDANDO_APROVACAO">Aguardando aprovação</option>
+                  <option value="ALOCADA">Alocada</option>
                   <option value="APROVADA">Aprovada</option>
-                  <option value="REJEITADA">Rejeitada</option>
                   <option value="CANCELADA">Cancelada</option>
                   <option value="RECUSADA">Recusada</option>
                 </select>
@@ -1472,10 +1546,10 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
                             style={{
                               borderRadius: '999px',
                               backgroundColor:
-                                solicitacao.status === 'CANCELADA' || solicitacao.status === 'RECUSADA' || solicitacao.status === 'REJEITADA'
+                                solicitacao.status === 'CANCELADA' || solicitacao.status === 'RECUSADA'
                                   ? 'rgba(239, 68, 68, 0.12)'
                                   : 'color-mix(in srgb, var(--primary) 12%, transparent)',
-                              color: solicitacao.status === 'CANCELADA' || solicitacao.status === 'RECUSADA' || solicitacao.status === 'REJEITADA' ? '#dc2626' : 'var(--primary)',
+                              color: solicitacao.status === 'CANCELADA' || solicitacao.status === 'RECUSADA' ? '#dc2626' : 'var(--primary)',
                               fontSize: 'var(--text-xs)',
                             }}
                           >
@@ -1507,10 +1581,10 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
                       </div>
                     </div>
 
-                    {(solicitacao.debitoRef || solicitacao.creditoRef) && (
+                    {(solicitacao.transacaoComprometimentoRef || solicitacao.transacaoReversaoRef) && (
                       <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', margin: '0.75rem 0 0' }}>
-                        {solicitacao.debitoRef ? `Débito: ${solicitacao.debitoRef}` : ''}
-                        {solicitacao.creditoRef ? ` · Crédito: ${solicitacao.creditoRef}` : ''}
+                        {solicitacao.transacaoComprometimentoRef ? `Comprometimento: ${solicitacao.transacaoComprometimentoRef}` : ''}
+                        {solicitacao.transacaoReversaoRef ? ` · Reversão: ${solicitacao.transacaoReversaoRef}` : ''}
                       </p>
                     )}
 
@@ -1520,13 +1594,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
                       </p>
                     )}
 
-                    {solicitacao.justificativaRejeicao && (
-                      <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', margin: '0.75rem 0 0' }}>
-                        Rejeição FAPES: {solicitacao.justificativaRejeicao}
-                      </p>
-                    )}
-
-                    {solicitacao.status === 'APROVADA' && cancelandoId !== solicitacao.id && (
+                    {(solicitacao.status === 'ALOCADA' || solicitacao.status === 'APROVADA') && dataInicioAindaNaoPassou(solicitacao.partida) && cancelandoId !== solicitacao.id && (
                       <button
                         onClick={() => setCancelandoId(solicitacao.id)}
                         className="mt-3 px-3 py-2 flex items-center gap-2"
@@ -1539,7 +1607,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
                         }}
                       >
                         <RotateCcw size={15} />
-                        Cancelar diária
+                        Remover diária
                       </button>
                     )}
 
@@ -1549,7 +1617,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
                           value={justificativaCancelamento}
                           onChange={(event) => setJustificativaCancelamento(event.target.value)}
                           rows={2}
-                          placeholder="Justificativa do cancelamento"
+                          placeholder="Justificativa da remoção"
                           className="w-full px-3 py-2 mb-2"
                           style={{
                             backgroundColor: 'var(--background)',
@@ -1651,7 +1719,7 @@ export function CertificatesPage({ accessType = 'bolsista' }: CertificatesPagePr
             Solicitar Diárias
           </h3>
           <p style={{ color: 'var(--muted-foreground)', fontWeight: 'var(--font-weight-normal)', fontSize: 'var(--text-sm)', lineHeight: '1.7', margin: 0 }}>
-            Entre no painel de controle para solicitar diárias, acompanhar aceites e cancelar solicitações aprovadas.
+            Entre no painel de controle para solicitar diárias, acompanhar aceites e remover solicitações antes do início.
           </p>
         </button>
         <div

@@ -241,7 +241,7 @@ classDiagram
         <<fora do escopo - M010>>
     }
 
-    class RubricaFinanceira {
+    class Rubrica {
         <<fora do escopo - M008>>
     }
 
@@ -283,10 +283,10 @@ classDiagram
     RepasseAcaoTransversal "*" --> "1" ReservaAcaoTransversal : consome reserva
     ReservaAcaoTransversal "1" --> "0..1" PlanoAplicacaoAcaoTransversal : planejada por
     PlanoAplicacaoAcaoTransversal "1" --> "*" ItemPlanoAplicacaoAcaoTransversal : itens
-    ItemPlanoAplicacaoAcaoTransversal "*" --> "1" RubricaFinanceira : rubrica
+    ItemPlanoAplicacaoAcaoTransversal "*" --> "1" Rubrica : rubrica
     ReservaAcaoTransversal "1" --> "*" DespesaAcaoTransversal : despesas
     DespesaAcaoTransversal "*" --> "0..1" ItemPlanoAplicacaoAcaoTransversal : executaItem
-    DespesaAcaoTransversal "*" --> "1" RubricaFinanceira : rubrica
+    DespesaAcaoTransversal "*" --> "1" Rubrica : rubrica
     DespesaAcaoTransversal "*" --> "1" Documento : comprovante
     PrestacaoFinanceiraAcaoTransversal "1" --> "*" DespesaAcaoTransversal : analisa
 ```
@@ -403,7 +403,13 @@ classDiagram
 **Entidades externas:**
 - Iniciativa: gerenciada por M003 (Gestao de Iniciativas Captadas) como abstracao estrutural de iniciativas apoiadas.
 - Programa e Parceria: gerenciados por M010 (Planejamento e Estrategia).
-- PessoaFisica, RubricaFinanceira e Documento: gerenciados por M008 (Cadastros Corporativos).
+- PessoaFisica, Rubrica e Documento: gerenciados por M008 (Cadastros Corporativos).
+
+**Rubrica x movimentacao financeira:**
+- `Rubrica` e referencia externa de classificacao orcamentaria/despesa.
+- `MovimentacaoFinanceira` e fato financeiro de entrada ou saida em conta bancaria.
+- Uma movimentacao pode ser classificada contabilmente por `ContaContabil` e conciliada com despesas classificadas por rubrica, mas a movimentacao nao deve ser modelada como rubrica.
+- Na Acao Transversal, `ItemPlanoAplicacaoAcaoTransversal` e `DespesaAcaoTransversal` referenciam `Rubrica` para planejamento/classificacao; a movimentacao bancária continua sendo registrada separadamente.
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: MovimentacaoFinanceira.contaContabil: ContaContabil)

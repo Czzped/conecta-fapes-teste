@@ -4,7 +4,7 @@ Dominio e regras de negocio: ver [README.md](README.md)
 
 ## Proposito do Contrato
 
-Este contrato documenta a superficie publica do modulo M013 como contexto responsavel por rubricas de projeto, solicitacoes orcamentarias, pareceres, saldos e historico de movimentacao.
+Este contrato documenta a superficie publica do modulo M013 como contexto responsavel por rubricas de projeto, solicitacoes orcamentarias, pareceres, saldos e historico de transacoes.
 
 ## Consumidores e Dependencias
 
@@ -22,18 +22,19 @@ Este contrato documenta a superficie publica do modulo M013 como contexto respon
 | Dependencia | Tipo | Observacao |
 |-------------|------|------------|
 | M003 | Modulo interno | Fornece `Projeto` |
-| M008 | Modulo interno | Fornece `RubricaFinanceira` |
+| M008 | Modulo interno | Fornece `Rubrica` |
 | M001 | Modulo interno | Fornece `VersaoNivel` para realocacao de bolsas |
 
 ## Operacoes Publicas
 
 | Nome da Operacao | Tipo | Objetivo | Entrada | Saida | Regras relacionadas | Pre-condicoes | Recusas/erros | Idempotencia | Autorizacao | Mapeamento de transporte |
 |------------------|------|----------|---------|-------|---------------------|---------------|---------------|--------------|-------------|--------------------------|
-| RegistrarRubricaDoProjeto | Command | Vincular rubrica do cadastro corporativo ao projeto com saldo inicial | projeto, rubricaFinanceira, valorAprovado | `RubricaProjeto` criada | RN03, RN06 | Projeto ativo | Rubrica inexistente, projeto invalido | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| RegistrarRubricaDoProjeto | Command | Vincular rubrica do cadastro corporativo ao projeto com valor aprovado inicial | projeto, rubricaRef, valorAprovado | `RubricaProjeto` criada | RN03, RN06, RN09 | Projeto ativo | Rubrica inexistente, projeto invalido | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| RegistrarTransacao | Command | Registrar comprometimento, execucao, estorno ou reversao vinculado a uma RubricaProjeto | rubricaProjetoRef, tipo, valor, origemModulo, origemRef, movimentoBancarioRef? | `Transacao` criada e saldo recalculado | RN06, RN10, RN11 | RubricaProjeto existente e saldo suficiente quando aplicavel | Saldo insuficiente, origem duplicada, rubrica inexistente | Sim por origemModulo+origemRef+tipo | Modulo interno autorizado | API interna a definir |
 | SolicitarMovimentacaoOrcamentaria | Command | Registrar adicao, inclusao, remanejamento ou realocacao de bolsas | projeto, tipoSolicitacao, justificativa, valores | `SolicitacaoOrcamentaria` criada | RN01, RN02, RN04, RN07, RN08, RI1, RI2 | Projeto ativo | Justificativa ausente, saldo insuficiente, tipo invalido | Nao | Coordenador | API interna/backoffice a definir |
 | RegistrarParecerSolicitacaoOrcamentaria | Command | Aprovar ou reprovar a solicitacao orcamentaria | solicitacao, aprovado, justificativa | `ParecerSolicitacao` registrado | RN01, RN02, RN05, RN06, RN07 | Solicitacao existente | Solicitacao inexistente, parecer inconsistente | Nao | Analista da Agencia de Fomento ou Diretor quando aplicavel | API interna/backoffice a definir |
-| ConsultarSaldoPorRubrica | Query | Consultar o saldo atualizado das rubricas do projeto | projeto, rubrica | `SaldoRubrica` consolidado | RN06, RN08 | Projeto existente | Projeto nao encontrado | N/A | Usuario interno autorizado | API interna a definir |
-| ConsultarHistoricoOrcamentario | Query | Consultar historico completo das movimentacoes orcamentarias do projeto | projeto, tipoMovimentacao, periodo | Lista de `HistoricoOrcamentario` | RN05, RN06 | Projeto existente | Nenhum historico encontrado | N/A | Usuario interno autorizado | API interna a definir |
+| ConsultarSaldoPorRubrica | Query | Consultar o saldo atualizado das rubricas do projeto | projeto, rubrica | `RubricaProjetoSaldo` consolidado | RN06, RN08, RN11 | Projeto existente | Projeto nao encontrado | N/A | Usuario interno autorizado | API interna a definir |
+| ConsultarHistoricoOrcamentario | Query | Consultar historico completo das transacoes do projeto | projeto, tipoTransacao, periodo | Lista de `Transacao` | RN05, RN06, RN11 | Projeto existente | Nenhum historico encontrado | N/A | Usuario interno autorizado | API interna a definir |
 | ConsultarExecucaoPorPrograma | Query | Consultar valor total executado (`SUM(RubricaProjeto.valorExecutado)`) de todos os projetos vinculados a um programa; consumido por M010 para calcular `valorExecutado` nos relatorios financeiros de parcerias | programaId | `{ programaId, valorTotalExecutado, projetos: [{ projetoId, valorExecutado }] }` | RN06 | Programa existente em M010 | Programa nao encontrado, nenhuma rubrica registrada | N/A | M010 (relatorios financeiros de parcerias) | API interna a definir |
 
 ## Padrao de Payload e Erro
@@ -64,7 +65,7 @@ Este contrato documenta a superficie publica do modulo M013 como contexto respon
 ```json
 {
   "projetoId": "PROJ-2026-014",
-  "rubricaFinanceiraId": "RUB-339030",
+  "rubricaId": "RUB-339030",
   "valorAprovado": 150000.0
 }
 ```
@@ -75,6 +76,13 @@ Este contrato documenta a superficie publica do modulo M013 como contexto respon
 {
   "rubricaProjeto": {
     "id": "RP-2026-004",
+    "rubricaId": "RUB-339030",
+    "codigoSnapshot": "RUB-339030",
+    "nomeSnapshot": "Material de Consumo",
+    "descricaoSnapshot": "Materiais consumiveis aprovados no plano de aplicacao.",
+    "naturezaSnapshot": "CUSTEIO",
+    "rubricaPaiSnapshot": null,
+    "documentoFonteSnapshot": "Resolucao CCAF no 309/2022",
     "saldoAtual": 150000.0
   }
 }
@@ -84,7 +92,7 @@ Este contrato documenta a superficie publica do modulo M013 como contexto respon
 
 | Codigo | Mensagem de erro exemplo |
 |--------|---------------------------|
-| RUBRICA_FINANCEIRA_NAO_ENCONTRADA | A rubrica financeira informada nao existe no cadastro basico. |
+| RUBRICA_NAO_ENCONTRADA | A rubrica informada nao existe no cadastro basico. |
 | PROJETO_NAO_ELEGIVEL_RUBRICA | O projeto informado nao esta apto a receber nova rubrica. |
 
 ### SolicitarMovimentacaoOrcamentaria

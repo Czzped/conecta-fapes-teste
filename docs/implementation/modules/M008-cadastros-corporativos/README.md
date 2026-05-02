@@ -28,7 +28,26 @@ Neste contexto, a propria agencia de fomento e representada como uma `Instituica
 
 Pessoas fisicas sao cadastradas com dados pessoais, academicos e profissionais. No front-office, o cadastro e feito automaticamente via Acesso Cidadao (SSO do governo do ES). No back-office, servidores podem cadastrar ou atualizar pessoas manualmente. Uma pessoa pode ser suspensa, o que bloqueia todas as operacoes vinculadas a ela.
 
-Alem dos cadastros de pessoas e organizacoes, o sistema mantem dados basicos de referencia: areas de conhecimento seguindo a classificacao do CNPq, rubricas financeiras para classificacao de despesas e tabelas geograficas de cidades e regioes do ES.
+Alem dos cadastros de pessoas e organizacoes, o sistema mantem dados basicos de referencia: areas de conhecimento seguindo a classificacao do CNPq, rubricas para classificacao de despesas e tabelas geograficas de cidades e regioes do ES. O cadastro de Rubricas e canonico para a plataforma: M011 seleciona o que cada edital permite, M013 materializa a Rubrica no orcamento do projeto, M014 usa a Rubrica do projeto na prestacao de contas e M016 pode receber mapeamentos contabeis sem assumir ownership do catalogo.
+
+Rubrica e dado mestre de classificacao. Ela nao representa o movimento em si: a movimentacao da rubrica fica em M013 como `Transacao`. Pagamentos e movimentos bancarios ficam em M014/M016 como `TransacaoFinanceira`/`MovimentacaoFinanceira`, referenciando a rubrica quando for necessario classificar o valor.
+
+No cadastro corporativo, a Rubrica possui `codigo`, `nome`, `descricao` e hierarquia opcional por `rubricaPai`/`subrubricas`. Subrubrica nao e entidade separada: e uma Rubrica filha de outra Rubrica.
+
+Tambem pertencem ao M008 os cadastros corporativos usados pelo fluxo de diarias: `TipoViagem`, que classifica o deslocamento, e `TipoDiaria`, que mantem valor vigente, vigencia e fracao de calculo por tipo de viagem. Os dois ficam no [contexto Diarias](diarias/README.md). O M003 apenas referencia esses cadastros ao criar uma solicitacao e grava snapshots para preservar o calculo historico.
+
+Os documentos detalhados do M008 sao organizados por contexto de negocio, nao por uma pasta generica de entidades:
+
+| Contexto | Entidades |
+|----------|-----------|
+| [Pessoas](pessoas/README.md) | PessoaFisica, NivelAcademico, HistoricoPessoa |
+| [Instituicoes](instituicoes/README.md) | Instituicao, TipoInstituicao, Dirigente |
+| [Diarias](diarias/README.md) | TipoViagem, TipoDiaria |
+| [Rubricas](rubricas/README.md) | Rubrica, SinonimoRubrica, MapeamentoContabilRubrica |
+| [Geografia](geografia/README.md) | Cidade, Regiao |
+| [Classificacoes](classificacoes/README.md) | AreaConhecimento, Finalidade |
+
+Cada contexto e dono do seu `README.md`, `modelo-estrutural.md`, `backlog.md` e pasta `epics/` quando houver EPICs especificos. O arquivo [modelo-estrutural.md](modelo-estrutural.md) funciona como visao consolidada do modulo; os submodelos contextuais sao a fonte de detalhe para atributos, relacionamentos e regras locais.
 
 > Autenticacao e controle de acesso (IAM) sao tratados no modulo M005. Este modulo consome a identidade autenticada para associar ao cadastro da pessoa.
 
@@ -44,7 +63,7 @@ Alem dos cadastros de pessoas e organizacoes, o sistema mantem dados basicos de 
 | RN04 | Um dirigente e o vinculo temporal entre uma pessoa fisica e uma instituicao, com mandato de inicio e fim. | Must |
 | RN05 | A suspensao de uma pessoa bloqueia todas as operacoes vinculadas (submissao, bolsas, pagamentos). | Must |
 | RN06 | Areas de conhecimento seguem a classificacao hierarquica do CNPq (grande area, area, subarea, especialidade). | Must |
-| RN07 | Rubricas financeiras devem estar vinculadas a categorias orcamentarias validas. | Must |
+| RN07 | Rubricas devem estar vinculadas a categorias orcamentarias validas quando aplicavel. | Must |
 | RN09 | Cidades devem pertencer a uma regiao; regioes agrupam cidades do estado. | Should |
 | RN10 | O cadastro automatico via Acesso Cidadao deve criar a pessoa caso nao exista, ou vincular a existente pelo CPF. | Should |
 | RN11 | Instituicao com CNPJ proprio deve possuir exatamente um dirigente ativo. | Must |
@@ -52,5 +71,13 @@ Alem dos cadastros de pessoas e organizacoes, o sistema mantem dados basicos de 
 | RN13 | Setor interno sem CNPJ proprio deve ser cadastrado como Instituicao sem CNPJ e com superior informado. | Must |
 | RN14 | Instituicao sem superior deve possuir CNPJ proprio. | Must |
 | RN15 | Instituicao sem CNPJ proprio e tratada como setor interno para fins de cadastro, consulta e hierarquia. | Must |
+| RN16 | Toda Rubrica deve possuir codigo canonico unico, nome, descricao, natureza da despesa e situacao ativa/inativa. | Must |
+| RN17 | Subrubricas sao representadas por relacao opcional com `rubricaPai`; nao ha campo adicional para classificar a hierarquia. | Must |
+| RN18 | Rubrica inativa nao deve ser ofertada em novas configuracoes de edital/projeto, mas deve permanecer consultavel para historico. | Must |
+| RN19 | Sinonimos de rubrica devem apontar para uma Rubrica canonica e apoiar importacao/normalizacao sem substituir o nome oficial. | Should |
+| RN20 | Mapeamento contabil de Rubrica e opcional, versionado por vigencia e referencia contas do M016 sem transformar Rubrica em conta contabil. | Should |
+| RN21 | Rubrica nao deve armazenar transacoes financeiras nem movimentos de saldo; deve ser referenciada por `Transacao` e movimentos bancarios apenas como classificacao. | Must |
+| RN22 | TipoViagem deve possuir codigo unico, nome, abrangencia e situacao ativa/inativa; nao armazena valor unitario. | Must |
+| RN23 | TipoDiaria deve possuir codigo unico, tipo de viagem, valor unitario, fracao de calculo, vigencia e situacao ativa/inativa, sem vigencias sobrepostas para o mesmo tipo de viagem. | Must |
 | RI1 | Uma instituicao so pode ter um dirigente ativo ao mesmo tempo. | Must |
 | RI2 | Uma pessoa suspensa nao pode ser reativada sem justificativa registrada. | Must |

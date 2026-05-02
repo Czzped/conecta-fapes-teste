@@ -1,16 +1,17 @@
-import { X, Search, CheckCheck, AlertTriangle, Info, CheckCircle2, Calendar } from 'lucide-react';
+import { X, Search, CheckCheck, AlertTriangle, Info, CheckCircle2, Calendar, PlaneTakeoff } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
 interface NotificationsSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  onNavigate?: (page: string) => void;
 }
 
 type TabType = 'avisos' | 'editais';
 
 interface Notification {
   id: string;
-  type: 'warning' | 'info' | 'success' | 'error';
+  type: 'warning' | 'info' | 'success' | 'error' | 'diaria';
   title: string;
   description: string;
   isRead: boolean;
@@ -27,7 +28,7 @@ interface EditalNotification {
   isRead: boolean;
 }
 
-export function NotificationsSidebar({ isOpen, onClose }: NotificationsSidebarProps) {
+export function NotificationsSidebar({ isOpen, onClose, onNavigate }: NotificationsSidebarProps) {
   const [activeTab, setActiveTab] = useState<TabType>('avisos');
   const [searchQuery, setSearchQuery] = useState('');
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -51,6 +52,14 @@ export function NotificationsSidebar({ isOpen, onClose }: NotificationsSidebarPr
   }, [isOpen, onClose]);
 
   const avisosNotifications: Notification[] = [
+    {
+      id: '6',
+      type: 'diaria',
+      title: 'Diária aguardando assinatura',
+      description: 'Você tem a diária SD-2026-002 para aceitar e assinar o termo.',
+      isRead: false,
+      link: 'certificados-diarias',
+    },
     {
       id: '4',
       type: 'success',
@@ -105,6 +114,8 @@ export function NotificationsSidebar({ isOpen, onClose }: NotificationsSidebarPr
         return <CheckCircle2 size={20} style={{ color: '#22c55e' }} />;
       case 'error':
         return <AlertTriangle size={20} style={{ color: '#ef4444' }} />;
+      case 'diaria':
+        return <PlaneTakeoff size={20} style={{ color: 'var(--primary)' }} />;
       default:
         return <Info size={20} style={{ color: 'var(--muted-foreground)' }} />;
     }
@@ -126,6 +137,15 @@ export function NotificationsSidebar({ isOpen, onClose }: NotificationsSidebarPr
   const markAllAsRead = () => {
     // TODO: Implement mark all as read logic
     console.log('Mark all as read');
+  };
+
+  const handleAvisoClick = (notification: Notification) => {
+    if (!notification.link || !onNavigate) {
+      return;
+    }
+
+    onClose();
+    onNavigate(notification.link);
   };
 
   return (
@@ -388,55 +408,82 @@ export function NotificationsSidebar({ isOpen, onClose }: NotificationsSidebarPr
 
           {activeTab === 'avisos' && (
             <div className="space-y-4">
-              {avisosNotifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className="flex gap-3 p-4 rounded-lg relative"
-                  style={{
-                    backgroundColor: 'transparent',
-                    border: '1px solid var(--border)',
-                  }}
-                >
-                  <div style={{ flexShrink: 0, marginTop: '2px' }}>
-                    {getNotificationIcon(notification.type)}
-                  </div>
-                  <div className="flex-1">
-                    <h4
-                      style={{
-                        fontSize: 'var(--text-sm)',
-                        fontWeight: 'var(--font-weight-medium)',
-                        color: 'var(--foreground)',
-                        marginBottom: '4px',
-                      }}
+              {avisosNotifications.map((notification) => {
+                const content = (
+                  <>
+                    <div style={{ flexShrink: 0, marginTop: '2px' }}>
+                      {getNotificationIcon(notification.type)}
+                    </div>
+                    <div className="flex-1">
+                      <h4
+                        style={{
+                          fontSize: 'var(--text-sm)',
+                          fontWeight: 'var(--font-weight-medium)',
+                          color: 'var(--foreground)',
+                          marginBottom: '4px',
+                        }}
+                      >
+                        {notification.title}
+                      </h4>
+                      <p
+                        style={{
+                          fontSize: 'var(--text-sm)',
+                          color: 'var(--muted-foreground)',
+                          lineHeight: '1.5',
+                          margin: 0,
+                        }}
+                      >
+                        {notification.description}
+                      </p>
+                    </div>
+                    {!notification.isRead && notification.type !== 'error' && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '16px',
+                          right: '16px',
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          backgroundColor: 'var(--primary)',
+                        }}
+                      />
+                    )}
+                  </>
+                );
+
+                const itemStyle = {
+                  width: '100%',
+                  backgroundColor: 'transparent',
+                  border: '1px solid var(--border)',
+                  color: 'inherit',
+                  cursor: notification.link ? 'pointer' : 'default',
+                };
+
+                if (notification.link) {
+                  return (
+                    <button
+                      key={notification.id}
+                      type="button"
+                      onClick={() => handleAvisoClick(notification)}
+                      className="flex gap-3 p-4 rounded-lg relative text-left transition-colors"
+                      style={itemStyle}
                     >
-                      {notification.title}
-                    </h4>
-                    <p
-                      style={{
-                        fontSize: 'var(--text-sm)',
-                        color: 'var(--muted-foreground)',
-                        lineHeight: '1.5',
-                        margin: 0,
-                      }}
-                    >
-                      {notification.description}
-                    </p>
+                      {content}
+                    </button>
+                  );
+                }
+
+                return (
+                  <div
+                    key={notification.id}
+                    className="flex gap-3 p-4 rounded-lg relative"
+                    style={itemStyle}
+                  >
+                    {content}
                   </div>
-                  {!notification.isRead && notification.type !== 'error' && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '16px',
-                        right: '16px',
-                        width: '8px',
-                        height: '8px',
-                        borderRadius: '50%',
-                        backgroundColor: 'var(--primary)',
-                      }}
-                    />
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

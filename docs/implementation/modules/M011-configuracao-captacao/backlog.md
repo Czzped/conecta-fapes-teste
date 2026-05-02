@@ -21,6 +21,7 @@ Especificacao de referencia: [README.md](README.md)
 | EPIC-M011-005 | Avaliacao Documental e Ad Hoc | UC05 | Must | To Do | [EPIC-M011-005](epics/EPIC-M011-005.md) |
 | EPIC-M011-006 | Revisao de Resultado | UC06 | Must | To Do | [EPIC-M011-006](epics/EPIC-M011-006.md) |
 | EPIC-M011-007 | Publicacao de Resultado | UC07 | Must | To Do | [EPIC-M011-007](epics/EPIC-M011-007.md) |
+| EPIC-M011-008 | Rubricas Permitidas da Captacao | UC08 | Must | To Do | [EPIC-M011-008](epics/EPIC-M011-008.md) |
 
 > **Nota:** EPICs 004-007 foram identificados na [analise do prototipo backoffice](specifications/analise-prototipo-captacao.md) — funcionalidades presentes no prototipo sem cobertura na documentacao anterior.
 
@@ -37,7 +38,7 @@ EPIC-M011-001 (Configuracao da Captacao)
 ├── US-M011-004 Publicar Configuracao de Captacao
 ├── US-M011-011 Definir Regras de Submissao
 ├── US-M011-012 Definir Requisitos do Proponente
-├── US-M011-013 Configurar Rubricas e Subrubricas Permitidas
+├── US-M011-013 Configurar Rubricas e Subrubricas Permitidas  -> detalhado em EPIC-M011-008
 ├── US-M011-014 Configurar Versoes de Bolsas Permitidas
 ├── US-M011-029 Definir Categorias de Iniciativas
 ├── US-M011-030 Configurar Faixas de Financiamento
@@ -77,6 +78,13 @@ EPIC-M011-007 (Publicacao de Resultado)  <- depende de EPIC-M011-005, EPIC-M011-
 ├── US-M011-026 Publicar Resultado Preliminar
 ├── US-M011-027 Publicar Resultado Final e Disponibilizar Aprovados ao M022
 └── US-M011-028 Dashboard KPIs da Captacao
+
+EPIC-M011-008 (Rubricas Permitidas da Captacao)  <- depende de M008, EPIC-M011-001
+├── US-M011-036 Selecionar Rubricas Permitidas
+├── US-M011-037 Configurar Subrubricas Permitidas
+├── US-M011-038 Definir Limites por Rubrica
+├── US-M011-039 Definir Restricoes e Comprovantes por Rubrica
+└── US-M011-040 Validar Orcamento da Proposta contra Rubricas Permitidas
 ```
 
 ## Observacoes do Prototipo Backoffice

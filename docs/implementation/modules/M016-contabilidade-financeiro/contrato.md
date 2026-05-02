@@ -23,7 +23,7 @@ Este contrato documenta a superficie publica do modulo M016 como contexto respon
 |-------------|------|------------|
 | M003 | Modulo interno | Fornece `Iniciativa` como entidade externa do escopo financeiro |
 | M010 | Modulo interno | Fornece `Programa` e `Parceria` |
-| M008 | Modulo interno | Fornece rubricas financeiras, documentos e tipos documentais usados na Acao Transversal |
+| M008 | Modulo interno | Fornece rubricas, documentos e tipos documentais usados na Acao Transversal |
 | Extrato bancario / sistema financeiro | Sistema externo | Pode alimentar conciliacao e dados de conta bancaria |
 
 ## Operacoes Publicas

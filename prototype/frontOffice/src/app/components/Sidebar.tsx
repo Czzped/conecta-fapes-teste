@@ -58,12 +58,15 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
   const { t } = useLanguage();
 
   // Translated menu items
-  const menuItems = [
+  const managementMenuItems = [
     { id: 'inicio', labelKey: 'sidebar.home', icon: Home },
-    { id: 'informacoes', labelKey: 'sidebar.myInfo', icon: User },
     { id: 'projetos', labelKey: 'sidebar.myProject', icon: FolderKanban },
-    { id: 'pagamentos', labelKey: 'sidebar.payments', icon: CreditCard },
     { id: 'certificados', labelKey: 'sidebar.requests', icon: ClipboardList },
+  ];
+
+  const profileMenuItems = [
+    { id: 'informacoes', labelKey: 'sidebar.myInfo', icon: User },
+    { id: 'pagamentos', labelKey: 'sidebar.payments', icon: CreditCard },
   ];
 
   // Menu items for Reitor/Diretor
@@ -74,6 +77,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
 
   // Minha Equipe - Only for Coordenador
   const minhaEquipeItem = { id: 'minha-equipe', labelKey: 'sidebar.myTeam', icon: Users };
+  const projectPaymentsItem = { id: 'pagamentos-projeto', labelKey: 'sidebar.projectPayments', icon: CreditCard };
 
   const prestacaoContasItems = [
     { id: 'financeira', labelKey: 'sidebar.financial', icon: DollarSign },
@@ -420,20 +424,21 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
   }
 
   // Filter out 'pagamentos' for voluntario access type
-  const filteredMenuItems = accessType === 'voluntario' 
-    ? menuItems.filter(item => item.id !== 'pagamentos')
-    : menuItems;
+  const filteredProfileMenuItems = accessType === 'voluntario'
+    ? profileMenuItems.filter(item => item.id !== 'pagamentos')
+    : profileMenuItems;
 
   // Insert "Minha Equipe" after "Meu Projeto" for Coordenador
-  const finalMenuItems = accessType === 'coordenador'
-    ? filteredMenuItems.reduce((acc, item) => {
+  const finalManagementMenuItems = accessType === 'coordenador'
+    ? managementMenuItems.reduce((acc, item) => {
         acc.push(item);
         if (item.id === 'projetos') {
           acc.push(minhaEquipeItem);
+          acc.push(projectPaymentsItem);
         }
         return acc;
-      }, [] as typeof menuItems)
-    : filteredMenuItems;
+      }, [] as typeof managementMenuItems)
+    : managementMenuItems;
 
   return (
     <aside 
@@ -557,6 +562,91 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
 
       <div className={isCollapsed ? 'px-2 flex-1' : 'px-4 flex-1'}>
         <nav className="mt-2">
+          {filteredProfileMenuItems.length > 0 && (
+            <>
+              {!isCollapsed && (
+                <div
+                  style={{
+                    fontSize: 'var(--text-xs)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--muted-foreground)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    marginBottom: '0.5rem',
+                    paddingLeft: '0.75rem',
+                    marginTop: '0.75rem',
+                  }}
+                >
+                  {t('sidebar.myProfile')}
+                </div>
+              )}
+
+              <ul className="space-y-2">
+                {filteredProfileMenuItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = currentPage === item.id;
+
+                  return (
+                    <li key={item.id}>
+                      <button
+                        onClick={() => onNavigate(item.id)}
+                        className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
+                        style={{
+                          backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
+                          color: isActive ? 'var(--sidebar-accent-foreground)' : 'var(--sidebar-foreground)',
+                          borderRadius: 'var(--radius)',
+                          fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
+                          fontSize: 'var(--text-sm)',
+                          paddingLeft: isCollapsed ? '0' : '0.75rem',
+                          paddingRight: isCollapsed ? '0' : '0.75rem',
+                          justifyContent: isCollapsed ? 'center' : 'flex-start',
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isActive) {
+                            e.currentTarget.style.backgroundColor = 'var(--muted)';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isActive) {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }
+                        }}
+                        title={isCollapsed ? t(item.labelKey) : undefined}
+                      >
+                        <Icon size={20} style={{ flexShrink: 0 }} />
+                        {!isCollapsed && <span style={{ textAlign: 'left' }}>{t(item.labelKey)}</span>}
+
+                        {/* Tooltip when collapsed */}
+                        {isCollapsed && (
+                          <div
+                            className="absolute left-full ml-2 px-3 py-2 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50"
+                            style={{
+                              backgroundColor: 'var(--popover)',
+                              color: 'var(--popover-foreground)',
+                              fontSize: 'var(--text-sm)',
+                              boxShadow: 'var(--shadow-lg)',
+                            }}
+                          >
+                            {t(item.labelKey)}
+                          </div>
+                        )}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              <div
+                style={{
+                  height: '1px',
+                  backgroundColor: 'var(--sidebar-border)',
+                  marginTop: '1rem',
+                  marginBottom: '1.5rem',
+                }}
+              />
+            </>
+          )}
+
           {/* Section: Gerenciamento - Only for Coordenador */}
           {accessType === 'coordenador' && !isCollapsed && (
             <div 
@@ -576,7 +666,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
           )}
           
           <ul className="space-y-2">
-            {finalMenuItems.map((item) => {
+            {finalManagementMenuItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentPage === item.id;
               

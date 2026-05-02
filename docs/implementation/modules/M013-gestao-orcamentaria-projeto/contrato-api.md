@@ -85,14 +85,14 @@ Vincula uma rubrica do cadastro corporativo ao projeto com saldo inicial.
 
 ```json
 {
-  "rubricaFinanceiraId": "RUB-339030",
+  "rubricaRef": "RUB-339030",
   "valorAprovado": 150000.0
 }
 ```
 
 | Campo | Tipo | Obrigatorio | Descricao |
 |-------|------|-------------|-----------|
-| `rubricaFinanceiraId` | string | Sim | Identificador da rubrica financeira do cadastro corporativo (M008) |
+| `rubricaRef` | string | Sim | Identificador da rubrica do cadastro corporativo (M008) |
 | `valorAprovado` | number | Sim | Valor aprovado para a rubrica neste projeto |
 
 **Response `201 Created`**
@@ -102,9 +102,18 @@ Vincula uma rubrica do cadastro corporativo ao projeto com saldo inicial.
   "rubricaProjeto": {
     "id": "RP-2026-004",
     "projetoId": "PROJ-2026-014",
-    "rubricaFinanceiraId": "RUB-339030",
+    "rubricaRef": "RUB-339030",
+    "codigoSnapshot": "RUB-339030",
+    "nomeSnapshot": "Material de Consumo",
+    "descricaoSnapshot": "Materiais consumiveis aprovados no plano de aplicacao.",
+    "naturezaSnapshot": "CUSTEIO",
+    "rubricaPaiSnapshot": null,
+    "documentoFonteSnapshot": "Resolucao CCAF no 309/2022",
     "valorAprovado": 150000.0,
-    "saldoAtual": 150000.0
+    "valorComprometido": 0.0,
+    "valorExecutado": 0.0,
+    "valorEstornado": 0.0,
+    "saldoDisponivel": 150000.0
   }
 }
 ```
@@ -113,7 +122,7 @@ Vincula uma rubrica do cadastro corporativo ao projeto com saldo inicial.
 
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
-| `404` | `RUBRICA_FINANCEIRA_NAO_ENCONTRADA` | A rubrica financeira informada nao existe no cadastro basico. |
+| `404` | `RUBRICA_NAO_ENCONTRADA` | A rubrica informada nao existe no cadastro basico. |
 | `404` | `PROJETO_NAO_ENCONTRADO` | O projeto informado nao foi encontrado. |
 | `409` | `RUBRICA_JA_VINCULADA_AO_PROJETO` | A rubrica informada ja esta vinculada a este projeto. |
 | `422` | `PROJETO_NAO_ELEGIVEL_RUBRICA` | O projeto informado nao esta apto a receber nova rubrica. |
@@ -148,9 +157,12 @@ Lista as rubricas vinculadas ao projeto com saldos atualizados.
   "items": [
     {
       "id": "RP-2026-004",
-      "rubricaFinanceiraId": "RUB-339030",
+      "rubricaRef": "RUB-339030",
       "valorAprovado": 150000.0,
-      "saldoAtual": 138000.0
+      "valorComprometido": 12000.0,
+      "valorExecutado": 0.0,
+      "valorEstornado": 0.0,
+      "saldoDisponivel": 138000.0
     }
   ],
   "total": 1,
@@ -188,9 +200,12 @@ Consulta o saldo atualizado de uma rubrica especifica do projeto.
 {
   "rubricaProjeto": {
     "id": "RP-2026-004",
-    "rubricaFinanceiraId": "RUB-339030",
+    "rubricaRef": "RUB-339030",
     "valorAprovado": 150000.0,
-    "saldoAtual": 138000.0
+    "valorComprometido": 12000.0,
+    "valorExecutado": 0.0,
+    "valorEstornado": 0.0,
+    "saldoDisponivel": 138000.0
   }
 }
 ```
@@ -201,6 +216,49 @@ Consulta o saldo atualizado de uma rubrica especifica do projeto.
 |------|--------|----------|
 | `404` | `PROJETO_NAO_ENCONTRADO` | O projeto informado nao foi encontrado. |
 | `404` | `RUBRICA_PROJETO_NAO_ENCONTRADA` | A rubrica informada nao foi encontrada para este projeto. |
+
+---
+
+#### `POST /api/v1/m013/projetos/{projetoId}/rubricas/{rubricaProjetoId}/transacoes`
+
+Registra uma transacao que altera o saldo da `RubricaProjeto`. Este endpoint nao cria movimento bancario; quando houver pagamento bancario conciliado, o movimento deve ser enviado apenas como referencia.
+
+- **Autorizacao:** `MODULO_INTERNO`, `ANALISTA_AGENCIA`
+- **Operacao de origem:** `RegistrarTransacao`
+- **Idempotencia:** por `origemModulo + origemRef + tipo`
+
+```json
+{
+  "tipo": "COMPROMETIMENTO",
+  "valor": 780.0,
+  "origemModulo": "M003",
+  "origemRef": "SD-2026-001",
+  "movimentoBancarioRef": null,
+  "descricao": "Comprometimento de diaria solicitada"
+}
+```
+
+**Response `201 Created`**
+
+```json
+{
+  "transacao": {
+    "id": "TR-2026-045",
+    "rubricaProjetoId": "RP-2026-004",
+    "tipo": "COMPROMETIMENTO",
+    "valor": 780.0,
+    "origemModulo": "M003",
+    "origemRef": "SD-2026-001"
+  },
+  "saldo": {
+    "valorAprovado": 150000.0,
+    "valorComprometido": 12780.0,
+    "valorExecutado": 0.0,
+    "valorEstornado": 0.0,
+    "saldoDisponivel": 137220.0
+  }
+}
+```
 
 ---
 
@@ -483,7 +541,13 @@ Consulta o historico completo das movimentacoes orcamentarias do projeto.
 {
   "id": "string",
   "projetoId": "string",
-  "rubricaFinanceiraId": "string",
+  "rubricaId": "string",
+  "codigoSnapshot": "string",
+  "nomeSnapshot": "string",
+  "descricaoSnapshot": "string",
+  "naturezaSnapshot": "CUSTEIO | CAPITAL",
+  "rubricaPaiSnapshot": "string | null",
+  "documentoFonteSnapshot": "string | null",
   "valorAprovado": "number",
   "saldoAtual": "number"
 }

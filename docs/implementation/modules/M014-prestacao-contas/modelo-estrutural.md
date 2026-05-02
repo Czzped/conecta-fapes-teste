@@ -35,8 +35,6 @@ classDiagram
         +Guid TransacaoFinanceiraContaBancariaId
         +Prestacao? Prestacao
         +Guid? TransacaoFinanceiraPrestacaoId
-        +RubricaOrcamentaria? RubricaOrcamentaria
-        +Guid? TransacaoFinanceiraRubricaOrcamentariaId
         +Guid? TransacaoEstornadaId
         +DateTimeOffset Data
         +decimal Valor
@@ -198,7 +196,6 @@ classDiagram
 
     TransacaoFinanceira "*" --> "1" ContaBancaria : pertence a
     TransacaoFinanceira "*" --> "0..1" Prestacao : vinculada a
-    TransacaoFinanceira "*" --> "0..1" RubricaOrcamentaria : classificada em
     TransacaoFinanceira "0..1" --> "0..1" TransacaoFinanceira : estorna
 
     JustificativaDespesa <|-- JustificativaNF : herda
@@ -256,8 +253,6 @@ Todas as entidades herdam de `BaseEntity` (`ConectaFapes.Common.Domain.BaseEntit
 | TransacaoFinanceiraContaBancariaId | Guid | Nao | Sim | FK para ContaBancaria |
 | Prestacao | Prestacao? | Sim | Nao | Navegacao para a prestacao vinculada (null se ainda nao vinculada) |
 | TransacaoFinanceiraPrestacaoId | Guid? | Sim | Nao | FK para Prestacao — null se a transacao ainda nao foi vinculada |
-| RubricaOrcamentaria | RubricaOrcamentaria? | Sim | Nao | Rubrica usada para classificar creditos como Estorno ou Rendimento quando aplicavel |
-| TransacaoFinanceiraRubricaOrcamentariaId | Guid? | Sim | Nao | FK opcional para RubricaOrcamentaria de classificacao operacional da transacao |
 | TransacaoEstornadaId | Guid? | Sim | Nao | FK opcional para a transacao de debito compensada por um credito de estorno |
 | Data | DateTimeOffset | Nao | Sim | Data do lancamento bancario |
 | Valor | decimal | Nao | Sim | Valor monetario da transacao (>= 0) |
@@ -267,6 +262,9 @@ Todas as entidades herdam de `BaseEntity` (`ConectaFapes.Common.Domain.BaseEntit
 | Tipo | TipoOperacao | Nao | Sim | DEBITO ou CREDITO |
 | Classificacao | TipoClassificacaoTransacao | Nao | Gerado | Classificacao operacional da transacao: DESPESA, ESTORNO, RENDIMENTO ou PENDENTE_CLASSIFICACAO |
 | Status | StatusTransacao | Nao | Gerado | Derivado do Status da Prestacao vinculada — ver enumeracoes |
+
+**Fronteira com rubricas:**
+`TransacaoFinanceira` representa apenas o movimento bancario/financeiro. Ela nao e uma rubrica e nao deve ser usada como fonte de verdade para saldo orcamentario. A classificacao por rubrica acontece na despesa comprovada (`JustificativaDespesa`, `ItemDocumentoFiscal`, `JustificativaDiaria`, `JustificativaProdutoSemNota`) e nas entidades `Transacao` do M013. Quando for necessario conciliar uma despesa com uma transacao financeira, o vinculo deve ser por referencia entre a justificativa/`Transacao` e a `TransacaoFinanceira`.
 
 ### ContaBancaria
 
@@ -402,6 +400,7 @@ Herda todos os atributos de `JustificativaDespesa`. Usada para compra excepciona
 
 > **DT-M014-001:** Implementado neste backend mas pertence conceitualmente a M013 (Gestao Orcamentaria).
 > **DT-M014-005:** O termo legado `ContaContabil` deve ser migrado no codigo/persistencia para `RubricaOrcamentaria`; no dominio deste modulo, a classificacao de despesas e feita por rubrica orcamentaria.
+> **DT-M014-006:** `TransacaoFinanceira` deve permanecer separada de `RubricaOrcamentaria`. Qualquer FK legado de transacao financeira para rubrica deve ser tratado como classificacao auxiliar/deprecada, migrando a classificacao oficial para justificativas, itens e `Transacao`.
 
 | Atributo | Tipo | Nullable | Obrig. | Descricao |
 |---|---|---|---|---|
@@ -495,6 +494,9 @@ Todas as entidades herdam de `BaseEntity` (`ConectaFapes.Common.Domain.BaseEntit
 
 **StatusTransacao como estado derivado:**
 O `Status` de `TransacaoFinanceira` nao e persistido diretamente — e uma propriedade calculada que reflete o `Status` da `Prestacao` a qual a transacao esta vinculada. Transacoes sem vinculo ficam com status `PENDENTE`.
+
+**Rubrica x transacao:**
+`RubricaOrcamentaria` classifica a despesa aprovada/prestada. `Transacao` movimenta o saldo da rubrica no M013. `TransacaoFinanceira` registra o movimento bancario. O mesmo pagamento pode precisar ser conciliado com uma justificativa e classificado em uma ou mais rubricas, mas a rubrica nao deve carregar o movimento bancario como se fosse sua propria entidade.
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: `JustificativaNF.DocumentoFiscal: DocumentoFiscal`)

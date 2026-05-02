@@ -86,6 +86,8 @@ O backend possui:
 
 Isso cobre a persistencia de debitos e creditos, mas nao cobre todo o fluxo de captura e processamento do CNAB 240 descrito no processo revisado.
 
+Importante: `TransacaoFinanceira` nao e rubrica. Ela representa movimento bancario/financeiro e deve ficar separada da classificacao orcamentaria. A rubrica deve aparecer na justificativa, no item fiscal ou na `Transacao` do M013; a `TransacaoFinanceira` deve ser vinculada apenas para conciliacao do pagamento.
+
 ## Lacunas Identificadas
 
 ### Produto sem Nota Fiscal
@@ -166,6 +168,8 @@ Impacto: a persistencia final das transacoes existe, mas a arquitetura operacion
 O backend usa `ContaContabil` para classificar itens de documento fiscal.
 
 O modelo revisado define `RubricaOrcamentaria` como termo de dominio. `ContaContabil` deve ser tratado como nome legado tecnico ate migracao controlada.
+
+Tambem deve ser evitado qualquer desenho em que `TransacaoFinanceira` substitua `RubricaOrcamentaria`. A transacao financeira responde "qual movimento financeiro ocorreu?"; a rubrica responde "em qual categoria orcamentaria esta despesa se enquadra?"; e a `Transacao` responde "qual movimento alterou o saldo da rubrica?".
 
 Impacto:
 

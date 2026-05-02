@@ -31,15 +31,13 @@ Contrato funcional: ver [contrato.md](contrato.md)
 | GET | `/parcerias/{parceriaId}/iniciativas` | ConsultarIniciativasPorParceria | Lista iniciativas associadas a parceria |
 | POST | `/iniciativas/{id}/versoes-plano` | CriarVersaoPlanoIniciativa | Cria nova versao do plano da iniciativa |
 | POST | `/iniciativas/{id}/versoes-plano/{versaoId}/ativar` | AtivarVersaoPlanoIniciativa | Ativa uma versao do plano |
-| POST | `/tipos-diaria` | CadastrarTipoDiaria | FAPES cadastra valor, vigencia, fracao de calculo e tipo de viagem |
 | POST | `/iniciativas/{id}/solicitacoes-rubrica` | SolicitarAlteracaoRubrica | Ortogado solicita inclusao ou retirada de rubrica |
 | POST | `/solicitacoes-rubrica/{id}/decisao` | DecidirSolicitacaoAlteracaoRubrica | Analisa solicitacao de rubrica |
 | POST | `/iniciativas/{id}/solicitacoes-diaria` | SolicitarDiaria | Ortogado solicita diaria para bolsistas da iniciativa |
-| POST | `/solicitacoes-diaria/{id}/submeter-aceite` | SubmeterSolicitacaoDiariaParaAceite | Envia solicitacao para aceite dos bolsistas |
 | POST | `/solicitacoes-diaria/{id}/beneficiarios/{beneficiarioId}/aceite` | AssinarTermoAceiteDiaria | Bolsista assina o termo de aceite |
 | POST | `/solicitacoes-diaria/{id}/beneficiarios/{beneficiarioId}/recusa` | RecusarTermoAceiteDiaria | Bolsista recusa a viagem com justificativa |
-| POST | `/solicitacoes-diaria/{id}/decisao` | DecidirSolicitacaoDiaria | FAPES aprova ou rejeita diaria e gera debito quando aprovada |
-| POST | `/solicitacoes-diaria/{id}/cancelar` | CancelarSolicitacaoDiaria | Cancela solicitacao de diaria |
+| POST | `/solicitacoes-diaria/{id}/cancelar` | RemoverSolicitacaoDiaria | Remove/cancela diaria alocada ou aprovada antes do inicio |
+| POST | `/solicitacoes-diaria/{id}/regularizar-nao-utilizada` | RegularizarDiariaNaoUtilizada | Regulariza diaria nao utilizada apos o inicio previsto |
 | GET | `/iniciativas/{id}/solicitacoes-diaria` | ConsultarSolicitacoesDiaria | Lista solicitacoes de diaria da iniciativa |
 | GET | `/solicitacoes-diaria/{id}` | ConsultarSolicitacaoDiaria | Consulta detalhe da solicitacao de diaria |
 | POST | `/iniciativas/{id}/lancamentos-execucao` | RegistrarLancamentoExecucao | Registra lancamento financeiro consolidavel |
@@ -74,12 +72,11 @@ Contrato funcional: ver [contrato.md](contrato.md)
 | 422 | PERIODO_DIARIA_INVALIDO | Data/hora de chegada deve ser posterior a partida |
 | 422 | BENEFICIARIO_DIARIA_INVALIDO | Beneficiario nao possui alocacao valida na iniciativa |
 | 422 | TIPO_DIARIA_VIGENTE_AUSENTE | Nao ha tipo de diaria vigente para o tipo de viagem informado |
-| 422 | TIPO_DIARIA_INVALIDO | Tipo de diaria deve possuir tipo de viagem, valor maior que zero, fracao de calculo e vigencia valida |
 | 422 | ACEITES_DIARIA_PENDENTES | Solicitacao ainda possui aceites obrigatorios pendentes |
 | 422 | RUBRICA_DIARIAS_PASSAGENS_INVALIDA | Rubrica de Diarias e Passagens ausente ou invalida |
-| 422 | JUSTIFICATIVA_CANCELAMENTO_DIARIA_OBRIGATORIA | Cancelamento de diaria exige justificativa |
-| 422 | JUSTIFICATIVA_REJEICAO_DIARIA_OBRIGATORIA | Rejeicao de diaria pela FAPES exige justificativa |
-| 409 | TIPO_DIARIA_VIGENCIA_SOBREPOSTA | Ja existe tipo de diaria ativo para a vigencia e tipo de viagem informados |
+| 422 | JUSTIFICATIVA_CANCELAMENTO_DIARIA_OBRIGATORIA | Remocao/cancelamento de diaria exige justificativa |
+| 422 | JUSTIFICATIVA_REGULARIZACAO_DIARIA_OBRIGATORIA | Regularizacao de diaria nao utilizada exige justificativa |
+| 422 | REMOCAO_DIARIA_APOS_INICIO_INVALIDA | Diaria com data/hora de partida ja passada deve seguir regularizacao, nao remocao operacional |
 | 409 | ACEITE_DIARIA_JA_REGISTRADO | Beneficiario ja assinou ou recusou o termo |
 | 409 | SOLICITACAO_DIARIA_VINCULADA_PRESTACAO | Solicitacao ja vinculada a prestacao de contas |
 
@@ -333,44 +330,9 @@ Registra a decisao sobre solicitacao de rubrica. Quando a decisao aprovada alter
 }
 ```
 
-## POST `/tipos-diaria`
-
-Cadastra o tipo de diaria que sera usado pelo M003 no calculo das solicitacoes. A FAPES deve manter vigencias sem sobreposicao por tipo de viagem para evitar ambiguidade no calculo.
-
-### Request
-
-```json
-{
-  "codigo": "DIA-2026-001",
-  "tipoViagemRef": "TVI-001",
-  "valorUnitario": 260.00,
-  "fracaoCalculo": "12H",
-  "vigenciaInicio": "2026-01-01",
-  "vigenciaFim": null,
-  "ativo": true
-}
-```
-
-### Response `201`
-
-```json
-{
-  "tipoDiaria": {
-    "id": "DIA-2026-001",
-    "codigo": "DIA-2026-001",
-    "tipoViagemRef": "TVI-001",
-    "valorUnitario": 260.00,
-    "fracaoCalculo": "12H",
-    "vigenciaInicio": "2026-01-01",
-    "vigenciaFim": null,
-    "ativo": true
-  }
-}
-```
-
 ## POST `/iniciativas/{id}/solicitacoes-diaria`
 
-Cria solicitacao operacional de diaria para um ou mais bolsistas alocados na iniciativa. O valor nao e informado pelo coordenador; o sistema calcula quantidade a partir do periodo informado, localiza o tipo de diaria vigente para o tipo de viagem selecionado e usa valor unitario e fracao de calculo desse cadastro no momento da solicitacao.
+Cria solicitacao operacional de diaria para um ou mais bolsistas alocados na iniciativa. O valor nao e informado pelo coordenador; o sistema calcula quantidade a partir do periodo informado, consulta o M008 para validar o tipo de viagem e localizar o tipo de diaria vigente, e usa valor unitario e fracao de calculo desse cadastro no snapshot da solicitacao.
 
 ### Request
 
@@ -398,13 +360,15 @@ Cria solicitacao operacional de diaria para um ou mais bolsistas alocados na ini
   "solicitacaoDiaria": {
     "id": "SD-2026-001",
     "codigo": "SD-2026-001",
-    "estado": "RASCUNHO",
+    "estado": "ALOCADA",
     "quantidadeDiariasCalculada": 2.5,
     "tipoViagemRef": "TVI-001",
     "tipoDiariaRef": "DIA-2026-001",
     "valorUnitarioDiaria": 260.00,
     "fracaoCalculoSnapshot": "12H",
     "valorTotalCalculado": 650.00,
+    "rubricaDebitoRef": "RUB-DIARIAS-PASSAGENS",
+    "lancamentoDebitoRef": "LEX-2026-045",
     "beneficiarios": [
       {
         "id": "BD-2026-001",
@@ -415,22 +379,6 @@ Cria solicitacao operacional de diaria para um ou mais bolsistas alocados na ini
         "aceite": "PENDENTE"
       }
     ]
-  }
-}
-```
-
-## POST `/solicitacoes-diaria/{id}/submeter-aceite`
-
-Submete a solicitacao para assinatura dos bolsistas e dispara notificacoes.
-
-### Response `200`
-
-```json
-{
-  "solicitacaoDiaria": {
-    "id": "SD-2026-001",
-    "estado": "AGUARDANDO_ACEITES",
-    "beneficiariosPendentes": 1
   }
 }
 ```
@@ -465,7 +413,7 @@ Registra assinatura do termo de aceite pelo bolsista beneficiario.
   },
   "solicitacaoDiaria": {
     "id": "SD-2026-001",
-    "estado": "AGUARDANDO_APROVACAO"
+    "estado": "APROVADA"
   }
 }
 ```
@@ -498,41 +446,6 @@ Registra recusa da viagem pelo bolsista beneficiario. A justificativa e obrigato
 }
 ```
 
-## POST `/solicitacoes-diaria/{id}/decisao`
-
-A FAPES aprova ou rejeita a solicitacao apos os aceites dos bolsistas. Quando aprovada, o M003 gera um lancamento de debito/comprometimento na rubrica de Diarias e Passagens. Quando rejeitada, a justificativa e obrigatoria e nenhum debito deve ser gerado.
-
-### Request
-
-```json
-{
-  "decisao": "APROVADA",
-  "justificativa": "Deslocamento previsto no plano de trabalho e aceito pelos bolsistas.",
-  "rubricaDiariasPassagensId": "RUB-DIARIAS-PASSAGENS"
-}
-```
-
-### Response `200`
-
-```json
-{
-  "solicitacaoDiaria": {
-    "id": "SD-2026-001",
-    "estado": "APROVADA",
-    "valorTotalAprovado": 800.00,
-    "rubricaDebitoRef": "RUB-DIARIAS-PASSAGENS",
-    "lancamentoDebitoRef": "LEX-2026-045"
-  },
-  "lancamentoExecucao": {
-    "id": "LEX-2026-045",
-    "tipo": "DEBITO",
-    "rubricaId": "RUB-DIARIAS-PASSAGENS",
-    "valor": 800.00,
-    "origem": "M003:SolicitacaoDiaria:SD-2026-001"
-  }
-}
-```
-
 ## GET `/iniciativas/{id}/solicitacoes-diaria`
 
 Lista solicitacoes de diaria da iniciativa, com filtros opcionais por busca livre, estado, periodo de partida e paginacao.
@@ -542,7 +455,7 @@ Lista solicitacoes de diaria da iniciativa, com filtros opcionais por busca livr
 | Parametro | Obrigatorio | Descricao |
 |-----------|-------------|-----------|
 | `busca` | Nao | Busca por codigo, iniciativa, coordenador, beneficiario, destino, motivo ou referencia da diaria corrente. |
-| `estado` | Nao | Estado da solicitacao: `AGUARDANDO_ACEITES`, `AGUARDANDO_APROVACAO`, `APROVADA`, `REJEITADA`, `CANCELADA` ou `RECUSADA`. |
+| `estado` | Nao | Estado da solicitacao: `ALOCADA`, `APROVADA`, `CANCELADA`, `RECUSADA` ou `REGULARIZADA_NAO_UTILIZADA`. |
 | `partidaInicio` | Nao | Data inicial do periodo de partida. |
 | `partidaFim` | Nao | Data final do periodo de partida. |
 | `pagina` | Nao | Numero da pagina, iniciando em 1. |
@@ -612,7 +525,7 @@ Consulta detalhe da solicitacao, incluindo beneficiarios, calculo aplicado e ter
 
 ## POST `/solicitacoes-diaria/{id}/cancelar`
 
-Cancela solicitacao de diaria com justificativa obrigatoria. Quando a solicitacao ja estiver aprovada e tiver gerado debito na rubrica de Diarias e Passagens, o cancelamento gera um lancamento de credito na mesma rubrica.
+Remove/cancela solicitacao de diaria `ALOCADA` ou `APROVADA` com justificativa obrigatoria, somente antes da data/hora de partida. Quando a solicitacao tiver gerado debito na rubrica de Diarias e Passagens, o cancelamento gera um lancamento de credito na mesma rubrica.
 
 ### Request
 
@@ -637,7 +550,32 @@ Cancela solicitacao de diaria com justificativa obrigatoria. Quando a solicitaca
     "tipo": "CREDITO",
     "rubricaId": "RUB-DIARIAS-PASSAGENS",
     "valor": 800.00,
-    "origem": "M003:SolicitacaoDiariaCancelada:SD-2026-001"
+    "origem": "M003:SolicitacaoDiariaRemovida:SD-2026-001"
+  }
+}
+```
+
+## POST `/solicitacoes-diaria/{id}/regularizar-nao-utilizada`
+
+Regulariza diaria nao utilizada quando a data/hora de partida ja passou. A solicitacao nao deve ser apagada fisicamente; o sistema preserva auditoria, exige justificativa e gera credito de reversao quando cabivel.
+
+### Request
+
+```json
+{
+  "justificativa": "Viagem nao realizada por cancelamento da agenda apos a data prevista."
+}
+```
+
+### Response `200`
+
+```json
+{
+  "solicitacaoDiaria": {
+    "id": "SD-2026-001",
+    "estado": "REGULARIZADA_NAO_UTILIZADA",
+    "justificativaRegularizacao": "Viagem nao realizada por cancelamento da agenda apos a data prevista.",
+    "lancamentoCreditoRef": "LEX-2026-052"
   }
 }
 ```
@@ -704,15 +642,13 @@ Consulta a execucao consolidada da iniciativa.
 | `GET /parcerias/{parceriaId}/iniciativas` | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `POST /iniciativas/{id}/versoes-plano` | ANALISTA_AGENCIA |
 | `POST /iniciativas/{id}/versoes-plano/{versaoId}/ativar` | ANALISTA_AGENCIA |
-| `POST /tipos-diaria` | ANALISTA_AGENCIA |
 | `POST /iniciativas/{id}/solicitacoes-rubrica` | ORTOGADO |
 | `POST /solicitacoes-rubrica/{id}/decisao` | ANALISTA_AGENCIA |
 | `POST /iniciativas/{id}/solicitacoes-diaria` | ORTOGADO |
-| `POST /solicitacoes-diaria/{id}/submeter-aceite` | ORTOGADO |
 | `POST /solicitacoes-diaria/{id}/beneficiarios/{beneficiarioId}/aceite` | BOLSISTA |
 | `POST /solicitacoes-diaria/{id}/beneficiarios/{beneficiarioId}/recusa` | BOLSISTA |
-| `POST /solicitacoes-diaria/{id}/decisao` | ANALISTA_AGENCIA |
 | `POST /solicitacoes-diaria/{id}/cancelar` | ORTOGADO |
+| `POST /solicitacoes-diaria/{id}/regularizar-nao-utilizada` | ORTOGADO |
 | `GET /iniciativas/{id}/solicitacoes-diaria` | ANALISTA_AGENCIA, ORTOGADO, MODULO_INTERNO |
 | `GET /solicitacoes-diaria/{id}` | ANALISTA_AGENCIA, ORTOGADO, BOLSISTA, MODULO_INTERNO |
 | `POST /iniciativas/{id}/lancamentos-execucao` | MODULO_INTERNO |

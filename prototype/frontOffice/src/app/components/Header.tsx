@@ -10,10 +10,11 @@ interface HeaderProps {
   onToggleMobileMenu: () => void;
   isMobileMenuOpen: boolean;
   onLogout?: () => void;
+  onNavigate?: (page: string) => void;
   accessType?: 'cidadao' | 'voluntario' | 'bolsista' | 'coordenador' | 'diretor' | 'reitor';
 }
 
-export function Header({ onToggleSidebar, onToggleMobileMenu, isMobileMenuOpen, onLogout, accessType }: HeaderProps) {
+export function Header({ onToggleSidebar, onToggleMobileMenu, isMobileMenuOpen, onLogout, onNavigate, accessType }: HeaderProps) {
   const { language, setLanguage, t } = useLanguage();
   const [isDarkMode, setIsDarkMode] = useState(true); // Dark mode como padrão
   const [showNotifications, setShowNotifications] = useState(false);
@@ -486,6 +487,7 @@ export function Header({ onToggleSidebar, onToggleMobileMenu, isMobileMenuOpen, 
       <NotificationsSidebar 
         isOpen={showNotifications}
         onClose={() => setShowNotifications(false)}
+        onNavigate={onNavigate}
       />
 
       {/* Accessibility Modal */}

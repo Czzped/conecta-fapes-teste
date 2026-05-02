@@ -63,7 +63,7 @@ Uma captacao pode receber aporte financeiro de um ou mais programas ou parcerias
 | RN10 | Uma captacao pode definir faixas de financiamento com duracao, valor minimo, valor maximo e valor aportado por faixa. | Should |
 | RN11 | As regras de submissao definem se multiplas propostas sao permitidas e se o proponente pode ter outra iniciativa ativa. | Must |
 | RN12 | Os requisitos do proponente podem exigir nivel academico minimo, vinculo institucional e restricao de vinculo empregaticio. | Must |
-| RN13 | A captacao deve definir as rubricas e subrubricas financeiras permitidas para as iniciativas financiadas, incluindo a rubrica Bolsa quando houver bolsas. | Must |
+| RN13 | A captacao deve definir as rubricas e subrubricas permitidas para as iniciativas financiadas, incluindo a rubrica Bolsa quando houver bolsas. | Must |
 | RN14 | Quando a rubrica Bolsa estiver permitida, a captacao deve definir modalidades e niveis de bolsa vinculados as versoes de niveis do M001, maximo de bolsistas e quantidade de cotas. | Must |
 | RN15 | Uma proposta submetida fora do periodo de recebimento deve ser recusada automaticamente. | Must |
 | RN16 | O resultado final so pode ser publicado apos o encerramento e a analise das revisoes admissiveis. | Must |
@@ -76,6 +76,9 @@ Uma captacao pode receber aporte financeiro de um ou mais programas ou parcerias
 | RN23 | A captacao deve indicar se as iniciativas resultantes exigirao prestacao tecnica e/ou financeira. | Must |
 | RN24 | Documentos exigidos do proponente devem ser cadastraveis como itens reutilizaveis e associados a captacao com formatos permitidos, obrigatoriedade e regra de reaproveitamento do cadastro corporativo. | Must |
 | RN25 | Cada aporte financeiro da captacao deve indicar origem do tipo Programa ou Parceria e valor aportado maior que zero. | Must |
+| RN26 | Rubricas permitidas devem ser selecionadas a partir de Rubricas ativas do M008. | Must |
+| RN27 | A captacao pode definir limite por Rubrica em valor absoluto ou percentual da faixa de financiamento. | Must |
+| RN28 | Restricoes, exclusoes e comprovantes esperados por Rubrica devem ser registrados na configuracao da captacao quando o edital trouxer regra especifica. | Should |
 | RN26 | Quando a submissao for restrita a proponentes escolhidos, a captacao deve indicar as instituicoes ou pessoas autorizadas a submeter proposta. | Must |
 | RN27 | A soma dos valores aportados nas faixas de financiamento nao deve ultrapassar o total financeiro calculado pelos aportes da captacao. | Must |
 | RN28 | Ao adiar uma etapa do cronograma, o sistema deve registrar historico com justificativa, datas originais e novas datas. | Must |

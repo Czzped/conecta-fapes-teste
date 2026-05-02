@@ -37,9 +37,17 @@ classDiagram
 
     class RubricaProjeto {
         +String codigo
+        +String rubricaRef
+        +String codigoSnapshot
+        +String nomeSnapshot
+        +String descricaoSnapshot
+        +String naturezaSnapshot
+        +String rubricaPaiSnapshot
+        +String documentoFonteSnapshot
         +double valorAprovado
         +double valorComprometido
         +double valorExecutado
+        +double valorEstornado
         +double saldoDisponivel
     }
 
@@ -51,12 +59,15 @@ classDiagram
         +Date dataAprovacao
     }
 
-    class SaldoRubrica {
-        +double saldoAnterior
-        +double valorMovimentacao
-        +double saldoAtual
-        +Date dataMovimentacao
-        +String descricaoMovimentacao
+    class Transacao {
+        +String codigo
+        +TipoTransacao tipo
+        +double valor
+        +Date dataTransacao
+        +String origemModulo
+        +String origemRef
+        +String movimentoBancarioRef
+        +String descricao
     }
 
     class ParecerSolicitacao {
@@ -79,14 +90,26 @@ classDiagram
         REMANEJAMENTO_CREDITO
         REMANEJAMENTO_DEBITO
         REALOCACAO_BOLSA
-        PAGAMENTO
+        EXECUCAO_DESPESA
+    }
+
+    class TipoTransacao {
+        <<enumeration>>
+        APORTE_INICIAL
+        ADITIVO
+        REMANEJAMENTO_CREDITO
+        REMANEJAMENTO_DEBITO
+        COMPROMETIMENTO
+        CANCELAMENTO_COMPROMETIMENTO
+        EXECUCAO
+        ESTORNO
     }
 
     class Projeto {
         <<fora do escopo - M003>>
     }
 
-    class RubricaFinanceira {
+    class Rubrica {
         <<fora do escopo - M008>>
     }
 
@@ -98,8 +121,8 @@ classDiagram
     SolicitacaoOrcamentaria "1" --> "0..1" ParecerSolicitacao : parecer
     SolicitacaoOrcamentaria "1" --> "0..1" Remanejamento : detalhe remanejamento
     RubricaProjeto "*" --> "1" Projeto : pertence a
-    RubricaProjeto "*" --> "1" RubricaFinanceira : referencia
-    RubricaProjeto "1" --> "*" SaldoRubrica : historico de saldo
+    RubricaProjeto "*" --> "1" Rubrica : referencia
+    RubricaProjeto "1" --> "*" Transacao : transacoes
     Remanejamento "*" --> "1" RubricaProjeto : rubrica origem
     Remanejamento "*" --> "1" RubricaProjeto : rubrica destino
     SolicitacaoOrcamentaria "*" --> "0..1" RubricaProjeto : rubrica alvo
@@ -119,20 +142,31 @@ classDiagram
 | | dataSubmissao | Data em que a solicitacao foi submetida | Cond. | Date | Preenchida ao submeter | | |
 | | estado | Estado atual da solicitacao no fluxo de aprovacao | Gerado | EstadoSolicitacaoOrcamentaria | Ver enumeracao | | |
 | **RubricaProjeto** | codigo | Codigo de identificacao da rubrica no projeto | Gerado | String | Ex: RP-2026-001 | | Sim |
+| | rubricaRef | Identificador da Rubrica canonica no M008 | Sim | String | Ex: RUB-DIARIAS | 80 | |
+| | codigoSnapshot | Codigo canonico da Rubrica no momento da aprovacao do orcamento do projeto | Sim | String | Ex: RUB-DIARIAS | 80 | |
+| | nomeSnapshot | Nome da Rubrica no momento da aprovacao do orcamento do projeto | Sim | String | Ex: Diarias | 150 | |
+| | descricaoSnapshot | Descricao da Rubrica no momento da aprovacao do orcamento do projeto | Sim | String | | 500 | |
+| | naturezaSnapshot | Natureza da Rubrica no momento da aprovacao | Sim | String | CUSTEIO, CAPITAL | 20 | |
+| | rubricaPaiSnapshot | Codigo/nome da Rubrica pai no momento da aprovacao, quando houver | Nao | String | Ex: RUB-DIARIAS - Diarias | 220 | |
+| | documentoFonteSnapshot | Documento fonte conhecido no momento da aprovacao | Nao | String | Ex: Resolucao CCAF no 309/2022 | 300 | |
 | | valorAprovado | Valor total aprovado para a rubrica no projeto | Sim | Double | | | |
-| | valorComprometido | Valor comprometido com despesas em andamento | Gerado | Double | | | |
-| | valorExecutado | Valor ja pago/executado | Gerado | Double | | | |
-| | saldoDisponivel | Saldo disponivel para novas despesas (aprovado - comprometido - executado) | Gerado | Double | | | |
+| | valorComprometido | Valor comprometido por transacoes ainda nao executadas | Gerado | Double | | | |
+| | valorExecutado | Valor ja executado a partir de transacoes aprovadas | Gerado | Double | | | |
+| | valorEstornado | Valor revertido por transacoes de estorno/cancelamento | Gerado | Double | | | |
+| | saldoDisponivel | Saldo disponivel para novas despesas (aprovado - comprometido - executado + estornado) | Gerado | Double | | | |
 | **Remanejamento** | valor | Valor a ser remanejado entre rubricas | Sim | Double | | | |
 | | justificativa | Justificativa para o remanejamento | Sim | String | | 2000 | |
 | | percentualOrigem | Percentual que o valor representa da rubrica de origem | Gerado | Double | Ex: 18.5% | | |
 | | exigeAprovacaoDiretor | Indica se o percentual excede 25% e exige aprovacao do Diretor | Gerado | Boolean | true se percentual > 25% | | |
 | | dataAprovacao | Data da aprovacao do remanejamento | Cond. | Date | | | |
-| **SaldoRubrica** | saldoAnterior | Saldo da rubrica antes da movimentacao | Gerado | Double | | | |
-| | valorMovimentacao | Valor da movimentacao (positivo ou negativo) | Sim | Double | | | |
-| | saldoAtual | Saldo resultante apos a movimentacao | Gerado | Double | | | |
-| | dataMovimentacao | Data em que a movimentacao ocorreu | Gerado | Date | | | |
-| | descricaoMovimentacao | Descricao textual da movimentacao | Sim | String | | 500 | |
+| **Transacao** | codigo | Codigo unico da transacao | Gerado | String | Ex: TR-2026-001 | | Sim |
+| | tipo | Tipo do movimento que afeta a RubricaProjeto | Sim | TipoTransacao | Ver enumeracao | | |
+| | valor | Valor da transacao | Sim | Double | >= 0 | | |
+| | dataTransacao | Data/hora da transacao | Gerado | Date | | | |
+| | origemModulo | Modulo ou contexto que originou a transacao | Sim | String | M003, M014, M016, BACKOFFICE | 30 | |
+| | origemRef | Referencia externa do fato de negocio que gerou a transacao | Sim | String | SolicitacaoDiariaId, PrestacaoId, RemanejamentoId | 120 | |
+| | movimentoBancarioRef | Referencia opcional ao movimento bancario conciliado | Nao | String | TransacaoFinanceiraId/MovimentoBancarioId | 120 | |
+| | descricao | Descricao textual da transacao | Sim | String | | 500 | |
 | **ParecerSolicitacao** | dataAnalise | Data em que o parecer foi emitido | Sim | Date | | | |
 | | aprovado | Indica se a solicitacao foi aprovada | Sim | Boolean | true/false | | |
 | | justificativa | Justificativa do parecer | Sim | String | | 1000 | |
@@ -145,9 +179,15 @@ classDiagram
 
 **Entidades externas:**
 - Projeto: gerenciado por M003 (Gestao de Iniciativas Captadas).
-- RubricaFinanceira: gerenciada por M008 (Cadastros Corporativos). Este modulo especializa a rubrica no contexto do projeto por meio de RubricaProjeto.
+- Rubrica: gerenciada por M008 (Cadastros Corporativos). Este modulo especializa a rubrica no contexto do projeto por meio de RubricaProjeto.
 - VersaoNivel: gerenciada por M001 (Modalidade de Bolsa).
+
+**Rubrica x transacao:**
+- `RubricaProjeto` e a categoria orcamentaria aprovada para a iniciativa. Ela guarda limites, snapshots e saldos derivados.
+- `Transacao` e o movimento da rubrica: comprometimento, execucao, estorno, reversao, remanejamento ou ajuste.
+- `TransacaoFinanceira` e movimento bancario/financeiro e pertence a M014/M016. Quando existir conciliacao, a `Transacao` pode guardar apenas `movimentoBancarioRef`.
+- A rubrica nao armazena o movimento em si; ela apenas classifica despesas e recebe saldos derivados das suas transacoes.
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: SolicitacaoOrcamentaria.projeto: Projeto)
-- Cardinalidade N: atributo lista do tipo da classe destino (ex: RubricaProjeto.historicoSaldo: List<SaldoRubrica>)
+- Cardinalidade N: atributo lista do tipo da classe destino (ex: RubricaProjeto.transacoes: List<Transacao>)

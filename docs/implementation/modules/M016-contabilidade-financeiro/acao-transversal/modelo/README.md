@@ -133,7 +133,7 @@ classDiagram
         <<fora do escopo - M008>>
     }
 
-    class RubricaFinanceira {
+    class Rubrica {
         <<fora do escopo - M008>>
     }
 
@@ -163,10 +163,10 @@ classDiagram
     RepasseAcaoTransversal "*" --> "1" ReservaAcaoTransversal : consome reserva
     ReservaAcaoTransversal "1" --> "0..1" PlanoAplicacaoAcaoTransversal : planejada por
     PlanoAplicacaoAcaoTransversal "1" --> "*" ItemPlanoAplicacaoAcaoTransversal : itens
-    ItemPlanoAplicacaoAcaoTransversal "*" --> "1" RubricaFinanceira : rubrica
+    ItemPlanoAplicacaoAcaoTransversal "*" --> "1" Rubrica : rubrica
     ReservaAcaoTransversal "1" --> "*" DespesaAcaoTransversal : despesas
     DespesaAcaoTransversal "*" --> "0..1" ItemPlanoAplicacaoAcaoTransversal : executa item
-    DespesaAcaoTransversal "*" --> "1" RubricaFinanceira : rubrica
+    DespesaAcaoTransversal "*" --> "1" Rubrica : rubrica
     DespesaAcaoTransversal "*" --> "1" Documento : comprovante
     PrestacaoFinanceiraAcaoTransversal "1" --> "*" DespesaAcaoTransversal : analisa
 ```

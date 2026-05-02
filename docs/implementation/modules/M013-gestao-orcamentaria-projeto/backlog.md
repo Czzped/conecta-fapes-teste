@@ -17,6 +17,7 @@ Especificacao de referencia: [README.md](README.md)
 | EPIC-M013-001 | Adicoes Orcamentarias | UC01 | Must | To Do | [EPIC-M013-001](epics/EPIC-M013-001.md) |
 | EPIC-M013-002 | Gestao de Rubricas | UC02 | Must | To Do | [EPIC-M013-002](epics/EPIC-M013-002.md) |
 | EPIC-M013-003 | Realocacao de Bolsas | UC03 | Must | To Do | [EPIC-M013-003](epics/EPIC-M013-003.md) |
+| EPIC-M013-004 | Orcamento do Projeto por Rubrica Aprovada | UC04 | Must | To Do | [EPIC-M013-004](epics/EPIC-M013-004.md) |
 
 ---
 
@@ -36,4 +37,12 @@ EPIC-M013-002 (Gestao de Rubricas)  <- depende de EPIC-M013-001
 EPIC-M013-003 (Realocacao de Bolsas)  <- depende de EPIC-M013-002
 ├── US-M013-007 Solicitar Realocacao de Bolsa
 └── US-M013-008 Aprovar Realocacao de Bolsa
+
+EPIC-M013-004 (Orcamento do Projeto por Rubrica Aprovada)  <- depende de M008, M011, M003/M022
+├── US-M013-009 Gerar Rubricas do Projeto a partir do Orcamento Aprovado
+├── US-M013-010 Preservar Snapshot da Rubrica no Projeto
+├── US-M013-011 Controlar Comprometido, Executado e Saldo
+├── US-M013-012 Bloquear Uso sem Saldo Disponivel
+├── US-M013-013 Publicar Saldos para Modulos Consumidores
+└── US-M013-014 Registrar Transacoes separadas de Movimentos Bancarios
 ```

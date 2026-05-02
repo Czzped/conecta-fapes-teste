@@ -12,7 +12,8 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 
 | Consumidor | Uso do contrato |
 |------------|-----------------|
-| Todos os modulos operacionais | Consultam pessoas, instituicoes, dirigentes e rubricas como referencia canonica |
+| Todos os modulos operacionais | Consultam pessoas, instituicoes, dirigentes e referencias corporativas como base canonica |
+| M003 - Gestao de Iniciativas Captadas | Consulta `TipoViagem` e `TipoDiaria` vigentes para calcular solicitacoes de diaria e gravar snapshots |
 | Autenticacao / Acesso Cidadao | Sincroniza cadastros de pessoas por CPF |
 | Analista da Agencia de Fomento | Mantem a base cadastral corporativa |
 | [Portal Coordenador](../../../products/portal-coordenador/README.md) | Gestao de perfil e dados pessoais ([EP-04](../../../products/portal-coordenador/features/EP-04-gestao-perfil-usuario.md)) |
@@ -33,6 +34,14 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 | CadastrarInstituicao | Command | Registrar instituicao com ou sem CNPJ proprio, incluindo natureza publica/privada quando aplicavel e eventual superior hierarquico | nome, sigla?, cnpj?, razaoSocial?, email?, telefone?, endereco?, isPublica?, isExterna, superiorId?, tipoInstituicaoId? | `Instituicao` registrada | RN02, RN03, RN12, RN13, RN14, RN15 | Nome informado; superior informado quando nao houver CNPJ | CNPJ duplicado, superior inexistente, instituicao sem CNPJ e sem superior, dados invalidos | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | RegistrarDirigente | Command | Registrar dirigente como vinculo temporal entre uma pessoa e uma instituicao | pessoaId, instituicaoId, dataInicio, dataFim | `Dirigente` criado/atualizado | RN04, RN11, RI1 | Pessoa e instituicao existentes | Mandato sobreposto, pessoa inexistente, instituicao inexistente | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | SincronizarPessoaViaAcessoCidadao | Event Consumed | Criar ou vincular pessoa automaticamente a partir do Acesso Cidadao | cpf, nome, email, origem | `PessoaFisica` criada/vinculada | RN10 | Evento recebido com CPF valido | CPF invalido, inconsistencias cadastrais | Sim por CPF e origem do evento | Sistema | Evento/mensagem interna a definir |
+| CadastrarRubrica | Command | Criar Rubrica canonica de custeio ou capital | codigo, nome, descricao, natureza, categoriaOrcamentaria?, documentoFonte?, vigenciaInicio?, rubricaPaiId? | `Rubrica` criada | RN07, RN16, RN17 | Codigo, nome, descricao e natureza informados | Codigo duplicado, rubrica pai inexistente, hierarquia invalida | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| AtualizarRubrica | Command | Atualizar metadados, vigencia, documento fonte ou rubrica pai | rubricaId, dados atualizados, justificativa | `Rubrica` atualizada | RN16, RN17, RN18 | Rubrica existente | Rubrica inexistente, hierarquia invalida, justificativa ausente quando aplicavel | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| AlterarEstadoRubrica | Command | Ativar ou desativar Rubrica preservando historico | rubricaId, ativa, justificativa | `Rubrica` atualizada | RN18 | Rubrica existente | Rubrica inexistente, desativacao sem justificativa | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| RegistrarSinonimoRubrica | Command | Vincular termo equivalente a uma Rubrica canonica | rubricaId, termo, origem? | `SinonimoRubrica` criado | RN19 | Rubrica existente | Termo duplicado, rubrica inexistente | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| DefinirMapeamentoContabilRubrica | Command | Vincular Rubrica a referencia contabil vigente do M016 | rubricaId, contaContabilRef, classificacaoContabil?, vigenciaInicio, vigenciaFim? | `MapeamentoContabilRubrica` criado | RN20 | Rubrica existente; conta contabil existente no M016 quando validavel | Conta contabil inexistente, vigencia sobreposta | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| CadastrarTipoViagem | Command | Criar ou atualizar tipo de viagem usado em solicitacoes de diaria | codigo, nome, abrangencia, descricao?, ativo | `TipoViagem` criado/atualizado | RN22 | Codigo, nome e abrangencia informados | Codigo duplicado, abrangencia invalida | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| CadastrarTipoDiaria | Command | Criar valor vigente de diaria por tipo de viagem | codigo, tipoViagemId, valorUnitario, fracaoCalculo, vigenciaInicio, vigenciaFim?, ativo | `TipoDiaria` criado/atualizado | RN23 | TipoViagem ativo; valor maior que zero; vigencia valida | Codigo duplicado, tipo viagem inexistente/inativo, vigencia sobreposta | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| ConsultarTipoDiariaVigente | Query | Obter tipo de diaria vigente para data de referencia e tipo de viagem | tipoViagemId, dataReferencia | `TipoDiaria` vigente | RN23 | TipoViagem existente | TipoDiaria vigente ausente | N/A | Modulo interno autorizado ou analista | API interna a definir |
 | ConsultarCadastrosCorporativos | Query | Consultar pessoas, instituicoes, dirigentes e referencias basicas | tipoCadastro, filtros | Lista ou detalhe cadastral | RN01, RN02, RN03, RN09, RN11, RN12, RN13, RN14, RN15 | Filtro informado | Cadastro nao encontrado | N/A | Modulo interno autorizado ou analista | API interna a definir |
 
 ## Padrao de Payload e Erro
@@ -216,6 +225,48 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 |--------|---------------------------|
 | CPF_INVALIDO | O CPF recebido no evento do Acesso Cidadao e invalido. |
 | EVENTO_CADASTRAL_INCONSISTENTE | O evento recebido nao possui dados suficientes para sincronizacao. |
+
+### CadastrarRubrica
+
+**Exemplo de entrada**
+
+```json
+{
+  "codigo": "RUB-DIARIAS",
+  "nome": "Diarias",
+  "descricao": "Despesas com diarias conforme normativa da FAPES.",
+  "natureza": "CUSTEIO",
+  "categoriaOrcamentaria": "Outras Despesas Correntes",
+  "documentoFonte": "Resolucao CCAF no 309/2022",
+  "vigenciaInicio": "2026-01-01",
+  "rubricaPaiId": null
+}
+```
+
+**Exemplo de saida**
+
+```json
+{
+  "rubrica": {
+    "id": "RUB-DIARIAS",
+    "codigo": "RUB-DIARIAS",
+    "nome": "Diarias",
+    "descricao": "Despesas com diarias conforme normativa da FAPES.",
+    "natureza": "CUSTEIO",
+    "rubricaPaiId": null,
+    "subrubricas": [],
+    "ativa": true
+  }
+}
+```
+
+**Excecoes e mensagens**
+
+| Codigo | Mensagem de erro exemplo |
+|--------|---------------------------|
+| RUBRICA_CODIGO_DUPLICADO | Ja existe uma Rubrica cadastrada com o codigo informado. |
+| RUBRICA_PAI_NAO_ENCONTRADA | A Rubrica pai informada nao foi encontrada. |
+| RUBRICA_HIERARQUIA_INVALIDA | A alteracao criaria uma hierarquia invalida de rubricas. |
 
 ### ConsultarCadastrosCorporativos
 

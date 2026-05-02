@@ -29,6 +29,7 @@ A captacao percorre os seguintes estados em sequencia: **(1) Em Elaboracao** —
 | 3.1.11 | Gestao de Revisores Ad Hoc | Cadastrar e selecionar especialistas para avaliacao de merito | Analista da Area Tecnica da Agencia | Art. 4, 2; Art. 6, par. unico |
 | 3.1.12 | Configurar/Parametrizar Captacao | Definir regras, prazos e etapas da captacao; permite sobrescrever o minimo de avaliadores ad hoc definido nos cadastros basicos (1.3.8) com um valor especifico para esta captacao | Analista da Area Tecnica da Agencia | Art. 15, I; Art. 3, 3 |
 | 3.1.13 | Dashboard da Captacao | Painel para acompanhar etapas de habilitacao, merito e resultados | Analista da Area Tecnica da Agencia | Art. 4, 1 e 2; Art. 14, IX |
+| 3.1.14 | Definir Rubricas e Subrubricas Permitidas | Configurar, a partir do catalogo normativo de [Rubricas e Subrubricas FAPES](../rubricas-subrubricas-fapes.md), quais rubricas/subrubricas o edital permite, seus limites, exclusoes e comprovantes exigidos | Analista da Area Tecnica da Agencia | Art. 25; Art. 27, II |
 
 ## 3.2 Fases da Captacao de Iniciativas
 

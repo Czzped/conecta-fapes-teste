@@ -649,9 +649,204 @@ Lista as areas de conhecimento seguindo a classificacao hierarquica do CNPq.
 
 ---
 
+#### `POST /api/v1/m008/rubricas`
+
+Cria uma Rubrica canonica no cadastro corporativo.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Operacao de origem:** `CadastrarRubrica`
+
+**Request body**
+
+```json
+{
+  "codigo": "RUB-DIARIAS",
+  "nome": "Diarias",
+  "descricao": "Despesas com diarias conforme normativa da FAPES.",
+  "natureza": "CUSTEIO",
+  "categoriaOrcamentaria": "Outras Despesas Correntes",
+  "documentoFonte": "Resolucao CCAF no 309/2022",
+  "vigenciaInicio": "2026-01-01",
+  "vigenciaFim": null,
+  "rubricaPaiId": null
+}
+```
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| `codigo` | string | Sim | Codigo canonico unico da Rubrica |
+| `nome` | string | Sim | Nome de exibicao |
+| `descricao` | string | Sim | Descricao de uso da Rubrica |
+| `natureza` | string | Sim | `CUSTEIO` ou `CAPITAL` |
+| `categoriaOrcamentaria` | string | Nao | Categoria orcamentaria quando aplicavel |
+| `documentoFonte` | string | Nao | Norma, edital ou resolucao de referencia |
+| `vigenciaInicio` | string | Nao | Inicio da vigencia cadastral |
+| `vigenciaFim` | string | Nao | Fim da vigencia cadastral |
+| `rubricaPaiId` | string | Nao | Rubrica superior, quando for subrubrica |
+
+**Response `201 Created`**
+
+```json
+{
+  "rubrica": {
+    "id": "RUB-DIARIAS",
+    "codigo": "RUB-DIARIAS",
+    "nome": "Diarias",
+    "descricao": "Despesas com diarias conforme normativa da FAPES.",
+    "natureza": "CUSTEIO",
+    "rubricaPaiId": null,
+    "subrubricas": [],
+    "ativa": true
+  }
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `409` | `RUBRICA_CODIGO_DUPLICADO` | Ja existe Rubrica cadastrada com o codigo informado. |
+| `404` | `RUBRICA_PAI_NAO_ENCONTRADA` | A Rubrica pai informada nao foi encontrada. |
+| `422` | `RUBRICA_HIERARQUIA_INVALIDA` | A relacao pai/filha informada criaria uma hierarquia invalida. |
+
+---
+
+#### `POST /api/v1/m008/tipos-viagem`
+
+Cria ou atualiza tipo de viagem usado por solicitacoes de diaria.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Operacao de origem:** `CadastrarTipoViagem`
+
+**Request body**
+
+```json
+{
+  "codigo": "TVI-001",
+  "nome": "Dentro do Estado",
+  "abrangencia": "DENTRO_ESTADO",
+  "descricao": "Deslocamento dentro do Espirito Santo.",
+  "ativo": true
+}
+```
+
+**Response `201 Created`**
+
+```json
+{
+  "tipoViagem": {
+    "id": "TVI-001",
+    "codigo": "TVI-001",
+    "nome": "Dentro do Estado",
+    "abrangencia": "DENTRO_ESTADO",
+    "ativo": true
+  }
+}
+```
+
+---
+
+#### `GET /api/v1/m008/tipos-viagem`
+
+Lista tipos de viagem ativos ou historicos.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
+- **Operacao de origem:** `ConsultarCadastrosCorporativos` (tipoCadastro=TIPO_VIAGEM)
+
+**Query parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `ativo` | boolean | Filtra por situacao |
+| `abrangencia` | string | Filtra por `DENTRO_ESTADO`, `NACIONAL` ou `INTERNACIONAL` |
+| `busca` | string | Busca textual por codigo ou nome |
+| `page` | integer | Numero da pagina |
+| `pageSize` | integer | Itens por pagina |
+
+---
+
+#### `POST /api/v1/m008/tipos-diaria`
+
+Cria valor vigente de diaria por tipo de viagem.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Operacao de origem:** `CadastrarTipoDiaria`
+
+**Request body**
+
+```json
+{
+  "codigo": "DIA-2026-001",
+  "tipoViagemId": "TVI-001",
+  "valorUnitario": 260.0,
+  "fracaoCalculo": "12H",
+  "vigenciaInicio": "2026-05-01",
+  "vigenciaFim": null,
+  "ativo": true
+}
+```
+
+**Response `201 Created`**
+
+```json
+{
+  "tipoDiaria": {
+    "id": "DIA-2026-001",
+    "codigo": "DIA-2026-001",
+    "tipoViagemId": "TVI-001",
+    "valorUnitario": 260.0,
+    "fracaoCalculo": "12H",
+    "vigenciaInicio": "2026-05-01",
+    "vigenciaFim": null,
+    "ativo": true
+  }
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `TIPO_VIAGEM_NAO_ENCONTRADO` | O tipo de viagem informado nao foi encontrado. |
+| `409` | `TIPO_DIARIA_VIGENCIA_SOBREPOSTA` | Ja existe tipo de diaria ativo para o tipo de viagem e periodo informados. |
+| `422` | `TIPO_DIARIA_VALOR_INVALIDO` | O valor unitario deve ser maior que zero. |
+
+---
+
+#### `GET /api/v1/m008/tipos-diaria/vigente`
+
+Consulta o tipo de diaria vigente para um tipo de viagem e data de referencia.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
+- **Operacao de origem:** `ConsultarTipoDiariaVigente`
+
+**Query parameters**
+
+| Parametro | Tipo | Obrigatorio | Descricao |
+|-----------|------|-------------|-----------|
+| `tipoViagemId` | string | Sim | Tipo de viagem selecionado na solicitacao |
+| `dataReferencia` | date | Sim | Data usada para localizar a vigencia |
+
+**Response `200 OK`**
+
+```json
+{
+  "tipoDiaria": {
+    "id": "DIA-2026-001",
+    "tipoViagemId": "TVI-001",
+    "valorUnitario": 260.0,
+    "fracaoCalculo": "12H",
+    "vigenciaInicio": "2026-05-01",
+    "vigenciaFim": null
+  }
+}
+```
+
+---
+
 #### `GET /api/v1/m008/rubricas`
 
-Lista as rubricas financeiras cadastradas.
+Lista as rubricas cadastradas.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
 - **Operacao de origem:** `ConsultarCadastrosCorporativos` (tipoCadastro=RUBRICA)
@@ -660,7 +855,9 @@ Lista as rubricas financeiras cadastradas.
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
+| `natureza` | string | Filtra pela natureza: `CUSTEIO`, `CAPITAL` |
 | `categoriaOrcamentaria` | string | Filtra pela categoria orcamentaria vinculada |
+| `rubricaPaiId` | string | Filtra subrubricas de uma rubrica especifica |
 | `nome` | string | Busca textual no nome |
 | `page` | integer | Numero da pagina (padrao: 1) |
 | `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
@@ -671,14 +868,164 @@ Lista as rubricas financeiras cadastradas.
 {
   "items": [
     {
-      "id": "RUB-BOLSA-PESQ",
-      "nome": "Bolsa de Pesquisa",
-      "categoriaOrcamentaria": "CUSTEIO"
+      "id": "RUB-DIARIAS",
+      "codigo": "RUB-DIARIAS",
+      "nome": "Diarias",
+      "descricao": "Despesas com diarias conforme normativa da FAPES.",
+      "natureza": "CUSTEIO",
+      "categoriaOrcamentaria": "Outras Despesas Correntes",
+      "documentoFonte": "Resolucao CCAF no 309/2022",
+      "rubricaPaiId": null,
+      "subrubricas": [
+        {
+          "id": "RUB-DIARIA-INTER",
+          "codigo": "RUB-DIARIA-INTER",
+          "nome": "Diaria internacional",
+          "descricao": "Diarias para viagens internacionais.",
+          "rubricaPaiId": "RUB-DIARIAS",
+          "ativa": true
+        }
+      ],
+      "ativa": true
     }
   ],
   "total": 1,
   "page": 1,
   "pageSize": 20
+}
+```
+
+---
+
+#### `GET /api/v1/m008/rubricas/{id}`
+
+Consulta uma Rubrica pelo identificador, incluindo sinonimos e mapeamentos contabeis vigentes.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
+
+**Response `200 OK`**
+
+```json
+{
+  "rubrica": {
+    "id": "RUB-DIARIAS",
+    "codigo": "RUB-DIARIAS",
+    "nome": "Diarias",
+    "descricao": "Despesas com diarias conforme normativa da FAPES.",
+    "natureza": "CUSTEIO",
+    "categoriaOrcamentaria": "Outras Despesas Correntes",
+    "documentoFonte": "Resolucao CCAF no 309/2022",
+    "vigenciaInicio": "2026-01-01",
+    "vigenciaFim": null,
+    "rubricaPaiId": null,
+    "subrubricas": [
+      {
+        "id": "RUB-DIARIA-INTER",
+        "codigo": "RUB-DIARIA-INTER",
+        "nome": "Diaria internacional",
+        "descricao": "Diarias para viagens internacionais.",
+        "rubricaPaiId": "RUB-DIARIAS",
+        "ativa": true
+      }
+    ],
+    "ativa": true,
+    "sinonimos": [
+      {
+        "id": "SIN-RUB-001",
+        "termo": "Passagens e Diarias",
+        "origem": "Edital 08/2025",
+        "ativo": true
+      }
+    ],
+    "mapeamentosContabeis": [
+      {
+        "id": "MAP-RUB-001",
+        "contaContabilRef": "CONTA-339014",
+        "classificacaoContabil": "Diarias - Civil",
+        "vigenciaInicio": "2026-01-01",
+        "vigenciaFim": null,
+        "ativo": true
+      }
+    ]
+  }
+}
+```
+
+---
+
+#### `PUT /api/v1/m008/rubricas/{id}`
+
+Atualiza dados cadastrais, vigencia ou rubrica pai.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Operacao de origem:** `AtualizarRubrica`
+
+**Request body**
+
+```json
+{
+  "nome": "Diarias",
+  "descricao": "Despesas com diarias estaduais, nacionais e internacionais.",
+  "documentoFonte": "Resolucao CCAF no 309/2022",
+  "vigenciaInicio": "2026-01-01",
+  "vigenciaFim": null,
+  "rubricaPaiId": null,
+  "justificativa": "Ajuste de descricao conforme discovery de rubricas."
+}
+```
+
+---
+
+#### `POST /api/v1/m008/rubricas/{id}/desativar`
+
+Desativa uma Rubrica para novos usos, preservando historico.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Operacao de origem:** `AlterarEstadoRubrica`
+
+**Request body**
+
+```json
+{
+  "justificativa": "Rubrica substituida por nova parametrizacao normativa."
+}
+```
+
+---
+
+#### `POST /api/v1/m008/rubricas/{id}/sinonimos`
+
+Vincula um termo alternativo a uma Rubrica canonica.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Operacao de origem:** `RegistrarSinonimoRubrica`
+
+**Request body**
+
+```json
+{
+  "termo": "Passagens e Diarias",
+  "origem": "Edital 08/2025"
+}
+```
+
+---
+
+#### `POST /api/v1/m008/rubricas/{id}/mapeamentos-contabeis`
+
+Cria mapeamento contabil versionado por vigencia.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Operacao de origem:** `DefinirMapeamentoContabilRubrica`
+
+**Request body**
+
+```json
+{
+  "contaContabilRef": "CONTA-339014",
+  "classificacaoContabil": "Diarias - Civil",
+  "vigenciaInicio": "2026-01-01",
+  "vigenciaFim": null
 }
 ```
 
@@ -786,7 +1133,17 @@ Cria ou vincula pessoa automaticamente a partir de evento do Acesso Cidadao.
 | `POST` | `/api/v1/m008/dirigentes` | RegistrarDirigente | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/m008/dirigentes` | ListarDirigentes | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `GET` | `/api/v1/m008/areas-conhecimento` | ListarAreasDeConhecimento | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/m008/tipos-viagem` | CadastrarTipoViagem | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/m008/tipos-viagem` | ListarTiposViagem | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/m008/tipos-diaria` | CadastrarTipoDiaria | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/m008/tipos-diaria/vigente` | ConsultarTipoDiariaVigente | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/m008/rubricas` | CadastrarRubrica | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/m008/rubricas` | ListarRubricas | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `GET` | `/api/v1/m008/rubricas/{id}` | ConsultarRubrica | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `PUT` | `/api/v1/m008/rubricas/{id}` | AtualizarRubrica | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m008/rubricas/{id}/desativar` | DesativarRubrica | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m008/rubricas/{id}/sinonimos` | RegistrarSinonimoRubrica | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m008/rubricas/{id}/mapeamentos-contabeis` | DefinirMapeamentoContabilRubrica | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/m008/cidades` | ListarCidades | ANALISTA_AGENCIA, MODULO_INTERNO |
 
 ---
@@ -845,13 +1202,77 @@ Cria ou vincula pessoa automaticamente a partir de evento do Acesso Cidadao.
 }
 ```
 
+### TipoViagem
+
+```json
+{
+  "id": "string",
+  "codigo": "string",
+  "nome": "string",
+  "abrangencia": "DENTRO_ESTADO | NACIONAL | INTERNACIONAL",
+  "descricao": "string | null",
+  "ativo": true
+}
+```
+
+### TipoDiaria
+
+```json
+{
+  "id": "string",
+  "codigo": "string",
+  "tipoViagemId": "string",
+  "valorUnitario": 260.0,
+  "fracaoCalculo": "12H | 24H",
+  "vigenciaInicio": "string (YYYY-MM-DD)",
+  "vigenciaFim": "string (YYYY-MM-DD) | null",
+  "ativo": true
+}
+```
+
 ### Rubrica
 
 ```json
 {
   "id": "string",
+  "codigo": "string",
   "nome": "string",
-  "categoriaOrcamentaria": "string"
+  "descricao": "string",
+  "natureza": "CUSTEIO | CAPITAL",
+  "categoriaOrcamentaria": "string | null",
+  "documentoFonte": "string | null",
+  "vigenciaInicio": "string (YYYY-MM-DD) | null",
+  "vigenciaFim": "string (YYYY-MM-DD) | null",
+  "rubricaPaiId": "string | null",
+  "subrubricas": [
+    {
+      "id": "string",
+      "codigo": "string",
+      "nome": "string",
+      "descricao": "string",
+      "rubricaPaiId": "string",
+      "ativa": true
+    }
+  ],
+  "ativa": true,
+  "sinonimos": [
+    {
+      "id": "string",
+      "termo": "string",
+      "origem": "string | null",
+      "ativo": true
+    }
+  ],
+  "mapeamentosContabeis": [
+    {
+      "id": "string",
+      "contaContabilRef": "string",
+      "classificacaoContabil": "string | null",
+      "vigenciaInicio": "string (YYYY-MM-DD)",
+      "vigenciaFim": "string (YYYY-MM-DD) | null",
+      "ativo": true
+    }
+  ]
 }
 ```
 
@@ -865,6 +1286,9 @@ Cria ou vincula pessoa automaticamente a partir de evento do Acesso Cidadao.
 | Dominio e regras de negocio | [README.md](README.md) |
 | Modelo estrutural | [modelo-estrutural.md](modelo-estrutural.md) |
 | Modelo comportamental | [modelo-comportamental.md](modelo-comportamental.md) |
-| EPIC-M008-001 (Cadastro de Pessoas Fisicas) | [epics/EPIC-M008-001.md](epics/EPIC-M008-001.md) |
-| EPIC-M008-002 (Cadastro de Instituicoes) | [epics/EPIC-M008-002.md](epics/EPIC-M008-002.md) |
-| EPIC-M008-003 (Cadastros Basicos de Referencia) | [epics/EPIC-M008-003.md](epics/EPIC-M008-003.md) |
+| EPIC-M008-001 (Cadastro de Pessoas Fisicas) | [pessoas/epics/EPIC-M008-001.md](pessoas/epics/EPIC-M008-001.md) |
+| EPIC-M008-002 (Cadastro de Instituicoes) | [instituicoes/epics/EPIC-M008-002.md](instituicoes/epics/EPIC-M008-002.md) |
+| EPIC-M008-003 (Classificacoes Corporativas) | [classificacoes/epics/EPIC-M008-003.md](classificacoes/epics/EPIC-M008-003.md) |
+| EPIC-M008-004 (Catalogo de Rubricas) | [rubricas/epics/EPIC-M008-004.md](rubricas/epics/EPIC-M008-004.md) |
+| EPIC-M008-005 (Cadastros Corporativos de Diarias) | [diarias/epics/EPIC-M008-005.md](diarias/epics/EPIC-M008-005.md) |
+| EPIC-M008-006 (Cadastros Geograficos) | [geografia/epics/EPIC-M008-006.md](geografia/epics/EPIC-M008-006.md) |

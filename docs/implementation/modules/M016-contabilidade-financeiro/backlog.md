@@ -33,7 +33,8 @@ Especificacao de referencia: [README.md](README.md)
 EPIC-M016-001 (Plano de Contas)
 ├── US-M016-001 Cadastrar Conta Contabil
 ├── US-M016-002 Associar Conta a Iniciativa/Programa/Parceria
-└── US-M016-003 Dashboard Contabil
+├── US-M016-003 Dashboard Contabil
+└── US-M016-044 Disponibilizar Conta Contabil para Mapeamento de Rubrica
 
 EPIC-M016-002 (Gestao de Contas Bancarias)  <- depende de EPIC-M016-001
 ├── US-M016-004 Cadastrar Conta Bancaria

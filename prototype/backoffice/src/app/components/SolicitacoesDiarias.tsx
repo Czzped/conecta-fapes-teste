@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  CheckCircle,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -8,11 +7,9 @@ import {
   PlaneTakeoff,
   ReceiptText,
   Search,
-  XCircle,
 } from 'lucide-react';
-import { toast } from 'sonner';
 
-type StatusSolicitacaoDiaria = 'AGUARDANDO_ACEITES' | 'AGUARDANDO_APROVACAO' | 'APROVADA' | 'REJEITADA' | 'CANCELADA' | 'RECUSADA';
+type StatusSolicitacaoDiaria = 'ALOCADA' | 'APROVADA' | 'CANCELADA' | 'RECUSADA';
 
 interface SolicitacaoDiaria {
   id: string;
@@ -28,11 +25,10 @@ interface SolicitacaoDiaria {
   valorUnitario: number;
   valorTotal: number;
   tipoDiariaRef: string;
-  debitoRef?: string;
-  creditoRef?: string;
+  transacaoComprometimentoRef?: string;
+  transacaoReversaoRef?: string;
   justificativaCancelamento?: string;
   justificativaRecusa?: string;
-  justificativaRejeicao?: string;
 }
 
 const currency = new Intl.NumberFormat('pt-BR', {
@@ -41,10 +37,8 @@ const currency = new Intl.NumberFormat('pt-BR', {
 });
 
 const statusConfig = {
-  AGUARDANDO_ACEITES: { label: 'Aguardando aceites', color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.12)' },
-  AGUARDANDO_APROVACAO: { label: 'Aguardando aprovação', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)' },
+  ALOCADA: { label: 'Alocada', color: '#22d3ee', bg: 'rgba(34, 211, 238, 0.12)' },
   APROVADA: { label: 'Aprovada', color: '#00c1af', bg: 'rgba(0, 193, 175, 0.12)' },
-  REJEITADA: { label: 'Rejeitada', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)' },
   CANCELADA: { label: 'Cancelada', color: '#64748b', bg: 'rgba(100, 116, 139, 0.14)' },
   RECUSADA: { label: 'Recusada pelo bolsista', color: '#f97316', bg: 'rgba(249, 115, 22, 0.12)' },
 };
@@ -53,16 +47,14 @@ type StatusFilter = 'TODOS' | StatusSolicitacaoDiaria;
 
 const statusOptions: Array<{ value: StatusFilter; label: string }> = [
   { value: 'TODOS', label: 'Todos os status' },
-  { value: 'AGUARDANDO_ACEITES', label: statusConfig.AGUARDANDO_ACEITES.label },
-  { value: 'AGUARDANDO_APROVACAO', label: statusConfig.AGUARDANDO_APROVACAO.label },
+  { value: 'ALOCADA', label: statusConfig.ALOCADA.label },
   { value: 'APROVADA', label: statusConfig.APROVADA.label },
-  { value: 'REJEITADA', label: statusConfig.REJEITADA.label },
   { value: 'CANCELADA', label: statusConfig.CANCELADA.label },
   { value: 'RECUSADA', label: statusConfig.RECUSADA.label },
 ];
 
 export const SolicitacoesDiarias: React.FC = () => {
-  const [solicitacoes, setSolicitacoes] = useState<SolicitacaoDiaria[]>([
+  const [solicitacoes] = useState<SolicitacaoDiaria[]>([
     {
       id: 'SD-2026-002',
       iniciativa: 'Conecta Fapes',
@@ -72,11 +64,12 @@ export const SolicitacoesDiarias: React.FC = () => {
       partida: '2026-06-18T07:00',
       chegada: '2026-06-19T19:00',
       motivo: 'Coleta de evidências de execução da atividade de campo.',
-      status: 'AGUARDANDO_APROVACAO',
+      status: 'APROVADA',
       quantidade: 1.5,
       valorUnitario: 260,
       valorTotal: 780,
       tipoDiariaRef: 'DIA-2026-001',
+      transacaoComprometimentoRef: 'TR-2026-047',
     },
     {
       id: 'SD-2026-003',
@@ -87,11 +80,12 @@ export const SolicitacoesDiarias: React.FC = () => {
       partida: '2026-06-24T06:30',
       chegada: '2026-06-25T18:30',
       motivo: 'Visita técnica para levantamento de dados junto aos parceiros locais.',
-      status: 'AGUARDANDO_ACEITES',
+      status: 'ALOCADA',
       quantidade: 1.5,
       valorUnitario: 260,
       valorTotal: 390,
       tipoDiariaRef: 'DIA-2026-001',
+      transacaoComprometimentoRef: 'TR-2026-048',
     },
     {
       id: 'SD-2026-001',
@@ -107,7 +101,7 @@ export const SolicitacoesDiarias: React.FC = () => {
       valorUnitario: 260,
       valorTotal: 1300,
       tipoDiariaRef: 'DIA-2026-001',
-      debitoRef: 'LEX-2026-045',
+      transacaoComprometimentoRef: 'TR-2026-045',
     },
     {
       id: 'SD-2026-000',
@@ -123,9 +117,9 @@ export const SolicitacoesDiarias: React.FC = () => {
       valorUnitario: 260,
       valorTotal: 130,
       tipoDiariaRef: 'DIA-2026-001',
-      debitoRef: 'LEX-2026-031',
-      creditoRef: 'LEX-2026-036',
-      justificativaCancelamento: 'Agenda cancelada após aprovação da solicitação.',
+      transacaoComprometimentoRef: 'TR-2026-031',
+      transacaoReversaoRef: 'TR-2026-036',
+      justificativaCancelamento: 'Agenda cancelada antes do início da viagem.',
     },
     {
       id: 'SD-2026-004',
@@ -141,6 +135,8 @@ export const SolicitacoesDiarias: React.FC = () => {
       valorUnitario: 260,
       valorTotal: 390,
       tipoDiariaRef: 'DIA-2026-001',
+      transacaoComprometimentoRef: 'TR-2026-049',
+      transacaoReversaoRef: 'TR-2026-050',
       justificativaRecusa: 'Beneficiária recusou a viagem por conflito de agenda acadêmica.',
     },
   ]);
@@ -150,11 +146,8 @@ export const SolicitacoesDiarias: React.FC = () => {
   const [dataFim, setDataFim] = useState('');
   const [pageSize, setPageSize] = useState(2);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rejeicaoEmEdicaoId, setRejeicaoEmEdicaoId] = useState<string | null>(null);
-  const [justificativasRejeicao, setJustificativasRejeicao] = useState<Record<string, string>>({});
-
   const pendentes = useMemo(
-    () => solicitacoes.filter((solicitacao) => solicitacao.status === 'AGUARDANDO_APROVACAO').length,
+    () => solicitacoes.filter((solicitacao) => solicitacao.status === 'ALOCADA').length,
     [solicitacoes],
   );
 
@@ -204,33 +197,6 @@ export const SolicitacoesDiarias: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const decidirSolicitacao = (id: string, status: 'APROVADA' | 'REJEITADA', justificativaRejeicao?: string) => {
-    if (status === 'REJEITADA' && !justificativaRejeicao?.trim()) {
-      toast.error('Informe a justificativa para rejeitar a diária.');
-      return;
-    }
-
-    setSolicitacoes((current) =>
-      current.map((solicitacao) =>
-        solicitacao.id === id
-          ? {
-              ...solicitacao,
-              status,
-              debitoRef: status === 'APROVADA' ? 'LEX-2026-047' : undefined,
-              justificativaRejeicao: status === 'REJEITADA' ? justificativaRejeicao?.trim() : solicitacao.justificativaRejeicao,
-            }
-          : solicitacao,
-      ),
-    );
-
-    if (status === 'REJEITADA') {
-      setRejeicaoEmEdicaoId(null);
-      setJustificativasRejeicao((current) => ({ ...current, [id]: '' }));
-    }
-
-    toast.success(status === 'APROVADA' ? 'Diária aprovada e debitada da rubrica.' : 'Solicitação rejeitada.');
-  };
-
   const inputStyle: React.CSSProperties = {
     width: '100%',
     height: '42px',
@@ -272,7 +238,7 @@ export const SolicitacoesDiarias: React.FC = () => {
               Diárias
             </h1>
             <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }}>
-              Aprovação FAPES e lançamentos na rubrica Diárias e Passagens.
+              Consulta operacional de diárias solicitadas pelo coordenador, com rubrica separada das transações.
             </p>
           </div>
         </div>
@@ -282,7 +248,7 @@ export const SolicitacoesDiarias: React.FC = () => {
       <section className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { label: 'Pendentes', value: pendentes, Icon: Clock, color: '#f59e0b' },
+            { label: 'Alocadas', value: pendentes, Icon: Clock, color: '#38bdf8' },
           ].map(({ label, value, Icon, color }) => (
             <div
               key={label}
@@ -466,52 +432,19 @@ export const SolicitacoesDiarias: React.FC = () => {
               </p>
 
               <div className="flex flex-wrap items-center gap-3">
-                {solicitacao.status === 'AGUARDANDO_APROVACAO' && (
-                  <>
-                    <button
-                      onClick={() => decidirSolicitacao(solicitacao.id, 'APROVADA')}
-                      className="px-4 py-2 rounded-lg flex items-center gap-2"
-                      style={{
-                        backgroundColor: '#00c1af',
-                        color: '#0f172b',
-                        border: 'none',
-                        fontFamily: 'var(--font-family)',
-                        fontSize: 'var(--text-sm)',
-                      }}
-                    >
-                      <CheckCircle size={16} />
-                      Aprovar e debitar
-                    </button>
-                    <button
-                      onClick={() => setRejeicaoEmEdicaoId(solicitacao.id)}
-                      className="px-4 py-2 rounded-lg flex items-center gap-2"
-                      style={{
-                        backgroundColor: 'transparent',
-                        color: '#ef4444',
-                        border: '1px solid rgba(239, 68, 68, 0.45)',
-                        fontFamily: 'var(--font-family)',
-                        fontSize: 'var(--text-sm)',
-                      }}
-                    >
-                      <XCircle size={16} />
-                      Rejeitar
-                    </button>
-                  </>
-                )}
-
-                {solicitacao.debitoRef && (
+                {solicitacao.transacaoComprometimentoRef && (
                   <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-secondary)' }}>
-                    Débito em Diárias e Passagens: {solicitacao.debitoRef}
+                    Comprometimento: {solicitacao.transacaoComprometimentoRef}
                   </span>
                 )}
-                {solicitacao.creditoRef && (
+                {solicitacao.transacaoReversaoRef && (
                   <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#3b82f6' }}>
-                    Crédito de reversão: {solicitacao.creditoRef}
+                    Reversão: {solicitacao.transacaoReversaoRef}
                   </span>
                 )}
                 {solicitacao.justificativaCancelamento && (
                   <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)' }}>
-                    Justificativa de cancelamento: {solicitacao.justificativaCancelamento}
+                    Justificativa da remoção: {solicitacao.justificativaCancelamento}
                   </span>
                 )}
                 {solicitacao.justificativaRecusa && (
@@ -519,81 +452,7 @@ export const SolicitacoesDiarias: React.FC = () => {
                     Justificativa da recusa: {solicitacao.justificativaRecusa}
                   </span>
                 )}
-                {solicitacao.justificativaRejeicao && (
-                  <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)' }}>
-                    Justificativa da rejeição: {solicitacao.justificativaRejeicao}
-                  </span>
-                )}
               </div>
-
-              {rejeicaoEmEdicaoId === solicitacao.id && (
-                <div
-                  className="mt-4 rounded-lg p-4"
-                  style={{
-                    backgroundColor: 'rgba(239, 68, 68, 0.08)',
-                    border: '1px solid rgba(239, 68, 68, 0.3)',
-                  }}
-                >
-                  <label style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', marginBottom: '8px' }}>
-                    Justificativa da rejeição
-                  </label>
-                  <textarea
-                    value={justificativasRejeicao[solicitacao.id] ?? ''}
-                    onChange={(event) =>
-                      setJustificativasRejeicao((current) => ({
-                        ...current,
-                        [solicitacao.id]: event.target.value,
-                      }))
-                    }
-                    placeholder="Informe o motivo da rejeição da diária"
-                    rows={3}
-                    style={{
-                      width: '100%',
-                      resize: 'vertical',
-                      minHeight: '88px',
-                      borderRadius: 'var(--radius)',
-                      backgroundColor: 'var(--dash-input-bg)',
-                      border: '1px solid var(--dash-card-border)',
-                      color: 'var(--dash-text-primary)',
-                      fontFamily: 'var(--font-family)',
-                      fontSize: 'var(--text-sm)',
-                      padding: '10px 12px',
-                      outline: 'none',
-                    }}
-                  />
-                  <div className="mt-3 flex flex-wrap gap-3">
-                    <button
-                      type="button"
-                      onClick={() => decidirSolicitacao(solicitacao.id, 'REJEITADA', justificativasRejeicao[solicitacao.id])}
-                      className="px-4 py-2 rounded-lg flex items-center gap-2"
-                      style={{
-                        backgroundColor: '#ef4444',
-                        color: '#ffffff',
-                        border: 'none',
-                        fontFamily: 'var(--font-family)',
-                        fontSize: 'var(--text-sm)',
-                      }}
-                    >
-                      <XCircle size={16} />
-                      Confirmar rejeição
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setRejeicaoEmEdicaoId(null)}
-                      className="px-4 py-2 rounded-lg"
-                      style={{
-                        backgroundColor: 'transparent',
-                        color: 'var(--dash-text-secondary)',
-                        border: '1px solid var(--dash-card-border)',
-                        fontFamily: 'var(--font-family)',
-                        fontSize: 'var(--text-sm)',
-                      }}
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                </div>
-              )}
             </article>
           );
         })}

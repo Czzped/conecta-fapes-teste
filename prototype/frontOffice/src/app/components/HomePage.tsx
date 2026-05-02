@@ -1,4 +1,4 @@
-import { Info, Briefcase, Bell, FileUser, FolderOpen, Check, GraduationCap, Building2, Users, ChevronRight } from 'lucide-react';
+import { Info, Briefcase, Bell, FileUser, FolderOpen, Check, GraduationCap, Building2, Users, ChevronRight, PlaneTakeoff } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Dropdown } from '@/app/components/Dropdown';
@@ -26,6 +26,7 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
     { label: t('home.validityPeriod'), value: '01/06/2025 - 01/06/2026' },
     { label: t('home.scholarshipStatus'), value: t('home.active'), isBadge: true },
   ];
+  const hasDiariaPendenteAceite = accessType === 'bolsista' || accessType === 'coordenador';
 
   return (
     <div className="w-full px-4 md:px-8 py-8">
@@ -292,32 +293,91 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
           </h3>
         </div>
         
-        {/* Nuxt Alert Info - Variant Subtle */}
-        <div
-          className="flex items-start gap-3 p-4"
-          style={{
-            backgroundColor: 'rgba(34, 211, 238, 0.1)',
-            borderRadius: 'var(--radius)',
-          }}
-        >
-          <Check size={20} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
-          <div>
-            <p style={{ 
-              color: 'var(--foreground)',
-              fontWeight: 'var(--font-weight-normal)',
-              fontSize: 'var(--text-sm)',
-              margin: '0 0 0.25rem 0',
-            }}>
-              Pagamento do mês de janeiro foi processado
-            </p>
-            <p style={{ 
-              color: 'var(--muted-foreground)',
-              fontWeight: 'var(--font-weight-normal)',
-              fontSize: 'var(--text-sm)',
-              margin: 0,
-            }}>
-              05/01/2026
-            </p>
+        <div className="space-y-3">
+          {hasDiariaPendenteAceite && (
+            <button
+              type="button"
+              onClick={() => onNavigate?.('certificados-diarias')}
+              className="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4 text-left transition-colors"
+              style={{
+                backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
+                border: '1px solid color-mix(in srgb, var(--primary) 24%, transparent)',
+                borderRadius: 'var(--radius)',
+              }}
+            >
+              <div className="flex items-start gap-3">
+                <PlaneTakeoff size={20} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
+                <div>
+                  <p style={{
+                    color: 'var(--foreground)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    fontSize: 'var(--text-sm)',
+                    margin: '0 0 0.25rem 0',
+                  }}>
+                    Diária aguardando assinatura
+                  </p>
+                  <p style={{
+                    color: 'var(--muted-foreground)',
+                    fontWeight: 'var(--font-weight-normal)',
+                    fontSize: 'var(--text-sm)',
+                    lineHeight: '1.5',
+                    margin: 0,
+                  }}>
+                    Você tem a diária SD-2026-002 para aceitar e assinar o termo.
+                  </p>
+                  <p style={{
+                    color: 'var(--muted-foreground)',
+                    fontWeight: 'var(--font-weight-normal)',
+                    fontSize: 'var(--text-xs)',
+                    lineHeight: '1.5',
+                    margin: '0.25rem 0 0',
+                  }}>
+                    Linhares/ES · partida em 03/07/2026 às 07:00.
+                  </p>
+                </div>
+              </div>
+              <span
+                className="inline-flex items-center gap-2"
+                style={{
+                  color: 'var(--primary)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Assinar diária
+                <ChevronRight size={16} />
+              </span>
+            </button>
+          )}
+
+          {/* Nuxt Alert Info - Variant Subtle */}
+          <div
+            className="flex items-start gap-3 p-4"
+            style={{
+              backgroundColor: 'rgba(34, 211, 238, 0.1)',
+              borderRadius: 'var(--radius)',
+            }}
+          >
+            <Check size={20} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
+            <div>
+              <p style={{
+                color: 'var(--foreground)',
+                fontWeight: 'var(--font-weight-normal)',
+                fontSize: 'var(--text-sm)',
+                margin: '0 0 0.25rem 0',
+              }}>
+                Pagamento do mês de janeiro foi processado
+              </p>
+              <p style={{
+                color: 'var(--muted-foreground)',
+                fontWeight: 'var(--font-weight-normal)',
+                fontSize: 'var(--text-sm)',
+                margin: 0,
+              }}>
+                05/01/2026
+              </p>
+            </div>
           </div>
         </div>
       </section>

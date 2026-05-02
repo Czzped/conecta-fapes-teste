@@ -210,15 +210,20 @@ classDiagram
         +String titulacao
     }
 
-    class RubricaFinanceira {
+    class Rubrica {
         <<fora do escopo - M008>>
         +String codigo
+        +String nome
         +String descricao
     }
 
     class RubricaPermitida {
         +boolean permiteSubrubricas
         +boolean obrigatoria
+        +double limiteValor
+        +double limitePercentual
+        +String comprovantesEsperados
+        +String restricoes
         +String observacao
     }
 
@@ -263,7 +268,7 @@ classDiagram
     ProponenteEscolhido "*" --> "0..1" PessoaFisica : pessoa autorizada
     DocumentoExigido "*" --> "*" FormatoArquivo : formatos permitidos
     RevisorAdHoc "*" --> "1" PessoaFisica : pessoa
-    RubricaPermitida "*" --> "1" RubricaFinanceira : rubrica
+    RubricaPermitida "*" --> "1" Rubrica : rubrica
     RubricaPermitida "0..1" --> "*" RubricaPermitida : subrubricas permitidas
     RubricaPermitida "0..1" --> "*" BolsaPermitida : detalha rubrica Bolsa
     BolsaPermitida "*" --> "1" VersaoNivel : versao de nivel
@@ -347,11 +352,16 @@ classDiagram
 | | dataInclusao | Data em que a pessoa foi incluida no pool de revisores da captacao | Gerado | Date | | | |
 | | areaAtuacao | Area de conhecimento considerada para distribuicao das propostas | Sim | String | | 200 | |
 | | titulacao | Titulacao academica do revisor | Sim | String | Ex: Doutor, Mestre | 100 | |
-| **RubricaFinanceira** | codigo | Codigo da rubrica no cadastro corporativo | Sim | String | M008 | 20 | Sim |
-| | descricao | Descricao da rubrica | Sim | String | M008 | 300 | |
-| **RubricaPermitida** | rubrica (relacao) | Rubrica financeira autorizada ou orientadora para propostas da captacao | Sim | FK → RubricaFinanceira | Via M008 | | |
+| **Rubrica** | codigo | Codigo da rubrica no cadastro corporativo | Sim | String | M008 | 40 | Sim |
+| | nome | Nome da rubrica | Sim | String | M008 | 150 | |
+| | descricao | Descricao da rubrica | Nao | String | M008 | 500 | |
+| **RubricaPermitida** | rubrica (relacao) | Rubrica autorizada ou orientadora para propostas da captacao | Sim | FK → Rubrica | Via M008 | | |
 | | permiteSubrubricas | Indica se a rubrica pode possuir subrubricas permitidas na captacao | Sim | Boolean | true/false | | |
 | | obrigatoria | Indica se a proposta deve usar esta rubrica quando informar orcamento | Sim | Boolean | true/false | | |
+| | limiteValor | Valor maximo permitido para a rubrica na captacao | Nao | Double | >= 0 | | |
+| | limitePercentual | Percentual maximo da faixa de financiamento permitido para a rubrica | Nao | Double | 0 a 100 | | |
+| | comprovantesEsperados | Orientacao de comprovantes esperados para prestacao de contas | Nao | String | | 1000 | |
+| | restricoes | Exclusoes ou restricoes especificas do edital para esta rubrica | Nao | String | | 1000 | |
 | | observacao | Orientacao de uso da rubrica na captacao | Nao | String | | 500 | |
 | | rubricaPai (relacao) | Rubrica permitida pai quando o registro representar uma subrubrica selecionada dentro de uma rubrica principal | Cond. | FK → RubricaPermitida | Nulo para rubrica raiz | | |
 | **VersaoNivel** | valor | Valor monetario vigente para o nivel de bolsa selecionado | Sim | Double | M001 | | |
@@ -376,7 +386,7 @@ classDiagram
 - CategoriaIniciativa: a captacao deve permitir selecao multipla de categorias. Cada categoria marcada no cadastro gera uma associacao da captacao com a categoria correspondente.
 - PessoaFisica e NivelAcademico: gerenciados por M008 (Cadastros Corporativos). O M011 usa `RevisorAdHoc` como papel operacional assumido por uma `PessoaFisica`, localizada por CPF ou nome na tela de cadastro; `OrtogadoDestinatario` indica a pessoa destinataria de uma demanda induzida; `NivelAcademico` representa requisito minimo do proponente.
 - Instituicao e TipoInstituicao: gerenciados por M008. A captacao pode aceitar propostas abertas, direcionadas a uma instituicao especifica ou direcionadas a um tipo de instituicao.
-- RubricaFinanceira: gerenciada por M008 (Cadastros Corporativos). O M011 seleciona rubricas e subrubricas permitidas para orientar o orcamento das propostas; quando uma rubrica principal e selecionada, a interface deve permitir selecionar uma ou mais subrubricas vinculadas a ela. A execucao orcamentaria fica nos modulos posteriores do ciclo da iniciativa. Quando a rubrica selecionada for Bolsa, o M011 tambem habilita a configuracao de modalidades e niveis de bolsa permitidos.
+- Rubrica: gerenciada por M008 (Cadastros Corporativos). O M011 seleciona rubricas e subrubricas permitidas para orientar o orcamento das propostas; quando uma rubrica possuir rubricas filhas, a interface deve permitir selecionar uma ou mais subrubricas vinculadas a ela. A execucao orcamentaria fica nos modulos posteriores do ciclo da iniciativa. Quando a rubrica selecionada for Bolsa, o M011 tambem habilita a configuracao de modalidades e niveis de bolsa permitidos.
 - VersaoNivel: gerenciada por M001 (Modalidade Bolsa). O M011 seleciona quais versoes de niveis de bolsa podem ser usadas na captacao e define limites operacionais, como cotas e maximo de bolsistas.
 - DocumentoExigido: gerenciado como item reutilizavel de configuracao, mas associado a captacao para definir documentos exigidos do proponente, formatos permitidos, obrigatoriedade e regra de reaproveitamento do cadastro corporativo.
 - Duvida em aberto: validar se todo comprovante deve ser `DocumentoExigido` ou se parte deles deve ser derivada de `RequisitoProponente` como evidencia documental de um requisito.

@@ -514,6 +514,7 @@ As rotas abaixo mantem as configuracoes complementares descobertas no processo e
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/categorias-iniciativas` | ConfigurarCategoriasDeIniciativas | `categorias[]` |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/aportes-financeiros` | ConfigurarAportesFinanceirosCaptacao | origem Programa/Parceria e valor aportado |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/faixas-financiamento` | ConfigurarFaixasFinanciamento | `duracaoMaximaMeses`, `valorMinimo`, `valorMaximo`, `valorAportado` |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/rubricas-permitidas` | ConfigurarRubricasPermitidas | `rubricaId`, limites, restricoes e comprovantes esperados |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/regras-submissao` | ConfigurarRegrasSubmissao | flags de multiplas propostas, acumulo de bolsa e restricao a escolhidos |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/proponentes-escolhidos` | ConfigurarProponentesEscolhidos | tipo INSTITUICAO/PESSOA e IDs autorizados |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/requisitos-proponente` | ConfigurarRequisitosProponente | direcionamento, instituicao/tipo de instituicao, nivel academico minimo e restricoes |
@@ -531,6 +532,24 @@ As rotas abaixo mantem as configuracoes complementares descobertas no processo e
       "valorMinimo": 50000.0,
       "valorMaximo": 200000.0,
       "valorAportado": 500000.0
+    }
+  ]
+}
+```
+
+**Exemplo: rubricas permitidas**
+
+```json
+{
+  "rubricas": [
+    {
+      "rubricaId": "RUB-DIARIAS",
+      "obrigatoria": false,
+      "permiteSubrubricas": true,
+      "limiteValor": 10000.0,
+      "limitePercentual": null,
+      "comprovantesEsperados": "Comprovante de pagamento da diaria e vinculo com solicitacao de diaria.",
+      "restricoes": "Somente para atividades diretamente vinculadas ao projeto."
     }
   ]
 }
@@ -819,6 +838,7 @@ Estas rotas representam o processo operacional descrito em [process.md](process.
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/categorias-iniciativas` | ConfigurarCategoriasDeIniciativas | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/aportes-financeiros` | ConfigurarAportesFinanceirosCaptacao | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/faixas-financiamento` | ConfigurarFaixasFinanciamento | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/rubricas-permitidas` | ConfigurarRubricasPermitidas | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/regras-submissao` | ConfigurarRegrasSubmissao | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/proponentes-escolhidos` | ConfigurarProponentesEscolhidos | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/requisitos-proponente` | ConfigurarRequisitosProponente | ANALISTA_AGENCIA |

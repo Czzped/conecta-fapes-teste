@@ -61,19 +61,19 @@ EPIC-M003-005 (Consultar Visao Consolidada da Iniciativa)
 └── US-M003-020 Listar iniciativas por estado
 
 EPIC-M003-006 (Solicitar Diarias da Iniciativa)
-├── US-M003-021 Cadastrar tipo de diaria com valor, vigencia, fracao de calculo e tipo de viagem
+├── US-M003-021 Validar referencias externas na criacao da solicitacao de diaria
 ├── US-M003-022 Criar solicitacao de diaria para beneficiarios da iniciativa
-├── US-M003-023 Associar solicitacao ao tipo de diaria vigente
-├── US-M003-024 Calcular quantidade e valor da diaria automaticamente
-├── US-M003-025 Submeter solicitacao para aceite dos bolsistas
+├── US-M003-023 Associar solicitacao de diaria ao tipo de diaria vigente do tipo de viagem
+├── US-M003-024 Calcular quantidade e valor da solicitacao de diaria automaticamente
+├── US-M003-025 Notificar bolsistas para aceite da diaria solicitada
 ├── US-M003-026 Assinar termo de aceite da diaria
-├── US-M003-027 Aprovar ou rejeitar solicitacao de diaria
-├── US-M003-028 Gerar debito na rubrica de Diarias e Passagens
-├── US-M003-029 Cancelar diaria aprovada e gerar credito
+├── US-M003-027 Validar saldo e comprometer rubrica ao criar solicitacao de diaria
+├── US-M003-028 Registrar transacao da solicitacao na RubricaProjeto do tipo de viagem
+├── US-M003-029 Remover solicitacao de diaria alocada/aprovada antes do inicio e gerar reversao
 ├── US-M003-030 Consultar solicitacoes de diaria da iniciativa
-├── US-M003-031 Aprovar automaticamente diaria propria do coordenador
+├── US-M003-031 Concluir solicitacao de diaria automaticamente apos aceite ou quando propria do coordenador
 ├── US-M003-032 Visualizar, aceitar ou recusar diaria pelo bolsista
-└── US-M003-033 Filtrar e paginar diarias no Backoffice
+└── US-M003-033 Consultar, filtrar e paginar solicitacoes de diaria no Backoffice
 
 EPIC-M003-007 (Consultar Ciclo de Fomento da Iniciativa)
 ├── US-M003-034 Consultar timeline consolidada da iniciativa
