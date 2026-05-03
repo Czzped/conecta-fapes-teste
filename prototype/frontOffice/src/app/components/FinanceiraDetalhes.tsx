@@ -1,17 +1,33 @@
 import {
+  CheckCircle,
   Home, Upload, Paperclip, FileText, Edit2, Trash2,
-  ChevronDown, Check, Info, Search, X, Send, Plus, Save, Trash,
+  ChevronDown, Check, Info, Search, X, Send, Plus, Save, Trash, RotateCcw, DollarSign,
 } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Payment {
   tipo: string;
+  operacao?: string;
+  classificacao?: string;
   valor: string;
   data: string;
   cnpj: string;
   status: string;
   statusColor: { bg: string; color: string; border: string };
+  origemTerceiro?: string;
+  debitoEstornado?: string;
+  creditoEstorno?: string;
+  prestacaoAssociada?: string;
+  situacaoPrestacao?: string;
+  modoAssociacao?: string;
+  situacaoDebito?: string;
+  efeitoLiquido?: string;
+  debitoOriginal?: string;
+  valorOriginal?: string;
+  valorDevolvido?: string;
+  valorResidual?: string;
+  comprovanteObrigatorio?: string;
 }
 interface FinanceiraDetalhesProps {
   payment: Payment;
@@ -25,6 +41,7 @@ interface DiariaPrestacao {
   valorUnit: string;
   numDiarias: string;
   valorTotal: string;
+  origem: string;
   destino: string;
   dataSaida: string;
   horarioSaida: string;
@@ -36,11 +53,11 @@ interface DiariaPrestacao {
 
 // Mock data para tabela de diárias
 const mockDiarias: DiariaPrestacao[] = [
-  { solicitacaoRef: 'SD-2026-001', nome: 'Ana Carolina Silva', tipo: 'Nacional - Dentro do Estado', valorUnit: 'R$ 260,00', numDiarias: '3', valorTotal: 'R$ 780,00', destino: 'Vitória', dataSaida: '15/03/2026', horarioSaida: '08:00', dataChegada: '18/03/2026', horarioChegada: '17:00', status: 'Aprovada', prestadaContas: false },
-  { solicitacaoRef: 'SD-2026-002', nome: 'Carlos Eduardo Rocha', tipo: 'Nacional - Fora do Estado', valorUnit: 'R$ 320,00', numDiarias: '5', valorTotal: 'R$ 1.600,00', destino: 'São Paulo', dataSaida: '20/03/2026', horarioSaida: '06:30', dataChegada: '25/03/2026', horarioChegada: '20:00', status: 'Aprovada', prestadaContas: false },
-  { solicitacaoRef: 'SD-2026-003', nome: 'Fernanda Martins', tipo: 'Internacional', valorUnit: 'R$ 620,00', numDiarias: '7', valorTotal: 'R$ 4.340,00', destino: 'Lisboa', dataSaida: '10/04/2026', horarioSaida: '14:00', dataChegada: '17/04/2026', horarioChegada: '22:30', status: 'Aprovada', prestadaContas: true },
-  { solicitacaoRef: 'SD-2026-004', nome: 'Roberto Oliveira', tipo: 'Nacional - Fora do Estado', valorUnit: 'R$ 320,00', numDiarias: '4', valorTotal: 'R$ 1.280,00', destino: 'Rio de Janeiro', dataSaida: '05/05/2026', horarioSaida: '07:00', dataChegada: '09/05/2026', horarioChegada: '19:00', status: 'Aprovada', prestadaContas: false },
-  { solicitacaoRef: 'SD-2026-005', nome: 'Beatriz Costa', tipo: 'Nacional - Dentro do Estado', valorUnit: 'R$ 260,00', numDiarias: '2', valorTotal: 'R$ 520,00', destino: 'Cachoeiro', dataSaida: '12/05/2026', horarioSaida: '09:00', dataChegada: '14/05/2026', horarioChegada: '16:00', status: 'Aprovada', prestadaContas: false },
+  { solicitacaoRef: 'SD-2026-001', nome: 'Ana Carolina Silva', tipo: 'Nacional - Dentro do Estado', valorUnit: 'R$ 260,00', numDiarias: '3', valorTotal: 'R$ 780,00', origem: 'Vila Velha', destino: 'Vitória', dataSaida: '15/03/2026', horarioSaida: '08:00', dataChegada: '18/03/2026', horarioChegada: '17:00', status: 'Aprovada', prestadaContas: false },
+  { solicitacaoRef: 'SD-2026-002', nome: 'Carlos Eduardo Rocha', tipo: 'Nacional - Fora do Estado', valorUnit: 'R$ 320,00', numDiarias: '5', valorTotal: 'R$ 1.600,00', origem: 'Vitória', destino: 'São Paulo', dataSaida: '20/03/2026', horarioSaida: '06:30', dataChegada: '25/03/2026', horarioChegada: '20:00', status: 'Aprovada', prestadaContas: false },
+  { solicitacaoRef: 'SD-2026-003', nome: 'Fernanda Martins', tipo: 'Internacional', valorUnit: 'R$ 620,00', numDiarias: '7', valorTotal: 'R$ 4.340,00', origem: 'Vitória', destino: 'Lisboa', dataSaida: '10/04/2026', horarioSaida: '14:00', dataChegada: '17/04/2026', horarioChegada: '22:30', status: 'Aprovada', prestadaContas: true },
+  { solicitacaoRef: 'SD-2026-004', nome: 'Roberto Oliveira', tipo: 'Nacional - Fora do Estado', valorUnit: 'R$ 320,00', numDiarias: '4', valorTotal: 'R$ 1.280,00', origem: 'Vitória', destino: 'Rio de Janeiro', dataSaida: '05/05/2026', horarioSaida: '07:00', dataChegada: '09/05/2026', horarioChegada: '19:00', status: 'Aprovada', prestadaContas: false },
+  { solicitacaoRef: 'SD-2026-005', nome: 'Beatriz Costa', tipo: 'Nacional - Dentro do Estado', valorUnit: 'R$ 260,00', numDiarias: '2', valorTotal: 'R$ 520,00', origem: 'Vitória', destino: 'Cachoeiro', dataSaida: '12/05/2026', horarioSaida: '09:00', dataChegada: '14/05/2026', horarioChegada: '16:00', status: 'Aprovada', prestadaContas: false },
 ];
 
 const tiposViagemDiaria = [
@@ -121,6 +138,11 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
   const passSearch       = useRef<HTMLInputElement>(null);
 
   const isReadOnly = payment.status !== 'Pendente';
+  const isCreditoEstorno = payment.operacao === 'CREDITO' && payment.classificacao === 'ESTORNO';
+  const isCreditoDevolucao = payment.operacao === 'CREDITO' && payment.classificacao === 'DEVOLUCAO';
+  const [estornoAssociado, setEstornoAssociado] = useState(false);
+  const [devolucaoComprovanteAnexado, setDevolucaoComprovanteAnexado] = useState(false);
+  const [devolucaoAssociada, setDevolucaoAssociada] = useState(false);
 
   /* ── Step 1 ── */
   const [selectedDocumento, setSelectedDocumento] = useState('');
@@ -279,6 +301,7 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
       valorUnit: formatarMoeda(diariaVigenteNovaDiaria.valor),
       numDiarias: quantidadeNovaDiaria.toLocaleString('pt-BR'),
       valorTotal: formatarMoeda(valorBeneficiarioNovaDiaria),
+      origem: 'Vitória',
       destino: novaDiariaDestino,
       dataSaida: formatarData(novaDiariaPartida),
       horarioSaida: formatarHora(novaDiariaPartida),
@@ -614,7 +637,19 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
         <span style={{ color: 'var(--foreground)', fontFamily: 'var(--font-family)' }}>Detalhes</span>
       </nav>
 
-      <h1 style={{ color: 'var(--foreground)', margin: '0 0 2rem', fontFamily: 'var(--font-family)' }}>Detalhes do Pagamento</h1>
+      <div className="flex items-center gap-3 mb-8">
+        <div
+          className="p-2 transition-colors"
+          style={{
+            color: 'var(--primary)',
+            borderRadius: 'var(--radius)',
+            backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
+          }}
+        >
+          <DollarSign size={20} />
+        </div>
+        <h1 style={{ color: 'var(--foreground)', margin: 0, fontFamily: 'var(--font-family)' }}>Detalhes do Pagamento</h1>
+      </div>
 
       {/* Payment card */}
       <div className="p-6 mb-6" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
@@ -643,6 +678,217 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
           </div>
         </div>
       </div>
+
+      {isCreditoEstorno && (
+        <section className="mb-6">
+          <div
+            className="p-5"
+            style={{
+              backgroundColor: 'color-mix(in srgb, rgb(34, 197, 94) 8%, transparent)',
+              border: '1px solid color-mix(in srgb, rgb(34, 197, 94) 24%, transparent)',
+              borderRadius: 'var(--radius)',
+            }}
+          >
+            <div className="flex items-start gap-3 mb-4">
+              <div>
+                <h1 style={{ color: 'var(--foreground)', margin: 0, fontFamily: 'var(--font-family)' }}>
+                  Estorno identificado
+                </h1>
+                <p style={{ color: 'var(--muted-foreground)', margin: '0.75rem 0 0', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
+                  Crédito de terceiro que anula um débito anterior e pode ser associado como ajuste conciliatório.
+                </p>
+              </div>
+            </div>
+
+            <div style={{ fontFamily: 'var(--font-family)' }}>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { label: 'Terceiro', value: payment.origemTerceiro ?? payment.cnpj },
+                  { label: 'Crédito', value: payment.valor, color: 'rgb(34, 197, 94)' },
+                  { label: 'Classificação', value: payment.classificacao ?? '-' },
+                  { label: 'Situação do débito', value: payment.situacaoDebito ?? '-' },
+                  { label: 'Efeito líquido', value: payment.efeitoLiquido ?? '-', color: 'var(--primary)' },
+                  { label: 'Modo', value: payment.modoAssociacao ?? '-' },
+                ].map((item) => (
+                  <div key={item.label}>
+                    <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
+                      {item.label}
+                    </div>
+                    <div style={{ color: item.color ?? 'var(--foreground)', fontWeight: 'var(--font-weight-normal)', fontSize: 'var(--text-sm)' }}>
+                      {item.value}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {estornoAssociado && (
+                <div
+                  className="mt-4 p-3"
+                  style={{
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    border: '1px solid rgba(34, 197, 94, 0.3)',
+                    borderRadius: 'var(--radius)',
+                    color: 'rgb(34, 197, 94)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-normal)',
+                  }}
+                >
+                  Estorno associado à {payment.prestacaoAssociada ?? 'prestação existente'} como {payment.modoAssociacao ?? 'ajuste conciliatório'}.
+                </div>
+              )}
+
+              <div className="mt-4 flex justify-end">
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2"
+                  aria-pressed={estornoAssociado}
+                  onClick={() => setEstornoAssociado(true)}
+                  style={{
+                    backgroundColor: estornoAssociado ? 'rgba(34, 197, 94, 0.14)' : 'var(--primary)',
+                    color: estornoAssociado ? 'rgb(34, 197, 94)' : 'var(--primary-foreground)',
+                    border: `1px solid ${estornoAssociado ? 'rgba(34, 197, 94, 0.35)' : 'var(--primary)'}`,
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: estornoAssociado ? 'default' : 'pointer',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {estornoAssociado ? <CheckCircle size={16} /> : <RotateCcw size={16} />}
+                  {estornoAssociado ? 'Associado à prestação existente' : 'Associar à prestação existente'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {isCreditoDevolucao && (
+        <section className="mb-6">
+          <div
+            className="p-5"
+            style={{
+              backgroundColor: 'color-mix(in srgb, rgb(234, 179, 8) 8%, transparent)',
+              border: '1px solid color-mix(in srgb, rgb(234, 179, 8) 24%, transparent)',
+              borderRadius: 'var(--radius)',
+            }}
+          >
+            <div className="flex items-start gap-3 mb-4">
+              <div
+                className="p-2"
+                style={{
+                  color: 'rgb(234, 179, 8)',
+                  backgroundColor: 'rgba(234, 179, 8, 0.12)',
+                  borderRadius: 'var(--radius)',
+                }}
+              >
+                <Upload size={18} />
+              </div>
+              <div>
+                <h1 style={{ color: 'var(--foreground)', margin: 0, fontFamily: 'var(--font-family)' }}>
+                  Devolução do coordenador
+                </h1>
+                <p style={{ color: 'var(--muted-foreground)', margin: '0.25rem 0 0', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
+                  Crédito feito pelo coordenador para devolver valor integral ou parcial. Exige comprovante, como Pix, TED ou boleto.
+                </p>
+              </div>
+            </div>
+
+            <div style={{ fontFamily: 'var(--font-family)' }}>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { label: 'Origem do crédito', value: payment.cnpj },
+                  { label: 'Valor devolvido', value: payment.valorDevolvido ?? payment.valor, color: 'rgb(34, 197, 94)' },
+                  { label: 'Valor original', value: payment.valorOriginal ?? '-' },
+                  {
+                    label: 'Comprovante',
+                    value: devolucaoComprovanteAnexado ? 'Anexado' : payment.comprovanteObrigatorio ?? '-',
+                    color: devolucaoComprovanteAnexado ? 'rgb(34, 197, 94)' : 'rgb(234, 179, 8)',
+                  },
+                  { label: 'Modo', value: payment.modoAssociacao ?? '-' },
+                  { label: 'Classificação', value: payment.classificacao ?? '-' },
+                ].map((item) => (
+                  <div key={item.label}>
+                    <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
+                      {item.label}
+                    </div>
+                    <div style={{ color: item.color ?? 'var(--foreground)', fontWeight: 'var(--font-weight-normal)', fontSize: 'var(--text-sm)' }}>
+                      {item.value}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {devolucaoAssociada && (
+                <div
+                  className="mt-4 p-3"
+                  style={{
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    border: '1px solid rgba(34, 197, 94, 0.3)',
+                    borderRadius: 'var(--radius)',
+                    color: 'rgb(34, 197, 94)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-normal)',
+                  }}
+                >
+                  Devolução associada à {payment.prestacaoAssociada ?? 'prestação existente'}. Saldo residual: {payment.valorResidual ?? '-'}.
+                </div>
+              )}
+
+              <div className="mt-4 flex flex-col sm:flex-row justify-end gap-2">
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2"
+                  aria-pressed={devolucaoComprovanteAnexado}
+                  onClick={() => setDevolucaoComprovanteAnexado(true)}
+                  style={{
+                    backgroundColor: devolucaoComprovanteAnexado ? 'rgba(34, 197, 94, 0.14)' : 'transparent',
+                    color: devolucaoComprovanteAnexado ? 'rgb(34, 197, 94)' : 'var(--foreground)',
+                    border: `1px solid ${devolucaoComprovanteAnexado ? 'rgba(34, 197, 94, 0.35)' : 'var(--border)'}`,
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {devolucaoComprovanteAnexado ? <CheckCircle size={16} /> : <Upload size={16} />}
+                  {devolucaoComprovanteAnexado ? 'Comprovante anexado' : 'Anexar comprovante'}
+                </button>
+
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2"
+                  aria-pressed={devolucaoAssociada}
+                  disabled={!devolucaoComprovanteAnexado || devolucaoAssociada}
+                  onClick={() => setDevolucaoAssociada(true)}
+                  style={{
+                    backgroundColor: devolucaoAssociada
+                      ? 'rgba(34, 197, 94, 0.14)'
+                      : devolucaoComprovanteAnexado
+                        ? 'var(--primary)'
+                        : 'transparent',
+                    color: devolucaoAssociada
+                      ? 'rgb(34, 197, 94)'
+                      : devolucaoComprovanteAnexado
+                        ? 'var(--primary-foreground)'
+                        : 'var(--muted-foreground)',
+                    border: `1px solid ${devolucaoAssociada ? 'rgba(34, 197, 94, 0.35)' : devolucaoComprovanteAnexado ? 'var(--primary)' : 'var(--border)'}`,
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    whiteSpace: 'nowrap',
+                    cursor: !devolucaoComprovanteAnexado || devolucaoAssociada ? 'not-allowed' : 'pointer',
+                    opacity: !devolucaoComprovanteAnexado && !devolucaoAssociada ? 0.7 : 1,
+                  }}
+                >
+                  {devolucaoAssociada ? <CheckCircle size={16} /> : <RotateCcw size={16} />}
+                  {devolucaoAssociada ? 'Devolução associada' : 'Associar prestação'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Status alert */}
       {statusMessage && (
@@ -707,30 +953,9 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
                   <div className="flex items-start gap-3">
                     <Info size={16} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
                     <p style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: 0, lineHeight: '1.6' }}>
-                      Aceitamos apenas diárias com até 15 dias consecutivos por viagem. Selecione uma diária já cadastrada ou crie uma nova diária operacional para associar a esta prestação de contas.
+                      Aceitamos apenas diárias com até 15 dias consecutivos por viagem. Selecione uma diária já cadastrada para associar a esta prestação de contas.
                     </p>
                   </div>
-                  {!isReadOnly && (
-                    <button
-                      type="button"
-                      onClick={() => setIsCriarDiariaModalOpen(true)}
-                      className="px-4 py-2 flex items-center justify-center gap-2"
-                      style={{
-                        backgroundColor: 'var(--primary)',
-                        color: 'var(--primary-foreground)',
-                        border: 'none',
-                        borderRadius: 'var(--radius)',
-                        fontSize: 'var(--text-sm)',
-                        fontWeight: 'var(--font-weight-medium)',
-                        fontFamily: 'var(--font-family)',
-                        whiteSpace: 'nowrap',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <Plus size={16} />
-                      Criar diária
-                    </button>
-                  )}
                 </div>
 
                 <div className="mb-4 space-y-3">
@@ -750,39 +975,14 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
                     <span>{totalDiariasJaPrestadas} já prestada(s) não aparecem na lista</span>
                   </div>
 
-                  {diariaSelecionada && (
-                    <div
-                      className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4"
-                      style={{
-                        backgroundColor: 'color-mix(in srgb, var(--primary) 6%, var(--background))',
-                        border: '1px solid color-mix(in srgb, var(--primary) 24%, var(--border))',
-                        borderRadius: 'var(--radius)',
-                        fontFamily: 'var(--font-family)',
-                      }}
-                    >
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>Diária selecionada</div>
-                        <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{diariaSelecionada.solicitacaoRef}</strong>
-                      </div>
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>Bolsista</div>
-                        <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{diariaSelecionada.nome}</strong>
-                      </div>
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>Valor da diária</div>
-                        <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{diariaSelecionada.valorTotal}</strong>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="space-y-3">
                     {diariasElegiveisPrestacao.map((diaria) => (
                       <button
                         key={diaria.solicitacaoRef}
                         type="button"
                         disabled={isReadOnly}
                         onClick={() => setSelectedDiariaIdx(diaria.originalIndex)}
-                        className="p-4 text-left"
+                        className="p-4 text-left w-full"
                         style={{
                           backgroundColor: selectedDiariaIdx === diaria.originalIndex ? 'color-mix(in srgb, var(--primary) 8%, var(--card))' : 'var(--card)',
                           border: `1px solid ${selectedDiariaIdx === diaria.originalIndex ? 'var(--primary)' : 'var(--border)'}`,
@@ -792,18 +992,69 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
                           fontFamily: 'var(--font-family)',
                         }}
                       >
-                        <div className="flex items-start justify-between gap-3 mb-3">
-                          <div>
-                            <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{diaria.solicitacaoRef}</strong>
-                            <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.25rem' }}>{diaria.nome}</div>
+                        <div className="flex items-start gap-4">
+                          <span
+                            aria-hidden="true"
+                            style={{
+                              width: '20px',
+                              height: '20px',
+                              borderRadius: '9999px',
+                              border: `2px solid ${selectedDiariaIdx === diaria.originalIndex ? 'var(--primary)' : 'var(--border)'}`,
+                              backgroundColor: selectedDiariaIdx === diaria.originalIndex ? 'var(--primary)' : 'transparent',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0,
+                              marginTop: '0.15rem',
+                            }}
+                          >
+                            {selectedDiariaIdx === diaria.originalIndex && (
+                              <span
+                                style={{
+                                  width: '8px',
+                                  height: '8px',
+                                  borderRadius: '9999px',
+                                  backgroundColor: 'var(--primary-foreground)',
+                                }}
+                              />
+                            )}
+                          </span>
+                          <div className="flex-1 space-y-5">
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                              {[
+                                { label: 'Bolsista', value: diaria.nome },
+                                { label: 'Tipo de Viagem', value: diaria.tipo },
+                                { label: 'Número de Diárias', value: diaria.numDiarias },
+                                { label: 'Valor Total', value: diaria.valorTotal },
+                              ].map((item) => (
+                                <div key={item.label}>
+                                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+                                    {item.label}
+                                  </div>
+                                  <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
+                                    {item.value}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                              {[
+                                { label: 'Destino', value: diaria.destino },
+                                { label: 'Data de Saída', value: diaria.dataSaida },
+                                { label: 'Origem', value: diaria.origem },
+                                { label: 'Data de Chegada', value: diaria.dataChegada },
+                              ].map((item) => (
+                                <div key={item.label}>
+                                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+                                    {item.label}
+                                  </div>
+                                  <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
+                                    {item.value}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                          <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>{diaria.valorTotal}</span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
-                          <span>{diaria.destino}</span>
-                          <span>{diaria.numDiarias} diária(s)</span>
-                          <span>{diaria.dataSaida}</span>
-                          <span>{diaria.dataChegada}</span>
                         </div>
                       </button>
                     ))}
@@ -1601,18 +1852,14 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
                           </div>
 
                           {/* Primeira linha */}
-                          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
-                              <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>Nome do Membro</div>
+                              <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>Bolsista</div>
                               <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>{diaria.nome}</div>
                             </div>
                             <div>
                               <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>Tipo de Viagem</div>
                               <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>{diaria.tipo}</div>
-                            </div>
-                            <div>
-                              <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>Valor Unitário</div>
-                              <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>{diaria.valorUnit}</div>
                             </div>
                             <div>
                               <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>Número de Diárias</div>
@@ -1625,7 +1872,7 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
                           </div>
 
                           {/* Segunda linha */}
-                          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                               <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>Destino</div>
                               <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>{diaria.destino}</div>
@@ -1635,16 +1882,8 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
                               <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>{diaria.dataSaida}</div>
                             </div>
                             <div>
-                              <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>Horário</div>
-                              <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>{diaria.horarioSaida}</div>
-                            </div>
-                            <div>
                               <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>Data de Chegada</div>
                               <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>{diaria.dataChegada}</div>
-                            </div>
-                            <div>
-                              <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>Horário</div>
-                              <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>{diaria.horarioChegada}</div>
                             </div>
                           </div>
                         </div>
