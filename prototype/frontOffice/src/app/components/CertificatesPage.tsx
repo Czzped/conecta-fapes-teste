@@ -1,18 +1,20 @@
 import {
+  Banknote,
   Calendar,
   CheckCheck,
-  CheckCircle,
+  ChevronRight,
   ClipboardList,
-  Clock,
+  CircleDollarSign,
+  Coins,
   FileText,
+  Hotel,
   MapPin,
-  PlaneTakeoff,
+  PiggyBank,
   Plus,
   ReceiptText,
   RotateCcw,
   Search,
   X,
-  WalletCards,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Dropdown } from '@/app/components/Dropdown';
@@ -26,7 +28,7 @@ import {
 } from '@/app/components/ui/breadcrumb';
 
 type DocumentoSolicitacao = 'declaracao' | 'informe' | 'termo' | null;
-type StatusDiaria = 'ALOCADA' | 'APROVADA' | 'CANCELADA' | 'RECUSADA';
+type StatusDiaria = 'RASCUNHO' | 'ALOCADA' | 'APROVADA' | 'CANCELADA' | 'RECUSADA';
 type EstadoAceiteDiaria = 'PENDENTE' | 'ASSINADO' | 'RECUSADO' | 'CANCELADO';
 type DiariaTab = 'solicitadas' | 'nova' | 'minhas';
 type AccessType = 'cidadao' | 'voluntario' | 'bolsista' | 'coordenador' | 'diretor' | 'reitor';
@@ -83,6 +85,7 @@ interface DiariaRequest {
 
 const coordenadorAtual = 'Mariana Costa';
 const bolsistaAtual = 'Ana Souza';
+const bolsistaMinhasDiarias = 'Paulo Sergio Souza Junior';
 const alocacoesDoProjeto: AlocacaoBolsistaProjeto[] = [
   { ref: 'ALO-2026-COORD-001', nome: coordenadorAtual, papel: 'COORDENADOR_BOLSISTA' },
   { ref: 'ALO-2026-001', nome: 'Ana Souza', papel: 'BOLSISTA' },
@@ -91,6 +94,7 @@ const alocacoesDoProjeto: AlocacaoBolsistaProjeto[] = [
   { ref: 'ALO-2026-004', nome: 'Diego Rocha', papel: 'BOLSISTA' },
   { ref: 'ALO-2026-005', nome: 'Fernanda Alves', papel: 'BOLSISTA' },
   { ref: 'ALO-2026-006', nome: 'João Pedro Martins', papel: 'BOLSISTA' },
+  { ref: 'ALO-2026-007', nome: bolsistaMinhasDiarias, papel: 'BOLSISTA' },
 ];
 const beneficiariosDoProjeto = alocacoesDoProjeto.map((alocacao) => alocacao.nome);
 const orcamentosRubricasDiarias: Record<TipoViagemCodigo, number> = {
@@ -267,9 +271,10 @@ function calcularDiarias(
 
 function statusLabel(status: StatusDiaria) {
   const labels = {
-    ALOCADA: 'Alocada',
+    RASCUNHO: 'Rascunho',
+    ALOCADA: 'Aguardando Bolsista',
     APROVADA: 'Aprovada',
-    CANCELADA: 'Cancelada',
+    CANCELADA: 'Cancelado',
     RECUSADA: 'Recusada',
   };
 
@@ -291,28 +296,50 @@ function dataInicioAindaNaoPassou(partida: string) {
   return Number.isFinite(inicio) && inicio > Date.now();
 }
 
+function formatarInputData(valor: string) {
+  return valor.split('T')[0] ?? '';
+}
+
+function formatarInputHora(valor: string) {
+  return (valor.split('T')[1] ?? '').slice(0, 8);
+}
+
+function combinarDataHora(atual: string, proximoValor: string, parte: 'data' | 'hora') {
+  const data = formatarInputData(atual) || '2026-06-10';
+  const hora = formatarInputHora(atual) || '08:00:00';
+
+  return parte === 'data' ? `${proximoValor}T${hora}` : `${data}T${proximoValor}`;
+}
+
 export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }: CertificatesPageProps) {
   const [selectedOption, setSelectedOption] = useState<DocumentoSolicitacao>(null);
   const [activeFlow, setActiveFlow] = useState<'diarias' | null>(initialFlow);
   const [activeDiariaTab, setActiveDiariaTab] = useState<DiariaTab>('solicitadas');
   const [selectedYear, setSelectedYear] = useState('2024');
-  const [selectedBolsistas, setSelectedBolsistas] = useState<string[]>(['Ana Souza']);
+  const [selectedBolsistas, setSelectedBolsistas] = useState<string[]>([]);
   const [bolsistaSearch, setBolsistaSearch] = useState('');
+  const [isBolsistaDropdownOpen, setIsBolsistaDropdownOpen] = useState(false);
   const [diariaSearch, setDiariaSearch] = useState('');
   const [diariaStatusFilter, setDiariaStatusFilter] = useState<StatusDiaria | 'TODOS'>('TODOS');
+  const [diariaTipoViagemFilter, setDiariaTipoViagemFilter] = useState<TipoViagemCodigo | 'TODOS'>('TODOS');
   const [minhasDiariasSearch, setMinhasDiariasSearch] = useState('');
-  const [minhasDiariasFilter, setMinhasDiariasFilter] = useState<'TODAS' | 'NOVAS' | 'HISTORICO'>('TODAS');
-  const [partida, setPartida] = useState('2026-06-10T08:00');
-  const [chegada, setChegada] = useState('2026-06-12T18:00');
-  const [tipoViagemSelecionado, setTipoViagemSelecionado] = useState<TipoViagemCodigo>('DENTRO_ESTADO');
-  const [origem, setOrigem] = useState('Vitória/ES');
-  const [destino, setDestino] = useState('Linhares/ES');
+  const [minhasDiariasStatusFilter, setMinhasDiariasStatusFilter] = useState<StatusDiaria | 'TODOS'>('TODOS');
+  const [minhasDiariasTipoViagemFilter, setMinhasDiariasTipoViagemFilter] = useState<TipoViagemCodigo | 'TODOS'>('TODOS');
+  const [partida, setPartida] = useState('');
+  const [chegada, setChegada] = useState('');
+  const [tipoViagemSelecionado, setTipoViagemSelecionado] = useState<TipoViagemCodigo | ''>('');
+  const [origem, setOrigem] = useState('');
+  const [destino, setDestino] = useState('');
   const [transporteCusteadoOutraEntidade, setTransporteCusteadoOutraEntidade] = useState(false);
   const [hospedagemCusteadaOutraEntidade, setHospedagemCusteadaOutraEntidade] = useState(false);
   const [alimentacaoCusteadaOutraEntidade, setAlimentacaoCusteadaOutraEntidade] = useState(false);
-  const [motivo, setMotivo] = useState('Participação em atividade técnica do plano de trabalho.');
+  const [motivo, setMotivo] = useState('');
   const [cancelandoId, setCancelandoId] = useState<string | null>(null);
   const [justificativaCancelamento, setJustificativaCancelamento] = useState('');
+  const [solicitacaoDetalheId, setSolicitacaoDetalheId] = useState<string | null>(null);
+  const [solicitacaoDetalheOrigem, setSolicitacaoDetalheOrigem] = useState<'solicitadas' | 'minhas'>('solicitadas');
+  const [mostrarMotivoCancelamento, setMostrarMotivoCancelamento] = useState(false);
+  const [mostrarJustificativaRecusa, setMostrarJustificativaRecusa] = useState(false);
   const [recusandoId, setRecusandoId] = useState<string | null>(null);
   const [resumoAceiteId, setResumoAceiteId] = useState<string | null>(null);
   const [justificativaRecusa, setJustificativaRecusa] = useState('');
@@ -460,6 +487,147 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
       transacaoReversaoRef: 'TR-2026-041',
       justificativaRecusa: 'Beneficiária recusou a viagem por conflito de agenda.',
     },
+    {
+      id: 'SD-2026-101',
+      alocacaoBolsistaRef: 'ALO-2026-007',
+      bolsistaNome: bolsistaMinhasDiarias,
+      partida: '2026-09-02T08:00',
+      chegada: '2026-09-03T18:00',
+      origem: 'Vitória/ES',
+      destino: 'Linhares/ES',
+      distanciaKm: 133.86,
+      deslocamentoRegiaoMetropolitana: false,
+      municipioLimitrofe: false,
+      transporteCusteadoOutraEntidade: false,
+      hospedagemCusteadaOutraEntidade: false,
+      alimentacaoCusteadaOutraEntidade: false,
+      motivo: 'Acompanhamento de atividade de campo.',
+      status: 'ALOCADA',
+      estadoAceite: 'PENDENTE',
+      quantidade: 1.5,
+      valorUnitario: 260,
+      valorTotal: 390,
+      tipoDiariaRef: 'DIA-2026-001',
+      parametroCalculoDiariaRef: 'PCD-2026-001',
+      tipoDiaria: 'NACIONAL',
+      tipoViagem: 'DENTRO_ESTADO',
+      regraCalculo: 'Normativa FAPES',
+      memoriaCalculoSnapshot: '1 pernoite + 0,5 por retorno após 14h.',
+      transacaoComprometimentoRef: 'TR-2026-101',
+    },
+    {
+      id: 'SD-2026-102',
+      alocacaoBolsistaRef: 'ALO-2026-007',
+      bolsistaNome: bolsistaMinhasDiarias,
+      partida: '2026-09-10T07:30',
+      chegada: '2026-09-12T16:00',
+      origem: 'Vitória/ES',
+      destino: 'São Paulo/SP',
+      distanciaKm: 0,
+      deslocamentoRegiaoMetropolitana: false,
+      municipioLimitrofe: false,
+      transporteCusteadoOutraEntidade: false,
+      hospedagemCusteadaOutraEntidade: false,
+      alimentacaoCusteadaOutraEntidade: false,
+      motivo: 'Participação em seminário nacional.',
+      status: 'APROVADA',
+      estadoAceite: 'ASSINADO',
+      quantidade: 2.5,
+      valorUnitario: 320,
+      valorTotal: 800,
+      tipoDiariaRef: 'DIA-2026-002',
+      parametroCalculoDiariaRef: 'PCD-2026-002',
+      tipoDiaria: 'NACIONAL',
+      tipoViagem: 'FORA_ESTADO',
+      regraCalculo: 'Normativa FAPES',
+      memoriaCalculoSnapshot: '2 pernoites + 0,5 por retorno após 14h.',
+      transacaoComprometimentoRef: 'TR-2026-102',
+    },
+    {
+      id: 'SD-2026-103',
+      alocacaoBolsistaRef: 'ALO-2026-007',
+      bolsistaNome: bolsistaMinhasDiarias,
+      partida: '2026-10-04T09:00',
+      chegada: '2026-10-06T20:00',
+      origem: 'Vitória/ES',
+      destino: 'Brasília/DF',
+      distanciaKm: 0,
+      deslocamentoRegiaoMetropolitana: false,
+      municipioLimitrofe: false,
+      transporteCusteadoOutraEntidade: true,
+      hospedagemCusteadaOutraEntidade: false,
+      alimentacaoCusteadaOutraEntidade: false,
+      motivo: 'Reunião técnica com parceiros institucionais.',
+      status: 'RECUSADA',
+      estadoAceite: 'RECUSADO',
+      quantidade: 2.5,
+      valorUnitario: 320,
+      valorTotal: 800,
+      tipoDiariaRef: 'DIA-2026-002',
+      parametroCalculoDiariaRef: 'PCD-2026-002',
+      tipoDiaria: 'NACIONAL',
+      tipoViagem: 'FORA_ESTADO',
+      regraCalculo: 'Normativa FAPES',
+      memoriaCalculoSnapshot: '2 pernoites + 0,5 por retorno após 14h.',
+      transacaoComprometimentoRef: 'TR-2026-103',
+      justificativaRecusa: 'Viagem substituída por agenda remota.',
+    },
+    {
+      id: 'SD-2026-104',
+      alocacaoBolsistaRef: 'ALO-2026-007',
+      bolsistaNome: bolsistaMinhasDiarias,
+      partida: '2026-11-15T14:00',
+      chegada: '2026-11-18T22:00',
+      origem: 'Vitória/ES',
+      destino: 'Lisboa/Portugal',
+      distanciaKm: 0,
+      deslocamentoRegiaoMetropolitana: false,
+      municipioLimitrofe: false,
+      transporteCusteadoOutraEntidade: false,
+      hospedagemCusteadaOutraEntidade: false,
+      alimentacaoCusteadaOutraEntidade: false,
+      motivo: 'Apresentação de resultados em evento internacional.',
+      status: 'APROVADA',
+      estadoAceite: 'ASSINADO',
+      quantidade: 3.5,
+      valorUnitario: 620,
+      valorTotal: 2170,
+      tipoDiariaRef: 'DIA-2026-003',
+      parametroCalculoDiariaRef: 'PCD-2026-003',
+      tipoDiaria: 'INTERNACIONAL',
+      tipoViagem: 'INTERNACIONAL',
+      regraCalculo: 'Normativa FAPES',
+      memoriaCalculoSnapshot: '3 pernoites + 0,5 por retorno após 14h.',
+      transacaoComprometimentoRef: 'TR-2026-104',
+    },
+    {
+      id: 'SD-2026-105',
+      alocacaoBolsistaRef: 'ALO-2026-007',
+      bolsistaNome: bolsistaMinhasDiarias,
+      partida: '2026-12-01T08:30',
+      chegada: '2026-12-01T17:00',
+      origem: 'Vitória/ES',
+      destino: 'Cachoeiro de Itapemirim/ES',
+      distanciaKm: 143.4,
+      deslocamentoRegiaoMetropolitana: false,
+      municipioLimitrofe: false,
+      transporteCusteadoOutraEntidade: false,
+      hospedagemCusteadaOutraEntidade: true,
+      alimentacaoCusteadaOutraEntidade: false,
+      motivo: 'Visita técnica sem pernoite.',
+      status: 'ALOCADA',
+      estadoAceite: 'PENDENTE',
+      quantidade: 0.5,
+      valorUnitario: 260,
+      valorTotal: 130,
+      tipoDiariaRef: 'DIA-2026-001',
+      parametroCalculoDiariaRef: 'PCD-2026-001',
+      tipoDiaria: 'NACIONAL',
+      tipoViagem: 'DENTRO_ESTADO',
+      regraCalculo: 'Normativa FAPES',
+      memoriaCalculoSnapshot: '8,5h sem pernoite: 0,5 diária.',
+      transacaoComprometimentoRef: 'TR-2026-105',
+    },
   ]);
 
   const tiposViagemComOrcamento = tiposViagem.filter((tipo) => (orcamentosRubricasDiarias[tipo.codigo] ?? 0) > 0);
@@ -470,7 +638,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
   const diariaVigenteAtual = diariasVigentes.find((diaria) => diaria.tipoViagem === tipoViagemAtual.codigo) ?? diariasVigentes[0];
   const tipoDiariaCalculado = tipoViagemAtual.abrangencia === 'Internacional' ? 'INTERNACIONAL' : 'NACIONAL';
   const tipoDiariaAtual = tiposDiaria.find((tipo) => tipo.codigo === tipoDiariaCalculado) ?? tiposDiaria[0];
-  const usaDistanciaNoCalculo = tipoViagemAtual.codigo === 'DENTRO_ESTADO';
+  const usaDistanciaNoCalculo = tipoViagemAtual.codigo === 'DENTRO_ESTADO' && Boolean(tipoViagemSelecionado);
   const distanciaRodoviaria = useMemo(
     () => (usaDistanciaNoCalculo ? buscarDistanciaRodoviaria(origem, destino) : { distanciaKm: 0, origemCalculo: 'NAO_APLICADA' as const }),
     [destino, origem, usaDistanciaNoCalculo],
@@ -490,7 +658,12 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
   );
   const quantidadeCalculada = calculoDiaria.quantidade;
   const valorTotalCalculado = quantidadeCalculada * diariaVigenteAtual.valor * selectedBolsistas.length;
+  const diariaFormIncompleto = !tipoViagemSelecionado || !origem.trim() || !destino.trim() || !partida || !chegada || !motivo.trim() || selectedBolsistas.length === 0;
   const solicitacaoPropriaCoordenador = selectedBolsistas.length === 1 && selectedBolsistas[0] === coordenadorAtual;
+  const partidaData = formatarInputData(partida);
+  const partidaHorario = formatarInputHora(partida);
+  const chegadaData = formatarInputData(chegada);
+  const chegadaHorario = formatarInputHora(chegada);
   const diariasFiltradas = useMemo(() => {
     const query = diariaSearch.trim().toLowerCase();
 
@@ -503,10 +676,11 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
         solicitacao.bolsistaNome.toLowerCase().includes(query) ||
         solicitacao.alocacaoBolsistaRef.toLowerCase().includes(query);
       const matchesStatus = diariaStatusFilter === 'TODOS' || solicitacao.status === diariaStatusFilter;
+      const matchesTipoViagem = diariaTipoViagemFilter === 'TODOS' || solicitacao.tipoViagem === diariaTipoViagemFilter;
 
-      return matchesSearch && matchesStatus;
+      return matchesSearch && matchesStatus && matchesTipoViagem;
     });
-  }, [diariaSearch, diariaStatusFilter, solicitacoesDiaria]);
+  }, [diariaSearch, diariaStatusFilter, diariaTipoViagemFilter, solicitacoesDiaria]);
   const diariasPorBeneficiario = useMemo<DiariaBeneficiarioItem[]>(
     () =>
       diariasFiltradas.map((solicitacao, beneficiarioIndex) => ({
@@ -548,6 +722,10 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
       };
     })
     .filter((rubrica) => rubrica.total > 0);
+  const totalDisponivelDashboard = rubricasDashboard.reduce((total, rubrica) => total + rubrica.total, 0);
+  const valorAlocadoDashboard = rubricasDashboard.reduce((total, rubrica) => total + rubrica.alocado, 0);
+  const valorUtilizadoDashboard = rubricasDashboard.reduce((total, rubrica) => total + rubrica.utilizado, 0);
+  const saldoDisponivelDashboard = rubricasDashboard.reduce((total, rubrica) => total + rubrica.saldo, 0);
   const orcamentoRubricaSelecionada = orcamentosRubricasDiarias[tipoViagemAtual.codigo] ?? 0;
   const totalComprometidoRubricaSelecionada = solicitacoesDiaria
     .filter(
@@ -559,13 +737,15 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
   const saldoDisponivelDiarias = Math.max(0, orcamentoRubricaSelecionada - totalComprometidoRubricaSelecionada);
   const saldoAposSolicitacao = saldoDisponivelDiarias - valorTotalCalculado;
   const solicitacaoExcedeSaldo = valorTotalCalculado > saldoDisponivelDiarias;
-  const solicitacaoBloqueada = solicitacaoExcedeSaldo || calculoDiaria.bloqueado;
+  const solicitacaoBloqueada = diariaFormIncompleto || solicitacaoExcedeSaldo || calculoDiaria.bloqueado;
   const mensagemSolicitacaoDiaria = calculoDiaria.bloqueado
     ? calculoDiaria.motivoBloqueio
+    : diariaFormIncompleto
+    ? 'Preencha os campos obrigatórios para calcular e solicitar a diária.'
     : solicitacaoExcedeSaldo
     ? `Saldo insuficiente na rubrica ${tipoViagemAtual.rubrica}. Faltam ${currency.format(Math.abs(saldoAposSolicitacao))} para esta solicitação.`
     : `Após esta solicitação, o saldo estimado da rubrica ${tipoViagemAtual.rubrica} será ${currency.format(saldoAposSolicitacao)}.`;
-  const beneficiarioLogado = accessType === 'coordenador' ? coordenadorAtual : bolsistaAtual;
+  const beneficiarioLogado = accessType === 'coordenador' ? bolsistaMinhasDiarias : bolsistaAtual;
   const minhasDiarias = solicitacoesDiaria.filter((solicitacao) => solicitacao.bolsistaNome === beneficiarioLogado);
   const minhasDiariasFiltradas = useMemo(() => {
     const query = minhasDiariasSearch.trim().toLowerCase();
@@ -576,16 +756,15 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
       const matchesSearch =
         !query ||
         solicitacao.id.toLowerCase().includes(query) ||
+        solicitacao.origem.toLowerCase().includes(query) ||
         solicitacao.destino.toLowerCase().includes(query) ||
         solicitacao.motivo.toLowerCase().includes(query);
-      const matchesFilter =
-        minhasDiariasFilter === 'TODAS' ||
-        (minhasDiariasFilter === 'NOVAS' && statusPendenteAceite(solicitacao)) ||
-        (minhasDiariasFilter === 'HISTORICO' && !statusPendenteAceite(solicitacao));
+      const matchesStatus = minhasDiariasStatusFilter === 'TODOS' || solicitacao.status === minhasDiariasStatusFilter;
+      const matchesTipoViagem = minhasDiariasTipoViagemFilter === 'TODOS' || solicitacao.tipoViagem === minhasDiariasTipoViagemFilter;
 
-      return matchesSearch && matchesFilter;
+      return matchesSearch && matchesStatus && matchesTipoViagem;
     });
-  }, [beneficiarioLogado, minhasDiariasFilter, minhasDiariasSearch, solicitacoesDiaria]);
+  }, [beneficiarioLogado, minhasDiariasSearch, minhasDiariasStatusFilter, minhasDiariasTipoViagemFilter, solicitacoesDiaria]);
   const bolsistasEncontrados = useMemo(() => {
     const query = bolsistaSearch.trim().toLowerCase();
 
@@ -600,11 +779,102 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
   };
 
   const removerBolsista = (nome: string) => {
-    setSelectedBolsistas((current) => (current.length === 1 ? current : current.filter((item) => item !== nome)));
+    setSelectedBolsistas((current) => current.filter((item) => item !== nome));
   };
 
-  const alterarTipoViagem = (tipoViagem: TipoViagemCodigo) => {
+  const limparFormularioDiaria = () => {
+    setSelectedBolsistas([]);
+    setBolsistaSearch('');
+    setPartida('');
+    setChegada('');
+    setTipoViagemSelecionado('');
+    setOrigem('');
+    setDestino('');
+    setTransporteCusteadoOutraEntidade(false);
+    setHospedagemCusteadaOutraEntidade(false);
+    setAlimentacaoCusteadaOutraEntidade(false);
+    setMotivo('');
+    setJustificativaCancelamento('');
+    setSolicitacaoDetalheId(null);
+    setSolicitacaoDetalheOrigem('solicitadas');
+    setMostrarMotivoCancelamento(false);
+    setMostrarJustificativaRecusa(false);
+    setJustificativaRecusa('');
+  };
+
+  const abrirNovaSolicitacaoDiaria = () => {
+    limparFormularioDiaria();
+    setActiveDiariaTab('nova');
+  };
+
+  const abrirDetalheSolicitacaoDiaria = (solicitacao: DiariaRequest, origemDetalhe: 'solicitadas' | 'minhas' = 'solicitadas') => {
+    setSolicitacaoDetalheId(solicitacao.id);
+    setSolicitacaoDetalheOrigem(origemDetalhe);
+    setSelectedBolsistas([solicitacao.bolsistaNome]);
+    setBolsistaSearch('');
+    setPartida(solicitacao.partida);
+    setChegada(solicitacao.chegada);
+    setTipoViagemSelecionado(solicitacao.tipoViagem);
+    setOrigem(solicitacao.origem);
+    setDestino(solicitacao.destino);
+    setTransporteCusteadoOutraEntidade(solicitacao.transporteCusteadoOutraEntidade);
+    setHospedagemCusteadaOutraEntidade(solicitacao.hospedagemCusteadaOutraEntidade);
+    setAlimentacaoCusteadaOutraEntidade(solicitacao.alimentacaoCusteadaOutraEntidade);
+    setMotivo(solicitacao.motivo);
+    setJustificativaCancelamento(solicitacao.justificativaCancelamento ?? '');
+    setJustificativaRecusa(solicitacao.justificativaRecusa ?? '');
+    setMostrarMotivoCancelamento(false);
+    setMostrarJustificativaRecusa(false);
+    setActiveDiariaTab('nova');
+  };
+
+  const cancelarSolicitacaoDetalhe = () => {
+    if (!solicitacaoDetalheId || !justificativaCancelamento.trim()) return;
+
+    setSolicitacoesDiaria((current) =>
+      current.map((solicitacao) =>
+        solicitacao.id === solicitacaoDetalheId
+          ? {
+              ...solicitacao,
+              status: 'CANCELADA',
+              estadoAceite: 'CANCELADO',
+              transacaoReversaoRef: solicitacao.transacaoReversaoRef ?? 'TR-2026-046',
+              justificativaCancelamento,
+            }
+          : solicitacao,
+      ),
+    );
+    setActiveDiariaTab('solicitadas');
+    setSolicitacaoDetalheId(null);
+    setMostrarMotivoCancelamento(false);
+    setJustificativaCancelamento('');
+  };
+
+  const recusarSolicitacaoDetalhe = () => {
+    if (!solicitacaoDetalheId || !justificativaRecusa.trim()) return;
+
+    setSolicitacoesDiaria((current) =>
+      current.map((solicitacao) =>
+        solicitacao.id === solicitacaoDetalheId
+          ? {
+              ...solicitacao,
+              status: 'RECUSADA',
+              estadoAceite: 'RECUSADO',
+              justificativaRecusa,
+              transacaoReversaoRef: solicitacao.transacaoReversaoRef ?? 'TR-2026-047',
+            }
+          : solicitacao,
+      ),
+    );
+    setActiveDiariaTab('minhas');
+    setSolicitacaoDetalheId(null);
+    setMostrarJustificativaRecusa(false);
+    setJustificativaRecusa('');
+  };
+
+  const alterarTipoViagem = (tipoViagem: TipoViagemCodigo | '') => {
     setTipoViagemSelecionado(tipoViagem);
+    if (!tipoViagem) return;
 
     const destinoCompativel = destinosDiaria.find((item) => item.value === destino && item.tipoViagem === tipoViagem);
     if (!destinoCompativel) {
@@ -621,7 +891,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
   };
 
   const criarSolicitacaoDiaria = () => {
-    if (!quantidadeCalculada || !origem.trim() || !destino.trim() || !motivo.trim() || solicitacaoExcedeSaldo || calculoDiaria.bloqueado) return;
+    if (diariaFormIncompleto || !quantidadeCalculada || solicitacaoExcedeSaldo || calculoDiaria.bloqueado) return;
 
     const novasSolicitacoes = selectedBolsistas.flatMap((nome, index) => {
       const alocacao = alocacoesDoProjeto.find((item) => item.nome === nome);
@@ -667,6 +937,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
     });
 
     setSolicitacoesDiaria((current) => [...novasSolicitacoes, ...current]);
+    limparFormularioDiaria();
     setActiveDiariaTab('solicitadas');
   };
 
@@ -705,6 +976,10 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
       ),
     );
     setResumoAceiteId(null);
+    if (solicitacaoDetalheId === id) {
+      setActiveDiariaTab('minhas');
+      setSolicitacaoDetalheId(null);
+    }
   };
 
   const recusarDiaria = (id: string) => {
@@ -728,101 +1003,16 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
   };
 
   const renderMinhasDiarias = () => (
-    <>
-      {(() => {
-        const diariaEmResumo = minhasDiarias.find((solicitacao) => solicitacao.id === resumoAceiteId);
-
-        if (!diariaEmResumo) return null;
-
-        return (
-          <section
-            className="p-5 mb-5"
-            style={{
-              backgroundColor: 'color-mix(in srgb, var(--primary) 3%, transparent)',
-              border: '1px solid color-mix(in srgb, var(--primary) 14%, transparent)',
-              borderLeft: '3px solid var(--primary)',
-              borderRadius: 'var(--radius)',
-            }}
-          >
-            <div className="flex items-start gap-3 mb-5">
-              <ReceiptText size={20} style={{ color: 'var(--primary)', marginTop: '2px' }} />
-              <div>
-                <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', margin: '0 0 0.35rem' }}>
-                  Resumo para aceite
-                </h2>
-                <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', margin: 0 }}>
-                  Confirme os dados da viagem antes de registrar o aceite da diária.
-                </p>
-              </div>
-            </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-5" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-              {[
-                { label: 'Solicitação', value: diariaEmResumo.id },
-                { label: 'Origem', value: diariaEmResumo.origem },
-                { label: 'Destino', value: diariaEmResumo.destino },
-                { label: 'Distância', value: formatarDistanciaDiaria(diariaEmResumo) },
-                { label: 'Partida', value: new Date(diariaEmResumo.partida).toLocaleString('pt-BR') },
-                { label: 'Chegada', value: new Date(diariaEmResumo.chegada).toLocaleString('pt-BR') },
-                { label: 'Diárias', value: diariaEmResumo.quantidade.toLocaleString('pt-BR') },
-                { label: 'Valor unitário', value: currency.format(diariaEmResumo.valorUnitario) },
-                { label: 'Valor total', value: currency.format(diariaEmResumo.valorTotal) },
-                { label: 'Cadastro/Parâmetro', value: `${diariaEmResumo.tipoDiariaRef} · ${diariaEmResumo.parametroCalculoDiariaRef}` },
-              ].map((item) => (
-                <div key={item.label}>
-                  <span style={{ color: 'var(--muted-foreground)' }}>{item.label}</span>
-                  <strong className="block mt-1">{item.value}</strong>
-                </div>
-              ))}
-            </div>
-
-            <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', lineHeight: '1.7', margin: '0 0 1rem' }}>
-              Ao confirmar, declaro ciencia da viagem e aceito receber a diaria na conta bancaria cadastrada.
-            </p>
-
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => aceitarDiaria(diariaEmResumo.id)}
-                className="px-4 py-2 flex items-center gap-2"
-                style={{
-                  backgroundColor: 'var(--primary)',
-                  color: 'var(--primary-foreground)',
-                  border: 'none',
-                  borderRadius: 'var(--radius)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-medium)',
-                }}
-              >
-                <CheckCheck size={16} />
-                Confirmar aceite
-              </button>
-              <button
-                onClick={() => setResumoAceiteId(null)}
-                className="px-4 py-2"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: 'var(--muted-foreground)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius)',
-                  fontSize: 'var(--text-sm)',
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-          </section>
-        );
-      })()}
-
-      <section>
-        <div className="flex flex-col lg:flex-row gap-3 mb-4">
-          <div className="relative flex-1">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--muted-foreground)' }} />
+    <section>
+      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_240px_240px] gap-3 mb-4">
+        <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+          Pesquisar
+          <div className="relative mt-2">
             <input
               value={minhasDiariasSearch}
               onChange={(event) => setMinhasDiariasSearch(event.target.value)}
-              placeholder="Buscar por código, destino ou motivo"
-              className="w-full pl-10 pr-3 py-2"
+              placeholder="Buscar"
+              className="w-full pl-3 pr-10 py-2"
               style={{
                 backgroundColor: 'var(--background)',
                 border: '1px solid var(--border)',
@@ -831,156 +1021,265 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                 fontSize: 'var(--text-sm)',
               }}
             />
+            <Search size={18} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--muted-foreground)' }} />
           </div>
-          <select
-            value={minhasDiariasFilter}
-            onChange={(event) => setMinhasDiariasFilter(event.target.value as 'TODAS' | 'NOVAS' | 'HISTORICO')}
-            className="px-3 py-2"
-            style={{
-              backgroundColor: 'var(--background)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius)',
-              color: 'var(--foreground)',
-              fontSize: 'var(--text-sm)',
-            }}
-          >
-            <option value="TODAS">Todas as diárias</option>
-            <option value="NOVAS">Novas para aceite</option>
-            <option value="HISTORICO">Histórico</option>
-          </select>
+        </label>
+        <div>
+          <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+            Tipo de Viagem
+          </label>
+          <div className="mt-2">
+            <Dropdown
+              value={minhasDiariasTipoViagemFilter}
+              onChange={(value) => setMinhasDiariasTipoViagemFilter(value as TipoViagemCodigo | 'TODOS')}
+              options={[
+                { value: 'TODOS', label: 'Todos' },
+                { value: 'DENTRO_ESTADO', label: 'Dentro do Estado' },
+                { value: 'FORA_ESTADO', label: 'Nacional' },
+                { value: 'INTERNACIONAL', label: 'Internacional' },
+              ]}
+            />
+          </div>
         </div>
+        <div>
+          <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+            Status
+          </label>
+          <div className="mt-2">
+            <Dropdown
+              value={minhasDiariasStatusFilter}
+              onChange={(value) => setMinhasDiariasStatusFilter(value as StatusDiaria | 'TODOS')}
+              options={[
+                { value: 'TODOS', label: 'Todos' },
+                { value: 'RASCUNHO', label: 'Rascunho' },
+                { value: 'ALOCADA', label: 'Aguardando Bolsista' },
+                { value: 'APROVADA', label: 'Aprovada' },
+                { value: 'RECUSADA', label: 'Recusada' },
+                { value: 'CANCELADA', label: 'Cancelada' },
+              ]}
+            />
+          </div>
+        </div>
+      </div>
 
-        <div className="space-y-3">
-        {minhasDiariasFiltradas.map((solicitacao) => {
-        const jaRespondida = diariasAceitas.includes(solicitacao.id) || !statusPendenteAceite(solicitacao);
-
-        return (
-          <article
+      <div className="space-y-3">
+        {minhasDiariasFiltradas.map((solicitacao) => (
+          <button
             key={solicitacao.id}
-            className="p-5"
+            type="button"
+            onClick={() => abrirDetalheSolicitacaoDiaria(solicitacao, 'minhas')}
+            className="w-full p-5 text-left transition-colors"
             style={{
-              backgroundColor: 'var(--background)',
+              backgroundColor: 'var(--card)',
               border: '1px solid var(--border)',
               borderRadius: 'var(--radius)',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+            onMouseEnter={(event) => {
+              event.currentTarget.style.backgroundColor = 'var(--muted)';
+            }}
+            onMouseLeave={(event) => {
+              event.currentTarget.style.backgroundColor = 'var(--card)';
             }}
           >
-            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-4">
-              <div>
-                <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{solicitacao.id}</strong>
+            <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto] gap-4 items-center">
+              <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
+                {[
+                  { label: 'Bolsista', value: solicitacao.bolsistaNome },
+                  { label: 'Diária', value: solicitacao.quantidade.toLocaleString('pt-BR') },
+                  { label: 'Valor Total', value: currency.format(solicitacao.valorTotal) },
+                  { label: 'Origem', value: solicitacao.origem },
+                  { label: 'Destino', value: solicitacao.destino },
+                ].map((item) => (
+                  <div key={item.label} className="min-w-0">
+                    <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                      {item.label}
+                    </div>
+                    <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: item.label === 'Valor Total' ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', overflowWrap: 'anywhere' }}>
+                      {item.value}
+                    </div>
+                  </div>
+                ))}
+                <div>
+                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                    Status
+                  </div>
                   <span
-                    className="px-2 py-1"
+                    className="inline-flex items-center px-2.5 py-1"
                     style={{
-                      borderRadius: '999px',
                       backgroundColor:
-                        solicitacao.status === 'CANCELADA' || solicitacao.status === 'RECUSADA'
+                        solicitacao.status === 'APROVADA'
+                          ? 'rgba(34, 197, 94, 0.12)'
+                          : solicitacao.status === 'RECUSADA'
+                          ? 'rgba(249, 115, 22, 0.14)'
+                          : solicitacao.status === 'CANCELADA'
                           ? 'rgba(239, 68, 68, 0.12)'
                           : 'color-mix(in srgb, var(--primary) 12%, transparent)',
                       color:
-                        solicitacao.status === 'CANCELADA' || solicitacao.status === 'RECUSADA'
+                        solicitacao.status === 'APROVADA'
+                          ? '#22c55e'
+                          : solicitacao.status === 'RECUSADA'
+                          ? '#f97316'
+                          : solicitacao.status === 'CANCELADA'
                           ? '#dc2626'
                           : 'var(--primary)',
+                      border: `1px solid ${
+                        solicitacao.status === 'APROVADA'
+                          ? 'rgba(34, 197, 94, 0.3)'
+                          : solicitacao.status === 'RECUSADA'
+                          ? 'rgba(249, 115, 22, 0.35)'
+                          : solicitacao.status === 'CANCELADA'
+                          ? 'rgba(239, 68, 68, 0.3)'
+                          : 'color-mix(in srgb, var(--primary) 28%, transparent)'
+                      }`,
+                      borderRadius: '9999px',
                       fontSize: 'var(--text-xs)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     {statusLabel(solicitacao.status)}
                   </span>
                 </div>
-                <p style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', margin: '0 0 0.35rem' }}>
-                  {solicitacao.origem} → {solicitacao.destino}
-                </p>
-                <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', margin: 0 }}>
-                  {solicitacao.motivo}
-                </p>
               </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-4" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                <div>
-                  <span style={{ color: 'var(--muted-foreground)' }}>Partida</span>
-                  <strong className="block mt-1">{new Date(solicitacao.partida).toLocaleString('pt-BR')}</strong>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--muted-foreground)' }}>Chegada</span>
-                  <strong className="block mt-1">{new Date(solicitacao.chegada).toLocaleString('pt-BR')}</strong>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--muted-foreground)' }}>Diárias</span>
-                  <strong className="block mt-1">{solicitacao.quantidade.toLocaleString('pt-BR')}</strong>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--muted-foreground)' }}>Distância</span>
-                  <strong className="block mt-1">{formatarDistanciaDiaria(solicitacao)}</strong>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--muted-foreground)' }}>Valor</span>
-                  <strong className="block mt-1">{currency.format(solicitacao.valorTotal)}</strong>
-                </div>
-              </div>
+              <ChevronRight size={20} style={{ color: 'var(--muted-foreground)' }} />
             </div>
+          </button>
+        ))}
+        {minhasDiariasFiltradas.length === 0 && (
+          <div
+            className="p-5"
+            style={{
+              backgroundColor: 'var(--background)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              color: 'var(--muted-foreground)',
+              fontSize: 'var(--text-sm)',
+            }}
+          >
+            Nenhuma diária encontrada para os filtros selecionados.
+          </div>
+        )}
+      </div>
+    </section>
+  );
 
-            {jaRespondida ? (
-              <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', margin: '0.9rem 0 0' }}>
-                {solicitacao.status === 'RECUSADA'
-                    ? `Viagem recusada. Justificativa: ${solicitacao.justificativaRecusa}`
-                    : 'Termo aceito ou diária já processada.'}
-              </p>
-            ) : recusandoId === solicitacao.id ? (
-              <div className="mt-4">
-                <textarea
-                  value={justificativaRecusa}
-                  onChange={(event) => setJustificativaRecusa(event.target.value)}
-                  rows={2}
-                  placeholder="Justificativa da recusa"
-                  className="w-full px-3 py-2 mb-2"
-                  style={{
-                    backgroundColor: 'var(--background)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius)',
-                    color: 'var(--foreground)',
-                    fontSize: 'var(--text-sm)',
-                  }}
-                />
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => recusarDiaria(solicitacao.id)}
-                    className="px-3 py-2"
-                    style={{
-                      backgroundColor: 'var(--primary)',
-                      color: 'var(--primary-foreground)',
-                      border: 'none',
-                      borderRadius: 'var(--radius)',
-                      fontSize: 'var(--text-sm)',
-                    }}
-                  >
-                    Confirmar recusa
-                  </button>
-                  <button
-                    onClick={() => {
-                      setRecusandoId(null);
-                      setJustificativaRecusa('');
-                    }}
-                    className="px-3 py-2"
-                    style={{
-                      backgroundColor: 'transparent',
-                      color: 'var(--muted-foreground)',
-                      border: '1px solid var(--border)',
-                      borderRadius: 'var(--radius)',
-                      fontSize: 'var(--text-sm)',
-                    }}
-                  >
-                    Cancelar
-                  </button>
-                </div>
+  const isNovaSolicitacaoDiaria = activeFlow === 'diarias' && activeDiariaTab === 'nova';
+  const solicitacaoDetalhe = solicitacaoDetalheId
+    ? solicitacoesDiaria.find((solicitacao) => solicitacao.id === solicitacaoDetalheId)
+    : null;
+  const temDiariaPendenteBolsista = solicitacoesDiaria.some((solicitacao) => solicitacao.bolsistaNome === bolsistaAtual && statusPendenteAceite(solicitacao));
+
+  const renderDetalhesBolsistaDiaria = () => {
+    if (!solicitacaoDetalhe) return null;
+
+    return (
+      <section className="mb-8">
+        <div
+          className="p-5"
+          style={{
+            backgroundColor: 'var(--card)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius)',
+          }}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+            {[
+              { label: 'Bolsista', value: solicitacaoDetalhe.bolsistaNome },
+              { label: 'Tipo de Viagem', value: tiposViagem.find((tipo) => tipo.codigo === solicitacaoDetalhe.tipoViagem)?.nome ?? '-' },
+              { label: 'Diária', value: solicitacaoDetalhe.quantidade.toLocaleString('pt-BR') },
+              { label: 'Valor', value: currency.format(solicitacaoDetalhe.valorTotal) },
+              { label: 'Origem', value: solicitacaoDetalhe.origem },
+              { label: 'Destino', value: solicitacaoDetalhe.destino },
+              { label: 'Partida', value: new Date(solicitacaoDetalhe.partida).toLocaleString('pt-BR') },
+              { label: 'Chegada', value: new Date(solicitacaoDetalhe.chegada).toLocaleString('pt-BR') },
+              { label: 'Distância', value: formatarDistanciaDiaria(solicitacaoDetalhe) },
+              { label: 'Status', value: statusLabel(solicitacaoDetalhe.status) },
+              { label: 'Motivo', value: solicitacaoDetalhe.motivo },
+            ].map((item) => (
+              <div key={item.label} className="min-w-0">
+                <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                  {item.label}
+                </span>
+                <strong style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', overflowWrap: 'anywhere' }}>
+                  {item.value}
+                </strong>
               </div>
+            ))}
+          </div>
+        </div>
+
+        {mostrarJustificativaRecusa && (
+          <div
+            className="mt-6 p-5"
+            style={{
+              backgroundColor: 'var(--card)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+            }}
+          >
+            <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+              Justificativa da Recusa
+              <textarea
+                value={justificativaRecusa}
+                onChange={(event) => setJustificativaRecusa(event.target.value)}
+                rows={3}
+                className="mt-2 w-full px-3 py-2"
+                style={{
+                  backgroundColor: 'transparent',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                  color: 'var(--foreground)',
+                  fontSize: 'var(--text-sm)',
+                  resize: 'vertical',
+                }}
+              />
+            </label>
+          </div>
+        )}
+
+        {solicitacaoDetalhe.status === 'ALOCADA' && (
+          <div className="mt-6 flex flex-col sm:flex-row justify-end gap-3">
+            {mostrarJustificativaRecusa ? (
+              <button
+                type="button"
+                onClick={recusarSolicitacaoDetalhe}
+                disabled={!justificativaRecusa.trim()}
+                className="px-4 py-2 transition-colors"
+                style={{
+                  backgroundColor: justificativaRecusa.trim() ? 'var(--primary)' : 'var(--muted)',
+                  color: justificativaRecusa.trim() ? 'var(--primary-foreground)' : 'var(--muted-foreground)',
+                  border: 'none',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: justificativaRecusa.trim() ? 'pointer' : 'not-allowed',
+                }}
+              >
+                Confirmar Recusa
+              </button>
             ) : (
-              <div className="mt-4 flex flex-wrap gap-2">
+              <>
                 <button
-                  onClick={() => {
-                    setResumoAceiteId(solicitacao.id);
-                    setRecusandoId(null);
-                    setJustificativaRecusa('');
+                  type="button"
+                  onClick={() => setMostrarJustificativaRecusa(true)}
+                  className="px-4 py-2"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: 'var(--primary)',
+                    border: '1px solid var(--primary)',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
                   }}
-                  className="px-4 py-2 flex items-center gap-2"
+                >
+                  Recusar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => aceitarDiaria(solicitacaoDetalhe.id)}
+                  className="px-4 py-2"
                   style={{
                     backgroundColor: 'var(--primary)',
                     color: 'var(--primary-foreground)',
@@ -990,51 +1289,20 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                     fontWeight: 'var(--font-weight-medium)',
                   }}
                 >
-                  <CheckCircle size={16} />
-                  Aceitar viagem
+                  Aceitar
                 </button>
-                <button
-                  onClick={() => setRecusandoId(solicitacao.id)}
-                  className="px-4 py-2 flex items-center gap-2"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: 'var(--foreground)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-weight-medium)',
-                  }}
-                >
-                  <X size={16} />
-                  Recusar viagem
-                </button>
-              </div>
+              </>
             )}
-          </article>
-        );
-        })}
-          {minhasDiariasFiltradas.length === 0 && (
-            <div
-              className="p-5"
-              style={{
-                backgroundColor: 'var(--background)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius)',
-                color: 'var(--muted-foreground)',
-                fontSize: 'var(--text-sm)',
-              }}
-            >
-              Nenhuma diária encontrada para os filtros selecionados.
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </section>
-    </>
-  );
+    );
+  };
 
   if (accessType === 'bolsista') {
     return (
       <div className="w-full px-4 md:px-8 py-8">
+        {!(activeFlow === 'diarias' && activeDiariaTab !== 'nova') && (
         <Breadcrumb className="mb-5">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -1063,12 +1331,21 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
               <>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Minhas Diárias</BreadcrumbPage>
+                  <BreadcrumbPage>{activeDiariaTab === 'nova' ? 'Diária' : 'Minhas Diárias'}</BreadcrumbPage>
                 </BreadcrumbItem>
+                {activeDiariaTab === 'nova' && (
+                  <>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>Detalhes</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </>
+                )}
               </>
             )}
           </BreadcrumbList>
         </Breadcrumb>
+        )}
 
         <div className="flex items-center gap-3 mb-2">
           <div
@@ -1079,10 +1356,10 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
               backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
             }}
           >
-            {activeFlow === 'diarias' ? <PlaneTakeoff size={20} /> : <ClipboardList size={20} />}
+            {activeFlow === 'diarias' ? <Hotel size={20} /> : <ClipboardList size={20} />}
           </div>
           <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
-            {activeFlow === 'diarias' ? 'Minhas Diárias' : 'Solicitações'}
+            {activeFlow === 'diarias' ? (activeDiariaTab === 'nova' ? 'Detalhes da Solicitação' : 'Minhas Diárias') : 'Solicitações'}
           </h1>
         </div>
 
@@ -1096,12 +1373,17 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
           }}
         >
           {activeFlow === 'diarias'
-            ? 'Visualize suas viagens e aceite ou recuse o termo de diária quando houver solicitação pendente.'
+            ? activeDiariaTab === 'nova'
+              ? 'Confira as informações da solicitação da Diária.'
+              : 'Visualize suas viagens e aceite ou recuse o termo de diária quando houver solicitação pendente.'
             : 'Acesse documentos, informes e suas solicitações vinculadas ao projeto.'}
         </p>
 
         {activeFlow === 'diarias' ? (
-          renderMinhasDiarias()
+          <>
+            <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '1rem' }} />
+            {activeDiariaTab === 'nova' ? renderDetalhesBolsistaDiaria() : renderMinhasDiarias()}
+          </>
         ) : (
           <>
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
@@ -1151,9 +1433,27 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                   width: '100%',
                 }}
               >
-                <h3 style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--text-sm)', margin: '0 0 1rem 0' }}>
-                  Minhas Diárias
-                </h3>
+                <div className="flex items-start justify-between gap-3" style={{ marginBottom: '1rem' }}>
+                  <h3 style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--text-sm)', margin: 0 }}>
+                    Minhas Diárias
+                  </h3>
+                  {temDiariaPendenteBolsista && (
+                    <span
+                      className="px-2 py-1"
+                      style={{
+                        backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
+                        color: 'var(--primary)',
+                        border: '1px solid color-mix(in srgb, var(--primary) 28%, transparent)',
+                        borderRadius: '9999px',
+                        fontSize: 'var(--text-xs)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      Pendente
+                    </span>
+                  )}
+                </div>
                 <p style={{ color: 'var(--muted-foreground)', fontWeight: 'var(--font-weight-normal)', fontSize: 'var(--text-sm)', lineHeight: '1.7', margin: 0 }}>
                   Visualize suas viagens e aceite ou recuse o termo de diária quando houver solicitação pendente.
                 </p>
@@ -1222,10 +1522,10 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
 
   return (
     <div className="w-full px-4 md:px-8 py-8">
-      <Breadcrumb className="mb-5">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            {activeFlow === 'diarias' ? (
+      {isNovaSolicitacaoDiaria && (
+        <Breadcrumb className="mb-5">
+          <BreadcrumbList>
+            <BreadcrumbItem>
               <BreadcrumbLink asChild>
                 <button
                   type="button"
@@ -1242,195 +1542,151 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                   Solicitações
                 </button>
               </BreadcrumbLink>
-            ) : (
-              <BreadcrumbPage>Solicitações</BreadcrumbPage>
-            )}
-          </BreadcrumbItem>
-          {activeFlow === 'diarias' && (
-            <>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Diárias</BreadcrumbPage>
-              </BreadcrumbItem>
-            </>
-          )}
-        </BreadcrumbList>
-      </Breadcrumb>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <button
+                  type="button"
+                  onClick={() => setActiveDiariaTab('solicitadas')}
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    color: 'var(--muted-foreground)',
+                    cursor: 'pointer',
+                    fontSize: 'var(--text-sm)',
+                    padding: 0,
+                  }}
+                >
+                  Diária
+                </button>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{solicitacaoDetalheId ? 'Detalhes' : 'Nova Solicitação'}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      )}
 
-      <div className="flex items-center gap-3 mb-2">
-        <div
-          className="p-2 transition-colors"
-          style={{
-            color: 'var(--primary)',
-            borderRadius: 'var(--radius)',
-            backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
-          }}
-        >
-          {activeFlow === 'diarias' ? <PlaneTakeoff size={20} /> : <ClipboardList size={20} />}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-2">
+        <div className="flex items-center gap-3">
+          <div
+            className="p-2 transition-colors"
+            style={{
+              color: 'var(--primary)',
+              borderRadius: 'var(--radius)',
+              backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
+            }}
+          >
+            {activeFlow === 'diarias' ? <Hotel size={20} /> : <ClipboardList size={20} />}
+          </div>
+          <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
+            {isNovaSolicitacaoDiaria ? (solicitacaoDetalheId ? 'Detalhes da Solicitação' : 'Nova Solicitação') : activeFlow === 'diarias' ? 'Diária' : 'Solicitações'}
+          </h1>
         </div>
-        <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
-          {activeFlow === 'diarias' ? 'Painel de Diárias' : 'Solicitações'}
-        </h1>
+        {activeFlow === 'diarias' && !isNovaSolicitacaoDiaria && (
+          <button
+            onClick={abrirNovaSolicitacaoDiaria}
+            className="px-4 py-2 flex items-center justify-center gap-2 self-start md:self-auto"
+            style={{
+              backgroundColor: 'var(--primary)',
+              color: 'var(--primary-foreground)',
+              border: 'none',
+              borderRadius: 'var(--radius)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <Plus size={16} />
+            Nova Solicitação
+          </button>
+        )}
       </div>
 
       <p
-        className="mb-8"
         style={{
           color: 'var(--muted-foreground)',
           fontSize: 'var(--text-sm)',
           fontWeight: 'var(--font-weight-normal)',
-          marginLeft: 'calc(32px + 0.75rem)',
+          margin: '0 0 1.5rem calc(32px + 0.75rem)',
         }}
       >
-        {activeFlow === 'diarias'
+        {isNovaSolicitacaoDiaria
+          ? solicitacaoDetalheId
+            ? 'Confira as informações da solicitação da Diária.'
+            : 'Preencha as informações abaixo para solicitar uma nova Diária.'
+          : activeFlow === 'diarias'
           ? 'Controle solicitações, aceites e remoções de diárias da iniciativa.'
           : 'Solicite diárias, acompanhe aceites e emita documentos da iniciativa.'}
       </p>
+      {isNovaSolicitacaoDiaria && (
+        <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '1rem' }} />
+      )}
 
       {activeFlow === 'diarias' ? (
         <>
-          <section
-            className="mb-6 p-5"
-            style={{
-              backgroundColor: 'color-mix(in srgb, var(--primary) 3%, transparent)',
-              borderTop: '1px solid color-mix(in srgb, var(--primary) 10%, transparent)',
-              borderRight: '1px solid color-mix(in srgb, var(--primary) 10%, transparent)',
-              borderBottom: '1px solid color-mix(in srgb, var(--primary) 10%, transparent)',
-              borderLeft: '3px solid var(--primary)',
-              borderRadius: 'var(--radius)',
-            }}
-          >
-            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
-              <div className="flex items-start gap-3">
-                <div
-                  className="p-2"
-                  style={{
-                    color: 'var(--primary)',
-                    borderRadius: 'var(--radius)',
-                    backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
-                  }}
-                >
-                  <PlaneTakeoff size={20} />
-                </div>
-                <div>
-                  <h2
-                    style={{
-                      color: 'var(--foreground)',
-                      fontSize: 'var(--text-base)',
-                      fontWeight: 'var(--font-weight-semibold)',
-                      margin: '0 0 0.35rem',
-                    }}
-                  >
-                    Painel de controle
-                  </h2>
-                  <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', lineHeight: '1.6', margin: 0 }}>
-                    O coordenador solicita diárias quando há saldo na rubrica, acompanha os termos de aceite dos bolsistas e visualiza as transações.
-                  </p>
-                </div>
-              </div>
+          {!isNovaSolicitacaoDiaria && (
+            <>
+              <div style={{ height: '1px', backgroundColor: 'var(--border)', marginBottom: '2rem' }} />
 
-              <button
-                onClick={() => setActiveDiariaTab('nova')}
-                className="px-4 py-2 flex items-center justify-center gap-2"
-                style={{
-                  backgroundColor: 'var(--primary)',
-                  color: 'var(--primary-foreground)',
-                  border: 'none',
-                  borderRadius: 'var(--radius)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <Plus size={16} />
-                Nova solicitação
-              </button>
-            </div>
+              <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+                {[
+                  { label: 'Valor Total Disponível', value: currency.format(totalDisponivelDashboard), icon: Banknote, tint: 'var(--primary)' },
+                  { label: 'Valor Alocado', value: currency.format(valorAlocadoDashboard), icon: Coins, tint: '#f59e0b' },
+                  { label: 'Valor Utilizado', value: currency.format(valorUtilizadoDashboard), icon: CircleDollarSign, tint: '#22c55e' },
+                  { label: 'Saldo Disponível', value: currency.format(saldoDisponivelDashboard), icon: PiggyBank, tint: '#38bdf8' },
+                ].map((card) => {
+                  const Icon = card.icon;
 
-            <div
-              className="mt-5 overflow-x-auto"
-              style={{
-                backgroundColor: 'var(--background)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius)',
-              }}
-            >
-              <table
-                style={{
-                  width: '100%',
-                  minWidth: '920px',
-                  borderCollapse: 'collapse',
-                  color: 'var(--foreground)',
-                  fontSize: 'var(--text-sm)',
-                }}
-              >
-                <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    {['Rubrica', 'Total', 'Alocado', 'Utilizado', 'Saldo', 'Aceites pendentes'].map((header) => (
-                      <th
-                        key={header}
-                        style={{
-                          padding: '0.75rem 0.875rem',
-                          textAlign: header === 'Rubrica' ? 'left' : 'right',
-                          color: 'var(--muted-foreground)',
-                          fontSize: 'var(--text-xs)',
-                          fontWeight: 'var(--font-weight-medium)',
-                        }}
-                      >
-                        {header}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {rubricasDashboard.map((rubrica) => (
-                    <tr key={rubrica.codigo}>
-                      <td style={{ padding: '0.875rem', verticalAlign: 'top', borderBottom: '1px solid var(--border)' }}>
-                        <strong style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                          {rubrica.nome}
-                        </strong>
-                        <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
-                          {rubrica.codigo}
-                        </span>
-                        <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.35rem' }}>
-                          Tipo de viagem: {rubrica.tipoViagem} · {rubrica.diariaVigente}
-                        </span>
-                      </td>
-                      {[
-                        currency.format(rubrica.total),
-                        currency.format(rubrica.alocado),
-                        currency.format(rubrica.utilizado),
-                        currency.format(rubrica.saldo),
-                        String(rubrica.aceitesPendentes),
-                      ].map((value, index) => (
-                        <td
-                          key={`${rubrica.codigo}-${index}`}
+                  return (
+                    <article
+                      key={card.label}
+                      className="p-5"
+                      style={{
+                        minHeight: '116px',
+                        backgroundColor: 'var(--card)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                      }}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div
+                          className="p-2"
                           style={{
-                            padding: '0.875rem',
-                            textAlign: 'right',
-                            verticalAlign: 'top',
-                            borderBottom: '1px solid var(--border)',
-                            fontWeight: 'var(--font-weight-semibold)',
-                            color: index === 3 ? 'var(--primary)' : 'var(--foreground)',
+                            color: card.tint,
+                            borderRadius: 'var(--radius)',
+                            backgroundColor: `color-mix(in srgb, ${card.tint} 18%, transparent)`,
                           }}
                         >
-                          {value}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
+                          <Icon size={18} />
+                        </div>
+                        <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>
+                          {card.label}
+                        </span>
+                      </div>
+                      <strong
+                        className="block mt-5 text-center"
+                        style={{ color: 'var(--foreground)', fontSize: 'var(--text-xl)', fontWeight: 'var(--font-weight-semibold)' }}
+                      >
+                        {card.value}
+                      </strong>
+                    </article>
+                  );
+                })}
+              </section>
+            </>
+          )}
 
+          {!isNovaSolicitacaoDiaria && (
           <div
             className="hidden md:flex gap-1 mb-6"
             style={{ borderBottom: '1px solid var(--border)' }}
           >
             {[
               { key: 'solicitadas' as DiariaTab, label: 'Diárias Solicitadas' },
-              { key: 'nova' as DiariaTab, label: 'Nova Solicitação' },
               { key: 'minhas' as DiariaTab, label: 'Minhas Diárias' },
             ].map((tab) => (
               <button
@@ -1454,683 +1710,730 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
               </button>
             ))}
           </div>
-
-          {activeDiariaTab === 'solicitadas' && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              {[
-                { label: 'Solicitadas', value: String(solicitacoesDiaria.length), color: 'var(--foreground)' },
-                { label: 'Aprovadas', value: String(solicitacoesDiaria.filter((item) => item.status === 'APROVADA').length), color: 'var(--primary)' },
-                { label: 'Comprometido', value: currency.format(totalComprometido), color: 'var(--primary)' },
-              ].map((metric) => (
-                <div
-                  key={metric.label}
-                  style={{
-                    backgroundColor: 'color-mix(in srgb, var(--primary) 5%, transparent)',
-                    border: '1px solid color-mix(in srgb, var(--primary) 15%, transparent)',
-                    borderRadius: 'var(--radius)',
-                    padding: '1rem',
-                  }}
-                >
-                  <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', margin: '0 0 0.5rem' }}>
-                    {metric.label}
-                  </p>
-                  <strong style={{ color: metric.color, fontSize: 'var(--text-lg)' }}>{metric.value}</strong>
-                </div>
-              ))}
-            </div>
           )}
 
           {activeDiariaTab === 'minhas' ? (
             renderMinhasDiarias()
           ) : activeDiariaTab === 'nova' ? (
-      <section className="grid grid-cols-1 gap-6 items-start mb-8">
-        <div
-          className="p-5"
-          style={{
-            backgroundColor: 'color-mix(in srgb, var(--primary) 3%, transparent)',
-            border: '1px solid color-mix(in srgb, var(--primary) 12%, transparent)',
-            borderLeft: '3px solid var(--primary)',
-            borderRadius: 'var(--radius)',
-          }}
-        >
-          <div className="flex items-start justify-between gap-4 mb-5">
-            <div className="flex items-start gap-3">
-              <PlaneTakeoff size={20} style={{ color: 'var(--primary)', marginTop: '2px' }} />
-              <div>
-                <h2
-                  style={{
-                    color: 'var(--foreground)',
-                    fontSize: 'var(--text-base)',
-                    fontWeight: 'var(--font-weight-semibold)',
-                    margin: '0 0 0.35rem',
-                  }}
-                >
-                  Solicitação de Diárias
-                </h2>
-                <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', margin: 0 }}>
-                  Rubrica: {tipoViagemAtual.rubrica} · {currency.format(diariaVigenteAtual.valor)} · fração {diariaVigenteAtual.fracaoCalculo}
-                </p>
-              </div>
-            </div>
-            <WalletCards size={20} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
-          </div>
-
-          {solicitacaoBloqueada && (
-            <div
-              role="alert"
-              className="mb-5 p-3"
-              style={{
-                border: '1px solid color-mix(in srgb, #dc2626 35%, var(--border))',
-                borderRadius: 'var(--radius)',
-                backgroundColor: 'color-mix(in srgb, #dc2626 10%, var(--background))',
-                color: 'var(--foreground)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)',
-              }}
-            >
-              {mensagemSolicitacaoDiaria}
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-              Tipo de viagem
-              <select
-                value={tipoViagemSelecionado}
-                onChange={(event) => alterarTipoViagem(event.target.value as TipoViagemCodigo)}
-                className="mt-2 w-full px-3 py-2"
-                style={{
-                  backgroundColor: 'var(--background)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius)',
-                  color: 'var(--foreground)',
-                  fontSize: 'var(--text-sm)',
-                }}
-              >
-                {tiposViagemComOrcamento.map((tipo) => {
-                  const diaria = diariasVigentes.find((item) => item.tipoViagem === tipo.codigo) ?? diariasVigentes[0];
-
-                  return (
-                    <option key={tipo.codigo} value={tipo.codigo}>
-                      {tipo.nome} · {tipo.rubrica} · {currency.format(diaria.valor)} · {diaria.fracaoCalculo}
-                    </option>
-                  );
-                })}
-              </select>
-            </label>
-            <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-              Partida
-              <div className="mt-2 flex items-center gap-2">
-                <Clock size={16} style={{ color: 'var(--muted-foreground)' }} />
-                <input
-                  type="datetime-local"
-                  value={partida}
-                  onChange={(event) => setPartida(event.target.value)}
-                  className="w-full px-3 py-2"
-                  style={{
-                    backgroundColor: 'var(--background)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius)',
-                    color: 'var(--foreground)',
-                    fontSize: 'var(--text-sm)',
-                  }}
-                />
-              </div>
-            </label>
-
-            <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-              Chegada
-              <div className="mt-2 flex items-center gap-2">
-                <Calendar size={16} style={{ color: 'var(--muted-foreground)' }} />
-                <input
-                  type="datetime-local"
-                  value={chegada}
-                  onChange={(event) => setChegada(event.target.value)}
-                  className="w-full px-3 py-2"
-                  style={{
-                    backgroundColor: 'var(--background)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius)',
-                    color: 'var(--foreground)',
-                    fontSize: 'var(--text-sm)',
-                  }}
-                />
-              </div>
-            </label>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-              Origem
-              <div className="mt-2 flex items-center gap-2">
-                <MapPin size={16} style={{ color: 'var(--muted-foreground)' }} />
-                <select
-                  value={origem}
-                  onChange={(event) => setOrigem(event.target.value)}
-                  className="w-full px-3 py-2"
-                  style={{
-                    backgroundColor: 'var(--background)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius)',
-                    color: 'var(--foreground)',
-                    fontSize: 'var(--text-sm)',
-                  }}
-                >
-                  {origensDiaria.map((localidade) => (
-                    <option key={localidade} value={localidade}>{localidade}</option>
-                  ))}
-                </select>
-              </div>
-            </label>
-
-            <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-              Destino
-              <div className="mt-2 flex items-center gap-2">
-                <MapPin size={16} style={{ color: 'var(--muted-foreground)' }} />
-                <select
-                  value={destino}
-                  onChange={(event) => alterarDestino(event.target.value)}
-                  className="w-full px-3 py-2"
-                  style={{
-                    backgroundColor: 'var(--background)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius)',
-                    color: 'var(--foreground)',
-                    fontSize: 'var(--text-sm)',
-                  }}
-                >
-                  {gruposDestinoDiaria.map((grupo) => {
-                    const destinosDoGrupo = destinosDiaria.filter((item) => item.grupo === grupo);
-                    if (!destinosDoGrupo.length) return null;
-
-                    return (
-                      <optgroup key={grupo} label={grupo}>
-                        {destinosDoGrupo.map((item) => (
-                          <option key={item.value} value={item.value}>{item.label}</option>
-                        ))}
-                      </optgroup>
-                    );
-                  })}
-                </select>
-              </div>
-            </label>
-
-            <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-              Distância calculada
+            <section className="mb-8">
               <div
-                className="mt-2 px-3 py-2"
+                className="p-5"
                 style={{
-                  backgroundColor: 'var(--background)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius)',
-                  color: 'var(--foreground)',
-                  fontSize: 'var(--text-sm)',
-                }}
-              >
-                <strong>{usaDistanciaNoCalculo ? (distanciaKmNumerica ? `${distanciaKmNumerica.toLocaleString('pt-BR')} km` : '-') : 'Não aplicada'}</strong>
-                <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.25rem' }}>
-                  {usaDistanciaNoCalculo
-                    ? (distanciaRodoviaria.origemCalculo === 'TABELA_MEMORIA'
-                        ? 'Calculada por tabela de distâncias em memória.'
-                        : 'Distância origem-destino não encontrada pelo provedor.')
-                    : 'Usada somente para viagens dentro do Estado.'}
-                </span>
-              </div>
-            </label>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-4" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-            {[
-              ...(usaDistanciaNoCalculo
-                ? [
-                    { label: 'Origem/destino em região metropolitana', checked: deslocamentoRegiaoMetropolitana, automatico: true, hint: 'Calculado pela origem e destino' },
-                    { label: 'Município limítrofe sem pernoite', checked: municipioLimitrofe, automatico: true, hint: 'Calculado pela origem e destino' },
-                  ]
-                : []),
-              { label: 'Transporte custeado por outra entidade', checked: transporteCusteadoOutraEntidade, onChange: setTransporteCusteadoOutraEntidade },
-              { label: 'Hospedagem custeada por outra entidade', checked: hospedagemCusteadaOutraEntidade, onChange: setHospedagemCusteadaOutraEntidade },
-              { label: 'Alimentação custeada por outra entidade', checked: alimentacaoCusteadaOutraEntidade, onChange: setAlimentacaoCusteadaOutraEntidade },
-            ].map((item) => (
-              <label
-                key={item.label}
-                className="flex items-center gap-2 px-3 py-2"
-                style={{
-                  backgroundColor: 'var(--background)',
+                  backgroundColor: 'var(--card)',
                   border: '1px solid var(--border)',
                   borderRadius: 'var(--radius)',
                 }}
               >
-                <input
-                  type="checkbox"
-                  checked={item.checked}
-                  disabled={item.automatico}
-                  onChange={(event) => item.onChange?.(event.target.checked)}
-                  style={{ accentColor: 'var(--primary)', cursor: item.automatico ? 'not-allowed' : 'pointer' }}
-                />
-                <span>
-                  {item.label}
-                  {item.automatico && (
-                    <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.15rem' }}>
-                      {item.hint}
-                    </span>
-                  )}
-                </span>
-              </label>
-            ))}
-          </div>
-
-          <label className="block mb-4" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-            Bolsistas do projeto
-            <div className="mt-2">
-              <div className="flex items-center gap-2 mb-2">
-                <Search size={16} style={{ color: 'var(--muted-foreground)' }} />
-                <input
-                  value={bolsistaSearch}
-                  onChange={(event) => setBolsistaSearch(event.target.value)}
-                  placeholder="Buscar coordenador ou bolsista do projeto"
-                  className="w-full px-3 py-2"
-                  style={{
-                    backgroundColor: 'var(--background)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius)',
-                    color: 'var(--foreground)',
-                    fontSize: 'var(--text-sm)',
-                  }}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
-                {bolsistasEncontrados.map((nome) => (
-                  <button
-                    key={nome}
-                    type="button"
-                    onClick={() => adicionarBolsista(nome)}
-                    className="px-3 py-2 flex items-center gap-2 transition-colors"
-                    style={{
-                      border: '1px solid var(--border)',
-                      borderRadius: 'var(--radius)',
-                      backgroundColor: 'var(--background)',
-                      color: 'var(--foreground)',
-                      fontSize: 'var(--text-sm)',
-                      textAlign: 'left',
-                    }}
-                  >
-                    <CheckCircle size={16} style={{ color: 'var(--muted-foreground)' }} />
-                    <span>
-                      {nome}
-                      {nome === coordenadorAtual && (
-                        <span style={{ color: 'var(--muted-foreground)' }}> · Coordenadora</span>
-                      )}
-                    </span>
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {selectedBolsistas.map((nome) => (
+                <div className="flex items-center gap-3 mb-6">
                   <span
-                    key={nome}
-                    className="px-3 py-2 flex items-center gap-2"
+                    className="flex items-center justify-center"
                     style={{
-                      border: '1px solid var(--primary)',
+                      width: '22px',
+                      height: '22px',
                       borderRadius: '999px',
-                      backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
-                      color: 'var(--foreground)',
-                      fontSize: 'var(--text-sm)',
+                      backgroundColor: 'var(--primary)',
+                      color: 'var(--primary-foreground)',
+                      fontSize: 'var(--text-xs)',
+                      fontWeight: 'var(--font-weight-normal)',
+                      flexShrink: 0,
                     }}
                   >
-                    {nome}
-                    <button
-                      type="button"
-                      onClick={() => removerBolsista(nome)}
-                      aria-label={`Remover ${nome}`}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        color: 'var(--muted-foreground)',
-                        padding: 0,
-                      }}
-                    >
-                      <X size={14} />
-                    </button>
+                    1
                   </span>
-                ))}
-              </div>
-              {solicitacaoPropriaCoordenador && (
-                <p style={{ color: 'var(--primary)', fontSize: 'var(--text-xs)', margin: '0.75rem 0 0' }}>
-                  Solicitação própria do coordenador: transação de comprometimento imediata na rubrica de Diárias.
-                </p>
-              )}
-            </div>
-          </label>
-
-          <label className="block mb-5" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-            Motivo
-            <textarea
-              value={motivo}
-              onChange={(event) => setMotivo(event.target.value)}
-              rows={3}
-              className="mt-2 w-full px-3 py-2"
-              style={{
-                backgroundColor: 'var(--background)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius)',
-                color: 'var(--foreground)',
-                fontSize: 'var(--text-sm)',
-                resize: 'vertical',
-              }}
-            />
-          </label>
-
-          <div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5"
-            style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}
-          >
-            <div>
-              <span style={{ color: 'var(--muted-foreground)' }}>Diárias</span>
-              <strong className="block mt-1">{quantidadeCalculada.toLocaleString('pt-BR')}</strong>
-            </div>
-            <div>
-              <span style={{ color: 'var(--muted-foreground)' }}>Rubrica</span>
-              <strong className="block mt-1">{tipoViagemAtual.rubrica}</strong>
-            </div>
-            <div>
-              <span style={{ color: 'var(--muted-foreground)' }}>Valor unitário</span>
-              <strong className="block mt-1">{currency.format(diariaVigenteAtual.valor)}</strong>
-            </div>
-            <div>
-              <span style={{ color: 'var(--muted-foreground)' }}>Solicitações</span>
-              <strong className="block mt-1">{selectedBolsistas.length}</strong>
-            </div>
-            <div>
-              <span style={{ color: 'var(--muted-foreground)' }}>Total</span>
-              <strong className="block mt-1">{currency.format(valorTotalCalculado)}</strong>
-            </div>
-            <div>
-              <span style={{ color: 'var(--muted-foreground)' }}>Distância</span>
-              <strong className="block mt-1">{usaDistanciaNoCalculo && Number.isFinite(distanciaKmNumerica) ? `${distanciaKmNumerica.toLocaleString('pt-BR')} km` : 'Não aplicada'}</strong>
-            </div>
-            <div>
-              <span style={{ color: 'var(--muted-foreground)' }}>Memória</span>
-              <strong className="block mt-1">{calculoDiaria.memoria}</strong>
-            </div>
-            <div>
-              <span style={{ color: 'var(--muted-foreground)' }}>Saldo disponível</span>
-              <strong className="block mt-1" style={{ color: solicitacaoBloqueada ? '#dc2626' : 'var(--foreground)' }}>
-                {currency.format(saldoDisponivelDiarias)}
-              </strong>
-            </div>
-          </div>
-
-          <div
-            className="mb-5 p-3"
-            style={{
-              border: `1px solid ${solicitacaoBloqueada ? 'color-mix(in srgb, #dc2626 35%, var(--border))' : 'var(--border)'}`,
-              borderRadius: 'var(--radius)',
-              backgroundColor: solicitacaoBloqueada ? 'color-mix(in srgb, #dc2626 10%, var(--background))' : 'var(--background)',
-              color: solicitacaoBloqueada ? 'var(--foreground)' : 'var(--muted-foreground)',
-              fontSize: 'var(--text-sm)',
-            }}
-          >
-            {mensagemSolicitacaoDiaria}
-          </div>
-
-          <button
-            onClick={criarSolicitacaoDiaria}
-            disabled={solicitacaoBloqueada}
-            className="px-4 py-2 transition-colors flex items-center gap-2"
-            style={{
-              backgroundColor: solicitacaoBloqueada ? 'var(--muted)' : 'var(--primary)',
-              color: solicitacaoBloqueada ? 'var(--muted-foreground)' : 'var(--primary-foreground)',
-              borderRadius: 'var(--radius)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-medium)',
-              border: 'none',
-              cursor: solicitacaoBloqueada ? 'not-allowed' : 'pointer',
-              opacity: solicitacaoBloqueada ? 0.7 : 1,
-            }}
-          >
-            <ReceiptText size={16} />
-            Solicitar diária
-          </button>
-        </div>
-
-      </section>
-          ) : (
-            <section>
-              <div className="flex flex-col md:flex-row gap-3 mb-4">
-                <div className="relative flex-1">
-                  <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--muted-foreground)' }} />
-                  <input
-                    value={diariaSearch}
-                    onChange={(event) => setDiariaSearch(event.target.value)}
-                    placeholder="Buscar por código, destino ou bolsista"
-                    className="w-full pl-10 pr-3 py-2"
+                  <h2
                     style={{
-                      backgroundColor: 'var(--background)',
-                      border: '1px solid var(--border)',
-                      borderRadius: 'var(--radius)',
                       color: 'var(--foreground)',
-                      fontSize: 'var(--text-sm)',
+                      fontSize: 'inherit',
+                      fontWeight: 'var(--font-weight-normal)',
+                      margin: 0,
                     }}
-                  />
+                  >
+                    Informações Gerais
+                  </h2>
                 </div>
-                <select
-                  value={diariaStatusFilter}
-                  onChange={(event) => setDiariaStatusFilter(event.target.value as StatusDiaria | 'TODOS')}
-                  className="px-3 py-2"
-                  style={{
-                    backgroundColor: 'var(--background)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius)',
-                    color: 'var(--foreground)',
-                    fontSize: 'var(--text-sm)',
-                  }}
-                >
-                  <option value="TODOS">Todos os status</option>
-                  <option value="ALOCADA">Alocada</option>
-                  <option value="APROVADA">Aprovada</option>
-                  <option value="CANCELADA">Cancelada</option>
-                  <option value="RECUSADA">Recusada</option>
-                </select>
-                <button
-                  onClick={() => setActiveDiariaTab('nova')}
-                  className="px-4 py-2 flex items-center gap-2"
-                  style={{
-                    backgroundColor: 'var(--primary)',
-                    color: 'var(--primary-foreground)',
-                    border: 'none',
-                    borderRadius: 'var(--radius)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-weight-medium)',
-                  }}
-                >
-                  <Plus size={16} />
-                  Nova solicitação
-                </button>
-              </div>
 
-              <div className="space-y-3">
-                {diariasPorBeneficiario.map((solicitacao) => (
-	                  <article
-	                    key={`${solicitacao.id}-${solicitacao.beneficiarioIndex}`}
-	                    className="p-5"
-	                    style={{
-	                      backgroundColor: 'var(--background)',
-	                      border: '1px solid var(--border)',
-	                      borderRadius: 'var(--radius)',
-                        boxShadow: '0 1px 0 color-mix(in srgb, var(--foreground) 6%, transparent)',
-	                    }}
-	                  >
-                      <div className="flex flex-col gap-4">
-                        <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
-                          <div className="min-w-0">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
-                                Solicitação
-                              </span>
-                              <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)' }}>
-                                {solicitacao.id}
-                              </strong>
-                              <span
-                                className="px-2 py-1"
-                                style={{
-                                  borderRadius: '999px',
-                                  backgroundColor:
-                                    solicitacao.status === 'CANCELADA' || solicitacao.status === 'RECUSADA'
-                                      ? 'rgba(239, 68, 68, 0.12)'
-                                      : 'color-mix(in srgb, var(--primary) 12%, transparent)',
-                                  color: solicitacao.status === 'CANCELADA' || solicitacao.status === 'RECUSADA' ? '#dc2626' : 'var(--primary)',
-                                  fontSize: 'var(--text-xs)',
-                                  fontWeight: 'var(--font-weight-medium)',
-                                }}
-                              >
-                                {statusLabel(solicitacao.status)}
-                              </span>
-                            </div>
-                            <p
-                              className="mt-2"
-                              style={{
-                                color: 'var(--muted-foreground)',
-                                fontSize: 'var(--text-sm)',
-                                marginBottom: 0,
-                                overflowWrap: 'anywhere',
-                              }}
-                            >
-                              {solicitacao.origem} <span aria-hidden="true">→</span> {solicitacao.destino}
-                            </p>
-                          </div>
+                <div className="grid grid-cols-1 gap-4">
+                  <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                    Tipo de Viagem
+                    <div className="mt-2">
+                      <Dropdown
+                      value={tipoViagemSelecionado}
+                      onChange={(value) => alterarTipoViagem(value as TipoViagemCodigo)}
+                      placeholder="Selecione o tipo de viagem"
+                      options={[
+                        { value: 'DENTRO_ESTADO', label: 'Dentro do estado - R$ 260 - 12h' },
+                        { value: 'FORA_ESTADO', label: 'Nacional - R$ 320 - 12h' },
+                        { value: 'INTERNACIONAL', label: 'Internacional - R$ 620 - 24h' },
+                      ]}
+                      />
+                    </div>
+                  </label>
 
-                          {(solicitacao.transacaoComprometimentoRef || solicitacao.transacaoReversaoRef) && (
-                            <div
-                              className="px-3 py-2"
-                              style={{
-                                border: '1px solid var(--border)',
-                                borderRadius: 'var(--radius)',
-                                color: 'var(--muted-foreground)',
-                                fontSize: 'var(--text-xs)',
-                                lineHeight: 1.5,
-                              }}
-                            >
-                              {solicitacao.transacaoComprometimentoRef && (
-                                <span>Comprometimento: <strong style={{ color: 'var(--foreground)' }}>{solicitacao.transacaoComprometimentoRef}</strong></span>
-                              )}
-                              {solicitacao.transacaoReversaoRef && (
-                                <span>{solicitacao.transacaoComprometimentoRef ? ' · ' : ''}Reversão: <strong style={{ color: 'var(--foreground)' }}>{solicitacao.transacaoReversaoRef}</strong></span>
-                              )}
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                          {[
-                            { label: 'Bolsista', value: solicitacao.beneficiario },
-                            { label: 'Diárias', value: solicitacao.quantidade.toLocaleString('pt-BR') },
-                            { label: 'Valor', value: currency.format(solicitacao.valorBeneficiario) },
-                            { label: 'Distância', value: formatarDistanciaDiaria(solicitacao) },
-                            { label: 'Cadastro/Parâmetro', value: `${solicitacao.tipoDiariaRef} · ${solicitacao.parametroCalculoDiariaRef}` },
-                          ].map((item) => (
-                            <div
-                              key={item.label}
-                              className="min-w-0 p-3"
-                              style={{
-                                border: '1px solid var(--border)',
-                                borderRadius: 'var(--radius)',
-                                backgroundColor: 'color-mix(in srgb, var(--card) 84%, transparent)',
-                              }}
-                            >
-                              <span className="block" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
-                                {item.label}
-                              </span>
-                              <strong
-                                className="block mt-1"
-                                style={{
-                                  color: 'var(--foreground)',
-                                  fontSize: 'var(--text-sm)',
-                                  lineHeight: 1.45,
-                                  overflowWrap: 'anywhere',
-                                }}
-                              >
-                                {item.value}
-                              </strong>
-                            </div>
-                          ))}
-                        </div>
+                  <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_180px_150px] gap-4">
+                    <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                      Origem
+                      <div className="mt-2">
+                        <Dropdown
+                        value={origem}
+                        onChange={setOrigem}
+                        placeholder="Selecione a origem"
+                        options={origensDiaria.map((localidade) => ({ value: localidade, label: localidade }))}
+                        />
                       </div>
-
-                    {solicitacao.justificativaRecusa && (
-                      <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', margin: '0.75rem 0 0' }}>
-                        Recusa do bolsista: {solicitacao.justificativaRecusa}
-                      </p>
-                    )}
-
-                    {(solicitacao.status === 'ALOCADA' || solicitacao.status === 'APROVADA') && dataInicioAindaNaoPassou(solicitacao.partida) && cancelandoId !== solicitacao.id && (
-                      <button
-                        onClick={() => setCancelandoId(solicitacao.id)}
-                        className="mt-3 px-3 py-2 flex items-center gap-2"
+                    </label>
+                    <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                      Data da Partida
+                      <input
+                        type="date"
+                        value={partidaData}
+                        onChange={(event) => setPartida((current) => combinarDataHora(current, event.target.value, 'data'))}
+                        className="mt-2 w-full px-3 py-2"
                         style={{
+                          backgroundColor: 'transparent',
                           border: '1px solid var(--border)',
                           borderRadius: 'var(--radius)',
-                          backgroundColor: 'transparent',
                           color: 'var(--foreground)',
                           fontSize: 'var(--text-sm)',
                         }}
-                      >
-                        <RotateCcw size={15} />
-                        Remover diária
-                      </button>
-                    )}
+                      />
+                    </label>
+                    <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                      Horário
+                      <input
+                        type="time"
+                        step="1"
+                        value={partidaHorario}
+                        onChange={(event) => setPartida((current) => combinarDataHora(current, event.target.value, 'hora'))}
+                        className="mt-2 w-full px-3 py-2"
+                        style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius)',
+                          color: 'var(--foreground)',
+                          fontSize: 'var(--text-sm)',
+                        }}
+                      />
+                    </label>
+                  </div>
 
-                    {cancelandoId === solicitacao.id && (
-                      <div className="mt-3">
-                        <textarea
-                          value={justificativaCancelamento}
-                          onChange={(event) => setJustificativaCancelamento(event.target.value)}
-                          rows={2}
-                          placeholder="Justificativa da remoção"
-                          className="w-full px-3 py-2 mb-2"
+                  <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_180px_150px] gap-4">
+                    <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                      Destino
+                      <div className="mt-2">
+                        <Dropdown
+                        value={destino}
+                        onChange={alterarDestino}
+                        placeholder="Selecione o destino"
+                        options={destinosDiaria.map((item) => ({ value: item.value, label: item.label }))}
+                        />
+                      </div>
+                    </label>
+                    <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                      Data de Chegada
+                      <input
+                        type="date"
+                        value={chegadaData}
+                        onChange={(event) => setChegada((current) => combinarDataHora(current, event.target.value, 'data'))}
+                        className="mt-2 w-full px-3 py-2"
+                        style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius)',
+                          color: 'var(--foreground)',
+                          fontSize: 'var(--text-sm)',
+                        }}
+                      />
+                    </label>
+                    <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                      Horário
+                      <input
+                        type="time"
+                        step="1"
+                        value={chegadaHorario}
+                        onChange={(event) => setChegada((current) => combinarDataHora(current, event.target.value, 'hora'))}
+                        className="mt-2 w-full px-3 py-2"
+                        style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius)',
+                          color: 'var(--foreground)',
+                          fontSize: 'var(--text-sm)',
+                        }}
+                      />
+                    </label>
+                  </div>
+
+                  <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                    Distância
+                    <div
+                      className="mt-2 px-3 py-2"
+                      style={{
+                        backgroundColor: 'transparent',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        color: 'var(--foreground)',
+                        fontSize: 'var(--text-sm)',
+                      }}
+                    >
+                      {origem && destino
+                        ? usaDistanciaNoCalculo && distanciaKmNumerica
+                          ? `${distanciaKmNumerica.toLocaleString('pt-BR')} km`
+                          : 'Distância não aplicada para este tipo de viagem.'
+                        : 'Preencha origem e destino para calcular automaticamente.'}
+                    </div>
+                  </label>
+
+                  <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                    Motivo
+                    <textarea
+                      value={motivo}
+                      onChange={(event) => setMotivo(event.target.value)}
+                      rows={4}
+                      className="mt-2 w-full px-3 py-2"
+                      style={{
+                        backgroundColor: 'transparent',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        color: 'var(--foreground)',
+                        fontSize: 'var(--text-sm)',
+                        resize: 'vertical',
+                      }}
+                    />
+                  </label>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    {[
+                      { label: 'Origem/Destino em região metropolitana', hint: 'Calculado pela origem e destino', checked: deslocamentoRegiaoMetropolitana, automatico: true },
+                      { label: 'Município limítrofe sem pernoite', hint: 'Calculado pela origem e destino', checked: municipioLimitrofe, automatico: true },
+                    ].map((item) => (
+                      <label
+                        key={item.label}
+                        className="flex items-start gap-3 px-3 py-3"
+                        style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius)',
+                          color: 'var(--foreground)',
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={item.checked}
+                          disabled
+                          readOnly
+                          style={{ accentColor: 'var(--primary)', marginTop: '0.2rem' }}
+                        />
+                        <span>
+                          <span style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)' }}>
+                            {item.label}
+                          </span>
+                          <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.2rem' }}>
+                            {item.hint}
+                          </span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                    {[
+                      { label: 'Transporte custeado por outra entidade', checked: transporteCusteadoOutraEntidade, onChange: setTransporteCusteadoOutraEntidade },
+                      { label: 'Hospedagem custeada por outra entidade', checked: hospedagemCusteadaOutraEntidade, onChange: setHospedagemCusteadaOutraEntidade },
+                      { label: 'Alimentação custeada por outra entidade', checked: alimentacaoCusteadaOutraEntidade, onChange: setAlimentacaoCusteadaOutraEntidade },
+                    ].map((item) => (
+                      <label
+                        key={item.label}
+                        className="flex items-center gap-3 px-3 py-3"
+                        style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius)',
+                          color: 'var(--foreground)',
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={item.checked}
+                          onChange={(event) => item.onChange(event.target.checked)}
+                          style={{ accentColor: 'var(--primary)' }}
+                        />
+                        <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)' }}>
+                          {item.label}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+
+                  <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                    Bolsistas
+                    <div className="mt-2">
+                      <div className="relative">
+                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--muted-foreground)' }} />
+                        <input
+                          value={bolsistaSearch}
+                          onFocus={() => setIsBolsistaDropdownOpen(true)}
+                          onBlur={() => window.setTimeout(() => setIsBolsistaDropdownOpen(false), 120)}
+                          onChange={(event) => {
+                            setBolsistaSearch(event.target.value);
+                            setIsBolsistaDropdownOpen(true);
+                          }}
+                          placeholder="Digite ou selecione um bolsista"
+                          className="w-full pl-10 pr-3 py-2"
                           style={{
-                            backgroundColor: 'var(--background)',
+                            backgroundColor: 'transparent',
                             border: '1px solid var(--border)',
                             borderRadius: 'var(--radius)',
                             color: 'var(--foreground)',
                             fontSize: 'var(--text-sm)',
                           }}
                         />
-                        <div className="flex gap-2">
+                        {isBolsistaDropdownOpen && bolsistasEncontrados.length > 0 && (
+                          <div
+                            className="absolute z-50 w-full mt-1 overflow-hidden"
+                            style={{
+                              backgroundColor: 'var(--popover)',
+                              border: '1px solid var(--border)',
+                              borderRadius: 'var(--radius)',
+                              boxShadow: 'var(--elevation-sm)',
+                            }}
+                          >
+                            {bolsistasEncontrados.map((nome) => (
+                              <button
+                                key={nome}
+                                type="button"
+                                onMouseDown={(event) => event.preventDefault()}
+                                onClick={() => {
+                                  adicionarBolsista(nome);
+                                  setIsBolsistaDropdownOpen(false);
+                                }}
+                                className="w-full px-3 py-2.5 text-left transition-colors"
+                                style={{
+                                  backgroundColor: 'transparent',
+                                  color: 'var(--foreground)',
+                                  border: 'none',
+                                  fontSize: 'var(--text-sm)',
+                                  fontFamily: 'inherit',
+                                  cursor: 'pointer',
+                                }}
+                                onMouseEnter={(event) => {
+                                  event.currentTarget.style.backgroundColor = 'var(--muted)';
+                                }}
+                                onMouseLeave={(event) => {
+                                  event.currentTarget.style.backgroundColor = 'transparent';
+                                }}
+                              >
+                                {nome}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </label>
+
+                  <div className="flex flex-wrap gap-2">
+                    {selectedBolsistas.map((nome) => (
+                      <span
+                        key={nome}
+                        className="px-3 py-2 flex items-center gap-2"
+                        style={{
+                          border: '1px solid var(--primary)',
+                          borderRadius: '999px',
+                          backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
+                          color: 'var(--foreground)',
+                          fontSize: 'var(--text-sm)',
+                        }}
+                      >
+                        {nome}
+                        <button
+                          type="button"
+                          onClick={() => removerBolsista(nome)}
+                          aria-label={`Remover ${nome}`}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            color: 'var(--muted-foreground)',
+                            padding: 0,
+                          }}
+                        >
+                          <X size={14} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+
+                  <div
+                    className="p-4"
+                    style={{
+                      backgroundColor: 'color-mix(in srgb, var(--primary) 14%, var(--card))',
+                      border: '1px solid color-mix(in srgb, var(--primary) 34%, var(--border))',
+                      borderRadius: 'var(--radius)',
+                    }}
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <span style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
+                        Valor Total
+                      </span>
+                      <strong style={{ color: 'var(--primary)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', whiteSpace: 'nowrap' }}>
+                        {currency.format(valorTotalCalculado)}
+                      </strong>
+                    </div>
+                  </div>
+
+                  {!diariaFormIncompleto && solicitacaoBloqueada && (
+                    <div
+                      role="alert"
+                      className="p-3"
+                      style={{
+                        border: '1px solid color-mix(in srgb, #dc2626 35%, var(--border))',
+                        borderRadius: 'var(--radius)',
+                        backgroundColor: 'color-mix(in srgb, #dc2626 10%, var(--background))',
+                        color: 'var(--foreground)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-weight-medium)',
+                      }}
+                    >
+                      {mensagemSolicitacaoDiaria}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {solicitacaoDetalheId && mostrarMotivoCancelamento && (
+                <div
+                  className="mt-6 p-5"
+                  style={{
+                    backgroundColor: 'var(--card)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                  }}
+                >
+                  <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                    Motivo do Cancelamento
+                    <textarea
+                      value={justificativaCancelamento}
+                      onChange={(event) => setJustificativaCancelamento(event.target.value)}
+                      rows={3}
+                      className="mt-2 w-full px-3 py-2"
+                      style={{
+                        backgroundColor: 'transparent',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        color: 'var(--foreground)',
+                        fontSize: 'var(--text-sm)',
+                        resize: 'vertical',
+                      }}
+                    />
+                  </label>
+                </div>
+              )}
+
+              {solicitacaoDetalheId && mostrarJustificativaRecusa && (
+                <div
+                  className="mt-6 p-5"
+                  style={{
+                    backgroundColor: 'var(--card)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                  }}
+                >
+                  <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                    Justificativa da Recusa
+                    <textarea
+                      value={justificativaRecusa}
+                      onChange={(event) => setJustificativaRecusa(event.target.value)}
+                      rows={3}
+                      className="mt-2 w-full px-3 py-2"
+                      style={{
+                        backgroundColor: 'transparent',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        color: 'var(--foreground)',
+                        fontSize: 'var(--text-sm)',
+                        resize: 'vertical',
+                      }}
+                    />
+                  </label>
+                </div>
+              )}
+
+              <div className="mt-6 flex flex-col sm:flex-row justify-end gap-3">
+                {solicitacaoDetalheId ? (
+                  <>
+                    {solicitacaoDetalheOrigem === 'minhas' && solicitacaoDetalhe?.status === 'ALOCADA' ? (
+                      mostrarJustificativaRecusa ? (
+                        <button
+                          type="button"
+                          onClick={recusarSolicitacaoDetalhe}
+                          disabled={!justificativaRecusa.trim()}
+                          className="px-4 py-2 transition-colors"
+                          style={{
+                            backgroundColor: justificativaRecusa.trim() ? 'var(--primary)' : 'var(--muted)',
+                            color: justificativaRecusa.trim() ? 'var(--primary-foreground)' : 'var(--muted-foreground)',
+                            border: 'none',
+                            borderRadius: 'var(--radius)',
+                            fontSize: 'var(--text-sm)',
+                            fontWeight: 'var(--font-weight-medium)',
+                            cursor: justificativaRecusa.trim() ? 'pointer' : 'not-allowed',
+                          }}
+                        >
+                          Confirmar Recusa
+                        </button>
+	                      ) : (
+                        <>
                           <button
-                            onClick={() => cancelarDiaria(solicitacao.id)}
-                            className="px-3 py-2"
+                            type="button"
+                            onClick={() => setMostrarJustificativaRecusa(true)}
+                            className="px-4 py-2"
+                            style={{
+                              backgroundColor: 'transparent',
+                              color: 'var(--primary)',
+                              border: '1px solid var(--primary)',
+                              borderRadius: 'var(--radius)',
+                              fontSize: 'var(--text-sm)',
+                              fontWeight: 'var(--font-weight-medium)',
+                            }}
+                          >
+                            Recusar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => aceitarDiaria(solicitacaoDetalheId)}
+                            className="px-4 py-2"
                             style={{
                               backgroundColor: 'var(--primary)',
                               color: 'var(--primary-foreground)',
                               border: 'none',
                               borderRadius: 'var(--radius)',
                               fontSize: 'var(--text-sm)',
+                              fontWeight: 'var(--font-weight-medium)',
                             }}
                           >
-                            Confirmar
+                            Aceitar
                           </button>
-                          <button
-                            onClick={() => setCancelandoId(null)}
-                            className="px-3 py-2"
+                        </>
+                      )
+                    ) : solicitacaoDetalhe?.status === 'CANCELADA' || solicitacaoDetalhe?.status === 'RECUSADA' ? null : mostrarMotivoCancelamento ? (
+                      <button
+                        type="button"
+                        onClick={cancelarSolicitacaoDetalhe}
+                        disabled={!justificativaCancelamento.trim()}
+                        className="px-4 py-2 transition-colors"
+                        style={{
+                          backgroundColor: justificativaCancelamento.trim() ? 'var(--primary)' : 'var(--muted)',
+                          color: justificativaCancelamento.trim() ? 'var(--primary-foreground)' : 'var(--muted-foreground)',
+                          border: 'none',
+                          borderRadius: 'var(--radius)',
+                          fontSize: 'var(--text-sm)',
+                          fontWeight: 'var(--font-weight-medium)',
+                          cursor: justificativaCancelamento.trim() ? 'pointer' : 'not-allowed',
+                        }}
+                      >
+                        Confirmar Cancelamento
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setMostrarMotivoCancelamento(true)}
+                        className="px-4 py-2"
+                        style={{
+                          backgroundColor: 'transparent',
+                          color: '#dc2626',
+                          border: '1px solid rgba(239, 68, 68, 0.35)',
+                          borderRadius: 'var(--radius)',
+                          fontSize: 'var(--text-sm)',
+                          fontWeight: 'var(--font-weight-medium)',
+                        }}
+                      >
+                        Cancelar Solicitação
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="px-4 py-2"
+                      style={{
+                        backgroundColor: 'transparent',
+                        color: 'var(--foreground)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-weight-medium)',
+                      }}
+                    >
+                      Salvar Rascunho
+                    </button>
+                    <button
+                      onClick={criarSolicitacaoDiaria}
+                      disabled={solicitacaoBloqueada}
+                      className="px-4 py-2 transition-colors flex items-center justify-center gap-2"
+                      style={{
+                        backgroundColor: solicitacaoBloqueada ? 'var(--muted)' : 'var(--primary)',
+                        color: solicitacaoBloqueada ? 'var(--muted-foreground)' : 'var(--primary-foreground)',
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        border: 'none',
+                        cursor: solicitacaoBloqueada ? 'not-allowed' : 'pointer',
+                        opacity: solicitacaoBloqueada ? 0.7 : 1,
+                      }}
+                    >
+                      <ReceiptText size={16} />
+                      Solicitar Diária
+                    </button>
+                  </>
+                )}
+              </div>
+            </section>
+          ) : (
+            <section>
+              <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_240px_240px] gap-3 mb-4">
+                <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                  Pesquisar
+                  <div className="relative mt-2">
+                    <input
+                      value={diariaSearch}
+                      onChange={(event) => setDiariaSearch(event.target.value)}
+                      placeholder="Buscar"
+                      className="w-full pl-3 pr-10 py-2"
+                      style={{
+                        backgroundColor: 'var(--background)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        color: 'var(--foreground)',
+                        fontSize: 'var(--text-sm)',
+                      }}
+                    />
+                    <Search size={18} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--muted-foreground)' }} />
+                  </div>
+                </label>
+                <div>
+                  <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                    Tipo de Viagem
+                  </label>
+                  <div className="mt-2">
+                    <Dropdown
+                      value={diariaTipoViagemFilter}
+                      onChange={(value) => setDiariaTipoViagemFilter(value as TipoViagemCodigo | 'TODOS')}
+                      options={[
+                        { value: 'TODOS', label: 'Todos' },
+                        { value: 'DENTRO_ESTADO', label: 'Dentro do Estado' },
+                        { value: 'FORA_ESTADO', label: 'Nacional' },
+                        { value: 'INTERNACIONAL', label: 'Internacional' },
+                      ]}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                    Status
+                  </label>
+                  <div className="mt-2">
+                    <Dropdown
+                      value={diariaStatusFilter}
+                      onChange={(value) => setDiariaStatusFilter(value as StatusDiaria | 'TODOS')}
+                      options={[
+                        { value: 'TODOS', label: 'Todos' },
+                        { value: 'RASCUNHO', label: 'Rascunho' },
+                        { value: 'ALOCADA', label: 'Aguardando Bolsista' },
+                        { value: 'APROVADA', label: 'Aprovada' },
+                        { value: 'RECUSADA', label: 'Recusada' },
+                        { value: 'CANCELADA', label: 'Cancelada' },
+                      ]}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {diariasPorBeneficiario.map((solicitacao) => (
+                  <button
+                    key={`${solicitacao.id}-${solicitacao.beneficiarioIndex}`}
+                    type="button"
+                    onClick={() => abrirDetalheSolicitacaoDiaria(solicitacao)}
+                    className="w-full p-5 text-left transition-colors"
+                    style={{
+                      backgroundColor: 'var(--card)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius)',
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                    }}
+                    onMouseEnter={(event) => {
+                      event.currentTarget.style.backgroundColor = 'var(--muted)';
+                    }}
+                    onMouseLeave={(event) => {
+                      event.currentTarget.style.backgroundColor = 'var(--card)';
+                    }}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto] gap-4 items-center">
+                      <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
+                        {[
+                          { label: 'Bolsista', value: solicitacao.beneficiario },
+                          { label: 'Diária', value: solicitacao.quantidade.toLocaleString('pt-BR') },
+                          { label: 'Valor Total', value: currency.format(solicitacao.valorBeneficiario) },
+                          { label: 'Origem', value: solicitacao.origem },
+                          { label: 'Destino', value: solicitacao.destino },
+                        ].map((item) => (
+                          <div key={item.label} className="min-w-0">
+                            <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                              {item.label}
+                            </div>
+                            <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: item.label === 'Valor Total' ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', overflowWrap: 'anywhere' }}>
+                              {item.value}
+                            </div>
+                          </div>
+                        ))}
+                        <div>
+                          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                            Status
+                          </div>
+                          <span
+                            className="inline-flex items-center px-2.5 py-1"
                             style={{
-                              backgroundColor: 'transparent',
-                              color: 'var(--muted-foreground)',
-                              border: '1px solid var(--border)',
-                              borderRadius: 'var(--radius)',
-                              fontSize: 'var(--text-sm)',
+                              backgroundColor:
+                                solicitacao.status === 'APROVADA'
+                                  ? 'rgba(34, 197, 94, 0.12)'
+                                  : solicitacao.status === 'RECUSADA'
+                                  ? 'rgba(249, 115, 22, 0.14)'
+                                  : solicitacao.status === 'CANCELADA'
+                                  ? 'rgba(239, 68, 68, 0.12)'
+                                  : 'color-mix(in srgb, var(--primary) 12%, transparent)',
+                              color:
+                                solicitacao.status === 'APROVADA'
+                                  ? '#22c55e'
+                                  : solicitacao.status === 'RECUSADA'
+                                  ? '#f97316'
+                                  : solicitacao.status === 'CANCELADA'
+                                  ? '#dc2626'
+                                  : 'var(--primary)',
+                              border: `1px solid ${
+                                solicitacao.status === 'APROVADA'
+                                  ? 'rgba(34, 197, 94, 0.3)'
+                                  : solicitacao.status === 'RECUSADA'
+                                  ? 'rgba(249, 115, 22, 0.35)'
+                                  : solicitacao.status === 'CANCELADA'
+                                  ? 'rgba(239, 68, 68, 0.3)'
+                                  : 'color-mix(in srgb, var(--primary) 28%, transparent)'
+                              }`,
+                              borderRadius: '9999px',
+                              fontSize: 'var(--text-xs)',
+                              fontWeight: 'var(--font-weight-medium)',
+                              whiteSpace: 'nowrap',
                             }}
                           >
-                            Cancelar
-                          </button>
+                            {statusLabel(solicitacao.status)}
+                          </span>
                         </div>
                       </div>
-                    )}
-                  </article>
+                      <ChevronRight size={20} style={{ color: 'var(--muted-foreground)' }} />
+                    </div>
+                  </button>
                 ))}
               </div>
             </section>
@@ -2189,7 +2492,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
           }}
         >
           <h3 style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--text-sm)', margin: '0 0 1rem 0' }}>
-            Solicitar Diárias
+            Diárias
           </h3>
           <p style={{ color: 'var(--muted-foreground)', fontWeight: 'var(--font-weight-normal)', fontSize: 'var(--text-sm)', lineHeight: '1.7', margin: 0 }}>
             Entre no painel de controle para solicitar diárias, acompanhar aceites e remover solicitações antes do início.

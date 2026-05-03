@@ -210,7 +210,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
           </div>
         )}
 
-        <div className={isCollapsed ? 'px-2 flex-1' : 'px-4 flex-1'}>
+        <div className={isCollapsed ? 'px-2 flex-1' : 'px-4 flex-1'} style={{ overflowY: 'auto', minHeight: 0 }}>
           <nav className="mt-2">
             {/* Section: Gerenciamento - Only for Coordenador */}
             {accessType === 'coordenador' && !isCollapsed && (
@@ -241,14 +241,17 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                       onClick={() => onNavigate(item.id)}
                       className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                       style={{
-                        backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
-                        color: isActive ? 'var(--sidebar-accent-foreground)' : 'var(--sidebar-foreground)',
+                        backgroundColor: isActive ? 'var(--muted)' : 'transparent',
+                        color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
                         borderRadius: 'var(--radius)',
                         fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
                         fontSize: 'var(--text-sm)',
                         paddingLeft: isCollapsed ? '0' : '0.75rem',
                         paddingRight: isCollapsed ? '0' : '0.75rem',
                         justifyContent: isCollapsed ? 'center' : 'flex-start',
+                        minHeight: isCollapsed ? '56px' : undefined,
+                        width: isCollapsed ? '56px' : '100%',
+                        margin: isCollapsed ? '0 auto' : undefined,
                       }}
                       onMouseEnter={(e) => {
                         if (!isActive) {
@@ -328,14 +331,17 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                           onClick={() => onNavigate(item.id)}
                           className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                           style={{
-                            backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
-                            color: isActive ? 'var(--sidebar-accent-foreground)' : 'var(--sidebar-foreground)',
+                            backgroundColor: isActive ? 'var(--muted)' : 'transparent',
+                            color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
                             borderRadius: 'var(--radius)',
                             fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
                             fontSize: 'var(--text-sm)',
                             paddingLeft: isCollapsed ? '0' : '0.75rem',
                             paddingRight: isCollapsed ? '0' : '0.75rem',
                             justifyContent: isCollapsed ? 'center' : 'flex-start',
+                        minHeight: isCollapsed ? '56px' : undefined,
+                        width: isCollapsed ? '56px' : '100%',
+                        margin: isCollapsed ? '0 auto' : undefined,
                           }}
                           onMouseEnter={(e) => {
                             if (!isActive) {
@@ -392,6 +398,9 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
               paddingLeft: isCollapsed ? '0' : '0.75rem',
               paddingRight: isCollapsed ? '0' : '0.75rem',
               justifyContent: isCollapsed ? 'center' : 'flex-start',
+                        minHeight: isCollapsed ? '56px' : undefined,
+                        width: isCollapsed ? '56px' : '100%',
+                        margin: isCollapsed ? '0 auto' : undefined,
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = 'var(--muted)';
@@ -561,7 +570,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
         </div>
       )}
 
-      <div className={isCollapsed ? 'px-2 flex-1' : 'px-4 flex-1'}>
+      <div className={isCollapsed ? 'px-2 flex-1' : 'px-4 flex-1'} style={{ overflowY: 'auto', minHeight: 0 }}>
         <nav className="mt-2">
           <ul className="space-y-2">
             {(() => {
@@ -574,14 +583,17 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                     onClick={() => onNavigate(homeMenuItem.id)}
                     className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                     style={{
-                      backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
-                      color: isActive ? 'var(--sidebar-accent-foreground)' : 'var(--sidebar-foreground)',
+                      backgroundColor: isActive ? 'var(--muted)' : 'transparent',
+                      color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
                       borderRadius: 'var(--radius)',
                       fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
                       fontSize: 'var(--text-sm)',
                       paddingLeft: isCollapsed ? '0' : '0.75rem',
                       paddingRight: isCollapsed ? '0' : '0.75rem',
                       justifyContent: isCollapsed ? 'center' : 'flex-start',
+                        minHeight: isCollapsed ? '56px' : undefined,
+                        width: isCollapsed ? '56px' : '100%',
+                        margin: isCollapsed ? '0 auto' : undefined,
                     }}
                     onMouseEnter={(e) => {
                       if (!isActive) {
@@ -656,14 +668,17 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                         onClick={() => onNavigate(item.id)}
                         className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                         style={{
-                          backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
-                          color: isActive ? 'var(--sidebar-accent-foreground)' : 'var(--sidebar-foreground)',
+                          backgroundColor: isActive ? 'var(--muted)' : 'transparent',
+                          color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
                           borderRadius: 'var(--radius)',
                           fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
                           fontSize: 'var(--text-sm)',
                           paddingLeft: isCollapsed ? '0' : '0.75rem',
                           paddingRight: isCollapsed ? '0' : '0.75rem',
                           justifyContent: isCollapsed ? 'center' : 'flex-start',
+                        minHeight: isCollapsed ? '56px' : undefined,
+                        width: isCollapsed ? '56px' : '100%',
+                        margin: isCollapsed ? '0 auto' : undefined,
                         }}
                         onMouseEnter={(e) => {
                           if (!isActive) {
@@ -740,14 +755,17 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                     onClick={() => onNavigate(item.id)}
                     className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                     style={{
-                      backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
-                      color: isActive ? 'var(--sidebar-accent-foreground)' : 'var(--sidebar-foreground)',
+                      backgroundColor: isActive ? 'var(--muted)' : 'transparent',
+                      color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
                       borderRadius: 'var(--radius)',
                       fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
                       fontSize: 'var(--text-sm)',
                       paddingLeft: isCollapsed ? '0' : '0.75rem',
                       paddingRight: isCollapsed ? '0' : '0.75rem',
                       justifyContent: isCollapsed ? 'center' : 'flex-start',
+                        minHeight: isCollapsed ? '56px' : undefined,
+                        width: isCollapsed ? '56px' : '100%',
+                        margin: isCollapsed ? '0 auto' : undefined,
                     }}
                     onMouseEnter={(e) => {
                       if (!isActive) {
@@ -827,14 +845,17 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                         onClick={() => onNavigate(item.id)}
                         className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                         style={{
-                          backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
-                          color: isActive ? 'var(--sidebar-accent-foreground)' : 'var(--sidebar-foreground)',
+                          backgroundColor: isActive ? 'var(--muted)' : 'transparent',
+                          color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
                           borderRadius: 'var(--radius)',
                           fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
                           fontSize: 'var(--text-sm)',
                           paddingLeft: isCollapsed ? '0' : '0.75rem',
                           paddingRight: isCollapsed ? '0' : '0.75rem',
                           justifyContent: isCollapsed ? 'center' : 'flex-start',
+                        minHeight: isCollapsed ? '56px' : undefined,
+                        width: isCollapsed ? '56px' : '100%',
+                        margin: isCollapsed ? '0 auto' : undefined,
                         }}
                         onMouseEnter={(e) => {
                           if (!isActive) {
@@ -891,6 +912,9 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
             paddingLeft: isCollapsed ? '0' : '0.75rem',
             paddingRight: isCollapsed ? '0' : '0.75rem',
             justifyContent: isCollapsed ? 'center' : 'flex-start',
+                        minHeight: isCollapsed ? '56px' : undefined,
+                        width: isCollapsed ? '56px' : '100%',
+                        margin: isCollapsed ? '0 auto' : undefined,
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = 'var(--muted)';

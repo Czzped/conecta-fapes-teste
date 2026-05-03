@@ -1,4 +1,4 @@
-import { CheckCircle, DollarSign, Search, Calendar, ChevronDown, ChevronRight, RotateCcw, Upload } from 'lucide-react';
+import { DollarSign, Search, Calendar, ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
@@ -24,9 +24,6 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [associatedEstornos, setAssociatedEstornos] = useState<Record<string, boolean>>({});
-  const [attachedDevolucoes, setAttachedDevolucoes] = useState<Record<string, boolean>>({});
-  const [associatedDevolucoes, setAssociatedDevolucoes] = useState<Record<string, boolean>>({});
 
   const categoriesConsumed = [
     { name: 'Material Permanente', value: 'R$ 200.000,00' },
@@ -58,9 +55,6 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
     { tipo: 'Pix', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 5.234,20', data: '14/02/2026 - 08:40', cnpj: 'Amazon', status: 'Validado', statusColor: { bg: 'rgba(34, 197, 94, 0.1)', color: 'rgb(34, 197, 94)', border: 'rgba(34, 197, 94, 0.3)' } },
     { tipo: 'Boleto', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 3.890,00', data: '12/02/2026 - 09:15', cnpj: 'Amazon', status: 'Em Validação', statusColor: { bg: 'rgba(59, 130, 246, 0.1)', color: 'rgb(59, 130, 246)', border: 'rgba(59, 130, 246, 0.3)' } },
   ];
-
-  const estornos = payments.filter((payment) => payment.classificacao === 'ESTORNO');
-  const devolucoes = payments.filter((payment) => payment.classificacao === 'DEVOLUCAO');
 
   return (
     <div 
@@ -568,358 +562,36 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
         </div>
       </section>
 
-      {estornos.length > 0 && (
-        <section className="mb-8">
-          <div
-            className="p-5"
-            style={{
-              backgroundColor: 'color-mix(in srgb, rgb(34, 197, 94) 8%, transparent)',
-              border: '1px solid color-mix(in srgb, rgb(34, 197, 94) 24%, transparent)',
-              borderRadius: 'var(--radius)',
-            }}
-          >
-            <div className="flex items-start gap-3 mb-4">
-              <div
-                className="p-2"
-                style={{
-                  color: 'rgb(34, 197, 94)',
-                  backgroundColor: 'rgba(34, 197, 94, 0.12)',
-                  borderRadius: 'var(--radius)',
-                }}
-              >
-                <RotateCcw size={18} />
-              </div>
-              <div>
-                <h2 style={{ color: 'var(--foreground)', margin: 0, fontSize: 'var(--text-lg)' }}>
-                  Estornos identificados
-                </h2>
-                <p style={{ color: 'var(--muted-foreground)', margin: '0.25rem 0 0', fontSize: 'var(--text-sm)' }}>
-                  Créditos de terceiros que anulam débitos anteriores de mesmo valor. Podem ser associados a uma prestação já feita como ajuste conciliatório.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {estornos.map((estorno) => {
-                const estornoKey = `${estorno.data}-${estorno.valor}`;
-                const isAssociated = Boolean(associatedEstornos[estornoKey]);
-
-                return (
-                  <div
-                    key={estornoKey}
-                    className="p-4"
-                    style={{
-                      backgroundColor: 'var(--card)',
-                      border: `1px solid ${isAssociated ? 'rgba(34, 197, 94, 0.45)' : 'var(--border)'}`,
-                      borderRadius: 'var(--radius)',
-                    }}
-                  >
-                    <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
-                      Terceiro
-                    </div>
-                    <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)', marginBottom: '0.75rem' }}>
-                      {estorno.origemTerceiro}
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Crédito</div>
-                        <div style={{ color: 'rgb(34, 197, 94)', fontWeight: 'var(--font-weight-semibold)' }}>{estorno.valor}</div>
-                      </div>
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Débito pareado</div>
-                        <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)' }}>{estorno.debitoEstornado}</div>
-                      </div>
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Classificação</div>
-                        <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)' }}>{estorno.classificacao}</div>
-                      </div>
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Situação do débito</div>
-                        <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)' }}>{estorno.situacaoDebito}</div>
-                      </div>
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Prestação</div>
-                        <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)' }}>{estorno.prestacaoAssociada}</div>
-                      </div>
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Efeito líquido</div>
-                        <div style={{ color: 'var(--primary)', fontWeight: 'var(--font-weight-semibold)' }}>{estorno.efeitoLiquido}</div>
-                      </div>
-                    </div>
-
-                    {isAssociated && (
-                      <div
-                        className="mt-4 p-3"
-                        style={{
-                          backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                          border: '1px solid rgba(34, 197, 94, 0.3)',
-                          borderRadius: 'var(--radius)',
-                          color: 'rgb(34, 197, 94)',
-                          fontSize: 'var(--text-sm)',
-                          fontWeight: 'var(--font-weight-semibold)',
-                        }}
-                      >
-                        Estorno associado à {estorno.prestacaoAssociada} como {estorno.modoAssociacao}.
-                      </div>
-                    )}
-
-                    <button
-                      type="button"
-                      className="mt-4 inline-flex items-center justify-center gap-2 px-3 py-2"
-                      aria-pressed={isAssociated}
-                      onClick={() =>
-                        setAssociatedEstornos((current) => ({
-                          ...current,
-                          [estornoKey]: true,
-                        }))
-                      }
-                      style={{
-                        backgroundColor: isAssociated ? 'rgba(34, 197, 94, 0.14)' : 'var(--primary)',
-                        color: isAssociated ? 'rgb(34, 197, 94)' : 'var(--primary-foreground)',
-                        border: `1px solid ${isAssociated ? 'rgba(34, 197, 94, 0.35)' : 'var(--primary)'}`,
-                        borderRadius: 'var(--radius)',
-                        fontSize: 'var(--text-sm)',
-                        fontWeight: 'var(--font-weight-semibold)',
-                        width: '100%',
-                        cursor: isAssociated ? 'default' : 'pointer',
-                      }}
-                    >
-                      {isAssociated ? <CheckCircle size={16} /> : <RotateCcw size={16} />}
-                      {isAssociated ? 'Associado à prestação existente' : 'Associar à prestação existente'}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div
-              className="mt-4 p-4"
-              style={{
-                backgroundColor: 'color-mix(in srgb, var(--card) 75%, transparent)',
-                border: '1px dashed var(--border)',
-                borderRadius: 'var(--radius)',
-              }}
-            >
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-                <div>
-                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
-                    Débito da prestação
-                  </div>
-                  <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)' }}>TR-2026-041 · R$ 1.250,00</div>
-                </div>
-                <div>
-                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
-                    Crédito de estorno
-                  </div>
-                  <div style={{ color: 'rgb(34, 197, 94)', fontWeight: 'var(--font-weight-semibold)' }}>TR-2026-052 · R$ 1.250,00</div>
-                </div>
-                <div>
-                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
-                    Efeito na conciliação
-                  </div>
-                  <div style={{ color: 'var(--primary)', fontWeight: 'var(--font-weight-semibold)' }}>R$ 0,00</div>
-                </div>
-                <div>
-                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
-                    Modo
-                  </div>
-                  <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)' }}>Ajuste pós-prestação</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {devolucoes.length > 0 && (
-        <section className="mb-8">
-          <div
-            className="p-5"
-            style={{
-              backgroundColor: 'color-mix(in srgb, rgb(234, 179, 8) 8%, transparent)',
-              border: '1px solid color-mix(in srgb, rgb(234, 179, 8) 24%, transparent)',
-              borderRadius: 'var(--radius)',
-            }}
-          >
-            <div className="flex items-start gap-3 mb-4">
-              <div
-                className="p-2"
-                style={{
-                  color: 'rgb(234, 179, 8)',
-                  backgroundColor: 'rgba(234, 179, 8, 0.12)',
-                  borderRadius: 'var(--radius)',
-                }}
-              >
-                <Upload size={18} />
-              </div>
-              <div>
-                <h2 style={{ color: 'var(--foreground)', margin: 0, fontSize: 'var(--text-lg)' }}>
-                  Devoluções do coordenador
-                </h2>
-                <p style={{ color: 'var(--muted-foreground)', margin: '0.25rem 0 0', fontSize: 'var(--text-sm)' }}>
-                  Créditos feitos pelo coordenador para devolver valores integrais ou parciais. Exigem comprovante, como Pix, TED ou boleto.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {devolucoes.map((devolucao) => {
-                const devolucaoKey = `${devolucao.data}-${devolucao.valor}`;
-                const hasAttachment = Boolean(attachedDevolucoes[devolucaoKey]);
-                const isAssociated = Boolean(associatedDevolucoes[devolucaoKey]);
-
-                return (
-                  <div
-                    key={devolucaoKey}
-                    className="p-4"
-                    style={{
-                      backgroundColor: 'var(--card)',
-                      border: `1px solid ${isAssociated ? 'rgba(34, 197, 94, 0.45)' : hasAttachment ? 'rgba(234, 179, 8, 0.45)' : 'var(--border)'}`,
-                      borderRadius: 'var(--radius)',
-                    }}
-                  >
-                    <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
-                      Origem do crédito
-                    </div>
-                    <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)', marginBottom: '0.75rem' }}>
-                      {devolucao.cnpj}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Valor devolvido</div>
-                        <div style={{ color: 'rgb(34, 197, 94)', fontWeight: 'var(--font-weight-semibold)' }}>{devolucao.valorDevolvido}</div>
-                      </div>
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Compra original</div>
-                        <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)' }}>{devolucao.debitoOriginal}</div>
-                      </div>
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Valor original</div>
-                        <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)' }}>{devolucao.valorOriginal}</div>
-                      </div>
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Saldo residual</div>
-                        <div style={{ color: 'var(--primary)', fontWeight: 'var(--font-weight-semibold)' }}>{devolucao.valorResidual}</div>
-                      </div>
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Prestação</div>
-                        <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)' }}>{devolucao.prestacaoAssociada}</div>
-                      </div>
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Comprovante</div>
-                        <div style={{ color: hasAttachment ? 'rgb(34, 197, 94)' : 'rgb(234, 179, 8)', fontWeight: 'var(--font-weight-semibold)' }}>
-                          {hasAttachment ? 'Anexado' : devolucao.comprovanteObrigatorio}
-                        </div>
-                      </div>
-                    </div>
-
-                    {isAssociated && (
-                      <div
-                        className="mt-4 p-3"
-                        style={{
-                          backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                          border: '1px solid rgba(34, 197, 94, 0.3)',
-                          borderRadius: 'var(--radius)',
-                          color: 'rgb(34, 197, 94)',
-                          fontSize: 'var(--text-sm)',
-                          fontWeight: 'var(--font-weight-semibold)',
-                        }}
-                      >
-                        Devolução associada à {devolucao.prestacaoAssociada}. Saldo residual: {devolucao.valorResidual}.
-                      </div>
-                    )}
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">
-                      <button
-                        type="button"
-                        className="inline-flex items-center justify-center gap-2 px-3 py-2"
-                        aria-pressed={hasAttachment}
-                        onClick={() =>
-                          setAttachedDevolucoes((current) => ({
-                            ...current,
-                            [devolucaoKey]: true,
-                          }))
-                        }
-                        style={{
-                          backgroundColor: hasAttachment ? 'rgba(34, 197, 94, 0.14)' : 'transparent',
-                          color: hasAttachment ? 'rgb(34, 197, 94)' : 'var(--foreground)',
-                          border: `1px solid ${hasAttachment ? 'rgba(34, 197, 94, 0.35)' : 'var(--border)'}`,
-                          borderRadius: 'var(--radius)',
-                          fontSize: 'var(--text-sm)',
-                          fontWeight: 'var(--font-weight-semibold)',
-                          width: '100%',
-                        }}
-                      >
-                        {hasAttachment ? <CheckCircle size={16} /> : <Upload size={16} />}
-                        {hasAttachment ? 'Comprovante anexado' : 'Anexar comprovante'}
-                      </button>
-
-                      <button
-                        type="button"
-                        className="inline-flex items-center justify-center gap-2 px-3 py-2"
-                        aria-pressed={isAssociated}
-                        disabled={!hasAttachment || isAssociated}
-                        onClick={() =>
-                          setAssociatedDevolucoes((current) => ({
-                            ...current,
-                            [devolucaoKey]: true,
-                          }))
-                        }
-                        style={{
-                          backgroundColor: isAssociated
-                            ? 'rgba(34, 197, 94, 0.14)'
-                            : hasAttachment
-                              ? 'var(--primary)'
-                              : 'transparent',
-                          color: isAssociated
-                            ? 'rgb(34, 197, 94)'
-                            : hasAttachment
-                              ? 'var(--primary-foreground)'
-                              : 'var(--muted-foreground)',
-                          border: `1px solid ${isAssociated ? 'rgba(34, 197, 94, 0.35)' : hasAttachment ? 'var(--primary)' : 'var(--border)'}`,
-                          borderRadius: 'var(--radius)',
-                          fontSize: 'var(--text-sm)',
-                          fontWeight: 'var(--font-weight-semibold)',
-                          width: '100%',
-                          cursor: !hasAttachment || isAssociated ? 'not-allowed' : 'pointer',
-                          opacity: !hasAttachment && !isAssociated ? 0.7 : 1,
-                        }}
-                      >
-                        {isAssociated ? <CheckCircle size={16} /> : <RotateCcw size={16} />}
-                        {isAssociated ? 'Devolução associada' : hasAttachment ? 'Associar à prestação' : 'Anexe para associar'}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Payments List */}
       <div className="space-y-4 mb-8">
-        {payments.map((payment, index) => (
+        {payments.map((payment, index) => {
+          const canOpenPaymentDetails =
+            payment.status === 'Pendente' ||
+            payment.status === 'Em Validação' ||
+            payment.status === 'Reprovado' ||
+            payment.status === 'Revisar' ||
+            payment.status === 'Validado' ||
+            payment.status === 'Classificado' ||
+            payment.status === 'Comprovar';
+
+          return (
           <div 
             key={index}
             className="p-5"
             onClick={() => {
-              if (payment.status === 'Pendente' || payment.status === 'Em Validação' || payment.status === 'Reprovado' || payment.status === 'Revisar' || payment.status === 'Validado' || payment.status === 'Classificado') {
-                if (onNavigateToDetails) {
-                  onNavigateToDetails(payment);
-                }
+              if (canOpenPaymentDetails && onNavigateToDetails) {
+                onNavigateToDetails(payment);
               }
             }}
             style={{
               backgroundColor: 'var(--card)',
               border: '1px solid var(--border)',
               borderRadius: 'var(--radius)',
-              cursor: (payment.status === 'Pendente' || payment.status === 'Em Validação' || payment.status === 'Reprovado' || payment.status === 'Revisar' || payment.status === 'Validado' || payment.status === 'Classificado') ? 'pointer' : 'default',
+              cursor: canOpenPaymentDetails ? 'pointer' : 'default',
               transition: 'all 0.2s',
             }}
             onMouseEnter={(e) => {
-              if (payment.status === 'Pendente' || payment.status === 'Em Validação' || payment.status === 'Reprovado' || payment.status === 'Revisar' || payment.status === 'Validado' || payment.status === 'Classificado') {
+              if (canOpenPaymentDetails) {
                 e.currentTarget.style.backgroundColor = 'var(--muted)';
               }
             }}
@@ -1007,7 +679,7 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
 
                 {/* Seta */}
                 <div className="col-span-1 flex justify-end">
-                  {(payment.status === 'Pendente' || payment.status === 'Em Validação' || payment.status === 'Reprovado' || payment.status === 'Revisar' || payment.status === 'Validado' || payment.status === 'Classificado') && (
+                  {canOpenPaymentDetails && (
                     <ChevronRight size={20} style={{ color: 'var(--muted-foreground)' }} />
                   )}
                 </div>
@@ -1044,7 +716,7 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
                   >
                     {payment.status}
                   </span>
-                  {(payment.status === 'Pendente' || payment.status === 'Em Validação' || payment.status === 'Reprovado' || payment.status === 'Revisar' || payment.status === 'Validado' || payment.status === 'Classificado') && (
+                  {canOpenPaymentDetails && (
                     <ChevronRight size={20} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
                   )}
                 </div>
@@ -1094,7 +766,8 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Pagination */}
