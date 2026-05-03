@@ -2,7 +2,38 @@
 
 Dominio e regras de negocio: ver [README.md](README.md)
 
-### Ciclo de Vida: PrestacaoContas
+> **Atencao — duas maquinas de estados.** Este modulo documenta dois ciclos de vida para `PrestacaoContas`:
+>
+> - **V1 (implementada):** ciclo nuclear de 5 estados — `RASCUNHO → EM_ANALISE → {FINALIZADO | NEGADO | REVISAO → EM_ANALISE}`. E o que o backend atual (`ConectaFapes.PrestacaoContas.*`) executa hoje e o que o `contrato-api.md`, README, modelo-estrutural e processos refletem.
+> - **Pos-MVP (target evolutivo, aguardando DT-M014-002 + EPIC-M014-002/003):** ciclo de 11 estados PascalCase incluindo contestacao (EmContestacao, EmReanalise, AprovadaFinal, RecusadaFinal) e auditoria SECONT (EmAuditoria, Auditada). Permanece documentado abaixo apenas como referencia evolutiva e **nao** esta implementado.
+>
+> Toda regra/codigo do M014 hoje aplica a maquina V1. Diagramas Pos-MVP entram em vigor apenas quando os EPICs correspondentes forem priorizados.
+
+### Ciclo de Vida V1: PrestacaoContas (implementado)
+
+```mermaid
+stateDiagram-v2
+    [*] --> RASCUNHO : Criar Prestacao
+    RASCUNHO --> RASCUNHO : Adicionar/editar/remover documentos, justificativas e vinculos
+    RASCUNHO --> EM_ANALISE : Submeter Prestacao
+    REVISAO --> EM_ANALISE : Resubmeter apos revisao
+    EM_ANALISE --> FINALIZADO : Parecer favoravel
+    EM_ANALISE --> NEGADO : Parecer desfavoravel
+    EM_ANALISE --> REVISAO : Solicitada complementacao
+
+    FINALIZADO --> [*]
+    NEGADO --> [*]
+
+    state RASCUNHO : Coordenador prepara prestacao
+    state EM_ANALISE : Area Tecnica analisa (edicao bloqueada)
+    state REVISAO : Coordenador completa pendencias
+    state FINALIZADO : Aprovada (terminal)
+    state NEGADO : Recusada (terminal)
+    note right of EM_ANALISE : RN03 bloqueia edicao\ndo agregado
+    note right of FINALIZADO : RN08 terminal
+```
+
+### Ciclo de Vida Pos-MVP: PrestacaoContas (target evolutivo, aguardando DT-M014-002)
 
 ```mermaid
 stateDiagram-v2
@@ -49,7 +80,7 @@ stateDiagram-v2
     note right of AprovadaFinal : Irreversivel (RN06)
 ```
 
-### Ciclo de Vida: Contestacao
+### Ciclo de Vida Pos-MVP: Contestacao (EPIC-M014-003)
 
 ```mermaid
 stateDiagram-v2
@@ -70,6 +101,8 @@ stateDiagram-v2
 ```
 
 ### Ciclo de Classificacao: TransacaoFinanceira de Credito
+
+> **Aviso de versao.** Os estados detalhados (`CreditoImportado`, `EmClassificacao`, `PareadoSemPrestacao`, `Conciliavel`, `VinculadaPrestacao`, `ClassificacaoConfirmada`) descrevem o pipeline Pos-MVP. **No V1, o que o sistema persiste sao apenas as 4 categorias de `TipoClassificacaoTransacao`: `DESPESA`, `ESTORNO`, `RENDIMENTO`, `PENDENTE_CLASSIFICACAO`** (ver RN11 no README e enum em modelo-estrutural). O diagrama abaixo descreve o ciclo conceitual completo planejado.
 
 Creditos importados do extrato bancario precisam ser classificados antes ou durante a conciliacao da prestacao. Um credito pode ser rendimento, estorno ou permanecer pendente de classificacao. O estorno representa devolucao de terceiro, como vendedor ou fornecedor, anulando um debito anterior de mesmo valor referente a compra nao concluida, cancelada ou nao entregue. Esse debito pode ainda nao ter prestacao de contas, justificativa ou validacao pela FAPES.
 

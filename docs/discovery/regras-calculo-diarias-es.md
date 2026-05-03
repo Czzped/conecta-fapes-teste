@@ -59,6 +59,34 @@
 | RCD-13 | Viagens internacionais devem considerar moeda estrangeira aplicavel e conversao pela cotacao turismo do dia anterior a solicitacao, conforme regra vigente. | Decreto no 5533-R/2023; Calculadora SEP |
 | RCD-14 | Quando hospedagem, alimentacao ou despesas correlatas forem custeadas por outra entidade, o calculo deve aplicar reducao ou complemento conforme a norma vigente. | Decreto no 6202-R/2025; Calculadora SEP |
 
+## Regras em Linguagem Natural
+
+A diaria representa uma compensacao financeira pelo afastamento temporario da origem para cumprir uma atividade vinculada ao projeto. Para calcular corretamente a diaria, o sistema precisa considerar o periodo total de afastamento, a abrangencia da viagem, a origem, o destino, a existencia de pernoite, a distancia quando a viagem for dentro do Estado e eventuais despesas ja custeadas por outra entidade.
+
+O calculo comeca pela definicao da viagem. O coordenador informa a data e hora de partida, a data e hora de chegada, a origem, o destino e a finalidade da atividade. A partir dessas informacoes, o sistema identifica a abrangencia principal: **dentro do Estado**, **fora do Estado** ou **fora do Pais**. Essa abrangencia define qual tipo de diaria e qual valor unitario vigente devem ser usados.
+
+Quando a viagem e **dentro do Estado**, origem e destino devem ser municipios selecionados em lista controlada. Nesse caso, o sistema calcula ou consulta automaticamente a distancia rodoviaria entre os municipios. Essa distancia serve apenas para regras de elegibilidade da diaria estadual. Ela nao deve ser usada para viagens nacionais fora do Estado nem para viagens internacionais.
+
+Se a viagem dentro do Estado ocorrer entre municipios da Regiao Metropolitana, entre municipios limitrofes ou em deslocamento inferior ao limite normativo, a diaria pode ser bloqueada quando nao houver pernoite. A regra geral identificada e que, sem pernoite, deslocamentos metropolitanos, limitrofes ou inferiores a 150 km podem nao gerar direito a diaria, salvo excecao normativa especifica.
+
+O pernoite e um fator central do calculo. Quando ha pernoite, a diaria e calculada considerando os dias/pernoites de afastamento conforme a norma vigente. O sistema deve registrar na memoria de calculo se o pernoite ocorreu no destino ou durante o deslocamento, pois essa informacao justifica a quantidade de diarias calculada.
+
+Quando nao ha pernoite, o sistema calcula a duracao do afastamento em horas. Se o afastamento for inferior a 6 horas, nao ha diaria. Se o afastamento for igual ou superior a 6 horas, pode haver diaria parcial, equivalente a 40% do valor unitario da diaria, desde que as demais regras de elegibilidade permitam o pagamento.
+
+O horario de retorno tambem pode alterar o valor. Quando o retorno ocorre apos as 14h, a norma permite acrescimo equivalente a uma diaria parcial, conforme regra vigente. Esse acrescimo deve aparecer de forma explicita na memoria de calculo, separado do valor base da diaria.
+
+Em viagens fora do Estado e viagens internacionais, o sistema nao usa distancia municipal para validar elegibilidade. Nesses casos, a classificacao da viagem e feita pela abrangencia: nacional ou internacional. Para viagem internacional, pode haver regra de moeda estrangeira e conversao pela cotacao turismo do dia anterior a solicitacao, conforme a norma aplicavel.
+
+Quando transporte, hospedagem, alimentacao ou outras despesas forem custeadas por outra entidade, o valor da diaria pode ser reduzido, bloqueado ou receber complemento de forma diferente, de acordo com a norma vigente. Por isso, esses indicadores precisam ser informados ou derivados no momento da solicitacao e preservados na memoria de calculo.
+
+O complemento de transporte urbano pode ser aplicado em viagens interestaduais ou internacionais quando nao houver veiculo oficial nem transporte custeado por outra entidade. Se o transporte ja foi custeado, o complemento nao deve ser aplicado.
+
+A solicitacao tambem deve respeitar limites normativos de quantidade. Foram identificados limite de 15 dias consecutivos por viagem e limite mensal de 15 diarias por beneficiario, conforme norma vigente. O sistema deve validar esses limites antes de criar ou confirmar a solicitacao.
+
+Toda diaria calculada deve guardar um snapshot do calculo. Esse snapshot deve conter o tipo de diaria usado, o parametro normativo aplicado, o valor unitario vigente no momento da solicitacao, a quantidade calculada, os acrescimos ou descontos, a distancia usada quando aplicavel, os indicadores de pernoite/custeio por terceiro e a norma de referencia. A prestacao de contas deve usar esse snapshot, sem recalcular a diaria com valores ou regras alteradas posteriormente.
+
+Em resumo, o sistema deve calcular a diaria no M003 no momento da solicitacao, consumindo valores e parametros vigentes cadastrados no M008, validando saldo na rubrica correspondente e preservando a memoria de calculo para auditoria e prestacao de contas.
+
 ## Implicacoes Para o Conecta FAPES
 
 | Tema | Decisao Recomendada |

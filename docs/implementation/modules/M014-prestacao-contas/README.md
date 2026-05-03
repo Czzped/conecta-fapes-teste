@@ -22,7 +22,7 @@
 
 > **Dependencia de M016 — FundoFinanceiro:** A entidade `FundoFinanceiro` e a relacao N:1 entre `ContaBancaria` e `FundoFinanceiro` estao modeladas em M016 mas sua implementacao esta deferida ate que M014 (Prestacao de Contas) esteja concluido, pois os requisitos de segregacao de fundos surgem naturalmente do fluxo de prestacao de contas. Ver [M016 backlog](../M016-contabilidade-financeiro/backlog.md).
 
-> **Aderencia do backend atual:** A API `leds-conectafapes-prestacao-de-contas` em `develop` esta adequada para uma V1 nuclear de prestacao de contas, com `Prestacao`, `JustificativaNF`, `JustificativaDiaria`, `JustificativaInvoice`, `DocumentoFiscal`, `ItemDocumentoFiscal`, `TransacaoFinanceira`, SERPRO para NF-e, extracao interna de NFS-e e MinIO. Ela ainda nao cobre completamente o processo revisado deste modulo: faltam `JustificativaProdutoSemNota`, fluxo proprio de passagens, campos de PIX, referencia a solicitacao de diaria aprovada no M003, bloqueio de reutilizacao de diaria ja prestada contas, importacao CNAB 240 com EDI Banestes -> API/Base M014 -> MinIO -> fila -> workers, e migracao conceitual de `ContaContabil` para `RubricaOrcamentaria`. Ver avaliacao completa em [arquitetura.md](arquitetura.md).
+> **Aderencia do backend atual:** A API `leds-conectafapes-prestacao-de-contas` em `develop` esta adequada para uma V1 nuclear de prestacao de contas, com `Prestacao`, `JustificativaNF`, `JustificativaDiaria`, `JustificativaInvoice`, `DocumentoFiscal`, `ItemDocumentoFiscal`, `TransacaoFinanceira`, SERPRO para NF-e, extracao interna de NFS-e e MinIO. Ela ainda nao cobre completamente o processo revisado deste modulo: faltam `JustificativaProdutoSemNota`, fluxo proprio de passagens, campos de PIX, referencia a solicitacao de diaria aprovada no M003, bloqueio de reutilizacao de diaria ja prestada contas, importacao CNAB 240 com EDI Banestes -> API/Base M014 -> MinIO -> fila -> workers, e migracao conceitual de `ContaContabil` para `RubricaProjeto`. Ver avaliacao completa em [arquitetura.md](arquitetura.md).
 
 ---
 
@@ -38,8 +38,8 @@ A prestacao de contas e organizada como um agregado `Prestacao` que agrupa `Just
 
 O fluxo opera em duas frentes:
 
-- **Backoffice / Integracoes**: jobs de integracao importam movimentos bancarios da iniciativa, orcamento planejado e rubricas orcamentarias hierarquicas com limites. Toda iniciativa possui uma `ContaBancaria` obrigatoria vinculada a uma referencia operacional.
-- **Frontoffice (Coordenador)**: cria a `Prestacao` em RASCUNHO, vincula transacoes bancarias, registra justificativas, anexa orcamentos de fornecedor, classifica itens de nota fiscal em rubricas orcamentarias e submete para analise.
+- **Backoffice / Integracoes**: jobs de integracao importam movimentos bancarios da iniciativa, orcamento planejado e rubricas do projeto hierarquicas com limites. Toda iniciativa possui uma `ContaBancaria` obrigatoria vinculada a uma referencia operacional.
+- **Frontoffice (Coordenador)**: cria a `Prestacao` em RASCUNHO, vincula transacoes bancarias, registra justificativas, anexa orcamentos de fornecedor, classifica itens de nota fiscal em rubricas do projeto e submete para analise.
 
 O ciclo de estados da prestacao e `RASCUNHO → EM_ANALISE → {FINALIZADO | NEGADO | REVISAO → EM_ANALISE}`. Enquanto a prestacao esta `EM_ANALISE`, toda edicao e exclusao das entidades do agregado e bloqueada para preservar a integridade da analise. `FINALIZADO` e `NEGADO` sao estados terminais.
 
@@ -61,15 +61,15 @@ Notas fiscais eletronicas (NF-e) sao validadas via API SERPRO pela `ChaveAcesso`
 | RN04 | Uma `TransacaoFinanceira` so pode estar vinculada a uma `Prestacao` por vez; nova vinculacao e rejeitada se ja houver prestacao associada. | Must |
 | RN05 | Cada `JustificativaDespesa` pode ter ate 3 `OrcamentoFornecedor`, dos quais no maximo um e marcado como escolhido. | Must |
 | RN06 | NF-e sao validadas via API SERPRO por `ChaveAcesso` (44 digitos numericos) antes de vincular o `DocumentoFiscal` a `JustificativaNF`. | Must |
-| RN07 | Cada `ItemDocumentoFiscal` deve ser classificado em uma `RubricaOrcamentaria`. | Must |
+| RN07 | Cada `ItemDocumentoFiscal` deve ser classificado em uma `RubricaProjeto`. | Must |
 | RN08 | `FINALIZADO` e `NEGADO` sao estados terminais — prestacoes nesses estados sao irreversiveis. | Must |
 | RN09 | Operacoes relevantes de submissao, analise, importacao e jobs de integracao devem registrar historico/auditoria. | Must |
 | RN10 | Uma `Prestacao` so pode ser aprovada, negada ou ter revisao solicitada se estiver em `EM_ANALISE`. | Must |
 | RN11 | Creditos bancarios importados via CNAB 240 devem ser classificados como `ESTORNO`, `RENDIMENTO` ou `PENDENTE_CLASSIFICACAO` conforme origem e pareamento com debitos; `ESTORNO` e um credito de terceiro que anula um debito anterior do mesmo valor, como devolucao de vendedor/fornecedor por compra nao concluida, mesmo quando o debito ainda nao foi vinculado a uma prestacao ou validado pela FAPES. | Must |
 | RN12 | Na prestacao de contas de passagem, o Coordenador deve informar obrigatoriamente o valor da passagem comprada, associar a justificativa a uma RubricaProjeto de passagem e anexar o comprovante de pagamento e o comprovante/registro da viagem realizada. | Must |
 | RN13 | Durante a elaboracao ou apos a criacao da prestacao, o Coordenador pode associar um credito classificado como `ESTORNO` ao debito estornado correspondente; o sistema deve vincular ambos a mesma `Prestacao`, manter `TransacaoEstornadaId`, preservar historico e exibir o efeito liquido `R$ 0,00` na conciliacao. Se a prestacao ja estiver submetida ou finalizada, a associacao deve ser registrada como ajuste conciliatorio pos-prestacao, sem apagar a submissao original. | Must |
-| RI1 | Valores monetarios (`TransacaoFinanceira.Valor`, `JustificativaDespesa.ValorTotal`, `OrcamentoFornecedor.Valor`, `ContaBancaria.SaldoAtual`, `RubricaOrcamentaria.Limite`) devem ser sempre >= 0. | Must |
-| RI2 | A soma dos valores vinculados a uma `RubricaOrcamentaria` nao pode exceder seu limite aprovado sem alerta de estouro de rubrica. | Must |
+| RI1 | Valores monetarios (`TransacaoFinanceira.Valor`, `JustificativaDespesa.ValorTotal`, `OrcamentoFornecedor.Valor`, `ContaBancaria.SaldoAtual`, `RubricaProjeto.Limite`) devem ser sempre >= 0. | Must |
+| RI2 | A soma dos valores vinculados a uma `RubricaProjeto` nao pode exceder seu limite aprovado sem alerta de estouro de rubrica. | Must |
 | RI3 | `ItemDocumentoFiscal.ValorTotal` = `Quantidade × ValorUnitario`. | Must |
 | RI4 | `StatusTransacao` e derivado do `Status` da `Prestacao` vinculada: `RASCUNHO→EM_RASCUNHO`, `EM_ANALISE→EM_ANALISE`, `REVISAO→EM_REVISAO`, `FINALIZADO→APROVADA`, `NEGADO→REJEITADA`; sem vinculo: `PENDENTE`. | Must |
 

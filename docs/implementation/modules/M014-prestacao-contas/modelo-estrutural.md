@@ -107,8 +107,7 @@ classDiagram
         +string Fornecedor
         +string? IdentificadorFornecedor
         +DateTime DataCompra
-        +Guid JustificativaProdutoSemNotaRubricaOrcamentariaId
-        +RubricaOrcamentaria RubricaOrcamentaria
+        +Guid RubricaProjetoRef
         +string JustificativaAusenciaNota
         +string UrlComprovanteAlternativo
         +bool AnaliseObrigatoria
@@ -218,7 +217,8 @@ classDiagram
 
     JustificativaDespesa "1" --> "*" OrcamentoFornecedor : possui
     JustificativaNF "1" --> "1" DocumentoFiscal : associada a
-    JustificativaProdutoSemNota "*" --> "1" RubricaOrcamentaria : classificada em
+    %% legado: classe-alvo era RubricaOrcamentaria; termo canonico de dominio e RubricaProjeto (M013)
+    JustificativaProdutoSemNota "*" --> "1" RubricaOrcamentaria : classificada em (RubricaProjeto)
 
     DocumentoFiscal "1" --> "*" ItemDocumentoFiscal : contem
 
@@ -385,8 +385,7 @@ Herda todos os atributos de `JustificativaDespesa`. Usada para compra excepciona
 | Fornecedor | string | Nao | Sim | Nome ou razao social do fornecedor da compra |
 | IdentificadorFornecedor | string? | Sim | Nao | CPF ou CNPJ do fornecedor, quando informado |
 | DataCompra | DateTime | Nao | Sim | Data da compra sem nota fiscal |
-| RubricaOrcamentaria | RubricaOrcamentaria | Nao | Sim | Rubrica orcamentaria usada para classificar a despesa |
-| JustificativaProdutoSemNotaRubricaOrcamentariaId | Guid | Nao | Sim | FK para RubricaOrcamentaria |
+| RubricaProjetoRef | Guid/string | Nao | Sim | Referencia a RubricaProjeto do M013 usada para classificar a despesa <!-- legado: era atributo `RubricaOrcamentaria` + FK `JustificativaProdutoSemNotaRubricaOrcamentariaId`; alias tecnico permanece ate DT-M014-001 --> |
 | JustificativaAusenciaNota | string | Nao | Sim | Justificativa formal para ausencia da nota fiscal |
 | UrlComprovanteAlternativo | string | Nao | Sim | URL do comprovante alternativo armazenado no MinIO |
 | AnaliseObrigatoria | bool | Nao | Gerado | Indica que a despesa deve ser destacada para analise obrigatoria pela Area Tecnica |
@@ -451,8 +450,10 @@ Herda todos os atributos de `JustificativaDespesa`. Usada para compra excepciona
 
 ### RubricaOrcamentaria
 
+> **Termo canonico:** `RubricaProjeto` (referencia ao M013). Esta entidade e a implementacao local atual e mantem o nome `RubricaOrcamentaria` como alias tecnico do backend legado (DT-M014-001 e DT-M014-005). Em texto de dominio e contratos, prefira `RubricaProjeto`.
+
 > **DT-M014-001:** Implementado neste backend mas pertence conceitualmente a M013 (Gestao Orcamentaria).
-> **DT-M014-005:** O termo legado `ContaContabil` deve ser migrado no codigo/persistencia para `RubricaOrcamentaria`; no dominio deste modulo, a classificacao de despesas e feita por rubrica orcamentaria.
+> **DT-M014-005:** O termo legado `ContaContabil` deve ser migrado no codigo/persistencia para `RubricaOrcamentaria`; no dominio deste modulo, a classificacao de despesas e feita por rubrica orcamentaria. Decisao atual: `RubricaProjeto` e o termo canonico de dominio em README, EPICs, contratos e modelos. `RubricaOrcamentaria` permanece como nome de classe/tabela legado ate DT-M014-001.
 > **DT-M014-006:** `TransacaoFinanceira` deve permanecer separada de `RubricaOrcamentaria`. Qualquer FK legado de transacao financeira para rubrica deve ser tratado como classificacao auxiliar/deprecada, migrando a classificacao oficial para justificativas, itens e `Transacao`.
 
 | Atributo | Tipo | Nullable | Obrig. | Descricao |
@@ -549,7 +550,7 @@ Todas as entidades herdam de `BaseEntity` (`ConectaFapes.Common.Domain.BaseEntit
 O `Status` de `TransacaoFinanceira` nao e persistido diretamente — e uma propriedade calculada que reflete o `Status` da `Prestacao` a qual a transacao esta vinculada. Transacoes sem vinculo ficam com status `PENDENTE`.
 
 **Rubrica x transacao:**
-`RubricaOrcamentaria` classifica a despesa aprovada/prestada. `Transacao` movimenta o saldo da rubrica no M013. `TransacaoFinanceira` registra o movimento bancario. O mesmo pagamento pode precisar ser conciliado com uma justificativa e classificado em uma ou mais rubricas, mas a rubrica nao deve carregar o movimento bancario como se fosse sua propria entidade.
+`RubricaProjeto` classifica a despesa aprovada/prestada. `Transacao` movimenta o saldo da rubrica no M013. `TransacaoFinanceira` registra o movimento bancario. O mesmo pagamento pode precisar ser conciliado com uma justificativa e classificado em uma ou mais rubricas, mas a rubrica nao deve carregar o movimento bancario como se fosse sua propria entidade.
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: `JustificativaNF.DocumentoFiscal: DocumentoFiscal`)
