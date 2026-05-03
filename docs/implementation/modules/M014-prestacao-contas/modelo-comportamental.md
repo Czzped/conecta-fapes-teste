@@ -68,3 +68,56 @@ stateDiagram-v2
     state Deferida : Prestacao aprovada em carater final
     state Indeferida : Recusa mantida em carater final
 ```
+
+### Ciclo de Classificacao: TransacaoFinanceira de Credito
+
+Creditos importados do extrato bancario precisam ser classificados antes ou durante a conciliacao da prestacao. Um credito pode ser rendimento, estorno ou permanecer pendente de classificacao. O estorno representa devolucao de terceiro, como vendedor ou fornecedor, anulando um debito anterior de mesmo valor referente a compra nao concluida, cancelada ou nao entregue. Esse debito pode ainda nao ter prestacao de contas, justificativa ou validacao pela FAPES.
+
+```mermaid
+stateDiagram-v2
+    [*] --> CreditoImportado : CNAB 240 importa CREDITO
+
+    CreditoImportado --> EmClassificacao : Processar regras automaticas
+
+    EmClassificacao --> Estorno : Ha debito anterior de mesmo valor\ne terceiro relacionado
+    EmClassificacao --> Rendimento : Credito identificado como rendimento bancario
+    EmClassificacao --> PendenteClassificacao : Sem pareamento seguro
+
+    PendenteClassificacao --> Estorno : Analista confirma debito estornado
+    PendenteClassificacao --> Rendimento : Analista confirma rendimento
+    PendenteClassificacao --> PendenteClassificacao : Informacao insuficiente
+
+    Estorno --> PareadoSemPrestacao : Debito ainda sem Prestacao
+    Estorno --> Conciliavel : Debito ja vinculado a Prestacao
+    PareadoSemPrestacao --> Conciliavel : Coordenador associa estorno na prestacao
+    Rendimento --> Conciliavel : Classificado como receita financeira
+
+    Conciliavel --> VinculadaPrestacao : Coordenador vincula a prestacao
+    VinculadaPrestacao --> EmAnalise : Prestacao submetida
+    EmAnalise --> ClassificacaoConfirmada : FAPES aprova conciliacao
+    EmAnalise --> PendenteClassificacao : FAPES solicita revisao
+
+    ClassificacaoConfirmada --> [*]
+
+    state CreditoImportado : TransacaoFinanceira Tipo=CREDITO
+    state EmClassificacao : M014 tenta classificar automaticamente
+    state Estorno : Classificacao=ESTORNO\nTransacaoEstornadaId preenchido
+    state PareadoSemPrestacao : Credito e debito pareados\nsem Prestacao vinculada
+    state Rendimento : Classificacao=RENDIMENTO
+    state PendenteClassificacao : Classificacao=PENDENTE_CLASSIFICACAO
+    state Conciliavel : Pronta para montagem da prestacao
+    state VinculadaPrestacao : Transacao associada a Prestacao
+    state EmAnalise : Prestacao bloqueada para edicao
+    state ClassificacaoConfirmada : Classificacao aceita na analise
+```
+
+#### Regras comportamentais do estorno
+
+- O estorno so pode ser aplicado a `TransacaoFinanceira` de `Tipo = CREDITO`.
+- O credito classificado como `ESTORNO` deve ser pareado a uma `TransacaoFinanceira` anterior de `Tipo = DEBITO`.
+- O valor do credito deve ser igual ao valor do debito estornado.
+- A origem do credito deve indicar terceiro relacionado ao debito original, como vendedor, fornecedor, operadora ou prestador.
+- O debito estornado pode estar sem `Prestacao`, sem justificativa e sem validacao pela FAPES; o estorno deve ser permitido como pareamento financeiro antes da prestacao de contas.
+- Quando o pareamento automatico nao for seguro, a classificacao deve permanecer `PENDENTE_CLASSIFICACAO` ate revisao manual.
+- Quando confirmado e vinculado a uma prestacao, o par debito/estorno deve aparecer junto na conciliacao, com efeito liquido `R$ 0,00`.
+- A associacao manual do estorno pode ocorrer em `RASCUNHO` ou `REVISAO` como parte da elaboracao. Se a `Prestacao` ja estiver `EM_ANALISE`, `FINALIZADO` ou `NEGADO`, a associacao deve ser registrada como ajuste conciliatorio pos-prestacao, append-only, com auditoria e sem alterar documentos ou justificativas ja submetidos.

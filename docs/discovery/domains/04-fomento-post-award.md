@@ -94,13 +94,15 @@ A hierarquia de rubricas/subrubricas deve usar o catalogo de discovery em [Rubri
 
 Fluxo de prestacao de contas do projeto: backoffice FAPES prepara a base operacional (extrato bancario, conta bancaria e orcamento do projeto por Rubrica), o Coordenador monta a prestacao vinculando transacoes e registrando justificativas (NF, diaria, passagem ou invoice internacional), e o Responsavel FAPES analisa, aprovando, negando ou devolvendo para revisao. A edicao das entidades da prestacao e bloqueada enquanto o status e `EM_ANALISE`. A classificacao contabil final pertence ao M016; o M014 classifica despesas contra a Rubrica do projeto aprovada no M013.
 
+Creditos bancarios importados podem ser classificados como **estorno** quando forem devolucoes de terceiro que anulam debito anterior do mesmo valor, como devolucao de vendedor/fornecedor por compra nao concluida. Esse pareamento pode ocorrer antes de o debito estar vinculado a uma prestacao ou validado pela FAPES. O discovery detalhado esta em [Estornos na Prestacao de Contas](../estornos-prestacao-contas.md).
+
 **Implementado por:** [M014 — Prestacao de Contas](../../implementation/modules/M014-prestacao-contas/README.md)
 
 ### Preparacao (Backoffice FAPES)
 
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|
-| 4.4.1 | Importar Extrato Bancario | Importar lancamentos do extrato bancario do projeto, criando `TransacaoFinanceira` (debito/credito) associadas a `ContaBancaria` | Responsavel FAPES | Art. 27, II |
+| 4.4.1 | Importar Extrato Bancario | Importar lancamentos do extrato bancario do projeto, criando `TransacaoFinanceira` (debito/credito) associadas a `ContaBancaria` e classificando creditos como estorno, rendimento ou pendente de classificacao | Responsavel FAPES | Art. 27, II |
 | 4.4.2 | Gerir Orcamento e Rubricas do Projeto | Consultar orcamento aprovado por `RubricaProjeto`, com limites, utilizado, comprometido e saldo, consumindo a gestao orcamentaria do M013 | Responsavel FAPES | — |
 | 4.4.3 | Gerir Conta Bancaria do Projeto | Cadastrar/atualizar banco, agencia, numero e titular da `ContaBancaria` do projeto | Responsavel FAPES | — |
 

@@ -149,6 +149,7 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
   const [passageiro,   setPassageiro]   = useState('');
   const [isPassOpen,   setIsPassOpen]   = useState(false);
   const [localizador,  setLocalizador]  = useState('');
+  const [valorPassagemComprada, setValorPassagemComprada] = useState('');
   const [dataEmissao,  setDataEmissao]  = useState('');
   const [passOrigem,   setPassOrigem]   = useState('');
   const [passDestino,  setPassDestino]  = useState('');
@@ -263,6 +264,7 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
     setOpenItemIdx(null);
     setSelectedDiariaIdx(null);
     setPassQuery(''); setPassageiro(''); setLocalizador(''); setDataEmissao('');
+    setValorPassagemComprada('');
     setPassOrigem(''); setPassDestino('');
     setDataSaida(''); setHoraSaida(''); setDataChegada(''); setHoraChegada('');
   };
@@ -815,7 +817,7 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
               <div style={infoBox()}>
                 <Info size={16} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
                 <p style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: 0, lineHeight: '1.6' }}>
-                  Envie o comprovante de pagamento da passagem e o comprovante de realização da viagem. O comprovante de realização pode ser cartão de embarque, declaração de participação, certificado, carta de aceite de artigo ou declaração de reunião ou visita técnica.
+                  Informe o valor da passagem comprada, envie o comprovante de pagamento da passagem e o comprovante de realização da viagem. O comprovante de realização pode ser cartão de embarque, declaração de participação, certificado, carta de aceite de artigo ou declaração de reunião ou visita técnica.
                 </p>
               </div>
             )}
@@ -1950,32 +1952,60 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
                   <div style={stepCircle}>3</div>
                   <h2 style={stepTitle}>Informações da Passagem</h2>
                 </div>
-                <p style={stepSubtitle}>Preencha os dados da passagem realizada.</p>
+                <p style={stepSubtitle}>Preencha os dados da passagem realizada. O valor informado será associado à rubrica de passagem.</p>
 
                 <div style={{ marginLeft: '36px' }}>
-                  {/* Linha 1: Passageiro + Localizador + Data de Emissão */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <PersonSelect
-                      label="Nome do Passageiro"
-                      query={passQuery} setQuery={setPassQuery}
-                      selected={passageiro} setSelected={setPassageiro}
-                      isOpen={isPassOpen} setIsOpen={setIsPassOpen}
-                      filtered={passagFiltrado} inputRef={passSearch}
-                      disabled={isReadOnly}
-                    />
-                    <div>
-                      <label style={labelSt}>Localizador</label>
-                      <input type="text" value={localizador} onChange={e => setLocalizador(e.target.value)} placeholder="Ex.: ABC123" disabled={isReadOnly} style={inputSt(isReadOnly)}
-                        onFocus={e => { if (!isReadOnly) { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; } }}
-                        onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
+                  {/* Linha 1: Passageiro + Valor + Localizador + Data de Emissão */}
+                  <div
+                    className="mb-4 p-4"
+                    style={{
+                      backgroundColor: 'color-mix(in srgb, var(--primary) 8%, var(--card))',
+                      border: '1px solid color-mix(in srgb, var(--primary) 32%, var(--border))',
+                      borderRadius: 'var(--radius)',
+                    }}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <PersonSelect
+                        label="Nome do Passageiro"
+                        query={passQuery} setQuery={setPassQuery}
+                        selected={passageiro} setSelected={setPassageiro}
+                        isOpen={isPassOpen} setIsOpen={setIsPassOpen}
+                        filtered={passagFiltrado} inputRef={passSearch}
+                        disabled={isReadOnly}
                       />
+                      <div>
+                        <label style={labelSt}>Valor da passagem comprada *</label>
+                        <input
+                          type="text"
+                          value={valorPassagemComprada}
+                          onChange={e => setValorPassagemComprada(e.target.value)}
+                          placeholder="R$ 0,00"
+                          disabled={isReadOnly}
+                          style={inputSt(isReadOnly)}
+                          onFocus={e => { if (!isReadOnly) { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; } }}
+                          onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
+                        />
+                        <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)', marginTop: '0.35rem', display: 'block' }}>
+                          Usado para validar saldo e conciliar a transação.
+                        </span>
+                      </div>
+                      <div>
+                        <label style={labelSt}>Localizador</label>
+                        <input type="text" value={localizador} onChange={e => setLocalizador(e.target.value)} placeholder="Ex.: ABC123" disabled={isReadOnly} style={inputSt(isReadOnly)}
+                          onFocus={e => { if (!isReadOnly) { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; } }}
+                          onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
+                        />
+                      </div>
+                      <div>
+                        <label style={labelSt}>Data de Emissão</label>
+                        <input type="text" value={dataEmissao} onChange={e => setDataEmissao(e.target.value)} placeholder="dd/mm/aaaa" disabled={isReadOnly} style={inputSt(isReadOnly)}
+                          onFocus={e => { if (!isReadOnly) { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; } }}
+                          onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <label style={labelSt}>Data de Emissão</label>
-                      <input type="text" value={dataEmissao} onChange={e => setDataEmissao(e.target.value)} placeholder="dd/mm/aaaa" disabled={isReadOnly} style={inputSt(isReadOnly)}
-                        onFocus={e => { if (!isReadOnly) { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; } }}
-                        onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
-                      />
+                    <div className="mt-3" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)' }}>
+                      Rubrica associada ao salvar: <strong style={{ color: 'var(--foreground)' }}>Passagens</strong>
                     </div>
                   </div>
 

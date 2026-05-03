@@ -136,6 +136,7 @@ Conceitos centrais ao M014.
 | **ItemDocumentoFiscal** | Linha de um DocumentoFiscal. Deve ser classificado na rubrica orcamentaria/rubrica do projeto aplicavel; a conta contabil e apenas mapeamento contábil quando necessario. `ValorTotal = Quantidade × ValorUnitario` (RI3). | M014 |
 | **OrcamentoFornecedor** | Cotacao de fornecedor usada para comprovar melhor preco. Ate 3 por justificativa, no maximo 1 escolhido (RN05). | M014 |
 | **TransacaoFinanceira** | Movimento bancario/financeiro (DEBITO/CREDITO) importado do extrato ou registrado no financeiro. Pode ser vinculada a uma Prestacao para conciliacao e pode apoiar uma `Transacao`, mas nao substitui a rubrica nem seu movimento orcamentario. Status derivado do Status da Prestacao (RI2). | M014/M016 |
+| **Estorno** | Credito bancario de terceiro que anula um debito anterior do mesmo valor, como devolucao de vendedor/fornecedor por compra nao concluida, cancelada ou nao entregue. Nao e rendimento nem receita nova; deve ser pareado ao debito original mesmo quando esse debito ainda esta sem prestacao de contas ou validacao. | [Estornos na Prestacao de Contas](estornos-prestacao-contas.md) |
 | **Conta Bancaria** | Conta do projeto usada para movimentacoes financeiras. | M014 |
 | **ChaveAcesso (NF-e)** | Codigo de 44 digitos numericos que identifica unicamente uma nota fiscal eletronica na SEFAZ. Validada via API SERPRO. | M014 |
 | **SERPRO** | Servico Federal de Processamento de Dados — fornece API para consulta e validacao de NF-e. | M014 |
@@ -208,6 +209,7 @@ Conceitos centrais ao M014.
 | **StatusPrestacao** | Prestacao (M014) | `RASCUNHO`, `EM_ANALISE`, `REVISAO`, `FINALIZADO`, `NEGADO` | [M014 modelo-estrutural](../implementation/modules/M014-prestacao-contas/modelo-estrutural.md) |
 | **StatusTransacao** | TransacaoFinanceira (M014) | `PENDENTE`, `EM_RASCUNHO`, `EM_ANALISE`, `EM_REVISAO`, `APROVADA`, `REJEITADA` (derivado do Status da Prestacao) | M014 |
 | **TipoOperacao** | TransacaoFinanceira (M014) | `DEBITO`, `CREDITO` | M014 |
+| **TipoClassificacaoTransacao** | TransacaoFinanceira (M014) | `DESPESA`, `ESTORNO`, `RENDIMENTO`, `PENDENTE_CLASSIFICACAO` | M014 |
 | **TipoNota** | DocumentoFiscal (M014) | `PRODUTO`, `SERVICO` | M014 |
 | **TipoJustificativa** | JustificativaDespesa (M014) | `NF`, `INVOICE`, `DIARIA` | M014 |
 | **TipoMoeda** | JustificativaInvoice (M014) | `BRL`, `USD`, `EUR`, `GBP` | M014 |

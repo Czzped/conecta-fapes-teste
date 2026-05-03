@@ -343,6 +343,66 @@ Sem corpo na resposta.
 
 ---
 
+#### `POST /api/v1/m014/prestacoes-contas/{prestacaoId}/estornos`
+
+Associa um credito classificado como estorno ao debito correspondente em uma prestacao existente. Quando a prestacao ja foi submetida ou finalizada, a associacao e registrada como ajuste conciliatorio pos-prestacao, preservando a submissao original.
+
+- **Autorizacao:** `COORDENADOR`
+- **Operacao de origem:** `AssociarEstornoPrestacaoContas`
+- **Idempotencia:** Sim, por par `debitoTransacaoFinanceiraId` + `creditoEstornoTransacaoFinanceiraId`
+
+**Path parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `prestacaoId` | string | Identificador da prestacao de contas |
+
+**Request body**
+
+```json
+{
+  "debitoTransacaoFinanceiraId": "TR-2026-041",
+  "creditoEstornoTransacaoFinanceiraId": "TR-2026-052",
+  "modoAssociacao": "AUTO"
+}
+```
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| `debitoTransacaoFinanceiraId` | string | Sim | Transacao financeira de debito que sera estornada |
+| `creditoEstornoTransacaoFinanceiraId` | string | Sim | Transacao financeira de credito classificada como `ESTORNO` |
+| `modoAssociacao` | string | Nao | `AUTO`, `CONCILIACAO` ou `AJUSTE_POS_PRESTACAO`; quando omitido, o sistema deriva pelo estado da prestacao |
+
+**Response `200 OK`**
+
+```json
+{
+  "estornoAssociado": {
+    "prestacaoId": "PC-2026-013",
+    "debitoTransacaoFinanceiraId": "TR-2026-041",
+    "creditoEstornoTransacaoFinanceiraId": "TR-2026-052",
+    "valorDebito": 1250.0,
+    "valorCredito": 1250.0,
+    "efeitoLiquido": 0.0,
+    "modoAssociacao": "AJUSTE_POS_PRESTACAO",
+    "preservaSubmissaoOriginal": true,
+    "situacao": "ASSOCIADO"
+  }
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `PRESTACAO_NAO_ENCONTRADA` | A prestacao de contas informada nao foi encontrada. |
+| `404` | `TRANSACAO_NAO_ENCONTRADA` | Debito ou credito de estorno nao foi encontrado. |
+| `422` | `ESTORNO_VALOR_DIVERGENTE` | O credito de estorno deve ter o mesmo valor do debito estornado. |
+| `422` | `ESTORNO_OPERACAO_INVALIDA` | A transacao de credito deve estar classificada como `ESTORNO` e a transacao original deve ser `DEBITO`. |
+| `409` | `ESTORNO_JA_ASSOCIADO` | O debito informado ja possui estorno associado. |
+
+---
+
 ### 3. Importacoes de Integracao
 
 As importacoes de projeto/dados bancarios, orcamento planejado SIGFAPES e movimentos bancarios CNAB 240 sao executadas por jobs internos. Nao ha endpoint publico para upload manual de arquivo bancario por Coordenador ou Analista.
@@ -524,6 +584,7 @@ Lista as contestacoes de uma prestacao de contas.
 | `POST` | `/api/v1/m014/prestacoes-contas/{prestacaoId}/documentos-fiscais` | RegistrarDocumentoFiscal | COORDENADOR |
 | `GET` | `/api/v1/m014/prestacoes-contas/{prestacaoId}/documentos-fiscais` | ListarDocumentosFiscais | COORDENADOR, ANALISTA_AGENCIA, SECONT |
 | `DELETE` | `/api/v1/m014/prestacoes-contas/{prestacaoId}/documentos-fiscais/{documentoId}` | RemoverDocumentoFiscal | COORDENADOR |
+| `POST` | `/api/v1/m014/prestacoes-contas/{prestacaoId}/estornos` | AssociarEstornoPrestacaoContas | COORDENADOR |
 | `POST` | `/api/v1/m014/prestacoes-contas/{prestacaoId}/parecer` | EmitirParecerPrestacaoContas | ANALISTA_AGENCIA, SECONT |
 | `POST` | `/api/v1/m014/prestacoes-contas/{prestacaoId}/contestacoes` | RegistrarContestacaoPrestacaoContas | COORDENADOR |
 | `GET` | `/api/v1/m014/prestacoes-contas/{prestacaoId}/contestacoes` | ListarContestacoes | COORDENADOR, ANALISTA_AGENCIA, SECONT |
@@ -559,6 +620,46 @@ Lista as contestacoes de uma prestacao de contas.
   "status": "PENDENTE_ANALISE | APROVADO | REPROVADO"
 }
 ```
+
+### JustificativaPassagem
+
+```json
+{
+  "id": "string",
+  "prestacaoId": "string",
+  "rubricaProjetoId": "string",
+  "valorPassagemComprada": "number",
+  "origem": "string",
+  "destino": "string",
+  "dataViagem": "string (YYYY-MM-DD)",
+  "urlComprovantePagamento": "string (url)",
+  "urlComprovanteRealizacao": "string (url)",
+  "transacaoFinanceiraId": "string | null",
+  "status": "PENDENTE_ANALISE | APROVADO | REPROVADO"
+}
+```
+
+`valorPassagemComprada` e obrigatorio, deve ser maior que zero e representa o valor efetivamente pago pela passagem. Esse valor deve ser usado como valor da despesa para validacao de rubrica, saldo e conciliacao com a transacao financeira do pagamento.
+
+`rubricaProjetoId` tambem e obrigatorio e deve apontar para uma rubrica de passagem vigente do projeto. A API deve recusar o salvamento quando a rubrica informada for de diaria ou de outra categoria.
+
+### EstornoAssociado
+
+```json
+{
+  "prestacaoId": "string",
+  "debitoTransacaoFinanceiraId": "string",
+  "creditoEstornoTransacaoFinanceiraId": "string",
+  "valorDebito": "number",
+  "valorCredito": "number",
+  "efeitoLiquido": "number",
+  "modoAssociacao": "CONCILIACAO | AJUSTE_POS_PRESTACAO",
+  "preservaSubmissaoOriginal": "boolean",
+  "situacao": "ASSOCIADO"
+}
+```
+
+O estorno associado representa o pareamento entre uma transacao de debito e uma transacao de credito classificada como `ESTORNO`. O par deve aparecer junto na conciliacao da prestacao e nao deve gerar nova despesa nem rendimento. Quando `modoAssociacao = AJUSTE_POS_PRESTACAO`, a associacao e append-only e nao altera documentos, justificativas ou a submissao original.
 
 ### ExtratoBancario
 

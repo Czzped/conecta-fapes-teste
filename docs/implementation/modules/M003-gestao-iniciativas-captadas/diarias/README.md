@@ -63,3 +63,13 @@ Rubrica nao deve ser modelada como entidade interna do M003. A solicitacao apena
 - A remocao de diaria `ALOCADA` ou `APROVADA` exige justificativa, so pode ocorrer antes da data/hora de partida e gera transacao de reversao na mesma `RubricaProjeto`.
 - Rubrica e categoria: a rubrica classifica e limita; a `Transacao` movimenta saldo; a transacao financeira/bancaria aparece apenas na prestacao/conciliacao em M014/M016.
 - Depois da data/hora de partida, diaria nao utilizada deve seguir regularizacao propria com justificativa e auditoria, sem exclusao fisica.
+
+## Municipios limitrofes
+
+Municipios limitrofes sao municipios que fazem divisa territorial direta entre si. No fluxo de diarias, esse conceito e usado como uma regra objetiva de elegibilidade para viagens **Dentro do Estado**, principalmente quando nao ha pernoite.
+
+Na solicitacao de diaria, o coordenador seleciona a origem e o destino. O sistema deve consultar a matriz de municipios limitrofes do ES e calcular automaticamente se a combinacao origem/destino e limitrofe. Esse campo nao deve ser informado manualmente pelo coordenador.
+
+Quando a viagem for dentro do Estado, sem pernoite, e origem/destino forem municipios limitrofes, a regra de calculo pode bloquear a geracao de diaria ou aplicar o tratamento definido pela norma vigente. A decisao final deve ficar registrada na memoria de calculo da `SolicitacaoDiaria`.
+
+A matriz operacional fica em [data/municipios-limitrofes-es.json](data/municipios-limitrofes-es.json), com os municipios do ES e os pares de divisa usados para consulta automatica.

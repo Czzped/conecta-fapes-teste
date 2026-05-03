@@ -1,4 +1,4 @@
-import { DollarSign, Search, Calendar, ChevronDown, ChevronRight } from 'lucide-react';
+import { DollarSign, Search, Calendar, ChevronDown, ChevronRight, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
@@ -42,17 +42,20 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
   ];
 
   const payments = [
-    { tipo: 'Boleto', valor: 'R$ 3.456,70', data: '27/02/2026 - 09:35', cnpj: 'Magazine Luiza', status: 'Pendente', statusColor: { bg: 'rgba(249, 115, 22, 0.1)', color: 'rgb(249, 115, 22)', border: 'rgba(249, 115, 22, 0.3)' } },
-    { tipo: 'Pix', valor: 'R$ 4.567,90', data: '25/02/2026 - 10:05', cnpj: 'Magazine Luiza', status: 'Em Validação', statusColor: { bg: 'rgba(59, 130, 246, 0.1)', color: 'rgb(59, 130, 246)', border: 'rgba(59, 130, 246, 0.3)' } },
-    { tipo: 'Pix', valor: 'R$ 789,00', data: '23/02/2026 - 12:50', cnpj: 'Kalunga', status: 'Validado', statusColor: { bg: 'rgba(34, 197, 94, 0.1)', color: 'rgb(34, 197, 94)', border: 'rgba(34, 197, 94, 0.3)' } },
-    { tipo: 'Boleto', valor: 'R$ 2.100,00', data: '22/02/2026 - 11:20', cnpj: 'Kalunga', status: 'Revisar', statusColor: { bg: 'rgba(234, 179, 8, 0.1)', color: 'rgb(234, 179, 8)', border: 'rgba(234, 179, 8, 0.3)' } },
-    { tipo: 'Boleto', valor: 'R$ 1.890,50', data: '20/02/2026 - 11:45', cnpj: 'Americanas', status: 'Reprovado', statusColor: { bg: 'rgba(239, 68, 68, 0.1)', color: 'rgb(239, 68, 68)', border: 'rgba(239, 68, 68, 0.3)' } },
-    { tipo: 'Boleto', valor: 'R$ 2.345,60', data: '19/02/2026 - 17:25', cnpj: 'Americanas', status: 'Em Validação', statusColor: { bg: 'rgba(59, 130, 246, 0.1)', color: 'rgb(59, 130, 246)', border: 'rgba(59, 130, 246, 0.3)' } },
-    { tipo: 'Pix', valor: 'R$ 567,80', data: '18/02/2026 - 16:45', cnpj: 'Americanas', status: 'Validado', statusColor: { bg: 'rgba(34, 197, 94, 0.1)', color: 'rgb(34, 197, 94)', border: 'rgba(34, 197, 94, 0.3)' } },
-    { tipo: 'Pix', valor: 'R$ 2.567,30', data: '15/02/2026 - 16:00', cnpj: 'Amazon', status: 'Pendente', statusColor: { bg: 'rgba(249, 115, 22, 0.1)', color: 'rgb(249, 115, 22)', border: 'rgba(249, 115, 22, 0.3)' } },
-    { tipo: 'Pix', valor: 'R$ 5.234,20', data: '14/02/2026 - 08:40', cnpj: 'Amazon', status: 'Validado', statusColor: { bg: 'rgba(34, 197, 94, 0.1)', color: 'rgb(34, 197, 94)', border: 'rgba(34, 197, 94, 0.3)' } },
-    { tipo: 'Boleto', valor: 'R$ 3.890,00', data: '12/02/2026 - 09:15', cnpj: 'Amazon', status: 'Em Validação', statusColor: { bg: 'rgba(59, 130, 246, 0.1)', color: 'rgb(59, 130, 246)', border: 'rgba(59, 130, 246, 0.3)' } },
+    { tipo: 'Boleto', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 3.456,70', data: '27/02/2026 - 09:35', cnpj: 'Magazine Luiza', status: 'Pendente', statusColor: { bg: 'rgba(249, 115, 22, 0.1)', color: 'rgb(249, 115, 22)', border: 'rgba(249, 115, 22, 0.3)' } },
+    { tipo: 'Pix', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 4.567,90', data: '25/02/2026 - 10:05', cnpj: 'Magazine Luiza', status: 'Em Validação', statusColor: { bg: 'rgba(59, 130, 246, 0.1)', color: 'rgb(59, 130, 246)', border: 'rgba(59, 130, 246, 0.3)' } },
+    { tipo: 'Crédito de terceiro', operacao: 'CREDITO', classificacao: 'ESTORNO', valor: 'R$ 1.250,00', data: '24/02/2026 - 15:10', cnpj: 'Fornecedor Alfa', status: 'Classificado', origemTerceiro: 'Fornecedor Alfa', debitoEstornado: 'TR-2026-041', creditoEstorno: 'TR-2026-052', prestacaoAssociada: 'PC-2026-013', situacaoPrestacao: 'Finalizada', modoAssociacao: 'Ajuste pós-prestação', situacaoDebito: 'Sem prestação de contas', efeitoLiquido: 'R$ 0,00', statusColor: { bg: 'rgba(34, 197, 94, 0.1)', color: 'rgb(34, 197, 94)', border: 'rgba(34, 197, 94, 0.3)' } },
+    { tipo: 'Pix', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 789,00', data: '23/02/2026 - 12:50', cnpj: 'Kalunga', status: 'Validado', statusColor: { bg: 'rgba(34, 197, 94, 0.1)', color: 'rgb(34, 197, 94)', border: 'rgba(34, 197, 94, 0.3)' } },
+    { tipo: 'Boleto', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 2.100,00', data: '22/02/2026 - 11:20', cnpj: 'Kalunga', status: 'Revisar', statusColor: { bg: 'rgba(234, 179, 8, 0.1)', color: 'rgb(234, 179, 8)', border: 'rgba(234, 179, 8, 0.3)' } },
+    { tipo: 'Boleto', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 1.890,50', data: '20/02/2026 - 11:45', cnpj: 'Americanas', status: 'Reprovado', statusColor: { bg: 'rgba(239, 68, 68, 0.1)', color: 'rgb(239, 68, 68)', border: 'rgba(239, 68, 68, 0.3)' } },
+    { tipo: 'Boleto', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 2.345,60', data: '19/02/2026 - 17:25', cnpj: 'Americanas', status: 'Em Validação', statusColor: { bg: 'rgba(59, 130, 246, 0.1)', color: 'rgb(59, 130, 246)', border: 'rgba(59, 130, 246, 0.3)' } },
+    { tipo: 'Pix', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 567,80', data: '18/02/2026 - 16:45', cnpj: 'Americanas', status: 'Validado', statusColor: { bg: 'rgba(34, 197, 94, 0.1)', color: 'rgb(34, 197, 94)', border: 'rgba(34, 197, 94, 0.3)' } },
+    { tipo: 'Pix', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 2.567,30', data: '15/02/2026 - 16:00', cnpj: 'Amazon', status: 'Pendente', statusColor: { bg: 'rgba(249, 115, 22, 0.1)', color: 'rgb(249, 115, 22)', border: 'rgba(249, 115, 22, 0.3)' } },
+    { tipo: 'Pix', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 5.234,20', data: '14/02/2026 - 08:40', cnpj: 'Amazon', status: 'Validado', statusColor: { bg: 'rgba(34, 197, 94, 0.1)', color: 'rgb(34, 197, 94)', border: 'rgba(34, 197, 94, 0.3)' } },
+    { tipo: 'Boleto', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 3.890,00', data: '12/02/2026 - 09:15', cnpj: 'Amazon', status: 'Em Validação', statusColor: { bg: 'rgba(59, 130, 246, 0.1)', color: 'rgb(59, 130, 246)', border: 'rgba(59, 130, 246, 0.3)' } },
   ];
+
+  const estornos = payments.filter((payment) => payment.classificacao === 'ESTORNO');
 
   return (
     <div 
@@ -560,6 +563,139 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
         </div>
       </section>
 
+      {estornos.length > 0 && (
+        <section className="mb-8">
+          <div
+            className="p-5"
+            style={{
+              backgroundColor: 'color-mix(in srgb, rgb(34, 197, 94) 8%, transparent)',
+              border: '1px solid color-mix(in srgb, rgb(34, 197, 94) 24%, transparent)',
+              borderRadius: 'var(--radius)',
+            }}
+          >
+            <div className="flex items-start gap-3 mb-4">
+              <div
+                className="p-2"
+                style={{
+                  color: 'rgb(34, 197, 94)',
+                  backgroundColor: 'rgba(34, 197, 94, 0.12)',
+                  borderRadius: 'var(--radius)',
+                }}
+              >
+                <RotateCcw size={18} />
+              </div>
+              <div>
+                <h2 style={{ color: 'var(--foreground)', margin: 0, fontSize: 'var(--text-lg)' }}>
+                  Estornos identificados
+                </h2>
+                <p style={{ color: 'var(--muted-foreground)', margin: '0.25rem 0 0', fontSize: 'var(--text-sm)' }}>
+                  Créditos de terceiros que anulam débitos anteriores de mesmo valor. Podem ser associados a uma prestação já feita como ajuste conciliatório.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {estornos.map((estorno) => (
+                <div
+                  key={`${estorno.data}-${estorno.valor}`}
+                  className="p-4"
+                  style={{
+                    backgroundColor: 'var(--card)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                  }}
+                >
+                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
+                    Terceiro
+                  </div>
+                  <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)', marginBottom: '0.75rem' }}>
+                    {estorno.origemTerceiro}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Crédito</div>
+                      <div style={{ color: 'rgb(34, 197, 94)', fontWeight: 'var(--font-weight-semibold)' }}>{estorno.valor}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Débito pareado</div>
+                      <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)' }}>{estorno.debitoEstornado}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Classificação</div>
+                      <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)' }}>{estorno.classificacao}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Situação do débito</div>
+                      <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)' }}>{estorno.situacaoDebito}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Prestação</div>
+                      <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)' }}>{estorno.prestacaoAssociada}</div>
+                    </div>
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Efeito líquido</div>
+                      <div style={{ color: 'var(--primary)', fontWeight: 'var(--font-weight-semibold)' }}>{estorno.efeitoLiquido}</div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="mt-4 inline-flex items-center justify-center gap-2 px-3 py-2"
+                    style={{
+                      backgroundColor: 'var(--primary)',
+                      color: 'var(--primary-foreground)',
+                      border: '1px solid var(--primary)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-semibold)',
+                      width: '100%',
+                    }}
+                  >
+                    <RotateCcw size={16} />
+                    Associar à prestação existente
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div
+              className="mt-4 p-4"
+              style={{
+                backgroundColor: 'color-mix(in srgb, var(--card) 75%, transparent)',
+                border: '1px dashed var(--border)',
+                borderRadius: 'var(--radius)',
+              }}
+            >
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                <div>
+                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
+                    Débito da prestação
+                  </div>
+                  <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)' }}>TR-2026-041 · R$ 1.250,00</div>
+                </div>
+                <div>
+                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
+                    Crédito de estorno
+                  </div>
+                  <div style={{ color: 'rgb(34, 197, 94)', fontWeight: 'var(--font-weight-semibold)' }}>TR-2026-052 · R$ 1.250,00</div>
+                </div>
+                <div>
+                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
+                    Efeito na conciliação
+                  </div>
+                  <div style={{ color: 'var(--primary)', fontWeight: 'var(--font-weight-semibold)' }}>R$ 0,00</div>
+                </div>
+                <div>
+                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
+                    Modo
+                  </div>
+                  <div style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)' }}>Ajuste pós-prestação</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Payments List */}
       <div className="space-y-4 mb-8">
         {payments.map((payment, index) => (
@@ -567,7 +703,7 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
             key={index}
             className="p-5"
             onClick={() => {
-              if (payment.status === 'Pendente' || payment.status === 'Em Validação' || payment.status === 'Reprovado' || payment.status === 'Revisar' || payment.status === 'Validado') {
+              if (payment.status === 'Pendente' || payment.status === 'Em Validação' || payment.status === 'Reprovado' || payment.status === 'Revisar' || payment.status === 'Validado' || payment.status === 'Classificado') {
                 if (onNavigateToDetails) {
                   onNavigateToDetails(payment);
                 }
@@ -577,11 +713,11 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
               backgroundColor: 'var(--card)',
               border: '1px solid var(--border)',
               borderRadius: 'var(--radius)',
-              cursor: (payment.status === 'Pendente' || payment.status === 'Em Validação' || payment.status === 'Reprovado' || payment.status === 'Revisar' || payment.status === 'Validado') ? 'pointer' : 'default',
+              cursor: (payment.status === 'Pendente' || payment.status === 'Em Validação' || payment.status === 'Reprovado' || payment.status === 'Revisar' || payment.status === 'Validado' || payment.status === 'Classificado') ? 'pointer' : 'default',
               transition: 'all 0.2s',
             }}
             onMouseEnter={(e) => {
-              if (payment.status === 'Pendente' || payment.status === 'Em Validação' || payment.status === 'Reprovado' || payment.status === 'Revisar' || payment.status === 'Validado') {
+              if (payment.status === 'Pendente' || payment.status === 'Em Validação' || payment.status === 'Reprovado' || payment.status === 'Revisar' || payment.status === 'Validado' || payment.status === 'Classificado') {
                 e.currentTarget.style.backgroundColor = 'var(--muted)';
               }
             }}
@@ -596,10 +732,13 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
                 {/* Pagamento */}
                 <div className="col-span-2">
                   <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
-                    Pagamento
+                    Movimento
                   </div>
                   <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', whiteSpace: 'nowrap' }}>
                     {payment.tipo}
+                  </div>
+                  <div style={{ color: payment.operacao === 'CREDITO' ? 'rgb(34, 197, 94)' : 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.35rem', whiteSpace: 'nowrap' }}>
+                    {payment.operacao} · {payment.classificacao}
                   </div>
                 </div>
 
@@ -626,11 +765,16 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
                 {/* CNPJ */}
                 <div className="col-span-3" style={{ marginLeft: '10rem' }}>
                   <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
-                    CNPJ
+                    Terceiro
                   </div>
                   <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', whiteSpace: 'nowrap' }}>
                     {payment.cnpj}
                   </div>
+                  {payment.classificacao === 'ESTORNO' && (
+                    <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.35rem', whiteSpace: 'nowrap' }}>
+                      Associa {payment.creditoEstorno} ao débito {payment.debitoEstornado} · {payment.modoAssociacao}
+                    </div>
+                  )}
                 </div>
 
                 {/* Status */}
@@ -656,7 +800,7 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
 
                 {/* Seta */}
                 <div className="col-span-1 flex justify-end">
-                  {(payment.status === 'Pendente' || payment.status === 'Em Validação' || payment.status === 'Reprovado' || payment.status === 'Revisar' || payment.status === 'Validado') && (
+                  {(payment.status === 'Pendente' || payment.status === 'Em Validação' || payment.status === 'Reprovado' || payment.status === 'Revisar' || payment.status === 'Validado' || payment.status === 'Classificado') && (
                     <ChevronRight size={20} style={{ color: 'var(--muted-foreground)' }} />
                   )}
                 </div>
@@ -669,10 +813,13 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
-                    Pagamento
+                    Movimento
                   </div>
                   <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>
                     {payment.tipo}
+                  </div>
+                  <div style={{ color: payment.operacao === 'CREDITO' ? 'rgb(34, 197, 94)' : 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.35rem' }}>
+                    {payment.operacao} · {payment.classificacao}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -690,7 +837,7 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
                   >
                     {payment.status}
                   </span>
-                  {(payment.status === 'Pendente' || payment.status === 'Em Validação' || payment.status === 'Reprovado' || payment.status === 'Revisar' || payment.status === 'Validado') && (
+                  {(payment.status === 'Pendente' || payment.status === 'Em Validação' || payment.status === 'Reprovado' || payment.status === 'Revisar' || payment.status === 'Validado' || payment.status === 'Classificado') && (
                     <ChevronRight size={20} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
                   )}
                 </div>
@@ -722,11 +869,16 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
               {/* CNPJ - Linha Completa */}
               <div className="mt-4">
                 <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
-                  CNPJ
+                  Terceiro
                 </div>
                 <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
                   {payment.cnpj}
                 </div>
+                {payment.classificacao === 'ESTORNO' && (
+                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.35rem' }}>
+                    Associa {payment.creditoEstorno} ao débito {payment.debitoEstornado} · {payment.modoAssociacao}
+                  </div>
+                )}
               </div>
             </div>
           </div>

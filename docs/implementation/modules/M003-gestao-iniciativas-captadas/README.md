@@ -93,3 +93,4 @@ A consulta de vigencia e aditivos preserva a data de aprovacao original, a data 
 | RN39 | O bloco **Vigencia e aditivos** em **Meu Projeto** deve possuir abas **Resumo** e **Dados dos aditivos**. | Must |
 | RN40 | A aba **Dados dos aditivos** deve exibir data de aprovacao original, orcamento original e lista de aditivos vinculados ao projeto, quando existirem. | Must |
 | RN41 | Quando nao houver aditivos, a aba **Dados dos aditivos** deve exibir estado vazio objetivo. | Must |
+| RN42 | A visao orcamentaria por rubrica em **Meu Projeto** deve ser exibida somente para coordenador da iniciativa, contendo total, consumido, alocado quando aplicavel, disponivel e percentuais por rubrica. | Must |

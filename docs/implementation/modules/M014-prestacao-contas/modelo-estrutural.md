@@ -23,6 +23,7 @@ classDiagram
         +RemoverJustificativa(justificativa)
         +AdicionarTransacao(transacao)
         +RemoverTransacao(transacao)
+        +AssociarEstorno(debitoId, creditoEstornoId)
         +ValorTotalJustificativas() decimal
         +ValorTotalTransacoes() decimal
         +Saldo() decimal
@@ -41,6 +42,7 @@ classDiagram
         +string Descricao
         +string Identificador
         +string? Fonte
+        +string? OrigemTerceiro
         +TipoOperacao Tipo
         +TipoClassificacaoTransacao Classificacao
         +StatusTransacao Status
@@ -84,6 +86,16 @@ classDiagram
         +decimal ValorDiaria
         +int Quantidade
         +Guid JustificativaDiariaAlocacaoBolsistaId
+    }
+
+    class JustificativaPassagem {
+        +Guid RubricaProjetoRef
+        +decimal ValorPassagemComprada
+        +string Origem
+        +string Destino
+        +DateTime DataViagem
+        +string UrlComprovantePagamento
+        +string UrlComprovanteRealizacao
     }
 
     class JustificativaInvoice {
@@ -200,6 +212,7 @@ classDiagram
 
     JustificativaDespesa <|-- JustificativaNF : herda
     JustificativaDespesa <|-- JustificativaDiaria : herda
+    JustificativaDespesa <|-- JustificativaPassagem : herda
     JustificativaDespesa <|-- JustificativaInvoice : herda
     JustificativaDespesa <|-- JustificativaProdutoSemNota : herda
 
@@ -259,9 +272,27 @@ Todas as entidades herdam de `BaseEntity` (`ConectaFapes.Common.Domain.BaseEntit
 | Descricao | string | Nao | Sim | Descricao do lancamento conforme extrato |
 | Identificador | string | Nao | Sim | Identificador unico da transacao no arquivo CNAB 240 |
 | Fonte | string? | Sim | Nao | Origem/fonte do lancamento usada para parear estorno com debito de mesmo valor e mesma fonte |
+| OrigemTerceiro | string? | Sim | Nao | Nome, identificador ou descricao do terceiro que realizou o credito de estorno, como vendedor, fornecedor, operadora ou prestador |
 | Tipo | TipoOperacao | Nao | Sim | DEBITO ou CREDITO |
 | Classificacao | TipoClassificacaoTransacao | Nao | Gerado | Classificacao operacional da transacao: DESPESA, ESTORNO, RENDIMENTO ou PENDENTE_CLASSIFICACAO |
 | Status | StatusTransacao | Nao | Gerado | Derivado do Status da Prestacao vinculada — ver enumeracoes |
+
+**Estorno:**
+Um estorno e uma `TransacaoFinanceira` de `Tipo = CREDITO`, realizada por terceiro, que anula uma `TransacaoFinanceira` anterior de `Tipo = DEBITO` e mesmo valor. O caso tipico e a devolucao de vendedor/fornecedor por compra nao concluida, cancelada ou nao entregue.
+
+Regras estruturais:
+
+- `TransacaoEstornadaId` deve ser preenchido somente quando `Classificacao = ESTORNO`.
+- A transacao de estorno deve ser `CREDITO`.
+- A transacao referenciada em `TransacaoEstornadaId` deve ser `DEBITO`.
+- O debito estornado pode estar sem `Prestacao` vinculada, sem justificativa ou ainda nao validado pela FAPES; o estorno pode ocorrer antes da prestacao de contas desse debito.
+- `Valor` do credito de estorno deve ser igual ao `Valor` do debito estornado.
+- `OrigemTerceiro` deve identificar o terceiro que devolveu o valor sempre que a informacao estiver disponivel no CNAB, extrato ou revisao manual.
+- O mesmo debito nao deve possuir mais de um estorno confirmado que zere o mesmo valor.
+- Quando o credito nao puder ser pareado com debito de mesmo valor e terceiro relacionado, sua `Classificacao` deve permanecer `PENDENTE_CLASSIFICACAO`.
+- Ao associar estorno durante a elaboracao da `Prestacao`, debito e credito de estorno devem ficar vinculados a mesma `Prestacao`.
+- Ao associar estorno a uma `Prestacao` ja submetida ou finalizada, a associacao deve ser append-only, registrada como ajuste conciliatorio pos-prestacao, sem remover documentos, justificativas ou transacoes ja submetidas.
+- `Prestacao.AssociarEstorno(debitoId, creditoEstornoId)` deve validar que o credito e `CREDITO/ESTORNO`, que o debito e `DEBITO`, que ambos pertencem a mesma conta bancaria do projeto e que possuem o mesmo valor.
 
 **Fronteira com rubricas:**
 `TransacaoFinanceira` representa apenas o movimento bancario/financeiro. Ela nao e uma rubrica e nao deve ser usada como fonte de verdade para saldo orcamentario. A classificacao por rubrica acontece na despesa comprovada (`JustificativaDespesa`, `ItemDocumentoFiscal`, `JustificativaDiaria`, `JustificativaProdutoSemNota`) e nas entidades `Transacao` do M013. Quando for necessario conciliar uma despesa com uma transacao financeira, o vinculo deve ser por referencia entre a justificativa/`Transacao` e a `TransacaoFinanceira`.
@@ -313,6 +344,28 @@ Regras estruturais:
 
 - `SolicitacaoDiariaRef` deve ser unica entre `JustificativaDiaria` ativas, impedindo que a mesma diaria seja prestada contas mais de uma vez.
 - A lista de selecao de diarias deve consultar o M003 e remover solicitacoes ja vinculadas a `JustificativaDiaria`.
+
+### JustificativaPassagem
+
+Herda todos os atributos de `JustificativaDespesa`. Usada para comprovar passagem comprada no contexto da viagem, sem validacao SERPRO.
+
+| Atributo | Tipo | Nullable | Obrig. | Descricao |
+|---|---|---|---|---|
+| RubricaProjetoRef | Guid/string | Nao | Sim | Referencia a RubricaProjeto de passagem do M013 associada no momento do salvamento |
+| ValorPassagemComprada | decimal | Nao | Sim | Valor efetivamente pago pela passagem comprada, informado pelo Coordenador e usado como `ValorTotal` da justificativa |
+| Origem | string | Nao | Sim | Origem da passagem comprada |
+| Destino | string | Nao | Sim | Destino da passagem comprada |
+| DataViagem | DateTime | Nao | Sim | Data da viagem associada a passagem |
+| UrlComprovantePagamento | string | Nao | Sim | Comprovante de pagamento da passagem |
+| UrlComprovanteRealizacao | string | Nao | Sim | Comprovante ou registro da viagem realizada, como cartao de embarque, declaracao, certificado ou documento equivalente |
+
+Regras estruturais:
+
+- `ValorPassagemComprada` e obrigatorio e deve ser maior que zero.
+- `RubricaProjetoRef` e obrigatoria e deve apontar para uma rubrica de passagem vigente do projeto.
+- A passagem nao pode ser salva com rubrica de diaria ou de outra categoria.
+- O valor informado deve ser usado para validar saldo, classificacao na `RubricaProjeto` e conciliacao com `TransacaoFinanceira`.
+- O comprovante de pagamento e o comprovante/registro de realizacao da viagem sao obrigatorios.
 
 ### JustificativaInvoice
 

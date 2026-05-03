@@ -104,6 +104,75 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
     },
   ];
 
+  const budgetCategories = [
+    {
+      name: 'Bolsa',
+      total: 'R$ 4.738.032,00',
+      consumido: 'R$ 2.100.000,00',
+      alocado: 'R$ 1.122.000,00',
+      disponivel: 'R$ 1.516.032,00',
+      consumidoPercent: 44,
+      alocadoPercent: 24,
+      Icon: GraduationCap,
+      accentColor: '#60a5fa',
+    },
+    {
+      name: 'Diárias',
+      total: 'R$ 60.000,00',
+      consumido: 'R$ 22.432,00',
+      alocado: 'R$ 12.080,00',
+      disponivel: 'R$ 25.488,00',
+      consumidoPercent: 37,
+      alocadoPercent: 20,
+      Icon: Hotel,
+      accentColor: 'var(--primary)',
+    },
+    {
+      name: 'Material Permanente',
+      total: 'R$ 500.000,00',
+      consumido: 'R$ 180.000,00',
+      alocado: null,
+      disponivel: 'R$ 267.575,00',
+      consumidoPercent: 46,
+      alocadoPercent: 0,
+      Icon: Package,
+      accentColor: 'var(--primary)',
+    },
+    {
+      name: 'Material de Consumo',
+      total: 'R$ 260.000,00',
+      consumido: 'R$ 150.992,80',
+      alocado: null,
+      disponivel: 'R$ 73.007,20',
+      consumidoPercent: 72,
+      alocadoPercent: 0,
+      Icon: Box,
+      accentColor: 'var(--primary)',
+    },
+    {
+      name: 'Passagens',
+      total: 'R$ 85.000,00',
+      consumido: 'R$ 28.616,00',
+      alocado: null,
+      disponivel: 'R$ 45.384,00',
+      consumidoPercent: 47,
+      alocadoPercent: 0,
+      Icon: Plane,
+      accentColor: 'var(--primary)',
+    },
+    {
+      name: 'Pessoa Jurídica',
+      total: 'R$ 1.650.000,00',
+      consumido: 'R$ 1.137.502,00',
+      alocado: null,
+      disponivel: 'R$ 312.498,00',
+      consumidoPercent: 81,
+      alocadoPercent: 0,
+      Icon: Building2,
+      accentColor: 'var(--primary)',
+    },
+  ];
+
   const activities = [
     {
       id: 'A.1',
@@ -941,335 +1010,120 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
           }}
         >
           <div className="space-y-6">
-            {/* Bolsa */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="p-2"
-                    style={{
-                      color: 'var(--primary)',
-                      borderRadius: 'var(--radius)',
-                      backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
-                    }}
-                  >
-                    <GraduationCap size={18} />
+            {budgetCategories.map(({ name, total, consumido, alocado, disponivel, consumidoPercent, alocadoPercent, Icon, accentColor }) => (
+              <div key={name}>
+                <div
+                  className="mb-3"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    gap: 'var(--spacing-4)',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div 
+                      className="p-2"
+                      style={{
+                        color: 'var(--primary)',
+                        borderRadius: 'var(--radius)',
+                        backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
+                      }}
+                    >
+                      <Icon size={18} />
+                    </div>
+                    <div>
+                      <div 
+                        style={{ 
+                          color: 'var(--muted-foreground)',
+                          fontSize: 'var(--text-sm)',
+                          fontWeight: 'var(--font-weight-medium)',
+                        }}
+                      >
+                        {name}
+                      </div>
+                    </div>
                   </div>
-                  <div 
-                    style={{ 
-                      color: 'var(--muted-foreground)',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: 'var(--font-weight-medium)',
-                    }}
-                  >
-                    Bolsa
-                  </div>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)' }}>
-                    Disponível{' '}
-                  </span>
-                  <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
-                    R$ 1.516.032,00
-                  </span>
-                </div>
-              </div>
 
-              {/* Progress Bar */}
-              <div 
-                style={{
-                  width: '100%',
-                  height: '6px',
-                  backgroundColor: 'var(--muted)',
-                  borderRadius: 'var(--radius)',
-                  overflow: 'hidden',
-                }}
-              >
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: `repeat(auto-fit, minmax(${alocado ? '168px' : '188px'}, 1fr))`,
+                      columnGap: 'var(--spacing-8)',
+                      rowGap: 'var(--spacing-3)',
+                      alignItems: 'start',
+                      width: alocado ? 'min(100%, 940px)' : 'min(100%, 760px)',
+                    }}
+                  >
+                    {[
+                      { label: 'Total', value: total, percent: 100, color: 'var(--muted-foreground)' },
+                      { label: 'Consumido', value: consumido, percent: consumidoPercent, color: 'var(--foreground)' },
+                      ...(alocado
+                        ? [{ label: 'Alocado', value: alocado, percent: alocadoPercent, color: '#60a5fa' }]
+                        : []),
+                      { label: 'Disponível', value: disponivel, percent: 100 - consumidoPercent - alocadoPercent, color: 'var(--primary)' },
+                    ].map((metric) => (
+                      <div key={metric.label} style={{ textAlign: 'right' }}>
+                        <div
+                          style={{
+                            color: 'var(--muted-foreground)',
+                            fontSize: 'var(--text-xs)',
+                            fontWeight: 'var(--font-weight-normal)',
+                          }}
+                        >
+                          {metric.label}
+                        </div>
+                        <div
+                          style={{
+                            color: metric.color,
+                            fontSize: 'var(--text-sm)',
+                            fontWeight: 'var(--font-weight-semibold)',
+                            whiteSpace: 'nowrap',
+                            display: 'inline-flex',
+                            alignItems: 'baseline',
+                            justifyContent: 'flex-end',
+                            gap: '0.35rem',
+                          }}
+                        >
+                          <span>{metric.value}</span>
+                          <span style={{ color: metric.color }}>·</span>
+                          <span>{metric.percent}%</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <div 
                   style={{
-                    width: '68%',
-                    height: '100%',
-                    backgroundColor: '#60a5fa',
-                    transition: 'width 0.3s ease',
+                    width: '100%',
+                    height: '6px',
+                    backgroundColor: 'var(--muted)',
+                    borderRadius: 'var(--radius)',
+                    overflow: 'hidden',
+                    display: 'flex',
                   }}
-                />
-              </div>
-            </div>
-
-            {/* Material Permanente */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
+                >
                   <div 
-                    className="p-2"
                     style={{
-                      color: 'var(--primary)',
-                      borderRadius: 'var(--radius)',
-                      backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
+                      width: `${consumidoPercent}%`,
+                      height: '100%',
+                      backgroundColor: accentColor,
+                      transition: 'width 0.3s ease',
                     }}
-                  >
-                    <Package size={18} />
-                  </div>
+                  />
                   <div 
-                    style={{ 
-                      color: 'var(--muted-foreground)',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: 'var(--font-weight-medium)',
-                    }}
-                  >
-                    Material Permanente
-                  </div>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)' }}>
-                    Disponível{' '}
-                  </span>
-                  <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
-                    R$ 267.575,00
-                  </span>
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div 
-                style={{
-                  width: '100%',
-                  height: '6px',
-                  backgroundColor: 'var(--muted)',
-                  borderRadius: 'var(--radius)',
-                  overflow: 'hidden',
-                }}
-              >
-                <div 
-                  style={{
-                    width: '45%',
-                    height: '100%',
-                    backgroundColor: 'var(--primary)',
-                    transition: 'width 0.3s ease',
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Material de Consumo */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="p-2"
                     style={{
-                      color: 'var(--primary)',
-                      borderRadius: 'var(--radius)',
-                      backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
+                      width: `${alocadoPercent}%`,
+                      height: '100%',
+                      backgroundColor: 'color-mix(in srgb, #60a5fa 55%, transparent)',
+                      transition: 'width 0.3s ease',
                     }}
-                  >
-                    <Box size={18} />
-                  </div>
-                  <div 
-                    style={{ 
-                      color: 'var(--muted-foreground)',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: 'var(--font-weight-medium)',
-                    }}
-                  >
-                    Material de Consumo
-                  </div>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)' }}>
-                    Disponível{' '}
-                  </span>
-                  <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
-                    R$ 73.007,20
-                  </span>
+                  />
                 </div>
               </div>
-
-              {/* Progress Bar */}
-              <div 
-                style={{
-                  width: '100%',
-                  height: '6px',
-                  backgroundColor: 'var(--muted)',
-                  borderRadius: 'var(--radius)',
-                  overflow: 'hidden',
-                }}
-              >
-                <div 
-                  style={{
-                    width: '72%',
-                    height: '100%',
-                    backgroundColor: 'var(--primary)',
-                    transition: 'width 0.3s ease',
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Passagens */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="p-2"
-                    style={{
-                      color: 'var(--primary)',
-                      borderRadius: 'var(--radius)',
-                      backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
-                    }}
-                  >
-                    <Plane size={18} />
-                  </div>
-                  <div 
-                    style={{ 
-                      color: 'var(--muted-foreground)',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: 'var(--font-weight-medium)',
-                    }}
-                  >
-                    Passagens
-                  </div>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)' }}>
-                    Disponível{' '}
-                  </span>
-                  <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
-                    R$ 45.384,00
-                  </span>
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div 
-                style={{
-                  width: '100%',
-                  height: '6px',
-                  backgroundColor: 'var(--muted)',
-                  borderRadius: 'var(--radius)',
-                  overflow: 'hidden',
-                }}
-              >
-                <div 
-                  style={{
-                    width: '38%',
-                    height: '100%',
-                    backgroundColor: 'var(--primary)',
-                    transition: 'width 0.3s ease',
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Diárias */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="p-2"
-                    style={{
-                      color: 'var(--primary)',
-                      borderRadius: 'var(--radius)',
-                      backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
-                    }}
-                  >
-                    <Hotel size={18} />
-                  </div>
-                  <div 
-                    style={{ 
-                      color: 'var(--muted-foreground)',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: 'var(--font-weight-medium)',
-                    }}
-                  >
-                    Diárias
-                  </div>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)' }}>
-                    Disponível{' '}
-                  </span>
-                  <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
-                    R$ 25.488,00
-                  </span>
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div 
-                style={{
-                  width: '100%',
-                  height: '6px',
-                  backgroundColor: 'var(--muted)',
-                  borderRadius: 'var(--radius)',
-                  overflow: 'hidden',
-                }}
-              >
-                <div 
-                  style={{
-                    width: '55%',
-                    height: '100%',
-                    backgroundColor: 'var(--primary)',
-                    transition: 'width 0.3s ease',
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Pessoa Jurídica */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="p-2"
-                    style={{
-                      color: 'var(--primary)',
-                      borderRadius: 'var(--radius)',
-                      backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
-                    }}
-                  >
-                    <Building2 size={18} />
-                  </div>
-                  <div 
-                    style={{ 
-                      color: 'var(--muted-foreground)',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: 'var(--font-weight-medium)',
-                    }}
-                  >
-                    Pessoa Jurídica
-                  </div>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)' }}>
-                    Disponível{' '}
-                  </span>
-                  <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
-                    R$ 312.498,00
-                  </span>
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div 
-                style={{
-                  width: '100%',
-                  height: '6px',
-                  backgroundColor: 'var(--muted)',
-                  borderRadius: 'var(--radius)',
-                  overflow: 'hidden',
-                }}
-              >
-                <div 
-                  style={{
-                    width: '82%',
-                    height: '100%',
-                    backgroundColor: 'var(--primary)',
-                    transition: 'width 0.3s ease',
-                  }}
-                />
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

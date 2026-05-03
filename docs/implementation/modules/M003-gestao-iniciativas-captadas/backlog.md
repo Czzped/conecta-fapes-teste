@@ -18,7 +18,7 @@ Especificacao de referencia: [README.md](README.md)
 | EPIC-M003-002 | Gerir Plano Versionado da Iniciativa | RN04-RN08 | Must | To Do | [EPIC-M003-002](epics/EPIC-M003-002.md) |
 | EPIC-M003-003 | Gerir Orcamento Planejado e Rubricas | RN08, RN09, RN11, RN12 | Must | To Do | [EPIC-M003-003](epics/EPIC-M003-003.md) |
 | EPIC-M003-004 | Consolidar Execucao Financeira da Iniciativa | RN09, RN10, RN15 | Must | To Do | [EPIC-M003-004](epics/EPIC-M003-004.md) |
-| EPIC-M003-005 | Consultar Visao Consolidada da Iniciativa | RN01-RN15 | Must | To Do | [EPIC-M003-005](epics/EPIC-M003-005.md) |
+| EPIC-M003-005 | Consultar Visao Consolidada da Iniciativa | RN01-RN15, RN42 | Must | To Do | [EPIC-M003-005](epics/EPIC-M003-005.md) |
 | EPIC-M003-006 | Solicitar Diarias da Iniciativa | RN22-RN33 | Must | To Do | [EPIC-M003-006](diarias/epics/EPIC-M003-006.md) |
 | EPIC-M003-007 | Consultar Ciclo de Fomento da Iniciativa | RN16-RN21 | Must | To Do | [EPIC-M003-007](epics/EPIC-M003-007.md) |
 | EPIC-M003-008 | Consultar Vigencia e Aditivos da Iniciativa | RN34-RN41 | Must | To Do | [EPIC-M003-008](aditivos/epics/EPIC-M003-008.md) |
@@ -58,7 +58,8 @@ EPIC-M003-005 (Consultar Visao Consolidada da Iniciativa)
 ├── US-M003-017 Consultar iniciativa consolidada
 ├── US-M003-018 Listar iniciativas por programa
 ├── US-M003-019 Listar iniciativas por parceria
-└── US-M003-020 Listar iniciativas por estado
+├── US-M003-020 Listar iniciativas por estado
+└── US-M003-042 Visualizar acompanhamento orcamentario por rubrica no Meu Projeto
 
 EPIC-M003-006 (Solicitar Diarias da Iniciativa)
 ├── US-M003-021 Validar referencias externas na criacao da solicitacao de diaria

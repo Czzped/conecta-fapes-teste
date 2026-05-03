@@ -34,7 +34,7 @@ Coordenadores ou ortogados submetem documentos fiscais que comprovam a aplicacao
 
 ## Dominio
 
-A prestacao de contas e organizada como um agregado `Prestacao` que agrupa `JustificativaDespesa` (de tipos NF, Diaria, Invoice internacional ou Produto sem Nota Fiscal) e `TransacaoFinanceira` (movimentos bancarios importados via CNAB 240 e vinculados a prestacao). Cada justificativa pode ter ate tres `OrcamentoFornecedor` como comprovacao de melhor preco, dos quais no maximo um e marcado como escolhido. A classificacao orcamentaria da despesa fica na justificativa/item/rubrica do projeto, nao na transacao.
+A prestacao de contas e organizada como um agregado `Prestacao` que agrupa `JustificativaDespesa` (de tipos NF, Diaria, Passagem, Invoice internacional ou Produto sem Nota Fiscal) e `TransacaoFinanceira` (movimentos bancarios importados via CNAB 240 e vinculados a prestacao). Cada justificativa pode ter ate tres `OrcamentoFornecedor` como comprovacao de melhor preco, dos quais no maximo um e marcado como escolhido. A classificacao orcamentaria da despesa fica na justificativa/item/rubrica do projeto, nao na transacao.
 
 O fluxo opera em duas frentes:
 
@@ -57,7 +57,7 @@ Notas fiscais eletronicas (NF-e) sao validadas via API SERPRO pela `ChaveAcesso`
 |----|-----------|------------|
 | RN01 | Uma `Prestacao` so pode ser submetida se estiver em `RASCUNHO` ou `REVISAO`. | Must |
 | RN02 | Uma `Prestacao` so pode ser submetida, aprovada ou finalizada se houver movimentos bancarios importados e conciliacao entre `TransacaoFinanceira` e `JustificativaDespesa`. | Must |
-| RN03 | Enquanto a `Prestacao` esta em `EM_ANALISE`, operacoes de edicao e exclusao nas entidades do agregado (justificativas, documentos fiscais, itens, orcamentos de fornecedor e transacoes vinculadas) sao bloqueadas com erro `PRESTACAO_EM_ANALISE`. | Must |
+| RN03 | Enquanto a `Prestacao` esta em `EM_ANALISE`, operacoes de edicao e exclusao nas entidades do agregado (justificativas, documentos fiscais, itens, orcamentos de fornecedor e transacoes vinculadas) sao bloqueadas com erro `PRESTACAO_EM_ANALISE`, exceto associacao de estorno prevista na RN13, que deve ser registrada como ajuste conciliatorio auditavel. | Must |
 | RN04 | Uma `TransacaoFinanceira` so pode estar vinculada a uma `Prestacao` por vez; nova vinculacao e rejeitada se ja houver prestacao associada. | Must |
 | RN05 | Cada `JustificativaDespesa` pode ter ate 3 `OrcamentoFornecedor`, dos quais no maximo um e marcado como escolhido. | Must |
 | RN06 | NF-e sao validadas via API SERPRO por `ChaveAcesso` (44 digitos numericos) antes de vincular o `DocumentoFiscal` a `JustificativaNF`. | Must |
@@ -65,7 +65,9 @@ Notas fiscais eletronicas (NF-e) sao validadas via API SERPRO pela `ChaveAcesso`
 | RN08 | `FINALIZADO` e `NEGADO` sao estados terminais — prestacoes nesses estados sao irreversiveis. | Must |
 | RN09 | Operacoes relevantes de submissao, analise, importacao e jobs de integracao devem registrar historico/auditoria. | Must |
 | RN10 | Uma `Prestacao` so pode ser aprovada, negada ou ter revisao solicitada se estiver em `EM_ANALISE`. | Must |
-| RN11 | Creditos bancarios importados via CNAB 240 devem ser classificados como `ESTORNO`, `RENDIMENTO` ou `PENDENTE_CLASSIFICACAO` conforme origem e pareamento com debitos. | Must |
+| RN11 | Creditos bancarios importados via CNAB 240 devem ser classificados como `ESTORNO`, `RENDIMENTO` ou `PENDENTE_CLASSIFICACAO` conforme origem e pareamento com debitos; `ESTORNO` e um credito de terceiro que anula um debito anterior do mesmo valor, como devolucao de vendedor/fornecedor por compra nao concluida, mesmo quando o debito ainda nao foi vinculado a uma prestacao ou validado pela FAPES. | Must |
+| RN12 | Na prestacao de contas de passagem, o Coordenador deve informar obrigatoriamente o valor da passagem comprada, associar a justificativa a uma RubricaProjeto de passagem e anexar o comprovante de pagamento e o comprovante/registro da viagem realizada. | Must |
+| RN13 | Durante a elaboracao ou apos a criacao da prestacao, o Coordenador pode associar um credito classificado como `ESTORNO` ao debito estornado correspondente; o sistema deve vincular ambos a mesma `Prestacao`, manter `TransacaoEstornadaId`, preservar historico e exibir o efeito liquido `R$ 0,00` na conciliacao. Se a prestacao ja estiver submetida ou finalizada, a associacao deve ser registrada como ajuste conciliatorio pos-prestacao, sem apagar a submissao original. | Must |
 | RI1 | Valores monetarios (`TransacaoFinanceira.Valor`, `JustificativaDespesa.ValorTotal`, `OrcamentoFornecedor.Valor`, `ContaBancaria.SaldoAtual`, `RubricaOrcamentaria.Limite`) devem ser sempre >= 0. | Must |
 | RI2 | A soma dos valores vinculados a uma `RubricaOrcamentaria` nao pode exceder seu limite aprovado sem alerta de estouro de rubrica. | Must |
 | RI3 | `ItemDocumentoFiscal.ValorTotal` = `Quantidade × ValorUnitario`. | Must |

@@ -26,7 +26,8 @@ Status: **Done** = implementado no backend atual. **To Do (Pos-MVP)** = document
 | EPIC-M014-007 | Orcamentos de Fornecedor | UC07 | Must | Done | — | [EPIC-M014-007](epics/EPIC-M014-007.md) |
 | EPIC-M014-008 | Fluxo de Submissao e Analise (V1) | UC08 | Must | Done | Ciclo nuclear RASCUNHO → EM_ANALISE → {FINALIZADO \| NEGADO \| REVISAO} | [EPIC-M014-008](epics/EPIC-M014-008.md) |
 | EPIC-M014-009 | Prazos Temporais da Prestacao | UC09 | Must | To Do (Pos-MVP) | Prazo 30d submissao + 30d reposicao + notificacoes T-7/T-3/T-0 | [EPIC-M014-009](epics/EPIC-M014-009.md) |
-| EPIC-M014-011 | Prestacao de Contas por Rubrica do Projeto | UC11 | Must | To Do | Usa RubricaProjeto do M013; inclui selecao de diaria ainda nao prestada | [EPIC-M014-011](epics/EPIC-M014-011.md) |
+| EPIC-M014-011 | Prestacao de Contas de Diarias | UC11 | Must | To Do | Seleciona diaria do M003 ainda nao prestada, comprovante de pagamento e conciliacao | [EPIC-M014-011](epics/EPIC-M014-011.md) |
+| EPIC-M014-012 | Prestacao de Contas de Passagens | UC12 | Must | To Do | Registra valor da passagem comprada, rubrica de passagem, comprovantes e conciliacao | [EPIC-M014-012](epics/EPIC-M014-012.md) |
 
 > **Nota:** Os EPICs do legado EP-01 a EP-04 (Contas Bancarias, Orcamento, Rubricas Orcamentarias, Transacoes Financeiras) estao implementados no backend `ConectaFapes.PrestacaoContas` mas pertencem conceitualmente a M016 (Contabilidade e Financeiro). Ver [debito tecnico](#debito-tecnico). A maquina de estados expandida (11 estados) que habilita os EPICs Pos-MVP e rastreada em DT-M014-002.
 
@@ -45,7 +46,8 @@ EPIC-M014-001 (Submissao de Prestacao de Contas)  <- depende de EPIC-M014-010
 ├── US-M014-003 Submeter PC de Diarias
 ├── US-M014-004 Submeter PC de Passagens
 ├── US-M014-033 Submeter Compra de Produto por Nota Fiscal
-└── US-M014-034 Submeter Compra de Produto sem Nota Fiscal
+├── US-M014-034 Submeter Compra de Produto sem Nota Fiscal
+└── US-M014-049 Associar Estorno na Prestacao
 
 EPIC-M014-002 (Analise de Prestacao de Contas)  <- depende de EPIC-M014-001
 ├── US-M014-005 Analisar Documentos
@@ -92,12 +94,19 @@ EPIC-M014-009 (Prazos Temporais)  [Pos-MVP]  <- depende de EPIC-M014-008
 ├── US-M014-031 Validar e Registrar Reposicao de Valor (30 dias)
 └── US-M014-032 Notificar Coordenador dos Prazos em Aberto
 
-EPIC-M014-011 (Prestacao de Contas por Rubrica do Projeto)  <- depende de M013, M003 Diarias, EPIC-M014-001
-├── US-M014-038 Selecionar Rubrica do Projeto na Prestacao
+EPIC-M014-011 (Prestacao de Contas de Diarias)  <- depende de M013, M003 Diarias, EPIC-M014-001
 ├── US-M014-039 Selecionar Diaria ainda nao Prestada
 ├── US-M014-040 Criar Diaria pelo Modal Compartilhado quando Ausente
-├── US-M014-041 Validar Comprovantes por Rubrica
-└── US-M014-042 Atualizar Impacto no Saldo da Rubrica
+├── US-M014-041 Validar Comprovante de Pagamento da Diaria
+├── US-M014-042 Atualizar Impacto da Diaria no Saldo da Rubrica
+└── US-M014-043 Separar Rubrica e Transacao Financeira na Prestacao de Diaria
+
+EPIC-M014-012 (Prestacao de Contas de Passagens)  <- depende de M013, EPIC-M014-001
+├── US-M014-044 Informar Valor da Passagem Comprada
+├── US-M014-045 Validar Comprovantes de Passagem
+├── US-M014-046 Selecionar Rubrica do Projeto para Passagem
+├── US-M014-047 Separar Rubrica e Transacao Financeira na Prestacao de Passagem
+└── US-M014-048 Atualizar Impacto da Passagem no Saldo da Rubrica
 ```
 
 ---

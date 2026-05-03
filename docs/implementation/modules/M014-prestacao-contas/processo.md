@@ -121,6 +121,64 @@ sequenceDiagram
 | 12 | Atualizar saldo | API Prestacao de Contas / Financeiro M016 | Saldo da `ContaBancaria` atualizado a partir dos movimentos importados. |
 | 13 | Registrar resultado | API Prestacao de Contas / Workers de Importacao | Arquivo marcado como importado ou com falha registrada; mensagem da fila confirmada. |
 
+### Cenario de estorno
+
+Um **estorno** ocorre quando a conta bancaria recebe um credito de terceiro que anula um debito anterior do mesmo valor. O caso tipico e o vendedor/fornecedor devolver o valor de uma compra que nao foi concluida, cancelada ou nao entregue. O debito original pode ainda nao ter sido vinculado a uma prestacao de contas, pode estar sem justificativa e pode nao ter sido validado pela FAPES. O estorno nasce do pareamento financeiro entre credito e debito; depois, quando a prestacao for montada, o par deve aparecer junto para demonstrar que a saida financeira foi revertida.
+
+Exemplo operacional:
+
+| Data | Movimento | Tipo | Classificacao | Valor | Efeito esperado |
+|------|-----------|------|---------------|-------|-----------------|
+| 10/04/2026 | Pagamento ao fornecedor por compra nao concluida | DEBITO | DESPESA | R$ 1.250,00 | Reduz saldo bancario e pode ficar sem prestacao de contas ate a conciliacao. |
+| 12/04/2026 | Devolucao do fornecedor/vendedor pela compra cancelada | CREDITO | ESTORNO | R$ 1.250,00 | Anula o debito original antes ou durante a prestacao, restabelecendo o saldo pelo mesmo valor. |
+
+Regra de pareamento:
+
+- O credito classificado como `ESTORNO` deve possuir o mesmo valor do debito estornado.
+- A origem do credito deve ser terceiro relacionado ao debito original, como vendedor, fornecedor, operadora ou prestador que devolveu valor pago.
+- O debito original nao precisa estar vinculado a uma `Prestacao`, nao precisa ter justificativa cadastrada e nao precisa estar validado pela FAPES para que o credito seja pareado como `ESTORNO`.
+- O sistema deve manter referencia entre o credito de estorno e o debito original sempre que o pareamento for identificado automaticamente ou informado na analise.
+- O saldo liquido do par debito/estorno deve ser zero.
+- Quando a prestacao for montada, ela deve apresentar o par na conciliacao para que a FAPES entenda que nao houve despesa efetiva naquele movimento.
+- Durante a elaboracao ou apos a criacao da prestacao, o Coordenador pode associar manualmente um credito de estorno disponivel ao debito correspondente; nesse caso, o sistema deve vincular os dois movimentos a mesma prestacao.
+- Quando a prestacao ja tiver sido submetida ou finalizada, a associacao deve ser registrada como ajuste conciliatorio pos-prestacao, com trilha de auditoria, sem apagar a submissao original.
+- Quando o credito tiver valor diferente do debito, ou nao houver debito correspondente, a classificacao deve permanecer `PENDENTE_CLASSIFICACAO` ate revisao.
+
+```gherkin
+Funcionalidade: Classificacao de estorno em prestacao de contas
+
+  Cenario: Credito estorna debito de mesmo valor
+    Dado que existe uma TransacaoFinanceira de DEBITO no valor de R$ 1.250,00
+    E o debito ainda nao foi vinculado a uma Prestacao
+    E o CNAB 240 importou uma TransacaoFinanceira de CREDITO no valor de R$ 1.250,00
+    E o credito foi realizado por terceiro relacionado ao debito original
+    E o credito possui identificacao bancaria ou referencia operacional compativel com a compra nao concluida
+    Quando o sistema processa a classificacao dos creditos
+    Entao o credito deve ser classificado como ESTORNO
+    E o credito deve ficar pareado ao debito original
+    E o efeito liquido do par deve ser R$ 0,00
+    E quando a prestacao for montada ela deve exibir o debito e o estorno juntos na conciliacao
+
+  Cenario: Coordenador associa estorno na prestacao
+    Dado que a prestacao de contas esta em RASCUNHO
+    E existe um debito ainda sem justificativa no valor de R$ 1.250,00
+    E existe um credito de ESTORNO no valor de R$ 1.250,00 do mesmo terceiro
+    Quando o Coordenador associa o credito de estorno ao debito na tela da prestacao
+    Entao o sistema vincula o debito e o credito a mesma Prestacao
+    E mantem TransacaoEstornadaId apontando para o debito original
+    E exibe o efeito liquido do par como R$ 0,00
+
+  Cenario: Coordenador associa estorno a prestacao ja feita
+    Dado que existe uma prestacao de contas "PC-2026-013" ja criada para o projeto
+    E existe um debito da prestacao no valor de R$ 1.250,00
+    E existe um credito de ESTORNO posterior no valor de R$ 1.250,00 do mesmo terceiro
+    Quando o Coordenador associa o credito de estorno a prestacao existente
+    Entao o sistema registra um ajuste conciliatorio pos-prestacao
+    E preserva o historico da submissao original
+    E exibe o par debito/estorno na conciliacao da prestacao existente
+    E exibe o efeito liquido do par como R$ 0,00
+```
+
 ---
 
 ## Fluxo 3 - Elaboracao da Prestacao
@@ -335,7 +393,7 @@ sequenceDiagram
 
 ### Fluxo 3.7 - Passagens
 
-Passagens nao passam pelo SERPRO. O Coordenador deve informar os dados da viagem, anexar o comprovante de pagamento da passagem e anexar o comprovante de realizacao da viagem. O comprovante de realizacao pode ser cartao de embarque, declaracao de participacao, certificado, carta de aceite de artigo ou declaracao de reuniao/visita tecnica. A API valida os comprovantes obrigatorios, os dados da viagem e o pagamento, armazena os arquivos e registra a despesa na RubricaProjeto definida pelo Coordenador ou Outorgado.
+Passagens nao passam pelo SERPRO. O Coordenador deve informar os dados da viagem, informar o valor da passagem comprada, selecionar a RubricaProjeto de passagem, anexar o comprovante de pagamento da passagem e anexar o comprovante de realizacao da viagem. O comprovante de realizacao pode ser cartao de embarque, declaracao de participacao, certificado, carta de aceite de artigo ou declaracao de reuniao/visita tecnica. A API valida os comprovantes obrigatorios, o valor informado, os dados da viagem, o pagamento e a rubrica selecionada, armazena os arquivos e registra a despesa associada a RubricaProjeto de passagem.
 
 ```mermaid
 sequenceDiagram
@@ -345,16 +403,15 @@ sequenceDiagram
     participant DB as Base M014
     participant MinIO as MinIO
 
-    Coord->>API: Registra passagem, comprovante de pagamento e comprovante da viagem
+    Coord->>API: Registra passagem, rubrica de passagem, valor comprado, comprovante de pagamento e comprovante da viagem
     API->>DB: Registra metadados dos arquivos
     API->>MinIO: Salva arquivos enviados
     MinIO-->>API: Retorna URLs dos arquivos
     API->>DB: Atualiza URLs dos arquivos
-    Coord->>API: Informa dados da viagem e comprovantes
-    API->>API: Valida dados da passagem, pagamento e realizacao da viagem
-    API->>DB: Persiste justificativa de passagem
-    Coord->>API: Define RubricaProjeto da passagem
-    API->>DB: Valida RubricaProjeto e limite orcamentario
+    Coord->>API: Informa dados da viagem, valor comprado, RubricaProjeto de passagem e comprovantes
+    API->>API: Valida dados da passagem, valor comprado, pagamento, realizacao da viagem e rubrica de passagem
+    API->>DB: Valida RubricaProjeto de passagem e limite orcamentario
+    API->>DB: Persiste justificativa de passagem associada a RubricaProjeto de passagem
     Coord->>API: Informa orcamentos quando aplicavel
     API->>DB: Persiste OrcamentoFornecedor
     API->>DB: Calcula saldo da prestacao
@@ -372,7 +429,7 @@ sequenceDiagram
 | 5 | Registrar produto sem nota fiscal | Coordenador / Outorgado | Despesa excepcional registrada com justificativa, comprovante alternativo, rubrica e analise obrigatoria pela Area Tecnica. |
 | 6 | Registrar invoice | Coordenador / Outorgado | Despesa internacional registrada com moeda, valor e cambio, sem chamada ao SERPRO. |
 | 7 | Registrar diaria | Coordenador / Outorgado | Diaria registrada a partir da solicitacao de diaria aprovada do M003, com beneficiario, quantidade, valor calculado e comprovante de pagamento da diaria, sem chamada ao SERPRO. |
-| 8 | Registrar passagem | Coordenador / Outorgado | Passagem registrada com dados da viagem, comprovante de pagamento da passagem e comprovante de realizacao da viagem, sem chamada ao SERPRO. |
+| 8 | Registrar passagem | Coordenador / Outorgado | Passagem registrada com dados da viagem, valor da passagem comprada, comprovante de pagamento da passagem e comprovante de realizacao da viagem, sem chamada ao SERPRO. |
 | 9 | Enviar arquivos | Coordenador / Outorgado / MinIO | Arquivos comprobatorios armazenados no MinIO e vinculados a despesa. |
 | 10 | Definir rubrica | Coordenador / Outorgado | Despesa classificada na rubrica orcamentaria correspondente, separada da transacao bancaria. |
 | 11 | Informar orcamentos | Coordenador / Outorgado | Orcamentos cadastrados quando aplicavel e, quando necessario, um orcamento marcado como escolhido. |
