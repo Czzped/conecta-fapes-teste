@@ -1,4 +1,4 @@
-import { Sun, Moon, Bell, User, Menu, LogOut, Globe, Check, FileText } from 'lucide-react';
+import { Sun, Moon, Bell, User, Menu, LogOut, Globe, Check, ChevronDown } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { AccessibilityModal } from '@/app/components/AccessibilityModal';
 import { NotificationsSidebar } from '@/app/components/NotificationsSidebar';
@@ -215,20 +215,29 @@ export function Header({ onToggleSidebar, onToggleMobileMenu, isMobileMenuOpen, 
                 <button
                   ref={projectButtonRef}
                   onClick={toggleProjectMenu}
-                  className="p-2 transition-colors"
+                  className="h-11 px-4 transition-colors inline-flex items-center justify-between gap-3"
                   style={{
                     color: 'var(--foreground)',
+                    backgroundColor: 'var(--input-background)',
+                    border: '1px solid var(--border)',
                     borderRadius: 'var(--radius)',
+                    minWidth: '220px',
+                    maxWidth: 'min(320px, 42vw)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--muted)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.backgroundColor = 'var(--input-background)';
                   }}
                   aria-label="Select project"
                 >
-                  <FileText size={20} />
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {t('home.selectProject')}
+                  </span>
+                  <ChevronDown size={18} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
                 </button>
 
                 {/* Project Menu */}

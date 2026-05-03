@@ -58,8 +58,9 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
   const { t } = useLanguage();
 
   // Translated menu items
+  const homeMenuItem = { id: 'inicio', labelKey: 'sidebar.home', icon: Home };
+
   const managementMenuItems = [
-    { id: 'inicio', labelKey: 'sidebar.home', icon: Home },
     { id: 'projetos', labelKey: 'sidebar.myProject', icon: FolderKanban },
     { id: 'certificados', labelKey: 'sidebar.requests', icon: ClipboardList },
   ];
@@ -562,8 +563,71 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
 
       <div className={isCollapsed ? 'px-2 flex-1' : 'px-4 flex-1'}>
         <nav className="mt-2">
+          <ul className="space-y-2">
+            {(() => {
+              const Icon = homeMenuItem.icon;
+              const isActive = currentPage === homeMenuItem.id;
+
+              return (
+                <li key={homeMenuItem.id}>
+                  <button
+                    onClick={() => onNavigate(homeMenuItem.id)}
+                    className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
+                    style={{
+                      backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
+                      color: isActive ? 'var(--sidebar-accent-foreground)' : 'var(--sidebar-foreground)',
+                      borderRadius: 'var(--radius)',
+                      fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
+                      fontSize: 'var(--text-sm)',
+                      paddingLeft: isCollapsed ? '0' : '0.75rem',
+                      paddingRight: isCollapsed ? '0' : '0.75rem',
+                      justifyContent: isCollapsed ? 'center' : 'flex-start',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = 'var(--muted)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }
+                    }}
+                    title={isCollapsed ? t(homeMenuItem.labelKey) : undefined}
+                  >
+                    <Icon size={20} style={{ flexShrink: 0 }} />
+                    {!isCollapsed && <span style={{ textAlign: 'left' }}>{t(homeMenuItem.labelKey)}</span>}
+
+                    {isCollapsed && (
+                      <div
+                        className="absolute left-full ml-2 px-3 py-2 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50"
+                        style={{
+                          backgroundColor: 'var(--popover)',
+                          color: 'var(--popover-foreground)',
+                          fontSize: 'var(--text-sm)',
+                          boxShadow: 'var(--shadow-lg)',
+                        }}
+                      >
+                        {t(homeMenuItem.labelKey)}
+                      </div>
+                    )}
+                  </button>
+                </li>
+              );
+            })()}
+          </ul>
+
           {filteredProfileMenuItems.length > 0 && (
             <>
+              <div
+                style={{
+                  height: '1px',
+                  backgroundColor: 'var(--sidebar-border)',
+                  marginTop: '1rem',
+                  marginBottom: '1.5rem',
+                }}
+              />
+
               {!isCollapsed && (
                 <div
                   style={{

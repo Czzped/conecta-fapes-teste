@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{{titulo}}</title>
+  </head>
+  <body style="margin:0; padding:0; background:#eef3f8; font-family:Arial, Helvetica, sans-serif; color:#0f172a;">
+    <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:transparent;">
+      {{preheader}}
+    </div>
+
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#eef3f8; margin:0; padding:24px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%; max-width:640px; background:#ffffff; border-radius:12px; overflow:hidden; border:1px solid #d8e2ee;">
+            <tr>
+              <td style="background:#071527; padding:24px 28px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                  <tr>
+                    <td align="left" style="vertical-align:middle;">
+                      <div style="font-size:20px; line-height:24px; font-weight:700; color:#ffffff; letter-spacing:0.2px;">
+                        ConectaFAPES
+                      </div>
+                      <div style="font-size:12px; line-height:18px; color:#9fb3c8; margin-top:4px;">
+                        Fundacao de Amparo a Pesquisa e Inovacao do Espirito Santo
+                      </div>
+                    </td>
+                    <td align="right" style="vertical-align:middle;">
+                      <span style="display:inline-block; padding:8px 12px; border-radius:999px; background:#0e7490; color:#ecfeff; font-size:12px; line-height:14px; font-weight:700;">
+                        {{tipoEvento}}
+                      </span>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:32px 28px 8px 28px;">
+                <p style="margin:0 0 10px 0; color:#64748b; font-size:14px; line-height:20px;">
+                  Ola, {{nomeDestinatario}}.
+                </p>
+                <h1 style="margin:0; color:#0f172a; font-size:28px; line-height:34px; font-weight:700;">
+                  {{titulo}}
+                </h1>
+                <p style="margin:14px 0 0 0; color:#334155; font-size:16px; line-height:24px;">
+                  {{mensagemPrincipal}}
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:20px 28px 8px 28px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f8fafc; border:1px solid #dbe5ef; border-radius:10px;">
+                  <tr>
+                    <td style="padding:18px 18px 8px 18px;">
+                      <div style="font-size:12px; line-height:16px; color:#64748b; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;">
+                        Resumo
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:0 18px 18px 18px;">
+                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                        <tr>
+                          <td style="padding:10px 0; border-bottom:1px solid #e2e8f0; color:#64748b; font-size:13px; line-height:18px; width:38%;">
+                            Projeto
+                          </td>
+                          <td style="padding:10px 0; border-bottom:1px solid #e2e8f0; color:#0f172a; font-size:14px; line-height:20px; font-weight:700;">
+                            {{projeto}}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding:10px 0; border-bottom:1px solid #e2e8f0; color:#64748b; font-size:13px; line-height:18px;">
+                            {{atorPrincipalRotulo}}
+                          </td>
+                          <td style="padding:10px 0; border-bottom:1px solid #e2e8f0; color:#0f172a; font-size:14px; line-height:20px; font-weight:700;">
+                            {{atorPrincipalNome}}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding:10px 0; border-bottom:1px solid #e2e8f0; color:#64748b; font-size:13px; line-height:18px;">
+                            {{valorRotulo}}
+                          </td>
+                          <td style="padding:10px 0; border-bottom:1px solid #e2e8f0; color:#0e7490; font-size:16px; line-height:22px; font-weight:700;">
+                            {{valor}}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding:10px 0; border-bottom:1px solid #e2e8f0; color:#64748b; font-size:13px; line-height:18px;">
+                            {{dataRotulo}}
+                          </td>
+                          <td style="padding:10px 0; border-bottom:1px solid #e2e8f0; color:#0f172a; font-size:14px; line-height:20px; font-weight:700;">
+                            {{dataEvento}}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding:10px 0; color:#64748b; font-size:13px; line-height:18px;">
+                            Status
+                          </td>
+                          <td style="padding:10px 0; color:#0f172a; font-size:14px; line-height:20px; font-weight:700;">
+                            <span style="display:inline-block; padding:6px 10px; border-radius:999px; background:#dcfce7; color:#166534; font-size:12px; line-height:14px; font-weight:700;">
+                              {{status}}
+                            </span>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:22px 28px 8px 28px;">
+                <a href="{{acaoUrl}}" style="display:inline-block; background:#06b6d4; color:#071527; text-decoration:none; padding:13px 18px; border-radius:8px; font-size:14px; line-height:18px; font-weight:700;">
+                  {{acaoTexto}}
+                </a>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:18px 28px 30px 28px;">
+                <div style="background:#ecfeff; border:1px solid #bae6fd; border-radius:10px; padding:14px 16px;">
+                  <p style="margin:0; color:#0f3f52; font-size:13px; line-height:20px;">
+                    {{observacao}}
+                  </p>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="background:#f8fafc; padding:20px 28px; border-top:1px solid #dbe5ef;">
+                <p style="margin:0; color:#64748b; font-size:12px; line-height:18px;">
+                  Este e um email automatico. Nao responda esta mensagem.
+                </p>
+                <p style="margin:8px 0 0 0; color:#94a3b8; font-size:11px; line-height:16px;">
+                  Evento: {{codigoEvento}} · Modulo: {{moduloOrigem}} · Enviado em {{dataEnvio}}
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

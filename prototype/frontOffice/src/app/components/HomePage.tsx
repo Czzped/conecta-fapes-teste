@@ -1,7 +1,6 @@
 import { Info, Briefcase, Bell, FileUser, FolderOpen, Check, GraduationCap, Building2, Users, ChevronRight, PlaneTakeoff } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Dropdown } from '@/app/components/Dropdown';
 
 type AccessType = 'voluntario' | 'bolsista' | 'coordenador';
 
@@ -12,7 +11,6 @@ interface HomePageProps {
 
 export function HomePage({ accessType, onNavigate }: HomePageProps) {
   const { t, language } = useLanguage();
-  const [selectedProject, setSelectedProject] = useState('');
 
   useEffect(() => {
     console.log('🏠 HomePage language changed to:', language);
@@ -30,8 +28,8 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
 
   return (
     <div className="w-full px-4 md:px-8 py-8">
-      {/* Header with icon button and dropdown for Coordenador */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-8">
+      {/* Header with icon button */}
+      <div className="flex items-center gap-3 mb-8">
         <div className="flex items-center gap-3">
           <button
             className="p-2 transition-colors"
@@ -58,22 +56,6 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
             {t('home.portalTitle')}
           </h1>
         </div>
-
-        {/* Dropdown - Only for Coordenador */}
-        {accessType === 'coordenador' && (
-          <Dropdown
-            value={selectedProject}
-            onChange={setSelectedProject}
-            options={[
-              { value: '', label: t('home.selectProject') },
-              { value: 'conecta-fapes', label: 'Conecta Fapes' },
-              { value: 'outro-exemplo', label: 'Outro Exemplo de Projeto' },
-              { value: 'mais-um-exemplo', label: 'Mais um Exemplo de Projeto' },
-            ]}
-            placeholder={t('home.selectProject')}
-            className="w-full md:w-[250px]"
-          />
-        )}
       </div>
 
       {/* Project Card - Only for Coordenador */}

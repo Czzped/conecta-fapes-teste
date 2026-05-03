@@ -28,6 +28,7 @@ Status: **Done** = implementado no backend atual. **To Do (Pos-MVP)** = document
 | EPIC-M014-009 | Prazos Temporais da Prestacao | UC09 | Must | To Do (Pos-MVP) | Prazo 30d submissao + 30d reposicao + notificacoes T-7/T-3/T-0 | [EPIC-M014-009](epics/EPIC-M014-009.md) |
 | EPIC-M014-011 | Prestacao de Contas de Diarias | UC11 | Must | To Do | Seleciona diaria do M003 ainda nao prestada, comprovante de pagamento e conciliacao | [EPIC-M014-011](epics/EPIC-M014-011.md) |
 | EPIC-M014-012 | Prestacao de Contas de Passagens | UC12 | Must | To Do | Registra valor da passagem comprada, rubrica de passagem, comprovantes e conciliacao | [EPIC-M014-012](epics/EPIC-M014-012.md) |
+| EPIC-M014-013 | Devolucoes do Coordenador | UC13 | Must | To Do | Credito de devolucao parcial ou integral feito pelo coordenador, com comprovante obrigatorio | [EPIC-M014-013](epics/EPIC-M014-013.md) |
 
 > **Nota:** Os EPICs do legado EP-01 a EP-04 (Contas Bancarias, Orcamento, Rubricas Orcamentarias, Transacoes Financeiras) estao implementados no backend `ConectaFapes.PrestacaoContas` mas pertencem conceitualmente a M016 (Contabilidade e Financeiro). Ver [debito tecnico](#debito-tecnico). A maquina de estados expandida (11 estados) que habilita os EPICs Pos-MVP e rastreada em DT-M014-002.
 
@@ -107,6 +108,12 @@ EPIC-M014-012 (Prestacao de Contas de Passagens)  <- depende de M013, EPIC-M014-
 ├── US-M014-046 Selecionar Rubrica do Projeto para Passagem
 ├── US-M014-047 Separar Rubrica e Transacao Financeira na Prestacao de Passagem
 └── US-M014-048 Atualizar Impacto da Passagem no Saldo da Rubrica
+
+EPIC-M014-013 (Devolucoes do Coordenador)  <- depende de EPIC-M014-010, EPIC-M014-001
+├── US-M014-050 Classificar Credito como Devolucao
+├── US-M014-051 Anexar Comprovante da Devolucao
+├── US-M014-052 Associar Devolucao a Compra ou Prestacao
+└── US-M014-053 Exibir Saldo Residual da Compra
 ```
 
 ---

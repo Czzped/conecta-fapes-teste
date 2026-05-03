@@ -11,6 +11,8 @@
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclo de vida da Notificacao |
+| [Notificacoes](notificacoes/README.md) | Artefatos do servico de notificacoes individuais |
+| [Template de Email - Notificacao de Evento](notificacoes/emails/email-notificacao-evento.md) | Design base para emails transacionais disparados por eventos de negocio |
 
 ---
 

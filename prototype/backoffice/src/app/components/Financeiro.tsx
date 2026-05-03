@@ -10,7 +10,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell 
 } from 'recharts';
 import { 
-  DollarSign, ArrowUpRight, ArrowDownRight, FileText, Calendar, Filter, Search, RotateCcw
+  DollarSign, ArrowUpRight, ArrowDownRight, FileText, Calendar, Filter, Search, RotateCcw, Upload
 } from 'lucide-react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
@@ -32,10 +32,12 @@ const transactions = [
   { id: '5', project: 'Publicação Científica Internacional', value: 'R$ 3.450,00', status: 'Pago', date: '01/02/2026', category: 'Difusão', rubrica: 'Passagens', valorPassagemComprada: 'R$ 3.450,00', operacao: 'DEBITO', classificacao: 'DESPESA', origemTerceiro: null, transacaoEstornadaId: null, situacaoDebito: null, prestacaoAssociada: null, efeitoLiquido: null },
   { id: '6', project: 'Conecta Fapes', value: 'R$ 1.280,00', status: 'Pendente', date: '21/02/2026', category: 'Passagem', rubrica: 'Passagens', valorPassagemComprada: 'R$ 1.280,00', operacao: 'DEBITO', classificacao: 'DESPESA', origemTerceiro: null, transacaoEstornadaId: null, situacaoDebito: null, prestacaoAssociada: null, efeitoLiquido: null },
   { id: '7', project: 'Conecta Fapes', value: 'R$ 1.250,00', status: 'Classificado', date: '24/02/2026', category: 'Crédito de terceiro', rubrica: '—', valorPassagemComprada: null, operacao: 'CREDITO', classificacao: 'ESTORNO', origemTerceiro: 'Fornecedor Alfa', transacaoEstornadaId: 'TR-2026-041', situacaoDebito: 'Sem prestação de contas', prestacaoAssociada: 'PC-2026-013', modoAssociacao: 'Ajuste pós-prestação', efeitoLiquido: 'R$ 0,00' },
+  { id: '8', project: 'Conecta Fapes', value: 'R$ 400,00', status: 'Comprovar', date: '24/02/2026', category: 'Devolução do coordenador', rubrica: 'Material de consumo', valorPassagemComprada: null, operacao: 'CREDITO', classificacao: 'DEVOLUCAO', origemTerceiro: 'Coordenador do projeto', transacaoEstornadaId: 'TR-2026-045', situacaoDebito: 'Parcialmente devolvido', prestacaoAssociada: 'PC-2026-013', modoAssociacao: 'Ajuste conciliatório', efeitoLiquido: 'R$ 850,00', valorOriginal: 'R$ 1.250,00', valorDevolvido: 'R$ 400,00', valorResidual: 'R$ 850,00', comprovante: 'Pix obrigatório' },
 ];
 
 export const Financeiro: React.FC = () => {
   const estornos = transactions.filter((t) => t.classificacao === 'ESTORNO');
+  const devolucoes = transactions.filter((t) => t.classificacao === 'DEVOLUCAO');
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -192,6 +194,60 @@ export const Financeiro: React.FC = () => {
         </CardContent>
       </Card>
 
+      <Card>
+        <CardHeader>
+          <CardTitle>Devoluções do Coordenador</CardTitle>
+          <CardDescription>Créditos devolvidos pelo coordenador exigem comprovante obrigatório e podem regularizar compras de forma parcial ou integral.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 md:grid-cols-2">
+            {devolucoes.map((t) => (
+              <div key={t.id} className="rounded-lg border border-border bg-card p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className="size-10 rounded-md bg-amber-500/10 flex items-center justify-center shrink-0">
+                      <Upload className="h-5 w-5 text-amber-500" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold truncate">{t.project}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t.date} • Origem: {t.origemTerceiro}</p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="border-amber-500/40 text-amber-500">{t.classificacao}</Badge>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  <div className="rounded-md bg-muted/60 p-3">
+                    <p className="text-xs text-muted-foreground">Valor original</p>
+                    <p className="text-lg font-bold">{t.valorOriginal}</p>
+                  </div>
+                  <div className="rounded-md bg-muted/60 p-3">
+                    <p className="text-xs text-muted-foreground">Valor devolvido</p>
+                    <p className="text-lg font-bold text-primary">{t.valorDevolvido}</p>
+                  </div>
+                  <div className="rounded-md bg-muted/60 p-3">
+                    <p className="text-xs text-muted-foreground">Saldo residual</p>
+                    <p className="text-sm font-semibold">{t.valorResidual}</p>
+                  </div>
+                  <div className="rounded-md bg-muted/60 p-3">
+                    <p className="text-xs text-muted-foreground">Compra/debito</p>
+                    <p className="text-sm font-semibold">{t.transacaoEstornadaId}</p>
+                  </div>
+                  <div className="rounded-md bg-muted/60 p-3">
+                    <p className="text-xs text-muted-foreground">Prestação associada</p>
+                    <p className="text-sm font-semibold">{t.prestacaoAssociada}</p>
+                  </div>
+                  <div className="rounded-md bg-muted/60 p-3">
+                    <p className="text-xs text-muted-foreground">Comprovante</p>
+                    <p className="text-sm font-semibold text-amber-500">{t.comprovante}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         {/* Chart */}
         <Card className="col-span-4">
@@ -288,11 +344,23 @@ export const Financeiro: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
-                      <Badge variant={t.classificacao === 'ESTORNO' ? 'default' : 'outline'} className={t.classificacao === 'ESTORNO' ? 'bg-primary text-white' : ''}>
+                      <Badge
+                        variant={t.classificacao === 'ESTORNO' ? 'default' : 'outline'}
+                        className={
+                          t.classificacao === 'ESTORNO'
+                            ? 'bg-primary text-white'
+                            : t.classificacao === 'DEVOLUCAO'
+                              ? 'border-amber-500/40 text-amber-500'
+                              : ''
+                        }
+                      >
                         {t.classificacao}
                       </Badge>
                       {t.classificacao === 'ESTORNO' && (
                         <p className="text-xs text-muted-foreground">Estorna {t.transacaoEstornadaId} • {t.prestacaoAssociada}</p>
+                      )}
+                      {t.classificacao === 'DEVOLUCAO' && (
+                        <p className="text-xs text-muted-foreground">Devolve {t.valorDevolvido} • residual {t.valorResidual}</p>
                       )}
                     </div>
                   </TableCell>
