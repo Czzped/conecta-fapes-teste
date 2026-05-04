@@ -34,11 +34,9 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 | CadastrarInstituicao | Command | Registrar instituicao com ou sem CNPJ proprio, incluindo natureza publica/privada quando aplicavel e eventual superior hierarquico | nome, sigla?, cnpj?, razaoSocial?, email?, telefone?, endereco?, isPublica?, isExterna, superiorId?, tipoInstituicaoId? | `Instituicao` registrada | RN02, RN03, RN12, RN13, RN14, RN15 | Nome informado; superior informado quando nao houver CNPJ | CNPJ duplicado, superior inexistente, instituicao sem CNPJ e sem superior, dados invalidos | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | RegistrarDirigente | Command | Registrar dirigente como vinculo temporal entre uma pessoa e uma instituicao | pessoaId, instituicaoId, dataInicio, dataFim | `Dirigente` criado/atualizado | RN04, RN11, RI1 | Pessoa e instituicao existentes | Mandato sobreposto, pessoa inexistente, instituicao inexistente | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | SincronizarPessoaViaAcessoCidadao | Event Consumed | Criar ou vincular pessoa automaticamente a partir do Acesso Cidadao | cpf, nome, email, origem | `PessoaFisica` criada/vinculada | RN10 | Evento recebido com CPF valido | CPF invalido, inconsistencias cadastrais | Sim por CPF e origem do evento | Sistema | Evento/mensagem interna a definir |
-| CadastrarRubrica | Command | Criar Rubrica canonica de custeio ou capital | codigo, nome, descricao, natureza, categoriaOrcamentaria?, documentoFonte?, vigenciaInicio?, rubricaPaiId? | `Rubrica` criada | RN07, RN16, RN17 | Codigo, nome, descricao e natureza informados | Codigo duplicado, rubrica pai inexistente, hierarquia invalida | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
-| AtualizarRubrica | Command | Atualizar metadados, vigencia, documento fonte ou rubrica pai | rubricaId, dados atualizados, justificativa | `Rubrica` atualizada | RN16, RN17, RN18 | Rubrica existente | Rubrica inexistente, hierarquia invalida, justificativa ausente quando aplicavel | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| CadastrarRubrica | Command | Criar Rubrica canonica de custeio ou capital | codigo, nome, descricao, naturezaDespesa, ativa, rubricaPaiId? | `Rubrica` criada | RN07, RN16, RN17 | Codigo, nome, descricao, natureza da despesa e ativa informados | Codigo duplicado, rubrica pai inexistente, hierarquia invalida | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| AtualizarRubrica | Command | Atualizar metadados, indicador ativa ou rubrica pai | rubricaId, dados atualizados, justificativa | `Rubrica` atualizada | RN16, RN17, RN18 | Rubrica existente | Rubrica inexistente, hierarquia invalida, justificativa ausente quando aplicavel | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | AlterarEstadoRubrica | Command | Ativar ou desativar Rubrica preservando historico | rubricaId, ativa, justificativa | `Rubrica` atualizada | RN18 | Rubrica existente | Rubrica inexistente, desativacao sem justificativa | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
-| RegistrarSinonimoRubrica | Command | Vincular termo equivalente a uma Rubrica canonica | rubricaId, termo, origem? | `SinonimoRubrica` criado | RN19 | Rubrica existente | Termo duplicado, rubrica inexistente | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
-| DefinirMapeamentoContabilRubrica | Command | Vincular Rubrica a referencia contabil vigente do M016 | rubricaId, contaContabilRef, classificacaoContabil?, vigenciaInicio, vigenciaFim? | `MapeamentoContabilRubrica` criado | RN20 | Rubrica existente; conta contabil existente no M016 quando validavel | Conta contabil inexistente, vigencia sobreposta | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | CadastrarAbrangenciaDiaria | Command | Criar ou atualizar abrangencia corporativa de diaria | codigo, nome, descricao?, ativo | `Abrangencia` criada/atualizada | RN22 | Codigo e nome informados | Codigo duplicado, dados invalidos | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | CadastrarTipoDiaria | Command | Criar valor vigente de diaria por abrangencia | abrangenciaId, valorUnitario, vigenciaInicio, vigenciaFim?, ativo | `TipoDiaria` criado/atualizado | RN22, RN23 | Abrangencia existente e ativa; valor maior que zero; vigencia valida | Abrangencia inexistente/inativa, valor invalido, vigencia sobreposta | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | CadastrarParametroCalculoDiaria | Command | Criar parametros normativos vigentes de calculo de diaria vinculados a um tipo de diaria | tipoDiariaId, normaReferencia, percentualDiariaSemPernoite, horasMinimasSemPernoite, horaLimiteRetornoAcrescimo?, percentualAcrescimoRetorno?, distanciaMinimaKm?, limiteDiasConsecutivos?, limiteDiariasMes?, percentualComplementoTransporte?, bloqueiaRegiaoMetropolitanaSemPernoite, bloqueiaMunicipioLimitrofeSemPernoite, vigenciaInicio, vigenciaFim?, ativo | `ParametroCalculoDiaria` criado/atualizado | RN24 | TipoDiaria existente; norma, vigencia e parametros obrigatorios informados | TipoDiaria inexistente, parametros invalidos, vigencia sobreposta para o mesmo tipo | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
@@ -236,10 +234,8 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
   "codigo": "RUB-DIARIAS",
   "nome": "Diarias",
   "descricao": "Despesas com diarias conforme normativa da FAPES.",
-  "natureza": "CUSTEIO",
-  "categoriaOrcamentaria": "Outras Despesas Correntes",
-  "documentoFonte": "Resolucao CCAF no 309/2022",
-  "vigenciaInicio": "2026-01-01",
+  "naturezaDespesa": "CUSTEIO",
+  "ativa": true,
   "rubricaPaiId": null
 }
 ```
@@ -253,7 +249,7 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
     "codigo": "RUB-DIARIAS",
     "nome": "Diarias",
     "descricao": "Despesas com diarias conforme normativa da FAPES.",
-    "natureza": "CUSTEIO",
+    "naturezaDespesa": "CUSTEIO",
     "rubricaPaiId": null,
     "subrubricas": [],
     "ativa": true

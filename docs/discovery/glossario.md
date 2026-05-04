@@ -106,7 +106,7 @@ Conceitos centrais a M010 (Parcerias e Programas).
 | **ContaBancaria** | Conta bancaria registrada em M016, vinculada a um `FundoFinanceiro` (M016) e opcionalmente a um Programa, Parceria ou Iniciativa. Recebe depositos de `AporteFinanceiro` registrados em M010. | [M016](../implementation/modules/M016-contabilidade-financeiro/modelo-estrutural.md) |
 | **Orcamento do Projeto** | Planejamento/limite financeiro aprovado para uma Iniciativa ou Projeto, distribuido por rubricas. Nao e conta contabil. | [M013](../implementation/modules/M013-gestao-orcamentaria-projeto/README.md) |
 | **Orcamento Anual** | Planejamento financeiro anual agrupando ContasContabeis com limites. Implementado em M014 como debito tecnico (DT-M014-001), pertence conceitualmente a M013. | [M014 modelo-estrutural](../implementation/modules/M014-prestacao-contas/modelo-estrutural.md) |
-| **Natureza de Despesa** | Classificacao macro da despesa como `CUSTEIO` ou `CAPITAL`, usada pela FAPES para separar itens financiaveis. | [Rubricas e Subrubricas FAPES](rubricas-subrubricas-fapes.md) |
+| **Natureza da Despesa** | Classificacao macro da Rubrica como `CUSTEIO` ou `CAPITAL`, usada pela FAPES para separar itens financiaveis. | [Rubricas e Subrubricas FAPES](rubricas-subrubricas-fapes.md) |
 | **Rubrica** | Categoria orcamentaria/despesa usada no planejamento e na execucao do gasto, como diarias, passagens, bolsas, servicos de terceiros ou material permanente. A rubrica permitida em uma iniciativa depende do edital e do orcamento aprovado. | [Rubricas e Subrubricas FAPES](rubricas-subrubricas-fapes.md), [M013](../implementation/modules/M013-gestao-orcamentaria-projeto/README.md), [M008 Rubricas](../implementation/modules/M008-cadastros-corporativos/rubricas/README.md) |
 | **Subrubrica** | Detalhamento hierarquico de uma Rubrica, usado para modalidades de bolsa, tipos de auxilio, tipos de viagem, passagens, diarias, pessoa fisica/juridica ou outros agrupamentos definidos por edital/planilha. | [Rubricas e Subrubricas FAPES](rubricas-subrubricas-fapes.md) |
 | **Transacao** | Movimento de uma RubricaProjeto. Altera comprometido, executado, estornado ou saldo da rubrica; pode apontar para origem de negocio e, quando aplicavel, para movimento bancario conciliado. | [M013 modelo-estrutural](../implementation/modules/M013-gestao-orcamentaria-projeto/modelo-estrutural.md) |
@@ -223,6 +223,6 @@ Conceitos centrais ao M014.
 ## Como contribuir com este glossario
 
 - Ao introduzir um novo conceito de dominio em um modulo, adicionar entrada aqui com link para a fonte canonica
-- Ao renomear um conceito, atualizar a definicao e marcar sinonimos a evitar
+- Ao renomear um conceito, atualizar a definicao e marcar termos equivalentes a evitar
 - Nao duplicar regras de negocio — apenas definir o termo e apontar para o RN/RI canonico
 - Entrada vazia ("conceito citado mas nao definido") e indicador de debito de documentacao

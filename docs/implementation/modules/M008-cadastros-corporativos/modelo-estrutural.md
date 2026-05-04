@@ -11,7 +11,7 @@ Para facilitar a leitura, o modelo esta dividido em contextos de negocio. Cada c
 | [Pessoas](pessoas/modelo-estrutural.md) | PessoaFisica, NivelAcademico, HistoricoPessoa | Cadastro de individuos, titulacao e auditoria |
 | [Instituicoes](instituicoes/modelo-estrutural.md) | Instituicao, TipoInstituicao, Dirigente | Organizacoes, instituicoes, campi, filiais, setores internos e seus dirigentes |
 | [Diarias](diarias/modelo-estrutural.md) | Abrangencia, TipoDiaria, ParametroCalculoDiaria | Cadastros corporativos para calculo de diarias por abrangencia e parametros normativos |
-| [Rubricas](rubricas/modelo-estrutural.md) | Rubrica, SinonimoRubrica, MapeamentoContabilRubrica | Catalogo de rubricas e referencias contabeis |
+| [Rubricas](rubricas/modelo-estrutural.md) | Rubrica | Catalogo corporativo de rubricas |
 | [Geografia](geografia/modelo-estrutural.md) | Cidade, Regiao | Tabelas territoriais |
 | [Classificacoes](classificacoes/modelo-estrutural.md) | AreaConhecimento, Finalidade | Classificacoes transversais |
 | [Cadastros de Referencia](modelo-estrutural-referencia.md) | Diarias, Rubricas, Geografia e Classificacoes | Indice consolidado das referencias por contexto |
@@ -23,7 +23,7 @@ Para facilitar a leitura, o modelo esta dividido em contextos de negocio. Cada c
 | [Pessoas](pessoas/README.md) | [PessoaFisica](pessoas/pessoa-fisica/README.md), [NivelAcademico](pessoas/nivel-academico/README.md), [HistoricoPessoa](pessoas/historico-pessoa/README.md) |
 | [Instituicoes](instituicoes/README.md) | Instituicao, TipoInstituicao, Dirigente |
 | [Diarias](diarias/README.md) | Abrangencia, TipoDiaria, ParametroCalculoDiaria |
-| [Rubricas](rubricas/README.md) | [Rubrica](rubricas/rubrica/README.md), [SinonimoRubrica](rubricas/sinonimo-rubrica/README.md), [MapeamentoContabilRubrica](rubricas/mapeamento-contabil-rubrica/README.md) |
+| [Rubricas](rubricas/README.md) | [Rubrica](rubricas/rubrica/README.md) |
 | [Geografia](geografia/README.md) | [Cidade](geografia/cidade/README.md), [Regiao](geografia/regiao/README.md) |
 | [Classificacoes](classificacoes/README.md) | [AreaConhecimento](classificacoes/area-conhecimento/README.md), [Finalidade](classificacoes/finalidade/README.md) |
 
@@ -98,13 +98,7 @@ classDiagram
         +String codigo
         +String nome
         +String descricao
-        +Rubrica rubricaPai
-        +List~Rubrica~ subrubricas
-        +NaturezaDespesa natureza
-        +String categoriaOrcamentaria
-        +String documentoFonte
-        +Date vigenciaInicio
-        +Date vigenciaFim
+        +NaturezaDespesa naturezaDespesa
         +boolean ativa
     }
 
@@ -138,20 +132,6 @@ classDiagram
         +String codigo
         +String nome
         +String descricao
-        +boolean ativo
-    }
-
-    class SinonimoRubrica {
-        +String termo
-        +String origem
-        +boolean ativo
-    }
-
-    class MapeamentoContabilRubrica {
-        +String contaContabilRef
-        +String classificacaoContabil
-        +Date vigenciaInicio
-        +Date vigenciaFim
         +boolean ativo
     }
 
@@ -199,8 +179,7 @@ classDiagram
     PessoaFisica "0..1" --> "1" NivelAcademico : nivel academico
     AreaConhecimento "0..1" --> "*" AreaConhecimento : subareas
     Rubrica "0..1" --> "*" Rubrica : subrubricas
-    Rubrica "1" --> "*" SinonimoRubrica : sinonimos
-    Rubrica "1" --> "*" MapeamentoContabilRubrica : mapeamentos contabeis
+    Rubrica "*" --> "0..1" NaturezaDespesa : natureza
     Abrangencia "1" --> "*" TipoDiaria : tipos
     TipoDiaria "1" --> "*" ParametroCalculoDiaria : parametros
 
@@ -273,22 +252,8 @@ classDiagram
 | | descricao | Descricao da rubrica | Sim | String | | 500 | |
 | | rubricaPai (relacao) | Rubrica superior quando esta rubrica representar detalhamento/subrubrica | Nao | FK -> Rubrica | Via `subrubricas` | | |
 | | subrubricas (relacao) | Rubricas filhas que detalham esta rubrica | Nao | Lista FK -> Rubrica | Via `rubricaPai` | | |
-| | natureza | Natureza da despesa | Sim | NaturezaDespesa | CUSTEIO, CAPITAL | | |
-| | categoriaOrcamentaria | Categoria orcamentaria vinculada, quando aplicavel | Nao | String | | 200 | |
-| | documentoFonte | Norma, edital ou resolucao que fundamenta a rubrica | Nao | String | Ex: Resolucao CCAF no 309/2022 | 300 | |
-| | vigenciaInicio | Data de inicio da vigencia cadastral | Nao | Date | | | |
-| | vigenciaFim | Data de fim da vigencia cadastral | Nao | Date | | | |
+| | naturezaDespesa | Natureza da despesa | Sim | NaturezaDespesa | CUSTEIO, CAPITAL | | |
 | | ativa | Indica se a rubrica esta ativa | Sim | Boolean | true/false | | |
-| **SinonimoRubrica** | termo | Nome alternativo usado em edital, planilha, SIGFAPES ou legado | Sim | String | Ex: Passagens e Diarias | 200 | |
-| | origem | Origem do termo alternativo | Nao | String | Ex: Edital 08/2025, SIGFAPES | 200 | |
-| | ativo | Indica se o sinonimo continua valido para novas normalizacoes | Sim | Boolean | true/false | | |
-| | rubrica (relacao) | Rubrica canonica a que o termo alternativo pertence | Sim | FK -> Rubrica | Via `sinonimos` | | |
-| **MapeamentoContabilRubrica** | contaContabilRef | Referencia da conta contabil no M016 | Sim | String | Ex: CONTA-339014 | 80 | |
-| | classificacaoContabil | Descricao ou codigo auxiliar de classificacao contabil | Nao | String | | 200 | |
-| | vigenciaInicio | Inicio da validade do mapeamento contabil | Sim | Date | | | |
-| | vigenciaFim | Fim da validade do mapeamento contabil | Nao | Date | | | |
-| | ativo | Indica se o mapeamento esta vigente para novas classificacoes | Sim | Boolean | true/false | | |
-| | rubrica (relacao) | Rubrica canonica vinculada ao mapeamento contabil | Sim | FK -> Rubrica | Via `mapeamentos contabeis` | | |
 | **Cidade** | nome | Nome da cidade | Sim | String | Ex: Vitoria | 200 | |
 | | codigoIBGE | Codigo IBGE da cidade | Sim | String | Ex: 3205309 | 10 | Sim |
 | **Regiao** | nome | Nome da regiao | Sim | String | Ex: Grande Vitoria | 200 | Sim |
@@ -313,7 +278,6 @@ classDiagram
 **Rubrica x transacao:**
 - `Rubrica` e dado mestre de classificacao normativa/orcamentaria, com `codigo`, `nome`, `descricao` e hierarquia por `rubricaPai`/`subrubricas`.
 - Subrubrica nao e entidade separada; e uma Rubrica filha de outra Rubrica.
-- `MapeamentoContabilRubrica` apenas aponta para conta contabil sugerida no M016; nao transforma rubrica em conta.
 - Movimentos de saldo da rubrica nao pertencem ao catalogo de Rubricas; pertencem ao M013 como `Transacao`. Pagamentos e movimentos bancarios pertencem a M014/M016 como `TransacaoFinanceira`/`MovimentacaoFinanceira` e apenas referenciam a rubrica quando aplicavel.
 
 **Navegabilidade:**

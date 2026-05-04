@@ -11,8 +11,6 @@
 | ID | Historia | Prioridade | Status |
 |----|----------|------------|--------|
 | US-M008-015 | Cadastrar Rubrica | Must | To Do |
-| US-M008-016 | Editar Rubrica e Vigencia | Must | To Do |
+| US-M008-016 | Editar Rubrica e Ativacao | Must | To Do |
 | US-M008-017 | Vincular Rubrica Filha | Must | To Do |
-| US-M008-018 | Gerenciar Sinonimos de Rubrica | Should | To Do |
-| US-M008-019 | Definir Mapeamento Contabil da Rubrica | Should | To Do |
 | US-M008-020 | Consultar Catalogo de Rubricas | Must | To Do |

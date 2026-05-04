@@ -7,8 +7,6 @@
 | Entidade | Documento | Responsabilidade |
 |----------|-----------|------------------|
 | Rubrica | [rubrica](rubrica/README.md) | Categoria normativa/orcamentaria para classificacao de despesas |
-| SinonimoRubrica | [sinonimo-rubrica](sinonimo-rubrica/README.md) | Termos alternativos vinculados a rubrica canonica |
-| MapeamentoContabilRubrica | [mapeamento-contabil-rubrica](mapeamento-contabil-rubrica/README.md) | Ponte opcional entre rubrica e conta contabil do M016 |
 
 ## Diagrama
 
@@ -20,28 +18,18 @@ classDiagram
         +String codigo
         +String nome
         +String descricao
-        +NaturezaDespesa natureza
-        +String documentoFonte
+        +NaturezaDespesa naturezaDespesa
         +boolean ativa
     }
 
-    class SinonimoRubrica {
-        +String termo
-        +String origem
-        +boolean ativo
+    class NaturezaDespesa {
+        CUSTEIO
+        CAPITAL
     }
 
-    class MapeamentoContabilRubrica {
-        +String contaContabilRef
-        +String classificacaoContabil
-        +Date vigenciaInicio
-        +Date vigenciaFim
-        +boolean ativo
-    }
+   Rubrica  "*" --> "0..1"  NaturezaDespesa: natureza
 
     Rubrica "0..1" --> "*" Rubrica : subrubricas
-    Rubrica "1" --> "*" SinonimoRubrica : sinonimos
-    Rubrica "1" --> "*" MapeamentoContabilRubrica : mapeamentos contabeis
 ```
 
 ## Regras

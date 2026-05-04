@@ -41,13 +41,7 @@ classDiagram
         +String codigo
         +String nome
         +String descricao
-        +Rubrica rubricaPai
-        +List~Rubrica~ subrubricas
-        +NaturezaDespesa natureza
-        +String categoriaOrcamentaria
-        +String documentoFonte
-        +Date vigenciaInicio
-        +Date vigenciaFim
+        +NaturezaDespesa naturezaDespesa
         +boolean ativa
     }
 
@@ -84,20 +78,6 @@ classDiagram
         +boolean ativo
     }
 
-    class SinonimoRubrica {
-        +String termo
-        +String origem
-        +boolean ativo
-    }
-
-    class MapeamentoContabilRubrica {
-        +String contaContabilRef
-        +String classificacaoContabil
-        +Date vigenciaInicio
-        +Date vigenciaFim
-        +boolean ativo
-    }
-
     class NaturezaDespesa {
         <<enumeration>>
         CUSTEIO
@@ -121,8 +101,7 @@ classDiagram
 
     AreaConhecimento "0..1" --> "*" AreaConhecimento : subareas
     Rubrica "0..1" --> "*" Rubrica : subrubricas
-    Rubrica "1" --> "*" SinonimoRubrica : sinonimos
-    Rubrica "1" --> "*" MapeamentoContabilRubrica : mapeamentos contabeis
+    Rubrica "*" --> "0..1" NaturezaDespesa : natureza
     Abrangencia "1" --> "*" TipoDiaria : tipos
     TipoDiaria "1" --> "*" ParametroCalculoDiaria : parametros
     Regiao "1" --> "*" Cidade : cidades
@@ -164,21 +143,8 @@ classDiagram
 | | descricao | Descricao da rubrica | Sim | String | | 500 | |
 | | rubricaPai (relacao) | Rubrica superior quando esta rubrica representar detalhamento/subrubrica | Nao | FK -> Rubrica | Via `subrubricas` | | |
 | | subrubricas (relacao) | Rubricas filhas que detalham esta rubrica | Nao | Lista FK -> Rubrica | Via `rubricaPai` | | |
-| | natureza | Natureza da despesa | Sim | NaturezaDespesa | CUSTEIO, CAPITAL | | |
-| | categoriaOrcamentaria | Categoria orcamentaria vinculada, quando aplicavel | Nao | String | | 200 | |
-| | documentoFonte | Norma, edital ou resolucao que fundamenta a rubrica | Nao | String | Ex: Resolucao CCAF no 309/2022 | 300 | |
-| | vigenciaInicio | Data de inicio da vigencia cadastral | Nao | Date | | | |
-| | vigenciaFim | Data de fim da vigencia cadastral | Nao | Date | | | |
+| | naturezaDespesa | Natureza da despesa | Sim | NaturezaDespesa | CUSTEIO, CAPITAL | | |
 | | ativa | Indica se a rubrica esta ativa | Sim | Boolean | true/false | | |
-| **SinonimoRubrica** | termo | Nome alternativo usado em edital, planilha, SIGFAPES ou legado | Sim | String | Ex: Passagens e Diarias | 200 | |
-| | origem | Origem do termo alternativo | Nao | String | Ex: Edital 08/2025, SIGFAPES | 200 | |
-| | ativo | Indica se o sinonimo continua valido para novas normalizacoes | Sim | Boolean | true/false | | |
-| | rubrica (relacao) | Rubrica canonica a que o termo alternativo pertence | Sim | FK -> Rubrica | Via `sinonimos` | | |
-| **MapeamentoContabilRubrica** | contaContabilRef | Referencia da conta contabil no M016 | Sim | String | Ex: CONTA-339014 | 80 | |
-| | classificacaoContabil | Descricao ou codigo auxiliar de classificacao contabil | Nao | String | | 200 | |
-| | vigenciaInicio | Inicio da validade do mapeamento contabil | Sim | Date | | | |
-| | vigenciaFim | Fim da validade do mapeamento contabil | Nao | Date | | | |
-| | ativo | Indica se o mapeamento esta vigente para novas classificacoes | Sim | Boolean | true/false | | |
 | | rubrica (relacao) | Rubrica canonica vinculada ao mapeamento contabil | Sim | FK -> Rubrica | Via `mapeamentos contabeis` | | |
 | **Cidade** | nome | Nome da cidade | Sim | String | Ex: Vitoria | 200 | |
 | | codigoIBGE | Codigo IBGE da cidade | Sim | String | Ex: 3205309 | 10 | Sim |
@@ -195,10 +161,9 @@ classDiagram
 - RN24: ParametroCalculoDiaria define parametros normativos vigentes vinculados a TipoDiaria, sem vigencias sobrepostas para o mesmo TipoDiaria
 - RN07: Rubricas vinculadas a categorias orcamentarias validas quando aplicavel
 - RN09: Cidades pertencem a uma regiao; regioes agrupam cidades do estado
-- RN16: Toda Rubrica deve possuir codigo canonico unico, nome, descricao, natureza e situacao ativa/inativa
+- RN16: Toda Rubrica deve possuir codigo canonico unico, nome, descricao, natureza da despesa e situacao ativa/inativa
 - RN17: Subrubricas sao representadas por relacao opcional com `rubricaPai`; nao ha campo adicional para classificar a hierarquia
 - RN18: Rubrica inativa nao deve aparecer em novas configuracoes, mas deve permanecer consultavel para historico
-- RN19: Sinonimos de rubrica devem apontar para uma rubrica canonica e nao substituem o nome oficial da rubrica
 - RN20: Mapeamento contabil e opcional, versionado por vigencia e referencia contas do M016 sem transformar rubrica em conta contabil
 
 ### Consumidores

@@ -663,11 +663,8 @@ Cria uma Rubrica canonica no cadastro corporativo.
   "codigo": "RUB-DIARIAS",
   "nome": "Diarias",
   "descricao": "Despesas com diarias conforme normativa da FAPES.",
-  "natureza": "CUSTEIO",
-  "categoriaOrcamentaria": "Outras Despesas Correntes",
-  "documentoFonte": "Resolucao CCAF no 309/2022",
-  "vigenciaInicio": "2026-01-01",
-  "vigenciaFim": null,
+  "naturezaDespesa": "CUSTEIO",
+  "ativa": true,
   "rubricaPaiId": null
 }
 ```
@@ -677,11 +674,8 @@ Cria uma Rubrica canonica no cadastro corporativo.
 | `codigo` | string | Sim | Codigo canonico unico da Rubrica |
 | `nome` | string | Sim | Nome de exibicao |
 | `descricao` | string | Sim | Descricao de uso da Rubrica |
-| `natureza` | string | Sim | `CUSTEIO` ou `CAPITAL` |
-| `categoriaOrcamentaria` | string | Nao | Categoria orcamentaria quando aplicavel |
-| `documentoFonte` | string | Nao | Norma, edital ou resolucao de referencia |
-| `vigenciaInicio` | string | Nao | Inicio da vigencia cadastral |
-| `vigenciaFim` | string | Nao | Fim da vigencia cadastral |
+| `naturezaDespesa` | string | Sim | `CUSTEIO` ou `CAPITAL` |
+| `ativa` | boolean | Sim | Indica se a Rubrica esta ativa para novos usos |
 | `rubricaPaiId` | string | Nao | Rubrica superior, quando for subrubrica |
 
 **Response `201 Created`**
@@ -693,7 +687,7 @@ Cria uma Rubrica canonica no cadastro corporativo.
     "codigo": "RUB-DIARIAS",
     "nome": "Diarias",
     "descricao": "Despesas com diarias conforme normativa da FAPES.",
-    "natureza": "CUSTEIO",
+    "naturezaDespesa": "CUSTEIO",
     "rubricaPaiId": null,
     "subrubricas": [],
     "ativa": true
@@ -926,8 +920,7 @@ Lista as rubricas cadastradas.
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `natureza` | string | Filtra pela natureza: `CUSTEIO`, `CAPITAL` |
-| `categoriaOrcamentaria` | string | Filtra pela categoria orcamentaria vinculada |
+| `naturezaDespesa` | string | Filtra pela natureza da despesa: `CUSTEIO`, `CAPITAL` |
 | `rubricaPaiId` | string | Filtra subrubricas de uma rubrica especifica |
 | `nome` | string | Busca textual no nome |
 | `page` | integer | Numero da pagina (padrao: 1) |
@@ -943,9 +936,7 @@ Lista as rubricas cadastradas.
       "codigo": "RUB-DIARIAS",
       "nome": "Diarias",
       "descricao": "Despesas com diarias conforme normativa da FAPES.",
-      "natureza": "CUSTEIO",
-      "categoriaOrcamentaria": "Outras Despesas Correntes",
-      "documentoFonte": "Resolucao CCAF no 309/2022",
+      "naturezaDespesa": "CUSTEIO",
       "rubricaPaiId": null,
       "subrubricas": [
         {
@@ -970,7 +961,7 @@ Lista as rubricas cadastradas.
 
 #### `GET /api/v1/m008/rubricas/{id}`
 
-Consulta uma Rubrica pelo identificador, incluindo sinonimos e mapeamentos contabeis vigentes.
+Consulta uma Rubrica pelo identificador, incluindo subrubricas.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
 
@@ -983,11 +974,7 @@ Consulta uma Rubrica pelo identificador, incluindo sinonimos e mapeamentos conta
     "codigo": "RUB-DIARIAS",
     "nome": "Diarias",
     "descricao": "Despesas com diarias conforme normativa da FAPES.",
-    "natureza": "CUSTEIO",
-    "categoriaOrcamentaria": "Outras Despesas Correntes",
-    "documentoFonte": "Resolucao CCAF no 309/2022",
-    "vigenciaInicio": "2026-01-01",
-    "vigenciaFim": null,
+    "naturezaDespesa": "CUSTEIO",
     "rubricaPaiId": null,
     "subrubricas": [
       {
@@ -999,25 +986,7 @@ Consulta uma Rubrica pelo identificador, incluindo sinonimos e mapeamentos conta
         "ativa": true
       }
     ],
-    "ativa": true,
-    "sinonimos": [
-      {
-        "id": "SIN-RUB-001",
-        "termo": "Passagens e Diarias",
-        "origem": "Edital 08/2025",
-        "ativo": true
-      }
-    ],
-    "mapeamentosContabeis": [
-      {
-        "id": "MAP-RUB-001",
-        "contaContabilRef": "CONTA-339014",
-        "classificacaoContabil": "Diarias - Civil",
-        "vigenciaInicio": "2026-01-01",
-        "vigenciaFim": null,
-        "ativo": true
-      }
-    ]
+    "ativa": true
   }
 }
 ```
@@ -1026,7 +995,7 @@ Consulta uma Rubrica pelo identificador, incluindo sinonimos e mapeamentos conta
 
 #### `PUT /api/v1/m008/rubricas/{id}`
 
-Atualiza dados cadastrais, vigencia ou rubrica pai.
+Atualiza dados cadastrais, indicador `ativa` ou rubrica pai.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
 - **Operacao de origem:** `AtualizarRubrica`
@@ -1037,9 +1006,7 @@ Atualiza dados cadastrais, vigencia ou rubrica pai.
 {
   "nome": "Diarias",
   "descricao": "Despesas com diarias estaduais, nacionais e internacionais.",
-  "documentoFonte": "Resolucao CCAF no 309/2022",
-  "vigenciaInicio": "2026-01-01",
-  "vigenciaFim": null,
+  "ativa": true,
   "rubricaPaiId": null,
   "justificativa": "Ajuste de descricao conforme discovery de rubricas."
 }
@@ -1059,44 +1026,6 @@ Desativa uma Rubrica para novos usos, preservando historico.
 ```json
 {
   "justificativa": "Rubrica substituida por nova parametrizacao normativa."
-}
-```
-
----
-
-#### `POST /api/v1/m008/rubricas/{id}/sinonimos`
-
-Vincula um termo alternativo a uma Rubrica canonica.
-
-- **Autorizacao:** `ANALISTA_AGENCIA`
-- **Operacao de origem:** `RegistrarSinonimoRubrica`
-
-**Request body**
-
-```json
-{
-  "termo": "Passagens e Diarias",
-  "origem": "Edital 08/2025"
-}
-```
-
----
-
-#### `POST /api/v1/m008/rubricas/{id}/mapeamentos-contabeis`
-
-Cria mapeamento contabil versionado por vigencia.
-
-- **Autorizacao:** `ANALISTA_AGENCIA`
-- **Operacao de origem:** `DefinirMapeamentoContabilRubrica`
-
-**Request body**
-
-```json
-{
-  "contaContabilRef": "CONTA-339014",
-  "classificacaoContabil": "Diarias - Civil",
-  "vigenciaInicio": "2026-01-01",
-  "vigenciaFim": null
 }
 ```
 
@@ -1213,8 +1142,6 @@ Cria ou vincula pessoa automaticamente a partir de evento do Acesso Cidadao.
 | `GET` | `/api/v1/m008/rubricas/{id}` | ConsultarRubrica | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `PUT` | `/api/v1/m008/rubricas/{id}` | AtualizarRubrica | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m008/rubricas/{id}/desativar` | DesativarRubrica | ANALISTA_AGENCIA |
-| `POST` | `/api/v1/m008/rubricas/{id}/sinonimos` | RegistrarSinonimoRubrica | ANALISTA_AGENCIA |
-| `POST` | `/api/v1/m008/rubricas/{id}/mapeamentos-contabeis` | DefinirMapeamentoContabilRubrica | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/m008/cidades` | ListarCidades | ANALISTA_AGENCIA, MODULO_INTERNO |
 
 ---
@@ -1329,11 +1256,7 @@ Cria ou vincula pessoa automaticamente a partir de evento do Acesso Cidadao.
   "codigo": "string",
   "nome": "string",
   "descricao": "string",
-  "natureza": "CUSTEIO | CAPITAL",
-  "categoriaOrcamentaria": "string | null",
-  "documentoFonte": "string | null",
-  "vigenciaInicio": "string (YYYY-MM-DD) | null",
-  "vigenciaFim": "string (YYYY-MM-DD) | null",
+  "naturezaDespesa": "CUSTEIO | CAPITAL",
   "rubricaPaiId": "string | null",
   "subrubricas": [
     {
@@ -1345,25 +1268,7 @@ Cria ou vincula pessoa automaticamente a partir de evento do Acesso Cidadao.
       "ativa": true
     }
   ],
-  "ativa": true,
-  "sinonimos": [
-    {
-      "id": "string",
-      "termo": "string",
-      "origem": "string | null",
-      "ativo": true
-    }
-  ],
-  "mapeamentosContabeis": [
-    {
-      "id": "string",
-      "contaContabilRef": "string",
-      "classificacaoContabil": "string | null",
-      "vigenciaInicio": "string (YYYY-MM-DD)",
-      "vigenciaFim": "string (YYYY-MM-DD) | null",
-      "ativo": true
-    }
-  ]
+  "ativa": true
 }
 ```
 

@@ -28,11 +28,11 @@ Neste contexto, a propria agencia de fomento e representada como uma `Instituica
 
 Pessoas fisicas sao cadastradas com dados pessoais, academicos e profissionais. No front-office, o cadastro e feito automaticamente via Acesso Cidadao (SSO do governo do ES). No back-office, servidores podem cadastrar ou atualizar pessoas manualmente. Uma pessoa pode ser suspensa, o que bloqueia todas as operacoes vinculadas a ela.
 
-Alem dos cadastros de pessoas e organizacoes, o sistema mantem dados basicos de referencia: areas de conhecimento seguindo a classificacao do CNPq, rubricas para classificacao de despesas e tabelas geograficas de cidades e regioes do ES. O cadastro de Rubricas e canonico para a plataforma: M011 seleciona o que cada edital permite, M013 materializa a Rubrica no orcamento do projeto, M014 usa a Rubrica do projeto na prestacao de contas e M016 pode receber mapeamentos contabeis sem assumir ownership do catalogo.
+Alem dos cadastros de pessoas e organizacoes, o sistema mantem dados basicos de referencia: areas de conhecimento seguindo a classificacao do CNPq, rubricas para classificacao de despesas e tabelas geograficas de cidades e regioes do ES. O cadastro de Rubricas e canonico para a plataforma: M011 seleciona o que cada edital permite, M013 materializa a Rubrica no orcamento do projeto e M014 usa a Rubrica do projeto na prestacao de contas.
 
 Rubrica e dado mestre de classificacao. Ela nao representa o movimento em si: a movimentacao da rubrica fica em M013 como `Transacao`. Pagamentos e movimentos bancarios ficam em M014/M016 como `TransacaoFinanceira`/`MovimentacaoFinanceira`, referenciando a rubrica quando for necessario classificar o valor.
 
-No cadastro corporativo, a Rubrica possui `codigo`, `nome`, `descricao` e hierarquia opcional por `rubricaPai`/`subrubricas`. Subrubrica nao e entidade separada: e uma Rubrica filha de outra Rubrica.
+No cadastro corporativo, a Rubrica possui `codigo`, `nome`, `descricao`, `naturezaDespesa`, indicador booleano `ativa` e hierarquia opcional por `rubricaPai`/`subrubricas`. Subrubrica nao e entidade separada: e uma Rubrica filha de outra Rubrica.
 
 Tambem pertencem ao M008 os cadastros corporativos usados pelo fluxo de diarias: `Abrangencia`, que classifica o deslocamento, `TipoDiaria`, que mantem valor vigente, vigencia e abrangencia da viagem, e `ParametroCalculoDiaria`, que versiona os parametros normativos de calculo vinculados ao tipo de diaria, como percentuais, limites, bloqueios e norma de referencia. Esses dados ficam no [contexto Diarias](diarias/README.md). O M003 apenas referencia os cadastros vigentes ao criar uma solicitacao e grava snapshots para preservar o calculo historico.
 
@@ -43,7 +43,7 @@ Os documentos detalhados do M008 sao organizados por contexto de negocio, nao po
 | [Pessoas](pessoas/README.md) | PessoaFisica, NivelAcademico, HistoricoPessoa |
 | [Instituicoes](instituicoes/README.md) | Instituicao, TipoInstituicao, Dirigente |
 | [Diarias](diarias/README.md) | Abrangencia, TipoDiaria, ParametroCalculoDiaria |
-| [Rubricas](rubricas/README.md) | Rubrica, SinonimoRubrica, MapeamentoContabilRubrica |
+| [Rubricas](rubricas/README.md) | Rubrica |
 | [Geografia](geografia/README.md) | Cidade, Regiao |
 | [Classificacoes](classificacoes/README.md) | AreaConhecimento, Finalidade |
 
@@ -63,7 +63,7 @@ Cada contexto e dono do seu `README.md`, `modelo-estrutural.md`, `backlog.md` e 
 | RN04 | Um dirigente e o vinculo temporal entre uma pessoa fisica e uma instituicao, com mandato de inicio e fim. | Must |
 | RN05 | A suspensao de uma pessoa bloqueia todas as operacoes vinculadas (submissao, bolsas, pagamentos). | Must |
 | RN06 | Areas de conhecimento seguem a classificacao hierarquica do CNPq (grande area, area, subarea, especialidade). | Must |
-| RN07 | Rubricas devem estar vinculadas a categorias orcamentarias validas quando aplicavel. | Must |
+| RN07 | Rubricas devem possuir referencia canonica estavel para uso por editais, orcamentos, transacoes e prestacoes de contas. | Must |
 | RN09 | Cidades devem pertencer a uma regiao; regioes agrupam cidades do estado. | Should |
 | RN10 | O cadastro automatico via Acesso Cidadao deve criar a pessoa caso nao exista, ou vincular a existente pelo CPF. | Should |
 | RN11 | Instituicao com CNPJ proprio deve possuir exatamente um dirigente ativo. | Must |
@@ -71,11 +71,9 @@ Cada contexto e dono do seu `README.md`, `modelo-estrutural.md`, `backlog.md` e 
 | RN13 | Setor interno sem CNPJ proprio deve ser cadastrado como Instituicao sem CNPJ e com superior informado. | Must |
 | RN14 | Instituicao sem superior deve possuir CNPJ proprio. | Must |
 | RN15 | Instituicao sem CNPJ proprio e tratada como setor interno para fins de cadastro, consulta e hierarquia. | Must |
-| RN16 | Toda Rubrica deve possuir codigo canonico unico, nome, descricao, natureza da despesa e situacao ativa/inativa. | Must |
+| RN16 | Toda Rubrica deve possuir codigo canonico unico, nome, descricao, natureza da despesa e indicador booleano `ativa`. | Must |
 | RN17 | Subrubricas sao representadas por relacao opcional com `rubricaPai`; nao ha campo adicional para classificar a hierarquia. | Must |
 | RN18 | Rubrica inativa nao deve ser ofertada em novas configuracoes de edital/projeto, mas deve permanecer consultavel para historico. | Must |
-| RN19 | Sinonimos de rubrica devem apontar para uma Rubrica canonica e apoiar importacao/normalizacao sem substituir o nome oficial. | Should |
-| RN20 | Mapeamento contabil de Rubrica e opcional, versionado por vigencia e referencia contas do M016 sem transformar Rubrica em conta contabil. | Should |
 | RN21 | Rubrica nao deve armazenar transacoes financeiras nem movimentos de saldo; deve ser referenciada por `Transacao` e movimentos bancarios apenas como classificacao. | Must |
 | RN22 | Abrangencia da diaria e classe corporativa com codigo canonico unico, nome, descricao e situacao ativa/inativa. | Must |
 | RN23 | TipoDiaria deve possuir abrangencia, valor unitario, vigencia e situacao ativa/inativa, sem vigencias sobrepostas para a mesma abrangencia. | Must |

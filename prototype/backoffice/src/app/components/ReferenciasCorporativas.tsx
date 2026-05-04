@@ -14,8 +14,10 @@ interface AreaConhecimento {
 interface RubricaFinanceira {
   id: number;
   codigo: string;
+  nome: string;
   descricao: string;
-  categoriaOrcamentaria: string;
+  naturezaDespesa: 'CUSTEIO' | 'CAPITAL';
+  rubricaPaiId?: number;
   ativa: boolean;
 }
 
@@ -88,9 +90,11 @@ const initialAreas: AreaConhecimento[] = [
 ];
 
 const initialRubricas: RubricaFinanceira[] = [
-  { id: 1, codigo: '339018', descricao: 'Auxílio financeiro a estudantes', categoriaOrcamentaria: 'Bolsas', ativa: true },
-  { id: 2, codigo: '339030', descricao: 'Material de consumo', categoriaOrcamentaria: 'Capital', ativa: true },
-  { id: 3, codigo: '449052', descricao: 'Equipamentos e material permanente', categoriaOrcamentaria: 'Capital', ativa: true },
+  { id: 1, codigo: 'RUB-BOLSAS', nome: 'Bolsas', descricao: 'Apoio financeiro por modalidade e nível de bolsa.', naturezaDespesa: 'CUSTEIO', ativa: true },
+  { id: 2, codigo: 'RUB-DIARIAS', nome: 'Diárias', descricao: 'Diárias estaduais, nacionais e internacionais vinculadas ao projeto.', naturezaDespesa: 'CUSTEIO', ativa: true },
+  { id: 3, codigo: 'RUB-DIARIA-ES', nome: 'Diária dentro do Estado', descricao: 'Deslocamentos dentro do Espírito Santo.', naturezaDespesa: 'CUSTEIO', rubricaPaiId: 2, ativa: true },
+  { id: 4, codigo: 'RUB-MAT-CONSUMO', nome: 'Material de Consumo', descricao: 'Insumos e materiais consumíveis usados no projeto.', naturezaDespesa: 'CUSTEIO', ativa: true },
+  { id: 5, codigo: 'RUB-MAT-PERM', nome: 'Material Permanente', descricao: 'Bens permanentes e equipamentos incorporáveis.', naturezaDespesa: 'CAPITAL', ativa: true },
 ];
 
 const initialDiarias: ValorDiaria[] = [
@@ -127,14 +131,17 @@ export const ReferenciasCorporativas: React.FC<{ onBack: () => void }> = ({ onBa
   const [regioes, setRegioes] = useState<RegiaoCidade[]>(initialRegioes);
   const [finalidades, setFinalidades] = useState<Finalidade[]>(initialFinalidades);
   const [areaDraft, setAreaDraft] = useState<AreaConhecimento>({ id: 0, codigo: '', nome: '', nivel: 'Grande Área', superior: '' });
-  const [rubricaDraft, setRubricaDraft] = useState<RubricaFinanceira>({ id: 0, codigo: '', descricao: '', categoriaOrcamentaria: '', ativa: true });
+  const [rubricaDraft, setRubricaDraft] = useState<RubricaFinanceira>({ id: 0, codigo: '', nome: '', descricao: '', naturezaDespesa: 'CUSTEIO', rubricaPaiId: undefined, ativa: true });
   const [diariaDraft, setDiariaDraft] = useState<ValorDiaria>({ id: 0, codigo: '', tipoViagem: 'Dentro do Estado', valor: '', fracaoCalculo: '12h', vigenciaInicio: '', situacao: true });
   const [tipoViagemDraft, setTipoViagemDraft] = useState<TipoViagem>({ id: 0, codigo: '', nome: '', abrangencia: 'Nacional', descricao: '', situacao: 'Ativo' });
   const [regiaoDraft, setRegiaoDraft] = useState<RegiaoCidade>({ id: 0, regiao: '', descricao: '', cidade: '', codigoIBGE: '' });
   const [finalidadeDraft, setFinalidadeDraft] = useState<Finalidade>({ id: 0, nome: '', descricao: '' });
 
   const filteredAreas = areas.filter(item => matches(searchTerm, [item.codigo, item.nome, item.nivel, item.superior]));
-  const filteredRubricas = rubricas.filter(item => matches(searchTerm, [item.codigo, item.descricao, item.categoriaOrcamentaria]));
+  const filteredRubricas = rubricas.filter(item => {
+    const parentName = item.rubricaPaiId ? rubricas.find(parent => parent.id === item.rubricaPaiId)?.nome || '' : '';
+    return matches(searchTerm, [item.codigo, item.nome, item.descricao, item.naturezaDespesa, parentName, item.ativa ? 'Ativa' : 'Inativa']);
+  });
   const filteredDiarias = diarias.filter(item => matches(searchTerm, [item.codigo, item.tipoViagem, item.valor, item.fracaoCalculo, item.vigenciaInicio, item.situacao ? 'Ativo' : 'Inativo']));
   const filteredTiposViagem = tiposViagem.filter(item => matches(searchTerm, [item.codigo, item.nome, item.abrangencia, item.descricao, item.situacao]));
   const filteredRegioes = regioes.filter(item => matches(searchTerm, [item.regiao, item.cidade, item.codigoIBGE]));
@@ -159,7 +166,7 @@ export const ReferenciasCorporativas: React.FC<{ onBack: () => void }> = ({ onBa
   const saveRubrica = () => {
     const item = { ...rubricaDraft, id: rubricaDraft.id || Date.now() };
     setRubricas(prev => upsert(prev, item));
-    setRubricaDraft({ id: 0, codigo: '', descricao: '', categoriaOrcamentaria: '', ativa: true });
+    setRubricaDraft({ id: 0, codigo: '', nome: '', descricao: '', naturezaDespesa: 'CUSTEIO', rubricaPaiId: undefined, ativa: true });
   };
 
   const saveDiaria = () => {
@@ -239,14 +246,27 @@ export const ReferenciasCorporativas: React.FC<{ onBack: () => void }> = ({ onBa
 
         {activeTab === 'rubricas' && (
           <ReferenceSection title="Rubricas Financeiras" subtitle="Rubricas usadas para classificar despesas e orçamentos nos módulos consumidores.">
-            <div style={{ display: 'grid', gridTemplateColumns: '0.6fr 1.2fr 0.9fr 0.5fr auto', gap: '12px', alignItems: 'end', marginBottom: '18px' }}>
-              <Field label="Código" value={rubricaDraft.codigo} onChange={value => setRubricaDraft(prev => ({ ...prev, codigo: value }))} placeholder="339018" />
+            <div style={{ display: 'grid', gridTemplateColumns: '0.7fr 1fr 1.4fr 0.8fr 0.9fr 0.5fr auto', gap: '12px', alignItems: 'end', marginBottom: '18px' }}>
+              <Field label="Código" value={rubricaDraft.codigo} onChange={value => setRubricaDraft(prev => ({ ...prev, codigo: value.toUpperCase() }))} placeholder="RUB-DIARIAS" />
+              <Field label="Nome" value={rubricaDraft.nome} onChange={value => setRubricaDraft(prev => ({ ...prev, nome: value }))} placeholder="Diárias" />
               <Field label="Descrição" value={rubricaDraft.descricao} onChange={value => setRubricaDraft(prev => ({ ...prev, descricao: value }))} placeholder="Descrição da rubrica" />
-              <Field label="Categoria" value={rubricaDraft.categoriaOrcamentaria} onChange={value => setRubricaDraft(prev => ({ ...prev, categoriaOrcamentaria: value }))} placeholder="Categoria orçamentária" />
+              <Select label="Natureza" value={rubricaDraft.naturezaDespesa} onChange={value => setRubricaDraft(prev => ({ ...prev, naturezaDespesa: value as RubricaFinanceira['naturezaDespesa'] }))} options={['CUSTEIO', 'CAPITAL']} />
+              <Select label="Rubrica pai" value={rubricaDraft.rubricaPaiId ? String(rubricaDraft.rubricaPaiId) : ''} onChange={value => setRubricaDraft(prev => ({ ...prev, rubricaPaiId: value ? Number(value) : undefined }))} options={['', ...rubricas.filter(item => !item.rubricaPaiId && item.id !== rubricaDraft.id).map(item => String(item.id))]} labels={['Nenhuma', ...rubricas.filter(item => !item.rubricaPaiId && item.id !== rubricaDraft.id).map(item => item.nome)]} />
               <Select label="Ativa" value={rubricaDraft.ativa ? 'Sim' : 'Não'} onChange={value => setRubricaDraft(prev => ({ ...prev, ativa: value === 'Sim' }))} options={['Sim', 'Não']} />
               <SaveButton onClick={saveRubrica} />
             </div>
-            <ReferenceList items={filteredRubricas.map(item => ({ id: item.id, cols: [item.codigo, item.descricao, item.categoriaOrcamentaria, item.ativa ? 'Ativa' : 'Inativa'], onEdit: () => setRubricaDraft(item), onRemove: () => setRubricas(prev => prev.filter(row => row.id !== item.id)) }))} labels={['Código', 'Descrição', 'Categoria', 'Situação']} />
+            <ReferenceList
+              items={filteredRubricas.map(item => {
+                const parent = item.rubricaPaiId ? rubricas.find(row => row.id === item.rubricaPaiId) : undefined;
+                return {
+                  id: item.id,
+                  cols: [item.codigo, item.nome, item.naturezaDespesa, parent?.nome || 'Rubrica principal', item.ativa ? 'Ativa' : 'Inativa'],
+                  onEdit: () => setRubricaDraft(item),
+                  onRemove: () => setRubricas(prev => prev.filter(row => row.id !== item.id && row.rubricaPaiId !== item.id)),
+                };
+              })}
+              labels={['Código', 'Nome', 'Natureza', 'Rubrica pai', 'Situação']}
+            />
           </ReferenceSection>
         )}
 
@@ -352,11 +372,11 @@ const Field: React.FC<{ label: string; value: string; onChange: (value: string) 
   </div>
 );
 
-const Select: React.FC<{ label: string; value: string; onChange: (value: string) => void; options: string[] }> = ({ label, value, onChange, options }) => (
+const Select: React.FC<{ label: string; value: string; onChange: (value: string) => void; options: string[]; labels?: string[] }> = ({ label, value, onChange, options, labels }) => (
   <div>
     <label style={labelStyle}>{label}</label>
     <select value={value} onChange={event => onChange(event.target.value)} style={inputStyle}>
-      {options.map(option => <option key={option} value={option}>{option}</option>)}
+      {options.map((option, index) => <option key={option || 'empty'} value={option}>{labels?.[index] || option}</option>)}
     </select>
   </div>
 );
