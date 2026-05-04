@@ -1,0 +1,58 @@
+name: Deploy Backoffice and Front-office
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-prototypes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy ${{ matrix.app_name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app_name: backoffice
+            working_directory: prototype/backoffice
+            vercel_project_id: prj_ZjDnZCVAx8GIiCa3L6fsnDUI2A8M
+          - app_name: front-office
+            working_directory: prototype/frontOffice
+            vercel_project_id: prj_5QLBPJAlmemx41YwFeWZkWCqLBsC
+
+    defaults:
+      run:
+        working-directory: ${{ matrix.working_directory }}
+
+    env:
+      VERCEL_ORG_ID: team_wjS2wgLaerYwDfEVz71nvMul
+      VERCEL_PROJECT_ID: ${{ matrix.vercel_project_id }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel production environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build production bundle
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to Vercel production
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
