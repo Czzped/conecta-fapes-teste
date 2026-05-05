@@ -1,4 +1,4 @@
-import { Info, Briefcase, Bell, FileUser, FolderOpen, Check, GraduationCap, Building2, Users, ChevronRight, PlaneTakeoff } from 'lucide-react';
+import { Info, Briefcase, Bell, FileUser, FolderOpen, Check, GraduationCap, Building2, Users, ChevronRight, Hotel } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -288,7 +288,7 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
               }}
             >
               <div className="flex items-start gap-3">
-                <PlaneTakeoff size={20} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
+                <Hotel size={20} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
                 <div>
                   <p style={{
                     color: 'var(--foreground)',
@@ -305,7 +305,7 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
                     lineHeight: '1.5',
                     margin: 0,
                   }}>
-                    Você tem a diária SD-2026-002 para aceitar e assinar o termo.
+                    Você possui uma Diária aguardando o seu aceite.
                   </p>
                   <p style={{
                     color: 'var(--muted-foreground)',
@@ -332,35 +332,6 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
               </span>
             </button>
           )}
-
-          {/* Nuxt Alert Info - Variant Subtle */}
-          <div
-            className="flex items-start gap-3 p-4"
-            style={{
-              backgroundColor: 'rgba(34, 211, 238, 0.1)',
-              borderRadius: 'var(--radius)',
-            }}
-          >
-            <Check size={20} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
-            <div>
-              <p style={{
-                color: 'var(--foreground)',
-                fontWeight: 'var(--font-weight-normal)',
-                fontSize: 'var(--text-sm)',
-                margin: '0 0 0.25rem 0',
-              }}>
-                Pagamento do mês de janeiro foi processado
-              </p>
-              <p style={{
-                color: 'var(--muted-foreground)',
-                fontWeight: 'var(--font-weight-normal)',
-                fontSize: 'var(--text-sm)',
-                margin: 0,
-              }}>
-                05/01/2026
-              </p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -393,17 +364,6 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
 
         {/* Subtitle and Button on the same line */}
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-3">
-          <p 
-            style={{ 
-              color: 'var(--muted-foreground)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-normal)',
-              margin: 0,
-            }}
-          >
-            Acompanhe as chamadas abertas na Fapes.
-          </p>
-
           <button
             className="px-4 py-2 transition-colors self-end md:self-auto"
             style={{
@@ -423,7 +383,7 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
               e.currentTarget.style.backgroundColor = 'transparent';
             }}
           >
-            Ver Editais
+            Ver Todas
           </button>
         </div>
 

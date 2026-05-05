@@ -24,6 +24,7 @@ export function MyInfoPage() {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<TabType>('documentos');
   const [expandedDocId, setExpandedDocId] = useState<number | null>(null);
+  const [expandedCanceledScholarship, setExpandedCanceledScholarship] = useState(false);
   const [dragActive, setDragActive] = useState<number | null>(null);
   const [deletedDocuments, setDeletedDocuments] = useState<number[]>([]);
   const [termoQ1, setTermoQ1] = useState<'sim' | 'nao' | null>(null);
@@ -927,6 +928,42 @@ export function MyInfoPage() {
                 const isInValidation = doc.status === 'Em Validação';
                 const isValidated = doc.status === 'Validado';
                 const isReprovado = doc.status === 'Reprovado';
+
+                if (index >= 4 && !expandedCanceledScholarship) {
+                  if (index !== 4) return null;
+
+                  return (
+                    <button
+                      key="bpig-i-collapsed"
+                      type="button"
+                      onClick={() => setExpandedCanceledScholarship(true)}
+                      className="w-full p-5 text-left"
+                      style={{
+                        backgroundColor: 'var(--card)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        cursor: 'pointer',
+                        fontFamily: 'var(--font-family)',
+                        marginTop: '1.5rem',
+                      }}
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 style={{ color: 'var(--foreground)', margin: 0 }}>Bolsa: BPIG-I</h3>
+                            <span className="inline-flex items-center px-2.5 py-1" style={{ borderRadius: '9999px', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'rgb(239, 68, 68)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                              Cancelada
+                            </span>
+                          </div>
+                          <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', margin: 0 }}>
+                            Projeto: ConectaFapes: Uma plataforma de apoio à Pesquisa, Desenvolvimento e Inovação
+                          </p>
+                        </div>
+                        <ChevronDown size={18} style={{ color: 'var(--muted-foreground)' }} />
+                      </div>
+                    </button>
+                  );
+                }
                 
                 return (
                   <div key={doc.id}>
@@ -940,6 +977,12 @@ export function MyInfoPage() {
                           }}
                         />
                         <div className="flex flex-col gap-3 mb-4">
+                          <button
+                            type="button"
+                            onClick={() => setExpandedCanceledScholarship(false)}
+                            className="flex items-center justify-between gap-3 w-full text-left"
+                            style={{ backgroundColor: 'transparent', border: 'none', padding: 0, cursor: 'pointer', fontFamily: 'var(--font-family)' }}
+                          >
                           <div className="flex items-center gap-2">
                             <h3 style={{ color: 'var(--foreground)', margin: 0 }}>
                               Bolsa: BPIG-I
@@ -958,6 +1001,8 @@ export function MyInfoPage() {
                               Cancelada
                             </span>
                           </div>
+                          <ChevronDown size={18} style={{ color: 'var(--muted-foreground)', transform: 'rotate(180deg)' }} />
+                          </button>
                           <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', margin: 0 }}>
                             Projeto: ConectaFapes: Uma plataforma de apoio à Pesquisa, Desenvolvimento e Inovação
                           </p>
@@ -2009,6 +2054,42 @@ export function MyInfoPage() {
                 const isInValidation = doc.status === 'Em Validação';
                 const isValidated = doc.status === 'Validado';
                 const isReprovado = doc.status === 'Reprovado';
+
+                if (index >= 4 && !expandedCanceledScholarship) {
+                  if (index !== 4) return null;
+
+                  return (
+                    <button
+                      key="bpig-i-mobile-collapsed"
+                      type="button"
+                      onClick={() => setExpandedCanceledScholarship(true)}
+                      className="w-full p-4 text-left"
+                      style={{
+                        backgroundColor: 'var(--card)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        cursor: 'pointer',
+                        fontFamily: 'var(--font-family)',
+                        marginTop: '2rem',
+                      }}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 style={{ color: 'var(--foreground)', margin: 0 }}>Bolsa: BPIG-I</h3>
+                            <span className="inline-flex items-center px-2.5 py-1" style={{ borderRadius: '9999px', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'rgb(239, 68, 68)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                              Cancelada
+                            </span>
+                          </div>
+                          <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', margin: 0 }}>
+                            Projeto: ConectaFapes: Uma plataforma de apoio à Pesquisa, Desenvolvimento e Inovação
+                          </p>
+                        </div>
+                        <ChevronDown size={18} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
+                      </div>
+                    </button>
+                  );
+                }
                 
                 return (
                   <div 
@@ -2029,7 +2110,13 @@ export function MyInfoPage() {
                       }} />
                     )}
                     {index === 4 && (
-                      <div className="flex flex-col gap-3 mb-2">
+                      <div className="flex flex-col gap-3 mb-2 p-4">
+                        <button
+                          type="button"
+                          onClick={() => setExpandedCanceledScholarship(false)}
+                          className="flex items-center justify-between gap-3 w-full text-left"
+                          style={{ backgroundColor: 'transparent', border: 'none', padding: 0, cursor: 'pointer', fontFamily: 'var(--font-family)' }}
+                        >
                         <div className="flex items-center gap-2">
                           <h3 style={{ color: 'var(--foreground)', margin: 0 }}>
                             Bolsa: BPIG-I
@@ -2048,6 +2135,8 @@ export function MyInfoPage() {
                             Cancelada
                           </span>
                         </div>
+                        <ChevronDown size={18} style={{ color: 'var(--muted-foreground)', transform: 'rotate(180deg)' }} />
+                        </button>
                         <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', margin: 0 }}>
                           Projeto: ConectaFapes: Uma plataforma de apoio à Pesquisa, Desenvolvimento e Inovação
                         </p>

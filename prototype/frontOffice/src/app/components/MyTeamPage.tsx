@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import * as echarts from 'echarts';
 import { DatePicker } from '@/app/components/DatePicker';
+import { PaymentsPage } from '@/app/components/PaymentsPage';
 import {
   Pagination,
   PaginationContent,
@@ -17,7 +18,7 @@ interface MyTeamPageProps {
   accessType: 'voluntario' | 'bolsista' | 'coordenador';
   onNavigate?: (page: string) => void;
   hideHeader?: boolean;
-  defaultTab?: 'bolsistas' | 'informacoes';
+  defaultTab?: 'bolsistas' | 'informacoes' | 'pagamentos';
   hideTabs?: boolean;
   hideAddButton?: boolean;
   hideExpandable?: boolean;
@@ -43,7 +44,7 @@ interface TeamMember {
 
 export function MyTeamPage({ accessType, onNavigate, hideHeader = false, defaultTab = 'informacoes', hideTabs = false, hideAddButton = false, hideExpandable = false }: MyTeamPageProps) {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<'bolsistas' | 'informacoes'>(defaultTab);
+  const [activeTab, setActiveTab] = useState<'bolsistas' | 'informacoes' | 'pagamentos'>(defaultTab);
   const [expandedBolsistaId, setExpandedBolsistaId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
@@ -451,6 +452,26 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
           >
             Bolsistas do Projeto
           </button>
+          <button
+            onClick={() => setActiveTab('pagamentos')}
+            style={{
+              padding: '0.625rem 1rem',
+              backgroundColor: 'transparent',
+              borderTop: 'none',
+              borderLeft: 'none',
+              borderRight: 'none',
+              borderBottom: activeTab === 'pagamentos' ? '2px solid var(--primary)' : '2px solid transparent',
+              color: activeTab === 'pagamentos' ? 'var(--primary)' : 'var(--muted-foreground)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              cursor: 'pointer',
+              position: 'relative',
+              transition: 'color 0.2s',
+              marginBottom: '-1px',
+            }}
+          >
+            Pagamentos
+          </button>
         </div>
 
         {/* Mobile Tab Bar - Vertical */}
@@ -497,6 +518,25 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             }}
           >
             Bolsistas do Projeto
+          </button>
+          <button
+            onClick={() => setActiveTab('pagamentos')}
+            className="py-3 pl-4 text-left"
+            style={{
+              backgroundColor: 'transparent',
+              borderTop: 'none',
+              borderRight: 'none',
+              borderBottom: 'none',
+              borderLeft: activeTab === 'pagamentos' ? '2px solid var(--primary)' : '2px solid transparent',
+              color: activeTab === 'pagamentos' ? 'var(--primary)' : 'var(--muted-foreground)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              cursor: 'pointer',
+              transition: 'color 0.2s',
+              marginLeft: '-2px',
+            }}
+          >
+            Pagamentos
           </button>
         </div>
           </>
@@ -811,7 +851,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                 { name: 'BPIG-VIII', used: 0, total: 0, color: '#60a5fa' },
                 { name: 'BPIG-IX', used: 0, total: 0, color: '#60a5fa' },
                 { name: 'BPIG-X', used: 0, total: 0, color: '#60a5fa' },
-              ].map((modalidade, index) => {
+              ].filter((modalidade) => !(modalidade.used === 0 && modalidade.total === 0)).map((modalidade, index) => {
                 const available = modalidade.total - modalidade.used;
                 const percentage = modalidade.total > 0 ? Math.round((modalidade.used / modalidade.total) * 100) : 0;
                 
@@ -1356,7 +1396,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               onClick={() => onNavigate?.('cadastrar-bolsista')}
             >
               <Plus size={18} />
-              Cadastrar Bolsista
+              Solicitar Bolsa
             </button>
           )}
         </div>
@@ -1378,7 +1418,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               onClick={() => onNavigate?.('cadastrar-bolsista')}
             >
               <Plus size={18} />
-              Cadastrar Bolsista
+              Solicitar Bolsa
             </button>
           </div>
         )}
@@ -1939,6 +1979,10 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
           )}
         </div>
         </div>
+        )}
+
+        {activeTab === 'pagamentos' && (
+          <PaymentsPage scope="project" embedded />
         )}
       </section>
 

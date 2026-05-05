@@ -34,6 +34,7 @@ export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
   const [certificatesInitialFlow, setCertificatesInitialFlow] = useState<'diarias' | null>(null);
+  const [myTeamInitialTab, setMyTeamInitialTab] = useState<'bolsistas' | 'informacoes' | 'pagamentos'>('informacoes');
 
   // Cidadão sub-navigation
   const [cidadaoPage, setCidadaoPage] = useState<CidadaoPage>('home');
@@ -74,6 +75,10 @@ export default function App() {
       return;
     }
 
+    if (page !== 'minha-equipe') {
+      setMyTeamInitialTab('informacoes');
+    }
+
     setCertificatesInitialFlow(null);
     setCurrentPage(page);
     setIsMobileMenuOpen(false); // Close mobile menu after navigation
@@ -88,7 +93,7 @@ export default function App() {
       case 'projetos':
         return <MyProjectsPage accessType={accessType} />;
       case 'minha-equipe':
-        return <MyTeamPage accessType={accessType} onNavigate={handleNavigate} />;
+        return <MyTeamPage accessType={accessType} onNavigate={handleNavigate} defaultTab={myTeamInitialTab} />;
       case 'pagamentos-projeto':
         return <PaymentsPage scope="project" />;
       case 'pagamentos':
@@ -112,7 +117,10 @@ export default function App() {
       case 'remanejamento':
         return <RemanejamentoPage />;
       case 'cadastrar-bolsista':
-        return <CadastrarBolsista onBack={() => handleNavigate('minha-equipe')} />;
+        return <CadastrarBolsista onBack={(tab = 'informacoes') => {
+          setMyTeamInitialTab(tab);
+          handleNavigate('minha-equipe');
+        }} />;
       case 'editais':
         return <EditaisPage />;
       case 'projects-list':

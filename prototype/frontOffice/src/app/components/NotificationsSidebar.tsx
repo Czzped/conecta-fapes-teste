@@ -1,4 +1,4 @@
-import { X, Search, CheckCheck, AlertTriangle, Info, CheckCircle2, Calendar, PlaneTakeoff } from 'lucide-react';
+import { X, Search, CheckCheck, AlertTriangle, Info, CheckCircle2, Calendar, Hotel } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
 interface NotificationsSidebarProps {
@@ -56,16 +56,9 @@ export function NotificationsSidebar({ isOpen, onClose, onNavigate }: Notificati
       id: '6',
       type: 'diaria',
       title: 'Diária aguardando assinatura',
-      description: 'Você tem a diária SD-2026-002 para aceitar e assinar o termo.',
+      description: 'Você possui uma Diária aguardando o seu aceite.',
       isRead: false,
       link: 'certificados-diarias',
-    },
-    {
-      id: '4',
-      type: 'success',
-      title: 'Pagamento do mês de janeiro foi processado',
-      description: 'Mantenha o seu cadastro sempre atualizado!',
-      isRead: true,
     },
     {
       id: '1',
@@ -115,7 +108,7 @@ export function NotificationsSidebar({ isOpen, onClose, onNavigate }: Notificati
       case 'error':
         return <AlertTriangle size={20} style={{ color: '#ef4444' }} />;
       case 'diaria':
-        return <PlaneTakeoff size={20} style={{ color: 'var(--primary)' }} />;
+        return <Hotel size={20} style={{ color: 'var(--primary)' }} />;
       default:
         return <Info size={20} style={{ color: 'var(--muted-foreground)' }} />;
     }
