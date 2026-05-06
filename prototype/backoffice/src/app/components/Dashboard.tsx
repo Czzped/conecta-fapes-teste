@@ -11,6 +11,7 @@ import { PlanejamentoEstrategico } from './PlanejamentoEstrategico';
 import { Instituicoes } from './Instituicoes';
 import { Configuracoes } from './Configuracoes';
 import { PessoasFisicas } from './PessoasFisicas';
+import { Rubricas } from './Rubricas';
 import { ReferenciasCorporativas } from './ReferenciasCorporativas';
 import { DocumentosExigidos } from './DocumentosExigidos';
 import { SurveyFormBuilder } from './SurveyFormBuilder';
@@ -29,7 +30,7 @@ type Contrast = 'normal' | 'high' | 'maximum';
 type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
 type Language = 'pt' | 'en' | 'es';
 type NotificationTab = 'avisos' | 'editais';
-type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal';
+type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
 type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outra Iniciativa Exemplo' | 'Mais uma Iniciativa Exemplo';
@@ -1662,6 +1663,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <AcaoTransversalFinanceiro onBack={() => setActivePage('home')} />
         ) : activePage === 'iniciativas' ? (
           <Iniciativas />
+        ) : activePage === 'rubricas' ? (
+          <Rubricas />
         ) : activePage === 'editais' ? (
           <Editais />
         ) : activePage === 'editais-light' ? (
@@ -1671,6 +1674,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             onBack={() => setActivePage('home')}
             onOpenPlanejamento={() => setActivePage('planejamento')}
             onOpenReferencias={() => setActivePage('referencias')}
+            onOpenRubricas={() => setActivePage('rubricas')}
             onOpenDocumentos={() => setActivePage('documentos')}
             onOpenFormularios={() => setActivePage('formulario')}
             onOpenRegrasAcaoTransversal={() => setActivePage('regras-acao-transversal')}

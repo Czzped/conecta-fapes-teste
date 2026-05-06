@@ -278,8 +278,6 @@ nav:
                   - Backlog: implementation/modules/M008-cadastros-corporativos/rubricas/backlog.md
                   - Modelo Estrutural: implementation/modules/M008-cadastros-corporativos/rubricas/modelo-estrutural.md
                   - Rubrica: implementation/modules/M008-cadastros-corporativos/rubricas/rubrica/README.md
-                  - SinonimoRubrica: implementation/modules/M008-cadastros-corporativos/rubricas/sinonimo-rubrica/README.md
-                  - MapeamentoContabilRubrica: implementation/modules/M008-cadastros-corporativos/rubricas/mapeamento-contabil-rubrica/README.md
                   - EPIC-004: implementation/modules/M008-cadastros-corporativos/rubricas/epics/EPIC-M008-004.md
               - Geografia:
                   - Visao Geral: implementation/modules/M008-cadastros-corporativos/geografia/README.md

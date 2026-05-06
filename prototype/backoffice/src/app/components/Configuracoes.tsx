@@ -1,11 +1,12 @@
 import React from 'react';
-import { ArrowLeft, BookOpen, ChevronRight, ClipboardList, Database, FileCheck2, Settings, Target } from 'lucide-react';
+import { ArrowLeft, BookOpen, ChevronRight, ClipboardList, Database, FileCheck2, Settings, Tags, Target } from 'lucide-react';
 import { useThemeTokens } from '../theme/ThemeContext';
 
 interface ConfiguracoesProps {
   onBack: () => void;
   onOpenPlanejamento: () => void;
   onOpenReferencias: () => void;
+  onOpenRubricas: () => void;
   onOpenDocumentos: () => void;
   onOpenFormularios: () => void;
   onOpenRegrasAcaoTransversal: () => void;
@@ -25,6 +26,13 @@ const actions = [
     Icon: Database,
     color: '#f59e0b',
     key: 'referencias',
+  },
+  {
+    title: 'Rubricas',
+    description: 'Cadastro de rubricas e subrubricas por natureza da despesa, com situação e relação pai/filha.',
+    Icon: Tags,
+    color: '#00c1af',
+    key: 'rubricas',
   },
   {
     title: 'Documentos Exigidos',
@@ -49,7 +57,7 @@ const actions = [
   },
 ];
 
-export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlanejamento, onOpenReferencias, onOpenDocumentos, onOpenFormularios, onOpenRegrasAcaoTransversal }) => {
+export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlanejamento, onOpenReferencias, onOpenRubricas, onOpenDocumentos, onOpenFormularios, onOpenRegrasAcaoTransversal }) => {
   const { T } = useThemeTokens();
 
   const cardStyle: React.CSSProperties = {
@@ -66,6 +74,10 @@ export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlan
     }
     if (key === 'documentos') {
       onOpenDocumentos();
+      return;
+    }
+    if (key === 'rubricas') {
+      onOpenRubricas();
       return;
     }
     if (key === 'formularios') {

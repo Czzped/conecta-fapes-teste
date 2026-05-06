@@ -45,10 +45,8 @@ EPIC-M008-003 (Classificacoes Corporativas)
 
 EPIC-M008-004 (Catalogo de Rubricas)
 ├── US-M008-015 Cadastrar Rubrica
-├── US-M008-016 Editar Rubrica e Vigencia
+├── US-M008-016 Editar Rubrica e Ativacao
 ├── US-M008-017 Vincular Rubrica Filha
-├── US-M008-018 Gerenciar Sinonimos de Rubrica
-├── US-M008-019 Definir Mapeamento Contabil da Rubrica
 └── US-M008-020 Consultar Catalogo de Rubricas
 
 EPIC-M008-005 (Gestao Corporativa de Diarias)

@@ -9,6 +9,8 @@ Plataforma digital da FAPES para gestao do ciclo completo de fomento a pesquisa,
 - **Documentacao:** [docs/README.md](docs/README.md)
 - **Sprint Atual:** [SPRINT-007](docs/management/sprints/SPRINT-007.md)
 - **Backlog do Produto:** [backlog-product.md](docs/management/backlog-product.md)
+- **Front-office (producao):** https://portal-fapes-frontoffice.vercel.app
+- **Back-office (producao):** https://backoffice-beta-ten.vercel.app
 
 ## Premissas Nao Negociaveis do Projeto
 

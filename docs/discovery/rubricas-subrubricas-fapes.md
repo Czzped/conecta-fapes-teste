@@ -24,7 +24,7 @@ Analise das rubricas e subrubricas encontradas em normativas e editais da FAPES,
 
 ## Conclusao de Discovery
 
-A FAPES trabalha com uma base normativa de rubricas por natureza de despesa:
+A FAPES trabalha com uma base normativa de rubricas por natureza da despesa:
 
 - `CUSTEIO`: itens consumiveis, servicos, bolsas, auxilios, locomocao, diarias e despesas operacionais do projeto.
 - `CAPITAL`: bens patrimoniais, como equipamentos, material permanente, livros e software quando enquadrados como bens de vida util superior a dois anos e valor acima do limite em VRTE definido na norma.
@@ -52,7 +52,7 @@ Nao deve existir campo `nivelRubrica`. Uma rubrica principal e identificada por 
 
 ### Decisao sobre Diarias e Passagens
 
-Na Resolucao 309/2022, `Diaria` e `Despesa de Locomocao` aparecem como rubricas distintas de custeio. Em editais e planilhas, elas podem aparecer agregadas como `Despesas com passagens e diarias` ou `Passagens, diarias e hospedagem`. Para o sistema, recomenda-se tratar o agregado como label/sinonimo de edital e normalizar o orcamento aprovado em rubricas analiticas:
+Na Resolucao 309/2022, `Diaria` e `Despesa de Locomocao` aparecem como rubricas distintas de custeio. Em editais e planilhas, elas podem aparecer agregadas como `Despesas com passagens e diarias` ou `Passagens, diarias e hospedagem`. Para o sistema, recomenda-se tratar o agregado como label textual do edital e normalizar o orcamento aprovado em rubricas analiticas:
 
 - `Diarias`
 - `Passagens`
@@ -89,7 +89,7 @@ Essa relacao deve ser tratada como mapeamento e integracao, nao como equivalenci
 
 | Conceito | O que representa | Dono principal | Exemplo |
 |----------|------------------|----------------|---------|
-| `Rubrica` | Categoria corporativa/normativa de despesa, com natureza, hierarquia e fonte. | M008 | Diarias, Despesa de Locomocao, Material de Consumo. |
+| `Rubrica` | Categoria corporativa/normativa de despesa, com natureza da despesa e hierarquia. | M008 | Diarias, Despesa de Locomocao, Material de Consumo. |
 | `RubricaProjeto` | Rubrica aprovada no orcamento de uma iniciativa, com snapshot e limite financeiro. | M013 | Diarias com R$ 10.000,00 aprovados. |
 | `Subrubrica` | Rubrica filha usada para detalhar a rubrica principal, sem entidade separada e sem campo de nivel. | M008/M011/M013 | Material laboratorial, Equipamentos de informatica, Servicos graficos. |
 | `Transacao` | Movimento que altera comprometido, executado, estornado ou saldo de uma `RubricaProjeto`. | M013, consumido por M003/M014 | Comprometimento de diaria de R$ 780,00. |
@@ -105,7 +105,7 @@ O ajuste recomendado e reforcar as fronteiras entre os modulos:
 
 | Modulo | Responsabilidade na fronteira rubrica/orcamento/contabilidade |
 |--------|---------------------------------------------------------------|
-| `M008 - Cadastros Corporativos` | Mantem o catalogo corporativo de rubricas, naturezas, hierarquias e fontes normativas. |
+| `M008 - Cadastros Corporativos` | Mantem o catalogo corporativo de rubricas, natureza da despesa e hierarquias. |
 | `M011 - Configuracao da Captacao` | Define quais rubricas/subrubricas sao permitidas no edital, com limites, exclusoes e regras especificas. |
 | `M003 - Gestao de Iniciativas Captadas` | Mantem a iniciativa/projeto, vigencia, aditivos e leitura do orcamento aprovado em execucao. |
 | `M013 - Gestao Orcamentaria do Projeto` | Controla orcamento aprovado, rubricas do projeto, saldos, comprometimentos, remanejamentos e aditivos financeiros. |
@@ -156,7 +156,7 @@ Assim, a gestao fica mais simples porque cada modulo preserva seu vocabulario: p
 
 ## Catalogo Normativo
 
-### Naturezas
+### Naturezas da Despesa
 
 | Codigo sugerido | Natureza | Descricao de produto |
 |-----------------|----------|----------------------|
@@ -194,7 +194,7 @@ Assim, a gestao fica mais simples porque cada modulo preserva seu vocabulario: p
 |-------------------|--------------------------|------------------------------|
 | `Capital e Custeio` | Editais como Espacos Cientificos Culturais permitem os dois grupos, mas excluem itens especificos. | Usar catalogo geral com allowlist do edital. |
 | `Custeio limitado` | PROINFRA permite material de consumo e servicos, com limites, e exclui bolsas, locomocao e diarias. | Permitir limite por rubrica no edital. |
-| `Passagens e Diarias` | Planilhas de proposta podem agrupar passagens e diarias em uma unica secao. | Tratar como label/sinonimo de edital e normalizar em rubricas operacionais separadas. |
+| `Passagens e Diarias` | Planilhas de proposta podem agrupar passagens e diarias em uma unica secao. | Tratar como label textual de edital e normalizar em rubricas operacionais separadas. |
 | `Passagens, Diarias e Hospedagem` | Alguns editais de inovacao trazem hospedagem no mesmo grupo. | Separar diaria, passagem/locomocao e hospedagem quando houver orcamento ou comprovante especifico. |
 | `Bolsas` | Editais trazem tabela propria de modalidades, quantidades, duracao e valor mensal. | Importar/registrar modalidades e valores vigentes no modulo de bolsas, vinculando ao edital. |
 | `DOACI` | Editais de parceria/inovacao podem permitir DOACI com percentual proprio. | Parametrizar limite por edital/iniciativa, nao fixar apenas no catalogo global. |
@@ -221,7 +221,7 @@ Assim, a gestao fica mais simples porque cada modulo preserva seu vocabulario: p
 | RD-RUB-012 | Projeto/Iniciativa pode ser vinculado a centro de custo para apuracao gerencial. | M016 consolida contabilidade por centro de custo sem assumir ownership da iniciativa. |
 | RD-RUB-013 | Prestacao de contas alimenta a camada contabil/financeira, mas nao substitui demonstracoes contabeis. | M014 e M016 permanecem separados, integrados por eventos, classificacoes, transacoes e movimentos bancarios. |
 | RD-RUB-014 | Rubrica canonica deve se chamar apenas `Rubrica`; toda Rubrica possui `codigo`, `nome`, `descricao` e pode ter `rubricaPai` ou `subrubricas`. | Evita campos artificiais de nivel e simplifica a hierarquia. |
-| RD-RUB-015 | Sinonimos de rubrica devem ser cadastrados para normalizar nomes de editais, planilhas e SIGFAPES. | M002/M011 conseguem importar termos variados sem criar duplicidade no catalogo. |
+| RD-RUB-015 | Variacoes textuais de editais, planilhas e SIGFAPES devem ser normalizadas para uma Rubrica existente sem criar entidade propria para isso no M008. | M002/M011 conseguem importar termos variados sem criar duplicidade no catalogo. |
 | RD-RUB-016 | RubricaProjeto deve preservar snapshot da Rubrica no momento da aprovacao do projeto. | Mudancas futuras no M008 nao alteram historico orcamentario aprovado. |
 | RD-RUB-017 | Rubrica e categoria; `Transacao` e o movimento da rubrica. Movimentos de comprometimento, execucao, reversao, estorno e remanejamento devem ser registrados como transacoes. Movimentos de extrato/conta devem ficar como movimento bancario separado. | Evita misturar catalogo/estrutura orcamentaria com fatos financeiros e bancarios. |
 
@@ -231,7 +231,7 @@ Assim, a gestao fica mais simples porque cada modulo preserva seu vocabulario: p
 
 | Modulo | Implicacao |
 |--------|------------|
-| `M008 - Cadastros Corporativos` | Deve manter catalogo corporativo de Rubricas FAPES, natureza, status, relacao pai/filha, fonte normativa, sinonimos e mapeamento contabil opcional por vigencia. |
+| `M008 - Cadastros Corporativos` | Deve manter catalogo corporativo de Rubricas FAPES, natureza da despesa, status e relacao pai/filha. |
 | `M011 - Configuracao da Captacao` | Deve registrar quais Rubricas/subrubricas sao permitidas por edital, seus limites, exclusoes e comprovantes esperados. |
 | `M002 - Importacao de Editais` | Deve tentar extrair secoes de itens financiaveis, planilhas anexas e agrupamentos de rubricas dos PDFs. |
 | `M003 - Gestao de Iniciativas Captadas` | Deve manter a leitura do orcamento aprovado da iniciativa e suas rubricas vigentes apos aditivos. |
@@ -248,5 +248,5 @@ Assim, a gestao fica mais simples porque cada modulo preserva seu vocabulario: p
 | DISC-RUB-001 | Confirmar com FAPES o mapeamento de labels agregados, como `Diarias e Passagens`, para rubricas operacionais separadas: `Diarias` e `Locomocao/Passagens`. | Editais podem usar agregacao textual, enquanto o produto deve controlar diaria sem passagem no fluxo M003. |
 | DISC-RUB-002 | Mapear planilhas SIGFAPES reais para identificar nomes historicos de rubricas e subrubricas. | O importador precisa preservar nomenclatura legado sem perder normalizacao. |
 | DISC-RUB-003 | Confirmar tratamento de `Hospedagem` quando aparece junto a passagens/diarias. | Pode ser diaria, servico/hospedagem ou subitem especifico do edital. |
-| DISC-RUB-004 | Criar tabela de sinonimos: `Servicos`, `Servicos de Terceiros`, `STPF`, `STPJ`, `Passagens`, `Locomocao`, `Diarias e Passagens`. | Necessario para importacao de editais e classificacao automatica. |
+| DISC-RUB-004 | Definir estrategia de normalizacao de labels textuais como `Servicos`, `Servicos de Terceiros`, `STPF`, `STPJ`, `Passagens`, `Locomocao`, `Diarias e Passagens`. | Necessario para importacao de editais e classificacao automatica, sem criar cadastro corporativo de variacoes textuais no M008. |
 | DISC-RUB-005 | Validar regras de DOACI por tipo de instrumento. | Limites variam entre norma geral, acao transversal, parcerias e editais especificos. |
