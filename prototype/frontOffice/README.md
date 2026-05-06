@@ -5,7 +5,7 @@
 
   ## Deploy
 
-  Production: https://portal-fapes-frontoffice.vercel.app/
+  Production: https://frontoffice-conecta.vercel.app/
 
   ## Running the code
 

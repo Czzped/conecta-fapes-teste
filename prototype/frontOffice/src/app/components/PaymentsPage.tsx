@@ -15,6 +15,7 @@ interface FilterMultiSelectProps {
 
 interface PaymentsPageProps {
   scope?: 'personal' | 'project';
+  embedded?: boolean;
 }
 
 function FilterMultiSelect({ selectedValues, onChange, options, summaryLabel = 'itens' }: FilterMultiSelectProps) {
@@ -157,7 +158,7 @@ function FilterMultiSelect({ selectedValues, onChange, options, summaryLabel = '
   );
 }
 
-export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
+export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsPageProps) {
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [selectedBeneficiaries, setSelectedBeneficiaries] = useState<string[]>([]);
   const [selectedYears, setSelectedYears] = useState<string[]>([]);
@@ -356,6 +357,7 @@ export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
     ? 'Acompanhe todos os pagamentos do projeto.'
     : 'Acompanhe o histórico dos seus pagamentos de bolsa.';
   const shouldShowBeneficiary = scope === 'project';
+  const shouldShowProjectColumn = !embedded;
   const shouldShowProjectFilter = scope !== 'project';
   const bankAccountsByBeneficiary: Record<string, { agency: string; account: string }> = {
     'Ana Souza': { agency: '0912', account: '12345-6' },
@@ -421,43 +423,45 @@ export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
   });
 
   return (
-    <div className="w-full px-4 md:px-8 py-8">
+    <div className={embedded ? 'w-full' : 'w-full px-4 md:px-8 py-8'}>
       {/* Header with icon */}
-      <div className="flex items-center gap-3 mb-2">
-        <div 
-          className="p-2 transition-colors"
-          style={{
-            color: 'var(--primary)',
-            borderRadius: 'var(--radius)',
-            backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
-          }}
-        >
-          <CreditCard size={20} />
-        </div>
-        <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
-          {pageTitle}
-        </h1>
-      </div>
+      {!embedded && (
+        <>
+          <div className="flex items-center gap-3 mb-2">
+            <div
+              className="p-2 transition-colors"
+              style={{
+                color: 'var(--primary)',
+                borderRadius: 'var(--radius)',
+                backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
+              }}
+            >
+              <CreditCard size={20} />
+            </div>
+            <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
+              {pageTitle}
+            </h1>
+          </div>
 
-      {/* Subtitle */}
-      <p style={{
-        color: 'var(--muted-foreground)',
-        fontSize: 'var(--text-sm)',
-        fontWeight: 'var(--font-weight-normal)',
-        marginLeft: 'calc(32px + 0.75rem)', // Aligns with title (icon size + gap)
-        marginBottom: '1.5rem',
-      }}>
-        {pageSubtitle}
-      </p>
+          <p style={{
+            color: 'var(--muted-foreground)',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 'var(--font-weight-normal)',
+            marginLeft: 'calc(32px + 0.75rem)',
+            marginBottom: '1.5rem',
+          }}>
+            {pageSubtitle}
+          </p>
 
-      {/* Divider */}
-      <div
-        style={{
-          height: '1px',
-          backgroundColor: 'var(--border)',
-          marginBottom: '2rem',
-        }}
-      />
+          <div
+            style={{
+              height: '1px',
+              backgroundColor: 'var(--border)',
+              marginBottom: '2rem',
+            }}
+          />
+        </>
+      )}
 
       {/* Section */}
       <section className="mb-8 mt-6">
@@ -595,20 +599,24 @@ export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
                     className="grid gap-4"
                     style={{
                       gridTemplateColumns: shouldShowBeneficiary
-                        ? '1.15fr 1.2fr 1fr 1.15fr 1.35fr 0.8fr 0.8fr'
+                        ? shouldShowProjectColumn
+                          ? '1.15fr 1.2fr 1fr 1.15fr 1.35fr 0.8fr 0.8fr'
+                          : '1.2fr 1fr 1.15fr 1.35fr 0.8fr 0.8fr'
                         : '1.25fr 1fr 1.15fr 1.65fr 0.8fr 0.8fr',
                       alignItems: 'start',
                     }}
                   >
                     {/* Projeto */}
-                    <div>
-                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
-                        Projeto
+                    {shouldShowProjectColumn && (
+                      <div>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                          Projeto
+                        </div>
+                        <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', wordBreak: 'break-word' }}>
+                          {payment.project}
+                        </div>
                       </div>
-                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', wordBreak: 'break-word' }}>
-                        {payment.project}
-                      </div>
-                    </div>
+                    )}
 
                     {shouldShowBeneficiary && (
                       <div>
@@ -709,15 +717,16 @@ export function PaymentsPage({ scope = 'personal' }: PaymentsPageProps) {
                   <div className="grid grid-cols-2 gap-4">
                     {/* Left Column */}
                     <div className="space-y-3">
-                      {/* Projeto */}
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
-                          Projeto
+                      {shouldShowProjectColumn && (
+                        <div>
+                          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
+                            Projeto
+                          </div>
+                          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                            {payment.project}
+                          </div>
                         </div>
-                        <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                          {payment.project}
-                        </div>
-                      </div>
+                      )}
 
                       {shouldShowBeneficiary && (
                         <div>

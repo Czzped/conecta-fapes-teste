@@ -9,8 +9,8 @@ Plataforma digital da FAPES para gestao do ciclo completo de fomento a pesquisa,
 - **Documentacao:** [docs/README.md](docs/README.md)
 - **Sprint Atual:** [SPRINT-007](docs/management/sprints/SPRINT-007.md)
 - **Backlog do Produto:** [backlog-product.md](docs/management/backlog-product.md)
-- **Front-office (producao):** https://portal-fapes-frontoffice.vercel.app
-- **Back-office (producao):** https://backoffice-beta-ten.vercel.app
+- **Front-office (producao):** https://frontoffice-conecta.vercel.app
+- **Back-office (producao):** https://backoffice-conecta.vercel.app
 
 ## Premissas Nao Negociaveis do Projeto
 
@@ -159,8 +159,8 @@ A pasta `prototype/` concentra os prototipos navegaveis da aplicacao.
 | [prototype/frontOffice](prototype/frontOffice) | Prototipo do front-office (React + Vite) |
 | [Figma Front-office](https://rate-snort-02856207.figma.site/) | Prototipo do portal do coordenador |
 | [Figma Back-office](https://bucket-lake-78647159.figma.site/) | Prototipo do portal administrativo |
-| [Vercel Front-office](https://portal-fapes-frontoffice.vercel.app/) | Deploy navegavel do prototipo front-office |
-| [Vercel Back-office](https://backoffice-beta-ten.vercel.app/) | Deploy navegavel do prototipo administrativo |
+| [Vercel Front-office](https://frontoffice-conecta.vercel.app/) | Deploy navegavel do prototipo front-office |
+| [Vercel Back-office](https://backoffice-conecta.vercel.app/) | Deploy navegavel do prototipo administrativo |
 
 ---
 

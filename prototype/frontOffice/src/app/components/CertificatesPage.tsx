@@ -237,16 +237,16 @@ function calcularDiarias(
   const diasFora = Math.round((diaFim - diaInicio) / 86400000);
   const possuiPernoite = diasFora > 0;
 
+  if (usaDistancia && distanciaKm < 150) {
+    return { quantidade: 0, bloqueado: true, motivoBloqueio: 'É permitido solicitar diária apenas para distâncias a partir de 150 km.', memoria: 'Bloqueio por distância mínima de 150 km.' };
+  }
+
   if (usaDistancia && !possuiPernoite && deslocamentoRegiaoMetropolitana) {
     return { quantidade: 0, bloqueado: true, motivoBloqueio: 'Sem pernoite, deslocamento em região metropolitana não gera diária.', memoria: 'Bloqueio por região metropolitana sem pernoite.' };
   }
 
   if (usaDistancia && !possuiPernoite && municipioLimitrofe) {
     return { quantidade: 0, bloqueado: true, motivoBloqueio: 'Sem pernoite, deslocamento para município limítrofe não gera diária.', memoria: 'Bloqueio por município limítrofe sem pernoite.' };
-  }
-
-  if (usaDistancia && !possuiPernoite && distanciaKm < 150) {
-    return { quantidade: 0, bloqueado: true, motivoBloqueio: 'Sem pernoite, distância inferior a 150 km não gera diária.', memoria: 'Bloqueio por distância mínima sem pernoite.' };
   }
 
   if (horas < 6) {
@@ -342,6 +342,8 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
   const [mostrarJustificativaRecusa, setMostrarJustificativaRecusa] = useState(false);
   const [recusandoId, setRecusandoId] = useState<string | null>(null);
   const [resumoAceiteId, setResumoAceiteId] = useState<string | null>(null);
+  const [confirmarCriacaoDiariaOpen, setConfirmarCriacaoDiariaOpen] = useState(false);
+  const [confirmarAceiteDiariaId, setConfirmarAceiteDiariaId] = useState<string | null>(null);
   const [justificativaRecusa, setJustificativaRecusa] = useState('');
   const [diariasAceitas, setDiariasAceitas] = useState<string[]>([]);
   const [solicitacoesDiaria, setSolicitacoesDiaria] = useState<DiariaRequest[]>([
@@ -726,6 +728,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
   const valorAlocadoDashboard = rubricasDashboard.reduce((total, rubrica) => total + rubrica.alocado, 0);
   const valorUtilizadoDashboard = rubricasDashboard.reduce((total, rubrica) => total + rubrica.utilizado, 0);
   const saldoDisponivelDashboard = rubricasDashboard.reduce((total, rubrica) => total + rubrica.saldo, 0);
+  const saldoProjetoAposSolicitacao = saldoDisponivelDashboard - valorTotalCalculado;
   const orcamentoRubricaSelecionada = orcamentosRubricasDiarias[tipoViagemAtual.codigo] ?? 0;
   const totalComprometidoRubricaSelecionada = solicitacoesDiaria
     .filter(
@@ -890,6 +893,11 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
     if (destinoSelecionado) setTipoViagemSelecionado(destinoSelecionado.tipoViagem);
   };
 
+  const confirmarSolicitacaoDiaria = () => {
+    if (diariaFormIncompleto || !quantidadeCalculada || solicitacaoExcedeSaldo || calculoDiaria.bloqueado) return;
+    setConfirmarCriacaoDiariaOpen(true);
+  };
+
   const criarSolicitacaoDiaria = () => {
     if (diariaFormIncompleto || !quantidadeCalculada || solicitacaoExcedeSaldo || calculoDiaria.bloqueado) return;
 
@@ -937,6 +945,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
     });
 
     setSolicitacoesDiaria((current) => [...novasSolicitacoes, ...current]);
+    setConfirmarCriacaoDiariaOpen(false);
     limparFormularioDiaria();
     setActiveDiariaTab('solicitadas');
   };
@@ -961,6 +970,10 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
     setJustificativaCancelamento('');
   };
 
+  const solicitarAceiteDiaria = (id: string) => {
+    setConfirmarAceiteDiariaId(id);
+  };
+
   const aceitarDiaria = (id: string) => {
     setDiariasAceitas((current) => (current.includes(id) ? current : [...current, id]));
     setSolicitacoesDiaria((current) =>
@@ -976,6 +989,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
       ),
     );
     setResumoAceiteId(null);
+    setConfirmarAceiteDiariaId(null);
     if (solicitacaoDetalheId === id) {
       setActiveDiariaTab('minhas');
       setSolicitacaoDetalheId(null);
@@ -1239,26 +1253,46 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
           </div>
         )}
 
-        {solicitacaoDetalhe.status === 'ALOCADA' && (
+        {solicitacaoDetalhe.status === 'ALOCADA' && dataInicioAindaNaoPassou(solicitacaoDetalhe.partida) && (
           <div className="mt-6 flex flex-col sm:flex-row justify-end gap-3">
             {mostrarJustificativaRecusa ? (
-              <button
-                type="button"
-                onClick={recusarSolicitacaoDetalhe}
-                disabled={!justificativaRecusa.trim()}
-                className="px-4 py-2 transition-colors"
-                style={{
-                  backgroundColor: justificativaRecusa.trim() ? 'var(--primary)' : 'var(--muted)',
-                  color: justificativaRecusa.trim() ? 'var(--primary-foreground)' : 'var(--muted-foreground)',
-                  border: 'none',
-                  borderRadius: 'var(--radius)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  cursor: justificativaRecusa.trim() ? 'pointer' : 'not-allowed',
-                }}
-              >
-                Confirmar Recusa
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMostrarJustificativaRecusa(false);
+                    setJustificativaRecusa('');
+                  }}
+                  className="px-4 py-2"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: 'var(--foreground)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={recusarSolicitacaoDetalhe}
+                  disabled={!justificativaRecusa.trim()}
+                  className="px-4 py-2 transition-colors"
+                  style={{
+                    backgroundColor: justificativaRecusa.trim() ? 'var(--primary)' : 'var(--muted)',
+                    color: justificativaRecusa.trim() ? 'var(--primary-foreground)' : 'var(--muted-foreground)',
+                    border: 'none',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: justificativaRecusa.trim() ? 'pointer' : 'not-allowed',
+                  }}
+                >
+                  Confirmar Recusa
+                </button>
+              </>
             ) : (
               <>
                 <button
@@ -1278,7 +1312,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                 </button>
                 <button
                   type="button"
-                  onClick={() => aceitarDiaria(solicitacaoDetalhe.id)}
+                  onClick={() => solicitarAceiteDiaria(solicitacaoDetalhe.id)}
                   className="px-4 py-2"
                   style={{
                     backgroundColor: 'var(--primary)',
@@ -1299,10 +1333,81 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
     );
   };
 
+  const renderModaisDiaria = () => (
+    <>
+      {confirmarCriacaoDiariaOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.58)' }}>
+          <div
+            className="w-full max-w-md p-6"
+            style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-lg)' }}
+          >
+            <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', margin: '0 0 0.75rem 0' }}>
+              Confirmar solicitação
+            </h2>
+            <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', lineHeight: 1.6, margin: '0 0 1.5rem 0' }}>
+              Após solicitar a diária, o bolsista precisa aceitar a solicitação na própria conta para que o fluxo avance.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setConfirmarCriacaoDiariaOpen(false)}
+                className="px-4 py-2"
+                style={{ backgroundColor: 'transparent', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={criarSolicitacaoDiaria}
+                className="px-4 py-2"
+                style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmarAceiteDiariaId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.58)' }}>
+          <div
+            className="w-full max-w-md p-6"
+            style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-lg)' }}
+          >
+            <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', margin: '0 0 0.75rem 0' }}>
+              Confirmar aceite
+            </h2>
+            <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', lineHeight: 1.6, margin: '0 0 1.5rem 0' }}>
+              Confirme que você aceita a diária e está ciente das informações registradas na solicitação.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setConfirmarAceiteDiariaId(null)}
+                className="px-4 py-2"
+                style={{ backgroundColor: 'transparent', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => aceitarDiaria(confirmarAceiteDiariaId)}
+                className="px-4 py-2"
+                style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}
+              >
+                Aceitar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+
   if (accessType === 'bolsista') {
     return (
       <div className="w-full px-4 md:px-8 py-8">
-        {!(activeFlow === 'diarias' && activeDiariaTab !== 'nova') && (
         <Breadcrumb className="mb-5">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -1331,13 +1436,38 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
               <>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>{activeDiariaTab === 'nova' ? 'Diária' : 'Minhas Diárias'}</BreadcrumbPage>
+                  {activeDiariaTab === 'nova' ? (
+                    <BreadcrumbPage>Diária</BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink asChild>
+                      <button
+                        type="button"
+                        style={{
+                          backgroundColor: 'transparent',
+                          border: 'none',
+                          color: 'var(--muted-foreground)',
+                          cursor: 'pointer',
+                          fontSize: 'var(--text-sm)',
+                          padding: 0,
+                        }}
+                      >
+                        Diária
+                      </button>
+                    </BreadcrumbLink>
+                  )}
                 </BreadcrumbItem>
-                {activeDiariaTab === 'nova' && (
+                {activeDiariaTab === 'nova' ? (
                   <>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
                       <BreadcrumbPage>Detalhes</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </>
+                ) : (
+                  <>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>Minhas Diárias</BreadcrumbPage>
                     </BreadcrumbItem>
                   </>
                 )}
@@ -1345,7 +1475,6 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
             )}
           </BreadcrumbList>
         </Breadcrumb>
-        )}
 
         <div className="flex items-center gap-3 mb-2">
           <div
@@ -1378,10 +1507,10 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
               : 'Visualize suas viagens e aceite ou recuse o termo de diária quando houver solicitação pendente.'
             : 'Acesse documentos, informes e suas solicitações vinculadas ao projeto.'}
         </p>
+        <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '1.5rem' }} />
 
         {activeFlow === 'diarias' ? (
           <>
-            <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '1rem' }} />
             {activeDiariaTab === 'nova' ? renderDetalhesBolsistaDiaria() : renderMinhasDiarias()}
           </>
         ) : (
@@ -1516,13 +1645,14 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
             )}
           </>
         )}
+        {renderModaisDiaria()}
       </div>
     );
   }
 
   return (
     <div className="w-full px-4 md:px-8 py-8">
-      {isNovaSolicitacaoDiaria && (
+      {activeFlow === 'diarias' && (
         <Breadcrumb className="mb-5">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -1564,7 +1694,9 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>{solicitacaoDetalheId ? 'Detalhes' : 'Nova Solicitação'}</BreadcrumbPage>
+              <BreadcrumbPage>
+                {isNovaSolicitacaoDiaria ? (solicitacaoDetalheId ? 'Detalhes' : 'Nova Solicitação') : 'Diária'}
+              </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -1622,16 +1754,12 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
           ? 'Controle solicitações, aceites e remoções de diárias da iniciativa.'
           : 'Solicite diárias, acompanhe aceites e emita documentos da iniciativa.'}
       </p>
-      {isNovaSolicitacaoDiaria && (
-        <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '1rem' }} />
-      )}
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: isNovaSolicitacaoDiaria ? '1rem' : '2rem' }} />
 
       {activeFlow === 'diarias' ? (
         <>
           {!isNovaSolicitacaoDiaria && (
             <>
-              <div style={{ height: '1px', backgroundColor: 'var(--border)', marginBottom: '2rem' }} />
-
               <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
                 {[
                   { label: 'Valor Total Disponível', value: currency.format(totalDisponivelDashboard), icon: Banknote, tint: 'var(--primary)' },
@@ -1751,6 +1879,16 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                     Informações Gerais
                   </h2>
                 </div>
+                <p
+                  style={{
+                    color: 'var(--muted-foreground)',
+                    fontSize: 'var(--text-sm)',
+                    lineHeight: 1.6,
+                    margin: '-0.75rem 0 1.5rem 2.25rem',
+                  }}
+                >
+                  O valor da diária deve ser transferido da conta do projeto para a conta bancária Banestes do bolsista individualmente.
+                </p>
 
                 <div className="grid grid-cols-1 gap-4">
                   <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
@@ -1864,7 +2002,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                   </div>
 
                   <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                    Distância
+                    Distância (mínima de 150 km)
                     <div
                       className="mt-2 px-3 py-2"
                       style={{
@@ -1901,40 +2039,6 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                     />
                   </label>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                    {[
-                      { label: 'Origem/Destino em região metropolitana', hint: 'Calculado pela origem e destino', checked: deslocamentoRegiaoMetropolitana, automatico: true },
-                      { label: 'Município limítrofe sem pernoite', hint: 'Calculado pela origem e destino', checked: municipioLimitrofe, automatico: true },
-                    ].map((item) => (
-                      <label
-                        key={item.label}
-                        className="flex items-start gap-3 px-3 py-3"
-                        style={{
-                          backgroundColor: 'transparent',
-                          border: '1px solid var(--border)',
-                          borderRadius: 'var(--radius)',
-                          color: 'var(--foreground)',
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={item.checked}
-                          disabled
-                          readOnly
-                          style={{ accentColor: 'var(--primary)', marginTop: '0.2rem' }}
-                        />
-                        <span>
-                          <span style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)' }}>
-                            {item.label}
-                          </span>
-                          <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.2rem' }}>
-                            {item.hint}
-                          </span>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                     {[
                       { label: 'Transporte custeado por outra entidade', checked: transporteCusteadoOutraEntidade, onChange: setTransporteCusteadoOutraEntidade },
@@ -1965,7 +2069,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                   </div>
 
                   <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                    Bolsistas
+                    Equipe
                     <div className="mt-2">
                       <div className="relative">
                         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--muted-foreground)' }} />
@@ -1977,7 +2081,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                             setBolsistaSearch(event.target.value);
                             setIsBolsistaDropdownOpen(true);
                           }}
-                          placeholder="Digite ou selecione um bolsista"
+                          placeholder="Digite ou selecione uma pessoa da equipe"
                           className="w-full pl-10 pr-3 py-2"
                           style={{
                             backgroundColor: 'transparent',
@@ -2075,11 +2179,24 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                   >
                     <div className="flex items-center justify-between gap-4">
                       <span style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
-                        Valor Total
+                        Resumo da Diária no Projeto
                       </span>
-                      <strong style={{ color: 'var(--primary)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', whiteSpace: 'nowrap' }}>
-                        {currency.format(valorTotalCalculado)}
-                      </strong>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+                      {[
+                        { label: 'Total disponível para Diária', value: currency.format(totalDisponivelDashboard) },
+                        { label: 'Esta solicitação consome', value: currency.format(valorTotalCalculado) },
+                        { label: 'Saldo após a solicitação', value: currency.format(saldoProjetoAposSolicitacao) },
+                      ].map((item) => (
+                        <div key={item.label}>
+                          <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
+                            {item.label}
+                          </span>
+                          <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
+                            {item.value}
+                          </strong>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
@@ -2163,25 +2280,45 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
               <div className="mt-6 flex flex-col sm:flex-row justify-end gap-3">
                 {solicitacaoDetalheId ? (
                   <>
-                    {solicitacaoDetalheOrigem === 'minhas' && solicitacaoDetalhe?.status === 'ALOCADA' ? (
+                    {solicitacaoDetalheOrigem === 'minhas' && solicitacaoDetalhe?.status === 'ALOCADA' && dataInicioAindaNaoPassou(solicitacaoDetalhe.partida) ? (
                       mostrarJustificativaRecusa ? (
-                        <button
-                          type="button"
-                          onClick={recusarSolicitacaoDetalhe}
-                          disabled={!justificativaRecusa.trim()}
-                          className="px-4 py-2 transition-colors"
-                          style={{
-                            backgroundColor: justificativaRecusa.trim() ? 'var(--primary)' : 'var(--muted)',
-                            color: justificativaRecusa.trim() ? 'var(--primary-foreground)' : 'var(--muted-foreground)',
-                            border: 'none',
-                            borderRadius: 'var(--radius)',
-                            fontSize: 'var(--text-sm)',
-                            fontWeight: 'var(--font-weight-medium)',
-                            cursor: justificativaRecusa.trim() ? 'pointer' : 'not-allowed',
-                          }}
-                        >
-                          Confirmar Recusa
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMostrarJustificativaRecusa(false);
+                              setJustificativaRecusa('');
+                            }}
+                            className="px-4 py-2"
+                            style={{
+                              backgroundColor: 'transparent',
+                              color: 'var(--foreground)',
+                              border: '1px solid var(--border)',
+                              borderRadius: 'var(--radius)',
+                              fontSize: 'var(--text-sm)',
+                              fontWeight: 'var(--font-weight-medium)',
+                            }}
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={recusarSolicitacaoDetalhe}
+                            disabled={!justificativaRecusa.trim()}
+                            className="px-4 py-2 transition-colors"
+                            style={{
+                              backgroundColor: justificativaRecusa.trim() ? 'var(--primary)' : 'var(--muted)',
+                              color: justificativaRecusa.trim() ? 'var(--primary-foreground)' : 'var(--muted-foreground)',
+                              border: 'none',
+                              borderRadius: 'var(--radius)',
+                              fontSize: 'var(--text-sm)',
+                              fontWeight: 'var(--font-weight-medium)',
+                              cursor: justificativaRecusa.trim() ? 'pointer' : 'not-allowed',
+                            }}
+                          >
+                            Confirmar Recusa
+                          </button>
+                        </>
 	                      ) : (
                         <>
                           <button
@@ -2201,7 +2338,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                           </button>
                           <button
                             type="button"
-                            onClick={() => aceitarDiaria(solicitacaoDetalheId)}
+                            onClick={() => solicitarAceiteDiaria(solicitacaoDetalheId)}
                             className="px-4 py-2"
                             style={{
                               backgroundColor: 'var(--primary)',
@@ -2216,7 +2353,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                           </button>
                         </>
                       )
-                    ) : solicitacaoDetalhe?.status === 'CANCELADA' || solicitacaoDetalhe?.status === 'RECUSADA' ? null : mostrarMotivoCancelamento ? (
+                    ) : solicitacaoDetalhe?.status === 'CANCELADA' || solicitacaoDetalhe?.status === 'RECUSADA' || !dataInicioAindaNaoPassou(solicitacaoDetalhe?.partida ?? '') ? null : mostrarMotivoCancelamento ? (
                       <button
                         type="button"
                         onClick={cancelarSolicitacaoDetalhe}
@@ -2269,7 +2406,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                       Salvar Rascunho
                     </button>
                     <button
-                      onClick={criarSolicitacaoDiaria}
+                      onClick={confirmarSolicitacaoDiaria}
                       disabled={solicitacaoBloqueada}
                       className="px-4 py-2 transition-colors flex items-center justify-center gap-2"
                       style={{
@@ -2556,6 +2693,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
       )}
         </>
       )}
+      {renderModaisDiaria()}
     </div>
   );
 }

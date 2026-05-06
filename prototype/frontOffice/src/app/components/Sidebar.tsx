@@ -78,8 +78,6 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
 
   // Minha Equipe - Only for Coordenador
   const minhaEquipeItem = { id: 'minha-equipe', labelKey: 'sidebar.myTeam', icon: Users };
-  const projectPaymentsItem = { id: 'pagamentos-projeto', labelKey: 'sidebar.projectPayments', icon: CreditCard };
-
   const prestacaoContasItems = [
     { id: 'financeira', labelKey: 'sidebar.financial', icon: DollarSign },
     { id: 'prestacao-contas-tecnica', labelKey: 'sidebar.technical', icon: FileText },
@@ -444,7 +442,6 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
         acc.push(item);
         if (item.id === 'projetos') {
           acc.push(minhaEquipeItem);
-          acc.push(projectPaymentsItem);
         }
         return acc;
       }, [] as typeof managementMenuItems)

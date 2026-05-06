@@ -16,7 +16,7 @@ O Portal Coordenador e a interface principal para coordenadores de projetos de p
 | **Stack** | Vue 3, Vite, Nuxt UI, Tailwind CSS v4, Pinia, Vue Query, Axios |
 | **Autenticacao** | Acesso Cidadao (OpenID Connect) |
 | **Status** | Em producao |
-| **Prototipo navegavel** | [Vercel Front-office](https://portal-fapes-frontoffice.vercel.app/) |
+| **Prototipo navegavel** | [Vercel Front-office](https://frontoffice-conecta.vercel.app/) |
 
 ---
 
