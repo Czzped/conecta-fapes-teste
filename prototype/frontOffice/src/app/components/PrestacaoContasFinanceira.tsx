@@ -644,16 +644,6 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
                   <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', whiteSpace: 'nowrap' }}>
                     {payment.cnpj}
                   </div>
-                  {payment.classificacao === 'ESTORNO' && (
-                    <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.35rem', whiteSpace: 'nowrap' }}>
-                      Associa {payment.creditoEstorno} ao débito {payment.debitoEstornado} · {payment.modoAssociacao}
-                    </div>
-                  )}
-                  {payment.classificacao === 'DEVOLUCAO' && (
-                    <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.35rem', whiteSpace: 'nowrap' }}>
-                      Devolve {payment.valorDevolvido} da compra {payment.debitoOriginal} · residual {payment.valorResidual}
-                    </div>
-                  )}
                 </div>
 
                 {/* Status */}
@@ -753,16 +743,6 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
                 <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
                   {payment.cnpj}
                 </div>
-                {payment.classificacao === 'ESTORNO' && (
-                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.35rem' }}>
-                    Associa {payment.creditoEstorno} ao débito {payment.debitoEstornado} · {payment.modoAssociacao}
-                  </div>
-                )}
-                {payment.classificacao === 'DEVOLUCAO' && (
-                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.35rem' }}>
-                    Devolve {payment.valorDevolvido} da compra {payment.debitoOriginal} · residual {payment.valorResidual}
-                  </div>
-                )}
               </div>
             </div>
           </div>

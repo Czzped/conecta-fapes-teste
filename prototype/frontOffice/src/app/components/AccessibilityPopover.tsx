@@ -80,20 +80,17 @@ export function AccessibilityPopover({ isOpen, onClose, anchorEl }: Accessibilit
     >
       {/* Header */}
       <div
-        className="flex items-center justify-between p-4 border-b"
-        style={{
-          borderColor: 'var(--border)',
-        }}
+        className="flex items-center justify-between p-4"
       >
         <h3
           style={{
-            fontSize: 'var(--text-sm)',
-            fontWeight: 'var(--font-weight-semibold)',
+            fontSize: '16px',
+            fontWeight: 'var(--font-weight-normal)',
             color: 'var(--foreground)',
             margin: 0,
           }}
         >
-          ACESSIBILIDADE
+          Acessibilidade
         </h3>
         <button
           onClick={onClose}

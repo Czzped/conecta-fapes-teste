@@ -162,7 +162,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                 borderRadius: 'var(--radius)',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--muted)';
+                e.currentTarget.style.backgroundColor = 'var(--sidebar-accent)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
@@ -184,21 +184,21 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                 width: '32px',
                 height: '32px',
                 borderRadius: '50%',
-                backgroundColor: 'rgba(34, 211, 238, 0.1)',
+                backgroundColor: 'color-mix(in srgb, var(--sidebar-primary) 10%, transparent)',
                 color: 'var(--primary)',
-                border: '1px solid rgba(34, 211, 238, 0.2)',
+                border: '1px solid color-mix(in srgb, var(--sidebar-primary) 20%, transparent)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.15)';
-                e.currentTarget.style.borderColor = 'rgba(34, 211, 238, 0.3)';
+                e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--sidebar-primary) 15%, transparent)';
+                e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--sidebar-primary) 30%, transparent)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.1)';
-                e.currentTarget.style.borderColor = 'rgba(34, 211, 238, 0.2)';
+                e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--sidebar-primary) 10%, transparent)';
+                e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--sidebar-primary) 20%, transparent)';
               }}
               title={isCollapsed ? 'Expandir menu' : 'Colapsar menu'}
               aria-label={isCollapsed ? 'Expandir menu' : 'Colapsar menu'}
@@ -239,7 +239,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                       onClick={() => onNavigate(item.id)}
                       className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                       style={{
-                        backgroundColor: isActive ? 'var(--muted)' : 'transparent',
+                        backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
                         color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
                         borderRadius: 'var(--radius)',
                         fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
@@ -253,7 +253,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                       }}
                       onMouseEnter={(e) => {
                         if (!isActive) {
-                          e.currentTarget.style.backgroundColor = 'var(--muted)';
+                          e.currentTarget.style.backgroundColor = 'var(--sidebar-accent)';
                         }
                       }}
                       onMouseLeave={(e) => {
@@ -329,7 +329,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                           onClick={() => onNavigate(item.id)}
                           className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                           style={{
-                            backgroundColor: isActive ? 'var(--muted)' : 'transparent',
+                            backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
                             color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
                             borderRadius: 'var(--radius)',
                             fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
@@ -343,7 +343,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                           }}
                           onMouseEnter={(e) => {
                             if (!isActive) {
-                              e.currentTarget.style.backgroundColor = 'var(--muted)';
+                              e.currentTarget.style.backgroundColor = 'var(--sidebar-accent)';
                             }
                           }}
                           onMouseLeave={(e) => {
@@ -401,7 +401,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                         margin: isCollapsed ? '0 auto' : undefined,
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--muted)';
+              e.currentTarget.style.backgroundColor = 'var(--sidebar-accent)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
@@ -521,7 +521,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
               borderRadius: 'var(--radius)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--muted)';
+              e.currentTarget.style.backgroundColor = 'var(--sidebar-accent)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
@@ -543,21 +543,21 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              backgroundColor: 'rgba(34, 211, 238, 0.1)',
+              backgroundColor: 'color-mix(in srgb, var(--sidebar-primary) 10%, transparent)',
               color: 'var(--primary)',
-              border: '1px solid rgba(34, 211, 238, 0.2)',
+              border: '1px solid color-mix(in srgb, var(--sidebar-primary) 20%, transparent)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.15)';
-              e.currentTarget.style.borderColor = 'rgba(34, 211, 238, 0.3)';
+              e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--sidebar-primary) 15%, transparent)';
+              e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--sidebar-primary) 30%, transparent)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.1)';
-              e.currentTarget.style.borderColor = 'rgba(34, 211, 238, 0.2)';
+              e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--sidebar-primary) 10%, transparent)';
+              e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--sidebar-primary) 20%, transparent)';
             }}
             title={isCollapsed ? 'Expandir menu' : 'Colapsar menu'}
             aria-label={isCollapsed ? 'Expandir menu' : 'Colapsar menu'}
@@ -580,7 +580,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                     onClick={() => onNavigate(homeMenuItem.id)}
                     className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                     style={{
-                      backgroundColor: isActive ? 'var(--muted)' : 'transparent',
+                      backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
                       color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
                       borderRadius: 'var(--radius)',
                       fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
@@ -594,7 +594,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                     }}
                     onMouseEnter={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.backgroundColor = 'var(--muted)';
+                        e.currentTarget.style.backgroundColor = 'var(--sidebar-accent)';
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -665,7 +665,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                         onClick={() => onNavigate(item.id)}
                         className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                         style={{
-                          backgroundColor: isActive ? 'var(--muted)' : 'transparent',
+                          backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
                           color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
                           borderRadius: 'var(--radius)',
                           fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
@@ -679,7 +679,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                         }}
                         onMouseEnter={(e) => {
                           if (!isActive) {
-                            e.currentTarget.style.backgroundColor = 'var(--muted)';
+                            e.currentTarget.style.backgroundColor = 'var(--sidebar-accent)';
                           }
                         }}
                         onMouseLeave={(e) => {
@@ -752,7 +752,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                     onClick={() => onNavigate(item.id)}
                     className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                     style={{
-                      backgroundColor: isActive ? 'var(--muted)' : 'transparent',
+                      backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
                       color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
                       borderRadius: 'var(--radius)',
                       fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
@@ -766,7 +766,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                     }}
                     onMouseEnter={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.backgroundColor = 'var(--muted)';
+                        e.currentTarget.style.backgroundColor = 'var(--sidebar-accent)';
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -842,7 +842,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                         onClick={() => onNavigate(item.id)}
                         className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                         style={{
-                          backgroundColor: isActive ? 'var(--muted)' : 'transparent',
+                          backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
                           color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
                           borderRadius: 'var(--radius)',
                           fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
@@ -856,7 +856,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                         }}
                         onMouseEnter={(e) => {
                           if (!isActive) {
-                            e.currentTarget.style.backgroundColor = 'var(--muted)';
+                            e.currentTarget.style.backgroundColor = 'var(--sidebar-accent)';
                           }
                         }}
                         onMouseLeave={(e) => {
@@ -914,7 +914,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                         margin: isCollapsed ? '0 auto' : undefined,
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--muted)';
+            e.currentTarget.style.backgroundColor = 'var(--sidebar-accent)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';

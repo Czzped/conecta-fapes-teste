@@ -1,4 +1,4 @@
-import { Users, Plus, ChevronDown, ChevronLeft, ChevronRight, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp } from 'lucide-react';
+import { Users, Plus, ChevronDown, ChevronLeft, ChevronRight, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -1127,7 +1127,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                   maxWidth: '100%',
                   padding: '0.625rem 0.75rem',
                   paddingLeft: '2.5rem',
-                  backgroundColor: 'var(--background)',
+                  backgroundColor: 'var(--input-background)',
                   color: 'var(--foreground)',
                   border: '1px solid var(--border)',
                   borderRadius: 'var(--radius)',
@@ -1187,7 +1187,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                   width: '100%',
                   maxWidth: '100%',
                   padding: '0.625rem 0.75rem',
-                  backgroundColor: 'var(--background)',
+                  backgroundColor: 'var(--input-background)',
                   color: 'var(--foreground)',
                   border: '1px solid var(--border)',
                   borderRadius: 'var(--radius)',
@@ -1227,7 +1227,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                     top: 'calc(100% + 4px)',
                     left: 0,
                     right: 0,
-                    backgroundColor: 'var(--card)',
+                    backgroundColor: 'var(--popover)',
                     border: '1px solid var(--border)',
                     borderRadius: 'var(--radius)',
                     boxShadow: 'var(--shadow-lg)',
@@ -1245,18 +1245,21 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                       style={{
                         width: '100%',
                         padding: '0.625rem 0.75rem',
-                        backgroundColor: selectedModalidade === modalidade ? 'var(--accent)' : 'transparent',
-                        color: selectedModalidade === modalidade ? 'var(--background)' : 'var(--foreground)',
+                        backgroundColor: selectedModalidade === modalidade ? 'color-mix(in srgb, var(--primary) 16%, var(--popover))' : 'transparent',
+                        color: 'var(--foreground)',
                         border: 'none',
                         fontSize: 'var(--text-sm)',
                         fontWeight: 'var(--font-weight-normal)',
                         textAlign: 'left',
                         cursor: 'pointer',
                         transition: 'background-color 0.15s, color 0.15s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
                       }}
                       onMouseEnter={(e) => {
                         if (selectedModalidade !== modalidade) {
-                          e.currentTarget.style.backgroundColor = 'var(--muted)';
+                          e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--primary) 8%, var(--popover))';
                         }
                       }}
                       onMouseLeave={(e) => {
@@ -1265,6 +1268,20 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                         }
                       }}
                     >
+                      <span
+                        aria-hidden="true"
+                        className="flex items-center justify-center"
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '6px',
+                          backgroundColor: selectedModalidade === modalidade ? 'var(--primary)' : 'transparent',
+                          color: 'var(--primary-foreground)',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {selectedModalidade === modalidade && <Check size={16} />}
+                      </span>
                       {modalidade}
                     </button>
                   ))}
@@ -1293,7 +1310,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                   width: '100%',
                   maxWidth: '100%',
                   padding: '0.625rem 0.75rem',
-                  backgroundColor: 'var(--background)',
+                  backgroundColor: 'var(--input-background)',
                   color: 'var(--foreground)',
                   border: '1px solid var(--border)',
                   borderRadius: 'var(--radius)',
@@ -1333,7 +1350,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                     top: 'calc(100% + 4px)',
                     left: 0,
                     right: 0,
-                    backgroundColor: 'var(--card)',
+                    backgroundColor: 'var(--popover)',
                     border: '1px solid var(--border)',
                     borderRadius: 'var(--radius)',
                     boxShadow: 'var(--shadow-lg)',
@@ -1351,18 +1368,21 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                       style={{
                         width: '100%',
                         padding: '0.625rem 0.75rem',
-                        backgroundColor: selectedStatus === status ? 'var(--accent)' : 'transparent',
-                        color: selectedStatus === status ? 'var(--background)' : 'var(--foreground)',
+                        backgroundColor: selectedStatus === status ? 'color-mix(in srgb, var(--primary) 16%, var(--popover))' : 'transparent',
+                        color: 'var(--foreground)',
                         border: 'none',
                         fontSize: 'var(--text-sm)',
                         fontWeight: 'var(--font-weight-normal)',
                         textAlign: 'left',
                         cursor: 'pointer',
                         transition: 'background-color 0.15s, color 0.15s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
                       }}
                       onMouseEnter={(e) => {
                         if (selectedStatus !== status) {
-                          e.currentTarget.style.backgroundColor = 'var(--muted)';
+                          e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--primary) 8%, var(--popover))';
                         }
                       }}
                       onMouseLeave={(e) => {
@@ -1371,6 +1391,20 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                         }
                       }}
                     >
+                      <span
+                        aria-hidden="true"
+                        className="flex items-center justify-center"
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '6px',
+                          backgroundColor: selectedStatus === status ? 'var(--primary)' : 'transparent',
+                          color: 'var(--primary-foreground)',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {selectedStatus === status && <Check size={16} />}
+                      </span>
                       {status}
                     </button>
                   ))}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Save, User, ChevronDown, FileText, IdCard, MapPin, DollarSign, Upload, Trash2, Paperclip } from 'lucide-react';
+import { Save, User, ChevronDown, FileText, Upload, Trash2, Paperclip } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Dropdown } from '@/app/components/Dropdown';
 import exampleImage from 'figma:asset/5fdde35260b51e236743e92a6751fa016c01ebe7.png';
@@ -272,6 +272,47 @@ export function MyInfoPage() {
     </div>
   );
 
+  const SectionHeader = ({ number, title }: { number: number; title: string }) => (
+    <div className="flex items-center gap-3 mb-6">
+      <span
+        className="flex items-center justify-center"
+        style={{
+          width: '24px',
+          height: '24px',
+          borderRadius: '9999px',
+          backgroundColor: 'var(--primary)',
+          color: 'var(--primary-foreground)',
+          fontSize: 'var(--text-xs)',
+          fontWeight: 'var(--font-weight-semibold)',
+          flexShrink: 0,
+          fontFamily: 'var(--font-family)',
+        }}
+      >
+        {number}
+      </span>
+      <h3
+        style={{
+          color: 'var(--foreground)',
+          fontSize: '16px',
+          fontWeight: 'var(--font-weight-normal)',
+          lineHeight: 1.2,
+          margin: 0,
+          fontFamily: 'var(--font-family)',
+        }}
+      >
+        {title}
+      </h3>
+    </div>
+  );
+
+  const dataSectionStyle = {
+    backgroundColor: 'var(--card)',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius)',
+    padding: '1.5rem',
+  };
+  const dataFieldBackground = '#1e293b';
+
   return (
     <div className="w-full px-4 md:px-8 py-8">
       {/* Header */}
@@ -375,24 +416,10 @@ export function MyInfoPage() {
 
       {/* Tab Content */}
       {activeTab === 'dados' && (
-        <div>
+        <div className="space-y-6">
           {/* Dados Pessoais Section */}
-          <section className="mb-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div 
-                className="p-2 transition-colors"
-                style={{
-                  color: 'var(--primary)',
-                  borderRadius: 'var(--radius)',
-                  backgroundColor: 'rgba(34, 211, 238, 0.1)',
-                }}
-              >
-                <IdCard size={20} />
-              </div>
-              <h3 style={{ color: 'var(--foreground)', margin: 0 }}>
-                Dados Pessoais
-              </h3>
-            </div>
+          <section style={dataSectionStyle}>
+            <SectionHeader number={1} title="Dados Pessoais" />
 
             <div className="space-y-6">
               {/* Row 1: Nome Completo | Nome Social */}
@@ -406,7 +433,7 @@ export function MyInfoPage() {
                     defaultValue="Paulo Sérgio Junior"
                     className="w-full px-4 py-2 border transition-colors"
                     style={{
-                      backgroundColor: 'var(--input-background)',
+                      backgroundColor: dataFieldBackground,
                       color: 'var(--foreground)',
                       borderColor: 'var(--border)',
                       borderRadius: 'var(--radius)',
@@ -423,7 +450,7 @@ export function MyInfoPage() {
                     defaultValue=""
                     className="w-full px-4 py-2 border transition-colors"
                     style={{
-                      backgroundColor: 'var(--input-background)',
+                      backgroundColor: dataFieldBackground,
                       color: 'var(--foreground)',
                       borderColor: 'var(--border)',
                       borderRadius: 'var(--radius)',
@@ -444,7 +471,7 @@ export function MyInfoPage() {
                     defaultValue="123.456.789-00"
                     className="w-full px-4 py-2 border transition-colors"
                     style={{
-                      backgroundColor: 'var(--input-background)',
+                      backgroundColor: dataFieldBackground,
                       color: 'var(--foreground)',
                       borderColor: 'var(--border)',
                       borderRadius: 'var(--radius)',
@@ -461,7 +488,7 @@ export function MyInfoPage() {
                     defaultValue="1995-03-15"
                     className="w-full px-4 py-2 border transition-colors"
                     style={{
-                      backgroundColor: 'var(--input-background)',
+                      backgroundColor: dataFieldBackground,
                       color: 'var(--foreground)',
                       borderColor: 'var(--border)',
                       borderRadius: 'var(--radius)',
@@ -482,7 +509,7 @@ export function MyInfoPage() {
                     defaultValue="paulo.souza@example.com"
                     className="w-full px-4 py-2 border transition-colors"
                     style={{
-                      backgroundColor: 'var(--input-background)',
+                      backgroundColor: dataFieldBackground,
                       color: 'var(--foreground)',
                       borderColor: 'var(--border)',
                       borderRadius: 'var(--radius)',
@@ -499,7 +526,7 @@ export function MyInfoPage() {
                     defaultValue="(27) 99999-9999"
                     className="w-full px-4 py-2 border transition-colors"
                     style={{
-                      backgroundColor: 'var(--input-background)',
+                      backgroundColor: dataFieldBackground,
                       color: 'var(--foreground)',
                       borderColor: 'var(--border)',
                       borderRadius: 'var(--radius)',
@@ -520,7 +547,7 @@ export function MyInfoPage() {
                     defaultValue="Masculino"
                     className="w-full px-4 py-2 border transition-colors"
                     style={{
-                      backgroundColor: 'var(--input-background)',
+                      backgroundColor: dataFieldBackground,
                       color: 'var(--foreground)',
                       borderColor: 'var(--border)',
                       borderRadius: 'var(--radius)',
@@ -536,6 +563,7 @@ export function MyInfoPage() {
                     value={selectedEthnicity}
                     onChange={setSelectedEthnicity}
                     options={ethnicities.map(ethnicity => ({ value: ethnicity, label: ethnicity }))}
+                    backgroundColor={dataFieldBackground}
                   />
                 </div>
               </div>
@@ -551,7 +579,7 @@ export function MyInfoPage() {
                     defaultValue="http://lattes.cnpq.br/1234567890"
                     className="w-full px-4 py-2 border transition-colors"
                     style={{
-                      backgroundColor: 'var(--input-background)',
+                      backgroundColor: dataFieldBackground,
                       color: 'var(--primary)',
                       borderColor: 'var(--border)',
                       borderRadius: 'var(--radius)',
@@ -568,38 +596,16 @@ export function MyInfoPage() {
                     value={selectedAcademicLevel}
                     onChange={setSelectedAcademicLevel}
                     options={academicLevels.map(level => ({ value: level, label: level }))}
+                    backgroundColor={dataFieldBackground}
                   />
                 </div>
               </div>
             </div>
           </section>
 
-          {/* Divider */}
-          <div
-            className="my-8"
-            style={{
-              height: '1px',
-              backgroundColor: 'var(--primary)',
-            }}
-          />
-
           {/* Endereço Residencial Section */}
-          <section className="mb-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div 
-                className="p-2 transition-colors"
-                style={{
-                  color: 'var(--primary)',
-                  borderRadius: 'var(--radius)',
-                  backgroundColor: 'rgba(34, 211, 238, 0.1)',
-                }}
-              >
-                <MapPin size={20} />
-              </div>
-              <h3 style={{ color: 'var(--foreground)', margin: 0 }}>
-                Endereço Residencial
-              </h3>
-            </div>
+          <section style={dataSectionStyle}>
+            <SectionHeader number={2} title="Endereço Residencial" />
 
             <div className="space-y-6">
               {/* Row 1: Rua | Número | Complemento */}
@@ -613,7 +619,7 @@ export function MyInfoPage() {
                     defaultValue="Rua das Flores"
                     className="w-full px-4 py-2 border transition-colors"
                     style={{
-                      backgroundColor: 'var(--input-background)',
+                      backgroundColor: dataFieldBackground,
                       color: 'var(--foreground)',
                       borderColor: 'var(--border)',
                       borderRadius: 'var(--radius)',
@@ -630,7 +636,7 @@ export function MyInfoPage() {
                     defaultValue="123"
                     className="w-full px-4 py-2 border transition-colors"
                     style={{
-                      backgroundColor: 'var(--input-background)',
+                      backgroundColor: dataFieldBackground,
                       color: 'var(--foreground)',
                       borderColor: 'var(--border)',
                       borderRadius: 'var(--radius)',
@@ -647,7 +653,7 @@ export function MyInfoPage() {
                     defaultValue="Apto 101"
                     className="w-full px-4 py-2 border transition-colors"
                     style={{
-                      backgroundColor: 'var(--input-background)',
+                      backgroundColor: dataFieldBackground,
                       color: 'var(--foreground)',
                       borderColor: 'var(--border)',
                       borderRadius: 'var(--radius)',
@@ -668,7 +674,7 @@ export function MyInfoPage() {
                     defaultValue="29000-000"
                     className="w-full px-4 py-2 border transition-colors"
                     style={{
-                      backgroundColor: 'var(--input-background)',
+                      backgroundColor: dataFieldBackground,
                       color: 'var(--foreground)',
                       borderColor: 'var(--border)',
                       borderRadius: 'var(--radius)',
@@ -685,7 +691,7 @@ export function MyInfoPage() {
                     defaultValue="Centro"
                     className="w-full px-4 py-2 border transition-colors"
                     style={{
-                      backgroundColor: 'var(--input-background)',
+                      backgroundColor: dataFieldBackground,
                       color: 'var(--foreground)',
                       borderColor: 'var(--border)',
                       borderRadius: 'var(--radius)',
@@ -702,7 +708,7 @@ export function MyInfoPage() {
                     defaultValue="Vitória"
                     className="w-full px-4 py-2 border transition-colors"
                     style={{
-                      backgroundColor: 'var(--input-background)',
+                      backgroundColor: dataFieldBackground,
                       color: 'var(--foreground)',
                       borderColor: 'var(--border)',
                       borderRadius: 'var(--radius)',
@@ -723,7 +729,7 @@ export function MyInfoPage() {
                     defaultValue="Espírito Santo"
                     className="w-full px-4 py-2 border transition-colors"
                     style={{
-                      backgroundColor: 'var(--input-background)',
+                      backgroundColor: dataFieldBackground,
                       color: 'var(--foreground)',
                       borderColor: 'var(--border)',
                       borderRadius: 'var(--radius)',
@@ -740,7 +746,7 @@ export function MyInfoPage() {
                     defaultValue="Brasil"
                     className="w-full px-4 py-2 border transition-colors"
                     style={{
-                      backgroundColor: 'var(--input-background)',
+                      backgroundColor: dataFieldBackground,
                       color: 'var(--foreground)',
                       borderColor: 'var(--border)',
                       borderRadius: 'var(--radius)',
@@ -752,32 +758,9 @@ export function MyInfoPage() {
             </div>
           </section>
 
-          {/* Divider */}
-          <div
-            className="my-8"
-            style={{
-              height: '1px',
-              backgroundColor: 'var(--primary)',
-            }}
-          />
-
           {/* Dados Bancários Section */}
-          <section className="mb-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div 
-                className="p-2 transition-colors"
-                style={{
-                  color: 'var(--primary)',
-                  borderRadius: 'var(--radius)',
-                  backgroundColor: 'rgba(34, 211, 238, 0.1)',
-                }}
-              >
-                <DollarSign size={20} />
-              </div>
-              <h3 style={{ color: 'var(--foreground)', margin: 0 }}>
-                Dados Bancários
-              </h3>
-            </div>
+          <section style={dataSectionStyle}>
+            <SectionHeader number={3} title="Dados Bancários" />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
@@ -790,7 +773,7 @@ export function MyInfoPage() {
                   readOnly
                   className="w-full px-4 py-2 border transition-colors"
                   style={{
-                    backgroundColor: 'var(--muted)',
+                    backgroundColor: dataFieldBackground,
                     color: 'var(--foreground)',
                     borderColor: 'var(--border)',
                     borderRadius: 'var(--radius)',
@@ -808,7 +791,7 @@ export function MyInfoPage() {
                   defaultValue="0001"
                   className="w-full px-4 py-2 border transition-colors"
                   style={{
-                    backgroundColor: 'var(--input-background)',
+                    backgroundColor: dataFieldBackground,
                     color: 'var(--foreground)',
                     borderColor: 'var(--border)',
                     borderRadius: 'var(--radius)',
@@ -825,7 +808,7 @@ export function MyInfoPage() {
                   defaultValue="12345678-9"
                   className="w-full px-4 py-2 border transition-colors"
                   style={{
-                    backgroundColor: 'var(--input-background)',
+                    backgroundColor: dataFieldBackground,
                     color: 'var(--foreground)',
                     borderColor: 'var(--border)',
                     borderRadius: 'var(--radius)',

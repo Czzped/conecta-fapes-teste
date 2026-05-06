@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 
 interface DropdownOption {
   value: string;
@@ -13,9 +13,10 @@ interface DropdownProps {
   placeholder?: string;
   className?: string;
   disabled?: boolean;
+  backgroundColor?: string;
 }
 
-export function Dropdown({ value, onChange, options, placeholder = 'Selecione', className = '', disabled = false }: DropdownProps) {
+export function Dropdown({ value, onChange, options, placeholder = 'Selecione', className = '', disabled = false, backgroundColor = 'var(--input-background)' }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +49,7 @@ export function Dropdown({ value, onChange, options, placeholder = 'Selecione', 
         disabled={disabled}
         className="w-full px-3 py-2 pr-10 text-left transition-colors"
         style={{
-          backgroundColor: 'var(--input-background)',
+          backgroundColor,
           color: 'var(--foreground)',
           border: '1px solid var(--border)',
           borderRadius: 'var(--radius)',
@@ -100,10 +101,10 @@ export function Dropdown({ value, onChange, options, placeholder = 'Selecione', 
                   onChange(option.value);
                   setIsOpen(false);
                 }}
-                className="w-full px-3 py-2.5 text-left transition-colors"
+                className="w-full px-3 py-2.5 text-left transition-colors flex items-center gap-3"
                 style={{
-                  backgroundColor: isSelected ? 'var(--primary)' : 'transparent',
-                  color: isSelected ? 'var(--background)' : 'var(--foreground)',
+                  backgroundColor: isSelected ? 'color-mix(in srgb, var(--primary) 16%, var(--popover))' : 'transparent',
+                  color: 'var(--foreground)',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-normal)',
                   border: 'none',
@@ -121,6 +122,20 @@ export function Dropdown({ value, onChange, options, placeholder = 'Selecione', 
                   }
                 }}
               >
+                <span
+                  aria-hidden="true"
+                  className="flex items-center justify-center"
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '6px',
+                    backgroundColor: isSelected ? 'var(--primary)' : 'transparent',
+                    color: 'var(--primary-foreground)',
+                    flexShrink: 0,
+                  }}
+                >
+                  {isSelected && <Check size={16} />}
+                </span>
                 {option.label}
               </button>
             );

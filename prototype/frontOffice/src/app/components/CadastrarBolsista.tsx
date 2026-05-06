@@ -132,6 +132,47 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
 
   const Required = () => <span style={{ color: 'var(--destructive-foreground)' }}>*</span>;
 
+  const SectionHeader = ({ number, title }: { number: number; title: string }) => (
+    <div className="flex items-center gap-3 mb-6">
+      <span
+        className="flex items-center justify-center"
+        style={{
+          width: '24px',
+          height: '24px',
+          borderRadius: '9999px',
+          backgroundColor: 'var(--primary)',
+          color: 'var(--primary-foreground)',
+          fontSize: 'var(--text-xs)',
+          fontWeight: 'var(--font-weight-semibold)',
+          flexShrink: 0,
+          fontFamily: 'var(--font-family)',
+        }}
+      >
+        {number}
+      </span>
+      <h2
+        style={{
+          color: 'var(--foreground)',
+          fontSize: '16px',
+          fontWeight: 'var(--font-weight-normal)',
+          lineHeight: 1.2,
+          margin: 0,
+          fontFamily: 'var(--font-family)',
+        }}
+      >
+        {title}
+      </h2>
+    </div>
+  );
+
+  const formSectionStyle = {
+    backgroundColor: 'var(--card)',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius)',
+    padding: '1.5rem',
+  };
+  const formFieldBackground = '#1e293b';
+
   const MonthPicker = ({
     value,
     onChange,
@@ -153,7 +194,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           className="w-full flex items-center justify-between"
-          style={{ padding: '0.625rem 0.75rem', backgroundColor: 'var(--background)', color: value ? 'var(--foreground)' : 'var(--muted-foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', textAlign: 'left', cursor: 'pointer', fontFamily: 'var(--font-family)' }}
+          style={{ padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: value ? 'var(--foreground)' : 'var(--muted-foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', textAlign: 'left', cursor: 'pointer', fontFamily: 'var(--font-family)' }}
         >
           <span>{value ? formatMonthYear(value) : placeholder}</span>
           <Calendar size={16} style={{ color: 'var(--muted-foreground)' }} />
@@ -306,7 +347,10 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
       <div style={{ height: '1px', backgroundColor: 'var(--border)', marginBottom: '2rem' }} />
 
       {/* Form */}
-      <div>
+      <div className="space-y-6">
+        <section style={formSectionStyle}>
+          <SectionHeader number={1} title="Informações da Bolsa" />
+
         {/* Projeto Vinculado */}
         <div className="mb-6">
           <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
@@ -332,7 +376,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
               onChange={handleCPFChange}
               placeholder="000.000.000-00"
               maxLength={14}
-              style={{ flex: 1, padding: '0.625rem 0.75rem', backgroundColor: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
+              style={{ flex: 1, padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
               onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; }}
               onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
             />
@@ -381,7 +425,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
               }
             }}
             placeholder="Nome do orientador responsável"
-            style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
+            style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
             onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; }}
             onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
           />
@@ -409,7 +453,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
             <div className="relative">
               <button
                 onClick={() => setIsModalidadeOpen(!isModalidadeOpen)}
-                style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', textAlign: 'left', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'var(--font-family)' }}
+                style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', textAlign: 'left', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'var(--font-family)' }}
               >
                 {modalidade}
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ transform: isModalidadeOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', flexShrink: 0 }}>
@@ -419,7 +463,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
               {isModalidadeOpen && (
                 <>
                   <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setIsModalidadeOpen(false)} />
-                  <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', boxShadow: 'var(--elevation-sm)', zIndex: 50, overflow: 'hidden', maxHeight: '200px', overflowY: 'auto' }}>
+                  <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, backgroundColor: 'var(--popover)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', boxShadow: 'var(--elevation-sm)', zIndex: 50, overflow: 'hidden', maxHeight: '200px', overflowY: 'auto' }}>
                     {modalidades.map((mod) => (
                       <button
                         key={mod}
@@ -445,7 +489,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
             <div className="relative">
               <button
                 onClick={() => setIsTipoBolsaOpen(!isTipoBolsaOpen)}
-                style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', textAlign: 'left', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'var(--font-family)' }}
+                style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', textAlign: 'left', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'var(--font-family)' }}
               >
                 {tipoBolsa}
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ transform: isTipoBolsaOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', flexShrink: 0 }}>
@@ -455,7 +499,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
               {isTipoBolsaOpen && (
                 <>
                   <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setIsTipoBolsaOpen(false)} />
-                  <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', boxShadow: 'var(--elevation-sm)', zIndex: 50, overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, backgroundColor: 'var(--popover)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', boxShadow: 'var(--elevation-sm)', zIndex: 50, overflow: 'hidden' }}>
                     {tiposBolsa.map((tipo) => (
                       <button
                         key={tipo}
@@ -485,7 +529,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
               min="1"
               value={quantidadeCotas}
               onChange={(e) => handleQuantidadeCotasChange(e.target.value)}
-              style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
+              style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
               onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; }}
               onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
             />
@@ -503,6 +547,10 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
             <MonthPicker value={dataTermino} onChange={setDataTermino} placeholder="Selecione o mês de fim" />
           </div>
         </div>
+        </section>
+
+        <section style={formSectionStyle}>
+          <SectionHeader number={2} title="Informações Gerais" />
 
         {/* Plano de Trabalho */}
         <div className="mb-6">
@@ -514,7 +562,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
             onChange={(e) => setPlanoTrabalho(e.target.value)}
             placeholder="Descreva o plano de trabalho do bolsista, incluindo atividades previstas e metodologia..."
             rows={4}
-            style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', resize: 'vertical', fontFamily: 'var(--font-family)' }}
+            style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', resize: 'vertical', fontFamily: 'var(--font-family)' }}
             onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; }}
             onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
           />
@@ -529,7 +577,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
             value={nomeAtividade}
             onChange={(e) => setNomeAtividade(e.target.value)}
             placeholder="Nome da função que será realizada pelo bolsista"
-            style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
+            style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
             onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; }}
             onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
           />
@@ -545,7 +593,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
             onChange={(e) => setObjetivos(e.target.value)}
             placeholder="Liste os objetivos do bolsista (um por linha) 1. Objetivo 1 2. Objetivo 2 3. Objetivo 3"
             rows={4}
-            style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', resize: 'vertical', fontFamily: 'var(--font-family)' }}
+            style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', resize: 'vertical', fontFamily: 'var(--font-family)' }}
             onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; }}
             onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
           />
@@ -567,10 +615,10 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
                 setIsAreaConhecimentoOpen(true);
               }}
               placeholder="Digite ou selecione uma área CNPq"
-              style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
+              style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
             />
             {isAreaConhecimentoOpen && filteredAreasConhecimento.length > 0 && (
-              <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', boxShadow: 'var(--elevation-sm)', zIndex: 50, maxHeight: '220px', overflowY: 'auto' }}>
+              <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, backgroundColor: 'var(--popover)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', boxShadow: 'var(--elevation-sm)', zIndex: 50, maxHeight: '220px', overflowY: 'auto' }}>
                 {filteredAreasConhecimento.map((area) => (
                   <button
                     key={`${area.nivel1}-${area.nivel2}-${area.nivel3}`}
@@ -604,6 +652,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
             </div>
           )}
         </div>
+        </section>
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-3">

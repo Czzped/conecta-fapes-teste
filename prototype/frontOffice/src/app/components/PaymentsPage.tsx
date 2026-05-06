@@ -100,10 +100,10 @@ function FilterMultiSelect({ selectedValues, onChange, options, summaryLabel = '
           <button
             type="button"
             onClick={() => onChange([])}
-            className="w-full px-3 py-2.5 text-left transition-colors"
+            className="w-full px-3 py-2.5 text-left transition-colors flex items-center gap-3"
             style={{
-              backgroundColor: selectedValues.length === 0 ? 'var(--primary)' : 'transparent',
-              color: selectedValues.length === 0 ? 'var(--background)' : 'var(--foreground)',
+              backgroundColor: selectedValues.length === 0 ? 'color-mix(in srgb, var(--primary) 16%, var(--popover))' : 'transparent',
+              color: 'var(--foreground)',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-normal)',
               border: 'none',
@@ -111,6 +111,20 @@ function FilterMultiSelect({ selectedValues, onChange, options, summaryLabel = '
               fontFamily: 'inherit',
             }}
           >
+            <span
+              aria-hidden="true"
+              className="flex items-center justify-center"
+              style={{
+                width: '24px',
+                height: '24px',
+                borderRadius: '6px',
+                backgroundColor: selectedValues.length === 0 ? 'var(--primary)' : 'transparent',
+                color: 'var(--primary-foreground)',
+                flexShrink: 0,
+              }}
+            >
+              {selectedValues.length === 0 && <Check size={16} />}
+            </span>
             Todos
           </button>
 
@@ -122,9 +136,9 @@ function FilterMultiSelect({ selectedValues, onChange, options, summaryLabel = '
                 key={option.value}
                 type="button"
                 onClick={() => toggleValue(option.value)}
-                className="w-full px-3 py-2.5 text-left transition-colors flex items-center gap-2"
+                className="w-full px-3 py-2.5 text-left transition-colors flex items-center gap-3"
                 style={{
-                  backgroundColor: isSelected ? 'color-mix(in srgb, var(--primary) 12%, transparent)' : 'transparent',
+                  backgroundColor: isSelected ? 'color-mix(in srgb, var(--primary) 16%, var(--popover))' : 'transparent',
                   color: 'var(--foreground)',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-normal)',
@@ -137,16 +151,16 @@ function FilterMultiSelect({ selectedValues, onChange, options, summaryLabel = '
                   aria-hidden="true"
                   className="flex items-center justify-center"
                   style={{
-                    width: '16px',
-                    height: '16px',
-                    borderRadius: '4px',
-                    border: `1px solid ${isSelected ? 'var(--primary)' : 'var(--border)'}`,
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '6px',
+                    border: 'none',
                     backgroundColor: isSelected ? 'var(--primary)' : 'transparent',
-                    color: 'var(--background)',
+                    color: 'var(--primary-foreground)',
                     flexShrink: 0,
                   }}
                 >
-                  {isSelected && <Check size={12} />}
+                  {isSelected && <Check size={16} />}
                 </span>
                 {option.label}
               </button>

@@ -1,4 +1,4 @@
-import { FolderKanban, ChevronDown, Tag, ListChecks, Target, Zap, Clock, Send, FileText, UserCheck, FileEdit, CheckCircle, PlayCircle, Award, Wallet, GraduationCap, Package, Box, Plane, Hotel, Building2, PiggyBank, Receipt, Info, DollarSign, PauseCircle, XCircle, CalendarDays } from 'lucide-react';
+import { FolderKanban, ChevronDown, Tag, ListChecks, Target, Zap, Clock, Send, FileText, UserCheck, FileEdit, CheckCircle, PlayCircle, Award, Wallet, GraduationCap, Package, Box, Plane, Hotel, Building2, DollarSign, PauseCircle, XCircle, CalendarDays } from 'lucide-react';
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -12,8 +12,6 @@ interface MyProjectsPageProps {
 export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: MyProjectsPageProps) {
   const { t } = useLanguage();
   const [isWorkPlanExpanded, setIsWorkPlanExpanded] = useState(false);
-  const [isDoaciTooltipVisible, setIsDoaciTooltipVisible] = useState(false);
-  const [activeTermTab, setActiveTermTab] = useState<'resumo' | 'aditivos'>('resumo');
 
   const projectStages = [
     { id: 1, label: 'Submissão', phase: 'Pre-award', source: 'M011', date: '15/01/2024', icon: Send, status: 'completed' },
@@ -36,73 +34,9 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
   ];
 
   const projectTermData = {
-    dataAprovacaoOriginal: '20/02/2024',
-    orcamentoOriginal: 'R$ 1.250.000,00',
     dataInicio: '01/03/2024',
-    dataFimOriginal: '28/02/2026',
     dataFimVigente: '31/08/2026',
-    possuiAditivoTempo: true,
-    diasAditados: 184,
-    possuiAditivoFinanceiro: true,
-    valorAditivado: 'R$ 250.000,00',
-    documentoReferencia: 'TA-2026-014',
   };
-
-  const termCards = [
-    {
-      label: 'Data inicial do projeto',
-      value: projectTermData.dataInicio,
-      helper: 'Inicio formal da iniciativa',
-      icon: PlayCircle,
-    },
-    {
-      label: 'Data final vigente',
-      value: projectTermData.dataFimVigente,
-      helper: `Original: ${projectTermData.dataFimOriginal}`,
-      icon: Clock,
-    },
-    {
-      label: 'Aditivo de tempo',
-      value: projectTermData.possuiAditivoTempo ? 'Sim' : 'Não',
-      helper: projectTermData.possuiAditivoTempo
-        ? `Prorrogado em ${projectTermData.diasAditados} dias`
-        : 'Sem prorrogacao de prazo',
-      icon: FileEdit,
-      badge: projectTermData.possuiAditivoTempo,
-    },
-    {
-      label: 'Aditivo financeiro',
-      value: projectTermData.possuiAditivoFinanceiro ? 'Sim' : 'Não',
-      helper: projectTermData.possuiAditivoFinanceiro
-        ? `${projectTermData.valorAditivado} · ${projectTermData.documentoReferencia}`
-        : 'Sem acrescimo financeiro',
-      icon: Wallet,
-      badge: projectTermData.possuiAditivoFinanceiro,
-    },
-  ];
-
-  const aditivos = [
-    {
-      id: 'TA-2026-014',
-      tipo: 'Tempo e financeiro',
-      situacao: 'Aprovado',
-      data: '15/02/2026',
-      prazo: '28/02/2026 -> 31/08/2026',
-      valor: 'R$ 250.000,00',
-      documento: 'Termo Aditivo 014/2026',
-      observacao: 'Prorrogação de vigência e suplementação para continuidade das entregas previstas.',
-    },
-    {
-      id: 'TA-2025-009',
-      tipo: 'Financeiro',
-      situacao: 'Aprovado',
-      data: '10/09/2025',
-      prazo: 'Sem alteração',
-      valor: 'R$ 80.000,00',
-      documento: 'Termo Aditivo 009/2025',
-      observacao: 'Acréscimo financeiro para ampliação de rubricas de execução do projeto.',
-    },
-  ];
 
   const budgetCategories = [
     {
@@ -251,297 +185,9 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
         </>
       )}
 
-      <section className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <div
-            className="p-2 transition-colors"
-            style={{
-              color: 'var(--primary)',
-              borderRadius: 'var(--radius)',
-              backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
-            }}
-          >
-            <Clock size={20} />
-          </div>
-          <div>
-            <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', margin: 0 }}>
-              Vigência e aditivos
-            </h2>
-            <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', margin: '0.25rem 0 0' }}>
-              Datas formais do projeto e alterações aprovadas de prazo ou recurso.
-            </p>
-          </div>
-        </div>
-
-        <div
-          className="flex gap-6 mb-4"
-          style={{ borderBottom: '1px solid var(--border)' }}
-        >
-          {[
-            { key: 'resumo', label: 'Resumo' },
-            { key: 'aditivos', label: 'Dados dos aditivos' },
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setActiveTermTab(tab.key as 'resumo' | 'aditivos')}
-              style={{
-                background: 'none',
-                border: 'none',
-                padding: '0.75rem 0',
-                color: activeTermTab === tab.key ? 'var(--primary)' : 'var(--muted-foreground)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)',
-                cursor: 'pointer',
-                position: 'relative',
-                fontFamily: 'var(--font-family)',
-              }}
-            >
-              {tab.label}
-              {activeTermTab === tab.key && (
-                <span
-                  style={{
-                    position: 'absolute',
-                    left: 0,
-                    right: 0,
-                    bottom: '-1px',
-                    height: '2px',
-                    backgroundColor: 'var(--primary)',
-                  }}
-                />
-              )}
-            </button>
-          ))}
-        </div>
-
-        {activeTermTab === 'resumo' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-            {termCards.map((item) => {
-              const Icon = item.icon;
-
-              return (
-                <div
-                  key={item.label}
-                  className="p-4"
-                  style={{
-                    backgroundColor: 'color-mix(in srgb, var(--primary) 3%, transparent)',
-                    border: '1px solid color-mix(in srgb, var(--primary) 12%, transparent)',
-                    borderRadius: 'var(--radius)',
-                  }}
-                >
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>{item.label}</span>
-                    <Icon size={18} style={{ color: 'var(--primary)', flexShrink: 0 }} />
-                  </div>
-                  {item.badge ? (
-                    <span
-                      className="inline-flex items-center px-2.5 py-1 mb-2"
-                      style={{
-                        backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
-                        color: 'var(--primary)',
-                        border: '1px solid color-mix(in srgb, var(--primary) 24%, transparent)',
-                        borderRadius: '9999px',
-                        fontSize: 'var(--text-xs)',
-                        fontWeight: 'var(--font-weight-medium)',
-                      }}
-                    >
-                      {item.value}
-                    </span>
-                  ) : (
-                    <strong style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-lg)', marginBottom: '0.5rem' }}>
-                      {item.value}
-                    </strong>
-                  )}
-                  <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', lineHeight: '1.5', margin: 0 }}>
-                    {item.helper}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {activeTermTab === 'aditivos' && (
-          <div className="space-y-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div
-                className="p-4"
-                style={{
-                  backgroundColor: 'color-mix(in srgb, var(--primary) 3%, transparent)',
-                  border: '1px solid color-mix(in srgb, var(--primary) 12%, transparent)',
-                  borderRadius: 'var(--radius)',
-                }}
-              >
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>Data de aprovação original</span>
-                  <CalendarDays size={18} style={{ color: 'var(--primary)', flexShrink: 0 }} />
-                </div>
-                <strong style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-lg)', marginBottom: '0.5rem' }}>
-                  {projectTermData.dataAprovacaoOriginal}
-                </strong>
-                <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', lineHeight: '1.5', margin: 0 }}>
-                  Aprovação inicial do projeto antes de qualquer aditivo
-                </p>
-              </div>
-
-              <div
-                className="p-4"
-                style={{
-                  backgroundColor: 'color-mix(in srgb, var(--primary) 3%, transparent)',
-                  border: '1px solid color-mix(in srgb, var(--primary) 12%, transparent)',
-                  borderRadius: 'var(--radius)',
-                }}
-              >
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>Orçamento original</span>
-                  <Wallet size={18} style={{ color: 'var(--primary)', flexShrink: 0 }} />
-                </div>
-                <strong style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-lg)', marginBottom: '0.5rem' }}>
-                  {projectTermData.orcamentoOriginal}
-                </strong>
-                <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', lineHeight: '1.5', margin: 0 }}>
-                  Valor aprovado na contratação original da iniciativa
-                </p>
-              </div>
-            </div>
-
-            {aditivos.length > 0 ? (
-              aditivos.map((aditivo) => (
-                <div
-                  key={aditivo.id}
-                  className="p-4"
-                  style={{
-                    backgroundColor: 'color-mix(in srgb, var(--primary) 3%, transparent)',
-                    border: '1px solid color-mix(in srgb, var(--primary) 12%, transparent)',
-                    borderRadius: 'var(--radius)',
-                  }}
-                >
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)' }}>
-                          {aditivo.id}
-                        </strong>
-                        <span
-                          className="inline-flex items-center gap-1 px-2.5 py-1"
-                          style={{
-                            color: 'var(--primary)',
-                            backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
-                            border: '1px solid color-mix(in srgb, var(--primary) 24%, transparent)',
-                            borderRadius: '9999px',
-                            fontSize: 'var(--text-xs)',
-                            fontWeight: 'var(--font-weight-medium)',
-                          }}
-                        >
-                          <CheckCircle size={13} />
-                          {aditivo.situacao}
-                        </span>
-                      </div>
-                      <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', lineHeight: '1.6', margin: 0 }}>
-                        {aditivo.observacao}
-                      </p>
-                    </div>
-
-                    <div
-                      className="px-3 py-2"
-                      style={{
-                        color: 'var(--foreground)',
-                        backgroundColor: 'var(--background)',
-                        border: '1px solid var(--border)',
-                        borderRadius: 'var(--radius)',
-                        fontSize: 'var(--text-sm)',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {aditivo.documento}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-                    <div className="flex items-start gap-2">
-                      <FileText size={16} style={{ color: 'var(--primary)', marginTop: 2 }} />
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Tipo</div>
-                        <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>{aditivo.tipo}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <CalendarDays size={16} style={{ color: 'var(--primary)', marginTop: 2 }} />
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Formalização</div>
-                        <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>{aditivo.data}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Clock size={16} style={{ color: 'var(--primary)', marginTop: 2 }} />
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Prazo</div>
-                        <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>{aditivo.prazo}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Wallet size={16} style={{ color: 'var(--primary)', marginTop: 2 }} />
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>Valor aditivado</div>
-                        <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>{aditivo.valor}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div
-                className="p-6 text-center"
-                style={{
-                  color: 'var(--muted-foreground)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius)',
-                  backgroundColor: 'var(--card)',
-                }}
-              >
-                Este projeto não possui aditivos registrados.
-              </div>
-            )}
-          </div>
-        )}
-      </section>
-
       {/* Estágio do Projeto - Only for Coordenador */}
       {accessType === 'coordenador' && (
       <div className="mb-12">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-2">
-          <div 
-            className="p-2 transition-colors"
-            style={{
-              color: 'var(--primary)',
-              borderRadius: 'var(--radius)',
-              backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
-            }}
-          >
-            <Clock size={20} />
-          </div>
-          <h1 
-            style={{ 
-              color: 'var(--foreground)',
-              margin: 0,
-            }}
-          >
-            Ciclo de Fomento
-          </h1>
-        </div>
-        <p 
-          style={{ 
-            color: 'var(--muted-foreground)',
-            fontSize: 'var(--text-sm)',
-            fontWeight: 'var(--font-weight-normal)',
-            marginLeft: 'calc(32px + 0.75rem)', // Aligns with title (icon size + gap)
-            marginBottom: '1.5rem',
-          }}
-        >
-          Acompanhe a jornada consolidada da iniciativa
-        </p>
-
         {/* Card Container - Only Timeline */}
         <div 
           className="p-6"
@@ -825,7 +471,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
             </div>
           </div>
 
-          {/* Accumulated Income Card */}
+          {/* Project Start Date Card */}
           <div 
             className="p-6"
             style={{
@@ -846,7 +492,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                   backgroundColor: 'color-mix(in srgb, var(--primary) 15%, transparent)',
                 }}
               >
-                <PiggyBank size={20} />
+                <CalendarDays size={20} />
               </div>
               <div 
                 style={{ 
@@ -855,21 +501,21 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                   fontWeight: 'var(--font-weight-medium)',
                 }}
               >
-                Rendimento Acumulado
+                Data de Inicio
               </div>
             </div>
             <div 
               style={{ 
-                color: 'var(--primary)',
+                color: 'var(--foreground)',
                 fontSize: '1.25rem',
                 fontWeight: 'var(--font-weight-semibold)',
               }}
             >
-              + R$ 12.500,00
+              {projectTermData.dataInicio}
             </div>
           </div>
 
-          {/* DOACI Card */}
+          {/* Project Current End Date Card */}
           <div 
             className="p-6"
             style={{
@@ -890,73 +536,16 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                   backgroundColor: 'color-mix(in srgb, var(--primary) 15%, transparent)',
                 }}
               >
-                <Receipt size={20} />
+                <Clock size={20} />
               </div>
-              <div className="flex items-center gap-2">
-                <div 
-                  style={{ 
-                    color: 'var(--muted-foreground)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-weight-medium)',
-                  }}
-                >
-                  DOACI
-                </div>
-                <div 
-                  className="relative"
-                  onMouseEnter={() => setIsDoaciTooltipVisible(true)}
-                  onMouseLeave={() => setIsDoaciTooltipVisible(false)}
-                  onClick={() => setIsDoaciTooltipVisible(!isDoaciTooltipVisible)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <Info 
-                    size={16} 
-                    style={{ 
-                      color: 'var(--muted-foreground)',
-                      transition: 'color 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary)'}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--muted-foreground)'}
-                  />
-                  {isDoaciTooltipVisible && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: 'calc(100% + 8px)',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        backgroundColor: 'var(--popover)',
-                        color: 'var(--popover-foreground)',
-                        padding: '8px 12px',
-                        borderRadius: 'var(--radius)',
-                        fontSize: 'var(--text-xs)',
-                        fontWeight: 'var(--font-weight-normal)',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                        border: '1px solid var(--border)',
-                        zIndex: 50,
-                        minWidth: '280px',
-                        maxWidth: '320px',
-                        whiteSpace: 'normal',
-                        lineHeight: '1.5',
-                      }}
-                    >
-                      Para despesas operacionais e administrativas indivisíveis na execução do projeto.
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '100%',
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          width: 0,
-                          height: 0,
-                          borderLeft: '6px solid transparent',
-                          borderRight: '6px solid transparent',
-                          borderTop: '6px solid var(--popover)',
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
+              <div 
+                style={{ 
+                  color: 'var(--muted-foreground)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                }}
+              >
+                Data de Fim
               </div>
             </div>
             <div 
@@ -964,35 +553,9 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                 color: 'var(--foreground)',
                 fontSize: '1.25rem',
                 fontWeight: 'var(--font-weight-semibold)',
-                marginBottom: '12px',
               }}
             >
-              R$ 14.500,00
-            </div>
-            <div 
-              style={{ 
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--spacing-2)',
-                fontSize: 'var(--text-sm)',
-              }}
-            >
-              <div>
-                <span style={{ color: 'var(--muted-foreground)', fontWeight: 'var(--font-weight-normal)' }}>
-                  Utilizado:{' '}
-                </span>
-                <span style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)' }}>
-                  R$ 8.555,00
-                </span>
-              </div>
-              <div>
-                <span style={{ color: 'var(--muted-foreground)', fontWeight: 'var(--font-weight-normal)' }}>
-                  Disponível:{' '}
-                </span>
-                <span style={{ color: 'var(--primary)', fontWeight: 'var(--font-weight-semibold)' }}>
-                  R$ 5.945,00
-                </span>
-              </div>
+              {projectTermData.dataFimVigente}
             </div>
           </div>
         </div>

@@ -175,8 +175,8 @@ export function Header({ onToggleSidebar, onToggleMobileMenu, isMobileMenuOpen, 
       <header 
         className="sticky top-0 z-50 border-b"
         style={{
-          backgroundColor: 'rgba(var(--card-rgb), 0.8)',
-          borderColor: 'var(--border)',
+          backgroundColor: 'var(--app-header)',
+          borderColor: 'var(--app-header-border)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
         }}
@@ -247,7 +247,7 @@ export function Header({ onToggleSidebar, onToggleMobileMenu, isMobileMenuOpen, 
                   style={{
                     top: '100%',
                     display: showProjectMenu ? 'block' : 'none',
-                    backgroundColor: 'var(--card)',
+                    backgroundColor: 'var(--popover)',
                     borderColor: 'var(--border)',
                     borderWidth: '1px',
                     borderStyle: 'solid',
@@ -386,7 +386,7 @@ export function Header({ onToggleSidebar, onToggleMobileMenu, isMobileMenuOpen, 
                 style={{
                   top: '100%',
                   display: showLanguageMenu ? 'block' : 'none',
-                  backgroundColor: 'var(--card)',
+                  backgroundColor: 'var(--popover)',
                   borderColor: 'var(--border)',
                   borderWidth: '1px',
                   borderStyle: 'solid',
@@ -457,7 +457,7 @@ export function Header({ onToggleSidebar, onToggleMobileMenu, isMobileMenuOpen, 
                 style={{
                   top: '100%',
                   display: showProfileMenu ? 'block' : 'none',
-                  backgroundColor: 'var(--card)',
+                  backgroundColor: 'var(--popover)',
                   borderColor: 'var(--border)',
                   borderWidth: '1px',
                   borderStyle: 'solid',

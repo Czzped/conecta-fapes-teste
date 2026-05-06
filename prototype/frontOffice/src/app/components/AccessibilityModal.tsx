@@ -122,7 +122,7 @@ export function AccessibilityModal({ isOpen, onClose }: AccessibilityModalProps)
       <div
         className="fixed right-4 top-20 z-50 w-[280px] overflow-hidden"
         style={{
-          backgroundColor: 'var(--card)',
+          backgroundColor: 'var(--popover)',
           borderColor: 'var(--border)',
           borderWidth: '1px',
           borderStyle: 'solid',
@@ -132,17 +132,17 @@ export function AccessibilityModal({ isOpen, onClose }: AccessibilityModalProps)
       >
         {/* Header */}
         <div 
-          className="flex items-center justify-between px-4 py-3 border-b"
-          style={{ borderColor: 'var(--border)' }}
+          className="flex items-center justify-between px-4 py-3"
         >
           <h2 
             style={{ 
-              fontSize: 'var(--text-base)',
-              fontWeight: 'var(--font-weight-semibold)',
+              fontSize: '16px',
+              fontWeight: 'var(--font-weight-normal)',
               color: 'var(--foreground)',
+              margin: 0,
             }}
           >
-            ACESSIBILIDADE
+            Acessibilidade
           </h2>
           <button
             onClick={onClose}
