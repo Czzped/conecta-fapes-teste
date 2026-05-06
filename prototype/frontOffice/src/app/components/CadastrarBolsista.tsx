@@ -691,7 +691,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              backgroundColor: 'var(--card)',
+              backgroundColor: 'var(--popover)',
               border: '1px solid var(--border)',
               borderRadius: 'var(--radius-lg)',
               width: '90%',
@@ -723,8 +723,8 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
                   <h2
                     style={{
                       color: 'var(--foreground)',
-                      fontSize: 'var(--text-lg)',
-                      fontWeight: 'var(--font-weight-semibold)',
+                      fontSize: '18px',
+                      fontWeight: 'var(--font-weight-normal)',
                       margin: 0,
                       fontFamily: 'var(--font-family)',
                     }}
@@ -821,7 +821,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
                   onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.88'; }}
                   onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
                 >
-                  Solicitar Bolsa
+                  Confirmar
                 </button>
               </div>
             </div>
