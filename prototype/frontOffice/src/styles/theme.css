@@ -120,7 +120,7 @@
   /* Shadow for small elevations, such as cards or modals. */
   --elevation-sm: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
   /* The background color for sidebars, navigation menus, and other persistent elements. */
-  --sidebar: #0f172a;
+  --sidebar: #1e293b;
   /* The default color for text or elements that appear on top of sidebars, navigation menus, and other persistent elements. */
   --sidebar-foreground: rgba(255, 255, 255, 1.00);
   /* The primary color used for buttons, links, and other interactive elements in sidebars and navigation menus. */
@@ -135,7 +135,7 @@
   --sidebar-border: rgba(255, 255, 255, 0.1);
   /* The default color for focus rings, outlines, and other focus indicators in sidebars and navigation menus. */
   --sidebar-ring: #22d3ee;
-  --app-header: transparent;
+  --app-header: #1e293b;
   --app-header-border: rgba(255, 255, 255, 0.1);
 }
 
