@@ -383,15 +383,15 @@ export const SolicitacoesDiarias: React.FC<SolicitacoesDiariasProps> = ({ embedd
           <label className="lg:col-span-2" style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)' }}>
             Buscar
             <div style={{ position: 'relative', marginTop: '8px' }}>
-              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--dash-text-muted)' }} />
+              <Search size={16} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--dash-text-muted)' }} />
               <input
                 value={searchTerm}
                 onChange={(event) => {
                   setSearchTerm(event.target.value);
                   resetPage();
                 }}
-                placeholder="Código, iniciativa, coordenador, bolsista ou destino"
-                style={{ ...inputStyle, padding: '0 12px 0 38px' }}
+                placeholder="Buscar"
+                style={{ ...inputStyle, padding: '0 38px 0 12px' }}
               />
             </div>
           </label>

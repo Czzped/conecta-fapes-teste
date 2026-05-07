@@ -373,9 +373,6 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <div className="mb-6">
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', flex: 1 }}>
-              <button onClick={onBack} style={{ width: '36px', height: '36px', border: `1px solid ${T.borderSubtle}`, borderRadius: 'var(--radius)', backgroundColor: T.bgCard, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                <ArrowLeft size={16} style={{ color: T.textSecondary }} />
-              </button>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', flexShrink: 0, backgroundColor: T.accentSoft, borderRadius: 'var(--radius)' }}>
                 <Building2 size={18} style={{ color: T.accent }} />
               </div>
@@ -394,8 +391,6 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </button>
           </div>
         </div>
-
-        <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, margin: '20px 0 28px' }} />
 
         <div style={{ display: 'flex', gap: '4px', borderBottom: `1px solid ${T.borderSubtle}`, marginBottom: '28px' }}>
           {[
@@ -460,8 +455,8 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <div>
                 <label style={S.label}>Pesquisar</label>
                 <div style={{ position: 'relative' }}>
-                  <input type="text" placeholder="Buscar por nome, sigla ou CNPJ..." value={searchTerm} onChange={event => setSearchTerm(event.target.value)} style={{ ...S.input, paddingLeft: '36px' }} />
-                  <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
+                  <input type="text" placeholder="Buscar" value={searchTerm} onChange={event => setSearchTerm(event.target.value)} style={{ ...S.input, paddingRight: '36px' }} />
+                  <Search size={16} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
                 </div>
               </div>
               <DropdownFilter label="Natureza" value={naturezaFilter} options={['Todos', 'Publica', 'Privada']} open={showNaturezaDropdown} setOpen={setShowNaturezaDropdown} onSelect={value => setNaturezaFilter(value as typeof naturezaFilter)} />

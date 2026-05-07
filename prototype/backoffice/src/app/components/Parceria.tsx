@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ChevronDown, ChevronRight, DollarSign, FolderOpen, Handshake, PauseCircle, Plus, Search } from 'lucide-react';
+import { ChevronDown, ChevronRight, DollarSign, FolderOpen, Handshake, PauseCircle, Plus, Search } from 'lucide-react';
 import { FormularioParceria } from './FormularioParceria';
 import { DetalhesParceria } from './DetalhesParceria';
 import { DetalhesPrograma } from './DetalhesPrograma';
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
-type StatusFilter = 'Todos' | 'EmElaboracao' | 'Vigente' | 'Suspensa' | 'Encerrada';
-type ParceriaStatus = Exclude<StatusFilter, 'Todos'>;
+type StatusFilter = 'Rascunho' | 'Ativo' | 'Finalizado';
+type ParceriaStatus = StatusFilter;
+type DataFimSort = 'Mais Recente' | 'Mais Antiga';
 
 export interface ParceriaItem {
   id: number;
@@ -42,18 +43,16 @@ export interface ParceriaItem {
 }
 
 const statusLabel: Record<ParceriaStatus, string> = {
-  EmElaboracao: 'Em elaboração',
-  Vigente: 'Vigente',
-  Suspensa: 'Suspensa',
-  Encerrada: 'Encerrada',
+  Rascunho: 'Rascunho',
+  Ativo: 'Ativo',
+  Finalizado: 'Finalizado',
 };
 
 const statusColor = (status: ParceriaStatus) => {
   switch (status) {
-    case 'EmElaboracao': return '#f59e0b';
-    case 'Vigente': return '#22c55e';
-    case 'Suspensa': return '#f97316';
-    case 'Encerrada': return '#94a3b8';
+    case 'Rascunho': return '#f59e0b';
+    case 'Ativo': return '#22c55e';
+    case 'Finalizado': return '#94a3b8';
     default: return '#94a3b8';
   }
 };
@@ -65,6 +64,11 @@ const formatCurrency = (value: number) => (
 const formatPercent = (value: number) => (
   `${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
 );
+
+const parseDateBR = (value: string) => {
+  const [day, month, year] = value.split('/').map(Number);
+  return new Date(year, month - 1, day).getTime();
+};
 
 const calcularPercentualAcaoTransversal = (valor: number) => {
   if (valor < 50000) return 0;
@@ -128,15 +132,18 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
 
   const [activeTab, setActiveTab] = useState<'dashboard' | 'listagem'>('listagem');
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('Todos');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter | 'Todos'>('Todos');
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [dataFimSort, setDataFimSort] = useState<DataFimSort>('Mais Recente');
+  const [showDataFimDropdown, setShowDataFimDropdown] = useState(false);
   const [instituicaoFilter, setInstituicaoFilter] = useState('Todos');
   const [showInstituicaoDropdown, setShowInstituicaoDropdown] = useState(false);
   const [showNovaParceria, setShowNovaParceria] = useState(false);
   const [selectedParceria, setSelectedParceria] = useState<ParceriaItem | null>(null);
   const [selectedProgramaFromParceria, setSelectedProgramaFromParceria] = useState<{ codigo: string; nome: string } | null>(null);
 
-  const statusOptions: StatusFilter[] = ['Todos', 'EmElaboracao', 'Vigente', 'Suspensa', 'Encerrada'];
+  const statusOptions: StatusFilter[] = ['Rascunho', 'Ativo', 'Finalizado'];
+  const dataFimOptions: DataFimSort[] = ['Mais Recente', 'Mais Antiga'];
   const parceriasBase = [
     {
       id: 1,
@@ -145,7 +152,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       dataEnvio: '15/01/2026',
       aditivo: 'Sim',
       area: 'Pesquisa',
-      status: 'Vigente',
+      status: 'Ativo',
       investimento: 'R$ 2.500.000,00',
       dataAssinatura: '10/01/2026',
       vigenciaInicio: '01/02/2026',
@@ -173,7 +180,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       dataEnvio: '10/02/2026',
       aditivo: 'Não',
       area: 'Inovação',
-      status: 'Vigente',
+      status: 'Ativo',
       investimento: 'R$ 3.800.000,00',
       dataAssinatura: '05/02/2026',
       vigenciaInicio: '01/03/2026',
@@ -201,7 +208,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       dataEnvio: '05/03/2026',
       aditivo: 'Não',
       area: 'Extensão',
-      status: 'EmElaboracao',
+      status: 'Rascunho',
       investimento: 'R$ 1.200.000,00',
       dataAssinatura: '',
       vigenciaInicio: '01/05/2026',
@@ -229,7 +236,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       dataEnvio: '20/12/2025',
       aditivo: 'Sim',
       area: 'Pesquisa',
-      status: 'Suspensa',
+      status: 'Finalizado',
       investimento: 'R$ 4.500.000,00',
       dataAssinatura: '15/12/2025',
       vigenciaInicio: '01/01/2026',
@@ -257,7 +264,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       dataEnvio: '15/11/2025',
       aditivo: 'Não',
       area: 'Internacional',
-      status: 'Encerrada',
+      status: 'Finalizado',
       investimento: 'R$ 8.900.000,00',
       dataAssinatura: '10/11/2025',
       vigenciaInicio: '01/12/2025',
@@ -277,6 +284,146 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       termoDescentralizacao: 'Não aplicável',
       contaBancariaDestino: 'International transfer account',
       contaBancariaAcaoTransversal: 'BANESTES / Ag. 0192 / CC AT-000109-9',
+    },
+    {
+      id: 6,
+      nome: 'Parceria Fapes-Secti para Transformação Digital',
+      instituicaoParceira: 'Secti',
+      dataEnvio: '08/04/2026',
+      aditivo: 'Não',
+      area: 'Inovação',
+      status: 'Ativo',
+      investimento: 'R$ 2.100.000,00',
+      dataAssinatura: '02/04/2026',
+      vigenciaInicio: '01/05/2026',
+      vigenciaFim: '30/04/2029',
+      numeroProcesso: '2026-NO12P',
+      objetivo: 'Apoiar iniciativas digitais vinculadas à transformação tecnológica do Estado.',
+      coordenadorNome: 'Dra. Lívia Castro',
+      coordenadorEmail: 'livia.castro@secti.es.gov.br',
+      coordenadorCelular: '(27) 98888-1200',
+      aporteTotal: 2100000,
+      valorAlocado: 980000,
+      saldoDisponivel: 1120000,
+      programasRelacionados: 2,
+      iniciativasImpactadas: 7,
+      documentoSolicitacao: 'Ofício Secti 034/2026',
+      documentoFormalizador: 'Termo de Cooperação 014/2026',
+      termoDescentralizacao: 'TED 041/2026',
+      contaBancariaDestino: 'Banco 021 / Ag. 0007 / CC 55432-1',
+      contaBancariaAcaoTransversal: 'BANESTES / Ag. 0192 / CC AT-000131-0',
+    },
+    {
+      id: 7,
+      nome: 'Cooperação Fapes-Findes em Empreendedorismo',
+      instituicaoParceira: 'Findes',
+      dataEnvio: '12/04/2026',
+      aditivo: 'Sim',
+      area: 'Inovação',
+      status: 'Ativo',
+      investimento: 'R$ 3.200.000,00',
+      dataAssinatura: '07/04/2026',
+      vigenciaInicio: '01/06/2026',
+      vigenciaFim: '31/05/2030',
+      numeroProcesso: '2026-QR34S',
+      objetivo: 'Estruturar programas de empreendedorismo e inovação aberta.',
+      coordenadorNome: 'Marcos Vieira',
+      coordenadorEmail: 'marcos.vieira@findes.org.br',
+      coordenadorCelular: '(27) 97777-4500',
+      aporteTotal: 3200000,
+      valorAlocado: 1640000,
+      saldoDisponivel: 1560000,
+      programasRelacionados: 3,
+      iniciativasImpactadas: 11,
+      documentoSolicitacao: 'Ofício Findes 078/2026',
+      documentoFormalizador: 'Termo de Cooperação 016/2026',
+      termoDescentralizacao: 'TED 047/2026',
+      contaBancariaDestino: 'Banco 001 / Ag. 0910 / CC 66321-8',
+      contaBancariaAcaoTransversal: 'BANESTES / Ag. 0192 / CC AT-000133-6',
+    },
+    {
+      id: 8,
+      nome: 'Parceria Fapes-Sesa em Pesquisa Clínica',
+      instituicaoParceira: 'Sesa',
+      dataEnvio: '18/04/2026',
+      aditivo: 'Não',
+      area: 'Pesquisa',
+      status: 'Ativo',
+      investimento: 'R$ 2.850.000,00',
+      dataAssinatura: '12/04/2026',
+      vigenciaInicio: '01/06/2026',
+      vigenciaFim: '31/05/2029',
+      numeroProcesso: '2026-TU56V',
+      objetivo: 'Financiar iniciativas de pesquisa clínica e saúde pública aplicada.',
+      coordenadorNome: 'Dra. Camila Nunes',
+      coordenadorEmail: 'camila.nunes@sesa.es.gov.br',
+      coordenadorCelular: '(27) 96666-2300',
+      aporteTotal: 2850000,
+      valorAlocado: 1180000,
+      saldoDisponivel: 1670000,
+      programasRelacionados: 2,
+      iniciativasImpactadas: 9,
+      documentoSolicitacao: 'Ofício Sesa 112/2026',
+      documentoFormalizador: 'Termo de Cooperação 019/2026',
+      termoDescentralizacao: 'TED 052/2026',
+      contaBancariaDestino: 'Banco 104 / Ag. 1102 / CC 77120-3',
+      contaBancariaAcaoTransversal: 'BANESTES / Ag. 0192 / CC AT-000137-9',
+    },
+    {
+      id: 9,
+      nome: 'Parceria Fapes-IJSN em Dados Públicos',
+      instituicaoParceira: 'IJSN',
+      dataEnvio: '22/04/2026',
+      aditivo: 'Não',
+      area: 'Difusão',
+      status: 'Ativo',
+      investimento: 'R$ 1.650.000,00',
+      dataAssinatura: '18/04/2026',
+      vigenciaInicio: '01/07/2026',
+      vigenciaFim: '30/06/2028',
+      numeroProcesso: '2026-WX78Y',
+      objetivo: 'Apoiar o uso de dados públicos em pesquisas estratégicas.',
+      coordenadorNome: 'Eduardo Rios',
+      coordenadorEmail: 'eduardo.rios@ijsn.es.gov.br',
+      coordenadorCelular: '(27) 95555-9800',
+      aporteTotal: 1650000,
+      valorAlocado: 720000,
+      saldoDisponivel: 930000,
+      programasRelacionados: 1,
+      iniciativasImpactadas: 5,
+      documentoSolicitacao: 'Ofício IJSN 045/2026',
+      documentoFormalizador: 'Termo de Cooperação 021/2026',
+      termoDescentralizacao: 'TED 058/2026',
+      contaBancariaDestino: 'Banco 021 / Ag. 0042 / CC 88001-2',
+      contaBancariaAcaoTransversal: 'BANESTES / Ag. 0192 / CC AT-000140-1',
+    },
+    {
+      id: 10,
+      nome: 'Cooperação Fapes-UVV em Educação Científica',
+      instituicaoParceira: 'UVV',
+      dataEnvio: '28/04/2026',
+      aditivo: 'Não',
+      area: 'Extensão',
+      status: 'Ativo',
+      investimento: 'R$ 1.950.000,00',
+      dataAssinatura: '23/04/2026',
+      vigenciaInicio: '01/07/2026',
+      vigenciaFim: '30/06/2029',
+      numeroProcesso: '2026-ZA90B',
+      objetivo: 'Ampliar ações de educação científica em escolas públicas.',
+      coordenadorNome: 'Profa. Beatriz Lopes',
+      coordenadorEmail: 'beatriz.lopes@uvv.br',
+      coordenadorCelular: '(27) 94444-7810',
+      aporteTotal: 1950000,
+      valorAlocado: 860000,
+      saldoDisponivel: 1090000,
+      programasRelacionados: 2,
+      iniciativasImpactadas: 8,
+      documentoSolicitacao: 'Ofício UVV 063/2026',
+      documentoFormalizador: 'Termo de Cooperação 024/2026',
+      termoDescentralizacao: 'TED 061/2026',
+      contaBancariaDestino: 'Banco 001 / Ag. 2210 / CC 99012-7',
+      contaBancariaAcaoTransversal: 'BANESTES / Ag. 0192 / CC AT-000142-8',
     },
   ];
 
@@ -303,6 +450,9 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
     const matchStatus = statusFilter === 'Todos' || p.status === statusFilter;
     const matchInstituicao = instituicaoFilter === 'Todos' || p.instituicaoParceira === instituicaoFilter;
     return matchSearch && matchStatus && matchInstituicao;
+  }).sort((a, b) => {
+    const delta = parseDateBR(b.vigenciaFim) - parseDateBR(a.vigenciaFim);
+    return dataFimSort === 'Mais Recente' ? delta : -delta;
   });
 
   const totalInvestido = parceriasData.reduce((acc, p) => acc + p.aporteTotal, 0);
@@ -310,7 +460,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
   const totalAlocado = parceriasData.reduce((acc, p) => acc + p.valorAlocado, 0);
   const saldoTotal = parceriasData.reduce((acc, p) => acc + p.saldoAlocavelEmProgramas, 0);
   const totalAportado = parceriasData.reduce((acc, p) => {
-    const fatorAportado = p.status === 'Encerrada' ? 0.92 : p.status === 'Suspensa' ? 0.44 : p.status === 'EmElaboracao' ? 0 : 0.58;
+    const fatorAportado = p.status === 'Finalizado' ? 0.92 : p.status === 'Rascunho' ? 0 : 0.58;
     return acc + Math.min(p.valorAlocado * fatorAportado, p.valorAlocado);
   }, 0);
   const percentualAportadoPortfolio = totalAlocado > 0 ? (totalAportado / totalAlocado) * 100 : 0;
@@ -411,23 +561,6 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
         <div className="mb-6">
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', flex: 1 }}>
-              <button
-                onClick={onBack}
-                title="Voltar"
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  border: `1px solid ${T.borderSubtle}`,
-                  borderRadius: 'var(--radius)',
-                  backgroundColor: T.bgCard,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <ArrowLeft size={16} style={{ color: T.textSecondary }} />
-              </button>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', flexShrink: 0, backgroundColor: T.accentSoft, borderRadius: 'var(--radius)' }}>
                 <Handshake size={18} style={{ color: T.accent }} />
               </div>
@@ -456,8 +589,6 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
               Nova Parceria
             </button>
           </div>
-
-          <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, marginTop: '24px' }} />
         </div>
 
         <div style={{ display: 'flex', gap: '4px', borderBottom: `1px solid ${T.borderSubtle}`, marginBottom: '28px' }}>
@@ -586,7 +717,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
         {activeTab === 'listagem' && (
         <>
         <div className="mb-6">
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '16px' }}>
             <div>
               <label htmlFor="search-input" style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, marginBottom: '8px' }}>
                 Pesquisar
@@ -595,7 +726,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
                 <input
                   id="search-input"
                   type="text"
-                  placeholder="Nome, instituição ou processo"
+                  placeholder="Buscar"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   style={{
@@ -603,7 +734,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
                     backgroundColor: T.bgInput,
                     border: `1px solid ${T.borderDefault}`,
                     borderRadius: 'var(--radius)',
-                    padding: '10px 14px 10px 38px',
+                    padding: '10px 38px 10px 14px',
                     color: T.textPrimary,
                     fontFamily: 'var(--font-family)',
                     fontSize: 'var(--text-sm)',
@@ -611,9 +742,22 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
                     boxSizing: 'border-box',
                   }}
                 />
-                <Search size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued, pointerEvents: 'none' }} />
+                <Search size={15} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued, pointerEvents: 'none' }} />
               </div>
             </div>
+
+            <DropdownFilter
+              label="Data de Fim"
+              value={dataFimSort}
+              options={dataFimOptions}
+              open={showDataFimDropdown}
+              setOpen={setShowDataFimDropdown}
+              onSelect={(value) => setDataFimSort(value as DataFimSort)}
+              onBeforeOpen={() => {
+                setShowInstituicaoDropdown(false);
+                setShowStatusDropdown(false);
+              }}
+            />
 
             <DropdownFilter
               label="Instituição"
@@ -622,19 +766,25 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
               open={showInstituicaoDropdown}
               setOpen={setShowInstituicaoDropdown}
               onSelect={setInstituicaoFilter}
-              onBeforeOpen={() => setShowStatusDropdown(false)}
+              onBeforeOpen={() => {
+                setShowDataFimDropdown(false);
+                setShowStatusDropdown(false);
+              }}
             />
 
             <DropdownFilter
-              label="Estado"
+              label="Status"
               value={statusFilter}
               displayValue={statusFilter === 'Todos' ? 'Todos' : statusLabel[statusFilter]}
               options={statusOptions}
-              optionLabel={(opt) => opt === 'Todos' ? opt : statusLabel[opt]}
+              optionLabel={(opt) => statusLabel[opt as StatusFilter]}
               open={showStatusDropdown}
               setOpen={setShowStatusDropdown}
               onSelect={(value) => setStatusFilter(value as StatusFilter)}
-              onBeforeOpen={() => setShowInstituicaoDropdown(false)}
+              onBeforeOpen={() => {
+                setShowDataFimDropdown(false);
+                setShowInstituicaoDropdown(false);
+              }}
             />
           </div>
         </div>
@@ -646,7 +796,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
               onClick={() => setSelectedParceria(parceria)}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '2fr 1fr 0.9fr 1.1fr 0.9fr 0.9fr 1.15fr 0.9fr 40px',
+                gridTemplateColumns: '2fr 1fr 1.1fr 0.9fr 1fr 0.9fr 40px',
                 gap: '16px',
                 alignItems: 'center',
                 width: '100%',
@@ -659,18 +809,16 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
               }}
             >
               <ListCell label="Parceria" value={parceria.nome} strong />
-              <ListCell label="Instituição única" value={parceria.instituicaoParceira} />
+              <ListCell label="Instituição" value={parceria.instituicaoParceira} />
+              <ListCell label="Vigência corrente" value={`${parceria.vigenciaInicio} - ${parceria.vigenciaFim}`} />
+              <ListCell label="Aporte total" value={formatCurrency(parceria.aporteTotal)} />
+              <ListCell label="Saldo com Programas" value={formatCurrency(parceria.saldoAlocavelEmProgramas)} />
               <div>
-                <CellLabel label="Estado" />
-                <span style={{ display: 'inline-block', padding: '4px 10px', borderRadius: '12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', backgroundColor: `${statusColor(parceria.status)}20`, color: statusColor(parceria.status) }}>
+                <CellLabel label="Status" />
+                <span style={{ display: 'inline-block', padding: '4px 10px', borderRadius: '12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', backgroundColor: `${statusColor(parceria.status)}20`, border: `1px solid ${statusColor(parceria.status)}`, color: statusColor(parceria.status) }}>
                   {statusLabel[parceria.status]}
                 </span>
               </div>
-              <ListCell label="Vigência corrente" value={`${parceria.vigenciaInicio} - ${parceria.vigenciaFim}`} />
-              <ListCell label="Aporte total" value={formatCurrency(parceria.aporteTotal)} />
-              <ListCell label="Faixa aplicada" value={parceria.faixaAcaoTransversal} detail={`${formatPercent(parceria.percentualAcaoTransversal)} reservado`} />
-              <ListCell label="Conta Ação Transversal" value={parceria.contaBancariaAcaoTransversal} detail={formatCurrency(parceria.valorReservaAcaoTransversal)} />
-              <ListCell label="Saldo programas" value={formatCurrency(parceria.saldoAlocavelEmProgramas)} highlight={parceria.saldoAlocavelEmProgramas > 0} />
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <ChevronRight size={18} style={{ color: T.iconSubdued }} />
               </div>

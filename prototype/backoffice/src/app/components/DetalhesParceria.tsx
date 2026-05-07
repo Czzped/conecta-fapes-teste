@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Archive, ArrowLeft, ChevronDown, ChevronRight, DollarSign, Edit3, FileText, FolderOpen, Handshake, Home, PauseCircle, Plus, RotateCcw, Save, Search, Trash2, Upload, X } from 'lucide-react';
+import { Archive, ChevronDown, ChevronRight, DollarSign, Edit3, FileText, FolderOpen, Handshake, PauseCircle, Plus, Save, Search, Upload, X } from 'lucide-react';
 import type { ParceriaItem } from './Parceria';
 
 interface Props {
@@ -8,21 +8,13 @@ interface Props {
   onOpenPrograma?: (programa: { codigo: string; nome: string }) => void;
 }
 
-const statusLabel: Record<ParceriaItem['status'], string> = {
-  EmElaboracao: 'Em elaboração',
-  Vigente: 'Vigente',
-  Suspensa: 'Suspensa',
-  Encerrada: 'Encerrada',
-};
+type DetailStatus = ParceriaItem['status'] | 'Suspensa';
 
-const statusColor = (status: ParceriaItem['status']) => {
-  switch (status) {
-    case 'EmElaboracao': return '#f59e0b';
-    case 'Vigente': return '#22c55e';
-    case 'Suspensa': return '#f97316';
-    case 'Encerrada': return '#94a3b8';
-    default: return '#94a3b8';
-  }
+const statusLabel: Record<DetailStatus, string> = {
+  Rascunho: 'Rascunho',
+  Ativo: 'Ativo',
+  Finalizado: 'Finalizado',
+  Suspensa: 'Suspensa',
 };
 
 const formatCurrency = (value: number) => (
@@ -127,8 +119,9 @@ const tipoDocumentoOptions = [
 ];
 
 export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenPrograma }) => {
-  const [activeTab, setActiveTab] = useState<'resumo' | 'financeiro' | 'dashboard' | 'documentos'>('resumo');
-  const [currentStatus, setCurrentStatus] = useState<ParceriaItem['status']>(parceria.status);
+  const [activeTab, setActiveTab] = useState<'resumo' | 'financeiro' | 'dashboard'>('resumo');
+  const [currentStatus, setCurrentStatus] = useState<DetailStatus>(parceria.status);
+  const [showActionDropdown, setShowActionDropdown] = useState(false);
   const [editingCadastro, setEditingCadastro] = useState(false);
   const [showAditivo, setShowAditivo] = useState(false);
   const [showSuspensao, setShowSuspensao] = useState(false);
@@ -226,7 +219,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
   const reservaAditivoPreview = calcularReservaAcaoTransversal(valorAditivoPreview);
 
   const registrarAditivo = () => {
-    if (currentStatus === 'Suspensa' || currentStatus === 'Encerrada') return;
+    if (currentStatus === 'Suspensa' || currentStatus === 'Finalizado') return;
     if (aditivoTipo === 'financeiro') {
       const valor = parseCurrency(aditivoFinanceiro.valor);
       if (valor > 0) {
@@ -268,8 +261,8 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
   };
 
   const programas = [
-    { nome: 'Programa de Pesquisa Aplicada', valor: Math.min(cadastroData.valorAlocado, 950000), estado: currentStatus === 'Encerrada' ? 'Encerrado' : currentStatus === 'Suspensa' ? 'Suspenso' : 'Vigente' },
-    { nome: 'Programa de Inovação Regional', valor: Math.max(cadastroData.valorAlocado - 950000, 0), estado: currentStatus === 'Encerrada' ? 'Encerrado' : currentStatus === 'Suspensa' ? 'Suspenso' : 'Vigente' },
+    { nome: 'Programa de Pesquisa Aplicada', valor: Math.min(cadastroData.valorAlocado, 950000), estado: currentStatus === 'Finalizado' ? 'Finalizado' : currentStatus === 'Suspensa' ? 'Suspenso' : 'Ativo' },
+    { nome: 'Programa de Inovação Regional', valor: Math.max(cadastroData.valorAlocado - 950000, 0), estado: currentStatus === 'Finalizado' ? 'Finalizado' : currentStatus === 'Suspensa' ? 'Suspenso' : 'Ativo' },
   ].filter(p => p.valor > 0);
   const dashboardPorPrograma = programas.map((programa, index) => {
     const fatorAportado = index === 0 ? 0.62 : 0.38;
@@ -345,13 +338,13 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
   };
 
   const reativarParceria = () => {
-    setCurrentStatus('Vigente');
+    setCurrentStatus('Ativo');
     setSuspensaoRegistrada(null);
   };
 
   const confirmarEncerramento = () => {
     if (!encerramento.justificativa.trim()) return;
-    setCurrentStatus('Encerrada');
+    setCurrentStatus('Finalizado');
     setEncerramentoRegistrado({ justificativa: encerramento.justificativa, programasAfetados });
     setShowEncerramento(false);
     setShowSuspensao(false);
@@ -365,8 +358,6 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
     <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-16">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
-          <Home size={15} style={{ color: 'rgba(255,255,255,0.5)' }} />
-          <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
           <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)' }}>
             Parcerias
           </button>
@@ -378,13 +369,6 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
 
         <div style={{ marginBottom: '28px' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-            <button
-              onClick={onBack}
-              title="Voltar"
-              style={{ width: '36px', height: '36px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(30,41,59,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-            >
-              <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
-            </button>
             <div style={{ width: '36px', height: '36px', borderRadius: 'var(--radius)', backgroundColor: 'rgba(0,193,175,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Handshake size={18} style={{ color: '#00c1af' }} />
             </div>
@@ -393,24 +377,45 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                 <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: 0 }}>
                   {cadastroData.nome}
                 </h1>
-                <span style={{ display: 'inline-block', padding: '4px 10px', borderRadius: '12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', backgroundColor: `${statusColor(currentStatus)}20`, color: statusColor(currentStatus) }}>
-                  {statusLabel[currentStatus]}
-                </span>
               </div>
               <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
                 Instituição vinculada: {cadastroData.instituicaoParceira} · Processo {cadastroData.numeroProcesso}
               </p>
             </div>
-            <ActionButton icon={<Plus size={15} />} label="Aditivo" muted={currentStatus === 'Suspensa' || currentStatus === 'Encerrada'} onClick={() => currentStatus !== 'Suspensa' && currentStatus !== 'Encerrada' && setShowAditivo(true)} />
-            {currentStatus === 'Suspensa' ? (
-              <ActionButton icon={<RotateCcw size={15} />} label="Reativar" onClick={reativarParceria} />
-            ) : currentStatus === 'Encerrada' ? (
-              <ActionButton icon={<PauseCircle size={15} />} label="Suspender" muted />
-            ) : (
-              <ActionButton icon={<PauseCircle size={15} />} label="Suspender" onClick={() => setShowSuspensao(true)} />
-            )}
-            <ActionButton icon={<Archive size={15} />} label="Encerrar" muted={currentStatus === 'Encerrada'} onClick={() => currentStatus !== 'Encerrada' && setShowEncerramento(true)} />
-            <ActionButton icon={<Trash2 size={15} />} label="Deletar" danger onClick={() => setConfirmDelete(true)} />
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <button
+                type="button"
+                onClick={() => setShowActionDropdown(prev => !prev)}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(30,41,59,0.95)', color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}
+              >
+                Ações
+                <ChevronDown size={15} style={{ transform: showActionDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+              </button>
+              {showActionDropdown && (
+                <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 4px)', minWidth: '190px', backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius)', overflow: 'hidden', zIndex: 30, boxShadow: '0 12px 32px rgba(0,0,0,0.35)' }}>
+                  {[
+                    { label: 'Aditivo', onClick: () => setShowAditivo(true), disabled: currentStatus === 'Suspensa' || currentStatus === 'Finalizado' },
+                    { label: currentStatus === 'Suspensa' ? 'Reativar' : 'Suspender', onClick: () => currentStatus === 'Suspensa' ? reativarParceria() : setShowSuspensao(true), disabled: currentStatus === 'Finalizado' },
+                    { label: 'Encerrar', onClick: () => setShowEncerramento(true), disabled: currentStatus === 'Finalizado' },
+                    { label: 'Deletar', onClick: () => setConfirmDelete(true), danger: true },
+                  ].map(action => (
+                    <button
+                      key={action.label}
+                      type="button"
+                      disabled={action.disabled}
+                      onClick={() => {
+                        if (action.disabled) return;
+                        action.onClick();
+                        setShowActionDropdown(false);
+                      }}
+                      style={{ width: '100%', padding: '11px 14px', border: 'none', backgroundColor: 'transparent', color: action.disabled ? 'rgba(255,255,255,0.3)' : action.danger ? '#f87171' : '#ffffff', textAlign: 'left', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: action.disabled ? 'not-allowed' : 'pointer' }}
+                    >
+                      {action.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', marginTop: '20px' }} />
         </div>
@@ -536,7 +541,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
           </div>
         )}
 
-        {encerramentoRegistrado && currentStatus === 'Encerrada' && (
+        {encerramentoRegistrado && currentStatus === 'Finalizado' && (
           <div style={{ ...cardStyle, borderColor: 'rgba(148,163,184,0.35)', backgroundColor: 'rgba(148,163,184,0.08)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '16px', alignItems: 'center' }}>
               <Info label="Justificativa do encerramento" value={encerramentoRegistrado.justificativa} />
@@ -643,7 +648,6 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
             { id: 'resumo', label: 'Resumo' },
             { id: 'financeiro', label: 'Financeiro' },
             { id: 'dashboard', label: 'Dashboard' },
-            { id: 'documentos', label: 'Documentos' },
           ].map(tab => (
             <button
               key={tab.id}
@@ -778,6 +782,83 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                     <Info label="Líquido programas" value={formatCurrency(reserva.saldoLiquido)} />
                   </Row>
                 ))}
+              </div>
+            </SummarySection>
+
+            <SummarySection number="5" title="Documentos" subtitle="Documentos que sustentam a formalização da parceria">
+              <div style={{ ...cardStyle, padding: '20px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
+                  <div>
+                    <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+                      Anexar documento
+                    </h2>
+                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                      Faça upload do arquivo e classifique o documento por tipo.
+                    </p>
+                  </div>
+                  <SmallButton icon={<Plus size={14} />} label="Anexar" onClick={anexarDocumento} />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 1fr 1.2fr', gap: '16px', alignItems: 'end' }}>
+                  <SelectEditField
+                    label="Tipo do documento"
+                    value={novoDocumento.tipo}
+                    options={tipoDocumentoOptions}
+                    onChange={(tipo) => setNovoDocumento(prev => ({ ...prev, tipo }))}
+                  />
+                  <TextEditField
+                    label="Descrição"
+                    value={novoDocumento.descricao}
+                    onChange={(descricao) => setNovoDocumento(prev => ({ ...prev, descricao }))}
+                  />
+                  <DateMaskEditField
+                    label="Data de emissão"
+                    value={novoDocumento.dataEmissao}
+                    onChange={(dataEmissao) => setNovoDocumento(prev => ({ ...prev, dataEmissao }))}
+                  />
+                  <UploadEditField
+                    label="Arquivo"
+                    fileName={novoDocumento.arquivo}
+                    onChange={(arquivo) => setNovoDocumento(prev => ({ ...prev, arquivo }))}
+                  />
+                </div>
+              </div>
+
+              <div style={{ ...cardStyle, padding: '20px', marginBottom: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
+                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+                    Documentos da parceria
+                  </h2>
+                  <div style={{ width: '240px' }}>
+                    <SelectEditField
+                      label="Filtrar por tipo"
+                      value={filtroTipoDocumento}
+                      options={['Todos', ...tipoDocumentoOptions]}
+                      onChange={setFiltroTipoDocumento}
+                    />
+                  </div>
+                </div>
+
+                {documentosFiltrados.length === 0 ? (
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                    Nenhum documento encontrado para o filtro selecionado.
+                  </p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {documentosFiltrados.map(documento => (
+                      <Row key={documento.id}>
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                          <FileText size={18} style={{ color: '#00c1af', flexShrink: 0, marginTop: '2px' }} />
+                          <Info label="Identificador" value={documento.id} />
+                        </div>
+                        <Info label="Tipo" value={documento.tipo} />
+                        <Info label="Descrição" value={documento.descricao} />
+                        <Info label="Data de emissão" value={documento.dataEmissao} />
+                        <Info label="Arquivo" value={documento.arquivo} />
+                      </Row>
+                    ))}
+                  </div>
+                )}
               </div>
             </SummarySection>
           </div>
@@ -1001,98 +1082,10 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
           </>
         )}
 
-        {activeTab === 'documentos' && (
-          <>
-            <div style={cardStyle}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
-                <div>
-                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
-                    Anexar documento
-                  </h2>
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
-                    Faça upload do arquivo e classifique o documento por tipo.
-                  </p>
-                </div>
-                <SmallButton icon={<Plus size={14} />} label="Anexar" onClick={anexarDocumento} />
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 1fr 1.2fr', gap: '16px', alignItems: 'end' }}>
-                <SelectEditField
-                  label="Tipo do documento"
-                  value={novoDocumento.tipo}
-                  options={tipoDocumentoOptions}
-                  onChange={(tipo) => setNovoDocumento(prev => ({ ...prev, tipo }))}
-                />
-                <TextEditField
-                  label="Descrição"
-                  value={novoDocumento.descricao}
-                  onChange={(descricao) => setNovoDocumento(prev => ({ ...prev, descricao }))}
-                />
-                <DateMaskEditField
-                  label="Data de emissão"
-                  value={novoDocumento.dataEmissao}
-                  onChange={(dataEmissao) => setNovoDocumento(prev => ({ ...prev, dataEmissao }))}
-                />
-                <UploadEditField
-                  label="Arquivo"
-                  fileName={novoDocumento.arquivo}
-                  onChange={(arquivo) => setNovoDocumento(prev => ({ ...prev, arquivo }))}
-                />
-              </div>
-            </div>
-
-            <div style={cardStyle}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
-                <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
-                  Documentos da parceria
-                </h2>
-                <div style={{ width: '240px' }}>
-                  <SelectEditField
-                    label="Filtrar por tipo"
-                    value={filtroTipoDocumento}
-                    options={['Todos', ...tipoDocumentoOptions]}
-                    onChange={setFiltroTipoDocumento}
-                  />
-                </div>
-              </div>
-
-              {documentosFiltrados.length === 0 ? (
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
-                  Nenhum documento encontrado para o filtro selecionado.
-                </p>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {documentosFiltrados.map(documento => (
-                    <Row key={documento.id}>
-                      <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                        <FileText size={18} style={{ color: '#00c1af', flexShrink: 0, marginTop: '2px' }} />
-                        <Info label="Identificador" value={documento.id} />
-                      </div>
-                      <Info label="Tipo" value={documento.tipo} />
-                      <Info label="Descrição" value={documento.descricao} />
-                      <Info label="Data de emissão" value={documento.dataEmissao} />
-                      <Info label="Arquivo" value={documento.arquivo} />
-                    </Row>
-                  ))}
-                </div>
-              )}
-            </div>
-          </>
-        )}
       </div>
     </div>
   );
 };
-
-const ActionButton: React.FC<{ icon: React.ReactNode; label: string; muted?: boolean; danger?: boolean; onClick?: () => void }> = ({ icon, label, muted, danger, onClick }) => (
-  <button
-    onClick={onClick}
-    style={{ display: 'flex', alignItems: 'center', gap: '8px', height: '38px', padding: '0 14px', backgroundColor: danger ? 'rgba(239,68,68,0.08)' : muted ? 'transparent' : 'rgba(0,193,175,0.12)', border: danger ? '1px solid rgba(239,68,68,0.28)' : muted ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(0,193,175,0.35)', borderRadius: 'var(--radius)', color: danger ? '#f87171' : muted ? 'rgba(255,255,255,0.7)' : '#00c1af', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer', flexShrink: 0 }}
-  >
-    {icon}
-    {label}
-  </button>
-);
 
 const SummarySection: React.FC<{ number: string; title: string; subtitle: string; children: React.ReactNode }> = ({ number, title, subtitle, children }) => (
   <div style={cardStyle}>

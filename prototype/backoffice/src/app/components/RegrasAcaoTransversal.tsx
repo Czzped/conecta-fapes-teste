@@ -166,8 +166,8 @@ export const RegrasAcaoTransversal: React.FC<{ onBack: () => void }> = ({ onBack
             <div style={{ marginBottom: '16px' }}>
               <label style={S.label}>Pesquisar</label>
               <div style={{ position: 'relative' }}>
-                <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
-                <input value={searchTerm} onChange={event => setSearchTerm(event.target.value)} placeholder="Buscar por norma, nome ou rubrica" style={{ ...S.input, paddingLeft: '36px' }} />
+                <Search size={15} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
+                <input value={searchTerm} onChange={event => setSearchTerm(event.target.value)} placeholder="Buscar" style={{ ...S.input, paddingRight: '36px' }} />
               </div>
             </div>
 

@@ -156,8 +156,8 @@ export const AcaoTransversalFinanceiro: React.FC<Props> = ({ onBack }) => {
                 <p style={sectionSubtitle(T)}>Valores calculados em Parcerias e aguardando ou mantendo classificação contábil no financeiro.</p>
               </div>
               <div style={{ position: 'relative', width: '320px' }}>
-                <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
-                <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Buscar parceria ou reserva" style={{ ...inputStyle(T), paddingLeft: '36px' }} />
+                <Search size={15} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
+                <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Buscar" style={{ ...inputStyle(T), paddingRight: '36px' }} />
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>

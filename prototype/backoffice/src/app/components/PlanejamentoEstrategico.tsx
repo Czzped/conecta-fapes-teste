@@ -335,7 +335,7 @@ export const PlanejamentoEstrategico: React.FC = () => {
                 <input
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
-                  placeholder="Buscar por nome ou descrição"
+                  placeholder="Buscar"
                   style={{ ...S.input, paddingRight: '40px' }}
                 />
                 <Search size={17} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />

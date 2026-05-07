@@ -351,8 +351,8 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
             <div style={{ marginBottom: '24px' }}>
               <label style={S.label}>Pesquisar</label>
               <div style={{ position: 'relative' }}>
-                <input type="text" placeholder="Buscar por nome, CPF ou email..." value={searchTerm} onChange={event => setSearchTerm(event.target.value)} style={{ ...S.input, paddingLeft: '36px' }} />
-                <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
+                <input type="text" placeholder="Buscar" value={searchTerm} onChange={event => setSearchTerm(event.target.value)} style={{ ...S.input, paddingRight: '36px' }} />
+                <Search size={16} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
               </div>
             </div>
 
@@ -398,9 +398,6 @@ const PageHeader: React.FC<{ title: string; subtitle: string; onBack: () => void
       <div className="mb-6">
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', flex: 1 }}>
-            <button onClick={onBack} style={{ width: '36px', height: '36px', border: `1px solid ${T.borderSubtle}`, borderRadius: 'var(--radius)', backgroundColor: T.bgCard, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <ArrowLeft size={16} style={{ color: T.textSecondary }} />
-            </button>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', flexShrink: 0, backgroundColor: T.accentSoft, borderRadius: 'var(--radius)' }}>
               <UserRound size={18} style={{ color: T.accent }} />
             </div>
@@ -415,7 +412,6 @@ const PageHeader: React.FC<{ title: string; subtitle: string; onBack: () => void
           </button>
         </div>
       </div>
-      <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, margin: '20px 0 28px' }} />
     </>
   );
 };

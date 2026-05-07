@@ -429,7 +429,7 @@ export const EditaisLight: React.FC = () => {
             </label>
             <div style={{ position: 'relative' }}>
               <input
-                type="text" placeholder="Buscar edital..."
+                type="text" placeholder="Buscar"
                 value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                 style={{
                   width: '100%', backgroundColor: C.surface,
@@ -443,7 +443,7 @@ export const EditaisLight: React.FC = () => {
                 onFocus={(e) => { e.target.style.borderColor = C.primary; e.target.style.boxShadow = `0 0 0 3px ${C.primary}22`; }}
                 onBlur={(e) => { if (!searchTerm) { e.target.style.borderColor = C.border; e.target.style.boxShadow = 'none'; } }}
               />
-              <Search size={14} style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', color: C.textMuted, pointerEvents: 'none' }} />
+              <Search size={14} style={{ position: 'absolute', right: '11px', top: '50%', transform: 'translateY(-50%)', color: C.textMuted, pointerEvents: 'none' }} />
             </div>
           </div>
 
@@ -511,9 +511,9 @@ export const EditaisLight: React.FC = () => {
               <div>
                 <label style={{ display: 'block', marginBottom: '6px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: C.textSecond, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pesquisar</label>
                 <div style={{ position: 'relative' }}>
-                  <input type="text" placeholder="Buscar edital..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+                  <input type="text" placeholder="Buscar" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                     style={{ width: '100%', backgroundColor: C.bg, border: `1px solid ${C.border}`, borderRadius: '8px', padding: '9px 12px 9px 34px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: C.textPrimary, outline: 'none', boxSizing: 'border-box' }} />
-                  <Search size={14} style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', color: C.textMuted }} />
+                  <Search size={14} style={{ position: 'absolute', right: '11px', top: '50%', transform: 'translateY(-50%)', color: C.textMuted }} />
                 </div>
               </div>
 

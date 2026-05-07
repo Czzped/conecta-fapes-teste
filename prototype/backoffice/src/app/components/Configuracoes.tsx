@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, BookOpen, ChevronRight, ClipboardList, Database, FileCheck2, Settings, Tags, Target } from 'lucide-react';
+import { BookOpen, ChevronRight, ClipboardList, Database, FileCheck2, Settings, Tags, Target } from 'lucide-react';
 import { useThemeTokens } from '../theme/ThemeContext';
 
 interface ConfiguracoesProps {
@@ -95,12 +95,6 @@ export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlan
     <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '28px' }}>
-          <button
-            onClick={onBack}
-            style={{ width: '36px', height: '36px', border: `1px solid ${T.borderSubtle}`, borderRadius: 'var(--radius)', backgroundColor: T.bgCard, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-          >
-            <ArrowLeft size={16} style={{ color: T.textSecondary }} />
-          </button>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', flexShrink: 0, backgroundColor: T.accentSoft, borderRadius: 'var(--radius)' }}>
             <Settings size={18} style={{ color: T.accent }} />
           </div>
@@ -115,16 +109,6 @@ export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlan
         </div>
 
         <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, margin: '20px 0 28px' }} />
-
-        <div style={{ ...cardStyle, marginBottom: '24px' }}>
-          <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
-            Cadastros e Parâmetros
-          </h2>
-          <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
-            Use esta área para manter dados de base que dão suporte aos módulos operacionais.
-          </p>
-        </div>
-
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '18px' }}>
           {actions.map(({ title, description, Icon, color, key }) => (
             <button

@@ -2,12 +2,13 @@
 
 :root {
   --font-size: 16px;
-  --font-family: Inter, "Segoe UI", -apple-system, BlinkMacSystemFont, "SF Pro Text", Roboto, Arial, sans-serif;
+  --font-family: Poppins, "Segoe UI", -apple-system, BlinkMacSystemFont, "SF Pro Text", Roboto, Arial, sans-serif;
   /* Typography size variables */
   --text-7xl: 72px;
   --text-2xl: 24px;
   --text-xl: 20px;
   --text-lg: 18px;
+  --text-md: 18px;
   --text-base: 16px;
   --text-sm: 14px;
   /* Page canvas: off-white para tirar a "lâmpada" do fundo branco puro */

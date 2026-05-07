@@ -182,6 +182,10 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
     { id: 4, codigo: 'CAP-004/2026', titulo: 'Desenvolvimento Regional', tipo: 'Chamada Pública', vinculoTipo: 'Parceria', vinculoNome: 'Parceria Desenvolvimento ES', propostasRecebidas: 27, dataPublicacao: '28/02/2026', area: 'Difusão do Conhecimento', status: 'Em andamento' },
     { id: 5, codigo: 'CAP-005/2026', titulo: 'Carreira Científica', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Carreira Científica', propostasRecebidas: 56, dataPublicacao: '20/01/2026', area: 'Carreira Científica', status: 'Encerrado' },
     { id: 6, codigo: 'CAP-006/2026', titulo: 'Difusão do Conhecimento', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Difusão do Conhecimento', propostasRecebidas: 14, dataPublicacao: '05/01/2026', area: 'Internacional', status: 'Não publicado' },
+    { id: 7, codigo: 'CAP-007/2026', titulo: 'Pesquisa Aplicada em Saúde', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Pesquisa Aplicada em Saúde', propostasRecebidas: 31, dataPublicacao: '10/04/2026', area: 'Pesquisa', status: 'Publicado' },
+    { id: 8, codigo: 'CAP-008/2026', titulo: 'Laboratórios Inteligentes', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa Laboratórios Inteligentes', propostasRecebidas: 22, dataPublicacao: '18/04/2026', area: 'Inovação', status: 'Em andamento' },
+    { id: 9, codigo: 'CAP-009/2026', titulo: 'Internacionalização Científica', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Internacionalização Científica', propostasRecebidas: 8, dataPublicacao: '25/04/2026', area: 'Internacional', status: 'Não publicado' },
+    { id: 10, codigo: 'CAP-010/2026', titulo: 'Empreendedorismo Capixaba', tipo: 'Demanda Induzida', vinculoTipo: 'Parceria', vinculoNome: 'Parceria FAPES-Findes', propostasRecebidas: 12, dataPublicacao: '02/05/2026', area: 'Extensão', status: 'Em andamento' },
   ];
   const statusCaptacaoDashboard = captacaoStatusOptions
     .filter((status): status is CaptacaoItem['status'] => status !== 'Todos')
@@ -405,7 +409,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               <div style={{ position: 'relative' }}>
                 <input
                   type="text"
-                  placeholder="buscar"
+                  placeholder="Buscar"
                   value={formularioPesquisa}
                   onChange={(e) => setFormularioPesquisa(e.target.value)}
                   style={{
@@ -413,7 +417,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     backgroundColor: T.bgInput,
                     border: `1px solid ${T.borderDefault}`,
                     borderRadius: 'var(--radius)',
-                    padding: '10px 14px 10px 38px',
+                    padding: '10px 38px 10px 14px',
                     color: T.textPrimary,
                     fontFamily: 'var(--font-family)',
                     fontSize: 'var(--text-sm)',
@@ -423,7 +427,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                   onFocus={(e) => { e.currentTarget.style.borderColor = T.accent; }}
                   onBlur={(e) => { e.currentTarget.style.borderColor = T.borderDefault; }}
                 />
-                <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
+                <Search size={16} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
               </div>
             </div>
             <div>
@@ -980,12 +984,12 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                 <input
                   id="search-input"
                   type="text"
-                  placeholder="Buscar captação..."
+                  placeholder="Buscar"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  style={{ width: '100%', backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '6px', padding: '10px 12px 10px 36px', color: T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', outline: 'none', boxSizing: 'border-box' }}
+                  style={{ width: '100%', backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '6px', padding: '10px 36px 10px 12px', color: T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', outline: 'none', boxSizing: 'border-box' }}
                 />
-                <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
+                <Search size={16} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
               </div>
             </div>
 

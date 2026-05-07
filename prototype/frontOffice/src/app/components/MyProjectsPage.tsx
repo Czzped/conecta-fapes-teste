@@ -560,37 +560,28 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
           </div>
         </div>
 
-        {/* Budget Categories - Consolidated Card */}
-        <div 
-          className="p-6"
-          style={{
-            backgroundColor: 'color-mix(in srgb, var(--primary) 3%, transparent)',
-            borderTop: '1px solid color-mix(in srgb, var(--primary) 12%, transparent)',
-            borderRight: '1px solid color-mix(in srgb, var(--primary) 12%, transparent)',
-            borderBottom: '1px solid color-mix(in srgb, var(--primary) 12%, transparent)',
-            borderLeft: '1px solid color-mix(in srgb, var(--primary) 12%, transparent)',
-            borderRadius: 'var(--radius)',
-          }}
-        >
-          <div className="space-y-6">
-            {budgetCategories.map(({ name, total, consumido, alocado, disponivel, consumidoPercent, alocadoPercent, Icon, accentColor }) => (
-              <div key={name}>
+        {/* Budget Categories */}
+        <div className="space-y-4">
+            {budgetCategories.map(({ name, total, consumido, alocado, disponivel, consumidoPercent, alocadoPercent, Icon }) => (
+              <article
+                key={name}
+                className="rounded-lg p-4"
+                style={{
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--border)',
+                }}
+              >
                 <div
-                  className="mb-3"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    justifyContent: 'space-between',
-                    gap: 'var(--spacing-4)',
-                    flexWrap: 'wrap',
-                  }}
+                  className="grid grid-cols-1 2xl:grid-cols-[260px_minmax(0,1fr)] gap-5"
+                  style={{ alignItems: 'start' }}
                 >
                   <div className="flex items-center gap-3">
                     <div 
-                      className="p-2"
+                      className="flex items-center justify-center rounded-lg"
                       style={{
+                        width: '40px',
+                        height: '40px',
                         color: 'var(--primary)',
-                        borderRadius: 'var(--radius)',
                         backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
                       }}
                     >
@@ -599,24 +590,29 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                     <div>
                       <div 
                         style={{ 
-                          color: 'var(--muted-foreground)',
+                          color: 'var(--foreground)',
                           fontSize: 'var(--text-sm)',
-                          fontWeight: 'var(--font-weight-medium)',
+                          fontWeight: 'var(--font-weight-normal)',
                         }}
                       >
                         {name}
                       </div>
+                      <span
+                        style={{
+                          color: 'var(--muted-foreground)',
+                          fontSize: 'var(--text-xs)',
+                          fontWeight: 'var(--font-weight-normal)',
+                        }}
+                      >
+                        {alocado ? 'Possui valor alocado' : 'Sem alocação operacional'}
+                      </span>
                     </div>
                   </div>
 
                   <div
+                    className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3"
                     style={{
-                      display: 'grid',
-                      gridTemplateColumns: `repeat(auto-fit, minmax(${alocado ? '168px' : '188px'}, 1fr))`,
-                      columnGap: 'var(--spacing-8)',
-                      rowGap: 'var(--spacing-3)',
-                      alignItems: 'start',
-                      width: alocado ? 'min(100%, 940px)' : 'min(100%, 760px)',
+                      minWidth: 0,
                     }}
                   >
                     {[
@@ -627,30 +623,36 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                         : []),
                       { label: 'Disponível', value: disponivel, percent: 100 - consumidoPercent - alocadoPercent, color: 'var(--primary)' },
                     ].map((metric) => (
-                      <div key={metric.label} style={{ textAlign: 'right' }}>
+                      <div
+                        key={metric.label}
+                        className="rounded-lg px-3 py-2"
+                        style={{
+                          border: '1px solid var(--border)',
+                          backgroundColor: 'var(--muted)',
+                          minWidth: 0,
+                        }}
+                      >
                         <div
                           style={{
                             color: 'var(--muted-foreground)',
                             fontSize: 'var(--text-xs)',
                             fontWeight: 'var(--font-weight-normal)',
+                            marginBottom: '4px',
                           }}
                         >
                           {metric.label}
                         </div>
                         <div
                           style={{
-                            color: metric.color,
+                            color: 'var(--foreground)',
+                            fontFamily: 'var(--font-family)',
                             fontSize: 'var(--text-sm)',
-                            fontWeight: 'var(--font-weight-semibold)',
-                            whiteSpace: 'nowrap',
-                            display: 'inline-flex',
-                            alignItems: 'baseline',
-                            justifyContent: 'flex-end',
-                            gap: '0.35rem',
+                            fontWeight: 'var(--font-weight-normal)',
+                            lineHeight: 1.35,
                           }}
                         >
                           <span>{metric.value}</span>
-                          <span style={{ color: metric.color }}>·</span>
+                          <span style={{ color: 'var(--muted-foreground)', margin: '0 6px' }}>·</span>
                           <span>{metric.percent}%</span>
                         </div>
                       </div>
@@ -663,31 +665,33 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                     width: '100%',
                     height: '6px',
                     backgroundColor: 'var(--muted)',
-                    borderRadius: 'var(--radius)',
+                    borderRadius: '999px',
                     overflow: 'hidden',
                     display: 'flex',
+                    marginTop: '14px',
                   }}
                 >
                   <div 
                     style={{
                       width: `${consumidoPercent}%`,
                       height: '100%',
-                      backgroundColor: accentColor,
+                      backgroundColor: 'var(--primary)',
                       transition: 'width 0.3s ease',
                     }}
                   />
-                  <div 
-                    style={{
-                      width: `${alocadoPercent}%`,
-                      height: '100%',
-                      backgroundColor: 'color-mix(in srgb, #60a5fa 55%, transparent)',
-                      transition: 'width 0.3s ease',
-                    }}
-                  />
+                  {alocado && (
+                    <div
+                      style={{
+                        width: `${alocadoPercent}%`,
+                        height: '100%',
+                        backgroundColor: 'color-mix(in srgb, var(--primary) 45%, transparent)',
+                        transition: 'width 0.3s ease',
+                      }}
+                    />
+                  )}
                 </div>
-              </div>
+              </article>
             ))}
-          </div>
         </div>
       </div>
       )}

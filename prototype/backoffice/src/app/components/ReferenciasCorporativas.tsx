@@ -226,8 +226,8 @@ export const ReferenciasCorporativas: React.FC<{ onBack: () => void }> = ({ onBa
         <div style={{ marginBottom: '22px' }}>
           <label style={labelStyle}>Pesquisar</label>
           <div style={{ position: 'relative' }}>
-            <input type="text" placeholder="Buscar no cadastro selecionado..." value={searchTerm} onChange={event => setSearchTerm(event.target.value)} style={{ ...inputStyle, paddingLeft: '36px' }} />
-            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--dash-icon-subdued)' }} />
+            <input type="text" placeholder="Buscar" value={searchTerm} onChange={event => setSearchTerm(event.target.value)} style={{ ...inputStyle, paddingRight: '36px' }} />
+            <Search size={16} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--dash-icon-subdued)' }} />
           </div>
         </div>
 

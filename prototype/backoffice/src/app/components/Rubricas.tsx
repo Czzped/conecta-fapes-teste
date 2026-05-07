@@ -234,8 +234,8 @@ export const Rubricas: React.FC = () => {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 1fr) 150px 150px', gap: '12px', marginBottom: '16px' }}>
               <div style={{ position: 'relative' }}>
-                <input value={searchTerm} onChange={event => setSearchTerm(event.target.value)} placeholder="Buscar rubrica..." style={{ ...S.input, paddingLeft: '36px' }} />
-                <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
+                <input value={searchTerm} onChange={event => setSearchTerm(event.target.value)} placeholder="Buscar" style={{ ...S.input, paddingRight: '36px' }} />
+                <Search size={16} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
               </div>
               <Select S={S} label="" value={naturezaFilter} onChange={value => setNaturezaFilter(value as typeof naturezaFilter)} options={['Todas', 'CUSTEIO', 'CAPITAL']} />
               <Select S={S} label="" value={ativaFilter} onChange={value => setAtivaFilter(value as typeof ativaFilter)} options={['Todas', 'Ativa', 'Inativa']} />

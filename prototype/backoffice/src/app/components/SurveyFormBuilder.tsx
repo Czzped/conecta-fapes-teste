@@ -640,7 +640,7 @@ export const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onBack }) 
                   <input
                     value={searchTerm}
                     onChange={(event) => setSearchTerm(event.target.value)}
-                    placeholder="Buscar formulario"
+                    placeholder="Buscar"
                     aria-label="Buscar formulario"
                   />
                 </label>

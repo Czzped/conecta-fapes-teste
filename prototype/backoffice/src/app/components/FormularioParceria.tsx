@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, Home, Plus, Save, Search, Send, Upload } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Save, Search, Send, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Props {
@@ -33,6 +33,13 @@ const labelStyle: React.CSSProperties = {
   display: 'block',
   marginBottom: '6px',
 };
+
+const RequiredLabel: React.FC<{ label: string; required?: boolean }> = ({ label, required = true }) => (
+  <label style={labelStyle}>
+    {label}
+    {required && <span style={{ color: '#ef4444', marginLeft: '4px' }}>*</span>}
+  </label>
+);
 
 const sectionCardStyle: React.CSSProperties = {
   backgroundColor: 'rgba(30, 41, 59, 0.5)',
@@ -87,11 +94,12 @@ const SelectField: React.FC<{
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
   placeholder?: string;
-}> = ({ label, value, onChange, options, placeholder }) => {
+  required?: boolean;
+}> = ({ label, value, onChange, options, placeholder, required = true }) => {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ position: 'relative' }}>
-      {label && <label style={labelStyle}>{label}</label>}
+      {label && <RequiredLabel label={label} required={required} />}
       <button
         type="button"
         onClick={() => setOpen(!open)}
@@ -136,7 +144,8 @@ const SearchableInstitutionField: React.FC<{
   onChange: (v: string) => void;
   options: { value: string; label: string; cnpj: string }[];
   placeholder?: string;
-}> = ({ label, value, onChange, options, placeholder }) => {
+  required?: boolean;
+}> = ({ label, value, onChange, options, placeholder, required = true }) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const selected = options.find(o => o.value === value);
@@ -149,7 +158,7 @@ const SearchableInstitutionField: React.FC<{
 
   return (
     <div style={{ position: 'relative' }}>
-      <label style={labelStyle}>{label}</label>
+      <RequiredLabel label={label} required={required} />
       <button
         type="button"
         onClick={() => setOpen(!open)}
@@ -217,6 +226,7 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
   const [nomeParceria, setNomeParceria] = useState('');
   const [instituicaoVinculada, setInstituicaoVinculada] = useState('');
   const [numeroProcesso, setNumeroProcesso] = useState('');
+  const [ano, setAno] = useState('');
   const [dataAssinatura, setDataAssinatura] = useState('');
   const [dataVigenciaInicio, setDataVigenciaInicio] = useState('');
   const [dataVigenciaFim, setDataVigenciaFim] = useState('');
@@ -263,12 +273,12 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
   };
 
   const handleSalvarElaboracao = () => {
-    toast.success('Parceria salva em elaboração.');
+    toast.success('Parceria salva como rascunho.');
     setTimeout(onBack, 800);
   };
 
   const handleFormalizarParceria = () => {
-    toast.success('Parceria formalizada como vigente.');
+    toast.success('Parceria formalizada como ativa.');
     setTimeout(onBack, 800);
   };
 
@@ -276,8 +286,6 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
     <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-16">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
-          <Home size={15} style={{ color: 'rgba(255,255,255,0.5)' }} />
-          <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
           <button
             onClick={onBack}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)' }}
@@ -308,20 +316,21 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
         </div>
 
         <Section number="1" title="Identificação da Parceria" subtitle="Dados básicos da solicitação e do processo administrativo">
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', marginBottom: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 0.6fr', gap: '16px', marginBottom: '16px' }}>
             <Field label="Nome da Parceria" value={nomeParceria} onChange={setNomeParceria} placeholder="Digite o nome da parceria" />
             <Field label="Número do Processo" value={numeroProcesso} onChange={setNumeroProcesso} placeholder="Ex: 2026-AB12F" />
+            <Field label="Ano" value={ano} onChange={setAno} placeholder="2026" />
           </div>
           <div style={{ marginBottom: '16px' }}>
             <SearchableInstitutionField
-              label="Instituição vinculada"
+              label="Instituição Parceira"
               value={instituicaoVinculada}
               onChange={setInstituicaoVinculada}
               options={instituicoesOptions}
               placeholder="Busque por nome ou CNPJ"
             />
           </div>
-          <label style={labelStyle}>Objetivo</label>
+          <RequiredLabel label="Objetivo" />
           <textarea
             placeholder="Descreva o objetivo da parceria"
             value={objetivo}
@@ -351,8 +360,8 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
             <Metric label="Saldo alocável em programas" value={formatCurrency(saldoAlocavelEmProgramas)} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <Field label="Conta Bancária de Destino da Parceria" value={contaBancariaDestino} onChange={setContaBancariaDestino} placeholder="Banco / agência / conta" />
-            <Field label="Conta Ação Transversal" value={contaBancariaAcaoTransversal} onChange={setContaBancariaAcaoTransversal} placeholder="BANESTES / agência / conta específica" />
+            <Field label="Conta Bancária de Destino da Parceria" value={contaBancariaDestino} onChange={setContaBancariaDestino} placeholder="Banco / agência / conta" required={false} />
+            <Field label="Conta Ação Transversal" value={contaBancariaAcaoTransversal} onChange={setContaBancariaAcaoTransversal} placeholder="BANESTES / agência / conta específica" required={false} />
           </div>
         </Section>
 
@@ -394,14 +403,14 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
             style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 'var(--radius)', color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}
           >
             <Save size={16} />
-            Salvar em elaboração
+            Salvar Rascunho
           </button>
           <button
             onClick={handleFormalizarParceria}
             style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', color: '#0f172a', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}
           >
             <Send size={16} />
-            Formalizar parceria
+            Formalizar Parceria
           </button>
         </div>
       </div>
@@ -422,9 +431,9 @@ const Section: React.FC<{ number: string; title: string; subtitle: string; child
   </div>
 );
 
-const Field: React.FC<{ label: string; value: string; onChange: (value: string) => void; placeholder?: string }> = ({ label, value, onChange, placeholder }) => (
+const Field: React.FC<{ label: string; value: string; onChange: (value: string) => void; placeholder?: string; required?: boolean }> = ({ label, value, onChange, placeholder, required = true }) => (
   <div>
-    <label style={labelStyle}>{label}</label>
+    <RequiredLabel label={label} required={required} />
     <input type="text" placeholder={placeholder} value={value} onChange={e => onChange(e.target.value)} style={inputStyle} />
   </div>
 );
@@ -440,14 +449,14 @@ const Metric: React.FC<{ label: string; value: string; highlight?: boolean }> = 
 
 const DateField: React.FC<{ label: string; value: string; onChange: (value: string) => void }> = ({ label, value, onChange }) => (
   <div>
-    <label style={labelStyle}>{label}</label>
+    <RequiredLabel label={label} />
     <input type="date" value={value} onChange={e => onChange(e.target.value)} style={{ ...inputStyle, colorScheme: 'dark' }} />
   </div>
 );
 
 const UploadField: React.FC<{ label: string; fileName: string; onChange: (fileName: string) => void }> = ({ label, fileName, onChange }) => (
   <div>
-    <label style={labelStyle}>{label}</label>
+    <RequiredLabel label={label} />
     <label
       style={{
         ...inputStyle,

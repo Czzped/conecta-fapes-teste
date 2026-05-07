@@ -70,8 +70,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, onLo
                 <span className="font-bold text-sm">Portal FAPES</span>
             </div>
             <div className="hidden sm:flex items-center relative ml-4">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Buscar processos..." className="pl-9 h-9 w-[300px] bg-muted/50 border-0" />
+              <Search className="absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Buscar" className="pl-3 pr-9 h-9 w-[300px] bg-muted/50 border-0" />
             </div>
           </div>
 

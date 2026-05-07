@@ -314,8 +314,8 @@ export const Financeiro: React.FC = () => {
             <CardDescription>Gerencie e acompanhe todos os repasses financeiros ativos.</CardDescription>
           </div>
           <div className="relative w-64">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Buscar projeto..." className="pl-8 h-9" />
+            <Search className="absolute right-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Buscar" className="pl-3 pr-8 h-9" />
           </div>
         </CardHeader>
         <CardContent>

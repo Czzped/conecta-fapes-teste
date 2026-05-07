@@ -12,6 +12,7 @@ import {
   KeyRound,
   Plug,
   ArrowRight,
+  ChevronDown,
 } from 'lucide-react';
 
 type Cargo = 'financeiro' | 'tecnico' | 'gestor' | 'admin';
@@ -129,6 +130,7 @@ const formatPrazo = (dias: number): { texto: string; vencido: boolean; hoje: boo
 export const CaixaEntrada: React.FC<CaixaEntradaProps> = ({ isLight, onNavigate }) => {
   const [cargo, setCargo] = useState<Cargo>('financeiro');
   const [filtro, setFiltro] = useState<Filtro>('todos');
+  const [showCargoDropdown, setShowCargoDropdown] = useState(false);
 
   const T = {
     bgPage:        isLight ? '#f6f8fb' : '#0b1222',
@@ -188,105 +190,109 @@ export const CaixaEntrada: React.FC<CaixaEntradaProps> = ({ isLight, onNavigate 
   ];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: T.bgPage, paddingTop: '88px', paddingLeft: '32px', paddingRight: '32px', paddingBottom: '40px', transition: 'background-color 0.3s' }}>
-      <div className="mx-auto" style={{ maxWidth: '1080px' }}>
+    <div style={{ backgroundColor: T.bgPage, padding: '32px 32px 40px', transition: 'background-color 0.3s' }}>
+      <div>
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="flex items-center justify-center" style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: T.iconBg }}>
-              <Inbox size={20} color={T.iconColor} />
+          <div className="flex items-start justify-between gap-6">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="flex items-center justify-center" style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: T.iconBg }}>
+                  <Inbox size={20} color={T.iconColor} />
+                </div>
+                <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: T.textPrimary, margin: 0, lineHeight: '1.5' }}>
+                  Caixa de Entrada
+                </h1>
+              </div>
+              <div style={{ marginLeft: '48px' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
+                  Suas pendências do dia, ordenadas por prazo. A lista muda conforme o cargo selecionado.
+                </p>
+              </div>
             </div>
-            <h1 style={{ fontFamily: 'var(--font-family)', fontSize: '28px', fontWeight: 700, color: T.textPrimary, margin: 0 }}>
-              Caixa de Entrada
-            </h1>
+
+            <div className="relative" style={{ width: '260px' }}>
+              <label style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '6px', fontWeight: 'var(--font-weight-normal)' }}>
+                Visualizar como
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowCargoDropdown(!showCargoDropdown)}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 'var(--radius)', border: `1px solid ${T.cardBorder}`, backgroundColor: T.bgSurface, color: T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+              >
+                {cargoLabel[cargo]}
+                <ChevronDown size={16} style={{ transform: showCargoDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+              </button>
+              {showCargoDropdown && (
+                <div style={{ position: 'absolute', top: 'calc(100% + 2px)', left: 0, right: 0, zIndex: 20, overflow: 'hidden', borderRadius: 'var(--radius)', border: `1px solid ${T.cardBorder}`, backgroundColor: T.bgSurface, boxShadow: '0 12px 28px rgba(0,0,0,0.22)' }}>
+                  {(Object.keys(cargoLabel) as Cargo[]).map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => { setCargo(c); setFiltro('todos'); setShowCargoDropdown(false); }}
+                      style={{ width: '100%', padding: '10px 12px', border: 'none', backgroundColor: cargo === c ? 'rgba(0,193,175,0.16)' : 'transparent', color: T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', textAlign: 'left', cursor: 'pointer' }}
+                    >
+                      {cargoLabel[c]}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-          <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
-            Suas pendências do dia, ordenadas por prazo. A lista muda conforme o cargo selecionado.
-          </p>
         </div>
 
-        {/* Seletor de cargo */}
-        <div className="mb-6">
-          <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', color: T.textMuted, textTransform: 'uppercase' }}>
-            Visualizar como
-          </span>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {(Object.keys(cargoLabel) as Cargo[]).map((c) => {
-              const ativo = cargo === c;
+        {/* Filtros */}
+        <div className="mb-6" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '24px', borderBottom: `1px solid ${T.cardBorder}` }}>
+          <div className="flex flex-wrap items-center gap-1" style={{ paddingBottom: '4px' }}>
+            {filtros.map(({ key, label, count }) => {
+              const ativo = filtro === key;
               return (
                 <button
-                  key={c}
-                  onClick={() => { setCargo(c); setFiltro('todos'); }}
+                  key={key}
+                  onClick={() => setFiltro(key)}
                   style={{
-                    padding: '8px 14px',
-                    borderRadius: '999px',
-                    border: ativo ? '1px solid #00c1af' : `1px solid ${T.cardBorder}`,
-                    backgroundColor: ativo ? T.chipBgActive : T.chipBg,
-                    color: ativo ? T.chipTextActive : T.textSecondary,
+                    padding: '10px 14px',
+                    border: 'none',
+                    borderBottom: ativo ? '2px solid #00c1af' : '2px solid transparent',
+                    backgroundColor: 'transparent',
+                    color: ativo ? T.textPrimary : T.textSecondary,
                     fontFamily: 'var(--font-family)',
                     fontSize: 'var(--text-sm)',
-                    fontWeight: ativo ? 600 : 500,
+                    fontWeight: 'var(--font-weight-normal)',
                     cursor: 'pointer',
-                    transition: 'all 0.15s',
+                    marginBottom: '-1px',
+                    transition: 'color 0.15s, border-color 0.15s',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
                   }}
                 >
-                  {cargoLabel[c]}
+                  {label}
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minWidth: '22px',
+                    height: '20px',
+                    padding: '0 6px',
+                    borderRadius: '999px',
+                    backgroundColor: ativo ? T.chipBgActive : T.chipBg,
+                    color: ativo ? T.chipTextActive : T.textMuted,
+                    fontSize: '11px',
+                    fontWeight: 'var(--font-weight-normal)',
+                  }}>
+                    {count}
+                  </span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Filtros */}
-        <div className="flex flex-wrap items-center gap-1 mb-6" style={{ borderBottom: `1px solid ${T.cardBorder}`, paddingBottom: '4px' }}>
-          {filtros.map(({ key, label, count }) => {
-            const ativo = filtro === key;
-            return (
-              <button
-                key={key}
-                onClick={() => setFiltro(key)}
-                style={{
-                  padding: '10px 14px',
-                  border: 'none',
-                  borderBottom: ativo ? '2px solid #00c1af' : '2px solid transparent',
-                  backgroundColor: 'transparent',
-                  color: ativo ? T.textPrimary : T.textSecondary,
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: ativo ? 600 : 500,
-                  cursor: 'pointer',
-                  marginBottom: '-1px',
-                  transition: 'color 0.15s, border-color 0.15s',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}
-              >
-                {label}
-                <span style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  minWidth: '22px',
-                  height: '20px',
-                  padding: '0 6px',
-                  borderRadius: '999px',
-                  backgroundColor: ativo ? T.chipBgActive : T.chipBg,
-                  color: ativo ? T.chipTextActive : T.textMuted,
-                  fontSize: '11px',
-                  fontWeight: 700,
-                }}>
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
         {/* Filas agrupadas por tipo de tarefa */}
         {totalFiltrado === 0 ? (
           <div style={{ padding: '64px 24px', textAlign: 'center', borderRadius: '12px', border: `1px dashed ${T.cardBorder}`, backgroundColor: T.bgCard }}>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 600, color: T.textPrimary, margin: '0 0 6px 0' }}>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-normal)', color: T.textPrimary, margin: '0 0 6px 0' }}>
               Você está em dia.
             </p>
             <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
@@ -299,7 +305,7 @@ export const CaixaEntrada: React.FC<CaixaEntradaProps> = ({ isLight, onNavigate 
               <section key={fila.key}>
                 {/* Cabeçalho da fila */}
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '12px' }}>
-                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: '15px', fontWeight: 700, color: T.textPrimary, margin: 0, letterSpacing: '-0.01em' }}>
+                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: '15px', fontWeight: 'var(--font-weight-normal)', color: T.textPrimary, margin: 0, letterSpacing: '-0.01em' }}>
                     {fila.label}
                   </h2>
                   <span style={{
@@ -314,7 +320,7 @@ export const CaixaEntrada: React.FC<CaixaEntradaProps> = ({ isLight, onNavigate 
                     color: T.textSecondary,
                     fontFamily: 'var(--font-family)',
                     fontSize: '11px',
-                    fontWeight: 700,
+                    fontWeight: 'var(--font-weight-normal)',
                   }}>
                     {fila.itensFiltrados.length}{filtro !== 'todos' && fila.itensFiltrados.length !== fila.itensTotal ? `/${fila.itensTotal}` : ''}
                   </span>
@@ -357,11 +363,11 @@ export const CaixaEntrada: React.FC<CaixaEntradaProps> = ({ isLight, onNavigate 
 
                           <div style={{ minWidth: 0 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 600, color: T.textPrimary, lineHeight: 1.3 }}>
+                              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-normal)', color: T.textPrimary, lineHeight: 1.3 }}>
                                 {item.titulo}
                               </span>
                               {item.prioridade === 'alta' && (
-                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '999px', backgroundColor: 'rgba(239,68,68,0.12)', color: T.danger, fontSize: '11px', fontWeight: 700 }}>
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '999px', backgroundColor: 'rgba(239,68,68,0.12)', color: T.danger, fontSize: '11px', fontWeight: 'var(--font-weight-normal)' }}>
                                   <AlertCircle size={12} />
                                   alta
                                 </span>
@@ -372,7 +378,7 @@ export const CaixaEntrada: React.FC<CaixaEntradaProps> = ({ isLight, onNavigate 
                             </p>
                           </div>
 
-                          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 600, color: prazoColor, whiteSpace: 'nowrap' }}>
+                          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', color: prazoColor, whiteSpace: 'nowrap' }}>
                             {prazo.texto}
                           </span>
 
@@ -389,7 +395,7 @@ export const CaixaEntrada: React.FC<CaixaEntradaProps> = ({ isLight, onNavigate 
                               color: '#00c1af',
                               fontFamily: 'var(--font-family)',
                               fontSize: 'var(--text-sm)',
-                              fontWeight: 600,
+                              fontWeight: 'var(--font-weight-normal)',
                               cursor: 'pointer',
                               transition: 'background-color 0.15s, border-color 0.15s',
                               whiteSpace: 'nowrap',

@@ -319,7 +319,7 @@ const statusStyle: Record<StatusIniciativa, { color: string; bg: string; Icon: R
 };
 
 const filtros: Array<'Todas' | StatusIniciativa> = ['Todas', 'Submetida', 'Aprovada', 'Em contratação', 'Em execução', 'Suspensa', 'Concluída', 'Cancelada'];
-type DetailTab = 'geral' | 'equipe' | 'diarias' | 'conta';
+type DetailTab = 'informacoes' | 'equipe' | 'diarias' | 'conta' | 'aditivos';
 
 const projectStages = [
   { label: 'Submissão', date: '15/01/2024', Icon: Send, status: 'completed' },
@@ -513,9 +513,11 @@ const diariasPainelSolicitacoes: DiariaPainelSolicitacao[] = [
 export const Iniciativas: React.FC = () => {
   const [iniciativaSelecionada, setIniciativaSelecionada] = useState<Iniciativa | null>(null);
   const [statusFiltro, setStatusFiltro] = useState<'Todas' | StatusIniciativa>('Todas');
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [instituicaoFiltro, setInstituicaoFiltro] = useState('Todas');
+  const [showInstituicaoDropdown, setShowInstituicaoDropdown] = useState(false);
   const [busca, setBusca] = useState('');
-  const [activeTermTab, setActiveTermTab] = useState<'resumo' | 'aditivos'>('resumo');
-  const [activeDetailTab, setActiveDetailTab] = useState<DetailTab>('geral');
+  const [activeDetailTab, setActiveDetailTab] = useState<DetailTab>('informacoes');
   const [contasBancarias, setContasBancarias] = useState<Record<string, ContaBancariaIniciativa>>(contasIniciais);
   const [contaSalvaCodigo, setContaSalvaCodigo] = useState<string | null>(null);
 
@@ -524,16 +526,18 @@ export const Iniciativas: React.FC = () => {
 
     return iniciativas.filter((iniciativa) => {
       const matchStatus = statusFiltro === 'Todas' || iniciativa.status === statusFiltro;
+      const matchInstituicao = instituicaoFiltro === 'Todas' || iniciativa.proponente === instituicaoFiltro;
       const matchBusca =
         !normalizedBusca ||
-        iniciativa.codigo.toLowerCase().includes(normalizedBusca) ||
         iniciativa.titulo.toLowerCase().includes(normalizedBusca) ||
         iniciativa.proponente.toLowerCase().includes(normalizedBusca) ||
         iniciativa.coordenador.toLowerCase().includes(normalizedBusca);
 
-      return matchStatus && matchBusca;
+      return matchStatus && matchInstituicao && matchBusca;
     });
-  }, [busca, statusFiltro]);
+  }, [busca, instituicaoFiltro, statusFiltro]);
+
+  const instituicaoOptions = useMemo(() => ['Todas', ...Array.from(new Set(iniciativas.map((iniciativa) => iniciativa.proponente)))], []);
 
   const totalPorStatus = (status: StatusIniciativa) => iniciativas.filter((iniciativa) => iniciativa.status === status).length;
   const contaAtual = iniciativaSelecionada
@@ -570,8 +574,7 @@ export const Iniciativas: React.FC = () => {
 
   const abrirIniciativa = (iniciativa: Iniciativa) => {
     setIniciativaSelecionada(iniciativa);
-    setActiveDetailTab('geral');
-    setActiveTermTab('resumo');
+    setActiveDetailTab('informacoes');
   };
 
   const inputStyle: React.CSSProperties = {
@@ -589,6 +592,7 @@ export const Iniciativas: React.FC = () => {
 
   return (
     <div className="pt-8 px-8 pb-10">
+      {!iniciativaSelecionada && (
       <div className="mb-6">
         <div className="flex items-start gap-3">
           <div
@@ -608,6 +612,7 @@ export const Iniciativas: React.FC = () => {
         </div>
         <div className="mt-6" style={{ width: '100%', height: '1px', backgroundColor: 'var(--dash-divider)' }} />
       </div>
+      )}
 
       {iniciativaSelecionada ? (
         <section>
@@ -625,110 +630,69 @@ export const Iniciativas: React.FC = () => {
             >
               Iniciativas
             </button>
-            <span style={{ color: 'var(--dash-text-muted)', margin: '0 8px' }}>/</span>
-            <span style={{ color: 'var(--dash-text-primary)' }}>{iniciativaSelecionada.codigo}</span>
+            <span style={{ color: 'var(--dash-text-muted)', margin: '0 8px' }}>&gt;</span>
+            <span style={{ color: 'var(--dash-text-primary)' }}>Detalhe</span>
           </nav>
 
-          <div className="rounded-lg p-5 mb-8" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
-            <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_180px_180px_170px] gap-5">
-              <div>
-                <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', color: 'var(--dash-text-primary)', margin: '0 0 8px' }}>
-                  {iniciativaSelecionada.codigo} · {iniciativaSelecionada.titulo}
-                </h2>
+          <div className="mb-8">
+            <div className="flex items-start gap-3">
+              <div
+                className="flex items-center justify-center flex-shrink-0"
+                style={{ width: '36px', height: '36px', backgroundColor: 'rgba(0, 193, 175, 0.12)', borderRadius: 'var(--radius)' }}
+              >
+                <FolderKanban size={20} style={{ color: '#00c1af' }} />
+              </div>
+              <div className="flex-1" style={{ marginTop: '4px' }}>
+                <h1 className="mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: 'var(--dash-text-primary)', lineHeight: '1.5' }}>
+                  {iniciativaSelecionada.titulo}
+                </h1>
                 <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', margin: 0 }}>
                   {iniciativaSelecionada.proponente} · Coordenador: {iniciativaSelecionada.coordenador}
                 </p>
               </div>
-              <Info label="Edital" value={iniciativaSelecionada.edital} />
-              <Info label="Status" value={iniciativaSelecionada.status} />
-              <Info label="Valor aprovado" value={iniciativaSelecionada.valorAprovado} />
             </div>
           </div>
 
           <div
             role="tablist"
             aria-label="Seções da iniciativa"
-            className="flex flex-wrap items-center mb-8 rounded-lg"
-            style={{
-              backgroundColor: 'var(--dash-card-bg)',
-              border: '1px solid var(--dash-card-border)',
-              boxShadow: 'var(--dash-shadow)',
-              padding: '8px',
-              gap: '16px',
-            }}
+            className="flex flex-wrap items-center mb-8"
+            style={{ borderBottom: '1px solid var(--dash-divider)', gap: '4px' }}
           >
             {[
-              { key: 'geral' as DetailTab, label: 'Geral', Icon: FolderKanban },
-              { key: 'equipe' as DetailTab, label: 'Equipe', Icon: Users },
-              { key: 'diarias' as DetailTab, label: 'Diárias', Icon: Hotel },
-              { key: 'conta' as DetailTab, label: 'Conta bancária', Icon: Landmark },
-            ].map(({ key, label, Icon }) => (
+              { key: 'informacoes' as DetailTab, label: 'Informações Gerais' },
+              { key: 'equipe' as DetailTab, label: 'Equipe' },
+              { key: 'diarias' as DetailTab, label: 'Diárias' },
+              { key: 'conta' as DetailTab, label: 'Conta bancária' },
+              { key: 'aditivos' as DetailTab, label: 'Dados dos Aditivos' },
+            ].map(({ key, label }) => (
               <button
                 key={key}
                 type="button"
                 role="tab"
                 aria-selected={activeDetailTab === key}
                 onClick={() => setActiveDetailTab(key)}
-                className="inline-flex items-center justify-center rounded-lg"
                 style={{
-                  backgroundColor: activeDetailTab === key ? '#00c1af' : 'transparent',
-                  border: '1px solid transparent',
-                  color: activeDetailTab === key ? '#06111f' : 'var(--dash-text-secondary)',
+                  background: 'none',
+                  border: 'none',
+                  borderBottom: activeDetailTab === key ? '2px solid #00c1af' : '2px solid transparent',
+                  color: activeDetailTab === key ? '#00c1af' : 'var(--dash-text-secondary)',
                   fontFamily: 'var(--font-family)',
                   fontSize: 'var(--text-sm)',
-                  fontWeight: activeDetailTab === key ? 700 : 500,
+                  fontWeight: 'var(--font-weight-medium)',
                   cursor: 'pointer',
-                  minHeight: '54px',
-                  padding: '0 24px',
-                  gap: '10px',
-                  transition: 'background-color 160ms ease, color 160ms ease',
+                  marginBottom: '-1px',
+                  padding: '12px 24px',
                 }}
               >
-                <Icon size={18} />
                 {label}
               </button>
             ))}
           </div>
 
-          {activeDetailTab === 'geral' && (
+          {activeDetailTab === 'informacoes' && (
             <>
-          <SectionHeader
-            Icon={Clock}
-            title="Vigência e aditivos"
-            subtitle="Datas formais da iniciativa e alterações aprovadas de prazo ou recurso."
-          />
-
-          <div className="flex gap-6 mb-4" style={{ borderBottom: '1px solid var(--dash-divider)' }}>
-            {[
-              { key: 'resumo', label: 'Resumo' },
-              { key: 'aditivos', label: 'Dados dos aditivos' },
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setActiveTermTab(tab.key as 'resumo' | 'aditivos')}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  padding: '12px 0',
-                  color: activeTermTab === tab.key ? '#00c1af' : 'var(--dash-text-secondary)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-normal)',
-                  cursor: 'pointer',
-                  position: 'relative',
-                  fontFamily: 'var(--font-family)',
-                }}
-              >
-                {tab.label}
-                {activeTermTab === tab.key && (
-                  <span style={{ position: 'absolute', left: 0, right: 0, bottom: '-1px', height: '2px', backgroundColor: '#00c1af' }} />
-                )}
-              </button>
-            ))}
-          </div>
-
-          {activeTermTab === 'resumo' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
               {[
                 { label: 'Data inicial da iniciativa', value: iniciativaSelecionada.dataInicio, helper: 'Início formal da execução', Icon: PlayCircle },
                 { label: 'Data final vigente', value: iniciativaSelecionada.dataFimVigente, helper: `Original: ${iniciativaSelecionada.dataFimOriginal}`, Icon: Clock },
@@ -737,9 +701,171 @@ export const Iniciativas: React.FC = () => {
               ].map((card) => (
                 <MetricCard key={card.label} {...card} />
               ))}
+          </div>
+
+          <SectionHeader Icon={Clock} title="Ciclo de Fomento" subtitle="Acompanhe a jornada consolidada da iniciativa." />
+
+          <div className="rounded-lg p-5 mb-8" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
+            <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(10, minmax(0, 1fr))', gap: '10px', padding: '16px 6px 8px' }}>
+              <div style={{ position: 'absolute', left: '5%', right: '5%', top: '43px', height: '3px', backgroundColor: 'rgba(148, 163, 184, 0.22)', borderRadius: '999px' }} />
+              <div style={{ position: 'absolute', left: '5%', width: '50%', top: '43px', height: '3px', backgroundColor: '#14b8a6', borderRadius: '999px' }} />
+              {projectStages.map((stage) => {
+                const Icon = stage.Icon;
+                const isCompleted = stage.status === 'completed';
+                const isCurrent = stage.status === 'current';
+
+                return (
+                  <div key={stage.label} className="text-center" style={{ position: 'relative', zIndex: 1 }}>
+                    <div
+                      className="mx-auto flex items-center justify-center rounded-full mb-3"
+                      style={{
+                        width: '48px',
+                        height: '48px',
+                        backgroundColor: isCompleted || isCurrent ? '#22d3ee' : '#1e293b',
+                        color: isCompleted || isCurrent ? '#06111f' : 'var(--dash-text-muted)',
+                        boxShadow: isCurrent ? '0 0 0 7px rgba(34, 211, 238, 0.18)' : 'none',
+                      }}
+                    >
+                      <Icon size={18} />
+                    </div>
+                    <p style={{ color: isCompleted || isCurrent ? 'var(--dash-text-primary)' : 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-normal)', margin: 0, lineHeight: 1.35 }}>
+                      {stage.label}
+                    </p>
+                    {stage.date && (
+                      <span style={{ color: 'var(--dash-text-muted)', fontFamily: 'var(--font-family)', fontSize: '11px' }}>{stage.date}</span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+          </div>
+
+          <SectionHeader Icon={Wallet} title="Orçamento por rubrica" subtitle="Total, consumido, alocado e disponível por rubrica da iniciativa." />
+
+          <div className="space-y-4 mb-8">
+              {budgetCategories.map(({ name, total, consumido, alocado, disponivel, consumidoPercent, alocadoPercent, Icon, color }) => (
+                <article
+                  key={name}
+                  className="rounded-lg p-4"
+                  style={{
+                    backgroundColor: 'var(--dash-input-bg)',
+                    border: '1px solid var(--dash-card-border)',
+                  }}
+                >
+                  <div
+                    className="grid grid-cols-1 2xl:grid-cols-[260px_minmax(0,1fr)] gap-5"
+                    style={{ alignItems: 'start' }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center rounded-lg" style={{ width: '40px', height: '40px', backgroundColor: 'rgba(0, 193, 175, 0.12)', color: '#00c1af' }}>
+                        <Icon size={18} />
+                      </div>
+                      <div>
+                        <strong style={{ display: 'block', color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)' }}>{name}</strong>
+                        <span style={{ color: 'var(--dash-text-muted)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>
+                          {alocado ? 'Possui valor alocado' : 'Sem alocação operacional'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3"
+                      style={{ minWidth: 0 }}
+                    >
+                      {[
+                        { label: 'Total', value: total, percent: 100, metricColor: 'var(--dash-text-primary)' },
+                        { label: 'Consumido', value: consumido, percent: consumidoPercent, metricColor: 'var(--dash-text-primary)' },
+                        ...(alocado ? [{ label: 'Alocado', value: alocado, percent: alocadoPercent, metricColor: 'var(--dash-text-primary)' }] : []),
+                        { label: 'Disponível', value: disponivel, percent: 100 - consumidoPercent - alocadoPercent, metricColor: 'var(--dash-text-primary)' },
+                      ].map((metric) => (
+                        <div
+                          key={metric.label}
+                          className="rounded-lg px-3 py-2"
+                          style={{
+                            backgroundColor: 'var(--dash-card-bg)',
+                            border: '1px solid var(--dash-card-border)',
+                            minWidth: 0,
+                          }}
+                        >
+                          <div style={{ color: 'var(--dash-text-muted)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-normal)', marginBottom: '4px' }}>{metric.label}</div>
+                          <div
+                            style={{
+                              color: metric.metricColor,
+                              fontFamily: 'var(--font-family)',
+                              fontSize: 'var(--text-sm)',
+                              fontWeight: 'var(--font-weight-normal)',
+                              lineHeight: 1.35,
+                            }}
+                          >
+                            <span>{metric.value}</span>
+                            <span style={{ color: 'var(--dash-text-muted)', margin: '0 6px' }}>·</span>
+                            <span>{metric.percent}%</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{ width: '100%', height: '6px', backgroundColor: 'rgba(148, 163, 184, 0.24)', borderRadius: '999px', overflow: 'hidden', display: 'flex', marginTop: '14px' }}>
+                    <div style={{ width: `${consumidoPercent}%`, height: '100%', backgroundColor: '#14b8a6' }} />
+                    {alocado && <div style={{ width: `${alocadoPercent}%`, height: '100%', backgroundColor: 'rgba(20, 184, 166, 0.45)' }} />}
+                  </div>
+                </article>
+              ))}
+          </div>
+
+          <SectionHeader
+            Icon={Landmark}
+            title="Conta Bancária"
+            subtitle="Campo administrativo da FAPES para definir a conta de movimentação da iniciativa."
+          />
+
+          <div className="rounded-lg p-5 mb-8" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <Field label="Banco" value={contaAtual.banco} onChange={(value) => updateConta('banco', value)} placeholder="Banco responsável" style={inputStyle} />
+              <Field label="Agência" value={contaAtual.agencia} onChange={(value) => updateConta('agencia', value)} placeholder="0000" style={inputStyle} />
+              <Field label="Conta" value={contaAtual.conta} onChange={(value) => updateConta('conta', value)} placeholder="000000-0" style={inputStyle} />
+              <Field label="Tipo da conta" value={contaAtual.tipoConta} onChange={(value) => updateConta('tipoConta', value)} placeholder="Conta corrente" style={inputStyle} />
+              <Field label="Titular" value={contaAtual.titular} onChange={(value) => updateConta('titular', value)} placeholder="Nome do titular" style={inputStyle} />
+              <Field label="CPF/CNPJ do titular" value={contaAtual.documentoTitular} onChange={(value) => updateConta('documentoTitular', value)} placeholder="00.000.000/0000-00" style={inputStyle} />
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 mt-5">
+              <button
+                type="button"
+                onClick={salvarConta}
+                className="inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2"
+                style={{
+                  backgroundColor: '#00c1af',
+                  border: '1px solid #00c1af',
+                  color: '#06111f',
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-normal)',
+                  cursor: 'pointer',
+                }}
+              >
+                <Save size={16} />
+                Salvar conta da iniciativa
+              </button>
+            </div>
+            {contaSalvaCodigo === iniciativaSelecionada.codigo && (
+              <p style={{ color: '#22c55e', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', margin: '12px 0 0' }}>
+                Conta da iniciativa atualizada nesta sessão.
+              </p>
+            )}
+          </div>
+            </>
+          )}
+
+          {activeDetailTab === 'aditivos' && (
+            <>
+          <SectionHeader
+            Icon={FileEdit}
+            title="Dados dos Aditivos"
+            subtitle="Aditivos de prazo ou recurso aprovados para a iniciativa."
+          />
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
               {[
                 {
                   title: 'TA-2026-014',
@@ -761,8 +887,7 @@ export const Iniciativas: React.FC = () => {
                   <p style={{ color: 'var(--dash-text-secondary)', fontSize: 'var(--text-sm)', margin: 0, lineHeight: 1.6 }}>{aditivo.description}</p>
                 </div>
               ))}
-            </div>
-          )}
+          </div>
             </>
           )}
 
@@ -818,128 +943,13 @@ export const Iniciativas: React.FC = () => {
             </>
           )}
 
-          {activeDetailTab === 'geral' && (
-            <>
-          <SectionHeader Icon={Clock} title="Ciclo de Fomento" subtitle="Acompanhe a jornada consolidada da iniciativa." />
-
-          <div className="rounded-lg p-5 mb-8" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
-            <div className="grid grid-cols-1 md:grid-cols-5 xl:grid-cols-10 gap-4">
-              {projectStages.map((stage) => {
-                const Icon = stage.Icon;
-                const isCompleted = stage.status === 'completed';
-                const isCurrent = stage.status === 'current';
-
-                return (
-                  <div key={stage.label} className="text-center">
-                    <div
-                      className="mx-auto flex items-center justify-center rounded-full mb-3"
-                      style={{
-                        width: '44px',
-                        height: '44px',
-                        backgroundColor: isCompleted || isCurrent ? '#00c1af' : 'var(--dash-muted)',
-                        color: isCompleted || isCurrent ? '#06111f' : 'var(--dash-text-muted)',
-                        boxShadow: isCurrent ? '0 0 0 4px rgba(0, 193, 175, 0.18)' : 'none',
-                      }}
-                    >
-                      <Icon size={18} />
-                    </div>
-                    <p style={{ color: isCompleted || isCurrent ? 'var(--dash-text-primary)' : 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', margin: 0, lineHeight: 1.35 }}>
-                      {stage.label}
-                    </p>
-                    {stage.date && (
-                      <span style={{ color: 'var(--dash-text-muted)', fontFamily: 'var(--font-family)', fontSize: '11px' }}>{stage.date}</span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <SectionHeader Icon={Wallet} title="Orçamento por rubrica" subtitle="Total, consumido, alocado e disponível por rubrica da iniciativa." />
-
-          <div className="rounded-lg p-5 mb-8" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)', overflow: 'hidden' }}>
-            <div className="space-y-4">
-              {budgetCategories.map(({ name, total, consumido, alocado, disponivel, consumidoPercent, alocadoPercent, Icon, color }) => (
-                <article
-                  key={name}
-                  className="rounded-lg p-4"
-                  style={{
-                    backgroundColor: 'var(--dash-input-bg)',
-                    border: '1px solid var(--dash-card-border)',
-                  }}
-                >
-                  <div
-                    className="grid grid-cols-1 2xl:grid-cols-[260px_minmax(0,1fr)] gap-5"
-                    style={{ alignItems: 'start' }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center rounded-lg" style={{ width: '40px', height: '40px', backgroundColor: 'rgba(0, 193, 175, 0.12)', color: '#00c1af' }}>
-                        <Icon size={18} />
-                      </div>
-                      <div>
-                        <strong style={{ display: 'block', color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>{name}</strong>
-                        <span style={{ color: 'var(--dash-text-muted)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>
-                          {alocado ? 'Possui valor alocado' : 'Sem alocação operacional'}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div
-                      className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3"
-                      style={{ minWidth: 0 }}
-                    >
-                      {[
-                        { label: 'Total', value: total, percent: 100, metricColor: 'var(--dash-text-muted)' },
-                        { label: 'Consumido', value: consumido, percent: consumidoPercent, metricColor: 'var(--dash-text-primary)' },
-                        ...(alocado ? [{ label: 'Alocado', value: alocado, percent: alocadoPercent, metricColor: '#60a5fa' }] : []),
-                        { label: 'Disponível', value: disponivel, percent: 100 - consumidoPercent - alocadoPercent, metricColor: '#22d3ee' },
-                      ].map((metric) => (
-                        <div
-                          key={metric.label}
-                          className="rounded-lg px-3 py-2"
-                          style={{
-                            backgroundColor: 'var(--dash-card-bg)',
-                            border: '1px solid var(--dash-card-border)',
-                            minWidth: 0,
-                          }}
-                        >
-                          <div style={{ color: 'var(--dash-text-muted)', fontSize: 'var(--text-xs)', marginBottom: '4px' }}>{metric.label}</div>
-                          <div
-                            style={{
-                              color: metric.metricColor,
-                              fontFamily: 'var(--font-family)',
-                              fontSize: 'var(--text-sm)',
-                              fontWeight: 700,
-                              lineHeight: 1.35,
-                            }}
-                          >
-                            <span>{metric.value}</span>
-                            <span style={{ color: 'var(--dash-text-muted)', margin: '0 6px' }}>·</span>
-                            <span>{metric.percent}%</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div style={{ width: '100%', height: '6px', backgroundColor: 'var(--dash-muted)', borderRadius: '999px', overflow: 'hidden', display: 'flex', marginTop: '14px' }}>
-                    <div style={{ width: `${consumidoPercent}%`, height: '100%', backgroundColor: color }} />
-                    {alocado && <div style={{ width: `${alocadoPercent}%`, height: '100%', backgroundColor: 'rgba(96, 165, 250, 0.65)' }} />}
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-            </>
-          )}
-
           {activeDetailTab === 'diarias' && (
             <IniciativaDiariasPanel iniciativaTitulo={iniciativaSelecionada.titulo} />
           )}
         </section>
       ) : (
         <>
-      <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+      <section className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-6">
         {[
           { label: 'Submetidas', value: totalPorStatus('Submetida'), status: 'Submetida' as StatusIniciativa },
           { label: 'Aprovadas', value: totalPorStatus('Aprovada'), status: 'Aprovada' as StatusIniciativa },
@@ -956,32 +966,35 @@ export const Iniciativas: React.FC = () => {
               key={label}
               type="button"
               onClick={() => setStatusFiltro(status)}
-              className="rounded-lg p-4 text-left"
-              style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)', cursor: 'pointer' }}
+              className="rounded-lg p-3 text-center"
+              style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)', cursor: 'pointer', minHeight: '118px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
             >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex items-center justify-center rounded-lg" style={{ width: '40px', height: '40px', backgroundColor: bg }}>
-                  <Icon size={20} style={{ color }} />
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <div className="flex items-center justify-center rounded-lg" style={{ width: '32px', height: '32px', backgroundColor: bg, flexShrink: 0 }}>
+                  <Icon size={16} style={{ color }} />
                 </div>
-                <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }}>{label}</span>
+                <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-secondary)', lineHeight: 1.3 }}>{label}</span>
               </div>
-              <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: 'var(--dash-text-primary)' }}>{value}</strong>
+              <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: 'var(--dash-text-primary)' }}>{value}</strong>
             </button>
           );
         })}
       </section>
 
-      <section className="rounded-lg p-5 mb-5" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
-        <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+      <section className="mb-5">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(220px,1fr)_260px] gap-4">
           <div className="relative flex-1">
-            <Search size={18} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--dash-text-muted)' }} />
+            <label style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginBottom: '8px' }}>
+              Pesquisar
+            </label>
+            <Search size={18} style={{ position: 'absolute', right: 12, top: '39px', transform: 'translateY(-50%)', color: 'var(--dash-text-muted)' }} />
             <input
               value={busca}
               onChange={(event) => setBusca(event.target.value)}
-              placeholder="Buscar por código, título, proponente ou coordenador"
+              placeholder="Buscar"
               className="w-full rounded-lg"
               style={{
-                padding: '10px 12px 10px 40px',
+                padding: '10px 40px 10px 12px',
                 backgroundColor: 'var(--dash-input-bg)',
                 border: '1px solid var(--dash-card-border)',
                 color: 'var(--dash-text-primary)',
@@ -991,25 +1004,116 @@ export const Iniciativas: React.FC = () => {
             />
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {filtros.map((filtro) => (
-              <button
-                key={filtro}
-                type="button"
-                onClick={() => setStatusFiltro(filtro)}
-                className="px-3 py-2 rounded-lg"
-                style={{
-                  backgroundColor: statusFiltro === filtro ? 'rgba(0, 193, 175, 0.16)' : 'transparent',
-                  border: statusFiltro === filtro ? '1px solid rgba(0, 193, 175, 0.45)' : '1px solid var(--dash-card-border)',
-                  color: statusFiltro === filtro ? '#00c1af' : 'var(--dash-text-secondary)',
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--text-xs)',
-                  cursor: 'pointer',
-                }}
-              >
-                {filtro}
-              </button>
-            ))}
+          <div style={{ position: 'relative' }}>
+            <label style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginBottom: '8px' }}>
+              Instituições
+            </label>
+            <button
+              type="button"
+              onClick={() => {
+                setShowInstituicaoDropdown(!showInstituicaoDropdown);
+                setShowStatusDropdown(false);
+              }}
+              className="w-full rounded-lg"
+              style={{
+                padding: '10px 12px',
+                backgroundColor: 'var(--dash-input-bg)',
+                border: '1px solid var(--dash-card-border)',
+                color: 'var(--dash-text-primary)',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                cursor: 'pointer',
+              }}
+            >
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{instituicaoFiltro}</span>
+              <ChevronDown size={16} style={{ flexShrink: 0, transform: showInstituicaoDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+            </button>
+            {showInstituicaoDropdown && (
+              <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: '#1e293b', border: '1px solid var(--dash-card-border)', borderRadius: 'var(--radius)', overflow: 'hidden', zIndex: 30, boxShadow: '0 12px 28px rgba(0,0,0,0.28)' }}>
+                {instituicaoOptions.map((instituicao) => (
+                  <button
+                    key={instituicao}
+                    type="button"
+                    onClick={() => {
+                      setInstituicaoFiltro(instituicao);
+                      setShowInstituicaoDropdown(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      border: 'none',
+                      backgroundColor: instituicaoFiltro === instituicao ? 'rgba(0, 193, 175, 0.16)' : '#1e293b',
+                      color: instituicaoFiltro === instituicao ? '#00c1af' : 'var(--dash-text-primary)',
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-sm)',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {instituicao}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div style={{ position: 'relative' }}>
+            <label style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginBottom: '8px' }}>
+              Status
+            </label>
+            <button
+              type="button"
+              onClick={() => {
+                setShowStatusDropdown(!showStatusDropdown);
+                setShowInstituicaoDropdown(false);
+              }}
+              className="w-full rounded-lg"
+              style={{
+                padding: '10px 12px',
+                backgroundColor: 'var(--dash-input-bg)',
+                border: '1px solid var(--dash-card-border)',
+                color: 'var(--dash-text-primary)',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                cursor: 'pointer',
+              }}
+            >
+              {statusFiltro}
+              <ChevronDown size={16} style={{ transform: showStatusDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+            </button>
+            {showStatusDropdown && (
+              <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: '#1e293b', border: '1px solid var(--dash-card-border)', borderRadius: 'var(--radius)', overflow: 'hidden', zIndex: 30, boxShadow: '0 12px 28px rgba(0,0,0,0.28)' }}>
+                {filtros.map((filtro) => (
+                  <button
+                    key={filtro}
+                    type="button"
+                    onClick={() => {
+                      setStatusFiltro(filtro);
+                      setShowStatusDropdown(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      border: 'none',
+                      backgroundColor: statusFiltro === filtro ? 'rgba(0, 193, 175, 0.16)' : '#1e293b',
+                      color: statusFiltro === filtro ? '#00c1af' : 'var(--dash-text-primary)',
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-sm)',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {filtro}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -1021,7 +1125,7 @@ export const Iniciativas: React.FC = () => {
           return (
             <article
               key={iniciativa.codigo}
-              className="rounded-lg p-5"
+              className="rounded-lg"
               role="button"
               tabIndex={0}
               onClick={() => abrirIniciativa(iniciativa)}
@@ -1031,39 +1135,39 @@ export const Iniciativas: React.FC = () => {
                   abrirIniciativa(iniciativa);
                 }
               }}
-              style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)', cursor: 'pointer' }}
+              style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)', cursor: 'pointer', padding: '18px 20px' }}
             >
-              <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_180px_170px] gap-5">
+              <div className="grid grid-cols-1 xl:grid-cols-[2fr_1.5fr_1.1fr_1fr_1fr_40px] gap-5 items-center">
                 <div>
-                  <div className="flex flex-wrap items-center gap-3 mb-2">
-                    <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', color: 'var(--dash-text-primary)' }}>
-                      {iniciativa.codigo} · {iniciativa.titulo}
-                    </strong>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full" style={{ backgroundColor: bg, color, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>
-                      <Icon size={13} />
-                      {iniciativa.status}
-                    </span>
-                  </div>
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', margin: 0 }}>
-                    {iniciativa.proponente} · Coordenador: {iniciativa.coordenador}
-                  </p>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', margin: '0 0 5px' }}>Iniciativa</p>
+                  <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', fontWeight: 'var(--font-weight-medium)' }}>
+                    {iniciativa.titulo}
+                  </strong>
                 </div>
 
                 <div>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', margin: '0 0 5px' }}>Instituição</p>
+                  <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', fontWeight: 'var(--font-weight-normal)' }}>{iniciativa.proponente}</strong>
+                </div>
+
+                <div style={{ paddingLeft: '24px' }}>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', margin: '0 0 5px' }}>Coordenador</p>
+                  <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', fontWeight: 'var(--font-weight-normal)' }}>{iniciativa.coordenador}</strong>
+                </div>
+
+                <div style={{ paddingLeft: '24px' }}>
                   <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', margin: '0 0 5px' }}>Submissão</p>
-                  <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{iniciativa.dataSubmissao}</strong>
+                  <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', fontWeight: 'var(--font-weight-normal)' }}>{iniciativa.dataSubmissao}</strong>
                 </div>
 
-                <div>
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', margin: '0 0 5px' }}>Valor aprovado</p>
-                  <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{iniciativa.valorAprovado}</strong>
+                <div style={{ paddingLeft: '24px' }}>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', margin: '0 0 5px' }}>Status</p>
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full" style={{ backgroundColor: bg, border: `1px solid ${color}`, color, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>
+                    {iniciativa.status}
+                  </span>
                 </div>
-              </div>
 
-              <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--dash-divider)' }}>
-                <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-secondary)' }}>
-                  {iniciativa.edital}
-                </span>
+                <ChevronDown size={18} style={{ color: 'var(--dash-text-muted)', transform: 'rotate(-90deg)' }} />
               </div>
             </article>
           );
@@ -1101,7 +1205,7 @@ const SectionHeader: React.FC<{
       <Icon size={20} />
     </div>
     <div>
-      <h2 style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', margin: '0 0 5px' }}>
+      <h2 style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-normal)', margin: '0 0 5px' }}>
         {title}
       </h2>
       <p style={{ color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', margin: 0 }}>
@@ -1129,7 +1233,7 @@ const MetricCard: React.FC<{
       <span style={{ color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>{label}</span>
       <Icon size={18} style={{ color: '#00c1af', flexShrink: 0 }} />
     </div>
-    <strong style={{ display: 'block', color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', marginBottom: '6px' }}>
+    <strong style={{ display: 'block', color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', fontWeight: 'var(--font-weight-normal)', marginBottom: '6px' }}>
       {value}
     </strong>
     <p style={{ color: 'var(--dash-text-muted)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', lineHeight: 1.5, margin: 0 }}>
@@ -1661,13 +1765,13 @@ const IniciativaEquipePage: React.FC<{ membros: MembroEquipeIniciativa[] }> = ({
           <div className="rounded-lg p-5 mb-5" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
             <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px_180px] gap-4">
               <label style={{ color: 'var(--dash-text-muted)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>
-                Buscar bolsista
+                Pesquisar
                 <div style={{ position: 'relative', marginTop: '8px' }}>
-                  <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--dash-text-muted)' }} />
+                  <Search size={16} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--dash-text-muted)' }} />
                   <input
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
-                    placeholder="Nome, e-mail, modalidade ou papel"
+                    placeholder="Buscar"
                     style={{
                       width: '100%',
                       height: '42px',
@@ -1678,7 +1782,7 @@ const IniciativaEquipePage: React.FC<{ membros: MembroEquipeIniciativa[] }> = ({
                       fontFamily: 'var(--font-family)',
                       fontSize: 'var(--text-sm)',
                       outline: 'none',
-                      padding: '0 12px 0 38px',
+                      padding: '0 38px 0 12px',
                     }}
                   />
                 </div>
@@ -1762,7 +1866,7 @@ const SelectFilter: React.FC<{ label: string; value: string; options: string[]; 
       }}
     >
       {options.map((option) => (
-        <option key={option} value={option}>{option}</option>
+        <option key={option} value={option} style={{ backgroundColor: '#1e293b', color: '#ffffff' }}>{option}</option>
       ))}
     </select>
   </label>

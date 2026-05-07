@@ -74,6 +74,10 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
     { id: 4, nome: 'Programa de Infraestrutura Laboratorial', eixo: 'Infraestrutura de Pesquisa', instituicaoDemandante: 'Ufes', dataVigencia: '01/04/2026 - 31/03/2027', status: 'Em planejamento', valorInvestido: 2600000, valorAlocado: 1600000, valorAportado: 980000, valorConsumido: 360000, iniciativas: 11 },
     { id: 5, nome: 'Programa de Carreira Científica 2025', eixo: 'Formação de Recursos Humanos', instituicaoDemandante: 'Fapes', dataVigencia: '01/01/2025 - 31/12/2025', status: 'Encerrado', valorInvestido: 1450000, valorAlocado: 1450000, valorAportado: 1320000, valorConsumido: 1280000, iniciativas: 17 },
     { id: 6, nome: 'Programa de Difusão do Conhecimento', eixo: 'Ciência e Tecnologia', instituicaoDemandante: 'Secti', dataVigencia: '01/06/2025 - 31/05/2026', status: 'Suspenso', valorInvestido: 980000, valorAlocado: 760000, valorAportado: 540000, valorConsumido: 410000, iniciativas: 8 },
+    { id: 7, nome: 'Programa de Pesquisa Aplicada em Saúde', eixo: 'Ciência e Tecnologia', instituicaoDemandante: 'Sesa', dataVigencia: '01/07/2026 - 30/06/2027', status: 'Ativo', valorInvestido: 2100000, valorAlocado: 1680000, valorAportado: 1250000, valorConsumido: 640000, iniciativas: 13 },
+    { id: 8, nome: 'Programa de Internacionalização Científica', eixo: 'Formação de Recursos Humanos', instituicaoDemandante: 'Ufes', dataVigencia: '01/08/2026 - 31/07/2027', status: 'Em planejamento', valorInvestido: 1750000, valorAlocado: 820000, valorAportado: 360000, valorConsumido: 90000, iniciativas: 6 },
+    { id: 9, nome: 'Programa Laboratórios Inteligentes', eixo: 'Infraestrutura de Pesquisa', instituicaoDemandante: 'Ifes', dataVigencia: '01/09/2026 - 31/08/2027', status: 'Ativo', valorInvestido: 3900000, valorAlocado: 3100000, valorAportado: 2440000, valorConsumido: 1120000, iniciativas: 15 },
+    { id: 10, nome: 'Programa Empreendedorismo Capixaba', eixo: 'Inovação e Desenvolvimento', instituicaoDemandante: 'Findes', dataVigencia: '01/10/2026 - 30/09/2027', status: 'Ativo', valorInvestido: 2400000, valorAlocado: 1740000, valorAportado: 1310000, valorConsumido: 530000, iniciativas: 10 },
   ];
 
   const filtered = programasData.filter(p => {
@@ -190,8 +194,6 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
           </div>
         </div>
 
-        <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, margin: '20px 0 28px' }} />
-
         <div style={{ display: 'flex', gap: '4px', borderBottom: `1px solid ${T.borderSubtle}`, marginBottom: '28px' }}>
           {[
             { id: 'listagem' as ActiveTab, label: 'Programas' },
@@ -307,12 +309,12 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
             <div style={{ position: 'relative' }}>
               <input
                 type="text"
-                placeholder="Buscar programa..."
+                placeholder="Buscar"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                style={{ ...inputBaseStyle, padding: '10px 12px 10px 36px' }}
+                style={{ ...inputBaseStyle, padding: '10px 36px 10px 12px' }}
               />
-              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
+              <Search size={16} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
             </div>
           </div>
 

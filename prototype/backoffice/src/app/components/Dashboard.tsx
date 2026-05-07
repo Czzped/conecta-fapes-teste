@@ -30,6 +30,7 @@ type Contrast = 'normal' | 'high' | 'maximum';
 type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
 type Language = 'pt' | 'en' | 'es';
 type NotificationTab = 'avisos' | 'editais';
+type DashboardTab = 'financeiro' | 'captacao';
 type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
@@ -52,6 +53,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [activePage, setActivePage] = useState<ActivePage>('dashboard');
+  const [dashboardTab, setDashboardTab] = useState<DashboardTab>('financeiro');
   const [selectedPagamento, setSelectedPagamento] = useState<PagamentoCard | null>(null);
   
   const [theme, setTheme] = useState<Theme>(() => {
@@ -235,46 +237,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           </button>
 
           {/* Menu */}
-          <div className={`mt-6 transition-all duration-300 ${sidebarExpanded ? 'w-full px-4' : 'w-auto'}`}>
-            {/* Caixa de Entrada */}
-            <button
-              className="flex items-center gap-3 rounded-lg transition-all duration-200"
-              aria-label="Caixa de Entrada"
-              style={{
-                backgroundColor: activePage === 'caixa-entrada' ? T.menuActiveBg : 'transparent',
-                padding: sidebarExpanded ? '12px 16px' : '12px',
-                width: sidebarExpanded ? '100%' : '48px',
-                justifyContent: sidebarExpanded ? 'flex-start' : 'center',
-              }}
-              onClick={() => setActivePage('caixa-entrada')}
-              onMouseEnter={(e) => { if (activePage !== 'caixa-entrada') e.currentTarget.style.backgroundColor = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.07)'; }}
-              onMouseLeave={(e) => { if (activePage !== 'caixa-entrada') e.currentTarget.style.backgroundColor = 'transparent'; }}
-            >
-              <Inbox
-                size={20}
-                style={{
-                  color: activePage === 'caixa-entrada' ? T.menuActiveText : T.menuInactiveText,
-                  flexShrink: 0,
-                  transition: 'color 0.3s',
-                }}
-              />
-              {sidebarExpanded && (
-                <span
-                  style={{
-                    fontFamily: 'var(--font-family)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-weight-medium)',
-                    color: activePage === 'caixa-entrada' ? T.menuActiveText : T.menuInactiveText,
-                    transition: 'color 0.3s',
-                  }}
-                >
-                  Caixa de Entrada
-                </span>
-              )}
-            </button>
-
-            <div style={{ height: '8px' }} />
-
+          <div
+            className={`mt-6 transition-all duration-300 ${sidebarExpanded ? 'w-full px-4' : 'w-auto'}`}
+            style={{ overflowY: 'auto', minHeight: 0, flex: '1 1 auto', paddingBottom: '24px' }}
+          >
             {/* Dashboard */}
             <button
               className="flex items-center gap-3 rounded-lg transition-all duration-200"
@@ -312,6 +278,45 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               )}
             </button>
 
+            <div style={{ height: '8px' }} />
+
+            {/* Caixa de Entrada */}
+            <button
+              className="flex items-center gap-3 rounded-lg transition-all duration-200"
+              aria-label="Caixa de Entrada"
+              style={{
+                backgroundColor: activePage === 'caixa-entrada' ? T.menuActiveBg : 'transparent',
+                padding: sidebarExpanded ? '12px 16px' : '12px',
+                width: sidebarExpanded ? '100%' : '48px',
+                justifyContent: sidebarExpanded ? 'flex-start' : 'center',
+              }}
+              onClick={() => setActivePage('caixa-entrada')}
+              onMouseEnter={(e) => { if (activePage !== 'caixa-entrada') e.currentTarget.style.backgroundColor = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.07)'; }}
+              onMouseLeave={(e) => { if (activePage !== 'caixa-entrada') e.currentTarget.style.backgroundColor = 'transparent'; }}
+            >
+              <Inbox
+                size={20}
+                style={{
+                  color: activePage === 'caixa-entrada' ? T.menuActiveText : T.menuInactiveText,
+                  flexShrink: 0,
+                  transition: 'color 0.3s',
+                }}
+              />
+              {sidebarExpanded && (
+                <span
+                  style={{
+                    fontFamily: 'var(--font-family)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    color: activePage === 'caixa-entrada' ? T.menuActiveText : T.menuInactiveText,
+                    transition: 'color 0.3s',
+                  }}
+                >
+                  Caixa de Entrada
+                </span>
+              )}
+            </button>
+
             {/* Espaçamento entre seções */}
             <div style={{ height: '24px' }} />
 
@@ -337,6 +342,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               { key: 'parceria' as ActivePage, Icon: Handshake, label: 'Parceria' },
               { key: 'programa' as ActivePage, Icon: FolderOpen, label: 'Programa' },
               { key: 'editais' as ActivePage, Icon: FileText, label: 'Captação' },
+              { key: 'iniciativas' as ActivePage, Icon: FolderOpen, label: 'Iniciativas' },
             ]).map(({ key, Icon, label }, index) => {
               const active = activePage === key;
               return (
@@ -382,7 +388,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             {/* Espaçamento entre seções */}
             <div style={{ height: '24px' }} />
 
-            {/* Seção CADASTROS */}
+            {/* Seção FINANCEIRO */}
             {sidebarExpanded && (
               <h3
                 className="mb-3 px-2"
@@ -395,15 +401,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   transition: 'color 0.3s',
                 }}
               >
-                CADASTROS
+                FINANCEIRO
               </h3>
             )}
 
-            {/* Itens do menu CADASTROS */}
+            {/* Itens do menu FINANCEIRO */}
             {([
-              { key: 'iniciativas' as ActivePage, Icon: FolderOpen, label: 'Iniciativas' },
-              { key: 'instituicoes' as ActivePage, Icon: Building2, label: 'Instituições' },
-              { key: 'pessoas' as ActivePage, Icon: UserRound, label: 'Pessoas' },
+              { key: 'contabilidade-financeiro' as ActivePage, Icon: Landmark, label: 'Ação Transversal' },
             ]).map(({ key, Icon, label }, index) => {
               const active = activePage === key;
               return (
@@ -506,7 +510,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             {/* Espaçamento entre seções */}
             <div style={{ height: '24px' }} />
 
-            {/* Seção FINANCEIRO */}
+            {/* Seção PRESTAÇÃO DE CONTAS */}
             {sidebarExpanded && (
               <h3 
                 className="mb-3 px-2"
@@ -519,18 +523,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   transition: 'color 0.3s',
                 }}
               >
-                FINANCEIRO
+                PRESTAÇÃO DE CONTAS
               </h3>
             )}
 
             {([
-              { key: 'contabilidade-financeiro' as ActivePage, Icon: Landmark, label: 'Contabilidade e Financeiro', caption: 'Ação Transversal' },
-            ]).map(({ key, Icon, label, caption }) => {
+              { key: 'financeira' as ActivePage, Icon: DollarSign, label: 'Financeira' },
+              { key: 'tecnica' as ActivePage, Icon: ClipboardCheck, label: 'Técnica' },
+              { key: 'remanejamento' as ActivePage, Icon: FileEdit, label: 'Remanejamento' },
+            ]).map(({ key, Icon, label }, index) => {
               const active = activePage === key;
               return (
                 <button
                   key={key}
-                  className="flex items-center gap-3 rounded-lg transition-all duration-200"
+                  className={`flex items-center gap-3 rounded-lg transition-all duration-200 ${index > 0 ? 'mt-2' : ''}`}
                   aria-label={label}
                   style={{
                     backgroundColor: active ? T.menuActiveBg : 'transparent',
@@ -551,33 +557,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     }}
                   />
                   {sidebarExpanded && (
-                    <span style={{ minWidth: 0 }}>
-                      <span
-                        style={{
-                          display: 'block',
-                          fontFamily: 'var(--font-family)',
-                          fontSize: 'var(--text-sm)',
-                          fontWeight: 'var(--font-weight-medium)',
-                          color: active ? T.menuActiveText : T.menuInactiveText,
-                          transition: 'color 0.3s',
-                        }}
-                      >
-                        {label}
-                      </span>
-                      <span
-                        style={{
-                          display: 'block',
-                          marginTop: '2px',
-                          fontFamily: 'var(--font-family)',
-                          fontSize: 'var(--text-xs)',
-                          color: T.textMuted,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                      >
-                        {caption}
-                      </span>
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        color: active ? T.menuActiveText : T.menuInactiveText,
+                        transition: 'color 0.3s',
+                      }}
+                    >
+                      {label}
                     </span>
                   )}
                 </button>
@@ -586,7 +575,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
             <div style={{ height: '24px' }} />
             
-            {/* Seção PRESTAÇÃO DE CONTAS */}
+            {/* Seção CADASTROS */}
             {sidebarExpanded && (
               <h3 
                 className="mb-3 px-2"
@@ -599,15 +588,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   transition: 'color 0.3s',
                 }}
               >
-                PRESTAÇÃO DE CONTAS
+                CADASTROS
               </h3>
             )}
             
-            {/* Itens do menu PRESTAÇÃO DE CONTAS */}
+            {/* Itens do menu CADASTROS */}
             {([
-              { key: 'financeira' as ActivePage, Icon: DollarSign, label: 'Financeira' },
-              { key: 'tecnica' as ActivePage, Icon: ClipboardCheck, label: 'Técnica' },
-              { key: 'remanejamento' as ActivePage, Icon: FileEdit, label: 'Remanejamento' },
+              { key: 'instituicoes' as ActivePage, Icon: Building2, label: 'Instituições' },
+              { key: 'pessoas' as ActivePage, Icon: UserRound, label: 'Pessoas' },
             ]).map(({ key, Icon, label }, index) => {
               const active = activePage === key;
               return (
@@ -974,8 +962,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
               {/* Search */}
               <div className="mb-6 relative">
-                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--dash-icon-subdued)' }} />
-                <input type="text" placeholder="Pesquisar notificações..." className="w-full rounded-lg py-3 pl-10 pr-4"
+                <Search size={18} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--dash-icon-subdued)' }} />
+                <input type="text" placeholder="Buscar" className="w-full rounded-lg py-3 pl-4 pr-10"
                   style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
               </div>
 
@@ -1659,6 +1647,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             isLight={isLight}
             onNavigate={(destino) => setActivePage(destino as ActivePage)}
           />
+        ) : activePage === 'pagamento' ? (
+          <div />
         ) : activePage === 'contabilidade-financeiro' ? (
           <AcaoTransversalFinanceiro onBack={() => setActivePage('home')} />
         ) : activePage === 'iniciativas' ? (
@@ -1699,77 +1689,94 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <SurveyFormBuilder onBack={() => setActivePage('configuracoes')} />
         ) : (
           <div className="p-8">
-            <div className="mx-auto max-w-6xl">
-              <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-                <div>
-                  <p
-                    className="mb-2"
+            <div>
+              <div className="mb-6">
+                <div className="flex items-start gap-3">
+                  <div
+                    className="flex items-center justify-center flex-shrink-0"
                     style={{
-                      fontFamily: 'var(--font-family)',
-                      fontSize: 'var(--text-sm)',
-                      color: T.textMuted,
+                      width: '36px',
+                      height: '36px',
+                      backgroundColor: 'rgba(0,193,175,0.15)',
+                      borderRadius: 'var(--radius)',
                     }}
                   >
-                    Portal administrativo
-                  </p>
-                  <h1
-                    style={{
-                      fontFamily: 'var(--font-family)',
-                      fontSize: '32px',
-                      fontWeight: 'var(--font-weight-semibold)',
-                      color: T.textPrimary,
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    Visão geral do Conecta
-                  </h1>
-                  <p
-                    className="mt-3 max-w-2xl"
-                    style={{
-                      fontFamily: 'var(--font-family)',
-                      fontSize: 'var(--text-base)',
-                      color: T.textSecondary,
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    Acompanhe operações críticas, mantenha cadastros atualizados e acesse os fluxos mais usados do back-office.
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap gap-3">
-                  <button
-                    onClick={() => setActivePage('financeira')}
-                    className="flex items-center gap-2 rounded-lg px-4 py-3 transition-all hover:-translate-y-0.5"
-                    style={{
-                      backgroundColor: '#00c1af',
-                      color: '#07101f',
-                      boxShadow: 'var(--dash-shadow)',
-                      fontFamily: 'var(--font-family)',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: 'var(--font-weight-semibold)',
-                    }}
-                  >
-                    <DollarSign size={18} />
-                    Financeiro
-                  </button>
-                  <button
-                    onClick={() => setActivePage('editais')}
-                    className={`flex items-center gap-2 rounded-lg px-4 py-3 transition-all ${T.hoverClass}`}
-                    style={{
-                      backgroundColor: 'var(--dash-card-bg)',
-                      border: '1px solid var(--dash-card-border)',
-                      color: T.textPrimary,
-                      fontFamily: 'var(--font-family)',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: 'var(--font-weight-medium)',
-                    }}
-                  >
-                    <FileText size={18} />
-                    Captação
-                  </button>
+                    <LayoutDashboard size={20} style={{ color: '#00c1af' }} />
+                  </div>
+                  <div className="flex-1" style={{ marginTop: '6px' }}>
+                    <h1
+                      className="mb-3"
+                      style={{
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 'var(--text-md)',
+                        fontWeight: 'var(--font-weight-normal)',
+                        color: T.textPrimary,
+                        lineHeight: '1.5',
+                      }}
+                    >
+                      Dashboard
+                    </h1>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 'var(--text-sm)',
+                        color: T.textSecondary,
+                        lineHeight: '1.5',
+                        margin: 0,
+                      }}
+                    >
+                      Acompanhe operações críticas, mantenha cadastros atualizados e acesse os fluxos mais usados do back-office.
+                    </p>
+                  </div>
                 </div>
               </div>
 
+              <div className="mb-6 flex gap-6" style={{ borderBottom: '1px solid var(--dash-divider)' }}>
+                {([
+                  { key: 'financeiro' as DashboardTab, label: 'Financeiro' },
+                  { key: 'captacao' as DashboardTab, label: 'Captação' },
+                ]).map((tab) => {
+                  const active = dashboardTab === tab.key;
+                  return (
+                    <button
+                      key={tab.key}
+                      onClick={() => setDashboardTab(tab.key)}
+                      style={{
+                        position: 'relative',
+                        padding: '0.75rem 0',
+                        background: 'transparent',
+                        border: 'none',
+                        color: active ? '#00c1af' : T.textSecondary,
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {tab.label}
+                      {active && (
+                        <span
+                          style={{
+                            position: 'absolute',
+                            left: 0,
+                            right: 0,
+                            bottom: '-1px',
+                            height: '2px',
+                            backgroundColor: '#00c1af',
+                          }}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {dashboardTab === 'captacao' ? (
+                <div style={{ margin: '-32px' }}>
+                  <Editais />
+                </div>
+              ) : (
+                <>
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 {[
                   { label: 'Captações em andamento', value: '18', Icon: FileText, tone: '#4f6fce' },
@@ -1936,7 +1943,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 </div>
               </section>
 
-              <div className="mt-6 grid gap-4 xl:grid-cols-[1.3fr_0.7fr]">
+              <div className="mt-6">
                 <section
                   className="rounded-lg p-6"
                   style={{
@@ -1986,36 +1993,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     ))}
                   </div>
                 </section>
-
-                <section
-                  className="rounded-lg p-6"
-                  style={{
-                    backgroundColor: 'var(--dash-card-bg)',
-                    border: '1px solid var(--dash-card-border)',
-                    boxShadow: 'var(--dash-shadow)',
-                  }}
-                >
-                  <h2 style={{ color: T.textPrimary, fontSize: '20px', fontWeight: 600 }}>Acessos rápidos</h2>
-                  <div className="mt-5 grid gap-3">
-                    {[
-                      { label: 'Programas', page: 'programa' as ActivePage, Icon: BookOpen },
-                      { label: 'Parcerias', page: 'parceria' as ActivePage, Icon: Handshake },
-                      { label: 'Instituições', page: 'instituicoes' as ActivePage, Icon: Home },
-                      { label: 'Configurações', page: 'configuracoes' as ActivePage, Icon: Settings },
-                    ].map(({ label, page, Icon }) => (
-                      <button
-                        key={label}
-                        onClick={() => setActivePage(page)}
-                        className={`flex items-center gap-3 rounded-lg p-3 text-left transition-colors ${T.hoverClass}`}
-                        style={{ color: T.textPrimary }}
-                      >
-                        <Icon size={18} style={{ color: '#00c1af' }} />
-                        <span style={{ fontSize: '14px', fontWeight: 600 }}>{label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </section>
               </div>
+                </>
+              )}
             </div>
           </div>
         )}
