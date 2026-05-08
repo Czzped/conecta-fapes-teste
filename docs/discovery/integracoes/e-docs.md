@@ -38,35 +38,152 @@ Documentos formais que **pesquisadores assinam** hoje sao modelados no Conecta c
 | Sincronizacao | **Polling de eventos** (Guideline confirma que toda mutacao retorna `eventoId` enfileirado — Conecta consulta status do evento). Webhook por confirmar com PRODEST. |
 | Identidade compartilhada | Acesso Cidadao do servidor/cidadao e a **mesma** entre Conecta e E-Docs — sem nova credencial |
 
-## Fluxo end-to-end (caso M009 — Termo de Compromisso)
+## Passo a passo: enviar documento para assinatura + saber quando foi assinado (V2)
+
+Caso de uso: Conecta envia Termo de Compromisso (M009) com 5 signatarios para o E-Docs e detecta a conclusao.
+
+### Etapas
+
+| # | Etapa | Endpoint / acao | HTTP esperado |
+|---|-------|------------------|----------------|
+| 1 | Token Client Credentials (servidor↔servidor) | `POST https://acessocidadao.es.gov.br/is/connect/token` | `200 OK` com `access_token` |
+| 2 | Gerar URL de upload | `GET /v2/documentos/upload-arquivo/gerar-url-upload/{tamanhoBytes}` | `200 OK` com `{ url, body, idArquivo }` |
+| 3 | Upload do PDF para MinIO | `POST {url}` multipart com `body{...}` + `file` | `204 No Content` |
+| 4 | Registrar documento com lista de assinantes | `POST /v2/documentos/capturar/nato-digital/auto-assinado/servidor` | `202 Accepted` com `idEvento` |
+| 5 | Polling do evento de captura | `GET /v2/eventos/{idEvento}` | `200 OK`; quando `status=Executado`, retorna `idDocumento` |
+| 6 | Notificar signatarios (email/portal Conecta) | (mensageria interna M020) — exibir link `https://e-docs.es.gov.br/.../assinar/{idDocumento}` | — |
+| 7 | Cada signatario assina via portal E-Docs (auth Acesso Cidadao) | (acao do usuario, fora do Conecta) | — |
+| 8 | Polling do estado do documento | `GET /v2/documentos/{idDocumento}` ou polling de eventos por signatario | `200 OK`; verificar `assinaturas[].assinou` ou status global |
+| 9 | Quando todos assinaram → captura final dispara automaticamente | E-Docs gera novo `idEvento` `CapturaDocumento` apos ultima manifestacao | — |
+| 10 | Baixar PDF assinado | `GET /v2/documentos/{idDocumento}/conteudo` | `200 OK` com PDF + manifesto |
+| 11 | Arquivar localmente em M008.Documento | (escrita interna Conecta) | — |
+
+### Diagrama de sequencia — fluxo completo
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant Bolsa as M009 (Bolsa)
-    participant EDocs as M023 (Adapter E-Docs)
-    participant API as E-Docs API
+    participant Adapter as M023 (Adapter E-Docs)
+    participant AC as Acesso Cidadao
+    participant Edocs as E-Docs API V2
+    participant MinIO as Storage MinIO
     participant Comm as M020 (Comunicacao)
     participant Pesq as Pesquisador
-    participant AC as Acesso Cidadao
+    participant Job as Job Polling (Adapter)
 
-    Bolsa->>EDocs: EnviarDocumentoParaAssinatura(termoId, signatarios[])
-    EDocs->>API: POST /documentos (upload PDF)
-    EDocs->>API: POST /documentos/{id}/encaminhamento
-    API-->>EDocs: protocoloEdocs + urlsPortal
-    EDocs-->>Bolsa: protocoloEdocs + urlPortal
-    Bolsa->>Comm: NotificarSignatarios(urlPortal)
-    Comm->>Pesq: Email/SMS com link
-    Pesq->>API: Acessa portal
-    API->>AC: Login federado
-    AC-->>API: Identidade do signatario
-    Pesq->>API: Assina documento
-    API-->>EDocs: Webhook /api/v1/m023/webhooks/edocs
-    EDocs->>Bolsa: Evento DocumentoAssinadoCompletamenteEdocs
-    Bolsa->>Bolsa: Estado Bolsa = TermoAssinado
-    EDocs->>API: GET /documentos/{id}/conteudo
-    EDocs->>EDocs: Arquiva PDF assinado em M008.Documento
+    Note over Bolsa,Adapter: 1. Pedido de assinatura
+    Bolsa->>Adapter: EnviarDocumentoParaAssinatura(pdf, signatarios[])
+
+    Note over Adapter,AC: 2. Token OAuth (Client Credentials)
+    Adapter->>AC: POST /is/connect/token (scope api-sigades-documento)
+    AC-->>Adapter: access_token
+
+    Note over Adapter,MinIO: 3. Upload do PDF
+    Adapter->>Edocs: GET /v2/documentos/upload-arquivo/gerar-url-upload/{tamanho}
+    Edocs-->>Adapter: { url, body{...}, idArquivo }
+    Adapter->>MinIO: POST multipart (body + file)
+    MinIO-->>Adapter: 204 No Content
+
+    Note over Adapter,Edocs: 4. Registrar documento com assinantes
+    Adapter->>Edocs: POST /v2/documentos/capturar/nato-digital/auto-assinado/servidor<br/>{ idArquivo, idPapel, idClasseDocumental, resumo, assinantes[] }
+    Edocs-->>Adapter: 202 Accepted { idEvento, capturado:false }
+
+    Note over Adapter,Edocs: 5. Polling ate captura inicial concluir
+    loop ate status=Executado
+        Adapter->>Edocs: GET /v2/eventos/{idEvento}
+        Edocs-->>Adapter: { status: Pendente | Executado, idDocumento? }
+    end
+    Edocs-->>Adapter: status=Executado, idDocumento=DOC-001
+
+    Note over Adapter,Bolsa: 6. Persistir + notificar
+    Adapter->>Adapter: Salva SolicitacaoAssinaturaEdocs(idDocumento, signatarios)
+    Adapter-->>Bolsa: { idDocumento, urlPortal }
+    Bolsa->>Comm: NotificarSignatarios(idDocumento, urlPortal)
+    Comm->>Pesq: Email/SMS com link de assinatura
+
+    Note over Pesq,Edocs: 7. Pesquisador assina via portal E-Docs
+    Pesq->>Edocs: Acessa portal e-docs.es.gov.br
+    Edocs->>AC: Redirect login federado
+    AC-->>Pesq: Login (CPF + senha + 2FA)
+    Pesq->>Edocs: Confirma assinatura
+
+    Note over Job,Edocs: 8. Polling de status (Conecta side)
+    loop a cada N minutos para cada SolicitacaoAssinaturaEdocs pendente
+        Job->>Edocs: GET /v2/documentos/{idDocumento}
+        Edocs-->>Job: { assinaturas: [{ assinante, assinou, dataAssinatura, recusou? }] }
+        alt todos assinaram
+            Job->>Edocs: GET /v2/documentos/{idDocumento}/conteudo
+            Edocs-->>Job: PDF assinado + manifesto
+            Job->>Bolsa: Evento DocumentoAssinadoCompletamenteEdocs(idDocumento, hash)
+            Bolsa->>Bolsa: Estado Bolsa = TermoAssinado
+            Job->>Adapter: Arquiva PDF em M008.Documento
+        else algum recusou
+            Job->>Bolsa: Evento AssinaturaRecusadaEdocs(idDocumento, motivo)
+            Bolsa->>Bolsa: Estado Bolsa = AssinaturaRecusada
+        else parcial
+            Job->>Job: Atualiza N de M assinados; aguarda proxima rodada
+        end
+    end
 ```
+
+### Diagrama de sequencia — apenas o ciclo de polling (foco em "saber se foi assinado")
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Job as Job ReconciliarAssinaturas (cada 5 min)
+    participant DB as DB local Conecta
+    participant Adapter as M023 Adapter
+    participant Edocs as E-Docs API V2
+    participant Bolsa as M009 Bolsa
+
+    Job->>DB: SELECT Solicitacoes WHERE estado IN (AGUARDANDO, PARCIAL)
+    DB-->>Job: [SolicitacaoAssinaturaEdocs[]]
+    loop para cada solicitacao
+        Adapter->>Edocs: GET /v2/documentos/{idDocumento}
+        Edocs-->>Adapter: { totalAssinantes, assinados, recusados, capturadoFinal }
+        alt capturadoFinal == true
+            Adapter->>Edocs: GET /v2/documentos/{idDocumento}/conteudo
+            Edocs-->>Adapter: PDF assinado
+            Adapter->>DB: UPDATE estado=ASSINADA, hash=...
+            Adapter->>Bolsa: Evento DocumentoAssinadoCompletamenteEdocs
+        else algum recusou
+            Adapter->>DB: UPDATE estado=RECUSADA, motivo=...
+            Adapter->>Bolsa: Evento AssinaturaRecusadaEdocs
+        else parcial
+            Adapter->>DB: UPDATE estado=PARCIAL, assinados=N
+        else expirou
+            Adapter->>DB: UPDATE estado=ERRO
+            Adapter->>Bolsa: Evento ErroIntegracaoEdocs
+        end
+    end
+```
+
+### Como saber que o documento foi assinado
+
+E-Docs **nao oferece webhook**. Conecta detecta conclusao por **dois caminhos de polling**:
+
+1. **Polling do evento de captura final** (`GET /v2/eventos/{idEvento}`): apos ultima assinatura, E-Docs enfileira novo evento `CapturaDocumento`. Se Conecta tem o `idEvento` final, polling retorna `status=Executado`.
+2. **Polling do estado do documento** (`GET /v2/documentos/{idDocumento}`): retorna lista de assinaturas com flag `assinou` por signatario. Conecta calcula `N de M` localmente.
+
+**Recomendacao para Conecta:**
+- Usar polling do **documento** (caminho 2) em job recorrente cada 5 min para `SolicitacaoAssinaturaEdocs` em estado pendente.
+- Ao detectar `assinados == totalAssinantes && capturadoFinal == true`, baixar PDF e emitir evento de dominio (`DocumentoAssinadoCompletamenteEdocs`).
+- Ao detectar `recusados > 0`, emitir `AssinaturaRecusadaEdocs`.
+- Backoff exponencial em caso de erro 5xx; alerta em caso de pendencia > 30 dias.
+
+### Estados locais da `SolicitacaoAssinaturaEdocs`
+
+```
+ENVIADA  → AGUARDANDO_ASSINATURAS → PARCIALMENTE_ASSINADA → ASSINADA
+                                ↓
+                            RECUSADA
+                                ↓
+                            ERRO (timeout ou falha tecnica)
+```
+
+Transicoes disparadas pelo job de polling — nunca pelo evento sincrono (E-Docs e assincrono).
 
 ## Mapa de papeis
 
