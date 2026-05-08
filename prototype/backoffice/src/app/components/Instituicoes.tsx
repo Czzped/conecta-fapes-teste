@@ -262,12 +262,22 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   if (showForm || selected) {
     const isSetorSemCnpj = !draft.cnpj;
+    const isSituacaoAtiva = draft.situacao === 'Ativa';
     const superiorOptions = [
       '',
       ...instituicoes
         .filter(item => item.id !== draft.id)
         .map(item => (item.cnpj ? `${item.nome} — CNPJ ${item.cnpj}` : `${item.nome} — sem CNPJ`)),
     ];
+
+    // Mock — em producao vira de GET /api/v1/m008/responsaveis?instituicaoId={id}&estado=encerrado
+    const historicoDoSelecionado: { pessoa: string; papel: string; dataInicio: string; dataFim: string; motivo: string }[] = !showForm && selected
+      ? [
+          { pessoa: 'Prof. Joao Silva',  papel: 'Reitor',     dataInicio: '2020-01-01', dataFim: '2023-12-31', motivo: 'Fim de mandato' },
+          { pessoa: 'Prof. Pedro Lima',  papel: 'Reitor Pro Tempore', dataInicio: '2017-01-01', dataFim: '2019-12-31', motivo: 'Fim de mandato' },
+          { pessoa: 'Profa. Carla Mendes', papel: 'Reitora', dataInicio: '2013-01-01', dataFim: '2016-12-31', motivo: 'Fim de mandato' },
+        ]
+      : [];
 
     return (
       <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
@@ -392,11 +402,62 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </FormSection>
 
           <FormSection number="3" title="Responsável" subtitle="Responsável é o vínculo temporal entre uma Pessoa Física já cadastrada e uma Instituição, com mandato definido (RN04/RN11).">
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.5fr 0.5fr 0.5fr', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.5fr 0.6fr 0.5fr', gap: '16px' }}>
               <Select label="Pessoa responsável" value={draft.responsavel} onChange={value => updateDraft('responsavel', value)} options={['', 'Prof. Paulo Vargas', 'Prof. Ana Ribeiro', 'Jadir Pela', 'Marta Souza', 'Valcemiro Nossa', 'Carla Mendes']} />
               <Field label="Início do mandato" value={draft.dataInicioMandato} onChange={value => updateDraft('dataInicioMandato', value)} placeholder="AAAA-MM-DD" />
-              <Field label="Fim do mandato" value={draft.dataFimMandato} onChange={value => updateDraft('dataFimMandato', value)} placeholder="AAAA-MM-DD" />
+              <Field
+                label={isSituacaoAtiva ? 'Fim do mandato (opcional)' : 'Fim do mandato'}
+                value={draft.dataFimMandato}
+                onChange={value => updateDraft('dataFimMandato', value)}
+                placeholder={isSituacaoAtiva ? 'Em aberto enquanto ativa' : 'AAAA-MM-DD'}
+              />
               <Select label="Situação" value={draft.situacao} onChange={value => updateDraft('situacao', value)} options={['Ativa', 'Inativa']} />
+            </div>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, margin: '8px 0 0' }}>
+              {isSituacaoAtiva
+                ? 'Mandato em curso — fim do mandato não é obrigatório enquanto a situação for Ativa.'
+                : 'Mandato encerrado — preencha o fim do mandato.'}
+            </p>
+
+            <div style={{ marginTop: '24px', borderTop: `1px solid ${T.borderSubtle}`, paddingTop: '18px' }}>
+              <div style={{ marginBottom: '12px' }}>
+                <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 4px' }}>
+                  Histórico de Responsáveis
+                </h3>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, margin: 0 }}>
+                  Mandatos encerrados desta instituição (ordenados por mandato mais recente).
+                </p>
+              </div>
+              {historicoDoSelecionado.length === 0 ? (
+                <div style={{ border: `1px dashed ${T.borderDefault}`, borderRadius: '8px', padding: '16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textMuted }}>
+                  Nenhum responsável anterior registrado.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {historicoDoSelecionado.map((h, idx) => (
+                    <div
+                      key={`${h.pessoa}-${idx}`}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '2fr 1.2fr 1.6fr 2fr',
+                        gap: '12px',
+                        padding: '10px 14px',
+                        border: `1px solid ${T.borderSubtle}`,
+                        borderRadius: '8px',
+                        backgroundColor: T.bgSurfaceMuted,
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 'var(--text-sm)',
+                        color: T.textPrimary,
+                      }}
+                    >
+                      <span style={{ fontWeight: 'var(--font-weight-medium)' }}>{h.pessoa}</span>
+                      <span>{h.papel}</span>
+                      <span>{h.dataInicio} → {h.dataFim}</span>
+                      <span style={{ color: T.textMuted }}>{h.motivo}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </FormSection>
 

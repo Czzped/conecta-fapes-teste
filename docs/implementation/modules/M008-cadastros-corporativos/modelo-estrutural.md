@@ -243,7 +243,7 @@ classDiagram
 | **TipoInstituicao** | nome | Nome do tipo de instituicao | Sim | String | Ex: Ensino, Empresa, Agencia de Fomento | 200 | Sim |
 | | descricao | Descricao do tipo | Nao | String | | 500 | |
 | **Responsavel** | dataInicioMandato | Data de inicio do mandato | Sim | Date | | | |
-| | dataFimMandato | Data de termino do mandato | Sim | Date | | | |
+| | dataFimMandato | Data de termino do mandato | Cond. | Date | Obrigatorio quando Responsavel estiver inativo; opcional enquanto ativo (mandato em curso) | | |
 | | ativo | Indica se o mandato esta vigente | Gerado | Boolean | true/false | | |
 | | pessoa (relacao) | Pessoa fisica que assume o papel de responsavel | Sim | FK → PessoaFisica | Via `assume` | | |
 | | instituicao (relacao) | Instituicao onde a pessoa exerce o mandato (xor com `unidade`) | Cond. | FK → Instituicao | Via `responsaveis`. Obrigatorio quando `unidade` nao informada | | |

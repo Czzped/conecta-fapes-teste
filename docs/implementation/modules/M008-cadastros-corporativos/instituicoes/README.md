@@ -92,7 +92,7 @@ Agrupa os cadastros corporativos de organizacoes (Instituicao, UnidadeOrganizaci
 | Atributo | Definicao | Obrig. | Tipo | Dominio | Tamanho | Unico |
 |----------|-----------|--------|------|---------|---------|-------|
 | dataInicioMandato | Data de inicio do mandato | Sim | Date | | | |
-| dataFimMandato | Data de termino do mandato | Sim | Date | | | |
+| dataFimMandato | Data de termino do mandato | Cond. | Date | Obrigatorio quando mandato estiver encerrado (Responsavel inativo). Pode ficar vazio enquanto Responsavel estiver ativo. | | |
 | ativo | Indica se o mandato esta vigente | Gerado | Boolean | true/false | | |
 
 ### Relacionamentos
