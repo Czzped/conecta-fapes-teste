@@ -133,6 +133,8 @@ classDiagram
 
 Rubrica e categoria orcamentaria; transacao e movimento. Por isso, o M003 nao cria nem mantem a estrutura de rubricas. A `SolicitacaoDiaria` apenas referencia a `RubricaProjeto` aplicavel e dispara a criacao de `Transacao` quando precisa comprometer ou reverter saldo.
 
+> **Regras de saldo aplicaveis**: ver [discovery/regras-saldo-alocado-disponivel.md](../../../../discovery/regras-saldo-alocado-disponivel.md). RN-SLD01 a RN-SLD05 + RI-SLD1/2 governam `valorTotal`/`valorAlocado`/`valorConsumido`/`valorDisponivel` da rubrica de diarias. Em M013, a terminologia operacional e: `valorAprovado` (Total), `valorComprometido` (Alocado), `valorExecutado` (Consumido), `saldoDisponivel` (Disponivel). Eventos: solicitacao `APROVADA` → +Alocado; pagamento → −Alocado, +Consumido; cancelamento antes do pagamento → −Alocado, +Disponivel; estorno → −Consumido, +Disponivel.
+
 | Conceito | Dono | Papel no fluxo de diarias |
 |----------|------|---------------------------|
 | Rubrica | M008/M013 | Categoria orcamentaria corporativa, como **Diaria dentro do Estado**, **Diaria nacional** ou **Diaria internacional** |

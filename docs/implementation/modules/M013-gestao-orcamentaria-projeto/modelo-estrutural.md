@@ -188,6 +188,17 @@ classDiagram
 - `TransacaoFinanceira` e movimento bancario/financeiro e pertence a M014/M016. Quando existir conciliacao, a `Transacao` pode guardar apenas `movimentoBancarioRef`.
 - A rubrica nao armazena o movimento em si; ela apenas classifica despesas e recebe saldos derivados das suas transacoes.
 
+**Regras de saldo (canonicas — ver [discovery/regras-saldo-alocado-disponivel.md](../../../discovery/regras-saldo-alocado-disponivel.md)):**
+- M013 e fonte canonica do saldo de Bolsas (M009) e Diarias (M003).
+- Mapeamento da terminologia M013 → terminologia canonica das RN-SLD:
+  - `valorAprovado` ↔ `valorTotal`
+  - `valorComprometido` ↔ `valorAlocado` (reservado)
+  - `valorExecutado` ↔ `valorConsumido` (pago)
+  - `saldoDisponivel` ↔ `valorDisponivel`
+  - `valorEstornado` reverte `valorExecutado` (RN-SLD05)
+- Aplicam-se RN-SLD01 a RN-SLD05 e invariantes RI-SLD1, RI-SLD2.
+- M003 e M009 leem saldo desta entidade ao validar novas alocacoes; bloqueio por `SALDO_INSUFICIENTE` e disparado por RN-SLD02.
+
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: SolicitacaoOrcamentaria.projeto: Projeto)
 - Cardinalidade N: atributo lista do tipo da classe destino (ex: RubricaProjeto.transacoes: List<Transacao>)
