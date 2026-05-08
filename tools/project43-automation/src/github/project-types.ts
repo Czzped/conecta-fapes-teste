@@ -18,8 +18,19 @@ export interface ProjectV2SingleSelectField extends ProjectFieldBase {
   options: ProjectFieldOption[];
 }
 
+export interface ProjectIteration {
+  id: string;
+  title: string;
+  startDate: string;
+  duration: number;
+}
+
 export interface ProjectV2IterationField extends ProjectFieldBase {
   __typename: "ProjectV2IterationField";
+  configuration?: {
+    iterations: ProjectIteration[];
+    completedIterations: ProjectIteration[];
+  };
 }
 
 export type ProjectFieldNode =
@@ -37,6 +48,14 @@ export interface ProjectItemState {
   statusName: string | null;
   startedAt: string | null;
   doneAt: string | null;
+}
+
+export interface ProjectItemForSprintRollover {
+  id: string;
+  title: string;
+  url: string | null;
+  statusName: string | null;
+  iterationId: string | null;
 }
 
 export type ProjectCustomFieldType = "DATE" | "SINGLE_SELECT";
