@@ -194,22 +194,24 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   const openNew = () => {
     setDraft({ ...emptyInstituicao, id: Date.now() });
-    setDraftSubestruturas([]);
+    setDraftFiliais([]);
+    setDraftUnidades([]);
     setShowForm(true);
     setSelected(null);
   };
 
   const openDetails = (item: InstituicaoItem) => {
     setDraft({ ...item });
-    setDraftSubestruturas(
-      instituicoes
-        .filter(instituicao => instituicao.superior === item.nome)
-        .map(instituicao => ({
-          id: instituicao.id,
-          nome: instituicao.nome,
-          sigla: instituicao.sigla,
-          cnpj: instituicao.cnpj,
-        }))
+    const subs = instituicoes.filter(instituicao => instituicao.superior === item.nome);
+    setDraftFiliais(
+      subs
+        .filter(s => !!s.cnpj)
+        .map(s => ({ id: s.id, modo: 'EXISTENTE' as ModoSubestrutura, vinculadaId: s.id, nome: s.nome, sigla: s.sigla, cnpj: s.cnpj }))
+    );
+    setDraftUnidades(
+      subs
+        .filter(s => !s.cnpj)
+        .map(s => ({ id: s.id, modo: 'EXISTENTE' as ModoSubestrutura, vinculadaId: s.id, nome: s.nome, sigla: s.sigla, cnpj: s.cnpj }))
     );
     setSelected(item);
     setShowForm(false);
