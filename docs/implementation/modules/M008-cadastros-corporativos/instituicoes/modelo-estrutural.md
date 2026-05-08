@@ -88,8 +88,8 @@ classDiagram
 | | sigla | Sigla comum da instituicao | Nao | String | Ex: UFES | 20 | |
 | | cnpj | CNPJ proprio da instituicao (somente digitos) | Sim | String | Ex: 12345678000199 | 14 | Sim |
 | | razaoSocial | Razao social da instituicao | Sim | String | | 300 | |
-| | email | Email institucional ou de contato | Sim | String | | 200 | |
-| | telefone | Telefone institucional ou de contato | Nao | String | | 20 | |
+| | email | Email institucional da entidade juridica (nao confundir com email do Responsavel) | Sim | String | | 200 | |
+| | telefone | Telefone institucional da entidade juridica (nao confundir com telefone do Responsavel) | Nao | String | | 20 | |
 | | endereco | Endereco completo | Sim | String | | 500 | |
 | | ativa | Indica se a instituicao esta ativa | Sim | Boolean | true/false | | |
 | | isExterna | Indica se a instituicao e externa a agencia de fomento | Sim | Boolean | true/false | | |
