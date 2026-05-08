@@ -14,7 +14,9 @@ interface InstituicaoItem {
   razaoSocial: string;
   email: string;
   telefone: string;
+  cep: string;
   endereco: string;
+  bairro: string;
   natureza: NaturezaJuridica;
   municipio: string;
   uf: string;
@@ -23,6 +25,35 @@ interface InstituicaoItem {
   dataFimMandato: string;
   superior?: string;
   situacao: SituacaoInstituicao;
+}
+
+interface ViaCepResponse {
+  cep?: string;
+  logradouro?: string;
+  bairro?: string;
+  localidade?: string;
+  uf?: string;
+  erro?: boolean;
+}
+
+const onlyDigits = (s: string) => (s || '').replace(/\D/g, '');
+const maskCep = (s: string) => {
+  const d = onlyDigits(s).slice(0, 8);
+  return d.length > 5 ? `${d.slice(0, 5)}-${d.slice(5)}` : d;
+};
+
+async function fetchViaCep(cep: string): Promise<ViaCepResponse | null> {
+  const d = onlyDigits(cep);
+  if (d.length !== 8) return null;
+  try {
+    const res = await fetch(`https://viacep.com.br/ws/${d}/json/`);
+    if (!res.ok) return null;
+    const data: ViaCepResponse = await res.json();
+    if (data.erro) return null;
+    return data;
+  } catch {
+    return null;
+  }
 }
 
 interface SubestruturaDraft {
@@ -92,7 +123,9 @@ const emptyInstituicao: InstituicaoItem = {
   razaoSocial: '',
   email: '',
   telefone: '',
+  cep: '',
   endereco: '',
+  bairro: '',
   natureza: 'Publica',
   municipio: '',
   uf: 'ES',
@@ -229,7 +262,12 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   if (showForm || selected) {
     const isSetorSemCnpj = !draft.cnpj;
-    const superiorOptions = ['', ...instituicoes.filter(item => item.id !== draft.id).map(item => item.nome)];
+    const superiorOptions = [
+      '',
+      ...instituicoes
+        .filter(item => item.id !== draft.id)
+        .map(item => (item.cnpj ? `${item.nome} — CNPJ ${item.cnpj}` : `${item.nome} — sem CNPJ`)),
+    ];
 
     return (
       <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
@@ -277,14 +315,34 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <Field label="Email institucional" value={draft.email} onChange={value => updateDraft('email', value)} placeholder="email@instituicao.br" />
               <Field label="Telefone" value={draft.telefone} onChange={value => updateDraft('telefone', value)} placeholder="(00) 0000-0000" />
             </div>
-            <Field label="Endereço" value={draft.endereco} onChange={value => updateDraft('endereco', value)} placeholder="Endereço completo da entidade jurídica" />
-          </FormSection>
-
-          <FormSection number="2" title="Estrutura Organizacional" subtitle="Vínculo hierárquico e localização. Instituição sem CNPJ deve possuir superior.">
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 0.3fr', gap: '16px', marginBottom: '20px' }}>
-              <Select label="Instituição superior" value={draft.superior || ''} onChange={value => updateDraft('superior', value)} options={superiorOptions} />
+            <div style={{ display: 'grid', gridTemplateColumns: '0.6fr 1.6fr 1fr', gap: '16px', marginBottom: '16px' }}>
+              <Field
+                label="CEP"
+                value={draft.cep}
+                onChange={value => updateDraft('cep', maskCep(value))}
+                onBlur={async () => {
+                  const data = await fetchViaCep(draft.cep);
+                  if (data) {
+                    if (data.logradouro) updateDraft('endereco', data.logradouro);
+                    if (data.bairro) updateDraft('bairro', data.bairro);
+                    if (data.localidade) updateDraft('municipio', data.localidade);
+                    if (data.uf) updateDraft('uf', data.uf);
+                  }
+                }}
+                placeholder="00000-000"
+              />
+              <Field label="Endereço" value={draft.endereco} onChange={value => updateDraft('endereco', value)} placeholder="Logradouro" />
+              <Field label="Bairro" value={draft.bairro} onChange={value => updateDraft('bairro', value)} placeholder="Bairro" />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 0.3fr', gap: '16px' }}>
               <Field label="Município" value={draft.municipio} onChange={value => updateDraft('municipio', value)} placeholder="Município" />
               <Field label="UF" value={draft.uf} onChange={value => updateDraft('uf', value.toUpperCase().slice(0, 2))} placeholder="UF" />
+            </div>
+          </FormSection>
+
+          <FormSection number="2" title="Estrutura Organizacional" subtitle="Vínculo hierárquico. Instituição sem CNPJ deve possuir superior.">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '20px' }}>
+              <Select label="Instituição superior" value={draft.superior || ''} onChange={value => updateDraft('superior', value)} options={superiorOptions} />
             </div>
 
             <div style={{ borderTop: `1px solid ${T.borderSubtle}`, paddingTop: '18px' }}>
@@ -486,13 +544,13 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   );
 };
 
-const Field: React.FC<{ label: string; value: string; onChange: (value: string) => void; placeholder?: string; disabled?: boolean }> = ({ label, value, onChange, placeholder, disabled }) => {
+const Field: React.FC<{ label: string; value: string; onChange: (value: string) => void; onBlur?: () => void; placeholder?: string; disabled?: boolean }> = ({ label, value, onChange, onBlur, placeholder, disabled }) => {
   const { T } = useThemeTokens();
   const S = buildStyles(T);
   return (
     <div>
       <label style={S.label}>{label}</label>
-      <input type="text" value={disabled ? '' : value} placeholder={placeholder} disabled={disabled} onChange={event => onChange(event.target.value)} style={{ ...S.input, opacity: disabled ? 0.55 : 1 }} />
+      <input type="text" value={disabled ? '' : value} placeholder={placeholder} disabled={disabled} onChange={event => onChange(event.target.value)} onBlur={onBlur} style={{ ...S.input, opacity: disabled ? 0.55 : 1 }} />
     </div>
   );
 };
