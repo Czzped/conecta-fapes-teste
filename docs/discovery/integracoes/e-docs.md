@@ -86,17 +86,34 @@ sequenceDiagram
 - Recusa de qualquer signatario invalida a coleta — fluxo retorna ao estado anterior e exige nova rodada.
 - Reativacao de documento ja assinado nao e permitida; aditivo/correcao gera novo documento + novo protocolo.
 
-## Guideline oficial PRODEST
+## Documentacao oficial (V2 — atualizada)
 
-Fonte: [`prodest/e-docs-documentacao` — API/Guideline.md](https://github.com/prodest/e-docs-documentacao/blob/master/API/Guideline.md). Documentacao detalhada em arquivos por dominio: `Documentos.md`, `Encaminhamentos.md`, `Processos.md`, `Consultas.md`, `SolicitarAcesso.md`.
+Fonte canonica: [`docs.e-docs.es.gov.br/api`](https://docs.e-docs.es.gov.br/api/). **Use exclusivamente a V2** para novas implementacoes — V1 esta descontinuada. Documentacao publica organizada em paginas por dominio:
+
+| Pagina | Dominio coberto |
+|--------|------------------|
+| [Solicitacao de Acesso](https://docs.e-docs.es.gov.br/api/SolicitarAcesso) | Procedimento para registrar a aplicacao Conecta junto ao PRODEST |
+| [Autenticacao](https://docs.e-docs.es.gov.br/api/Autenticacao) | OAuth 2.0 via Acesso Cidadao, scopes, fluxos |
+| [Documentos](https://docs.e-docs.es.gov.br/api/Documentos) | Upload, fase de assinatura, captura, validacao |
+| [Captura](https://docs.e-docs.es.gov.br/api/Captura) | Fluxo final de registro institucional |
+| [Restricao de Acesso](https://docs.e-docs.es.gov.br/api/RestricaoAcesso) | Niveis: Publico, Organizacional, Sigiloso, Classificado |
+| [Encaminhamentos](https://docs.e-docs.es.gov.br/api/Encaminhamentos) | Roteamento entre setores/agentes |
+| [Processos](https://docs.e-docs.es.gov.br/api/Processos) | Autuacao, despacho, avocamento, entranhamento |
+| [Classificacao Documental](https://docs.e-docs.es.gov.br/api/ClassificacaoDocumental) | Tabela TTDD + retencao |
+| [Agente](https://docs.e-docs.es.gov.br/api/Agente) | Quem assina/encaminha (servidor, cidadao, papel) |
+| [Consultas](https://docs.e-docs.es.gov.br/api/Consultas) | Endpoints auxiliares |
+| [Documento Digitalizado Original](https://docs.e-docs.es.gov.br/api/DocumentoDigitalizadoOriginal) | Tratamento de digitalizacao com valor legal |
+| [Migracao V1 → V2](https://docs.e-docs.es.gov.br/api/MigracaoV1V2) | Guia para quem ja usava V1 |
 
 ### Ambientes
 
-| Ambiente | Web | API |
-|----------|-----|-----|
-| Treinamento (homologacao) | `treinamento.e-docs.es.gov.br` | `api.treinamento.e-docs.es.gov.br` |
-| Producao | `e-docs.es.gov.br` | `api.e-docs.es.gov.br` |
-| Swagger publico | — | `api.e-docs.es.gov.br/swagger/index.html?urls.primaryName=V2.0` |
+| Ambiente | Web | API base |
+|----------|-----|-----------|
+| Treinamento (homologacao) | `https://treinamento.e-docs.es.gov.br` | `https://api.treinamento.e-docs.es.gov.br` |
+| Producao | `https://e-docs.es.gov.br` | `https://api.e-docs.es.gov.br` |
+| Swagger publico V2 | — | `https://api.e-docs.es.gov.br/swagger/index.html?urls.primaryName=V2.0` |
+
+> Toda nova rota usa prefixo `/v2/...`. Modelo assincrono: enderecos de mutacao retornam `idEvento` com HTTP `202 Accepted`; cliente faz polling em `GET /v2/eventos/{idEvento}`.
 
 ### Sistemas integrados
 
@@ -106,83 +123,208 @@ E-Docs depende de:
 
 ### Pre-requisitos
 
-> **Solicitar acesso** para a aplicacao Conecta antes de qualquer integracao. Procedimento descrito em `SolicitarAcesso.md` do PRODEST.
+> **Solicitar acesso** para a aplicacao Conecta antes de qualquer integracao. Procedimento em [SolicitarAcesso](https://docs.e-docs.es.gov.br/api/SolicitarAcesso).
 
 Cadastrar dois Apps no Acesso Cidadao:
 
 | App | Fluxo OAuth | Quando usar |
 |-----|-------------|-------------|
-| App **Hybrid** | Authorization Code + Hybrid | Autenticar usuario final (servidor FAPES, pesquisador) que executara operacoes no E-Docs (assinar, capturar, encaminhar) |
-| App **ClientCredentials** | Client Credentials | Servidor↔servidor — Conecta backend consultar Organograma, etc. Adicionar scope `api-organograma` se for consumir Organograma |
+| App **Hybrid / Authorization Code** | Hybrid | Operacoes que exigem autoria (capturar, assinar, encaminhar, atos processuais) — token carrega identidade do usuario |
+| App **Client Credentials** | Client Credentials | Automacoes e consultas sem contexto de usuario — leitura de dados publicos e metadados, consultas ao Organograma |
+
+### Endpoints OAuth (Acesso Cidadao)
+
+| Operacao | URL |
+|----------|-----|
+| Authorize | `https://acessocidadao.es.gov.br/is/connect/authorize` |
+| Token | `https://acessocidadao.es.gov.br/is/connect/token` |
+
+Token enviado em header `Authorization: Bearer {token}` (RFC 6750). Resposta inclui `access_token`, `expires_in`, `token_type=Bearer`, `scope`. Refresh via `refresh_token` (Hybrid) ou nova requisicao (Client Credentials). Reutilizar token ate expiracao.
+
+### Scopes V2
+
+| Scope | Uso |
+|-------|-----|
+| `api-sigades-consultar` | Leituras (`GET /v2/agente/...`, `GET /v2/eventos/{id}`) |
+| `api-sigades-documento` | Upload, fase de assinatura, captura |
+| `api-sigades-encaminhamento` | Criar, responder, reencaminhar, complementar |
+| `api-sigades-processo` | Autuar, despachar, avocar, entranhar |
+| `api-organograma` | Consultas diretas ao Organograma |
 
 ### Acoes principais por dominio
 
-#### Documentos (`Documentos.md`)
+#### Documentos + Captura
 
-Scopes OAuth: `api-sigades-documento` (assinar/capturar) + `api-sigades-consultar` (consultar).
+Scopes: `api-sigades-documento` + `api-sigades-consultar`.
 
-Fluxo de captura/registro em **5 etapas**:
+**Tipos de assinatura (Lei 14.063/20):**
+1. **Eletronica (avancada)** — assinada dentro do E-Docs.
+2. **Digital qualificada (ICP-Brasil)** — aplicada ao arquivo antes do upload.
+3. **Sem assinatura** — captura direta (copia, digitalizado).
 
-| Etapa | Operacao |
-|-------|----------|
-| 1 | Bearer Token via Acesso Cidadao com scope adequado |
-| 2 | `POST` "Gerar URL para upload" passando `tamanho do arquivo`. Retorna URL + JSON com parametros de upload |
-| 3 | `POST` direto na URL retornada (cloud storage) com parametros + arquivo PDF. Esperado HTTP `204` |
-| 4 | Registrar documento via endpoint apropriado (varia por tipo — ver tabela abaixo) |
-| 5 | Consultar fila de captura: documento e enfileirado como evento; consulta retorna `id` do documento capturado |
+**Restricoes de arquivo:**
+- Formato: **PDF apenas** (audio/video so via interface web).
+- Tamanho maximo: **250 MB**.
+- URL de upload temporaria expira em segundos; arquivo nao registrado e descartado automaticamente.
 
-**Endpoints de registro por tipo de documento** (Lei 14.063/20):
+**Fluxo em 5 etapas (assincrono):**
 
-| Tipo | Modelo de assinatura | Padrao de endpoint |
-|------|----------------------|---------------------|
-| Nato-digital + multiplas assinaturas E-Docs | Fase de assinatura multi-signatario | `capturar_nato_digital_auto_assinado_{servidor\|cidadao}` |
-| Nato-digital + assinatura unica do capturador | Auto-assinado pelo capturador | `fase_assinatura_enviar_{servidor\|cidadao}` |
-| Nato-digital ICP-Brasil (assinado externamente) | Direto | `capturar_nato_digital_icp_brasil_{servidor\|cidadao}` |
-| Copia digital | Direto | `capturar_nato_digital_copia_{servidor\|cidadao}` |
-| Digitalizado (escaneado) | Direto | `capturar_digitalizado_{servidor\|cidadao}` |
+```
+1. Bearer token (Acesso Cidadao, scope api-sigades-documento)
+   ↓
+2a. GET /v2/documentos/upload-arquivo/gerar-url-upload/{tamanhoArquivo}
+   → resposta inclui { url, body{...}, idArquivo }
+2b. POST multipart/form-data na url devolvida com todos campos de body + arquivo binario em "file"
+   → 204 No Content
+   ↓
+3. Registrar documento (cenario depende do tipo de assinatura):
+   A) Nato-digital, varios assinantes E-Docs:
+      POST /v2/documentos/capturar/nato-digital/auto-assinado/{servidor|cidadao}
+      → entra em fase de assinatura; ultima manifestacao dispara captura
+   B) Nato-digital, so capturador assina:
+      POST /v2/documentos/fase-assinatura/enviar/{servidor|cidadao}
+      → E-Docs adiciona capturador como assinante e captura
+   C) Demais (ICP-Brasil, copia, digitalizado):
+      POST /v2/documentos/capturar/nato-digital/{icp-brasil|copia}/{servidor|cidadao}
+      ou POST /v2/documentos/capturar/digitalizado/{servidor|cidadao}
+   → resposta 202 Accepted com { idEvento, capturado, idCapturaEvento }
+   ↓
+4. Polling: GET /v2/eventos/{idEvento}
+   → quando status=Executado, payload inclui idDocumento
+   ↓
+5. Documento disponivel para encaminhamento, processo, consulta, download
+```
 
-**Restricoes:**
-- Formato: **somente PDF com texto pesquisavel**.
-- URL de upload **expira em segundos** — POST do arquivo deve ser imediato.
-- Assinatura aceita: **eletronica simples** (E-Docs), **digital ICP-Brasil**, ou **sem assinatura** (cópia/digitalizado).
+**Exemplo — capturar com so capturador assinante (servidor):**
 
-**Outras operacoes:** capturar, assinar (acao isolada), validar arquivo previamente capturado, pesquisar.
+```json
+POST /v2/documentos/fase-assinatura/enviar/servidor
+Authorization: Bearer {token}
+Content-Type: application/json
 
-#### Encaminhamentos (`Encaminhamentos.md`)
+{
+  "idArquivo": "8f9a1b2c-3d4e-5f6a-7b8c-9d0e1f2a3b4c",
+  "idPapel": "11111111-2222-3333-4444-555555555555",
+  "idClasseDocumental": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+  "resumo": "Memorando de solicitacao",
+  "valorLegal": "Original",
+  "natureza": "NatoDigital",
+  "genero": "Textual",
+  "restricaoAcesso": { "transparenciaAtiva": true }
+}
+```
+
+Resposta `202 Accepted`:
+```json
+{ "idEvento": "f1e2d3c4-...", "capturado": true, "idCapturaEvento": "c1d2e3..." }
+```
+
+**Exemplo — multiplos assinantes (Termo de Cooperacao):**
+
+```json
+POST /v2/documentos/capturar/nato-digital/auto-assinado/servidor
+{
+  "idArquivo": "...",
+  "idPapel": "...",
+  "idClasseDocumental": "...",
+  "resumo": "Termo de Cooperacao",
+  "valorLegal": "Original",
+  "natureza": "NatoDigital",
+  "assinantes": [
+    { "tipo": "Servidor", "idPapel": "..." },
+    { "tipo": "Servidor", "idPapel": "..." }
+  ],
+  "restricaoAcesso": { "transparenciaAtiva": false }
+}
+```
+
+Cada assinante manifesta-se via endpoint dedicado de assinatura. Ultima manifestacao dispara captura automaticamente.
+
+**Categorizacao de documento:**
+- `natureza`: `NatoDigital` ou `Digitalizado`
+- `valorLegal`: `Original`, `CopiaAutenticadaAdministrativamente`, `CopiaSimples`
+- `genero`: `Textual` (PDF) — audio/video so via web
+
+**Operacoes pos-captura:**
+- `PodeUsar` — verifica permissao do agente
+- `ValidarAssinaturaDigital` — valida parametros da assinatura
+
+#### Encaminhamentos
 
 Scopes: `api-sigades-encaminhamento` + `api-sigades-consultar`.
 
-Cinco operacoes:
+**Endpoints V2:**
 
-| Acao | Quando usar |
-|------|-------------|
-| Adicionar (Novo) | Encaminhamento original sem vinculo anterior |
-| Reencaminhar | Repassar encaminhamento ja recebido |
-| Responder | Responder ao remetente original |
-| Complementar | Adicionar informacoes a encaminhamento ainda nao respondido |
-| Pesquisar | Consultar status do evento enfileirado |
+| Acao | Endpoint |
+|------|----------|
+| Novo | `POST /v2/encaminhamento/novo` |
+| Reencaminhar | `POST /v2/encaminhamento/reencaminhar` |
+| Responder | `POST /v2/encaminhamento/responder` |
+| Complementar | `POST /v2/encaminhamento/complementar` |
+| Consultar | `GET /v2/encaminhamento?...` (filtros por destino, remetente, status, periodo) |
 
-Cada acao retorna **identificador do evento enfileirado**. Documentos so podem ser anexados ao encaminhamento apos passarem pelo fluxo de captura.
+**Exemplo — novo encaminhamento:**
 
-#### Processos (`Processos.md`)
+```json
+POST /v2/encaminhamento/novo
+{
+  "assunto": "Solicitacao de analise de processo",
+  "idsDestinos": ["<uuid>"],
+  "mensagem": "...",
+  "idResponsavel": "<uuid-do-papel-remetente>",
+  "idsDocumentos": ["<uuid-doc-capturado>"],
+  "enviarEmailNotificacoes": true,
+  "restricaoAcesso": { "transparenciaAtiva": true, "idsFundamentosLegais": [], "classificacaoInformacao": null }
+}
+```
 
-Operacoes: autuar, despachar, avocar, entranhar/desentranhar documentos e encaminhamentos, editar, encerrar, reabrir, pesquisar.
+Resposta 202: `{ "idEvento": "..." }`. Polling em `GET /v2/eventos/{idEvento}` ate retornar `idEncaminhamento`.
 
-#### Consultas (`Consultas.md`)
+**Identidade do remetente (`idResponsavel`):** cidadao = identificacao pessoal; servidor = papel/lotacao.
 
-Endpoints auxiliares para preenchimento de cadastros: patriarcas, orgaos, planos de classificacao, fundamentacoes legais, informacoes do usuario logado, agentes.
+**Pre-requisitos:**
+- Documentos anexados precisam estar **previamente capturados** (passar pelo fluxo de Captura).
+- Documentos com fase de assinatura precisam estar **totalmente assinados** antes de serem encaminhados.
 
-### Padrao de eventos enfileirados
+#### Processos
 
-Toda operacao de mutacao (capturar, assinar, encaminhar, autuar) **retorna `eventoId`** apos colocar o trabalho na fila. Conecta deve fazer **polling** consultando o evento ate ele concluir e devolver o id do documento/encaminhamento/processo gerado. Nao ha confirmacao sincrona.
+Scope: `api-sigades-processo` + `api-sigades-consultar`. Operacoes: autuar, despachar, avocar, entranhar/desentranhar documentos e encaminhamentos, editar, encerrar, reabrir, pesquisar. Mesmo modelo `idEvento` + polling.
 
-## Pendencias de discovery (atualizadas)
+#### Consultas
 
-1. **Webhooks de notificacao**: Guideline nao menciona webhook — polling via consulta de evento parece ser o unico mecanismo. Confirmar com PRODEST se webhook existe ou se Conecta deve fazer reconciliacao via polling sempre.
-2. **Fluxo Hybrid no Conecta**: aplicacao backoffice pode usar Hybrid em nome do usuario? Ou exige redirect explicito do navegador?
-3. **Limite de tamanho do PDF** — Guideline nao especifica.
-4. **Recusa de signatario** — formato de evento + payload retornado.
-5. **Lei 14.063/20**: para Termos de Compromisso (M009) e Outorga (M022), qual nivel de assinatura juridicamente exigido (eletronica simples vs ICP-Brasil)?
-6. **Cadastro previo do signatario externo no Acesso Cidadao**: pesquisador sem conta Acesso Cidadao consegue assinar?
-7. **PDF/A** obrigatorio ou PDF padrao serve?
-8. **Quotas/rate limit** no ambiente de Treinamento.
+Endpoints auxiliares (scope `api-sigades-consultar`): patriarcas, orgaos, planos de classificacao, fundamentacoes legais, informacoes do usuario logado, agentes.
+
+### Padrao assincrono — modelo de eventos
+
+Toda mutacao retorna **`idEvento`** com HTTP `202 Accepted`. Cliente consulta `GET /v2/eventos/{idEvento}` ate `status=Executado`. Resposta enriquece com identificador do recurso criado (`idDocumento`, `idEncaminhamento`, `idProcesso`).
+
+```json
+GET /v2/eventos/{idEvento}
+→ {
+  "idEvento": "f1e2d3c4-...",
+  "tipo": "CapturaDocumento",
+  "status": "Executado",
+  "idDocumento": "9b8a7c6d-..."
+}
+```
+
+Conecta deve implementar polling com backoff e idempotencia por `idEvento`.
+
+## Pendencias de discovery (atualizadas com docs V2)
+
+Itens **resolvidos** pela documentacao V2:
+- ✅ **Webhook**: nao existe; modelo e polling de eventos (`GET /v2/eventos/{idEvento}`).
+- ✅ **Tamanho do PDF**: 250 MB.
+- ✅ **Formato**: PDF apenas (audio/video so via web).
+- ✅ **Tipos de assinatura**: 3 niveis (eletronica E-Docs, digital ICP-Brasil, sem assinatura) conforme Lei 14.063/20.
+- ✅ **Endpoints**: paths `/v2/documentos/*`, `/v2/encaminhamento/*`, `/v2/eventos/{id}` confirmados.
+
+Itens ainda **pendentes**:
+1. **Fluxo Hybrid no Conecta backoffice**: como conectar o redirect do Acesso Cidadao com sessao do Conecta? Precisa explorar pagina [Autenticacao](https://docs.e-docs.es.gov.br/api/Autenticacao) com mais cuidado.
+2. **Recusa de signatario** — formato exato do evento e como Conecta detecta.
+3. **Lei 14.063/20 nivel exigido**: para Termos de Compromisso (M009), Outorga (M022) e Aceite (M003), confirmar com Diretoria Juridica FAPES qual nivel (eletronica avancada basta ou exige ICP-Brasil).
+4. **Signatario cidadao sem conta Acesso Cidadao**: existe enrollment automatico ou exige cadastro previo manual?
+5. **PDF/A obrigatorio** ou PDF padrao serve para captura.
+6. **Rate limit + SLA** no ambiente de Treinamento e Producao.
+7. **`idClasseDocumental`**: como Conecta descobre/escolhe a classe documental adequada para cada tipo (Termo, Plano, Aceite)? Endpoint de Classificacao Documental retorna catalogo.
+8. **`idPapel`**: papel do servidor capturador — vem do Acesso Cidadao ou do Organograma? Confirmar mapeamento com pagina [Agente](https://docs.e-docs.es.gov.br/api/Agente).
