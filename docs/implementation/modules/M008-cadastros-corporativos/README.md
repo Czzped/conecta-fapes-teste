@@ -70,6 +70,7 @@ Cada contexto e dono do seu `README.md`, `modelo-estrutural.md`, `backlog.md` e 
 | RN12 | Toda organizacao, campus ou filial com CNPJ proprio deve ser cadastrada como Instituicao. | Must |
 | RN13 | Setor interno e cadastrado como UnidadeOrganizacional vinculada a uma Instituicao ou a outra UnidadeOrganizacional. | Must |
 | RN14 | Toda Instituicao deve possuir CNPJ proprio (raiz ou filial). | Must |
+| RN19 | Pessoa fisica com idade inferior a 18 anos completos na data de cadastro deve informar `responsavelLegal` apontando para outra `PessoaFisica` ja cadastrada e maior de idade. Cadastro de menor sem responsavel legal informado e rejeitado. | Must |
 | RN16 | Toda Rubrica deve possuir codigo canonico unico, nome, descricao, natureza da despesa e indicador booleano `ativa`. | Must |
 | RN17 | Subrubricas sao representadas por relacao opcional com `rubricaPai`; nao ha campo adicional para classificar a hierarquia. | Must |
 | RN18 | Rubrica inativa nao deve ser ofertada em novas configuracoes de edital/projeto, mas deve permanecer consultavel para historico. | Must |
@@ -84,3 +85,4 @@ Cada contexto e dono do seu `README.md`, `modelo-estrutural.md`, `backlog.md` e 
 | RI3 | Uma UnidadeOrganizacional so pode ter um responsavel ativo ao mesmo tempo. | Must |
 | RI4 | Em UnidadeOrganizacional, exatamente um entre `instituicaoPai` e `unidadeSuperior` deve estar preenchido. | Must |
 | RI5 | Em Responsavel, exatamente um entre `instituicao` e `unidade` deve estar preenchido. | Must |
+| RI7 | `responsavelLegal` de uma PessoaFisica deve apontar para outra PessoaFisica cadastrada, ativa e maior de idade. Auto-referencia (pessoa apontando para si mesma) e rejeitada. | Must |

@@ -189,6 +189,7 @@ classDiagram
     PessoaFisica "1" --> "0..*" Responsavel : assume
     PessoaFisica "1" --> "*" HistoricoPessoa : historico
     PessoaFisica "0..1" --> "1" NivelAcademico : nivel academico
+    PessoaFisica "0..*" --> "0..1" PessoaFisica : responsavelLegal
     AreaConhecimento "0..1" --> "*" AreaConhecimento : subareas
     Rubrica "0..1" --> "*" Rubrica : subrubricas
     Rubrica "*" --> "0..1" NaturezaDespesa : natureza
@@ -210,6 +211,8 @@ classDiagram
 | | lattes | URL do curriculo Lattes | Nao | String | | 500 | |
 | | estado | Estado atual da pessoa | Gerado | EstadoPessoa | Ativa, Suspensa | | |
 | | nivelAcademico (relacao) | Maior nivel academico informado para a pessoa | Nao | FK -> NivelAcademico | Ex: Graduacao, Especializacao, Mestrado, Doutorado, Pos-Doutorado | | |
+| | responsavelLegal (relacao) | Outra `PessoaFisica` que responde legalmente quando esta for menor de idade | Cond. | FK -> PessoaFisica | Obrigatorio quando idade < 18 anos completos na data de cadastro (RN19, RI7) | | |
+| | dependentes (relacao) | Pessoas para as quais esta atua como `responsavelLegal` | Nao | Lista FK -> PessoaFisica | Via `responsavelLegal` | | |
 | **NivelAcademico** | nome | Nome do nivel academico | Sim | String | Ex: Doutorado | 100 | Sim |
 | | descricao | Descricao do nivel academico | Nao | String | | 300 | |
 | **Instituicao** | nome | Nome comum de exibicao da instituicao | Sim | String | Ex: UFES, IFES Campus Serra | 300 | |

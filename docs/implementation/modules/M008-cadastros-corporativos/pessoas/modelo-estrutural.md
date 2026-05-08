@@ -58,6 +58,7 @@ classDiagram
 
     PessoaFisica "1" --> "*" HistoricoPessoa : historico
     PessoaFisica "0..1" --> "1" NivelAcademico : nivel academico
+    PessoaFisica "0..*" --> "0..1" PessoaFisica : responsavelLegal
 ```
 
 ### Dicionario de Dados
@@ -72,6 +73,8 @@ classDiagram
 | | lattes | URL do curriculo Lattes | Nao | String | | 500 | |
 | | estado | Estado atual da pessoa | Gerado | EstadoPessoa | Ativa, Suspensa | | |
 | | nivelAcademico (relacao) | Maior nivel academico informado para a pessoa | Nao | FK → NivelAcademico | Ex: Graduacao, Especializacao, Mestrado, Doutorado, Pos-Doutorado | | |
+| | responsavelLegal (relacao) | Outra `PessoaFisica` que responde legalmente quando esta for menor de idade | Cond. | FK → PessoaFisica | Obrigatorio quando idade < 18 anos completos na data de cadastro (RN19); referencia outra pessoa cadastrada, ativa e maior de idade (RI7) | | |
+| | dependentes (relacao) | Pessoas para as quais esta atua como `responsavelLegal` | Nao | Lista FK → PessoaFisica | Via `responsavelLegal` | | |
 | **NivelAcademico** | nome | Nome do nivel academico | Sim | String | Ex: Doutorado | 100 | Sim |
 | | descricao | Descricao do nivel academico | Nao | String | | 300 | |
 | **HistoricoPessoa** | data | Data do evento | Gerado | Date | | | |
@@ -85,4 +88,6 @@ classDiagram
 - RN05: Suspensao bloqueia todas as operacoes vinculadas
 - RN10: Cadastro automatico via Acesso Cidadao vincula pelo CPF
 - RN11: NivelAcademico e uma tabela de referencia usada para requisitos de elegibilidade em captacoes e outras operacoes.
+- RN19: Pessoa menor de idade exige `responsavelLegal` apontando para outra PessoaFisica cadastrada e maior de idade
 - RI2: Reativacao requer justificativa
+- RI7: `responsavelLegal` aponta para outra PessoaFisica cadastrada, ativa e maior de idade; auto-referencia rejeitada

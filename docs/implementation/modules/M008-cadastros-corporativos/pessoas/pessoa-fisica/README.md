@@ -25,6 +25,8 @@
 | nivelAcademico | 0..1 | Maior nivel academico informado, via [NivelAcademico](../nivel-academico/README.md) |
 | historico | 1..* | Eventos de cadastro, atualizacao, suspensao e reativacao, via [HistoricoPessoa](../historico-pessoa/README.md) |
 | responsavel | 0..* | Mandatos em Instituicoes ou UnidadeOrganizacional, via [Responsavel](../../instituicoes/README.md#responsavel) |
+| responsavelLegal | 0..1 | Outra `PessoaFisica` que responde legalmente pela pessoa quando esta for menor de idade. Obrigatorio quando `dataNascimento` indicar idade < 18 anos completos (RN19). |
+| dependentes | 0..* | Pessoas para as quais esta pessoa atua como `responsavelLegal`. |
 
 ## Enumeracoes
 
@@ -37,4 +39,6 @@
 - RN01: uma pessoa fisica e identificada unicamente pelo CPF.
 - RN05: pessoa suspensa bloqueia operacoes vinculadas, como submissao, bolsa e pagamento.
 - RN10: cadastro automatico via Acesso Cidadao cria ou vincula a pessoa pelo CPF.
+- RN19: pessoa fisica com idade < 18 anos completos na data de cadastro deve informar `responsavelLegal` apontando para outra `PessoaFisica` cadastrada e maior de idade. Cadastro de menor sem responsavel legal e rejeitado.
 - RI2: reativacao de pessoa suspensa exige justificativa registrada.
+- RI7: `responsavelLegal` deve apontar para outra `PessoaFisica` cadastrada, ativa e maior de idade. Auto-referencia rejeitada.
