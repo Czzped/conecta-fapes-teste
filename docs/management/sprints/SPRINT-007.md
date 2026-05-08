@@ -339,6 +339,124 @@
 
 ---
 
+## Snapshot do Sprint Board (Sprint 32) — atualizado em 2026-05-08
+
+> Fonte: [GitHub Project #43 — Conecta Fapes](https://github.com/orgs/leds-conectafapes/projects/43/views/3). Sprint 32 e a iteracao corrente do board e cobre o periodo desta sprint interna SPRINT-007. Esta secao reflete o estado atual de 57 itens tracked no projeto.
+
+### Resumo por Status
+
+| Status | Quantidade |
+|--------|-----------|
+| Done | 9 |
+| Homologation | 27 |
+| Homologation In Progress | 1 |
+| In Validation | 4 |
+| In Progress | 8 |
+| Paused | 5 |
+| To Do | 2 |
+| Backlog | 1 |
+| **Total** | **57** |
+
+### Done (9)
+
+| # | Repo | Titulo | Squad | Assignees |
+|---|------|--------|-------|-----------|
+| [#167](https://github.com/leds-conectafapes/leds-conectafapes-frontoffice-frontend/issues/167) | frontoffice-frontend | [Front] Enviar termino da bolsa no ultimo dia do ultimo mes | Pink | OficialMark |
+| [#1653](https://github.com/leds-conectafapes/conectafapes-project/issues/1653) | conectafapes-project | [DevOps] Workflow de autoupdate para PRs | Blue | ManoelRL |
+| [#1684](https://github.com/leds-conectafapes/conectafapes-project/issues/1684) | conectafapes-project | [DevOps] Padronizar protecao de branches main/develop | Blue | ManoelRL |
+| [#1800](https://github.com/leds-conectafapes/conectafapes-project/issues/1800) | conectafapes-project | [Front-end] Adicionar Plano de atividades do bolsista | Pink | Vitorfdan |
+| [#1821](https://github.com/leds-conectafapes/conectafapes-project/issues/1821) | conectafapes-project | [DevOps] Workflow de autoupdate para PRs | Green | vinicius-je |
+| [#1822](https://github.com/leds-conectafapes/conectafapes-project/issues/1822) | conectafapes-project | [DevOps] Padronizar protecao de branches | Pink | marcelasfl |
+| [#1823](https://github.com/leds-conectafapes/conectafapes-project/issues/1823) | conectafapes-project | [DevOps] Padronizar protecao de branches | Green | vinicius-je |
+| [#1851](https://github.com/leds-conectafapes/conectafapes-project/issues/1851) | conectafapes-project | [FIX] Aviso de data final do projeto na Solicitacao de bolsa | Pink | marcelasfl |
+| [#1865](https://github.com/leds-conectafapes/conectafapes-project/issues/1865) | conectafapes-project | [BUG] Permitir pedido de bolsa ate o ultimo dia do projeto | Pink | marcelasfl, OficialMark |
+
+### Homologation (27)
+
+| # | Repo | Titulo | Squad | Assignees |
+|---|------|--------|-------|-----------|
+| [#153](https://github.com/leds-conectafapes/leds-conectafapes-frontend-backoffice/issues/153) | frontend-backoffice | [REFACTOR] Telas Pagamento NuxtUi | Green | — |
+| [#158](https://github.com/leds-conectafapes/leds-conectafapes-frontend-backoffice/issues/158) | frontend-backoffice | [REFACTOR] Visualizar Liberacao para nuxt.ui | Green | — |
+| [#162](https://github.com/leds-conectafapes/leds-conectafapes-frontoffice-frontend/issues/162) | frontoffice-frontend | [Front] Renomear Cadastrar Bolsista para Solicitar Bolsa | Pink | Vitorfdan |
+| [#172](https://github.com/leds-conectafapes/leds-conectafapes-frontoffice-frontend/issues/172) | frontoffice-frontend | [Front] Modal de confirmacao antes da mensagem de sucesso | Pink | rafableao |
+| [#1720](https://github.com/leds-conectafapes/conectafapes-project/issues/1720) | conectafapes-project | [Frontend] Filtros do Extrato do Projeto | Blue | joaopbarcellos |
+| [#1721](https://github.com/leds-conectafapes/conectafapes-project/issues/1721) | conectafapes-project | [Frontend] Listagem paginada do Extrato do Projeto | Blue | joaopbarcellos |
+| [#1738](https://github.com/leds-conectafapes/conectafapes-project/issues/1738) | conectafapes-project | [Backend] Listagem de parcerias | Green | vinicius-je, GustavoACaetano |
+| [#1801](https://github.com/leds-conectafapes/conectafapes-project/issues/1801) | conectafapes-project | [Backend] Resumo financeiro do projeto por ContaContabil | Blue | ManoelRL |
+| [#1802](https://github.com/leds-conectafapes/conectafapes-project/issues/1802) | conectafapes-project | [Backend] Filtros da listagem do extrato | Blue | ManoelRL |
+| [#1803](https://github.com/leds-conectafapes/conectafapes-project/issues/1803) | conectafapes-project | [Backend] Listagem paginada do extrato | Blue | ManoelRL |
+| [#1804](https://github.com/leds-conectafapes/conectafapes-project/issues/1804) | conectafapes-project | [Backend] Detalhes do extrato conforme status | Blue | ManoelRL |
+| [#1805](https://github.com/leds-conectafapes/conectafapes-project/issues/1805) | conectafapes-project | [Backend] Criacao de parceria | Green | vinicius-je |
+| [#1806](https://github.com/leds-conectafapes/conectafapes-project/issues/1806) | conectafapes-project | [Backend] Anexo de documentos na parceria | Green | vinicius-je |
+| [#1807](https://github.com/leds-conectafapes/conectafapes-project/issues/1807) | conectafapes-project | [Backend] Download de documentos da parceria | Green | vinicius-je |
+| [#1809](https://github.com/leds-conectafapes/conectafapes-project/issues/1809) | conectafapes-project | [Backend] Importar Orcamento e ContaContabil do Sigfapes | Blue | guihocosta |
+| [#1812](https://github.com/leds-conectafapes/conectafapes-project/issues/1812) | conectafapes-project | [Backend] Cadastro de Orcamento com ContaContabil | Blue | guihocosta |
+| [#1826](https://github.com/leds-conectafapes/conectafapes-project/issues/1826) | conectafapes-project | [Backend] Criacao de instituicao | Green | GustavoACaetano |
+| [#1828](https://github.com/leds-conectafapes/conectafapes-project/issues/1828) | conectafapes-project | [Front-end] Adequar Visualizar Liberacao para nuxt.ui | Green | harianadm |
+| [#1829](https://github.com/leds-conectafapes/conectafapes-project/issues/1829) | conectafapes-project | [Front-end] Adequar Gerenciar Bonus de Pagamento | Green | harianadm |
+| [#1830](https://github.com/leds-conectafapes/conectafapes-project/issues/1830) | conectafapes-project | [Front-end] Adequar Processar Remessa de Cadastro | Green | harianadm, RafaBMartins |
+| [#1831](https://github.com/leds-conectafapes/conectafapes-project/issues/1831) | conectafapes-project | [Front-end] Adequar Gerenciar Cotas Pagamento | Green | RafaBMartins |
+| [#1832](https://github.com/leds-conectafapes/conectafapes-project/issues/1832) | conectafapes-project | [Front-end] Adequar Editar dados de Pessoa | Green | RafaBMartins |
+| [#1843](https://github.com/leds-conectafapes/conectafapes-project/issues/1843) | conectafapes-project | [Front-end] Adequar tela de calendario | Green | RafaBMartins |
+| [#1846](https://github.com/leds-conectafapes/conectafapes-project/issues/1846) | conectafapes-project | [Front-end] Adicionar nome da mae em Meus dados | Pink | rafableao |
+| [#1870](https://github.com/leds-conectafapes/conectafapes-project/issues/1870) | conectafapes-project | [Front-end] adicionar loading nos botoes | Pink | Vitorfdan |
+| [#1879](https://github.com/leds-conectafapes/conectafapes-project/issues/1879) | conectafapes-project | [Backend] Filtros da listagem de prestacoes | Blue | ManoelRL |
+| [#1881](https://github.com/leds-conectafapes/conectafapes-project/issues/1881) | conectafapes-project | [Backend] Contestacao + endpoints de revisao/rejeicao | Blue | ManoelRL |
+
+### In Progress (8) + Homologation In Progress (1)
+
+| # | Repo | Titulo | Squad | Assignees | Status |
+|---|------|--------|-------|-----------|--------|
+| [#1357](https://github.com/leds-conectafapes/conectafapes-project/issues/1357) | conectafapes-project | [Back-end] Estender bolsa - pagamento avancado | Pink | Victor-Marins-Dev | In Progress |
+| [#1458](https://github.com/leds-conectafapes/conectafapes-project/issues/1458) | conectafapes-project | [Front-end] Excluir solicitacao de bolsa | Pink | Vitorfdan | In Progress |
+| [#1722](https://github.com/leds-conectafapes/conectafapes-project/issues/1722) | conectafapes-project | [Back-end] Auth para servicos no novo modelo | Pink | OficialMark | In Progress |
+| [#1723](https://github.com/leds-conectafapes/conectafapes-project/issues/1723) | conectafapes-project | [Frontend] Detalhes do extrato conforme status | Blue | joaopbarcellos | In Progress |
+| [#1818](https://github.com/leds-conectafapes/conectafapes-project/issues/1818) | conectafapes-project | [FRONTEND] Tela de submissao de projeto | Green | vinicius-je, HeloisaBorchardt | In Progress |
+| [#1820](https://github.com/leds-conectafapes/conectafapes-project/issues/1820) | conectafapes-project | [DevOps] Workflow de autoupdate (Pink) | Pink | marcelasfl | In Progress |
+| [#1825](https://github.com/leds-conectafapes/conectafapes-project/issues/1825) | conectafapes-project | [Frontend] Criacao de parceria | Green | RafaBMartins | In Progress |
+| [#1836](https://github.com/leds-conectafapes/conectafapes-project/issues/1836) | conectafapes-project | [Back-end] Reformulacao do Pre-Cadastro | Pink | OficialMark | In Progress |
+| [#1839](https://github.com/leds-conectafapes/conectafapes-project/issues/1839) | conectafapes-project | [Front-end] Padronizacao de mensagens de erro | Pink | lukevds | Homologation In Progress |
+
+### In Validation (4)
+
+| # | Repo | Titulo | Squad | Assignees |
+|---|------|--------|-------|-----------|
+| [#1459](https://github.com/leds-conectafapes/conectafapes-project/issues/1459) | conectafapes-project | [Back-end] Excluir solicitacao de bolsa | Pink | Victor-Marins-Dev |
+| [#1714](https://github.com/leds-conectafapes/conectafapes-project/issues/1714) | conectafapes-project | [Front-end] Tela do mapa financeiro | Green | vinicius-je, harianadm |
+| [#1838](https://github.com/leds-conectafapes/conectafapes-project/issues/1838) | conectafapes-project | [Back-end] Cadastro completo em Meus dados | Pink | Victor-Marins-Dev |
+| [#1840](https://github.com/leds-conectafapes/conectafapes-project/issues/1840) | conectafapes-project | [Front-end] Documento pagamento Banestes | Pink | marcelasfl |
+
+### Paused (5)
+
+| # | Titulo | Squad | Assignees |
+|---|--------|-------|-----------|
+| [#1814](https://github.com/leds-conectafapes/conectafapes-project/issues/1814) | [BACKEND] Endpoint p/ associar formulario ao item externo | Green | RobsonGarcia, vinicius-je, JoaoRicardoCetto |
+| [#1815](https://github.com/leds-conectafapes/conectafapes-project/issues/1815) | [Front-end] Tela p/ associar Edital a formulario Dynamic Forms | Green | vinicius-je, HeloisaBorchardt |
+| [#1816](https://github.com/leds-conectafapes/conectafapes-project/issues/1816) | [BACKEND] GET template do Edital | Green | vinicius-je, JoaoRicardoCetto |
+| [#1817](https://github.com/leds-conectafapes/conectafapes-project/issues/1817) | [BACKEND] POST submissao de projeto | Green | vinicius-je, JoaoRicardoCetto |
+| [#1835](https://github.com/leds-conectafapes/conectafapes-project/issues/1835) | [BUG] Edicao de bolsa em rascunho cria nova alocacao | Pink | lukevds |
+
+### To Do (2) + Backlog (1)
+
+| # | Titulo | Squad | Status |
+|---|--------|-------|--------|
+| [#1719](https://github.com/leds-conectafapes/conectafapes-project/issues/1719) | [Frontend] Controle de Gastos do Projeto | Blue | To Do |
+| [#1882](https://github.com/leds-conectafapes/conectafapes-project/issues/1882) | [Backend] Pedido de revisao da prestacao com Contestacao | Blue | To Do |
+| [#1849](https://github.com/leds-conectafapes/conectafapes-project/issues/1849) | [Back-end] Coluna ProjetoVersaoModalidadeId nao deve ser usada | Pink | Backlog |
+
+### Distribuicao por Squad (Sprint 32)
+
+| Squad | Done | Em validacao/homologacao | Em desenvolvimento | Pausado | Pendente | Total |
+|-------|------|--------------------------|--------------------|---------|----------|-------|
+| Blue | 2 | 9 | 1 | 0 | 2 | 14 |
+| Green | 2 | 13 | 2 | 4 | 0 | 21 |
+| Pink | 5 | 8 | 5 | 1 | 1 | 20 |
+| **Total** | **9** | **30** | **8** | **5** | **3** | **55** + 2 sem squad |
+
+> Nota: o Sprint Board tem cobertura mais ampla que a tabela "Features Comprometidas" desta sprint doc. SPRINT-007 ainda foca em entregas backend de Vinicius (M008/M010). Sprint 32 do board agrega trabalho cross-squad: prestacao de contas (Blue), refatoracao backoffice nuxt.ui (Green), portal coordenador (Pink), DevOps. Ambos os escopos coexistem.
+
+---
+
 ## Review
 
 ### Entregue
