@@ -11,6 +11,7 @@
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclo de vida da `SolicitacaoAssinatura` e do `Signatario` |
+| [Modelo de Processo](modelo-processo.md) | Fluxo end-to-end com raias dos atores |
 
 ---
 
@@ -88,6 +89,45 @@ Padrao de comunicacao com E-Docs: **assincrono**. Toda mutacao retorna `idEvento
 
 ## Documentos relacionados
 
-- [Discovery — E-Docs](../../../discovery/integracoes/e-docs.md) — capacidades, fluxos, sequence diagrams, swagger
+### Discovery interno
+
+- [Discovery — E-Docs](../../../discovery/integracoes/e-docs.md) — capacidades, fluxos V2, sequence diagrams, scopes
 - [Discovery — Organograma](../../../discovery/integracoes/organograma.md) — papeis dos signatarios servidores
-- [Glossario](../../../discovery/glossario.md) — verbetes E-Docs, Assinatura Eletronica Qualificada, Signatario Externo, Acesso Cidadao
+- [Glossario](../../../discovery/glossario.md) — verbetes E-Docs, Assinatura Eletronica Qualificada, Protocolo E-Docs, Signatario Externo, Acesso Cidadao
+- [Personas](../../../discovery/personas.md) — Coordenador, Orientador, Bolsista, Outorgado, Diretor, Servidor
+
+### Documentacao oficial do provedor (E-Docs V2)
+
+- [Documentacao E-Docs API V2](https://docs.e-docs.es.gov.br/api/) — referencia canonica
+- [Solicitar Acesso](https://docs.e-docs.es.gov.br/api/SolicitarAcesso) — registrar aplicacao Conecta
+- [Autenticacao](https://docs.e-docs.es.gov.br/api/Autenticacao) — OAuth 2.0, Client Credentials, Hybrid, scopes
+- [Documentos](https://docs.e-docs.es.gov.br/api/Documentos) — upload, fase de assinatura, validacao
+- [Captura](https://docs.e-docs.es.gov.br/api/Captura) — registro institucional + endpoints por tipo
+- [Encaminhamentos](https://docs.e-docs.es.gov.br/api/Encaminhamentos) — roteamento entre setores/agentes
+- [Restricao de Acesso](https://docs.e-docs.es.gov.br/api/RestricaoAcesso) — niveis Publico/Organizacional/Sigiloso/Classificado
+- [Agente](https://docs.e-docs.es.gov.br/api/Agente) — quem assina/encaminha (servidor, cidadao, papel)
+- [Classificacao Documental](https://docs.e-docs.es.gov.br/api/ClassificacaoDocumental) — tabela TTDD + retencao
+- [Migracao V1 → V2](https://docs.e-docs.es.gov.br/api/MigracaoV1V2) — guia de migracao
+- [Swagger publico V2](https://api.e-docs.es.gov.br/swagger/index.html?urls.primaryName=V2.0) — OpenAPI
+
+### Sistemas integrados (referencias externas)
+
+- [Acesso Cidadao](https://acessocidadao.es.gov.br) — IdP do Estado ES
+- [API Acesso Cidadao](https://sistemas.es.gov.br/prodest/acessocidadao.webapi/swagger) — Swagger
+- [Organograma ES](https://api.organograma.es.gov.br) — orgaos/setores/servidores
+- Lei 14.063/20 — assinatura eletronica em atos administrativos do Estado
+
+### Modulos consumidores Conecta
+
+- [M005 — Autenticacao](../M005-autenticacao/README.md) — Acesso Cidadao como IdP comum
+- [M008 — Cadastros Corporativos](../M008-cadastros-corporativos/README.md) — `Documento`, `PessoaFisica`
+- [M009 — Gestao Bolsista](../M009-gestao-bolsista/README.md) — Termo de Compromisso de Bolsa
+- [M010 — Parcerias](../M010-planejamento-estrategia/parcerias/modelo-estrutural.md) — Termo de Cooperacao
+- [M020 — Comunicacao](../M020-comunicacao/README.md) — notificacoes a signatarios e alertas de expiracao
+- [M022 — Contratacao Outorga](../M022-contratacao-outorga/modelo-estrutural.md) — Termo de Outorga
+- [M003 — Iniciativas Captadas](../M003-gestao-iniciativas-captadas/README.md) — Termo de Aceite, Plano de Trabalho
+
+### Ambientes
+
+- Treinamento (homologacao): `https://api.treinamento.e-docs.es.gov.br`
+- Producao: `https://api.e-docs.es.gov.br`

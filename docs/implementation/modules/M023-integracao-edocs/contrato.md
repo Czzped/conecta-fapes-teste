@@ -178,3 +178,19 @@ Este contrato documenta a superficie publica do M023 — como modulos consumidor
 | Codigo | Mensagem |
 |--------|----------|
 | SOLICITACAO_TERMINAL | Solicitacao ja em estado terminal (ASSINADA/RECUSADA/ERRO); cancelamento rejeitado. |
+
+---
+
+## Referencias
+
+- **Discovery interno**:
+  - [integracoes/e-docs.md](../../../discovery/integracoes/e-docs.md) — passo a passo, sequence diagrams, scopes
+  - [integracoes/organograma.md](../../../discovery/integracoes/organograma.md) — papel servidor
+  - [glossario.md](../../../discovery/glossario.md)
+- **Documentacao oficial (V2)** — fonte dos contratos remotos consumidos pelo adapter:
+  - [Autenticacao](https://docs.e-docs.es.gov.br/api/Autenticacao) — `POST /is/connect/token`
+  - [Documentos](https://docs.e-docs.es.gov.br/api/Documentos) — upload + captura
+  - [Captura](https://docs.e-docs.es.gov.br/api/Captura) — endpoints por tipo
+- **Sistemas integrados**: [Acesso Cidadao](https://acessocidadao.es.gov.br), [Organograma](https://api.organograma.es.gov.br)
+- **Lei 14.063/20** — base juridica das assinaturas
+- **Modulos consumidores**: [M008](../M008-cadastros-corporativos/contrato.md), [M009](../M009-gestao-bolsista/contrato.md), [M020](../M020-comunicacao/README.md), [M022](../M022-contratacao-outorga/contrato.md), [M003](../M003-gestao-iniciativas-captadas/contrato.md), [M010](../M010-planejamento-estrategia/contrato.md)

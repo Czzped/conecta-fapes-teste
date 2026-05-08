@@ -241,3 +241,21 @@ Estes eventos sao **publicados no barramento interno** e disparam reacoes em mod
 - **Idempotencia**: cada evento publico e emitido **uma unica vez** por transicao real do estado. Polling repetido nao reemite. Garantia: M023 verifica `EventoAssinatura.processado` antes de emitir.
 - **Ordem de eventos**: para uma mesma solicitacao, garante-se que `DocumentoAssinadoParcialmente` aparece antes de `DocumentoAssinadoCompletamente`. `AssinaturaExpirando` pode aparecer multiplas vezes (job diario) ate ocorrer transicao para `ASSINADA` ou `ERRO`.
 - **Modulos consumidores devem ser idempotentes**: se receberem o mesmo evento duas vezes (ex: replay manual), nao devem reaplicar efeitos colaterais.
+
+---
+
+## Referencias
+
+- **Discovery interno**:
+  - [integracoes/e-docs.md](../../../discovery/integracoes/e-docs.md) — passo a passo + 2 sequence diagrams (fluxo completo + ciclo de polling)
+  - [glossario.md](../../../discovery/glossario.md) — definicoes de Assinatura Eletronica Qualificada, Protocolo, Signatario Externo
+- **Documentacao oficial (V2)**:
+  - [Documentos](https://docs.e-docs.es.gov.br/api/Documentos) — base dos estados `ENVIADA`, `AGUARDANDO_ASSINATURAS`
+  - [Captura](https://docs.e-docs.es.gov.br/api/Captura) — base do estado `ASSINADA` (captura final automatica apos ultima assinatura)
+  - Modelo assincrono via `idEvento` + `GET /v2/eventos/{idEvento}` — base dos eventos `CAPTURA_INICIAL`, `CAPTURA_FINAL`, `ERRO`
+- **Lei 14.063/20** — fundamenta validade juridica dos estados `ASSINADA` e impacto sobre `Documento` em M008
+- **Modulos consumidores reagentes**:
+  - [M009](../M009-gestao-bolsista/modelo-comportamental.md) — Bolsa transita para `TermoAssinado` apos `DocumentoAssinadoCompletamente`
+  - [M010](../M010-planejamento-estrategia/parcerias/modelo-comportamental.md) — Parceria transita para `Vigente` apos assinatura
+  - [M022](../M022-contratacao-outorga/modelo-estrutural.md) — Termo de Outorga formalizado
+  - [M003](../M003-gestao-iniciativas-captadas/README.md) — Aceite/Plano vigente

@@ -168,3 +168,17 @@ M023 modela o ciclo assumindo polling como padrao (compativel com E-Docs V2 que 
 
 **Armazenamento do PDF assinado:**
 M023 nao armazena o PDF; apos download via adapter, delega ao M008 via comando `ArquivarDocumentoAssinado(documentoId, pdfBytes, hash, protocoloProvedor)`. M008 atualiza `protocoloAssinatura`, `hashAssinatura`, `urlConteudoAssinado` na entidade Documento.
+
+---
+
+## Referencias
+
+- **Discovery interno**: [integracoes/e-docs.md](../../../discovery/integracoes/e-docs.md), [integracoes/organograma.md](../../../discovery/integracoes/organograma.md), [glossario.md](../../../discovery/glossario.md)
+- **Documentacao oficial (V2)**:
+  - [Documentos](https://docs.e-docs.es.gov.br/api/Documentos) — fluxo de upload + captura, base do mapeamento `idArquivoExterno` e `idEventoCapturaInicial`
+  - [Captura](https://docs.e-docs.es.gov.br/api/Captura) — endpoints por tipo de assinatura, base dos cenarios A/B/C de captura
+  - [Autenticacao](https://docs.e-docs.es.gov.br/api/Autenticacao) — scopes (`api-sigades-documento`, `api-sigades-consultar`) + OAuth Client Credentials
+  - [Agente](https://docs.e-docs.es.gov.br/api/Agente) — modelo do `idExterno` do `Signatario` (papel servidor, identificacao cidadao)
+- **Sistemas integrados**: [Acesso Cidadao](https://acessocidadao.es.gov.br), [Organograma ES](https://api.organograma.es.gov.br)
+- **Lei 14.063/20** — fundamenta os 3 niveis de assinatura tratados pelo provedor (eletronica avancada, ICP-Brasil, sem assinatura)
+- **Modulos consumidores**: [M008](../M008-cadastros-corporativos/modelo-estrutural.md) (`Documento`, `PessoaFisica`), [M009](../M009-gestao-bolsista/README.md), [M022](../M022-contratacao-outorga/modelo-estrutural.md), [M003](../M003-gestao-iniciativas-captadas/README.md), [M010](../M010-planejamento-estrategia/parcerias/modelo-estrutural.md)

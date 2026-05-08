@@ -249,3 +249,14 @@ Lista e filtra solicitacoes.
   ]
 }
 ```
+
+---
+
+## Referencias
+
+- **Contrato logico**: [contrato.md](contrato.md)
+- **Modelo de dominio**: [modelo-estrutural.md](modelo-estrutural.md)
+- **Discovery do provedor (E-Docs V2)**: [integracoes/e-docs.md](../../../discovery/integracoes/e-docs.md)
+- **Documentacao oficial V2**: [docs.e-docs.es.gov.br/api](https://docs.e-docs.es.gov.br/api/)
+- **Convencao de identificadores Conecta**: similar ao padrao usado em outros modulos (`PES-2026-001`, `INST-2026-010`)
+- **Autorizacao**: JWT do M005-Autenticacao (Acesso Cidadao SSO)
