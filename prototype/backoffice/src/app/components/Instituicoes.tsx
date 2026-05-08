@@ -165,7 +165,8 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [showForm, setShowForm] = useState(false);
   const [selected, setSelected] = useState<InstituicaoItem | null>(null);
   const [draft, setDraft] = useState<InstituicaoItem>(emptyInstituicao);
-  const [draftSubestruturas, setDraftSubestruturas] = useState<SubestruturaDraft[]>([]);
+  const [draftFiliais, setDraftFiliais] = useState<SubestruturaDraft[]>([]);
+  const [draftUnidades, setDraftUnidades] = useState<SubestruturaDraft[]>([]);
   const [instituicoes, setInstituicoes] = useState<InstituicaoItem[]>(initialInstituicoes);
 
   const filtered = instituicoes.filter(item => {
@@ -218,39 +219,35 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     setDraft(prev => ({ ...prev, [field]: value }));
   };
 
-  const addSubestrutura = () => {
-    setDraftSubestruturas(prev => [
+  const makeSetter = (setState: React.Dispatch<React.SetStateAction<SubestruturaDraft[]>>) => ({
+    add: () => setState(prev => [
       ...prev,
       { id: Date.now() + prev.length, modo: 'EXISTENTE', vinculadaId: null, nome: '', sigla: '', cnpj: '' },
-    ]);
-  };
+    ]),
+    update: (id: number, field: keyof SubestruturaDraft, value: string | number | null) =>
+      setState(prev => prev.map(item => item.id === id ? { ...item, [field]: value } : item)),
+    setModo: (id: number, modo: ModoSubestrutura) =>
+      setState(prev => prev.map(item => item.id === id ? { ...item, modo, vinculadaId: null, nome: '', sigla: '', cnpj: '' } : item)),
+    vincular: (id: number, instituicaoId: number) => {
+      const inst = instituicoes.find(i => i.id === instituicaoId);
+      if (!inst) return;
+      setState(prev => prev.map(item => item.id === id
+        ? { ...item, vinculadaId: instituicaoId, nome: inst.nome, sigla: inst.sigla, cnpj: inst.cnpj }
+        : item));
+    },
+    remove: (id: number) => setState(prev => prev.filter(item => item.id !== id)),
+  });
 
-  const updateSubestrutura = (id: number, field: keyof SubestruturaDraft, value: string | number | null) => {
-    setDraftSubestruturas(prev => prev.map(item => item.id === id ? { ...item, [field]: value } : item));
-  };
-
-  const setModoSubestrutura = (id: number, modo: ModoSubestrutura) => {
-    setDraftSubestruturas(prev => prev.map(item => item.id === id ? { ...item, modo, vinculadaId: null, nome: '', sigla: '', cnpj: '' } : item));
-  };
-
-  const vincularExistente = (id: number, instituicaoId: number) => {
-    const inst = instituicoes.find(i => i.id === instituicaoId);
-    if (!inst) return;
-    setDraftSubestruturas(prev => prev.map(item => item.id === id
-      ? { ...item, vinculadaId: instituicaoId, nome: inst.nome, sigla: inst.sigla, cnpj: inst.cnpj }
-      : item));
-  };
-
-  const removeSubestrutura = (id: number) => {
-    setDraftSubestruturas(prev => prev.filter(item => item.id !== id));
-  };
+  const filiaisOps = makeSetter(setDraftFiliais);
+  const unidadesOps = makeSetter(setDraftUnidades);
 
   const saveDraft = () => {
     const isSetorSemCnpj = !draft.cnpj;
     const saved = { ...draft, razaoSocial: isSetorSemCnpj ? '' : draft.razaoSocial };
     const previousParentName = selected?.nome || saved.nome;
+    const draftSubestruturas = [...draftFiliais, ...draftUnidades];
     const subestruturas: InstituicaoItem[] = draftSubestruturas
-      .filter(item => item.nome.trim())
+      .filter(item => item.modo === 'NOVA' && item.nome.trim())
       .map(item => ({
         ...emptyInstituicao,
         id: item.id,
@@ -288,6 +285,108 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         .filter(item => item.id !== draft.id)
         .map(item => (item.cnpj ? `${item.nome} — CNPJ ${item.cnpj}` : `${item.nome} — sem CNPJ`)),
     ];
+
+    const renderSubestruturaBlock = (cfg: {
+      T: ThemeTokens;
+      titulo: string;
+      subtitulo: string;
+      draftItens: SubestruturaDraft[];
+      ops: ReturnType<typeof makeSetter>;
+      opcoesExistentes: InstituicaoItem[];
+      labelExistente: string;
+      labelNova: { nome: string; sigla: string; cnpj: string };
+      cnpjObrigatorio: boolean;
+      vazio: string;
+    }) => (
+      <div style={{ borderTop: `1px solid ${cfg.T.borderSubtle}`, paddingTop: '18px', marginTop: '18px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '14px' }}>
+          <div>
+            <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: cfg.T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 4px' }}>{cfg.titulo}</h3>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: cfg.T.textMuted, margin: 0 }}>{cfg.subtitulo}</p>
+          </div>
+          <button
+            type="button"
+            onClick={cfg.ops.add}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: cfg.T.accentSoft, border: `1px solid ${cfg.T.accent}`, borderRadius: 'var(--radius)', padding: '8px 12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: cfg.T.accent, cursor: 'pointer', flexShrink: 0 }}
+          >
+            <Plus size={14} />
+            Adicionar
+          </button>
+        </div>
+        {cfg.draftItens.length === 0 ? (
+          <div style={{ border: `1px dashed ${cfg.T.borderDefault}`, borderRadius: '8px', padding: '16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: cfg.T.textMuted }}>
+            {cfg.vazio}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {cfg.draftItens.map(item => (
+              <div key={item.id} style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '14px', border: `1px solid ${cfg.T.borderSubtle}`, borderRadius: '8px', backgroundColor: cfg.T.bgSurfaceMuted }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                  <div style={{ display: 'flex', gap: '6px', padding: '3px', backgroundColor: cfg.T.bgPage, border: `1px solid ${cfg.T.borderSubtle}`, borderRadius: 'var(--radius)' }}>
+                    <button
+                      type="button"
+                      onClick={() => cfg.ops.setModo(item.id, 'EXISTENTE')}
+                      style={{ padding: '6px 12px', border: 'none', borderRadius: 'calc(var(--radius) - 2px)', backgroundColor: item.modo === 'EXISTENTE' ? cfg.T.accentSoft : 'transparent', color: item.modo === 'EXISTENTE' ? cfg.T.accent : cfg.T.textSecondary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)' as any, cursor: 'pointer' }}
+                    >
+                      Vincular existente
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => cfg.ops.setModo(item.id, 'NOVA')}
+                      style={{ padding: '6px 12px', border: 'none', borderRadius: 'calc(var(--radius) - 2px)', backgroundColor: item.modo === 'NOVA' ? cfg.T.accentSoft : 'transparent', color: item.modo === 'NOVA' ? cfg.T.accent : cfg.T.textSecondary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)' as any, cursor: 'pointer' }}
+                    >
+                      Cadastrar nova
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => cfg.ops.remove(item.id)}
+                    style={{ width: '34px', height: '34px', border: '1px solid rgba(239,68,68,0.35)', borderRadius: 'var(--radius)', backgroundColor: 'transparent', color: cfg.T.danger, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                    aria-label="Remover"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+                {item.modo === 'EXISTENTE' ? (
+                  <div>
+                    <label style={{ ...buildStyles(cfg.T).label, display: 'block' }}>{cfg.labelExistente}</label>
+                    <select
+                      value={item.vinculadaId ?? ''}
+                      onChange={e => {
+                        const id = parseInt(e.target.value, 10);
+                        if (Number.isFinite(id)) cfg.ops.vincular(item.id, id);
+                        else cfg.ops.update(item.id, 'vinculadaId', null);
+                      }}
+                      style={{ ...buildStyles(cfg.T).input }}
+                    >
+                      <option value="">Buscar...</option>
+                      {cfg.opcoesExistentes.map(opt => (
+                        <option key={opt.id} value={opt.id}>
+                          {opt.cnpj ? `${opt.nome} — CNPJ ${opt.cnpj}` : `${opt.nome} — sem CNPJ`}
+                        </option>
+                      ))}
+                    </select>
+                    {item.vinculadaId && (
+                      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: cfg.T.textMuted, margin: '6px 0 0' }}>
+                        Vinculada: {item.nome} {item.cnpj && `· CNPJ ${item.cnpj}`}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: cfg.labelNova.cnpj ? '1.2fr 0.5fr 0.7fr' : '1.5fr 0.5fr', gap: '12px' }}>
+                    <Field label={cfg.labelNova.nome} value={item.nome} onChange={value => cfg.ops.update(item.id, 'nome', value)} placeholder="Nome" />
+                    <Field label={cfg.labelNova.sigla} value={item.sigla} onChange={value => cfg.ops.update(item.id, 'sigla', value)} placeholder="Sigla" />
+                    {cfg.labelNova.cnpj && (
+                      <Field label={cfg.cnpjObrigatorio ? `${cfg.labelNova.cnpj} (obrigatorio)` : cfg.labelNova.cnpj} value={item.cnpj} onChange={value => cfg.ops.update(item.id, 'cnpj', maskCnpj(value))} placeholder={cfg.cnpjObrigatorio ? '00.000.000/0000-00' : 'Opcional'} />
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
 
     // Mock — em producao vira de GET /api/v1/m008/responsaveis?instituicaoId={id}&estado=encerrado
     const historicoDoSelecionado: { pessoa: string; papel: string; dataInicio: string; dataFim: string; motivo: string }[] = !showForm && selected
@@ -374,121 +473,31 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <Select label="Instituição superior" value={draft.superior || ''} onChange={value => updateDraft('superior', value)} options={superiorOptions} />
             </div>
 
-            <div style={{ borderTop: `1px solid ${T.borderSubtle}`, paddingTop: '18px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '14px' }}>
-                <div>
-                  <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 4px' }}>
-                    Subestruturas
-                  </h3>
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, margin: 0 }}>
-                    Cadastre unidades com CNPJ ou setores sem CNPJ vinculados a esta instituição.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={addSubestrutura}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: T.accentSoft, border: `1px solid ${T.accent}`, borderRadius: 'var(--radius)', padding: '8px 12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.accent, cursor: 'pointer', flexShrink: 0 }}
-                >
-                  <Plus size={14} />
-                  Adicionar
-                </button>
-              </div>
+            {renderSubestruturaBlock({
+              T,
+              titulo: 'Filiais',
+              subtitulo: 'Outras Instituições com CNPJ próprio vinculadas a esta como matriz (campus, filial, unidade jurídica).',
+              draftItens: draftFiliais,
+              ops: filiaisOps,
+              opcoesExistentes: instituicoes.filter(i => i.id !== draft.id && !!i.cnpj),
+              labelExistente: 'Selecione uma Instituição com CNPJ',
+              labelNova: { nome: 'Nome da filial', sigla: 'Sigla', cnpj: 'CNPJ' },
+              cnpjObrigatorio: true,
+              vazio: 'Nenhuma filial vinculada.',
+            })}
 
-              {draftSubestruturas.length === 0 ? (
-                <div style={{ border: `1px dashed ${T.borderDefault}`, borderRadius: '8px', padding: '16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textMuted }}>
-                  Nenhuma subestrutura cadastrada nesta instituição.
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {draftSubestruturas.map(item => {
-                    const opcoesExistentes = instituicoes.filter(i => i.id !== draft.id);
-                    return (
-                      <div key={item.id} style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '14px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                          <div style={{ display: 'flex', gap: '6px', padding: '3px', backgroundColor: T.bgPage, border: `1px solid ${T.borderSubtle}`, borderRadius: 'var(--radius)' }}>
-                            <button
-                              type="button"
-                              onClick={() => setModoSubestrutura(item.id, 'EXISTENTE')}
-                              style={{
-                                padding: '6px 12px',
-                                border: 'none',
-                                borderRadius: 'calc(var(--radius) - 2px)',
-                                backgroundColor: item.modo === 'EXISTENTE' ? T.accentSoft : 'transparent',
-                                color: item.modo === 'EXISTENTE' ? T.accent : T.textSecondary,
-                                fontFamily: 'var(--font-family)',
-                                fontSize: 'var(--text-xs)',
-                                fontWeight: 'var(--font-weight-medium)' as any,
-                                cursor: 'pointer',
-                              }}
-                            >
-                              Vincular existente
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setModoSubestrutura(item.id, 'NOVA')}
-                              style={{
-                                padding: '6px 12px',
-                                border: 'none',
-                                borderRadius: 'calc(var(--radius) - 2px)',
-                                backgroundColor: item.modo === 'NOVA' ? T.accentSoft : 'transparent',
-                                color: item.modo === 'NOVA' ? T.accent : T.textSecondary,
-                                fontFamily: 'var(--font-family)',
-                                fontSize: 'var(--text-xs)',
-                                fontWeight: 'var(--font-weight-medium)' as any,
-                                cursor: 'pointer',
-                              }}
-                            >
-                              Cadastrar nova
-                            </button>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => removeSubestrutura(item.id)}
-                            style={{ width: '34px', height: '34px', border: '1px solid rgba(239,68,68,0.35)', borderRadius: 'var(--radius)', backgroundColor: 'transparent', color: T.danger, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                            aria-label="Remover subestrutura"
-                          >
-                            <Trash2 size={15} />
-                          </button>
-                        </div>
-
-                        {item.modo === 'EXISTENTE' ? (
-                          <div>
-                            <label style={{ ...buildStyles(T).label, display: 'block' }}>Selecione uma instituição/unidade já cadastrada</label>
-                            <select
-                              value={item.vinculadaId ?? ''}
-                              onChange={e => {
-                                const id = parseInt(e.target.value, 10);
-                                if (Number.isFinite(id)) vincularExistente(item.id, id);
-                                else updateSubestrutura(item.id, 'vinculadaId', null);
-                              }}
-                              style={{ ...buildStyles(T).input }}
-                            >
-                              <option value="">Buscar...</option>
-                              {opcoesExistentes.map(opt => (
-                                <option key={opt.id} value={opt.id}>
-                                  {opt.cnpj ? `${opt.nome} — CNPJ ${opt.cnpj}` : `${opt.nome} — sem CNPJ`}
-                                </option>
-                              ))}
-                            </select>
-                            {item.vinculadaId && (
-                              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, margin: '6px 0 0' }}>
-                                Vinculada: {item.nome} {item.cnpj && `· CNPJ ${item.cnpj}`}
-                              </p>
-                            )}
-                          </div>
-                        ) : (
-                          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.5fr 0.7fr', gap: '12px' }}>
-                            <Field label="Nome" value={item.nome} onChange={value => updateSubestrutura(item.id, 'nome', value)} placeholder="Nome da unidade ou setor" />
-                            <Field label="Sigla" value={item.sigla} onChange={value => updateSubestrutura(item.id, 'sigla', value)} placeholder="Sigla" />
-                            <Field label="CNPJ" value={item.cnpj} onChange={value => updateSubestrutura(item.id, 'cnpj', maskCnpj(value))} placeholder="Opcional" />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+            {renderSubestruturaBlock({
+              T,
+              titulo: 'Unidades Organizacionais',
+              subtitulo: 'Subdivisões internas sem CNPJ próprio (centro, departamento, coordenação, laboratório, setor).',
+              draftItens: draftUnidades,
+              ops: unidadesOps,
+              opcoesExistentes: instituicoes.filter(i => i.id !== draft.id && !i.cnpj),
+              labelExistente: 'Selecione uma Unidade Organizacional sem CNPJ',
+              labelNova: { nome: 'Nome da unidade', sigla: 'Sigla', cnpj: '' },
+              cnpjObrigatorio: false,
+              vazio: 'Nenhuma unidade organizacional cadastrada.',
+            })}
           </FormSection>
 
           <FormSection number="3" title="Responsável" subtitle="Responsável é o vínculo temporal entre uma Pessoa Física já cadastrada e uma Instituição, com mandato definido (RN04/RN11).">
