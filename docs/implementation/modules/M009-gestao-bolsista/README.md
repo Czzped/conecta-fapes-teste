@@ -40,7 +40,7 @@ Uma bolsa implementada possui vigencia definida e pode ser renovada, suspensa ou
 
 | ID | Descricao | Prioridade |
 |----|-----------|------------|
-| RN01 | Uma bolsa de pesquisa so pode ser alocada dentro das cotas disponibilizadas pelo edital para o programa. | Must |
+| RN01 | Uma bolsa de pesquisa so pode ser alocada dentro das cotas disponibilizadas pelo edital para o programa **e** dentro do saldo monetario disponivel da rubrica de bolsas (M013). Aplica RN-SLD02 (bloqueio por `SALDO_INSUFICIENTE`). | Must |
 | RN02 | O Coordenador do Programa e responsavel pela indicacao do bolsista. | Must |
 | RN03 | O Orientador deve assinar o termo de aceite antes que o bolsista possa inserir documentos. | Must |
 | RN04 | A documentacao do bolsista deve ser avaliada pela Area Tecnica da agencia de fomento antes da geracao dos termos de compromisso. | Must |
@@ -50,7 +50,8 @@ Uma bolsa implementada possui vigencia definida e pode ser renovada, suspensa ou
 | RN08 | Uma bolsa implementada deve ter data de inicio e data de fim de vigencia definidas. | Must |
 | RN09 | A renovacao de bolsa exige nova avaliacao documental pela Area Tecnica. | Must |
 | RN10 | O encerramento de bolsa pode ocorrer por conclusao, desistencia, corte de recursos ou descumprimento de requisitos. | Must |
-| RN11 | Ao encerrar ou suspender uma bolsa, a cota correspondente deve ser liberada para reutilizacao. | Should |
+| RN11 | Ao encerrar ou suspender uma bolsa, a cota correspondente deve ser liberada para reutilizacao. Saldo monetario segue RN-SLD04 (mensalidades futuras nao pagas voltam de Alocado para Disponivel) e RN-SLD05 (mensalidades ja pagas estornadas voltam de Consumido para Disponivel). | Should |
+| RN14 | Saldo monetario da rubrica de bolsas e governado por [RN-SLD01..RN-SLD05](../../../discovery/regras-saldo-alocado-disponivel.md): `BolsaConcedida` → +Alocado; `MensalidadePaga` → −Alocado/+Consumido; `BolsaCancelada` antes de pagamento → −Alocado/+Disponivel; `MensalidadeEstornada` → −Consumido/+Disponivel. | Must |
 | RN12 | O sistema deve notificar o Coordenador quando uma bolsa nao for implementada. | Should |
 | RN13 | Uma bolsa suspensa pode ser reativada mediante nova avaliacao. | Should |
 | RI1 | Um bolsista nao pode receber mais de uma bolsa do mesmo tipo simultaneamente, salvo modalidades acumulativas definidas em M001. | Must |

@@ -80,11 +80,11 @@ A consulta de vigencia e aditivos preserva a data de aprovacao original, a data 
 | RN28 | O M003 deve consumir do M008 a abrangencia, o tipo de diaria vigente e os parametros de calculo vinculados antes de permitir o calculo de novas solicitacoes. | Must |
 | RN28-A | Duvida para PO: definir se viagem nacional/internacional com trecho interno de apoio ate aeroporto/rodoviaria deve gerar uma unica diaria pela maior abrangencia ou diarias separadas por trecho, considerando impacto no valor consumido da rubrica. | Open |
 | RN28-B | Enquanto a duvida RN28-A nao for decidida, o sistema deve registrar o roteiro da viagem e manter a memoria de calculo preparada para auditar os trechos e a abrangencia aplicada. | Must |
-| RN29 | A solicitacao de diaria nao depende de permissao ou aprovacao manual da FAPES; a criacao deve ser bloqueada quando nao houver rubrica de Diarias e Passagens ou saldo suficiente. | Must |
-| RN30 | Quando a solicitacao de diaria for criada com saldo suficiente, o M003 deve gerar debito/comprometimento na rubrica de Diarias e Passagens pelo valor total calculado. | Must |
+| RN29 | A solicitacao de diaria nao depende de permissao ou aprovacao manual da FAPES; a criacao deve ser bloqueada quando nao houver rubrica de Diarias e Passagens ou saldo suficiente. Aplica RN-SLD02 (bloqueio por `SALDO_INSUFICIENTE`). | Must |
+| RN30 | Quando a solicitacao de diaria for criada com saldo suficiente, o M003 deve gerar debito/comprometimento na rubrica de Diarias e Passagens pelo valor total calculado. Equivale a +Alocado em RN-SLD01. | Must |
 | RN31 | O debito gerado pelo comprometimento da diaria deve ser rastreavel ate a `SolicitacaoDiaria` e compor a execucao consolidada da iniciativa. | Must |
 | RN32 | O coordenador pode remover uma solicitacao de diaria `ALOCADA` ou `APROVADA` com justificativa somente antes da data/hora de partida. | Must |
-| RN33 | A remocao ou regularizacao de diaria nao utilizada deve gerar credito de reversao na rubrica de Diarias e Passagens, rastreavel ate a `SolicitacaoDiaria`, quando houver comprometimento anterior. | Must |
+| RN33 | A remocao ou regularizacao de diaria nao utilizada deve gerar credito de reversao na rubrica de Diarias e Passagens, rastreavel ate a `SolicitacaoDiaria`, quando houver comprometimento anterior. Aplica RN-SLD04 (cancelamento libera Alocado para Disponivel) ou RN-SLD05 (estorno apos pagamento). | Must |
 | RN34 | Toda iniciativa deve preservar data de aprovacao original, data inicial, data final original, data final vigente e orcamento original para consulta historica. | Must |
 | RN35 | A data final vigente deve ser igual a data final original quando nao houver aditivo de tempo aprovado. | Must |
 | RN36 | Quando houver aditivo de tempo aprovado, a data final vigente deve refletir a ultima data final aprovada. | Must |
@@ -93,4 +93,4 @@ A consulta de vigencia e aditivos preserva a data de aprovacao original, a data 
 | RN39 | O bloco **Vigencia e aditivos** em **Meu Projeto** deve possuir abas **Resumo** e **Dados dos aditivos**. | Must |
 | RN40 | A aba **Dados dos aditivos** deve exibir data de aprovacao original, orcamento original e lista de aditivos vinculados ao projeto, quando existirem. | Must |
 | RN41 | Quando nao houver aditivos, a aba **Dados dos aditivos** deve exibir estado vazio objetivo. | Must |
-| RN42 | A visao orcamentaria por rubrica em **Meu Projeto** deve ser exibida somente para coordenador da iniciativa, contendo total, consumido, alocado quando aplicavel, disponivel e percentuais por rubrica. | Must |
+| RN42 | A visao orcamentaria por rubrica em **Meu Projeto** deve ser exibida somente para coordenador da iniciativa, contendo total, consumido, alocado quando aplicavel, disponivel e percentuais por rubrica. Saldos seguem definicao canonica de [RN-SLD01](../../../discovery/regras-saldo-alocado-disponivel.md). | Must |
