@@ -68,7 +68,7 @@ Cada contexto e dono do seu `README.md`, `modelo-estrutural.md`, `backlog.md` e 
 | RN10 | O cadastro automatico via Acesso Cidadao deve criar a pessoa caso nao exista, ou vincular a existente pelo CPF. | Should |
 | RN11 | Instituicao deve possuir exatamente um responsavel ativo. | Must |
 | RN12 | Toda organizacao, campus ou filial com CNPJ proprio deve ser cadastrada como Instituicao. | Must |
-| RN13 | Setor interno e cadastrado como UnidadeOrganizacional vinculada a uma Instituicao ou a outra UnidadeOrganizacional. | Must |
+| RN13 | Setor interno e cadastrado como UnidadeOrganizacional vinculada a uma ou mais Instituicoes e/ou Unidades Organizacionais (relacao N:N). | Must |
 | RN14 | Toda Instituicao deve possuir CNPJ proprio (raiz ou filial). | Must |
 | RN19 | Pessoa fisica com idade inferior a 18 anos completos na data de cadastro deve informar `responsavelLegal` apontando para outra `PessoaFisica` ja cadastrada e maior de idade. Cadastro de menor sem responsavel legal informado e rejeitado. | Must |
 | RN20 | `Responsavel.dataFimMandato` e obrigatorio apenas quando o Responsavel estiver inativo (mandato encerrado). Mandato em curso (Responsavel ativo) pode ter dataFimMandato vazia. | Must |
@@ -79,11 +79,12 @@ Cada contexto e dono do seu `README.md`, `modelo-estrutural.md`, `backlog.md` e 
 | RN22 | Abrangencia da diaria e classe corporativa com codigo canonico unico, nome, descricao e situacao ativa/inativa. | Must |
 | RN23 | TipoDiaria deve possuir abrangencia, valor unitario, vigencia e situacao ativa/inativa, sem vigencias sobrepostas para a mesma abrangencia. | Must |
 | RN24 | ParametroCalculoDiaria deve estar vinculado a um TipoDiaria e possuir norma de referencia, percentuais, limites, bloqueios, vigencia e situacao ativa/inativa, sem vigencias sobrepostas para o mesmo TipoDiaria. | Must |
-| RN25 | Toda UnidadeOrganizacional deve ser rastreavel transitivamente a uma Instituicao raiz (via instituicaoPai direto ou cadeia de unidadeSuperior). | Must |
+| RN25 | Toda UnidadeOrganizacional deve ser rastreavel transitivamente a pelo menos uma Instituicao raiz. Pode ter multiplos pais (Instituicoes ou outras Unidades). | Must |
 | RN26 | UnidadeOrganizacional deve possuir exatamente um responsavel ativo. | Must |
 | RI1 | Uma Instituicao so pode ter um responsavel ativo ao mesmo tempo. | Must |
 | RI2 | Uma pessoa suspensa nao pode ser reativada sem justificativa registrada. | Must |
 | RI3 | Uma UnidadeOrganizacional so pode ter um responsavel ativo ao mesmo tempo. | Must |
-| RI4 | Em UnidadeOrganizacional, exatamente um entre `instituicaoPai` e `unidadeSuperior` deve estar preenchido. | Must |
+| RI4 | UnidadeOrganizacional deve ter pelo menos um pai (Instituicao OU outra UnidadeOrganizacional). Pode ter multiplos pais (mistos). | Must |
+| RI8 | Instituicao tem no maximo um pai (`instituicaoSuperior`). Nao e permitido vincular uma mesma Instituicao a duas matrizes diferentes. | Must |
 | RI5 | Em Responsavel, exatamente um entre `instituicao` e `unidade` deve estar preenchido. | Must |
 | RI7 | `responsavelLegal` de uma PessoaFisica deve apontar para outra PessoaFisica cadastrada, ativa e maior de idade. Auto-referencia (pessoa apontando para si mesma) e rejeitada. | Must |

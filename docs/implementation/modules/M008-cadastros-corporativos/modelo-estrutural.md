@@ -181,8 +181,8 @@ classDiagram
     }
 
     Instituicao "0..1" *-- "0..*" Instituicao : matriz/subInstituicoes
-    Instituicao "1" *-- "0..*" UnidadeOrganizacional : unidades
-    UnidadeOrganizacional "0..1" *-- "0..*" UnidadeOrganizacional : subUnidades
+    Instituicao "0..*" o-- "0..*" UnidadeOrganizacional : unidades
+    UnidadeOrganizacional "0..*" o-- "0..*" UnidadeOrganizacional : subUnidades
     Instituicao "0..1" --> "0..*" Responsavel : responsaveis
     UnidadeOrganizacional "0..1" --> "0..*" Responsavel : responsaveis
     Instituicao "0..*" --> "0..1" TipoInstituicao : classificadaComo
@@ -236,8 +236,8 @@ classDiagram
 | | email | Email de contato da unidade | Nao | String | | 200 | |
 | | telefone | Telefone de contato da unidade | Nao | String | | 20 | |
 | | ativa | Indica se a unidade esta ativa | Sim | Boolean | true/false | | |
-| | instituicaoPai (relacao) | Instituicao a qual a unidade esta diretamente vinculada | Cond. | FK → Instituicao | Via `unidades`. Obrigatorio quando `unidadeSuperior` nao informada | | |
-| | unidadeSuperior (relacao) | Unidade superior na hierarquia interna | Cond. | FK → UnidadeOrganizacional | Via `subUnidades`. Obrigatorio quando `instituicaoPai` nao informada | | |
+| | instituicoesPai (relacao) | Instituicoes as quais a unidade esta diretamente vinculada (N:N) | Cond. | Lista FK → Instituicao | Via `unidades`. Pelo menos um pai entre `instituicoesPai` e `unidadesSuperiores` (RI4) | | |
+| | unidadesSuperiores (relacao) | Outras Unidades Organizacionais pais (N:N) | Cond. | Lista FK → UnidadeOrganizacional | Via `subUnidades`. Pelo menos um pai entre `instituicoesPai` e `unidadesSuperiores` (RI4) | | |
 | | subUnidades (relacao) | Unidades filhas vinculadas a esta unidade | Nao | Lista FK → UnidadeOrganizacional | Via `subUnidades` | | |
 | | responsaveis (relacao) | Vinculos de responsavel associados a esta unidade | Nao | Lista FK → Responsavel | Via `responsaveis` | | |
 | **TipoInstituicao** | nome | Nome do tipo de instituicao | Sim | String | Ex: Ensino, Empresa, Agencia de Fomento | 200 | Sim |
@@ -299,7 +299,7 @@ classDiagram
 - `Instituicao` representa entidade juridicamente identificavel (matriz, filial ou campus com CNPJ proprio). CNPJ e obrigatorio.
 - `UnidadeOrganizacional` representa subdivisao interna sem CNPJ (centro, departamento, coordenacao, laboratorio, setor).
 - Composicao: `Instituicao` pode ser composta por outras `Instituicao` (filiais juridicamente identificaveis) e/ou por `UnidadeOrganizacional`. `UnidadeOrganizacional` pode ser composta por outras `UnidadeOrganizacional`.
-- Toda `UnidadeOrganizacional` deve ser rastreavel transitivamente a uma `Instituicao` raiz, atraves de `instituicaoPai` direto ou via cadeia de `unidadeSuperior`.
+- Toda `UnidadeOrganizacional` deve ser rastreavel transitivamente a pelo menos uma `Instituicao` raiz. Pode ter multiplos pais simultaneamente (relacao N:N entre UO e Instituicao/UO).
 - `Responsavel` e o vinculo temporal entre `PessoaFisica` e uma entidade organizacional (`Instituicao` OU `UnidadeOrganizacional`). Cada `Responsavel` aponta exatamente para uma das duas entidades (xor).
 
 **Entidades externas:**

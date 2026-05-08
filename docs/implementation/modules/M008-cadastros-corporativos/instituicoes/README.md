@@ -59,12 +59,12 @@ Agrupa os cadastros corporativos de organizacoes (Instituicao, UnidadeOrganizaci
 
 | Relacao | Cardinalidade | Descricao |
 |---------|----------------|-----------|
-| instituicaoPai | 0..1 | Instituicao a qual a unidade esta diretamente vinculada (quando o pai for Instituicao) |
-| unidadeSuperior | 0..1 | Unidade superior na hierarquia interna (quando o pai for outra unidade) |
+| instituicoesPai | 0..* | Instituicoes as quais a unidade esta diretamente vinculada (uma UO pode pertencer a varias Instituicoes simultaneamente) |
+| unidadesSuperiores | 0..* | Outras Unidades Organizacionais as quais esta unidade esta vinculada |
 | subUnidades | 0..* | Unidades filhas vinculadas a esta unidade |
 | responsaveis | 0..* | Mandatos de responsavel vinculados a pessoa fisica |
 
-> Invariante: exatamente um entre `instituicaoPai` e `unidadeSuperior` deve estar preenchido.
+> Invariante: a UnidadeOrganizacional deve ter pelo menos um pai entre `instituicoesPai` e `unidadesSuperiores` (uniao nao vazia). Pode ter multiplos pais misturando os dois tipos.
 
 ## TipoInstituicao
 
@@ -112,13 +112,14 @@ Agrupa os cadastros corporativos de organizacoes (Instituicao, UnidadeOrganizaci
 - RN04: responsavel e o vinculo temporal entre uma pessoa fisica e uma entidade organizacional (Instituicao OU UnidadeOrganizacional).
 - RN11: instituicao deve possuir exatamente um responsavel ativo.
 - RN12: organizacao, campus ou filial com CNPJ proprio deve ser cadastrada como Instituicao.
-- RN13: setor interno e cadastrado como UnidadeOrganizacional vinculada a uma Instituicao ou a outra UnidadeOrganizacional.
+- RN13: setor interno e cadastrado como UnidadeOrganizacional vinculada a uma ou mais Instituicoes e/ou outras UnidadeOrganizacional (relacao N:N — pode pertencer a multiplos pais simultaneamente).
 - RN14: toda Instituicao deve possuir CNPJ proprio.
-- RN25: toda UnidadeOrganizacional deve ser rastreavel transitivamente a uma Instituicao raiz.
+- RN25: toda UnidadeOrganizacional deve ser rastreavel transitivamente a pelo menos uma Instituicao raiz (pode ter multiplos pais).
 - RN26: UnidadeOrganizacional deve possuir exatamente um responsavel ativo.
 - RI1: uma Instituicao so pode ter um responsavel ativo ao mesmo tempo.
 - RI3: uma UnidadeOrganizacional so pode ter um responsavel ativo ao mesmo tempo.
-- RI4: em UnidadeOrganizacional, exatamente um entre `instituicaoPai` e `unidadeSuperior` deve estar preenchido.
+- RI4: UnidadeOrganizacional deve ter pelo menos um pai (Instituicao OU outra UnidadeOrganizacional). Pode ter multiplos pais simultaneamente, misturando os dois tipos.
+- RI8: Instituicao tem no maximo um `instituicaoSuperior`; nao e permitido vincular a duas matrizes diferentes.
 - RI5: em Responsavel, exatamente um entre `instituicao` e `unidade` deve estar preenchido.
 - O nome do tipo de instituicao deve ser unico.
 - A classificacao por tipo aplica-se apenas a Instituicao.
