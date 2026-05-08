@@ -56,8 +56,12 @@ async function fetchViaCep(cep: string): Promise<ViaCepResponse | null> {
   }
 }
 
+type ModoSubestrutura = 'EXISTENTE' | 'NOVA';
+
 interface SubestruturaDraft {
   id: number;
+  modo: ModoSubestrutura;
+  vinculadaId: number | null;
   nome: string;
   sigla: string;
   cnpj: string;
@@ -215,11 +219,26 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   };
 
   const addSubestrutura = () => {
-    setDraftSubestruturas(prev => [...prev, { id: Date.now() + prev.length, nome: '', sigla: '', cnpj: '' }]);
+    setDraftSubestruturas(prev => [
+      ...prev,
+      { id: Date.now() + prev.length, modo: 'EXISTENTE', vinculadaId: null, nome: '', sigla: '', cnpj: '' },
+    ]);
   };
 
-  const updateSubestrutura = (id: number, field: keyof SubestruturaDraft, value: string) => {
+  const updateSubestrutura = (id: number, field: keyof SubestruturaDraft, value: string | number | null) => {
     setDraftSubestruturas(prev => prev.map(item => item.id === id ? { ...item, [field]: value } : item));
+  };
+
+  const setModoSubestrutura = (id: number, modo: ModoSubestrutura) => {
+    setDraftSubestruturas(prev => prev.map(item => item.id === id ? { ...item, modo, vinculadaId: null, nome: '', sigla: '', cnpj: '' } : item));
+  };
+
+  const vincularExistente = (id: number, instituicaoId: number) => {
+    const inst = instituicoes.find(i => i.id === instituicaoId);
+    if (!inst) return;
+    setDraftSubestruturas(prev => prev.map(item => item.id === id
+      ? { ...item, vinculadaId: instituicaoId, nome: inst.nome, sigla: inst.sigla, cnpj: inst.cnpj }
+      : item));
   };
 
   const removeSubestrutura = (id: number) => {
@@ -381,21 +400,92 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {draftSubestruturas.map(item => (
-                    <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.5fr 0.7fr auto', gap: '12px', alignItems: 'end', padding: '14px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
-                      <Field label="Nome" value={item.nome} onChange={value => updateSubestrutura(item.id, 'nome', value)} placeholder="Nome da unidade ou setor" />
-                      <Field label="Sigla" value={item.sigla} onChange={value => updateSubestrutura(item.id, 'sigla', value)} placeholder="Sigla" />
-                      <Field label="CNPJ" value={item.cnpj} onChange={value => updateSubestrutura(item.id, 'cnpj', maskCnpj(value))} placeholder="Opcional" />
-                      <button
-                        type="button"
-                        onClick={() => removeSubestrutura(item.id)}
-                        style={{ width: '38px', height: '38px', border: '1px solid rgba(239,68,68,0.35)', borderRadius: 'var(--radius)', backgroundColor: 'transparent', color: T.danger, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                        aria-label="Remover subestrutura"
-                      >
-                        <Trash2 size={15} />
-                      </button>
-                    </div>
-                  ))}
+                  {draftSubestruturas.map(item => {
+                    const opcoesExistentes = instituicoes.filter(i => i.id !== draft.id);
+                    return (
+                      <div key={item.id} style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '14px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                          <div style={{ display: 'flex', gap: '6px', padding: '3px', backgroundColor: T.bgPage, border: `1px solid ${T.borderSubtle}`, borderRadius: 'var(--radius)' }}>
+                            <button
+                              type="button"
+                              onClick={() => setModoSubestrutura(item.id, 'EXISTENTE')}
+                              style={{
+                                padding: '6px 12px',
+                                border: 'none',
+                                borderRadius: 'calc(var(--radius) - 2px)',
+                                backgroundColor: item.modo === 'EXISTENTE' ? T.accentSoft : 'transparent',
+                                color: item.modo === 'EXISTENTE' ? T.accent : T.textSecondary,
+                                fontFamily: 'var(--font-family)',
+                                fontSize: 'var(--text-xs)',
+                                fontWeight: 'var(--font-weight-medium)' as any,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Vincular existente
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setModoSubestrutura(item.id, 'NOVA')}
+                              style={{
+                                padding: '6px 12px',
+                                border: 'none',
+                                borderRadius: 'calc(var(--radius) - 2px)',
+                                backgroundColor: item.modo === 'NOVA' ? T.accentSoft : 'transparent',
+                                color: item.modo === 'NOVA' ? T.accent : T.textSecondary,
+                                fontFamily: 'var(--font-family)',
+                                fontSize: 'var(--text-xs)',
+                                fontWeight: 'var(--font-weight-medium)' as any,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Cadastrar nova
+                            </button>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeSubestrutura(item.id)}
+                            style={{ width: '34px', height: '34px', border: '1px solid rgba(239,68,68,0.35)', borderRadius: 'var(--radius)', backgroundColor: 'transparent', color: T.danger, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                            aria-label="Remover subestrutura"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+
+                        {item.modo === 'EXISTENTE' ? (
+                          <div>
+                            <label style={{ ...buildStyles(T).label, display: 'block' }}>Selecione uma instituição/unidade já cadastrada</label>
+                            <select
+                              value={item.vinculadaId ?? ''}
+                              onChange={e => {
+                                const id = parseInt(e.target.value, 10);
+                                if (Number.isFinite(id)) vincularExistente(item.id, id);
+                                else updateSubestrutura(item.id, 'vinculadaId', null);
+                              }}
+                              style={{ ...buildStyles(T).input }}
+                            >
+                              <option value="">Buscar...</option>
+                              {opcoesExistentes.map(opt => (
+                                <option key={opt.id} value={opt.id}>
+                                  {opt.cnpj ? `${opt.nome} — CNPJ ${opt.cnpj}` : `${opt.nome} — sem CNPJ`}
+                                </option>
+                              ))}
+                            </select>
+                            {item.vinculadaId && (
+                              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, margin: '6px 0 0' }}>
+                                Vinculada: {item.nome} {item.cnpj && `· CNPJ ${item.cnpj}`}
+                              </p>
+                            )}
+                          </div>
+                        ) : (
+                          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.5fr 0.7fr', gap: '12px' }}>
+                            <Field label="Nome" value={item.nome} onChange={value => updateSubestrutura(item.id, 'nome', value)} placeholder="Nome da unidade ou setor" />
+                            <Field label="Sigla" value={item.sigla} onChange={value => updateSubestrutura(item.id, 'sigla', value)} placeholder="Sigla" />
+                            <Field label="CNPJ" value={item.cnpj} onChange={value => updateSubestrutura(item.id, 'cnpj', maskCnpj(value))} placeholder="Opcional" />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
