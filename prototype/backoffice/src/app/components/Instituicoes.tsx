@@ -261,7 +261,7 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             )}
           </div>
 
-          <FormSection number="1" title="Identificação" subtitle="Dados básicos da instituição ou setor. A estrutura é inferida pelo CNPJ e pelo vínculo superior.">
+          <FormSection number="1" title="Identificação" subtitle="Dados básicos da instituição (nome, CNPJ, natureza) + dados institucionais de contato (email, telefone, endereço da entidade jurídica). Não confundir com email/telefone do Responsável (PessoaFísica).">
             <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 0.6fr', gap: '16px', marginBottom: '16px' }}>
               <Field label="Nome" value={draft.nome} onChange={value => updateDraft('nome', value)} placeholder="Nome da instituição ou unidade" />
               <Field label="Sigla" value={draft.sigla} onChange={value => updateDraft('sigla', value)} placeholder="Sigla" />
@@ -270,20 +270,17 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <Field label={isSetorSemCnpj ? 'Razão social' : 'Razão social obrigatória'} value={draft.razaoSocial} onChange={value => updateDraft('razaoSocial', value)} placeholder={isSetorSemCnpj ? 'Não se aplica a setor interno' : 'Razão social da instituição'} disabled={isSetorSemCnpj} />
               <Field label="CNPJ" value={draft.cnpj} onChange={value => updateDraft('cnpj', maskCnpj(value))} placeholder="Deixe vazio para setor sem CNPJ" />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '16px' }}>
               <Select label="Natureza" value={draft.natureza} onChange={value => updateDraft('natureza', value)} options={['Publica', 'Privada']} />
             </div>
-          </FormSection>
-
-          <FormSection number="2" title="Contato" subtitle="Dados de contato exigidos principalmente para instituições com CNPJ próprio.">
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 0.6fr', gap: '16px', marginBottom: '16px' }}>
               <Field label="Email institucional" value={draft.email} onChange={value => updateDraft('email', value)} placeholder="email@instituicao.br" />
               <Field label="Telefone" value={draft.telefone} onChange={value => updateDraft('telefone', value)} placeholder="(00) 0000-0000" />
             </div>
-            <Field label="Endereço" value={draft.endereco} onChange={value => updateDraft('endereco', value)} placeholder="Endereço completo ou localização do setor" />
+            <Field label="Endereço" value={draft.endereco} onChange={value => updateDraft('endereco', value)} placeholder="Endereço completo da entidade jurídica" />
           </FormSection>
 
-          <FormSection number="3" title="Estrutura Organizacional" subtitle="Vínculo hierárquico e localização. Instituição sem CNPJ deve possuir superior.">
+          <FormSection number="2" title="Estrutura Organizacional" subtitle="Vínculo hierárquico e localização. Instituição sem CNPJ deve possuir superior.">
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 0.3fr', gap: '16px', marginBottom: '20px' }}>
               <Select label="Instituição superior" value={draft.superior || ''} onChange={value => updateDraft('superior', value)} options={superiorOptions} />
               <Field label="Município" value={draft.municipio} onChange={value => updateDraft('municipio', value)} placeholder="Município" />
@@ -336,7 +333,7 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
           </FormSection>
 
-          <FormSection number="4" title="Responsável" subtitle="Responsável é o vínculo temporal entre uma Pessoa Física já cadastrada e uma Instituição, com mandato definido (RN04/RN11).">
+          <FormSection number="3" title="Responsável" subtitle="Responsável é o vínculo temporal entre uma Pessoa Física já cadastrada e uma Instituição, com mandato definido (RN04/RN11).">
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.5fr 0.5fr 0.5fr', gap: '16px' }}>
               <Select label="Pessoa responsável" value={draft.responsavel} onChange={value => updateDraft('responsavel', value)} options={['', 'Prof. Paulo Vargas', 'Prof. Ana Ribeiro', 'Jadir Pela', 'Marta Souza', 'Valcemiro Nossa', 'Carla Mendes']} />
               <Field label="Início do mandato" value={draft.dataInicioMandato} onChange={value => updateDraft('dataInicioMandato', value)} placeholder="AAAA-MM-DD" />
