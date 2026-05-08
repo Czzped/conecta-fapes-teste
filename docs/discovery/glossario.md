@@ -19,6 +19,7 @@ Dicionario central dos conceitos da plataforma. Cada entrada define o termo de f
 9. [Documentos e Tipos](#9-documentos-e-tipos)
 10. [Siglas](#10-siglas)
 11. [Enumeracoes Principais](#11-enumeracoes-principais)
+12. [Integracoes Externas](#12-integracoes-externas)
 
 ---
 
@@ -73,13 +74,17 @@ Conceitos centrais a M010 (Parcerias e Programas).
 
 | Termo | Definicao | Definido em |
 |-------|-----------|-------------|
-| **Instituicao** | Organizacao generica (publica ou privada) cadastrada no sistema. | [M008](../implementation/modules/M008-cadastros-corporativos/README.md) |
-| **Instituicao de Ensino e Pesquisa (IE&P)** | Tipo de Instituicao com dirigente maximo (Reitor) e Unidades Organizacionais. | M008 |
-| **Unidade Organizacional** | Subdivisao interna de uma Instituicao, com Diretor/Responsavel. | M008 |
+| **Instituicao** | Entidade juridicamente identificavel cadastrada no sistema, com CNPJ proprio obrigatorio. Pode ser composta por outras Instituicoes (filiais com CNPJ proprio) e/ou por UnidadeOrganizacional. | [M008](../implementation/modules/M008-cadastros-corporativos/README.md) |
+| **Instituicao de Ensino e Pesquisa (IE&P)** | Tipo de Instituicao com Responsavel maximo (Reitor) e UnidadeOrganizacional internas. | M008 |
+| **Unidade Organizacional** | Subdivisao interna de uma Instituicao, sem CNPJ proprio. Pode ser composta recursivamente por outras UnidadeOrganizacional. Toda UO deve ser rastreavel transitivamente a uma Instituicao raiz (RN25). | M008 |
 | **Entidade Parceira** | Instituicao que firma Parceria com a Agencia de Fomento mediante aporte financeiro. | [personas.md](personas.md), [M010 parcerias](../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) |
-| **Pessoa Fisica** | Registro de beneficiario, pesquisador ou consultor. | M008 |
+| **Pessoa Fisica** | Registro canonico de individuos cadastrados (pesquisadores, bolsistas, servidores etc), identificado por CPF. | M008 |
 | **Pessoa Juridica (PJ)** | Entidade contratada por projeto (ver restricao de conflito de interesse em [5.4.10](domains/05-financeiro.md)). | M008, Domain 05 |
-| **Area Tecnica** | Unidade organizacional da Agencia de Fomento, composta por servidores, responsavel por analise e liberacao de editais e pagamentos. | [personas.md](personas.md) |
+| **Area Tecnica** | UnidadeOrganizacional da Agencia de Fomento (DIRAF, DIPRE, DAFIN, DIGEC etc), composta por servidores. Responsavel por analise e liberacao de editais e pagamentos. | [personas.md](personas.md) |
+| **Responsavel** | Vinculo temporal entre PessoaFisica e entidade organizacional (Instituicao OU UnidadeOrganizacional), com `dataInicioMandato` e `dataFimMandato`. Substitui o conceito anterior de Dirigente. Cada entidade pode ter no maximo um Responsavel ativo (RN11/RN26). | M008 |
+| **Servidor FAPES** | Pessoa fisica com vinculo funcional ativo na Agencia de Fomento, lotada em uma Area Tecnica. Cadastro automatico via API Organograma do Estado ES. | [integracoes/organograma.md](integracoes/organograma.md) |
+| **Lotacao** | Vinculo administrativo do servidor a uma UnidadeOrganizacional especifica. Origem oficial: Organograma ES. Reflexo no Conecta: `Responsavel` ativo do servidor na UO da lotacao. | [integracoes/organograma.md](integracoes/organograma.md), [regras-passagem-areas-fapes.md](regras-passagem-areas-fapes.md) |
+| **Passagem de Area** | Mudanca de lotacao do servidor de uma UnidadeOrganizacional para outra. Detectada automaticamente via Organograma; dispara RN27 (encerra mandato anterior + cria novo) e RN28 (cascata em processos sob responsabilidade). | [regras-passagem-areas-fapes.md](regras-passagem-areas-fapes.md) |
 
 ---
 
@@ -118,6 +123,10 @@ Conceitos centrais a M010 (Parcerias e Programas).
 | **Remanejamento Orcamentario** | Transferencia de recursos entre rubricas. Entre subrubricas de mesma rubrica, aprovacao e automatica. | [Domain 04, 4.3.6–4.3.8](domains/04-fomento-post-award.md) |
 | **Adicao Orcamentaria** | Solicitacao de aumento do orcamento do projeto, sujeita a aprovacao da Agencia. | Domain 04, 4.3.1–4.3.3 |
 | **LOA / LDO / PPA** | Instrumentos legais de planejamento orcamentario publico — Lei Orcamentaria Anual, Lei de Diretrizes Orcamentarias, Plano Plurianual — referencia para dotacao de Programas. | Domain 02, 05 |
+| **valorTotal** (Bolsa/Diaria) | Valor bruto do orcamento previsto para Bolsas (M009) ou Diarias (M003) em Projeto/Edital/Parceria. Origem: planejamento orcamentario (M013). | [regras-saldo-alocado-disponivel.md](regras-saldo-alocado-disponivel.md) |
+| **valorAlocado** (Bolsa/Diaria) | Valor **reservado** para alocacao individual (bolsa concedida, diaria aprovada) que ainda nao foi pago. Compromete o orcamento mas nao consumiu caixa. (RN-SLD01) | [regras-saldo-alocado-disponivel.md](regras-saldo-alocado-disponivel.md) |
+| **valorConsumido** (Bolsa/Diaria) | Valor **efetivamente pago** ao beneficiario, baixado contra rubrica e refletido em movimentacao financeira (M014/M016). (RN-SLD01) | [regras-saldo-alocado-disponivel.md](regras-saldo-alocado-disponivel.md) |
+| **valorDisponivel** (Bolsa/Diaria) | Saldo livre para novas alocacoes: `valorTotal − valorAlocado − valorConsumido`. Sempre `>= 0`. Bloqueia novas alocacoes quando insuficiente (RN-SLD02). | [regras-saldo-alocado-disponivel.md](regras-saldo-alocado-disponivel.md) |
 
 ---
 
@@ -217,6 +226,21 @@ Conceitos centrais ao M014.
 | **EstadoPrograma** | Programa (M010) | `EmElaboracao`, `Ativo`, `Suspenso`, `Encerrado` | [M010 programas](../implementation/modules/M010-planejamento-estrategia/programas/modelo-estrutural.md) |
 | **StatusCaptacao** | Captacao (M011) | `EmElaboracao`, `Aberta`, `EmAnalise`, `Publicada`, `EmExecucao`, `Fechada` | [Domain 03](domains/03-fomento-pre-award.md) |
 | **TipoCaptacao** | Captacao (M011) | `ChamadaPublica`, `DemandaInduzida` | Domain 03 |
+
+---
+
+## 12. Integracoes Externas
+
+Catalogo completo em [integracoes/README.md](integracoes/README.md).
+
+| Termo | Definicao | Definido em |
+|-------|-----------|-------------|
+| **E-Docs ES** | Sistema oficial de gestao de documentos eletronicos do Estado, com assinatura eletronica qualificada via Acesso Cidadao. Conecta usa para coletar assinaturas de pesquisadores e servidores em Termos formais. | [integracoes/e-docs.md](integracoes/e-docs.md) |
+| **Assinatura Eletronica Qualificada** | Assinatura juridicamente valida realizada via E-Docs com identidade verificada por Acesso Cidadao + 2FA. Equivalente a assinatura a tinta para fins administrativos no ES. | [integracoes/e-docs.md](integracoes/e-docs.md) |
+| **Protocolo E-Docs** | Identificador unico atribuido pelo E-Docs a cada documento, retornado ao Conecta apos criacao. Usado para rastreabilidade e verificacao de integridade. | [integracoes/e-docs.md](integracoes/e-docs.md) |
+| **Signatario Externo** | Pessoa fisica nao-servidora (pesquisador, bolsista, coordenador, outorgado) que assina documento E-Docs via portal publico autenticando com Acesso Cidadao. | [integracoes/e-docs.md](integracoes/e-docs.md) |
+| **Organograma ES** | Catalogo oficial da estrutura do Estado: orgaos, secretarias, autarquias, fundacoes (FAPES inclusa) com servidores, cargos e lotacoes. Fonte unica de verdade para cadastro automatico de servidores backoffice. | [integracoes/organograma.md](integracoes/organograma.md) |
+| **Acesso Cidadao** | Provedor oficial de identidade SSO do Estado ES, compartilhado entre Conecta, E-Docs e Organograma. Mesmo login serve para autenticar no Conecta e assinar documentos no E-Docs. | [arquitetura/03-acesso-e-seguranca.md](../architecture/03-acesso-e-seguranca.md) |
 
 ---
 
