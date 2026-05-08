@@ -148,7 +148,7 @@ Roadmap       → sequencia de domains (longo prazo)
 | M020 | Comunicacao | 0% | [README](docs/implementation/modules/M020-comunicacao/README.md) |
 | M021 | Gestao de Formularios Dinamicos | 0% | [README](docs/implementation/modules/M021-gestao-formularios/README.md) |
 | M022 | Contratacao e Outorga | 0% | [README](docs/implementation/modules/M022-contratacao-outorga/README.md) |
-| M023 | Integracao Assinatura Eletronica (E-Docs) | 0% | [README](docs/implementation/modules/M023-integracao-edocs/README.md) |
+| M023 | Integracoes (assinatura E-Docs e outros adapters) | 0% | [README](docs/implementation/modules/M023-integracoes/README.md) |
 
 ### Resumo por Dominio
 
@@ -189,7 +189,7 @@ Roadmap       → sequencia de domains (longo prazo)
 - **M020** Comunicacao (notificacoes)
 
 **Integracoes Externas**
-- **M023** Integracao Assinatura Eletronica — adapter para E-Docs ES V2 (provedor agnostico no dominio); detecta conclusao via polling; arquiva PDF assinado em M008. Habilita formalizacao de Bolsa (M009), Outorga (M022), Aceite (M003), Cooperacao (M010)
+- **M023** Integracoes — modulo agnostico de provedor para coleta de assinaturas eletronicas qualificadas; adapter inicial em [`M023-integracoes/e-docs/`](docs/implementation/modules/M023-integracoes/e-docs/) para E-Docs ES V2; detecta conclusao via polling; arquiva PDF assinado em M008. Habilita formalizacao de Bolsa (M009), Outorga (M022), Aceite (M003), Cooperacao (M010). Novos provedores entram como subpastas adicionais
 
 > Discovery completo de integracoes externas em [docs/discovery/integracoes/](docs/discovery/integracoes/) — E-Docs, Organograma, Acesso Cidadao.
 
