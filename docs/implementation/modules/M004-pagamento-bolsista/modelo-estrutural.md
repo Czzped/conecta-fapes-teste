@@ -361,7 +361,7 @@ classDiagram
 ## Notas de Implementacao
 
 **Entidades externas:**
-- AreaTecnica: gerenciada por M008 (Cadastros Corporativos) como especializacao de UnidadeOrganizacional da Instituicao agencia.
+- AreaTecnica: gerenciada por M008 (Cadastros Corporativos) como `UnidadeOrganizacional` (subdivisao interna sem CNPJ) vinculada a `Instituicao` agencia, direta ou transitivamente.
 - Edital, Projeto, Pessoa e AlocacaoBolsista: gerenciados por M003 (Gestao de Iniciativas Captadas) e M009 (Gestao Bolsista).
 - VersaoNivel e VersaoModalidade: gerenciadas por M001 (Modalidade de Bolsa).
 

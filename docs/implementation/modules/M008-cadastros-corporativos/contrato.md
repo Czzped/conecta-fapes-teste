@@ -4,7 +4,7 @@ Dominio e regras de negocio: ver [README.md](README.md)
 
 ## Proposito do Contrato
 
-Este contrato documenta a superficie publica do modulo M008 como contexto responsavel pelos cadastros corporativos compartilhados da plataforma: pessoas, instituicoes, dirigentes e referencias basicas.
+Este contrato documenta a superficie publica do modulo M008 como contexto responsavel pelos cadastros corporativos compartilhados da plataforma: pessoas, instituicoes, unidades organizacionais, responsaveis e referencias basicas.
 
 ## Consumidores e Dependencias
 
@@ -12,7 +12,7 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 
 | Consumidor | Uso do contrato |
 |------------|-----------------|
-| Todos os modulos operacionais | Consultam pessoas, instituicoes, dirigentes e referencias corporativas como base canonica |
+| Todos os modulos operacionais | Consultam pessoas, instituicoes, unidades organizacionais, responsaveis e referencias corporativas como base canonica |
 | M003 - Gestao de Iniciativas Captadas | Consulta `TipoDiaria` e `ParametroCalculoDiaria` vigentes para calcular solicitacoes de diaria e gravar snapshots |
 | Autenticacao / Acesso Cidadao | Sincroniza cadastros de pessoas por CPF |
 | Analista da Agencia de Fomento | Mantem a base cadastral corporativa |
@@ -31,8 +31,9 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 |------------------|------|----------|---------|-------|---------------------|---------------|---------------|--------------|-------------|--------------------------|
 | CadastrarOuAtualizarPessoaFisica | Command | Criar ou atualizar pessoa fisica canonical da plataforma | cpf, nome, email, dados basicos | `PessoaFisica` criada/atualizada | RN01, RN05, RN10 | CPF informado | CPF duplicado, dados invalidos | Sim por CPF | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | AlterarEstadoPessoaFisica | Command | Suspender ou reativar pessoa com justificativa quando aplicavel | pessoa, novoEstado, justificativa | `PessoaFisica` atualizada | RN05, RI2 | Pessoa existente | Reativacao sem justificativa, pessoa inexistente | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
-| CadastrarInstituicao | Command | Registrar instituicao com ou sem CNPJ proprio, incluindo natureza publica/privada quando aplicavel e eventual superior hierarquico | nome, sigla?, cnpj?, razaoSocial?, email?, telefone?, endereco?, isPublica?, isExterna, superiorId?, tipoInstituicaoId? | `Instituicao` registrada | RN02, RN03, RN12, RN13, RN14, RN15 | Nome informado; superior informado quando nao houver CNPJ | CNPJ duplicado, superior inexistente, instituicao sem CNPJ e sem superior, dados invalidos | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
-| RegistrarDirigente | Command | Registrar dirigente como vinculo temporal entre uma pessoa e uma instituicao | pessoaId, instituicaoId, dataInicio, dataFim | `Dirigente` criado/atualizado | RN04, RN11, RI1 | Pessoa e instituicao existentes | Mandato sobreposto, pessoa inexistente, instituicao inexistente | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| CadastrarInstituicao | Command | Registrar instituicao juridica com CNPJ proprio, natureza publica/privada e eventual matriz | nome, sigla?, cnpj, razaoSocial, email, telefone?, endereco, isPublica, isExterna, instituicaoSuperiorId?, tipoInstituicaoId? | `Instituicao` registrada | RN02, RN12, RN14 | Nome e CNPJ informados; matriz (instituicaoSuperior) existente quando informada | CNPJ duplicado, matriz inexistente, dados invalidos | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| CadastrarUnidadeOrganizacional | Command | Registrar unidade organizacional interna sem CNPJ vinculada a Instituicao ou outra UnidadeOrganizacional | nome, sigla?, descricao?, email?, telefone?, ativa, instituicaoPaiId?, unidadeSuperiorId? | `UnidadeOrganizacional` registrada | RN03, RN13, RN25, RI4 | Exatamente um entre instituicaoPaiId e unidadeSuperiorId informado | Parent inexistente, ambos parents informados, ausencia de parent, dados invalidos | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
+| RegistrarResponsavel | Command | Registrar responsavel como vinculo temporal entre uma pessoa e uma Instituicao OU UnidadeOrganizacional | pessoaId, instituicaoId?, unidadeId?, dataInicio, dataFim | `Responsavel` criado/atualizado | RN04, RN11, RN26, RI1, RI3, RI5 | Pessoa existente; exatamente um entre instituicaoId e unidadeId informado | Mandato sobreposto, pessoa inexistente, alvo inexistente, ambos alvos informados, ausencia de alvo | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | SincronizarPessoaViaAcessoCidadao | Event Consumed | Criar ou vincular pessoa automaticamente a partir do Acesso Cidadao | cpf, nome, email, origem | `PessoaFisica` criada/vinculada | RN10 | Evento recebido com CPF valido | CPF invalido, inconsistencias cadastrais | Sim por CPF e origem do evento | Sistema | Evento/mensagem interna a definir |
 | CadastrarRubrica | Command | Criar Rubrica canonica de custeio ou capital | codigo, nome, descricao, naturezaDespesa, ativa, rubricaPaiId? | `Rubrica` criada | RN07, RN16, RN17 | Codigo, nome, descricao, natureza da despesa e ativa informados | Codigo duplicado, rubrica pai inexistente, hierarquia invalida | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | AtualizarRubrica | Command | Atualizar metadados, indicador ativa ou rubrica pai | rubricaId, dados atualizados, justificativa | `Rubrica` atualizada | RN16, RN17, RN18 | Rubrica existente | Rubrica inexistente, hierarquia invalida, justificativa ausente quando aplicavel | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
@@ -41,7 +42,7 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 | CadastrarTipoDiaria | Command | Criar valor vigente de diaria por abrangencia | abrangenciaId, valorUnitario, vigenciaInicio, vigenciaFim?, ativo | `TipoDiaria` criado/atualizado | RN22, RN23 | Abrangencia existente e ativa; valor maior que zero; vigencia valida | Abrangencia inexistente/inativa, valor invalido, vigencia sobreposta | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | CadastrarParametroCalculoDiaria | Command | Criar parametros normativos vigentes de calculo de diaria vinculados a um tipo de diaria | tipoDiariaId, normaReferencia, percentualDiariaSemPernoite, horasMinimasSemPernoite, horaLimiteRetornoAcrescimo?, percentualAcrescimoRetorno?, distanciaMinimaKm?, limiteDiasConsecutivos?, limiteDiariasMes?, percentualComplementoTransporte?, bloqueiaRegiaoMetropolitanaSemPernoite, bloqueiaMunicipioLimitrofeSemPernoite, vigenciaInicio, vigenciaFim?, ativo | `ParametroCalculoDiaria` criado/atualizado | RN24 | TipoDiaria existente; norma, vigencia e parametros obrigatorios informados | TipoDiaria inexistente, parametros invalidos, vigencia sobreposta para o mesmo tipo | Nao | Analista da Agencia de Fomento | API interna/backoffice a definir |
 | ConsultarTipoDiariaVigente | Query | Obter diaria e parametros normativos vigentes para data de referencia e abrangencia | abrangenciaId, dataReferencia | `TipoDiaria` e `ParametroCalculoDiaria` vigentes | RN22, RN23, RN24 | Abrangencia existente e ativa | TipoDiaria vigente ausente, parametros de calculo ausentes | N/A | Modulo interno autorizado ou analista | API interna a definir |
-| ConsultarCadastrosCorporativos | Query | Consultar pessoas, instituicoes, dirigentes e referencias basicas | tipoCadastro, filtros | Lista ou detalhe cadastral | RN01, RN02, RN03, RN09, RN11, RN12, RN13, RN14, RN15 | Filtro informado | Cadastro nao encontrado | N/A | Modulo interno autorizado ou analista | API interna a definir |
+| ConsultarCadastrosCorporativos | Query | Consultar pessoas, instituicoes, unidades organizacionais, responsaveis e referencias basicas | tipoCadastro, filtros | Lista ou detalhe cadastral | RN01, RN02, RN03, RN09, RN11, RN12, RN13, RN14, RN25, RN26 | Filtro informado | Cadastro nao encontrado | N/A | Modulo interno autorizado ou analista | API interna a definir |
 
 ## Padrao de Payload e Erro
 
@@ -135,9 +136,10 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
   "nome": "UFES",
   "sigla": "UFES",
   "email": "ufes@ufes.br",
+  "endereco": "Av. Fernando Ferrari, 514, Vitoria/ES",
   "isPublica": true,
   "isExterna": true,
-  "superiorId": null
+  "instituicaoSuperiorId": null
 }
 ```
 
@@ -149,7 +151,7 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
     "id": "INST-2026-010",
     "nome": "UFES",
     "cnpj": "12.345.678/0001-90",
-    "superiorId": null
+    "instituicaoSuperiorId": null
   }
 }
 ```
@@ -159,17 +161,68 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 | Codigo | Mensagem de erro exemplo |
 |--------|---------------------------|
 | CNPJ_DUPLICADO | Ja existe uma instituicao cadastrada com o CNPJ informado. |
-| INSTITUICAO_SUPERIOR_NAO_ENCONTRADA | A instituicao superior informada nao foi encontrada. |
-| INSTITUICAO_SEM_CNPJ_SEM_SUPERIOR | Instituicao sem CNPJ proprio deve possuir uma instituicao superior. |
+| CNPJ_OBRIGATORIO | Instituicao deve possuir CNPJ proprio. Use UnidadeOrganizacional para subdivisoes internas. |
+| INSTITUICAO_SUPERIOR_NAO_ENCONTRADA | A instituicao matriz informada nao foi encontrada. |
 
-### RegistrarDirigente
+### CadastrarUnidadeOrganizacional
 
 **Exemplo de entrada**
 
 ```json
 {
+  "nome": "Centro Tecnologico",
+  "sigla": "CT",
+  "descricao": "Centro academico de engenharias e computacao",
+  "ativa": true,
+  "instituicaoPaiId": "INST-2026-010",
+  "unidadeSuperiorId": null
+}
+```
+
+**Exemplo de saida**
+
+```json
+{
+  "unidade": {
+    "id": "UO-2026-001",
+    "nome": "Centro Tecnologico",
+    "instituicaoPaiId": "INST-2026-010",
+    "unidadeSuperiorId": null,
+    "ativa": true
+  }
+}
+```
+
+**Excecoes e mensagens**
+
+| Codigo | Mensagem de erro exemplo |
+|--------|---------------------------|
+| PARENT_AUSENTE | Informe instituicaoPaiId ou unidadeSuperiorId. |
+| PARENT_AMBIGUO | Informe apenas um entre instituicaoPaiId e unidadeSuperiorId. |
+| INSTITUICAO_PAI_NAO_ENCONTRADA | A instituicao pai informada nao foi encontrada. |
+| UNIDADE_SUPERIOR_NAO_ENCONTRADA | A unidade superior informada nao foi encontrada. |
+
+### RegistrarResponsavel
+
+**Exemplo de entrada (responsavel de Instituicao)**
+
+```json
+{
   "pessoaId": "PES-2026-001",
   "instituicaoId": "INST-2026-010",
+  "unidadeId": null,
+  "dataInicio": "2026-01-01",
+  "dataFim": "2026-12-31"
+}
+```
+
+**Exemplo de entrada (responsavel de UnidadeOrganizacional)**
+
+```json
+{
+  "pessoaId": "PES-2026-002",
+  "instituicaoId": null,
+  "unidadeId": "UO-2026-001",
   "dataInicio": "2026-01-01",
   "dataFim": "2026-12-31"
 }
@@ -179,9 +232,10 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 
 ```json
 {
-  "dirigente": {
-    "id": "DIR-2026-003",
+  "responsavel": {
+    "id": "RESP-2026-003",
     "instituicaoId": "INST-2026-010",
+    "unidadeId": null,
     "ativo": true
   }
 }
@@ -191,8 +245,11 @@ Este contrato documenta a superficie publica do modulo M008 como contexto respon
 
 | Codigo | Mensagem de erro exemplo |
 |--------|---------------------------|
-| MANDATO_SOBREPOSTO | Ja existe dirigente ativo na instituicao informada. |
+| MANDATO_SOBREPOSTO | Ja existe responsavel ativo na entidade informada. |
 | INSTITUICAO_NAO_ENCONTRADA | A instituicao informada nao foi encontrada. |
+| UNIDADE_NAO_ENCONTRADA | A unidade organizacional informada nao foi encontrada. |
+| ALVO_AUSENTE | Informe instituicaoId ou unidadeId. |
+| ALVO_AMBIGUO | Informe apenas um entre instituicaoId e unidadeId. |
 
 ### SincronizarPessoaViaAcessoCidadao
 

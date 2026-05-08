@@ -9,6 +9,8 @@
 | **GitHub Milestone** | `milestone: MS-01` |
 | **Goal** | Construir a base cadastral corporativa (Instituicoes em modelo unico, Documentos) para desbloquear o modulo de Parcerias (M010 refatorado — Finalidade permanece em M008 mas nao e mais vinculada a Parceria); entregar o extrato financeiro da Prestacao de Contas; iniciar discovery de Captacao de Iniciativas e melhorias de experiencia do usuario |
 
+> **Nota de reversao (2026-05-07):** decisao desta sprint de colapsar `Instituicao`/`UnidadeOrganizacional`/`Dirigente` em modelo unico foi parcialmente revertida. Modelo atual: `Instituicao` (CNPJ obrigatorio) + `UnidadeOrganizacional` (subdivisao interna sem CNPJ, composicao recursiva) + `Responsavel` (vinculo temporal unico para Instituicao OU UnidadeOrganizacional, substituindo `Dirigente`). Issue #1750 retitulada para "Cadastrar UnidadeOrganizacional"; #1751 retitulada para "Cadastrar Responsavel". Ver [M008 modelo-estrutural](../../implementation/modules/M008-cadastros-corporativos/instituicoes/modelo-estrutural.md).
+
 ---
 
 ## Prioridades da Sprint

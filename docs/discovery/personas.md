@@ -13,7 +13,7 @@
 | Terceiro (PJ) | 04 (prestacao de servico a projetos) | M014 |
 | Coordenador | 03 (submissao), 04 (execucao, prestacao de contas, bolsistas) | M003, M009, M012, M013, M014 |
 | Orientador | 04 (orientacao de bolsistas em pos-graduacao) | M003, M009 |
-| Reitor | 01 (dirigente maximo de Instituicao de Ensino e Pesquisa) | M008 |
+| Reitor | 01 (Responsavel maximo de Instituicao de Ensino e Pesquisa) | M008 |
 | Diretor / Responsavel | 01 (responsavel por Unidade Organizacional) | M008 |
 | Agencia de Fomento | 01-06 (opera toda a plataforma como entidade gestora) | Todos |
 | Entidade Parceira | 02 (parcerias com aporte financeiro para programas) | M010 |
@@ -44,12 +44,12 @@ O Cidadao e a persona base. Ao se associar a um projeto, torna-se Participante d
 
 ## Instituicoes
 
-Uma Instituicao e uma organizacao generica. Uma Instituicao de Ensino e Pesquisa e um tipo de Instituicao. Toda Instituicao e composta por Unidades Organizacionais, e cada Unidade possui um Diretor ou responsavel. A Instituicao de Ensino e Pesquisa possui um Reitor como dirigente maximo.
+Uma Instituicao e uma organizacao juridicamente identificavel (com CNPJ proprio). Uma Instituicao de Ensino e Pesquisa e um tipo de Instituicao. Uma Instituicao pode ser composta por outras Instituicoes (filiais, campi com CNPJ proprio) e/ou por UnidadeOrganizacional (subdivisoes internas sem CNPJ). Cada Instituicao e cada UnidadeOrganizacional possui um `Responsavel` (vinculo temporal com PessoaFisica). No caso de Instituicao de Ensino e Pesquisa, o Reitor exerce o papel de Responsavel maximo.
 
 | Persona | Descricao |
 |---------|-----------|
-| **Reitor** | Dirigente maximo de uma Instituicao de Ensino e Pesquisa |
-| **Diretor / Responsavel** | Responsavel por uma Unidade Organizacional dentro de uma Instituicao |
+| **Reitor** | Responsavel maximo de uma Instituicao de Ensino e Pesquisa, modelado como `Responsavel` ativo da Instituicao |
+| **Diretor / Responsavel de Unidade** | Responsavel por uma UnidadeOrganizacional, modelado como `Responsavel` ativo da unidade |
 
 ## Parceiros e Agencia de Fomento
 

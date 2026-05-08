@@ -4,7 +4,7 @@
 
 ## Responsabilidade
 
-`PessoaFisica` e o cadastro canonico de individuos que interagem com a FAPES: pesquisadores, bolsistas, coordenadores, dirigentes, avaliadores, consultores e demais pessoas naturais. A identidade primaria e o CPF.
+`PessoaFisica` e o cadastro canonico de individuos que interagem com a FAPES: pesquisadores, bolsistas, coordenadores, responsaveis institucionais, avaliadores, consultores e demais pessoas naturais. A identidade primaria e o CPF.
 
 ## Atributos
 
@@ -24,7 +24,7 @@
 |---------|----------------|-----------|
 | nivelAcademico | 0..1 | Maior nivel academico informado, via [NivelAcademico](../nivel-academico/README.md) |
 | historico | 1..* | Eventos de cadastro, atualizacao, suspensao e reativacao, via [HistoricoPessoa](../historico-pessoa/README.md) |
-| dirigente | 0..* | Mandatos em instituicoes, via [Dirigente](../../instituicoes/README.md#dirigente) |
+| responsavel | 0..* | Mandatos em Instituicoes ou UnidadeOrganizacional, via [Responsavel](../../instituicoes/README.md#responsavel) |
 
 ## Enumeracoes
 
