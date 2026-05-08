@@ -1,8 +1,27 @@
-import React, { useState } from 'react';
-import { ChevronRight, Home, Save, Plus, Trash2, ChevronDown } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { ChevronRight, Home, Save, Plus, Trash2, ChevronDown, Search, UserPlus, History } from 'lucide-react';
 
 interface Props {
   onBack: () => void;
+}
+
+interface PessoaFisica {
+  id: string;
+  nome: string;
+  cpf: string;
+  email: string;
+  telefone: string;
+  estado: 'ATIVA' | 'SUSPENSA';
+  jaFoiResponsavel: boolean;
+}
+
+interface ResponsavelHistorico {
+  pessoaId: string;
+  nome: string;
+  papel: string;
+  dataInicio: string;
+  dataFim: string;
+  motivo?: string;
 }
 
 interface Unidade {
@@ -167,20 +186,43 @@ export const FormularioInstituicaoParceira: React.FC<Props> = ({ onBack }) => {
   const [tipoOutro, setTipoOutro] = useState('');
   const [finalidade, setFinalidade] = useState('');
 
-  // Card 2 - Dados Pessoais do Dirigente
-  const [nomeDirigente, setNomeDirigente] = useState('');
-  const [cpfDirigente, setCpfDirigente] = useState('');
-  const [nomeCargo, setNomeCargo] = useState('');
-  const [validadeMandato, setValidadeMandato] = useState('');
-  const [emailDirigente, setEmailDirigente] = useState('');
-  const [celularDirigente, setCelularDirigente] = useState('');
-  const [enderecoDirigente, setEnderecoDirigente] = useState('');
-  const [bairroDirigente, setBairroDirigente] = useState('');
-  const [cidadeDirigente, setCidadeDirigente] = useState('');
-  const [ufDirigente, setUfDirigente] = useState('');
-  const [cepDirigente, setCepDirigente] = useState('');
-  const [cadastroConecta, setCadastroConecta] = useState('');
-  const [cadastroAcessoCidadao, setCadastroAcessoCidadao] = useState('');
+  // Card 2 - Responsavel (vinculo temporal PessoaFisica <-> Instituicao, RN04/RN11)
+  const [responsavelSelecionado, setResponsavelSelecionado] = useState<PessoaFisica | null>(null);
+  const [papelResponsavel, setPapelResponsavel] = useState('');
+  const [dataInicioMandato, setDataInicioMandato] = useState('');
+  const [dataFimMandato, setDataFimMandato] = useState('');
+  const [buscaResponsavel, setBuscaResponsavel] = useState('');
+  const [buscaAberta, setBuscaAberta] = useState(false);
+
+  // Mock — em producao vira de GET /api/v1/m008/pessoas?search={termo}
+  const pessoasCadastradas: PessoaFisica[] = [
+    { id: 'PES-2026-001', nome: 'Maria Souza',   cpf: '111.111.111-11', email: 'maria@ufes.br',  telefone: '(27) 99111-1111', estado: 'ATIVA',    jaFoiResponsavel: true  },
+    { id: 'PES-2026-002', nome: 'Joao Silva',    cpf: '222.222.222-22', email: 'joao@ufes.br',   telefone: '(27) 99222-2222', estado: 'ATIVA',    jaFoiResponsavel: true  },
+    { id: 'PES-2026-003', nome: 'Pedro Lima',    cpf: '333.333.333-33', email: 'pedro@ifes.br',  telefone: '(27) 99333-3333', estado: 'ATIVA',    jaFoiResponsavel: true  },
+    { id: 'PES-2026-004', nome: 'Ana Costa',     cpf: '444.444.444-44', email: 'ana@ifes.br',    telefone: '(27) 99444-4444', estado: 'ATIVA',    jaFoiResponsavel: false },
+    { id: 'PES-2026-005', nome: 'Carlos Mendes', cpf: '555.555.555-55', email: 'carlos@fapes',   telefone: '(27) 99555-5555', estado: 'SUSPENSA', jaFoiResponsavel: false },
+  ];
+
+  // Mock — em producao vira de GET /api/v1/m008/responsaveis?instituicaoId={id}&estado=encerrado
+  const historicoResponsaveis: ResponsavelHistorico[] = [
+    { pessoaId: 'PES-2026-002', nome: 'Joao Silva', papel: 'Reitor',     dataInicio: '2020-01-01', dataFim: '2023-12-31', motivo: 'Fim de mandato' },
+    { pessoaId: 'PES-2026-003', nome: 'Pedro Lima', papel: 'Reitor Pro Tempore', dataInicio: '2017-01-01', dataFim: '2019-12-31', motivo: 'Fim de mandato' },
+  ];
+
+  const sugestoes = useMemo(
+    () => pessoasCadastradas.filter((p) => p.jaFoiResponsavel && p.estado === 'ATIVA'),
+    [pessoasCadastradas]
+  );
+
+  const resultadoBusca = useMemo(() => {
+    const termo = buscaResponsavel.trim().toLowerCase();
+    if (!termo) return [];
+    return pessoasCadastradas.filter(
+      (p) =>
+        p.estado === 'ATIVA' &&
+        (p.nome.toLowerCase().includes(termo) || p.cpf.replace(/\D/g, '').includes(termo.replace(/\D/g, '')))
+    );
+  }, [buscaResponsavel, pessoasCadastradas]);
 
   // Card 3 - Dados das Unidades
   const [unidades, setUnidades] = useState<Unidade[]>([
@@ -541,7 +583,7 @@ export const FormularioInstituicaoParceira: React.FC<Props> = ({ onBack }) => {
           </div>
         </div>
 
-        {/* Card 2: Dados Pessoais do Dirigente */}
+        {/* Card 2: Responsavel (PessoaFisica com mandato) */}
         <div style={sectionCardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
             <div
@@ -567,166 +609,253 @@ export const FormularioInstituicaoParceira: React.FC<Props> = ({ onBack }) => {
                 2
               </span>
             </div>
-            <p style={sectionTitleStyle}>Dados Pessoais do Dirigente</p>
+            <p style={sectionTitleStyle}>Responsável</p>
           </div>
-          <p style={sectionSubtitleStyle}>Informações do dirigente máximo da instituição</p>
+          <p style={sectionSubtitleStyle}>
+            Vínculo temporal entre uma PessoaFísica cadastrada e a Instituição (RN04/RN11). Selecione uma pessoa já cadastrada no sistema.
+          </p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', marginBottom: '16px' }}>
-            <div>
-              <label style={labelStyle}>Nome Completo</label>
-              <input
-                type="text"
-                placeholder="Nome completo do dirigente"
-                value={nomeDirigente}
-                onChange={(e) => setNomeDirigente(e.target.value)}
-                style={inputStyle}
-                onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
-              />
+          {/* Sugestoes — pessoas que ja foram Responsavel */}
+          {!responsavelSelecionado && sugestoes.length > 0 && (
+            <div style={{ marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                <History size={14} style={{ color: 'rgba(0,193,175,0.8)' }} />
+                <span style={{ ...labelStyle, marginBottom: 0, color: 'rgba(0,193,175,0.9)' }}>Sugestões — já foram Responsável</span>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {sugestoes.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setResponsavelSelecionado(p)}
+                    style={{
+                      padding: '8px 14px',
+                      backgroundColor: 'rgba(0,193,175,0.08)',
+                      border: '1px solid rgba(0,193,175,0.3)',
+                      borderRadius: 'var(--radius)',
+                      color: '#ffffff',
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-sm)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {p.nome} <span style={{ opacity: 0.5 }}>· {p.cpf}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-            <div>
-              <label style={labelStyle}>CPF</label>
-              <input
-                type="text"
-                placeholder="000.000.000-00"
-                value={cpfDirigente}
-                onChange={(e) => setCpfDirigente(e.target.value)}
-                style={inputStyle}
-                onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
-              />
-            </div>
-          </div>
+          )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-            <div>
-              <label style={labelStyle}>Nome do Cargo</label>
-              <input
-                type="text"
-                placeholder="Ex: Reitor"
-                value={nomeCargo}
-                onChange={(e) => setNomeCargo(e.target.value)}
-                style={inputStyle}
-                onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
-              />
+          {/* Campo de busca por nome ou CPF */}
+          {!responsavelSelecionado && (
+            <div style={{ position: 'relative', marginBottom: '20px' }}>
+              <label style={labelStyle}>Buscar PessoaFísica por nome ou CPF</label>
+              <div style={{ position: 'relative' }}>
+                <Search
+                  size={15}
+                  style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }}
+                />
+                <input
+                  type="text"
+                  placeholder="Digite nome ou CPF da pessoa..."
+                  value={buscaResponsavel}
+                  onChange={(e) => {
+                    setBuscaResponsavel(e.target.value);
+                    setBuscaAberta(true);
+                  }}
+                  onFocus={() => setBuscaAberta(true)}
+                  style={{ ...inputStyle, paddingLeft: '36px' }}
+                />
+              </div>
+              {buscaAberta && buscaResponsavel.trim() && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 4px)',
+                    left: 0,
+                    width: '100%',
+                    backgroundColor: '#1e293b',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: 'var(--radius)',
+                    zIndex: 200,
+                    maxHeight: '260px',
+                    overflowY: 'auto',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+                  }}
+                >
+                  {resultadoBusca.length === 0 ? (
+                    <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>
+                        Pessoa não encontrada no banco de dados.
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => alert('Redirecionar para cadastro de PessoaFísica em M008/pessoas')}
+                        style={{
+                          alignSelf: 'flex-start',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '6px 12px',
+                          backgroundColor: 'rgba(0,193,175,0.15)',
+                          border: '1px solid rgba(0,193,175,0.4)',
+                          borderRadius: 'var(--radius)',
+                          color: '#00c1af',
+                          fontSize: 'var(--text-sm)',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <UserPlus size={13} />
+                        Cadastrar pessoa primeiro
+                      </button>
+                    </div>
+                  ) : (
+                    resultadoBusca.map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => {
+                          setResponsavelSelecionado(p);
+                          setBuscaResponsavel('');
+                          setBuscaAberta(false);
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '12px 16px',
+                          textAlign: 'left',
+                          border: 'none',
+                          backgroundColor: 'transparent',
+                          color: '#ffffff',
+                          fontFamily: 'var(--font-family)',
+                          fontSize: 'var(--text-sm)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '2px',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                      >
+                        <span>{p.nome}</span>
+                        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>
+                          CPF {p.cpf} · {p.email}
+                          {p.jaFoiResponsavel && <span style={{ marginLeft: '6px', color: '#00c1af' }}>· já foi Responsável</span>}
+                        </span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
-            <div>
-              <label style={labelStyle}>Validade do Mandato</label>
-              <input
-                type="date"
-                value={validadeMandato}
-                onChange={(e) => setValidadeMandato(e.target.value)}
-                style={{ ...inputStyle, colorScheme: 'dark' }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>E-mail</label>
-              <input
-                type="email"
-                placeholder="dirigente@email.com"
-                value={emailDirigente}
-                onChange={(e) => setEmailDirigente(e.target.value)}
-                style={inputStyle}
-                onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>Celular</label>
-              <input
-                type="tel"
-                placeholder="(27) 99999-9999"
-                value={celularDirigente}
-                onChange={(e) => setCelularDirigente(e.target.value)}
-                style={inputStyle}
-                onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
-              />
-            </div>
-          </div>
+          )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 0.5fr 1fr', gap: '16px', marginBottom: '16px' }}>
+          {/* Pessoa selecionada + dados do mandato */}
+          {responsavelSelecionado && (
             <div>
-              <label style={labelStyle}>Endereço Residencial</label>
-              <input
-                type="text"
-                placeholder="Rua, número"
-                value={enderecoDirigente}
-                onChange={(e) => setEnderecoDirigente(e.target.value)}
-                style={inputStyle}
-                onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>Bairro</label>
-              <input
-                type="text"
-                placeholder="Bairro"
-                value={bairroDirigente}
-                onChange={(e) => setBairroDirigente(e.target.value)}
-                style={inputStyle}
-                onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>Cidade</label>
-              <input
-                type="text"
-                placeholder="Cidade"
-                value={cidadeDirigente}
-                onChange={(e) => setCidadeDirigente(e.target.value)}
-                style={inputStyle}
-                onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>UF</label>
-              <input
-                type="text"
-                placeholder="ES"
-                value={ufDirigente}
-                onChange={(e) => setUfDirigente(e.target.value)}
-                style={inputStyle}
-                onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>CEP</label>
-              <input
-                type="text"
-                placeholder="00000-000"
-                value={cepDirigente}
-                onChange={(e) => setCepDirigente(e.target.value)}
-                style={inputStyle}
-                onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
-              />
-            </div>
-          </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '14px 16px',
+                  backgroundColor: 'rgba(0,193,175,0.08)',
+                  border: '1px solid rgba(0,193,175,0.3)',
+                  borderRadius: 'var(--radius)',
+                  marginBottom: '16px',
+                }}
+              >
+                <div>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
+                    {responsavelSelecionado.nome}
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginTop: '2px' }}>
+                    CPF {responsavelSelecionado.cpf} · {responsavelSelecionado.email} · {responsavelSelecionado.telefone}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setResponsavelSelecionado(null)}
+                  style={{
+                    padding: '6px 12px',
+                    backgroundColor: 'transparent',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: 'var(--radius)',
+                    color: 'rgba(255,255,255,0.7)',
+                    fontFamily: 'var(--font-family)',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Trocar pessoa
+                </button>
+              </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <SelectField
-              label="Possui Cadastro no Conecta?"
-              value={cadastroConecta}
-              onChange={setCadastroConecta}
-              options={simNaoOptions}
-              placeholder="Selecione"
-            />
-            <SelectField
-              label="Possui Cadastro no Acesso Cidadão?"
-              value={cadastroAcessoCidadao}
-              onChange={setCadastroAcessoCidadao}
-              options={simNaoOptions}
-              placeholder="Selecione"
-            />
-          </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={labelStyle}>Papel (texto livre)</label>
+                  <input
+                    type="text"
+                    placeholder="Ex: Reitor, Diretor, Coordenador"
+                    value={papelResponsavel}
+                    onChange={(e) => setPapelResponsavel(e.target.value)}
+                    style={inputStyle}
+                  />
+                </div>
+                <div>
+                  <label style={labelStyle}>Início do Mandato</label>
+                  <input
+                    type="date"
+                    value={dataInicioMandato}
+                    onChange={(e) => setDataInicioMandato(e.target.value)}
+                    style={{ ...inputStyle, colorScheme: 'dark' }}
+                  />
+                </div>
+                <div>
+                  <label style={labelStyle}>Fim do Mandato</label>
+                  <input
+                    type="date"
+                    value={dataFimMandato}
+                    onChange={(e) => setDataFimMandato(e.target.value)}
+                    style={{ ...inputStyle, colorScheme: 'dark' }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Historico de Responsaveis encerrados */}
+          {historicoResponsaveis.length > 0 && (
+            <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
+                <History size={14} style={{ color: 'rgba(255,255,255,0.6)' }} />
+                <span style={{ ...labelStyle, marginBottom: 0 }}>Histórico de Responsáveis (mandatos encerrados)</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {historicoResponsaveis.map((h, idx) => (
+                  <div
+                    key={`${h.pessoaId}-${idx}`}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '2fr 1.5fr 1.5fr 2fr',
+                      gap: '12px',
+                      padding: '10px 14px',
+                      backgroundColor: 'rgba(30, 41, 59, 0.5)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      borderRadius: 'var(--radius)',
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-sm)',
+                      color: 'rgba(255,255,255,0.85)',
+                    }}
+                  >
+                    <span style={{ fontWeight: 'var(--font-weight-medium)' }}>{h.nome}</span>
+                    <span>{h.papel}</span>
+                    <span>{h.dataInicio} → {h.dataFim}</span>
+                    <span style={{ color: 'rgba(255,255,255,0.5)' }}>{h.motivo}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Card 3: Dados das Unidades Vinculadas */}

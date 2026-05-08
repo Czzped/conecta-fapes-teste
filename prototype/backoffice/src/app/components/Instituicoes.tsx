@@ -18,7 +18,7 @@ interface InstituicaoItem {
   natureza: NaturezaJuridica;
   municipio: string;
   uf: string;
-  dirigente: string;
+  responsavel: string;
   dataInicioMandato: string;
   dataFimMandato: string;
   superior?: string;
@@ -96,7 +96,7 @@ const emptyInstituicao: InstituicaoItem = {
   natureza: 'Publica',
   municipio: '',
   uf: 'ES',
-  dirigente: '',
+  responsavel: '',
   dataInicioMandato: '',
   dataFimMandato: '',
   superior: '',
@@ -104,12 +104,12 @@ const emptyInstituicao: InstituicaoItem = {
 };
 
 const initialInstituicoes: InstituicaoItem[] = [
-  { id: 1, nome: 'Universidade Federal do Espírito Santo', sigla: 'UFES', cnpj: '32.479.123/0001-43', razaoSocial: 'Universidade Federal do Espírito Santo', email: 'gabinete@ufes.br', telefone: '(27) 4009-2000', endereco: 'Av. Fernando Ferrari, 514 - Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', dirigente: 'Prof. Paulo Vargas', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', situacao: 'Ativa' },
-  { id: 2, nome: 'Centro Tecnológico da UFES', sigla: 'CT-UFES', cnpj: '', razaoSocial: '', email: 'ct@ufes.br', telefone: '(27) 4009-2600', endereco: 'Campus Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', dirigente: 'Prof. Ana Ribeiro', dataInicioMandato: '2023-03-01', dataFimMandato: '2027-02-28', superior: 'Universidade Federal do Espírito Santo', situacao: 'Ativa' },
-  { id: 3, nome: 'Instituto Federal do Espírito Santo', sigla: 'IFES', cnpj: '10.838.653/0001-06', razaoSocial: 'Instituto Federal de Educação, Ciência e Tecnologia do Espírito Santo', email: 'reitoria@ifes.edu.br', telefone: '(27) 3357-7500', endereco: 'Av. Rio Branco, 50 - Santa Lúcia', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', dirigente: 'Jadir Pela', dataInicioMandato: '2021-10-01', dataFimMandato: '2025-09-30', situacao: 'Ativa' },
-  { id: 4, nome: 'IFES Campus Serra', sigla: 'IFES Serra', cnpj: '10.838.653/0010-99', razaoSocial: 'Instituto Federal do Espírito Santo - Campus Serra', email: 'campus.serra@ifes.edu.br', telefone: '(27) 3348-9200', endereco: 'Rodovia ES-010, Km 6,5 - Manguinhos', natureza: 'Publica', municipio: 'Serra', uf: 'ES', dirigente: 'Marta Souza', dataInicioMandato: '2022-01-01', dataFimMandato: '2026-12-31', superior: 'Instituto Federal do Espírito Santo', situacao: 'Ativa' },
-  { id: 5, nome: 'Fucape Business School', sigla: 'FUCAPE', cnpj: '03.389.451/0001-66', razaoSocial: 'Fundação Instituto Capixaba de Pesquisas em Contabilidade, Economia e Finanças', email: 'contato@fucape.br', telefone: '(27) 4009-4444', endereco: 'Av. Fernando Ferrari, 1358 - Boa Vista', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', dirigente: 'Valcemiro Nossa', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', situacao: 'Ativa' },
-  { id: 6, nome: 'Departamento de Pesquisa Aplicada', sigla: 'DPA', cnpj: '', razaoSocial: '', email: 'pesquisa@fucape.br', telefone: '(27) 4009-4450', endereco: 'Sede Fucape', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', dirigente: 'Carla Mendes', dataInicioMandato: '2024-02-01', dataFimMandato: '2026-01-31', superior: 'Fucape Business School', situacao: 'Inativa' },
+  { id: 1, nome: 'Universidade Federal do Espírito Santo', sigla: 'UFES', cnpj: '32.479.123/0001-43', razaoSocial: 'Universidade Federal do Espírito Santo', email: 'gabinete@ufes.br', telefone: '(27) 4009-2000', endereco: 'Av. Fernando Ferrari, 514 - Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Prof. Paulo Vargas', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', situacao: 'Ativa' },
+  { id: 2, nome: 'Centro Tecnológico da UFES', sigla: 'CT-UFES', cnpj: '', razaoSocial: '', email: 'ct@ufes.br', telefone: '(27) 4009-2600', endereco: 'Campus Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Prof. Ana Ribeiro', dataInicioMandato: '2023-03-01', dataFimMandato: '2027-02-28', superior: 'Universidade Federal do Espírito Santo', situacao: 'Ativa' },
+  { id: 3, nome: 'Instituto Federal do Espírito Santo', sigla: 'IFES', cnpj: '10.838.653/0001-06', razaoSocial: 'Instituto Federal de Educação, Ciência e Tecnologia do Espírito Santo', email: 'reitoria@ifes.edu.br', telefone: '(27) 3357-7500', endereco: 'Av. Rio Branco, 50 - Santa Lúcia', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Jadir Pela', dataInicioMandato: '2021-10-01', dataFimMandato: '2025-09-30', situacao: 'Ativa' },
+  { id: 4, nome: 'IFES Campus Serra', sigla: 'IFES Serra', cnpj: '10.838.653/0010-99', razaoSocial: 'Instituto Federal do Espírito Santo - Campus Serra', email: 'campus.serra@ifes.edu.br', telefone: '(27) 3348-9200', endereco: 'Rodovia ES-010, Km 6,5 - Manguinhos', natureza: 'Publica', municipio: 'Serra', uf: 'ES', responsavel: 'Marta Souza', dataInicioMandato: '2022-01-01', dataFimMandato: '2026-12-31', superior: 'Instituto Federal do Espírito Santo', situacao: 'Ativa' },
+  { id: 5, nome: 'Fucape Business School', sigla: 'FUCAPE', cnpj: '03.389.451/0001-66', razaoSocial: 'Fundação Instituto Capixaba de Pesquisas em Contabilidade, Economia e Finanças', email: 'contato@fucape.br', telefone: '(27) 4009-4444', endereco: 'Av. Fernando Ferrari, 1358 - Boa Vista', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', responsavel: 'Valcemiro Nossa', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', situacao: 'Ativa' },
+  { id: 6, nome: 'Departamento de Pesquisa Aplicada', sigla: 'DPA', cnpj: '', razaoSocial: '', email: 'pesquisa@fucape.br', telefone: '(27) 4009-4450', endereco: 'Sede Fucape', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', responsavel: 'Carla Mendes', dataInicioMandato: '2024-02-01', dataFimMandato: '2026-01-31', superior: 'Fucape Business School', situacao: 'Inativa' },
 ];
 
 const getClassificacao = (item: Pick<InstituicaoItem, 'cnpj' | 'superior'>) => {
@@ -336,9 +336,9 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
           </FormSection>
 
-          <FormSection number="4" title="Dirigente" subtitle="Dirigente é o vínculo temporal entre uma Pessoa Física e uma Instituição, com mandato definido.">
+          <FormSection number="4" title="Responsável" subtitle="Responsável é o vínculo temporal entre uma Pessoa Física já cadastrada e uma Instituição, com mandato definido (RN04/RN11).">
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.5fr 0.5fr 0.5fr', gap: '16px' }}>
-              <Select label="Pessoa dirigente" value={draft.dirigente} onChange={value => updateDraft('dirigente', value)} options={['', 'Prof. Paulo Vargas', 'Prof. Ana Ribeiro', 'Jadir Pela', 'Marta Souza', 'Valcemiro Nossa', 'Carla Mendes']} />
+              <Select label="Pessoa responsável" value={draft.responsavel} onChange={value => updateDraft('responsavel', value)} options={['', 'Prof. Paulo Vargas', 'Prof. Ana Ribeiro', 'Jadir Pela', 'Marta Souza', 'Valcemiro Nossa', 'Carla Mendes']} />
               <Field label="Início do mandato" value={draft.dataInicioMandato} onChange={value => updateDraft('dataInicioMandato', value)} placeholder="AAAA-MM-DD" />
               <Field label="Fim do mandato" value={draft.dataFimMandato} onChange={value => updateDraft('dataFimMandato', value)} placeholder="AAAA-MM-DD" />
               <Select label="Situação" value={draft.situacao} onChange={value => updateDraft('situacao', value)} options={['Ativa', 'Inativa']} />
@@ -470,7 +470,7 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <ListCell label="Natureza" value={item.natureza === 'Publica' ? 'Pública' : 'Privada'} />
                     <ListCell label="Classificação" value={getClassificacao(item)} />
                     <ListCell label="CNPJ" value={item.cnpj || 'Não possui'} detail={item.superior ? `Superior: ${item.superior}` : 'Sem superior'} />
-                    <ListCell label="Dirigente" value={item.dirigente} detail={`${item.dataInicioMandato || '-'} a ${item.dataFimMandato || '-'}`} />
+                    <ListCell label="Responsavel" value={item.responsavel} detail={`${item.dataInicioMandato || '-'} a ${item.dataFimMandato || '-'}`} />
                     <div>
                       <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>Situação</div>
                       <span style={{ display: 'inline-block', backgroundColor: `${statusColor(item.situacao)}20`, border: `1px solid ${statusColor(item.situacao)}`, borderRadius: '999px', padding: '3px 12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: statusColor(item.situacao) }}>
