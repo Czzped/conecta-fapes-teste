@@ -38,7 +38,7 @@ conectafapes-project/
 │   │   ├── README.md           # Visao geral, stack, diagramas C4
 │   │   └── adr/                # Architecture Decision Records (ADR-001 a ADR-010)
 │   ├── implementation/         # O QUE construir — modulos backend (bounded contexts)
-│   │   └── modules/            # 20 modulos (M001-M020), cada um com:
+│   │   └── modules/            # 23 modulos (M001-M023), cada um com:
 │   │       └── M00x/           #   README, contrato, backlog, modelo-estrutural,
 │   │                           #   modelo-comportamental, contrato-api, epics/
 │   ├── products/               # PARA QUEM — canais de entrega (frontends)
@@ -146,6 +146,52 @@ Roadmap       → sequencia de domains (longo prazo)
 | M018 | Business Intelligence | 0% | [README](docs/implementation/modules/M018-business-intelligence/README.md) |
 | M019 | Transparencia e Auditoria | 0% | [README](docs/implementation/modules/M019-transparencia-auditoria/README.md) |
 | M020 | Comunicacao | 0% | [README](docs/implementation/modules/M020-comunicacao/README.md) |
+| M021 | Gestao de Formularios Dinamicos | 0% | [README](docs/implementation/modules/M021-gestao-formularios/README.md) |
+| M022 | Contratacao e Outorga | 0% | [README](docs/implementation/modules/M022-contratacao-outorga/README.md) |
+| M023 | Integracao Assinatura Eletronica (E-Docs) | 0% | [README](docs/implementation/modules/M023-integracao-edocs/README.md) |
+
+### Resumo por Dominio
+
+**Cadastros e Identidade**
+- **M005** Autenticacao via Acesso Cidadao (SSO)
+- **M006** Autorizacao granular + auditoria
+- **M007** API Gateway
+- **M008** Cadastros Corporativos: PessoaFisica, Instituicao (CNPJ obrigatorio), UnidadeOrganizacional, Responsavel (vinculo temporal), TipoInstituicao, Documento, Rubrica, Geografia, Diaria
+
+**Planejamento e Captacao (Pre-Award)**
+- **M010** Planejamento Estrategico + Parcerias com Aporte Financeiro
+- **M011** Configuracao de Captacao + Editais
+- **M021** Gestao de Formularios Dinamicos para editais
+
+**Execucao (Post-Award)**
+- **M003** Gestao de Iniciativas Captadas + solicitacao de Diarias
+- **M013** Gestao Orcamentaria do Projeto (RubricaProjeto, saldos canonicos)
+- **M022** Contratacao e Outorga (Termo de Outorga)
+- **M015** Suspensao e Finalizacao
+
+**Bolsas**
+- **M001** Modalidades, Niveis e Versoes
+- **M009** Gestao Bolsa Pesquisa (Termo de Compromisso, ciclo de vida)
+- **M004** Pagamento de Bolsistas (Folha)
+
+**Financeiro e Prestacao**
+- **M014** Prestacao de Contas + DocumentoFiscal + Estornos
+- **M016** Contabilidade e Financeiro + Acao Transversal
+- **M017** Prevencao Lavagem de Dinheiro
+
+**Importacao e Migracao**
+- **M002** Importacao SIGFAPES (planilhas + JSONLs)
+
+**Comunicacao e Governanca**
+- **M012** Acompanhamento e Resultados
+- **M018** Business Intelligence
+- **M019** Transparencia e Auditoria
+- **M020** Comunicacao (notificacoes)
+
+**Integracoes Externas**
+- **M023** Integracao Assinatura Eletronica — adapter para E-Docs ES V2 (provedor agnostico no dominio); detecta conclusao via polling; arquiva PDF assinado em M008. Habilita formalizacao de Bolsa (M009), Outorga (M022), Aceite (M003), Cooperacao (M010)
+
+> Discovery completo de integracoes externas em [docs/discovery/integracoes/](docs/discovery/integracoes/) — E-Docs, Organograma, Acesso Cidadao.
 
 ---
 
