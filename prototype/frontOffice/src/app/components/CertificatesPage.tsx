@@ -1428,8 +1428,8 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
               onChange={(value) => setMinhasDiariasDataPartidaSort(value as OrdenacaoDataPartida)}
               showSelectedIcon={false}
               options={[
-                { value: 'RECENTE', label: 'Mais Recente' },
-                { value: 'ANTIGA', label: 'Mais Antiga' },
+                { value: 'RECENTE', label: 'Próxima' },
+                { value: 'ANTIGA', label: 'Anterior' },
               ]}
             />
           </div>
@@ -1615,7 +1615,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
             <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
               Comprovação da Atividade
             </h2>
-            {!comprovacaoEditavel && (
+            {!comprovacaoEditavel && !mostrarNumeroEtapa && (
               <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
                 Disponível para edição após a data de partida.
               </span>
@@ -1965,7 +1965,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                 <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
                   Comprovação da Atividade
                 </h2>
-                {!comprovacaoEditavel && (
+                {!comprovacaoEditavel && !mostrarNumeroEtapa && (
                   <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
                     Disponível para edição após a data de partida.
                   </span>
@@ -2427,11 +2427,13 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   {activeDiariaTab === 'nova' ? (
-                    <BreadcrumbPage>Diária</BreadcrumbPage>
-                  ) : (
                     <BreadcrumbLink asChild>
                       <button
                         type="button"
+                        onClick={() => {
+                          setSolicitacaoDetalheId(null);
+                          setActiveDiariaTab('minhas');
+                        }}
                         style={{
                           backgroundColor: 'transparent',
                           border: 'none',
@@ -2444,23 +2446,10 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                         Diária
                       </button>
                     </BreadcrumbLink>
+                  ) : (
+                    <BreadcrumbPage>Diária</BreadcrumbPage>
                   )}
                 </BreadcrumbItem>
-                {activeDiariaTab === 'nova' ? (
-                  <>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage>Detalhes</BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </>
-                ) : (
-                  <>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage>Minhas Diárias</BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </>
-                )}
               </>
             )}
           </BreadcrumbList>
@@ -2478,7 +2467,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
             {activeFlow === 'diarias' ? <Hotel size={20} /> : <ClipboardList size={20} />}
           </div>
           <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
-            {activeFlow === 'diarias' ? (activeDiariaTab === 'nova' ? 'Detalhes da Diária' : 'Minhas Diárias') : 'Solicitações'}
+            {activeFlow === 'diarias' ? (activeDiariaTab === 'nova' ? 'Detalhes da Diária' : 'Diárias') : 'Solicitações'}
           </h1>
         </div>
 
@@ -2554,7 +2543,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
               >
                 <div className="flex items-start justify-between gap-3" style={{ marginBottom: '1rem' }}>
                   <h3 style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-semibold)', fontSize: 'var(--text-sm)', margin: 0 }}>
-                    Minhas Diárias
+                    Diárias
                   </h3>
                   {temDiariaPendenteBolsista && (
                     <span
@@ -3585,8 +3574,8 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                       onChange={(value) => setDiariaDataPartidaSort(value as OrdenacaoDataPartida)}
                       showSelectedIcon={false}
                       options={[
-                        { value: 'RECENTE', label: 'Mais Recente' },
-                        { value: 'ANTIGA', label: 'Mais Antiga' },
+                        { value: 'RECENTE', label: 'Próxima' },
+                        { value: 'ANTIGA', label: 'Anterior' },
                       ]}
                     />
                   </div>
