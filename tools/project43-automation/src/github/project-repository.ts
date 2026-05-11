@@ -5,7 +5,9 @@ import type {
   ProjectFieldDefinition,
   ProjectFieldMetadata,
   ProjectFieldNode,
+  ProjectItemForSprintRollover,
   ProjectItemState,
+  ProjectV2IterationField,
   ProjectV2SingleSelectField,
 } from "./project-types.js";
 
@@ -14,7 +16,7 @@ const PROJECT_FIELDS_QUERY = `
     node(id: $projectId) {
       ... on ProjectV2 {
         id
-        fields(first: 50) {
+        fields(first: 100) {
           nodes {
             __typename
             ... on ProjectV2Field {
@@ -35,6 +37,20 @@ const PROJECT_FIELDS_QUERY = `
               id
               name
               dataType
+              configuration {
+                iterations {
+                  id
+                  title
+                  startDate
+                  duration
+                }
+                completedIterations {
+                  id
+                  title
+                  startDate
+                  duration
+                }
+              }
             }
           }
         }
@@ -77,6 +93,65 @@ const PROJECT_ITEM_QUERY = `
   }
 `;
 
+const PROJECT_ITEMS_QUERY = `
+  query ProjectItems($projectId: ID!, $after: String) {
+    node(id: $projectId) {
+      ... on ProjectV2 {
+        items(first: 100, after: $after) {
+          nodes {
+            id
+            content {
+              __typename
+              ... on DraftIssue {
+                title
+              }
+              ... on Issue {
+                title
+                url
+              }
+              ... on PullRequest {
+                title
+                url
+              }
+            }
+            fieldValues(first: 100) {
+              nodes {
+                __typename
+                ... on ProjectV2ItemFieldSingleSelectValue {
+                  name
+                  optionId
+                  field {
+                    ... on ProjectV2SingleSelectField {
+                      id
+                      name
+                    }
+                  }
+                }
+                ... on ProjectV2ItemFieldIterationValue {
+                  iterationId
+                  title
+                  startDate
+                  duration
+                  field {
+                    ... on ProjectV2IterationField {
+                      id
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+        }
+      }
+    }
+  }
+`;
+
 const SET_PROJECT_DATE_MUTATION = `
   mutation SetProjectDate(
     $projectId: ID!
@@ -110,6 +185,28 @@ const CLEAR_PROJECT_DATE_MUTATION = `
         projectId: $projectId
         itemId: $itemId
         fieldId: $fieldId
+      }
+    ) {
+      projectV2Item {
+        id
+      }
+    }
+  }
+`;
+
+const SET_PROJECT_ITERATION_MUTATION = `
+  mutation SetProjectIteration(
+    $projectId: ID!
+    $itemId: ID!
+    $fieldId: ID!
+    $iterationId: String!
+  ) {
+    updateProjectV2ItemFieldValue(
+      input: {
+        projectId: $projectId
+        itemId: $itemId
+        fieldId: $fieldId
+        value: { iterationId: $iterationId }
       }
     ) {
       projectV2Item {
@@ -215,10 +312,52 @@ type ProjectItemFieldValueNode =
   | ProjectItemFieldDateValueNode
   | ProjectItemFieldSingleSelectValueNode;
 
+interface ProjectItemFieldIterationValueNode {
+  __typename: "ProjectV2ItemFieldIterationValue";
+  iterationId: string | null;
+  title: string | null;
+  startDate: string | null;
+  duration: number | null;
+  field: {
+    id: string;
+    name: string;
+  } | null;
+}
+
+type ProjectSprintRolloverFieldValueNode =
+  | ProjectItemFieldSingleSelectValueNode
+  | ProjectItemFieldIterationValueNode;
+
 interface ProjectItemQueryResult {
   node: {
     fieldValues: {
       nodes: ProjectItemFieldValueNode[];
+    };
+  } | null;
+}
+
+interface ProjectItemContentNode {
+  __typename: "DraftIssue" | "Issue" | "PullRequest";
+  title: string;
+  url?: string;
+}
+
+interface ProjectSprintRolloverItemNode {
+  id: string;
+  content: ProjectItemContentNode | null;
+  fieldValues: {
+    nodes: ProjectSprintRolloverFieldValueNode[];
+  };
+}
+
+interface ProjectItemsQueryResult {
+  node: {
+    items: {
+      nodes: ProjectSprintRolloverItemNode[];
+      pageInfo: {
+        hasNextPage: boolean;
+        endCursor: string | null;
+      };
     };
   } | null;
 }
@@ -292,10 +431,60 @@ function resolveTrackedField(
   );
 }
 
+function createFieldNameSet(fieldNames: string[]): Set<string> {
+  return new Set(fieldNames.map((fieldName) => fieldName.trim()).filter(Boolean));
+}
+
+function createRolloverItem(
+  node: ProjectSprintRolloverItemNode,
+  statusFieldNames: Set<string>,
+  iterationFieldNames: Set<string>
+): ProjectItemForSprintRollover {
+  let statusName: string | null = null;
+  let iterationId: string | null = null;
+
+  for (const value of node.fieldValues.nodes) {
+    const fieldName = value.field?.name;
+
+    if (!fieldName) {
+      continue;
+    }
+
+    if (
+      value.__typename === "ProjectV2ItemFieldSingleSelectValue" &&
+      statusFieldNames.has(fieldName)
+    ) {
+      statusName = value.name;
+      continue;
+    }
+
+    if (
+      value.__typename === "ProjectV2ItemFieldIterationValue" &&
+      iterationFieldNames.has(fieldName)
+    ) {
+      iterationId = value.iterationId;
+    }
+  }
+
+  return {
+    id: node.id,
+    title: node.content?.title ?? "Untitled project item",
+    url: node.content?.url ?? null,
+    statusName,
+    iterationId,
+  };
+}
+
 export function isSingleSelectField(
   field: ProjectFieldNode
 ): field is ProjectV2SingleSelectField {
   return field.__typename === "ProjectV2SingleSelectField";
+}
+
+function isIterationField(
+  field: ProjectFieldNode
+): field is ProjectV2IterationField {
+  return field.__typename === "ProjectV2IterationField";
 }
 
 export class GitHubProjectRepository {
@@ -314,6 +503,43 @@ export class GitHubProjectRepository {
     return data.node.fields.nodes;
   }
 
+  async listItemsForSprintRollover(
+    projectId: string,
+    statusFieldNames: string[],
+    iterationFieldNames: string[]
+  ): Promise<ProjectItemForSprintRollover[]> {
+    const statusFieldNameSet = createFieldNameSet(statusFieldNames);
+    const iterationFieldNameSet = createFieldNameSet(iterationFieldNames);
+    const items: ProjectItemForSprintRollover[] = [];
+    let after: string | null = null;
+
+    do {
+      const data: ProjectItemsQueryResult =
+        await this.client.request<ProjectItemsQueryResult>(PROJECT_ITEMS_QUERY, {
+          projectId,
+          after,
+        });
+
+      if (!data.node) {
+        throw new Error(`project not found: ${projectId}`);
+      }
+
+      for (const node of data.node.items.nodes) {
+        items.push(
+          createRolloverItem(node, statusFieldNameSet, iterationFieldNameSet)
+        );
+      }
+
+      after = data.node.items.pageInfo.endCursor;
+
+      if (!data.node.items.pageInfo.hasNextPage) {
+        after = null;
+      }
+    } while (after);
+
+    return items;
+  }
+
   async getFieldMetadata(
     projectId: string,
     fieldNames: ProjectFieldNames
@@ -321,6 +547,24 @@ export class GitHubProjectRepository {
     const fields = await this.listFields(projectId);
     const fieldsByName = new Map(fields.map((field) => [field.name, field]));
     return createFieldMetadata(fieldsByName, fieldNames);
+  }
+
+  async getIterationField(
+    projectId: string,
+    fieldNames: string[]
+  ): Promise<ProjectV2IterationField> {
+    const fields = await this.listFields(projectId);
+    const fieldNameSet = createFieldNameSet(fieldNames);
+    const field = fields.find(
+      (candidate): candidate is ProjectV2IterationField =>
+        isIterationField(candidate) && fieldNameSet.has(candidate.name)
+    );
+
+    if (!field) {
+      throw new Error(`iteration field not found: ${fieldNames.join(", ")}`);
+    }
+
+    return field;
   }
 
   async getItemState(
@@ -407,6 +651,20 @@ export class GitHubProjectRepository {
         fieldId: field.id,
       });
     }
+  }
+
+  async setItemIteration(
+    projectId: string,
+    itemId: string,
+    fieldId: string,
+    iterationId: string
+  ): Promise<void> {
+    await this.client.request(SET_PROJECT_ITERATION_MUTATION, {
+      projectId,
+      itemId,
+      fieldId,
+      iterationId,
+    });
   }
 
   async createField(

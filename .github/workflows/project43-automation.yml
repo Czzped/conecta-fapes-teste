@@ -4,12 +4,14 @@ on:
   pull_request:
     paths:
       - ".github/workflows/project43-automation.yml"
+      - ".github/workflows/project43-sprint-rollover.yml"
       - "tools/project43-automation/**"
   push:
     branches:
       - main
     paths:
       - ".github/workflows/project43-automation.yml"
+      - ".github/workflows/project43-sprint-rollover.yml"
       - "tools/project43-automation/**"
 
 jobs:

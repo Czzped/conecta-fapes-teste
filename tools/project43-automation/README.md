@@ -10,6 +10,8 @@ do GitHub App e atualiza as datas do Project 43 da organizacao
 - preenche `Iniciado em` ao entrar em `In Progress`
 - preenche `Data de Conclusao` ao entrar em `Done`
 - limpa `Data de Conclusao` quando o item sai de `Done`
+- move automaticamente para a proxima sprint os cards da sprint encerrada
+  que nao estao em `Done`
 
 ## Estrutura
 
@@ -25,6 +27,7 @@ do GitHub App e atualiza as datas do Project 43 da organizacao
 
 ```bash
 npm install
+npm run rollover:sprint
 npm run typecheck
 npm test
 npm run sync:fields
@@ -42,6 +45,9 @@ npm run sync:fields
 - `DONE_AT_FIELD_NAME`
 - `IN_PROGRESS_OPTION_NAME`
 - `DONE_OPTION_NAME`
+- `ITERATION_FIELD_NAME` ou `SPRINT_FIELD_NAME`
+- `SPRINT_ROLLOVER_DRY_RUN`
+- `SPRINT_ROLLOVER_DATE`
 
 ### Segredos
 
@@ -49,3 +55,7 @@ npm run sync:fields
 - `GITHUB_APP_INSTALLATION_ID`
 - `GITHUB_APP_PRIVATE_KEY`
 - `GITHUB_WEBHOOK_SECRET`
+
+Para o rollover executado pelo GitHub Actions, use um token com permissao de
+Projects em `GITHUB_LEDS`/`PROJECTS_PAT` ou os segredos do GitHub App
+`GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID` e `GITHUB_APP_PRIVATE_KEY`.
