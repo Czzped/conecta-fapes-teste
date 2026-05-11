@@ -190,6 +190,51 @@
   }
 }
 
+@property --login-card-border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.login-card-border-glow {
+  --login-card-border-angle: 0deg;
+}
+
+.login-card-border-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--login-card-border-angle),
+    transparent 0deg,
+    transparent 292deg,
+    rgba(163, 163, 163, 0.24) 314deg,
+    rgba(245, 245, 245, 0.62) 332deg,
+    rgba(163, 163, 163, 0.24) 350deg,
+    transparent 360deg
+  );
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: login-card-stroke-light 14s linear infinite;
+}
+
+.login-card-border-glow > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes login-card-stroke-light {
+  to {
+    --login-card-border-angle: 360deg;
+  }
+}
+
 /**
  * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
  */

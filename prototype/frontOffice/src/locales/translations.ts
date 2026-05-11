@@ -43,7 +43,7 @@ export const translations = {
       loginButton: 'Entrar',
       noAccount: 'Não tem uma conta?',
       register: 'Cadastre-se',
-      welcome: 'Bem-vindo',
+      welcome: 'Boas-Vindas',
       loginWithAcessoCidadao: 'Faça login usando sua conta do Acesso Cidadão',
       acessoCidadaoInfo: 'O Acesso Cidadão é o sistema oficial de autenticação do Governo Federal',
       volunteer: 'Voluntário',

@@ -2,7 +2,6 @@ import { User, UserCircle, GraduationCap, Users, Briefcase, Building, ClipboardC
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-import backgroundImage from 'figma:asset/57dfbf595eb8fd2b733bc4ff608d932fd65501c6.png';
 import fapesLogo from 'figma:asset/aec6ed8eb7cf2782d52002e0d4c19150c79afd78.png';
 
 interface LoginPageProps {
@@ -31,16 +30,30 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     onLogin(accessType);
   };
 
+  const getLoginOptionBackground = (accessType: AccessType) =>
+    selectedAccessType === accessType ? 'var(--sidebar-accent)' : 'transparent';
+  const getLoginOptionColor = (accessType: AccessType) =>
+    selectedAccessType === accessType ? 'var(--primary)' : 'var(--card-foreground)';
+  const setLoginOptionHover = (element: HTMLButtonElement, accessType: AccessType) => {
+    element.style.backgroundColor = 'var(--sidebar-accent)';
+    element.style.color = getLoginOptionColor(accessType);
+    element.style.transform = 'translateY(0)';
+    element.style.boxShadow = 'none';
+  };
+  const resetLoginOption = (element: HTMLButtonElement, accessType: AccessType) => {
+    element.style.backgroundColor = getLoginOptionBackground(accessType);
+    element.style.color = getLoginOptionColor(accessType);
+    element.style.transform = 'translateY(0)';
+    element.style.boxShadow = 'none';
+  };
+
   return (
     <div 
-      className="min-h-screen flex items-center justify-center"
+      className="min-h-screen flex items-center justify-center overflow-hidden"
       style={{
-        backgroundColor: 'var(--background)',
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
+        backgroundColor: 'var(--color-neutral-950)',
         padding: '1rem',
+        position: 'relative',
       }}
     >
       <div 
@@ -50,6 +63,8 @@ export function LoginPage({ onLogin }: LoginPageProps) {
           flexDirection: 'column',
           alignItems: 'center',
           gap: '2rem',
+          position: 'relative',
+          zIndex: 1,
         }}
       >
         {/* Logo Container */}
@@ -71,12 +86,15 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
         {/* Login Card */}
         <div 
-          className="w-full px-6 py-8 md:p-8"
+          className="login-card-border-glow w-full px-6 py-8 md:p-8"
           style={{
-            backgroundColor: 'var(--card)',
+            backgroundColor: 'color-mix(in srgb, var(--color-neutral-900) 92%, transparent)',
             borderRadius: 'var(--radius-lg)',
-            boxShadow: 'var(--elevation-sm)',
-            border: '1px solid var(--border)',
+            boxShadow: '0 24px 80px rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.04)',
+            border: '1px solid color-mix(in srgb, var(--color-neutral-700) 58%, transparent)',
+            backdropFilter: 'blur(18px)',
+            position: 'relative',
+            overflow: 'hidden',
           }}
         >
           <div 
@@ -126,34 +144,28 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 }}
                 className="flex items-center justify-center gap-2 transition-all duration-200"
                 style={{
-                  backgroundColor: selectedAccessType === 'cidadao' ? 'var(--primary)' : 'var(--card)',
-                  color: selectedAccessType === 'cidadao' ? 'var(--primary-foreground)' : 'var(--card-foreground)',
+                  backgroundColor: getLoginOptionBackground('cidadao'),
+                  color: getLoginOptionColor('cidadao'),
                   padding: '0.75rem 1rem',
                   borderRadius: 'var(--radius)',
                   border: 'none',
                   cursor: 'pointer',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
-                  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                  boxShadow: 'none',
                   width: '100%',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#06b6d4';
-                  e.currentTarget.style.color = 'var(--background)';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                  setLoginOptionHover(e.currentTarget, 'cidadao');
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = selectedAccessType === 'cidadao' ? 'var(--primary)' : 'var(--card)';
-                  e.currentTarget.style.color = selectedAccessType === 'cidadao' ? 'var(--primary-foreground)' : 'var(--card-foreground)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+                  resetLoginOption(e.currentTarget, 'cidadao');
                 }}
                 onMouseDown={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
                 onMouseUp={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
                 <UserCircle size={16} />
@@ -166,34 +178,28 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 }}
                 className="flex items-center justify-center gap-2 transition-all duration-200"
                 style={{
-                  backgroundColor: selectedAccessType === 'voluntario' ? 'var(--primary)' : 'var(--card)',
-                  color: selectedAccessType === 'voluntario' ? 'var(--primary-foreground)' : 'var(--card-foreground)',
+                  backgroundColor: getLoginOptionBackground('voluntario'),
+                  color: getLoginOptionColor('voluntario'),
                   padding: '0.75rem 1rem',
                   borderRadius: 'var(--radius)',
                   border: 'none',
                   cursor: 'pointer',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
-                  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                  boxShadow: 'none',
                   width: '100%',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#06b6d4';
-                  e.currentTarget.style.color = 'var(--background)';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                  setLoginOptionHover(e.currentTarget, 'voluntario');
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = selectedAccessType === 'voluntario' ? 'var(--primary)' : 'var(--card)';
-                  e.currentTarget.style.color = selectedAccessType === 'voluntario' ? 'var(--primary-foreground)' : 'var(--card-foreground)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+                  resetLoginOption(e.currentTarget, 'voluntario');
                 }}
                 onMouseDown={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
                 onMouseUp={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
                 <User size={16} />
@@ -206,34 +212,28 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 }}
                 className="flex items-center justify-center gap-2 transition-all duration-200"
                 style={{
-                  backgroundColor: selectedAccessType === 'bolsista' ? 'var(--primary)' : 'var(--card)',
-                  color: selectedAccessType === 'bolsista' ? 'var(--primary-foreground)' : 'var(--card-foreground)',
+                  backgroundColor: getLoginOptionBackground('bolsista'),
+                  color: getLoginOptionColor('bolsista'),
                   padding: '0.75rem 1rem',
                   borderRadius: 'var(--radius)',
                   border: 'none',
                   cursor: 'pointer',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
-                  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                  boxShadow: 'none',
                   width: '100%',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#06b6d4';
-                  e.currentTarget.style.color = 'var(--background)';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                  setLoginOptionHover(e.currentTarget, 'bolsista');
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = selectedAccessType === 'bolsista' ? 'var(--primary)' : 'var(--card)';
-                  e.currentTarget.style.color = selectedAccessType === 'bolsista' ? 'var(--primary-foreground)' : 'var(--card-foreground)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+                  resetLoginOption(e.currentTarget, 'bolsista');
                 }}
                 onMouseDown={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
                 onMouseUp={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
                 <GraduationCap size={16} />
@@ -246,34 +246,28 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 }}
                 className="flex items-center justify-center gap-2 transition-all duration-200"
                 style={{
-                  backgroundColor: selectedAccessType === 'coordenador' ? 'var(--primary)' : 'var(--card)',
-                  color: selectedAccessType === 'coordenador' ? 'var(--primary-foreground)' : 'var(--card-foreground)',
+                  backgroundColor: getLoginOptionBackground('coordenador'),
+                  color: getLoginOptionColor('coordenador'),
                   padding: '0.75rem 1rem',
                   borderRadius: 'var(--radius)',
                   border: 'none',
                   cursor: 'pointer',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
-                  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                  boxShadow: 'none',
                   width: '100%',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#06b6d4';
-                  e.currentTarget.style.color = 'var(--background)';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                  setLoginOptionHover(e.currentTarget, 'coordenador');
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = selectedAccessType === 'coordenador' ? 'var(--primary)' : 'var(--card)';
-                  e.currentTarget.style.color = selectedAccessType === 'coordenador' ? 'var(--primary-foreground)' : 'var(--card-foreground)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+                  resetLoginOption(e.currentTarget, 'coordenador');
                 }}
                 onMouseDown={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
                 onMouseUp={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
                 <Users size={16} />
@@ -286,33 +280,29 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 }}
                 className="flex items-center justify-center gap-2 transition-all duration-200"
                 style={{
-                  backgroundColor: selectedAccessType === 'avaliador' ? 'var(--primary)' : 'var(--card)',
-                  color: selectedAccessType === 'avaliador' ? 'var(--primary-foreground)' : 'var(--card-foreground)',
+                  backgroundColor: getLoginOptionBackground('avaliador'),
+                  color: getLoginOptionColor('avaliador'),
                   padding: '0.75rem 1rem',
                   borderRadius: 'var(--radius)',
                   border: 'none',
                   cursor: 'pointer',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
-                  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                  boxShadow: 'none',
                   width: '100%',
                   opacity: 0.6,
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#06b6d4';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                  setLoginOptionHover(e.currentTarget, 'avaliador');
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = selectedAccessType === 'avaliador' ? 'var(--primary)' : 'var(--card)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+                  resetLoginOption(e.currentTarget, 'avaliador');
                 }}
                 onMouseDown={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
                 onMouseUp={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
                 disabled
               >
@@ -326,34 +316,28 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 }}
                 className="flex items-center justify-center gap-2 transition-all duration-200"
                 style={{
-                  backgroundColor: selectedAccessType === 'reitor' ? 'var(--primary)' : 'var(--card)',
-                  color: selectedAccessType === 'reitor' ? 'var(--primary-foreground)' : 'var(--card-foreground)',
+                  backgroundColor: getLoginOptionBackground('reitor'),
+                  color: getLoginOptionColor('reitor'),
                   padding: '0.75rem 1rem',
                   borderRadius: 'var(--radius)',
                   border: 'none',
                   cursor: 'pointer',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
-                  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                  boxShadow: 'none',
                   width: '100%',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#06b6d4';
-                  e.currentTarget.style.color = 'var(--background)';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                  setLoginOptionHover(e.currentTarget, 'reitor');
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = selectedAccessType === 'reitor' ? 'var(--primary)' : 'var(--card)';
-                  e.currentTarget.style.color = selectedAccessType === 'reitor' ? 'var(--primary-foreground)' : 'var(--card-foreground)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+                  resetLoginOption(e.currentTarget, 'reitor');
                 }}
                 onMouseDown={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
                 onMouseUp={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
                 <Building size={16} />
