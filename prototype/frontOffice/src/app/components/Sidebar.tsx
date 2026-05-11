@@ -219,9 +219,9 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                   color: 'var(--muted-foreground)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
-                  marginBottom: '0.5rem',
+                  marginBottom: '0.75rem',
                   paddingLeft: '0.75rem',
-                  marginTop: '0.75rem',
+                  marginTop: '1.5rem',
                 }}
               >
                 {t('sidebar.management')}
@@ -286,19 +286,9 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
               })}
             </ul>
             
-            {/* Divider and Prestação de Contas - Only for Coordenador */}
+            {/* Prestação de Contas - Only for Coordenador */}
             {accessType === 'coordenador' && (
               <>
-                {/* Divider */}
-                <div 
-                  style={{
-                    height: '1px',
-                    backgroundColor: 'var(--sidebar-border)',
-                    marginTop: '1rem',
-                    marginBottom: '1.5rem',
-                  }}
-                />
-                
                 {/* Section Title: Prestação de Contas */}
                 {!isCollapsed && (
                   <div 
@@ -308,9 +298,9 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                       color: 'var(--muted-foreground)',
                       textTransform: 'uppercase',
                       letterSpacing: '0.05em',
-                      marginBottom: '0.5rem',
+                      marginBottom: '0.75rem',
                       paddingLeft: '0.75rem',
-                      marginTop: '0.25rem',
+                      marginTop: '1.5rem',
                     }}
                   >
                     {t('sidebar.accountability')}
@@ -381,10 +371,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
         </div>
 
         {/* Logout button at bottom */}
-        <div 
-          className={isCollapsed ? 'p-2 border-t' : 'p-4 border-t'}
-          style={{ borderColor: 'var(--sidebar-border)' }}
-        >
+        <div className={isCollapsed ? 'p-2' : 'p-4'}>
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 py-3 transition-colors relative group"
@@ -628,15 +615,6 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
 
           {filteredProfileMenuItems.length > 0 && (
             <>
-              <div
-                style={{
-                  height: '1px',
-                  backgroundColor: 'var(--sidebar-border)',
-                  marginTop: '1rem',
-                  marginBottom: '1.5rem',
-                }}
-              />
-
               {!isCollapsed && (
                 <div
                   style={{
@@ -645,9 +623,9 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                     color: 'var(--muted-foreground)',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
-                    marginBottom: '0.5rem',
+                    marginBottom: '0.75rem',
                     paddingLeft: '0.75rem',
-                    marginTop: '0.75rem',
+                    marginTop: '1.5rem',
                   }}
                 >
                   {t('sidebar.myProfile')}
@@ -712,14 +690,6 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                 })}
               </ul>
 
-              <div
-                style={{
-                  height: '1px',
-                  backgroundColor: 'var(--sidebar-border)',
-                  marginTop: '1rem',
-                  marginBottom: '1.5rem',
-                }}
-              />
             </>
           )}
 
@@ -732,9 +702,9 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                 color: 'var(--muted-foreground)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
-                marginBottom: '0.5rem',
+                marginBottom: '0.75rem',
                 paddingLeft: '0.75rem',
-                marginTop: '0.75rem',
+                marginTop: '1.5rem',
               }}
             >
               {t('sidebar.management')}
@@ -799,19 +769,9 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
             })}
           </ul>
           
-          {/* Divider and Prestação de Contas - Only for Coordenador */}
+          {/* Prestação de Contas - Only for Coordenador */}
           {accessType === 'coordenador' && (
             <>
-              {/* Divider */}
-              <div 
-                style={{
-                  height: '1px',
-                  backgroundColor: 'var(--sidebar-border)',
-                  marginTop: '1rem',
-                  marginBottom: '1.5rem',
-                }}
-              />
-              
               {/* Section Title: Prestação de Contas */}
               {!isCollapsed && (
                 <div 
@@ -821,9 +781,9 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                     color: 'var(--muted-foreground)',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
-                    marginBottom: '0.5rem',
+                    marginBottom: '0.75rem',
                     paddingLeft: '0.75rem',
-                    marginTop: '0.25rem',
+                    marginTop: '1.5rem',
                   }}
                 >
                   {t('sidebar.accountability')}
@@ -894,10 +854,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
       </div>
 
       {/* Logout button at bottom */}
-      <div 
-        className={isCollapsed ? 'p-2 border-t' : 'p-4 border-t'}
-        style={{ borderColor: 'var(--sidebar-border)' }}
-      >
+      <div className={isCollapsed ? 'p-2' : 'p-4'}>
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 py-3 transition-colors relative group"

@@ -159,7 +159,7 @@ export function NotificationsSidebar({ isOpen, onClose, onNavigate }: Notificati
         className="fixed top-0 right-0 h-full flex flex-col transition-transform duration-300 ease-in-out z-50"
         style={{
           width: '400px',
-          backgroundColor: 'var(--background)',
+          backgroundColor: 'var(--app-header)',
           borderLeft: '1px solid var(--border)',
           transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
           boxShadow: isOpen ? 'var(--elevation-sm)' : 'none',

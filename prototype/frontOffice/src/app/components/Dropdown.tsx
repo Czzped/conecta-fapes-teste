@@ -14,9 +14,10 @@ interface DropdownProps {
   className?: string;
   disabled?: boolean;
   backgroundColor?: string;
+  showSelectedIcon?: boolean;
 }
 
-export function Dropdown({ value, onChange, options, placeholder = 'Selecione', className = '', disabled = false, backgroundColor = 'var(--input-background)' }: DropdownProps) {
+export function Dropdown({ value, onChange, options, placeholder = 'Selecione', className = '', disabled = false, backgroundColor = 'var(--input-background)', showSelectedIcon = true }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -101,7 +102,7 @@ export function Dropdown({ value, onChange, options, placeholder = 'Selecione', 
                   onChange(option.value);
                   setIsOpen(false);
                 }}
-                className="w-full px-3 py-2.5 text-left transition-colors flex items-center gap-3"
+                className={`w-full px-3 py-2.5 text-left transition-colors ${showSelectedIcon ? 'flex items-center gap-3' : ''}`}
                 style={{
                   backgroundColor: isSelected ? 'color-mix(in srgb, var(--primary) 16%, var(--popover))' : 'transparent',
                   color: 'var(--foreground)',
@@ -122,20 +123,22 @@ export function Dropdown({ value, onChange, options, placeholder = 'Selecione', 
                   }
                 }}
               >
-                <span
-                  aria-hidden="true"
-                  className="flex items-center justify-center"
-                  style={{
-                    width: '24px',
-                    height: '24px',
-                    borderRadius: '6px',
-                    backgroundColor: isSelected ? 'var(--primary)' : 'transparent',
-                    color: 'var(--primary-foreground)',
-                    flexShrink: 0,
-                  }}
-                >
-                  {isSelected && <Check size={16} />}
-                </span>
+                {showSelectedIcon && (
+                  <span
+                    aria-hidden="true"
+                    className="flex items-center justify-center"
+                    style={{
+                      width: '24px',
+                      height: '24px',
+                      borderRadius: '6px',
+                      backgroundColor: isSelected ? 'var(--primary)' : 'transparent',
+                      color: 'var(--primary-foreground)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {isSelected && <Check size={16} />}
+                  </span>
+                )}
                 {option.label}
               </button>
             );

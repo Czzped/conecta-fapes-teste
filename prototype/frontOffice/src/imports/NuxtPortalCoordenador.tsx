@@ -36,7 +36,7 @@ function Button() {
 function Paragraph() {
   return (
     <div className="content-stretch flex h-[24px] items-start relative shrink-0 w-full" data-name="Paragraph">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:SemiBold',sans-serif] leading-[24px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[16px]">Prestação de Contas Técnica</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:SemiBold',sans-serif] leading-[24px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[16px]">Prestação de Contas Técnica</p>
     </div>
   );
 }
@@ -59,7 +59,7 @@ function Header() {
 }
 
 function PrimitiveDiv() {
-  return <div className="absolute bg-[#334155] h-px left-[289.5px] top-[233px] w-[1024px]" data-name="Primitive.div" />;
+  return <div className="absolute bg-[#404040] h-px left-[289.5px] top-[233px] w-[1024px]" data-name="Primitive.div" />;
 }
 
 function Text1() {
@@ -73,7 +73,7 @@ function Text1() {
 function Label() {
   return (
     <div className="h-[20px] relative shrink-0 w-full" data-name="Label">
-      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[20px] left-0 not-italic text-[#f8fafc] text-[14px] top-0">Palavras-chave</p>
+      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[20px] left-0 not-italic text-[#fafafa] text-[14px] top-0">Palavras-chave</p>
       <Text1 />
     </div>
   );
@@ -89,13 +89,13 @@ function Paragraph2() {
 
 function TextInput() {
   return (
-    <div className="bg-[#0f172b] h-[38px] relative rounded-[6px] shrink-0 w-full" data-name="Text Input">
+    <div className="bg-[#171717] h-[38px] relative rounded-[6px] shrink-0 w-full" data-name="Text Input">
       <div className="flex flex-row items-center overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex items-center px-[12px] py-[8px] relative size-full">
           <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[normal] not-italic relative shrink-0 text-[#94a3b8] text-[14px]">Ex: Educação, Tecnologia, Inovação</p>
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
   );
 }
@@ -121,7 +121,7 @@ function Text2() {
 function Label1() {
   return (
     <div className="h-[20px] relative shrink-0 w-full" data-name="Label">
-      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[20px] left-0 not-italic text-[#f8fafc] text-[14px] top-0">Resumo para Publicação no site da Fapes</p>
+      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[20px] left-0 not-italic text-[#fafafa] text-[14px] top-0">Resumo para Publicação no site da Fapes</p>
       <Text2 />
     </div>
   );
@@ -137,13 +137,13 @@ function Paragraph3() {
 
 function TextArea() {
   return (
-    <div className="bg-[#0f172b] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
+    <div className="bg-[#171717] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
       <div className="overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex items-start px-[12px] py-[8px] relative size-full">
           <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#94a3b8] text-[14px]">Digite aqui</p>
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
   );
 }
@@ -178,7 +178,7 @@ function Text3() {
 function Heading() {
   return (
     <div className="h-[24px] relative shrink-0 w-full" data-name="Heading 3">
-      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[24px] left-0 not-italic text-[#f8fafc] text-[16px] top-0">Descrição do Projeto</p>
+      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[24px] left-0 not-italic text-[#fafafa] text-[16px] top-0">Descrição do Projeto</p>
       <Text3 />
     </div>
   );
@@ -187,20 +187,20 @@ function Heading() {
 function Label2() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Label">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Introdução</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Introdução</p>
     </div>
   );
 }
 
 function TextArea1() {
   return (
-    <div className="bg-[#0f172b] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
+    <div className="bg-[#171717] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
       <div className="overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex items-start px-[12px] py-[8px] relative size-full">
           <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#94a3b8] text-[14px]">Digite aqui</p>
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
   );
 }
@@ -226,20 +226,20 @@ function Container2() {
 function Label3() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Label">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Objetivos Propostos</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Objetivos Propostos</p>
     </div>
   );
 }
 
 function TextArea2() {
   return (
-    <div className="bg-[#0f172b] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
+    <div className="bg-[#171717] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
       <div className="overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex items-start px-[12px] py-[8px] relative size-full">
           <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#94a3b8] text-[14px]">Digite aqui</p>
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
   );
 }
@@ -265,20 +265,20 @@ function Container3() {
 function Label4() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Label">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Metodologia</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Metodologia</p>
     </div>
   );
 }
 
 function TextArea3() {
   return (
-    <div className="bg-[#0f172b] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
+    <div className="bg-[#171717] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
       <div className="overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex items-start px-[12px] py-[8px] relative size-full">
           <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#94a3b8] text-[14px]">Digite aqui</p>
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
   );
 }
@@ -315,7 +315,7 @@ function Container5() {
 function Heading1() {
   return (
     <div className="content-stretch flex h-[24px] items-start relative shrink-0 w-full" data-name="Heading 3">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Medium',sans-serif] leading-[24px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[16px]">Objetivos Alcançados</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Medium',sans-serif] leading-[24px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[16px]">Objetivos Alcançados</p>
     </div>
   );
 }
@@ -323,7 +323,7 @@ function Heading1() {
 function Label5() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Label">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Até o momento, os objetivos da pesquisa foram atingidos?</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Até o momento, os objetivos da pesquisa foram atingidos?</p>
     </div>
   );
 }
@@ -352,8 +352,8 @@ function Icon1() {
 
 function PrimitiveButton() {
   return (
-    <div className="bg-[rgba(30,41,59,0.3)] h-[36px] relative rounded-[6px] shrink-0 w-full" data-name="Primitive.button">
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+    <div className="bg-[rgba(38,38,38,0.3)] h-[36px] relative rounded-[6px] shrink-0 w-full" data-name="Primitive.button">
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
       <div className="flex flex-row items-center size-full">
         <div className="content-stretch flex items-center justify-between px-[13px] py-px relative size-full">
           <PrimitiveSpan />
@@ -376,20 +376,20 @@ function Container6() {
 function Label6() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Label">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Justifique</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Justifique</p>
     </div>
   );
 }
 
 function TextArea4() {
   return (
-    <div className="bg-[#0f172b] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
+    <div className="bg-[#171717] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
       <div className="overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex items-start px-[12px] py-[8px] relative size-full">
           <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#94a3b8] text-[14px]">Digite aqui</p>
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
   );
 }
@@ -423,7 +423,7 @@ function Container8() {
 }
 
 function PrimitiveDiv1() {
-  return <div className="absolute bg-[#334155] h-px left-0 top-[1423px] w-[1024px]" data-name="Primitive.div" />;
+  return <div className="absolute bg-[#404040] h-px left-0 top-[1423px] w-[1024px]" data-name="Primitive.div" />;
 }
 
 function Text4() {
@@ -437,7 +437,7 @@ function Text4() {
 function Heading2() {
   return (
     <div className="h-[24px] relative shrink-0 w-full" data-name="Heading 3">
-      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[24px] left-0 not-italic text-[#f8fafc] text-[16px] top-0">Equipe Técnica Efetiva</p>
+      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[24px] left-0 not-italic text-[#fafafa] text-[16px] top-0">Equipe Técnica Efetiva</p>
       <Text4 />
     </div>
   );
@@ -446,7 +446,7 @@ function Heading2() {
 function Paragraph9() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Paragraph">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Equipe de Execução</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Equipe de Execução</p>
     </div>
   );
 }
@@ -462,7 +462,7 @@ function Paragraph10() {
 function HeaderCell() {
   return (
     <div className="absolute content-stretch flex h-[44.5px] items-start left-0 px-[8px] py-[12px] top-0 w-[476.25px]" data-name="Header Cell">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Medium',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Membros</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Medium',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Membros</p>
     </div>
   );
 }
@@ -470,7 +470,7 @@ function HeaderCell() {
 function HeaderCell1() {
   return (
     <div className="absolute content-stretch flex h-[44.5px] items-start left-[476.25px] px-[8px] py-[12px] top-0 w-[219.672px]" data-name="Header Cell">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Medium',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Instituição</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Medium',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Instituição</p>
     </div>
   );
 }
@@ -478,14 +478,14 @@ function HeaderCell1() {
 function HeaderCell2() {
   return (
     <div className="absolute content-stretch flex h-[44.5px] items-start left-[695.92px] px-[8px] py-[12px] top-0 w-[328.078px]" data-name="Header Cell">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Medium',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Participação</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Medium',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Participação</p>
     </div>
   );
 }
 
 function TableRow() {
   return (
-    <div className="absolute border-[#334155] border-b border-solid h-[44.5px] left-0 top-0 w-[1024px]" data-name="Table Row">
+    <div className="absolute border-[#404040] border-b border-solid h-[44.5px] left-0 top-0 w-[1024px]" data-name="Table Row">
       <HeaderCell />
       <HeaderCell1 />
       <HeaderCell2 />
@@ -504,7 +504,7 @@ function TableHeader() {
 function TableCell() {
   return (
     <div className="absolute h-[45px] left-0 top-0 w-[476.25px]" data-name="Table Cell">
-      <p className="absolute css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] left-[8px] not-italic text-[#f8fafc] text-[14px] top-[12.5px]">Paulo Sérgio Souza Junior</p>
+      <p className="absolute css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] left-[8px] not-italic text-[#fafafa] text-[14px] top-[12.5px]">Paulo Sérgio Souza Junior</p>
     </div>
   );
 }
@@ -512,7 +512,7 @@ function TableCell() {
 function TableCell1() {
   return (
     <div className="absolute h-[45px] left-[476.25px] top-0 w-[219.672px]" data-name="Table Cell">
-      <p className="absolute css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] left-[8px] not-italic text-[#f8fafc] text-[14px] top-[12.5px]">Ifes</p>
+      <p className="absolute css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] left-[8px] not-italic text-[#fafafa] text-[14px] top-[12.5px]">Ifes</p>
     </div>
   );
 }
@@ -520,13 +520,13 @@ function TableCell1() {
 function Text5() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[26.094px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Sim</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Sim</p>
     </div>
   );
 }
 
 function RadioButton() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label7() {
@@ -543,13 +543,13 @@ function Label7() {
 function Text6() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[28.281px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Não</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Não</p>
     </div>
   );
 }
 
 function RadioButton1() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label8() {
@@ -582,7 +582,7 @@ function TableCell2() {
 
 function TableRow1() {
   return (
-    <div className="absolute border-[#334155] border-b border-solid h-[45px] left-0 top-0 w-[1024px]" data-name="Table Row">
+    <div className="absolute border-[#404040] border-b border-solid h-[45px] left-0 top-0 w-[1024px]" data-name="Table Row">
       <TableCell />
       <TableCell1 />
       <TableCell2 />
@@ -610,7 +610,7 @@ function Table() {
 function Paragraph11() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Paragraph">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Houve mudanças na Equipe de Execução?</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Houve mudanças na Equipe de Execução?</p>
     </div>
   );
 }
@@ -618,13 +618,13 @@ function Paragraph11() {
 function Text7() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[26.094px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Sim</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Sim</p>
     </div>
   );
 }
 
 function RadioButton2() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label9() {
@@ -641,13 +641,13 @@ function Label9() {
 function Text8() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[28.281px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Não</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Não</p>
     </div>
   );
 }
 
 function RadioButton3() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label10() {
@@ -692,13 +692,13 @@ function Container12() {
 }
 
 function PrimitiveDiv2() {
-  return <div className="absolute bg-[#334155] h-px left-0 top-[1766px] w-[1024px]" data-name="Primitive.div" />;
+  return <div className="absolute bg-[#404040] h-px left-0 top-[1766px] w-[1024px]" data-name="Primitive.div" />;
 }
 
 function Heading3() {
   return (
     <div className="content-stretch flex h-[24px] items-start relative shrink-0 w-full" data-name="Heading 3">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Medium',sans-serif] leading-[24px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[16px]">Indicadores de Produção</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Medium',sans-serif] leading-[24px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[16px]">Indicadores de Produção</p>
     </div>
   );
 }
@@ -714,7 +714,7 @@ function Paragraph12() {
 function Label11() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Label">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Produção Bibliográfica</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Produção Bibliográfica</p>
     </div>
   );
 }
@@ -743,8 +743,8 @@ function Icon2() {
 
 function PrimitiveButton1() {
   return (
-    <div className="bg-[rgba(30,41,59,0.3)] h-[36px] relative rounded-[6px] shrink-0 w-full" data-name="Primitive.button">
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+    <div className="bg-[rgba(38,38,38,0.3)] h-[36px] relative rounded-[6px] shrink-0 w-full" data-name="Primitive.button">
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
       <div className="flex flex-row items-center size-full">
         <div className="content-stretch flex items-center justify-between px-[13px] py-px relative size-full">
           <PrimitiveSpan1 />
@@ -767,7 +767,7 @@ function Container13() {
 function Label12() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Label">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Produção Cultural</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Produção Cultural</p>
     </div>
   );
 }
@@ -796,8 +796,8 @@ function Icon3() {
 
 function PrimitiveButton2() {
   return (
-    <div className="bg-[rgba(30,41,59,0.3)] h-[36px] relative rounded-[6px] shrink-0 w-full" data-name="Primitive.button">
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+    <div className="bg-[rgba(38,38,38,0.3)] h-[36px] relative rounded-[6px] shrink-0 w-full" data-name="Primitive.button">
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
       <div className="flex flex-row items-center size-full">
         <div className="content-stretch flex items-center justify-between px-[13px] py-px relative size-full">
           <PrimitiveSpan2 />
@@ -820,7 +820,7 @@ function Container14() {
 function Label13() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Label">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Produção Técnica</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Produção Técnica</p>
     </div>
   );
 }
@@ -849,8 +849,8 @@ function Icon4() {
 
 function PrimitiveButton3() {
   return (
-    <div className="bg-[rgba(30,41,59,0.3)] h-[36px] relative rounded-[6px] shrink-0 w-full" data-name="Primitive.button">
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+    <div className="bg-[rgba(38,38,38,0.3)] h-[36px] relative rounded-[6px] shrink-0 w-full" data-name="Primitive.button">
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
       <div className="flex flex-row items-center size-full">
         <div className="content-stretch flex items-center justify-between px-[13px] py-px relative size-full">
           <PrimitiveSpan3 />
@@ -873,7 +873,7 @@ function Container15() {
 function Label14() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Label">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Orientação - Concluída ou Em Andamento</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Orientação - Concluída ou Em Andamento</p>
     </div>
   );
 }
@@ -902,8 +902,8 @@ function Icon5() {
 
 function PrimitiveButton4() {
   return (
-    <div className="bg-[rgba(30,41,59,0.3)] h-[36px] relative rounded-[6px] shrink-0 w-full" data-name="Primitive.button">
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+    <div className="bg-[rgba(38,38,38,0.3)] h-[36px] relative rounded-[6px] shrink-0 w-full" data-name="Primitive.button">
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
       <div className="flex flex-row items-center size-full">
         <div className="content-stretch flex items-center justify-between px-[13px] py-px relative size-full">
           <PrimitiveSpan4 />
@@ -937,7 +937,7 @@ function Container17() {
 }
 
 function PrimitiveDiv3() {
-  return <div className="absolute bg-[#334155] h-px left-0 top-[2211px] w-[1024px]" data-name="Primitive.div" />;
+  return <div className="absolute bg-[#404040] h-px left-0 top-[2211px] w-[1024px]" data-name="Primitive.div" />;
 }
 
 function Text9() {
@@ -951,7 +951,7 @@ function Text9() {
 function Heading4() {
   return (
     <div className="h-[24px] relative shrink-0 w-full" data-name="Heading 3">
-      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[24px] left-0 not-italic text-[#f8fafc] text-[16px] top-0">Impactos</p>
+      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[24px] left-0 not-italic text-[#fafafa] text-[16px] top-0">Impactos</p>
       <Text9 />
     </div>
   );
@@ -968,7 +968,7 @@ function Paragraph13() {
 function Paragraph14() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Paragraph">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Houve Impacto Tecnológico?</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Houve Impacto Tecnológico?</p>
     </div>
   );
 }
@@ -976,13 +976,13 @@ function Paragraph14() {
 function Text10() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[26.094px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Sim</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Sim</p>
     </div>
   );
 }
 
 function RadioButton4() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label15() {
@@ -999,13 +999,13 @@ function Label15() {
 function Text11() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[28.281px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Não</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Não</p>
     </div>
   );
 }
 
 function RadioButton5() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label16() {
@@ -1040,7 +1040,7 @@ function Container19() {
 function Paragraph15() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Paragraph">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Houve Impacto Econômico?</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Houve Impacto Econômico?</p>
     </div>
   );
 }
@@ -1048,13 +1048,13 @@ function Paragraph15() {
 function Text12() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[26.094px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Sim</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Sim</p>
     </div>
   );
 }
 
 function RadioButton6() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label17() {
@@ -1071,13 +1071,13 @@ function Label17() {
 function Text13() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[28.281px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Não</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Não</p>
     </div>
   );
 }
 
 function RadioButton7() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label18() {
@@ -1112,7 +1112,7 @@ function Container21() {
 function Paragraph16() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Paragraph">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Houve Impacto Social?</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Houve Impacto Social?</p>
     </div>
   );
 }
@@ -1120,13 +1120,13 @@ function Paragraph16() {
 function Text14() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[26.094px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Sim</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Sim</p>
     </div>
   );
 }
 
 function RadioButton8() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label19() {
@@ -1143,13 +1143,13 @@ function Label19() {
 function Text15() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[28.281px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Não</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Não</p>
     </div>
   );
 }
 
 function RadioButton9() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label20() {
@@ -1184,7 +1184,7 @@ function Container23() {
 function Paragraph17() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Paragraph">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Houve Impacto Ambiental?</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Houve Impacto Ambiental?</p>
     </div>
   );
 }
@@ -1192,13 +1192,13 @@ function Paragraph17() {
 function Text16() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[26.094px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Sim</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Sim</p>
     </div>
   );
 }
 
 function RadioButton10() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label21() {
@@ -1215,13 +1215,13 @@ function Label21() {
 function Text17() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[28.281px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Não</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Não</p>
     </div>
   );
 }
 
 function RadioButton11() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label22() {
@@ -1267,13 +1267,13 @@ function Container26() {
 }
 
 function PrimitiveDiv4() {
-  return <div className="absolute bg-[#334155] h-px left-0 top-[2628px] w-[1024px]" data-name="Primitive.div" />;
+  return <div className="absolute bg-[#404040] h-px left-0 top-[2628px] w-[1024px]" data-name="Primitive.div" />;
 }
 
 function Heading5() {
   return (
     <div className="content-stretch flex h-[24px] items-start relative shrink-0 w-full" data-name="Heading 3">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Medium',sans-serif] leading-[24px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[16px]">Parcerias Institucionais</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Medium',sans-serif] leading-[24px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[16px]">Parcerias Institucionais</p>
     </div>
   );
 }
@@ -1288,13 +1288,13 @@ function Paragraph18() {
 
 function TextArea5() {
   return (
-    <div className="bg-[#0f172b] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
+    <div className="bg-[#171717] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
       <div className="overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex items-start px-[12px] py-[8px] relative size-full">
           <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#94a3b8] text-[14px]">Digite aqui</p>
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
   );
 }
@@ -1329,7 +1329,7 @@ function Text18() {
 function Heading6() {
   return (
     <div className="h-[24px] relative shrink-0 w-full" data-name="Heading 3">
-      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[24px] left-0 not-italic text-[#f8fafc] text-[16px] top-0">Dificuldades encontradas e sugestões</p>
+      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[24px] left-0 not-italic text-[#fafafa] text-[16px] top-0">Dificuldades encontradas e sugestões</p>
       <Text18 />
     </div>
   );
@@ -1345,13 +1345,13 @@ function Paragraph20() {
 
 function TextArea6() {
   return (
-    <div className="bg-[#0f172b] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
+    <div className="bg-[#171717] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
       <div className="overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex items-start px-[12px] py-[8px] relative size-full">
           <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#94a3b8] text-[14px]">Digite aqui</p>
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
   );
 }
@@ -1386,7 +1386,7 @@ function Text19() {
 function Heading7() {
   return (
     <div className="h-[24px] relative shrink-0 w-full" data-name="Heading 3">
-      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[24px] left-0 not-italic text-[#f8fafc] text-[16px] top-0">Conclusões e Perspectivas</p>
+      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[24px] left-0 not-italic text-[#fafafa] text-[16px] top-0">Conclusões e Perspectivas</p>
       <Text19 />
     </div>
   );
@@ -1402,13 +1402,13 @@ function Paragraph22() {
 
 function TextArea7() {
   return (
-    <div className="bg-[#0f172b] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
+    <div className="bg-[#171717] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
       <div className="overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex items-start px-[12px] py-[8px] relative size-full">
           <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#94a3b8] text-[14px]">Digite aqui</p>
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
   );
 }
@@ -1433,7 +1433,7 @@ function Container29() {
 }
 
 function PrimitiveDiv5() {
-  return <div className="absolute bg-[#334155] h-px left-0 top-[3532px] w-[1024px]" data-name="Primitive.div" />;
+  return <div className="absolute bg-[#404040] h-px left-0 top-[3532px] w-[1024px]" data-name="Primitive.div" />;
 }
 
 function Text20() {
@@ -1447,7 +1447,7 @@ function Text20() {
 function Heading8() {
   return (
     <div className="h-[24px] relative shrink-0 w-full" data-name="Heading 3">
-      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[24px] left-0 not-italic text-[#f8fafc] text-[16px] top-0">Avaliação Geral</p>
+      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[24px] left-0 not-italic text-[#fafafa] text-[16px] top-0">Avaliação Geral</p>
       <Text20 />
     </div>
   );
@@ -1456,7 +1456,7 @@ function Heading8() {
 function Paragraph24() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Paragraph">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">O resultado do projeto tem inovação tecnológica?</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">O resultado do projeto tem inovação tecnológica?</p>
     </div>
   );
 }
@@ -1464,13 +1464,13 @@ function Paragraph24() {
 function Text21() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[26.094px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Sim</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Sim</p>
     </div>
   );
 }
 
 function RadioButton12() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label23() {
@@ -1487,13 +1487,13 @@ function Label23() {
 function Text22() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[28.281px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Não</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Não</p>
     </div>
   );
 }
 
 function RadioButton13() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label24() {
@@ -1528,7 +1528,7 @@ function Container31() {
 function Paragraph25() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Paragraph">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">O resultado do projeto (tecnologia gerada) pode ser repassado a terceiros?</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">O resultado do projeto (tecnologia gerada) pode ser repassado a terceiros?</p>
     </div>
   );
 }
@@ -1536,13 +1536,13 @@ function Paragraph25() {
 function Text23() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[26.094px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Sim</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Sim</p>
     </div>
   );
 }
 
 function RadioButton14() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label25() {
@@ -1559,13 +1559,13 @@ function Label25() {
 function Text24() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[28.281px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Não</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Não</p>
     </div>
   );
 }
 
 function RadioButton15() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label26() {
@@ -1600,7 +1600,7 @@ function Container33() {
 function Paragraph26() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Paragraph">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">O resultado do projeto é passível de proteção (patentes, cultivares, direitos autorais ou softwares)?</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">O resultado do projeto é passível de proteção (patentes, cultivares, direitos autorais ou softwares)?</p>
     </div>
   );
 }
@@ -1608,13 +1608,13 @@ function Paragraph26() {
 function Text25() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[26.094px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Sim</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Sim</p>
     </div>
   );
 }
 
 function RadioButton16() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label27() {
@@ -1631,13 +1631,13 @@ function Label27() {
 function Text26() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[28.281px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Não</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Não</p>
     </div>
   );
 }
 
 function RadioButton17() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label28() {
@@ -1672,7 +1672,7 @@ function Container35() {
 function Paragraph27() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Paragraph">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Houve relação de pesquisa com atividades de ensino e de extensão na sua instituição (Ensino, Pesquisa e Extensão)?</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Houve relação de pesquisa com atividades de ensino e de extensão na sua instituição (Ensino, Pesquisa e Extensão)?</p>
     </div>
   );
 }
@@ -1680,13 +1680,13 @@ function Paragraph27() {
 function Text27() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[26.094px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Sim</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Sim</p>
     </div>
   );
 }
 
 function RadioButton18() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label29() {
@@ -1703,13 +1703,13 @@ function Label29() {
 function Text28() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[28.281px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Não</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Não</p>
     </div>
   );
 }
 
 function RadioButton19() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label30() {
@@ -1744,7 +1744,7 @@ function Container37() {
 function Paragraph28() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Paragraph">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Houve durante a execução da pesquisa momentos de interação e integração com a sociedade civil?</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Houve durante a execução da pesquisa momentos de interação e integração com a sociedade civil?</p>
     </div>
   );
 }
@@ -1752,13 +1752,13 @@ function Paragraph28() {
 function Text29() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[26.094px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Sim</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Sim</p>
     </div>
   );
 }
 
 function RadioButton20() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label31() {
@@ -1775,13 +1775,13 @@ function Label31() {
 function Text30() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[24px] top-0 w-[28.281px]" data-name="Text">
-      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Não</p>
+      <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Não</p>
     </div>
   );
 }
 
 function RadioButton21() {
-  return <div className="absolute border-2 border-[#334155] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
+  return <div className="absolute border-2 border-[#404040] border-solid left-0 rounded-[8px] size-[16px] top-[2px]" data-name="Radio Button" />;
 }
 
 function Label32() {
@@ -1816,20 +1816,20 @@ function Container39() {
 function Label33() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Label">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Descreva o público-alvo que pode se beneficiar com os resultados da pesquisa.</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Descreva o público-alvo que pode se beneficiar com os resultados da pesquisa.</p>
     </div>
   );
 }
 
 function TextArea8() {
   return (
-    <div className="bg-[#0f172b] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
+    <div className="bg-[#171717] h-[138px] relative rounded-[6px] shrink-0 w-full" data-name="Text Area">
       <div className="overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex items-start px-[12px] py-[8px] relative size-full">
           <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#94a3b8] text-[14px]">Digite aqui</p>
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
   );
 }
@@ -1855,18 +1855,18 @@ function Container40() {
 function Label34() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-0 top-0 w-[1024px]" data-name="Label">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px]">Qual o número estimado de pessoas que podem se beneficiar com os resultados da pesquisa?</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px]">Qual o número estimado de pessoas que podem se beneficiar com os resultados da pesquisa?</p>
     </div>
   );
 }
 
 function TextInput1() {
   return (
-    <div className="absolute bg-[#0f172b] h-[38px] left-0 rounded-[6px] top-[28px] w-[174px]" data-name="Text Input">
+    <div className="absolute bg-[#171717] h-[38px] left-0 rounded-[6px] top-[28px] w-[174px]" data-name="Text Input">
       <div className="content-stretch flex items-center overflow-clip px-[12px] py-[8px] relative rounded-[inherit] size-full">
         <p className="css-ew64yg font-['Poppins:Regular',sans-serif] leading-[normal] not-italic relative shrink-0 text-[#94a3b8] text-[14px]">000000</p>
       </div>
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
   );
 }
@@ -1896,13 +1896,13 @@ function Container42() {
 }
 
 function PrimitiveDiv6() {
-  return <div className="absolute bg-[#334155] h-px left-0 top-[4260px] w-[1024px]" data-name="Primitive.div" />;
+  return <div className="absolute bg-[#404040] h-px left-0 top-[4260px] w-[1024px]" data-name="Primitive.div" />;
 }
 
 function Heading9() {
   return (
     <div className="content-stretch flex h-[24px] items-start relative shrink-0 w-full" data-name="Heading 3">
-      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Medium',sans-serif] leading-[24px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[16px]">Inclusão de Arquivos</p>
+      <p className="css-4hzbpn flex-[1_0_0] font-['Poppins:Medium',sans-serif] leading-[24px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[16px]">Inclusão de Arquivos</p>
     </div>
   );
 }
@@ -1938,9 +1938,9 @@ function Icon6() {
 
 function Button1() {
   return (
-    <div className="absolute bg-[rgba(30,41,59,0.3)] border border-[#334155] border-solid h-[36px] left-[818.53px] rounded-[6px] top-[68px] w-[205.469px]" data-name="Button">
+    <div className="absolute bg-[rgba(38,38,38,0.3)] border border-[#404040] border-solid h-[36px] left-[818.53px] rounded-[6px] top-[68px] w-[205.469px]" data-name="Button">
       <Icon6 />
-      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[20px] left-[114px] not-italic text-[#f8fafc] text-[14px] text-center top-[7px] translate-x-[-50%]">Anexar Comprovação</p>
+      <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[20px] left-[114px] not-italic text-[#fafafa] text-[14px] text-center top-[7px] translate-x-[-50%]">Anexar Comprovação</p>
     </div>
   );
 }
@@ -1955,12 +1955,12 @@ function Container44() {
 }
 
 function PrimitiveDiv7() {
-  return <div className="absolute bg-[#334155] h-px left-0 top-[4429px] w-[1024px]" data-name="Primitive.div" />;
+  return <div className="absolute bg-[#404040] h-px left-0 top-[4429px] w-[1024px]" data-name="Primitive.div" />;
 }
 
 function Button2() {
   return (
-    <div className="bg-[rgba(30,41,59,0.3)] h-[36px] relative rounded-[6px] shrink-0 w-[152.625px]" data-name="Button">
+    <div className="bg-[rgba(38,38,38,0.3)] h-[36px] relative rounded-[6px] shrink-0 w-[152.625px]" data-name="Button">
       <div aria-hidden="true" className="absolute border border-[#14b8a6] border-solid inset-0 pointer-events-none rounded-[6px]" />
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center px-[17px] py-[9px] relative size-full">
         <p className="css-ew64yg font-['Poppins:Medium',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#14b8a6] text-[14px] text-center">Salvar Rascunho</p>
@@ -1992,7 +1992,7 @@ function Button3() {
     <div className="bg-[#14b8a6] h-[36px] relative rounded-[6px] shrink-0 w-[91.063px]" data-name="Button">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
         <Icon7 />
-        <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[20px] left-[58px] not-italic text-[#0f172b] text-[14px] text-center top-[8px] translate-x-[-50%]">Enviar</p>
+        <p className="absolute css-ew64yg font-['Poppins:Medium',sans-serif] leading-[20px] left-[58px] not-italic text-[#171717] text-[14px] text-center top-[8px] translate-x-[-50%]">Enviar</p>
       </div>
     </div>
   );
@@ -2036,7 +2036,7 @@ function Section() {
 
 function TecnicaPage() {
   return (
-    <div className="absolute bg-[#0f172b] h-[4796px] left-0 top-0 w-[1603px]" data-name="TecnicaPage">
+    <div className="absolute bg-[#171717] h-[4796px] left-0 top-0 w-[1603px]" data-name="TecnicaPage">
       <Button />
       <Header />
       <PrimitiveDiv />
@@ -2191,7 +2191,7 @@ function Navigation() {
 function Header1() {
   return (
     <div className="absolute bg-[rgba(15,23,43,0.6)] content-stretch flex flex-col h-[65px] items-start left-0 pb-px px-[33.5px] top-0 w-[1603px]" data-name="Header">
-      <div aria-hidden="true" className="absolute border-[#334155] border-b border-solid inset-0 pointer-events-none" />
+      <div aria-hidden="true" className="absolute border-[#404040] border-b border-solid inset-0 pointer-events-none" />
       <Navigation />
     </div>
   );
@@ -2199,7 +2199,7 @@ function Header1() {
 
 export default function NuxtPortalCoordenador() {
   return (
-    <div className="bg-[#0f172b] relative size-full" data-name="Nuxt - Portal Coordenador">
+    <div className="bg-[#171717] relative size-full" data-name="Nuxt - Portal Coordenador">
       <TecnicaPage />
       <Header1 />
     </div>

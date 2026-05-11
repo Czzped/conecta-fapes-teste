@@ -87,7 +87,7 @@ function Text3() {
   return (
     <div className="h-[20px] relative shrink-0 w-[61.531px]" data-name="Text">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-start relative size-full">
-        <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Detalhes</p>
+        <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Detalhes</p>
       </div>
     </div>
   );
@@ -110,7 +110,7 @@ function Navigation() {
 function Paragraph() {
   return (
     <div className="absolute h-[24px] left-[111.5px] top-[141px] w-[976px]" data-name="Paragraph">
-      <p className="absolute font-['Poppins:SemiBold',sans-serif] leading-[24px] left-0 not-italic text-[#f8fafc] text-[16px] top-[0.5px]">Detalhes do Pagamento</p>
+      <p className="absolute font-['Poppins:SemiBold',sans-serif] leading-[24px] left-0 not-italic text-[#fafafa] text-[16px] top-[0.5px]">Detalhes do Pagamento</p>
     </div>
   );
 }
@@ -126,7 +126,7 @@ function Paragraph1() {
 function Paragraph2() {
   return (
     <div className="h-[24px] relative shrink-0 w-full" data-name="Paragraph">
-      <p className="absolute font-['Poppins:Medium',sans-serif] leading-[24px] left-0 not-italic text-[#f8fafc] text-[16px] top-[0.5px]">Boleto</p>
+      <p className="absolute font-['Poppins:Medium',sans-serif] leading-[24px] left-0 not-italic text-[#fafafa] text-[16px] top-[0.5px]">Boleto</p>
     </div>
   );
 }
@@ -153,7 +153,7 @@ function Paragraph3() {
 function Paragraph4() {
   return (
     <div className="h-[24px] relative shrink-0 w-full" data-name="Paragraph">
-      <p className="absolute font-['Poppins:Medium',sans-serif] leading-[24px] left-0 not-italic text-[#f8fafc] text-[16px] top-[0.5px]">R$ 1.890,50</p>
+      <p className="absolute font-['Poppins:Medium',sans-serif] leading-[24px] left-0 not-italic text-[#fafafa] text-[16px] top-[0.5px]">R$ 1.890,50</p>
     </div>
   );
 }
@@ -180,7 +180,7 @@ function Paragraph5() {
 function Paragraph6() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Paragraph">
-      <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">20/02/2026 - 11:45</p>
+      <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">20/02/2026 - 11:45</p>
     </div>
   );
 }
@@ -207,7 +207,7 @@ function Paragraph7() {
 function Paragraph8() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Paragraph">
-      <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Americanas</p>
+      <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Americanas</p>
     </div>
   );
 }
@@ -266,7 +266,7 @@ function Container1() {
 }
 
 function PrimitiveDiv() {
-  return <div className="bg-[#334155] h-px shrink-0 w-full" data-name="Primitive.div" />;
+  return <div className="bg-[#404040] h-px shrink-0 w-full" data-name="Primitive.div" />;
 }
 
 function Text4() {
@@ -280,7 +280,7 @@ function Text4() {
 function Text5() {
   return (
     <div className="absolute content-stretch flex h-[22.5px] items-start left-[87.65px] top-[0.5px] w-[649.063px]" data-name="Text">
-      <p className="font-['Poppins:Regular',sans-serif] leading-[24px] not-italic relative shrink-0 text-[#f8fafc] text-[16px]">Compra de equipamentos para o laboratório de pesquisa do projeto FAPES 2024.</p>
+      <p className="font-['Poppins:Regular',sans-serif] leading-[24px] not-italic relative shrink-0 text-[#fafafa] text-[16px]">Compra de equipamentos para o laboratório de pesquisa do projeto FAPES 2024.</p>
     </div>
   );
 }
@@ -401,8 +401,8 @@ function Container7() {
 
 function Container() {
   return (
-    <div className="absolute bg-[#1e293b] content-stretch flex flex-col gap-[24px] h-[171.5px] items-start left-[111.5px] pb-px pt-[25px] px-[41px] rounded-[8px] top-[189px] w-[976px]" data-name="Container">
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[8px] shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_0px_rgba(0,0,0,0.1)]" />
+    <div className="absolute bg-[#262626] content-stretch flex flex-col gap-[24px] h-[171.5px] items-start left-[111.5px] pb-px pt-[25px] px-[41px] rounded-[8px] top-[189px] w-[976px]" data-name="Container">
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[8px] shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_0px_rgba(0,0,0,0.1)]" />
       <Container1 />
       <PrimitiveDiv />
       <Container7 />
@@ -413,7 +413,7 @@ function Container() {
 function Paragraph10() {
   return (
     <div className="h-[40px] relative shrink-0 w-full" data-name="Paragraph">
-      <p className="absolute font-['Poppins:Regular',sans-serif] leading-[20px] left-0 not-italic text-[#f8fafc] text-[14px] top-0 w-[882px] whitespace-pre-wrap">Essa Prestação de Contas não foi aprovada por X motivo. Você deve depositar o valor para a conta do projeto em até 30 dias corridos.</p>
+      <p className="absolute font-['Poppins:Regular',sans-serif] leading-[20px] left-0 not-italic text-[#fafafa] text-[14px] top-0 w-[882px] whitespace-pre-wrap">Essa Prestação de Contas não foi aprovada por X motivo. Você deve depositar o valor para a conta do projeto em até 30 dias corridos.</p>
     </div>
   );
 }
@@ -431,14 +431,14 @@ function Container13() {
   return (
     <div className="bg-[#14b8a6] relative rounded-[16777200px] shrink-0 size-[32px]" data-name="Container">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center relative size-full">
-        <p className="font-['Poppins:SemiBold',sans-serif] leading-[24px] not-italic relative shrink-0 text-[#0f172b] text-[16px]">1</p>
+        <p className="font-['Poppins:SemiBold',sans-serif] leading-[24px] not-italic relative shrink-0 text-[#171717] text-[16px]">1</p>
       </div>
     </div>
   );
 }
 
 function Container14() {
-  return <div className="bg-[#334155] flex-[1_0_0] min-h-px min-w-px w-[2px]" data-name="Container" />;
+  return <div className="bg-[#404040] flex-[1_0_0] min-h-px min-w-px w-[2px]" data-name="Container" />;
 }
 
 function Container12() {
@@ -456,7 +456,7 @@ function Heading() {
   return (
     <div className="h-[24px] relative shrink-0 w-[151.078px]" data-name="Heading 3">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
-        <p className="absolute font-['Poppins:SemiBold',sans-serif] leading-[24px] left-0 not-italic text-[#f8fafc] text-[16px] top-[0.5px]">Anexar Nota Fiscal</p>
+        <p className="absolute font-['Poppins:SemiBold',sans-serif] leading-[24px] left-0 not-italic text-[#fafafa] text-[16px] top-[0.5px]">Anexar Nota Fiscal</p>
       </div>
     </div>
   );
@@ -509,7 +509,7 @@ function Text7() {
   return (
     <div className="flex-[1_0_0] h-[20px] min-h-px min-w-px relative" data-name="Text">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-start relative size-full">
-        <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Nota_Fiscal_Monitor_2024.pdf</p>
+        <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Nota_Fiscal_Monitor_2024.pdf</p>
       </div>
     </div>
   );
@@ -575,8 +575,8 @@ function Container18() {
 
 function Container17() {
   return (
-    <div className="bg-[#1e293b] h-[46px] relative rounded-[8px] shrink-0 w-full" data-name="Container">
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[8px]" />
+    <div className="bg-[#262626] h-[46px] relative rounded-[8px] shrink-0 w-full" data-name="Container">
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[8px]" />
       <div className="content-stretch flex flex-col items-start p-px relative size-full">
         <Container18 />
       </div>
@@ -609,14 +609,14 @@ function Container23() {
   return (
     <div className="bg-[#14b8a6] relative rounded-[16777200px] shrink-0 size-[32px]" data-name="Container">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center relative size-full">
-        <p className="font-['Poppins:SemiBold',sans-serif] leading-[24px] not-italic relative shrink-0 text-[#0f172b] text-[16px]">2</p>
+        <p className="font-['Poppins:SemiBold',sans-serif] leading-[24px] not-italic relative shrink-0 text-[#171717] text-[16px]">2</p>
       </div>
     </div>
   );
 }
 
 function Container24() {
-  return <div className="bg-[#334155] flex-[1_0_0] min-h-px min-w-px w-[2px]" data-name="Container" />;
+  return <div className="bg-[#404040] flex-[1_0_0] min-h-px min-w-px w-[2px]" data-name="Container" />;
 }
 
 function Container22() {
@@ -634,7 +634,7 @@ function Heading1() {
   return (
     <div className="h-[24px] relative shrink-0 w-[141.734px]" data-name="Heading 3">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
-        <p className="absolute font-['Poppins:SemiBold',sans-serif] leading-[24px] left-0 not-italic text-[#f8fafc] text-[16px] top-[0.5px]">Associar Compra</p>
+        <p className="absolute font-['Poppins:SemiBold',sans-serif] leading-[24px] left-0 not-italic text-[#fafafa] text-[16px] top-[0.5px]">Associar Compra</p>
       </div>
     </div>
   );
@@ -679,7 +679,7 @@ function Text9() {
   return (
     <div className="h-[20px] relative shrink-0 w-[192.953px]" data-name="Text">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-start relative size-full">
-        <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Exemplo - Item Monitor.png</p>
+        <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Exemplo - Item Monitor.png</p>
       </div>
     </div>
   );
@@ -696,8 +696,8 @@ function Container28() {
 
 function Container27() {
   return (
-    <div className="absolute bg-[#1e293b] content-stretch flex flex-col h-[46px] items-start left-0 pb-px pt-[13px] px-[13px] rounded-[8px] top-[32px] w-[928px]" data-name="Container">
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[8px]" />
+    <div className="absolute bg-[#262626] content-stretch flex flex-col h-[46px] items-start left-0 pb-px pt-[13px] px-[13px] rounded-[8px] top-[32px] w-[928px]" data-name="Container">
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[8px]" />
       <Container28 />
     </div>
   );
@@ -706,7 +706,7 @@ function Container27() {
 function Label() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Label">
-      <p className="flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px] whitespace-pre-wrap">Selecione a categoria do item:</p>
+      <p className="flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px] whitespace-pre-wrap">Selecione a categoria do item:</p>
     </div>
   );
 }
@@ -763,12 +763,12 @@ function Dropdown() {
   return (
     <div className="h-[38px] opacity-50 relative rounded-[8px] shrink-0 w-full" data-name="Dropdown">
       <div aria-hidden="true" className="absolute inset-0 pointer-events-none rounded-[8px]">
-        <div className="absolute bg-[#0f172b] inset-0 rounded-[8px]" />
+        <div className="absolute bg-[#171717] inset-0 rounded-[8px]" />
         <div className="absolute inset-0 overflow-hidden rounded-[8px]">
           <img alt="" className="absolute h-[46.05%] left-0 max-w-none top-[26.97%] w-[1.89%]" src={imgDropdown} />
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[8px]" />
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[8px]" />
       <Option />
       <Option1 />
       <Option2 />
@@ -791,7 +791,7 @@ function Container29() {
 function Label1() {
   return (
     <div className="content-stretch flex h-[20px] items-start relative shrink-0 w-full" data-name="Label">
-      <p className="flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px] whitespace-pre-wrap">Selecione o item do edital que foi adquirido:</p>
+      <p className="flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px] whitespace-pre-wrap">Selecione o item do edital que foi adquirido:</p>
     </div>
   );
 }
@@ -832,12 +832,12 @@ function Dropdown1() {
   return (
     <div className="h-[38px] opacity-50 relative rounded-[8px] shrink-0 w-full" data-name="Dropdown">
       <div aria-hidden="true" className="absolute inset-0 pointer-events-none rounded-[8px]">
-        <div className="absolute bg-[#0f172b] inset-0 rounded-[8px]" />
+        <div className="absolute bg-[#171717] inset-0 rounded-[8px]" />
         <div className="absolute inset-0 overflow-hidden rounded-[8px]">
           <img alt="" className="absolute h-[46.05%] left-0 max-w-none top-[26.97%] w-[1.89%]" src={imgDropdown} />
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[8px]" />
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[8px]" />
       <Option6 />
       <Option7 />
       <Option8 />
@@ -881,7 +881,7 @@ function Container33() {
   return (
     <div className="bg-[#14b8a6] relative rounded-[16777200px] shrink-0 size-[32px]" data-name="Container">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center relative size-full">
-        <p className="font-['Poppins:SemiBold',sans-serif] leading-[24px] not-italic relative shrink-0 text-[#0f172b] text-[16px]">3</p>
+        <p className="font-['Poppins:SemiBold',sans-serif] leading-[24px] not-italic relative shrink-0 text-[#171717] text-[16px]">3</p>
       </div>
     </div>
   );
@@ -900,7 +900,7 @@ function Container32() {
 function Heading2() {
   return (
     <div className="absolute h-[24px] left-0 top-0 w-[928px]" data-name="Heading 3">
-      <p className="absolute font-['Poppins:SemiBold',sans-serif] leading-[24px] left-0 not-italic text-[#f8fafc] text-[16px] top-[0.5px]">Cotação</p>
+      <p className="absolute font-['Poppins:SemiBold',sans-serif] leading-[24px] left-0 not-italic text-[#fafafa] text-[16px] top-[0.5px]">Cotação</p>
     </div>
   );
 }
@@ -930,7 +930,7 @@ function Icon6() {
 function Paragraph13() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[32px] top-[68px] w-[860px]" data-name="Paragraph">
-      <p className="flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#f8fafc] text-[14px] text-center whitespace-pre-wrap">Arraste e solte o arquivo aqui</p>
+      <p className="flex-[1_0_0] font-['Poppins:Regular',sans-serif] leading-[20px] min-h-px min-w-px not-italic relative text-[#fafafa] text-[14px] text-center whitespace-pre-wrap">Arraste e solte o arquivo aqui</p>
     </div>
   );
 }
@@ -957,16 +957,16 @@ function Icon7() {
 
 function Button6() {
   return (
-    <div className="absolute bg-[rgba(30,41,59,0.3)] border border-[#334155] border-solid h-[36px] left-[366.13px] opacity-50 rounded-[6px] top-[128px] w-[191.734px]" data-name="Button">
+    <div className="absolute bg-[rgba(38,38,38,0.3)] border border-[#404040] border-solid h-[36px] left-[366.13px] opacity-50 rounded-[6px] top-[128px] w-[191.734px]" data-name="Button">
       <Icon7 />
-      <p className="-translate-x-1/2 absolute font-['Poppins:Medium',sans-serif] leading-[20px] left-[107px] not-italic text-[#f8fafc] text-[14px] text-center top-[7px] w-[142px] whitespace-pre-wrap">Anexar Cotação 3/3</p>
+      <p className="-translate-x-1/2 absolute font-['Poppins:Medium',sans-serif] leading-[20px] left-[107px] not-italic text-[#fafafa] text-[14px] text-center top-[7px] w-[142px] whitespace-pre-wrap">Anexar Cotação 3/3</p>
     </div>
   );
 }
 
 function Container35() {
   return (
-    <div className="absolute bg-[#1e293b] border-2 border-[#334155] border-solid h-[200px] left-0 rounded-[8px] top-[108px] w-[928px]" data-name="Container">
+    <div className="absolute bg-[#262626] border-2 border-[#404040] border-solid h-[200px] left-0 rounded-[8px] top-[108px] w-[928px]" data-name="Container">
       <Icon6 />
       <Paragraph13 />
       <Paragraph14 />
@@ -994,7 +994,7 @@ function Icon8() {
 function Text10() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[64px] top-0 w-[145.633px]" data-name="Text">
-      <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Cotacao_Loja_A.pdf</p>
+      <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Cotacao_Loja_A.pdf</p>
     </div>
   );
 }
@@ -1091,8 +1091,8 @@ function Container38() {
 
 function Container37() {
   return (
-    <div className="bg-[#1e293b] h-[46px] relative rounded-[8px] shrink-0 w-full" data-name="Container">
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[8px]" />
+    <div className="bg-[#262626] h-[46px] relative rounded-[8px] shrink-0 w-full" data-name="Container">
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[8px]" />
       <div className="content-stretch flex flex-col items-start p-px relative size-full">
         <Container38 />
       </div>
@@ -1119,7 +1119,7 @@ function Icon10() {
 function Text11() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[64px] top-0 w-[144.781px]" data-name="Text">
-      <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Cotacao_Loja_B.pdf</p>
+      <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Cotacao_Loja_B.pdf</p>
     </div>
   );
 }
@@ -1201,8 +1201,8 @@ function Container45() {
 
 function Container44() {
   return (
-    <div className="bg-[#1e293b] h-[46px] relative rounded-[8px] shrink-0 w-full" data-name="Container">
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[8px]" />
+    <div className="bg-[#262626] h-[46px] relative rounded-[8px] shrink-0 w-full" data-name="Container">
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[8px]" />
       <div className="content-stretch flex flex-col items-start p-px relative size-full">
         <Container45 />
       </div>
@@ -1229,7 +1229,7 @@ function Icon12() {
 function Text12() {
   return (
     <div className="absolute content-stretch flex h-[20px] items-start left-[64px] top-0 w-[147px]" data-name="Text">
-      <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#f8fafc] text-[14px]">Cotacao_Loja_C.pdf</p>
+      <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#fafafa] text-[14px]">Cotacao_Loja_C.pdf</p>
     </div>
   );
 }
@@ -1311,8 +1311,8 @@ function Container50() {
 
 function Container49() {
   return (
-    <div className="bg-[#1e293b] h-[46px] relative rounded-[8px] shrink-0 w-full" data-name="Container">
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[8px]" />
+    <div className="bg-[#262626] h-[46px] relative rounded-[8px] shrink-0 w-full" data-name="Container">
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[8px]" />
       <div className="content-stretch flex flex-col items-start p-px relative size-full">
         <Container50 />
       </div>
@@ -1359,7 +1359,7 @@ function Container55() {
 function Heading3() {
   return (
     <div className="h-[24px] relative shrink-0 w-full" data-name="Heading 3">
-      <p className="absolute font-['Poppins:SemiBold',sans-serif] leading-[24px] left-0 not-italic text-[#f8fafc] text-[16px] top-[0.5px]">Observação</p>
+      <p className="absolute font-['Poppins:SemiBold',sans-serif] leading-[24px] left-0 not-italic text-[#fafafa] text-[16px] top-[0.5px]">Observação</p>
     </div>
   );
 }
@@ -1374,13 +1374,13 @@ function Paragraph15() {
 
 function Textarea() {
   return (
-    <div className="bg-[rgba(30,41,59,0.3)] h-[100px] opacity-75 relative rounded-[6px] shrink-0 w-full" data-name="Textarea">
+    <div className="bg-[rgba(38,38,38,0.3)] h-[100px] opacity-75 relative rounded-[6px] shrink-0 w-full" data-name="Textarea">
       <div className="overflow-clip rounded-[inherit] size-full">
         <div className="content-stretch flex items-start px-[12px] py-[8px] relative size-full">
           <p className="font-['Poppins:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#94a3b8] text-[14px]">Exemplo: motivo da viagem ou da compra do curso.</p>
         </div>
       </div>
-      <div aria-hidden="true" className="absolute border border-[#334155] border-solid inset-0 pointer-events-none rounded-[6px]" />
+      <div aria-hidden="true" className="absolute border border-[#404040] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
   );
 }
@@ -1439,7 +1439,7 @@ function Container54() {
 
 function DetalhesPagamentoPage() {
   return (
-    <div className="absolute bg-[#0f172b] h-[1738.5px] left-0 top-0 w-[1199px]" data-name="DetalhesPagamentoPage">
+    <div className="absolute bg-[#171717] h-[1738.5px] left-0 top-0 w-[1199px]" data-name="DetalhesPagamentoPage">
       <Navigation />
       <Paragraph />
       <Container />
@@ -1598,7 +1598,7 @@ function Navigation1() {
 function Header() {
   return (
     <div className="absolute bg-[rgba(15,23,43,0.6)] content-stretch flex flex-col h-[65px] items-start left-0 pb-px px-[87.5px] top-0 w-[1199px]" data-name="Header">
-      <div aria-hidden="true" className="absolute border-[#334155] border-b border-solid inset-0 pointer-events-none" />
+      <div aria-hidden="true" className="absolute border-[#404040] border-b border-solid inset-0 pointer-events-none" />
       <Navigation1 />
     </div>
   );
@@ -1606,7 +1606,7 @@ function Header() {
 
 export default function NuxtPortalCoordenador() {
   return (
-    <div className="bg-[#0f172b] relative size-full" data-name="Nuxt - Portal Coordenador">
+    <div className="bg-[#171717] relative size-full" data-name="Nuxt - Portal Coordenador">
       <DetalhesPagamentoPage />
       <Header />
     </div>

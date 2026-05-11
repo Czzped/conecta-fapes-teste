@@ -83,7 +83,7 @@ export function EditaisPage() {
       case 'Em análise':
         return { bg: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: 'rgba(59, 130, 246, 0.3)' };
       case 'Encerrado':
-        return { bg: 'rgba(100, 116, 139, 0.1)', color: '#64748b', border: 'rgba(100, 116, 139, 0.3)' };
+        return { bg: 'rgba(115, 115, 115, 0.1)', color: '#737373', border: 'rgba(115, 115, 115, 0.3)' };
       default:
         return { bg: 'var(--muted)', color: 'var(--muted-foreground)', border: 'var(--border)' };
     }

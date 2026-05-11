@@ -34,6 +34,7 @@ export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
   const [certificatesInitialFlow, setCertificatesInitialFlow] = useState<'diarias' | null>(null);
+  const [certificatesInitialDiariaTab, setCertificatesInitialDiariaTab] = useState<'solicitadas' | 'minhas' | 'nova'>('solicitadas');
   const [myTeamInitialTab, setMyTeamInitialTab] = useState<'bolsistas' | 'informacoes' | 'pagamentos'>('informacoes');
 
   // Cidadão sub-navigation
@@ -68,8 +69,17 @@ export default function App() {
   };
 
   const handleNavigate = (page: string) => {
+    if (page === 'certificados-diarias-criar') {
+      setCertificatesInitialFlow('diarias');
+      setCertificatesInitialDiariaTab('nova');
+      setCurrentPage('certificados');
+      setIsMobileMenuOpen(false);
+      return;
+    }
+
     if (page === 'certificados-diarias') {
       setCertificatesInitialFlow('diarias');
+      setCertificatesInitialDiariaTab('solicitadas');
       setCurrentPage('certificados');
       setIsMobileMenuOpen(false);
       return;
@@ -80,6 +90,7 @@ export default function App() {
     }
 
     setCertificatesInitialFlow(null);
+    setCertificatesInitialDiariaTab('solicitadas');
     setCurrentPage(page);
     setIsMobileMenuOpen(false); // Close mobile menu after navigation
   };
@@ -99,7 +110,14 @@ export default function App() {
       case 'pagamentos':
         return <PaymentsPage scope="personal" />;
       case 'certificados':
-        return <CertificatesPage accessType={accessType} initialFlow={certificatesInitialFlow} />;
+        return (
+          <CertificatesPage
+            accessType={accessType}
+            initialFlow={certificatesInitialFlow}
+            initialDiariaTab={certificatesInitialDiariaTab}
+            onNavigate={handleNavigate}
+          />
+        );
       case 'prestacao-contas-tecnica':
         return <PrestacaoContasTecnica onBack={() => handleNavigate('inicio')} />;
       case 'financeira':
@@ -113,7 +131,7 @@ export default function App() {
           />
         );
       case 'financeira-detalhes':
-        return <FinanceiraDetalhes payment={selectedPayment} onBack={() => handleNavigate('financeira')} />;
+        return <FinanceiraDetalhes payment={selectedPayment} onBack={() => handleNavigate('financeira')} onNavigate={handleNavigate} />;
       case 'remanejamento':
         return <RemanejamentoPage />;
       case 'cadastrar-bolsista':

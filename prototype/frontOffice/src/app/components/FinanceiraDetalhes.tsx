@@ -32,6 +32,7 @@ interface Payment {
 interface FinanceiraDetalhesProps {
   payment: Payment;
   onBack: () => void;
+  onNavigate?: (page: string) => void;
 }
 
 interface DiariaPrestacao {
@@ -130,7 +131,7 @@ const inputSt = (disabled?: boolean): React.CSSProperties => ({
 });
 
 /* ─── component ─────────────────────────────────────────────── */
-export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps) {
+export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDetalhesProps) {
   useLanguage();
   const fileInputRef     = useRef<HTMLInputElement>(null);
   const cotacaoInputRef  = useRef<HTMLInputElement>(null);
@@ -953,7 +954,24 @@ export function FinanceiraDetalhes({ payment, onBack }: FinanceiraDetalhesProps)
                   <div className="flex items-start gap-3">
                     <Info size={16} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
                     <p style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: 0, lineHeight: '1.6' }}>
-                      Aceitamos apenas diárias com até 15 dias consecutivos por viagem. Selecione uma diária já cadastrada para associar a esta prestação de contas.
+                      Selecione uma diária já cadastrada para associar a esta Prestação de Contas. Se você ainda não fez a Solicitação da Diária,{' '}
+                      <button
+                        type="button"
+                        onClick={() => onNavigate?.('certificados-diarias-criar')}
+                        style={{
+                          backgroundColor: 'transparent',
+                          border: 'none',
+                          color: 'var(--primary)',
+                          cursor: 'pointer',
+                          font: 'inherit',
+                          fontWeight: 'var(--font-weight-medium)',
+                          padding: 0,
+                          textDecoration: 'underline',
+                        }}
+                      >
+                        faça aqui a solicitação
+                      </button>
+                      .
                     </p>
                   </div>
                 </div>

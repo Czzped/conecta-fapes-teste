@@ -311,7 +311,7 @@ export function MyInfoPage() {
     borderRadius: 'var(--radius)',
     padding: '1.5rem',
   };
-  const dataFieldBackground = '#1e293b';
+  const dataFieldBackground = '#262626';
 
   return (
     <div className="w-full px-4 md:px-8 py-8">

@@ -13,25 +13,25 @@
   --text-xs: 12px;
   /* Page canvas: off-white para tirar a "lâmpada" do fundo branco puro */
   --background: #f6f8fb;
-  /* Texto principal: slate-800 em vez de slate-950 */
-  --foreground: var(--color-slate-800);
+  /* Texto principal: neutral-800 em vez de neutral-950 */
+  --foreground: var(--color-neutral-800);
   --card: #ffffff;
   --card-rgb: 255, 255, 255;
-  --card-foreground: var(--color-slate-800);
+  --card-foreground: var(--color-neutral-800);
   --popover: #ffffff;
-  --popover-foreground: var(--color-slate-800);
+  --popover-foreground: var(--color-neutral-800);
   /* Cyan-700 no claro: o cyan-500 vibra demais sobre branco */
   --primary: #0891b2;
   --primary-foreground: #ffffff;
   --secondary: rgba(0, 0, 0, 0);
-  --secondary-foreground: var(--color-slate-700);
-  --muted: var(--color-slate-100);
-  --muted-foreground: var(--color-slate-500);
+  --secondary-foreground: var(--color-neutral-700);
+  --muted: var(--color-neutral-100);
+  --muted-foreground: var(--color-neutral-500);
   --accent: #0891b2;
   --accent-foreground: #ffffff;
   --destructive: rgba(0, 0, 0, 0);
   --destructive-foreground: var(--color-red-500);
-  --border: var(--color-slate-200);
+  --border: var(--color-neutral-200);
   --input: #ffffff;
   --input-background: #ffffff;
   /* The default font weight for medium text. */
@@ -43,8 +43,8 @@
   /* The default font weight for bold text. */
   --font-weight-bold: 700;
   --ring: #0891b2;
-  /* Sombra com tinta slate em vez de preto puro */
-  --elevation-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+  /* Sombra com tinta neutral em vez de preto puro */
+  --elevation-sm: 0 1px 2px rgba(23, 23, 23, 0.04), 0 1px 3px rgba(23, 23, 23, 0.06);
   /* The color for chart elements, such as a bar or line in a chart. */
   --chart-1: #06b6d4;
   /* The color for another chart element, such as a bar or line in a chart. */
@@ -61,22 +61,22 @@
   --radius-sm: 4px;
   /* The larger border radius variant. */
   --radius-lg: 8px;
-  --sidebar: #ffffff;
-  --sidebar-foreground: var(--color-slate-800);
-  /* Item ATIVO usa cyan da marca; HOVER fica em slate-100 */
+  --sidebar: var(--background);
+  --sidebar-foreground: var(--color-neutral-800);
+  /* Item ATIVO usa cyan da marca; HOVER fica em neutral-100 */
   --sidebar-primary: #00c1af;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #f0fdfa;
   --sidebar-accent-foreground: #00c1af;
-  --sidebar-border: var(--color-slate-200);
+  --sidebar-border: var(--color-neutral-200);
   --sidebar-ring: #0891b2;
-  --app-header: rgba(255, 255, 255, 0.92);
-  --app-header-border: #e2e8f0;
+  --app-header: var(--background);
+  --app-header-border: #e5e5e5;
 }
 
 .dark {
   /* The default background color for the application. */
-  --background: #0f172a;
+  --background: #0a0a0a;
   /* The default color for elements or text that appears on top of the background. */
   --foreground: rgba(255, 255, 255, 1.00);
   /* The background color for cards, modals, and other containers. */
@@ -86,47 +86,47 @@
   /* The default color for text or elements that appear on top of cards, modals and other background containers. */
   --card-foreground: rgba(255, 255, 255, 1.00);
   /* The background color for dropdowns and tooltips. */
-  --popover: #1e293b;
+  --popover: #262626;
   /* The default color for text or elements that appear on top of dropdowns and tooltips. */
   --popover-foreground: rgba(255, 255, 255, 1.00);
   /* The primary color used for buttons, links, and other interactive elements. */
   --primary: #22d3ee;
   /* The default color for text or elements that appear on top of primary colored elements. */
-  --primary-foreground: rgba(15, 23, 43, 1.00);
+  --primary-foreground: rgba(23, 23, 23, 1.00);
   /* The secondary color used for secondary(but NOT-DESTRUCTIVE) buttons and interactive elements. */
   --secondary: rgba(0, 0, 0, 0);
   /* The default color for text or elements that appear on top of secondary colored elements. */
-  --secondary-foreground: rgba(203, 213, 225, 1.00);
+  --secondary-foreground: rgba(212, 212, 212, 1.00);
   /* The muted color used for less prominent elements, such as disabled buttons or disabled text. */
   --muted: rgba(255, 255, 255, 0.06);
   /* The default color for text or elements that appear on top of muted colored elements. */
-  --muted-foreground: rgba(148, 163, 184, 1.00);
+  --muted-foreground: rgba(163, 163, 163, 1.00);
   /* The accent color used for highlights, links, and other interactive elements. */
   --accent: #22d3ee;
   /* The default color for text or elements that appear on top of accent colored elements. */
-  --accent-foreground: rgba(15, 23, 43, 1.00);
+  --accent-foreground: rgba(23, 23, 23, 1.00);
   /* The color used for background in destructive actions, such as delete buttons or error messages. */
   --destructive: rgba(0, 0, 0, 0);
   /* The default color for text or elements that appear on top of destructive colored elements. */
-  --destructive-foreground: rgba(251, 44, 54, 1.00);
+  --destructive-foreground: var(--color-red-400);
   /* The default border color for elements such as inputs, buttons, and other containers. */
   --border: rgba(255, 255, 255, 0.12);
   /* The default background color for input fields once the text has been filled. Should be either transparent or match the input-background. */
-  --input: rgba(15, 23, 42, 0.82);
+  --input: rgba(23, 23, 23, 0.82);
   /* The default background color for input fields, text areas, and other input elements. */
-  --input-background: rgba(15, 23, 42, 0.82);
+  --input-background: rgba(23, 23, 23, 0.82);
   /* The color for focus rings, outlines, and other focus indicators. */
   --ring: #22d3ee;
   /* Shadow for small elevations, such as cards or modals. */
   --elevation-sm: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
   /* The background color for sidebars, navigation menus, and other persistent elements. */
-  --sidebar: #1e293b;
+  --sidebar: #171717;
   /* The default color for text or elements that appear on top of sidebars, navigation menus, and other persistent elements. */
   --sidebar-foreground: rgba(255, 255, 255, 1.00);
   /* The primary color used for buttons, links, and other interactive elements in sidebars and navigation menus. */
   --sidebar-primary: #00c1af;
   /* The default color for text or elements that appear on top of primary colored elements in sidebars and navigation menus. */
-  --sidebar-primary-foreground: rgba(15, 23, 43, 1.00);
+  --sidebar-primary-foreground: rgba(23, 23, 23, 1.00);
   /* The accent color used for highlights, links, and other interactive elements in sidebars and navigation menus. */
   --sidebar-accent: rgba(255, 255, 255, 0.1);
   /* The default color for text or elements that appear on top of accent colored elements in sidebars and navigation menus. */
@@ -135,7 +135,7 @@
   --sidebar-border: rgba(255, 255, 255, 0.1);
   /* The default color for focus rings, outlines, and other focus indicators in sidebars and navigation menus. */
   --sidebar-ring: #22d3ee;
-  --app-header: #1e293b;
+  --app-header: #171717;
   --app-header-border: rgba(255, 255, 255, 0.1);
 }
 
@@ -487,7 +487,7 @@ input[type="date"]:focus {
 
 .custom-datepicker .rdp-day_selected {
   background-color: #67e8f9 !important;
-  color: #0f172b !important;
+  color: #171717 !important;
   font-weight: var(--font-weight-semibold);
 }
 
@@ -509,7 +509,7 @@ input[type="date"]:focus {
 
 /* Light mode adjustments */
 :root:not(.dark) .custom-datepicker .rdp-months {
-  background-color: rgba(226, 232, 240, 1);
+  background-color: rgba(228, 228, 231, 1);
 }
 
 :root:not(.dark) .custom-datepicker .rdp-day_selected {
@@ -541,7 +541,7 @@ select:focus {
 
 /* Style for dropdown options in dark mode */
 .dark select option {
-  background-color: #1e293b;
+  background-color: #262626;
   color: #ffffff;
   padding: 0.625rem 1rem;
   font-family: 'Poppins', sans-serif;
@@ -560,7 +560,7 @@ select:focus {
 /* Style for dropdown options in light mode */
 :root:not(.dark) select option {
   background-color: #ffffff;
-  color: #0f172b;
+  color: #171717;
   padding: 0.625rem 1rem;
   font-family: 'Poppins', sans-serif;
 }

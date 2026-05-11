@@ -1,22 +1,30 @@
 import {
   Banknote,
   Calendar,
+  Check,
   CheckCheck,
+  ChevronDown,
   ChevronRight,
   ClipboardList,
   CircleDollarSign,
   Coins,
+  Edit2,
   FileText,
   Hotel,
   MapPin,
+  Paperclip,
   PiggyBank,
   Plus,
   ReceiptText,
   RotateCcw,
+  Save,
   Search,
+  Send,
+  Trash2,
+  Upload,
   X,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Dropdown } from '@/app/components/Dropdown';
 import {
   Breadcrumb,
@@ -34,6 +42,7 @@ type DiariaTab = 'solicitadas' | 'nova' | 'minhas';
 type AccessType = 'cidadao' | 'voluntario' | 'bolsista' | 'coordenador' | 'diretor' | 'reitor';
 type TipoDiariaCodigo = 'NACIONAL' | 'INTERNACIONAL';
 type TipoViagemCodigo = 'DENTRO_ESTADO' | 'FORA_ESTADO' | 'INTERNACIONAL';
+type OrdenacaoDataPartida = 'RECENTE' | 'ANTIGA';
 type DiariaBeneficiarioItem = DiariaRequest & {
   beneficiario: string;
   beneficiarioIndex: number;
@@ -43,6 +52,8 @@ type DiariaBeneficiarioItem = DiariaRequest & {
 interface CertificatesPageProps {
   accessType?: AccessType;
   initialFlow?: 'diarias' | null;
+  initialDiariaTab?: DiariaTab;
+  onNavigate?: (page: string) => void;
 }
 
 interface AlocacaoBolsistaProjeto {
@@ -81,6 +92,10 @@ interface DiariaRequest {
   transacaoReversaoRef?: string;
   justificativaCancelamento?: string;
   justificativaRecusa?: string;
+  comprovacaoAtividade?: {
+    descricao: string;
+    anexos: string[];
+  };
 }
 
 const coordenadorAtual = 'Mariana Costa';
@@ -236,6 +251,28 @@ function calcularDiarias(
   const diaFim = new Date(fimData.getFullYear(), fimData.getMonth(), fimData.getDate()).getTime();
   const diasFora = Math.round((diaFim - diaInicio) / 86400000);
   const possuiPernoite = diasFora > 0;
+  const maximoDiasSeguidosNoMesmoMes = (() => {
+    const cursor = new Date(inicioData.getFullYear(), inicioData.getMonth(), inicioData.getDate());
+    const fimDia = new Date(fimData.getFullYear(), fimData.getMonth(), fimData.getDate());
+    const diasPorMes = new Map<string, number>();
+
+    while (cursor.getTime() <= fimDia.getTime()) {
+      const chaveMes = `${cursor.getFullYear()}-${cursor.getMonth()}`;
+      diasPorMes.set(chaveMes, (diasPorMes.get(chaveMes) ?? 0) + 1);
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    return Math.max(...diasPorMes.values());
+  })();
+
+  if (maximoDiasSeguidosNoMesmoMes > 15) {
+    return {
+      quantidade: 0,
+      bloqueado: true,
+      motivoBloqueio: 'É permitido solicitar no máximo 15 dias seguidos em um único mês.',
+      memoria: 'Bloqueio por limite de 15 dias seguidos em um único mês.',
+    };
+  }
 
   if (usaDistancia && distanciaKm < 150) {
     return { quantidade: 0, bloqueado: true, motivoBloqueio: 'É permitido solicitar diária apenas para distâncias a partir de 150 km.', memoria: 'Bloqueio por distância mínima de 150 km.' };
@@ -296,6 +333,19 @@ function dataInicioAindaNaoPassou(partida: string) {
   return Number.isFinite(inicio) && inicio > Date.now();
 }
 
+function formatarDataPartida(partida: string) {
+  return new Date(partida).toLocaleDateString('pt-BR');
+}
+
+function ordenarPorDataPartida<T extends Pick<DiariaRequest, 'partida'>>(items: T[], ordenacao: OrdenacaoDataPartida) {
+  return [...items].sort((a, b) => {
+    const partidaA = new Date(a.partida).getTime();
+    const partidaB = new Date(b.partida).getTime();
+
+    return ordenacao === 'RECENTE' ? partidaB - partidaA : partidaA - partidaB;
+  });
+}
+
 function formatarInputData(valor: string) {
   return valor.split('T')[0] ?? '';
 }
@@ -311,10 +361,10 @@ function combinarDataHora(atual: string, proximoValor: string, parte: 'data' | '
   return parte === 'data' ? `${proximoValor}T${hora}` : `${data}T${proximoValor}`;
 }
 
-export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }: CertificatesPageProps) {
+export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, initialDiariaTab = 'solicitadas', onNavigate }: CertificatesPageProps) {
   const [selectedOption, setSelectedOption] = useState<DocumentoSolicitacao>(null);
   const [activeFlow, setActiveFlow] = useState<'diarias' | null>(initialFlow);
-  const [activeDiariaTab, setActiveDiariaTab] = useState<DiariaTab>('solicitadas');
+  const [activeDiariaTab, setActiveDiariaTab] = useState<DiariaTab>(initialFlow === 'diarias' ? initialDiariaTab : 'solicitadas');
   const [selectedYear, setSelectedYear] = useState('2024');
   const [selectedBolsistas, setSelectedBolsistas] = useState<string[]>([]);
   const [bolsistaSearch, setBolsistaSearch] = useState('');
@@ -322,9 +372,11 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
   const [diariaSearch, setDiariaSearch] = useState('');
   const [diariaStatusFilter, setDiariaStatusFilter] = useState<StatusDiaria | 'TODOS'>('TODOS');
   const [diariaTipoViagemFilter, setDiariaTipoViagemFilter] = useState<TipoViagemCodigo | 'TODOS'>('TODOS');
+  const [diariaDataPartidaSort, setDiariaDataPartidaSort] = useState<OrdenacaoDataPartida>('RECENTE');
   const [minhasDiariasSearch, setMinhasDiariasSearch] = useState('');
   const [minhasDiariasStatusFilter, setMinhasDiariasStatusFilter] = useState<StatusDiaria | 'TODOS'>('TODOS');
   const [minhasDiariasTipoViagemFilter, setMinhasDiariasTipoViagemFilter] = useState<TipoViagemCodigo | 'TODOS'>('TODOS');
+  const [minhasDiariasDataPartidaSort, setMinhasDiariasDataPartidaSort] = useState<OrdenacaoDataPartida>('RECENTE');
   const [partida, setPartida] = useState('');
   const [chegada, setChegada] = useState('');
   const [tipoViagemSelecionado, setTipoViagemSelecionado] = useState<TipoViagemCodigo | ''>('');
@@ -345,6 +397,14 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
   const [confirmarCriacaoDiariaOpen, setConfirmarCriacaoDiariaOpen] = useState(false);
   const [confirmarAceiteDiariaId, setConfirmarAceiteDiariaId] = useState<string | null>(null);
   const [justificativaRecusa, setJustificativaRecusa] = useState('');
+  const [descricaoComprovacaoAtividade, setDescricaoComprovacaoAtividade] = useState('');
+  const [isComprovacaoDragging, setIsComprovacaoDragging] = useState(false);
+  const [arquivosComprovacaoAtividade, setArquivosComprovacaoAtividade] = useState<File[]>([]);
+  const [nomesArquivosComprovacaoAtividade, setNomesArquivosComprovacaoAtividade] = useState<string[]>([]);
+  const [arquivoComprovacaoEditandoIdx, setArquivoComprovacaoEditandoIdx] = useState<number | null>(null);
+  const [nomeArquivoComprovacaoTemporario, setNomeArquivoComprovacaoTemporario] = useState('');
+  const [arquivoComprovacaoExpandidoIdx, setArquivoComprovacaoExpandidoIdx] = useState<number | null>(null);
+  const comprovacaoFileInputRef = useRef<HTMLInputElement>(null);
   const [diariasAceitas, setDiariasAceitas] = useState<string[]>([]);
   const [solicitacoesDiaria, setSolicitacoesDiaria] = useState<DiariaRequest[]>([
     {
@@ -630,6 +690,265 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
       memoriaCalculoSnapshot: '8,5h sem pernoite: 0,5 diária.',
       transacaoComprometimentoRef: 'TR-2026-105',
     },
+    ...([
+      {
+        id: 'SD-2026-201',
+        alocacaoBolsistaRef: 'ALO-2026-001',
+        bolsistaNome: bolsistaAtual,
+        partida: '2026-02-12T08:00',
+        chegada: '2026-02-13T18:00',
+        destino: 'Linhares/ES',
+        distanciaKm: 133.86,
+        status: 'APROVADA',
+        estadoAceite: 'ASSINADO',
+        quantidade: 1.5,
+        valorUnitario: 260,
+        valorTotal: 390,
+        tipoDiariaRef: 'DIA-2026-001',
+        parametroCalculoDiariaRef: 'PCD-2026-001',
+        tipoDiaria: 'NACIONAL',
+        tipoViagem: 'DENTRO_ESTADO',
+      },
+      {
+        id: 'SD-2026-202',
+        alocacaoBolsistaRef: 'ALO-2026-001',
+        bolsistaNome: bolsistaAtual,
+        partida: '2026-03-04T07:30',
+        chegada: '2026-03-06T17:30',
+        destino: 'São Paulo/SP',
+        distanciaKm: 0,
+        status: 'APROVADA',
+        estadoAceite: 'ASSINADO',
+        quantidade: 2.5,
+        valorUnitario: 320,
+        valorTotal: 800,
+        tipoDiariaRef: 'DIA-2026-002',
+        parametroCalculoDiariaRef: 'PCD-2026-002',
+        tipoDiaria: 'NACIONAL',
+        tipoViagem: 'FORA_ESTADO',
+      },
+      {
+        id: 'SD-2026-203',
+        alocacaoBolsistaRef: 'ALO-2026-001',
+        bolsistaNome: bolsistaAtual,
+        partida: '2026-04-18T09:00',
+        chegada: '2026-04-18T18:00',
+        destino: 'Cachoeiro de Itapemirim/ES',
+        distanciaKm: 143.4,
+        status: 'APROVADA',
+        estadoAceite: 'ASSINADO',
+        quantidade: 0.5,
+        valorUnitario: 260,
+        valorTotal: 130,
+        tipoDiariaRef: 'DIA-2026-001',
+        parametroCalculoDiariaRef: 'PCD-2026-001',
+        tipoDiaria: 'NACIONAL',
+        tipoViagem: 'DENTRO_ESTADO',
+      },
+      {
+        id: 'SD-2026-204',
+        alocacaoBolsistaRef: 'ALO-2026-001',
+        bolsistaNome: bolsistaAtual,
+        partida: '2026-05-07T08:00',
+        chegada: '2026-05-08T16:00',
+        destino: 'Brasília/DF',
+        distanciaKm: 0,
+        status: 'APROVADA',
+        estadoAceite: 'ASSINADO',
+        quantidade: 1.5,
+        valorUnitario: 320,
+        valorTotal: 480,
+        tipoDiariaRef: 'DIA-2026-002',
+        parametroCalculoDiariaRef: 'PCD-2026-002',
+        tipoDiaria: 'NACIONAL',
+        tipoViagem: 'FORA_ESTADO',
+      },
+      {
+        id: 'SD-2026-205',
+        alocacaoBolsistaRef: 'ALO-2026-001',
+        bolsistaNome: bolsistaAtual,
+        partida: '2026-08-14T08:00',
+        chegada: '2026-08-16T18:00',
+        destino: 'Linhares/ES',
+        distanciaKm: 133.86,
+        status: 'ALOCADA',
+        estadoAceite: 'PENDENTE',
+        quantidade: 2.5,
+        valorUnitario: 260,
+        valorTotal: 650,
+        tipoDiariaRef: 'DIA-2026-001',
+        parametroCalculoDiariaRef: 'PCD-2026-001',
+        tipoDiaria: 'NACIONAL',
+        tipoViagem: 'DENTRO_ESTADO',
+      },
+      {
+        id: 'SD-2026-206',
+        alocacaoBolsistaRef: 'ALO-2026-001',
+        bolsistaNome: bolsistaAtual,
+        partida: '2026-09-22T07:00',
+        chegada: '2026-09-25T19:00',
+        destino: 'Lisboa/Portugal',
+        distanciaKm: 0,
+        status: 'ALOCADA',
+        estadoAceite: 'PENDENTE',
+        quantidade: 3.5,
+        valorUnitario: 620,
+        valorTotal: 2170,
+        tipoDiariaRef: 'DIA-2026-003',
+        parametroCalculoDiariaRef: 'PCD-2026-003',
+        tipoDiaria: 'INTERNACIONAL',
+        tipoViagem: 'INTERNACIONAL',
+      },
+      {
+        id: 'SD-2026-207',
+        alocacaoBolsistaRef: 'ALO-2026-001',
+        bolsistaNome: bolsistaAtual,
+        partida: '2026-10-19T08:30',
+        chegada: '2026-10-20T17:30',
+        destino: 'São Paulo/SP',
+        distanciaKm: 0,
+        status: 'RECUSADA',
+        estadoAceite: 'RECUSADO',
+        quantidade: 1.5,
+        valorUnitario: 320,
+        valorTotal: 480,
+        tipoDiariaRef: 'DIA-2026-002',
+        parametroCalculoDiariaRef: 'PCD-2026-002',
+        tipoDiaria: 'NACIONAL',
+        tipoViagem: 'FORA_ESTADO',
+      },
+      {
+        id: 'SD-2026-208',
+        alocacaoBolsistaRef: 'ALO-2026-001',
+        bolsistaNome: bolsistaAtual,
+        partida: '2026-11-27T08:00',
+        chegada: '2026-11-27T18:30',
+        destino: 'Cachoeiro de Itapemirim/ES',
+        distanciaKm: 143.4,
+        status: 'ALOCADA',
+        estadoAceite: 'PENDENTE',
+        quantidade: 0.5,
+        valorUnitario: 260,
+        valorTotal: 130,
+        tipoDiariaRef: 'DIA-2026-001',
+        parametroCalculoDiariaRef: 'PCD-2026-001',
+        tipoDiaria: 'NACIONAL',
+        tipoViagem: 'DENTRO_ESTADO',
+      },
+      {
+        id: 'SD-2026-106',
+        alocacaoBolsistaRef: 'ALO-2026-007',
+        bolsistaNome: bolsistaMinhasDiarias,
+        partida: '2026-01-22T08:00',
+        chegada: '2026-01-23T17:00',
+        destino: 'Linhares/ES',
+        distanciaKm: 133.86,
+        status: 'APROVADA',
+        estadoAceite: 'ASSINADO',
+        quantidade: 1.5,
+        valorUnitario: 260,
+        valorTotal: 390,
+        tipoDiariaRef: 'DIA-2026-001',
+        parametroCalculoDiariaRef: 'PCD-2026-001',
+        tipoDiaria: 'NACIONAL',
+        tipoViagem: 'DENTRO_ESTADO',
+      },
+      {
+        id: 'SD-2026-107',
+        alocacaoBolsistaRef: 'ALO-2026-007',
+        bolsistaNome: bolsistaMinhasDiarias,
+        partida: '2026-03-13T07:00',
+        chegada: '2026-03-15T19:00',
+        destino: 'São Paulo/SP',
+        distanciaKm: 0,
+        status: 'APROVADA',
+        estadoAceite: 'ASSINADO',
+        quantidade: 2.5,
+        valorUnitario: 320,
+        valorTotal: 800,
+        tipoDiariaRef: 'DIA-2026-002',
+        parametroCalculoDiariaRef: 'PCD-2026-002',
+        tipoDiaria: 'NACIONAL',
+        tipoViagem: 'FORA_ESTADO',
+      },
+      {
+        id: 'SD-2026-108',
+        alocacaoBolsistaRef: 'ALO-2026-007',
+        bolsistaNome: bolsistaMinhasDiarias,
+        partida: '2026-04-28T08:30',
+        chegada: '2026-04-28T18:00',
+        destino: 'Cachoeiro de Itapemirim/ES',
+        distanciaKm: 143.4,
+        status: 'APROVADA',
+        estadoAceite: 'ASSINADO',
+        quantidade: 0.5,
+        valorUnitario: 260,
+        valorTotal: 130,
+        tipoDiariaRef: 'DIA-2026-001',
+        parametroCalculoDiariaRef: 'PCD-2026-001',
+        tipoDiaria: 'NACIONAL',
+        tipoViagem: 'DENTRO_ESTADO',
+      },
+      {
+        id: 'SD-2026-109',
+        alocacaoBolsistaRef: 'ALO-2026-007',
+        bolsistaNome: bolsistaMinhasDiarias,
+        partida: '2026-06-18T08:00',
+        chegada: '2026-06-19T17:00',
+        destino: 'Brasília/DF',
+        distanciaKm: 0,
+        status: 'ALOCADA',
+        estadoAceite: 'PENDENTE',
+        quantidade: 1.5,
+        valorUnitario: 320,
+        valorTotal: 480,
+        tipoDiariaRef: 'DIA-2026-002',
+        parametroCalculoDiariaRef: 'PCD-2026-002',
+        tipoDiaria: 'NACIONAL',
+        tipoViagem: 'FORA_ESTADO',
+      },
+      {
+        id: 'SD-2026-110',
+        alocacaoBolsistaRef: 'ALO-2026-007',
+        bolsistaNome: bolsistaMinhasDiarias,
+        partida: '2026-08-24T08:00',
+        chegada: '2026-08-26T18:00',
+        destino: 'Lisboa/Portugal',
+        distanciaKm: 0,
+        status: 'ALOCADA',
+        estadoAceite: 'PENDENTE',
+        quantidade: 2.5,
+        valorUnitario: 620,
+        valorTotal: 1550,
+        tipoDiariaRef: 'DIA-2026-003',
+        parametroCalculoDiariaRef: 'PCD-2026-003',
+        tipoDiaria: 'INTERNACIONAL',
+        tipoViagem: 'INTERNACIONAL',
+      },
+    ] as const).map((solicitacao): DiariaRequest => ({
+      origem: 'Vitória/ES',
+      deslocamentoRegiaoMetropolitana: false,
+      municipioLimitrofe: false,
+      transporteCusteadoOutraEntidade: false,
+      hospedagemCusteadaOutraEntidade: false,
+      alimentacaoCusteadaOutraEntidade: false,
+      motivo: 'Atividade prevista no plano de trabalho da iniciativa.',
+      regraCalculo: 'Normativa FAPES',
+      memoriaCalculoSnapshot: 'Cálculo conforme período informado na solicitação.',
+      transacaoComprometimentoRef: solicitacao.id.replace('SD', 'TR'),
+      ...solicitacao,
+      ...(['SD-2026-108', 'SD-2026-202', 'SD-2026-107', 'SD-2026-201', 'SD-2026-106'].includes(solicitacao.id)
+        ? {
+            comprovacaoAtividade: {
+              descricao: 'Atividade realizada conforme cronograma aprovado, com participação em reuniões técnicas, coleta de evidências e registro dos encaminhamentos para continuidade do projeto.',
+              anexos: [
+                `registro-fotografico-${solicitacao.id.toLowerCase()}.png`,
+                `relatorio-atividade-${solicitacao.id.toLowerCase()}.pdf`,
+              ],
+            },
+          }
+        : {}),
+    })),
   ]);
 
   const tiposViagemComOrcamento = tiposViagem.filter((tipo) => (orcamentosRubricasDiarias[tipo.codigo] ?? 0) > 0);
@@ -669,7 +988,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
   const diariasFiltradas = useMemo(() => {
     const query = diariaSearch.trim().toLowerCase();
 
-    return solicitacoesDiaria.filter((solicitacao) => {
+    const filtradas = solicitacoesDiaria.filter((solicitacao) => {
       const matchesSearch =
         !query ||
         solicitacao.id.toLowerCase().includes(query) ||
@@ -682,7 +1001,9 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
 
       return matchesSearch && matchesStatus && matchesTipoViagem;
     });
-  }, [diariaSearch, diariaStatusFilter, diariaTipoViagemFilter, solicitacoesDiaria]);
+
+    return ordenarPorDataPartida(filtradas, diariaDataPartidaSort);
+  }, [diariaDataPartidaSort, diariaSearch, diariaStatusFilter, diariaTipoViagemFilter, solicitacoesDiaria]);
   const diariasPorBeneficiario = useMemo<DiariaBeneficiarioItem[]>(
     () =>
       diariasFiltradas.map((solicitacao, beneficiarioIndex) => ({
@@ -693,6 +1014,22 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
       })),
     [diariasFiltradas],
   );
+  const diariasSolicitadasExibidas = useMemo(() => {
+    const idsExemplo = new Set([
+      'SD-2026-105',
+      'SD-2026-208',
+      'SD-2026-207',
+      'SD-2026-206',
+      'SD-2026-205',
+      'SD-2026-108',
+      'SD-2026-202',
+      'SD-2026-107',
+      'SD-2026-201',
+      'SD-2026-106',
+    ]);
+
+    return diariasPorBeneficiario.filter((solicitacao) => idsExemplo.has(solicitacao.id));
+  }, [diariasPorBeneficiario]);
   const totalComprometido = solicitacoesDiaria
     .filter((solicitacao) => solicitacao.status === 'APROVADA' || statusPendenteAceite(solicitacao))
     .reduce((total, solicitacao) => total + solicitacao.valorTotal, 0);
@@ -741,6 +1078,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
   const saldoAposSolicitacao = saldoDisponivelDiarias - valorTotalCalculado;
   const solicitacaoExcedeSaldo = valorTotalCalculado > saldoDisponivelDiarias;
   const solicitacaoBloqueada = diariaFormIncompleto || solicitacaoExcedeSaldo || calculoDiaria.bloqueado;
+  const bloqueioDistanciaMinima = calculoDiaria.motivoBloqueio === 'É permitido solicitar diária apenas para distâncias a partir de 150 km.';
   const mensagemSolicitacaoDiaria = calculoDiaria.bloqueado
     ? calculoDiaria.motivoBloqueio
     : diariaFormIncompleto
@@ -753,7 +1091,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
   const minhasDiariasFiltradas = useMemo(() => {
     const query = minhasDiariasSearch.trim().toLowerCase();
 
-    return solicitacoesDiaria.filter((solicitacao) => {
+    const filtradas = solicitacoesDiaria.filter((solicitacao) => {
       if (solicitacao.bolsistaNome !== beneficiarioLogado) return false;
 
       const matchesSearch =
@@ -767,7 +1105,9 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
 
       return matchesSearch && matchesStatus && matchesTipoViagem;
     });
-  }, [beneficiarioLogado, minhasDiariasSearch, minhasDiariasStatusFilter, minhasDiariasTipoViagemFilter, solicitacoesDiaria]);
+
+    return ordenarPorDataPartida(filtradas, minhasDiariasDataPartidaSort);
+  }, [beneficiarioLogado, minhasDiariasDataPartidaSort, minhasDiariasSearch, minhasDiariasStatusFilter, minhasDiariasTipoViagemFilter, solicitacoesDiaria]);
   const bolsistasEncontrados = useMemo(() => {
     const query = bolsistaSearch.trim().toLowerCase();
 
@@ -803,6 +1143,13 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
     setMostrarMotivoCancelamento(false);
     setMostrarJustificativaRecusa(false);
     setJustificativaRecusa('');
+    setDescricaoComprovacaoAtividade('');
+    setIsComprovacaoDragging(false);
+    setArquivosComprovacaoAtividade([]);
+    setNomesArquivosComprovacaoAtividade([]);
+    setArquivoComprovacaoEditandoIdx(null);
+    setNomeArquivoComprovacaoTemporario('');
+    setArquivoComprovacaoExpandidoIdx(null);
   };
 
   const abrirNovaSolicitacaoDiaria = () => {
@@ -828,6 +1175,15 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
     setJustificativaRecusa(solicitacao.justificativaRecusa ?? '');
     setMostrarMotivoCancelamento(false);
     setMostrarJustificativaRecusa(false);
+    setDescricaoComprovacaoAtividade(solicitacao.comprovacaoAtividade?.descricao ?? '');
+    setIsComprovacaoDragging(false);
+    setArquivosComprovacaoAtividade(
+      (solicitacao.comprovacaoAtividade?.anexos ?? []).map((nome) => new File(['mock'], nome, { type: nome.endsWith('.pdf') ? 'application/pdf' : 'image/png' })),
+    );
+    setNomesArquivosComprovacaoAtividade(solicitacao.comprovacaoAtividade?.anexos ?? []);
+    setArquivoComprovacaoEditandoIdx(null);
+    setNomeArquivoComprovacaoTemporario('');
+    setArquivoComprovacaoExpandidoIdx(null);
     setActiveDiariaTab('nova');
   };
 
@@ -1016,9 +1372,33 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
     setJustificativaRecusa('');
   };
 
+  const adicionarArquivosComprovacaoAtividade = (files: File[]) => {
+    if (files.length === 0) return;
+
+    setArquivosComprovacaoAtividade((current) => [...current, ...files]);
+    setNomesArquivosComprovacaoAtividade((current) => [...current, ...files.map((file) => file.name)]);
+  };
+
+  const confirmarEdicaoNomeArquivoComprovacao = (index: number) => {
+    if (nomeArquivoComprovacaoTemporario.trim()) {
+      setNomesArquivosComprovacaoAtividade((current) =>
+        current.map((nome, nomeIndex) => (nomeIndex === index ? nomeArquivoComprovacaoTemporario.trim() : nome)),
+      );
+    }
+    setArquivoComprovacaoEditandoIdx(null);
+    setNomeArquivoComprovacaoTemporario('');
+  };
+
+  const removerArquivoComprovacaoAtividade = (index: number) => {
+    setArquivosComprovacaoAtividade((current) => current.filter((_, fileIndex) => fileIndex !== index));
+    setNomesArquivosComprovacaoAtividade((current) => current.filter((_, fileIndex) => fileIndex !== index));
+    setArquivoComprovacaoEditandoIdx((current) => (current === index ? null : current));
+    setArquivoComprovacaoExpandidoIdx((current) => (current === index ? null : current));
+  };
+
   const renderMinhasDiarias = () => (
     <section>
-      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_240px_240px] gap-3 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_220px_220px_220px] gap-3 mb-4">
         <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
           Pesquisar
           <div className="relative mt-2">
@@ -1038,6 +1418,22 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
             <Search size={18} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--muted-foreground)' }} />
           </div>
         </label>
+        <div>
+          <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+            Data de Partida
+          </label>
+          <div className="mt-2">
+            <Dropdown
+              value={minhasDiariasDataPartidaSort}
+              onChange={(value) => setMinhasDiariasDataPartidaSort(value as OrdenacaoDataPartida)}
+              showSelectedIcon={false}
+              options={[
+                { value: 'RECENTE', label: 'Mais Recente' },
+                { value: 'ANTIGA', label: 'Mais Antiga' },
+              ]}
+            />
+          </div>
+        </div>
         <div>
           <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
             Tipo de Viagem
@@ -1077,7 +1473,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
       </div>
 
       <div className="space-y-3">
-        {minhasDiariasFiltradas.map((solicitacao) => (
+        {minhasDiariasFiltradas.slice(0, 10).map((solicitacao) => (
           <button
             key={solicitacao.id}
             type="button"
@@ -1103,10 +1499,10 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                   { label: 'Bolsista', value: solicitacao.bolsistaNome },
                   { label: 'Diária', value: solicitacao.quantidade.toLocaleString('pt-BR') },
                   { label: 'Valor Total', value: currency.format(solicitacao.valorTotal) },
-                  { label: 'Origem', value: solicitacao.origem },
+                  { label: 'Data de Partida', value: formatarDataPartida(solicitacao.partida) },
                   { label: 'Destino', value: solicitacao.destino },
                 ].map((item) => (
-                  <div key={item.label} className="min-w-0">
+                  <div key={item.label} className="min-w-0" style={item.label === 'Diária' ? { paddingLeft: '2.75rem' } : undefined}>
                     <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                       {item.label}
                     </div>
@@ -1185,8 +1581,325 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
     : null;
   const temDiariaPendenteBolsista = solicitacoesDiaria.some((solicitacao) => solicitacao.bolsistaNome === bolsistaAtual && statusPendenteAceite(solicitacao));
 
+  const renderComprovacaoAtividadeCard = (comprovacaoEditavel: boolean, mostrarNumeroEtapa = false, somenteVisualizacao = false) => (
+    <>
+    <div
+      className="mt-6 p-5"
+      style={{
+        backgroundColor: 'var(--card)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius)',
+        opacity: comprovacaoEditavel ? 1 : 0.72,
+      }}
+    >
+      <div className="mb-5">
+        <div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            {mostrarNumeroEtapa && (
+              <span
+                className="flex items-center justify-center"
+                style={{
+                  width: '22px',
+                  height: '22px',
+                  borderRadius: '999px',
+                  backgroundColor: 'var(--primary)',
+                  color: 'var(--primary-foreground)',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 'var(--font-weight-normal)',
+                  flexShrink: 0,
+                }}
+              >
+                2
+              </span>
+            )}
+            <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+              Comprovação da Atividade
+            </h2>
+            {!comprovacaoEditavel && (
+              <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
+                Disponível para edição após a data de partida.
+              </span>
+            )}
+          </div>
+          <p
+            style={{
+              color: 'var(--muted-foreground)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-normal)',
+              margin: mostrarNumeroEtapa ? '0.35rem 0 0 calc(22px + 0.5rem)' : '0.35rem 0 0',
+            }}
+          >
+            Após a data da Diária, envie informações sobre a execução da atividade que motivou a Diária.
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-8">
+        <label className="block" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', marginBottom: '1.5rem' }}>
+          Descrição
+          <textarea
+            value={descricaoComprovacaoAtividade}
+            onChange={(event) => setDescricaoComprovacaoAtividade(event.target.value)}
+            disabled={!comprovacaoEditavel}
+            rows={4}
+            placeholder="Descreva o que foi realizado"
+            className="mt-2 w-full px-3 py-2"
+            style={{
+              backgroundColor: 'transparent',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              color: 'var(--foreground)',
+              fontSize: 'var(--text-sm)',
+              resize: 'vertical',
+              cursor: comprovacaoEditavel ? 'text' : 'not-allowed',
+            }}
+          />
+        </label>
+
+        {!somenteVisualizacao && (
+          <>
+            <div
+              className="p-8 flex flex-col items-center justify-center text-center"
+              onDragOver={(event) => {
+                event.preventDefault();
+                if (comprovacaoEditavel) setIsComprovacaoDragging(true);
+              }}
+              onDragLeave={() => setIsComprovacaoDragging(false)}
+              onDrop={(event) => {
+                event.preventDefault();
+                setIsComprovacaoDragging(false);
+                if (!comprovacaoEditavel) return;
+                adicionarArquivosComprovacaoAtividade(Array.from(event.dataTransfer.files ?? []));
+              }}
+              onClick={() => {
+                if (comprovacaoEditavel) comprovacaoFileInputRef.current?.click();
+              }}
+              style={{
+                backgroundColor: 'transparent',
+                border: `2px dashed ${isComprovacaoDragging ? 'var(--primary)' : 'var(--border)'}`,
+                borderRadius: 'var(--radius)',
+                cursor: comprovacaoEditavel ? 'pointer' : 'not-allowed',
+                minHeight: '180px',
+                transition: 'all .2s',
+              }}
+            >
+              <div style={{ color: 'var(--muted-foreground)', marginBottom: '1rem' }}>
+                <Upload size={32} />
+              </div>
+              <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: '0 0 1.25rem' }}>
+                Arraste e solte o arquivo aqui ou
+              </p>
+              <button
+                type="button"
+                disabled={!comprovacaoEditavel}
+                className="inline-flex items-center gap-2 px-4 py-2"
+                style={{
+                  backgroundColor: 'transparent',
+                  color: comprovacaoEditavel ? 'var(--foreground)' : 'var(--muted-foreground)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontFamily: 'var(--font-family)',
+                  cursor: comprovacaoEditavel ? 'pointer' : 'not-allowed',
+                  transition: 'all .2s',
+                }}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  if (comprovacaoEditavel) comprovacaoFileInputRef.current?.click();
+                }}
+                onMouseEnter={(event) => {
+                  if (comprovacaoEditavel) event.currentTarget.style.backgroundColor = 'var(--muted)';
+                }}
+                onMouseLeave={(event) => {
+                  event.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <Paperclip size={16} />
+                Anexar Arquivo
+              </button>
+            </div>
+            <input
+              ref={comprovacaoFileInputRef}
+              type="file"
+              className="hidden"
+              multiple
+              disabled={!comprovacaoEditavel}
+              onChange={(event) => {
+                adicionarArquivosComprovacaoAtividade(Array.from(event.target.files ?? []));
+                event.target.value = '';
+              }}
+            />
+          </>
+        )}
+        {arquivosComprovacaoAtividade.length > 0 && (
+          <div className="space-y-2">
+            {arquivosComprovacaoAtividade.map((file, index) => {
+              const isEditing = arquivoComprovacaoEditandoIdx === index;
+              const isExpanded = arquivoComprovacaoExpandidoIdx === index;
+
+              return (
+                <div key={`${file.name}-${index}`}>
+                  <div
+                    className="p-4 flex items-center gap-4"
+                    style={{
+                      backgroundColor: 'var(--card)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius)',
+                    }}
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <FileText size={20} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={nomeArquivoComprovacaoTemporario}
+                          onChange={(event) => setNomeArquivoComprovacaoTemporario(event.target.value)}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') confirmarEdicaoNomeArquivoComprovacao(index);
+                            if (event.key === 'Escape') {
+                              setArquivoComprovacaoEditandoIdx(null);
+                              setNomeArquivoComprovacaoTemporario('');
+                            }
+                          }}
+                          autoFocus
+                          style={{
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            borderBottom: '1px solid var(--primary)',
+                            outline: 'none',
+                            fontSize: 'var(--text-sm)',
+                            fontFamily: 'var(--font-family)',
+                            color: 'var(--foreground)',
+                            width: '100%',
+                            padding: '2px 0',
+                          }}
+                        />
+                      ) : (
+                        <span style={{ fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', color: 'var(--foreground)', overflowWrap: 'anywhere' }}>
+                          {nomesArquivosComprovacaoAtividade[index]}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {isEditing ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => confirmarEdicaoNomeArquivoComprovacao(index)}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', color: 'rgb(34,197,94)', display: 'flex', borderRadius: 'var(--radius)' }}
+                          >
+                            <Check size={18} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setArquivoComprovacaoEditandoIdx(null);
+                              setNomeArquivoComprovacaoTemporario('');
+                            }}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', color: 'var(--muted-foreground)', display: 'flex', borderRadius: 'var(--radius)' }}
+                          >
+                            <X size={18} />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            disabled={!comprovacaoEditavel}
+                            onClick={() => {
+                              setArquivoComprovacaoEditandoIdx(index);
+                              setNomeArquivoComprovacaoTemporario(nomesArquivosComprovacaoAtividade[index]);
+                            }}
+                            style={{ background: 'none', border: 'none', cursor: comprovacaoEditavel ? 'pointer' : 'not-allowed', padding: '6px', color: 'var(--muted-foreground)', display: 'flex', borderRadius: 'var(--radius)', transition: 'background-color .2s' }}
+                          >
+                            <Edit2 size={18} />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={!comprovacaoEditavel}
+                            onClick={() => removerArquivoComprovacaoAtividade(index)}
+                            style={{ background: 'none', border: 'none', cursor: comprovacaoEditavel ? 'pointer' : 'not-allowed', padding: '6px', color: 'var(--muted-foreground)', display: 'flex', borderRadius: 'var(--radius)', transition: 'background-color .2s' }}
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setArquivoComprovacaoExpandidoIdx(isExpanded ? null : index)}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', color: 'var(--muted-foreground)', display: 'flex', borderRadius: 'var(--radius)', transition: 'all .2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                          >
+                            <ChevronDown size={18} />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  {isExpanded && (
+                    <div
+                      className="mt-2 p-4"
+                      style={{
+                        backgroundColor: 'var(--card)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        color: 'var(--muted-foreground)',
+                        fontSize: 'var(--text-sm)',
+                      }}
+                    >
+                      Arquivo selecionado: <span style={{ color: 'var(--foreground)' }}>{file.name}</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+    {!somenteVisualizacao && (
+    <div className="mt-4 flex flex-col sm:flex-row justify-end gap-3">
+      <button
+        type="button"
+        disabled={!comprovacaoEditavel}
+        className="px-4 py-2 flex items-center justify-center gap-2"
+        style={{
+          backgroundColor: 'transparent',
+          color: comprovacaoEditavel ? 'var(--foreground)' : 'var(--muted-foreground)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius)',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 'var(--font-weight-medium)',
+          cursor: comprovacaoEditavel ? 'pointer' : 'not-allowed',
+        }}
+      >
+        <Save size={16} />
+        Salvar Rascunho
+      </button>
+      <button
+        type="button"
+        disabled={!comprovacaoEditavel}
+        className="px-4 py-2 flex items-center justify-center gap-2"
+        style={{
+          backgroundColor: comprovacaoEditavel ? 'var(--primary)' : 'var(--muted)',
+          color: comprovacaoEditavel ? 'var(--primary-foreground)' : 'var(--muted-foreground)',
+          border: 'none',
+          borderRadius: 'var(--radius)',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 'var(--font-weight-medium)',
+          cursor: comprovacaoEditavel ? 'pointer' : 'not-allowed',
+        }}
+      >
+        <Send size={16} />
+        Enviar Comprovação
+      </button>
+    </div>
+    )}
+  </>
+  );
+
   const renderDetalhesBolsistaDiaria = () => {
     if (!solicitacaoDetalhe) return null;
+
+    const comprovacaoEditavel = !dataInicioAindaNaoPassou(solicitacaoDetalhe.partida);
 
     return (
       <section className="mb-8">
@@ -1198,6 +1911,11 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
             borderRadius: 'var(--radius)',
           }}
         >
+          <div className="mb-5">
+            <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+              Informações Gerais
+            </h2>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
             {[
               { label: 'Bolsista', value: solicitacaoDetalhe.bolsistaNome },
@@ -1208,9 +1926,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
               { label: 'Destino', value: solicitacaoDetalhe.destino },
               { label: 'Partida', value: new Date(solicitacaoDetalhe.partida).toLocaleString('pt-BR') },
               { label: 'Chegada', value: new Date(solicitacaoDetalhe.chegada).toLocaleString('pt-BR') },
-              { label: 'Distância', value: formatarDistanciaDiaria(solicitacaoDetalhe) },
               { label: 'Status', value: statusLabel(solicitacaoDetalhe.status) },
-              { label: 'Motivo', value: solicitacaoDetalhe.motivo },
             ].map((item) => (
               <div key={item.label} className="min-w-0">
                 <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
@@ -1221,6 +1937,280 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                 </strong>
               </div>
             ))}
+            <div className="min-w-0 lg:col-span-3">
+              <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                Motivo
+              </span>
+              <strong style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', overflowWrap: 'anywhere', lineHeight: 1.6 }}>
+                {solicitacaoDetalhe.motivo}
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        {renderComprovacaoAtividadeCard(comprovacaoEditavel)}
+
+        <div
+          className="hidden mt-6 p-5"
+          style={{
+            backgroundColor: 'var(--card)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius)',
+            opacity: comprovacaoEditavel ? 1 : 0.72,
+          }}
+        >
+          <div className="mb-5">
+            <div>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+                  Comprovação da Atividade
+                </h2>
+                {!comprovacaoEditavel && (
+                  <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
+                    Disponível para edição após a data de partida.
+                  </span>
+                )}
+              </div>
+              <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', margin: '0.35rem 0 0' }}>
+                Após a data da Diária, envie informações sobre a execução da atividade que motivou a Diária.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+              Descrição
+              <textarea
+                value={descricaoComprovacaoAtividade}
+                onChange={(event) => setDescricaoComprovacaoAtividade(event.target.value)}
+                disabled={!comprovacaoEditavel}
+                rows={4}
+                placeholder="Descreva o que foi realizado"
+                className="mt-2 w-full px-3 py-2"
+                style={{
+                  backgroundColor: 'transparent',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                  color: 'var(--foreground)',
+                  fontSize: 'var(--text-sm)',
+                  resize: 'vertical',
+                  cursor: comprovacaoEditavel ? 'text' : 'not-allowed',
+                }}
+              />
+            </label>
+
+            <div
+              className="p-8 flex flex-col items-center justify-center text-center"
+              onDragOver={(event) => {
+                event.preventDefault();
+                if (comprovacaoEditavel) setIsComprovacaoDragging(true);
+              }}
+              onDragLeave={() => setIsComprovacaoDragging(false)}
+              onDrop={(event) => {
+                event.preventDefault();
+                setIsComprovacaoDragging(false);
+                if (!comprovacaoEditavel) return;
+
+                adicionarArquivosComprovacaoAtividade(Array.from(event.dataTransfer.files ?? []));
+              }}
+              onClick={() => {
+                if (comprovacaoEditavel) comprovacaoFileInputRef.current?.click();
+              }}
+              style={{
+                backgroundColor: 'transparent',
+                border: `2px dashed ${isComprovacaoDragging ? 'var(--primary)' : 'var(--border)'}`,
+                borderRadius: 'var(--radius)',
+                cursor: comprovacaoEditavel ? 'pointer' : 'not-allowed',
+                minHeight: '180px',
+                transition: 'all .2s',
+              }}
+            >
+              <div style={{ color: 'var(--muted-foreground)', marginBottom: '1rem' }}>
+                <Upload size={32} />
+              </div>
+              <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: '0 0 1.25rem' }}>
+                Arraste e solte o arquivo aqui ou
+              </p>
+              <button
+                type="button"
+                disabled={!comprovacaoEditavel}
+                className="inline-flex items-center gap-2 px-4 py-2"
+                style={{
+                  backgroundColor: 'transparent',
+                  color: comprovacaoEditavel ? 'var(--foreground)' : 'var(--muted-foreground)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontFamily: 'var(--font-family)',
+                  cursor: comprovacaoEditavel ? 'pointer' : 'not-allowed',
+                  transition: 'all .2s',
+                }}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  if (comprovacaoEditavel) comprovacaoFileInputRef.current?.click();
+                }}
+                onMouseEnter={(event) => {
+                  if (comprovacaoEditavel) event.currentTarget.style.backgroundColor = 'var(--muted)';
+                }}
+                onMouseLeave={(event) => {
+                  event.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <Paperclip size={16} />
+                Anexar Arquivo
+              </button>
+            </div>
+            <input
+              ref={comprovacaoFileInputRef}
+              type="file"
+              className="hidden"
+              multiple
+              disabled={!comprovacaoEditavel}
+              onChange={(event) => {
+                adicionarArquivosComprovacaoAtividade(Array.from(event.target.files ?? []));
+                event.target.value = '';
+              }}
+            />
+            {arquivosComprovacaoAtividade.length > 0 && (
+              <div className="space-y-2">
+                {arquivosComprovacaoAtividade.map((file, index) => {
+                  const isEditing = arquivoComprovacaoEditandoIdx === index;
+                  const isExpanded = arquivoComprovacaoExpandidoIdx === index;
+
+                  return (
+                    <div key={`${file.name}-${index}`}>
+                      <div
+                        className="p-4 flex items-center gap-4"
+                        style={{
+                          backgroundColor: 'var(--card)',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius)',
+                        }}
+                      >
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <FileText size={20} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
+                          {isEditing ? (
+                            <input
+                              type="text"
+                              value={nomeArquivoComprovacaoTemporario}
+                              onChange={(event) => setNomeArquivoComprovacaoTemporario(event.target.value)}
+                              onKeyDown={(event) => {
+                                if (event.key === 'Enter') confirmarEdicaoNomeArquivoComprovacao(index);
+                                if (event.key === 'Escape') {
+                                  setArquivoComprovacaoEditandoIdx(null);
+                                  setNomeArquivoComprovacaoTemporario('');
+                                }
+                              }}
+                              autoFocus
+                              style={{
+                                backgroundColor: 'transparent',
+                                border: 'none',
+                                borderBottom: '1px solid var(--primary)',
+                                outline: 'none',
+                                fontSize: 'var(--text-sm)',
+                                fontFamily: 'var(--font-family)',
+                                color: 'var(--foreground)',
+                                width: '100%',
+                                padding: '2px 0',
+                              }}
+                            />
+                          ) : (
+                            <span style={{ fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', color: 'var(--foreground)', overflowWrap: 'anywhere' }}>
+                              {nomesArquivosComprovacaoAtividade[index]}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          {isEditing ? (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => confirmarEdicaoNomeArquivoComprovacao(index)}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', color: 'rgb(34,197,94)', display: 'flex', borderRadius: 'var(--radius)' }}
+                              >
+                                <Check size={18} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setArquivoComprovacaoEditandoIdx(null);
+                                  setNomeArquivoComprovacaoTemporario('');
+                                }}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', color: 'var(--muted-foreground)', display: 'flex', borderRadius: 'var(--radius)' }}
+                              >
+                                <X size={18} />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                type="button"
+                                disabled={!comprovacaoEditavel}
+                                onClick={() => {
+                                  setArquivoComprovacaoEditandoIdx(index);
+                                  setNomeArquivoComprovacaoTemporario(nomesArquivosComprovacaoAtividade[index]);
+                                }}
+                                style={{ background: 'none', border: 'none', cursor: comprovacaoEditavel ? 'pointer' : 'not-allowed', padding: '6px', color: 'var(--muted-foreground)', display: 'flex', borderRadius: 'var(--radius)', transition: 'background-color .2s' }}
+                                onMouseEnter={(event) => {
+                                  if (comprovacaoEditavel) event.currentTarget.style.backgroundColor = 'var(--muted)';
+                                }}
+                                onMouseLeave={(event) => {
+                                  event.currentTarget.style.backgroundColor = 'transparent';
+                                }}
+                              >
+                                <Edit2 size={18} />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={!comprovacaoEditavel}
+                                onClick={() => removerArquivoComprovacaoAtividade(index)}
+                                style={{ background: 'none', border: 'none', cursor: comprovacaoEditavel ? 'pointer' : 'not-allowed', padding: '6px', color: 'var(--muted-foreground)', display: 'flex', borderRadius: 'var(--radius)', transition: 'background-color .2s' }}
+                                onMouseEnter={(event) => {
+                                  if (comprovacaoEditavel) event.currentTarget.style.backgroundColor = 'var(--muted)';
+                                }}
+                                onMouseLeave={(event) => {
+                                  event.currentTarget.style.backgroundColor = 'transparent';
+                                }}
+                              >
+                                <Trash2 size={18} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setArquivoComprovacaoExpandidoIdx(isExpanded ? null : index)}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', color: 'var(--muted-foreground)', display: 'flex', borderRadius: 'var(--radius)', transition: 'all .2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                                onMouseEnter={(event) => {
+                                  event.currentTarget.style.backgroundColor = 'var(--muted)';
+                                }}
+                                onMouseLeave={(event) => {
+                                  event.currentTarget.style.backgroundColor = 'transparent';
+                                }}
+                              >
+                                <ChevronDown size={18} />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      {isExpanded && (
+                        <div
+                          className="mt-2 p-4"
+                          style={{
+                            backgroundColor: 'var(--card)',
+                            border: '1px solid var(--border)',
+                            borderRadius: 'var(--radius)',
+                            color: 'var(--muted-foreground)',
+                            fontSize: 'var(--text-sm)',
+                          }}
+                        >
+                          Arquivo selecionado: <span style={{ color: 'var(--foreground)' }}>{file.name}</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
@@ -1488,7 +2478,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
             {activeFlow === 'diarias' ? <Hotel size={20} /> : <ClipboardList size={20} />}
           </div>
           <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
-            {activeFlow === 'diarias' ? (activeDiariaTab === 'nova' ? 'Detalhes da Solicitação' : 'Minhas Diárias') : 'Solicitações'}
+            {activeFlow === 'diarias' ? (activeDiariaTab === 'nova' ? 'Detalhes da Diária' : 'Minhas Diárias') : 'Solicitações'}
           </h1>
         </div>
 
@@ -1692,17 +2682,21 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                 </button>
               </BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>
-                {isNovaSolicitacaoDiaria ? (solicitacaoDetalheId ? 'Detalhes' : 'Nova Solicitação') : 'Diária'}
-              </BreadcrumbPage>
-            </BreadcrumbItem>
+            {isNovaSolicitacaoDiaria && (
+              <>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>
+                    {solicitacaoDetalheId ? 'Detalhes' : 'Criar Diária'}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </>
+            )}
           </BreadcrumbList>
         </Breadcrumb>
       )}
 
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-2">
+      <div className="flex items-center gap-3 mb-2">
         <div className="flex items-center gap-3">
           <div
             className="p-2 transition-colors"
@@ -1715,9 +2709,31 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
             {activeFlow === 'diarias' ? <Hotel size={20} /> : <ClipboardList size={20} />}
           </div>
           <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
-            {isNovaSolicitacaoDiaria ? (solicitacaoDetalheId ? 'Detalhes da Solicitação' : 'Nova Solicitação') : activeFlow === 'diarias' ? 'Diária' : 'Solicitações'}
+            {isNovaSolicitacaoDiaria ? (solicitacaoDetalheId ? 'Detalhes da Diária' : 'Criar Diária') : activeFlow === 'diarias' ? 'Diária' : 'Solicitações'}
           </h1>
         </div>
+      </div>
+
+      <div
+        className="flex flex-col md:flex-row md:items-center md:justify-between gap-3"
+        style={{ margin: '0 0 1.5rem calc(32px + 0.75rem)' }}
+      >
+        <p
+          style={{
+            color: 'var(--muted-foreground)',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 'var(--font-weight-normal)',
+            margin: 0,
+          }}
+        >
+          {isNovaSolicitacaoDiaria
+            ? solicitacaoDetalheId
+              ? 'Confira as informações da solicitação da Diária.'
+              : 'Preencha as informações abaixo para criar uma nova Diária.'
+            : activeFlow === 'diarias'
+            ? 'Controle solicitações, aceites e remoções de diárias da iniciativa.'
+            : 'Solicite diárias, acompanhe aceites e emita documentos da iniciativa.'}
+        </p>
         {activeFlow === 'diarias' && !isNovaSolicitacaoDiaria && (
           <button
             onClick={abrirNovaSolicitacaoDiaria}
@@ -1733,27 +2749,10 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
             }}
           >
             <Plus size={16} />
-            Nova Solicitação
+            Criar Diária
           </button>
         )}
       </div>
-
-      <p
-        style={{
-          color: 'var(--muted-foreground)',
-          fontSize: 'var(--text-sm)',
-          fontWeight: 'var(--font-weight-normal)',
-          margin: '0 0 1.5rem calc(32px + 0.75rem)',
-        }}
-      >
-        {isNovaSolicitacaoDiaria
-          ? solicitacaoDetalheId
-            ? 'Confira as informações da solicitação da Diária.'
-            : 'Preencha as informações abaixo para solicitar uma nova Diária.'
-          : activeFlow === 'diarias'
-          ? 'Controle solicitações, aceites e remoções de diárias da iniciativa.'
-          : 'Solicite diárias, acompanhe aceites e emita documentos da iniciativa.'}
-      </p>
       <div style={{ borderBottom: '1px solid var(--border)', marginBottom: isNovaSolicitacaoDiaria ? '1rem' : '2rem' }} />
 
       {activeFlow === 'diarias' ? (
@@ -2001,72 +3000,47 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                     </label>
                   </div>
 
-                  <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                    Distância (mínima de 150 km)
-                    <div
-                      className="mt-2 px-3 py-2"
-                      style={{
-                        backgroundColor: 'transparent',
-                        border: '1px solid var(--border)',
-                        borderRadius: 'var(--radius)',
-                        color: 'var(--foreground)',
-                        fontSize: 'var(--text-sm)',
-                      }}
-                    >
-                      {origem && destino
-                        ? usaDistanciaNoCalculo && distanciaKmNumerica
-                          ? `${distanciaKmNumerica.toLocaleString('pt-BR')} km`
-                          : 'Distância não aplicada para este tipo de viagem.'
-                        : 'Preencha origem e destino para calcular automaticamente.'}
-                    </div>
-                  </label>
-
-                  <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                    Motivo
-                    <textarea
-                      value={motivo}
-                      onChange={(event) => setMotivo(event.target.value)}
-                      rows={4}
-                      className="mt-2 w-full px-3 py-2"
-                      style={{
-                        backgroundColor: 'transparent',
-                        border: '1px solid var(--border)',
-                        borderRadius: 'var(--radius)',
-                        color: 'var(--foreground)',
-                        fontSize: 'var(--text-sm)',
-                        resize: 'vertical',
-                      }}
-                    />
-                  </label>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                    {[
-                      { label: 'Transporte custeado por outra entidade', checked: transporteCusteadoOutraEntidade, onChange: setTransporteCusteadoOutraEntidade },
-                      { label: 'Hospedagem custeada por outra entidade', checked: hospedagemCusteadaOutraEntidade, onChange: setHospedagemCusteadaOutraEntidade },
-                      { label: 'Alimentação custeada por outra entidade', checked: alimentacaoCusteadaOutraEntidade, onChange: setAlimentacaoCusteadaOutraEntidade },
-                    ].map((item) => (
-                      <label
-                        key={item.label}
-                        className="flex items-center gap-3 px-3 py-3"
+                  {!solicitacaoDetalheId && (
+                    <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                      Distância (mínima de 150 km)
+                      <div
+                        className="mt-2 px-3 py-2"
                         style={{
                           backgroundColor: 'transparent',
                           border: '1px solid var(--border)',
                           borderRadius: 'var(--radius)',
                           color: 'var(--foreground)',
+                          fontSize: 'var(--text-sm)',
                         }}
                       >
-                        <input
-                          type="checkbox"
-                          checked={item.checked}
-                          onChange={(event) => item.onChange(event.target.checked)}
-                          style={{ accentColor: 'var(--primary)' }}
-                        />
-                        <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)' }}>
-                          {item.label}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
+                        {origem && destino
+                          ? usaDistanciaNoCalculo && distanciaKmNumerica
+                            ? `${distanciaKmNumerica.toLocaleString('pt-BR')} km`
+                            : 'Distância não aplicada para este tipo de viagem.'
+                          : 'Preencha origem e destino para calcular automaticamente.'}
+                      </div>
+                    </label>
+                  )}
+
+                  {!solicitacaoDetalheId && (
+                    <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                      Motivo
+                      <textarea
+                        value={motivo}
+                        onChange={(event) => setMotivo(event.target.value)}
+                        rows={4}
+                        className="mt-2 w-full px-3 py-2"
+                        style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius)',
+                          color: 'var(--foreground)',
+                          fontSize: 'var(--text-sm)',
+                          resize: 'vertical',
+                        }}
+                      />
+                    </label>
+                  )}
 
                   <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
                     Equipe
@@ -2081,7 +3055,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                             setBolsistaSearch(event.target.value);
                             setIsBolsistaDropdownOpen(true);
                           }}
-                          placeholder="Digite ou selecione uma pessoa da equipe"
+                          placeholder="Digite ou selecione uma ou mais pessoas da equipe"
                           className="w-full pl-10 pr-3 py-2"
                           style={{
                             backgroundColor: 'transparent',
@@ -2169,38 +3143,131 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                     ))}
                   </div>
 
-                  <div
-                    className="p-4"
-                    style={{
-                      backgroundColor: 'color-mix(in srgb, var(--primary) 14%, var(--card))',
-                      border: '1px solid color-mix(in srgb, var(--primary) 34%, var(--border))',
-                      borderRadius: 'var(--radius)',
-                    }}
-                  >
-                    <div className="flex items-center justify-between gap-4">
-                      <span style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
-                        Resumo da Diária no Projeto
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-                      {[
-                        { label: 'Total disponível para Diária', value: currency.format(totalDisponivelDashboard) },
-                        { label: 'Esta solicitação consome', value: currency.format(valorTotalCalculado) },
-                        { label: 'Saldo após a solicitação', value: currency.format(saldoProjetoAposSolicitacao) },
-                      ].map((item) => (
-                        <div key={item.label}>
-                          <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
-                            {item.label}
-                          </span>
-                          <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
-                            {item.value}
-                          </strong>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  {solicitacaoDetalheId && (
+                    <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                      Motivo
+                      <textarea
+                        value={motivo}
+                        onChange={(event) => setMotivo(event.target.value)}
+                        rows={4}
+                        className="mt-2 w-full px-3 py-2"
+                        style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius)',
+                          color: 'var(--foreground)',
+                          fontSize: 'var(--text-sm)',
+                          resize: 'vertical',
+                        }}
+                      />
+                    </label>
+                  )}
 
-                  {!diariaFormIncompleto && solicitacaoBloqueada && (
+                  {!solicitacaoDetalheId && (
+                    <div
+                      className="p-5"
+                      style={{
+                        backgroundColor: 'var(--card)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                      }}
+                    >
+                      <div className="flex flex-col gap-1">
+                        <span style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>
+                          Resumo da Diária no Projeto
+                        </span>
+                        <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-normal)' }}>
+                          Acompanhe o impacto desta solicitação no saldo disponível da rubrica de diária.
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+                        {[
+                          {
+                            label: 'Disponível atualmente',
+                            value: currency.format(totalDisponivelDashboard),
+                            Icon: Banknote,
+                            helper: 'Saldo total da rubrica',
+                          },
+                          {
+                            label: 'Consumo desta diária',
+                            value: currency.format(valorTotalCalculado),
+                            Icon: CircleDollarSign,
+                            helper: selectedBolsistas.length > 1 ? `${selectedBolsistas.length} pessoas selecionadas` : '1 pessoa selecionada',
+                          },
+                          {
+                            label: 'Saldo após solicitação',
+                            value: currency.format(saldoProjetoAposSolicitacao),
+                            Icon: PiggyBank,
+                            helper: saldoProjetoAposSolicitacao < 0 ? 'Saldo insuficiente' : 'Saldo projetado',
+                          },
+                        ].map(({ label, value, Icon, helper }) => (
+                          <div
+                            key={label}
+                            className="p-4"
+                            style={{
+                              backgroundColor: 'var(--muted)',
+                              border: '1px solid var(--border)',
+                              borderRadius: 'var(--radius)',
+                            }}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
+                                  {label}
+                                </span>
+                                <span
+                                  style={{
+                                    color: label === 'Saldo após solicitação' && saldoProjetoAposSolicitacao < 0 ? '#f87171' : 'var(--foreground)',
+                                    fontSize: 'var(--text-base)',
+                                    fontWeight: 'var(--font-weight-normal)',
+                                  }}
+                                >
+                                  {value}
+                                </span>
+                              </div>
+                              <div
+                                className="flex items-center justify-center"
+                                style={{
+                                  width: '32px',
+                                  height: '32px',
+                                  borderRadius: 'var(--radius)',
+                                  backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
+                                  color: 'var(--primary)',
+                                  flexShrink: 0,
+                                }}
+                              >
+                                <Icon size={17} />
+                              </div>
+                            </div>
+                            <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.75rem' }}>
+                              {helper}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div
+                        style={{
+                          width: '100%',
+                          height: '6px',
+                          backgroundColor: 'color-mix(in srgb, var(--muted-foreground) 20%, transparent)',
+                          borderRadius: '999px',
+                          overflow: 'hidden',
+                          marginTop: '1rem',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: `${Math.min(100, Math.max(0, (valorTotalCalculado / Math.max(totalDisponivelDashboard, 1)) * 100))}%`,
+                            height: '100%',
+                            backgroundColor: 'var(--primary)',
+                            borderRadius: '999px',
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {!diariaFormIncompleto && solicitacaoBloqueada && !bloqueioDistanciaMinima && !solicitacaoExcedeSaldo && (
                     <div
                       role="alert"
                       className="p-3"
@@ -2216,8 +3283,49 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                       {mensagemSolicitacaoDiaria}
                     </div>
                   )}
+                  {!solicitacaoDetalheId && !diariaFormIncompleto && solicitacaoExcedeSaldo && (
+                    <div
+                      role="alert"
+                      className="p-3"
+                      style={{
+                        border: '1px solid color-mix(in srgb, #dc2626 35%, var(--border))',
+                        borderRadius: 'var(--radius)',
+                        backgroundColor: 'color-mix(in srgb, #dc2626 10%, var(--background))',
+                        color: 'var(--foreground)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-weight-normal)',
+                      }}
+                    >
+                      Você não possui disponível esse valor para usar em Diárias. Se precisar, você pode{' '}
+                      <button
+                        type="button"
+                        onClick={() => onNavigate?.('remanejamento')}
+                        style={{
+                          backgroundColor: 'transparent',
+                          border: 'none',
+                          color: 'var(--primary)',
+                          cursor: 'pointer',
+                          font: 'inherit',
+                          fontWeight: 'var(--font-weight-medium)',
+                          padding: 0,
+                          textDecoration: 'underline',
+                        }}
+                      >
+                        Solicitar Remanejamento de Recursos.
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
+
+              {solicitacaoDetalheId &&
+                solicitacaoDetalhe &&
+                (solicitacaoDetalheOrigem === 'minhas' || (!dataInicioAindaNaoPassou(solicitacaoDetalhe.partida) && Boolean(solicitacaoDetalhe.comprovacaoAtividade))) &&
+                renderComprovacaoAtividadeCard(
+                  solicitacaoDetalheOrigem === 'minhas' && !dataInicioAindaNaoPassou(solicitacaoDetalhe.partida),
+                  true,
+                  solicitacaoDetalheOrigem !== 'minhas',
+                )}
 
               {solicitacaoDetalheId && mostrarMotivoCancelamento && (
                 <div
@@ -2353,7 +3461,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                           </button>
                         </>
                       )
-                    ) : solicitacaoDetalhe?.status === 'CANCELADA' || solicitacaoDetalhe?.status === 'RECUSADA' || !dataInicioAindaNaoPassou(solicitacaoDetalhe?.partida ?? '') ? null : mostrarMotivoCancelamento ? (
+                    ) : solicitacaoDetalhe?.status === 'CANCELADA' || (solicitacaoDetalhe?.status !== 'RECUSADA' && !dataInicioAindaNaoPassou(solicitacaoDetalhe?.partida ?? '')) ? null : mostrarMotivoCancelamento ? (
                       <button
                         type="button"
                         onClick={cancelarSolicitacaoDetalhe}
@@ -2372,21 +3480,39 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                         Confirmar Cancelamento
                       </button>
                     ) : (
-                      <button
-                        type="button"
-                        onClick={() => setMostrarMotivoCancelamento(true)}
-                        className="px-4 py-2"
-                        style={{
-                          backgroundColor: 'transparent',
-                          color: '#dc2626',
-                          border: '1px solid rgba(239, 68, 68, 0.35)',
-                          borderRadius: 'var(--radius)',
-                          fontSize: 'var(--text-sm)',
-                          fontWeight: 'var(--font-weight-medium)',
-                        }}
-                      >
-                        Cancelar Solicitação
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          className="px-4 py-2 flex items-center justify-center gap-2"
+                          style={{
+                            backgroundColor: 'transparent',
+                            color: 'var(--foreground)',
+                            border: '1px solid var(--border)',
+                            borderRadius: 'var(--radius)',
+                            fontSize: 'var(--text-sm)',
+                            fontWeight: 'var(--font-weight-medium)',
+                          }}
+                        >
+                          <Edit2 size={16} />
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setMostrarMotivoCancelamento(true)}
+                          className="px-4 py-2 flex items-center justify-center gap-2"
+                          style={{
+                            backgroundColor: 'transparent',
+                            color: 'var(--destructive-foreground)',
+                            border: '1px solid color-mix(in srgb, var(--destructive-foreground) 35%, var(--border))',
+                            borderRadius: 'var(--radius)',
+                            fontSize: 'var(--text-sm)',
+                            fontWeight: 'var(--font-weight-medium)',
+                          }}
+                        >
+                          <Trash2 size={16} />
+                          Excluir
+                        </button>
+                      </>
                     )}
                   </>
                 ) : (
@@ -2429,7 +3555,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
             </section>
           ) : (
             <section>
-              <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_240px_240px] gap-3 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_220px_220px_220px] gap-3 mb-4">
                 <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
                   Pesquisar
                   <div className="relative mt-2">
@@ -2449,6 +3575,22 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                     <Search size={18} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--muted-foreground)' }} />
                   </div>
                 </label>
+                <div>
+                  <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                    Data de Partida
+                  </label>
+                  <div className="mt-2">
+                    <Dropdown
+                      value={diariaDataPartidaSort}
+                      onChange={(value) => setDiariaDataPartidaSort(value as OrdenacaoDataPartida)}
+                      showSelectedIcon={false}
+                      options={[
+                        { value: 'RECENTE', label: 'Mais Recente' },
+                        { value: 'ANTIGA', label: 'Mais Antiga' },
+                      ]}
+                    />
+                  </div>
+                </div>
                 <div>
                   <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
                     Tipo de Viagem
@@ -2488,7 +3630,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
               </div>
 
               <div className="space-y-3">
-                {diariasPorBeneficiario.map((solicitacao) => (
+                {diariasSolicitadasExibidas.slice(0, 10).map((solicitacao) => (
                   <button
                     key={`${solicitacao.id}-${solicitacao.beneficiarioIndex}`}
                     type="button"
@@ -2514,10 +3656,10 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null }
                           { label: 'Bolsista', value: solicitacao.beneficiario },
                           { label: 'Diária', value: solicitacao.quantidade.toLocaleString('pt-BR') },
                           { label: 'Valor Total', value: currency.format(solicitacao.valorBeneficiario) },
-                          { label: 'Origem', value: solicitacao.origem },
+                          { label: 'Data de Partida', value: formatarDataPartida(solicitacao.partida) },
                           { label: 'Destino', value: solicitacao.destino },
                         ].map((item) => (
-                          <div key={item.label} className="min-w-0">
+                          <div key={item.label} className="min-w-0" style={item.label === 'Diária' ? { paddingLeft: '2.75rem' } : undefined}>
                             <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                               {item.label}
                             </div>

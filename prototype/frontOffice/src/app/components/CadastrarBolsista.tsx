@@ -171,7 +171,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
     borderRadius: 'var(--radius)',
     padding: '1.5rem',
   };
-  const formFieldBackground = '#1e293b';
+  const formFieldBackground = '#262626';
 
   const MonthPicker = ({
     value,
