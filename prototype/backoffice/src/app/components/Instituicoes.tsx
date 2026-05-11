@@ -14,19 +14,54 @@ interface InstituicaoItem {
   razaoSocial: string;
   email: string;
   telefone: string;
+  cep: string;
   endereco: string;
+  bairro: string;
   natureza: NaturezaJuridica;
   municipio: string;
   uf: string;
-  dirigente: string;
+  responsavel: string;
   dataInicioMandato: string;
   dataFimMandato: string;
   superior?: string;
   situacao: SituacaoInstituicao;
 }
 
+interface ViaCepResponse {
+  cep?: string;
+  logradouro?: string;
+  bairro?: string;
+  localidade?: string;
+  uf?: string;
+  erro?: boolean;
+}
+
+const onlyDigits = (s: string) => (s || '').replace(/\D/g, '');
+const maskCep = (s: string) => {
+  const d = onlyDigits(s).slice(0, 8);
+  return d.length > 5 ? `${d.slice(0, 5)}-${d.slice(5)}` : d;
+};
+
+async function fetchViaCep(cep: string): Promise<ViaCepResponse | null> {
+  const d = onlyDigits(cep);
+  if (d.length !== 8) return null;
+  try {
+    const res = await fetch(`https://viacep.com.br/ws/${d}/json/`);
+    if (!res.ok) return null;
+    const data: ViaCepResponse = await res.json();
+    if (data.erro) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+type ModoSubestrutura = 'EXISTENTE' | 'NOVA';
+
 interface SubestruturaDraft {
   id: number;
+  modo: ModoSubestrutura;
+  vinculadaId: number | null;
   nome: string;
   sigla: string;
   cnpj: string;
@@ -92,11 +127,13 @@ const emptyInstituicao: InstituicaoItem = {
   razaoSocial: '',
   email: '',
   telefone: '',
+  cep: '',
   endereco: '',
+  bairro: '',
   natureza: 'Publica',
   municipio: '',
   uf: 'ES',
-  dirigente: '',
+  responsavel: '',
   dataInicioMandato: '',
   dataFimMandato: '',
   superior: '',
@@ -104,12 +141,12 @@ const emptyInstituicao: InstituicaoItem = {
 };
 
 const initialInstituicoes: InstituicaoItem[] = [
-  { id: 1, nome: 'Universidade Federal do Espírito Santo', sigla: 'UFES', cnpj: '32.479.123/0001-43', razaoSocial: 'Universidade Federal do Espírito Santo', email: 'gabinete@ufes.br', telefone: '(27) 4009-2000', endereco: 'Av. Fernando Ferrari, 514 - Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', dirigente: 'Prof. Paulo Vargas', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', situacao: 'Ativa' },
-  { id: 2, nome: 'Centro Tecnológico da UFES', sigla: 'CT-UFES', cnpj: '', razaoSocial: '', email: 'ct@ufes.br', telefone: '(27) 4009-2600', endereco: 'Campus Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', dirigente: 'Prof. Ana Ribeiro', dataInicioMandato: '2023-03-01', dataFimMandato: '2027-02-28', superior: 'Universidade Federal do Espírito Santo', situacao: 'Ativa' },
-  { id: 3, nome: 'Instituto Federal do Espírito Santo', sigla: 'IFES', cnpj: '10.838.653/0001-06', razaoSocial: 'Instituto Federal de Educação, Ciência e Tecnologia do Espírito Santo', email: 'reitoria@ifes.edu.br', telefone: '(27) 3357-7500', endereco: 'Av. Rio Branco, 50 - Santa Lúcia', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', dirigente: 'Jadir Pela', dataInicioMandato: '2021-10-01', dataFimMandato: '2025-09-30', situacao: 'Ativa' },
-  { id: 4, nome: 'IFES Campus Serra', sigla: 'IFES Serra', cnpj: '10.838.653/0010-99', razaoSocial: 'Instituto Federal do Espírito Santo - Campus Serra', email: 'campus.serra@ifes.edu.br', telefone: '(27) 3348-9200', endereco: 'Rodovia ES-010, Km 6,5 - Manguinhos', natureza: 'Publica', municipio: 'Serra', uf: 'ES', dirigente: 'Marta Souza', dataInicioMandato: '2022-01-01', dataFimMandato: '2026-12-31', superior: 'Instituto Federal do Espírito Santo', situacao: 'Ativa' },
-  { id: 5, nome: 'Fucape Business School', sigla: 'FUCAPE', cnpj: '03.389.451/0001-66', razaoSocial: 'Fundação Instituto Capixaba de Pesquisas em Contabilidade, Economia e Finanças', email: 'contato@fucape.br', telefone: '(27) 4009-4444', endereco: 'Av. Fernando Ferrari, 1358 - Boa Vista', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', dirigente: 'Valcemiro Nossa', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', situacao: 'Ativa' },
-  { id: 6, nome: 'Departamento de Pesquisa Aplicada', sigla: 'DPA', cnpj: '', razaoSocial: '', email: 'pesquisa@fucape.br', telefone: '(27) 4009-4450', endereco: 'Sede Fucape', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', dirigente: 'Carla Mendes', dataInicioMandato: '2024-02-01', dataFimMandato: '2026-01-31', superior: 'Fucape Business School', situacao: 'Inativa' },
+  { id: 1, nome: 'Universidade Federal do Espírito Santo', sigla: 'UFES', cnpj: '32.479.123/0001-43', razaoSocial: 'Universidade Federal do Espírito Santo', email: 'gabinete@ufes.br', telefone: '(27) 4009-2000', endereco: 'Av. Fernando Ferrari, 514 - Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Prof. Paulo Vargas', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', situacao: 'Ativa' },
+  { id: 2, nome: 'Centro Tecnológico da UFES', sigla: 'CT-UFES', cnpj: '', razaoSocial: '', email: 'ct@ufes.br', telefone: '(27) 4009-2600', endereco: 'Campus Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Prof. Ana Ribeiro', dataInicioMandato: '2023-03-01', dataFimMandato: '2027-02-28', superior: 'Universidade Federal do Espírito Santo', situacao: 'Ativa' },
+  { id: 3, nome: 'Instituto Federal do Espírito Santo', sigla: 'IFES', cnpj: '10.838.653/0001-06', razaoSocial: 'Instituto Federal de Educação, Ciência e Tecnologia do Espírito Santo', email: 'reitoria@ifes.edu.br', telefone: '(27) 3357-7500', endereco: 'Av. Rio Branco, 50 - Santa Lúcia', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Jadir Pela', dataInicioMandato: '2021-10-01', dataFimMandato: '2025-09-30', situacao: 'Ativa' },
+  { id: 4, nome: 'IFES Campus Serra', sigla: 'IFES Serra', cnpj: '10.838.653/0010-99', razaoSocial: 'Instituto Federal do Espírito Santo - Campus Serra', email: 'campus.serra@ifes.edu.br', telefone: '(27) 3348-9200', endereco: 'Rodovia ES-010, Km 6,5 - Manguinhos', natureza: 'Publica', municipio: 'Serra', uf: 'ES', responsavel: 'Marta Souza', dataInicioMandato: '2022-01-01', dataFimMandato: '2026-12-31', superior: 'Instituto Federal do Espírito Santo', situacao: 'Ativa' },
+  { id: 5, nome: 'Fucape Business School', sigla: 'FUCAPE', cnpj: '03.389.451/0001-66', razaoSocial: 'Fundação Instituto Capixaba de Pesquisas em Contabilidade, Economia e Finanças', email: 'contato@fucape.br', telefone: '(27) 4009-4444', endereco: 'Av. Fernando Ferrari, 1358 - Boa Vista', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', responsavel: 'Valcemiro Nossa', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', situacao: 'Ativa' },
+  { id: 6, nome: 'Departamento de Pesquisa Aplicada', sigla: 'DPA', cnpj: '', razaoSocial: '', email: 'pesquisa@fucape.br', telefone: '(27) 4009-4450', endereco: 'Sede Fucape', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', responsavel: 'Carla Mendes', dataInicioMandato: '2024-02-01', dataFimMandato: '2026-01-31', superior: 'Fucape Business School', situacao: 'Inativa' },
 ];
 
 const getClassificacao = (item: Pick<InstituicaoItem, 'cnpj' | 'superior'>) => {
@@ -128,7 +165,8 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [showForm, setShowForm] = useState(false);
   const [selected, setSelected] = useState<InstituicaoItem | null>(null);
   const [draft, setDraft] = useState<InstituicaoItem>(emptyInstituicao);
-  const [draftSubestruturas, setDraftSubestruturas] = useState<SubestruturaDraft[]>([]);
+  const [draftFiliais, setDraftFiliais] = useState<SubestruturaDraft[]>([]);
+  const [draftUnidades, setDraftUnidades] = useState<SubestruturaDraft[]>([]);
   const [instituicoes, setInstituicoes] = useState<InstituicaoItem[]>(initialInstituicoes);
 
   const filtered = instituicoes.filter(item => {
@@ -156,22 +194,24 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   const openNew = () => {
     setDraft({ ...emptyInstituicao, id: Date.now() });
-    setDraftSubestruturas([]);
+    setDraftFiliais([]);
+    setDraftUnidades([]);
     setShowForm(true);
     setSelected(null);
   };
 
   const openDetails = (item: InstituicaoItem) => {
     setDraft({ ...item });
-    setDraftSubestruturas(
-      instituicoes
-        .filter(instituicao => instituicao.superior === item.nome)
-        .map(instituicao => ({
-          id: instituicao.id,
-          nome: instituicao.nome,
-          sigla: instituicao.sigla,
-          cnpj: instituicao.cnpj,
-        }))
+    const subs = instituicoes.filter(instituicao => instituicao.superior === item.nome);
+    setDraftFiliais(
+      subs
+        .filter(s => !!s.cnpj)
+        .map(s => ({ id: s.id, modo: 'EXISTENTE' as ModoSubestrutura, vinculadaId: s.id, nome: s.nome, sigla: s.sigla, cnpj: s.cnpj }))
+    );
+    setDraftUnidades(
+      subs
+        .filter(s => !s.cnpj)
+        .map(s => ({ id: s.id, modo: 'EXISTENTE' as ModoSubestrutura, vinculadaId: s.id, nome: s.nome, sigla: s.sigla, cnpj: s.cnpj }))
     );
     setSelected(item);
     setShowForm(false);
@@ -181,24 +221,35 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     setDraft(prev => ({ ...prev, [field]: value }));
   };
 
-  const addSubestrutura = () => {
-    setDraftSubestruturas(prev => [...prev, { id: Date.now() + prev.length, nome: '', sigla: '', cnpj: '' }]);
-  };
+  const makeSetter = (setState: React.Dispatch<React.SetStateAction<SubestruturaDraft[]>>) => ({
+    add: () => setState(prev => [
+      ...prev,
+      { id: Date.now() + prev.length, modo: 'EXISTENTE', vinculadaId: null, nome: '', sigla: '', cnpj: '' },
+    ]),
+    update: (id: number, field: keyof SubestruturaDraft, value: string | number | null) =>
+      setState(prev => prev.map(item => item.id === id ? { ...item, [field]: value } : item)),
+    setModo: (id: number, modo: ModoSubestrutura) =>
+      setState(prev => prev.map(item => item.id === id ? { ...item, modo, vinculadaId: null, nome: '', sigla: '', cnpj: '' } : item)),
+    vincular: (id: number, instituicaoId: number) => {
+      const inst = instituicoes.find(i => i.id === instituicaoId);
+      if (!inst) return;
+      setState(prev => prev.map(item => item.id === id
+        ? { ...item, vinculadaId: instituicaoId, nome: inst.nome, sigla: inst.sigla, cnpj: inst.cnpj }
+        : item));
+    },
+    remove: (id: number) => setState(prev => prev.filter(item => item.id !== id)),
+  });
 
-  const updateSubestrutura = (id: number, field: keyof SubestruturaDraft, value: string) => {
-    setDraftSubestruturas(prev => prev.map(item => item.id === id ? { ...item, [field]: value } : item));
-  };
-
-  const removeSubestrutura = (id: number) => {
-    setDraftSubestruturas(prev => prev.filter(item => item.id !== id));
-  };
+  const filiaisOps = makeSetter(setDraftFiliais);
+  const unidadesOps = makeSetter(setDraftUnidades);
 
   const saveDraft = () => {
     const isSetorSemCnpj = !draft.cnpj;
     const saved = { ...draft, razaoSocial: isSetorSemCnpj ? '' : draft.razaoSocial };
     const previousParentName = selected?.nome || saved.nome;
+    const draftSubestruturas = [...draftFiliais, ...draftUnidades];
     const subestruturas: InstituicaoItem[] = draftSubestruturas
-      .filter(item => item.nome.trim())
+      .filter(item => item.modo === 'NOVA' && item.nome.trim())
       .map(item => ({
         ...emptyInstituicao,
         id: item.id,
@@ -229,7 +280,124 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   if (showForm || selected) {
     const isSetorSemCnpj = !draft.cnpj;
-    const superiorOptions = ['', ...instituicoes.filter(item => item.id !== draft.id).map(item => item.nome)];
+    const isSituacaoAtiva = draft.situacao === 'Ativa';
+    const superiorOptions = [
+      '',
+      ...instituicoes
+        .filter(item => item.id !== draft.id)
+        .map(item => (item.cnpj ? `${item.nome} — CNPJ ${item.cnpj}` : `${item.nome} — sem CNPJ`)),
+    ];
+
+    const renderSubestruturaBlock = (cfg: {
+      T: ThemeTokens;
+      titulo: string;
+      subtitulo: string;
+      draftItens: SubestruturaDraft[];
+      ops: ReturnType<typeof makeSetter>;
+      opcoesExistentes: InstituicaoItem[];
+      labelExistente: string;
+      labelNova: { nome: string; sigla: string; cnpj: string };
+      cnpjObrigatorio: boolean;
+      vazio: string;
+    }) => (
+      <div style={{ borderTop: `1px solid ${cfg.T.borderSubtle}`, paddingTop: '18px', marginTop: '18px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '14px' }}>
+          <div>
+            <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: cfg.T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 4px' }}>{cfg.titulo}</h3>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: cfg.T.textMuted, margin: 0 }}>{cfg.subtitulo}</p>
+          </div>
+          <button
+            type="button"
+            onClick={cfg.ops.add}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: cfg.T.accentSoft, border: `1px solid ${cfg.T.accent}`, borderRadius: 'var(--radius)', padding: '8px 12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: cfg.T.accent, cursor: 'pointer', flexShrink: 0 }}
+          >
+            <Plus size={14} />
+            Adicionar
+          </button>
+        </div>
+        {cfg.draftItens.length === 0 ? (
+          <div style={{ border: `1px dashed ${cfg.T.borderDefault}`, borderRadius: '8px', padding: '16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: cfg.T.textMuted }}>
+            {cfg.vazio}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {cfg.draftItens.map(item => (
+              <div key={item.id} style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '14px', border: `1px solid ${cfg.T.borderSubtle}`, borderRadius: '8px', backgroundColor: cfg.T.bgSurfaceMuted }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                  <div style={{ display: 'flex', gap: '6px', padding: '3px', backgroundColor: cfg.T.bgPage, border: `1px solid ${cfg.T.borderSubtle}`, borderRadius: 'var(--radius)' }}>
+                    <button
+                      type="button"
+                      onClick={() => cfg.ops.setModo(item.id, 'EXISTENTE')}
+                      style={{ padding: '6px 12px', border: 'none', borderRadius: 'calc(var(--radius) - 2px)', backgroundColor: item.modo === 'EXISTENTE' ? cfg.T.accentSoft : 'transparent', color: item.modo === 'EXISTENTE' ? cfg.T.accent : cfg.T.textSecondary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)' as any, cursor: 'pointer' }}
+                    >
+                      Vincular existente
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => cfg.ops.setModo(item.id, 'NOVA')}
+                      style={{ padding: '6px 12px', border: 'none', borderRadius: 'calc(var(--radius) - 2px)', backgroundColor: item.modo === 'NOVA' ? cfg.T.accentSoft : 'transparent', color: item.modo === 'NOVA' ? cfg.T.accent : cfg.T.textSecondary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)' as any, cursor: 'pointer' }}
+                    >
+                      Cadastrar nova
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => cfg.ops.remove(item.id)}
+                    style={{ width: '34px', height: '34px', border: '1px solid rgba(239,68,68,0.35)', borderRadius: 'var(--radius)', backgroundColor: 'transparent', color: cfg.T.danger, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                    aria-label="Remover"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+                {item.modo === 'EXISTENTE' ? (
+                  <div>
+                    <label style={{ ...buildStyles(cfg.T).label, display: 'block' }}>{cfg.labelExistente}</label>
+                    <select
+                      value={item.vinculadaId ?? ''}
+                      onChange={e => {
+                        const id = parseInt(e.target.value, 10);
+                        if (Number.isFinite(id)) cfg.ops.vincular(item.id, id);
+                        else cfg.ops.update(item.id, 'vinculadaId', null);
+                      }}
+                      style={{ ...buildStyles(cfg.T).input }}
+                    >
+                      <option value="">Buscar...</option>
+                      {cfg.opcoesExistentes.map(opt => (
+                        <option key={opt.id} value={opt.id}>
+                          {opt.cnpj ? `${opt.nome} — CNPJ ${opt.cnpj}` : `${opt.nome} — sem CNPJ`}
+                        </option>
+                      ))}
+                    </select>
+                    {item.vinculadaId && (
+                      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: cfg.T.textMuted, margin: '6px 0 0' }}>
+                        Vinculada: {item.nome} {item.cnpj && `· CNPJ ${item.cnpj}`}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: cfg.labelNova.cnpj ? '1.2fr 0.5fr 0.7fr' : '1.5fr 0.5fr', gap: '12px' }}>
+                    <Field label={cfg.labelNova.nome} value={item.nome} onChange={value => cfg.ops.update(item.id, 'nome', value)} placeholder="Nome" />
+                    <Field label={cfg.labelNova.sigla} value={item.sigla} onChange={value => cfg.ops.update(item.id, 'sigla', value)} placeholder="Sigla" />
+                    {cfg.labelNova.cnpj && (
+                      <Field label={cfg.cnpjObrigatorio ? `${cfg.labelNova.cnpj} (obrigatorio)` : cfg.labelNova.cnpj} value={item.cnpj} onChange={value => cfg.ops.update(item.id, 'cnpj', maskCnpj(value))} placeholder={cfg.cnpjObrigatorio ? '00.000.000/0000-00' : 'Opcional'} />
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+
+    // Mock — em producao vira de GET /api/v1/m008/responsaveis?instituicaoId={id}&estado=encerrado
+    const historicoDoSelecionado: { pessoa: string; papel: string; dataInicio: string; dataFim: string; motivo: string }[] = !showForm && selected
+      ? [
+          { pessoa: 'Prof. Joao Silva',  papel: 'Reitor',     dataInicio: '2020-01-01', dataFim: '2023-12-31', motivo: 'Fim de mandato' },
+          { pessoa: 'Prof. Pedro Lima',  papel: 'Reitor Pro Tempore', dataInicio: '2017-01-01', dataFim: '2019-12-31', motivo: 'Fim de mandato' },
+          { pessoa: 'Profa. Carla Mendes', papel: 'Reitora', dataInicio: '2013-01-01', dataFim: '2016-12-31', motivo: 'Fim de mandato' },
+        ]
+      : [];
 
     return (
       <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
@@ -261,7 +429,7 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             )}
           </div>
 
-          <FormSection number="1" title="Identificação" subtitle="Dados básicos da instituição ou setor. A estrutura é inferida pelo CNPJ e pelo vínculo superior.">
+          <FormSection number="1" title="Identificação" subtitle="Dados básicos da instituição (nome, CNPJ, natureza) + dados institucionais de contato (email, telefone, endereço da entidade jurídica). Não confundir com email/telefone do Responsável (PessoaFísica).">
             <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 0.6fr', gap: '16px', marginBottom: '16px' }}>
               <Field label="Nome" value={draft.nome} onChange={value => updateDraft('nome', value)} placeholder="Nome da instituição ou unidade" />
               <Field label="Sigla" value={draft.sigla} onChange={value => updateDraft('sigla', value)} placeholder="Sigla" />
@@ -270,78 +438,127 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <Field label={isSetorSemCnpj ? 'Razão social' : 'Razão social obrigatória'} value={draft.razaoSocial} onChange={value => updateDraft('razaoSocial', value)} placeholder={isSetorSemCnpj ? 'Não se aplica a setor interno' : 'Razão social da instituição'} disabled={isSetorSemCnpj} />
               <Field label="CNPJ" value={draft.cnpj} onChange={value => updateDraft('cnpj', maskCnpj(value))} placeholder="Deixe vazio para setor sem CNPJ" />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '16px' }}>
               <Select label="Natureza" value={draft.natureza} onChange={value => updateDraft('natureza', value)} options={['Publica', 'Privada']} />
             </div>
-          </FormSection>
-
-          <FormSection number="2" title="Contato" subtitle="Dados de contato exigidos principalmente para instituições com CNPJ próprio.">
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 0.6fr', gap: '16px', marginBottom: '16px' }}>
               <Field label="Email institucional" value={draft.email} onChange={value => updateDraft('email', value)} placeholder="email@instituicao.br" />
               <Field label="Telefone" value={draft.telefone} onChange={value => updateDraft('telefone', value)} placeholder="(00) 0000-0000" />
             </div>
-            <Field label="Endereço" value={draft.endereco} onChange={value => updateDraft('endereco', value)} placeholder="Endereço completo ou localização do setor" />
-          </FormSection>
-
-          <FormSection number="3" title="Estrutura Organizacional" subtitle="Vínculo hierárquico e localização. Instituição sem CNPJ deve possuir superior.">
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 0.3fr', gap: '16px', marginBottom: '20px' }}>
-              <Select label="Instituição superior" value={draft.superior || ''} onChange={value => updateDraft('superior', value)} options={superiorOptions} />
+            <div style={{ display: 'grid', gridTemplateColumns: '0.6fr 1.6fr 1fr', gap: '16px', marginBottom: '16px' }}>
+              <Field
+                label="CEP"
+                value={draft.cep}
+                onChange={value => updateDraft('cep', maskCep(value))}
+                onBlur={async () => {
+                  const data = await fetchViaCep(draft.cep);
+                  if (data) {
+                    if (data.logradouro) updateDraft('endereco', data.logradouro);
+                    if (data.bairro) updateDraft('bairro', data.bairro);
+                    if (data.localidade) updateDraft('municipio', data.localidade);
+                    if (data.uf) updateDraft('uf', data.uf);
+                  }
+                }}
+                placeholder="00000-000"
+              />
+              <Field label="Endereço" value={draft.endereco} onChange={value => updateDraft('endereco', value)} placeholder="Logradouro" />
+              <Field label="Bairro" value={draft.bairro} onChange={value => updateDraft('bairro', value)} placeholder="Bairro" />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 0.3fr', gap: '16px' }}>
               <Field label="Município" value={draft.municipio} onChange={value => updateDraft('municipio', value)} placeholder="Município" />
               <Field label="UF" value={draft.uf} onChange={value => updateDraft('uf', value.toUpperCase().slice(0, 2))} placeholder="UF" />
             </div>
+          </FormSection>
 
-            <div style={{ borderTop: `1px solid ${T.borderSubtle}`, paddingTop: '18px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '14px' }}>
-                <div>
-                  <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 4px' }}>
-                    Subestruturas
-                  </h3>
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, margin: 0 }}>
-                    Cadastre unidades com CNPJ ou setores sem CNPJ vinculados a esta instituição.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={addSubestrutura}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: T.accentSoft, border: `1px solid ${T.accent}`, borderRadius: 'var(--radius)', padding: '8px 12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.accent, cursor: 'pointer', flexShrink: 0 }}
-                >
-                  <Plus size={14} />
-                  Adicionar
-                </button>
+          <FormSection number="2" title="Estrutura Organizacional" subtitle="Vínculo hierárquico. Instituição sem CNPJ deve possuir superior.">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '20px' }}>
+              <Select label="Instituição superior" value={draft.superior || ''} onChange={value => updateDraft('superior', value)} options={superiorOptions} />
+            </div>
+
+            {renderSubestruturaBlock({
+              T,
+              titulo: 'Filiais',
+              subtitulo: 'Outras Instituições com CNPJ próprio vinculadas a esta como matriz (campus, filial, unidade jurídica).',
+              draftItens: draftFiliais,
+              ops: filiaisOps,
+              opcoesExistentes: instituicoes.filter(i => i.id !== draft.id && !!i.cnpj),
+              labelExistente: 'Selecione uma Instituição com CNPJ',
+              labelNova: { nome: 'Nome da filial', sigla: 'Sigla', cnpj: 'CNPJ' },
+              cnpjObrigatorio: true,
+              vazio: 'Nenhuma filial vinculada.',
+            })}
+
+            {renderSubestruturaBlock({
+              T,
+              titulo: 'Unidades Organizacionais',
+              subtitulo: 'Subdivisões internas sem CNPJ próprio (centro, departamento, coordenação, laboratório, setor).',
+              draftItens: draftUnidades,
+              ops: unidadesOps,
+              opcoesExistentes: instituicoes.filter(i => i.id !== draft.id && !i.cnpj),
+              labelExistente: 'Selecione uma Unidade Organizacional sem CNPJ',
+              labelNova: { nome: 'Nome da unidade', sigla: 'Sigla', cnpj: '' },
+              cnpjObrigatorio: false,
+              vazio: 'Nenhuma unidade organizacional cadastrada.',
+            })}
+          </FormSection>
+
+          <FormSection number="3" title="Responsável" subtitle="Responsável é o vínculo temporal entre uma Pessoa Física já cadastrada e uma Instituição, com mandato definido (RN04/RN11).">
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.5fr 0.6fr 0.5fr', gap: '16px' }}>
+              <Select label="Pessoa responsável" value={draft.responsavel} onChange={value => updateDraft('responsavel', value)} options={['', 'Prof. Paulo Vargas', 'Prof. Ana Ribeiro', 'Jadir Pela', 'Marta Souza', 'Valcemiro Nossa', 'Carla Mendes']} />
+              <Field label="Início do mandato" value={draft.dataInicioMandato} onChange={value => updateDraft('dataInicioMandato', value)} placeholder="AAAA-MM-DD" />
+              <Field
+                label={isSituacaoAtiva ? 'Fim do mandato (opcional)' : 'Fim do mandato'}
+                value={draft.dataFimMandato}
+                onChange={value => updateDraft('dataFimMandato', value)}
+                placeholder={isSituacaoAtiva ? 'Em aberto enquanto ativa' : 'AAAA-MM-DD'}
+              />
+              <Select label="Situação" value={draft.situacao} onChange={value => updateDraft('situacao', value)} options={['Ativa', 'Inativa']} />
+            </div>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, margin: '8px 0 0' }}>
+              {isSituacaoAtiva
+                ? 'Mandato em curso — fim do mandato não é obrigatório enquanto a situação for Ativa.'
+                : 'Mandato encerrado — preencha o fim do mandato.'}
+            </p>
+
+            <div style={{ marginTop: '24px', borderTop: `1px solid ${T.borderSubtle}`, paddingTop: '18px' }}>
+              <div style={{ marginBottom: '12px' }}>
+                <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 4px' }}>
+                  Histórico de Responsáveis
+                </h3>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, margin: 0 }}>
+                  Mandatos encerrados desta instituição (ordenados por mandato mais recente).
+                </p>
               </div>
-
-              {draftSubestruturas.length === 0 ? (
+              {historicoDoSelecionado.length === 0 ? (
                 <div style={{ border: `1px dashed ${T.borderDefault}`, borderRadius: '8px', padding: '16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textMuted }}>
-                  Nenhuma subestrutura cadastrada nesta instituição.
+                  Nenhum responsável anterior registrado.
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {draftSubestruturas.map(item => (
-                    <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.5fr 0.7fr auto', gap: '12px', alignItems: 'end', padding: '14px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
-                      <Field label="Nome" value={item.nome} onChange={value => updateSubestrutura(item.id, 'nome', value)} placeholder="Nome da unidade ou setor" />
-                      <Field label="Sigla" value={item.sigla} onChange={value => updateSubestrutura(item.id, 'sigla', value)} placeholder="Sigla" />
-                      <Field label="CNPJ" value={item.cnpj} onChange={value => updateSubestrutura(item.id, 'cnpj', maskCnpj(value))} placeholder="Opcional" />
-                      <button
-                        type="button"
-                        onClick={() => removeSubestrutura(item.id)}
-                        style={{ width: '38px', height: '38px', border: '1px solid rgba(239,68,68,0.35)', borderRadius: 'var(--radius)', backgroundColor: 'transparent', color: T.danger, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                        aria-label="Remover subestrutura"
-                      >
-                        <Trash2 size={15} />
-                      </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {historicoDoSelecionado.map((h, idx) => (
+                    <div
+                      key={`${h.pessoa}-${idx}`}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '2fr 1.2fr 1.6fr 2fr',
+                        gap: '12px',
+                        padding: '10px 14px',
+                        border: `1px solid ${T.borderSubtle}`,
+                        borderRadius: '8px',
+                        backgroundColor: T.bgSurfaceMuted,
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 'var(--text-sm)',
+                        color: T.textPrimary,
+                      }}
+                    >
+                      <span style={{ fontWeight: 'var(--font-weight-medium)' }}>{h.pessoa}</span>
+                      <span>{h.papel}</span>
+                      <span>{h.dataInicio} → {h.dataFim}</span>
+                      <span style={{ color: T.textMuted }}>{h.motivo}</span>
                     </div>
                   ))}
                 </div>
               )}
-            </div>
-          </FormSection>
-
-          <FormSection number="4" title="Dirigente" subtitle="Dirigente é o vínculo temporal entre uma Pessoa Física e uma Instituição, com mandato definido.">
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.5fr 0.5fr 0.5fr', gap: '16px' }}>
-              <Select label="Pessoa dirigente" value={draft.dirigente} onChange={value => updateDraft('dirigente', value)} options={['', 'Prof. Paulo Vargas', 'Prof. Ana Ribeiro', 'Jadir Pela', 'Marta Souza', 'Valcemiro Nossa', 'Carla Mendes']} />
-              <Field label="Início do mandato" value={draft.dataInicioMandato} onChange={value => updateDraft('dataInicioMandato', value)} placeholder="AAAA-MM-DD" />
-              <Field label="Fim do mandato" value={draft.dataFimMandato} onChange={value => updateDraft('dataFimMandato', value)} placeholder="AAAA-MM-DD" />
-              <Select label="Situação" value={draft.situacao} onChange={value => updateDraft('situacao', value)} options={['Ativa', 'Inativa']} />
             </div>
           </FormSection>
 
@@ -470,7 +687,7 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <ListCell label="Natureza" value={item.natureza === 'Publica' ? 'Pública' : 'Privada'} />
                     <ListCell label="Classificação" value={getClassificacao(item)} />
                     <ListCell label="CNPJ" value={item.cnpj || 'Não possui'} detail={item.superior ? `Superior: ${item.superior}` : 'Sem superior'} />
-                    <ListCell label="Dirigente" value={item.dirigente} detail={`${item.dataInicioMandato || '-'} a ${item.dataFimMandato || '-'}`} />
+                    <ListCell label="Responsavel" value={item.responsavel} detail={`${item.dataInicioMandato || '-'} a ${item.dataFimMandato || '-'}`} />
                     <div>
                       <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>Situação</div>
                       <span style={{ display: 'inline-block', backgroundColor: `${statusColor(item.situacao)}20`, border: `1px solid ${statusColor(item.situacao)}`, borderRadius: '999px', padding: '3px 12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: statusColor(item.situacao) }}>
@@ -489,13 +706,13 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   );
 };
 
-const Field: React.FC<{ label: string; value: string; onChange: (value: string) => void; placeholder?: string; disabled?: boolean }> = ({ label, value, onChange, placeholder, disabled }) => {
+const Field: React.FC<{ label: string; value: string; onChange: (value: string) => void; onBlur?: () => void; placeholder?: string; disabled?: boolean }> = ({ label, value, onChange, onBlur, placeholder, disabled }) => {
   const { T } = useThemeTokens();
   const S = buildStyles(T);
   return (
     <div>
       <label style={S.label}>{label}</label>
-      <input type="text" value={disabled ? '' : value} placeholder={placeholder} disabled={disabled} onChange={event => onChange(event.target.value)} style={{ ...S.input, opacity: disabled ? 0.55 : 1 }} />
+      <input type="text" value={disabled ? '' : value} placeholder={placeholder} disabled={disabled} onChange={event => onChange(event.target.value)} onBlur={onBlur} style={{ ...S.input, opacity: disabled ? 0.55 : 1 }} />
     </div>
   );
 };

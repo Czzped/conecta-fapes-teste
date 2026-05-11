@@ -212,3 +212,14 @@ classDiagram
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: BolsaPesquisa.projeto: Projeto)
 - Cardinalidade N: atributo lista do tipo da classe destino (ex: BolsaPesquisa.documentos: List&lt;DocumentoBolsa&gt;)
+
+**Regras de saldo aplicaveis:**
+Ver [discovery/regras-saldo-alocado-disponivel.md](../../../discovery/regras-saldo-alocado-disponivel.md). RN-SLD01 a RN-SLD05 + RI-SLD1/2 governam saldo de bolsas no orcamento do projeto. M013 e fonte canonica via `RubricaProjeto` (terminologia: `valorAprovado`/`valorComprometido`/`valorExecutado`/`saldoDisponivel` ↔ `valorTotal`/`valorAlocado`/`valorConsumido`/`valorDisponivel`). Eventos M009 que afetam saldo:
+- `BolsaConcedida` → +Alocado (mensalidades futuras reservadas)
+- `MensalidadePaga` (via M004 Folha) → −Alocado, +Consumido
+- `BolsaCancelada` antes do pagamento → −Alocado, +Disponivel
+- `MensalidadeEstornada` → −Consumido, +Disponivel
+
+Nova concessao bloqueada por RN-SLD02 quando `valorBolsaSolicitada > valorDisponivel`.
+
+`CotaBolsa.quantidadeDisponivel` e contador independente em quantidade de cotas; nao substitui o saldo monetario governado por RN-SLD01.

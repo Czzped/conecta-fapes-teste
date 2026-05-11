@@ -4,12 +4,14 @@ on:
   pull_request:
     paths:
       - ".github/workflows/project43-automation.yml"
+      - ".github/workflows/project43-sprint-rollover.yml"
       - "tools/project43-automation/**"
   push:
     branches:
       - main
     paths:
       - ".github/workflows/project43-automation.yml"
+      - ".github/workflows/project43-sprint-rollover.yml"
       - "tools/project43-automation/**"
 
 jobs:
@@ -20,10 +22,10 @@ jobs:
         working-directory: tools/project43-automation
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm

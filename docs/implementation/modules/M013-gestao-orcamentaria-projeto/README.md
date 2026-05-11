@@ -57,11 +57,13 @@ As rubricas disponiveis para um projeto devem estar previamente cadastradas no m
 | RN03 | A rubrica a ser incluida em um projeto deve existir no cadastro basico de rubricas (M008). | Must |
 | RN04 | Todas as operacoes orcamentarias (adicao, inclusao, remanejamento, realocacao) exigem justificativa do coordenador. | Must |
 | RN05 | O sistema deve manter trilha de auditoria completa de todas as movimentacoes orcamentarias. | Must |
-| RN06 | O saldo de cada rubrica deve ser atualizado em tempo real apos aprovacao de qualquer movimentacao. | Must |
+| RN06 | O saldo de cada rubrica deve ser atualizado em tempo real apos aprovacao de qualquer movimentacao. Aplica RI-SLD1 (invariante `Total = Alocado + Consumido + Disponivel`). | Must |
 | RN07 | Realocacao de bolsas segue as mesmas regras de aprovacao do remanejamento entre rubricas. | Must |
-| RN08 | Nao e permitido remanejamento que resulte em saldo negativo na rubrica de origem. | Must |
+| RN08 | Nao e permitido remanejamento que resulte em saldo negativo na rubrica de origem. Aplica RI-SLD2 (nao-negatividade). | Must |
 | RN09 | A RubricaProjeto deve preservar snapshot da Rubrica aprovada, incluindo codigo, nome, descricao, natureza, rubrica pai e documento fonte. | Must |
-| RN10 | Nenhum comprometimento ou execucao pode ultrapassar o saldo disponivel da RubricaProjeto. | Must |
-| RN11 | Todo fato que altere saldo de RubricaProjeto deve ser registrado como `Transacao`, separado da categoria Rubrica e do movimento bancario. | Must |
+| RN10 | Nenhum comprometimento ou execucao pode ultrapassar o saldo disponivel da RubricaProjeto. Aplica RN-SLD02 (bloqueio por `SALDO_INSUFICIENTE`). | Must |
+| RN11 | Todo fato que altere saldo de RubricaProjeto deve ser registrado como `Transacao`, separado da categoria Rubrica e do movimento bancario. Eventos seguem RN-SLD03 (pagamento), RN-SLD04 (cancelamento), RN-SLD05 (estorno). | Must |
 | RI1 | Uma solicitacao orcamentaria so pode ser submetida para projetos com status "Ativo". | Must |
 | RI2 | O valor total do projeto apos adicao orcamentaria nao pode exceder o limite definido pelo edital, salvo autorizacao especial. | Should |
+
+> **Saldo canonico**: M013 e fonte oficial dos saldos `valorTotal`/`valorAlocado`/`valorConsumido`/`valorDisponivel` consumidos por M003 (Diarias) e M009 (Bolsas). Definicao canonica em [discovery/regras-saldo-alocado-disponivel.md](../../../discovery/regras-saldo-alocado-disponivel.md). Mapeamento de terminologia: `valorAprovado` ↔ Total, `valorComprometido` ↔ Alocado, `valorExecutado` ↔ Consumido, `saldoDisponivel` ↔ Disponivel.

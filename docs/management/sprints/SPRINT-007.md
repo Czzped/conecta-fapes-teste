@@ -9,6 +9,8 @@
 | **GitHub Milestone** | `milestone: MS-01` |
 | **Goal** | Construir a base cadastral corporativa (Instituicoes em modelo unico, Documentos) para desbloquear o modulo de Parcerias (M010 refatorado — Finalidade permanece em M008 mas nao e mais vinculada a Parceria); entregar o extrato financeiro da Prestacao de Contas; iniciar discovery de Captacao de Iniciativas e melhorias de experiencia do usuario |
 
+> **Nota de reversao (2026-05-07):** decisao desta sprint de colapsar `Instituicao`/`UnidadeOrganizacional`/`Dirigente` em modelo unico foi parcialmente revertida. Modelo atual: `Instituicao` (CNPJ obrigatorio) + `UnidadeOrganizacional` (subdivisao interna sem CNPJ, composicao recursiva) + `Responsavel` (vinculo temporal unico para Instituicao OU UnidadeOrganizacional, substituindo `Dirigente`). Issue #1750 retitulada para "Cadastrar UnidadeOrganizacional"; #1751 retitulada para "Cadastrar Responsavel". Ver [M008 modelo-estrutural](../../implementation/modules/M008-cadastros-corporativos/instituicoes/modelo-estrutural.md).
+
 ---
 
 ## Prioridades da Sprint
@@ -101,10 +103,10 @@
 
 | Feature | Issue | Produto | Documentacao | Status |
 |---------|-------|---------|--------------|--------|
-| Cadastrar Instituicao | [#1749](https://github.com/leds-conectafapes/conectafapes-project/issues/1749) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/instituicoes/modelo-estrutural.md) | 🔵 In Progress — [PR #261](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/261) |
-| Cadastrar Setor Interno (Instituicao sem CNPJ) | [#1750](https://github.com/leds-conectafapes/conectafapes-project/issues/1750) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/instituicoes/modelo-estrutural.md) | ⚪ To Do — substitui Unidade Organizacional |
-| Cadastrar Dirigente | [#1751](https://github.com/leds-conectafapes/conectafapes-project/issues/1751) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/instituicoes/modelo-estrutural.md) | ⚪ To Do |
-| Listar e Consultar Instituicoes | [#1752](https://github.com/leds-conectafapes/conectafapes-project/issues/1752) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/instituicoes/modelo-estrutural.md) | ⚪ To Do |
+| Cadastrar Instituicao | [#1749](https://github.com/leds-conectafapes/conectafapes-project/issues/1749) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/instituicoes/modelo-estrutural.md) | 🟢 Done — [PR #271](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/271) merged 2026-05-04 |
+| Cadastrar UnidadeOrganizacional (renomeada de "Setor Interno") | [#1750](https://github.com/leds-conectafapes/conectafapes-project/issues/1750) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/instituicoes/modelo-estrutural.md) | ⚪ To Do — replanejada apos reversao do modelo (ver nota de reversao) |
+| Cadastrar Responsavel (renomeada de "Dirigente") | [#1751](https://github.com/leds-conectafapes/conectafapes-project/issues/1751) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/instituicoes/modelo-estrutural.md) | ⚪ To Do — replanejada para classe Responsavel unica (ver nota de reversao) |
+| Listar e Consultar Instituicoes | [#1752](https://github.com/leds-conectafapes/conectafapes-project/issues/1752) | [Portal Admin](../../products/portal-admin/README.md) | [Modelo Instituicoes](../../implementation/modules/M008-cadastros-corporativos/instituicoes/modelo-estrutural.md) | 🟢 Done — [PR #274](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/274) merged 2026-05-05 |
 
 **Issues removidas do escopo M008 atual**:
 - ~~[#1753](https://github.com/leds-conectafapes/conectafapes-project/issues/1753) Vincular Pessoa a Instituicao/Unidade~~ — relacao direta Pessoa-Instituicao removida; pessoa se vincula a instituicao apenas via `Dirigente` quando aplicavel.
@@ -117,17 +119,17 @@
 
 | Feature | Issue | Produto | Documentacao | Status |
 |---------|-------|---------|--------------|--------|
-| Cadastrar e Formalizar Parceria (RN19) | [#1739](https://github.com/leds-conectafapes/conectafapes-project/issues/1739) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md), [EPIC](../../implementation/modules/M010-planejamento-estrategia/parcerias/epics/EPIC-M010-002.md) | 🔵 In Progress — [PR #262](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/262) |
-| Registrar Aporte Financeiro (inflow, isAditivo) | [#1740](https://github.com/leds-conectafapes/conectafapes-project/issues/1740) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | 🔵 In Progress — [PR #264](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/264) |
-| Listar e Consultar Parcerias | [#1743](https://github.com/leds-conectafapes/conectafapes-project/issues/1743) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Contrato API](../../implementation/modules/M010-planejamento-estrategia/contrato-api.md) | 🔵 In Progress — [PR #267](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/267) |
-| Encerrar Parceria (cascata RI2) | [#1744](https://github.com/leds-conectafapes/conectafapes-project/issues/1744) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | 🔵 In Progress — [PR #267](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/267) |
-| Registrar Vigencia (Aditivo) | [#1791](https://github.com/leds-conectafapes/conectafapes-project/issues/1791) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | 🔵 In Progress — [PR #263](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/263) |
-| Registrar Aditivo de Aporte Financeiro | [#1792](https://github.com/leds-conectafapes/conectafapes-project/issues/1792) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | 🔵 In Progress — [PR #265](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/265) |
+| Cadastrar e Formalizar Parceria (RN19) | [#1739](https://github.com/leds-conectafapes/conectafapes-project/issues/1739) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md), [EPIC](../../implementation/modules/M010-planejamento-estrategia/parcerias/epics/EPIC-M010-002.md) | 🟢 Done — [PR #272](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/272) merged 2026-05-04 + [PR #276](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/276) Publicar Parceria merged 2026-05-05 |
+| Registrar Aporte Financeiro (inflow, isAditivo) | [#1740](https://github.com/leds-conectafapes/conectafapes-project/issues/1740) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ Pendente — PR #264 fechado sem merge; replanejado |
+| Listar e Consultar Parcerias | [#1743](https://github.com/leds-conectafapes/conectafapes-project/issues/1743) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Contrato API](../../implementation/modules/M010-planejamento-estrategia/contrato-api.md) | 🟢 Done — [PR #273](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/273) merged 2026-05-04 |
+| Encerrar Parceria (cascata RI2) | [#1744](https://github.com/leds-conectafapes/conectafapes-project/issues/1744) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | ⚪ Pendente — PR #267 fechado sem merge; replanejado |
+| Registrar Vigencia (Aditivo) | [#1791](https://github.com/leds-conectafapes/conectafapes-project/issues/1791) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ Pendente — PR #263 fechado sem merge; replanejado |
+| Registrar Aditivo de Aporte Financeiro | [#1792](https://github.com/leds-conectafapes/conectafapes-project/issues/1792) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ Pendente — PR #265 fechado sem merge; replanejado |
 | Anexar Documentos a Parceria | [#1793](https://github.com/leds-conectafapes/conectafapes-project/issues/1793) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | 🔴 Omitido — Documento fora do escopo deste sprint |
 | Registrar Aporte Financeiro Parceria em Programa (N:N) | [#1794](https://github.com/leds-conectafapes/conectafapes-project/issues/1794) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Programas — Estrutural](../../implementation/modules/M010-planejamento-estrategia/programas/modelo-estrutural.md) | 🔴 Adiado — aguarda M014; modelo permite multiplas Parcerias por Programa |
 | Validar Invariante Temporal Programa/Parceria (RN13) | [#1795](https://github.com/leds-conectafapes/conectafapes-project/issues/1795) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Programas — Comportamental](../../implementation/modules/M010-planejamento-estrategia/programas/modelo-comportamental.md) | 🔴 Adiado — depende de #1794 |
-| Consultar Saldo da Parceria (RN14) | [#1796](https://github.com/leds-conectafapes/conectafapes-project/issues/1796) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | 🔵 In Progress — [PR #266](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/266) |
-| Remover Parceria (RI3) | [#1797](https://github.com/leds-conectafapes/conectafapes-project/issues/1797) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | 🔵 In Progress — [PR #267](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/267) |
+| Consultar Saldo da Parceria (RN14) | [#1796](https://github.com/leds-conectafapes/conectafapes-project/issues/1796) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Estrutural](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) | ⚪ Pendente — PR #266 fechado sem merge; replanejado |
+| Remover Parceria (RI3) | [#1797](https://github.com/leds-conectafapes/conectafapes-project/issues/1797) | [Portal Admin / EPA-07](../../products/portal-admin/features/EPA-07-gestao-parcerias.md) | [Parcerias — Comportamental](../../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md) | ⚪ Pendente — PR #267 fechado sem merge; replanejado |
 
 **Issues fechadas** (concepts removidos do dominio M010):
 - ~~[#1741](https://github.com/leds-conectafapes/conectafapes-project/issues/1741) Registrar Coordenacao~~ — `Coordenacao` removida de M010 (parcerias nao tem coordenador no dominio atual)
@@ -289,17 +291,18 @@
 | **Desenvolvimento (M014)** | 5 |
 | **Design de Produto** | 2 |
 | **Discovery de Melhorias** | 1 |
-| **Concluidas** | 0 |
-| **Em andamento** | 9 |
-| **Pendentes** | 11 |
+| **Concluidas** | 4 |
+| **Em andamento** | 0 |
+| **Pendentes (PR fechado, replanejado)** | 6 |
+| **Pendentes (To Do)** | 10 |
 | **Omitidas/adiadas/removidas** | 3 M010 + 2 M008 |
-| **% Concluido** | 0% |
+| **% Concluido** | ~17% (4/23) |
 
 ### Progresso por Responsavel
 
 | Responsavel | Total | Done | In Progress | To Do | Omitidas/adiadas | % |
 |-------------|-------|------|-------------|-------|------------------|---|
-| Vinicius | 15 | 0 | 9 | 3 | 3 | 0% |
+| Vinicius | 15 | 4 | 0 | 8 | 3 | 27% |
 | Manoel | 5 | 0 | 0 | 5 | 0 | 0% |
 | Leticia | 2 | 0 | 0 | 2 | 0 | 0% |
 | Marcela + Leticia | 1 | 0 | 0 | 1 | 0 | 0% |
@@ -308,21 +311,21 @@
 
 | # | Responsavel | Feature | Issue | Produto | Status |
 |---|-------------|---------|-------|---------|--------|
-| 1 | Vinicius | Cadastrar Instituicao | #1749 | Portal Admin | 🔵 In Progress — [PR #261](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/261) |
-| 2 | Vinicius | Cadastrar Setor Interno (Instituicao sem CNPJ) | #1750 | Portal Admin | ⚪ To Do |
-| 3 | Vinicius | Cadastrar Dirigente | #1751 | Portal Admin | ⚪ To Do |
-| 4 | Vinicius | Listar e Consultar Instituicoes | #1752 | Portal Admin | ⚪ To Do |
-| 5 | Vinicius | Cadastrar e Formalizar Parceria (RN19) | #1739 | Portal Admin / EPA-07 | 🔵 In Progress — [PR #262](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/262) |
-| 6 | Vinicius | Registrar Aporte Financeiro (inflow) | #1740 | Portal Admin / EPA-07 | 🔵 In Progress — [PR #264](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/264) |
-| 7 | Vinicius | Listar e Consultar Parcerias | #1743 | Portal Admin / EPA-07 | 🔵 In Progress — [PR #267](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/267) |
-| 8 | Vinicius | Encerrar Parceria (cascata RI2) | #1744 | Portal Admin / EPA-07 | 🔵 In Progress — [PR #267](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/267) |
-| 9 | Vinicius | Registrar Vigencia (Aditivo) | #1791 | Portal Admin / EPA-07 | 🔵 In Progress — [PR #263](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/263) |
-| 10 | Vinicius | Registrar Aditivo de Aporte Financeiro | #1792 | Portal Admin / EPA-07 | 🔵 In Progress — [PR #265](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/265) |
+| 1 | Vinicius | Cadastrar Instituicao | #1749 | Portal Admin | 🟢 Done — [PR #271](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/271) merged 2026-05-04 |
+| 2 | Vinicius | Cadastrar UnidadeOrganizacional | #1750 | Portal Admin | ⚪ To Do — replanejada |
+| 3 | Vinicius | Cadastrar Responsavel | #1751 | Portal Admin | ⚪ To Do — replanejada |
+| 4 | Vinicius | Listar e Consultar Instituicoes | #1752 | Portal Admin | 🟢 Done — [PR #274](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/274) merged 2026-05-05 |
+| 5 | Vinicius | Cadastrar e Formalizar Parceria (RN19) | #1739 | Portal Admin / EPA-07 | 🟢 Done — [PR #272](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/272) merged 2026-05-04 + [PR #276](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/276) |
+| 6 | Vinicius | Registrar Aporte Financeiro (inflow) | #1740 | Portal Admin / EPA-07 | 🔵 In Progress — PR #264 fechado, replanejado |
+| 7 | Vinicius | Listar e Consultar Parcerias | #1743 | Portal Admin / EPA-07 | 🟢 Done — [PR #273](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/273) merged 2026-05-04 |
+| 8 | Vinicius | Encerrar Parceria (cascata RI2) | #1744 | Portal Admin / EPA-07 | ⚪ Pendente — PR #267 fechado, replanejado |
+| 9 | Vinicius | Registrar Vigencia (Aditivo) | #1791 | Portal Admin / EPA-07 | ⚪ Pendente — PR #263 fechado, replanejado |
+| 10 | Vinicius | Registrar Aditivo de Aporte Financeiro | #1792 | Portal Admin / EPA-07 | ⚪ Pendente — PR #265 fechado, replanejado |
 | 11 | Vinicius | Anexar Documentos a Parceria | #1793 | Portal Admin / EPA-07 | 🔴 Omitido — Documento fora do escopo |
 | 12 | Vinicius | Registrar Aporte Parceria em Programa (N:N) | #1794 | Portal Admin / EPA-07 | 🔴 Adiado — aguarda M014; modelo permite multiplas Parcerias por Programa |
 | 13 | Vinicius | Validar Invariante Temporal RN13 | #1795 | Portal Admin / EPA-07 | 🔴 Adiado — depende de #1794 |
-| 14 | Vinicius | Consultar Saldo da Parceria | #1796 | Portal Admin / EPA-07 | 🔵 In Progress — [PR #266](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/266) |
-| 15 | Vinicius | Remover Parceria (RI3) | #1797 | Portal Admin / EPA-07 | 🔵 In Progress — [PR #267](https://github.com/leds-conectafapes/leds-conectafapes-backend-admin/pull/267) |
+| 14 | Vinicius | Consultar Saldo da Parceria | #1796 | Portal Admin / EPA-07 | ⚪ Pendente — PR #266 fechado, replanejado |
+| 15 | Vinicius | Remover Parceria (RI3) | #1797 | Portal Admin / EPA-07 | ⚪ Pendente — PR #267 fechado, replanejado |
 | 16 | Manoel | Extrato do Projeto (EPIC) | #1718 | Portal Admin + Portal Coordenador | ⚪ To Do |
 | 17 | Manoel | Listagem paginada do Extrato | #1721 | Portal Admin + Portal Coordenador | ⚪ To Do |
 | 18 | Manoel | Controle de Gastos do Projeto | #1719 | Portal Admin + Portal Coordenador | ⚪ To Do |
@@ -333,6 +336,124 @@
 | 23 | Marcela + Leticia | Jornadas e melhorias de usuario | #1755 | Cross-product | ⚪ To Do |
 
 > **Legenda:** ⚪ To Do | 🔵 In Progress | 🟢 Done | 🔴 Omitido/Adiado/Removido
+
+---
+
+## Snapshot do Sprint Board (Sprint 32) — atualizado em 2026-05-08
+
+> Fonte: [GitHub Project #43 — Conecta Fapes](https://github.com/orgs/leds-conectafapes/projects/43/views/3). Sprint 32 e a iteracao corrente do board e cobre o periodo desta sprint interna SPRINT-007. Esta secao reflete o estado atual de 57 itens tracked no projeto.
+
+### Resumo por Status
+
+| Status | Quantidade |
+|--------|-----------|
+| Done | 9 |
+| Homologation | 27 |
+| Homologation In Progress | 1 |
+| In Validation | 4 |
+| In Progress | 8 |
+| Paused | 5 |
+| To Do | 2 |
+| Backlog | 1 |
+| **Total** | **57** |
+
+### Done (9)
+
+| # | Repo | Titulo | Squad | Assignees |
+|---|------|--------|-------|-----------|
+| [#167](https://github.com/leds-conectafapes/leds-conectafapes-frontoffice-frontend/issues/167) | frontoffice-frontend | [Front] Enviar termino da bolsa no ultimo dia do ultimo mes | Pink | OficialMark |
+| [#1653](https://github.com/leds-conectafapes/conectafapes-project/issues/1653) | conectafapes-project | [DevOps] Workflow de autoupdate para PRs | Blue | ManoelRL |
+| [#1684](https://github.com/leds-conectafapes/conectafapes-project/issues/1684) | conectafapes-project | [DevOps] Padronizar protecao de branches main/develop | Blue | ManoelRL |
+| [#1800](https://github.com/leds-conectafapes/conectafapes-project/issues/1800) | conectafapes-project | [Front-end] Adicionar Plano de atividades do bolsista | Pink | Vitorfdan |
+| [#1821](https://github.com/leds-conectafapes/conectafapes-project/issues/1821) | conectafapes-project | [DevOps] Workflow de autoupdate para PRs | Green | vinicius-je |
+| [#1822](https://github.com/leds-conectafapes/conectafapes-project/issues/1822) | conectafapes-project | [DevOps] Padronizar protecao de branches | Pink | marcelasfl |
+| [#1823](https://github.com/leds-conectafapes/conectafapes-project/issues/1823) | conectafapes-project | [DevOps] Padronizar protecao de branches | Green | vinicius-je |
+| [#1851](https://github.com/leds-conectafapes/conectafapes-project/issues/1851) | conectafapes-project | [FIX] Aviso de data final do projeto na Solicitacao de bolsa | Pink | marcelasfl |
+| [#1865](https://github.com/leds-conectafapes/conectafapes-project/issues/1865) | conectafapes-project | [BUG] Permitir pedido de bolsa ate o ultimo dia do projeto | Pink | marcelasfl, OficialMark |
+
+### Homologation (27)
+
+| # | Repo | Titulo | Squad | Assignees |
+|---|------|--------|-------|-----------|
+| [#153](https://github.com/leds-conectafapes/leds-conectafapes-frontend-backoffice/issues/153) | frontend-backoffice | [REFACTOR] Telas Pagamento NuxtUi | Green | — |
+| [#158](https://github.com/leds-conectafapes/leds-conectafapes-frontend-backoffice/issues/158) | frontend-backoffice | [REFACTOR] Visualizar Liberacao para nuxt.ui | Green | — |
+| [#162](https://github.com/leds-conectafapes/leds-conectafapes-frontoffice-frontend/issues/162) | frontoffice-frontend | [Front] Renomear Cadastrar Bolsista para Solicitar Bolsa | Pink | Vitorfdan |
+| [#172](https://github.com/leds-conectafapes/leds-conectafapes-frontoffice-frontend/issues/172) | frontoffice-frontend | [Front] Modal de confirmacao antes da mensagem de sucesso | Pink | rafableao |
+| [#1720](https://github.com/leds-conectafapes/conectafapes-project/issues/1720) | conectafapes-project | [Frontend] Filtros do Extrato do Projeto | Blue | joaopbarcellos |
+| [#1721](https://github.com/leds-conectafapes/conectafapes-project/issues/1721) | conectafapes-project | [Frontend] Listagem paginada do Extrato do Projeto | Blue | joaopbarcellos |
+| [#1738](https://github.com/leds-conectafapes/conectafapes-project/issues/1738) | conectafapes-project | [Backend] Listagem de parcerias | Green | vinicius-je, GustavoACaetano |
+| [#1801](https://github.com/leds-conectafapes/conectafapes-project/issues/1801) | conectafapes-project | [Backend] Resumo financeiro do projeto por ContaContabil | Blue | ManoelRL |
+| [#1802](https://github.com/leds-conectafapes/conectafapes-project/issues/1802) | conectafapes-project | [Backend] Filtros da listagem do extrato | Blue | ManoelRL |
+| [#1803](https://github.com/leds-conectafapes/conectafapes-project/issues/1803) | conectafapes-project | [Backend] Listagem paginada do extrato | Blue | ManoelRL |
+| [#1804](https://github.com/leds-conectafapes/conectafapes-project/issues/1804) | conectafapes-project | [Backend] Detalhes do extrato conforme status | Blue | ManoelRL |
+| [#1805](https://github.com/leds-conectafapes/conectafapes-project/issues/1805) | conectafapes-project | [Backend] Criacao de parceria | Green | vinicius-je |
+| [#1806](https://github.com/leds-conectafapes/conectafapes-project/issues/1806) | conectafapes-project | [Backend] Anexo de documentos na parceria | Green | vinicius-je |
+| [#1807](https://github.com/leds-conectafapes/conectafapes-project/issues/1807) | conectafapes-project | [Backend] Download de documentos da parceria | Green | vinicius-je |
+| [#1809](https://github.com/leds-conectafapes/conectafapes-project/issues/1809) | conectafapes-project | [Backend] Importar Orcamento e ContaContabil do Sigfapes | Blue | guihocosta |
+| [#1812](https://github.com/leds-conectafapes/conectafapes-project/issues/1812) | conectafapes-project | [Backend] Cadastro de Orcamento com ContaContabil | Blue | guihocosta |
+| [#1826](https://github.com/leds-conectafapes/conectafapes-project/issues/1826) | conectafapes-project | [Backend] Criacao de instituicao | Green | GustavoACaetano |
+| [#1828](https://github.com/leds-conectafapes/conectafapes-project/issues/1828) | conectafapes-project | [Front-end] Adequar Visualizar Liberacao para nuxt.ui | Green | harianadm |
+| [#1829](https://github.com/leds-conectafapes/conectafapes-project/issues/1829) | conectafapes-project | [Front-end] Adequar Gerenciar Bonus de Pagamento | Green | harianadm |
+| [#1830](https://github.com/leds-conectafapes/conectafapes-project/issues/1830) | conectafapes-project | [Front-end] Adequar Processar Remessa de Cadastro | Green | harianadm, RafaBMartins |
+| [#1831](https://github.com/leds-conectafapes/conectafapes-project/issues/1831) | conectafapes-project | [Front-end] Adequar Gerenciar Cotas Pagamento | Green | RafaBMartins |
+| [#1832](https://github.com/leds-conectafapes/conectafapes-project/issues/1832) | conectafapes-project | [Front-end] Adequar Editar dados de Pessoa | Green | RafaBMartins |
+| [#1843](https://github.com/leds-conectafapes/conectafapes-project/issues/1843) | conectafapes-project | [Front-end] Adequar tela de calendario | Green | RafaBMartins |
+| [#1846](https://github.com/leds-conectafapes/conectafapes-project/issues/1846) | conectafapes-project | [Front-end] Adicionar nome da mae em Meus dados | Pink | rafableao |
+| [#1870](https://github.com/leds-conectafapes/conectafapes-project/issues/1870) | conectafapes-project | [Front-end] adicionar loading nos botoes | Pink | Vitorfdan |
+| [#1879](https://github.com/leds-conectafapes/conectafapes-project/issues/1879) | conectafapes-project | [Backend] Filtros da listagem de prestacoes | Blue | ManoelRL |
+| [#1881](https://github.com/leds-conectafapes/conectafapes-project/issues/1881) | conectafapes-project | [Backend] Contestacao + endpoints de revisao/rejeicao | Blue | ManoelRL |
+
+### In Progress (8) + Homologation In Progress (1)
+
+| # | Repo | Titulo | Squad | Assignees | Status |
+|---|------|--------|-------|-----------|--------|
+| [#1357](https://github.com/leds-conectafapes/conectafapes-project/issues/1357) | conectafapes-project | [Back-end] Estender bolsa - pagamento avancado | Pink | Victor-Marins-Dev | In Progress |
+| [#1458](https://github.com/leds-conectafapes/conectafapes-project/issues/1458) | conectafapes-project | [Front-end] Excluir solicitacao de bolsa | Pink | Vitorfdan | In Progress |
+| [#1722](https://github.com/leds-conectafapes/conectafapes-project/issues/1722) | conectafapes-project | [Back-end] Auth para servicos no novo modelo | Pink | OficialMark | In Progress |
+| [#1723](https://github.com/leds-conectafapes/conectafapes-project/issues/1723) | conectafapes-project | [Frontend] Detalhes do extrato conforme status | Blue | joaopbarcellos | In Progress |
+| [#1818](https://github.com/leds-conectafapes/conectafapes-project/issues/1818) | conectafapes-project | [FRONTEND] Tela de submissao de projeto | Green | vinicius-je, HeloisaBorchardt | In Progress |
+| [#1820](https://github.com/leds-conectafapes/conectafapes-project/issues/1820) | conectafapes-project | [DevOps] Workflow de autoupdate (Pink) | Pink | marcelasfl | In Progress |
+| [#1825](https://github.com/leds-conectafapes/conectafapes-project/issues/1825) | conectafapes-project | [Frontend] Criacao de parceria | Green | RafaBMartins | In Progress |
+| [#1836](https://github.com/leds-conectafapes/conectafapes-project/issues/1836) | conectafapes-project | [Back-end] Reformulacao do Pre-Cadastro | Pink | OficialMark | In Progress |
+| [#1839](https://github.com/leds-conectafapes/conectafapes-project/issues/1839) | conectafapes-project | [Front-end] Padronizacao de mensagens de erro | Pink | lukevds | Homologation In Progress |
+
+### In Validation (4)
+
+| # | Repo | Titulo | Squad | Assignees |
+|---|------|--------|-------|-----------|
+| [#1459](https://github.com/leds-conectafapes/conectafapes-project/issues/1459) | conectafapes-project | [Back-end] Excluir solicitacao de bolsa | Pink | Victor-Marins-Dev |
+| [#1714](https://github.com/leds-conectafapes/conectafapes-project/issues/1714) | conectafapes-project | [Front-end] Tela do mapa financeiro | Green | vinicius-je, harianadm |
+| [#1838](https://github.com/leds-conectafapes/conectafapes-project/issues/1838) | conectafapes-project | [Back-end] Cadastro completo em Meus dados | Pink | Victor-Marins-Dev |
+| [#1840](https://github.com/leds-conectafapes/conectafapes-project/issues/1840) | conectafapes-project | [Front-end] Documento pagamento Banestes | Pink | marcelasfl |
+
+### Paused (5)
+
+| # | Titulo | Squad | Assignees |
+|---|--------|-------|-----------|
+| [#1814](https://github.com/leds-conectafapes/conectafapes-project/issues/1814) | [BACKEND] Endpoint p/ associar formulario ao item externo | Green | RobsonGarcia, vinicius-je, JoaoRicardoCetto |
+| [#1815](https://github.com/leds-conectafapes/conectafapes-project/issues/1815) | [Front-end] Tela p/ associar Edital a formulario Dynamic Forms | Green | vinicius-je, HeloisaBorchardt |
+| [#1816](https://github.com/leds-conectafapes/conectafapes-project/issues/1816) | [BACKEND] GET template do Edital | Green | vinicius-je, JoaoRicardoCetto |
+| [#1817](https://github.com/leds-conectafapes/conectafapes-project/issues/1817) | [BACKEND] POST submissao de projeto | Green | vinicius-je, JoaoRicardoCetto |
+| [#1835](https://github.com/leds-conectafapes/conectafapes-project/issues/1835) | [BUG] Edicao de bolsa em rascunho cria nova alocacao | Pink | lukevds |
+
+### To Do (2) + Backlog (1)
+
+| # | Titulo | Squad | Status |
+|---|--------|-------|--------|
+| [#1719](https://github.com/leds-conectafapes/conectafapes-project/issues/1719) | [Frontend] Controle de Gastos do Projeto | Blue | To Do |
+| [#1882](https://github.com/leds-conectafapes/conectafapes-project/issues/1882) | [Backend] Pedido de revisao da prestacao com Contestacao | Blue | To Do |
+| [#1849](https://github.com/leds-conectafapes/conectafapes-project/issues/1849) | [Back-end] Coluna ProjetoVersaoModalidadeId nao deve ser usada | Pink | Backlog |
+
+### Distribuicao por Squad (Sprint 32)
+
+| Squad | Done | Em validacao/homologacao | Em desenvolvimento | Pausado | Pendente | Total |
+|-------|------|--------------------------|--------------------|---------|----------|-------|
+| Blue | 2 | 9 | 1 | 0 | 2 | 14 |
+| Green | 2 | 13 | 2 | 4 | 0 | 21 |
+| Pink | 5 | 8 | 5 | 1 | 1 | 20 |
+| **Total** | **9** | **30** | **8** | **5** | **3** | **55** + 2 sem squad |
+
+> Nota: o Sprint Board tem cobertura mais ampla que a tabela "Features Comprometidas" desta sprint doc. SPRINT-007 ainda foca em entregas backend de Vinicius (M008/M010). Sprint 32 do board agrega trabalho cross-squad: prestacao de contas (Blue), refatoracao backoffice nuxt.ui (Green), portal coordenador (Pink), DevOps. Ambos os escopos coexistem.
 
 ---
 

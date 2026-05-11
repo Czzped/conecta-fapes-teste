@@ -24,7 +24,7 @@ Atualmente, os cadastros de pessoas fisicas, instituicoes e dados de referencia 
 
 A agencia de fomento interage com diversos atores externos -- pesquisadores, bolsistas, consultores ad hoc, instituicoes de ensino e pesquisa e parceiros institucionais -- e precisa manter registros confiaveis sobre cada um deles para operacionalizar editais, iniciativas, bolsas e pagamentos.
 
-Neste contexto, a propria agencia de fomento e representada como uma `Instituicao`. Toda organizacao, matriz, filial, campus ou unidade com CNPJ proprio e cadastrada como `Instituicao` com CNPJ; setores internos sem CNPJ proprio tambem sao `Instituicao`, mas devem possuir uma instituicao superior. Assim, IFES matriz, IFES Campus Serra, UFES, Centro Tecnologico e Departamento de Informatica usam o mesmo modelo, diferenciados por regras de negocio e pela presenca ou ausencia de CNPJ.
+Neste contexto, a propria agencia de fomento e representada como uma `Instituicao`. Toda organizacao, matriz, filial ou campus com CNPJ proprio e cadastrada como `Instituicao` (CNPJ obrigatorio). Subdivisoes internas sem CNPJ (centros, departamentos, coordenacoes, laboratorios, setores) sao cadastradas como `UnidadeOrganizacional`, vinculadas direta ou transitivamente a uma `Instituicao` raiz. Uma `Instituicao` pode ser composta por outras `Instituicao` e/ou por `UnidadeOrganizacional`; uma `UnidadeOrganizacional` pode ser composta por outras `UnidadeOrganizacional`. Assim, UFES e `Instituicao`, enquanto Centro Tecnologico e Departamento de Informatica sao `UnidadeOrganizacional`. IFES matriz e IFES Campus Serra, ambos com CNPJ proprio, sao duas `Instituicao` ligadas por matriz/subInstituicoes.
 
 Pessoas fisicas sao cadastradas com dados pessoais, academicos e profissionais. No front-office, o cadastro e feito automaticamente via Acesso Cidadao (SSO do governo do ES). No back-office, servidores podem cadastrar ou atualizar pessoas manualmente. Uma pessoa pode ser suspensa, o que bloqueia todas as operacoes vinculadas a ela.
 
@@ -41,7 +41,7 @@ Os documentos detalhados do M008 sao organizados por contexto de negocio, nao po
 | Contexto | Entidades |
 |----------|-----------|
 | [Pessoas](pessoas/README.md) | PessoaFisica, NivelAcademico, HistoricoPessoa |
-| [Instituicoes](instituicoes/README.md) | Instituicao, TipoInstituicao, Dirigente |
+| [Instituicoes](instituicoes/README.md) | Instituicao, UnidadeOrganizacional, TipoInstituicao, Responsavel |
 | [Diarias](diarias/README.md) | Abrangencia, TipoDiaria, ParametroCalculoDiaria |
 | [Rubricas](rubricas/README.md) | Rubrica |
 | [Geografia](geografia/README.md) | Cidade, Regiao |
@@ -58,19 +58,20 @@ Cada contexto e dono do seu `README.md`, `modelo-estrutural.md`, `backlog.md` e 
 | ID | Descricao | Prioridade |
 |----|-----------|------------|
 | RN01 | Uma pessoa fisica e identificada unicamente pelo CPF; nao pode haver duplicidade. | Must |
-| RN02 | Uma instituicao com CNPJ proprio e identificada unicamente pelo CNPJ; nao pode haver duplicidade. | Must |
-| RN03 | Instituicoes podem possuir hierarquia superior-subestrutura. | Must |
-| RN04 | Um dirigente e o vinculo temporal entre uma pessoa fisica e uma instituicao, com mandato de inicio e fim. | Must |
+| RN02 | Uma instituicao e identificada unicamente pelo CNPJ (obrigatorio); nao pode haver duplicidade. | Must |
+| RN03 | Instituicoes formam hierarquia matriz/subInstituicoes; instituicoes podem conter UnidadeOrganizacional; unidades formam sub-hierarquia interna. | Must |
+| RN04 | Um responsavel e o vinculo temporal entre uma pessoa fisica e uma entidade organizacional (Instituicao ou UnidadeOrganizacional), com mandato de inicio e fim. | Must |
 | RN05 | A suspensao de uma pessoa bloqueia todas as operacoes vinculadas (submissao, bolsas, pagamentos). | Must |
 | RN06 | Areas de conhecimento seguem a classificacao hierarquica do CNPq (grande area, area, subarea, especialidade). | Must |
 | RN07 | Rubricas devem possuir referencia canonica estavel para uso por editais, orcamentos, transacoes e prestacoes de contas. | Must |
 | RN09 | Cidades devem pertencer a uma regiao; regioes agrupam cidades do estado. | Should |
 | RN10 | O cadastro automatico via Acesso Cidadao deve criar a pessoa caso nao exista, ou vincular a existente pelo CPF. | Should |
-| RN11 | Instituicao com CNPJ proprio deve possuir exatamente um dirigente ativo. | Must |
-| RN12 | Toda organizacao, campus, filial ou unidade com CNPJ proprio deve ser cadastrada como Instituicao com CNPJ. | Must |
-| RN13 | Setor interno sem CNPJ proprio deve ser cadastrado como Instituicao sem CNPJ e com superior informado. | Must |
-| RN14 | Instituicao sem superior deve possuir CNPJ proprio. | Must |
-| RN15 | Instituicao sem CNPJ proprio e tratada como setor interno para fins de cadastro, consulta e hierarquia. | Must |
+| RN11 | Instituicao deve possuir exatamente um responsavel ativo. | Must |
+| RN12 | Toda organizacao, campus ou filial com CNPJ proprio deve ser cadastrada como Instituicao. | Must |
+| RN13 | Setor interno e cadastrado como UnidadeOrganizacional vinculada a uma ou mais Instituicoes e/ou Unidades Organizacionais (relacao N:N). | Must |
+| RN14 | Toda Instituicao deve possuir CNPJ proprio (raiz ou filial). | Must |
+| RN19 | Pessoa fisica com idade inferior a 18 anos completos na data de cadastro deve informar `responsavelLegal` apontando para outra `PessoaFisica` ja cadastrada e maior de idade. Cadastro de menor sem responsavel legal informado e rejeitado. | Must |
+| RN20 | `Responsavel.dataFimMandato` e obrigatorio apenas quando o Responsavel estiver inativo (mandato encerrado). Mandato em curso (Responsavel ativo) pode ter dataFimMandato vazia. | Must |
 | RN16 | Toda Rubrica deve possuir codigo canonico unico, nome, descricao, natureza da despesa e indicador booleano `ativa`. | Must |
 | RN17 | Subrubricas sao representadas por relacao opcional com `rubricaPai`; nao ha campo adicional para classificar a hierarquia. | Must |
 | RN18 | Rubrica inativa nao deve ser ofertada em novas configuracoes de edital/projeto, mas deve permanecer consultavel para historico. | Must |
@@ -78,5 +79,12 @@ Cada contexto e dono do seu `README.md`, `modelo-estrutural.md`, `backlog.md` e 
 | RN22 | Abrangencia da diaria e classe corporativa com codigo canonico unico, nome, descricao e situacao ativa/inativa. | Must |
 | RN23 | TipoDiaria deve possuir abrangencia, valor unitario, vigencia e situacao ativa/inativa, sem vigencias sobrepostas para a mesma abrangencia. | Must |
 | RN24 | ParametroCalculoDiaria deve estar vinculado a um TipoDiaria e possuir norma de referencia, percentuais, limites, bloqueios, vigencia e situacao ativa/inativa, sem vigencias sobrepostas para o mesmo TipoDiaria. | Must |
-| RI1 | Uma instituicao so pode ter um dirigente ativo ao mesmo tempo. | Must |
+| RN25 | Toda UnidadeOrganizacional deve ser rastreavel transitivamente a pelo menos uma Instituicao raiz. Pode ter multiplos pais (Instituicoes ou outras Unidades). | Must |
+| RN26 | UnidadeOrganizacional deve possuir exatamente um responsavel ativo. | Must |
+| RI1 | Uma Instituicao so pode ter um responsavel ativo ao mesmo tempo. | Must |
 | RI2 | Uma pessoa suspensa nao pode ser reativada sem justificativa registrada. | Must |
+| RI3 | Uma UnidadeOrganizacional so pode ter um responsavel ativo ao mesmo tempo. | Must |
+| RI4 | UnidadeOrganizacional deve ter pelo menos um pai (Instituicao OU outra UnidadeOrganizacional). Pode ter multiplos pais (mistos). | Must |
+| RI8 | Instituicao tem no maximo um pai (`instituicaoSuperior`). Nao e permitido vincular uma mesma Instituicao a duas matrizes diferentes. | Must |
+| RI5 | Em Responsavel, exatamente um entre `instituicao` e `unidade` deve estar preenchido. | Must |
+| RI7 | `responsavelLegal` de uma PessoaFisica deve apontar para outra PessoaFisica cadastrada, ativa e maior de idade. Auto-referencia (pessoa apontando para si mesma) e rejeitada. | Must |

@@ -20,11 +20,11 @@ stateDiagram-v2
     note right of Suspensa : Reativacao exige justificativa\nregistrada no historico
 ```
 
-### Ciclo de Vida: Dirigente (Mandato)
+### Ciclo de Vida: Responsavel (Mandato)
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Ativo : Cadastrar Dirigente [com mandato]
+    [*] --> Ativo : Registrar Responsavel [com mandato]
 
     Ativo --> Ativo : Atualizar Dados do Mandato
     Ativo --> Encerrado : Data fim mandato atingida
@@ -32,7 +32,7 @@ stateDiagram-v2
 
     Encerrado --> [*]
 
-    state Ativo : Dirigente vinculado a instituicao
+    state Ativo : Responsavel vinculado a Instituicao OU UnidadeOrganizacional
     state Encerrado : Mandato finalizado, historico mantido
 ```
 
@@ -49,4 +49,19 @@ stateDiagram-v2
 
     state Ativa : Instituicao habilitada para vinculos
     state Inativa : Instituicao desabilitada, vinculos mantidos como historico
+```
+
+### Ciclo de Vida: UnidadeOrganizacional
+
+```mermaid
+stateDiagram-v2
+    [*] --> Ativa : Cadastrar UnidadeOrganizacional
+
+    Ativa --> Ativa : Atualizar Dados
+    Ativa --> Inativa : Desativar Unidade
+
+    Inativa --> Ativa : Reativar Unidade
+
+    state Ativa : Unidade habilitada para vinculos
+    state Inativa : Unidade desabilitada, vinculos mantidos como historico
 ```

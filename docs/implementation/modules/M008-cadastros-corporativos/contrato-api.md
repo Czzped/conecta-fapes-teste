@@ -4,7 +4,7 @@ Referencia de dominio e regras de negocio: [contrato.md](contrato.md) | [README.
 
 ## Visao Geral
 
-Este documento especifica o contrato HTTP REST do modulo M008 como bounded context responsavel pelos cadastros corporativos compartilhados da plataforma: pessoas, instituicoes, dirigentes e referencias basicas. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
+Este documento especifica o contrato HTTP REST do modulo M008 como bounded context responsavel pelos cadastros corporativos compartilhados da plataforma: pessoas, instituicoes, unidades organizacionais, responsaveis e referencias basicas. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
 
 ### Base URL
 
@@ -19,7 +19,7 @@ Este documento especifica o contrato HTTP REST do modulo M008 como bounded conte
 | Formato de corpo | `application/json` |
 | Formato de data | ISO 8601 — `YYYY-MM-DD` |
 | Paginacao | Query params `?page=1&pageSize=20` (padrao: page=1, pageSize=20) |
-| Identificadores | Strings opacas (ex: `PES-2026-001`, `INST-2026-010`, `AT-DGPP-01`, `DIR-2026-003`) |
+| Identificadores | Strings opacas (ex: `PES-2026-001`, `INST-2026-010`, `UO-2026-001`, `RESP-2026-003`) |
 | Encoding | UTF-8 |
 | Idioma de erros | Portugues brasileiro |
 
@@ -339,7 +339,7 @@ Reativa uma pessoa fisica suspensa.
 
 #### `POST /api/v1/m008/instituicoes`
 
-Registra uma instituicao com ou sem CNPJ proprio. Quando nao houver CNPJ, a instituicao representa um setor interno e deve informar `superiorId`.
+Registra uma instituicao juridica com CNPJ proprio. Subdivisoes internas sem CNPJ devem ser cadastradas como `UnidadeOrganizacional` em `POST /api/v1/m008/unidades-organizacionais`.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
 - **Operacao de origem:** `CadastrarInstituicao`
@@ -354,22 +354,24 @@ Registra uma instituicao com ou sem CNPJ proprio. Quando nao houver CNPJ, a inst
   "nome": "UFES",
   "sigla": "UFES",
   "email": "ufes@ufes.br",
+  "endereco": "Av. Fernando Ferrari, 514, Vitoria/ES",
   "isPublica": true,
   "isExterna": true,
-  "superiorId": null
+  "instituicaoSuperiorId": null
 }
 ```
 
 | Campo | Tipo | Obrigatorio | Descricao |
 |-------|------|-------------|-----------|
-| `cnpj` | string | Cond. | CNPJ da instituicao no formato `NN.NNN.NNN/NNNN-NN`; obrigatorio quando nao houver superior |
-| `razaoSocial` | string | Cond. | Razao social da instituicao; obrigatoria quando houver CNPJ |
-| `nome` | string | Sim | Nome comum de exibicao da instituicao, campus, filial ou setor |
-| `sigla` | string | Nao | Sigla comum da instituicao ou setor |
-| `email` | string | Cond. | Email institucional; obrigatorio quando houver CNPJ |
-| `isPublica` | boolean | Cond. | `true` para instituicao publica; `false` para privada; obrigatorio quando houver CNPJ |
+| `cnpj` | string | Sim | CNPJ da instituicao no formato `NN.NNN.NNN/NNNN-NN` |
+| `razaoSocial` | string | Sim | Razao social da instituicao |
+| `nome` | string | Sim | Nome comum de exibicao da instituicao, campus ou filial |
+| `sigla` | string | Nao | Sigla comum da instituicao |
+| `email` | string | Sim | Email institucional |
+| `endereco` | string | Sim | Endereco completo |
+| `isPublica` | boolean | Sim | `true` para instituicao publica; `false` para privada |
 | `isExterna` | boolean | Sim | Indica se e externa a agencia de fomento |
-| `superiorId` | string | Cond. | Instituicao superior; obrigatoria quando nao houver CNPJ |
+| `instituicaoSuperiorId` | string | Nao | Instituicao matriz quando esta for filial juridicamente identificavel |
 
 **Response `201 Created`**
 
@@ -381,7 +383,7 @@ Registra uma instituicao com ou sem CNPJ proprio. Quando nao houver CNPJ, a inst
     "nome": "UFES",
     "sigla": "UFES",
     "isPublica": true,
-    "superiorId": null
+    "instituicaoSuperiorId": null
   }
 }
 ```
@@ -391,8 +393,8 @@ Registra uma instituicao com ou sem CNPJ proprio. Quando nao houver CNPJ, a inst
 | HTTP | Codigo | Mensagem |
 |------|--------|----------|
 | `409` | `CNPJ_DUPLICADO` | Ja existe uma instituicao cadastrada com o CNPJ informado. |
-| `404` | `INSTITUICAO_SUPERIOR_NAO_ENCONTRADA` | A instituicao superior informada nao foi encontrada. |
-| `422` | `INSTITUICAO_SEM_CNPJ_SEM_SUPERIOR` | Instituicao sem CNPJ proprio deve possuir uma instituicao superior. |
+| `422` | `CNPJ_OBRIGATORIO` | Instituicao deve possuir CNPJ proprio. Use UnidadeOrganizacional para subdivisoes internas. |
+| `404` | `INSTITUICAO_SUPERIOR_NAO_ENCONTRADA` | A instituicao matriz informada nao foi encontrada. |
 | `400` | `INSTITUICAO_DADOS_INVALIDOS` | Os dados da instituicao sao invalidos ou incompletos. |
 
 ---
@@ -411,7 +413,7 @@ Lista e filtra instituicoes cadastradas.
 | `cnpj` | string | Filtra pelo CNPJ exato |
 | `nome` | string | Busca textual no nome |
 | `isPublica` | boolean | Filtra por natureza publica/privada |
-| `superiorId` | string | Filtra por instituicao superior |
+| `instituicaoSuperiorId` | string | Filtra por instituicao matriz |
 | `page` | integer | Numero da pagina (padrao: 1) |
 | `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
 
@@ -425,7 +427,7 @@ Lista e filtra instituicoes cadastradas.
       "cnpj": "12.345.678/0001-90",
       "nome": "UFES",
       "isPublica": true,
-      "superiorId": null
+      "instituicaoSuperiorId": null
     }
   ],
   "total": 1,
@@ -458,7 +460,7 @@ Consulta o detalhe de uma instituicao pelo identificador.
     "nome": "UFES",
     "sigla": "UFES",
     "isPublica": true,
-    "superiorId": null
+    "instituicaoSuperiorId": null
   }
 }
 ```
@@ -471,24 +473,23 @@ Consulta o detalhe de uma instituicao pelo identificador.
 
 ---
 
-#### `GET /api/v1/m008/instituicoes/{id}/subestruturas`
+#### `GET /api/v1/m008/instituicoes/{id}/sub-instituicoes`
 
-Lista as instituicoes diretamente vinculadas a uma instituicao superior. O retorno pode conter campi/filiais com CNPJ proprio e setores internos sem CNPJ.
+Lista as Instituicoes filhas (filiais ou campi com CNPJ proprio) de uma Instituicao matriz.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
-- **Operacao de origem:** `ConsultarCadastrosCorporativos` (tipoCadastro=INSTITUICAO, superiorId={id})
+- **Operacao de origem:** `ConsultarCadastrosCorporativos` (tipoCadastro=INSTITUICAO, instituicaoSuperiorId={id})
 
 **Path parameters**
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `id` | string | Identificador da instituicao |
+| `id` | string | Identificador da instituicao matriz |
 
 **Query parameters**
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `superiorId` | string | Filtra por instituicao superior |
 | `page` | integer | Numero da pagina (padrao: 1) |
 | `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
 
@@ -499,10 +500,10 @@ Lista as instituicoes diretamente vinculadas a uma instituicao superior. O retor
   "items": [
     {
       "id": "INST-2026-011",
-      "nome": "Centro Tecnologico",
-      "sigla": "CT",
-      "cnpj": null,
-      "superiorId": "INST-2026-010"
+      "nome": "IFES Campus Serra",
+      "sigla": "IFES-CS",
+      "cnpj": "98.765.432/0001-10",
+      "instituicaoSuperiorId": "INST-2026-010"
     }
   ],
   "total": 1,
@@ -519,14 +520,171 @@ Lista as instituicoes diretamente vinculadas a uma instituicao superior. O retor
 
 ---
 
-### 3. Dirigentes
+#### `GET /api/v1/m008/instituicoes/{id}/unidades`
 
-#### `POST /api/v1/m008/dirigentes`
+Lista as `UnidadeOrganizacional` diretamente vinculadas a uma Instituicao via `instituicaoPai`.
 
-Registra um dirigente como vinculo temporal entre uma pessoa e uma instituicao.
+- **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
+- **Operacao de origem:** `ConsultarCadastrosCorporativos` (tipoCadastro=UNIDADE_ORGANIZACIONAL, instituicaoPaiId={id})
+
+**Response `200 OK`**
+
+```json
+{
+  "items": [
+    {
+      "id": "UO-2026-001",
+      "nome": "Centro Tecnologico",
+      "sigla": "CT",
+      "instituicaoPaiId": "INST-2026-010",
+      "unidadeSuperiorId": null,
+      "ativa": true
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "pageSize": 20
+}
+```
+
+---
+
+### 3. Unidades Organizacionais
+
+#### `POST /api/v1/m008/unidades-organizacionais`
+
+Registra uma `UnidadeOrganizacional` (subdivisao interna sem CNPJ) vinculada a uma Instituicao ou a outra UnidadeOrganizacional.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
-- **Operacao de origem:** `RegistrarDirigente`
+- **Operacao de origem:** `CadastrarUnidadeOrganizacional`
+- **Idempotencia:** Nao
+
+**Request body**
+
+```json
+{
+  "nome": "Centro Tecnologico",
+  "sigla": "CT",
+  "descricao": "Centro academico de engenharias e computacao",
+  "ativa": true,
+  "instituicaoPaiId": "INST-2026-010",
+  "unidadeSuperiorId": null
+}
+```
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| `nome` | string | Sim | Nome de exibicao da unidade |
+| `sigla` | string | Nao | Sigla comum da unidade |
+| `descricao` | string | Nao | Descricao da unidade |
+| `email` | string | Nao | Email de contato da unidade |
+| `telefone` | string | Nao | Telefone de contato da unidade |
+| `ativa` | boolean | Sim | Indica se a unidade esta ativa |
+| `instituicaoPaiId` | string | Cond. | Instituicao pai. Obrigatorio quando `unidadeSuperiorId` nao informado |
+| `unidadeSuperiorId` | string | Cond. | Unidade superior. Obrigatorio quando `instituicaoPaiId` nao informado |
+
+**Response `201 Created`**
+
+```json
+{
+  "unidade": {
+    "id": "UO-2026-001",
+    "nome": "Centro Tecnologico",
+    "sigla": "CT",
+    "instituicaoPaiId": "INST-2026-010",
+    "unidadeSuperiorId": null,
+    "ativa": true
+  }
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `422` | `PARENT_AUSENTE` | Informe instituicaoPaiId ou unidadeSuperiorId. |
+| `422` | `PARENT_AMBIGUO` | Informe apenas um entre instituicaoPaiId e unidadeSuperiorId. |
+| `404` | `INSTITUICAO_PAI_NAO_ENCONTRADA` | A instituicao pai informada nao foi encontrada. |
+| `404` | `UNIDADE_SUPERIOR_NAO_ENCONTRADA` | A unidade superior informada nao foi encontrada. |
+| `400` | `UNIDADE_DADOS_INVALIDOS` | Os dados da unidade organizacional sao invalidos ou incompletos. |
+
+---
+
+#### `GET /api/v1/m008/unidades-organizacionais`
+
+Lista e filtra unidades organizacionais cadastradas.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
+
+**Query parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `nome` | string | Busca textual no nome |
+| `instituicaoPaiId` | string | Filtra por Instituicao pai |
+| `unidadeSuperiorId` | string | Filtra por unidade superior |
+| `ativa` | boolean | Filtra por situacao |
+| `page` | integer | Numero da pagina (padrao: 1) |
+| `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
+
+**Response `200 OK`**
+
+```json
+{
+  "items": [
+    {
+      "id": "UO-2026-001",
+      "nome": "Centro Tecnologico",
+      "sigla": "CT",
+      "instituicaoPaiId": "INST-2026-010",
+      "unidadeSuperiorId": null,
+      "ativa": true
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "pageSize": 20
+}
+```
+
+---
+
+#### `GET /api/v1/m008/unidades-organizacionais/{id}/sub-unidades`
+
+Lista as unidades filhas vinculadas a uma unidade superior via `unidadeSuperior`.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
+
+**Response `200 OK`**
+
+```json
+{
+  "items": [
+    {
+      "id": "UO-2026-002",
+      "nome": "Departamento de Informatica",
+      "sigla": "DI",
+      "instituicaoPaiId": null,
+      "unidadeSuperiorId": "UO-2026-001",
+      "ativa": true
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "pageSize": 20
+}
+```
+
+---
+
+### 4. Responsaveis
+
+#### `POST /api/v1/m008/responsaveis`
+
+Registra um `Responsavel` como vinculo temporal entre uma pessoa e uma `Instituicao` OU `UnidadeOrganizacional`.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Operacao de origem:** `RegistrarResponsavel`
 - **Idempotencia:** Nao
 
 **Request body**
@@ -535,6 +693,7 @@ Registra um dirigente como vinculo temporal entre uma pessoa e uma instituicao.
 {
   "pessoaId": "PES-2026-001",
   "instituicaoId": "INST-2026-010",
+  "unidadeId": null,
   "dataInicio": "2026-01-01",
   "dataFim": "2026-12-31"
 }
@@ -543,7 +702,8 @@ Registra um dirigente como vinculo temporal entre uma pessoa e uma instituicao.
 | Campo | Tipo | Obrigatorio | Descricao |
 |-------|------|-------------|-----------|
 | `pessoaId` | string | Sim | Identificador da pessoa fisica (M008) |
-| `instituicaoId` | string | Sim | Identificador da instituicao dirigida |
+| `instituicaoId` | string | Cond. | Instituicao alvo. Obrigatorio quando `unidadeId` nao informado |
+| `unidadeId` | string | Cond. | UnidadeOrganizacional alvo. Obrigatorio quando `instituicaoId` nao informado |
 | `dataInicio` | string (date) | Sim | Data de inicio do mandato |
 | `dataFim` | string (date) | Sim | Data de fim do mandato |
 
@@ -551,10 +711,11 @@ Registra um dirigente como vinculo temporal entre uma pessoa e uma instituicao.
 
 ```json
 {
-  "dirigente": {
-    "id": "DIR-2026-003",
+  "responsavel": {
+    "id": "RESP-2026-003",
     "pessoaId": "PES-2026-001",
     "instituicaoId": "INST-2026-010",
+    "unidadeId": null,
     "ativo": true,
     "dataInicio": "2026-01-01",
     "dataFim": "2026-12-31"
@@ -568,14 +729,17 @@ Registra um dirigente como vinculo temporal entre uma pessoa e uma instituicao.
 |------|--------|----------|
 | `404` | `PESSOA_NAO_ENCONTRADA` | A pessoa informada nao foi encontrada. |
 | `404` | `INSTITUICAO_NAO_ENCONTRADA` | A instituicao informada nao foi encontrada. |
-| `409` | `MANDATO_SOBREPOSTO` | Ja existe dirigente ativo na instituicao informada. |
-| `400` | `DIRIGENTE_DADOS_INVALIDOS` | Os dados do dirigente sao invalidos ou incompletos. |
+| `404` | `UNIDADE_NAO_ENCONTRADA` | A unidade organizacional informada nao foi encontrada. |
+| `422` | `ALVO_AUSENTE` | Informe instituicaoId ou unidadeId. |
+| `422` | `ALVO_AMBIGUO` | Informe apenas um entre instituicaoId e unidadeId. |
+| `409` | `MANDATO_SOBREPOSTO` | Ja existe responsavel ativo na entidade informada. |
+| `400` | `RESPONSAVEL_DADOS_INVALIDOS` | Os dados do responsavel sao invalidos ou incompletos. |
 
 ---
 
-#### `GET /api/v1/m008/dirigentes`
+#### `GET /api/v1/m008/responsaveis`
 
-Lista e filtra dirigentes cadastrados.
+Lista e filtra responsaveis cadastrados.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
 
@@ -584,8 +748,9 @@ Lista e filtra dirigentes cadastrados.
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
 | `pessoaId` | string | Filtra pelo identificador da pessoa |
-| `instituicaoId` | string | Filtra pela instituicao |
-| `ativo` | boolean | Quando `true`, retorna apenas dirigentes com mandato vigente |
+| `instituicaoId` | string | Filtra pela instituicao alvo |
+| `unidadeId` | string | Filtra pela unidade organizacional alvo |
+| `ativo` | boolean | Quando `true`, retorna apenas responsaveis com mandato vigente |
 | `page` | integer | Numero da pagina (padrao: 1) |
 | `pageSize` | integer | Itens por pagina (padrao: 20, max: 100) |
 
@@ -595,9 +760,10 @@ Lista e filtra dirigentes cadastrados.
 {
   "items": [
     {
-      "id": "DIR-2026-003",
+      "id": "RESP-2026-003",
       "pessoaId": "PES-2026-001",
       "instituicaoId": "INST-2026-010",
+      "unidadeId": null,
       "ativo": true,
       "dataInicio": "2026-01-01",
       "dataFim": "2026-12-31"
@@ -611,7 +777,7 @@ Lista e filtra dirigentes cadastrados.
 
 ---
 
-### 4. Cadastros Basicos de Referencia
+### 5. Cadastros Basicos de Referencia
 
 #### `GET /api/v1/m008/areas-conhecimento`
 
@@ -1129,9 +1295,13 @@ Cria ou vincula pessoa automaticamente a partir de evento do Acesso Cidadao.
 | `POST` | `/api/v1/m008/instituicoes` | CadastrarInstituicao | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/m008/instituicoes` | ListarInstituicoes | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `GET` | `/api/v1/m008/instituicoes/{id}` | ConsultarInstituicao | ANALISTA_AGENCIA, MODULO_INTERNO |
-| `GET` | `/api/v1/m008/instituicoes/{id}/subestruturas` | ListarSubestruturasDaInstituicao | ANALISTA_AGENCIA, MODULO_INTERNO |
-| `POST` | `/api/v1/m008/dirigentes` | RegistrarDirigente | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m008/dirigentes` | ListarDirigentes | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `GET` | `/api/v1/m008/instituicoes/{id}/sub-instituicoes` | ListarSubInstituicoes | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `GET` | `/api/v1/m008/instituicoes/{id}/unidades` | ListarUnidadesDaInstituicao | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/m008/unidades-organizacionais` | CadastrarUnidadeOrganizacional | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/m008/unidades-organizacionais` | ListarUnidadesOrganizacionais | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `GET` | `/api/v1/m008/unidades-organizacionais/{id}/sub-unidades` | ListarSubUnidades | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/m008/responsaveis` | RegistrarResponsavel | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/m008/responsaveis` | ListarResponsaveis | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `GET` | `/api/v1/m008/areas-conhecimento` | ListarAreasDeConhecimento | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `POST` | `/api/v1/m008/abrangencias-diaria` | CadastrarAbrangenciaDiaria | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m008/tipos-diaria` | CadastrarTipoDiaria | ANALISTA_AGENCIA |
@@ -1165,24 +1335,42 @@ Cria ou vincula pessoa automaticamente a partir de evento do Acesso Cidadao.
 ```json
 {
   "id": "string",
-  "cnpj": "string | null",
-  "razaoSocial": "string | null",
+  "cnpj": "string",
+  "razaoSocial": "string",
   "nome": "string",
   "sigla": "string",
-  "email": "string | null",
+  "email": "string",
+  "endereco": "string",
   "isPublica": true,
   "isExterna": true,
-  "superiorId": "string | null"
+  "instituicaoSuperiorId": "string | null"
 }
 ```
 
-### Dirigente
+### UnidadeOrganizacional
+
+```json
+{
+  "id": "string",
+  "nome": "string",
+  "sigla": "string | null",
+  "descricao": "string | null",
+  "email": "string | null",
+  "telefone": "string | null",
+  "ativa": true,
+  "instituicaoPaiId": "string | null",
+  "unidadeSuperiorId": "string | null"
+}
+```
+
+### Responsavel
 
 ```json
 {
   "id": "string",
   "pessoaId": "string",
-  "instituicaoId": "string",
+  "instituicaoId": "string | null",
+  "unidadeId": "string | null",
   "ativo": true,
   "dataInicio": "string (YYYY-MM-DD)",
   "dataFim": "string (YYYY-MM-DD)"

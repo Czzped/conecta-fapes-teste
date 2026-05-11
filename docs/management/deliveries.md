@@ -50,9 +50,9 @@ Entregas comprometidas por sprint, organizadas por mes. Atualizado ao final de c
 |---------|-----------|-------|---------|------|--------|
 | Cadastrar Instituicao | CRUD de instituicoes parceiras (universidades, empresas, orgaos publicos) | [#1749](https://github.com/leds-conectafapes/conectafapes-project/issues/1749) | Portal Admin | Implementation | ⚪ To Do |
 | Cadastrar Unidade Organizacional | Cadastro de unidades e departamentos vinculados a uma instituicao | [#1750](https://github.com/leds-conectafapes/conectafapes-project/issues/1750) | Portal Admin | Implementation | ⚪ To Do |
-| Vincular Pessoa a Instituicao/Unidade | Associar pessoas (dirigentes, tecnicos) a uma instituicao ou unidade organizacional | [#1753](https://github.com/leds-conectafapes/conectafapes-project/issues/1753) | Portal Admin | Implementation | ⚪ To Do |
+| Vincular Pessoa a Instituicao/Unidade | Associar pessoas (responsaveis, tecnicos) a uma Instituicao ou UnidadeOrganizacional | [#1753](https://github.com/leds-conectafapes/conectafapes-project/issues/1753) | Portal Admin | Implementation | ⚪ To Do |
 | Cadastrar e Gerenciar Area Tecnica | CRUD de areas tecnicas para classificacao de projetos e parcerias | [#1754](https://github.com/leds-conectafapes/conectafapes-project/issues/1754) | Portal Admin | Implementation | ⚪ To Do |
-| Cadastrar Dirigente | Registrar o dirigente responsavel por uma instituicao com cargo e periodo de mandato | [#1751](https://github.com/leds-conectafapes/conectafapes-project/issues/1751) | Portal Admin | Implementation | ⚪ To Do |
+| Cadastrar Responsavel | Registrar o Responsavel (PessoaFisica) de uma Instituicao OU UnidadeOrganizacional com periodo de mandato | [#1751](https://github.com/leds-conectafapes/conectafapes-project/issues/1751) | Portal Admin | Implementation | ⚪ To Do |
 | Listar e Consultar Instituicoes | Listagem paginada com filtros e visao detalhada de cada instituicao cadastrada | [#1752](https://github.com/leds-conectafapes/conectafapes-project/issues/1752) | Portal Admin | Implementation | ⚪ To Do |
 
 **Parcerias — Vinicius (M010)**

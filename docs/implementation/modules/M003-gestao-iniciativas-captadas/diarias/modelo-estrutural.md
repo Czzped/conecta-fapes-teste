@@ -121,17 +121,157 @@ EXPIRADO
 
 ```mermaid
 classDiagram
-    Iniciativa "1" --> "*" SolicitacaoDiaria
-    SolicitacaoDiaria "*" --> "1" AlocacaoBolsista : M009
-    SolicitacaoDiaria "*" --> "1" ParametroCalculoDiaria : M008
-    SolicitacaoDiaria "1" --> "0..*" Transacao : comprometimento/reversao
+    direction TB
+
+    class SolicitacaoDiaria {
+        +String codigo
+        +DateTime dataHoraPartida
+        +DateTime dataHoraChegada
+        +String origem
+        +String destino
+        +Integer trechoPrincipalIndice
+        +Decimal distanciaKm
+        +String provedorDistancia
+        +String origemRespostaDistancia
+        +DateTime dataHoraCalculoDistancia
+        +String parDistanciaRef
+        +Boolean deslocamentoRegiaoMetropolitana
+        +Boolean municipioLimitrofe
+        +String motivo
+        +Object abrangenciaSnapshot
+        +Decimal quantidadeDiariasCalculada
+        +Decimal valorUnitarioDiaria
+        +String regraCalculoSnapshot
+        +Object memoriaCalculoSnapshot
+        +Decimal valorTotalCalculado
+        +Object contaBancariaSnapshot
+        +EstadoAceiteDiaria estadoAceite
+        +DateTime dataAssinaturaAceite
+        +DateTime dataRecusaAceite
+        +String versaoAceite
+        +String hashAceite
+        +String justificativaCancelamento
+        +String justificativaRegularizacao
+        +String justificativaRecusa
+        +EstadoSolicitacaoDiaria estado
+    }
+
+    class RoteiroViagemSnapshot {
+        +Integer ordem
+        +String origem
+        +String destino
+        +String tipoTrecho
+        +String abrangenciaTrecho
+        +String meioTransporte
+        +Decimal distanciaKm
+        +String observacao
+    }
+
+    class EstadoSolicitacaoDiaria {
+        <<enumeration>>
+        ALOCADA
+        AGUARDANDO_ACEITES
+        APROVADA
+        CANCELADA
+        RECUSADA
+        REGULARIZADA_NAO_UTILIZADA
+        DISPONIVEL_PRESTACAO
+    }
+
+    class EstadoAceiteDiaria {
+        <<enumeration>>
+        PENDENTE
+        ASSINADO
+        RECUSADO
+        CANCELADO
+        EXPIRADO
+    }
+
+    class Iniciativa {
+        <<M003 - fora do escopo desta visao>>
+    }
+
+    class Ortogado {
+        <<M003 - fora do escopo desta visao>>
+    }
+
+    class AlocacaoBolsista {
+        <<M009 - externo>>
+    }
+
+    class Usuario {
+        <<M005 - externo>>
+    }
+
+    class Abrangencia {
+        <<M008 - externo>>
+    }
+
+    class TipoDiaria {
+        <<M008 - externo>>
+    }
+
+    class ParametroCalculoDiaria {
+        <<M008 - externo>>
+    }
+
+    class RubricaProjeto {
+        <<M013 - externo>>
+    }
+
+    class Transacao {
+        <<M013 - externo>>
+    }
+
+    SolicitacaoDiaria "1" *-- "1..*" RoteiroViagemSnapshot : roteiroViagemSnapshot
+    SolicitacaoDiaria "*" --> "1" Iniciativa : iniciativaId
+    SolicitacaoDiaria "*" --> "1" Ortogado : ortogadoId
+    SolicitacaoDiaria "*" --> "1" AlocacaoBolsista : alocacaoBolsistaRef
+    SolicitacaoDiaria "*" --> "1" Abrangencia : abrangenciaRef
+    SolicitacaoDiaria "*" --> "1" TipoDiaria : tipoDiariaRef
+    SolicitacaoDiaria "*" --> "1" ParametroCalculoDiaria : parametroCalculoDiariaRef
+    SolicitacaoDiaria "*" --> "1" RubricaProjeto : rubricaProjetoRef
+    SolicitacaoDiaria "1" --> "0..1" Transacao : transacaoComprometimentoRef
+    SolicitacaoDiaria "1" --> "0..1" Transacao : transacaoReversaoRef
+    SolicitacaoDiaria "*" --> "0..1" Usuario : usuarioAssinanteRef
+    SolicitacaoDiaria "*" --> "0..1" Usuario : usuarioRecusaRef
+    SolicitacaoDiaria "*" --> "1" EstadoSolicitacaoDiaria : estado
+    SolicitacaoDiaria "*" --> "1" EstadoAceiteDiaria : estadoAceite
 ```
 
-`alocacaoBolsistaRef` e referencia externa para M009. `tipoDiariaRef` e `parametroCalculoDiariaRef` sao referencias externas para M008. O M003 nao modela nem persiste esses cadastros como entidades proprias.
+### Tabela de Relacionamentos
+
+| Relacao | Cardinalidade | Tipo | Destino | Modulo dono | Descricao |
+|---------|----------------|------|---------|-------------|-----------|
+| `iniciativaId` | 1 | FK | `Iniciativa` | M003 | Iniciativa a qual a solicitacao pertence |
+| `ortogadoId` | 1 | FK | `Ortogado` | M003 | Coordenador/ortogado solicitante |
+| `alocacaoBolsistaRef` | 1 | FK externa | `AlocacaoBolsista` | M009 | Bolsista que recebera a diaria |
+| `abrangenciaRef` | 1 | FK externa | `Abrangencia` | M008 | Abrangencia corporativa selecionada |
+| `tipoDiariaRef` | 1 | FK externa | `TipoDiaria` | M008 | TipoDiaria vigente usado na criacao |
+| `parametroCalculoDiariaRef` | 1 | FK externa | `ParametroCalculoDiaria` | M008 | Parametros normativos vigentes |
+| `rubricaProjetoRef` | 1 | FK externa | `RubricaProjeto` | M013 | RubricaProjeto de diaria correspondente a abrangencia |
+| `transacaoComprometimentoRef` | 0..1 | FK externa | `Transacao` | M013 | Transacao de comprometimento gerada na criacao |
+| `transacaoReversaoRef` | 0..1 | FK externa | `Transacao` | M013 | Transacao de reversao em cancelamento/regularizacao |
+| `usuarioAssinanteRef` | 0..1 | FK externa | `Usuario` | M005 | Usuario que assinou o aceite |
+| `usuarioRecusaRef` | 0..1 | FK externa | `Usuario` | M005 | Usuario que recusou o aceite |
+| `roteiroViagemSnapshot` | 1..* | Composicao | `RoteiroViagemSnapshot` | M003 | Trechos da viagem (entidade-valor embarcada) |
+| `estado` | 1 | Enum | `EstadoSolicitacaoDiaria` | M003 | Estado atual da solicitacao |
+| `estadoAceite` | 1 | Enum | `EstadoAceiteDiaria` | M003 | Estado do aceite pelo bolsista |
+
+> **Donos das entidades externas:**
+> - `Iniciativa`, `Ortogado`: M003
+> - `AlocacaoBolsista`: M009
+> - `Abrangencia`, `TipoDiaria`, `ParametroCalculoDiaria`: M008 (cadastros corporativos de Diarias)
+> - `RubricaProjeto`, `Transacao`: M013 (gestao orcamentaria)
+> - `Usuario`: M005 (autenticacao)
+>
+> M003 nao modela nem persiste essas entidades — apenas referencia via FK opaca. Snapshots (`abrangenciaSnapshot`, `valorUnitarioDiaria`, `regraCalculoSnapshot`, `memoriaCalculoSnapshot`, `contaBancariaSnapshot`) preservam os dados no momento da criacao para auditoria mesmo que os cadastros mudem.
 
 ## Relacao com Rubricas
 
 Rubrica e categoria orcamentaria; transacao e movimento. Por isso, o M003 nao cria nem mantem a estrutura de rubricas. A `SolicitacaoDiaria` apenas referencia a `RubricaProjeto` aplicavel e dispara a criacao de `Transacao` quando precisa comprometer ou reverter saldo.
+
+> **Regras de saldo aplicaveis**: ver [discovery/regras-saldo-alocado-disponivel.md](../../../../discovery/regras-saldo-alocado-disponivel.md). RN-SLD01 a RN-SLD05 + RI-SLD1/2 governam `valorTotal`/`valorAlocado`/`valorConsumido`/`valorDisponivel` da rubrica de diarias. Em M013, a terminologia operacional e: `valorAprovado` (Total), `valorComprometido` (Alocado), `valorExecutado` (Consumido), `saldoDisponivel` (Disponivel). Eventos: solicitacao `APROVADA` → +Alocado; pagamento → −Alocado, +Consumido; cancelamento antes do pagamento → −Alocado, +Disponivel; estorno → −Consumido, +Disponivel.
 
 | Conceito | Dono | Papel no fluxo de diarias |
 |----------|------|---------------------------|

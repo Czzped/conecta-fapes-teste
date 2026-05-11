@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "rollover:sprint": "tsx ./scripts/rollover-sprint.ts",
     "sync:fields": "tsx ./scripts/sync-project-fields.ts",
     "test": "node --import tsx --test",
     "typecheck": "tsc --noEmit"

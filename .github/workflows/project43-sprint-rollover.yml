@@ -1,0 +1,53 @@
+name: Project 43 Sprint Rollover
+
+on:
+  schedule:
+    # Daily at 03:15 America/Sao_Paulo. The script only moves cards after
+    # a sprint has ended and a next sprint exists.
+    - cron: "15 6 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Only report cards that would be moved"
+        required: false
+        type: boolean
+        default: false
+      rollover_date:
+        description: "Override today's date as YYYY-MM-DD"
+        required: false
+        type: string
+
+jobs:
+  rollover:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/project43-automation
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: tools/project43-automation/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Move unfinished cards to next sprint
+        run: npm run rollover:sprint
+        env:
+          GITHUB_LEDS: ${{ secrets.GITHUB_LEDS }}
+          GITHUB_PAT: ${{ secrets.PROJECTS_PAT }}
+          GITHUB_APP_ID: ${{ secrets.GITHUB_APP_ID }}
+          GITHUB_APP_INSTALLATION_ID: ${{ secrets.GITHUB_APP_INSTALLATION_ID }}
+          GITHUB_APP_PRIVATE_KEY: ${{ secrets.GITHUB_APP_PRIVATE_KEY }}
+          GITHUB_PROJECT_ID: ${{ vars.GITHUB_PROJECT_ID }}
+          STATUS_FIELD_NAME: ${{ vars.STATUS_FIELD_NAME }}
+          DONE_OPTION_NAME: ${{ vars.DONE_OPTION_NAME }}
+          ITERATION_FIELD_NAME: ${{ vars.ITERATION_FIELD_NAME }}
+          SPRINT_ROLLOVER_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
+          SPRINT_ROLLOVER_DATE: ${{ inputs.rollover_date }}
