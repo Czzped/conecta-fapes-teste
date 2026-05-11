@@ -94,10 +94,10 @@ const PROJECT_ITEM_QUERY = `
 `;
 
 const PROJECT_ITEMS_QUERY = `
-  query ProjectItems($projectId: ID!, $after: String) {
+  query ProjectItems($projectId: ID!, $first: Int!, $after: String) {
     node(id: $projectId) {
       ... on ProjectV2 {
-        items(first: 100, after: $after) {
+        items(first: $first, after: $after) {
           nodes {
             id
             content {
@@ -151,6 +151,8 @@ const PROJECT_ITEMS_QUERY = `
     }
   }
 `;
+
+const SPRINT_ROLLOVER_ITEMS_PAGE_SIZE = 20;
 
 const SET_PROJECT_DATE_MUTATION = `
   mutation SetProjectDate(
@@ -517,6 +519,7 @@ export class GitHubProjectRepository {
       const data: ProjectItemsQueryResult =
         await this.client.request<ProjectItemsQueryResult>(PROJECT_ITEMS_QUERY, {
           projectId,
+          first: SPRINT_ROLLOVER_ITEMS_PAGE_SIZE,
           after,
         });
 
