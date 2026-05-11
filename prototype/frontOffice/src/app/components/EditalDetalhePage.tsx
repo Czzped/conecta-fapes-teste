@@ -92,7 +92,7 @@ export function EditalDetalhePage({ edital, onBack }: EditalDetalhePageProps) {
             style={{
               color: 'var(--primary)',
               borderRadius: 'var(--radius)',
-              backgroundColor: 'rgba(34, 211, 238, 0.1)',
+              backgroundColor: 'rgba(8, 145, 178, 0.1)',
             }}
           >
             <FileText size={20} />

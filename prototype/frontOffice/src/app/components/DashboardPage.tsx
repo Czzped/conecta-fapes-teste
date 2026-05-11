@@ -73,7 +73,7 @@ export function DashboardPage() {
                 show: false,
               },
               data: [
-                { value: 1048, name: 'Sistemas de Computação', itemStyle: { color: '#22d3ee' } },
+                { value: 1048, name: 'Sistemas de Computação', itemStyle: { color: '#0891b2' } },
                 { value: 735, name: 'Telecomunicações', itemStyle: { color: '#06b6d4' } },
                 { value: 580, name: 'Matemática Aplicada', itemStyle: { color: '#0891b2' } },
                 { value: 484, name: 'Saneamento Ambiental', itemStyle: { color: '#0e7490' } },
@@ -176,17 +176,17 @@ export function DashboardPage() {
               data: [45, 52, 38, 58, 35, 98, 85, 72, 78, 95, 115, 128],
               smooth: true,
               itemStyle: {
-                color: '#22d3ee',
+                color: '#0891b2',
               },
               areaStyle: {
                 color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                   {
                     offset: 0,
-                    color: 'rgba(34, 211, 238, 0.3)',
+                    color: 'rgba(8, 145, 178, 0.3)',
                   },
                   {
                     offset: 1,
-                    color: 'rgba(34, 211, 238, 0.0)',
+                    color: 'rgba(8, 145, 178, 0.0)',
                   },
                 ]),
               },
@@ -262,7 +262,7 @@ export function DashboardPage() {
               barWidth: '40%',
               itemStyle: {
                 color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
-                  { offset: 0, color: '#22d3ee' },
+                  { offset: 0, color: '#0891b2' },
                   { offset: 1, color: '#0891b2' },
                 ]),
                 borderRadius: [0, 8, 8, 0],
@@ -347,7 +347,7 @@ export function DashboardPage() {
               barWidth: '40%',
               itemStyle: {
                 color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
-                  { offset: 0, color: '#22d3ee' },
+                  { offset: 0, color: '#0891b2' },
                   { offset: 1, color: '#0891b2' },
                 ]),
                 borderRadius: [0, 8, 8, 0],
@@ -418,7 +418,7 @@ export function DashboardPage() {
                 show: false,
               },
               data: [
-                { value: 85, name: 'Pesquisa', itemStyle: { color: '#22d3ee' } },
+                { value: 85, name: 'Pesquisa', itemStyle: { color: '#0891b2' } },
                 { value: 78, name: 'Carreira Científica', itemStyle: { color: '#0e7490' } },
                 { value: 58, name: 'Difusão do Conhecimento', itemStyle: { color: '#155e75' } },
                 { value: 72, name: 'Inovação', itemStyle: { color: '#06b6d4' } },
@@ -535,16 +535,16 @@ export function DashboardPage() {
           <button
             className="p-2 transition-colors"
             style={{
-              backgroundColor: 'rgba(34, 211, 238, 0.1)',
+              backgroundColor: 'rgba(8, 145, 178, 0.1)',
               color: 'var(--primary)',
               borderRadius: 'var(--radius)',
               flexShrink: 0,
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.2)';
+              e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.2)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.1)';
+              e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.1)';
             }}
             aria-label="Dashboard"
           >
@@ -603,7 +603,7 @@ export function DashboardPage() {
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = 'var(--primary)';
             e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(34, 211, 238, 0.1)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(8, 145, 178, 0.1)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.borderColor = 'var(--border)';
@@ -615,7 +615,7 @@ export function DashboardPage() {
             <div
               style={{
                 padding: '0.75rem',
-                backgroundColor: 'rgba(34, 211, 238, 0.1)',
+                backgroundColor: 'rgba(8, 145, 178, 0.1)',
                 borderRadius: 'var(--radius)',
               }}
             >
@@ -657,7 +657,7 @@ export function DashboardPage() {
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = 'var(--primary)';
             e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(34, 211, 238, 0.1)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(8, 145, 178, 0.1)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.borderColor = 'var(--border)';
@@ -669,7 +669,7 @@ export function DashboardPage() {
             <div
               style={{
                 padding: '0.75rem',
-                backgroundColor: 'rgba(34, 211, 238, 0.1)',
+                backgroundColor: 'rgba(8, 145, 178, 0.1)',
                 borderRadius: 'var(--radius)',
               }}
             >
@@ -711,7 +711,7 @@ export function DashboardPage() {
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = 'var(--primary)';
             e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(34, 211, 238, 0.1)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(8, 145, 178, 0.1)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.borderColor = 'var(--border)';
@@ -723,7 +723,7 @@ export function DashboardPage() {
             <div
               style={{
                 padding: '0.75rem',
-                backgroundColor: 'rgba(34, 211, 238, 0.1)',
+                backgroundColor: 'rgba(8, 145, 178, 0.1)',
                 borderRadius: 'var(--radius)',
               }}
             >
@@ -765,7 +765,7 @@ export function DashboardPage() {
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = 'var(--primary)';
             e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(34, 211, 238, 0.1)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(8, 145, 178, 0.1)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.borderColor = 'var(--border)';
@@ -777,7 +777,7 @@ export function DashboardPage() {
             <div
               style={{
                 padding: '0.75rem',
-                backgroundColor: 'rgba(34, 211, 238, 0.1)',
+                backgroundColor: 'rgba(8, 145, 178, 0.1)',
                 borderRadius: 'var(--radius)',
               }}
             >
@@ -870,7 +870,7 @@ export function DashboardPage() {
                 }}
                 onFocus={(e) => {
                   e.currentTarget.style.borderColor = 'var(--primary)';
-                  e.currentTarget.style.boxShadow = '0 0 0 2px rgba(34, 211, 238, 0.1)';
+                  e.currentTarget.style.boxShadow = '0 0 0 2px rgba(8, 145, 178, 0.1)';
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = 'var(--border)';
@@ -900,7 +900,7 @@ export function DashboardPage() {
                       padding: '0.625rem 1rem',
                       cursor: 'pointer',
                       transition: 'background-color 0.2s',
-                      backgroundColor: cnpqLevel === 'Nível 1' ? 'rgba(34, 211, 238, 0.15)' : 'transparent',
+                      backgroundColor: cnpqLevel === 'Nível 1' ? 'rgba(8, 145, 178, 0.15)' : 'transparent',
                     }}
                     onClick={() => {
                       setCnpqLevel('Nível 1');
@@ -908,14 +908,14 @@ export function DashboardPage() {
                     }}
                     onMouseEnter={(e) => {
                       if (cnpqLevel !== 'Nível 1') {
-                        e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.08)';
+                        e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.08)';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (cnpqLevel !== 'Nível 1') {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       } else {
-                        e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.15)';
+                        e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.15)';
                       }
                     }}
                   >
@@ -935,7 +935,7 @@ export function DashboardPage() {
                       padding: '0.625rem 1rem',
                       cursor: 'pointer',
                       transition: 'background-color 0.2s',
-                      backgroundColor: cnpqLevel === 'Nível 2' ? 'rgba(34, 211, 238, 0.15)' : 'transparent',
+                      backgroundColor: cnpqLevel === 'Nível 2' ? 'rgba(8, 145, 178, 0.15)' : 'transparent',
                     }}
                     onClick={() => {
                       setCnpqLevel('Nível 2');
@@ -943,14 +943,14 @@ export function DashboardPage() {
                     }}
                     onMouseEnter={(e) => {
                       if (cnpqLevel !== 'Nível 2') {
-                        e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.08)';
+                        e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.08)';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (cnpqLevel !== 'Nível 2') {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       } else {
-                        e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.15)';
+                        e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.15)';
                       }
                     }}
                   >
@@ -970,7 +970,7 @@ export function DashboardPage() {
                       padding: '0.625rem 1rem',
                       cursor: 'pointer',
                       transition: 'background-color 0.2s',
-                      backgroundColor: cnpqLevel === 'Nível 3' ? 'rgba(34, 211, 238, 0.15)' : 'transparent',
+                      backgroundColor: cnpqLevel === 'Nível 3' ? 'rgba(8, 145, 178, 0.15)' : 'transparent',
                     }}
                     onClick={() => {
                       setCnpqLevel('Nível 3');
@@ -978,14 +978,14 @@ export function DashboardPage() {
                     }}
                     onMouseEnter={(e) => {
                       if (cnpqLevel !== 'Nível 3') {
-                        e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.08)';
+                        e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.08)';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (cnpqLevel !== 'Nível 3') {
                         e.currentTarget.style.backgroundColor = 'transparent';
                       } else {
-                        e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.15)';
+                        e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.15)';
                       }
                     }}
                   >

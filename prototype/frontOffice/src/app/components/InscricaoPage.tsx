@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import {
   ChevronLeft, FileText, User, Users, Receipt, CalendarDays, Eye,
-  Plus, CheckCircle2,
+  Plus, CheckCircle2, Moon,
 } from 'lucide-react';
 import fapesLogo from 'figma:asset/aec6ed8eb7cf2782d52002e0d4c19150c79afd78.png';
 import { editais } from '../data/editais';
+import { AccessibilityModal } from './AccessibilityModal';
 
 interface InscricaoPageProps {
   editalId: number;
@@ -20,7 +21,7 @@ const CONTAINER: React.CSSProperties = {
 };
 
 // ── shared style helpers ──
-const PAGE_BG = '#071f2e';
+const PAGE_BG = 'var(--background)';
 const CARD_BG = 'rgba(255,255,255,0.03)';
 const CARD_BORDER = '1px solid rgba(6,182,212,0.14)';
 const SECTION_HEAD_BG = 'rgba(6,182,212,0.06)';
@@ -32,10 +33,10 @@ const INPUT_BG_FOCUS = 'rgba(6,182,212,0.07)';
 const RADIUS = 'var(--radius)';
 const RADIUS_LG = 'var(--radius-lg)';
 const FF = 'var(--font-family)';
-const CLR_FG = '#f0f9ff';
-const CLR_MUTED = 'rgba(186,230,253,0.55)';
-const CLR_LABEL = 'rgba(186,230,253,0.65)';
-const CLR_TEAL = '#22d3ee';
+const CLR_FG = 'var(--foreground)';
+const CLR_MUTED = 'var(--muted-foreground)';
+const CLR_LABEL = 'var(--muted-foreground)';
+const CLR_TEAL = '#0891b2';
 const CLR_TEAL_MID = '#06b6d4';
 
 const inputBase: React.CSSProperties = {
@@ -290,6 +291,7 @@ interface Atividade { descricao: string; inicio: string; conclusao: string; }
 
 export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps) {
   const edital = editais.find(e => e.id === editalId) ?? editais[0];
+  const [showAccessibility, setShowAccessibility] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   // Dados Gerais
@@ -323,14 +325,26 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
   if (submitted) {
     return (
       <div className="min-h-screen flex flex-col" style={{ backgroundColor: PAGE_BG, color: CLR_FG, fontFamily: FF }}>
-        <header className="sticky top-0 z-50" style={{ backgroundColor: 'rgba(7,31,46,0.92)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(6,182,212,0.15)' }}>
+        <header className="sticky top-0 z-50" style={{ backgroundColor: 'var(--app-header)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid var(--app-header-border)' }}>
           <div style={{ ...CONTAINER, height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <img src={fapesLogo} alt="FAPES" style={{ height: '36px', objectFit: 'contain' }} />
-            <button onClick={onLogin} style={{ padding: '0.45rem 1.1rem', borderRadius: '9999px', border: 'none', backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: FF }}>
-              Entrar com Acesso Cidadão
-            </button>
+            <div className="flex items-center gap-3">
+              <button onClick={onLogin} style={{ padding: '0.45rem 1.1rem', borderRadius: '9999px', border: '1px solid #0891b2', backgroundColor: 'transparent', color: '#0891b2', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: FF }}>
+                Entrar com Acesso Cidadão
+              </button>
+              <button
+                onClick={() => setShowAccessibility(true)}
+                aria-label="Acessibilidade"
+                style={{ padding: '0.5rem', borderRadius: 'var(--radius)', border: 'none', backgroundColor: 'transparent', color: 'var(--foreground)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s' }}
+                onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--muted)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.transform = 'translateY(0)'; }}
+              >
+                <Moon size={18} />
+              </button>
+            </div>
           </div>
         </header>
+        <AccessibilityModal isOpen={showAccessibility} onClose={() => setShowAccessibility(false)} />
         <div className="flex-1 flex flex-col items-center justify-center" style={{ padding: '4rem 1.5rem', textAlign: 'center' }}>
           <div style={{ width: '72px', height: '72px', borderRadius: '50%', backgroundColor: 'rgba(6,182,212,0.15)', border: '2px solid rgba(6,182,212,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
             <CheckCircle2 size={36} style={{ color: CLR_TEAL }} />
@@ -353,18 +367,30 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
       {/* ── HEADER ── */}
       <header
         className="sticky top-0 z-50"
-        style={{ backgroundColor: 'rgba(7,31,46,0.92)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(6,182,212,0.15)' }}
+        style={{ backgroundColor: 'var(--app-header)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid var(--app-header-border)' }}
       >
         <div style={{ ...CONTAINER, height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <img src={fapesLogo} alt="FAPES" style={{ height: '36px', objectFit: 'contain' }} />
-          <button
-            onClick={onLogin}
-            style={{ padding: '0.45rem 1.1rem', borderRadius: '9999px', border: 'none', backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: FF }}
-          >
-            Entrar com Acesso Cidadão
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onLogin}
+              style={{ padding: '0.45rem 1.1rem', borderRadius: '9999px', border: '1px solid #0891b2', backgroundColor: 'transparent', color: '#0891b2', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: FF }}
+            >
+              Entrar com Acesso Cidadão
+            </button>
+            <button
+              onClick={() => setShowAccessibility(true)}
+              aria-label="Acessibilidade"
+              style={{ padding: '0.5rem', borderRadius: 'var(--radius)', border: 'none', backgroundColor: 'transparent', color: 'var(--foreground)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s' }}
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--muted)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.transform = 'translateY(0)'; }}
+            >
+              <Moon size={18} />
+            </button>
+          </div>
         </div>
       </header>
+      <AccessibilityModal isOpen={showAccessibility} onClose={() => setShowAccessibility(false)} />
 
       {/* ── PAGE TITLE BAR ── */}
       <div>
@@ -680,7 +706,7 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
           left: 0,
           right: 0,
           zIndex: 40,
-          backgroundColor: 'rgba(7,31,46,0.97)',
+          backgroundColor: 'var(--app-header)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
           borderTop: '1px solid rgba(6,182,212,0.2)',
@@ -722,7 +748,7 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
               borderRadius: RADIUS,
               border: 'none',
               backgroundColor: CLR_TEAL_MID,
-              color: 'rgba(7,31,46,1)',
+              color: '#0a0a0a',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-semibold)',
               cursor: 'pointer',

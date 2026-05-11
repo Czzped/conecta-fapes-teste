@@ -52,16 +52,16 @@ export function ProjectDetailsPage({ projectName = 'Projeto Selecionado', onBack
           <button
             className="p-2 transition-colors"
             style={{
-              backgroundColor: 'rgba(34, 211, 238, 0.1)',
+              backgroundColor: 'rgba(8, 145, 178, 0.1)',
               color: 'var(--primary)',
               borderRadius: 'var(--radius)',
               flexShrink: 0,
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.2)';
+              e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.2)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.1)';
+              e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.1)';
             }}
             aria-label="Detalhes do Projeto"
           >

@@ -50,7 +50,7 @@
   /* The color for another chart element, such as a bar or line in a chart. */
   --chart-2: #0891b2;
   /* The color for another chart element, such as a bar or line in a chart. */
-  --chart-3: #22d3ee;
+  --chart-3: #0891b2;
   /* The color for another chart element, such as a bar or line in a chart. */
   --chart-4: #67e8f9;
   /* The color for another chart element, such as a bar or line in a chart. */
@@ -63,10 +63,10 @@
   --radius-lg: 8px;
   --sidebar: var(--background);
   --sidebar-foreground: var(--color-neutral-800);
-  /* Item ATIVO usa cyan da marca; HOVER fica em neutral-100 */
+  /* Item ATIVO usa fundo neutral mais escuro que o canvas; texto/icone seguem cyan */
   --sidebar-primary: #00c1af;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f0fdfa;
+  --sidebar-accent: var(--color-neutral-200);
   --sidebar-accent-foreground: #00c1af;
   --sidebar-border: var(--color-neutral-200);
   --sidebar-ring: #0891b2;
@@ -90,7 +90,7 @@
   /* The default color for text or elements that appear on top of dropdowns and tooltips. */
   --popover-foreground: rgba(255, 255, 255, 1.00);
   /* The primary color used for buttons, links, and other interactive elements. */
-  --primary: #22d3ee;
+  --primary: #0891b2;
   /* The default color for text or elements that appear on top of primary colored elements. */
   --primary-foreground: rgba(23, 23, 23, 1.00);
   /* The secondary color used for secondary(but NOT-DESTRUCTIVE) buttons and interactive elements. */
@@ -102,7 +102,7 @@
   /* The default color for text or elements that appear on top of muted colored elements. */
   --muted-foreground: rgba(163, 163, 163, 1.00);
   /* The accent color used for highlights, links, and other interactive elements. */
-  --accent: #22d3ee;
+  --accent: #0891b2;
   /* The default color for text or elements that appear on top of accent colored elements. */
   --accent-foreground: rgba(23, 23, 23, 1.00);
   /* The color used for background in destructive actions, such as delete buttons or error messages. */
@@ -116,7 +116,7 @@
   /* The default background color for input fields, text areas, and other input elements. */
   --input-background: rgba(23, 23, 23, 0.82);
   /* The color for focus rings, outlines, and other focus indicators. */
-  --ring: #22d3ee;
+  --ring: #0891b2;
   /* Shadow for small elevations, such as cards or modals. */
   --elevation-sm: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
   /* The background color for sidebars, navigation menus, and other persistent elements. */
@@ -134,7 +134,7 @@
   /* The default border color for elements in sidebars and navigation menus. */
   --sidebar-border: rgba(255, 255, 255, 0.1);
   /* The default color for focus rings, outlines, and other focus indicators in sidebars and navigation menus. */
-  --sidebar-ring: #22d3ee;
+  --sidebar-ring: #0891b2;
   --app-header: #171717;
   --app-header-border: rgba(255, 255, 255, 0.1);
 }
@@ -593,12 +593,12 @@ select:focus {
 }
 
 .dark select option:hover {
-  background-color: rgba(34, 211, 238, 0.1);
+  background-color: rgba(8, 145, 178, 0.1);
 }
 
 .dark select option:checked {
-  background-color: rgba(34, 211, 238, 0.2);
-  color: #22d3ee;
+  background-color: rgba(8, 145, 178, 0.2);
+  color: #0891b2;
   font-weight: 500;
 }
 

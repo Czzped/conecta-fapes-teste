@@ -12,6 +12,7 @@ interface MyProjectsPageProps {
 export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: MyProjectsPageProps) {
   const { t } = useLanguage();
   const [isWorkPlanExpanded, setIsWorkPlanExpanded] = useState(false);
+  const timelineActiveColor = '#0891b2';
 
   const projectStages = [
     { id: 1, label: 'Submissão', phase: 'Pre-award', source: 'M011', date: '15/01/2024', icon: Send, status: 'completed' },
@@ -217,7 +218,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
               <div 
                 className="absolute top-6 h-0.5 transition-all duration-500"
                 style={{ 
-                  backgroundColor: 'var(--primary)',
+                  backgroundColor: timelineActiveColor,
                   left: `calc(100% / ${projectStages.length * 2})`,
                   width: `calc((${((projectStages.findIndex(s => s.status === 'current') + 1) / projectStages.length) * 100}% - (100% / ${projectStages.length})))`,
                 }}
@@ -241,10 +242,10 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                           height: '48px',
                           borderRadius: '50%',
                           backgroundColor: isCompleted || isCurrent 
-                            ? 'var(--primary)' 
+                            ? timelineActiveColor 
                             : 'var(--muted)',
-                          border: isCurrent ? '3px solid var(--primary)' : 'none',
-                          boxShadow: isCurrent ? '0 0 0 4px color-mix(in srgb, var(--primary) 20%, transparent)' : 'none',
+                          border: isCurrent ? `3px solid ${timelineActiveColor}` : 'none',
+                          boxShadow: isCurrent ? `0 0 0 4px color-mix(in srgb, ${timelineActiveColor} 20%, transparent)` : 'none',
                         }}
                       >
                         <Icon 
@@ -316,7 +317,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
               <div 
                 className="absolute left-6 top-0 w-0.5 transition-all duration-500"
                 style={{ 
-                  backgroundColor: 'var(--primary)',
+                  backgroundColor: timelineActiveColor,
                   height: `calc(${((projectStages.findIndex(s => s.status === 'current') + 1) / projectStages.length) * 100}% - 24px)`,
                 }}
               />
@@ -339,10 +340,10 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                           height: '48px',
                           borderRadius: '50%',
                           backgroundColor: isCompleted || isCurrent 
-                            ? 'var(--primary)' 
+                            ? timelineActiveColor 
                             : 'var(--muted)',
-                          border: isCurrent ? '3px solid var(--primary)' : 'none',
-                          boxShadow: isCurrent ? '0 0 0 4px color-mix(in srgb, var(--primary) 20%, transparent)' : 'none',
+                          border: isCurrent ? `3px solid ${timelineActiveColor}` : 'none',
+                          boxShadow: isCurrent ? `0 0 0 4px color-mix(in srgb, ${timelineActiveColor} 20%, transparent)` : 'none',
                         }}
                       >
                         <Icon 

@@ -62,7 +62,7 @@ export function BolsaCard({ modalidade, valor, cotasDisponiveis, cotasDesejadas,
               }}
               disabled={cotasDesejadas === 0}
             >
-              <Minus size={16} style={{ color: cotasDesejadas === 0 ? 'var(--muted-foreground)' : '#22d3ee' }} />
+              <Minus size={16} style={{ color: cotasDesejadas === 0 ? 'var(--muted-foreground)' : '#0891b2' }} />
             </button>
             <div 
               style={{ 
@@ -87,7 +87,7 @@ export function BolsaCard({ modalidade, valor, cotasDisponiveis, cotasDesejadas,
                 justifyContent: 'center',
               }}
             >
-              <Plus size={16} style={{ color: '#22d3ee' }} />
+              <Plus size={16} style={{ color: '#0891b2' }} />
             </button>
           </div>
         </div>

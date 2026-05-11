@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
-import { Search, Calendar, ArrowRight } from 'lucide-react';
+import { Search, Calendar, ArrowRight, Moon } from 'lucide-react';
 import fapesLogo from 'figma:asset/aec6ed8eb7cf2782d52002e0d4c19150c79afd78.png';
+import { AccessibilityModal } from './AccessibilityModal';
 
 interface CidadaoHomePageProps {
   onLogin?: () => void;
@@ -77,12 +78,12 @@ const editais = [
 ];
 
 const areaColors: Record<string, { bg: string; color: string }> = {
-  'Carreira Científica':     { bg: 'rgba(203,213,225,0.12)', color: '#cbd5e1' },
-  'Pesquisa':                { bg: 'rgba(203,213,225,0.12)', color: '#cbd5e1' },
-  'Extensão':                { bg: 'rgba(203,213,225,0.12)', color: '#cbd5e1' },
-  'Internacional':           { bg: 'rgba(203,213,225,0.12)', color: '#cbd5e1' },
-  'Difusão do Conhecimento': { bg: 'rgba(203,213,225,0.12)', color: '#cbd5e1' },
-  'Inovação':                { bg: 'rgba(203,213,225,0.12)', color: '#cbd5e1' },
+  'Carreira Científica':     { bg: 'var(--muted)', color: 'var(--muted-foreground)' },
+  'Pesquisa':                { bg: 'var(--muted)', color: 'var(--muted-foreground)' },
+  'Extensão':                { bg: 'var(--muted)', color: 'var(--muted-foreground)' },
+  'Internacional':           { bg: 'var(--muted)', color: 'var(--muted-foreground)' },
+  'Difusão do Conhecimento': { bg: 'var(--muted)', color: 'var(--muted-foreground)' },
+  'Inovação':                { bg: 'var(--muted)', color: 'var(--muted-foreground)' },
 };
 
 /* Shared max-width + horizontal padding — matches across all sections */
@@ -96,6 +97,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArea, setSelectedArea] = useState('Todas');
   const [selectedTab, setSelectedTab] = useState('Aberto');
+  const [showAccessibility, setShowAccessibility] = useState(false);
 
   const oportunidadesRef = useRef<HTMLElement>(null);
 
@@ -118,13 +120,13 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
   });
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#083344', color: '#f0f9ff' }}>
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)' }}>
 
       {/* ── HEADER ── */}
       <header
         className="sticky top-0 z-50"
         style={{
-          backgroundColor: 'rgba(15,23,42,0.8)',
+          backgroundColor: 'var(--app-header)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           borderBottom: '1px solid var(--border)',
@@ -151,29 +153,50 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
               style={{
                 padding: '0.45rem 1.1rem',
                 borderRadius: '9999px',
-                border: 'none',
-                backgroundColor: 'var(--primary)',
-                color: 'var(--primary-foreground)',
+                border: '1px solid #0891b2',
+                backgroundColor: 'transparent',
+                color: '#0891b2',
                 fontSize: 'var(--text-sm)',
                 fontWeight: 'var(--font-weight-medium)',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
                 fontFamily: 'var(--font-family)',
               }}
-              onMouseEnter={e => { e.currentTarget.style.opacity = '0.85'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-              onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)'; }}
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(8,145,178,0.12)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
               Entrar com Acesso Cidadão
+            </button>
+            <button
+              onClick={() => setShowAccessibility(true)}
+              aria-label="Acessibilidade"
+              style={{
+                padding: '0.5rem',
+                borderRadius: 'var(--radius)',
+                border: 'none',
+                backgroundColor: 'transparent',
+                color: 'var(--foreground)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--muted)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.transform = 'translateY(0)'; }}
+            >
+              <Moon size={18} />
             </button>
           </div>
         </div>
       </header>
+      <AccessibilityModal isOpen={showAccessibility} onClose={() => setShowAccessibility(false)} />
 
       {/* ── HERO SECTION ── */}
       <section
         className="relative overflow-hidden"
         style={{
-          backgroundColor: '#071f2e',
+          backgroundColor: 'var(--background)',
           padding: '6rem 0 5rem',
           minHeight: '520px',
           display: 'flex',
@@ -181,10 +204,10 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
         }}
       >
         {/* Background glow blobs */}
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 70% 80% at 80% 40%, rgba(6,100,140,0.55) 0%, transparent 70%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 40% 50% at 90% 20%, rgba(6,182,212,0.18) 0%, transparent 65%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 30% 40% at 5% 80%, rgba(6,182,212,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '120px', background: 'linear-gradient(to bottom, transparent, rgba(15,23,42,0.8))', pointerEvents: 'none', zIndex: 5 }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, color-mix(in srgb, var(--card) 92%, transparent) 0%, color-mix(in srgb, var(--background) 98%, transparent) 68%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 44% 56% at 88% 24%, rgba(8,145,178,0.16) 0%, transparent 68%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 36% 42% at 6% 78%, rgba(8,145,178,0.08) 0%, transparent 72%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '120px', background: 'linear-gradient(to bottom, transparent, var(--background))', pointerEvents: 'none', zIndex: 5 }} />
 
         <div style={{ ...CONTAINER, width: '100%', position: 'relative', zIndex: 10 }}>
           {/* Badge */}
@@ -198,7 +221,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
               marginBottom: '2rem',
             }}
           >
-            <span style={{ color: '#22d3ee', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '0.08em', fontFamily: 'var(--font-family)' }}>
+            <span style={{ color: '#0891b2', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '0.08em', fontFamily: 'var(--font-family)' }}>
               TRANSPARÊNCIA &amp; CIÊNCIA
             </span>
           </div>
@@ -208,7 +231,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
             style={{
               fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
               fontWeight: 'var(--font-weight-bold)',
-              color: '#ffffff',
+              color: 'var(--foreground)',
               lineHeight: 1.1,
               marginBottom: '1.5rem',
               maxWidth: '700px',
@@ -216,14 +239,14 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
             }}
           >
             Simplicidade no acesso a{' '}
-            <span style={{ color: '#22d3ee' }}>Editais</span>.
+            <span style={{ color: '#0891b2' }}>Editais</span>.
           </h1>
 
           {/* Subtitle */}
           <p
             style={{
               fontSize: 'var(--text-base)',
-              color: 'rgba(203,213,225,0.85)',
+              color: 'var(--muted-foreground)',
               maxWidth: '640px',
               lineHeight: 1.7,
               marginBottom: '2.5rem',
@@ -242,9 +265,9 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                 borderRadius: 'var(--radius)',
                 border: 'none',
                 backgroundColor: '#06b6d4',
-                color: 'rgba(15,23,42,1)',
+                color: '#0a0a0a',
                 fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-semibold)',
+                fontWeight: 'var(--font-weight-medium)',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
                 fontFamily: 'var(--font-family)',
@@ -259,7 +282,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
       </section>
 
       {/* ── OPORTUNIDADES SECTION ── */}
-      <section ref={oportunidadesRef} style={{ padding: '4rem 0 5rem', backgroundColor: 'rgba(15,23,42,0.8)' }}>
+      <section ref={oportunidadesRef} style={{ padding: '4rem 0 5rem', backgroundColor: 'var(--background)' }}>
         <div style={{ ...CONTAINER }}>
 
           {/* Section header */}
@@ -268,14 +291,14 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
               style={{
                 fontSize: 'var(--text-2xl)',
                 fontWeight: 'var(--font-weight-semibold)',
-                color: '#f0f9ff',
+                color: 'var(--foreground)',
                 marginBottom: '0.375rem',
                 fontFamily: 'var(--font-family)',
               }}
             >
               Oportunidades
             </h2>
-            <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(186,230,253,0.7)', fontFamily: 'var(--font-family)' }}>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', fontFamily: 'var(--font-family)' }}>
               Explore os editais disponíveis.
             </p>
           </div>
@@ -287,14 +310,14 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
             <div
               className="flex items-center gap-2"
               style={{
-                backgroundColor: 'rgba(6,182,212,0.08)',
+                backgroundColor: 'var(--input-background)',
                 border: '1px solid rgba(6,182,212,0.22)',
                 borderRadius: 'var(--radius)',
                 padding: '0 1.125rem',
                 maxWidth: '360px',
               }}
             >
-              <Search size={18} style={{ color: 'rgba(186,230,253,0.6)', flexShrink: 0 }} />
+              <Search size={18} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
               <input
                 type="text"
                 placeholder="Buscar por edital ou palavra-chave"
@@ -305,7 +328,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                   border: 'none',
                   outline: 'none',
                   backgroundColor: 'transparent',
-                  color: '#f0f9ff',
+                  color: 'var(--foreground)',
                   fontSize: 'var(--text-sm)',
                   padding: '0.5rem 0',
                   fontFamily: 'var(--font-family)',
@@ -323,9 +346,9 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                     padding: '0.5rem 1rem',
                     borderRadius: '9999px',
                     border: '1px solid',
-                    borderColor: selectedArea === area ? '#22d3ee' : 'rgba(6,182,212,0.25)',
+                    borderColor: selectedArea === area ? '#0891b2' : 'rgba(6,182,212,0.25)',
                     backgroundColor: selectedArea === area ? 'rgba(6,182,212,0.25)' : 'rgba(6,182,212,0.08)',
-                    color: selectedArea === area ? '#22d3ee' : 'rgba(186,230,253,0.7)',
+                    color: selectedArea === area ? '#0891b2' : 'var(--muted-foreground)',
                     fontSize: 'var(--text-xs)',
                     fontWeight: 'var(--font-weight-medium)',
                     cursor: 'pointer',
@@ -360,7 +383,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                       backgroundColor: 'transparent',
                       border: 'none',
                       cursor: 'pointer',
-                      color: isActive ? '#22d3ee' : 'rgba(186,230,253,0.55)',
+                      color: isActive ? '#0891b2' : 'var(--muted-foreground)',
                       fontSize: 'var(--text-sm)',
                       fontWeight: isActive ? 'var(--font-weight-semibold)' : 'var(--font-weight-medium)',
                       fontFamily: 'var(--font-family)',
@@ -368,8 +391,8 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                       outline: 'none',
                       whiteSpace: 'nowrap',
                     }}
-                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = 'rgba(186,230,253,0.9)'; }}
-                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = 'rgba(186,230,253,0.55)'; }}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = 'var(--foreground)'; }}
+                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = 'var(--muted-foreground)'; }}
                   >
                     {tab}
                     {isActive && (
@@ -380,7 +403,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                           left: 0,
                           right: 0,
                           height: '2px',
-                          backgroundColor: '#22d3ee',
+                          backgroundColor: '#0891b2',
                           borderRadius: '2px 2px 0 0',
                         }}
                       />
@@ -394,7 +417,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
           {/* Editais Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filtered.map(edital => {
-              const areaColor = areaColors[edital.area] ?? { bg: 'rgba(6,182,212,0.12)', color: '#22d3ee' };
+              const areaColor = areaColors[edital.area] ?? { bg: 'rgba(6,182,212,0.12)', color: '#0891b2' };
               return (
                 <div
                   key={edital.id}
@@ -410,7 +433,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                     cursor: 'pointer',
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = 'rgba(34,211,238,0.45)';
+                    e.currentTarget.style.borderColor = 'rgba(8, 145, 178,0.45)';
                     e.currentTarget.style.transform = 'translateY(-2px)';
                     e.currentTarget.style.boxShadow = '0 8px 24px rgba(6,182,212,0.1)';
                     e.currentTarget.style.backgroundColor = 'rgba(6,182,212,0.1)';
@@ -457,7 +480,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                     style={{
                       fontSize: 'var(--text-base)',
                       fontWeight: 'var(--font-weight-semibold)',
-                      color: '#f0f9ff',
+                      color: 'var(--foreground)',
                       lineHeight: 1.4,
                       fontFamily: 'var(--font-family)',
                     }}
@@ -469,7 +492,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                   <p
                     style={{
                       fontSize: 'var(--text-sm)',
-                      color: 'rgba(186,230,253,0.7)',
+                      color: 'var(--muted-foreground)',
                       lineHeight: 1.6,
                       flex: 1,
                       fontFamily: 'var(--font-family)',
@@ -489,22 +512,22 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                     }}
                   >
                     <div>
-                      <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(186,230,253,0.6)', marginBottom: '0.25rem', fontFamily: 'var(--font-family)' }}>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)', marginBottom: '0.25rem', fontFamily: 'var(--font-family)' }}>
                         Inscrição até
                       </div>
                       <div
                         className="flex items-center gap-1"
-                        style={{ fontSize: 'var(--text-sm)', color: '#f0f9ff', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}
+                        style={{ fontSize: 'var(--text-sm)', color: 'var(--foreground)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}
                       >
-                        <Calendar size={13} style={{ color: 'rgba(186,230,253,0.6)' }} />
+                        <Calendar size={13} style={{ color: 'var(--muted-foreground)' }} />
                         {edital.prazo}
                       </div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(186,230,253,0.6)', marginBottom: '0.25rem', fontFamily: 'var(--font-family)' }}>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)', marginBottom: '0.25rem', fontFamily: 'var(--font-family)' }}>
                         Valor total
                       </div>
-                      <div style={{ fontSize: 'var(--text-sm)', color: '#f0f9ff', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
+                      <div style={{ fontSize: 'var(--text-sm)', color: 'var(--foreground)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
                         {edital.valor}
                       </div>
                     </div>
@@ -522,7 +545,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                       borderRadius: 'var(--radius)',
                       border: '1px solid rgba(6,182,212,0.35)',
                       backgroundColor: 'rgba(6,182,212,0.12)',
-                      color: '#22d3ee',
+                      color: '#0891b2',
                       fontSize: 'var(--text-sm)',
                       fontWeight: 'var(--font-weight-medium)',
                       cursor: 'pointer',
@@ -544,7 +567,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
           {filtered.length === 0 && (
             <div
               className="flex flex-col items-center justify-center py-16 gap-3"
-              style={{ color: 'rgba(186,230,253,0.6)' }}
+              style={{ color: 'var(--muted-foreground)' }}
             >
               <Search size={40} style={{ opacity: 0.4 }} />
               <p style={{ fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>

@@ -1,7 +1,9 @@
-import { ChevronLeft, Calendar, Users, DollarSign, FileText, ExternalLink } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronLeft, Calendar, Users, DollarSign, FileText, ExternalLink, Moon } from 'lucide-react';
 import fapesLogo from 'figma:asset/aec6ed8eb7cf2782d52002e0d4c19150c79afd78.png';
 import editalImg from 'figma:asset/87cbb34a404391c3629605e4569ee0dab2b3e31f.png';
 import { editais } from '../data/editais';
+import { AccessibilityModal } from './AccessibilityModal';
 
 interface EditalDetailPageProps {
   editalId: number;
@@ -17,28 +19,29 @@ const CONTAINER: React.CSSProperties = {
 };
 
 const areaColors: Record<string, { bg: string; color: string }> = {
-  'Carreira Científica':     { bg: 'rgba(34,211,238,0.12)', color: '#22d3ee' },
-  'Pesquisa':                { bg: 'rgba(34,211,238,0.12)', color: '#22d3ee' },
-  'Extensão':                { bg: 'rgba(34,211,238,0.12)', color: '#22d3ee' },
-  'Internacional':           { bg: 'rgba(34,211,238,0.12)', color: '#22d3ee' },
-  'Difusão do Conhecimento': { bg: 'rgba(34,211,238,0.12)', color: '#22d3ee' },
-  'Inovação':                { bg: 'rgba(34,211,238,0.12)', color: '#22d3ee' },
+  'Carreira Científica':     { bg: 'rgba(8, 145, 178,0.12)', color: '#0891b2' },
+  'Pesquisa':                { bg: 'rgba(8, 145, 178,0.12)', color: '#0891b2' },
+  'Extensão':                { bg: 'rgba(8, 145, 178,0.12)', color: '#0891b2' },
+  'Internacional':           { bg: 'rgba(8, 145, 178,0.12)', color: '#0891b2' },
+  'Difusão do Conhecimento': { bg: 'rgba(8, 145, 178,0.12)', color: '#0891b2' },
+  'Inovação':                { bg: 'rgba(8, 145, 178,0.12)', color: '#0891b2' },
 };
 
 export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: EditalDetailPageProps) {
+  const [showAccessibility, setShowAccessibility] = useState(false);
   const edital = editais.find(e => e.id === editalId) ?? editais[0];
-  const areaColor = areaColors[edital.area] ?? { bg: 'rgba(34,211,238,0.12)', color: '#22d3ee' };
+  const areaColor = areaColors[edital.area] ?? { bg: 'rgba(8, 145, 178,0.12)', color: '#0891b2' };
 
   return (
     <div
       className="min-h-screen"
-      style={{ backgroundColor: '#071f2e', color: '#f0f9ff', fontFamily: 'var(--font-family)' }}
+      style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)', fontFamily: 'var(--font-family)' }}
     >
       {/* ── HEADER ── */}
       <header
         className="sticky top-0 z-50"
         style={{
-          backgroundColor: 'rgba(7,31,46,0.92)',
+          backgroundColor: 'var(--app-header)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           borderBottom: '1px solid rgba(6,182,212,0.15)',
@@ -54,27 +57,50 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
           }}
         >
           <img src={fapesLogo} alt="FAPES" style={{ height: '36px', objectFit: 'contain' }} />
-          <button
-            onClick={onLogin}
-            style={{
-              padding: '0.45rem 1.1rem',
-              borderRadius: '9999px',
-              border: 'none',
-              backgroundColor: 'var(--primary)',
-              color: 'var(--primary-foreground)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-medium)',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontFamily: 'var(--font-family)',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.opacity = '0.85'; }}
-            onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
-          >
-            Entrar com Acesso Cidadão
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onLogin}
+              style={{
+                padding: '0.45rem 1.1rem',
+                borderRadius: '9999px',
+                border: '1px solid #0891b2',
+                backgroundColor: 'transparent',
+                color: '#0891b2',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                fontFamily: 'var(--font-family)',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(8,145,178,0.12)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.transform = 'translateY(0)'; }}
+            >
+              Entrar com Acesso Cidadão
+            </button>
+            <button
+              onClick={() => setShowAccessibility(true)}
+              aria-label="Acessibilidade"
+              style={{
+                padding: '0.5rem',
+                borderRadius: 'var(--radius)',
+                border: 'none',
+                backgroundColor: 'transparent',
+                color: 'var(--foreground)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--muted)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.transform = 'translateY(0)'; }}
+            >
+              <Moon size={18} />
+            </button>
+          </div>
         </div>
       </header>
+      <AccessibilityModal isOpen={showAccessibility} onClose={() => setShowAccessibility(false)} />
 
       {/* ── BREADCRUMB / BACK ── */}
       <div style={{ ...CONTAINER, paddingTop: '1.75rem', paddingBottom: '0.5rem' }}>
@@ -85,14 +111,14 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            color: 'rgba(186,230,253,0.65)',
+            color: 'var(--muted-foreground)',
             fontSize: 'var(--text-sm)',
             fontFamily: 'var(--font-family)',
             padding: 0,
             transition: 'color 0.2s',
           }}
-          onMouseEnter={e => { e.currentTarget.style.color = '#22d3ee'; }}
-          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(186,230,253,0.65)'; }}
+          onMouseEnter={e => { e.currentTarget.style.color = '#0891b2'; }}
+          onMouseLeave={e => { e.currentTarget.style.color = 'var(--muted-foreground)'; }}
         >
           <ChevronLeft size={16} />
           Voltar para Oportunidades
@@ -148,7 +174,7 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
                 <span
                   style={{
                     fontSize: 'var(--text-xs)',
-                    color: 'rgba(186,230,253,0.5)',
+                    color: 'var(--muted-foreground)',
                     fontFamily: 'var(--font-family)',
                   }}
                 >
@@ -160,7 +186,7 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
               style={{
                 fontSize: 'var(--text-2xl)',
                 fontWeight: 'var(--font-weight-semibold)',
-                color: '#f0f9ff',
+                color: 'var(--foreground)',
                 lineHeight: 1.3,
                 fontFamily: 'var(--font-family)',
                 marginBottom: '0.5rem',
@@ -171,7 +197,7 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
             <p
               style={{
                 fontSize: 'var(--text-sm)',
-                color: 'rgba(186,230,253,0.7)',
+                color: 'var(--muted-foreground)',
                 lineHeight: 1.6,
                 fontFamily: 'var(--font-family)',
               }}
@@ -195,12 +221,12 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
               { icon: <DollarSign size={15} />, label: 'Valor total', value: edital.valor },
             ].map(item => (
               <div key={item.label} className="flex items-center gap-2">
-                <span style={{ color: 'rgba(186,230,253,0.45)' }}>{item.icon}</span>
+                <span style={{ color: 'var(--muted-foreground)' }}>{item.icon}</span>
                 <div>
-                  <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(186,230,253,0.5)', fontFamily: 'var(--font-family)', lineHeight: 1 }}>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)', fontFamily: 'var(--font-family)', lineHeight: 1 }}>
                     {item.label}
                   </div>
-                  <div style={{ fontSize: 'var(--text-sm)', color: '#f0f9ff', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
+                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--foreground)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
                     {item.value}
                   </div>
                 </div>
@@ -211,8 +237,8 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
 
         {/* Document viewer label */}
         <div className="flex items-center gap-2" style={{ marginBottom: '1rem' }}>
-          <FileText size={16} style={{ color: 'rgba(186,230,253,0.5)' }} />
-          <span style={{ fontSize: 'var(--text-sm)', color: 'rgba(186,230,253,0.55)', fontFamily: 'var(--font-family)' }}>
+          <FileText size={16} style={{ color: 'var(--muted-foreground)' }} />
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', fontFamily: 'var(--font-family)' }}>
             Documento do Edital
           </span>
         </div>
@@ -237,7 +263,7 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
               justifyContent: 'space-between',
             }}
           >
-            <span style={{ fontSize: 'var(--text-xs)', color: 'rgba(186,230,253,0.55)', fontFamily: 'var(--font-family)' }}>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)', fontFamily: 'var(--font-family)' }}>
               {edital.numero ?? 'Edital FAPES'} — Página 1 de 53
             </span>
             <button
@@ -248,13 +274,13 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                color: 'rgba(186,230,253,0.55)',
+                color: 'var(--muted-foreground)',
                 fontSize: 'var(--text-xs)',
                 fontFamily: 'var(--font-family)',
                 transition: 'color 0.2s',
               }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#22d3ee'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(186,230,253,0.55)'; }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#0891b2'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'var(--muted-foreground)'; }}
             >
               <ExternalLink size={13} />
               Abrir em nova aba
@@ -286,7 +312,7 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
           left: 0,
           right: 0,
           zIndex: 40,
-          backgroundColor: 'rgba(7,31,46,0.95)',
+          backgroundColor: 'var(--app-header)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
           borderTop: '1px solid rgba(6,182,212,0.2)',
@@ -304,10 +330,10 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
           }}
         >
           <div>
-            <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(186,230,253,0.5)', fontFamily: 'var(--font-family)', marginBottom: '0.2rem' }}>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)', fontFamily: 'var(--font-family)', marginBottom: '0.2rem' }}>
               Edital aberto
             </div>
-            <div style={{ fontSize: 'var(--text-sm)', color: '#f0f9ff', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
+            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--foreground)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
               {edital.titulo} · Inscrições até {edital.prazo}
             </div>
           </div>
@@ -318,7 +344,7 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
               borderRadius: 'var(--radius)',
               border: 'none',
               backgroundColor: '#06b6d4',
-              color: 'rgba(7,31,46,1)',
+              color: '#0a0a0a',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-semibold)',
               cursor: 'pointer',

@@ -128,6 +128,9 @@ export function AccessibilityModal({ isOpen, onClose }: AccessibilityModalProps)
           borderStyle: 'solid',
           borderRadius: 'var(--radius-lg)',
           boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          maxHeight: 'calc(100vh - 6rem)',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         {/* Header */}
@@ -164,7 +167,14 @@ export function AccessibilityModal({ isOpen, onClose }: AccessibilityModalProps)
         </div>
 
         {/* Content */}
-        <div className="max-h-[calc(100vh-200px)] overflow-y-auto p-4">
+        <div
+          className="p-4"
+          style={{
+            flex: '1 1 auto',
+            overflowY: 'auto',
+            minHeight: 0,
+          }}
+        >
           {/* TEMA */}
           <div className="mb-6">
             <h3 
