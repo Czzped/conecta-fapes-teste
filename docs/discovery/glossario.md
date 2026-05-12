@@ -40,11 +40,16 @@ Catalogo completo em [personas.md](personas.md). Resumo rapido por agrupamento:
 
 ## 2. Instrumentos de Fomento
 
+M010 e o modulo responsavel pelos tres pilares do ciclo estrategico da Agencia: **Planejamento Estrategico** (Plano + Eixos), **Programas** (instrumentos de execucao) e **Parcerias** (instrumentos de cooperacao). Plano → Eixo → Programa → Captacao e o fluxo principal; Parceria aporta recursos em Programas via `AporteFinanceiroParceriaPrograma`.
+
 | Termo | Definicao | Definido em |
 |-------|-----------|-------------|
+| **Planejamento Estrategico** | Um dos tres pilares do M010. Composto por `PlanoEstrategico` + `EixoEstrategico`. Define rumo e tematica antes de qualquer Programa ou Captacao ser criado. | [M010 planejamento](../implementation/modules/M010-planejamento-estrategia/planejamento/modelo-estrutural.md) |
 | **Plano Estrategico** | Documento que define objetivos e metas estrategicas da agencia. Possui vigencia e so pode haver um ativo por vez. | [M010 planejamento](../implementation/modules/M010-planejamento-estrategia/planejamento/modelo-estrutural.md) |
 | **Eixo Estrategico** | Agrupamento tematico dentro de um Plano Estrategico que orienta a criacao de Programas. Pertence a exatamente um Plano (RN08). | [M010 planejamento](../implementation/modules/M010-planejamento-estrategia/planejamento/modelo-estrutural.md) |
+| **Programas** | Um dos tres pilares do M010. Conjunto de `Programa` que executa o fomento aprovado no Planejamento Estrategico. Recebe recursos internos da Agencia e aportes de Parcerias; e vinculo entre Plano e Captacoes. | [M010 programas](../implementation/modules/M010-planejamento-estrategia/programas/modelo-estrutural.md) |
 | **Programa** | Instrumento de execucao do fomento, vinculado a pelo menos um Eixo (RN01), demandado por uma Instituicao (RN16). Recebe recursos internos e aportes via `AporteFinanceiroParceriaPrograma`. | [M010 programas](../implementation/modules/M010-planejamento-estrategia/programas/modelo-estrutural.md) |
+| **Parcerias** | Um dos tres pilares do M010. Conjunto de `Parceria` que formaliza cooperacoes com Entidades Parceiras, capta recursos externos e os distribui em Programas. | [M010 parcerias](../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) |
 | **Parceria** | Instrumento formal de cooperacao entre a Agencia e uma ou mais Instituicoes (RN10). Possui Vigencia (original + aditivos), AporteFinanceiro recebido e Documentos regularizadores. Aporta recursos em Programas via `AporteFinanceiroParceriaPrograma`. | [M010 parcerias](../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) |
 | **Edital** | Documento publico que formaliza uma Captacao, contendo regras, cronograma e requisitos. | [M011 configuracao-captacao](../implementation/modules/M011-configuracao-captacao/README.md) |
 | **Captacao** | Processo de recepcao de propostas, associado a um Edital. Tipos: **Chamada Publica** (aberta) ou **Demanda Induzida** (direcionada). Vinculada a um Programa ou a uma Parceria. | [M011](../implementation/modules/M011-configuracao-captacao/README.md), [Domain 03](domains/03-fomento-pre-award.md) |

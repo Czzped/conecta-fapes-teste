@@ -1,0 +1,208 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  --font-family: 'Poppins', sans-serif;
+
+  --text-7xl: 72px;
+  --text-2xl: 24px;
+  --text-xl: 20px;
+  --text-lg: 18px;
+  --text-base: 16px;
+  --text-sm: 14px;
+  --text-xs: 12px;
+
+  --background: #f6f8fb;
+  --foreground: var(--color-neutral-800);
+  --card: #ffffff;
+  --card-rgb: 255, 255, 255;
+  --card-foreground: var(--color-neutral-800);
+  --popover: #ffffff;
+  --popover-foreground: var(--color-neutral-800);
+  --primary: #0891b2;
+  --primary-foreground: #ffffff;
+  --secondary: rgba(0, 0, 0, 0);
+  --secondary-foreground: var(--color-neutral-700);
+  --muted: var(--color-neutral-100);
+  --muted-foreground: var(--color-neutral-500);
+  --accent: #0891b2;
+  --accent-foreground: #ffffff;
+  --destructive: rgba(0, 0, 0, 0);
+  --destructive-foreground: var(--color-red-500);
+  --border: var(--color-neutral-200);
+  --input: #ffffff;
+  --input-background: #ffffff;
+  --ring: #0891b2;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --elevation-sm: 0 1px 2px rgba(23, 23, 23, 0.04), 0 1px 3px rgba(23, 23, 23, 0.06);
+
+  --chart-1: #06b6d4;
+  --chart-2: #0891b2;
+  --chart-3: #0891b2;
+  --chart-4: #67e8f9;
+  --chart-5: #cffafe;
+
+  --radius: 6px;
+  --radius-sm: 4px;
+  --radius-lg: 8px;
+
+  --sidebar: var(--background);
+  --sidebar-foreground: var(--color-neutral-800);
+  --sidebar-primary: #00c1af;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--color-neutral-200);
+  --sidebar-accent-foreground: #00c1af;
+  --sidebar-border: var(--color-neutral-200);
+  --sidebar-ring: #0891b2;
+
+  --app-header: var(--background);
+  --app-header-border: #e5e5e5;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: rgba(255, 255, 255, 1);
+  --card: rgba(255, 255, 255, 0.04);
+  --card-rgb: 255, 255, 255;
+  --card-foreground: rgba(255, 255, 255, 1);
+  --popover: #262626;
+  --popover-foreground: rgba(255, 255, 255, 1);
+  --primary: #0891b2;
+  --primary-foreground: rgba(23, 23, 23, 1);
+  --secondary: rgba(0, 0, 0, 0);
+  --secondary-foreground: rgba(212, 212, 212, 1);
+  --muted: rgba(255, 255, 255, 0.06);
+  --muted-foreground: rgba(163, 163, 163, 1);
+  --accent: #0891b2;
+  --accent-foreground: rgba(23, 23, 23, 1);
+  --destructive: rgba(0, 0, 0, 0);
+  --destructive-foreground: rgba(251, 44, 54, 1);
+  --border: rgba(255, 255, 255, 0.12);
+  --input: rgba(23, 23, 23, 0.82);
+  --input-background: rgba(23, 23, 23, 0.82);
+  --ring: #0891b2;
+
+  --elevation-sm: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+
+  --sidebar: #171717;
+  --sidebar-foreground: rgba(255, 255, 255, 1);
+  --sidebar-primary: #00c1af;
+  --sidebar-primary-foreground: rgba(23, 23, 23, 1);
+  --sidebar-accent: rgba(255, 255, 255, 0.1);
+  --sidebar-accent-foreground: #00c1af;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #0891b2;
+
+  --app-header: #171717;
+  --app-header-border: rgba(255, 255, 255, 0.1);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-family);
+  }
+
+  h1 { font-size: var(--text-7xl); font-weight: var(--font-weight-bold); line-height: 1.2; }
+  h2 { font-size: var(--text-2xl); font-weight: var(--font-weight-bold); line-height: 1.5; }
+  h3 { font-size: var(--text-xl); font-weight: var(--font-weight-semibold); line-height: 1.5; }
+  h4 { font-size: var(--text-lg); font-weight: var(--font-weight-bold); line-height: 1.5; }
+}
+
+html {
+  font-size: var(--font-size);
+}
+
+@property --login-card-border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.login-card-border-glow {
+  --login-card-border-angle: 0deg;
+}
+
+.login-card-border-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--login-card-border-angle),
+    transparent 0deg,
+    transparent 292deg,
+    rgba(163, 163, 163, 0.24) 314deg,
+    rgba(245, 245, 245, 0.62) 332deg,
+    rgba(163, 163, 163, 0.24) 350deg,
+    transparent 360deg
+  );
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: login-card-stroke-light 14s linear infinite;
+}
+
+.login-card-border-glow > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes login-card-stroke-light {
+  to {
+    --login-card-border-angle: 360deg;
+  }
+}
