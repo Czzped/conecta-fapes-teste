@@ -35,7 +35,7 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
             className="p-2 transition-colors"
             style={{
               backgroundColor: 'rgba(8, 145, 178, 0.1)',
-              color: 'var(--primary)',
+              color: 'var(--title-icon-foreground)',
               borderRadius: 'var(--radius)',
             }}
             onMouseEnter={(e) => {
@@ -260,10 +260,10 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
       {/* Notificações Section */}
       <section className="mb-8">
         <div className="flex items-center gap-3 mb-4">
-          <div 
+          <div
             className="p-2 transition-colors"
             style={{
-              color: 'var(--primary)',
+              color: 'var(--title-icon-foreground)',
               borderRadius: 'var(--radius)',
               backgroundColor: 'rgba(8, 145, 178, 0.1)',
             }}
@@ -347,10 +347,10 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
       {/* Submissão de Propostas Section */}
       <section className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div 
+          <div
             className="p-2 transition-colors"
             style={{
-              color: 'var(--primary)',
+              color: 'var(--title-icon-foreground)',
               borderRadius: 'var(--radius)',
               backgroundColor: 'rgba(8, 145, 178, 0.1)',
             }}
@@ -467,10 +467,10 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
         />
 
         <div className="flex items-center gap-3 mb-6">
-          <div 
+          <div
             className="p-2 transition-colors"
             style={{
-              color: 'var(--primary)',
+              color: 'var(--title-icon-foreground)',
               borderRadius: 'var(--radius)',
               backgroundColor: 'rgba(8, 145, 178, 0.1)',
             }}

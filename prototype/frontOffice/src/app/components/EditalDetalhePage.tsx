@@ -87,10 +87,10 @@ export function EditalDetalhePage({ edital, onBack }: EditalDetalhePageProps) {
       {/* Edital Info */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-3">
-          <div 
+          <div
             className="p-2 transition-colors"
             style={{
-              color: 'var(--primary)',
+              color: 'var(--title-icon-foreground)',
               borderRadius: 'var(--radius)',
               backgroundColor: 'rgba(8, 145, 178, 0.1)',
             }}

@@ -246,10 +246,10 @@ export function RemanejamentoPage() {
     <div className="w-full max-w-full px-4 md:px-8 py-8" style={{ overflowX: 'hidden' }}>
       {/* Header with icon */}
       <div className="flex items-center gap-3 mb-2">
-        <div 
-          className="p-2 transition-colors"
-          style={{
-            color: 'var(--primary)',
+        <div
+            className="p-2 transition-colors"
+            style={{
+              color: 'var(--title-icon-foreground)',
             borderRadius: 'var(--radius)',
             backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
           }}
@@ -288,7 +288,7 @@ export function RemanejamentoPage() {
           onClick={() => setActiveTab('interno')}
           className="pb-3 transition-all"
           style={{
-            color: activeTab === 'interno' ? 'var(--primary)' : 'var(--muted-foreground)',
+            color: activeTab === 'interno' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
             fontWeight: 'var(--font-weight-medium)',
             fontSize: 'var(--text-sm)',
             marginBottom: '-1px',
@@ -304,7 +304,7 @@ export function RemanejamentoPage() {
           onClick={() => setActiveTab('fapes')}
           className="pb-3 transition-all"
           style={{
-            color: activeTab === 'fapes' ? 'var(--primary)' : 'var(--muted-foreground)',
+            color: activeTab === 'fapes' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
             fontWeight: 'var(--font-weight-medium)',
             fontSize: 'var(--text-sm)',
             marginBottom: '-1px',
@@ -320,7 +320,7 @@ export function RemanejamentoPage() {
           onClick={() => setActiveTab('bolsa')}
           className="pb-3 transition-all"
           style={{
-            color: activeTab === 'bolsa' ? 'var(--primary)' : 'var(--muted-foreground)',
+            color: activeTab === 'bolsa' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
             fontWeight: 'var(--font-weight-medium)',
             fontSize: 'var(--text-sm)',
             marginBottom: '-1px',
@@ -345,7 +345,7 @@ export function RemanejamentoPage() {
           onClick={() => setActiveTab('interno')}
           className="py-3 pl-4 transition-all text-left"
           style={{
-            color: activeTab === 'interno' ? 'var(--primary)' : 'var(--muted-foreground)',
+            color: activeTab === 'interno' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
             fontWeight: 'var(--font-weight-medium)',
             fontSize: 'var(--text-sm)',
             background: 'none',
@@ -361,7 +361,7 @@ export function RemanejamentoPage() {
           onClick={() => setActiveTab('fapes')}
           className="py-3 pl-4 transition-all text-left"
           style={{
-            color: activeTab === 'fapes' ? 'var(--primary)' : 'var(--muted-foreground)',
+            color: activeTab === 'fapes' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
             fontWeight: 'var(--font-weight-medium)',
             fontSize: 'var(--text-sm)',
             background: 'none',
@@ -377,7 +377,7 @@ export function RemanejamentoPage() {
           onClick={() => setActiveTab('bolsa')}
           className="py-3 pl-4 transition-all text-left"
           style={{
-            color: activeTab === 'bolsa' ? 'var(--primary)' : 'var(--muted-foreground)',
+            color: activeTab === 'bolsa' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
             fontWeight: 'var(--font-weight-medium)',
             fontSize: 'var(--text-sm)',
             background: 'none',

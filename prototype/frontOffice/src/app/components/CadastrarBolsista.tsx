@@ -315,9 +315,9 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
       {/* Header with icon */}
       <div className="flex items-center gap-3 mb-2">
         <div
-          className="p-2 transition-colors"
-          style={{
-            color: 'var(--primary)',
+            className="p-2 transition-colors"
+            style={{
+              color: 'var(--title-icon-foreground)',
             borderRadius: 'var(--radius)',
             backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
           }}

@@ -16,10 +16,10 @@ export function PrestacaoContasTecnica({ onBack }: PrestacaoContasTecnicaProps) 
     >
       {/* Header */}
       <div className="flex items-center gap-3 mb-2">
-        <div 
-          className="p-2 transition-colors"
-          style={{
-            color: 'var(--primary)',
+        <div
+            className="p-2 transition-colors"
+            style={{
+              color: 'var(--title-icon-foreground)',
             borderRadius: 'var(--radius)',
             backgroundColor: 'rgba(8, 145, 178, 0.1)',
           }}

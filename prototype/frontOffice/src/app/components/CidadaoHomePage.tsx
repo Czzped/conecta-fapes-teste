@@ -383,7 +383,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                       backgroundColor: 'transparent',
                       border: 'none',
                       cursor: 'pointer',
-                      color: isActive ? '#0891b2' : 'var(--muted-foreground)',
+                      color: isActive ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
                       fontSize: 'var(--text-sm)',
                       fontWeight: isActive ? 'var(--font-weight-semibold)' : 'var(--font-weight-medium)',
                       fontFamily: 'var(--font-family)',

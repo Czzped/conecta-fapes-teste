@@ -16,16 +16,14 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
   const timelineCurrentColor = '#06b6d4';
 
   const projectStages = [
-    { id: 1, label: 'Submissão', phase: 'Pre-award', source: 'M011', date: '15/01/2024', icon: Send, status: 'completed' },
-    { id: 2, label: 'Avaliação de Documentos', phase: 'Pre-award', source: 'M011', date: '20/01/2024', icon: FileText, status: 'completed' },
-    { id: 3, label: 'Avaliação Ad Hoc', phase: 'Pre-award', source: 'M011', date: '05/02/2024', icon: UserCheck, status: 'completed' },
-    { id: 4, label: 'Em Contratação', phase: 'Award', source: 'M022', date: '20/02/2024', icon: FileEdit, status: 'completed' },
-    { id: 5, label: 'Contratado', phase: 'Award', source: 'M003', date: '01/03/2024', icon: CheckCircle, status: 'completed' },
-    { id: 6, label: 'Em Execução', phase: 'Post-award', source: 'M003', date: '16/03/2024', icon: PlayCircle, status: 'current' },
-    { id: 7, label: 'Suspensa', phase: 'Post-award', source: 'M015', date: '', icon: PauseCircle, status: 'pending' },
-    { id: 8, label: 'Em Aprovação de Contas', phase: 'Post-award', source: 'M014', date: '', icon: DollarSign, status: 'pending' },
-    { id: 9, label: 'Concluído', phase: 'Post-award', source: 'M015', date: '', icon: Award, status: 'pending' },
-    { id: 10, label: 'Cancelada', phase: 'Post-award', source: 'M015', date: '', icon: XCircle, status: 'pending' },
+    { id: 1, label: 'Submissão', date: '15/01/2024', icon: Send, status: 'completed' },
+    { id: 2, label: 'Avaliação de Documentos', date: '20/01/2024', icon: FileText, status: 'completed' },
+    { id: 3, label: 'Avaliação Ad Hoc', date: '05/02/2024', icon: UserCheck, status: 'completed' },
+    { id: 4, label: 'Em Contratação', date: '20/02/2024', icon: FileEdit, status: 'completed' },
+    { id: 5, label: 'Contratado', date: '01/03/2024', icon: CheckCircle, status: 'completed' },
+    { id: 6, label: 'Em Execução', date: '16/03/2024', icon: PlayCircle, status: 'current' },
+    { id: 7, label: 'Em Aprovação de Contas', date: '', icon: DollarSign, status: 'pending' },
+    { id: 8, label: 'Concluído', date: '', icon: Award, status: 'pending' },
   ];
 
   const projectData = [
@@ -148,10 +146,10 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
       {!hideHeader && (
         <>
           <div className="flex items-center gap-3 mb-2">
-            <div 
-              className="p-2 transition-colors"
-              style={{
-                color: 'var(--primary)',
+            <div
+            className="p-2 transition-colors"
+            style={{
+              color: 'var(--title-icon-foreground)',
                 borderRadius: 'var(--radius)',
                 backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
               }}
@@ -231,7 +229,6 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                   const Icon = stage.icon;
                   const isCompleted = stage.status === 'completed';
                   const isCurrent = stage.status === 'current';
-                  const isPending = stage.status === 'pending';
 
                   return (
                     <div key={stage.id} className="flex flex-col items-center" style={{ flex: 1 }}>
@@ -246,7 +243,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                             ? timelineCurrentColor
                             : isCompleted
                             ? timelineActiveColor
-                            : 'var(--muted)',
+                            : 'var(--timeline-pending-circle)',
                           border: isCurrent ? `3px solid ${timelineCurrentColor}` : 'none',
                           boxShadow: isCurrent ? `0 0 0 4px color-mix(in srgb, ${timelineCurrentColor} 20%, transparent)` : 'none',
                         }}
@@ -286,18 +283,6 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                           {stage.date}
                         </p>
                       )}
-                      <p
-                        className="mt-1 text-center"
-                        style={{
-                          color: 'var(--muted-foreground)',
-                          fontSize: 'var(--text-xs)',
-                          fontWeight: 'var(--font-weight-normal)',
-                          maxWidth: '96px',
-                          lineHeight: '1.3',
-                        }}
-                      >
-                        {stage.phase} · {stage.source}
-                      </p>
                     </div>
                   );
                 })}
@@ -331,7 +316,6 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                   const Icon = stage.icon;
                   const isCompleted = stage.status === 'completed';
                   const isCurrent = stage.status === 'current';
-                  const isPending = stage.status === 'pending';
 
                   return (
                     <div key={stage.id} className="relative flex items-start gap-4">
@@ -346,7 +330,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                             ? timelineCurrentColor
                             : isCompleted
                             ? timelineActiveColor
-                            : 'var(--muted)',
+                            : 'var(--timeline-pending-circle)',
                           border: isCurrent ? `3px solid ${timelineCurrentColor}` : 'none',
                           boxShadow: isCurrent ? `0 0 0 4px color-mix(in srgb, ${timelineCurrentColor} 20%, transparent)` : 'none',
                         }}
@@ -382,15 +366,6 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                             {stage.date}
                           </p>
                         )}
-                        <p
-                          style={{
-                            color: 'var(--muted-foreground)',
-                            fontSize: 'var(--text-xs)',
-                            fontWeight: 'var(--font-weight-normal)',
-                          }}
-                        >
-                          {stage.phase} · {stage.source}
-                        </p>
                       </div>
                     </div>
                   );
@@ -515,6 +490,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                 color: 'var(--foreground)',
                 fontSize: '1.25rem',
                 fontWeight: 'var(--font-weight-semibold)',
+                textAlign: 'center',
               }}
             >
               {projectTermData.dataInicio}
@@ -559,6 +535,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                 color: 'var(--foreground)',
                 fontSize: '1.25rem',
                 fontWeight: 'var(--font-weight-semibold)',
+                textAlign: 'center',
               }}
             >
               {projectTermData.dataFimVigente}

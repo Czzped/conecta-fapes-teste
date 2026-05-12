@@ -122,7 +122,7 @@ export function ProjectsListPage({ onNavigate }: { onNavigate?: (page: string, p
             className="p-2 transition-colors"
             style={{
               backgroundColor: 'rgba(8, 145, 178, 0.1)',
-              color: 'var(--primary)',
+              color: 'var(--title-icon-foreground)',
               borderRadius: 'var(--radius)',
               flexShrink: 0,
             }}

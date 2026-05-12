@@ -371,10 +371,10 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
         {!hideHeader && (
           <>
             <div className="flex items-center gap-3 mb-2">
-              <div 
-                className="p-2 transition-colors"
-                style={{
-                  color: 'var(--primary)',
+              <div
+            className="p-2 transition-colors"
+            style={{
+              color: 'var(--title-icon-foreground)',
                   borderRadius: 'var(--radius)',
                   backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
                 }}
@@ -421,7 +421,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               borderLeft: 'none',
               borderRight: 'none',
               borderBottom: activeTab === 'informacoes' ? '2px solid var(--primary)' : '2px solid transparent',
-              color: activeTab === 'informacoes' ? 'var(--primary)' : 'var(--muted-foreground)',
+              color: activeTab === 'informacoes' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-medium)',
               cursor: 'pointer',
@@ -441,7 +441,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               borderLeft: 'none',
               borderRight: 'none',
               borderBottom: activeTab === 'bolsistas' ? '2px solid var(--primary)' : '2px solid transparent',
-              color: activeTab === 'bolsistas' ? 'var(--primary)' : 'var(--muted-foreground)',
+              color: activeTab === 'bolsistas' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-medium)',
               cursor: 'pointer',
@@ -461,7 +461,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               borderLeft: 'none',
               borderRight: 'none',
               borderBottom: activeTab === 'pagamentos' ? '2px solid var(--primary)' : '2px solid transparent',
-              color: activeTab === 'pagamentos' ? 'var(--primary)' : 'var(--muted-foreground)',
+              color: activeTab === 'pagamentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-medium)',
               cursor: 'pointer',
@@ -490,7 +490,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               borderRight: 'none',
               borderBottom: 'none',
               borderLeft: activeTab === 'informacoes' ? '2px solid var(--primary)' : '2px solid transparent',
-              color: activeTab === 'informacoes' ? 'var(--primary)' : 'var(--muted-foreground)',
+              color: activeTab === 'informacoes' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-medium)',
               cursor: 'pointer',
@@ -509,7 +509,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               borderRight: 'none',
               borderBottom: 'none',
               borderLeft: activeTab === 'bolsistas' ? '2px solid var(--primary)' : '2px solid transparent',
-              color: activeTab === 'bolsistas' ? 'var(--primary)' : 'var(--muted-foreground)',
+              color: activeTab === 'bolsistas' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-medium)',
               cursor: 'pointer',
@@ -528,7 +528,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               borderRight: 'none',
               borderBottom: 'none',
               borderLeft: activeTab === 'pagamentos' ? '2px solid var(--primary)' : '2px solid transparent',
-              color: activeTab === 'pagamentos' ? 'var(--primary)' : 'var(--muted-foreground)',
+              color: activeTab === 'pagamentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-medium)',
               cursor: 'pointer',
@@ -2097,7 +2097,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                 className="px-4 py-2 transition-colors"
                 style={{
                   backgroundColor: 'transparent',
-                  color: detailsTab === 'informacoes' ? 'var(--primary)' : 'var(--muted-foreground)',
+                  color: detailsTab === 'informacoes' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
                   border: 'none',
                   borderBottom: detailsTab === 'informacoes' ? '2px solid var(--primary)' : '2px solid transparent',
                   fontSize: 'var(--text-sm)',
@@ -2112,7 +2112,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                 className="px-4 py-2 transition-colors"
                 style={{
                   backgroundColor: 'transparent',
-                  color: detailsTab === 'aprovacao' ? 'var(--primary)' : 'var(--muted-foreground)',
+                  color: detailsTab === 'aprovacao' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
                   border: 'none',
                   borderBottom: detailsTab === 'aprovacao' ? '2px solid var(--primary)' : '2px solid transparent',
                   fontSize: 'var(--text-sm)',

@@ -323,10 +323,10 @@ export function MyInfoPage() {
     <div className="w-full px-4 md:px-8 py-8">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
-        <div 
-          className="p-2 transition-colors"
-          style={{
-            color: 'var(--primary)',
+        <div
+            className="p-2 transition-colors"
+            style={{
+              color: 'var(--title-icon-foreground)',
             borderRadius: 'var(--radius)',
             backgroundColor: 'rgba(8, 145, 178, 0.1)',
           }}
@@ -349,7 +349,7 @@ export function MyInfoPage() {
           onClick={() => setActiveTab('documentos')}
           className="pb-3 transition-all"
           style={{
-            color: activeTab === 'documentos' ? 'var(--primary)' : 'var(--muted-foreground)',
+            color: activeTab === 'documentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
             fontWeight: 'var(--font-weight-medium)',
             fontSize: 'var(--text-sm)',
             marginBottom: '-1px',
@@ -365,7 +365,7 @@ export function MyInfoPage() {
           onClick={() => setActiveTab('dados')}
           className="pb-3 transition-all"
           style={{
-            color: activeTab === 'dados' ? 'var(--primary)' : 'var(--muted-foreground)',
+            color: activeTab === 'dados' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
             fontWeight: 'var(--font-weight-medium)',
             fontSize: 'var(--text-sm)',
             marginBottom: '-1px',
@@ -390,7 +390,7 @@ export function MyInfoPage() {
           onClick={() => setActiveTab('documentos')}
           className="py-3 pl-4 transition-all text-left"
           style={{
-            color: activeTab === 'documentos' ? 'var(--primary)' : 'var(--muted-foreground)',
+            color: activeTab === 'documentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
             fontWeight: 'var(--font-weight-medium)',
             fontSize: 'var(--text-sm)',
             background: 'none',
@@ -406,7 +406,7 @@ export function MyInfoPage() {
           onClick={() => setActiveTab('dados')}
           className="py-3 pl-4 transition-all text-left"
           style={{
-            color: activeTab === 'dados' ? 'var(--primary)' : 'var(--muted-foreground)',
+            color: activeTab === 'dados' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
             fontWeight: 'var(--font-weight-medium)',
             fontSize: 'var(--text-sm)',
             background: 'none',
@@ -446,7 +446,9 @@ export function MyInfoPage() {
                   />
                 </div>
                 <div>
-                  <RequiredLabel>Nome Social</RequiredLabel>
+                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
+                    Nome Social
+                  </label>
                   <input
                     type="text"
                     defaultValue=""
@@ -627,7 +629,9 @@ export function MyInfoPage() {
                   />
                 </div>
                 <div>
-                  <RequiredLabel>Complemento</RequiredLabel>
+                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
+                    Complemento
+                  </label>
                   <input
                     type="text"
                     defaultValue="Apto 101"
@@ -812,10 +816,10 @@ export function MyInfoPage() {
         <div>
           <section>
             <div className="flex items-center gap-3 mb-2">
-              <div 
-                className="p-2 transition-colors"
-                style={{
-                  color: 'var(--primary)',
+              <div
+            className="p-2 transition-colors"
+            style={{
+              color: 'var(--title-icon-foreground)',
                   borderRadius: 'var(--radius)',
                   backgroundColor: 'rgba(8, 145, 178, 0.1)',
                 }}

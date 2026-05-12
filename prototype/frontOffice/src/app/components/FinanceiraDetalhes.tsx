@@ -1,6 +1,6 @@
 import {
   CheckCircle,
-  Home, Upload, Paperclip, FileText, Edit2, Trash2,
+  Upload, Paperclip, FileText, Edit2, Trash2,
   ChevronDown, Check, Info, Search, X, Send, Plus, Save, Trash, RotateCcw, DollarSign,
 } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
@@ -123,7 +123,7 @@ const labelSt: React.CSSProperties = {
 };
 const inputSt = (disabled?: boolean): React.CSSProperties => ({
   width: '100%', padding: '0.625rem 0.75rem',
-  backgroundColor: disabled ? 'var(--muted)' : 'var(--background)',
+  backgroundColor: 'transparent',
   color: disabled ? 'var(--muted-foreground)' : 'var(--foreground)',
   border: '1px solid var(--border)', borderRadius: 'var(--radius)',
   fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)',
@@ -254,7 +254,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
   /* ── derived flags ──────────────────────────── */
   const isStep1Complete = selectedDocumento !== '';
   const isStep2Complete = uploadedFiles.length > 0;
-  const showStep3 = isStep2Complete;
+  const showStep3 = selectedDocumento === 'Diária' ? selectedDiariaIdx !== null : isStep2Complete;
   const allowMultipleFiles = ['Diária', 'Passagem', 'Invoice (Pagamento Internacional)'].includes(selectedDocumento);
   const showCotacao = ['Nota Fiscal (Produto ou Serviço)', 'Invoice (Pagamento Internacional)', 'Passagem'].includes(selectedDocumento);
 
@@ -436,13 +436,13 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
   /* ── style factories ─────────────────────────── */
   const dropdownMenu: React.CSSProperties = {
     position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
-    backgroundColor: 'var(--card)', border: '1px solid var(--border)',
+    backgroundColor: 'var(--popover)', border: '1px solid var(--border)',
     borderRadius: 'var(--radius)', boxShadow: 'var(--elevation-sm)',
     zIndex: 50, overflow: 'hidden', maxHeight: '220px', overflowY: 'auto',
   };
   const dropItemSt = (sel: boolean): React.CSSProperties => ({
     width: '100%', padding: '0.625rem 0.75rem',
-    backgroundColor: sel ? 'color-mix(in srgb, var(--primary) 10%, transparent)' : 'transparent',
+    backgroundColor: sel ? 'color-mix(in srgb, var(--primary) 10%, var(--popover))' : 'var(--popover)',
     color: sel ? 'var(--primary)' : 'var(--foreground)',
     border: 'none', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)',
     textAlign: 'left', cursor: 'pointer',
@@ -450,7 +450,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
   });
   const triggerSt = (disabled?: boolean, hasValue?: boolean): React.CSSProperties => ({
     width: '100%', padding: '0.625rem 0.75rem',
-    backgroundColor: disabled ? 'var(--muted)' : 'var(--background)',
+    backgroundColor: 'transparent',
     color: disabled ? 'var(--muted-foreground)' : hasValue ? 'var(--foreground)' : 'var(--muted-foreground)',
     border: '1px solid var(--border)', borderRadius: 'var(--radius)',
     fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)',
@@ -498,7 +498,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
       <div
         style={{
           display: 'flex', alignItems: 'center', gap: '0.5rem',
-          backgroundColor: disabled ? 'var(--muted)' : 'var(--background)',
+          backgroundColor: 'transparent',
           border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '0 0.75rem',
           opacity: disabled ? 0.7 : 1,
         }}
@@ -545,7 +545,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                 style={dropItemSt(selected === name)}
                 onClick={() => { setSelected(name); setQuery(''); setIsOpen(false); }}
                 onMouseEnter={e => { if (selected !== name) e.currentTarget.style.backgroundColor = 'var(--muted)'; }}
-                onMouseLeave={e => { if (selected !== name) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                onMouseLeave={e => { if (selected !== name) e.currentTarget.style.backgroundColor = 'var(--popover)'; }}
               >
                 {selected === name && <Check size={13} style={{ flexShrink: 0, color: 'var(--primary)' }} />}
                 <span style={{ marginLeft: selected === name ? 0 : '21px', fontFamily: 'var(--font-family)' }}>{name}</span>
@@ -629,8 +629,6 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 mb-6" style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', fontFamily: 'var(--font-family)' }}>
-        <button onClick={onBack} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--muted-foreground)', display: 'flex', alignItems: 'center', transition: 'color .2s' }} onMouseEnter={e => { e.currentTarget.style.color = 'var(--foreground)'; }} onMouseLeave={e => { e.currentTarget.style.color = 'var(--muted-foreground)'; }}><Home size={16} /></button>
-        <span>&gt;</span>
         <button onClick={onBack} className="hidden md:inline" style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', transition: 'color .2s' }} onMouseEnter={e => { e.currentTarget.style.color = 'var(--foreground)'; }} onMouseLeave={e => { e.currentTarget.style.color = 'var(--muted-foreground)'; }}>Prestação de Contas</button>
         <span className="hidden md:inline">&gt;</span>
         <button onClick={onBack} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', transition: 'color .2s' }} onMouseEnter={e => { e.currentTarget.style.color = 'var(--foreground)'; }} onMouseLeave={e => { e.currentTarget.style.color = 'var(--muted-foreground)'; }}>Financeira</button>
@@ -640,9 +638,9 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
 
       <div className="flex items-center gap-3 mb-8">
         <div
-          className="p-2 transition-colors"
-          style={{
-            color: 'var(--primary)',
+            className="p-2 transition-colors"
+            style={{
+              color: 'var(--title-icon-foreground)',
             borderRadius: 'var(--radius)',
             backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
           }}
@@ -654,7 +652,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
 
       {/* Payment card */}
       <div className="p-6 mb-6" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
-        <div className="hidden md:grid grid-cols-5 gap-6">
+        <div className="hidden md:grid grid-cols-5 gap-20">
           {[['Pagamento', payment.tipo], ['Valor', payment.valor], ['Data', payment.data], ['CNPJ', payment.cnpj]].map(([l, v]) => (
             <div key={l}>
               <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>{l}</div>
@@ -899,7 +897,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
       )}
 
       {/* ══ Steps container ══ */}
-      <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '2rem', marginBottom: '2rem' }}>
+      <div style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '2rem', marginBottom: '2rem' }}>
 
         {/* ─── Step 1: Informações Gerais ─── */}
         <section className="mb-8">
@@ -933,7 +931,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                           style={dropItemSt(selectedDocumento === doc)}
                           onClick={() => handleDocumentoChange(doc)}
                           onMouseEnter={e => { if (selectedDocumento !== doc) e.currentTarget.style.backgroundColor = 'var(--muted)'; }}
-                          onMouseLeave={e => { if (selectedDocumento !== doc) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                          onMouseLeave={e => { if (selectedDocumento !== doc) e.currentTarget.style.backgroundColor = 'var(--popover)'; }}
                         >
                           {selectedDocumento === doc && <Check size={14} style={{ flexShrink: 0, color: 'var(--primary)' }} />}
                           <span style={{ marginLeft: selectedDocumento === doc ? 0 : '21px', fontFamily: 'var(--font-family)' }}>{doc}</span>
@@ -1102,7 +1100,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
             )}
 
             {/* Descrição — opcional na prestação de contas */}
-            {selectedDocumento !== '' && (
+            {selectedDocumento !== '' && selectedDocumento !== 'Diária' && (
               <div>
                 <label style={labelSt}>
                   Descrição
@@ -1113,7 +1111,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                   placeholder="Descreva o contexto da compra ou pagamento..."
                   rows={3}
                   disabled={isReadOnly}
-                  style={{ width: '100%', padding: '0.75rem', backgroundColor: isReadOnly ? 'var(--muted)' : 'var(--background)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', resize: 'vertical', outline: 'none', opacity: isReadOnly ? 0.7 : 1, cursor: isReadOnly ? 'not-allowed' : 'text', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '0.75rem', backgroundColor: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', resize: 'vertical', outline: 'none', opacity: isReadOnly ? 0.7 : 1, cursor: isReadOnly ? 'not-allowed' : 'text', boxSizing: 'border-box' }}
                   onFocus={e => { if (!isReadOnly) { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; } }}
                   onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
                 />
@@ -1126,7 +1124,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
         </section>
 
         {/* ─── Step 2: Anexar Documento Fiscal ─── */}
-        {isStep1Complete && (
+        {isStep1Complete && selectedDocumento !== 'Diária' && (
           <section className="mb-8">
             <div className="flex items-start gap-3 mb-1">
               <div style={stepCircle}>2</div>
@@ -1141,7 +1139,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                 onDragLeave={() => setIsDragging(false)}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                style={{ backgroundColor: 'var(--background)', border: `2px dashed ${isDragging ? 'var(--primary)' : 'var(--border)'}`, borderRadius: 'var(--radius)', cursor: 'pointer', transition: 'all .2s', minHeight: '180px', marginLeft: '36px', marginBottom: uploadedFiles.length > 0 ? '1rem' : 0 }}
+                style={{ backgroundColor: 'transparent', border: `2px dashed ${isDragging ? 'var(--primary)' : 'var(--border)'}`, borderRadius: 'var(--radius)', cursor: 'pointer', transition: 'all .2s', minHeight: '180px', marginLeft: '36px', marginBottom: uploadedFiles.length > 0 ? '1rem' : 0 }}
               >
                 <div style={{ color: 'var(--muted-foreground)', marginBottom: '1rem' }}><Upload size={32} /></div>
                 <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: '0 0 1.25rem' }}>Arraste e solte o arquivo aqui ou</p>
@@ -2213,14 +2211,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
 
                 <div style={{ marginLeft: '36px' }}>
                   {/* Linha 1: Passageiro + Valor + Localizador + Data de Emissão */}
-                  <div
-                    className="mb-4 p-4"
-                    style={{
-                      backgroundColor: 'color-mix(in srgb, var(--primary) 8%, var(--card))',
-                      border: '1px solid color-mix(in srgb, var(--primary) 32%, var(--border))',
-                      borderRadius: 'var(--radius)',
-                    }}
-                  >
+                  <div className="mb-4">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <PersonSelect
                         label="Nome do Passageiro"
@@ -2231,7 +2222,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                         disabled={isReadOnly}
                       />
                       <div>
-                        <label style={labelSt}>Valor da passagem comprada *</label>
+                        <label style={labelSt}>Valor</label>
                         <input
                           type="text"
                           value={valorPassagemComprada}
@@ -2242,9 +2233,6 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                           onFocus={e => { if (!isReadOnly) { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; } }}
                           onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
                         />
-                        <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)', marginTop: '0.35rem', display: 'block' }}>
-                          Usado para validar saldo e conciliar a transação.
-                        </span>
                       </div>
                       <div>
                         <label style={labelSt}>Localizador</label>
@@ -2260,9 +2248,6 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                           onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
                         />
                       </div>
-                    </div>
-                    <div className="mt-3" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)' }}>
-                      Rubrica associada ao salvar: <strong style={{ color: 'var(--foreground)' }}>Passagens</strong>
                     </div>
                   </div>
 
@@ -2341,7 +2326,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                     onDragLeave={() => setIsDraggingCotacao(false)}
                     onDrop={handleCotacaoDrop}
                     onClick={() => cotacaoInputRef.current?.click()}
-                    style={{ backgroundColor: 'var(--background)', border: `2px dashed ${isDraggingCotacao ? 'var(--primary)' : 'var(--border)'}`, borderRadius: 'var(--radius)', cursor: 'pointer', transition: 'all .2s', minHeight: '180px', marginLeft: '36px', marginBottom: cotacaoFiles.length > 0 ? '1rem' : 0 }}
+                    style={{ backgroundColor: 'transparent', border: `2px dashed ${isDraggingCotacao ? 'var(--primary)' : 'var(--border)'}`, borderRadius: 'var(--radius)', cursor: 'pointer', transition: 'all .2s', minHeight: '180px', marginLeft: '36px', marginBottom: cotacaoFiles.length > 0 ? '1rem' : 0 }}
                   >
                     <div style={{ color: 'var(--muted-foreground)', marginBottom: '1rem' }}><Upload size={32} /></div>
                     <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: '0 0 1.25rem' }}>Arraste e solte o arquivo aqui ou</p>

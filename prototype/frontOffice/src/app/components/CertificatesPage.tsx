@@ -2479,7 +2479,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
           <div
             className="p-2 transition-colors"
             style={{
-              color: 'var(--primary)',
+              color: 'var(--title-icon-foreground)',
               borderRadius: 'var(--radius)',
               backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
             }}
@@ -2710,7 +2710,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
           <div
             className="p-2 transition-colors"
             style={{
-              color: 'var(--primary)',
+              color: 'var(--title-icon-foreground)',
               borderRadius: 'var(--radius)',
               backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
             }}
@@ -2835,7 +2835,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                   borderLeft: 'none',
                   borderRight: 'none',
                   borderBottom: activeDiariaTab === tab.key ? '2px solid var(--primary)' : '2px solid transparent',
-                  color: activeDiariaTab === tab.key ? 'var(--primary)' : 'var(--muted-foreground)',
+                  color: activeDiariaTab === tab.key ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
                   cursor: 'pointer',

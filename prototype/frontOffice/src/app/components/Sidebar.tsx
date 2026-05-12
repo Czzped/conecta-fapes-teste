@@ -57,6 +57,16 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
 
   const { t } = useLanguage();
 
+  const parentPageByRoute: Record<string, string> = {
+    'financeira-detalhes': 'financeira',
+    'cadastrar-bolsista': 'minha-equipe',
+    'pagamentos-projeto': 'minha-equipe',
+    'project-details': 'projects-list',
+  };
+
+  const activeMenuPage = parentPageByRoute[currentPage] ?? currentPage;
+  const isMenuItemActive = (itemId: string) => activeMenuPage === itemId;
+
   // Translated menu items
   const homeMenuItem = { id: 'inicio', labelKey: 'sidebar.home', icon: Home };
 
@@ -231,7 +241,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
             <ul className="space-y-2">
               {finalMenuItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = currentPage === item.id;
+                const isActive = isMenuItemActive(item.id);
                 
                 return (
                   <li key={item.id}>
@@ -240,7 +250,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                       className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                       style={{
                         backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
-                        color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
+                        color: isActive ? 'var(--sidebar-selected-foreground)' : 'var(--sidebar-foreground)',
                         borderRadius: 'var(--radius)',
                         fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
                         fontSize: 'var(--text-sm)',
@@ -311,7 +321,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                 <ul className="space-y-2">
                   {prestacaoContasItems.map((item) => {
                     const Icon = item.icon;
-                    const isActive = currentPage === item.id;
+                    const isActive = isMenuItemActive(item.id);
                     
                     return (
                       <li key={item.id}>
@@ -320,7 +330,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                           className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                           style={{
                             backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
-                            color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
+                            color: isActive ? 'var(--sidebar-selected-foreground)' : 'var(--sidebar-foreground)',
                             borderRadius: 'var(--radius)',
                             fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
                             fontSize: 'var(--text-sm)',
@@ -559,7 +569,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
           <ul className="space-y-2">
             {(() => {
               const Icon = homeMenuItem.icon;
-              const isActive = currentPage === homeMenuItem.id;
+              const isActive = isMenuItemActive(homeMenuItem.id);
 
               return (
                 <li key={homeMenuItem.id}>
@@ -568,7 +578,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                     className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                     style={{
                       backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
-                      color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
+                      color: isActive ? 'var(--sidebar-selected-foreground)' : 'var(--sidebar-foreground)',
                       borderRadius: 'var(--radius)',
                       fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
                       fontSize: 'var(--text-sm)',
@@ -635,7 +645,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
               <ul className="space-y-2">
                 {filteredProfileMenuItems.map((item) => {
                   const Icon = item.icon;
-                  const isActive = currentPage === item.id;
+                  const isActive = isMenuItemActive(item.id);
 
                   return (
                     <li key={item.id}>
@@ -644,7 +654,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                         className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                         style={{
                           backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
-                          color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
+                          color: isActive ? 'var(--sidebar-selected-foreground)' : 'var(--sidebar-foreground)',
                           borderRadius: 'var(--radius)',
                           fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
                           fontSize: 'var(--text-sm)',
@@ -714,7 +724,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
           <ul className="space-y-2">
             {finalManagementMenuItems.map((item) => {
               const Icon = item.icon;
-              const isActive = currentPage === item.id;
+              const isActive = isMenuItemActive(item.id);
               
               return (
                 <li key={item.id}>
@@ -723,7 +733,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                     className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                     style={{
                       backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
-                      color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
+                      color: isActive ? 'var(--sidebar-selected-foreground)' : 'var(--sidebar-foreground)',
                       borderRadius: 'var(--radius)',
                       fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
                       fontSize: 'var(--text-sm)',
@@ -794,7 +804,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
               <ul className="space-y-2">
                 {prestacaoContasItems.map((item) => {
                   const Icon = item.icon;
-                  const isActive = currentPage === item.id;
+                  const isActive = isMenuItemActive(item.id);
                   
                   return (
                     <li key={item.id}>
@@ -803,7 +813,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
                         className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
                         style={{
                           backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
-                          color: isActive ? 'var(--primary)' : 'var(--sidebar-foreground)',
+                          color: isActive ? 'var(--sidebar-selected-foreground)' : 'var(--sidebar-foreground)',
                           borderRadius: 'var(--radius)',
                           fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
                           fontSize: 'var(--text-sm)',
