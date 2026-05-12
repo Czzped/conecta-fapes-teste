@@ -7,6 +7,7 @@
 | Persona | Dominios onde atua | Modulos principais |
 |---------|--------------------|--------------------|
 | Cidadao | 01 (portal de transparencia), 03 (submissao de propostas) | M005, M008, M011 |
+| Pesquisador | 01 (cadastro + curriculo Lattes), 03 (avaliacao ad hoc), 04 (execucao de projetos) | M008, M011, M024 |
 | Participante de Projeto | 04 (execucao de iniciativas) | M003, M009 |
 | Bolsista | 04 (bolsas, documentos, plano de trabalho) | M009 |
 | Voluntario | 04 (participacao em projeto sem bolsa) | M009 |
@@ -30,11 +31,12 @@
 
 Personas externas que interagem com a agencia de fomento como beneficiarias, proponentes ou participantes de projetos.
 
-O Cidadao e a persona base. Ao se associar a um projeto, torna-se Participante de Projeto. O Participante com bolsa e um Bolsista; sem bolsa, e um Voluntario. O Orientador e um Participante de Projeto responsavel pela orientacao de outros participantes. Um Terceiro (PJ) e uma pessoa juridica que participa do projeto. O Coordenador e o responsavel pela coordenacao do projeto.
+O Cidadao e a persona base. Ao vincular um curriculo Lattes ao seu cadastro, torna-se Pesquisador — pre-condicao para qualquer papel que exija titulacao, producao ou area de atuacao. Ao se associar a um projeto, o Pesquisador (ou Cidadao) torna-se Participante de Projeto. O Participante com bolsa e um Bolsista; sem bolsa, e um Voluntario. O Orientador e um Participante de Projeto responsavel pela orientacao de outros participantes. Um Terceiro (PJ) e uma pessoa juridica que participa do projeto. O Coordenador e o responsavel pela coordenacao do projeto.
 
 | Persona | Descricao |
 |---------|-----------|
 | **Cidadao** | Pessoa que acessa o portal publico da agencia de fomento para consultar editais, programas e resultados |
+| **Pesquisador** | Cidadao com curriculo Lattes vinculado ao Conecta (formacao academica, producao bibliografica, orientacoes, projetos, premios, eventos, idiomas). Base para Participante de Projeto, Orientador, Coordenador e Consultor Ad Hoc sempre que houver exigencia de titulacao, producao ou area de atuacao |
 | **Participante de Projeto** | Cidadao associado a um projeto de pesquisa |
 | **Bolsista** | Participante de projeto com bolsa ativa vinculada com um plano de trabalho|
 | **Voluntario** | Participante de projeto sem bolsa associada com um plano de trabalho|
@@ -81,4 +83,4 @@ Personas internas da agencia de fomento responsaveis pela operacao e administrac
 
 | Persona | Descricao |
 |---------|-----------|
-| **Consultor Ad Hoc** | Cidadao com curriculo Lattes, convidado como avaliador externo de merito tecnico-cientifico |
+| **Consultor Ad Hoc** | Pesquisador convidado como avaliador externo de merito tecnico-cientifico. Selecao considera area de atuacao e producao bibliografica do curriculo Lattes vinculado ([M024](../implementation/modules/M024-curriculo-pesquisador/README.md)) |

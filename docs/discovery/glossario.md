@@ -29,7 +29,7 @@ Catalogo completo em [personas.md](personas.md). Resumo rapido por agrupamento:
 
 | Agrupamento | Personas | Definido em |
 |-------------|----------|-------------|
-| Comunidade cientifica | Cidadao, Participante de Projeto, Bolsista, Voluntario, Coordenador, Orientador, Terceiro (PJ) | [personas.md](personas.md) |
+| Comunidade cientifica | Cidadao, Pesquisador, Participante de Projeto, Bolsista, Voluntario, Coordenador, Orientador, Terceiro (PJ) | [personas.md](personas.md) |
 | Instituicoes | Reitor, Diretor/Responsavel | [personas.md](personas.md) |
 | Parceiros | Agencia de Fomento, Entidade Parceira | [personas.md](personas.md) |
 | Agencia (interno) | Analista da Area Tecnica da Agencia, Analista, Area Tecnica, SUCON, Diretoria da Agencia, Servidor da Area Tecnica, Servidor da Area de Parcerias | [personas.md](personas.md), [M010/README.md](../implementation/modules/M010-planejamento-estrategia/README.md) |
@@ -79,6 +79,11 @@ Conceitos centrais a M010 (Parcerias e Programas).
 | **Unidade Organizacional** | Subdivisao interna de uma Instituicao, sem CNPJ proprio. Pode ser composta recursivamente por outras UnidadeOrganizacional. Toda UO deve ser rastreavel transitivamente a uma Instituicao raiz (RN25). | M008 |
 | **Entidade Parceira** | Instituicao que firma Parceria com a Agencia de Fomento mediante aporte financeiro. | [personas.md](personas.md), [M010 parcerias](../implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md) |
 | **Pessoa Fisica** | Registro canonico de individuos cadastrados (pesquisadores, bolsistas, servidores etc), identificado por CPF. | M008 |
+| **Pesquisador** | `PessoaFisica` com `Curriculo` vinculado. Pre-condicao para Orientador, Coordenador, Consultor Ad Hoc e qualquer papel que exija titulacao, producao bibliografica ou area de atuacao. | [M024](../implementation/modules/M024-curriculo-pesquisador/README.md) |
+| **Curriculo Lattes** | Replica local versionada dos dados do Lattes do Pesquisador: formacao academica, producao bibliografica, orientacoes, projetos de pesquisa, premios, eventos e idiomas. Lattes (CNPq) e fonte canonica; Conecta nao edita. | [M024](../implementation/modules/M024-curriculo-pesquisador/README.md) |
+| **Producao Bibliografica** | Conjunto de Artigos (periodicos/conferencias), Livros e Capitulos publicados pelo Pesquisador, importados do Curriculo Lattes. Usado em selecao de Ad Hoc e indicadores agregados. | [M024](../implementation/modules/M024-curriculo-pesquisador/README.md) |
+| **Orientacao Academica** | Vinculo Pesquisador-orientando em programa de pos-graduacao (IC, Mestrado, Doutorado, Pos-Doc) registrado no Curriculo Lattes. Distinto da persona Orientador (que e papel em projeto). | [M024](../implementation/modules/M024-curriculo-pesquisador/README.md) |
+| **Sincronizacao Lattes** | Operacao de importacao/atualizacao do Curriculo Lattes do Pesquisador. Estados: `PENDENTE` → `IMPORTANDO` → `IMPORTADA` ou `ERRO`. Curriculo valido = sincronizacao bem-sucedida nos ultimos 12 meses. | [integracoes/lattes.md](integracoes/lattes.md), [M024](../implementation/modules/M024-curriculo-pesquisador/README.md) |
 | **Responsavel Legal** | Outra `PessoaFisica` cadastrada, ativa e maior de idade que responde legalmente por uma pessoa menor de idade. Obrigatorio quando o cadastrado tem idade < 18 anos completos na data de cadastro (RN19, RI7). Distinto de `Responsavel` (mandato em Instituicao/UO). | [M008/pessoas/pessoa-fisica](../implementation/modules/M008-cadastros-corporativos/pessoas/pessoa-fisica/README.md) |
 | **Pessoa Juridica (PJ)** | Entidade contratada por projeto (ver restricao de conflito de interesse em [5.4.10](domains/05-financeiro.md)). | M008, Domain 05 |
 | **Area Tecnica** | UnidadeOrganizacional da Agencia de Fomento (DIRAF, DIPRE, DAFIN, DIGEC etc), composta por servidores. Responsavel por analise e liberacao de editais e pagamentos. | [personas.md](personas.md) |
@@ -242,6 +247,8 @@ Catalogo completo em [integracoes/README.md](integracoes/README.md).
 | **Signatario Externo** | Pessoa fisica nao-servidora (pesquisador, bolsista, coordenador, outorgado) que assina documento E-Docs via portal publico autenticando com Acesso Cidadao. | [integracoes/e-docs.md](integracoes/e-docs.md) |
 | **Organograma ES** | Catalogo oficial da estrutura do Estado: orgaos, secretarias, autarquias, fundacoes (FAPES inclusa) com servidores, cargos e lotacoes. Fonte unica de verdade para cadastro automatico de servidores backoffice. | [integracoes/organograma.md](integracoes/organograma.md) |
 | **Acesso Cidadao** | Provedor oficial de identidade SSO do Estado ES, compartilhado entre Conecta, E-Docs e Organograma. Mesmo login serve para autenticar no Conecta e assinar documentos no E-Docs. | [arquitetura/03-acesso-e-seguranca.md](../architecture/03-acesso-e-seguranca.md) |
+| **Plataforma Lattes** | Repositorio nacional de curriculos academicos mantido pelo CNPq ([lattes.cnpq.br](https://lattes.cnpq.br)). Identidade do pesquisador brasileiro por numero Lattes de 16 digitos. Fonte canonica do `Curriculo` no Conecta. | [integracoes/lattes.md](integracoes/lattes.md) |
+| **ORCID** | *Open Researcher and Contributor ID*. Identificador internacional aberto de pesquisador, com Public API REST oficial. Cada pesquisador recebe um ORCID iD de 16 digitos com hifens (ex.: `0000-0001-2345-6789`). Fonte **complementar** ao Lattes no Conecta -- usado para pesquisador estrangeiro, producao bibliografica indexada por DOI e busca por afiliacao/nome via `/expanded-search/`. | [integracoes/orcid.md](integracoes/orcid.md) |
 
 ---
 

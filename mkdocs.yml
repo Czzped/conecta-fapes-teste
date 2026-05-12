@@ -93,6 +93,7 @@ nav:
       - Glossario: discovery/glossario.md
       - Rubricas e Subrubricas FAPES: discovery/rubricas-subrubricas-fapes.md
       - Corporativo: discovery/domains/01-corporativo.md
+      - Curriculo do Pesquisador (Modelo): discovery/domains/01-corporativo-pesquisador.md
       - Planejamento: discovery/domains/02-planejamento.md
       - Fomento Pre-Award: discovery/domains/03-fomento-pre-award.md
       - Fomento Post-Award: discovery/domains/04-fomento-post-award.md
@@ -100,6 +101,8 @@ nav:
       - Suporte e Inteligencia: discovery/domains/06-suporte-inteligencia.md
       - Importacao SIGFAPES: discovery/domains/07-importacao-sigfapes.md
       - Acao Transversal: discovery/domains/08-acao-transversal.md
+      - Integracao Lattes: discovery/integracoes/lattes.md
+      - Integracao ORCID: discovery/integracoes/orcid.md
 
   - Produtos:
       - products/README.md
@@ -491,6 +494,29 @@ nav:
           - EPIC-001: implementation/modules/M022-contratacao-outorga/epics/EPIC-M022-001.md
           - EPIC-002: implementation/modules/M022-contratacao-outorga/epics/EPIC-M022-002.md
           - EPIC-003: implementation/modules/M022-contratacao-outorga/epics/EPIC-M022-003.md
+      - M023 Integracoes:
+          - implementation/modules/M023-integracoes/README.md
+          - Backlog: implementation/modules/M023-integracoes/backlog.md
+          - Contrato: implementation/modules/M023-integracoes/contrato.md
+          - Contrato API: implementation/modules/M023-integracoes/contrato-api.md
+          - Modelo Estrutural: implementation/modules/M023-integracoes/modelo-estrutural.md
+          - Modelo Comportamental: implementation/modules/M023-integracoes/modelo-comportamental.md
+          - Modelo de Processo: implementation/modules/M023-integracoes/modelo-processo.md
+          - Adapter E-Docs:
+              - implementation/modules/M023-integracoes/e-docs/README.md
+              - Adapter: implementation/modules/M023-integracoes/e-docs/adapter.md
+              - Fluxos: implementation/modules/M023-integracoes/e-docs/fluxos.md
+          - Adapter Lattes (CNPq):
+              - implementation/modules/M023-integracoes/lattes/README.md
+              - Adapter: implementation/modules/M023-integracoes/lattes/adapter.md
+          - Adapter ORCID:
+              - implementation/modules/M023-integracoes/orcid/README.md
+              - Adapter: implementation/modules/M023-integracoes/orcid/adapter.md
+      - M024 Curriculo do Pesquisador:
+          - implementation/modules/M024-curriculo-pesquisador/README.md
+          - Modelo Estrutural: implementation/modules/M024-curriculo-pesquisador/modelo-estrutural.md
+          - Contrato API: implementation/modules/M024-curriculo-pesquisador/contrato-api.md
+          - Eventos de Dominio: implementation/modules/M024-curriculo-pesquisador/eventos-dominio.md
 
   - Gestao:
       - management/README.md

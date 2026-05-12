@@ -15,28 +15,45 @@
 
 ### Adapters por provedor
 
-| Provedor | Pasta | Descricao |
-|----------|-------|-----------|
-| **E-Docs ES** | [e-docs/](e-docs/README.md) | Adapter para o sistema oficial de documentos eletronicos do Estado do ES — V2 |
+| Provedor | Pasta | Capacidade | Descricao |
+|----------|-------|------------|-----------|
+| **E-Docs ES** | [e-docs/](e-docs/README.md) | Assinatura eletronica qualificada | Adapter para o sistema oficial de documentos eletronicos do Estado do ES — V2 |
+| **Plataforma Lattes (CNPq)** | [lattes/](lattes/README.md) | Importacao de curriculo academico | Adapter para importar e sincronizar curriculos do CNPq, alimentando entidades de [M024 — Curriculo do Pesquisador](../M024-curriculo-pesquisador/README.md) |
+| **ORCID (Public API)** | [orcid/](orcid/README.md) | Importacao de curriculo academico | Adapter para o registro publico ORCID. Fonte complementar ao Lattes, especialmente para pesquisador estrangeiro e producao bibliografica indexada por DOI. Alimenta entidades de M024 |
 
-> Novos provedores (ICP-Brasil direto, GovBR, DocuSign etc) entram como subpastas adicionais sem alterar o modelo de dominio (atributo `provedor` na `SolicitacaoAssinatura`).
+> Novos provedores (ICP-Brasil direto, GovBR, DocuSign, OpenAlex etc.) entram como subpastas adicionais. Cada adapter tem dominio proprio — assinatura usa `SolicitacaoAssinatura`/`Signatario`; adapters de curriculo (Lattes, ORCID) sao sincronos e populam entidades do M024 sem agregado persistido em M023.
 
 ---
 
 ## Sobre o Modulo
 
-M023 e o modulo de **integracoes** com sistemas externos para coleta de **assinaturas eletronicas qualificadas** sobre documentos do Conecta. Hoje atende:
+M023 e o modulo de **integracoes com sistemas externos** do Conecta. Hospeda adapters plugaveis que abstraem a comunicacao com APIs e plataformas externas atras de comandos e eventos genericos, isolando os modulos consumidores de detalhes de OAuth, polling, parsing, retries e idiossincrasias de cada provedor.
+
+Hoje cobre duas familias de integracao:
+
+### Familia 1 — Assinatura eletronica qualificada
+
+Coleta de assinaturas com valor juridico sobre documentos do Conecta:
 
 - Termo de Compromisso de Bolsa (M009)
 - Termo de Outorga (M022)
 - Termo de Aceite e Plano de Trabalho (M003)
 - Termo de Cooperacao e aditivos (M010)
 
-Antes do M023, o sistema apenas registrava `dataAssinatura` localmente, sem evidencia juridica. Esse vacuo bloqueava a formalizacao de bolsa (M009 EPIC-003 explicitamente "A definir") e a publicacao em Diario Oficial.
+Antes do M023, o sistema apenas registrava `dataAssinatura` localmente, sem evidencia juridica. Esse vacuo bloqueava a formalizacao de bolsa (M009 EPIC-003 explicitamente "A definir") e a publicacao em Diario Oficial. Adapter ativo: **E-Docs ES V2** ([e-docs/](e-docs/README.md)).
 
-M023 abstrai a comunicacao com qualquer **provedor de assinatura externo** atras de um modelo de dominio agnostico. Modulos consumidores chamam comandos genericos (`EnviarDocumentoParaAssinatura`, `ConsultarStatusAssinatura`, `BaixarDocumentoAssinado`) e recebem eventos genericos (`DocumentoAssinadoCompletamente`, `AssinaturaRecusada`, etc) sem precisar conhecer OAuth, MinIO, polling ou detalhes do provedor especifico.
+### Familia 2 — Importacao de curriculo academico
 
-Hoje o adapter implementado e o **E-Docs ES V2**, descrito em detalhe em [e-docs/](e-docs/README.md).
+Importacao e sincronizacao do curriculo do pesquisador para alimentar o modelo de dominio do M024:
+
+- Selecao de Consultor Ad Hoc por expertise (M011)
+- Validacao automatica de elegibilidade em editais (M011, M024)
+- Indicadores agregados de producao cientifica FAPES (M018, M019)
+- Perfil/vitrine do pesquisador no Conecta (M024)
+
+Adapters ativos:
+- **Plataforma Lattes (CNPq)** ([lattes/](lattes/README.md)) -- fonte canonica para pesquisador brasileiro.
+- **ORCID Public API** ([orcid/](orcid/README.md)) -- complementar, especialmente para pesquisador estrangeiro e producao bibliografica indexada por DOI.
 
 | Atributo | Valor |
 |----------|-------|
@@ -49,13 +66,21 @@ Hoje o adapter implementado e o **E-Docs ES V2**, descrito em detalhe em [e-docs
 
 ## Dominio
 
-O M023 e dono apenas dos artefatos de integracao. Os documentos canonicos (`Documento`) pertencem ao M008. Os fluxos de negocio (Termo de Compromisso, Outorga, Aceite, Cooperacao) pertencem aos modulos respectivos. Aqui ficam:
+O M023 e dono apenas dos artefatos de integracao. Os documentos canonicos (`Documento`) pertencem ao M008; o curriculo academico (`Curriculo` e entidades filhas) pertence ao M024. Os fluxos de negocio (Termo de Compromisso, Outorga, Aceite, Cooperacao, selecao de Ad Hoc, etc.) pertencem aos modulos respectivos. Aqui ficam:
+
+### Dominio da Familia 1 (Assinatura)
 
 - **`SolicitacaoAssinatura`** — agregado que representa um pedido de assinatura. Liga `Documento` (M008) ao `idExterno` no provedor e mantem estado local sincronizado.
 - **`Signatario`** — entidade-filha que representa cada signatario do pedido (com papel, ordem, estado individual e motivo de recusa quando aplicavel).
 - **`EventoAssinatura`** — log imutavel de cada evento detectado durante polling. Auditoria + replay em caso de erro.
 
-Atributo `provedor` da `SolicitacaoAssinatura` indica qual adapter foi usado (`E_DOCS`, `ICP_BRASIL_DIRETO`, `GOVBR`, `OUTRO`). Nada acima do nivel de dominio depende de provedor especifico.
+Atributo `provedor` da `SolicitacaoAssinatura` indica qual adapter foi usado (`E_DOCS`, `ICP_BRASIL_DIRETO`, `GOVBR`, `OUTRO`).
+
+### Dominio da Familia 2 (Importacao de curriculo)
+
+A Familia 2 opera de forma **sincrona**: os adapters Lattes e ORCID retornam o snapshot persistido ou excecao tipada em-linha. Nao ha agregado de auditoria persistido em M023 -- sucesso e refletido em `Curriculo.dataUltimaSincronizacao` (M024); falhas vao para log estruturado.
+
+- **`AreaConhecimentoNaoMapeada`** — log de discrepancia quando o adapter encontra area do Lattes/ORCID que nao bate com cadastro CNPq canonico de M008. Sem agregado persistido; e item do DTO de retorno do adapter (publicado por M024 como evento de dominio).
 
 ---
 
@@ -92,12 +117,15 @@ Atributo `provedor` da `SolicitacaoAssinatura` indica qual adapter foi usado (`E
 
 ## Habilita
 
-| Modulo | Uso |
-|--------|-----|
-| M009 (Bolsa) | Termo de Compromisso (5 signatarios) |
-| M022 (Outorga) | Termo de Outorga (Outorgado + Diretor) |
-| M003 (Iniciativas) | Termo de Aceite, Plano de Trabalho |
-| M010 (Parcerias) | Termo de Cooperacao + aditivos |
+| Modulo | Uso | Familia |
+|--------|-----|---------|
+| M009 (Bolsa) | Termo de Compromisso (5 signatarios) | Assinatura |
+| M022 (Outorga) | Termo de Outorga (Outorgado + Diretor) | Assinatura |
+| M003 (Iniciativas) | Termo de Aceite, Plano de Trabalho | Assinatura |
+| M010 (Parcerias) | Termo de Cooperacao + aditivos | Assinatura |
+| [M024 (Curriculo Pesquisador)](../M024-curriculo-pesquisador/README.md) | Importa e sincroniza Curriculo via adapters Lattes e ORCID | Curriculo |
+| [M011 (Captacao)](../M011-configuracao-captacao/README.md) | Selecao de Ad Hoc consome curriculo importado | Curriculo |
+| [M018 (BI)](../M018-business-intelligence/README.md) | Indicadores agregados de producao cientifica | Curriculo |
 
 ---
 

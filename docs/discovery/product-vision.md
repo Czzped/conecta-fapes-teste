@@ -19,7 +19,7 @@ Cada domain define uma capacidade de negocio. Um modulo e a implementacao de um 
 
 | # | Domain | Descricao | Modulos |
 |---|--------|-----------|---------|
-| 01 | [Corporativo e Administrativo](domains/01-corporativo.md) | Identidades, cadastros mestres, estrutura organizacional e modalidades de bolsa | M001, M005, M006, M007, M008 |
+| 01 | [Corporativo e Administrativo](domains/01-corporativo.md) | Identidades, cadastros mestres, estrutura organizacional, modalidades de bolsa e curriculo de pesquisador | M001, M005, M006, M007, M008, M024 |
 | 02 | [Planejamento e Estrategia](domains/02-planejamento.md) | Plano estrategico, parcerias e programas de fomento | M010 |
 | 03 | [Fomento Pre-Award](domains/03-fomento-pre-award.md) | Captacao, selecao e contratacao de iniciativas | M011, M002 |
 | 04 | [Fomento Post-Award](domains/04-fomento-post-award.md) | Gestao de iniciativas captadas, acompanhamento, bolsistas e finalizacao | M003, M009, M012, M013, M014, M015 |

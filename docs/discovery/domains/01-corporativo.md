@@ -2,7 +2,7 @@
 
 Dados mestres transversais a toda a organizacao, gestao de identidades e parametros do sistema. Glossario dos conceitos centrais em [../glossario.md](../glossario.md).
 
-**Modulos que implementam este domain:** M001, M005, M006, M007, M008
+**Modulos que implementam este domain:** M001, M005, M006, M007, M008, M024
 
 ---
 
@@ -25,7 +25,7 @@ Cadastro e manutencao de pessoas fisicas (beneficiarios, pesquisadores, consulto
 
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|
-| 1.2.1 | Cadastro de Pessoa | Registrar dados de beneficiarios, pesquisadores e consultores ad hoc | Analista da Area Tecnica da Agencia | Art. 4, 2 e 3 |
+| 1.2.1 | Cadastro de Pessoa | Registrar dados de beneficiarios, pesquisadores e consultores ad hoc. Pessoa fisica pode ser enriquecida com curriculo Lattes via [M024](../../implementation/modules/M024-curriculo-pesquisador/README.md) — ver [§1.5](#15-curriculo-do-pesquisador) | Analista da Area Tecnica da Agencia | Art. 4, 2 e 3 |
 | 1.2.2 | Suspender Pessoa | Registrar alteracoes funcionais e movimentacoes internas de pessoas | Analista da Area Tecnica da Agencia | Art. 30, II |
 | 1.2.3 | Cadastro de Instituicoes de Ensino e Pesquisa | Registrar dados de instituicoes e seus representantes | Analista da Area Tecnica da Agencia | Art. 4 |
 | 1.2.4 | Cadastro de Unidades Organizacionais e hierarquia | Definir a estrutura organizacional das instituicoes parceiras | Analista da Area Tecnica da Agencia | — |
@@ -60,3 +60,23 @@ Cadastro e manutencao das modalidades, niveis e requisitos de bolsas definidos p
 | 1.4.3 | Cadastro de Niveis | Registrar niveis dentro de cada modalidade com valores e requisitos | Analista da Area Tecnica da Agencia | Art. 3, VII; Art. 37 |
 | 1.4.4 | Cadastro de Requisitos de Niveis | Definir requisitos de elegibilidade por nivel de bolsa | Analista da Area Tecnica da Agencia | Art. 14, I e VI; Art. 2 |
 | 1.4.5 | Atualizar Valores de Bolsa | Atualizar valores de apoio financeiro conforme novas resolucoes | Analista da Area Tecnica da Agencia | Art. 14, VII; Art. 25, III |
+
+## 1.5 Curriculo do Pesquisador
+
+Vinculacao e sincronizacao do curriculo Lattes a PessoaFisica cadastrada. Quando o curriculo e vinculado, a Pessoa passa a operar como Pesquisador na plataforma — pre-condicao para qualquer papel que exija titulacao, producao bibliografica ou area de atuacao (Orientador, Coordenador, Consultor Ad Hoc). O Conecta mantem replica local versionada dos dados do Lattes, sincronizada periodicamente; o Lattes (CNPq) e a fonte canonica e o Conecta nao edita dados academicos.
+
+**Implementado por:** [M024 — Curriculo do Pesquisador](../../implementation/modules/M024-curriculo-pesquisador/README.md)
+
+**Modelo conceitual:** [01-corporativo-pesquisador.md](01-corporativo-pesquisador.md)
+
+**Integracao externa:** [integracoes/lattes.md](../integracoes/lattes.md) (Discovery) — [Adapter Lattes em M023](../../implementation/modules/M023-integracoes/lattes/README.md) (Implementacao)
+
+| # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
+|---|---------------|-----------|---------|---------------------|
+| 1.5.1 | Vincular curriculo Lattes a Pessoa | Associar URL/numero Lattes a uma PessoaFisica, transformando-a em Pesquisador | Pesquisador (autosserviço), Analista da Area Tecnica da Agencia | Art. 4 |
+| 1.5.2 | Importar dados do Lattes via API | Coletar formacao academica, producao bibliografica, orientacoes, projetos, premios, eventos e idiomas do Lattes e persistir como replica local. Adapter em [M023/lattes](../../implementation/modules/M023-integracoes/lattes/README.md) | Sistema (M023 adapter) | Art. 4 |
+| 1.5.3 | Sincronizar curriculo Lattes periodicamente | Atualizar replica local com novas producoes/formacoes do pesquisador conforme frequencia definida | Sistema (M023 adapter, job) | — |
+| 1.5.4 | Consultar perfil de pesquisador | Visualizar curriculo (formacao, producao, orientacoes, projetos, premios, eventos, idiomas) no Conecta | Pesquisador, Analista, Consultor Ad Hoc | Art. 3, 3 |
+| 1.5.5 | Buscar pesquisadores por area de conhecimento ou producao | Filtrar pesquisadores por area CNPq, titulacao minima ou producao recente — base para selecao de Ad Hoc e identificacao de especialistas | Analista da Area Tecnica da Agencia | Art. 4, 2; Art. 12 |
+| 1.5.6 | Validar elegibilidade automatica contra requisitos de edital | Cruzar requisitos de edital (titulacao minima, producao minima) com curriculo importado | Sistema, Analista da Area Tecnica da Agencia | Art. 14, I e VI |
+| 1.5.7 | Indicadores agregados de producao cientifica | Consolidar producao dos pesquisadores beneficiarios para prestacao de contas e indicadores institucionais FAPES | Analista, Agencia de Fomento | Art. 18 |
