@@ -312,6 +312,12 @@ export function MyInfoPage() {
     padding: '1.5rem',
   };
   const dataFieldBackground = '#262626';
+  const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
+    <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
+      {children}
+      <span style={{ color: 'var(--destructive-foreground)', marginLeft: '4px' }}>*</span>
+    </label>
+  );
 
   return (
     <div className="w-full px-4 md:px-8 py-8">
@@ -425,9 +431,7 @@ export function MyInfoPage() {
               {/* Row 1: Nome Completo | Nome Social */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    Nome Completo
-                  </label>
+                  <RequiredLabel>Nome Completo</RequiredLabel>
                   <input
                     type="text"
                     defaultValue="Paulo Sérgio Junior"
@@ -442,9 +446,7 @@ export function MyInfoPage() {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    Nome Social
-                  </label>
+                  <RequiredLabel>Nome Social</RequiredLabel>
                   <input
                     type="text"
                     defaultValue=""
@@ -463,9 +465,7 @@ export function MyInfoPage() {
               {/* Row 2: CPF | Data de Nascimento */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    CPF
-                  </label>
+                  <RequiredLabel>CPF</RequiredLabel>
                   <input
                     type="text"
                     defaultValue="123.456.789-00"
@@ -480,9 +480,7 @@ export function MyInfoPage() {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    Data de Nascimento
-                  </label>
+                  <RequiredLabel>Data de Nascimento</RequiredLabel>
                   <input
                     type="date"
                     defaultValue="1995-03-15"
@@ -501,9 +499,7 @@ export function MyInfoPage() {
               {/* Row 3: E-mail | Celular */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    E-mail
-                  </label>
+                  <RequiredLabel>E-mail</RequiredLabel>
                   <input
                     type="email"
                     defaultValue="paulo.souza@example.com"
@@ -518,9 +514,7 @@ export function MyInfoPage() {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    Celular
-                  </label>
+                  <RequiredLabel>Celular</RequiredLabel>
                   <input
                     type="tel"
                     defaultValue="(27) 99999-9999"
@@ -539,9 +533,7 @@ export function MyInfoPage() {
               {/* Row 4: Gênero | Etnia */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    Gênero
-                  </label>
+                  <RequiredLabel>Gênero</RequiredLabel>
                   <input
                     type="text"
                     defaultValue="Masculino"
@@ -556,9 +548,7 @@ export function MyInfoPage() {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    Etnia
-                  </label>
+                  <RequiredLabel>Etnia</RequiredLabel>
                   <Dropdown
                     value={selectedEthnicity}
                     onChange={setSelectedEthnicity}
@@ -571,9 +561,7 @@ export function MyInfoPage() {
               {/* Row 5: Lattes | Nível Acadêmico */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    Lattes
-                  </label>
+                  <RequiredLabel>Lattes</RequiredLabel>
                   <input
                     type="url"
                     defaultValue="http://lattes.cnpq.br/1234567890"
@@ -589,9 +577,7 @@ export function MyInfoPage() {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    Nível Acadêmico
-                  </label>
+                  <RequiredLabel>Nível Acadêmico</RequiredLabel>
                   <Dropdown
                     value={selectedAcademicLevel}
                     onChange={setSelectedAcademicLevel}
@@ -611,9 +597,7 @@ export function MyInfoPage() {
               {/* Row 1: Rua | Número | Complemento */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-1">
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    Rua
-                  </label>
+                  <RequiredLabel>Rua</RequiredLabel>
                   <input
                     type="text"
                     defaultValue="Rua das Flores"
@@ -628,9 +612,7 @@ export function MyInfoPage() {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    Número
-                  </label>
+                  <RequiredLabel>Número</RequiredLabel>
                   <input
                     type="text"
                     defaultValue="123"
@@ -645,9 +627,7 @@ export function MyInfoPage() {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    Complemento
-                  </label>
+                  <RequiredLabel>Complemento</RequiredLabel>
                   <input
                     type="text"
                     defaultValue="Apto 101"
@@ -666,9 +646,7 @@ export function MyInfoPage() {
               {/* Row 2: CEP | Bairro | Município */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    CEP
-                  </label>
+                  <RequiredLabel>CEP</RequiredLabel>
                   <input
                     type="text"
                     defaultValue="29000-000"
@@ -683,9 +661,7 @@ export function MyInfoPage() {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    Bairro
-                  </label>
+                  <RequiredLabel>Bairro</RequiredLabel>
                   <input
                     type="text"
                     defaultValue="Centro"
@@ -700,9 +676,7 @@ export function MyInfoPage() {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    Município
-                  </label>
+                  <RequiredLabel>Município</RequiredLabel>
                   <input
                     type="text"
                     defaultValue="Vitória"
@@ -721,9 +695,7 @@ export function MyInfoPage() {
               {/* Row 3: Estado | País */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    Estado
-                  </label>
+                  <RequiredLabel>Estado</RequiredLabel>
                   <input
                     type="text"
                     defaultValue="Espírito Santo"
@@ -738,9 +710,7 @@ export function MyInfoPage() {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    País
-                  </label>
+                  <RequiredLabel>País</RequiredLabel>
                   <input
                     type="text"
                     defaultValue="Brasil"
@@ -764,9 +734,7 @@ export function MyInfoPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                  Banco
-                </label>
+                <RequiredLabel>Banco</RequiredLabel>
                 <input
                   type="text"
                   value="Banestes"
@@ -783,9 +751,7 @@ export function MyInfoPage() {
                 />
               </div>
               <div>
-                <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                  Agência
-                </label>
+                <RequiredLabel>Agência</RequiredLabel>
                 <input
                   type="text"
                   defaultValue="0001"
@@ -800,9 +766,7 @@ export function MyInfoPage() {
                 />
               </div>
               <div>
-                <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                  Conta
-                </label>
+                <RequiredLabel>Conta</RequiredLabel>
                 <input
                   type="text"
                   defaultValue="12345678-9"

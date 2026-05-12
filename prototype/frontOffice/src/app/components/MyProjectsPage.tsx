@@ -12,7 +12,8 @@ interface MyProjectsPageProps {
 export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: MyProjectsPageProps) {
   const { t } = useLanguage();
   const [isWorkPlanExpanded, setIsWorkPlanExpanded] = useState(false);
-  const timelineActiveColor = '#0891b2';
+  const timelineActiveColor = '#0e7490';
+  const timelineCurrentColor = '#06b6d4';
 
   const projectStages = [
     { id: 1, label: 'Submissão', phase: 'Pre-award', source: 'M011', date: '15/01/2024', icon: Send, status: 'completed' },
@@ -241,11 +242,13 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                           width: '48px',
                           height: '48px',
                           borderRadius: '50%',
-                          backgroundColor: isCompleted || isCurrent 
-                            ? timelineActiveColor 
+                          backgroundColor: isCurrent
+                            ? timelineCurrentColor
+                            : isCompleted
+                            ? timelineActiveColor
                             : 'var(--muted)',
-                          border: isCurrent ? `3px solid ${timelineActiveColor}` : 'none',
-                          boxShadow: isCurrent ? `0 0 0 4px color-mix(in srgb, ${timelineActiveColor} 20%, transparent)` : 'none',
+                          border: isCurrent ? `3px solid ${timelineCurrentColor}` : 'none',
+                          boxShadow: isCurrent ? `0 0 0 4px color-mix(in srgb, ${timelineCurrentColor} 20%, transparent)` : 'none',
                         }}
                       >
                         <Icon 
@@ -339,11 +342,13 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                           width: '48px',
                           height: '48px',
                           borderRadius: '50%',
-                          backgroundColor: isCompleted || isCurrent 
-                            ? timelineActiveColor 
+                          backgroundColor: isCurrent
+                            ? timelineCurrentColor
+                            : isCompleted
+                            ? timelineActiveColor
                             : 'var(--muted)',
-                          border: isCurrent ? `3px solid ${timelineActiveColor}` : 'none',
-                          boxShadow: isCurrent ? `0 0 0 4px color-mix(in srgb, ${timelineActiveColor} 20%, transparent)` : 'none',
+                          border: isCurrent ? `3px solid ${timelineCurrentColor}` : 'none',
+                          boxShadow: isCurrent ? `0 0 0 4px color-mix(in srgb, ${timelineCurrentColor} 20%, transparent)` : 'none',
                         }}
                       >
                         <Icon 
@@ -611,7 +616,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                   </div>
 
                   <div
-                    className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3"
+                    className={`grid grid-cols-1 sm:grid-cols-2 ${alocado ? 'xl:grid-cols-4' : 'xl:grid-cols-3'} gap-3`}
                     style={{
                       minWidth: 0,
                     }}

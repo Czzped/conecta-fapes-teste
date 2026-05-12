@@ -182,6 +182,8 @@ const paresMunicipiosLimitrofes = new Set([
   'Vila Velha/ES|Vitória/ES',
 ]);
 
+const mensagemDistanciaMinimaDiaria = 'A distância mínima para solicitar uma Diária é de 150km';
+
 function normalizarParLocalidades(origem: string, destino: string) {
   return [origem, destino].sort((a, b) => a.localeCompare(b, 'pt-BR')).join('|');
 }
@@ -243,10 +245,6 @@ function calcularDiarias(
   }
 
   const horas = (fim - inicio) / 36e5;
-  if (usaDistancia && (!Number.isFinite(distanciaKm) || distanciaKm <= 0)) {
-    return { quantidade: 0, bloqueado: true, motivoBloqueio: 'Não foi possível calcular automaticamente a distância entre origem e destino.', memoria: 'Distância automática obrigatória para aplicar bloqueios normativos.' };
-  }
-
   const diaInicio = new Date(inicioData.getFullYear(), inicioData.getMonth(), inicioData.getDate()).getTime();
   const diaFim = new Date(fimData.getFullYear(), fimData.getMonth(), fimData.getDate()).getTime();
   const diasFora = Math.round((diaFim - diaInicio) / 86400000);
@@ -274,8 +272,8 @@ function calcularDiarias(
     };
   }
 
-  if (usaDistancia && distanciaKm < 150) {
-    return { quantidade: 0, bloqueado: true, motivoBloqueio: 'É permitido solicitar diária apenas para distâncias a partir de 150 km.', memoria: 'Bloqueio por distância mínima de 150 km.' };
+  if (usaDistancia && (!Number.isFinite(distanciaKm) || distanciaKm < 150)) {
+    return { quantidade: 0, bloqueado: true, motivoBloqueio: mensagemDistanciaMinimaDiaria, memoria: 'Bloqueio por distância mínima de 150 km.' };
   }
 
   if (usaDistancia && !possuiPernoite && deslocamentoRegiaoMetropolitana) {
@@ -1078,7 +1076,18 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
   const saldoAposSolicitacao = saldoDisponivelDiarias - valorTotalCalculado;
   const solicitacaoExcedeSaldo = valorTotalCalculado > saldoDisponivelDiarias;
   const solicitacaoBloqueada = diariaFormIncompleto || solicitacaoExcedeSaldo || calculoDiaria.bloqueado;
-  const bloqueioDistanciaMinima = calculoDiaria.motivoBloqueio === 'É permitido solicitar diária apenas para distâncias a partir de 150 km.';
+  const distanciaAbaixoMinimo = Boolean(
+    usaDistanciaNoCalculo &&
+      origem.trim() &&
+      destino.trim() &&
+      (!Number.isFinite(distanciaKmNumerica) || distanciaKmNumerica < 150),
+  );
+  const bloqueioDistanciaMinima = calculoDiaria.motivoBloqueio === mensagemDistanciaMinimaDiaria || distanciaAbaixoMinimo;
+  const distanciaDiariaTexto = origem && destino
+    ? bloqueioDistanciaMinima
+      ? mensagemDistanciaMinimaDiaria
+      : 'Aprovada'
+    : 'Preencha origem e destino para calcular automaticamente.';
   const mensagemSolicitacaoDiaria = calculoDiaria.bloqueado
     ? calculoDiaria.motivoBloqueio
     : diariaFormIncompleto
@@ -1235,6 +1244,11 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
     setTipoViagemSelecionado(tipoViagem);
     if (!tipoViagem) return;
 
+    if (tipoViagem === 'INTERNACIONAL') {
+      setDestino('');
+      return;
+    }
+
     const destinoCompativel = destinosDiaria.find((item) => item.value === destino && item.tipoViagem === tipoViagem);
     if (!destinoCompativel) {
       const primeiroDestino = destinosDiaria.find((item) => item.tipoViagem === tipoViagem);
@@ -1295,7 +1309,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
         tipoDiaria: tipoDiariaAtual.codigo,
         tipoViagem: tipoViagemAtual.codigo,
         regraCalculo: tipoDiariaAtual.regra,
-        memoriaCalculoSnapshot: `${calculoDiaria.memoria} Origem: ${origem}. Destino: ${destino}. ${usaDistanciaNoCalculo ? `Distância: ${distanciaKmNumerica.toLocaleString('pt-BR')} km.` : 'Distância não aplicada para viagens nacionais ou internacionais.'} Custeios externos: ${custeiosExternos}. Parâmetro ${diariaVigenteAtual.parametroRef}.`,
+        memoriaCalculoSnapshot: `${calculoDiaria.memoria} Origem: ${origem}. Destino: ${destino}. ${usaDistanciaNoCalculo ? `Distância: ${distanciaKmNumerica.toLocaleString('pt-BR')} km.` : 'Distância aprovada para este tipo de viagem.'} Custeios externos: ${custeiosExternos}. Parâmetro ${diariaVigenteAtual.parametroRef}.`,
         transacaoComprometimentoRef: `TR-2026-${String(45 + solicitacoesDiaria.length + index + 1).padStart(3, '0')}`,
       } satisfies DiariaRequest];
     });
@@ -1521,6 +1535,8 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                       backgroundColor:
                         solicitacao.status === 'APROVADA'
                           ? 'rgba(34, 197, 94, 0.12)'
+                          : solicitacao.status === 'ALOCADA'
+                          ? 'rgba(59, 130, 246, 0.12)'
                           : solicitacao.status === 'RECUSADA'
                           ? 'rgba(249, 115, 22, 0.14)'
                           : solicitacao.status === 'CANCELADA'
@@ -1529,6 +1545,8 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                       color:
                         solicitacao.status === 'APROVADA'
                           ? '#22c55e'
+                          : solicitacao.status === 'ALOCADA'
+                          ? 'rgb(59, 130, 246)'
                           : solicitacao.status === 'RECUSADA'
                           ? '#f97316'
                           : solicitacao.status === 'CANCELADA'
@@ -1537,6 +1555,8 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                       border: `1px solid ${
                         solicitacao.status === 'APROVADA'
                           ? 'rgba(34, 197, 94, 0.3)'
+                          : solicitacao.status === 'ALOCADA'
+                          ? 'rgba(59, 130, 246, 0.3)'
                           : solicitacao.status === 'RECUSADA'
                           ? 'rgba(249, 115, 22, 0.35)'
                           : solicitacao.status === 'CANCELADA'
@@ -2886,6 +2906,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                       value={tipoViagemSelecionado}
                       onChange={(value) => alterarTipoViagem(value as TipoViagemCodigo)}
                       placeholder="Selecione o tipo de viagem"
+                      showSelectedIcon={false}
                       options={[
                         { value: 'DENTRO_ESTADO', label: 'Dentro do estado - R$ 260 - 12h' },
                         { value: 'FORA_ESTADO', label: 'Nacional - R$ 320 - 12h' },
@@ -2903,6 +2924,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                         value={origem}
                         onChange={setOrigem}
                         placeholder="Selecione a origem"
+                        showSelectedIcon={false}
                         options={origensDiaria.map((localidade) => ({ value: localidade, label: localidade }))}
                         />
                       </div>
@@ -2946,12 +2968,28 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                     <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
                       Destino
                       <div className="mt-2">
-                        <Dropdown
-                        value={destino}
-                        onChange={alterarDestino}
-                        placeholder="Selecione o destino"
-                        options={destinosDiaria.map((item) => ({ value: item.value, label: item.label }))}
-                        />
+                        {tipoViagemSelecionado === 'INTERNACIONAL' ? (
+                          <input
+                            value={destino}
+                            onChange={(event) => setDestino(event.target.value)}
+                            placeholder="Digite o destino"
+                            className="w-full px-3 py-2"
+                            style={{
+                              backgroundColor: 'transparent',
+                              border: '1px solid var(--border)',
+                              borderRadius: 'var(--radius)',
+                              color: 'var(--foreground)',
+                              fontSize: 'var(--text-sm)',
+                            }}
+                          />
+                        ) : (
+                          <Dropdown
+                          value={destino}
+                          onChange={alterarDestino}
+                          placeholder="Selecione o destino"
+                          options={destinosDiaria.map((item) => ({ value: item.value, label: item.label }))}
+                          />
+                        )}
                       </div>
                     </label>
                     <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
@@ -3002,11 +3040,9 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                           fontSize: 'var(--text-sm)',
                         }}
                       >
-                        {origem && destino
-                          ? usaDistanciaNoCalculo && distanciaKmNumerica
-                            ? `${distanciaKmNumerica.toLocaleString('pt-BR')} km`
-                            : 'Distância não aplicada para este tipo de viagem.'
-                          : 'Preencha origem e destino para calcular automaticamente.'}
+                        <span style={{ color: bloqueioDistanciaMinima ? 'var(--destructive-foreground)' : 'var(--foreground)' }}>
+                          {distanciaDiariaTexto}
+                        </span>
                       </div>
                     </label>
                   )}
@@ -3199,21 +3235,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                               borderRadius: 'var(--radius)',
                             }}
                           >
-                            <div className="flex items-start justify-between gap-3">
-                              <div>
-                                <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
-                                  {label}
-                                </span>
-                                <span
-                                  style={{
-                                    color: label === 'Saldo após solicitação' && saldoProjetoAposSolicitacao < 0 ? '#f87171' : 'var(--foreground)',
-                                    fontSize: 'var(--text-base)',
-                                    fontWeight: 'var(--font-weight-normal)',
-                                  }}
-                                >
-                                  {value}
-                                </span>
-                              </div>
+                            <div className="flex items-start gap-3">
                               <div
                                 className="flex items-center justify-center"
                                 style={{
@@ -3227,9 +3249,23 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                               >
                                 <Icon size={17} />
                               </div>
-                            </div>
-                            <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.75rem' }}>
-                              {helper}
+                              <div style={{ minWidth: 0 }}>
+                                <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
+                                  {label}
+                                </span>
+                                <span
+                                  style={{
+                                    color: label === 'Saldo após solicitação' && saldoProjetoAposSolicitacao < 0 ? '#f87171' : 'var(--foreground)',
+                                    fontSize: 'var(--text-base)',
+                                    fontWeight: 'var(--font-weight-normal)',
+                                  }}
+                                >
+                                  {value}
+                                </span>
+                                <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.75rem' }}>
+                                  {helper}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -3261,10 +3297,10 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                       role="alert"
                       className="p-3"
                       style={{
-                        border: '1px solid color-mix(in srgb, #dc2626 35%, var(--border))',
+                        border: '1px solid color-mix(in srgb, var(--destructive-foreground) 35%, var(--border))',
                         borderRadius: 'var(--radius)',
-                        backgroundColor: 'color-mix(in srgb, #dc2626 10%, var(--background))',
-                        color: 'var(--foreground)',
+                        backgroundColor: 'color-mix(in srgb, var(--destructive-foreground) 10%, var(--background))',
+                        color: 'var(--destructive-foreground)',
                         fontSize: 'var(--text-sm)',
                         fontWeight: 'var(--font-weight-medium)',
                       }}
@@ -3292,7 +3328,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                         style={{
                           backgroundColor: 'transparent',
                           border: 'none',
-                          color: 'var(--primary)',
+                          color: 'var(--foreground)',
                           cursor: 'pointer',
                           font: 'inherit',
                           fontWeight: 'var(--font-weight-medium)',
@@ -3667,6 +3703,8 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                               backgroundColor:
                                 solicitacao.status === 'APROVADA'
                                   ? 'rgba(34, 197, 94, 0.12)'
+                                  : solicitacao.status === 'ALOCADA'
+                                  ? 'rgba(59, 130, 246, 0.12)'
                                   : solicitacao.status === 'RECUSADA'
                                   ? 'rgba(249, 115, 22, 0.14)'
                                   : solicitacao.status === 'CANCELADA'
@@ -3675,6 +3713,8 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                               color:
                                 solicitacao.status === 'APROVADA'
                                   ? '#22c55e'
+                                  : solicitacao.status === 'ALOCADA'
+                                  ? 'rgb(59, 130, 246)'
                                   : solicitacao.status === 'RECUSADA'
                                   ? '#f97316'
                                   : solicitacao.status === 'CANCELADA'
@@ -3683,6 +3723,8 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                               border: `1px solid ${
                                 solicitacao.status === 'APROVADA'
                                   ? 'rgba(34, 197, 94, 0.3)'
+                                  : solicitacao.status === 'ALOCADA'
+                                  ? 'rgba(59, 130, 246, 0.3)'
                                   : solicitacao.status === 'RECUSADA'
                                   ? 'rgba(249, 115, 22, 0.35)'
                                   : solicitacao.status === 'CANCELADA'
