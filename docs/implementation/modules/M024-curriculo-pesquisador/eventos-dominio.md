@@ -2,7 +2,7 @@
 
 Referencia de dominio e regras: [README.md](README.md) | [Modelo Estrutural](modelo-estrutural.md) | [Adapter Lattes (M023)](../M023-integracoes/lattes/adapter.md)
 
-M024 opera de forma **sincrona** com o adapter [M023/lattes](../M023-integracoes/lattes/README.md): a chamada `Sincronizar(numeroLattes)` retorna o snapshot ja persistido ou um erro. **Nao ha eventos assincronos consumidos do adapter** -- erros do adapter sao propagados em-linha como excecao/codigo de erro HTTP `502 ADAPTER_LATTES_FALHOU`.
+M024 opera de forma **sincrona** com o adapter [M023/lattes](../M023-integracoes/lattes/README.md): a chamada ao adapter retorna um snapshot academico normalizado ou um erro. M024 persiste esse snapshot em transacao propria. **Nao ha eventos assincronos consumidos do adapter** -- erros do adapter sao propagados em-linha como excecao/codigo de erro HTTP `502 ADAPTER_LATTES_FALHOU`.
 
 Apos cada mutacao com sucesso, M024 publica eventos de dominio para os consumidores. Os eventos sao **dominio puro** (in-process); cada consumidor escolhe se trata sincronamente (handler in-process) ou assincronamente (subscriber no barramento).
 
@@ -105,5 +105,17 @@ Publicado quando uma `PessoaFisica` previamente suspensa e reativada em M008 e p
 | Publica | `AreaConhecimentoNaoMapeada` | M024 | Log/curadoria |
 | Publica | `PesquisadorSuspenso` | M024 | M011, M019 |
 | Publica | `PesquisadorReativado` | M024 | M011, M019 |
+| Consome | `PessoaSuspensa` | M008 | M024 |
+| Consome | `PessoaReativada` | M008 | M024 |
+
+## Eventos Consumidos
+
+### `PessoaSuspensa`
+
+Consumido de M008 quando uma `PessoaFisica` entra em estado suspenso. Se a pessoa possuir `Curriculo` vinculado, M024 publica `PesquisadorSuspenso` para consumidores do dominio academico.
+
+### `PessoaReativada`
+
+Consumido de M008 quando uma `PessoaFisica` suspensa e reativada. Se a pessoa possuir `Curriculo` vinculado, M024 publica `PesquisadorReativado`; consumidores aplicam RN-M024-04 para decidir se o curriculo volta a ser elegivel.
 
 > **Nao ha eventos consumidos do adapter M023/lattes.** Toda comunicacao com o adapter e por chamada sincrona retornando snapshot ou erro -- ver [M023/lattes/adapter.md](../M023-integracoes/lattes/adapter.md).

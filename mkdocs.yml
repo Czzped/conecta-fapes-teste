@@ -514,9 +514,31 @@ nav:
               - Adapter: implementation/modules/M023-integracoes/orcid/adapter.md
       - M024 Curriculo do Pesquisador:
           - implementation/modules/M024-curriculo-pesquisador/README.md
-          - Modelo Estrutural: implementation/modules/M024-curriculo-pesquisador/modelo-estrutural.md
+          - Backlog: implementation/modules/M024-curriculo-pesquisador/backlog.md
+          - Contrato: implementation/modules/M024-curriculo-pesquisador/contrato.md
           - Contrato API: implementation/modules/M024-curriculo-pesquisador/contrato-api.md
+          - Modelo Estrutural: implementation/modules/M024-curriculo-pesquisador/modelo-estrutural.md
+          - Modelo Comportamental: implementation/modules/M024-curriculo-pesquisador/modelo-comportamental.md
           - Eventos de Dominio: implementation/modules/M024-curriculo-pesquisador/eventos-dominio.md
+          - EPICs:
+              - EPIC-M024-001: implementation/modules/M024-curriculo-pesquisador/epics/EPIC-M024-001.md
+              - EPIC-M024-002: implementation/modules/M024-curriculo-pesquisador/epics/EPIC-M024-002.md
+              - EPIC-M024-003: implementation/modules/M024-curriculo-pesquisador/epics/EPIC-M024-003.md
+              - EPIC-M024-004: implementation/modules/M024-curriculo-pesquisador/epics/EPIC-M024-004.md
+              - EPIC-M024-005: implementation/modules/M024-curriculo-pesquisador/epics/EPIC-M024-005.md
+              - EPIC-M024-006: implementation/modules/M024-curriculo-pesquisador/epics/EPIC-M024-006.md
+          - Submodelos:
+              - implementation/modules/M024-curriculo-pesquisador/submodelos/README.md
+              - 01 Curriculo: implementation/modules/M024-curriculo-pesquisador/submodelos/01-curriculo.md
+              - 02 Formacao Academica: implementation/modules/M024-curriculo-pesquisador/submodelos/02-formacao-academica.md
+              - 03 Artigos: implementation/modules/M024-curriculo-pesquisador/submodelos/03-artigos.md
+              - 04 Livros e Capitulos: implementation/modules/M024-curriculo-pesquisador/submodelos/04-livros.md
+              - 05 Orientacoes: implementation/modules/M024-curriculo-pesquisador/submodelos/05-orientacoes.md
+              - 06 Projetos: implementation/modules/M024-curriculo-pesquisador/submodelos/06-projetos.md
+              - 07 Eventos: implementation/modules/M024-curriculo-pesquisador/submodelos/07-eventos.md
+              - 08 Premios: implementation/modules/M024-curriculo-pesquisador/submodelos/08-premios.md
+              - 09 Idiomas: implementation/modules/M024-curriculo-pesquisador/submodelos/09-idiomas.md
+              - 10 Cadastros de Apoio e Referencias: implementation/modules/M024-curriculo-pesquisador/submodelos/10-cadastros-apoio.md
 
   - Gestao:
       - management/README.md
