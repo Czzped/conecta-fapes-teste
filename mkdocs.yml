@@ -538,7 +538,7 @@ nav:
               - 07 Eventos: implementation/modules/M024-curriculo-pesquisador/submodelos/07-eventos.md
               - 08 Premios: implementation/modules/M024-curriculo-pesquisador/submodelos/08-premios.md
               - 09 Idiomas: implementation/modules/M024-curriculo-pesquisador/submodelos/09-idiomas.md
-              - 10 Cadastros de Apoio: implementation/modules/M024-curriculo-pesquisador/submodelos/10-cadastros-apoio.md
+              - 10 Cadastros de Apoio e Referencias: implementation/modules/M024-curriculo-pesquisador/submodelos/10-cadastros-apoio.md
 
   - Gestao:
       - management/README.md

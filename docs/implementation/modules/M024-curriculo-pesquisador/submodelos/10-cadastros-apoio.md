@@ -1,10 +1,14 @@
-# Submodelo 10 — Cadastros de Apoio
+# Submodelo 10 — Cadastros de Apoio e Referencias
 
 [← Modelo Estrutural](../modelo-estrutural.md) | [M024](../README.md)
 
 ## Escopo
 
-Consolida entidades auxiliares usadas por mais de um submodelo. Algumas vivem em M024 (`Periodico`, `NivelOrientacao`, `TipoProjeto`), outras sao apenas referencias canonicas de M008.
+Consolida tres tipos de dependencia estrutural usadas por mais de um submodelo:
+
+- cadastros locais mantidos em M024 (`Periodico`, `NivelOrientacao`, `TipoProjeto`);
+- entidades compartilhaveis do proprio dominio (`Artigo`, `Projeto`);
+- referencias canonicas externas mantidas em M008 (`PessoaFisica`, `Instituicao`, `AreaConhecimento`, `Cidade`).
 
 ## Diagrama
 
@@ -61,19 +65,29 @@ classDiagram
 | | nome | Nome do tipo de projeto | Sim | String | | 100 | Nao |
 | | descricao | Descricao do tipo de projeto | Nao | String | | 500 | Nao |
 
-## Relacionamentos
+## Cadastros Locais M024
 
-| Entidade | Tipo | Usado por | Observacao |
-|----------|------|-----------|------------|
-| `Periodico` | Cadastro local M024 | [Artigos](03-artigos.md) | Cadastro compartilhado, deduplicado por `issn` ou nome normalizado |
-| `Artigo` | Producao compartilhavel M024 | [Artigos](03-artigos.md) | Pode aparecer em mais de um curriculo; deduplicado por `doi` ou `(titulo, ano, periodico)` |
-| `NivelOrientacao` | Cadastro local M024 | [Orientacoes](05-orientacoes.md) | Valores iniciais: IC, M, D, PD |
-| `TipoProjeto` | Cadastro local M024 | [Projetos](06-projetos.md) | Valores iniciais: PESQUISA, EXTENSAO, DESENVOLVIMENTO, ENSINO, OUTRO |
-| `Projeto` | Producao/atividade compartilhavel M024 | [Projetos](06-projetos.md) | Pode aparecer em mais de um curriculo por meio de `ParticipacaoProjeto` |
-| `PessoaFisica` | Referencia M008 | Curriculo, Artigos, Orientacoes | Titular do curriculo, autores de artigos e orientandos |
-| `Instituicao` | Referencia M008 | Formacao, Livros, Orientacoes, Projetos, Premios | Match-or-create pelo adapter quando vier do Lattes |
-| `AreaConhecimento` | Referencia M008 | Curriculo, Formacao | Cadastro canonico CNPq |
-| `Cidade` | Referencia M008 | Eventos | Local de evento quando inferivel |
+| Entidade | Usado por | Observacao |
+|----------|-----------|------------|
+| `Periodico` | [Artigos](03-artigos.md) | Cadastro compartilhado, deduplicado por `issn` ou nome normalizado |
+| `NivelOrientacao` | [Orientacoes](05-orientacoes.md) | Valores iniciais: IC, M, D, PD |
+| `TipoProjeto` | [Projetos](06-projetos.md) | Valores iniciais: PESQUISA, EXTENSAO, DESENVOLVIMENTO, ENSINO, OUTRO |
+
+## Entidades Compartilhaveis M024
+
+| Entidade | Usado por | Observacao |
+|----------|-----------|------------|
+| `Artigo` | [Artigos](03-artigos.md) | Pode aparecer em mais de um curriculo; deduplicado por `doi` ou `(titulo, ano, periodico)` |
+| `Projeto` | [Projetos](06-projetos.md) | Pode aparecer em mais de um curriculo por meio de `ParticipacaoProjeto` |
+
+## Referencias Canonicas M008
+
+| Entidade | Usado por | Observacao |
+|----------|-----------|------------|
+| `PessoaFisica` | Curriculo, Artigos, Orientacoes, Projetos | Titular do curriculo, autores de artigos, orientandos e participantes de projetos |
+| `Instituicao` | Formacao, Livros, Orientacoes, Projetos, Premios | Associada por M024 durante a persistencia do snapshot; nomes sem correspondencia seguem politica de reconciliacao/match-or-create de M008 |
+| `AreaConhecimento` | Curriculo, Formacao | Cadastro canonico CNPq |
+| `Cidade` | Eventos | Local de evento quando inferivel |
 
 ## Regras
 

@@ -4,7 +4,7 @@ Referencia de dominio e regras de negocio: [README.md](README.md) | [modelo-estr
 
 ## Visao Geral
 
-Especifica o contrato HTTP REST do M024 como bounded context responsavel pelo `Curriculo` academico do pesquisador. Integracao com o CNPq Lattes esta em [M023/lattes](../M023-integracoes/lattes/README.md) -- as rotas de sincronizacao deste modulo invocam o adapter de forma **sincrona** e retornam o resultado final na mesma resposta.
+Especifica o contrato HTTP REST do M024 como bounded context responsavel pelo `Curriculo` academico do pesquisador. Integracao com o CNPq Lattes esta em [M023/lattes](../M023-integracoes/lattes/README.md) -- as rotas de sincronizacao deste modulo invocam o adapter de forma **sincrona**, persistem o snapshot no proprio M024 e retornam o resultado final na mesma resposta.
 
 ### Base URL
 
@@ -22,7 +22,7 @@ Especifica o contrato HTTP REST do M024 como bounded context responsavel pelo `C
 | Identificadores | CPF (somente digitos), `numeroLattes` |
 | Encoding | UTF-8 |
 | Idioma de erros | Portugues brasileiro |
-| Modelo de execucao | **Sincrono**. Vincular/Sincronizar chamam o adapter e bloqueiam ate concluir (sucesso ou erro). Sem polling, sem eventos assincronos. |
+| Modelo de execucao | **Sincrono**. Vincular/Sincronizar chamam o adapter, recebem snapshot academico normalizado e persistem em transacao no M024. Sem polling, sem eventos assincronos com o adapter. |
 
 ### Autorizacao
 
@@ -122,7 +122,7 @@ Associa um `numeroLattes` a uma `PessoaFisica` existente e executa a primeira si
 
 #### `POST /api/v1/m024/pesquisadores/{cpf}/curriculo/sincronizar`
 
-Reexecuta a sincronizacao do curriculo. Delega ao adapter M023/lattes que substitui as entidades filhas e vinculos academicos do snapshot anterior (incluindo vinculos com artigos compartilhados) a partir do snapshot atual do Lattes (RN-M024-03). Sincrona: a resposta carrega o `Curriculo` atualizado, ou retorna erro mantendo o snapshot anterior intacto.
+Reexecuta a sincronizacao do curriculo. M024 chama M023/lattes para obter o snapshot academico normalizado e, em transacao propria, substitui as entidades filhas e vinculos academicos do snapshot anterior (incluindo vinculos com artigos compartilhados) a partir do snapshot atual do Lattes (RN-M024-03). Sincrona: a resposta carrega o `Curriculo` atualizado, ou retorna erro mantendo o snapshot anterior intacto.
 
 - **Autorizacao:** `PESQUISADOR` (proprio CPF) ou `ANALISTA_AGENCIA`
 - **Operacao de origem:** `SincronizarCurriculo`
@@ -185,7 +185,7 @@ Retorna o perfil completo do pesquisador (Curriculo + entidades academicas e vin
     "dataAtualizacaoLattes": "2026-05-03",
     "dataUltimaSincronizacao": "2026-05-11T14:32:42Z",
     "resumo": "Pesquisadora em Ciencia da Computacao...",
-    "valido": true,
+    "curriculoValido": true,
     "formacoes": [],
     "artigos": [],
     "livros": [],
@@ -199,7 +199,7 @@ Retorna o perfil completo do pesquisador (Curriculo + entidades academicas e vin
 }
 ```
 
-O campo `valido` reflete RN-M024-04 (sincronizado nos ultimos 12 meses).
+O campo `curriculoValido` reflete RN-M024-04 (sincronizado nos ultimos 12 meses).
 
 **Erros**
 

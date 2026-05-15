@@ -8,7 +8,7 @@ Os EPICs foram reorganizados a partir dos submodelos estruturais do M024. O modu
 
 | Subdominio | Submodelos | EPIC |
 |------------|------------|------|
-| Nucleo do curriculo | 01 - Curriculo, 10 - Cadastros de Apoio | EPIC-M024-001 |
+| Nucleo do curriculo | 01 - Curriculo, 10 - Cadastros de Apoio e Referencias | EPIC-M024-001 |
 | Formacao e titulacao | 02 - Formacao Academica, AreaConhecimento | EPIC-M024-002 |
 | Producoes bibliograficas | 03 - Artigos, 04 - Livros e Capitulos, Periodico | EPIC-M024-003 |
 | Atuacao academica | 05 - Orientacoes, 06 - Projetos | EPIC-M024-004 |

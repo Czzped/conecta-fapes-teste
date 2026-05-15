@@ -15,7 +15,7 @@
 | [07 - Eventos](07-eventos.md) | Participacoes em eventos cientificos, papel, ano e local |
 | [08 - Premios](08-premios.md) | Premios, titulos honorificos, homenagens e entidade concedente |
 | [09 - Idiomas](09-idiomas.md) | Idiomas e proficiencia por compreensao, fala, leitura e escrita |
-| [10 - Cadastros de Apoio](10-cadastros-apoio.md) | Cadastros locais do M024 e referencias canonicas externas de M008 |
+| [10 - Cadastros de Apoio e Referencias](10-cadastros-apoio.md) | Cadastros locais, entidades compartilhadas e referencias canonicas externas de M008 |
 
 ## Convencao
 

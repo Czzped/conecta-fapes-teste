@@ -60,6 +60,6 @@ classDiagram
 
 - RN-M024-03: reimportacao apaga os vinculos `Curriculo` x `Artigo` do curriculo sincronizado e recria a partir do snapshot atual. O registro compartilhado de `Artigo` nao e apagado se estiver vinculado a outro curriculo.
 - `Periodico` nao e composicao de `Curriculo`; persiste como cadastro compartilhado.
-- `Periodico.issn` e a chave de deduplicacao preferencial; quando ausente, o adapter usa nome normalizado.
-- `Artigo.doi` e a chave de deduplicacao preferencial; quando ausente, o adapter usa a combinacao normalizada `(titulo, ano, periodico)`.
+- `Periodico.issn` e a chave de deduplicacao preferencial; quando ausente, M024 usa nome normalizado durante a persistencia.
+- `Artigo.doi` e a chave de deduplicacao preferencial; quando ausente, M024 usa a combinacao normalizada `(titulo, ano, periodico)` durante a persistencia.
 - `qualis` nao e dado canonico do Lattes; quando indisponivel, fica vazio.

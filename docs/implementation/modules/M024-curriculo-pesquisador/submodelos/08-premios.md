@@ -26,7 +26,7 @@ classDiagram
     }
 
     Curriculo "1" *-- "0..*" Premio
-    Premio "0..*" -- "1" Instituicao : entidade
+    Premio "0..*" -- "0..1" Instituicao : entidade
 ```
 
 ## Dicionario de Dados
@@ -41,11 +41,10 @@ classDiagram
 | Relacao | Cardinalidade | Descricao |
 |---------|----------------|-----------|
 | curriculo | 1 | `Curriculo` ao qual o premio pertence |
-| entidade | 1 | [M008 Instituicao](../../M008-cadastros-corporativos/instituicoes/README.md) que conferiu o premio |
+| entidade | 0..1 | [M008 Instituicao](../../M008-cadastros-corporativos/instituicoes/README.md) que conferiu o premio, quando informada no Lattes |
 
 ## Regras
 
 - RN-M024-03: reimportacao apaga todos os `Premio` anteriores e recria a partir do snapshot atual.
-- `entidade` deve ser criada/associada via match-or-create no adapter quando houver entidade concedente.
+- `entidade` deve ser criada/associada durante a importacao quando houver entidade concedente identificavel.
 - Um curriculo pode nao possuir premio registrado.
-

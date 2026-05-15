@@ -32,7 +32,7 @@ O curriculo do pesquisador e replica local versionada da Plataforma Lattes do CN
 
 A vinculacao entre `PessoaFisica` e `Curriculo` se da pelo `numeroLattes` (identificador do CNPq) e e unica no sistema (RN-M024-02). Uma `PessoaFisica` so e tratada como `Pesquisador` apos ter um `Curriculo` vinculado e sincronizado com sucesso. `Pesquisador` nao e entidade separada: e flag derivado da existencia do curriculo.
 
-O adapter externo que importa do CNPq vive em [M023/lattes](../M023-integracoes/lattes/README.md). M024 invoca o adapter de forma **sincrona** (`ImportarCurriculo`, `SincronizarCurriculo`): a chamada bloqueia ate o adapter parseiar, persistir e retornar o snapshot, ou ate falhar com codigo de erro. Apos persistir com sucesso, M024 publica seus proprios eventos de dominio (`PesquisadorVinculado`, `CurriculoAtualizado` etc.) para os consumidores -- ver [eventos-dominio.md](eventos-dominio.md). M024 nao conhece XML do Lattes, wrappers ou parsers -- conhece apenas o modelo academico.
+O adapter externo que importa do CNPq vive em [M023/lattes](../M023-integracoes/lattes/README.md). M024 invoca o adapter de forma **sincrona** (`ImportarCurriculo`, `SincronizarCurriculo`): a chamada bloqueia ate o adapter coletar, parsear e retornar o snapshot academico, ou ate falhar com codigo de erro. A persistencia transacional do `Curriculo`, entidades filhas e vinculos compartilhados e responsabilidade do M024. Apos persistir com sucesso, M024 publica seus proprios eventos de dominio (`PesquisadorVinculado`, `CurriculoAtualizado` etc.) para os consumidores -- ver [eventos-dominio.md](eventos-dominio.md). M024 nao conhece XML do Lattes, wrappers ou parsers -- conhece apenas o snapshot academico normalizado retornado pelo adapter.
 
 | Entidade | Descricao | Cardinalidade vs Curriculo |
 |----------|-----------|----------------------------------|
@@ -75,7 +75,7 @@ O mapa conceitual completo esta em [modelo-estrutural.md](modelo-estrutural.md);
 | [M005 - Autenticacao](../M005-autenticacao/README.md) | Identidade autenticada do pesquisador que vincula seu curriculo |
 | [M008 - Cadastros Corporativos](../M008-cadastros-corporativos/README.md) | `PessoaFisica` canonical (pelo CPF) e cadastro canonico de `AreaConhecimento` (CNPq) |
 | [M020 - Comunicacao](../M020-comunicacao/README.md) | Notificacao ao pesquisador sobre sincronizacao concluida, falha ou curriculo desatualizado |
-| [M023/lattes - Adapter Lattes](../M023-integracoes/lattes/README.md) | Adapter externo invocado sincronamente para importar e sincronizar snapshots do CNPq |
+| [M023/lattes - Adapter Lattes](../M023-integracoes/lattes/README.md) | Adapter externo invocado sincronamente para coletar, parsear e retornar snapshots normalizados do CNPq |
 
 ---
 

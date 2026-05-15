@@ -24,7 +24,7 @@ Este contrato documenta a superficie publica do M024 — como pesquisadores, ana
 
 | Dependencia | Tipo | Observacao |
 |-------------|------|------------|
-| M023/lattes | Modulo interno / adapter externo | Importa e sincroniza snapshot Lattes de forma sincrona |
+| M023/lattes | Modulo interno / adapter externo | Coleta, parseia e retorna snapshot Lattes normalizado de forma sincrona |
 | Plataforma Lattes CNPq | Sistema externo | Fonte canonica dos dados academicos |
 | M005 (Autenticacao) | Modulo interno | Identidade autenticada e perfis de acesso |
 | M008 (Cadastros Corporativos) | Modulo interno | `PessoaFisica`, `Instituicao`, `AreaConhecimento`, `Cidade` e `Documento` |
