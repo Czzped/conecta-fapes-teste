@@ -335,6 +335,12 @@ function formatarDataPartida(partida: string) {
   return new Date(partida).toLocaleDateString('pt-BR');
 }
 
+function relatorioEnviadoDiaria(solicitacao: Pick<DiariaRequest, 'partida' | 'comprovacaoAtividade'>) {
+  if (dataInicioAindaNaoPassou(solicitacao.partida)) return 'Não';
+
+  return solicitacao.comprovacaoAtividade ? 'Sim' : 'Não';
+}
+
 function ordenarPorDataPartida<T extends Pick<DiariaRequest, 'partida'>>(items: T[], ordenacao: OrdenacaoDataPartida) {
   return [...items].sort((a, b) => {
     const partidaA = new Date(a.partida).getTime();
@@ -1511,12 +1517,11 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
               <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
                 {[
                   { label: 'Bolsista', value: solicitacao.bolsistaNome },
-                  { label: 'Diária', value: solicitacao.quantidade.toLocaleString('pt-BR') },
                   { label: 'Valor Total', value: currency.format(solicitacao.valorTotal) },
                   { label: 'Data de Partida', value: formatarDataPartida(solicitacao.partida) },
                   { label: 'Destino', value: solicitacao.destino },
                 ].map((item) => (
-                  <div key={item.label} className="min-w-0" style={item.label === 'Diária' ? { paddingLeft: '2.75rem' } : undefined}>
+                  <div key={item.label} className="min-w-0" style={item.label === 'Valor Total' ? { paddingLeft: '1rem' } : undefined}>
                     <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                       {item.label}
                     </div>
@@ -1571,6 +1576,14 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                   >
                     {statusLabel(solicitacao.status)}
                   </span>
+                </div>
+                <div style={{ paddingLeft: '1rem' }}>
+                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                    Relatório Enviado
+                  </div>
+                  <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)' }}>
+                    {relatorioEnviadoDiaria(solicitacao)}
+                  </div>
                 </div>
               </div>
               <ChevronRight size={20} style={{ color: 'var(--muted-foreground)' }} />
@@ -1633,7 +1646,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
               </span>
             )}
             <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
-              Comprovação da Atividade
+              Relatório da Diária
             </h2>
             {!comprovacaoEditavel && !mostrarNumeroEtapa && (
               <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
@@ -1983,7 +1996,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
             <div>
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
-                  Comprovação da Atividade
+                  Relatório da Diária
                 </h2>
                 {!comprovacaoEditavel && !mostrarNumeroEtapa && (
                   <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
@@ -3343,14 +3356,12 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                 </div>
               </div>
 
-              {solicitacaoDetalheId &&
-                solicitacaoDetalhe &&
-                (solicitacaoDetalheOrigem === 'minhas' || (!dataInicioAindaNaoPassou(solicitacaoDetalhe.partida) && Boolean(solicitacaoDetalhe.comprovacaoAtividade))) &&
+              {solicitacaoDetalheId && solicitacaoDetalhe && (
                 renderComprovacaoAtividadeCard(
-                  solicitacaoDetalheOrigem === 'minhas' && !dataInicioAindaNaoPassou(solicitacaoDetalhe.partida),
+                  !dataInicioAindaNaoPassou(solicitacaoDetalhe.partida),
                   true,
-                  solicitacaoDetalheOrigem !== 'minhas',
-                )}
+                )
+              )}
 
               {solicitacaoDetalheId && mostrarMotivoCancelamento && (
                 <div
@@ -3679,12 +3690,11 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                       <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
                         {[
                           { label: 'Bolsista', value: solicitacao.beneficiario },
-                          { label: 'Diária', value: solicitacao.quantidade.toLocaleString('pt-BR') },
                           { label: 'Valor Total', value: currency.format(solicitacao.valorBeneficiario) },
                           { label: 'Data de Partida', value: formatarDataPartida(solicitacao.partida) },
                           { label: 'Destino', value: solicitacao.destino },
                         ].map((item) => (
-                          <div key={item.label} className="min-w-0" style={item.label === 'Diária' ? { paddingLeft: '2.75rem' } : undefined}>
+                          <div key={item.label} className="min-w-0" style={item.label === 'Valor Total' ? { paddingLeft: '1rem' } : undefined}>
                             <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                               {item.label}
                             </div>
@@ -3739,6 +3749,14 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                           >
                             {statusLabel(solicitacao.status)}
                           </span>
+                        </div>
+                        <div style={{ paddingLeft: '1rem' }}>
+                          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                            Relatório Enviado
+                          </div>
+                          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)' }}>
+                            {relatorioEnviadoDiaria(solicitacao)}
+                          </div>
                         </div>
                       </div>
                       <ChevronRight size={20} style={{ color: 'var(--muted-foreground)' }} />

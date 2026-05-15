@@ -1,8 +1,10 @@
 import {
+  AlertTriangle,
   CheckCircle,
   Upload, Paperclip, FileText, Edit2, Trash2,
   ChevronDown, Check, Info, Search, X, Send, Plus, Save, Trash, RotateCcw, DollarSign,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { useRef, useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -94,6 +96,10 @@ function calcularQuantidadeDiarias(partida: string, chegada: string) {
   const horaRetorno = fimData.getHours() + fimData.getMinutes() / 60;
 
   return diasFora + (horaRetorno > 14 ? 0.5 : 0);
+}
+
+function relatorioEnviadoPrestacaoDiaria(diaria: Pick<DiariaPrestacao, 'prestadaContas'>) {
+  return diaria.prestadaContas ? 'Sim' : 'Não';
 }
 
 function formatarData(value: string) {
@@ -238,8 +244,8 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
   const passagFiltrado = PESSOAS_FICTICIAS.filter(n => n.toLowerCase().includes(passQuery.toLowerCase()));
   const diariasElegiveisPrestacao = diariasPrestacao
     .map((diaria, originalIndex) => ({ ...diaria, originalIndex }))
-    .filter(diaria => diaria.status === 'Aprovada' && !diaria.prestadaContas);
-  const totalDiariasJaPrestadas = diariasPrestacao.length - diariasElegiveisPrestacao.length;
+    .filter(diaria => diaria.status === 'Aprovada');
+  const totalDiariasJaPrestadas = diariasPrestacao.filter((diaria) => diaria.status === 'Aprovada' && diaria.prestadaContas).length;
   const diariaSelecionada = selectedDiariaIdx === null ? null : diariasPrestacao[selectedDiariaIdx];
   const tipoViagemNovaDiaria = tiposViagemDiaria.find((tipo) => tipo.nome === novaDiariaTipo) ?? tiposViagemDiaria[0];
   const diariaVigenteNovaDiaria = diariasVigentesPrestacao.find((diaria) => diaria.tipoViagem === tipoViagemNovaDiaria.nome) ?? diariasVigentesPrestacao[0];
@@ -290,6 +296,37 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
     setValorPassagemComprada('');
     setPassOrigem(''); setPassDestino('');
     setDataSaida(''); setHoraSaida(''); setDataChegada(''); setHoraChegada('');
+  };
+
+  const selecionarDiariaPrestacao = (diaria: DiariaPrestacao & { originalIndex: number }) => {
+    if (isReadOnly) return;
+
+    setSelectedDiariaIdx(diaria.originalIndex);
+
+    if (!diaria.prestadaContas) {
+      toast.custom(() => (
+        <div
+          className="rounded-md px-4 py-3 flex items-start gap-3"
+          style={{
+            backgroundColor: '#4f481f',
+            border: '1px solid #eab308',
+            color: 'var(--foreground)',
+            boxShadow: '0 16px 32px rgba(0, 0, 0, 0.24)',
+            fontFamily: 'var(--font-family)',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 'var(--font-weight-medium)',
+            lineHeight: 1.5,
+            maxWidth: '420px',
+          }}
+        >
+          <AlertTriangle size={20} style={{ color: '#eab308', flexShrink: 0, marginTop: '1px' }} />
+          <span>Em Detalhes da Diária, o bolsita ou o coordenador devem enviar o Relatório da Atividade</span>
+        </div>
+      ), {
+        duration: 15000,
+        position: 'bottom-right',
+      });
+    }
   };
 
   const criarDiariaPrestacao = () => {
@@ -988,7 +1025,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                   >
                     <span>{diariasElegiveisPrestacao.length} diárias disponíveis para prestação de contas</span>
                     <span>•</span>
-                    <span>{totalDiariasJaPrestadas} já prestada(s) não aparecem na lista</span>
+                    <span>{totalDiariasJaPrestadas} com relatório enviado</span>
                   </div>
 
                   <div className="space-y-3">
@@ -997,7 +1034,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                         key={diaria.solicitacaoRef}
                         type="button"
                         disabled={isReadOnly}
-                        onClick={() => setSelectedDiariaIdx(diaria.originalIndex)}
+                        onClick={() => selecionarDiariaPrestacao(diaria)}
                         className="p-4 text-left w-full"
                         style={{
                           backgroundColor: selectedDiariaIdx === diaria.originalIndex ? 'color-mix(in srgb, var(--primary) 8%, var(--card))' : 'var(--card)',
@@ -1036,29 +1073,13 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                             )}
                           </span>
                           <div className="flex-1 space-y-5">
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                               {[
                                 { label: 'Bolsista', value: diaria.nome },
-                                { label: 'Tipo de Viagem', value: diaria.tipo },
-                                { label: 'Número de Diárias', value: diaria.numDiarias },
                                 { label: 'Valor Total', value: diaria.valorTotal },
-                              ].map((item) => (
-                                <div key={item.label}>
-                                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
-                                    {item.label}
-                                  </div>
-                                  <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
-                                    {item.value}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                              {[
+                                { label: 'Data de Partida', value: diaria.dataSaida },
                                 { label: 'Destino', value: diaria.destino },
-                                { label: 'Data de Saída', value: diaria.dataSaida },
-                                { label: 'Origem', value: diaria.origem },
-                                { label: 'Data de Chegada', value: diaria.dataChegada },
+                                { label: 'Relatório Enviado', value: relatorioEnviadoPrestacaoDiaria(diaria) },
                               ].map((item) => (
                                 <div key={item.label}>
                                   <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
@@ -1750,7 +1771,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                   >
                     <span>{diariasElegiveisPrestacao.length} diárias disponíveis para prestação de contas</span>
                     <span>•</span>
-                    <span>{totalDiariasJaPrestadas} já prestada(s) não aparecem na lista</span>
+                    <span>{totalDiariasJaPrestadas} com relatório enviado</span>
                     {!isReadOnly && (
                       <button
                         type="button"
@@ -1803,7 +1824,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                     <div
                       key={diaria.solicitacaoRef}
                       className="p-4"
-                      onClick={() => { if (!isReadOnly) setSelectedDiariaIdx(diaria.originalIndex); }}
+                      onClick={() => selecionarDiariaPrestacao(diaria)}
                       style={{
                         backgroundColor: 'var(--card)',
                         border: '1px solid var(--border)',
@@ -1818,7 +1839,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                           disabled={isReadOnly}
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (!isReadOnly) setSelectedDiariaIdx(diaria.originalIndex);
+                            selecionarDiariaPrestacao(diaria);
                           }}
                           style={{
                             width: '20px',
