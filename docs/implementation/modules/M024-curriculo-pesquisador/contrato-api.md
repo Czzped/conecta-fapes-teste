@@ -122,7 +122,7 @@ Associa um `numeroLattes` a uma `PessoaFisica` existente e executa a primeira si
 
 #### `POST /api/v1/m024/pesquisadores/{cpf}/curriculo/sincronizar`
 
-Reexecuta a sincronizacao do curriculo. Delega ao adapter M023/lattes que apaga as entidades filhas anteriores e recria a partir do snapshot atual do Lattes (RN-M024-03). Sincrona: a resposta carrega o `Curriculo` atualizado, ou retorna erro mantendo o snapshot anterior intacto.
+Reexecuta a sincronizacao do curriculo. Delega ao adapter M023/lattes que substitui as entidades filhas e vinculos academicos do snapshot anterior (incluindo vinculos com artigos compartilhados) a partir do snapshot atual do Lattes (RN-M024-03). Sincrona: a resposta carrega o `Curriculo` atualizado, ou retorna erro mantendo o snapshot anterior intacto.
 
 - **Autorizacao:** `PESQUISADOR` (proprio CPF) ou `ANALISTA_AGENCIA`
 - **Operacao de origem:** `SincronizarCurriculo`
@@ -169,7 +169,7 @@ Vazio.
 
 #### `GET /api/v1/m024/pesquisadores/{cpf}/curriculo`
 
-Retorna o perfil completo do pesquisador (Curriculo + entidades filhas consolidadas).
+Retorna o perfil completo do pesquisador (Curriculo + entidades academicas e vinculos consolidados, incluindo artigos compartilhados entre curriculos).
 
 - **Autorizacao:** `PESQUISADOR` (proprio CPF), `ANALISTA_AGENCIA` ou `MODULO_INTERNO`
 
@@ -183,7 +183,7 @@ Retorna o perfil completo do pesquisador (Curriculo + entidades filhas consolida
     "numeroLattes": "1234567890123456",
     "versao": 5,
     "dataAtualizacaoLattes": "2026-05-03",
-  "dataUltimaSincronizacao": "2026-05-11T14:32:42Z",
+    "dataUltimaSincronizacao": "2026-05-11T14:32:42Z",
     "resumo": "Pesquisadora em Ciencia da Computacao...",
     "valido": true,
     "formacoes": [],
