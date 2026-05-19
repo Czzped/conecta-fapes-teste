@@ -78,7 +78,7 @@ const EDITAIS_OPTS = [
 
 /* ─── Shared style tokens ────────────────────────────────── */
 const CARD: React.CSSProperties = {
-  backgroundColor: 'rgba(30,41,59,0.6)',
+  backgroundColor: 'rgba(38, 38, 38,0.6)',
   border: '1px solid rgba(255,255,255,0.1)',
   borderRadius: '10px',
   overflow: 'hidden',
@@ -255,7 +255,7 @@ export const FormularioPersonalizado: React.FC<Props> = ({ onBack }) => {
   /* ── Render question body ── */
   const renderBody = (q: Questao, isActive: boolean) => {
     const selectStyle: React.CSSProperties = {
-      backgroundColor: 'rgba(30,41,59,0.8)',
+      backgroundColor: 'rgba(38, 38, 38,0.8)',
       border: '1px solid rgba(255,255,255,0.12)',
       borderRadius: 'var(--radius)', padding: '6px 10px',
       color: '#ffffff', fontFamily: 'var(--font-family)',
@@ -421,7 +421,7 @@ export const FormularioPersonalizado: React.FC<Props> = ({ onBack }) => {
       case 'data':
         return (
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 0' }}>
-            <div style={{ backgroundColor: 'rgba(30,41,59,0.7)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius)', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>
+            <div style={{ backgroundColor: 'rgba(38, 38, 38,0.7)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius)', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>
               <Calendar size={15} />
               DD/MM/AAAA
             </div>
@@ -431,7 +431,7 @@ export const FormularioPersonalizado: React.FC<Props> = ({ onBack }) => {
       case 'horario':
         return (
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 0' }}>
-            <div style={{ backgroundColor: 'rgba(30,41,59,0.7)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius)', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>
+            <div style={{ backgroundColor: 'rgba(38, 38, 38,0.7)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius)', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>
               <Clock size={15} />
               HH:MM
             </div>
@@ -447,7 +447,7 @@ export const FormularioPersonalizado: React.FC<Props> = ({ onBack }) => {
 
   /* ─── Render ─────────────────────────────────────────────── */
   return (
-    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#171717', minHeight: '100vh' }}>
       <div style={{ padding: '32px 32px 80px' }}>
 
         {/* Breadcrumb */}
@@ -502,7 +502,7 @@ export const FormularioPersonalizado: React.FC<Props> = ({ onBack }) => {
                     onClick={() => setShowEditalDd(!showEditalDd)}
                     style={{
                       width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      backgroundColor: 'rgba(30,41,59,0.8)', border: '1px solid rgba(255,255,255,0.12)',
+                      backgroundColor: 'rgba(38, 38, 38,0.8)', border: '1px solid rgba(255,255,255,0.12)',
                       borderRadius: 'var(--radius)', padding: '11px 14px',
                       fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer',
                       color: edital ? '#ffffff' : 'rgba(255,255,255,0.3)',
@@ -585,7 +585,7 @@ export const FormularioPersonalizado: React.FC<Props> = ({ onBack }) => {
                         ? '1px solid rgba(255,255,255,0.18)'
                         : '1px solid rgba(255,255,255,0.1)',
                       borderLeft: 'none',
-                      backgroundColor: isActive ? 'rgba(30,41,59,0.8)' : 'rgba(30,41,59,0.5)',
+                      backgroundColor: isActive ? 'rgba(38, 38, 38,0.8)' : 'rgba(38, 38, 38,0.5)',
                       cursor: isActive ? 'default' : 'pointer',
                       transition: 'background-color 0.2s, border-color 0.2s',
                       marginBottom: '12px',
@@ -643,7 +643,7 @@ export const FormularioPersonalizado: React.FC<Props> = ({ onBack }) => {
                             onClick={e => { e.stopPropagation(); setTypeDdId(typeDdId === q.id ? null : q.id); }}
                             style={{
                               display: 'flex', alignItems: 'center', gap: '8px',
-                              backgroundColor: isActive ? 'rgba(30,41,59,0.9)' : 'transparent',
+                              backgroundColor: isActive ? 'rgba(38, 38, 38,0.9)' : 'transparent',
                               border: isActive ? '1px solid rgba(255,255,255,0.15)' : 'none',
                               borderRadius: 'var(--radius)', padding: isActive ? '10px 14px' : '6px 0',
                               color: isActive ? '#ffffff' : 'rgba(255,255,255,0.4)',
@@ -801,7 +801,7 @@ export const FormularioPersonalizado: React.FC<Props> = ({ onBack }) => {
                   backgroundColor: '#00c1af', border: 'none',
                   borderRadius: 'var(--radius)', padding: '11px 20px',
                   fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-medium)', color: '#0f172a', cursor: 'pointer',
+                  fontWeight: 'var(--font-weight-medium)', color: '#171717', cursor: 'pointer',
                   transition: 'background-color 0.2s',
                 }}
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = '#00a99a'}
@@ -833,7 +833,7 @@ export const FormularioPersonalizado: React.FC<Props> = ({ onBack }) => {
               onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#00a99a'; e.currentTarget.style.transform = 'scale(1.06)'; }}
               onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#00c1af'; e.currentTarget.style.transform = 'scale(1)'; }}
             >
-              <Plus size={22} style={{ color: '#0f172a' }} />
+              <Plus size={22} style={{ color: '#171717' }} />
             </button>
 
             {/* Divider */}
@@ -845,13 +845,13 @@ export const FormularioPersonalizado: React.FC<Props> = ({ onBack }) => {
               title="Duplicar pergunta"
               style={{
                 width: '48px', height: '48px', borderRadius: '50%',
-                backgroundColor: 'rgba(30,41,59,0.8)', border: '1px solid rgba(255,255,255,0.1)',
+                backgroundColor: 'rgba(38, 38, 38,0.8)', border: '1px solid rgba(255,255,255,0.1)',
                 cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'background-color 0.2s, border-color 0.2s, transform 0.15s',
                 color: 'rgba(255,255,255,0.5)',
               }}
               onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.transform = 'scale(1.06)'; }}
-              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(30,41,59,0.8)'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; e.currentTarget.style.transform = 'scale(1)'; }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38,0.8)'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; e.currentTarget.style.transform = 'scale(1)'; }}
             >
               <Copy size={18} />
             </button>
@@ -862,13 +862,13 @@ export const FormularioPersonalizado: React.FC<Props> = ({ onBack }) => {
               title="Excluir pergunta"
               style={{
                 width: '48px', height: '48px', borderRadius: '50%',
-                backgroundColor: 'rgba(30,41,59,0.8)', border: '1px solid rgba(255,255,255,0.1)',
+                backgroundColor: 'rgba(38, 38, 38,0.8)', border: '1px solid rgba(255,255,255,0.1)',
                 cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'background-color 0.2s, border-color 0.2s, transform 0.15s',
                 color: 'rgba(255,255,255,0.5)',
               }}
               onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.1)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.3)'; e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.transform = 'scale(1.06)'; }}
-              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(30,41,59,0.8)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; e.currentTarget.style.transform = 'scale(1)'; }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38,0.8)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; e.currentTarget.style.transform = 'scale(1)'; }}
             >
               <Trash2 size={18} />
             </button>

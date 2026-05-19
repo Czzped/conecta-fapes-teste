@@ -114,22 +114,22 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   /* ── Design tokens derivados do tema ─────────────────────────── */
   const isLight = theme === 'light';
   const T = {
-    bgPage:           isLight ? '#f6f8fb'                 : '#0b1222',
-    bgSidebar:        isLight ? '#ffffff'                 : 'rgba(17, 28, 48, 0.96)',
-    sidebarBorder:    isLight ? '#e2e8f0'                 : 'rgba(255, 255, 255, 0.1)',
-    bgHeader:         isLight ? 'rgba(255,255,255,0.92)'  : 'rgba(17, 28, 48, 0.82)',
-    headerBorder:     isLight ? '#e2e8f0'                 : 'rgba(255, 255, 255, 0.1)',
-    iconColor:        isLight ? '#475569'                 : '#ffffff',
-    textPrimary:      isLight ? '#0f172a'                 : '#ffffff',
-    textSecondary:    isLight ? '#475569'                 : 'rgba(255, 255, 255, 0.7)',
-    textMuted:        isLight ? '#94a3b8'                 : 'rgba(255, 255, 255, 0.5)',
-    toggleBorder:     isLight ? '#e2e8f0'                 : 'rgba(255, 255, 255, 0.2)',
+    bgPage:           isLight ? '#fafafa'                 : '#0a0a0a',
+    bgSidebar:        isLight ? '#ffffff'                 : 'rgba(23, 23, 23, 0.96)',
+    sidebarBorder:    isLight ? '#e5e5e5'                 : 'rgba(255, 255, 255, 0.1)',
+    bgHeader:         isLight ? 'rgba(255,255,255,0.92)'  : 'rgba(23, 23, 23, 0.82)',
+    headerBorder:     isLight ? '#e5e5e5'                 : 'rgba(255, 255, 255, 0.1)',
+    iconColor:        isLight ? '#525252'                 : '#ffffff',
+    textPrimary:      isLight ? '#171717'                 : '#ffffff',
+    textSecondary:    isLight ? '#525252'                 : 'rgba(255, 255, 255, 0.7)',
+    textMuted:        isLight ? '#a3a3a3'                 : 'rgba(255, 255, 255, 0.5)',
+    toggleBorder:     isLight ? '#e5e5e5'                 : 'rgba(255, 255, 255, 0.2)',
     menuActiveBg:     isLight ? '#f0fdfa'                 : 'rgba(255, 255, 255, 0.1)',
     menuActiveText:   '#00c1af',
-    menuInactiveText: isLight ? '#475569'                 : 'rgba(255, 255, 255, 0.7)',
-    dropdownBg:       isLight ? '#ffffff'                 : 'rgba(30, 41, 59, 0.95)',
-    dropdownBorder:   isLight ? '#e2e8f0'                 : 'rgba(255, 255, 255, 0.1)',
-    dropdownText:     isLight ? '#0f172a'                 : '#ffffff',
+    menuInactiveText: isLight ? '#525252'                 : 'rgba(255, 255, 255, 0.7)',
+    dropdownBg:       isLight ? '#ffffff'                 : 'rgba(38, 38, 38, 0.95)',
+    dropdownBorder:   isLight ? '#e5e5e5'                 : 'rgba(255, 255, 255, 0.1)',
+    dropdownText:     isLight ? '#171717'                 : '#ffffff',
     hoverClass:       isLight ? 'hover:bg-black/5'        : 'hover:bg-white/10',
   } as const;
 
@@ -842,8 +842,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '14px 8px', borderRadius: '10px', border: active ? '1.5px solid #00c1af' : `1px solid ${T.toggleBorder}`, backgroundColor: active ? '#00c1af' : 'var(--dash-badge-bg)', cursor: 'pointer', transition: 'all 0.15s' }}
                         onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'var(--dash-hover-bg)'; }}
                         onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'var(--dash-badge-bg)'; }}>
-                        <Icon size={20} style={{ color: active ? '#0f172b' : T.iconColor }} />
-                        <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: active ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', color: active ? '#0f172b' : T.textPrimary }}>{label}</span>
+                        <Icon size={20} style={{ color: active ? '#171717' : T.iconColor }} />
+                        <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: active ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', color: active ? '#171717' : T.textPrimary }}>{label}</span>
                       </button>
                     );
                   })}
@@ -862,7 +862,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     const active = contrast === key;
                     return (
                       <button key={key} onClick={() => setContrast(key)}
-                        style={{ padding: '12px 8px', borderRadius: '10px', textAlign: 'center', border: active ? '1.5px solid #00c1af' : `1px solid ${T.toggleBorder}`, backgroundColor: active ? '#00c1af' : 'var(--dash-badge-bg)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: active ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', color: active ? '#0f172b' : T.textPrimary, cursor: 'pointer', transition: 'all 0.15s' }}
+                        style={{ padding: '12px 8px', borderRadius: '10px', textAlign: 'center', border: active ? '1.5px solid #00c1af' : `1px solid ${T.toggleBorder}`, backgroundColor: active ? '#00c1af' : 'var(--dash-badge-bg)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: active ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', color: active ? '#171717' : T.textPrimary, cursor: 'pointer', transition: 'all 0.15s' }}
                         onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'var(--dash-hover-bg)'; }}
                         onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'var(--dash-badge-bg)'; }}>
                         {label}
@@ -885,7 +885,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     const active = fontSize === key;
                     return (
                       <button key={key} onClick={() => setFontSize(key)}
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '52px', borderRadius: '10px', border: active ? '1.5px solid #00c1af' : `1px solid ${T.toggleBorder}`, backgroundColor: active ? '#00c1af' : 'var(--dash-badge-bg)', fontFamily: 'var(--font-family)', fontSize: fs, fontWeight: 'var(--font-weight-semibold)', color: active ? '#0f172b' : T.textPrimary, cursor: 'pointer', transition: 'all 0.15s' }}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '52px', borderRadius: '10px', border: active ? '1.5px solid #00c1af' : `1px solid ${T.toggleBorder}`, backgroundColor: active ? '#00c1af' : 'var(--dash-badge-bg)', fontFamily: 'var(--font-family)', fontSize: fs, fontWeight: 'var(--font-weight-semibold)', color: active ? '#171717' : T.textPrimary, cursor: 'pointer', transition: 'all 0.15s' }}
                         onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'var(--dash-hover-bg)'; }}
                         onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'var(--dash-badge-bg)'; }}>
                         A
@@ -953,7 +953,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xl)', fontWeight: 'var(--font-weight-bold)', color: T.textPrimary }}>Notificações</h2>
-                  <span className="rounded-full px-3 py-1" style={{ backgroundColor: '#00c1af', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#0f172b' }}>3 Novas</span>
+                  <span className="rounded-full px-3 py-1" style={{ backgroundColor: '#00c1af', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#171717' }}>3 Novas</span>
                 </div>
                 <button onClick={() => setShowNotificationsSidebar(false)} className={`p-2 transition-colors ${T.hoverClass} rounded-lg`} style={{ color: T.iconColor }}>
                   <X size={20} />
@@ -971,7 +971,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               <div className="mb-6 flex gap-2">
                 {(['avisos', 'editais'] as NotificationTab[]).map((tab) => (
                   <button key={tab} onClick={() => setNotificationTab(tab)} className="rounded-lg px-4 py-2 transition-all"
-                    style={{ backgroundColor: notificationTab === tab ? '#00c1af' : 'var(--dash-badge-bg)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: notificationTab === tab ? '#0f172b' : 'var(--dash-text-primary)' }}>
+                    style={{ backgroundColor: notificationTab === tab ? '#00c1af' : 'var(--dash-badge-bg)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: notificationTab === tab ? '#171717' : 'var(--dash-text-primary)' }}>
                     {tab === 'avisos' ? 'Avisos (1)' : 'Captação (2)'}
                   </button>
                 ))}
@@ -1171,7 +1171,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     {selectedPagamentos.length > 0 && (
                       <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowValidarLoteModal(true); }}
                         className="px-6 py-2 rounded-lg transition-all ml-auto"
-                        style={{ backgroundColor: '#00c1af', border: '1px solid #00c1af', color: '#0f172b', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
+                        style={{ backgroundColor: '#00c1af', border: '1px solid #00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
                         Validar
                       </button>
                     )}
@@ -1258,7 +1258,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     <div
                       className="flex items-center gap-6 flex-1 cursor-pointer"
                       onClick={() => { setSelectedPagamento(pagamento); setActivePage('detalhes'); }}
-                      onMouseEnter={(e) => { (e.currentTarget.parentElement!.parentElement as HTMLElement).style.backgroundColor = isLight ? '#f8fafc' : 'rgba(30,41,59,0.8)'; }}
+                      onMouseEnter={(e) => { (e.currentTarget.parentElement!.parentElement as HTMLElement).style.backgroundColor = isLight ? '#fafafa' : 'rgba(38, 38, 38,0.8)'; }}
                       onMouseLeave={(e) => { (e.currentTarget.parentElement!.parentElement as HTMLElement).style.backgroundColor = 'var(--dash-card-bg)'; }}
                     >
                       <div className="grid grid-cols-6 gap-6 flex-1">
@@ -1369,7 +1369,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 <div className="flex items-center gap-2 mb-3">
                   <div 
                     className="flex items-center justify-center rounded-full"
-                    style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#0f172b', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}
+                    style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}
                   >
                     1
                   </div>
@@ -1396,7 +1396,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 <div className="flex items-center gap-2 mb-3">
                   <div 
                     className="flex items-center justify-center rounded-full"
-                    style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#0f172b', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}
+                    style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}
                   >
                     2
                   </div>
@@ -1428,7 +1428,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               {/* Passo 3: Cotação */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="flex items-center justify-center rounded-full" style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#0f172b', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}>3</div>
+                  <div className="flex items-center justify-center rounded-full" style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}>3</div>
                   <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Cotação</h2>
                 </div>
                 <div style={{ marginLeft: '32px' }}>
@@ -1497,7 +1497,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   style={{
                     backgroundColor: statusAvaliacao === 'validado' ? '#14b8a6' : 'rgba(20, 184, 166, 0.1)',
                     border: `1px solid ${statusAvaliacao === 'validado' ? '#14b8a6' : 'rgba(20, 184, 166, 0.3)'}`,
-                    color: statusAvaliacao === 'validado' ? '#0f172b' : '#14b8a6',
+                    color: statusAvaliacao === 'validado' ? '#171717' : '#14b8a6',
                     fontFamily: 'var(--font-family)',
                     fontSize: 'var(--text-sm)',
                     fontWeight: 'var(--font-weight-medium)',
@@ -1515,7 +1515,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   style={{
                     backgroundColor: statusAvaliacao === 'revisar' ? '#eab308' : 'rgba(234, 179, 8, 0.1)',
                     border: `1px solid ${statusAvaliacao === 'revisar' ? '#eab308' : 'rgba(234, 179, 8, 0.3)'}`,
-                    color: statusAvaliacao === 'revisar' ? '#0f172b' : '#eab308',
+                    color: statusAvaliacao === 'revisar' ? '#171717' : '#eab308',
                     fontFamily: 'var(--font-family)',
                     fontSize: 'var(--text-sm)',
                     fontWeight: 'var(--font-weight-medium)',
@@ -1533,7 +1533,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   style={{
                     backgroundColor: statusAvaliacao === 'reprovado' ? '#ef4444' : 'rgba(239, 68, 68, 0.1)',
                     border: `1px solid ${statusAvaliacao === 'reprovado' ? '#ef4444' : 'rgba(239, 68, 68, 0.3)'}`,
-                    color: statusAvaliacao === 'reprovado' ? (theme === 'dark' ? '#0f172b' : '#ffffff') : '#ef4444',
+                    color: statusAvaliacao === 'reprovado' ? (theme === 'dark' ? '#171717' : '#ffffff') : '#ef4444',
                     fontFamily: 'var(--font-family)',
                     fontSize: 'var(--text-sm)',
                     fontWeight: 'var(--font-weight-medium)',
@@ -1628,7 +1628,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                       style={{
                         backgroundColor: '#00c1af',
                         border: '1px solid #00c1af',
-                        color: '#0f172b',
+                        color: '#171717',
                         fontFamily: 'var(--font-family)',
                         fontSize: 'var(--text-sm)',
                         fontWeight: 'var(--font-weight-semibold)',
@@ -1917,7 +1917,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                             onClick={() => setActivePage(page)}
                           className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${T.hoverClass}`}
                             style={{
-                              backgroundColor: isLight ? '#f8fafc' : 'rgba(255,255,255,0.035)',
+                              backgroundColor: isLight ? '#fafafa' : 'rgba(255,255,255,0.035)',
                               border: '1px solid var(--dash-card-border)',
                             }}
                           >
@@ -2018,7 +2018,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               </button>
               <button onClick={() => { setStatusAvaliacao('validado'); setShowConfirmacaoModal(false); toast.success('Pagamento validado com sucesso!'); setTimeout(() => { setActivePage('financeira'); setSelectedPagamento(null); }, 1000); }}
                 className="px-6 py-2 rounded-lg transition-all"
-                style={{ backgroundColor: '#00c1af', border: '1px solid #00c1af', color: '#0f172b', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
+                style={{ backgroundColor: '#00c1af', border: '1px solid #00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
                   cursor: 'pointer'
                 }}
@@ -2067,7 +2067,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               </button>
               <button onClick={() => { if (novoMotivo.trim()) { toast.success('Motivo cadastrado com sucesso!'); setMotivoRevisao(novoMotivo); setShowCadastrarMotivoModal(false); setNovoMotivo(''); } else { toast.error('Por favor, digite um motivo válido'); } }}
                 className="px-6 py-2 rounded-lg transition-all"
-                style={{ backgroundColor: '#00c1af', border: '1px solid #00c1af', color: '#0f172b', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
+                style={{ backgroundColor: '#00c1af', border: '1px solid #00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
                 Salvar
               </button>
             </div>
@@ -2092,7 +2092,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               </button>
               <button onClick={() => { setShowValidarLoteModal(false); const count = selectedPagamentos.length; toast.success(`${count} pagamento${count > 1 ? 's validados' : ' validado'} com sucesso!`); setSelectedPagamentos([]); }}
                 className="px-6 py-2 rounded-lg transition-all"
-                style={{ backgroundColor: '#00c1af', border: '1px solid #00c1af', color: '#0f172b', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
+                style={{ backgroundColor: '#00c1af', border: '1px solid #00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
                 Aprovar
               </button>
             </div>

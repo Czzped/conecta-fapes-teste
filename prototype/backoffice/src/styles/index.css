@@ -11,10 +11,10 @@
   --sjs-primary-backcolor: #00c1af;
   --sjs-primary-backcolor-light: rgba(0, 193, 175, 0.14);
   --sjs-primary-backcolor-dark: #00a99a;
-  --sjs-primary-forecolor: #0b1222;
-  --sjs-general-backcolor: #111c30;
-  --sjs-general-backcolor-dim: #0b1222;
-  --sjs-general-backcolor-dim-light: #17233a;
+  --sjs-primary-forecolor: #0a0a0a;
+  --sjs-general-backcolor: #171717;
+  --sjs-general-backcolor-dim: #0a0a0a;
+  --sjs-general-backcolor-dim-light: #262626;
   --sjs-general-forecolor: #ffffff;
   --sjs-general-forecolor-light: rgba(255, 255, 255, 0.66);
   --sjs-border-default: rgba(255, 255, 255, 0.16);
@@ -28,7 +28,7 @@
 .survey-form-builder .svc-toolbox,
 .survey-form-builder .svc-property-grid,
 .survey-form-builder .svc-creator__content-wrapper {
-  background: #0b1222;
+  background: #0a0a0a;
 }
 
 .survey-form-builder .svc-tabbed-menu-wrapper,
@@ -36,7 +36,7 @@
 .survey-form-builder .svc-side-bar__container-header,
 .survey-form-builder .svc-toolbox__panel,
 .survey-form-builder .spg-panel__content {
-  background: #111c30;
+  background: #171717;
   border-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -55,7 +55,7 @@
 .survey-form-builder .svc-question__content,
 .survey-form-builder .svc-page,
 .survey-form-builder .svc-page__content {
-  background: rgba(30, 41, 59, 0.78);
+  background: rgba(38, 38, 38, 0.78);
   border-color: rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-lg);
 }
@@ -68,7 +68,7 @@
 .survey-form-builder .spg-input,
 .survey-form-builder .spg-dropdown,
 .survey-form-builder .spg-comment {
-  background: rgba(15, 23, 42, 0.82);
+  background: rgba(23, 23, 23, 0.82);
   border-color: rgba(255, 255, 255, 0.14);
 }
 
@@ -90,7 +90,7 @@
 .survey-form-builder .survey-action-button.primary {
   background: #00c1af;
   border: 1px solid #00c1af;
-  color: #0b1222;
+  color: #0a0a0a;
 }
 
 .survey-form-builder .survey-action-button.primary:hover {
@@ -99,7 +99,7 @@
 
 .survey-form-builder .survey-action-button.secondary,
 .survey-form-builder .survey-json-toggle {
-  background: rgba(30, 41, 59, 0.72);
+  background: rgba(38, 38, 38, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: rgba(255, 255, 255, 0.78);
 }
@@ -152,7 +152,7 @@
 }
 
 .survey-form-builder .survey-field-input {
-  background: rgba(15, 23, 42, 0.82);
+  background: rgba(23, 23, 23, 0.82);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius);
   color: #ffffff;
@@ -169,7 +169,7 @@
 
 .survey-form-builder .survey-list-search {
   align-items: center;
-  background: rgba(15, 23, 42, 0.82);
+  background: rgba(23, 23, 23, 0.82);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius);
   color: rgba(255, 255, 255, 0.52);
@@ -195,7 +195,7 @@
 }
 
 .survey-form-builder .survey-list-filter {
-  background: rgba(15, 23, 42, 0.82);
+  background: rgba(23, 23, 23, 0.82);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius);
   color: #ffffff;
@@ -316,7 +316,7 @@
 }
 
 .survey-form-builder .survey-runtime-panel {
-  background: #0b1222;
+  background: #0a0a0a;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-lg);
   min-width: 0;
@@ -325,7 +325,7 @@
 
 .survey-form-builder .survey-runtime-header {
   align-items: flex-start;
-  background: #111c30;
+  background: #171717;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   gap: 16px;
@@ -351,15 +351,15 @@
   --sjs-primary-backcolor: #00c1af;
   --sjs-primary-backcolor-light: rgba(0, 193, 175, 0.14);
   --sjs-primary-backcolor-dark: #00a99a;
-  --sjs-primary-forecolor: #0b1222;
-  --sjs-general-backcolor: #111c30;
-  --sjs-general-backcolor-dim: #0b1222;
-  --sjs-general-backcolor-dim-light: #17233a;
+  --sjs-primary-forecolor: #0a0a0a;
+  --sjs-general-backcolor: #171717;
+  --sjs-general-backcolor-dim: #0a0a0a;
+  --sjs-general-backcolor-dim-light: #262626;
   --sjs-general-forecolor: #ffffff;
   --sjs-general-forecolor-light: rgba(255, 255, 255, 0.66);
   --sjs-border-default: rgba(255, 255, 255, 0.16);
   --sjs-border-light: rgba(255, 255, 255, 0.1);
-  background: #0b1222;
+  background: #0a0a0a;
   min-height: 560px;
   padding: 12px;
 }

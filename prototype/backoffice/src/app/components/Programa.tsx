@@ -27,8 +27,8 @@ const statusColor = (s: string) => {
     case 'Ativo': return '#22c55e';
     case 'Em planejamento': return '#fbbf24';
     case 'Suspenso': return '#f97316';
-    case 'Encerrado': return '#94a3b8';
-    default:         return '#94a3b8';
+    case 'Encerrado': return '#a3a3a3';
+    default:         return '#a3a3a3';
   }
 };
 

@@ -2,15 +2,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   ChevronRight, Home, ChevronDown, Save, BookOpen, Plus, X, Trash2,
 } from 'lucide-react';
+import { useThemeTokens } from '../theme/ThemeContext';
 
 /* ─── Shared style tokens ─────────────────────────────────── */
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  backgroundColor: 'rgba(30, 41, 59, 0.7)',
-  border: '1px solid rgba(255,255,255,0.12)',
+  backgroundColor: 'var(--form-input-bg)',
+  border: '1px solid var(--form-border)',
   borderRadius: 'var(--radius)',
   padding: '10px 14px',
-  color: '#ffffff',
+  color: 'var(--form-text-primary)',
   fontFamily: 'var(--font-family)',
   fontSize: 'var(--text-sm)',
   outline: 'none',
@@ -21,14 +22,14 @@ const inputStyle: React.CSSProperties = {
 const labelStyle: React.CSSProperties = {
   fontFamily: 'var(--font-family)',
   fontSize: 'var(--text-sm)',
-  color: 'rgba(255,255,255,0.7)',
+  color: 'var(--form-text-secondary)',
   display: 'block',
   marginBottom: '6px',
 };
 
 const sectionCard: React.CSSProperties = {
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
-  border: '1px solid rgba(255,255,255,0.1)',
+  backgroundColor: 'var(--form-card-bg)',
+  border: '1px solid var(--form-border)',
   borderRadius: '10px',
   padding: '28px',
   marginBottom: '20px',
@@ -37,13 +38,13 @@ const sectionCard: React.CSSProperties = {
 const divider: React.CSSProperties = {
   width: '100%',
   height: '1px',
-  backgroundColor: 'rgba(255,255,255,0.08)',
+  backgroundColor: 'var(--form-divider)',
   margin: '22px 0',
 };
 
 const innerCardStyle: React.CSSProperties = {
-  backgroundColor: 'rgba(15,23,42,0.5)',
-  border: '1px solid rgba(255,255,255,0.08)',
+  backgroundColor: 'var(--form-inner-card-bg)',
+  border: '1px solid var(--form-border)',
   borderRadius: '8px',
   padding: '20px 24px',
 };
@@ -59,12 +60,12 @@ const SectionHeader: React.FC<{ num: string; title: string; subtitle?: string }>
       }}>
         <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>{num}</span>
       </div>
-      <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: 0 }}>
+      <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: 0 }}>
         {title}
       </h2>
     </div>
     {subtitle && (
-      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: '2px 0 0 34px' }}>
+      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: '2px 0 0 34px' }}>
         {subtitle}
       </p>
     )}
@@ -197,7 +198,7 @@ const CheckboxField: React.FC<{
     }}>
       {checked && (
         <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-          <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M1 4L3.5 6.5L9 1" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )}
     </div>
@@ -210,7 +211,7 @@ const CheckboxField: React.FC<{
 /* ─── Sub-section inner card ──────────────────────────────── */
 const InnerCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
   <div style={innerCardStyle}>
-    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 18px' }}>
+    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 18px' }}>
       {title}
     </p>
     {children}
@@ -308,7 +309,7 @@ const RubricaChip: React.FC<{ label: string; checked: boolean; onToggle: () => v
     }}>
       {checked && (
         <svg width="9" height="7" viewBox="0 0 10 8" fill="none">
-          <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M1 4L3.5 6.5L9 1" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )}
     </div>
@@ -341,7 +342,7 @@ const DocCheckRow: React.FC<{ label: string; checked: boolean; onToggle: () => v
       }}>
         {checked && (
           <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-            <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M1 4L3.5 6.5L9 1" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         )}
       </div>
@@ -360,6 +361,7 @@ const DocCheckRow: React.FC<{ label: string; checked: boolean; onToggle: () => v
    Main Component
 ═══════════════════════════════════════════════════════════ */
 export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) => {
+  const { T } = useThemeTokens();
   const isEditMode = mode === 'edit';
 
   /* ── Section 1 ── */
@@ -819,18 +821,31 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
   }, []);
 
   return (
-    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div
+      style={{
+        backgroundColor: T.bgPage,
+        minHeight: '100vh',
+        '--form-card-bg': T.bgCard,
+        '--form-inner-card-bg': T.bgSurfaceMuted,
+        '--form-input-bg': T.bgInput,
+        '--form-border': T.borderDefault,
+        '--form-divider': T.borderSubtle,
+        '--form-text-primary': T.textPrimary,
+        '--form-text-secondary': T.textSecondary,
+        '--form-text-muted': T.textMuted,
+      } as React.CSSProperties}
+    >
       <div style={{ padding: '32px 32px 80px' }}>
 
         {/* Breadcrumb */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
-          <Home size={15} style={{ color: 'rgba(255,255,255,0.5)' }} />
+          <Home size={15} style={{ color: 'var(--form-text-muted)' }} />
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
-          <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)' }}>
+          <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)' }}>
             Captação
           </button>
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
-          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
+          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-primary)', fontWeight: 'var(--font-weight-medium)' }}>
             {isEditMode ? 'Editar Captação' : 'Criar Captação'}
           </span>
         </div>
@@ -841,10 +856,10 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
             <BookOpen size={18} style={{ color: '#00c1af' }} />
           </div>
           <div>
-            <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 4px' }}>
+            <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 4px' }}>
               {isEditMode ? 'Editar Captação' : 'Criar Captação'}
             </h1>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>
               {isEditMode ? 'Edite a configuração da captação usando os mesmos controles do cadastro.' : 'Crie e configure uma nova chamada para projetos.'}
             </p>
           </div>
@@ -929,7 +944,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: '12px',
-                  backgroundColor: 'rgba(30, 41, 59, 0.7)',
+                  backgroundColor: 'rgba(38, 38, 38, 0.7)',
                   border: '1px solid rgba(255,255,255,0.12)',
                   borderRadius: 'var(--radius)',
                   padding: '8px 12px',
@@ -971,7 +986,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   zIndex: 30,
                   border: '1px solid rgba(255,255,255,0.12)',
                   borderRadius: 'var(--radius)',
-                  backgroundColor: 'rgba(15,23,42,0.98)',
+                  backgroundColor: 'rgba(23, 23, 23,0.98)',
                   overflow: 'hidden',
                   boxShadow: '0 18px 45px rgba(0,0,0,0.35)',
                 }}>
@@ -994,7 +1009,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                     textAlign: 'left',
                   }}
                 >
-                  <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>{item.label}</span>
+                  <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-primary)' }}>{item.label}</span>
                   <span style={{
                     width: '18px',
                     height: '18px',
@@ -1008,7 +1023,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   }}>
                     {categoriasIniciativa[item.value] && (
                       <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                        <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M1 4L3.5 6.5L9 1" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     )}
                   </span>
@@ -1042,7 +1057,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                     top: '100%',
                     left: 0,
                     right: 0,
-                    backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                    backgroundColor: 'rgba(38, 38, 38, 0.95)',
                     border: '1px solid rgba(255,255,255,0.12)',
                     borderRadius: 'var(--radius)',
                     marginTop: '4px',
@@ -1073,7 +1088,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                             textAlign: 'left',
                             fontFamily: 'var(--font-family)',
                             fontSize: 'var(--text-sm)',
-                            color: '#ffffff',
+                            color: 'var(--form-text-primary)',
                             cursor: 'pointer',
                             transition: 'background-color 0.2s',
                           }}
@@ -1081,7 +1096,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                           onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
                         >
                           <div>{coord.nome} {coord.sobrenome}</div>
-                          <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)' }}>{coord.cpf}</div>
+                          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--form-text-muted)' }}>{coord.cpf}</div>
                         </button>
                       ))}
                   </div>
@@ -1093,14 +1108,14 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
           <div style={{ ...innerCardStyle, marginBottom: '20px', backgroundColor: 'rgba(0,193,175,0.06)', borderColor: 'rgba(0,193,175,0.18)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
               <div>
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 6px' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 6px' }}>
                   Aportes Financeiros da Captação
                 </p>
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>
                   Informe quais programas ou parcerias aportam recursos financeiros para esta captação.
                 </p>
               </div>
-              <div style={{ minWidth: '180px', padding: '10px 14px', border: '1px solid rgba(0,193,175,0.24)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(15,23,42,0.38)', textAlign: 'right' }}>
+              <div style={{ minWidth: '180px', padding: '10px 14px', border: '1px solid rgba(0,193,175,0.24)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(23, 23, 23,0.38)', textAlign: 'right' }}>
                 <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.48)', marginBottom: '4px' }}>
                   Total dos aportes
                 </div>
@@ -1172,14 +1187,14 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
           <div style={{ ...innerCardStyle, marginBottom: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '20px' }}>
               <div>
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 8px' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 8px' }}>
                   Faixas de Financiamento
                 </p>
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>
                   Distribua o valor aportado em faixas com duração máxima e limites financeiros.
                 </p>
               </div>
-              <div style={{ minWidth: '180px', padding: '10px 14px', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(15,23,42,0.38)', textAlign: 'right' }}>
+              <div style={{ minWidth: '180px', padding: '10px 14px', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(23, 23, 23,0.38)', textAlign: 'right' }}>
                 <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.48)', marginBottom: '4px' }}>
                   Aportado nas faixas
                 </div>
@@ -1316,10 +1331,10 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
             <div>
-              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 6px' }}>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 6px' }}>
                 Etapas do Cronograma
               </p>
-              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>
                 Adicione um card para cada etapa obrigatória da captação.
               </p>
             </div>
@@ -1383,7 +1398,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
               return (
                 <div key={etapa.id} style={{ ...innerCardStyle, padding: '18px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: 0 }}>
+                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: 0 }}>
                       Etapa {index + 1}
                     </p>
                     <button
@@ -1483,7 +1498,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
 
           {adiamentosCronograma.length > 0 && (
             <div style={{ ...innerCardStyle, marginTop: '18px', backgroundColor: 'rgba(251,191,36,0.06)', borderColor: 'rgba(251,191,36,0.2)' }}>
-              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 12px' }}>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 12px' }}>
                 Histórico de Adiamentos
               </p>
               <div style={{ display: 'grid', gap: '10px' }}>
@@ -1493,14 +1508,14 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   return (
                     <div key={adiamento.id} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '14px', padding: '10px 0', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                       <div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-primary)' }}>
                           {fase?.label || 'Etapa'} adiada em {adiamento.dias} dia(s)
                         </div>
                         <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#fbbf24', marginTop: '3px' }}>
                           {formatDateLabel(adiamento.dataInicioOriginal)} → {formatDateLabel(adiamento.dataInicioNova)}
                           {adiamento.dataFimOriginal && ` · fim: ${formatDateLabel(adiamento.dataFimOriginal)} → ${formatDateLabel(adiamento.dataFimNova)}`}
                         </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginTop: '3px' }}>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--form-text-muted)', marginTop: '3px' }}>
                           {adiamento.justificativa}
                         </div>
                       </div>
@@ -1517,10 +1532,10 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
           <div style={{ ...divider, margin: '24px 0' }} />
 
           <div>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 6px' }}>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 6px' }}>
               Formulários da Captação
             </p>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: '0 0 16px' }}>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: '0 0 16px' }}>
               Selecione os formulários usados nas etapas de inscrição, avaliação, recurso e anexos.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '20px' }}>
@@ -1568,10 +1583,10 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
 
           {regrasParticipacao.apenasEscolhidos && (
             <div style={{ ...innerCardStyle, marginTop: '20px', backgroundColor: 'rgba(0,193,175,0.06)', borderColor: 'rgba(0,193,175,0.18)' }}>
-              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 6px' }}>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 6px' }}>
                 Proponentes Escolhidos
               </p>
-              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: '0 0 16px' }}>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: '0 0 16px' }}>
                 Selecione quem poderá submeter proposta nesta captação.
               </p>
 
@@ -1589,7 +1604,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
               <div style={{
                 border: '1px solid rgba(255,255,255,0.12)',
                 borderRadius: 'var(--radius)',
-                backgroundColor: 'rgba(15,23,42,0.35)',
+                backgroundColor: 'rgba(23, 23, 23,0.35)',
                 overflow: 'hidden',
               }}>
                 {(tipoProponenteEscolhido === 'instituicoes' ? instituicaoOpts : coordenadoresData.map(pessoa => ({
@@ -1621,7 +1636,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                         textAlign: 'left',
                       }}
                     >
-                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>{item.label}</span>
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-primary)' }}>{item.label}</span>
                       <span style={{
                         width: '18px',
                         height: '18px',
@@ -1635,7 +1650,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                       }}>
                         {checked && (
                           <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                            <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M1 4L3.5 6.5L9 1" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         )}
                       </span>
@@ -1687,7 +1702,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
           </div>
 
           <div style={{ marginBottom: '24px' }}>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 4px' }}>Restrições de Vínculo</p>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 4px' }}>Restrições de Vínculo</p>
             <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.45)', margin: '0 0 16px' }}>Defina restrições sobre vínculo empregatício ou institucional</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
               {[
@@ -1736,10 +1751,10 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
               <div style={{ ...innerCardStyle, marginBottom: '24px', backgroundColor: 'rgba(0,193,175,0.06)', borderColor: 'rgba(0,193,175,0.18)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '16px' }}>
                   <div>
-                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 6px' }}>
+                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 6px' }}>
                       Pool de Revisores Ad Hoc
                     </p>
-                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>
                       Informe o CPF para localizar e adicionar revisores ao pool desta captação.
                     </p>
                   </div>
@@ -1776,7 +1791,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                       border: 'none',
                       borderRadius: 'var(--radius)',
                       backgroundColor: revisoresFiltradosAdHoc[0] ? '#00c1af' : 'rgba(255,255,255,0.08)',
-                      color: revisoresFiltradosAdHoc[0] ? '#0f172a' : 'rgba(255,255,255,0.35)',
+                      color: revisoresFiltradosAdHoc[0] ? '#171717' : 'rgba(255,255,255,0.35)',
                       fontFamily: 'var(--font-family)',
                       fontSize: 'var(--text-sm)',
                       fontWeight: 'var(--font-weight-medium)',
@@ -1809,13 +1824,13 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                           padding: '11px 12px',
                           border: '1px solid rgba(255,255,255,0.1)',
                           borderRadius: 'var(--radius)',
-                          backgroundColor: 'rgba(15,23,42,0.45)',
+                          backgroundColor: 'rgba(23, 23, 23,0.45)',
                           cursor: 'pointer',
                           textAlign: 'left',
                         }}
                       >
                         <div>
-                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>{revisor.nome}</div>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-primary)' }}>{revisor.nome}</div>
                           <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginTop: '2px' }}>{revisor.instituicao}</div>
                         </div>
                         <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af' }}>{revisor.cpf}</span>
@@ -1823,7 +1838,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                       </button>
                     ))}
                     {revisoresFiltradosAdHoc.length === 0 && (
-                      <div style={{ padding: '12px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(15,23,42,0.35)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)' }}>
+                      <div style={{ padding: '12px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(23, 23, 23,0.35)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)' }}>
                         Nenhum revisor disponível encontrado para este CPF.
                       </div>
                     )}
@@ -1832,7 +1847,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
 
                 <div style={{ display: 'grid', gap: '12px' }}>
                   {revisoresSelecionadosAdHoc.length === 0 ? (
-                    <div style={{ padding: '16px', border: '1px dashed rgba(255,255,255,0.18)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(15,23,42,0.25)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)' }}>
+                    <div style={{ padding: '16px', border: '1px dashed rgba(255,255,255,0.18)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(23, 23, 23,0.25)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)' }}>
                       Nenhum revisor ad hoc selecionado.
                     </div>
                   ) : revisoresSelecionadosAdHoc.map(revisor => (
@@ -1846,11 +1861,11 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                         padding: '14px',
                         border: '1px solid rgba(0,193,175,0.22)',
                         borderRadius: 'var(--radius)',
-                        backgroundColor: 'rgba(15,23,42,0.42)',
+                        backgroundColor: 'rgba(23, 23, 23,0.42)',
                       }}
                     >
                       <div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>{revisor.nome}</div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-primary)' }}>{revisor.nome}</div>
                         <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginTop: '2px' }}>{revisor.instituicao}</div>
                       </div>
                       <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af' }}>{revisor.cpf}</span>
@@ -1900,12 +1915,12 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
           </div>
 
           <div>
-	            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 4px' }}>Rubricas Permitidas</p>
+	            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 4px' }}>Rubricas Permitidas</p>
 	            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.45)', margin: '0 0 16px' }}>Selecione as rubricas de despesas que podem ser utilizadas. Ao selecionar uma rubrica, informe também quais sub-rubricas ficam permitidas.</p>
 	            <div style={{
 	              border: '1px solid rgba(255,255,255,0.12)',
 	              borderRadius: 'var(--radius)',
-	              backgroundColor: 'rgba(15,23,42,0.35)',
+	              backgroundColor: 'rgba(23, 23, 23,0.35)',
 	              overflow: 'hidden',
 	            }}>
 	              {rubricasPermitidasData.map((item, index, lista) => {
@@ -1937,7 +1952,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
 	                      }}
 	                    >
 	                      <span>
-	                        <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff' }}>
+	                        <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)' }}>
 	                          {item.label}
 	                        </span>
 	                        <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginTop: '3px' }}>
@@ -1961,7 +1976,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
 	                      }}>
 	                        {checked && (
 	                          <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-	                            <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+	                            <path d="M1 4L3.5 6.5L9 1" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
 	                          </svg>
 	                        )}
 	                      </span>
@@ -1991,7 +2006,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
 	                                padding: '10px 12px',
 	                                border: `1px solid ${subChecked ? 'rgba(0,193,175,0.34)' : 'rgba(255,255,255,0.1)'}`,
 	                                borderRadius: 'var(--radius)',
-	                                backgroundColor: subChecked ? 'rgba(0,193,175,0.1)' : 'rgba(15,23,42,0.35)',
+	                                backgroundColor: subChecked ? 'rgba(0,193,175,0.1)' : 'rgba(23, 23, 23,0.35)',
 	                                cursor: 'pointer',
 	                                textAlign: 'left',
 	                              }}
@@ -2012,7 +2027,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
 	                              }}>
 	                                {subChecked && (
 	                                  <svg width="9" height="7" viewBox="0 0 10 8" fill="none">
-	                                    <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+	                                    <path d="M1 4L3.5 6.5L9 1" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
 	                                  </svg>
 	                                )}
 	                              </span>
@@ -2030,10 +2045,10 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
           {rubricas.bolsa && (
             <div style={{ ...innerCardStyle, marginTop: '20px', backgroundColor: 'rgba(0,193,175,0.06)', borderColor: 'rgba(0,193,175,0.18)' }}>
               <div style={{ marginBottom: '18px' }}>
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 6px' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 6px' }}>
                   Modalidades e Níveis de Bolsa
                 </p>
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>
                   Configure as modalidades e níveis aceitos quando a rubrica Bolsa estiver permitida.
                 </p>
               </div>
@@ -2164,14 +2179,14 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                     padding: '16px',
                     borderRadius: 'var(--radius)',
                     border: `1px solid ${checked ? 'rgba(0,193,175,0.35)' : 'rgba(255,255,255,0.12)'}`,
-                    backgroundColor: checked ? 'rgba(0,193,175,0.08)' : 'rgba(15,23,42,0.35)',
+                    backgroundColor: checked ? 'rgba(0,193,175,0.08)' : 'rgba(23, 23, 23,0.35)',
                     cursor: 'pointer',
                     textAlign: 'left',
                   }}
                 >
                   <span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff' }}>
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)' }}>
                         {item.label}
                       </span>
                       <span style={{
@@ -2185,7 +2200,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                         {item.obrigatorio ? 'Obrigatório' : 'Opcional'}
                       </span>
                     </span>
-                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', lineHeight: 1.45 }}>
+                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--form-text-muted)', lineHeight: 1.45 }}>
                       {item.descricao}
                     </span>
                     <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.38)', marginTop: '8px' }}>
@@ -2204,7 +2219,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   }}>
                     {checked && (
                       <svg width="11" height="9" viewBox="0 0 10 8" fill="none">
-                        <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M1 4L3.5 6.5L9 1" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     )}
                   </span>
@@ -2255,7 +2270,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
               fontFamily: 'var(--font-family)',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-medium)',
-              color: 'rgba(255,255,255,0.7)',
+              color: 'var(--form-text-secondary)',
               transition: 'background-color 0.2s, border-color 0.2s',
             }}
             onMouseEnter={e => {
@@ -2288,7 +2303,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
               fontFamily: 'var(--font-family)',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-medium)',
-              color: '#0f172a',
+              color: '#171717',
               transition: 'background-color 0.2s',
             }}
             onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#00a99a'; }}
@@ -2334,7 +2349,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   fontFamily: 'var(--font-family)',
                   fontSize: 'var(--text-md)',
                   fontWeight: 'var(--font-weight-medium)',
-                  color: '#ffffff',
+                  color: 'var(--form-text-primary)',
                   margin: '0 0 6px',
                 }}>
                   Criar Novo Recurso
@@ -2342,7 +2357,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                 <p style={{
                   fontFamily: 'var(--font-family)',
                   fontSize: 'var(--text-sm)',
-                  color: 'rgba(255,255,255,0.5)',
+                  color: 'var(--form-text-muted)',
                   margin: 0,
                 }}>
                   Inclua as informações da nova origem do recurso financeiro.
@@ -2355,7 +2370,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   border: 'none',
                   cursor: 'pointer',
                   padding: '4px',
-                  color: 'rgba(255,255,255,0.5)',
+                  color: 'var(--form-text-muted)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -2405,7 +2420,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   fontFamily: 'var(--font-family)',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
-                  color: 'rgba(255,255,255,0.7)',
+                  color: 'var(--form-text-secondary)',
                   transition: 'background-color 0.2s, border-color 0.2s',
                 }}
                 onMouseEnter={e => {
@@ -2434,7 +2449,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   fontFamily: 'var(--font-family)',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
-                  color: '#0f172a',
+                  color: '#171717',
                   transition: 'background-color 0.2s',
                 }}
                 onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#00a99a'; }}
@@ -2483,7 +2498,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   fontFamily: 'var(--font-family)',
                   fontSize: 'var(--text-md)',
                   fontWeight: 'var(--font-weight-medium)',
-                  color: '#ffffff',
+                  color: 'var(--form-text-primary)',
                   margin: '0 0 6px',
                 }}>
                   Criar Novo Arquivo
@@ -2491,7 +2506,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                 <p style={{
                   fontFamily: 'var(--font-family)',
                   fontSize: 'var(--text-sm)',
-                  color: 'rgba(255,255,255,0.5)',
+                  color: 'var(--form-text-muted)',
                   margin: 0,
                 }}>
                   Inclua as informações do arquivo.
@@ -2504,7 +2519,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   border: 'none',
                   cursor: 'pointer',
                   padding: '4px',
-                  color: 'rgba(255,255,255,0.5)',
+                  color: 'var(--form-text-muted)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -2601,7 +2616,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   fontFamily: 'var(--font-family)',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
-                  color: 'rgba(255,255,255,0.7)',
+                  color: 'var(--form-text-secondary)',
                   transition: 'background-color 0.2s, border-color 0.2s',
                 }}
                 onMouseEnter={e => {
@@ -2635,7 +2650,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   fontFamily: 'var(--font-family)',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
-                  color: '#0f172a',
+                  color: '#171717',
                   transition: 'background-color 0.2s',
                 }}
                 onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#00a99a'; }}

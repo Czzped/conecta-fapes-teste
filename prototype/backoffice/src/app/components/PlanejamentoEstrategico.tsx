@@ -67,7 +67,7 @@ const buildStyles = (T: ThemeTokens) => ({
 const estadoColor = (estado: EstadoPlano) => {
   if (estado === 'Ativo') return '#22c55e';
   if (estado === 'Em elaboração') return '#f59e0b';
-  return '#94a3b8';
+  return '#a3a3a3';
 };
 
 const formatCurrency = (value: number) => (

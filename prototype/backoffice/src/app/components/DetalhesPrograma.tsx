@@ -58,7 +58,7 @@ interface IniciativaAportada {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  backgroundColor: 'rgba(30, 41, 59, 0.7)',
+  backgroundColor: 'rgba(38, 38, 38, 0.7)',
   border: '1px solid rgba(255,255,255,0.12)',
   borderRadius: 'var(--radius)',
   padding: '10px 14px',
@@ -78,7 +78,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 const cardStyle: React.CSSProperties = {
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
+  backgroundColor: 'rgba(38, 38, 38, 0.5)',
   border: '1px solid rgba(255,255,255,0.1)',
   borderRadius: '10px',
   padding: '28px',
@@ -86,7 +86,7 @@ const cardStyle: React.CSSProperties = {
 };
 
 const dashboardCardStyle = (): React.CSSProperties => ({
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
+  backgroundColor: 'rgba(38, 38, 38, 0.5)',
   border: '1px solid rgba(255,255,255,0.1)',
   borderRadius: '10px',
   padding: '20px',
@@ -440,7 +440,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
   };
 
   return (
-    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#171717', minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
           <Home size={15} style={{ color: 'rgba(255,255,255,0.5)' }} />
@@ -614,7 +614,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
                     }}>
                       {eixos.includes(eixo) && (
                         <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                          <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M1 4L3.5 6.5L9 1" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       )}
                     </div>
@@ -703,7 +703,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
                   fontFamily: 'var(--font-family)',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
-                  color: '#0f172a',
+                  color: '#171717',
                   cursor: 'pointer',
                 }}
               >
@@ -720,7 +720,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
             <div style={{ display: 'grid', gap: '12px' }}>
               {aditivosTempo.map(aditivo => (
                 <div key={aditivo.id} style={{
-                  backgroundColor: 'rgba(15,23,42,0.5)',
+                  backgroundColor: 'rgba(23, 23, 23,0.5)',
                   border: '1px solid rgba(255,255,255,0.08)',
                   borderRadius: '8px',
                   padding: '16px',
@@ -821,7 +821,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
                   fontFamily: 'var(--font-family)',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
-                  color: '#0f172a',
+                  color: '#171717',
                   cursor: 'pointer',
                 }}
               >
@@ -838,7 +838,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
             <div style={{ display: 'grid', gap: '12px' }}>
               {retiradasAporte.map(retirada => (
                 <div key={retirada.id} style={{
-                  backgroundColor: 'rgba(15,23,42,0.5)',
+                  backgroundColor: 'rgba(23, 23, 23,0.5)',
                   border: retirada.situacao === 'Bloqueado' ? '1px solid rgba(249,115,22,0.35)' : '1px solid rgba(255,255,255,0.08)',
                   borderRadius: '8px',
                   padding: '16px',
@@ -989,7 +989,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
               fontFamily: 'var(--font-family)',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-medium)',
-              color: '#0f172a',
+              color: '#171717',
               cursor: 'pointer',
             }}
             onMouseEnter={e => e.currentTarget.style.backgroundColor = '#00a99a'}
@@ -1023,7 +1023,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {parceriasDashboard.map(parceria => (
-                  <div key={parceria.parceria} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+                  <div key={parceria.parceria} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(23, 23, 23,0.35)' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1.6fr repeat(4, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
                       <ListCell label="Parceria" value={parceria.parceria} strong />
                       <ListCell label="Aportado" value={formatCurrency(parceria.aportado)} highlight detail={`${formatPercent(parceria.percentualAportado)} do alocado`} />
@@ -1050,7 +1050,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
                   const percentualAportado = valores.alocado > 0 ? (valores.aportado / valores.alocado) * 100 : 0;
                   const percentualConsumido = valores.aportado > 0 ? (valores.consumido / valores.aportado) * 100 : 0;
                   return (
-                    <div key={rubrica} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+                    <div key={rubrica} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(23, 23, 23,0.35)' }}>
                       <div style={{ display: 'grid', gridTemplateColumns: '1.6fr repeat(4, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
                         <ListCell label="Rubrica" value={rubrica} strong />
                         <ListCell label="Aportado" value={formatCurrency(valores.aportado)} highlight detail={`${formatPercent(percentualAportado)} do alocado`} />
@@ -1080,7 +1080,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
                     : 0;
 
                   return (
-                    <div key={iniciativa.codigo} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+                    <div key={iniciativa.codigo} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(23, 23, 23,0.35)' }}>
                       <div style={{ display: 'grid', gridTemplateColumns: '1.6fr repeat(4, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
                         <div>
                           <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>

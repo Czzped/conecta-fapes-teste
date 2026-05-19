@@ -15,7 +15,7 @@ interface Pergunta {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
+  backgroundColor: 'rgba(38, 38, 38, 0.5)',
   border: '1px solid rgba(255,255,255,0.1)',
   borderRadius: '6px',
   padding: '10px 12px',
@@ -60,7 +60,7 @@ export const FormularioAvaliacao: React.FC<Props> = ({ onBack }) => {
   };
 
   return (
-    <div className="flex-1" style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div className="flex-1" style={{ backgroundColor: '#171717', minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-16">
 
         {/* Breadcrumb */}
@@ -96,7 +96,7 @@ export const FormularioAvaliacao: React.FC<Props> = ({ onBack }) => {
 
         {/* ── Section 1: Dados da Avaliação ── */}
         <div style={{
-          backgroundColor: 'rgba(30, 41, 59, 0.6)',
+          backgroundColor: 'rgba(38, 38, 38, 0.6)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
           borderRadius: '10px',
           padding: '28px',
@@ -117,7 +117,7 @@ export const FormularioAvaliacao: React.FC<Props> = ({ onBack }) => {
                 fontFamily: 'var(--font-family)',
                 fontSize: '11px',
                 fontWeight: 'var(--font-weight-medium)',
-                color: '#0f172a',
+                color: '#171717',
               }}>
                 1
               </span>
@@ -154,7 +154,7 @@ export const FormularioAvaliacao: React.FC<Props> = ({ onBack }) => {
               }}>
                 {aceitaTermos && (
                   <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                    <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M1 4L3.5 6.5L9 1" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
               </div>
@@ -172,7 +172,7 @@ export const FormularioAvaliacao: React.FC<Props> = ({ onBack }) => {
 
         {/* ── Section 2: Avaliação da Proposta ── */}
         <div style={{
-          backgroundColor: 'rgba(30, 41, 59, 0.6)',
+          backgroundColor: 'rgba(38, 38, 38, 0.6)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
           borderRadius: '10px',
           padding: '28px',
@@ -193,7 +193,7 @@ export const FormularioAvaliacao: React.FC<Props> = ({ onBack }) => {
                 fontFamily: 'var(--font-family)',
                 fontSize: '11px',
                 fontWeight: 'var(--font-weight-medium)',
-                color: '#0f172a',
+                color: '#171717',
               }}>
                 2
               </span>
@@ -342,7 +342,7 @@ export const FormularioAvaliacao: React.FC<Props> = ({ onBack }) => {
               fontFamily: 'var(--font-family)',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-medium)',
-              color: '#0f172a',
+              color: '#171717',
               cursor: 'pointer',
               transition: 'background-color 0.2s',
             }}

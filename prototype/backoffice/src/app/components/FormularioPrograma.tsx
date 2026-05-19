@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronRight, Home, Save, Send, Plus, Trash2, ChevronDown, Search } from 'lucide-react';
+import { useThemeTokens } from '../theme/ThemeContext';
 
 interface Membro { id: number; nome: string; }
 interface AportePrograma { id: number; parceria: string; valor: string; dataAporte: string; }
@@ -10,11 +11,11 @@ interface Props {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  backgroundColor: 'rgba(30, 41, 59, 0.7)',
-  border: '1px solid rgba(255,255,255,0.12)',
+  backgroundColor: 'var(--form-input-bg)',
+  border: '1px solid var(--form-border)',
   borderRadius: 'var(--radius)',
   padding: '10px 14px',
-  color: '#ffffff',
+  color: 'var(--form-text-primary)',
   fontFamily: 'var(--font-family)',
   fontSize: 'var(--text-sm)',
   outline: 'none',
@@ -25,14 +26,14 @@ const inputStyle: React.CSSProperties = {
 const labelStyle: React.CSSProperties = {
   fontFamily: 'var(--font-family)',
   fontSize: 'var(--text-sm)',
-  color: 'rgba(255,255,255,0.7)',
+  color: 'var(--form-text-secondary)',
   display: 'block',
   marginBottom: '6px',
 };
 
 const sectionCardStyle: React.CSSProperties = {
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
-  border: '1px solid rgba(255,255,255,0.1)',
+  backgroundColor: 'var(--form-card-bg)',
+  border: '1px solid var(--form-border)',
   borderRadius: '10px',
   padding: '28px',
   marginBottom: '20px',
@@ -42,21 +43,21 @@ const sectionTitleStyle: React.CSSProperties = {
   fontFamily: 'var(--font-family)',
   fontSize: 'var(--text-sm)',
   fontWeight: 'var(--font-weight-medium)',
-  color: '#ffffff',
+  color: 'var(--form-text-primary)',
   margin: '0 0 4px',
 };
 
 const sectionSubtitleStyle: React.CSSProperties = {
   fontFamily: 'var(--font-family)',
   fontSize: 'var(--text-sm)',
-  color: 'rgba(255,255,255,0.5)',
+  color: 'var(--form-text-muted)',
   margin: '0 0 24px',
 };
 
 const dividerStyle: React.CSSProperties = {
   width: '100%',
   height: '1px',
-  backgroundColor: 'rgba(255,255,255,0.08)',
+  backgroundColor: 'var(--form-divider)',
   margin: '20px 0',
 };
 
@@ -231,6 +232,7 @@ const SearchableSelect: React.FC<{
 
 // ── Componente principal ────────────────────────────────────────────────────
 export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
+  const { T } = useThemeTokens();
   // Seção 1
   const [nome, setNome] = useState('');
   const [instituicaoDemandante, setInstituicaoDemandante] = useState('');
@@ -317,21 +319,33 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
   };
 
   return (
-    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div
+      style={{
+        backgroundColor: T.bgPage,
+        minHeight: '100vh',
+        '--form-card-bg': T.bgCard,
+        '--form-input-bg': T.bgInput,
+        '--form-border': T.borderDefault,
+        '--form-divider': T.borderSubtle,
+        '--form-text-primary': T.textPrimary,
+        '--form-text-secondary': T.textSecondary,
+        '--form-text-muted': T.textMuted,
+      } as React.CSSProperties}
+    >
       <div className="pt-8 px-8 pb-16">
 
         {/* Breadcrumb — sem "Gestão de Captação" */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
-          <Home size={15} style={{ color: 'rgba(255,255,255,0.5)' }} />
+          <Home size={15} style={{ color: 'var(--form-text-muted)' }} />
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
           <button
             onClick={onBack}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)' }}
           >
             Programa
           </button>
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
-          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
+          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-primary)', fontWeight: 'var(--font-weight-medium)' }}>
             Novo Programa
           </span>
         </div>
@@ -347,10 +361,10 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
               <Plus size={18} style={{ color: '#00c1af' }} />
             </div>
             <div style={{ flex: 1, marginTop: '6px' }}>
-              <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 4px' }}>
+              <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 4px' }}>
                 Novo Programa
               </h1>
-              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>
                 Preencha as informações abaixo para criar um novo programa de fomento.
               </p>
             </div>
@@ -362,7 +376,7 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
         <div style={sectionCardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
             <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#0f172a' }}>1</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#171717' }}>1</span>
             </div>
             <p style={sectionTitleStyle}>Identificação do Programa</p>
           </div>
@@ -454,7 +468,7 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
                       }}>
                         {eixos.includes(eixo) && (
                           <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                            <path d="M1 4L3.5 6.5L9 1" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M1 4L3.5 6.5L9 1" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         )}
                       </div>
@@ -473,7 +487,7 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
         <div style={sectionCardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
             <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#0f172a' }}>2</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#171717' }}>2</span>
             </div>
             <p style={sectionTitleStyle}>Aporte Financeiro</p>
           </div>
@@ -549,7 +563,7 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
             paddingTop: '16px',
           }}>
             <div>
-              <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)' }}>
+              <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)' }}>
                 Total aportado no programa
               </span>
               <span style={{ display: 'block', marginTop: '4px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: '#00c1af' }}>
@@ -573,7 +587,7 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
         <div style={sectionCardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
             <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#0f172a' }}>3</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#171717' }}>3</span>
             </div>
             <p style={sectionTitleStyle}>Comitê de Governança</p>
           </div>
@@ -633,7 +647,7 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
               border: '1px solid rgba(255,255,255,0.2)',
               borderRadius: 'var(--radius)', padding: '11px 20px',
               fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-medium)', color: 'rgba(255,255,255,0.8)',
+              fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-secondary)',
               cursor: 'pointer', transition: 'border-color 0.2s, background-color 0.2s',
             }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.04)'; }}
@@ -649,7 +663,7 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
               backgroundColor: '#00c1af', border: 'none',
               borderRadius: 'var(--radius)', padding: '11px 20px',
               fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-medium)', color: '#0f172a',
+              fontWeight: 'var(--font-weight-medium)', color: '#171717',
               cursor: 'pointer', transition: 'background-color 0.2s',
             }}
             onMouseEnter={e => e.currentTarget.style.backgroundColor = '#00a99a'}

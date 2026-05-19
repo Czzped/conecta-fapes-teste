@@ -34,13 +34,13 @@ const getStatusColor = (status: string) => {
     case 'Não Aprovado': return '#ef4444';
     case 'Em andamento': return '#fbbf24';
     case 'Publicado': return '#22c55e';
-    case 'Não publicado': return '#94a3b8';
+    case 'Não publicado': return '#a3a3a3';
     case 'Encerrado': return '#64748b';
     // Recurso statuses
     case 'Recebido': return '#fbbf24';
     case 'Recusado': return '#ef4444';
     case 'Aceito': return '#22c55e';
-    default: return '#94a3b8';
+    default: return '#a3a3a3';
   }
 };
 

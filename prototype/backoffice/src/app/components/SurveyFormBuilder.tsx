@@ -60,10 +60,10 @@ const conectaSurveyTheme: ITheme = {
   colorPalette: 'dark',
   isPanelless: false,
   cssVariables: {
-    '--sjs-general-backcolor': '#111c30',
-    '--sjs-general-backcolor-dark': '#0f172a',
-    '--sjs-general-backcolor-dim': '#0b1222',
-    '--sjs-general-backcolor-dim-light': '#17233a',
+    '--sjs-general-backcolor': '#171717',
+    '--sjs-general-backcolor-dark': '#171717',
+    '--sjs-general-backcolor-dim': '#0a0a0a',
+    '--sjs-general-backcolor-dim-light': '#262626',
     '--sjs-general-backcolor-dim-dark': '#08101f',
     '--sjs-general-forecolor': '#ffffff',
     '--sjs-general-forecolor-light': 'rgba(255, 255, 255, 0.66)',
@@ -72,8 +72,8 @@ const conectaSurveyTheme: ITheme = {
     '--sjs-primary-backcolor': '#00c1af',
     '--sjs-primary-backcolor-light': 'rgba(0, 193, 175, 0.14)',
     '--sjs-primary-backcolor-dark': '#00a99a',
-    '--sjs-primary-forecolor': '#0b1222',
-    '--sjs-primary-forecolor-light': '#0b1222',
+    '--sjs-primary-forecolor': '#0a0a0a',
+    '--sjs-primary-forecolor-light': '#0a0a0a',
     '--sjs-secondary-backcolor': '#4f6fce',
     '--sjs-secondary-backcolor-light': 'rgba(79, 111, 206, 0.18)',
     '--sjs-secondary-backcolor-semi-light': 'rgba(79, 111, 206, 0.28)',
@@ -95,9 +95,9 @@ const conectaSurveyTheme: ITheme = {
     '--sjs-special-blue-light': 'rgba(59, 130, 246, 0.15)',
     '--sjs-special-yellow': '#f59e0b',
     '--sjs-special-yellow-light': 'rgba(245, 158, 11, 0.16)',
-    '--sjs-questionpanel-backcolor': 'rgba(30, 41, 59, 0.78)',
+    '--sjs-questionpanel-backcolor': 'rgba(38, 38, 38, 0.78)',
     '--sjs-questionpanel-hovercolor': 'rgba(255, 255, 255, 0.045)',
-    '--sjs-editorpanel-backcolor': 'rgba(15, 23, 42, 0.82)',
+    '--sjs-editorpanel-backcolor': 'rgba(23, 23, 23, 0.82)',
     '--sjs-font-questiontitle-color': '#ffffff',
     '--sjs-font-questiondescription-color': 'rgba(255, 255, 255, 0.56)',
     '--sjs-font-editorfont-color': '#ffffff',
@@ -111,15 +111,15 @@ const conectaCreatorTheme = {
   cssVariables: {
     '--ctr-font-family': 'var(--font-family)',
     '--ctr-list-item-background-color-selected': '#00c1af',
-    '--ctr-list-item-text-color-selected': '#0b1222',
-    '--ctr-list-item-icon-color-selected': '#0b1222',
+    '--ctr-list-item-text-color-selected': '#0a0a0a',
+    '--ctr-list-item-icon-color-selected': '#0a0a0a',
     '--ctr-list-item-background-color-hovered': 'rgba(0, 193, 175, 0.12)',
     '--ctr-list-item-icon-color-hovered': '#00c1af',
     '--ctr-list-search-border-color': 'rgba(255, 255, 255, 0.12)',
     '--ctr-list-search-text-color': '#ffffff',
     '--ctr-list-search-text-color-placeholder': 'rgba(255, 255, 255, 0.42)',
     '--ctr-separator-color': 'rgba(255, 255, 255, 0.10)',
-    '--ctr-survey-contextual-button-background-color': '#111c30',
+    '--ctr-survey-contextual-button-background-color': '#171717',
     '--ctr-survey-contextual-button-icon-color': 'rgba(255, 255, 255, 0.66)',
     '--ctr-survey-contextual-button-icon-color-positive': '#00c1af',
     '--ctr-survey-contextual-button-icon-color-negative': '#ef4444',
@@ -590,7 +590,7 @@ export const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onBack }) 
 
   if (viewMode === 'list') {
     return (
-      <div className="survey-form-builder min-h-screen" style={{ backgroundColor: '#0f172a' }}>
+      <div className="survey-form-builder min-h-screen" style={{ backgroundColor: '#171717' }}>
         <div className="px-8 py-8">
           <div className="mb-6 flex items-start gap-3">
             <button
@@ -598,7 +598,7 @@ export const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onBack }) 
               onClick={onBack}
               aria-label="Voltar para configuracoes"
               className="flex h-9 w-9 items-center justify-center rounded-md"
-              style={{ backgroundColor: 'rgba(30,41,59,0.5)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}
+              style={{ backgroundColor: 'rgba(38, 38, 38,0.5)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}
             >
               <ArrowLeft size={16} />
             </button>
@@ -628,7 +628,7 @@ export const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onBack }) 
             <MetricCard label="Classificacoes" value={String(metrics.categories)} />
           </div>
 
-          <section className="rounded-lg p-5" style={{ backgroundColor: 'rgba(30,41,59,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <section className="rounded-lg p-5" style={{ backgroundColor: 'rgba(38, 38, 38,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
             <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
               <div>
                 <h2 style={{ color: '#ffffff', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>Formularios criados</h2>
@@ -705,7 +705,7 @@ export const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onBack }) 
 
   if (viewMode === 'usage') {
     return (
-      <div className="survey-form-builder min-h-screen" style={{ backgroundColor: '#0f172a' }}>
+      <div className="survey-form-builder min-h-screen" style={{ backgroundColor: '#171717' }}>
         <div className="px-8 py-8">
           <div className="mb-6 flex items-start gap-3">
             <button
@@ -713,7 +713,7 @@ export const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onBack }) 
               onClick={() => setViewMode('list')}
               aria-label="Voltar para listagem"
               className="flex h-9 w-9 items-center justify-center rounded-md"
-              style={{ backgroundColor: 'rgba(30,41,59,0.5)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}
+              style={{ backgroundColor: 'rgba(38, 38, 38,0.5)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}
             >
               <ArrowLeft size={16} />
             </button>
@@ -738,7 +738,7 @@ export const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onBack }) 
 
           <div className="grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)]">
             <aside className="space-y-4">
-              <section className="rounded-lg p-4" style={{ backgroundColor: 'rgba(30,41,59,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <section className="rounded-lg p-4" style={{ backgroundColor: 'rgba(38, 38, 38,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
                 <h2 style={{ color: '#ffffff', fontSize: '14px', fontWeight: 600, margin: '0 0 14px' }}>Contexto de uso</h2>
                 <div className="survey-usage-context">
                   <span>Formulario</span>
@@ -754,7 +754,7 @@ export const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onBack }) 
                 </div>
               </section>
 
-              <section className="rounded-lg p-4" style={{ backgroundColor: 'rgba(30,41,59,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <section className="rounded-lg p-4" style={{ backgroundColor: 'rgba(38, 38, 38,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
                 <h2 style={{ color: '#ffffff', fontSize: '14px', fontWeight: 600, margin: '0 0 14px' }}>Linha do tempo</h2>
                 {[
                   'Formulario selecionado pela area tecnica',
@@ -780,7 +780,7 @@ export const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onBack }) 
   }
 
   return (
-    <div className="survey-form-builder min-h-screen" style={{ backgroundColor: '#0b1222' }}>
+    <div className="survey-form-builder min-h-screen" style={{ backgroundColor: '#0a0a0a' }}>
       <div className="px-8 py-8">
         <div className="mb-6 flex items-start gap-3">
           <button
@@ -788,7 +788,7 @@ export const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onBack }) 
             onClick={() => setViewMode('list')}
             aria-label="Voltar para listagem"
             className="flex h-9 w-9 items-center justify-center rounded-md"
-            style={{ backgroundColor: 'rgba(30,41,59,0.72)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.72)' }}
+            style={{ backgroundColor: 'rgba(38, 38, 38,0.72)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.72)' }}
           >
             <ArrowLeft size={16} />
           </button>
@@ -827,7 +827,7 @@ export const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onBack }) 
 
         <div className="grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)]">
           <aside className="space-y-4">
-            <section className="rounded-lg p-4" style={{ backgroundColor: 'rgba(30,41,59,0.62)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <section className="rounded-lg p-4" style={{ backgroundColor: 'rgba(38, 38, 38,0.62)', border: '1px solid rgba(255,255,255,0.1)' }}>
               <div className="mb-3 flex items-center justify-between">
                 <h2 style={{ color: '#ffffff', fontSize: '14px', fontWeight: 600, margin: 0 }}>Biblioteca</h2>
                 <span style={{ color: 'rgba(255,255,255,0.42)', fontSize: '12px' }}>{forms.length} itens</span>
@@ -861,7 +861,7 @@ export const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onBack }) 
               </div>
             </section>
 
-            <section className="rounded-lg p-4" style={{ backgroundColor: 'rgba(30,41,59,0.62)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <section className="rounded-lg p-4" style={{ backgroundColor: 'rgba(38, 38, 38,0.62)', border: '1px solid rgba(255,255,255,0.1)' }}>
               <h2 style={{ color: '#ffffff', fontSize: '14px', fontWeight: 600, margin: '0 0 14px' }}>Metadados</h2>
               <label className="survey-field-label" htmlFor="form-name">Nome</label>
               <input id="form-name" value={selectedForm.name} onChange={(event) => updateSelected({ name: event.target.value })} className="survey-field-input" />
@@ -890,7 +890,7 @@ export const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onBack }) 
               </div>
             </section>
 
-            <section className="rounded-lg p-4" style={{ backgroundColor: 'rgba(30,41,59,0.62)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <section className="rounded-lg p-4" style={{ backgroundColor: 'rgba(38, 38, 38,0.62)', border: '1px solid rgba(255,255,255,0.1)' }}>
               <button type="button" onClick={() => setShowJson((value) => !value)} className="survey-json-toggle">
                 <FileJson size={15} />
                 {showJson ? 'Ocultar JSON' : 'Ver JSON'}
@@ -907,7 +907,7 @@ export const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onBack }) 
             </section>
           </aside>
 
-          <section className="min-w-0 overflow-hidden rounded-lg" style={{ backgroundColor: '#0b1222', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <section className="min-w-0 overflow-hidden rounded-lg" style={{ backgroundColor: '#0a0a0a', border: '1px solid rgba(255,255,255,0.1)' }}>
             <SurveyCreatorComponent creator={creator} />
           </section>
         </div>
@@ -920,7 +920,7 @@ const MetricCard: React.FC<{ label: string; value: string }> = ({ label, value }
   <div
     className="rounded-lg p-4"
     style={{
-      backgroundColor: 'rgba(30,41,59,0.5)',
+      backgroundColor: 'rgba(38, 38, 38,0.5)',
       border: '1px solid rgba(255,255,255,0.1)',
     }}
   >

@@ -383,7 +383,7 @@ const Metric: React.FC<{ T: ThemeTokens; label: string; value: string }> = ({ T,
 );
 
 const StatusBadge: React.FC<{ situacao: SituacaoRegra }> = ({ situacao }) => {
-  const color = situacao === 'Vigente' ? '#22c55e' : situacao === 'Programada' ? '#38bdf8' : '#94a3b8';
+  const color = situacao === 'Vigente' ? '#22c55e' : situacao === 'Programada' ? '#38bdf8' : '#a3a3a3';
   return (
     <span style={{ flexShrink: 0, padding: '4px 8px', borderRadius: '999px', backgroundColor: `${color}22`, color, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>
       {situacao}

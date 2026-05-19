@@ -707,7 +707,7 @@ export const Iniciativas: React.FC = () => {
 
           <div className="rounded-lg p-5 mb-8" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
             <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(10, minmax(0, 1fr))', gap: '10px', padding: '16px 6px 8px' }}>
-              <div style={{ position: 'absolute', left: '5%', right: '5%', top: '43px', height: '3px', backgroundColor: 'rgba(148, 163, 184, 0.22)', borderRadius: '999px' }} />
+              <div style={{ position: 'absolute', left: '5%', right: '5%', top: '43px', height: '3px', backgroundColor: 'rgba(163, 163, 163, 0.22)', borderRadius: '999px' }} />
               <div style={{ position: 'absolute', left: '5%', width: '50%', top: '43px', height: '3px', backgroundColor: '#14b8a6', borderRadius: '999px' }} />
               {projectStages.map((stage) => {
                 const Icon = stage.Icon;
@@ -806,7 +806,7 @@ export const Iniciativas: React.FC = () => {
                     </div>
                   </div>
 
-                  <div style={{ width: '100%', height: '6px', backgroundColor: 'rgba(148, 163, 184, 0.24)', borderRadius: '999px', overflow: 'hidden', display: 'flex', marginTop: '14px' }}>
+                  <div style={{ width: '100%', height: '6px', backgroundColor: 'rgba(163, 163, 163, 0.24)', borderRadius: '999px', overflow: 'hidden', display: 'flex', marginTop: '14px' }}>
                     <div style={{ width: `${consumidoPercent}%`, height: '100%', backgroundColor: '#14b8a6' }} />
                     {alocado && <div style={{ width: `${alocadoPercent}%`, height: '100%', backgroundColor: 'rgba(20, 184, 166, 0.45)' }} />}
                   </div>
@@ -1597,7 +1597,7 @@ const formInputStyle: React.CSSProperties = {
 const statusEquipeStyle: Record<MembroEquipeIniciativa['status'], { color: string; bg: string; border: string }> = {
   Ativo: { color: '#22c55e', bg: 'rgba(34, 197, 94, 0.10)', border: 'rgba(34, 197, 94, 0.30)' },
   Alocado: { color: '#60a5fa', bg: 'rgba(96, 165, 250, 0.12)', border: 'rgba(96, 165, 250, 0.30)' },
-  Finalizado: { color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.12)', border: 'rgba(148, 163, 184, 0.28)' },
+  Finalizado: { color: '#a3a3a3', bg: 'rgba(163, 163, 163, 0.12)', border: 'rgba(163, 163, 163, 0.28)' },
   Suspenso: { color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', border: 'rgba(245, 158, 11, 0.30)' },
 };
 

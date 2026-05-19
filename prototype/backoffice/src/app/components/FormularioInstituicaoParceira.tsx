@@ -40,7 +40,7 @@ interface Unidade {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  backgroundColor: 'rgba(30, 41, 59, 0.7)',
+  backgroundColor: 'rgba(38, 38, 38, 0.7)',
   border: '1px solid rgba(255,255,255,0.12)',
   borderRadius: 'var(--radius)',
   padding: '10px 14px',
@@ -61,7 +61,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 const sectionCardStyle: React.CSSProperties = {
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
+  backgroundColor: 'rgba(38, 38, 38, 0.5)',
   border: '1px solid rgba(255,255,255,0.1)',
   borderRadius: '10px',
   padding: '28px',
@@ -286,7 +286,7 @@ export const FormularioInstituicaoParceira: React.FC<Props> = ({ onBack }) => {
   };
 
   return (
-    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#171717', minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-16">
         {/* Breadcrumb */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
@@ -400,7 +400,7 @@ export const FormularioInstituicaoParceira: React.FC<Props> = ({ onBack }) => {
                   fontFamily: 'var(--font-family)',
                   fontSize: '11px',
                   fontWeight: 'var(--font-weight-medium)',
-                  color: '#0f172a',
+                  color: '#171717',
                 }}
               >
                 1
@@ -603,7 +603,7 @@ export const FormularioInstituicaoParceira: React.FC<Props> = ({ onBack }) => {
                   fontFamily: 'var(--font-family)',
                   fontSize: '11px',
                   fontWeight: 'var(--font-weight-medium)',
-                  color: '#0f172a',
+                  color: '#171717',
                 }}
               >
                 2
@@ -839,7 +839,7 @@ export const FormularioInstituicaoParceira: React.FC<Props> = ({ onBack }) => {
                       gridTemplateColumns: '2fr 1.5fr 1.5fr 2fr',
                       gap: '12px',
                       padding: '10px 14px',
-                      backgroundColor: 'rgba(30, 41, 59, 0.5)',
+                      backgroundColor: 'rgba(38, 38, 38, 0.5)',
                       border: '1px solid rgba(255,255,255,0.06)',
                       borderRadius: 'var(--radius)',
                       fontFamily: 'var(--font-family)',
@@ -879,7 +879,7 @@ export const FormularioInstituicaoParceira: React.FC<Props> = ({ onBack }) => {
                     fontFamily: 'var(--font-family)',
                     fontSize: '11px',
                     fontWeight: 'var(--font-weight-medium)',
-                    color: '#0f172a',
+                    color: '#171717',
                   }}
                 >
                   3
@@ -1140,7 +1140,7 @@ export const FormularioInstituicaoParceira: React.FC<Props> = ({ onBack }) => {
               fontFamily: 'var(--font-family)',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-medium)',
-              color: '#0f172a',
+              color: '#171717',
               cursor: 'pointer',
               transition: 'background-color 0.2s',
             }}

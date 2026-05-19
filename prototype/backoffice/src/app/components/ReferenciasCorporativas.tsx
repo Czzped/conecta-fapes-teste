@@ -382,7 +382,7 @@ const Select: React.FC<{ label: string; value: string; onChange: (value: string)
 );
 
 const SaveButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
-  <button type="button" onClick={onClick} style={{ height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', padding: '0 14px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#0f172a', cursor: 'pointer' }}>
+  <button type="button" onClick={onClick} style={{ height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', padding: '0 14px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#171717', cursor: 'pointer' }}>
     <Save size={15} />
     Salvar
   </button>

@@ -12,26 +12,26 @@
   --text-base: 16px;
   --text-sm: 14px;
   /* Page canvas: off-white para tirar a "lâmpada" do fundo branco puro */
-  --background: var(--color-slate-50);
-  /* Texto principal: slate-800 em vez de slate-950 — ainda AAA, sem peso de tinta cheia */
-  --foreground: var(--color-slate-800);
+  --background: var(--color-neutral-50);
+  /* Texto principal: neutral-800 em vez de neutral-950 — ainda AAA, sem peso de tinta cheia */
+  --foreground: var(--color-neutral-800);
   /* Cards ficam brancos de verdade e flutuam sobre o canvas off-white */
   --card: #ffffff;
-  --card-foreground: var(--color-slate-800);
+  --card-foreground: var(--color-neutral-800);
   --popover: #ffffff;
-  --popover-foreground: var(--color-slate-800);
+  --popover-foreground: var(--color-neutral-800);
   /* Verde da marca dessaturado um tom para parar de vibrar contra o branco do card */
   --primary: #02a85a;
   --primary-foreground: #ffffff;
   --secondary: rgba(0, 0, 0, 0);
-  --secondary-foreground: var(--color-slate-700);
-  --muted: var(--color-slate-100);
-  --muted-foreground: var(--color-slate-500);
+  --secondary-foreground: var(--color-neutral-700);
+  --muted: var(--color-neutral-100);
+  --muted-foreground: var(--color-neutral-500);
   --accent: #02a85a;
   --accent-foreground: #ffffff;
   --destructive: rgba(0, 0, 0, 0);
   --destructive-foreground: var(--color-red-500);
-  --border: var(--color-slate-200);
+  --border: var(--color-neutral-200);
   --input: #ffffff;
   --input-background: #ffffff;
   /* The default font weight for medium text. */
@@ -43,10 +43,10 @@
   /* The default font weight for bold text. */
   --font-weight-bold: 700;
   --ring: #02a85a;
-  /* Sombras com tinta slate em vez de preto puro — parecem "premium" e somem menos no off-white */
-  --elevation-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
-  --elevation-md: 0 4px 12px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.04);
-  --elevation-lg: 0 12px 32px rgba(15, 23, 42, 0.10), 0 4px 8px rgba(15, 23, 42, 0.04);
+  /* Sombras com tinta neutral em vez de preto puro — parecem "premium" e somem menos no off-white */
+  --elevation-sm: 0 1px 2px rgba(23, 23, 23, 0.04), 0 1px 3px rgba(23, 23, 23, 0.06);
+  --elevation-md: 0 4px 12px rgba(23, 23, 23, 0.06), 0 2px 4px rgba(23, 23, 23, 0.04);
+  --elevation-lg: 0 12px 32px rgba(23, 23, 23, 0.10), 0 4px 8px rgba(23, 23, 23, 0.04);
   /* The color for chart elements, such as a bar or line in a chart. */
   --chart-1: rgba(0, 193, 106, 1.00);
   /* The color for another chart element, such as a bar or line in a chart. */
@@ -64,13 +64,13 @@
   /* The larger border radius variant. */
   --radius-lg: 8px;
   --sidebar: #ffffff;
-  --sidebar-foreground: var(--color-slate-800);
-  /* Item ATIVO usa verde da marca; HOVER fica em slate-100 (era verde sólido nos dois — pesado demais) */
+  --sidebar-foreground: var(--color-neutral-800);
+  /* Item ATIVO usa verde da marca; HOVER fica em neutral-100 (era verde sólido nos dois — pesado demais) */
   --sidebar-primary: #02a85a;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: var(--color-slate-100);
-  --sidebar-accent-foreground: var(--color-slate-800);
-  --sidebar-border: var(--color-slate-200);
+  --sidebar-accent: var(--color-neutral-100);
+  --sidebar-accent-foreground: var(--color-neutral-800);
+  --sidebar-border: var(--color-neutral-200);
   --sidebar-ring: #02a85a;
 }
 
@@ -211,7 +211,7 @@ html {
    These complement the existing design system variables.
 ──────────────────────────────────────────────────────────────── */
 :root, [data-theme="dark"] {
-  --dash-page-bg:       #0b1222;
+  --dash-page-bg:       #0a0a0a;
   --dash-card-bg:       rgba(255, 255, 255, 0.055);
   --dash-card-border:   rgba(255, 255, 255, 0.12);
   --dash-text-primary:  #ffffff;
@@ -227,19 +227,19 @@ html {
 }
 
 [data-theme="light"] {
-  --dash-page-bg:       #f6f8fb;
+  --dash-page-bg:       #fafafa;
   --dash-card-bg:       #ffffff;
-  --dash-card-border:   #e2e8f0;
-  --dash-text-primary:  #0f172a;
-  --dash-text-secondary:#475569;
-  --dash-text-muted:    #94a3b8;
-  --dash-divider:       #e2e8f0;
+  --dash-card-border:   #e5e5e5;
+  --dash-text-primary:  #171717;
+  --dash-text-secondary:#525252;
+  --dash-text-muted:    #a3a3a3;
+  --dash-divider:       #e5e5e5;
   --dash-input-bg:      #ffffff;
-  --dash-input-border:  #e2e8f0;
-  --dash-hover-bg:      #f8fafc;
-  --dash-badge-bg:      #f1f5f9;
-  --dash-icon-subdued:  #94a3b8;
-  --dash-shadow:        0 8px 20px rgba(15, 23, 43, 0.08);
+  --dash-input-border:  #e5e5e5;
+  --dash-hover-bg:      #fafafa;
+  --dash-badge-bg:      #f5f5f5;
+  --dash-icon-subdued:  #a3a3a3;
+  --dash-shadow:        0 8px 20px rgba(23, 23, 23, 0.08);
 }
 
 /* Custom checkbox styling for dark mode (NuxtUI style) */
@@ -274,7 +274,7 @@ input[type="checkbox"]:checked::after {
   top: 2px;
   width: 5px;
   height: 10px;
-  border: solid #0f172a;
+  border: solid #171717;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }

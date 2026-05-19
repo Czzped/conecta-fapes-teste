@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronRight, Plus, Save, Search, Send, Upload } from 'lucide-react';
 import { toast } from 'sonner';
+import { useThemeTokens } from '../theme/ThemeContext';
 
 interface Props {
   onBack: () => void;
@@ -14,11 +15,11 @@ interface Documento {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  backgroundColor: 'rgba(30, 41, 59, 0.7)',
-  border: '1px solid rgba(255,255,255,0.12)',
+  backgroundColor: 'var(--form-input-bg)',
+  border: '1px solid var(--form-border)',
   borderRadius: 'var(--radius)',
   padding: '10px 14px',
-  color: '#ffffff',
+  color: 'var(--form-text-primary)',
   fontFamily: 'var(--font-family)',
   fontSize: 'var(--text-sm)',
   outline: 'none',
@@ -29,7 +30,7 @@ const inputStyle: React.CSSProperties = {
 const labelStyle: React.CSSProperties = {
   fontFamily: 'var(--font-family)',
   fontSize: 'var(--text-sm)',
-  color: 'rgba(255,255,255,0.7)',
+  color: 'var(--form-text-secondary)',
   display: 'block',
   marginBottom: '6px',
 };
@@ -42,8 +43,8 @@ const RequiredLabel: React.FC<{ label: string; required?: boolean }> = ({ label,
 );
 
 const sectionCardStyle: React.CSSProperties = {
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
-  border: '1px solid rgba(255,255,255,0.1)',
+  backgroundColor: 'var(--form-card-bg)',
+  border: '1px solid var(--form-border)',
   borderRadius: '10px',
   padding: '28px',
   marginBottom: '20px',
@@ -53,14 +54,14 @@ const sectionTitleStyle: React.CSSProperties = {
   fontFamily: 'var(--font-family)',
   fontSize: 'var(--text-sm)',
   fontWeight: 'var(--font-weight-medium)',
-  color: '#ffffff',
+  color: 'var(--form-text-primary)',
   margin: '0 0 4px',
 };
 
 const sectionSubtitleStyle: React.CSSProperties = {
   fontFamily: 'var(--font-family)',
   fontSize: 'var(--text-sm)',
-  color: 'rgba(255,255,255,0.5)',
+  color: 'var(--form-text-muted)',
   margin: '0 0 24px',
 };
 
@@ -183,7 +184,7 @@ const SearchableInstitutionField: React.FC<{
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Digite nome ou CNPJ"
-              style={{ ...inputStyle, paddingLeft: '36px', backgroundColor: 'rgba(15,23,42,0.8)' }}
+              style={{ ...inputStyle, paddingLeft: '36px', backgroundColor: 'var(--form-input-bg)' }}
             />
             <Search size={15} style={{ position: 'absolute', left: '22px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
           </div>
@@ -223,6 +224,7 @@ const SearchableInstitutionField: React.FC<{
 };
 
 export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
+  const { T } = useThemeTokens();
   const [nomeParceria, setNomeParceria] = useState('');
   const [instituicaoVinculada, setInstituicaoVinculada] = useState('');
   const [numeroProcesso, setNumeroProcesso] = useState('');
@@ -283,17 +285,28 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
   };
 
   return (
-    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div
+      style={{
+        backgroundColor: T.bgPage,
+        minHeight: '100vh',
+        '--form-card-bg': T.bgCard,
+        '--form-input-bg': T.bgInput,
+        '--form-border': T.borderDefault,
+        '--form-text-primary': T.textPrimary,
+        '--form-text-secondary': T.textSecondary,
+        '--form-text-muted': T.textMuted,
+      } as React.CSSProperties}
+    >
       <div className="pt-8 px-8 pb-16">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
           <button
             onClick={onBack}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)' }}
           >
             Parcerias
           </button>
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
-          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
+          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-primary)', fontWeight: 'var(--font-weight-medium)' }}>
             Nova Parceria
           </span>
         </div>
@@ -304,10 +317,10 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
               <Plus size={18} style={{ color: '#00c1af' }} />
             </div>
             <div style={{ flex: 1, marginTop: '6px' }}>
-              <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 4px' }}>
+              <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 4px' }}>
                 Nova Parceria
               </h1>
-              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>
                 Registre a solicitação, a instituição única, a vigência original e o aporte financeiro da parceria.
               </p>
             </div>
@@ -400,14 +413,14 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '8px' }}>
           <button
             onClick={handleSalvarElaboracao}
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 'var(--radius)', color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 'var(--radius)', color: 'var(--form-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}
           >
             <Save size={16} />
             Salvar Rascunho
           </button>
           <button
             onClick={handleFormalizarParceria}
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', color: '#0f172a', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}
           >
             <Send size={16} />
             Formalizar Parceria
@@ -422,7 +435,7 @@ const Section: React.FC<{ number: string; title: string; subtitle: string; child
   <div style={sectionCardStyle}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
       <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#0f172a' }}>{number}</span>
+        <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#171717' }}>{number}</span>
       </div>
       <p style={sectionTitleStyle}>{title}</p>
     </div>
@@ -440,7 +453,7 @@ const Field: React.FC<{ label: string; value: string; onChange: (value: string) 
 
 const Metric: React.FC<{ label: string; value: string; highlight?: boolean }> = ({ label, value, highlight }) => (
   <div>
-    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '5px' }}>{label}</div>
+    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--form-text-muted)', marginBottom: '5px' }}>{label}</div>
     <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: highlight ? '#f59e0b' : '#ffffff', fontWeight: highlight ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', margin: 0 }}>
       {value}
     </p>

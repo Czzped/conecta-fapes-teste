@@ -45,7 +45,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
         <div 
           className="w-full max-w-md rounded-lg p-10 shadow-2xl"
           style={{
-            backgroundColor: 'rgba(17, 28, 48, 0.86)',
+            backgroundColor: 'rgba(23, 23, 23, 0.86)',
             border: '1px solid rgba(255, 255, 255, 0.12)',
             boxShadow: '0 24px 80px rgba(0, 0, 0, 0.32)',
             backdropFilter: 'blur(18px)'

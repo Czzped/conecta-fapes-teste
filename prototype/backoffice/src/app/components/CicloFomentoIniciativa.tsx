@@ -42,7 +42,7 @@ const estagios: EstagioCiclo[] = [
 const estadoStyle = {
   CONCLUIDO: { label: 'Concluido', color: '#00c1af', bg: 'rgba(0, 193, 175, 0.12)' },
   ATUAL: { label: 'Atual', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.14)' },
-  PENDENTE: { label: 'Pendente', color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.14)' },
+  PENDENTE: { label: 'Pendente', color: '#a3a3a3', bg: 'rgba(163, 163, 163, 0.14)' },
   CANCELADO: { label: 'Cancelado', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)' },
 };
 

@@ -7,7 +7,7 @@ interface Props {
 }
 
 const cardStyle: React.CSSProperties = {
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
+  backgroundColor: 'rgba(38, 38, 38, 0.5)',
   border: '1px solid rgba(255,255,255,0.1)',
   borderRadius: '10px',
   padding: '28px',
@@ -24,7 +24,7 @@ const labelStyle: React.CSSProperties = {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  backgroundColor: 'rgba(30, 41, 59, 0.7)',
+  backgroundColor: 'rgba(38, 38, 38, 0.7)',
   border: '1px solid rgba(255,255,255,0.12)',
   borderRadius: 'var(--radius)',
   padding: '10px 14px',
@@ -154,7 +154,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
   const [showDropdown3, setShowDropdown3] = useState(false);
   const resumoInputStyle: React.CSSProperties = {
     ...inputStyle,
-    backgroundColor: editingResumo ? 'rgba(15,23,42,0.95)' : inputStyle.backgroundColor,
+    backgroundColor: editingResumo ? 'rgba(23, 23, 23,0.95)' : inputStyle.backgroundColor,
     border: editingResumo ? '1px solid rgba(0,193,175,0.42)' : inputStyle.border,
   };
   const iniciativaSelecionada = iniciativasEnviadas.find(item => item.codigo === iniciativaSelecionadaCodigo) || iniciativasEnviadas[0];
@@ -261,7 +261,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                   top: '100%',
                   left: 0,
                   right: 0,
-                  backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                  backgroundColor: 'rgba(38, 38, 38, 0.95)',
                   border: '1px solid rgba(255,255,255,0.12)',
                   borderRadius: 'var(--radius)',
                   marginTop: '4px',
@@ -319,7 +319,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                   top: '100%',
                   left: 0,
                   right: 0,
-                  backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                  backgroundColor: 'rgba(38, 38, 38, 0.95)',
                   border: '1px solid rgba(255,255,255,0.12)',
                   borderRadius: 'var(--radius)',
                   marginTop: '4px',
@@ -377,7 +377,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                   top: '100%',
                   left: 0,
                   right: 0,
-                  backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                  backgroundColor: 'rgba(38, 38, 38, 0.95)',
                   border: '1px solid rgba(255,255,255,0.12)',
                   borderRadius: 'var(--radius)',
                   marginTop: '4px',
@@ -472,7 +472,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
   };
 
   return (
-    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#171717', minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
         {/* Breadcrumb */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
@@ -679,7 +679,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                     padding: '14px 16px',
                     border: '1px solid rgba(255,255,255,0.1)',
                     borderRadius: 'var(--radius)',
-                    backgroundColor: 'rgba(15,23,42,0.32)',
+                    backgroundColor: 'rgba(23, 23, 23,0.32)',
                   }}>
                     <div>
                       <label style={labelStyle}>Origem {index + 1}</label>
@@ -724,7 +724,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                     padding: '16px',
                     border: '1px solid rgba(255,255,255,0.1)',
                     borderRadius: 'var(--radius)',
-                    backgroundColor: 'rgba(15,23,42,0.32)',
+                    backgroundColor: 'rgba(23, 23, 23,0.32)',
                   }}>
                     <h4 style={{ ...subSectionTitleStyle, marginBottom: '12px' }}>{faixa.nome}</h4>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
@@ -775,7 +775,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                 padding: '14px 16px',
                 borderRadius: 'var(--radius)',
                 border: '1px solid rgba(255,255,255,0.1)',
-                backgroundColor: 'rgba(15,23,42,0.32)',
+                backgroundColor: 'rgba(23, 23, 23,0.32)',
               }}>
                 <div style={{
                   width: '30px',
@@ -1092,7 +1092,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                 padding: '16px',
                 borderRadius: 'var(--radius)',
                 border: '1px solid rgba(255,255,255,0.12)',
-                backgroundColor: 'rgba(15,23,42,0.35)',
+                backgroundColor: 'rgba(23, 23, 23,0.35)',
               }}>
                 <div>
                   <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', marginBottom: '4px' }}>
@@ -1135,7 +1135,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                         padding: '18px',
                         border: '1px solid rgba(255,255,255,0.1)',
                         borderRadius: 'var(--radius)',
-                        backgroundColor: 'rgba(15,23,42,0.35)',
+                        backgroundColor: 'rgba(23, 23, 23,0.35)',
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
@@ -1195,7 +1195,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                 <div style={{
                   border: '1px solid rgba(255,255,255,0.1)',
                   borderRadius: 'var(--radius)',
-                  backgroundColor: 'rgba(15,23,42,0.35)',
+                  backgroundColor: 'rgba(23, 23, 23,0.35)',
                   padding: '18px',
                 }}>
                   <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>
@@ -1212,7 +1212,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                 <div style={{
                   border: '1px solid rgba(255,255,255,0.1)',
                   borderRadius: 'var(--radius)',
-                  backgroundColor: 'rgba(15,23,42,0.35)',
+                  backgroundColor: 'rgba(23, 23, 23,0.35)',
                   padding: '18px',
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
@@ -1271,7 +1271,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                         style={{
                           border: '1px solid rgba(255,255,255,0.1)',
                           borderRadius: 'var(--radius)',
-                          backgroundColor: 'rgba(15,23,42,0.35)',
+                          backgroundColor: 'rgba(23, 23, 23,0.35)',
                           padding: '18px',
                         }}
                       >
@@ -1365,7 +1365,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                         padding: '14px 16px',
                         border: selecionada ? '1px solid rgba(0,193,175,0.42)' : '1px solid rgba(255,255,255,0.1)',
                         borderRadius: 'var(--radius)',
-                        backgroundColor: selecionada ? 'rgba(0,193,175,0.08)' : 'rgba(15,23,42,0.35)',
+                        backgroundColor: selecionada ? 'rgba(0,193,175,0.08)' : 'rgba(23, 23, 23,0.35)',
                         cursor: 'pointer',
                         textAlign: 'left',
                       }}
@@ -1436,7 +1436,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                         padding: '12px',
                         borderRadius: 'var(--radius)',
                         border: '1px solid rgba(255,255,255,0.1)',
-                        backgroundColor: 'rgba(15,23,42,0.35)',
+                        backgroundColor: 'rgba(23, 23, 23,0.35)',
                       }}
                     >
                       <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginBottom: '4px' }}>
@@ -1479,7 +1479,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                         padding: '14px 16px',
                         borderRadius: 'var(--radius)',
                         border: '1px solid rgba(255,255,255,0.1)',
-                        backgroundColor: 'rgba(15,23,42,0.35)',
+                        backgroundColor: 'rgba(23, 23, 23,0.35)',
                       }}
                     >
                       <div>
@@ -1546,7 +1546,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                         padding: '16px',
                         borderRadius: 'var(--radius)',
                         border: avaliacao.iniciativaCodigo === iniciativaSelecionada.codigo ? '1px solid rgba(0,193,175,0.38)' : '1px solid rgba(255,255,255,0.1)',
-                        backgroundColor: avaliacao.iniciativaCodigo === iniciativaSelecionada.codigo ? 'rgba(0,193,175,0.07)' : 'rgba(15,23,42,0.35)',
+                        backgroundColor: avaliacao.iniciativaCodigo === iniciativaSelecionada.codigo ? 'rgba(0,193,175,0.07)' : 'rgba(23, 23, 23,0.35)',
                       }}
                     >
                       <div>

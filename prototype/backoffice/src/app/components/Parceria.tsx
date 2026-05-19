@@ -52,8 +52,8 @@ const statusColor = (status: ParceriaStatus) => {
   switch (status) {
     case 'Rascunho': return '#f59e0b';
     case 'Ativo': return '#22c55e';
-    case 'Finalizado': return '#94a3b8';
-    default: return '#94a3b8';
+    case 'Finalizado': return '#a3a3a3';
+    default: return '#a3a3a3';
   }
 };
 
@@ -466,17 +466,6 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
   const percentualAportadoPortfolio = totalAlocado > 0 ? (totalAportado / totalAlocado) * 100 : 0;
   const percentualAlocadoPortfolio = totalInvestido > 0 ? (totalAlocado / totalInvestido) * 100 : 0;
   const percentualDisponivelPortfolio = totalInvestido > 0 ? (saldoTotal / totalInvestido) * 100 : 0;
-  const instituicoesParceiras = Object.values(
-    parceriasData.reduce<Record<string, { nome: string; totalInvestido: number }>>((acc, parceria) => {
-      const atual = acc[parceria.instituicaoParceira] || {
-        nome: parceria.instituicaoParceira,
-        totalInvestido: 0,
-      };
-      atual.totalInvestido += parceria.aporteTotal;
-      acc[parceria.instituicaoParceira] = atual;
-      return acc;
-    }, {})
-  ).sort((a, b) => b.totalInvestido - a.totalInvestido);
   const programasPortfolio = [
     {
       nome: 'Programa de Pesquisa Aplicada',
@@ -654,13 +643,13 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
                 <div key={programa.nome} style={{ padding: '16px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1.6fr repeat(4, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
                     <ListCell label="Programa" value={programa.nome} strong />
-                    <ListCell label="Aportado" value={formatCurrency(programa.aportado)} highlight />
-                    <ListCell label="Alocado" value={formatCurrency(programa.alocado)} detail={`${formatPercent(programa.percentualAlocado)} do total`} />
-                    <ListCell label="Consumido" value={formatCurrency(programa.consumido)} detail={`${formatPercent(programa.percentualConsumido)} do programa`} />
-                    <ListCell label="Disponível" value={formatCurrency(programa.saldo)} detail={`${formatPercent(programa.percentualDisponivel)} do programa`} />
+                    <ListCell label="Aportado" value={formatCurrency(programa.aportado)} strong />
+                    <ListCell label="Alocado" value={formatCurrency(programa.alocado)} detail={`${formatPercent(programa.percentualAlocado)} do total`} strong />
+                    <ListCell label="Consumido" value={formatCurrency(programa.consumido)} detail={`${formatPercent(programa.percentualConsumido)} do programa`} strong />
+                    <ListCell label="Disponível" value={formatCurrency(programa.saldo)} detail={`${formatPercent(programa.percentualDisponivel)} do programa`} strong />
                   </div>
-                  <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: T.bgChip, overflow: 'hidden' }}>
-                    <div style={{ width: `${Math.min(programa.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: programa.percentualConsumido < 50 ? '#f59e0b' : '#22c55e' }} />
+                  <div style={{ height: '4px', width: '100%', borderRadius: '999px', backgroundColor: T.bgChip, overflow: 'hidden' }}>
+                    <div style={{ width: `${Math.min(programa.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: programa.percentualConsumido < 50 ? '#f59e0b' : T.accent }} />
                   </div>
                 </div>
               ))}
@@ -679,38 +668,19 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
                 <div key={rubrica.nome} style={{ padding: '16px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1.6fr repeat(4, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
                     <ListCell label="Rubrica" value={rubrica.nome} strong />
-                    <ListCell label="Aportado" value={formatCurrency(rubrica.aportado)} highlight />
-                    <ListCell label="Alocado" value={formatCurrency(rubrica.alocado)} detail={`${formatPercent(rubrica.percentualAlocado)} do total`} />
-                    <ListCell label="Consumido" value={formatCurrency(rubrica.consumido)} detail={`${formatPercent(rubrica.percentualConsumido)} da rubrica`} />
-                    <ListCell label="Disponível" value={formatCurrency(rubrica.saldo)} detail={`${formatPercent(rubrica.percentualDisponivel)} da rubrica`} />
+                    <ListCell label="Aportado" value={formatCurrency(rubrica.aportado)} strong />
+                    <ListCell label="Alocado" value={formatCurrency(rubrica.alocado)} detail={`${formatPercent(rubrica.percentualAlocado)} do total`} strong />
+                    <ListCell label="Consumido" value={formatCurrency(rubrica.consumido)} detail={`${formatPercent(rubrica.percentualConsumido)} da rubrica`} strong />
+                    <ListCell label="Disponível" value={formatCurrency(rubrica.saldo)} detail={`${formatPercent(rubrica.percentualDisponivel)} da rubrica`} strong />
                   </div>
-                  <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: T.bgChip, overflow: 'hidden' }}>
-                    <div style={{ width: `${Math.min(rubrica.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: rubrica.percentualConsumido < 50 ? '#f59e0b' : '#22c55e' }} />
+                  <div style={{ height: '4px', width: '100%', borderRadius: '999px', backgroundColor: T.bgChip, overflow: 'hidden' }}>
+                    <div style={{ width: `${Math.min(rubrica.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: rubrica.percentualConsumido < 50 ? '#f59e0b' : T.accent }} />
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div style={{ ...cardStyle, marginTop: '24px' }}>
-            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
-              Instituições parceiras
-            </h2>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: '0 0 18px' }}>
-              Total investido por instituição parceira.
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {instituicoesParceiras.map(instituicao => {
-                const percentualInvestido = totalInvestido > 0 ? (instituicao.totalInvestido / totalInvestido) * 100 : 0;
-                return (
-                  <div key={instituicao.nome} style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '16px', alignItems: 'center', padding: '14px 16px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
-                    <ListCell label="Instituição" value={instituicao.nome} strong />
-                    <ListCell label="Total investido" value={formatCurrency(instituicao.totalInvestido)} detail={`${formatPercent(percentualInvestido)} do total`} highlight />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
         </div>
         )}
 
@@ -810,10 +780,14 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
             >
               <ListCell label="Parceria" value={parceria.nome} strong />
               <ListCell label="Instituição" value={parceria.instituicaoParceira} />
-              <ListCell label="Vigência corrente" value={`${parceria.vigenciaInicio} - ${parceria.vigenciaFim}`} />
-              <ListCell label="Aporte total" value={formatCurrency(parceria.aporteTotal)} />
-              <ListCell label="Saldo com Programas" value={formatCurrency(parceria.saldoAlocavelEmProgramas)} />
-              <div>
+              <ListCell label="Vigência" value={`${parceria.vigenciaInicio} - ${parceria.vigenciaFim}`} />
+              <div style={{ paddingLeft: '1.25rem' }}>
+                <ListCell label="Aporte total" value={formatCurrency(parceria.aporteTotal)} />
+              </div>
+              <div style={{ paddingLeft: '0.75rem' }}>
+                <ListCell label="Saldo com Programas" value={formatCurrency(parceria.saldoAlocavelEmProgramas)} />
+              </div>
+              <div style={{ paddingLeft: '2.25rem' }}>
                 <CellLabel label="Status" />
                 <span style={{ display: 'inline-block', padding: '4px 10px', borderRadius: '12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', backgroundColor: `${statusColor(parceria.status)}20`, border: `1px solid ${statusColor(parceria.status)}`, color: statusColor(parceria.status) }}>
                   {statusLabel[parceria.status]}

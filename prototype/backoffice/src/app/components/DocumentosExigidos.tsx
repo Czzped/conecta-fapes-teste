@@ -15,7 +15,7 @@ interface DocumentoExigidoItem {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  backgroundColor: 'rgba(30, 41, 59, 0.7)',
+  backgroundColor: 'rgba(38, 38, 38, 0.7)',
   border: '1px solid rgba(255,255,255,0.12)',
   borderRadius: 'var(--radius)',
   padding: '10px 14px',
@@ -35,7 +35,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 const cardStyle: React.CSSProperties = {
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
+  backgroundColor: 'rgba(38, 38, 38, 0.5)',
   border: '1px solid rgba(255,255,255,0.1)',
   borderRadius: '10px',
   padding: '22px',
@@ -55,12 +55,12 @@ export const DocumentosExigidos: React.FC<DocumentosExigidosProps> = ({ onBack }
   };
 
   return (
-    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#171717', minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '28px' }}>
           <button
             onClick={onBack}
-            style={{ width: '36px', height: '36px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(30,41,59,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            style={{ width: '36px', height: '36px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(38, 38, 38,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
           >
             <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
           </button>
@@ -99,7 +99,7 @@ export const DocumentosExigidos: React.FC<DocumentosExigidosProps> = ({ onBack }
                 <input type="checkbox" checked={draft.obrigatorio} onChange={e => setDraft(prev => ({ ...prev, obrigatorio: e.target.checked }))} />
                 Documento obrigatório por padrão
               </label>
-              <button type="button" onClick={addDocumento} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 18px', border: 'none', borderRadius: 'var(--radius)', backgroundColor: '#00c1af', color: '#0f172a', cursor: 'pointer', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>
+              <button type="button" onClick={addDocumento} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 18px', border: 'none', borderRadius: 'var(--radius)', backgroundColor: '#00c1af', color: '#171717', cursor: 'pointer', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>
                 <Plus size={16} />
                 Adicionar
               </button>
@@ -112,7 +112,7 @@ export const DocumentosExigidos: React.FC<DocumentosExigidosProps> = ({ onBack }
             </h2>
             <div style={{ display: 'grid', gap: '12px' }}>
               {documentos.map(documento => (
-                <div key={documento.id} style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr auto', gap: '14px', alignItems: 'center', padding: '14px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.45)' }}>
+                <div key={documento.id} style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr auto', gap: '14px', alignItems: 'center', padding: '14px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(23, 23, 23,0.45)' }}>
                   <div>
                     <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>{documento.nome}</div>
                     <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginTop: '4px' }}>{documento.descricao}</div>

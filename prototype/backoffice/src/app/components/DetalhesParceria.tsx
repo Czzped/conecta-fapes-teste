@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Archive, ChevronDown, ChevronRight, DollarSign, Edit3, FileText, FolderOpen, Handshake, PauseCircle, Plus, Save, Search, Upload, X } from 'lucide-react';
 import type { ParceriaItem } from './Parceria';
+import { useThemeTokens } from '../theme/ThemeContext';
 
 interface Props {
   parceria: ParceriaItem;
@@ -42,7 +43,7 @@ const definirFaixaAcaoTransversal = (valor: number) => {
 };
 
 const cardStyle: React.CSSProperties = {
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
+  backgroundColor: 'rgba(38, 38, 38, 0.5)',
   border: '1px solid rgba(255,255,255,0.1)',
   borderRadius: '10px',
   padding: '28px',
@@ -50,7 +51,7 @@ const cardStyle: React.CSSProperties = {
 };
 
 const metricCardStyle: React.CSSProperties = {
-  backgroundColor: 'rgba(30, 41, 59, 0.6)',
+  backgroundColor: 'rgba(38, 38, 38, 0.6)',
   border: '1px solid rgba(255,255,255,0.1)',
   borderRadius: '10px',
   padding: '24px',
@@ -72,7 +73,7 @@ const valueStyle: React.CSSProperties = {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  backgroundColor: 'rgba(30, 41, 59, 0.7)',
+  backgroundColor: 'rgba(38, 38, 38, 0.7)',
   border: '1px solid rgba(255,255,255,0.12)',
   borderRadius: 'var(--radius)',
   padding: '10px 14px',
@@ -119,6 +120,7 @@ const tipoDocumentoOptions = [
 ];
 
 export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenPrograma }) => {
+  const { T } = useThemeTokens();
   const [activeTab, setActiveTab] = useState<'resumo' | 'financeiro' | 'dashboard'>('resumo');
   const [currentStatus, setCurrentStatus] = useState<DetailStatus>(parceria.status);
   const [showActionDropdown, setShowActionDropdown] = useState(false);
@@ -139,7 +141,6 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
   const [aditivosTempo, setAditivosTempo] = useState<Array<{ vigenciaFimAnterior: string; vigenciaFim: string; documento: string }>>([]);
   const [aditivoFinanceiro, setAditivoFinanceiro] = useState({ valor: '', data: '', documento: '' });
   const [aditivoTempo, setAditivoTempo] = useState({ vigenciaFim: '', documento: '' });
-  const [filtroTipoDocumento, setFiltroTipoDocumento] = useState('Todos');
   const [cadastroData, setCadastroData] = useState({
     nome: parceria.nome,
     instituicaoParceira: parceria.instituicaoParceira,
@@ -166,10 +167,6 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
     arquivo: '',
   });
 
-  const documentosFiltrados = filtroTipoDocumento === 'Todos'
-    ? documentos
-    : documentos.filter(documento => documento.tipo === filtroTipoDocumento);
-
   const anexarDocumento = () => {
     if (!novoDocumento.tipo || !novoDocumento.arquivo) return;
     setDocumentos(prev => [
@@ -183,7 +180,6 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
       },
     ]);
     setNovoDocumento({ tipo: 'Anexo', descricao: '', dataEmissao: '', arquivo: '' });
-    setFiltroTipoDocumento('Todos');
   };
 
   const startEditingCadastro = () => {
@@ -355,7 +351,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
   };
 
   return (
-    <div style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-16">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
           <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)' }}>
@@ -386,13 +382,13 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
               <button
                 type="button"
                 onClick={() => setShowActionDropdown(prev => !prev)}
-                style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(30,41,59,0.95)', color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', border: `1px solid ${T.borderDefault}`, borderRadius: 'var(--radius)', backgroundColor: T.bgCard, color: T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}
               >
                 Ações
                 <ChevronDown size={15} style={{ transform: showActionDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
               </button>
               {showActionDropdown && (
-                <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 4px)', minWidth: '190px', backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius)', overflow: 'hidden', zIndex: 30, boxShadow: '0 12px 32px rgba(0,0,0,0.35)' }}>
+                <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 4px)', minWidth: '190px', backgroundColor: T.bgSurface, border: `1px solid ${T.borderDefault}`, borderRadius: 'var(--radius)', overflow: 'hidden', zIndex: 30, boxShadow: T.shadowLg }}>
                   {[
                     { label: 'Aditivo', onClick: () => setShowAditivo(true), disabled: currentStatus === 'Suspensa' || currentStatus === 'Finalizado' },
                     { label: currentStatus === 'Suspensa' ? 'Reativar' : 'Suspender', onClick: () => currentStatus === 'Suspensa' ? reativarParceria() : setShowSuspensao(true), disabled: currentStatus === 'Finalizado' },
@@ -408,7 +404,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                         action.onClick();
                         setShowActionDropdown(false);
                       }}
-                      style={{ width: '100%', padding: '11px 14px', border: 'none', backgroundColor: 'transparent', color: action.disabled ? 'rgba(255,255,255,0.3)' : action.danger ? '#f87171' : '#ffffff', textAlign: 'left', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: action.disabled ? 'not-allowed' : 'pointer' }}
+                      style={{ width: '100%', padding: '11px 14px', border: 'none', backgroundColor: 'transparent', color: action.disabled ? T.textMuted : action.danger ? '#f87171' : T.textPrimary, textAlign: 'left', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: action.disabled ? 'not-allowed' : 'pointer' }}
                     >
                       {action.label}
                     </button>
@@ -504,7 +500,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                         padding: '9px 12px',
                         borderRadius: 'var(--radius)',
                         border: suspensao.origem === origem ? '1px solid rgba(0,193,175,0.55)' : '1px solid rgba(255,255,255,0.12)',
-                        backgroundColor: suspensao.origem === origem ? 'rgba(0,193,175,0.12)' : 'rgba(15,23,42,0.35)',
+                        backgroundColor: suspensao.origem === origem ? 'rgba(0,193,175,0.12)' : 'rgba(23, 23, 23,0.35)',
                         color: suspensao.origem === origem ? '#00c1af' : 'rgba(255,255,255,0.72)',
                         fontFamily: 'var(--font-family)',
                         fontSize: 'var(--text-sm)',
@@ -542,7 +538,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
         )}
 
         {encerramentoRegistrado && currentStatus === 'Finalizado' && (
-          <div style={{ ...cardStyle, borderColor: 'rgba(148,163,184,0.35)', backgroundColor: 'rgba(148,163,184,0.08)' }}>
+          <div style={{ ...cardStyle, borderColor: 'rgba(163, 163, 163,0.35)', backgroundColor: 'rgba(163, 163, 163,0.08)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '16px', alignItems: 'center' }}>
               <Info label="Justificativa do encerramento" value={encerramentoRegistrado.justificativa} />
               <Info label="Programas encerrados" value={String(encerramentoRegistrado.programasAfetados.length)} />
@@ -578,7 +574,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                     padding: '9px 14px',
                     borderRadius: 'var(--radius)',
                     border: aditivoTipo === option.id ? '1px solid rgba(0,193,175,0.55)' : '1px solid rgba(255,255,255,0.12)',
-                    backgroundColor: aditivoTipo === option.id ? 'rgba(0,193,175,0.12)' : 'rgba(15,23,42,0.35)',
+                    backgroundColor: aditivoTipo === option.id ? 'rgba(0,193,175,0.12)' : 'rgba(23, 23, 23,0.35)',
                     color: aditivoTipo === option.id ? '#00c1af' : 'rgba(255,255,255,0.72)',
                     fontFamily: 'var(--font-family)',
                     fontSize: 'var(--text-sm)',
@@ -661,17 +657,14 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
 
         {activeTab === 'resumo' && (
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '16px' }}>
-              <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
-                Cadastro da parceria
-              </h2>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px', marginBottom: '16px' }}>
               {editingCadastro ? (
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <SmallButton icon={<X size={14} />} label="Cancelar" onClick={() => setEditingCadastro(false)} muted />
                   <SmallButton icon={<Save size={14} />} label="Salvar" onClick={saveCadastroData} />
                 </div>
               ) : (
-                <SmallButton icon={<Edit3 size={14} />} label="Editar cadastro" onClick={startEditingCadastro} />
+                <SmallButton icon={<Edit3 size={14} />} label="Editar" onClick={startEditingCadastro} />
               )}
             </div>
 
@@ -829,23 +822,15 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                   <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
                     Documentos da parceria
                   </h2>
-                  <div style={{ width: '240px' }}>
-                    <SelectEditField
-                      label="Filtrar por tipo"
-                      value={filtroTipoDocumento}
-                      options={['Todos', ...tipoDocumentoOptions]}
-                      onChange={setFiltroTipoDocumento}
-                    />
-                  </div>
                 </div>
 
-                {documentosFiltrados.length === 0 ? (
+                {documentos.length === 0 ? (
                   <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
-                    Nenhum documento encontrado para o filtro selecionado.
+                    Nenhum documento cadastrado.
                   </p>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {documentosFiltrados.map(documento => (
+                    {documentos.map(documento => (
                       <Row key={documento.id}>
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                           <FileText size={18} style={{ color: '#00c1af', flexShrink: 0, marginTop: '2px' }} />
@@ -938,7 +923,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                     { label: 'Demandas induzidas', value: String(Math.max(1, Math.floor(parceria.programasRelacionados / 2))), Icon: Handshake, color: '#fb7185', bg: 'rgba(251,113,133,0.10)' },
                     { label: 'Iniciativas', value: String(parceria.iniciativasImpactadas), Icon: Handshake, color: '#fbbf24', bg: 'rgba(251,191,36,0.10)' },
                   ].map(({ label, value, Icon, color, bg }) => (
-                    <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.28)' }}>
+                    <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(23, 23, 23,0.28)' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '30px', height: '30px', backgroundColor: bg, borderRadius: '7px', flexShrink: 0 }}>
                         <Icon size={16} style={{ color }} />
                       </div>
@@ -957,39 +942,6 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
             </div>
 
             <div style={cardStyle}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
-                <div>
-                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
-                    Dashboard financeiro da parceria
-                  </h2>
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
-                    Consolidação do recurso investido, aportado, alocado e consumido pelas iniciativas vinculadas.
-                  </p>
-                </div>
-                <span style={{ padding: '6px 10px', borderRadius: '999px', backgroundColor: 'rgba(0,193,175,0.12)', border: '1px solid rgba(0,193,175,0.28)', color: '#00c1af', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', flexShrink: 0 }}>
-                  {formatPercent(percentualConsumido)} consumido
-                </span>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '22px' }}>
-                {[
-                  { label: 'Total investido', value: formatCurrency(cadastroData.aporteTotal), color: '#a855f7' },
-                  { label: 'Ação Transversal', value: formatCurrency(valorReservaAcaoTransversal), color: '#f59e0b' },
-                  { label: 'Total aportado', value: formatCurrency(valorAportado), color: '#38bdf8' },
-                  { label: 'Total alocado', value: formatCurrency(cadastroData.valorAlocado), color: '#3b82f6' },
-                  { label: 'Total consumido', value: formatCurrency(valorConsumido), color: '#22c55e' },
-                  { label: 'Saldo programas', value: formatCurrency(saldoDisponivel), color: '#00c1af' },
-                  { label: 'Percentual consumido', value: formatPercent(percentualConsumido), color: '#f59e0b' },
-                ].map(item => (
-                  <div key={item.label} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
-                    <div style={labelStyle}>{item.label}</div>
-                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: item.color, fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
-                      {item.value}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
               <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '16px', marginBottom: '14px' }}>
                 <div>
                   <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
@@ -1023,7 +975,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                         padding: '16px',
                         border: '1px solid rgba(255,255,255,0.08)',
                         borderRadius: '8px',
-                        backgroundColor: 'rgba(15,23,42,0.35)',
+                        backgroundColor: 'rgba(23, 23, 23,0.35)',
                         cursor: onOpenPrograma ? 'pointer' : 'default',
                         outline: 'none',
                       }}
@@ -1035,16 +987,17 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                         <Info label="Consumido" value={formatCurrency(programa.valorConsumido)} />
                         <Info label="Disponível" value={formatCurrency(programa.saldoDisponivelPrograma)} />
                       </div>
-                      <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                        <div style={{ width: `${Math.min(programa.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: programa.percentualConsumido < 50 ? '#f59e0b' : '#22c55e' }} />
+                      <div style={{ height: '4px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                        <div style={{ width: `${Math.min(programa.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: T.accent }} />
                       </div>
                     </div>
                   ))}
                 </div>
               )}
 
-              <div style={{ height: '1px', backgroundColor: 'rgba(255,255,255,0.08)', margin: '26px 0' }} />
+            </div>
 
+            <div style={{ ...cardStyle, marginTop: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '16px' }}>
                 <div>
                   <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
@@ -1060,7 +1013,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                 {rubricasConsolidadas.map(rubrica => {
                   const percentual = rubrica.alocado > 0 ? (rubrica.consumido / rubrica.alocado) * 100 : 0;
                   return (
-                    <div key={rubrica.rubrica} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+                    <div key={rubrica.rubrica} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(23, 23, 23,0.35)' }}>
                       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr repeat(6, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
                         <Info label="Rubrica" value={rubrica.rubrica} />
                         <Info label="Programas com rubrica" value={String(rubrica.programas.size)} />
@@ -1070,8 +1023,8 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                         <Info label="Disponível total" value={formatCurrency(rubrica.disponivel)} />
                         <Info label="Consumo" value={formatPercent(percentual)} />
                       </div>
-                      <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                        <div style={{ width: `${Math.min(percentual, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: percentual < 50 ? '#f59e0b' : '#22c55e' }} />
+                      <div style={{ height: '4px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                        <div style={{ width: `${Math.min(percentual, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: T.accent }} />
                       </div>
                     </div>
                   );
@@ -1091,7 +1044,7 @@ const SummarySection: React.FC<{ number: string; title: string; subtitle: string
   <div style={cardStyle}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
       <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#0f172a' }}>{number}</span>
+        <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#171717' }}>{number}</span>
       </div>
       <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: 0 }}>
         {title}
@@ -1118,7 +1071,7 @@ const SmallButton: React.FC<{ icon: React.ReactNode; label: string; onClick: () 
       borderRadius: 'var(--radius)',
       color: danger ? '#f87171' : muted ? 'rgba(255,255,255,0.7)' : '#00c1af',
       fontFamily: 'var(--font-family)',
-      fontSize: 'var(--text-xs)',
+      fontSize: 'var(--text-sm)',
       cursor: 'pointer',
     }}
   >
@@ -1128,7 +1081,7 @@ const SmallButton: React.FC<{ icon: React.ReactNode; label: string; onClick: () 
 );
 
 const ImpactList: React.FC<{ title: string; items: string[] }> = ({ title, items }) => (
-  <div style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+  <div style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(23, 23, 23,0.35)' }}>
     <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', marginBottom: '12px' }}>
       {title}
     </div>
@@ -1308,7 +1261,7 @@ const InstitutionEditField: React.FC<{ label: string; value: string; onChange: (
               value={query}
               onChange={event => setQuery(event.target.value)}
               placeholder="Digite nome ou CNPJ"
-              style={{ ...inputStyle, paddingLeft: '36px', backgroundColor: 'rgba(15,23,42,0.8)' }}
+              style={{ ...inputStyle, paddingLeft: '36px', backgroundColor: 'rgba(23, 23, 23,0.8)' }}
             />
             <Search size={15} style={{ position: 'absolute', left: '22px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
           </div>
@@ -1347,7 +1300,7 @@ const Info: React.FC<{ label: string; value: string; full?: boolean }> = ({ labe
 );
 
 const Row: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '16px', padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(15,23,42,0.35)' }}>
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '16px', padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(23, 23, 23,0.35)' }}>
     {children}
   </div>
 );

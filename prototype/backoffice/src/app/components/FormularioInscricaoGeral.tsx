@@ -7,7 +7,7 @@ import {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  backgroundColor: 'rgba(30, 41, 59, 0.5)',
+  backgroundColor: 'rgba(38, 38, 38, 0.5)',
   border: '1px solid rgba(255, 255, 255, 0.1)',
   borderRadius: '6px',
   padding: '10px 12px',
@@ -54,7 +54,7 @@ interface SectionCardProps {
 
 const SectionCard: React.FC<SectionCardProps> = ({ number, title, subtitle, children, onAddField, isEditMode }) => (
   <div style={{
-    backgroundColor: 'rgba(30, 41, 59, 0.6)',
+    backgroundColor: 'rgba(38, 38, 38, 0.6)',
     border: '1px solid rgba(255, 255, 255, 0.1)',
     borderRadius: '10px',
     padding: '28px',
@@ -77,7 +77,7 @@ const SectionCard: React.FC<SectionCardProps> = ({ number, title, subtitle, chil
               fontFamily: 'var(--font-family)',
               fontSize: '11px',
               fontWeight: 'var(--font-weight-medium)',
-              color: '#0f172a',
+              color: '#171717',
             }}>
               {number}
             </span>
@@ -435,7 +435,7 @@ const AddFieldModal: React.FC<AddFieldModalProps> = ({ isOpen, onClose, onAdd })
               fontFamily: 'var(--font-family)',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-medium)',
-              color: fieldLabel.trim() ? '#0f172a' : 'rgba(15,23,42,0.5)',
+              color: fieldLabel.trim() ? '#171717' : 'rgba(23, 23, 23,0.5)',
               cursor: fieldLabel.trim() ? 'pointer' : 'not-allowed',
             }}
           >
@@ -679,7 +679,7 @@ export const FormularioInscricaoGeral: React.FC<Props> = ({ onBack, onBackToEdit
   return (
     <div
       className="flex-1"
-      style={{ backgroundColor: '#0f172a', minHeight: '100vh' }}
+      style={{ backgroundColor: '#171717', minHeight: '100vh' }}
     >
       <div className="pt-8 px-8 pb-16">
 
@@ -746,7 +746,7 @@ export const FormularioInscricaoGeral: React.FC<Props> = ({ onBack, onBackToEdit
         {/* ── Form Metadata Card (only in edit mode) ── */}
         {isTemplate && isEditMode && (
           <div style={{
-            backgroundColor: 'rgba(30, 41, 59, 0.6)',
+            backgroundColor: 'rgba(38, 38, 38, 0.6)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
             borderRadius: '10px',
             padding: '28px',
@@ -832,7 +832,7 @@ export const FormularioInscricaoGeral: React.FC<Props> = ({ onBack, onBackToEdit
                 {objetivoEspecificoTemp.length}/100
               </div>
               {objetivosEspecificos.map((obj, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', backgroundColor: 'rgba(15,23,42,0.5)', padding: '8px 12px', borderRadius: '6px' }}>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', backgroundColor: 'rgba(23, 23, 23,0.5)', padding: '8px 12px', borderRadius: '6px' }}>
                   <span style={{ flex: 1, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>• {obj}</span>
                   <button type="button" onClick={() => removeObjetivoEspecifico(i)} style={deleteBtnStyle}>
                     <Trash2 size={14} />
@@ -872,7 +872,7 @@ export const FormularioInscricaoGeral: React.FC<Props> = ({ onBack, onBackToEdit
                 {resultadoTemp.length}/100
               </div>
               {resultados.map((res, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', backgroundColor: 'rgba(15,23,42,0.5)', padding: '8px 12px', borderRadius: '6px' }}>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', backgroundColor: 'rgba(23, 23, 23,0.5)', padding: '8px 12px', borderRadius: '6px' }}>
                   <span style={{ flex: 1, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>• {res}</span>
                   <button type="button" onClick={() => removeResultado(i)} style={deleteBtnStyle}>
                     <Trash2 size={14} />
@@ -1076,7 +1076,7 @@ export const FormularioInscricaoGeral: React.FC<Props> = ({ onBack, onBackToEdit
         {/* ── Custom Sections (user-created) ── */}
         {customSections.map(sec => (
           <div key={sec.id} style={{
-            backgroundColor: 'rgba(30, 41, 59, 0.6)',
+            backgroundColor: 'rgba(38, 38, 38, 0.6)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
             borderRadius: '10px',
             padding: '28px',
@@ -1098,7 +1098,7 @@ export const FormularioInscricaoGeral: React.FC<Props> = ({ onBack, onBackToEdit
                     fontFamily: 'var(--font-family)',
                     fontSize: '11px',
                     fontWeight: 'var(--font-weight-medium)',
-                    color: '#0f172a',
+                    color: '#171717',
                   }}>
                     {sec.id}
                   </span>
@@ -1277,7 +1277,7 @@ export const FormularioInscricaoGeral: React.FC<Props> = ({ onBack, onBackToEdit
               padding: '10px 24px', border: 'none',
               borderRadius: 'var(--radius)', backgroundColor: '#00c1af',
               fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-medium)', color: '#0f172a',
+              fontWeight: 'var(--font-weight-medium)', color: '#171717',
               cursor: 'pointer', transition: 'background-color 0.2s',
             }}
             onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#00a99a'; }}

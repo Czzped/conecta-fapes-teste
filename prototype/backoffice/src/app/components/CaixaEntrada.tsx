@@ -133,15 +133,15 @@ export const CaixaEntrada: React.FC<CaixaEntradaProps> = ({ isLight, onNavigate 
   const [showCargoDropdown, setShowCargoDropdown] = useState(false);
 
   const T = {
-    bgPage:        isLight ? '#f6f8fb' : '#0b1222',
+    bgPage:        isLight ? '#fafafa' : '#0a0a0a',
     bgCard:        isLight ? '#ffffff' : 'rgba(255,255,255,0.04)',
-    cardBorder:    isLight ? '#e2e8f0' : 'rgba(255,255,255,0.1)',
-    textPrimary:   isLight ? '#0f172a' : '#ffffff',
-    textSecondary: isLight ? '#475569' : 'rgba(255,255,255,0.7)',
-    textMuted:     isLight ? '#94a3b8' : 'rgba(255,255,255,0.5)',
-    chipBg:        isLight ? '#f1f5f9' : 'rgba(255,255,255,0.06)',
+    cardBorder:    isLight ? '#e5e5e5' : 'rgba(255,255,255,0.1)',
+    textPrimary:   isLight ? '#171717' : '#ffffff',
+    textSecondary: isLight ? '#525252' : 'rgba(255,255,255,0.7)',
+    textMuted:     isLight ? '#a3a3a3' : 'rgba(255,255,255,0.5)',
+    chipBg:        isLight ? '#f5f5f5' : 'rgba(255,255,255,0.06)',
     chipBgActive:  '#00c1af',
-    chipTextActive:'#0f172b',
+    chipTextActive:'#171717',
     iconBg:        isLight ? '#f0fdfa' : 'rgba(0,193,175,0.12)',
     iconColor:     '#00c1af',
     danger:        '#ef4444',

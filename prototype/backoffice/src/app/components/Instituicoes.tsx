@@ -108,7 +108,15 @@ const buildStyles = (T: ThemeTokens) => ({
   } as React.CSSProperties,
 });
 
-const statusColor = (situacao: SituacaoInstituicao) => situacao === 'Ativa' ? '#22c55e' : '#94a3b8';
+const statusColor = (situacao: SituacaoInstituicao) => situacao === 'Ativa' ? '#22c55e' : '#a3a3a3';
+
+const formatCurrency = (value: number) => (
+  `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+);
+
+const formatPercent = (value: number) => (
+  `${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
+);
 
 const maskCnpj = (value: string) => {
   const digits = value.replace(/\D/g, '').slice(0, 14);
@@ -149,6 +157,19 @@ const initialInstituicoes: InstituicaoItem[] = [
   { id: 6, nome: 'Departamento de Pesquisa Aplicada', sigla: 'DPA', cnpj: '', razaoSocial: '', email: 'pesquisa@fucape.br', telefone: '(27) 4009-4450', endereco: 'Sede Fucape', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', responsavel: 'Carla Mendes', dataInicioMandato: '2024-02-01', dataFimMandato: '2026-01-31', superior: 'Fucape Business School', situacao: 'Inativa' },
 ];
 
+const instituicoesParceiras = [
+  { nome: 'MIT', totalInvestido: 8900000 },
+  { nome: 'USP', totalInvestido: 4500000 },
+  { nome: 'Ifes', totalInvestido: 3800000 },
+  { nome: 'Findes', totalInvestido: 3200000 },
+  { nome: 'Sesa', totalInvestido: 2850000 },
+  { nome: 'Ufes', totalInvestido: 2500000 },
+  { nome: 'Secti', totalInvestido: 2100000 },
+  { nome: 'UVV', totalInvestido: 1950000 },
+  { nome: 'IJSN', totalInvestido: 1650000 },
+  { nome: 'UFMG', totalInvestido: 1200000 },
+];
+
 const getClassificacao = (item: Pick<InstituicaoItem, 'cnpj' | 'superior'>) => {
   if (!item.cnpj) return 'Setor sem CNPJ';
   return item.superior ? 'Unidade com CNPJ' : 'Instituição raiz';
@@ -186,6 +207,7 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const totalComCnpj = instituicoes.filter(item => item.cnpj).length;
   const totalSemCnpj = instituicoes.filter(item => !item.cnpj).length;
   const instituicoesRaiz = instituicoes.filter(item => !item.superior).length;
+  const totalInvestidoParceiras = instituicoesParceiras.reduce((total, instituicao) => total + instituicao.totalInvestido, 0);
   const estruturasPorTipo = useMemo(() => ([
     { nome: 'Instituições raiz', valor: instituicoes.filter(item => item.cnpj && !item.superior).length, color: '#38bdf8' },
     { nome: 'Unidades com CNPJ', valor: instituicoes.filter(item => item.cnpj && item.superior).length, color: '#22c55e' },
@@ -661,6 +683,24 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <Metric label="Com CNPJ" value={String(totalComCnpj)} color="#22c55e" bg="rgba(34,197,94,0.12)" />
                 <Metric label="Sem CNPJ" value={String(totalSemCnpj)} color="#f59e0b" bg="rgba(245,158,11,0.12)" />
+              </div>
+            </div>
+
+            <div style={{ ...S.card, marginTop: '24px' }}>
+              <h2 style={S.sectionTitle}>Instituições parceiras</h2>
+              <p style={{ ...S.sectionSubtitle, marginBottom: '18px' }}>
+                Total investido por instituição parceira.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {instituicoesParceiras.map(instituicao => {
+                  const percentualInvestido = totalInvestidoParceiras > 0 ? (instituicao.totalInvestido / totalInvestidoParceiras) * 100 : 0;
+                  return (
+                    <div key={instituicao.nome} style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '16px', alignItems: 'center', padding: '14px 16px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
+                      <ListCell label="Instituição" value={instituicao.nome} strong />
+                      <ListCell label="Total investido" value={formatCurrency(instituicao.totalInvestido)} detail={`${formatPercent(percentualInvestido)} do total`} highlight />
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
