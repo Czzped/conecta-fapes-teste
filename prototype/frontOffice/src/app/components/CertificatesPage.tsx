@@ -335,6 +335,10 @@ function formatarDataPartida(partida: string) {
   return new Date(partida).toLocaleDateString('pt-BR');
 }
 
+function formatarPeriodoDiaria(partida: string, chegada: string) {
+  return `${formatarDataPartida(partida)} a ${formatarDataPartida(chegada)}`;
+}
+
 function relatorioEnviadoDiaria(solicitacao: Pick<DiariaRequest, 'partida' | 'comprovacaoAtividade'>) {
   if (dataInicioAindaNaoPassou(solicitacao.partida)) return 'Não';
 
@@ -1518,7 +1522,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                 {[
                   { label: 'Bolsista', value: solicitacao.bolsistaNome },
                   { label: 'Valor Total', value: currency.format(solicitacao.valorTotal) },
-                  { label: 'Data de Partida', value: formatarDataPartida(solicitacao.partida) },
+                  { label: 'Período', value: formatarPeriodoDiaria(solicitacao.partida, solicitacao.chegada) },
                   { label: 'Destino', value: solicitacao.destino },
                 ].map((item) => (
                   <div key={item.label} className="min-w-0" style={item.label === 'Valor Total' ? { paddingLeft: '1rem' } : undefined}>
@@ -1612,6 +1616,14 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
   const solicitacaoDetalhe = solicitacaoDetalheId
     ? solicitacoesDiaria.find((solicitacao) => solicitacao.id === solicitacaoDetalheId)
     : null;
+  const diariaSomenteLeitura = Boolean(solicitacaoDetalheId);
+  const mostrarExcluirDiariaDetalheCoordenador =
+    accessType === 'coordenador' &&
+    activeFlow === 'diarias' &&
+    activeDiariaTab === 'nova' &&
+    Boolean(solicitacaoDetalheId) &&
+    solicitacaoDetalhe?.status === 'ALOCADA' &&
+    !mostrarMotivoCancelamento;
   const temDiariaPendenteBolsista = solicitacoesDiaria.some((solicitacao) => solicitacao.bolsistaNome === bolsistaAtual && statusPendenteAceite(solicitacao));
 
   const renderComprovacaoAtividadeCard = (comprovacaoEditavel: boolean, mostrarNumeroEtapa = false, somenteVisualizacao = false) => (
@@ -1669,13 +1681,13 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
 
       <div className="space-y-8">
         <label className="block" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', marginBottom: '1.5rem' }}>
-          Descrição
+          Descreva a atividade realizada
           <textarea
             value={descricaoComprovacaoAtividade}
             onChange={(event) => setDescricaoComprovacaoAtividade(event.target.value)}
             disabled={!comprovacaoEditavel}
             rows={4}
-            placeholder="Descreva o que foi realizado"
+            placeholder="Contextualize o que foi executado"
             className="mt-2 w-full px-3 py-2"
             style={{
               backgroundColor: 'transparent',
@@ -2012,13 +2024,13 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
 
           <div className="space-y-4">
             <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-              Descrição
+              Descreva a atividade realizada
               <textarea
                 value={descricaoComprovacaoAtividade}
                 onChange={(event) => setDescricaoComprovacaoAtividade(event.target.value)}
                 disabled={!comprovacaoEditavel}
                 rows={4}
-                placeholder="Descreva o que foi realizado"
+                placeholder="Contextualize o que foi executado"
                 className="mt-2 w-full px-3 py-2"
                 style={{
                   backgroundColor: 'transparent',
@@ -2738,7 +2750,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
 
       <div
         className="flex flex-col md:flex-row md:items-center md:justify-between gap-3"
-        style={{ margin: '0 0 1.5rem calc(32px + 0.75rem)' }}
+        style={{ margin: '0.5rem 0 1.5rem calc(32px + 0.75rem)', position: 'relative' }}
       >
         <p
           style={{
@@ -2756,6 +2768,28 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
             ? 'Controle solicitações, aceites e remoções de diárias da iniciativa.'
             : 'Solicite diárias, acompanhe aceites e emita documentos da iniciativa.'}
         </p>
+        {mostrarExcluirDiariaDetalheCoordenador && (
+          <button
+            type="button"
+            onClick={() => setMostrarMotivoCancelamento(true)}
+            className="px-4 py-2 flex items-center justify-center gap-2"
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: '-0.75rem',
+              backgroundColor: 'transparent',
+              color: 'var(--destructive-foreground)',
+              border: '1px solid color-mix(in srgb, var(--destructive-foreground) 35%, var(--border))',
+              borderRadius: 'var(--radius)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <Trash2 size={16} />
+            Excluir
+          </button>
+        )}
         {activeFlow === 'diarias' && !isNovaSolicitacaoDiaria && (
           <button
             onClick={abrirNovaSolicitacaoDiaria}
@@ -2919,6 +2953,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                       value={tipoViagemSelecionado}
                       onChange={(value) => alterarTipoViagem(value as TipoViagemCodigo)}
                       placeholder="Selecione o tipo de viagem"
+                      disabled={diariaSomenteLeitura}
                       showSelectedIcon={false}
                       options={[
                         { value: 'DENTRO_ESTADO', label: 'Dentro do estado - R$ 260 - 12h' },
@@ -2937,6 +2972,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                         value={origem}
                         onChange={setOrigem}
                         placeholder="Selecione a origem"
+                        disabled={diariaSomenteLeitura}
                         showSelectedIcon={false}
                         options={origensDiaria.map((localidade) => ({ value: localidade, label: localidade }))}
                         />
@@ -2948,6 +2984,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                         type="date"
                         value={partidaData}
                         onChange={(event) => setPartida((current) => combinarDataHora(current, event.target.value, 'data'))}
+                        disabled={diariaSomenteLeitura}
                         className="mt-2 w-full px-3 py-2"
                         style={{
                           backgroundColor: 'transparent',
@@ -2965,6 +3002,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                         step="1"
                         value={partidaHorario}
                         onChange={(event) => setPartida((current) => combinarDataHora(current, event.target.value, 'hora'))}
+                        disabled={diariaSomenteLeitura}
                         className="mt-2 w-full px-3 py-2"
                         style={{
                           backgroundColor: 'transparent',
@@ -2985,6 +3023,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                           <input
                             value={destino}
                             onChange={(event) => setDestino(event.target.value)}
+                            disabled={diariaSomenteLeitura}
                             placeholder="Digite o destino"
                             className="w-full px-3 py-2"
                             style={{
@@ -3000,6 +3039,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                           value={destino}
                           onChange={alterarDestino}
                           placeholder="Selecione o destino"
+                          disabled={diariaSomenteLeitura}
                           options={destinosDiaria.map((item) => ({ value: item.value, label: item.label }))}
                           />
                         )}
@@ -3011,6 +3051,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                         type="date"
                         value={chegadaData}
                         onChange={(event) => setChegada((current) => combinarDataHora(current, event.target.value, 'data'))}
+                        disabled={diariaSomenteLeitura}
                         className="mt-2 w-full px-3 py-2"
                         style={{
                           backgroundColor: 'transparent',
@@ -3028,6 +3069,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                         step="1"
                         value={chegadaHorario}
                         onChange={(event) => setChegada((current) => combinarDataHora(current, event.target.value, 'hora'))}
+                        disabled={diariaSomenteLeitura}
                         className="mt-2 w-full px-3 py-2"
                         style={{
                           backgroundColor: 'transparent',
@@ -3093,6 +3135,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                             setBolsistaSearch(event.target.value);
                             setIsBolsistaDropdownOpen(true);
                           }}
+                          disabled={diariaSomenteLeitura}
                           placeholder="Digite ou selecione uma ou mais pessoas da equipe"
                           className="w-full pl-10 pr-3 py-2"
                           style={{
@@ -3163,6 +3206,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                         {nome}
                         <button
                           type="button"
+                          disabled={diariaSomenteLeitura}
                           onClick={() => removerBolsista(nome)}
                           aria-label={`Remover ${nome}`}
                           style={{
@@ -3187,6 +3231,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                       <textarea
                         value={motivo}
                         onChange={(event) => setMotivo(event.target.value)}
+                        disabled={diariaSomenteLeitura}
                         rows={4}
                         className="mt-2 w-full px-3 py-2"
                         style={{
@@ -3515,41 +3560,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                       >
                         Confirmar Cancelamento
                       </button>
-                    ) : (
-                      <>
-                        <button
-                          type="button"
-                          className="px-4 py-2 flex items-center justify-center gap-2"
-                          style={{
-                            backgroundColor: 'transparent',
-                            color: 'var(--foreground)',
-                            border: '1px solid var(--border)',
-                            borderRadius: 'var(--radius)',
-                            fontSize: 'var(--text-sm)',
-                            fontWeight: 'var(--font-weight-medium)',
-                          }}
-                        >
-                          <Edit2 size={16} />
-                          Editar
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setMostrarMotivoCancelamento(true)}
-                          className="px-4 py-2 flex items-center justify-center gap-2"
-                          style={{
-                            backgroundColor: 'transparent',
-                            color: 'var(--destructive-foreground)',
-                            border: '1px solid color-mix(in srgb, var(--destructive-foreground) 35%, var(--border))',
-                            borderRadius: 'var(--radius)',
-                            fontSize: 'var(--text-sm)',
-                            fontWeight: 'var(--font-weight-medium)',
-                          }}
-                        >
-                          <Trash2 size={16} />
-                          Excluir
-                        </button>
-                      </>
-                    )}
+                    ) : null}
                   </>
                 ) : (
                   <>
@@ -3691,7 +3702,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                         {[
                           { label: 'Bolsista', value: solicitacao.beneficiario },
                           { label: 'Valor Total', value: currency.format(solicitacao.valorBeneficiario) },
-                          { label: 'Data de Partida', value: formatarDataPartida(solicitacao.partida) },
+                          { label: 'Período', value: formatarPeriodoDiaria(solicitacao.partida, solicitacao.chegada) },
                           { label: 'Destino', value: solicitacao.destino },
                         ].map((item) => (
                           <div key={item.label} className="min-w-0" style={item.label === 'Valor Total' ? { paddingLeft: '1rem' } : undefined}>

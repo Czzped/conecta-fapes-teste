@@ -1073,15 +1073,28 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                             )}
                           </span>
                           <div className="flex-1 space-y-5">
-                            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-5 gap-5">
                               {[
                                 { label: 'Bolsista', value: diaria.nome },
                                 { label: 'Valor Total', value: diaria.valorTotal },
-                                { label: 'Data de Partida', value: diaria.dataSaida },
+                                { label: 'Período', value: `${diaria.dataSaida} a ${diaria.dataChegada}` },
                                 { label: 'Destino', value: diaria.destino },
                                 { label: 'Relatório Enviado', value: relatorioEnviadoPrestacaoDiaria(diaria) },
                               ].map((item) => (
-                                <div key={item.label}>
+                                <div
+                                  key={item.label}
+                                  style={
+                                    item.label === 'Valor Total'
+                                      ? { paddingLeft: '0.75rem' }
+                                      : item.label === 'Destino'
+                                        ? { paddingLeft: '4rem' }
+                                        : item.label === 'Período'
+                                          ? { whiteSpace: 'nowrap' }
+                                          : item.label === 'Relatório Enviado'
+                                            ? { paddingLeft: '2rem' }
+                                        : undefined
+                                  }
+                                >
                                   <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
                                     {item.label}
                                   </div>
