@@ -10,6 +10,7 @@
 | [Contrato API](contrato-api.md) | Especificacao HTTP REST concreta: endpoints, payloads, erros e autorizacao |
 | [Backlog](backlog.md) | EPICs, rastreabilidade e debito tecnico |
 | [Arquitetura](arquitetura.md) | Avaliacao da arquitetura atual do backend e lacunas frente ao processo revisado |
+| [Funcionalidade de Diaria](funcionalidade-diaria.md) | Fluxo funcional de Solicitacoes > Diaria e Prestacao de Contas Financeira > Diaria |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclos de vida de PrestacaoContas e Contestacao |
 | [Processo](processo.md) | Fluxos de processo em diagramas de sequencia Mermaid |

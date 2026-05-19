@@ -389,6 +389,7 @@ nav:
           - Contrato: implementation/modules/M014-prestacao-contas/contrato.md
           - Contrato API: implementation/modules/M014-prestacao-contas/contrato-api.md
           - Arquitetura: implementation/modules/M014-prestacao-contas/arquitetura.md
+          - Funcionalidade de Diaria: implementation/modules/M014-prestacao-contas/funcionalidade-diaria.md
           - Modelo Estrutural: implementation/modules/M014-prestacao-contas/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M014-prestacao-contas/modelo-comportamental.md
           - Processo: implementation/modules/M014-prestacao-contas/processo.md
