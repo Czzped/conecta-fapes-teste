@@ -374,8 +374,8 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
   const [tituloCaptacao, setTituloCaptacao] = useState(isEditMode ? 'Edital de Inovação Tecnológica 2026' : '');
   const [dataInicio, setDataInicio] = useState('');
   const [dataFim, setDataFim] = useState('');
-  const [numeroCaptacao, setNumeroCaptacao] = useState(isEditMode ? 'CAP-001/2026' : '');
-  const [linkEdital, setLinkEdital] = useState(isEditMode ? 'https://fapes.es.gov.br/editais/cap-001-2026' : '');
+  const [numeroCaptacao, setNumeroCaptacao] = useState('');
+  const [linkEdital, setLinkEdital] = useState(isEditMode ? 'https://fapes.es.gov.br/editais/inovacao-tecnologica-2026' : '');
   const [arquivoEdital, setArquivoEdital] = useState('');
   const [setorResponsavel, setSetorResponsavel] = useState(isEditMode ? 'geinov' : '');
   const [tipoFomento, setTipoFomento] = useState('');
@@ -873,7 +873,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
           <div style={{ display: 'grid', gridTemplateColumns: '180px 1.6fr 1fr', gap: '20px', marginBottom: '20px' }}>
             <div>
               <label style={labelStyle}>Código da Captação</label>
-              <input type="text" placeholder="CAP-001/2026" value={numeroCaptacao} onChange={e => setNumeroCaptacao(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
+              <input type="text" placeholder="Digite o código..." value={numeroCaptacao} onChange={e => setNumeroCaptacao(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
             </div>
             <div>
               <label style={labelStyle}>Título da Captação</label>
@@ -897,10 +897,27 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                 onBlur={blurGray}
               />
             </div>
-            <div>
-              <label style={labelStyle}>Anexar Arquivo</label>
-              <label style={{ ...inputStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: arquivoEdital ? 'var(--form-text-primary)' : '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>
-                {arquivoEdital || 'Selecionar arquivo'}
+            <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                width: '100%',
+                minHeight: '42px',
+                padding: '10px 16px',
+                backgroundColor: 'rgba(0,193,175,0.1)',
+                border: '1px solid rgba(0,193,175,0.3)',
+                borderRadius: 'var(--radius)',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                color: '#00c1af',
+                boxSizing: 'border-box',
+              }}>
+                <Plus size={16} />
+                {arquivoEdital || 'Anexar Arquivo'}
                 <input
                   type="file"
                   style={{ display: 'none' }}

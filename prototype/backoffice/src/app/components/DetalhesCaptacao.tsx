@@ -1,9 +1,21 @@
 import React, { useState } from 'react';
-import { ChevronRight, Home, ArrowLeft, ChevronDown, X, Save } from 'lucide-react';
+import { ChevronRight, ArrowLeft, ChevronDown, X, Save } from 'lucide-react';
 import { FormularioEdital } from './FormularioEdital';
+
+interface CaptacaoDetalhe {
+  titulo: string;
+  tipo: string;
+  vinculoTipo: string;
+  vinculoNome: string;
+  propostasRecebidas: number;
+  dataPublicacao: string;
+  area: string;
+  status: 'Rascunho' | 'Ativo' | 'Finalizado';
+}
 
 interface Props {
   onBack: () => void;
+  captacao?: CaptacaoDetalhe;
 }
 
 const cardStyle: React.CSSProperties = {
@@ -42,6 +54,17 @@ const sectionTitleStyle: React.CSSProperties = {
   color: '#00c1af',
   margin: '0 0 20px',
 };
+
+const NumberedSectionTitle: React.FC<{ number: string; title: string }> = ({ number, title }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+    <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#171717' }}>{number}</span>
+    </div>
+    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: 0 }}>
+      {title}
+    </p>
+  </div>
+);
 
 const subSectionTitleStyle: React.CSSProperties = {
   fontFamily: 'var(--font-family)',
@@ -86,6 +109,10 @@ const iniciativasEnviadas = [
   { codigo: 'INI-2026-004', titulo: 'Tecnologia assistiva para educação inclusiva', proponente: 'Instituto Capixaba de Tecnologia', ortogado: 'Lucas Rocha', fase: 'Revisão de resultado', data: '22/02/2026', categoria: 'Extensão', faixa: 'Faixa 1', valorSolicitado: 'R$ 150.000,00', valorNumerico: 150000, resumo: 'Ferramentas digitais e dispositivos de apoio para estudantes com deficiência.', rubricas: [{ nome: 'Bolsas', valor: 60000, cor: '#38bdf8' }, { nome: 'Capital', valor: 50000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 40000, cor: '#22c55e' }] },
   { codigo: 'INI-2026-005', titulo: 'Observatório de inovação em saúde pública', proponente: 'Hospital Universitário Cassiano Antônio Moraes', ortogado: 'Fernanda Costa', fase: 'Resultado final', data: '25/02/2026', categoria: 'Pesquisa', faixa: 'Faixa 2', valorSolicitado: 'R$ 480.000,00', valorNumerico: 480000, resumo: 'Observatório para consolidar indicadores, evidências e iniciativas de inovação em saúde.', rubricas: [{ nome: 'Bolsas', valor: 180000, cor: '#38bdf8' }, { nome: 'Capital', valor: 160000, cor: '#a78bfa' }, { nome: 'Serviços de terceiros', valor: 90000, cor: '#fbbf24' }, { nome: 'Custeio', valor: 50000, cor: '#22c55e' }] },
   { codigo: 'INI-2026-006', titulo: 'Rede de sensores para cidades resilientes', proponente: 'Prefeitura Municipal de Vitória', ortogado: 'Ricardo Torres', fase: 'Submetida', data: '28/02/2026', categoria: 'Inovação', faixa: 'Faixa 1', valorSolicitado: 'R$ 210.000,00', valorNumerico: 210000, resumo: 'Rede de sensores urbanos para apoiar resposta rápida a eventos climáticos.', rubricas: [{ nome: 'Capital', valor: 130000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 50000, cor: '#22c55e' }, { nome: 'Diárias e passagens', valor: 30000, cor: '#fb7185' }] },
+  { codigo: 'INI-2026-007', titulo: 'Modelos preditivos para gestão costeira', proponente: 'Universidade Vila Velha', ortogado: 'Beatriz Nascimento', fase: 'Avaliação ad hoc', data: '01/03/2026', categoria: 'Pesquisa', faixa: 'Faixa 2', valorSolicitado: 'R$ 360.000,00', valorNumerico: 360000, resumo: 'Modelos analíticos para apoiar decisões sobre erosão costeira e ocupação urbana.', rubricas: [{ nome: 'Bolsas', valor: 120000, cor: '#38bdf8' }, { nome: 'Capital', valor: 140000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 100000, cor: '#22c55e' }] },
+  { codigo: 'INI-2026-008', titulo: 'Automação para laboratórios de biotecnologia', proponente: 'SENAI Cimatec ES', ortogado: 'Gustavo Almeida', fase: 'Resultado preliminar', data: '03/03/2026', categoria: 'Inovação', faixa: 'Faixa 2', valorSolicitado: 'R$ 440.000,00', valorNumerico: 440000, resumo: 'Automação de processos laboratoriais para ampliar capacidade de pesquisa aplicada.', rubricas: [{ nome: 'Capital', valor: 210000, cor: '#a78bfa' }, { nome: 'Serviços de terceiros', valor: 150000, cor: '#fbbf24' }, { nome: 'Custeio', valor: 80000, cor: '#22c55e' }] },
+  { codigo: 'INI-2026-009', titulo: 'Plataforma de educação científica aberta', proponente: 'Fundação de Apoio à Educação Científica', ortogado: 'Camila Ribeiro', fase: 'Revisão de resultado', data: '05/03/2026', categoria: 'Extensão', faixa: 'Faixa 1', valorSolicitado: 'R$ 160.000,00', valorNumerico: 160000, resumo: 'Ambiente digital para divulgação científica e formação de professores da rede pública.', rubricas: [{ nome: 'Bolsas', valor: 70000, cor: '#38bdf8' }, { nome: 'Custeio', valor: 60000, cor: '#22c55e' }, { nome: 'Serviços de terceiros', valor: 30000, cor: '#fbbf24' }] },
+  { codigo: 'INI-2026-010', titulo: 'Energia renovável em comunidades isoladas', proponente: 'Instituto de Energia do Espírito Santo', ortogado: 'Thiago Monteiro', fase: 'Resultado final', data: '07/03/2026', categoria: 'Inovação', faixa: 'Faixa 2', valorSolicitado: 'R$ 510.000,00', valorNumerico: 510000, resumo: 'Implantação piloto de soluções renováveis para comunidades de difícil acesso.', rubricas: [{ nome: 'Capital', valor: 260000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 150000, cor: '#22c55e' }, { nome: 'Bolsas', valor: 100000, cor: '#38bdf8' }] },
 ];
 
 const avaliacoesAdHoc = [
@@ -94,6 +121,11 @@ const avaliacoesAdHoc = [
   { iniciativaCodigo: 'INI-2026-003', revisor: 'Dra. Livia Barbosa', area: 'Educação e Extensão', status: 'Concluída', nota: '81', parecer: 'Boa aderência ao edital, com necessidade de detalhar indicadores de adoção.' },
   { iniciativaCodigo: 'INI-2026-004', revisor: 'Dr. Marcos Teixeira', area: 'Ciências Agrárias', status: 'Solicitada revisão', nota: '74', parecer: 'Revisão solicitada para esclarecer plano de execução e orçamento.' },
   { iniciativaCodigo: 'INI-2026-005', revisor: 'Dra. Helena Martins', area: 'Pesquisa em Saúde', status: 'Concluída', nota: '92', parecer: 'Excelente alinhamento com a política pública e boa capacidade de execução.' },
+  { iniciativaCodigo: 'INI-2026-006', revisor: 'Dr. Rafael Nogueira', area: 'Inovação Tecnológica', status: 'Em avaliação', nota: '-', parecer: 'Análise de viabilidade técnica em andamento.' },
+  { iniciativaCodigo: 'INI-2026-007', revisor: 'Dra. Livia Barbosa', area: 'Educação e Extensão', status: 'Concluída', nota: '86', parecer: 'Boa estrutura metodológica e impacto territorial mensurável.' },
+  { iniciativaCodigo: 'INI-2026-008', revisor: 'Dr. Marcos Teixeira', area: 'Ciências Agrárias', status: 'Concluída', nota: '89', parecer: 'Proposta robusta, com orçamento coerente e cronograma factível.' },
+  { iniciativaCodigo: 'INI-2026-009', revisor: 'Dra. Helena Martins', area: 'Pesquisa em Saúde', status: 'Solicitada revisão', nota: '76', parecer: 'Necessário detalhar indicadores de disseminação e governança.' },
+  { iniciativaCodigo: 'INI-2026-010', revisor: 'Dr. Rafael Nogueira', area: 'Inovação Tecnológica', status: 'Concluída', nota: '91', parecer: 'Excelente aderência ao edital e potencial de replicabilidade.' },
 ];
 
 const revisoresAdHocDashboard = [
@@ -140,8 +172,8 @@ const financeiroPorFaixaCaptacao = Array.from(new Set(iniciativasEnviadas.map(in
   };
 });
 
-export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
-  const [activeTab, setActiveTab] = useState<'resumo' | 'dashboard'>('resumo');
+export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
+  const [activeTab, setActiveTab] = useState<'informacoes' | 'dashboard' | 'proposta' | 'avaliacao' | 'avaliacaoAdHoc' | 'recurso' | 'resultadoFinal'>('informacoes');
   const [editingResumo, setEditingResumo] = useState(false);
   const [showFormularioEdicao, setShowFormularioEdicao] = useState(false);
   const [iniciativaSelecionadaCodigo, setIniciativaSelecionadaCodigo] = useState(iniciativasEnviadas[0].codigo);
@@ -161,8 +193,42 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
   const maiorValorRubricaDetalhe = Math.max(...financeiroCaptacaoDetalhe.rubricas.map(item => item.valor), 1);
   const formatCurrency = (value: number) =>
     value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const captacaoAtual = captacao || {
+    titulo: 'Bolsas de Pesquisa 2026',
+    tipo: 'Chamada Pública',
+    vinculoTipo: 'Programa',
+    vinculoNome: 'Programa de Bolsas de Pesquisa 2026',
+    propostasRecebidas: 42,
+    dataPublicacao: '01/03/2026',
+    area: 'Pesquisa',
+    status: 'Ativo' as const,
+  };
+  const podeEditar = captacaoAtual.status === 'Rascunho' || captacaoAtual.status === 'Finalizado';
+  const detalheLinhaStyle: React.CSSProperties = {
+    display: 'grid',
+    gap: '20px',
+    alignItems: 'center',
+    padding: '20px',
+    borderRadius: '8px',
+    border: '1px solid rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(38, 38, 38, 0.5)',
+    transition: 'background-color 0.2s',
+    cursor: 'pointer',
+  };
+  const detalheRotuloStyle: React.CSSProperties = {
+    fontFamily: 'var(--font-family)',
+    fontSize: 'var(--text-xs)',
+    color: 'rgba(255,255,255,0.45)',
+    marginBottom: '4px',
+  };
+  const detalheValorStyle: React.CSSProperties = {
+    fontFamily: 'var(--font-family)',
+    fontSize: 'var(--text-sm)',
+    color: '#ffffff',
+    lineHeight: 1.4,
+  };
 
-  if (showFormularioEdicao) {
+  if (showFormularioEdicao && podeEditar) {
     return <FormularioEdital mode="edit" onBack={() => setShowFormularioEdicao(false)} />;
   }
 
@@ -476,8 +542,6 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
       <div className="pt-8 px-8 pb-8">
         {/* Breadcrumb */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
-          <Home size={15} style={{ color: 'rgba(255,255,255,0.5)' }} />
-          <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
           <button
             onClick={onBack}
             style={{
@@ -535,7 +599,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                 margin: '0 0 8px',
                 lineHeight: '1.4',
               }}>
-                Captação
+                {captacaoAtual.titulo}
               </h1>
               <p style={{
                 fontFamily: 'var(--font-family)',
@@ -547,13 +611,17 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
               </p>
             </div>
           </div>
-          <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', marginTop: '24px' }} />
         </div>
 
         <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '24px' }}>
           {[
-            { id: 'resumo', label: 'Resumo' },
+            { id: 'informacoes', label: 'Informações Gerais' },
             { id: 'dashboard', label: 'Dashboard' },
+            { id: 'proposta', label: 'Proposta' },
+            { id: 'avaliacao', label: 'Avaliação de Documentos' },
+            { id: 'avaliacaoAdHoc', label: 'Avaliação Ad Hoc' },
+            { id: 'recurso', label: 'Recurso' },
+            { id: 'resultadoFinal', label: 'Resultado Final' },
           ].map(tab => (
             <button
               key={tab.id}
@@ -577,54 +645,56 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
           ))}
         </div>
 
-        {activeTab === 'resumo' && (
+        {activeTab === 'informacoes' && (
           <>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
-          <button
-            type="button"
-            onClick={() => setShowFormularioEdicao(true)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '10px 18px',
-              backgroundColor: 'rgba(0,193,175,0.1)',
-              border: '1px solid rgba(0,193,175,0.3)',
-              borderRadius: 'var(--radius)',
-              color: '#00c1af',
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-medium)',
-              cursor: 'pointer',
-            }}
-          >
-            Editar captação
-          </button>
-        </div>
+        {podeEditar && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+            <button
+              type="button"
+              onClick={() => setShowFormularioEdicao(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 18px',
+                backgroundColor: 'rgba(0,193,175,0.1)',
+                border: '1px solid rgba(0,193,175,0.3)',
+                borderRadius: 'var(--radius)',
+                color: '#00c1af',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+              }}
+            >
+              Editar captação
+            </button>
+          </div>
+        )}
 
         {/* SESSÃO 1 — Identificação da Captação */}
         <div style={cardStyle}>
-          <h2 style={sectionTitleStyle}>1. Identificação da Captação</h2>
+          <NumberedSectionTitle number="1" title="Identificação da Captação" />
           
           <div style={{ display: 'grid', gap: '16px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '180px 1.6fr 1fr', gap: '16px' }}>
               <div>
                 <label style={labelStyle}>Código da Captação</label>
-                <input type="text" defaultValue="CAP-001/2026" readOnly={!editingResumo} style={resumoInputStyle} />
+                <input type="text" defaultValue="" readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
               <div>
                 <label style={labelStyle}>Título da Captação</label>
-                <input type="text" defaultValue="Edital de Inovação Tecnológica 2026" readOnly={!editingResumo} style={resumoInputStyle} />
+                <input type="text" defaultValue={captacaoAtual.titulo} readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
               <div>
                 <label style={labelStyle}>Tipo de Captação</label>
-                <input type="text" defaultValue="Chamada Pública" readOnly={!editingResumo} style={resumoInputStyle} />
+                <input type="text" defaultValue={captacaoAtual.tipo} readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
             </div>
 
             <div>
               <label style={labelStyle}>Link do Edital</label>
-              <input type="text" defaultValue="https://fapes.es.gov.br/editais/cap-001-2026" readOnly={!editingResumo} style={resumoInputStyle} />
+              <input type="text" defaultValue="https://fapes.es.gov.br/editais/inovacao-tecnologica-2026" readOnly={!editingResumo} style={resumoInputStyle} />
             </div>
 
             <div>
@@ -659,7 +729,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
               </div>
               <div>
                 <label style={labelStyle}>Status da Configuração</label>
-                <input type="text" defaultValue="Publicado" readOnly={!editingResumo} style={{ ...resumoInputStyle, color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }} />
+                <input type="text" defaultValue={captacaoAtual.status} readOnly={!editingResumo} style={{ ...resumoInputStyle, color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }} />
               </div>
             </div>
 
@@ -676,10 +746,6 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                     display: 'grid',
                     gridTemplateColumns: '1fr 140px 170px',
                     gap: '16px',
-                    padding: '14px 16px',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: 'var(--radius)',
-                    backgroundColor: 'rgba(23, 23, 23,0.32)',
                   }}>
                     <div>
                       <label style={labelStyle}>Origem {index + 1}</label>
@@ -721,10 +787,8 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                   { nome: 'Faixa 2', duracao: '36 meses', minimo: 'R$ 200.001,00', maximo: 'R$ 500.000,00', aportado: 'R$ 2.000.000,00' },
                 ].map(faixa => (
                   <div key={faixa.nome} style={{
-                    padding: '16px',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: 'var(--radius)',
-                    backgroundColor: 'rgba(23, 23, 23,0.32)',
+                    display: 'grid',
+                    gap: '12px',
                   }}>
                     <h4 style={{ ...subSectionTitleStyle, marginBottom: '12px' }}>{faixa.nome}</h4>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
@@ -754,7 +818,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
 
         {/* SESSÃO 2 — Cronograma da Captação */}
         <div style={cardStyle}>
-          <h2 style={sectionTitleStyle}>2. Cronograma da Captação</h2>
+          <NumberedSectionTitle number="2" title="Cronograma da Captação" />
 
           <div style={{ display: 'grid', gap: '16px' }}>
             {[
@@ -772,10 +836,6 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                 gridTemplateColumns: '42px 1fr 160px 160px',
                 gap: '16px',
                 alignItems: 'center',
-                padding: '14px 16px',
-                borderRadius: 'var(--radius)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                backgroundColor: 'rgba(23, 23, 23,0.32)',
               }}>
                 <div style={{
                   width: '30px',
@@ -852,7 +912,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                           <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
                             {rubrica.nome}
                           </div>
-                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: rubrica.cor, textAlign: 'right' }}>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', textAlign: 'right' }}>
                             {formatCurrency(rubrica.valor)}
                           </div>
                           <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', textAlign: 'right' }}>
@@ -860,7 +920,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                           </div>
                         </div>
                         <div style={{ height: '7px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                          <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: rubrica.cor }} />
+                          <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: '#00c1af' }} />
                         </div>
                       </div>
                     );
@@ -897,7 +957,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
 
         {/* SESSÃO 3 — Parametrizações Gerais */}
         <div style={cardStyle}>
-          <h2 style={sectionTitleStyle}>3. Parametrizações Gerais</h2>
+          <NumberedSectionTitle number="3" title="Parametrizações Gerais" />
 
           <div style={{ display: 'grid', gap: '16px' }}>
             <h3 style={subSectionTitleStyle}>Regras de Submissão</h3>
@@ -926,7 +986,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
 
         {/* SESSÃO 4 — Requisitos e Restrições */}
         <div style={cardStyle}>
-          <h2 style={sectionTitleStyle}>4. Requisitos e Restrições</h2>
+          <NumberedSectionTitle number="4" title="Requisitos e Restrições" />
 
           <div style={{ display: 'grid', gap: '16px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
@@ -964,7 +1024,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
 
         {/* SESSÃO 5 — Rubricas, Avaliação e Prestações */}
         <div style={cardStyle}>
-          <h2 style={sectionTitleStyle}>5. Rubricas, Avaliação e Prestações</h2>
+          <NumberedSectionTitle number="5" title="Rubricas, Avaliação e Prestações" />
 
           <div style={{ display: 'grid', gap: '16px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
@@ -1066,7 +1126,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
 
         {/* SESSÃO 6 — Documentos Exigidos */}
         <div style={cardStyle}>
-          <h2 style={sectionTitleStyle}>6. Documentos Exigidos do Proponente</h2>
+          <NumberedSectionTitle number="6" title="Documentos Exigidos do Proponente" />
 
           <div style={{ padding: '12px 14px', borderRadius: 'var(--radius)', border: '1px solid rgba(251,191,36,0.24)', backgroundColor: 'rgba(251,191,36,0.08)', marginBottom: '18px' }}>
             <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#fbbf24', margin: '0 0 4px' }}>
@@ -1121,8 +1181,6 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
         {activeTab === 'dashboard' && (
           <>
             <div style={cardStyle}>
-              <h2 style={sectionTitleStyle}>Dashboard da Captação</h2>
-
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '16px' }}>
                 {fasesIniciativas.map(fase => {
                   const maiorQuantidade = Math.max(...fasesIniciativas.map(item => item.quantidade));
@@ -1161,7 +1219,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                           fontFamily: 'var(--font-family)',
                           fontSize: 'var(--text-md)',
                           fontWeight: 'var(--font-weight-medium)',
-                          color: fase.cor,
+                          color: '#00c1af',
                           lineHeight: 1,
                         }}>
                           {fase.quantidade}
@@ -1178,7 +1236,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                         <div style={{
                           width: `${percentual}%`,
                           height: '100%',
-                          backgroundColor: fase.cor,
+                          backgroundColor: '#00c1af',
                           borderRadius: '999px',
                         }} />
                       </div>
@@ -1205,7 +1263,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                     {formatCurrency(financeiroCaptacaoDetalhe.totalSolicitado)}
                   </div>
                   <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', lineHeight: 1.45 }}>
-                    Disponível na captação: <span style={{ color: '#00c1af' }}>{formatCurrency(financeiroCaptacaoDetalhe.totalDisponivel)}</span>
+                    Disponível na captação: <span style={{ color: '#ffffff' }}>{formatCurrency(financeiroCaptacaoDetalhe.totalDisponivel)}</span>
                   </div>
                 </div>
 
@@ -1234,15 +1292,15 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                             <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
                               {rubrica.nome}
                             </div>
-                            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: rubrica.cor, textAlign: 'right' }}>
+                            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', textAlign: 'right' }}>
                               {formatCurrency(rubrica.valor)}
                             </div>
                             <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', textAlign: 'right' }}>
                               {rubrica.quantidade} iniciativa(s)
                             </div>
                           </div>
-                          <div style={{ height: '7px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                            <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: rubrica.cor }} />
+                          <div style={{ height: '6px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                            <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: '#00c1af' }} />
                           </div>
                         </div>
                       );
@@ -1284,7 +1342,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                               {faixa.quantidadeIniciativas} iniciativa(s)
                             </div>
                           </div>
-                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: '#00c1af', fontWeight: 'var(--font-weight-medium)', textAlign: 'right' }}>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', textAlign: 'right' }}>
                             {formatCurrency(faixa.valorTotal)}
                           </div>
                         </div>
@@ -1299,15 +1357,15 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                                   <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
                                     {rubrica.nome}
                                   </div>
-                                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: rubrica.cor, textAlign: 'right' }}>
+                                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', textAlign: 'right' }}>
                                     {formatCurrency(rubrica.valor)}
                                   </div>
                                   <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', textAlign: 'right' }}>
                                     {rubrica.quantidade} item(ns)
                                   </div>
                                 </div>
-                                <div style={{ height: '7px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                                  <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: rubrica.cor }} />
+                                <div style={{ height: '6px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                                  <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: '#00c1af' }} />
                                 </div>
                               </div>
                             );
@@ -1388,6 +1446,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                           alignItems: 'center',
                           padding: '6px 10px',
                           borderRadius: '999px',
+                          border: `1px solid ${fase?.cor || 'rgba(255,255,255,0.2)'}`,
                           backgroundColor: fase ? `${fase.cor}1f` : 'rgba(255,255,255,0.08)',
                           color: fase?.cor || 'rgba(255,255,255,0.7)',
                           fontFamily: 'var(--font-family)',
@@ -1504,6 +1563,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                           display: 'inline-flex',
                           padding: '6px 10px',
                           borderRadius: '999px',
+                          border: '1px solid rgba(34,197,94,0.38)',
                           backgroundColor: 'rgba(34,197,94,0.12)',
                           color: '#22c55e',
                           fontFamily: 'var(--font-family)',
@@ -1576,6 +1636,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
                           display: 'inline-flex',
                           padding: '6px 10px',
                           borderRadius: '999px',
+                          border: avaliacao.status === 'Concluída' ? '1px solid rgba(34,197,94,0.38)' : avaliacao.status === 'Em avaliação' ? '1px solid rgba(167,139,250,0.38)' : '1px solid rgba(251,191,36,0.38)',
                           backgroundColor: avaliacao.status === 'Concluída' ? 'rgba(34,197,94,0.12)' : avaliacao.status === 'Em avaliação' ? 'rgba(167,139,250,0.14)' : 'rgba(251,191,36,0.12)',
                           color: avaliacao.status === 'Concluída' ? '#22c55e' : avaliacao.status === 'Em avaliação' ? '#a78bfa' : '#fbbf24',
                           fontFamily: 'var(--font-family)',
@@ -1599,6 +1660,265 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack }) => {
               </div>
             </div>
           </>
+        )}
+
+        {activeTab === 'proposta' && (
+          <div style={{ display: 'grid', gap: '10px' }}>
+              {iniciativasEnviadas.map(iniciativa => (
+                <div
+                  key={iniciativa.codigo}
+                  onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38, 0.5)'; }}
+                  style={{
+                    ...detalheLinhaStyle,
+                    gridTemplateColumns: '1.35fr 1.05fr 24px 1fr 150px 120px',
+                  }}
+                >
+                  <div>
+                    <div style={detalheRotuloStyle}>Proposta</div>
+                    <div style={{ ...detalheValorStyle, fontWeight: 'var(--font-weight-medium)' }}>
+                      {iniciativa.titulo}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Instituição</div>
+                    <div style={detalheValorStyle}>{iniciativa.proponente}</div>
+                  </div>
+                  <div aria-hidden="true" />
+                  <div>
+                    <div style={detalheRotuloStyle}>Proponente</div>
+                    <div style={detalheValorStyle}>{iniciativa.ortogado}</div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Valor solicitado</div>
+                    <div style={{ ...detalheValorStyle, color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>{iniciativa.valorSolicitado}</div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Envio</div>
+                    <div style={detalheValorStyle}>{iniciativa.data}</div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        )}
+
+        {activeTab === 'avaliacao' && (
+          <div style={{ display: 'grid', gap: '10px' }}>
+              {iniciativasEnviadas.map((iniciativa, index) => {
+                const habilitado = index % 4 !== 2;
+                return (
+                <div
+                  key={`documentos-${iniciativa.codigo}`}
+                  onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38, 0.5)'; }}
+                  style={{
+                    ...detalheLinhaStyle,
+                    gridTemplateColumns: '1.4fr 1.05fr 24px 1fr 190px',
+                  }}
+                >
+                  <div>
+                    <div style={detalheRotuloStyle}>Proposta</div>
+                    <div style={{ ...detalheValorStyle, fontWeight: 'var(--font-weight-medium)' }}>
+                      {iniciativa.titulo}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Instituição</div>
+                    <div style={detalheValorStyle}>{iniciativa.proponente}</div>
+                  </div>
+                  <div aria-hidden="true" />
+                  <div>
+                    <div style={detalheRotuloStyle}>Proponente</div>
+                    <div style={detalheValorStyle}>{iniciativa.ortogado}</div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Status</div>
+                    <span style={{
+                      display: 'inline-flex',
+                      width: 'fit-content',
+                      padding: '6px 10px',
+                      borderRadius: '999px',
+                      border: habilitado ? '1px solid rgba(34,197,94,0.38)' : '1px solid rgba(239,68,68,0.38)',
+                      backgroundColor: habilitado ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)',
+                      color: habilitado ? '#22c55e' : '#ef4444',
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-xs)',
+                      fontWeight: 'var(--font-weight-medium)',
+                    }}>
+                      {habilitado ? 'Habilitado' : 'Não Habilitado'}
+                    </span>
+                  </div>
+                </div>
+                );
+              })}
+          </div>
+        )}
+
+        {activeTab === 'avaliacaoAdHoc' && (
+          <div style={{ display: 'grid', gap: '10px' }}>
+              {avaliacoesAdHoc.map(avaliacao => {
+                const iniciativaAvaliada = iniciativasEnviadas.find(item => item.codigo === avaliacao.iniciativaCodigo);
+
+                return (
+                  <div
+                    key={`${avaliacao.iniciativaCodigo}-${avaliacao.revisor}`}
+                    onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38, 0.5)'; }}
+                    style={{
+                      ...detalheLinhaStyle,
+                      gridTemplateColumns: '1.1fr 1.35fr 24px 1.05fr 24px 1fr 130px 70px',
+                    }}
+                  >
+                    <div>
+                      <div style={detalheRotuloStyle}>Revisor</div>
+                      <div style={{ ...detalheValorStyle, fontWeight: 'var(--font-weight-medium)' }}>
+                        {avaliacao.revisor}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={detalheRotuloStyle}>Proposta</div>
+                      <div style={detalheValorStyle}>{iniciativaAvaliada?.titulo || avaliacao.iniciativaCodigo}</div>
+                    </div>
+                    <div aria-hidden="true" />
+                    <div>
+                      <div style={detalheRotuloStyle}>Instituição</div>
+                      <div style={detalheValorStyle}>{iniciativaAvaliada?.proponente || '-'}</div>
+                    </div>
+                    <div aria-hidden="true" />
+                    <div>
+                      <div style={detalheRotuloStyle}>Proponente</div>
+                      <div style={detalheValorStyle}>{iniciativaAvaliada?.ortogado || '-'}</div>
+                    </div>
+                    <div>
+                      <div style={detalheRotuloStyle}>Status</div>
+                      <span style={{
+                        display: 'inline-flex',
+                        width: 'fit-content',
+                        padding: '6px 10px',
+                        borderRadius: '999px',
+                        border: avaliacao.status === 'Concluída' ? '1px solid rgba(34,197,94,0.38)' : avaliacao.status === 'Em avaliação' ? '1px solid rgba(0,193,175,0.38)' : '1px solid rgba(251,191,36,0.38)',
+                        backgroundColor: avaliacao.status === 'Concluída' ? 'rgba(34,197,94,0.12)' : avaliacao.status === 'Em avaliação' ? 'rgba(0,193,175,0.12)' : 'rgba(251,191,36,0.12)',
+                        color: avaliacao.status === 'Concluída' ? '#22c55e' : avaliacao.status === 'Em avaliação' ? '#00c1af' : '#fbbf24',
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 'var(--text-xs)',
+                        fontWeight: 'var(--font-weight-medium)',
+                      }}>
+                        {avaliacao.status}
+                      </span>
+                    </div>
+                    <div>
+                      <div style={detalheRotuloStyle}>Nota</div>
+                      <div style={{ ...detalheValorStyle, color: '#00c1af', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)' }}>{avaliacao.nota}</div>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        )}
+
+        {activeTab === 'recurso' && (
+          <div style={{ display: 'grid', gap: '10px' }}>
+              {iniciativasEnviadas.map((iniciativa, index) => {
+                const recursoStatus = index % 3 === 0 ? 'Aprovado' : index % 3 === 1 ? 'Em análise' : 'Recusado';
+                const recursoColor = recursoStatus === 'Aprovado' ? '#22c55e' : recursoStatus === 'Recusado' ? '#ef4444' : '#00c1af';
+                const recursoBg = recursoStatus === 'Aprovado' ? 'rgba(34,197,94,0.12)' : recursoStatus === 'Recusado' ? 'rgba(239,68,68,0.12)' : 'rgba(0,193,175,0.12)';
+                const recursoBorder = recursoStatus === 'Aprovado' ? '1px solid rgba(34,197,94,0.38)' : recursoStatus === 'Recusado' ? '1px solid rgba(239,68,68,0.38)' : '1px solid rgba(0,193,175,0.38)';
+                return (
+                <div
+                  key={iniciativa.codigo}
+                  onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38, 0.5)'; }}
+                  style={{
+                    ...detalheLinhaStyle,
+                    gridTemplateColumns: '1.4fr 1.05fr 1fr 150px',
+                  }}
+                >
+                  <div>
+                    <div style={detalheRotuloStyle}>Proposta</div>
+                    <div style={{ ...detalheValorStyle, fontWeight: 'var(--font-weight-medium)' }}>
+                      {iniciativa.titulo}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Instituição</div>
+                    <div style={detalheValorStyle}>{iniciativa.proponente}</div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Proponente</div>
+                    <div style={detalheValorStyle}>{iniciativa.ortogado}</div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Status</div>
+                    <span style={{
+                      display: 'inline-flex',
+                      width: 'fit-content',
+                      padding: '6px 10px',
+                      borderRadius: '999px',
+                      border: recursoBorder,
+                      backgroundColor: recursoBg,
+                      color: recursoColor,
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-xs)',
+                      fontWeight: 'var(--font-weight-medium)',
+                    }}>
+                      {recursoStatus}
+                    </span>
+                  </div>
+                </div>
+                );
+              })}
+          </div>
+        )}
+
+        {activeTab === 'resultadoFinal' && (
+          <div style={{ display: 'grid', gap: '10px' }}>
+              {iniciativasEnviadas.map((iniciativa, index) => {
+                const aprovado = index % 4 !== 2;
+                return (
+                <div
+                  key={iniciativa.codigo}
+                  onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38, 0.5)'; }}
+                  style={{
+                    ...detalheLinhaStyle,
+                    gridTemplateColumns: '1.4fr 1.05fr 1fr 150px',
+                  }}
+                >
+                  <div>
+                    <div style={detalheRotuloStyle}>Proposta</div>
+                    <div style={{ ...detalheValorStyle, fontWeight: 'var(--font-weight-medium)' }}>
+                      {iniciativa.titulo}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Instituição</div>
+                    <div style={detalheValorStyle}>{iniciativa.proponente}</div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Proponente</div>
+                    <div style={detalheValorStyle}>{iniciativa.ortogado}</div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Status</div>
+                    <span style={{
+                      display: 'inline-flex',
+                      width: 'fit-content',
+                      padding: '6px 10px',
+                      borderRadius: '999px',
+                      border: aprovado ? '1px solid rgba(34,197,94,0.38)' : '1px solid rgba(239,68,68,0.38)',
+                      backgroundColor: aprovado ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)',
+                      color: aprovado ? '#22c55e' : '#ef4444',
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-xs)',
+                      fontWeight: 'var(--font-weight-medium)',
+                    }}>
+                      {aprovado ? 'Aprovado' : 'Reprovado'}
+                    </span>
+                  </div>
+                </div>
+                );
+              })}
+          </div>
         )}
 
       </div>

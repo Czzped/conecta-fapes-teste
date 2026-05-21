@@ -20,7 +20,7 @@ interface EditalInscricao {
 }
 
 type AreaFilter = 'Todas' | 'Carreira Científica' | 'Pesquisa' | 'Difusão do Conhecimento' | 'Extensão' | 'Inovação' | 'Internacional';
-type SetorFilter = 'Todos' | 'Em andamento' | 'Publicado' | 'Não publicado' | 'Encerrado' | 'Enviado' | 'Em Avaliação' | 'Avaliado' | 'Aprovado' | 'Reprovado';
+type SetorFilter = 'Todos' | 'Rascunho' | 'Ativo' | 'Finalizado' | 'Enviado' | 'Em Avaliação' | 'Avaliado' | 'Aprovado' | 'Reprovado';
 type VinculoFilter = 'Todos' | 'Programa' | 'Parceria';
 type ActiveTab = 'dashboard' | 'captacoes' | 'inscricoes' | 'avaliacao' | 'recurso' | 'finalizado';
 
@@ -32,10 +32,9 @@ const getStatusColor = (status: string) => {
     case 'Aprovado': return '#22c55e';
     case 'Reprovado': return '#ef4444';
     case 'Não Aprovado': return '#ef4444';
-    case 'Em andamento': return '#fbbf24';
-    case 'Publicado': return '#22c55e';
-    case 'Não publicado': return '#a3a3a3';
-    case 'Encerrado': return '#64748b';
+    case 'Rascunho': return '#fbbf24';
+    case 'Ativo': return '#22c55e';
+    case 'Finalizado': return '#a3a3a3';
     // Recurso statuses
     case 'Recebido': return '#fbbf24';
     case 'Recusado': return '#ef4444';
@@ -54,7 +53,7 @@ interface CaptacaoItem {
   propostasRecebidas: number;
   dataPublicacao: string;
   area: string;
-  status: 'Em andamento' | 'Publicado' | 'Não publicado' | 'Encerrado';
+  status: 'Rascunho' | 'Ativo' | 'Finalizado';
 }
 
 const SelectField: React.FC<{
@@ -162,6 +161,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
   const [showFormularioRecurso, setShowFormularioRecurso] = useState(false);
   const [showFormularioInstituicaoParceira, setShowFormularioInstituicaoParceira] = useState(false);
   const [showDetalhesCaptacao, setShowDetalhesCaptacao] = useState(false);
+  const [captacaoSelecionada, setCaptacaoSelecionada] = useState<CaptacaoItem | null>(null);
   const [showCriarPrograma, setShowCriarPrograma] = useState(false);
   const [showCriarEdital, setShowCriarEdital] = useState(false);
   const [activeTab, setActiveTab] = useState<ActiveTab>('captacoes');
@@ -170,22 +170,22 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
   const [formularioCategoria, setFormularioCategoria] = useState('');
 
   const areaOptions: AreaFilter[] = ['Todas', 'Carreira Científica', 'Pesquisa', 'Difusão do Conhecimento', 'Extensão', 'Inovação', 'Internacional'];
-  const captacaoStatusOptions: SetorFilter[] = ['Todos', 'Em andamento', 'Publicado', 'Não publicado', 'Encerrado'];
+  const captacaoStatusOptions: SetorFilter[] = ['Todos', 'Rascunho', 'Ativo', 'Finalizado'];
   const propostaStatusOptions: SetorFilter[] = ['Todos', 'Enviado', 'Em Avaliação', 'Avaliado', 'Aprovado', 'Reprovado'];
   const setorOptions = activeTab === 'captacoes' ? captacaoStatusOptions : propostaStatusOptions;
   const instituicaoOptions: VinculoFilter[] = ['Todos', 'Programa', 'Parceria'];
 
   const captacoesData: CaptacaoItem[] = [
-    { id: 1, codigo: 'CAP-001/2026', titulo: 'Bolsas de Pesquisa 2026', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Bolsas de Pesquisa 2026', propostasRecebidas: 42, dataPublicacao: '01/03/2026', area: 'Pesquisa', status: 'Publicado' },
-    { id: 2, codigo: 'CAP-002/2026', titulo: 'Inovação Tecnológica', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Inovação Tecnológica', propostasRecebidas: 18, dataPublicacao: '15/03/2026', area: 'Inovação', status: 'Publicado' },
-    { id: 3, codigo: 'CAP-003/2026', titulo: 'Demanda Induzida IFES', tipo: 'Demanda Induzida', vinculoTipo: 'Parceria', vinculoNome: 'Parceria FAPES-IFES', propostasRecebidas: 1, dataPublicacao: '20/03/2026', area: 'Extensão', status: 'Em andamento' },
-    { id: 4, codigo: 'CAP-004/2026', titulo: 'Desenvolvimento Regional', tipo: 'Chamada Pública', vinculoTipo: 'Parceria', vinculoNome: 'Parceria Desenvolvimento ES', propostasRecebidas: 27, dataPublicacao: '28/02/2026', area: 'Difusão do Conhecimento', status: 'Em andamento' },
-    { id: 5, codigo: 'CAP-005/2026', titulo: 'Carreira Científica', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Carreira Científica', propostasRecebidas: 56, dataPublicacao: '20/01/2026', area: 'Carreira Científica', status: 'Encerrado' },
-    { id: 6, codigo: 'CAP-006/2026', titulo: 'Difusão do Conhecimento', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Difusão do Conhecimento', propostasRecebidas: 14, dataPublicacao: '05/01/2026', area: 'Internacional', status: 'Não publicado' },
-    { id: 7, codigo: 'CAP-007/2026', titulo: 'Pesquisa Aplicada em Saúde', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Pesquisa Aplicada em Saúde', propostasRecebidas: 31, dataPublicacao: '10/04/2026', area: 'Pesquisa', status: 'Publicado' },
-    { id: 8, codigo: 'CAP-008/2026', titulo: 'Laboratórios Inteligentes', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa Laboratórios Inteligentes', propostasRecebidas: 22, dataPublicacao: '18/04/2026', area: 'Inovação', status: 'Em andamento' },
-    { id: 9, codigo: 'CAP-009/2026', titulo: 'Internacionalização Científica', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Internacionalização Científica', propostasRecebidas: 8, dataPublicacao: '25/04/2026', area: 'Internacional', status: 'Não publicado' },
-    { id: 10, codigo: 'CAP-010/2026', titulo: 'Empreendedorismo Capixaba', tipo: 'Demanda Induzida', vinculoTipo: 'Parceria', vinculoNome: 'Parceria FAPES-Findes', propostasRecebidas: 12, dataPublicacao: '02/05/2026', area: 'Extensão', status: 'Em andamento' },
+    { id: 1, codigo: 'captacao-1', titulo: 'Bolsas de Pesquisa 2026', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Bolsas de Pesquisa 2026', propostasRecebidas: 42, dataPublicacao: '01/03/2026', area: 'Pesquisa', status: 'Ativo' },
+    { id: 2, codigo: 'captacao-2', titulo: 'Inovação Tecnológica', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Inovação Tecnológica', propostasRecebidas: 18, dataPublicacao: '15/03/2026', area: 'Inovação', status: 'Ativo' },
+    { id: 3, codigo: 'captacao-3', titulo: 'Demanda Induzida IFES', tipo: 'Demanda Induzida', vinculoTipo: 'Parceria', vinculoNome: 'Parceria FAPES-IFES', propostasRecebidas: 1, dataPublicacao: '20/03/2026', area: 'Extensão', status: 'Ativo' },
+    { id: 4, codigo: 'captacao-4', titulo: 'Desenvolvimento Regional', tipo: 'Chamada Pública', vinculoTipo: 'Parceria', vinculoNome: 'Parceria Desenvolvimento ES', propostasRecebidas: 27, dataPublicacao: '28/02/2026', area: 'Difusão do Conhecimento', status: 'Ativo' },
+    { id: 5, codigo: 'captacao-5', titulo: 'Carreira Científica', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Carreira Científica', propostasRecebidas: 56, dataPublicacao: '20/01/2026', area: 'Carreira Científica', status: 'Finalizado' },
+    { id: 6, codigo: 'captacao-6', titulo: 'Difusão do Conhecimento', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Difusão do Conhecimento', propostasRecebidas: 14, dataPublicacao: '05/01/2026', area: 'Internacional', status: 'Rascunho' },
+    { id: 7, codigo: 'captacao-7', titulo: 'Pesquisa Aplicada em Saúde', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Pesquisa Aplicada em Saúde', propostasRecebidas: 31, dataPublicacao: '10/04/2026', area: 'Pesquisa', status: 'Ativo' },
+    { id: 8, codigo: 'captacao-8', titulo: 'Laboratórios Inteligentes', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa Laboratórios Inteligentes', propostasRecebidas: 22, dataPublicacao: '18/04/2026', area: 'Inovação', status: 'Ativo' },
+    { id: 9, codigo: 'captacao-9', titulo: 'Internacionalização Científica', tipo: 'Chamada Pública', vinculoTipo: 'Programa', vinculoNome: 'Programa de Internacionalização Científica', propostasRecebidas: 8, dataPublicacao: '25/04/2026', area: 'Internacional', status: 'Rascunho' },
+    { id: 10, codigo: 'captacao-10', titulo: 'Empreendedorismo Capixaba', tipo: 'Demanda Induzida', vinculoTipo: 'Parceria', vinculoNome: 'Parceria FAPES-Findes', propostasRecebidas: 12, dataPublicacao: '02/05/2026', area: 'Extensão', status: 'Ativo' },
   ];
   const statusCaptacaoDashboard = captacaoStatusOptions
     .filter((status): status is CaptacaoItem['status'] => status !== 'Todos')
@@ -277,7 +277,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
 
   if (showDetalhesCaptacao) {
     return (
-      <DetalhesCaptacao onBack={() => setShowDetalhesCaptacao(false)} />
+      <DetalhesCaptacao captacao={captacaoSelecionada || undefined} onBack={() => setShowDetalhesCaptacao(false)} />
     );
   }
 
@@ -674,9 +674,9 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               <div style={{ backgroundColor: T.accentSoft, borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <FileText size={18} style={{ color: T.accent }} />
               </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Captações publicadas</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Ativas</span>
             </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>2</div>
+            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>7</div>
           </div>
 
           <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
@@ -684,7 +684,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               <div style={{ backgroundColor: 'rgba(251, 191, 36, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Clock size={18} style={{ color: '#fbbf24' }} />
               </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Em andamento</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Rascunhos</span>
             </div>
             <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>2</div>
           </div>
@@ -704,7 +704,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               <div style={{ backgroundColor: 'rgba(34, 197, 94, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <CheckCircle size={18} style={{ color: '#22c55e' }} />
               </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Encerradas</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Finalizadas</span>
             </div>
             <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>1</div>
           </div>
@@ -714,18 +714,18 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <ClipboardList size={18} style={{ color: '#ef4444' }} />
               </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Não publicadas</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Total de captações</span>
             </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>1</div>
+            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>10</div>
           </div>
         </div>
 
         {/* Tab Bar Link */}
         <div style={{ marginBottom: '24px' }}>
           <div style={{ display: 'flex', gap: '0' }}>
-            {(['captacoes', 'inscricoes', 'avaliacao', 'recurso', 'finalizado', 'dashboard'] as ActiveTab[]).map((tab) => {
+            {(['captacoes', 'dashboard'] as ActiveTab[]).map((tab) => {
               const isActive = activeTab === tab;
-              const label = tab === 'dashboard' ? 'Dashboard' : tab === 'captacoes' ? 'Captações' : tab === 'inscricoes' ? 'Propostas' : tab === 'avaliacao' ? 'Avaliação' : tab === 'recurso' ? 'Revisão' : 'Resultado final';
+              const label = tab === 'dashboard' ? 'Dashboard' : 'Captações';
               return (
                 <button
                   key={tab}
@@ -937,7 +937,10 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                         <button
                           key={captacao.codigo}
                           type="button"
-                          onClick={() => setShowDetalhesCaptacao(true)}
+                          onClick={() => {
+                            setCaptacaoSelecionada(captacao);
+                            setShowDetalhesCaptacao(true);
+                          }}
                           style={{
                             width: '100%',
                             padding: '13px 14px',
@@ -952,7 +955,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                             {captacao.titulo}
                           </div>
                           <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '6px' }}>
-                            {captacao.codigo} · {captacao.vinculoTipo}
+                            {captacao.vinculoTipo}
                           </div>
                           <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
                             {captacao.propostasRecebidas} proposta(s) · {captacao.dataPublicacao}
@@ -1095,7 +1098,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
             {captacoesData
               .filter((captacao) => {
                 const query = searchTerm.toLowerCase();
-                const matchSearch = !query || `${captacao.codigo} ${captacao.titulo} ${captacao.vinculoNome}`.toLowerCase().includes(query);
+                const matchSearch = !query || `${captacao.titulo} ${captacao.vinculoNome}`.toLowerCase().includes(query);
                 const matchArea = areaFilter === 'Todas' || captacao.area === areaFilter;
                 const matchVinculo = instituicaoFilter === 'Todos' || captacao.vinculoTipo === instituicaoFilter;
                 const matchStatus = setorFilter === 'Todos' || captacao.status === setorFilter;
@@ -1114,7 +1117,10 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                   }}
                   onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = T.bgHover; }}
                   onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = T.bgCard; }}
-                  onClick={() => setShowDetalhesCaptacao(true)}
+                  onClick={() => {
+                    setCaptacaoSelecionada(captacao);
+                    setShowDetalhesCaptacao(true);
+                  }}
                 >
                   <div className="flex items-center gap-6">
                     <div
@@ -1127,9 +1133,6 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                         </div>
                         <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)' }}>
                           {captacao.titulo}
-                        </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginTop: '2px' }}>
-                          {captacao.codigo}
                         </div>
                       </div>
 
