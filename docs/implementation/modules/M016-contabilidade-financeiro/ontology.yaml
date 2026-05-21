@@ -1,36 +1,631 @@
-ontology: "Contabilidade e Financeiro"
+ontology: "Contabilidade e Financeiro — Taxa de Gestao de Parcerias e Acao Transversal"
 namespace: "financeiro.contabilidade"
 imports:
   - namespace: shared
-    path: path: "../../../ontology/shared/base.yaml"
+    path: "../../../ontology/shared/base.yaml"
+  - namespace: shared.people
+    path: "../../../ontology/shared/people.yaml"
+  - namespace: corporativo.instituicoes
+    path: "../M008-cadastros-corporativos/instituicoes/ontology.yaml"
+  - namespace: planejamento.parcerias
+    path: "../M010-planejamento-estrategia/parcerias/ontology.yaml"
+
 metadata:
   module: "M016"
-  source: "stub — no modelo-estrutural.md available"
-  version: "1.0.0"
-  description: "Contabilidade e financeiro da FAPES. Consolida informacoes financeiras de pagamentos e orcamento. Downstream de M004 (pagamentos) e M013 (orcamento). Integra com Banestes e BANDES."
-  todo: "Complete when modelo-estrutural.md is created"
+  source: "docs/discovery/domains/08-acao-transversal.md + docs/discovery/domains/05-financeiro.md"
+  version: "2.0.0"
+  legal_basis: "Resolucao CCAF n. 334/2023"
+  description: >
+    Dois mecanismos distintos:
+    (1) Taxa de Gestao de Parcerias — percentual retido sobre AporteFinanceiro de Parceria,
+    custodiado em conta BANESTES, classificado contabilmente em M016.
+    (2) Acao Transversal — projeto institucional interno da FAPES que gasta os recursos
+    da Taxa, com Coordenador Outorgado, plano de aplicacao, despesas e prestacao de contas.
+
+# =============================================================================
+# GRUPO 1 — TAXA DE GESTAO DE PARCERIAS
+# Mecanismo de retencao: calcula, custodia, classifica
+# =============================================================================
+
 entities:
-  todo: "Define when modelo-estrutural.md is available"
+
+  PoliticaTaxaGestaoParcerias:
+    description: >
+      Parametro normativo que define vigencia, base legal, faixas percentuais e rubricas
+      permitidas para calculo e execucao da Taxa de Gestao de Parcerias. Deve ser versionado;
+      novas versoes nao alteram calculos de taxas ja emitidas.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      descricao:
+        type: string
+        required: true
+      baseLegal:
+        type: string
+        required: true
+        description: "Ex: Resolucao CCAF n. 334/2023"
+      vigenciaInicio:
+        type: date
+        required: true
+      vigenciaFim:
+        type: date
+        required: false
+        description: "null = vigente sem prazo determinado"
+      faixas:
+        type: "ref:financeiro.contabilidade.FaixaPercentualTaxaGestao[]"
+        required: true
+        description: "Ordenadas por valorMinimo ASC. Sistema aplica a primeira faixa que contiver o valor do aporte."
+      rubricasPermitidas:
+        type: string[]
+        required: true
+        description: "Codigos das rubricas autorizadas para execucao de despesas das AcoesTransversais."
+      ativa:
+        type: boolean
+        required: true
+
+  FaixaPercentualTaxaGestao:
+    description: "Faixa de valor do aporte que determina o percentual da Taxa de Gestao de Parcerias."
+    extends: null
+    fields:
+      valorMinimo:
+        type: decimal
+        required: true
+      valorMaximo:
+        type: decimal
+        required: false
+        description: "null = sem limite superior (ultima faixa)"
+      percentual:
+        type: decimal
+        required: true
+        description: "Ex: 0.05 para 5%"
+
+  TaxaGestaoParcerias:
+    description: >
+      Valor financeiro retido sobre o aporte de uma Parceria para custear despesas operacionais
+      da FAPES. Nasce ao registrar um AporteFinanceiro no M010. Nao e rubrica do projeto nem
+      recurso do coordenador da iniciativa. Snapshot da politica aplicada e imutavel apos emissao.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      aporteFinanceiroId:
+        type: uuid
+        required: true
+        description: "ID do AporteFinanceiro (M010/parcerias) que originou esta taxa."
+      parceiraId:
+        type: uuid
+        required: true
+        description: "ID da Parceria (M010) para facilitar consultas agregadas."
+      valorBase:
+        type: decimal
+        required: true
+        description: "Valor do AporteFinanceiro usado como base de calculo."
+      percentualAplicado:
+        type: decimal
+        required: true
+        description: "Percentual da faixa vigente no momento do calculo. Imutavel apos emissao."
+      valorTaxaGestao:
+        type: decimal
+        required: true
+        derived: true
+        formula: "valorBase * percentualAplicado"
+      politicaAplicadaId:
+        type: uuid
+        required: true
+        description: "ID da PoliticaTaxaGestaoParcerias vigente no calculo. Snapshot imutavel."
+      estado:
+        type: "enum:EstadoTaxaGestao"
+        required: true
+      isAditivo:
+        type: boolean
+        required: true
+        description: "true quando gerada por aporte aditivo."
+      contaBancariaId:
+        type: uuid
+        required: false
+        description: "ref:corporativo.instituicoes.ContaBancaria — conta BANESTES quando houver repasse."
+
+  ClassificacaoContabilTGP:
+    description: >
+      Classificacao da TaxaGestaoParcerias em conta contabil, fundo financeiro e centro de custo
+      institucional da FAPES para fins de escrituracao.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      taxaGestaoId:
+        type: uuid
+        required: true
+      contaContabil:
+        type: string
+        required: true
+        todo: "Formato e plano de contas FAPES a definir"
+      fundoFinanceiro:
+        type: string
+        required: true
+        todo: "Codigos de fundo a definir com equipe contabil"
+      centroCusto:
+        type: string
+        required: true
+        todo: "Estrutura de centros de custo a definir"
+
+# =============================================================================
+# GRUPO 2 — ACAO TRANSVERSAL
+# Projeto institucional FAPES que gasta os recursos da Taxa de Gestao
+# =============================================================================
+
+  AcaoTransversal:
+    description: >
+      Projeto ou acao institucional interna da FAPES financiada por uma ou mais
+      TaxaGestaoParcerias. Tem objetivo, periodo, area responsavel, Coordenador Outorgado
+      e plano de aplicacao por rubrica permitida. Nao e rubrica de projeto externo.
+      O Coordenador Outorgado gerencia a AcaoTransversal, nao a taxa.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      titulo:
+        type: string
+        required: true
+        max_length: 300
+      objetivo:
+        type: string
+        required: true
+        max_length: 2000
+      areaResponsavel:
+        type: string
+        required: true
+        description: "Area interna da FAPES responsavel pela acao."
+        max_length: 200
+      periodoInicio:
+        type: date
+        required: true
+      periodoFim:
+        type: date
+        required: false
+      estado:
+        type: "enum:EstadoAcaoTransversal"
+        required: true
+
+  OutorgaAcaoTransversal:
+    description: >
+      Termo de Outorga emitido pela Diretoria Executiva autorizando um servidor FAPES
+      (Coordenador Outorgado) a gerir, movimentar, utilizar e prestar contas dos recursos
+      de uma AcaoTransversal. Vincula o outorgado a uma AcaoTransversal especifica, nao
+      diretamente a uma TaxaGestaoParcerias.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      numeroTermoOutorga:
+        type: string
+        required: true
+        unique: true
+      acaoTransversalId:
+        type: uuid
+        required: true
+        description: "AcaoTransversal que este Termo de Outorga autoriza gerir."
+      coordenadorOutorgadoId:
+        type: uuid
+        required: true
+        description: "ref:shared.people.PessoaFisica — servidor FAPES autorizado pela Diretoria Executiva. NAO inferir do coordenador da Parceria, Programa ou Projeto."
+      escopoDescricao:
+        type: string
+        required: true
+        description: "Descricao do escopo de gestao autorizado pelo TO."
+      periodoInicio:
+        type: date
+        required: true
+      periodoFim:
+        type: date
+        required: false
+      estado:
+        type: "enum:EstadoOutorgaAT"
+        required: true
+
+  PlanoAplicacaoAT:
+    description: >
+      Distribuicao planejada dos recursos da AcaoTransversal por rubricas permitidas.
+      Soma dos itens nao pode ultrapassar o saldo disponivel proveniente das TaxaGestaoParcerias
+      vinculadas a esta AcaoTransversal.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      acaoTransversalId:
+        type: uuid
+        required: true
+      outorgaId:
+        type: uuid
+        required: true
+      itens:
+        type: "ref:financeiro.contabilidade.ItemPlanoAplicacaoAT[]"
+        required: true
+      totalPlanejado:
+        type: decimal
+        required: true
+        derived: true
+        formula: "sum(itens[].valorPlanejado)"
+      estado:
+        type: "enum:EstadoPlanoAT"
+        required: true
+
+  ItemPlanoAplicacaoAT:
+    description: "Linha de distribuicao por rubrica dentro do PlanoAplicacaoAT."
+    extends: null
+    fields:
+      rubricaCodigo:
+        type: string
+        required: true
+        description: "Deve constar em PoliticaTaxaGestaoParcerias.rubricasPermitidas."
+      descricao:
+        type: string
+        required: true
+      valorPlanejado:
+        type: decimal
+        required: true
+
+  DespesaAcaoTransversal:
+    description: >
+      Despesa institucional executada com recursos da AcaoTransversal. Deve ter rubrica
+      permitida, documento comprobatorio e justificativa. Reduz o saldo do PlanoAplicacaoAT
+      na rubrica correspondente.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      acaoTransversalId:
+        type: uuid
+        required: true
+      outorgaId:
+        type: uuid
+        required: true
+      planoAplicacaoId:
+        type: uuid
+        required: true
+      rubricaCodigo:
+        type: string
+        required: true
+        description: "Deve constar em PoliticaTaxaGestaoParcerias.rubricasPermitidas."
+      descricao:
+        type: string
+        required: true
+      valor:
+        type: decimal
+        required: true
+      dataExecucao:
+        type: date
+        required: true
+      documentoComprobatorioId:
+        type: uuid
+        required: false
+        todo: "Integracao com EDOCS a definir"
+      justificativa:
+        type: string
+        required: true
+      estado:
+        type: "enum:EstadoDespesaAT"
+        required: true
+
+  PrestacaoContasAcaoTransversal:
+    description: >
+      Prestacao financeira institucional dos recursos geridos pelo Coordenador Outorgado.
+      Escopo e a OutorgaAcaoTransversal, nao o projeto ou parceria que gerou a taxa.
+      M014 NAO e dono deste processo.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      outorgaId:
+        type: uuid
+        required: true
+      acaoTransversalId:
+        type: uuid
+        required: true
+      periodoReferencia:
+        type: string
+        required: true
+        description: "Ex: 2024-01"
+      totalExecutado:
+        type: decimal
+        required: true
+        derived: true
+        formula: "sum(DespesaAcaoTransversal WHERE outorgaId = self.outorgaId AND periodoReferencia)"
+      estado:
+        type: "enum:EstadoPrestacaoAT"
+        required: true
+      dataSubmissao:
+        type: datetime
+        required: false
+      observacoesAnalista:
+        type: string
+        required: false
+
 relationships:
-  todo: "Define when modelo-estrutural.md is available"
+
+  # Grupo 1 — Taxa de Gestao
+  - from: "financeiro.contabilidade.TaxaGestaoParcerias"
+    relation: "aplica"
+    to: "financeiro.contabilidade.PoliticaTaxaGestaoParcerias"
+    cardinality: "N:1"
+    description: "Cada taxa registra snapshot da politica vigente no calculo."
+
+  - from: "financeiro.contabilidade.ClassificacaoContabilTGP"
+    relation: "classifica"
+    to: "financeiro.contabilidade.TaxaGestaoParcerias"
+    cardinality: "1:1"
+
+  - from: "financeiro.contabilidade.TaxaGestaoParcerias"
+    relation: "custodiada_em"
+    to: "corporativo.instituicoes.ContaBancaria"
+    cardinality: "N:1"
+    description: "Conta bancaria BANESTES quando houver repasse ao Coordenador Outorgado."
+
+  # Grupo 2 — Acao Transversal
+  - from: "financeiro.contabilidade.TaxaGestaoParcerias"
+    relation: "financia"
+    to: "financeiro.contabilidade.AcaoTransversal"
+    cardinality: "N:N"
+    description: "Uma taxa pode financiar multiplas acoes; uma acao pode receber de multiplas taxas. Mediada por OutorgaAcaoTransversal."
+
+  - from: "financeiro.contabilidade.OutorgaAcaoTransversal"
+    relation: "autoriza_gestao_de"
+    to: "financeiro.contabilidade.AcaoTransversal"
+    cardinality: "N:1"
+    description: "Uma outorga autoriza gestao de uma AcaoTransversal especifica."
+
+  - from: "financeiro.contabilidade.PlanoAplicacaoAT"
+    relation: "distribui_recursos_de"
+    to: "financeiro.contabilidade.AcaoTransversal"
+    cardinality: "N:1"
+
+  - from: "financeiro.contabilidade.DespesaAcaoTransversal"
+    relation: "debita"
+    to: "financeiro.contabilidade.PlanoAplicacaoAT"
+    cardinality: "N:1"
+
+  - from: "financeiro.contabilidade.PrestacaoContasAcaoTransversal"
+    relation: "presta_contas_de"
+    to: "financeiro.contabilidade.OutorgaAcaoTransversal"
+    cardinality: "N:1"
+
 axioms:
-  todo: "Define when modelo-estrutural.md is available"
+
+  # Taxa de Gestao
+  - id: "AX-TGP01"
+    natural_language: >
+      O valor da Taxa de Gestao de Parcerias e calculado multiplicando o valor do
+      AporteFinanceiro pelo percentual da faixa vigente na PoliticaTaxaGestaoParcerias
+      no momento do calculo. O percentual e imutavel apos a emissao da taxa.
+    formal_rule: >
+      TaxaGestaoParcerias.valorTaxaGestao = valorBase * percentualAplicado
+
+  - id: "AX-TGP02"
+    natural_language: >
+      O percentual aplicavel e determinado pela faixa do valor do aporte na
+      PoliticaTaxaGestaoParcerias: 5% para R$ 50k a R$ 2M, 4% para R$ 2M a R$ 5M,
+      3% acima de R$ 5M. Percentuais sao parametrizaveis, nao hardcoded.
+    formal_rule: >
+      faixa = PoliticaTaxaGestaoParcerias.faixas.firstWhere(f => valorBase >= f.valorMinimo
+              AND (f.valorMaximo IS NULL OR valorBase <= f.valorMaximo))
+      percentualAplicado = faixa.percentual
+
+  - id: "AX-TGP03"
+    natural_language: >
+      A TaxaGestaoParcerias nao compoe o saldo alocavel em Programas da Parceria.
+      O calculo de saldoAlocavelEmProgramas ja desconta a taxa.
+    formal_rule: >
+      Parceria.saldoAlocavelEmProgramas = valorBrutoRecebido - valorTaxaGestao
+        - SUM(AporteFinanceiroParceriaPrograma.valor em ATIVO)
+
 invariants:
-  todo: "Define when modelo-estrutural.md is available"
-enums: {}
-value_objects: {}
+
+  - id: "INV-TGP01"
+    rule: "PlanoAplicacaoAT.totalPlanejado <= SUM(TaxaGestaoParcerias.valorTaxaGestao WHERE acaoTransversalId = AcaoTransversal.id)"
+    description: "Plano de aplicacao nao pode exceder o total de taxas vinculadas a AcaoTransversal."
+
+  - id: "INV-TGP02"
+    rule: "DespesaAcaoTransversal.rubricaCodigo IN PoliticaTaxaGestaoParcerias.rubricasPermitidas"
+    description: "Toda despesa AT deve usar rubrica autorizada pela politica vigente."
+
+  - id: "INV-TGP03"
+    rule: "corporativo.instituicoes.ContaBancaria.banco = 'BANESTES' WHERE usada_em = TaxaGestaoParcerias"
+    description: "Resolucao CCAF n. 334/2023 exige conta especifica no BANESTES para repasse de Taxa de Gestao."
+
+  - id: "INV-AT01"
+    rule: "OutorgaAcaoTransversal.coordenadorOutorgadoId != auto_inferred_from(Parceria.coordenador OR Programa.coordenador OR Projeto.coordenador)"
+    description: >
+      Coordenador Outorgado NAO pode ser inferido automaticamente do coordenador da
+      Parceria, Programa ou Projeto. Deve ser designado explicitamente pela Diretoria
+      Executiva via Termo de Outorga.
+
+enums:
+  EstadoTaxaGestao:
+    description: "Ciclo de vida da Taxa de Gestao de Parcerias dentro do M016."
+    values:
+      CALCULADA: "Taxa emitida pelo M010, aguardando classificacao contabil no M016."
+      CLASSIFICADA: "Classificada em conta contabil, fundo e centro de custo."
+      REPASSADA: "Valor repassado para conta bancaria BANESTES do Coordenador Outorgado."
+      VINCULADA: "Vinculada a uma ou mais AcoesTransversais via OutorgaAcaoTransversal."
+      ENCERRADA: "Prestacao da AcaoTransversal correspondente aprovada."
+
+  EstadoAcaoTransversal:
+    description: "Ciclo de vida de uma Acao Transversal."
+    values:
+      EM_ELABORACAO: "Acao em definicao, sem outorga ativa."
+      ATIVA: "Outorga emitida; plano de aplicacao e despesas podem ser registrados."
+      EM_PRESTACAO: "Prestacao de contas em andamento."
+      ENCERRADA: "Prestacao aprovada; acao encerrada."
+      CANCELADA: "Cancelada antes de execucao."
+
+  EstadoOutorgaAT:
+    description: "Ciclo de vida do Termo de Outorga da Acao Transversal."
+    values:
+      EMITIDA: "Termo emitido pela Diretoria Executiva."
+      VIGENTE: "Outorgado em exercicio da gestao."
+      ENCERRADA: "Periodo expirado ou prestacao aprovada."
+      CANCELADA: "Cancelada antes do inicio da vigencia."
+
+  EstadoPlanoAT:
+    description: "Estado do Plano de Aplicacao da AT."
+    values:
+      RASCUNHO: "Em elaboracao pelo Gestor Financeiro."
+      APROVADO: "Plano aprovado; permite lancamento de despesas."
+      EM_REVISAO: "Enviado para revisao."
+
+  EstadoDespesaAT:
+    description: "Estado da despesa institucional de AT."
+    values:
+      LANCADA: "Despesa registrada."
+      COMPROVADA: "Documento comprobatorio vinculado."
+      REJEITADA: "Rejeitada na analise."
+
+  EstadoPrestacaoAT:
+    description: "Ciclo de vida da prestacao financeira da Acao Transversal."
+    values:
+      RASCUNHO: "Em elaboracao pelo Coordenador Outorgado."
+      SUBMETIDA: "Submetida para analise."
+      EM_ANALISE: "Em analise pelo Analista Financeiro."
+      APROVADA: "Prestacao aprovada."
+      REJEITADA: "Prestacao rejeitada; retorna ao Coordenador Outorgado."
+
 events:
-  todo: "Define when modelo-estrutural.md is available"
+  - name: "TaxaGestaoParcelasCalculada"
+    description: "Emitido quando M010 registra novo AporteFinanceiro e calcula TaxaGestaoParcerias. M016 recebe para classificacao."
+    payload_entity: "financeiro.contabilidade.TaxaGestaoParcerias"
+    trigger: "state_transition.CALCULADA"
+
+  - name: "AcaoTransversalAtivada"
+    description: "Emitido quando OutorgaAcaoTransversal e emitida e a AcaoTransversal transita para ATIVA."
+    payload_entity: "financeiro.contabilidade.AcaoTransversal"
+    trigger: "state_transition.ATIVA"
+
+  - name: "OutorgaAcaoTransversalEmitida"
+    description: "Emitido quando Diretoria Executiva emite Termo de Outorga para uma AcaoTransversal."
+    payload_entity: "financeiro.contabilidade.OutorgaAcaoTransversal"
+    trigger: "state_transition.EMITIDA"
+
+  - name: "DespesaAcaoTransversalLancada"
+    description: "Emitido quando despesa institucional e registrada pelo Coordenador Outorgado."
+    payload_entity: "financeiro.contabilidade.DespesaAcaoTransversal"
+    trigger: "state_transition.LANCADA"
+
+  - name: "PrestacaoAcaoTransversalSubmetida"
+    description: "Emitido quando Coordenador Outorgado submete prestacao de contas AT."
+    payload_entity: "financeiro.contabilidade.PrestacaoContasAcaoTransversal"
+    trigger: "state_transition.SUBMETIDA"
+
 workflows:
-  todo: "Define when modelo-estrutural.md is available"
+  TaxaGestaoParcelasLifecycle:
+    description: "Ciclo de vida da Taxa de Gestao de Parcerias no M016."
+    states:
+      - CALCULADA
+      - CLASSIFICADA
+      - REPASSADA
+      - VINCULADA
+      - ENCERRADA
+    transitions:
+      - from: CALCULADA
+        to: CLASSIFICADA
+        trigger: "classificar_taxa"
+        guard: "ClassificacaoContabilTGP criada com conta contabil, fundo e centro de custo"
+      - from: CLASSIFICADA
+        to: REPASSADA
+        trigger: "registrar_repasse"
+        guard: "ContaBancaria BANESTES informada E Coordenador Outorgado designado"
+      - from: CLASSIFICADA
+        to: VINCULADA
+        trigger: "vincular_a_acao_transversal"
+        guard: "OutorgaAcaoTransversal EMITIDA para AcaoTransversal valida"
+      - from: REPASSADA
+        to: VINCULADA
+        trigger: "vincular_a_acao_transversal"
+      - from: VINCULADA
+        to: ENCERRADA
+        trigger: "encerrar_taxa"
+        guard: "PrestacaoContasAcaoTransversal APROVADA"
+
+  AcaoTransversalLifecycle:
+    description: "Ciclo de vida de uma Acao Transversal."
+    states:
+      - EM_ELABORACAO
+      - ATIVA
+      - EM_PRESTACAO
+      - ENCERRADA
+      - CANCELADA
+    transitions:
+      - from: EM_ELABORACAO
+        to: ATIVA
+        trigger: "emitir_outorga"
+        guard: "OutorgaAcaoTransversal EMITIDA com coordenadorOutorgadoId definido"
+      - from: ATIVA
+        to: EM_PRESTACAO
+        trigger: "iniciar_prestacao"
+      - from: EM_PRESTACAO
+        to: ENCERRADA
+        trigger: "aprovar_prestacao"
+        guard: "PrestacaoContasAcaoTransversal APROVADA"
+      - from: EM_PRESTACAO
+        to: ATIVA
+        trigger: "rejeitar_prestacao"
+        guard: "PrestacaoContasAcaoTransversal REJEITADA"
+      - from: EM_ELABORACAO
+        to: CANCELADA
+        trigger: "cancelar_acao"
+
 policies:
-  todo: "Define when modelo-estrutural.md is available"
+  permissions:
+    GestorFinanceiro:
+      can:
+        - parametrizar_politica_taxa_gestao
+        - classificar_taxa_gestao
+        - registrar_repasse_taxa
+        - criar_acao_transversal
+        - aprovar_plano_aplicacao
+        - analisar_prestacao_at
+    DiretoriaExecutiva:
+      can:
+        - emitir_outorga_at
+        - cancelar_outorga_at
+    CoordenadorOutorgado:
+      can:
+        - elaborar_plano_aplicacao
+        - lancar_despesa_at
+        - submeter_prestacao_at
+    AnalistaFinanceiro:
+      can:
+        - analisar_prestacao_at
+        - aprovar_prestacao_at
+        - rejeitar_prestacao_at
 
 agent_instructions:
   rules:
-    - "Este módulo é stub. Não gerar implementações sem modelo-estrutural.md."
-    - "Consultar arquitetura em docs/architecture/02-modulos-e-integracoes.md."
+    - "M016 recebe TaxaGestaoParcerias do M010 via evento — nunca calcule a taxa aqui."
+    - "CoordenadorOutorgado NUNCA pode ser inferido automaticamente do coordenador da Parceria ou Projeto (INV-AT01)."
+    - "ContaBancaria para Taxa de Gestao DEVE ser BANESTES — invariant INV-TGP03. A entidade ContaBancaria vive em M008."
+    - "Percentuais da Taxa vem da PoliticaTaxaGestaoParcerias ativa — nao hardcode 5/4/3 porcento."
+    - "M014 NAO e dono da prestacao de contas da AcaoTransversal — PrestacaoContasAcaoTransversal vive aqui."
+    - "TaxaGestaoParcerias e a retencao; AcaoTransversal e o projeto que gasta — sao entidades distintas."
+    - "OutorgaAcaoTransversal vincula Coordenador a AcaoTransversal, nao a TaxaGestaoParcerias diretamente."
   notes:
-    - "Contabilidade e financeiro da FAPES."
-    - "Downstream de M004 (pagamentos) e M013 (orçamento)."
-    - "Integra com Banestes e BANDES."
+    - "Base legal: Resolucao CCAF n. 334/2023."
+    - "Upstream: M010 (calcula e emite TaxaGestaoParcerias), M008 (PessoaFisica do Coordenador, ContaBancaria)."
+    - "Integracoes: BANESTES (conta bancaria via M008.ContaBancaria), EDOCS (comprovantes de despesa)."
+    - "Decisao de design: ContaBancaria e cadastro corporativo de M008, nao entidade local de M016."

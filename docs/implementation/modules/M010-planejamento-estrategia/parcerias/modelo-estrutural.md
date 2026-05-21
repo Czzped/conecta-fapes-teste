@@ -23,7 +23,7 @@ classDiagram
         /+Date vigenciaInicioCorrente
         /+Date vigenciaFimCorrente
         /+Decimal valorBrutoRecebido
-        /+Decimal valorReservadoAcaoTransversal
+        /+Decimal valorTaxaGestao
         /+Decimal saldoAlocavelEmProgramas
     }
 
@@ -81,8 +81,8 @@ classDiagram
         <<fora do escopo - M010/programas>>
     }
 
-    class ReservaAcaoTransversal {
-        <<fora do escopo - M016/acao-transversal>>
+    class TaxaGestaoParcerias {
+        <<fora do escopo - M016>>
     }
 
     %% Relacoes internas
@@ -100,7 +100,7 @@ classDiagram
     Parceria "1" --> "0..*" AporteFinanceiroParceriaPrograma : origem
     AporteFinanceiroParceriaPrograma "*" --> "1" Programa : destinadoA
     Parceria "1" --> "0..*" Iniciativa : impacta
-    Parceria "1" --> "0..1" ReservaAcaoTransversal : gera
+    Parceria "1" --> "0..*" TaxaGestaoParcerias : gera
 ```
 
 ## Conceitos Financeiros Normalizados
@@ -111,8 +111,8 @@ classDiagram
 | Valor alocado | Parcela do valor investido reservada para um Programa. | `AporteFinanceiroParceriaPrograma.valor` |
 | Valor aportado | Parcela da alocacao efetivamente disponibilizada para Programas, Rubricas ou Iniciativas. | Consolidacao M010/M003 |
 | Valor consumido | Parcela da alocacao ja comprometida ou utilizada pelas Iniciativas, incluindo pagamentos e compromissos reconhecidos. | M003 alimentado por M014 |
-| Valor reservado para Acao Transversal | Percentual calculado uma unica vez na Parceria, conforme politica parametrizada no M016. | M010/M016 |
-| Saldo alocavel em Programas | No nivel da Parceria: `valorBrutoRecebido - valorReservadoAcaoTransversal - valorAlocadoEmProgramas`. No nivel de Programa/Rubrica: `valorAlocado - valorConsumido`. | Derivado |
+| Valor da Taxa de Gestao de Parcerias | Percentual calculado uma unica vez por AporteFinanceiro, conforme PoliticaTaxaGestaoParcerias parametrizada no M016 (Resolucao CCAF 334/2023). Nao compoe saldo alocavel em Programas. | M010/M016 |
+| Saldo alocavel em Programas | No nivel da Parceria: `valorBrutoRecebido - valorTaxaGestao - valorAlocadoEmProgramas`. No nivel de Programa/Rubrica: `valorAlocado - valorConsumido`. | Derivado |
 
 > Esses termos devem ser usados de forma consistente nos dashboards, epicos, contratos e telas. Evitar os termos "pago", "executado", "saldo nao alocado" e "saldo nao executado" nas telas de Parcerias quando o objetivo for acompanhamento gerencial do recurso.
 
@@ -129,8 +129,8 @@ classDiagram
 | | vigenciaInicioCorrente (derivado) | `MIN(Vigencia.dataInicio)` | Calculado | Date | | | |
 | | vigenciaFimCorrente (derivado) | `MAX(Vigencia.dataFim)` | Calculado | Date | | | |
 | | valorBrutoRecebido (derivado) | `SUM(AporteFinanceiro.valorInvestido)` | Calculado | Decimal | ≥ 0 | | |
-| | valorReservadoAcaoTransversal (derivado/snapshot) | Valor reservado conforme politica de Acao Transversal aplicada; nao compoe saldo alocavel em Programas | Calculado | Decimal | ≥ 0 | | |
-| | saldoAlocavelEmProgramas (derivado) | `valorBrutoRecebido − valorReservadoAcaoTransversal − SUM(AporteFinanceiroParceriaPrograma.valor)` — sempre `>= 0` | Calculado | Decimal | ≥ 0 | | |
+| | valorTaxaGestao (derivado) | Soma das TaxaGestaoParcerias geradas por cada AporteFinanceiro desta Parceria; nao compoe saldo alocavel em Programas | Calculado | Decimal | ≥ 0 | | |
+| | saldoAlocavelEmProgramas (derivado) | `valorBrutoRecebido − valorTaxaGestao − SUM(AporteFinanceiroParceriaPrograma.valor)` — sempre `>= 0` | Calculado | Decimal | ≥ 0 | | |
 | **Vigencia** | dataInicio | Inicio da janela | Sim | Date | | | |
 | | dataFim | Fim da janela; aditivo exige posterior a vigenciaFimCorrente anterior | Sim | Date | | | |
 | | dataAssinatura | Assinatura desta Vigencia; aditivo exige posterior a da Vigencia original | Sim | Date | | | |
@@ -158,7 +158,7 @@ Regras aplicaveis ao modelo de Parcerias: `RN03`, `RN04`, `RN06`, `RN10`, `RN12`
 | `M008/Documento` | `regulariza`, `formalizadoPor` | Termo de Cooperacao, Termo Aditivo, Termo de Descentralizacao, anexos |
 | `M008/TipoDocumento` | Classifica Documento | |
 | `M016/ContaBancaria` | `depositadoEm` (N:1 via AporteFinanceiro) | Conta bancaria da agencia que recebe o deposito; a conta pertence a um `FundoFinanceiro` gerido em M016 |
-| `M016/AcaoTransversal` | Parceria → ReservaAcaoTransversal | M010 calcula e bloqueia a reserva; M016 planeja, executa e presta financeiramente a Acao Transversal |
+| `M016/TaxaGestaoParcerias` | Parceria → TaxaGestaoParcerias | M010 calcula e bloqueia a taxa por AporteFinanceiro; M016 custodia, classifica contabilmente e alimenta as AcoesTransversais que gastam os recursos |
 
 ## Atributos derivados (prefixo `/`)
 
@@ -167,5 +167,5 @@ Regras aplicaveis ao modelo de Parcerias: `RN03`, `RN04`, `RN06`, `RN10`, `RN12`
 | `/vigenciaInicioCorrente` | `MIN(Vigencia.dataInicio)` | Ao criar/remover Vigencia |
 | `/vigenciaFimCorrente` | `MAX(Vigencia.dataFim)` | Ao registrar nova Vigencia aditivo (RN06, RN15) |
 | `/valorBrutoRecebido` | `SUM(AporteFinanceiro.valorInvestido)` | Ao registrar AporteFinanceiro original ou aditivo |
-| `/valorReservadoAcaoTransversal` | Snapshot calculado conforme politica vigente no M016 | Ao registrar AporteFinanceiro original ou aditivo, quando aplicavel |
-| `/saldoAlocavelEmProgramas` | `valorBrutoRecebido − valorReservadoAcaoTransversal − SUM(AporteFinanceiroParceriaPrograma.valor)` | Ao registrar AporteFinanceiro, ajustar reserva ou registrar AporteFinanceiroParceriaPrograma — RN22 |
+| `/valorTaxaGestao` | `SUM(TaxaGestaoParcerias.valorTaxaGestao WHERE parceria = this)` — snapshot por aporte conforme PoliticaTaxaGestaoParcerias vigente no M016 | Ao registrar AporteFinanceiro original ou aditivo |
+| `/saldoAlocavelEmProgramas` | `valorBrutoRecebido − valorTaxaGestao − SUM(AporteFinanceiroParceriaPrograma.valor)` | Ao registrar AporteFinanceiro, ajustar taxa ou registrar AporteFinanceiroParceriaPrograma — RN22 |

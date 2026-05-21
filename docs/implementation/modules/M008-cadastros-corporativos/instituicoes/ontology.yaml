@@ -2,11 +2,11 @@ ontology: "Instituicoes e Unidades Organizacionais"
 namespace: "corporativo.instituicoes"
 imports:
   - namespace: shared
-    path: path: "../../../ontology/shared/base.yaml"
+    path: "../../../ontology/shared/base.yaml"
   - namespace: shared.people
-    path: path: "../../../ontology/shared/people.yaml"
+    path: "../../../ontology/shared/people.yaml"
   - namespace: shared.geography
-    path: path: "../../../ontology/shared/geography.yaml"
+    path: "../../../ontology/shared/geography.yaml"
 metadata:
   module: "M008"
   source: "docs/implementation/modules/M008-cadastros-corporativos/instituicoes/modelo-estrutural.md"
@@ -160,6 +160,50 @@ entities:
         description: "Descricao do tipo de instituicao."
         max_length: 500
 
+  ContaBancaria:
+    description: >
+      Conta bancaria institucional registrada em nome de PessoaFisica ou Instituicao.
+      Cadastro corporativo reutilizavel por M016 (Taxa de Gestao de Parcerias, conta BANESTES do Coordenador Outorgado)
+      e M004 (conta de pagamento de bolsistas). A restricao banco=BANESTES e invariant de M016 — nao deste modulo.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      banco:
+        type: string
+        required: true
+        description: "Nome do banco (ex: BANESTES, ITAU, BRADESCO)."
+        max_length: 100
+      agencia:
+        type: string
+        required: true
+        description: "Codigo da agencia bancaria."
+        max_length: 20
+      numeroConta:
+        type: string
+        required: true
+        unique: true
+        description: "Numero da conta com digito verificador. Unico no sistema."
+        max_length: 30
+      titularId:
+        type: uuid
+        required: true
+        description: "ID do titular — PessoaFisica ou Instituicao, conforme titularTipo."
+      titularTipo:
+        type: "enum:TitularTipo"
+        required: true
+        description: "Discrimina se o titular e PessoaFisica ou Instituicao."
+      titularNome:
+        type: string
+        required: true
+        description: "Nome do titular conforme cadastro bancario (desnormalizado para auditoria)."
+        max_length: 300
+      ativa:
+        type: boolean
+        required: true
+
   Responsavel:
     description: "Vinculo temporal entre uma PessoaFisica e uma entidade organizacional (Instituicao OU UnidadeOrganizacional). Cada Responsavel aponta para exatamente uma das duas entidades (xor). Apenas um Responsavel pode estar ativo por entidade ao mesmo tempo (RI1, RI3)."
     extends: null
@@ -264,7 +308,13 @@ invariants:
     rule: "IF Responsavel.ativo == false THEN Responsavel.dataFimMandato IS NOT NULL"
     description: "dataFimMandato e obrigatorio quando Responsavel estiver inativo."
 
-enums: {}
+enums:
+  TitularTipo:
+    description: "Tipo do titular de uma ContaBancaria."
+    values:
+      PESSOA_FISICA: "Conta em nome de PessoaFisica (ex: Coordenador Outorgado)."
+      INSTITUICAO: "Conta em nome de Instituicao."
+
 value_objects: {}
 events: []
 workflows: null
@@ -280,7 +330,9 @@ agent_instructions:
     - "Apenas um Responsavel ativo por entidade organizacional ao mesmo tempo."
     - "UnidadeOrganizacional deve ter pelo menos um pai (RI4)."
     - "Instituicao tem no maximo um instituicaoSuperior (RI8)."
+    - "ContaBancaria e cadastro corporativo generico — a regra banco=BANESTES e invariant de M016, nao deste modulo."
   notes:
     - "PessoaFisica pertence ao contexto Pessoas (M008/pessoas) — referenciada aqui via shared.people."
     - "M010 consome Instituicao e UnidadeOrganizacional para Parcerias."
     - "Responsavel.ativo e campo gerado a partir de dataInicioMandato, dataFimMandato e data atual."
+    - "ContaBancaria e consumida por M016 (Taxa de Gestao de Parcerias, conta BANESTES) e M004 (pagamentos)."

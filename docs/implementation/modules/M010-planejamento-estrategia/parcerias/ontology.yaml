@@ -65,18 +65,18 @@ entities:
         description: "SUM(AporteFinanceiro.valorInvestido). Atributo derivado. Sempre >= 0."
         derived: true
         formula: "SUM(AporteFinanceiro.valorInvestido WHERE parceria = this)"
-      valorReservadoAcaoTransversal:
+      valorTaxaGestao:
         type: "decimal"
         required: false
-        description: "Valor reservado conforme politica de Acao Transversal parametrizada no M016; calculado uma unica vez por aporte (RN20, RN23). Nao compoe saldo alocavel em Programas (RN21)."
+        description: "Valor da Taxa de Gestao de Parcerias calculada conforme PoliticaTaxaGestaoParcerias parametrizada no M016; calculado uma unica vez por aporte (RN20, RN23). Nao compoe saldo alocavel em Programas (RN21)."
         derived: true
-        formula: "SUM(ReservaAcaoTransversal.valorReservado WHERE parceria = this)"
+        formula: "SUM(TaxaGestaoParcerias.valorTaxaGestao WHERE parceria = this)"
       saldoAlocavelEmProgramas:
         type: "decimal"
         required: false
-        description: "valorBrutoRecebido - valorReservadoAcaoTransversal - SUM(AporteFinanceiroParceriaPrograma.valor em estado ATIVO). Sempre >= 0 (RN14, RN22)."
+        description: "valorBrutoRecebido - valorTaxaGestao - SUM(AporteFinanceiroParceriaPrograma.valor em estado ATIVO). Sempre >= 0 (RN14, RN22)."
         derived: true
-        formula: "valorBrutoRecebido - valorReservadoAcaoTransversal - SUM(AporteFinanceiroParceriaPrograma.valor WHERE parceria = this AND estado = 'ATIVO')"
+        formula: "valorBrutoRecebido - valorTaxaGestao - SUM(AporteFinanceiroParceriaPrograma.valor WHERE parceria = this AND estado = 'ATIVO')"
 
   Vigencia:
     description: "Janela temporal da Parceria, original ou aditivo. A Parceria deve ter exatamente uma Vigencia com isAditivo = false (RN15). Aditivos estendem a vigencia com justificativa e documento (RN06)."
@@ -113,7 +113,7 @@ entities:
         description: "Parceria a qual esta vigencia pertence."
 
   AporteFinanceiro:
-    description: "Registro de valor recebido pela Parceria oriundo da Instituicao vinculada. Cada aporte sujeito a Acao Transversal gera sua propria reserva com snapshot da politica (RN23)."
+    description: "Registro de valor recebido pela Parceria oriundo da Instituicao vinculada. Cada aporte sujeito a Taxa de Gestao de Parcerias gera sua propria TaxaGestaoParcerias com snapshot da politica (RN23)."
     extends: "shared.Auditavel"
     fields:
       valorInvestido:
@@ -214,19 +214,19 @@ axioms:
     natural_language: "Transicao EmElaboracao para Vigente exige: dataAssinatura preenchida, pelo menos um AporteFinanceiro original, Vigencia original, pelo menos um Documento anexado e data de hoje dentro de [vigenciaInicioCorrente, vigenciaFimCorrente]."
     formal_rule: "Parceria.estado = 'EmElaboracao' → 'Vigente' REQUIRES dataAssinatura ≠ null AND COUNT(AporteFinanceiro WHERE isAditivo = false) >= 1 AND COUNT(Vigencia WHERE isAditivo = false) = 1 AND COUNT(Documento) >= 1 AND today() ∈ [vigenciaInicioCorrente, vigenciaFimCorrente]"
   - id: "AX-M010-RN20"
-    natural_language: "A Acao Transversal e calculada uma unica vez na Parceria, com base na politica vigente parametrizada no M016; Programas nao recalculam Acao Transversal sobre aportes recebidos."
-    formal_rule: "AcaoTransversal.calculada_em = Parceria AND Programa.recalcula_acao_transversal = false"
+    natural_language: "A Taxa de Gestao de Parcerias e calculada uma unica vez na Parceria ao registrar o AporteFinanceiro, com base na PoliticaTaxaGestaoParcerias vigente parametrizada no M016; Programas nao recalculam Taxa de Gestao sobre aportes recebidos."
+    formal_rule: "TaxaGestaoParcerias.calculada_em = Parceria AND Programa.recalcula_taxa_gestao = false"
   - id: "AX-M010-RN21"
-    natural_language: "O valor reservado para Acao Transversal nao compoe o saldo alocavel em Programas."
-    formal_rule: "saldoAlocavelEmProgramas = valorBrutoRecebido - valorReservadoAcaoTransversal - SUM(AporteFinanceiroParceriaPrograma.valor em ATIVO)"
+    natural_language: "O valor da Taxa de Gestao de Parcerias nao compoe o saldo alocavel em Programas."
+    formal_rule: "saldoAlocavelEmProgramas = valorBrutoRecebido - valorTaxaGestao - SUM(AporteFinanceiroParceriaPrograma.valor em ATIVO)"
   - id: "AX-M010-RN22"
-    natural_language: "O saldo alocavel em Programas e SUM(AporteFinanceiro.valorInvestido) - valorReservadoAcaoTransversal - SUM(AporteFinanceiroParceriaPrograma.valor em estado ATIVO), sempre >= 0."
+    natural_language: "O saldo alocavel em Programas e SUM(AporteFinanceiro.valorInvestido) - valorTaxaGestao - SUM(AporteFinanceiroParceriaPrograma.valor em estado ATIVO), sempre >= 0."
     formal_rule: "saldoAlocavelEmProgramas >= 0"
   - id: "AX-M010-RN23"
-    natural_language: "Cada AporteFinanceiro sujeito a Acao Transversal gera sua propria reserva com snapshot da politica, faixa, percentual, base de calculo e valor reservado. Nao se recalcula retroativamente."
-    formal_rule: "∀a ∈ AporteFinanceiro: snapshot(politica, faixa, percentual) captured_at a.dataAporte"
+    natural_language: "Cada AporteFinanceiro sujeito a Taxa de Gestao de Parcerias gera sua propria TaxaGestaoParcerias com snapshot da politica, faixa, percentual, base de calculo e valor calculado. Nao se recalcula retroativamente."
+    formal_rule: "∀a ∈ AporteFinanceiro: snapshot(politicaTaxaGestao, faixa, percentual) captured_at a.dataAporte"
   - id: "AX-M010-RN24"
-    natural_language: "A prestacao financeira da Acao Transversal pertence ao M016; a prestacao de contas da Iniciativa/Projeto permanece no M014."
+    natural_language: "A prestacao financeira da AcaoTransversal pertence ao M016; a prestacao de contas da Iniciativa/Projeto permanece no M014."
     formal_rule: "AcaoTransversal.prestacao_financeira.owner = M016 AND Iniciativa.prestacao_contas.owner = M014"
 
 invariants:
@@ -268,7 +268,7 @@ events:
     payload_entity: "planejamento.parcerias.Parceria"
     trigger: "state_transition.Encerrada"
   - name: "AporteFinanceiroRegistrado"
-    description: "Emitido quando um AporteFinanceiro e registrado na Parceria; recalcula valorBrutoRecebido, valorReservadoAcaoTransversal e saldoAlocavelEmProgramas."
+    description: "Emitido quando um AporteFinanceiro e registrado na Parceria; recalcula valorBrutoRecebido, valorTaxaGestao e saldoAlocavelEmProgramas."
     payload_entity: "planejamento.parcerias.AporteFinanceiro"
     trigger: "create"
   - name: "VigenciaAditivada"
@@ -342,13 +342,13 @@ agent_instructions:
     - "Ao registrar Vigencia aditivo, verificar dataAssinatura posterior a original e dataFim posterior a vigenciaFimCorrente (RN06)."
     - "Ao registrar AporteFinanceiro aditivo, verificar existencia de original e dataAporte posterior (RN17)."
     - "Garantir saldoAlocavelEmProgramas >= 0 em toda operacao financeira (RN14, RN22)."
-    - "valorReservadoAcaoTransversal nao compoe saldo alocavel — calcular antes de permitir aportes em Programas (RN21)."
+    - "valorTaxaGestao nao compoe saldo alocavel — calcular antes de permitir aportes em Programas (RN21)."
     - "Ao suspender Parceria, disparar evento ParceriaSuspensa para cascata em Programas e Iniciativas (RI4)."
     - "Ao encerrar Parceria, exigir confirmacao explicita e disparar encerramento em cascata de Programas aportados (RI2)."
     - "Parceria so pode ser removida se nao houver AporteFinanceiroParceriaPrograma vinculado (RI3)."
-    - "A prestacao financeira da Acao Transversal pertence ao M016; nao modelar aqui (RN24)."
+    - "A prestacao financeira da AcaoTransversal pertence ao M016; nao modelar aqui (RN24)."
   notes:
-    - "ContaBancaria e entidade externa do M016; apenas referenciada via FK."
-    - "ReservaAcaoTransversal e entidade externa do M016; M010 calcula e bloqueia, M016 planeja e executa."
+    - "ContaBancaria e entidade de M008 (cadastro corporativo); referenciada via FK em AporteFinanceiro.contaBancariaDestino."
+    - "TaxaGestaoParcerias e entidade de M016; M010 calcula e bloqueia, M016 custodia, planeja e executa via AcaoTransversal."
     - "AporteFinanceiroParceriaPrograma e entidade definida em planejamento.programas."
-    - "Percentuais e faixas de Acao Transversal sao parametrizados no M016 (Resolucao CCAF 334/2023)."
+    - "Percentuais e faixas da Taxa de Gestao de Parcerias sao parametrizados em M016 (PoliticaTaxaGestaoParcerias, Resolucao CCAF 334/2023)."
