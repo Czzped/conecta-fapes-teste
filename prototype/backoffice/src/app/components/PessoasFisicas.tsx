@@ -5,7 +5,6 @@ import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 type EstadoPessoa = 'Ativa' | 'Suspensa';
 type ActiveTab = 'listagem' | 'dashboard';
 type PersonDetailTab = 'cadastro' | 'dashboard' | 'vidaAcademica';
-type VidaAcademicaSection = 'formacoes' | 'artigos' | 'orientacoes' | 'projetos' | 'livros' | 'eventosPremios' | 'idiomas';
 
 interface PessoaFisicaItem {
   id: number;
@@ -296,7 +295,6 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('listagem');
   const [detailTab, setDetailTab] = useState<PersonDetailTab>('cadastro');
-  const [academicSection, setAcademicSection] = useState<VidaAcademicaSection>('artigos');
   const [academicSearchTerm, setAcademicSearchTerm] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [pessoas, setPessoas] = useState<PessoaFisicaItem[]>(initialPessoas);
@@ -327,7 +325,6 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
     setDraft({ ...item });
     setSelected(item);
     setDetailTab('dashboard');
-    setAcademicSection('artigos');
     setAcademicSearchTerm('');
     setShowForm(false);
   };
@@ -362,14 +359,14 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
     const totalProducoes = vidaAcademica
       ? vidaAcademica.artigos.length + vidaAcademica.livros.length + vidaAcademica.orientacoes.length + vidaAcademica.projetos.length + vidaAcademica.eventos.length + vidaAcademica.premios.length
       : 0;
-    const academicSections = vidaAcademica ? [
-      { id: 'artigos' as VidaAcademicaSection, label: 'Artigos', count: vidaAcademica.artigos.length },
-      { id: 'orientacoes' as VidaAcademicaSection, label: 'Orientacoes', count: vidaAcademica.orientacoes.length },
-      { id: 'projetos' as VidaAcademicaSection, label: 'Projetos', count: vidaAcademica.projetos.length },
-      { id: 'formacoes' as VidaAcademicaSection, label: 'Formacao', count: vidaAcademica.formacoes.length },
-      { id: 'livros' as VidaAcademicaSection, label: 'Livros', count: vidaAcademica.livros.length },
-      { id: 'eventosPremios' as VidaAcademicaSection, label: 'Eventos e premios', count: eventosPremios.length },
-      { id: 'idiomas' as VidaAcademicaSection, label: 'Idiomas', count: vidaAcademica.idiomas.length },
+    const curriculumSections = vidaAcademica ? [
+      { id: 'artigos', label: 'Artigos', count: vidaAcademica.artigos.length },
+      { id: 'orientacoes', label: 'Orientacoes', count: vidaAcademica.orientacoes.length },
+      { id: 'projetos', label: 'Projetos', count: vidaAcademica.projetos.length },
+      { id: 'formacao', label: 'Formacao', count: vidaAcademica.formacoes.length },
+      { id: 'livros', label: 'Livros', count: vidaAcademica.livros.length },
+      { id: 'eventos-premios', label: 'Eventos e premios', count: eventosPremios.length },
+      { id: 'idiomas', label: 'Idiomas', count: vidaAcademica.idiomas.length },
     ] : [];
     const bolsasAtivas = bolsas.filter(item => item.status === 'Recebendo');
     const valorMensalAtivo = bolsasAtivas.reduce((total, item) => total + item.valorMensal, 0);
@@ -383,7 +380,7 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
             <div style={{ display: 'flex', gap: '4px', borderBottom: `1px solid ${T.borderSubtle}`, marginBottom: '28px' }}>
               {[
                 ['dashboard', 'Dashboard'],
-                ['vidaAcademica', 'Vida Academica'],
+                ['vidaAcademica', 'Curriculum'],
                 ['cadastro', 'Cadastro'],
               ].map(([id, label]) => (
                 <button key={id} onClick={() => setDetailTab(id as PersonDetailTab)} style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: detailTab === id ? `2px solid ${T.accent}` : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: detailTab === id ? T.accent : T.textSecondary, cursor: 'pointer', marginBottom: '-1px' }}>
@@ -440,134 +437,100 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
 
           {selected && detailTab === 'vidaAcademica' && (
             vidaAcademica ? (
-              <>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px', marginBottom: '24px' }}>
-                  <Metric label="Titulacao maxima" value={vidaAcademica.titulacaoMaxima} color="#38bdf8" bg="rgba(56,189,248,0.12)" />
-                  <Metric label="Producoes" value={String(totalProducoes)} color={T.textPrimary} bg={T.bgChip} />
-                  <Metric label="Artigos" value={String(vidaAcademica.artigos.length)} color="#22c55e" bg="rgba(34,197,94,0.12)" />
-                  <Metric label="Projetos academicos" value={String(vidaAcademica.projetos.length)} color="#a855f7" bg="rgba(168,85,247,0.12)" />
-                  <Metric label="Curriculo valido" value={vidaAcademica.curriculoValido ? 'Sim' : 'Nao'} color="#f59e0b" bg="rgba(245,158,11,0.12)" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+                <CurriculumHero pessoa={selected} curriculum={vidaAcademica} totalProducoes={totalProducoes} />
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+                  <ResearcherStat label="Artigos" value={String(vidaAcademica.artigos.length)} detail="Producoes bibliograficas" />
+                  <ResearcherStat label="Orientacoes" value={String(vidaAcademica.orientacoes.length)} detail="Concluidas e em andamento" />
+                  <ResearcherStat label="Projetos" value={String(vidaAcademica.projetos.length)} detail="Participacoes registradas" />
+                  <ResearcherStat label="Sincronizacao" value={vidaAcademica.curriculoValido ? 'Valido' : 'Revisar'} detail={vidaAcademica.ultimaSincronizacao} />
                 </div>
 
-                <InfoCard title="Curriculo Lattes" subtitle="Resumo da sincronizacao M024 vinculada ao cadastro da pessoa.">
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
-                    <ListCell label="Numero Lattes" value={vidaAcademica.numeroLattes} strong />
-                    <ListCell label="Ultima sincronizacao" value={vidaAcademica.ultimaSincronizacao} />
-                    <ListCell label="Area principal" value={vidaAcademica.areaPrincipal} />
-                    <ListCell label="Situacao" value={vidaAcademica.curriculoValido ? 'Valido' : 'Desatualizado'} />
-                  </div>
-                </InfoCard>
-
-                <div style={{ height: '24px' }} />
-
-                <div style={{ display: 'grid', gridTemplateColumns: '260px minmax(0, 1fr)', gap: '24px', alignItems: 'start' }}>
-                  <div style={{ ...S.card, padding: '14px', position: 'sticky', top: '24px' }}>
-                    <div style={{ padding: '4px 6px 12px' }}>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: T.textPrimary }}>Colecoes M024</div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginTop: '4px' }}>Navegue por volume, sem alongar a pagina.</div>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      {academicSections.map(item => (
-                        <AcademicSectionButton key={item.id} label={item.label} count={item.count} active={academicSection === item.id} onClick={() => setAcademicSection(item.id)} />
-                      ))}
+                <div style={{ ...S.card, padding: '14px 16px', position: 'sticky', top: 0, zIndex: 2 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ position: 'relative', flex: 1 }}>
+                      <input type="text" placeholder="Buscar no curriculum por titulo, ano, participante ou instituicao" value={academicSearchTerm} onChange={event => setAcademicSearchTerm(event.target.value)} style={{ ...S.input, paddingLeft: '38px' }} />
+                      <Search size={16} style={{ position: 'absolute', left: '13px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
                     </div>
                   </div>
-
-                  <div>
-                    <div style={{ marginBottom: '14px' }}>
-                      <label style={S.label}>Filtrar na colecao selecionada</label>
-                      <div style={{ position: 'relative' }}>
-                        <input type="text" placeholder="Buscar por titulo, ano, participante ou instituicao" value={academicSearchTerm} onChange={event => setAcademicSearchTerm(event.target.value)} style={{ ...S.input, paddingRight: '36px' }} />
-                        <Search size={16} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
-                      </div>
-                    </div>
-
-                    {academicSection === 'artigos' && (
-                      <AcademicDataPanel title="Artigos" subtitle="Producoes compartilhadas entre curriculos de autores." items={vidaAcademica.artigos} searchTerm={academicSearchTerm} emptyText="Nenhum artigo encontrado." columns={['Titulo', 'Periodico', 'Ano']} gridTemplateColumns="minmax(320px, 1.5fr) minmax(220px, 1fr) 90px" getSearchText={item => `${item.titulo} ${item.periodico} ${item.ano} ${item.autores}`} renderRow={item => (
-                        <>
-                          <AcademicCell value={item.titulo} detail={item.autores} strong />
-                          <AcademicCell value={item.periodico} />
-                          <AcademicCell value={item.ano} />
-                        </>
-                      )} />
-                    )}
-
-                    {academicSection === 'orientacoes' && (
-                      <AcademicDataPanel title="Orientacoes" subtitle="Orientacoes concluidas ou em andamento." items={vidaAcademica.orientacoes} searchTerm={academicSearchTerm} emptyText="Nenhuma orientacao encontrada." columns={['Nivel', 'Orientando', 'Instituicao']} gridTemplateColumns="180px minmax(240px, 1fr) minmax(180px, 0.8fr)" getSearchText={item => `${item.nivel} ${item.orientando} ${item.instituicao} ${item.status}`} renderRow={item => (
-                        <>
-                          <AcademicCell value={item.nivel} detail={item.status} strong />
-                          <AcademicCell value={item.orientando} />
-                          <AcademicCell value={item.instituicao} />
-                        </>
-                      )} />
-                    )}
-
-                    {academicSection === 'projetos' && (
-                      <AcademicDataPanel title="Projetos academicos" subtitle="Participacoes em projetos do curriculo Lattes." items={vidaAcademica.projetos} searchTerm={academicSearchTerm} emptyText="Nenhum projeto academico encontrado." columns={['Projeto', 'Papel', 'Status']} gridTemplateColumns="minmax(320px, 1.5fr) minmax(180px, 0.8fr) 130px" getSearchText={item => `${item.titulo} ${item.tipo} ${item.papel} ${item.periodo} ${item.status}`} renderRow={item => (
-                        <>
-                          <AcademicCell value={item.titulo} detail={item.tipo} strong />
-                          <AcademicCell value={item.papel} detail={item.periodo} />
-                          <AcademicCell value={item.status} />
-                        </>
-                      )} />
-                    )}
-
-                    {academicSection === 'formacoes' && (
-                      <AcademicDataPanel title="Formacao academica" subtitle="Titulos importados do curriculo." items={vidaAcademica.formacoes} searchTerm={academicSearchTerm} emptyText="Nenhuma formacao encontrada." columns={['Nivel', 'Curso', 'Periodo']} gridTemplateColumns="180px minmax(260px, 1fr) 140px" getSearchText={item => `${item.nivel} ${item.curso} ${item.instituicao} ${item.periodo} ${item.status}`} renderRow={item => (
-                        <>
-                          <AcademicCell value={item.nivel} detail={item.status} strong />
-                          <AcademicCell value={item.curso} detail={item.instituicao} />
-                          <AcademicCell value={item.periodo} />
-                        </>
-                      )} />
-                    )}
-
-                    {academicSection === 'livros' && (
-                      <AcademicDataPanel title="Livros e capitulos" subtitle="Producoes bibliograficas em livros." items={vidaAcademica.livros} searchTerm={academicSearchTerm} emptyText="Nenhum livro encontrado." columns={['Titulo', 'Papel', 'Ano']} gridTemplateColumns="minmax(320px, 1.5fr) minmax(160px, 0.8fr) 90px" getSearchText={item => `${item.titulo} ${item.tipo} ${item.papel} ${item.ano}`} renderRow={item => (
-                        <>
-                          <AcademicCell value={item.titulo} detail={item.tipo} strong />
-                          <AcademicCell value={item.papel} />
-                          <AcademicCell value={item.ano} />
-                        </>
-                      )} />
-                    )}
-
-                    {academicSection === 'eventosPremios' && (
-                      <AcademicDataPanel title="Eventos e premios" subtitle="Participacoes, premios e reconhecimentos." items={eventosPremios} searchTerm={academicSearchTerm} emptyText="Nenhum evento ou premio encontrado." columns={['Registro', 'Detalhe', 'Ano']} gridTemplateColumns="minmax(300px, 1.3fr) minmax(220px, 1fr) 90px" getSearchText={item => `${item.tipoRegistro} ${item.nome} ${'local' in item ? item.local : item.entidade} ${item.ano}`} renderRow={item => {
-                        if ('local' in item) {
-                          return (
-                            <>
-                              <AcademicCell value={item.nome} detail="Evento" strong />
-                              <AcademicCell value={item.papel} detail={item.local} />
-                              <AcademicCell value={item.ano} />
-                            </>
-                          );
-                        }
-                        return (
-                          <>
-                            <AcademicCell value={item.nome} detail="Premio" strong />
-                            <AcademicCell value={item.entidade} />
-                            <AcademicCell value={item.ano} />
-                          </>
-                        );
-                      }} />
-                    )}
-
-                    {academicSection === 'idiomas' && (
-                      <AcademicDataPanel title="Idiomas" subtitle="Proficiencia declarada no Lattes." items={vidaAcademica.idiomas} searchTerm={academicSearchTerm} emptyText="Nenhum idioma encontrado." columns={['Idioma', 'Leitura', 'Fala', 'Escrita']} gridTemplateColumns="minmax(180px, 1fr) repeat(3, minmax(120px, 0.7fr))" getSearchText={item => `${item.idioma} ${item.leitura} ${item.fala} ${item.escrita}`} renderRow={item => (
-                        <>
-                          <AcademicCell value={item.idioma} strong />
-                          <AcademicCell value={item.leitura} />
-                          <AcademicCell value={item.fala} />
-                          <AcademicCell value={item.escrita} />
-                        </>
-                      )} />
-                    )}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '14px' }}>
+                    {curriculumSections.map(item => (
+                      <CurriculumAnchor key={item.id} href={`#curriculum-${item.id}`} label={item.label} count={item.count} />
+                    ))}
                   </div>
                 </div>
-              </>
+
+                <CurriculumDataSection id="artigos" title="Artigos" subtitle="Producoes compartilhadas entre curriculos de autores." items={vidaAcademica.artigos} searchTerm={academicSearchTerm} emptyText="Nenhum artigo encontrado." columns={['Titulo', 'Periodico', 'Ano']} gridTemplateColumns="minmax(320px, 1.5fr) minmax(220px, 1fr) 90px" getSearchText={item => `${item.titulo} ${item.periodico} ${item.ano} ${item.autores}`} renderRow={item => (
+                  <>
+                    <AcademicCell value={item.titulo} detail={item.autores} strong />
+                    <AcademicCell value={item.periodico} />
+                    <AcademicCell value={item.ano} />
+                  </>
+                )} />
+
+                <CurriculumDataSection id="orientacoes" title="Orientacoes" subtitle="Orientacoes concluidas ou em andamento." items={vidaAcademica.orientacoes} searchTerm={academicSearchTerm} emptyText="Nenhuma orientacao encontrada." columns={['Nivel', 'Orientando', 'Instituicao']} gridTemplateColumns="180px minmax(240px, 1fr) minmax(180px, 0.8fr)" getSearchText={item => `${item.nivel} ${item.orientando} ${item.instituicao} ${item.status}`} renderRow={item => (
+                  <>
+                    <AcademicCell value={item.nivel} detail={item.status} strong />
+                    <AcademicCell value={item.orientando} />
+                    <AcademicCell value={item.instituicao} />
+                  </>
+                )} />
+
+                <CurriculumDataSection id="projetos" title="Projetos academicos" subtitle="Participacoes em projetos do curriculo Lattes." items={vidaAcademica.projetos} searchTerm={academicSearchTerm} emptyText="Nenhum projeto academico encontrado." columns={['Projeto', 'Papel', 'Status']} gridTemplateColumns="minmax(320px, 1.5fr) minmax(180px, 0.8fr) 130px" getSearchText={item => `${item.titulo} ${item.tipo} ${item.papel} ${item.periodo} ${item.status}`} renderRow={item => (
+                  <>
+                    <AcademicCell value={item.titulo} detail={item.tipo} strong />
+                    <AcademicCell value={item.papel} detail={item.periodo} />
+                    <AcademicCell value={item.status} />
+                  </>
+                )} />
+
+                <CurriculumDataSection id="formacao" title="Formacao academica" subtitle="Titulos importados do curriculo." items={vidaAcademica.formacoes} searchTerm={academicSearchTerm} emptyText="Nenhuma formacao encontrada." columns={['Nivel', 'Curso', 'Periodo']} gridTemplateColumns="180px minmax(260px, 1fr) 140px" getSearchText={item => `${item.nivel} ${item.curso} ${item.instituicao} ${item.periodo} ${item.status}`} renderRow={item => (
+                  <>
+                    <AcademicCell value={item.nivel} detail={item.status} strong />
+                    <AcademicCell value={item.curso} detail={item.instituicao} />
+                    <AcademicCell value={item.periodo} />
+                  </>
+                )} />
+
+                <CurriculumDataSection id="livros" title="Livros e capitulos" subtitle="Producoes bibliograficas em livros." items={vidaAcademica.livros} searchTerm={academicSearchTerm} emptyText="Nenhum livro encontrado." columns={['Titulo', 'Papel', 'Ano']} gridTemplateColumns="minmax(320px, 1.5fr) minmax(160px, 0.8fr) 90px" getSearchText={item => `${item.titulo} ${item.tipo} ${item.papel} ${item.ano}`} renderRow={item => (
+                  <>
+                    <AcademicCell value={item.titulo} detail={item.tipo} strong />
+                    <AcademicCell value={item.papel} />
+                    <AcademicCell value={item.ano} />
+                  </>
+                )} />
+
+                <CurriculumDataSection id="eventos-premios" title="Eventos e premios" subtitle="Participacoes, premios e reconhecimentos." items={eventosPremios} searchTerm={academicSearchTerm} emptyText="Nenhum evento ou premio encontrado." columns={['Registro', 'Detalhe', 'Ano']} gridTemplateColumns="minmax(300px, 1.3fr) minmax(220px, 1fr) 90px" getSearchText={item => `${item.tipoRegistro} ${item.nome} ${'local' in item ? item.local : item.entidade} ${item.ano}`} renderRow={item => {
+                  if ('local' in item) {
+                    return (
+                      <>
+                        <AcademicCell value={item.nome} detail="Evento" strong />
+                        <AcademicCell value={item.papel} detail={item.local} />
+                        <AcademicCell value={item.ano} />
+                      </>
+                    );
+                  }
+                  return (
+                    <>
+                      <AcademicCell value={item.nome} detail="Premio" strong />
+                      <AcademicCell value={item.entidade} />
+                      <AcademicCell value={item.ano} />
+                    </>
+                  );
+                }} />
+
+                <CurriculumDataSection id="idiomas" title="Idiomas" subtitle="Proficiencia declarada no Lattes." items={vidaAcademica.idiomas} searchTerm={academicSearchTerm} emptyText="Nenhum idioma encontrado." columns={['Idioma', 'Leitura', 'Fala', 'Escrita']} gridTemplateColumns="minmax(180px, 1fr) repeat(3, minmax(120px, 0.7fr))" getSearchText={item => `${item.idioma} ${item.leitura} ${item.fala} ${item.escrita}`} renderRow={item => (
+                  <>
+                    <AcademicCell value={item.idioma} strong />
+                    <AcademicCell value={item.leitura} />
+                    <AcademicCell value={item.fala} />
+                    <AcademicCell value={item.escrita} />
+                  </>
+                )} />
+              </div>
             ) : (
-              <InfoCard title="Vida Academica" subtitle="Dados importados do M024 a partir do curriculo Lattes.">
+              <InfoCard title="Curriculum" subtitle="Dados importados do M024 a partir do curriculo Lattes.">
                 <EmptyState text="Nenhum curriculo Lattes sincronizado para esta pessoa." />
               </InfoCard>
             )
@@ -745,15 +708,88 @@ const InfoCard: React.FC<{ title: string; subtitle: string; children: React.Reac
   );
 };
 
-const AcademicSectionButton: React.FC<{ label: string; count: number; active: boolean; onClick: () => void }> = ({ label, count, active, onClick }) => {
+const CurriculumHero: React.FC<{ pessoa: PessoaFisicaItem; curriculum: VidaAcademicaPessoa; totalProducoes: number }> = ({ pessoa, curriculum, totalProducoes }) => {
   const { T } = useThemeTokens();
+  const S = buildStyles(T);
   return (
-    <button onClick={onClick} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', width: '100%', border: `1px solid ${active ? T.accent : T.borderSubtle}`, borderRadius: '8px', backgroundColor: active ? T.accentSoft : 'transparent', color: active ? T.accent : T.textSecondary, padding: '10px 12px', cursor: 'pointer', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>
-      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
-      <span style={{ minWidth: '34px', borderRadius: '999px', backgroundColor: active ? T.accent : T.bgChip, color: active ? T.accentText : T.textSecondary, padding: '3px 8px', fontSize: 'var(--text-xs)', textAlign: 'center' }}>{count}</span>
-    </button>
+    <section style={{ ...S.card, padding: '28px', overflow: 'hidden', position: 'relative' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '28px', alignItems: 'start' }}>
+        <div style={{ display: 'flex', gap: '18px', alignItems: 'flex-start' }}>
+          <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: `linear-gradient(135deg, ${T.accent}, #6366f1)`, color: T.accentText, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xl)', fontWeight: 'var(--font-weight-semibold)', flexShrink: 0 }}>
+            {pessoa.nome.split(' ').slice(0, 2).map(part => part[0]).join('')}
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
+              <span style={{ border: `1px solid ${T.borderSubtle}`, borderRadius: '999px', padding: '5px 10px', color: T.textSecondary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>Pesquisador</span>
+              <span style={{ border: `1px solid ${curriculum.curriculoValido ? 'rgba(34,197,94,0.45)' : 'rgba(245,158,11,0.45)'}`, backgroundColor: curriculum.curriculoValido ? 'rgba(34,197,94,0.12)' : 'rgba(245,158,11,0.12)', borderRadius: '999px', padding: '5px 10px', color: curriculum.curriculoValido ? '#16a34a' : '#d97706', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>
+                {curriculum.curriculoValido ? 'Curriculo valido' : 'Curriculo desatualizado'}
+              </span>
+            </div>
+            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: '28px', lineHeight: 1.15, color: T.textPrimary, margin: '0 0 10px', fontWeight: 'var(--font-weight-semibold)' }}>{pessoa.nome}</h2>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, lineHeight: 1.6, margin: 0 }}>
+              {curriculum.titulacaoMaxima} em {curriculum.areaPrincipal}. Curriculum sincronizado pelo M024 a partir do Lattes, com producoes, orientacoes, projetos e demais registros estruturados para consulta administrativa.
+            </p>
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
+          <HeroFact label="Numero Lattes" value={curriculum.numeroLattes} />
+          <HeroFact label="Ultima sincronizacao" value={curriculum.ultimaSincronizacao} />
+          <HeroFact label="Area principal" value={curriculum.areaPrincipal} />
+          <HeroFact label="Producoes" value={String(totalProducoes)} />
+        </div>
+      </div>
+    </section>
   );
 };
+
+const HeroFact: React.FC<{ label: string; value: string }> = ({ label, value }) => {
+  const { T } = useThemeTokens();
+  return (
+    <div style={{ border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted, padding: '12px' }}>
+      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '6px' }}>{label}</div>
+      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', lineHeight: 1.35, overflowWrap: 'anywhere' }}>{value}</div>
+    </div>
+  );
+};
+
+const ResearcherStat: React.FC<{ label: string; value: string; detail: string }> = ({ label, value, detail }) => {
+  const { T } = useThemeTokens();
+  return (
+    <div style={{ border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgCard, padding: '18px' }}>
+      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '10px' }}>{label}</div>
+      <div style={{ fontFamily: 'var(--font-family)', fontSize: '24px', color: T.textPrimary, fontWeight: 'var(--font-weight-semibold)', marginBottom: '6px' }}>{value}</div>
+      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textSecondary }}>{detail}</div>
+    </div>
+  );
+};
+
+const CurriculumAnchor: React.FC<{ href: string; label: string; count: number }> = ({ href, label, count }) => {
+  const { T } = useThemeTokens();
+  return (
+    <a href={href} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: `1px solid ${T.borderSubtle}`, borderRadius: '999px', backgroundColor: T.bgSurfaceMuted, color: T.textSecondary, padding: '8px 11px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', textDecoration: 'none' }}>
+      <span>{label}</span>
+      <span style={{ minWidth: '28px', borderRadius: '999px', backgroundColor: T.bgChip, color: T.textPrimary, padding: '2px 7px', fontSize: 'var(--text-xs)', textAlign: 'center' }}>{count}</span>
+    </a>
+  );
+};
+
+const CurriculumDataSection = <TItem,>(props: {
+  id: string;
+  title: string;
+  subtitle: string;
+  emptyText: string;
+  items: TItem[];
+  searchTerm: string;
+  columns: string[];
+  gridTemplateColumns: string;
+  getSearchText: (item: TItem) => string;
+  renderRow: (item: TItem, index: number) => React.ReactNode;
+}) => (
+  <section id={`curriculum-${props.id}`} style={{ scrollMarginTop: '96px' }}>
+    <AcademicDataPanel {...props} />
+  </section>
+);
 
 const AcademicDataPanel = <TItem,>({
   title,
