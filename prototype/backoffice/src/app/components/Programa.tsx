@@ -4,8 +4,8 @@ import { FormularioPrograma } from './FormularioPrograma';
 import { DetalhesPrograma } from './DetalhesPrograma';
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
-type StatusFilter = 'Todos' | 'Em planejamento' | 'Ativo' | 'Suspenso' | 'Encerrado';
-type ProgramaStatus = 'Em planejamento' | 'Ativo' | 'Suspenso' | 'Encerrado';
+type StatusFilter = 'Todos' | 'Rascunho' | 'Ativo' | 'Finalizado';
+type ProgramaStatus = 'Rascunho' | 'Ativo' | 'Finalizado';
 type ActiveTab = 'listagem' | 'dashboard';
 
 interface ProgramaItem {
@@ -24,10 +24,9 @@ interface ProgramaItem {
 
 const statusColor = (s: string) => {
   switch (s) {
+    case 'Rascunho': return '#f59e0b';
     case 'Ativo': return '#22c55e';
-    case 'Em planejamento': return '#fbbf24';
-    case 'Suspenso': return '#f97316';
-    case 'Encerrado': return '#a3a3a3';
+    case 'Finalizado': return '#a3a3a3';
     default:         return '#a3a3a3';
   }
 };
@@ -65,17 +64,17 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
   const [showEixoDropdown, setShowEixoDropdown] = useState(false);
   const [selectedPrograma, setSelectedPrograma] = useState<ProgramaItem | null>(null);
 
-  const statusOptions: StatusFilter[] = ['Todos', 'Em planejamento', 'Ativo', 'Suspenso', 'Encerrado'];
+  const statusOptions: StatusFilter[] = ['Todos', 'Rascunho', 'Ativo', 'Finalizado'];
 
   const programasData: ProgramaItem[] = [
     { id: 1, nome: 'Programa de Bolsas de Pesquisa 2026', eixo: 'Ciência e Tecnologia', instituicaoDemandante: 'Ufes', dataVigencia: '01/01/2026 - 31/12/2026', status: 'Ativo', valorInvestido: 4200000, valorAlocado: 3600000, valorAportado: 2980000, valorConsumido: 1840000, iniciativas: 24 },
     { id: 2, nome: 'Programa de Inovação Tecnológica', eixo: 'Inovação e Desenvolvimento', instituicaoDemandante: 'Findes', dataVigencia: '15/02/2026 - 14/02/2027', status: 'Ativo', valorInvestido: 3200000, valorAlocado: 2700000, valorAportado: 2180000, valorConsumido: 1490000, iniciativas: 18 },
-    { id: 3, nome: 'Programa de Extensão Universitária', eixo: 'Formação de Recursos Humanos', instituicaoDemandante: 'Ifes', dataVigencia: '01/03/2026 - 28/02/2027', status: 'Em planejamento', valorInvestido: 1800000, valorAlocado: 920000, valorAportado: 430000, valorConsumido: 120000, iniciativas: 9 },
-    { id: 4, nome: 'Programa de Infraestrutura Laboratorial', eixo: 'Infraestrutura de Pesquisa', instituicaoDemandante: 'Ufes', dataVigencia: '01/04/2026 - 31/03/2027', status: 'Em planejamento', valorInvestido: 2600000, valorAlocado: 1600000, valorAportado: 980000, valorConsumido: 360000, iniciativas: 11 },
-    { id: 5, nome: 'Programa de Carreira Científica 2025', eixo: 'Formação de Recursos Humanos', instituicaoDemandante: 'Fapes', dataVigencia: '01/01/2025 - 31/12/2025', status: 'Encerrado', valorInvestido: 1450000, valorAlocado: 1450000, valorAportado: 1320000, valorConsumido: 1280000, iniciativas: 17 },
-    { id: 6, nome: 'Programa de Difusão do Conhecimento', eixo: 'Ciência e Tecnologia', instituicaoDemandante: 'Secti', dataVigencia: '01/06/2025 - 31/05/2026', status: 'Suspenso', valorInvestido: 980000, valorAlocado: 760000, valorAportado: 540000, valorConsumido: 410000, iniciativas: 8 },
+    { id: 3, nome: 'Programa de Extensão Universitária', eixo: 'Formação de Recursos Humanos', instituicaoDemandante: 'Ifes', dataVigencia: '01/03/2026 - 28/02/2027', status: 'Rascunho', valorInvestido: 1800000, valorAlocado: 920000, valorAportado: 430000, valorConsumido: 120000, iniciativas: 9 },
+    { id: 4, nome: 'Programa de Infraestrutura Laboratorial', eixo: 'Infraestrutura de Pesquisa', instituicaoDemandante: 'Ufes', dataVigencia: '01/04/2026 - 31/03/2027', status: 'Rascunho', valorInvestido: 2600000, valorAlocado: 1600000, valorAportado: 980000, valorConsumido: 360000, iniciativas: 11 },
+    { id: 5, nome: 'Programa de Carreira Científica 2025', eixo: 'Formação de Recursos Humanos', instituicaoDemandante: 'Fapes', dataVigencia: '01/01/2025 - 31/12/2025', status: 'Finalizado', valorInvestido: 1450000, valorAlocado: 1450000, valorAportado: 1320000, valorConsumido: 1280000, iniciativas: 17 },
+    { id: 6, nome: 'Programa de Difusão do Conhecimento', eixo: 'Ciência e Tecnologia', instituicaoDemandante: 'Secti', dataVigencia: '01/06/2025 - 31/05/2026', status: 'Finalizado', valorInvestido: 980000, valorAlocado: 760000, valorAportado: 540000, valorConsumido: 410000, iniciativas: 8 },
     { id: 7, nome: 'Programa de Pesquisa Aplicada em Saúde', eixo: 'Ciência e Tecnologia', instituicaoDemandante: 'Sesa', dataVigencia: '01/07/2026 - 30/06/2027', status: 'Ativo', valorInvestido: 2100000, valorAlocado: 1680000, valorAportado: 1250000, valorConsumido: 640000, iniciativas: 13 },
-    { id: 8, nome: 'Programa de Internacionalização Científica', eixo: 'Formação de Recursos Humanos', instituicaoDemandante: 'Ufes', dataVigencia: '01/08/2026 - 31/07/2027', status: 'Em planejamento', valorInvestido: 1750000, valorAlocado: 820000, valorAportado: 360000, valorConsumido: 90000, iniciativas: 6 },
+    { id: 8, nome: 'Programa de Internacionalização Científica', eixo: 'Formação de Recursos Humanos', instituicaoDemandante: 'Ufes', dataVigencia: '01/08/2026 - 31/07/2027', status: 'Rascunho', valorInvestido: 1750000, valorAlocado: 820000, valorAportado: 360000, valorConsumido: 90000, iniciativas: 6 },
     { id: 9, nome: 'Programa Laboratórios Inteligentes', eixo: 'Infraestrutura de Pesquisa', instituicaoDemandante: 'Ifes', dataVigencia: '01/09/2026 - 31/08/2027', status: 'Ativo', valorInvestido: 3900000, valorAlocado: 3100000, valorAportado: 2440000, valorConsumido: 1120000, iniciativas: 15 },
     { id: 10, nome: 'Programa Empreendedorismo Capixaba', eixo: 'Inovação e Desenvolvimento', instituicaoDemandante: 'Findes', dataVigencia: '01/10/2026 - 30/09/2027', status: 'Ativo', valorInvestido: 2400000, valorAlocado: 1740000, valorAportado: 1310000, valorConsumido: 530000, iniciativas: 10 },
   ];
@@ -189,7 +188,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
               onMouseLeave={e => e.currentTarget.style.backgroundColor = T.accent}
             >
               <Plus size={16} />
-              Novo Programa
+              Criar Programa
             </button>
           </div>
         </div>
@@ -256,13 +255,13 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
                   <div key={programa.id} style={{ padding: '16px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1.6fr repeat(4, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
                       <ListCell label="Programa" value={programa.nome} strong />
-                      <ListCell label="Aportado" value={formatCurrency(programa.valorAportado)} highlight detail={`${formatPercent(programa.percentualAportado)} do alocado`} />
-                      <ListCell label="Alocado" value={formatCurrency(programa.valorAlocado)} detail={`${formatPercent(programa.percentualAlocado)} do investido`} />
-                      <ListCell label="Consumido" value={formatCurrency(programa.valorConsumido)} detail={`${formatPercent(programa.percentualConsumido)} do aportado`} />
-                      <ListCell label="Disponível" value={formatCurrency(programa.saldo)} detail={`${formatPercent(programa.percentualDisponivel)} do investido`} />
+                      <ListCell label="Aportado" value={formatCurrency(programa.valorAportado)} strong detail={`${formatPercent(programa.percentualAportado)} do alocado`} />
+                      <ListCell label="Alocado" value={formatCurrency(programa.valorAlocado)} strong detail={`${formatPercent(programa.percentualAlocado)} do investido`} />
+                      <ListCell label="Consumido" value={formatCurrency(programa.valorConsumido)} strong detail={`${formatPercent(programa.percentualConsumido)} do aportado`} />
+                      <ListCell label="Disponível" value={formatCurrency(programa.saldo)} strong detail={`${formatPercent(programa.percentualDisponivel)} do investido`} />
                     </div>
-                    <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: T.bgChip, overflow: 'hidden' }}>
-                      <div style={{ width: `${Math.min(programa.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: programa.percentualConsumido < 50 ? '#f59e0b' : '#22c55e' }} />
+                    <div style={{ height: '6px', width: '100%', borderRadius: '999px', backgroundColor: T.bgChip, overflow: 'hidden' }}>
+                      <div style={{ width: `${Math.min(programa.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: T.accent }} />
                     </div>
                   </div>
                 ))}
@@ -281,13 +280,13 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
                   <div key={rubrica.nome} style={{ padding: '16px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1.6fr repeat(4, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
                       <ListCell label="Rubrica" value={rubrica.nome} strong />
-                      <ListCell label="Aportado" value={formatCurrency(rubrica.aportado)} highlight detail={`${formatPercent(rubrica.percentualAportado)} do alocado`} />
-                      <ListCell label="Alocado" value={formatCurrency(rubrica.alocado)} detail={`${formatPercent(rubrica.percentualAlocado)} do total`} />
-                      <ListCell label="Consumido" value={formatCurrency(rubrica.consumido)} detail={`${formatPercent(rubrica.percentualConsumido)} da rubrica`} />
-                      <ListCell label="Disponível" value={formatCurrency(rubrica.saldo)} detail={`${formatPercent(rubrica.percentualDisponivel)} da rubrica`} />
+                      <ListCell label="Aportado" value={formatCurrency(rubrica.aportado)} strong detail={`${formatPercent(rubrica.percentualAportado)} do alocado`} />
+                      <ListCell label="Alocado" value={formatCurrency(rubrica.alocado)} strong detail={`${formatPercent(rubrica.percentualAlocado)} do total`} />
+                      <ListCell label="Consumido" value={formatCurrency(rubrica.consumido)} strong detail={`${formatPercent(rubrica.percentualConsumido)} da rubrica`} />
+                      <ListCell label="Disponível" value={formatCurrency(rubrica.saldo)} strong detail={`${formatPercent(rubrica.percentualDisponivel)} da rubrica`} />
                     </div>
-                    <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: T.bgChip, overflow: 'hidden' }}>
-                      <div style={{ width: `${Math.min(rubrica.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: rubrica.percentualConsumido < 50 ? '#f59e0b' : '#22c55e' }} />
+                    <div style={{ height: '6px', width: '100%', borderRadius: '999px', backgroundColor: T.bgChip, overflow: 'hidden' }}>
+                      <div style={{ width: `${Math.min(rubrica.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: T.accent }} />
                     </div>
                   </div>
                 ))}
@@ -380,7 +379,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
           {/* Status */}
           <div style={{ position: 'relative' }}>
             <label style={filterLabelStyle}>
-              Estado
+              Status
             </label>
             <button
               onClick={() => { setShowStatusDropdown(!showStatusDropdown); setShowEixoDropdown(false); }}
@@ -484,7 +483,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
 
                   <div>
                     <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '6px' }}>
-                      Estado
+                      Status
                     </span>
                     <div style={{
                       display: 'inline-block',

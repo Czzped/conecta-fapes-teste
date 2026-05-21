@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronRight, Home, ArrowLeft, Save, Plus, Trash2, CalendarClock, DollarSign, FolderOpen, Handshake } from 'lucide-react';
+import { ChevronRight, Save, Plus, Trash2, CalendarClock, DollarSign, FolderOpen, Handshake } from 'lucide-react';
+import { useThemeTokens } from '../theme/ThemeContext';
 
 interface Props {
   onBack: () => void;
@@ -179,6 +180,7 @@ const formatDate = (value: string) => {
 };
 
 export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
+  const { T } = useThemeTokens();
   const [nome, setNome] = useState(programaNome || 'Programa de Pesquisa em Energia Renovável');
   const [instituicaoDemandante, setInstituicaoDemandante] = useState('FAPES - Fundação de Amparo à Pesquisa e Inovação do Espírito Santo');
   const [dataInicio, setDataInicio] = useState('2026-01-01');
@@ -440,11 +442,9 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
   };
 
   return (
-    <div style={{ backgroundColor: '#171717', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
-          <Home size={15} style={{ color: 'rgba(255,255,255,0.5)' }} />
-          <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
           <button
             onClick={onBack}
             style={{
@@ -476,15 +476,15 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
                 width: '36px',
                 height: '36px',
                 flexShrink: 0,
-                backgroundColor: 'rgba(0,193,175,0.15)',
+                backgroundColor: T.accentSoft,
                 borderRadius: 'var(--radius)',
                 border: 'none',
                 cursor: 'pointer',
               }}
               onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.25)'}
-              onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.15)'}
+              onMouseLeave={e => e.currentTarget.style.backgroundColor = T.accentSoft}
             >
-              <ArrowLeft size={18} style={{ color: '#00c1af' }} />
+              <FolderOpen size={18} style={{ color: T.accent }} />
             </button>
             <div style={{ flex: 1 }}>
               <h1 style={{
@@ -526,7 +526,6 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
               Aditivo de Tempo
             </button>
           </div>
-          <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', marginTop: '24px' }} />
         </div>
 
         <div style={{
@@ -563,7 +562,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
         {activeTab === 'cadastro' && (
           <>
         <div style={cardStyle}>
-          <h2 style={sectionTitleStyle}>Identificação do Programa</h2>
+          <SectionTitle number="1" title="Identificação do Programa" />
           <div style={{ display: 'grid', gap: '16px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <Field label="Nome" value={nome} onChange={setNome} placeholder="Nome do programa" />
@@ -864,7 +863,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
         )}
 
         <div style={cardStyle}>
-          <h2 style={sectionTitleStyle}>Aportes recebidos de parcerias</h2>
+          <SectionTitle number="2" title="Aporte Financeiro" />
           <p style={sectionSubtitleStyle}>Ajuste os aportes vinculados ao programa por parceria.</p>
           <div style={{ display: 'grid', gap: '16px', marginBottom: '16px' }}>
             {aportes.map((aporte, idx) => (
@@ -941,7 +940,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
         </div>
 
         <div style={cardStyle}>
-          <h2 style={sectionTitleStyle}>Comitê de Governança</h2>
+          <SectionTitle number="3" title="Comitê de Governança" />
           <p style={sectionSubtitleStyle}>Informe as pessoas que compõem o comitê do programa.</p>
           <div style={{ display: 'grid', gap: '10px', marginBottom: '16px' }}>
             {membros.map(membro => (
@@ -1026,13 +1025,13 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
                   <div key={parceria.parceria} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(23, 23, 23,0.35)' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1.6fr repeat(4, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
                       <ListCell label="Parceria" value={parceria.parceria} strong />
-                      <ListCell label="Aportado" value={formatCurrency(parceria.aportado)} highlight detail={`${formatPercent(parceria.percentualAportado)} do alocado`} />
-                      <ListCell label="Alocado" value={formatCurrency(parceria.alocado)} detail={`${formatPercent(parceria.percentualAlocado)} do investido`} />
-                      <ListCell label="Consumido" value={formatCurrency(parceria.consumido)} detail={`${formatPercent(parceria.percentualConsumido)} do aportado`} />
-                      <ListCell label="Disponível" value={formatCurrency(parceria.saldo)} detail={`${formatPercent(parceria.investido > 0 ? (parceria.saldo / parceria.investido) * 100 : 0)} do investido`} />
+                      <ListCell label="Aportado" value={formatCurrency(parceria.aportado)} strong detail={`${formatPercent(parceria.percentualAportado)} do alocado`} />
+                      <ListCell label="Alocado" value={formatCurrency(parceria.alocado)} strong detail={`${formatPercent(parceria.percentualAlocado)} do investido`} />
+                      <ListCell label="Consumido" value={formatCurrency(parceria.consumido)} strong detail={`${formatPercent(parceria.percentualConsumido)} do aportado`} />
+                      <ListCell label="Disponível" value={formatCurrency(parceria.saldo)} strong detail={`${formatPercent(parceria.investido > 0 ? (parceria.saldo / parceria.investido) * 100 : 0)} do investido`} />
                     </div>
-                    <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                      <div style={{ width: `${Math.min(parceria.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: parceria.percentualConsumido < 50 ? '#f59e0b' : '#22c55e' }} />
+                    <div style={{ height: '6px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                      <div style={{ width: `${Math.min(parceria.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: '#00c1af' }} />
                     </div>
                   </div>
                 ))}
@@ -1053,13 +1052,13 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
                     <div key={rubrica} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(23, 23, 23,0.35)' }}>
                       <div style={{ display: 'grid', gridTemplateColumns: '1.6fr repeat(4, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
                         <ListCell label="Rubrica" value={rubrica} strong />
-                        <ListCell label="Aportado" value={formatCurrency(valores.aportado)} highlight detail={`${formatPercent(percentualAportado)} do alocado`} />
-                        <ListCell label="Alocado" value={formatCurrency(valores.alocado)} detail={`${formatPercent(percentualAlocado)} do total`} />
-                        <ListCell label="Consumido" value={formatCurrency(valores.consumido)} detail={`${formatPercent(percentualConsumido)} da rubrica`} />
-                        <ListCell label="Disponível" value={formatCurrency(valores.alocado - valores.aportado)} detail={`${formatPercent(valores.alocado > 0 ? ((valores.alocado - valores.aportado) / valores.alocado) * 100 : 0)} da rubrica`} />
+                        <ListCell label="Aportado" value={formatCurrency(valores.aportado)} strong detail={`${formatPercent(percentualAportado)} do alocado`} />
+                        <ListCell label="Alocado" value={formatCurrency(valores.alocado)} strong detail={`${formatPercent(percentualAlocado)} do total`} />
+                        <ListCell label="Consumido" value={formatCurrency(valores.consumido)} strong detail={`${formatPercent(percentualConsumido)} da rubrica`} />
+                        <ListCell label="Disponível" value={formatCurrency(valores.alocado - valores.aportado)} strong detail={`${formatPercent(valores.alocado > 0 ? ((valores.alocado - valores.aportado) / valores.alocado) * 100 : 0)} da rubrica`} />
                       </div>
-                      <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                        <div style={{ width: `${Math.min(percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: percentualConsumido < 50 ? '#f59e0b' : '#22c55e' }} />
+                      <div style={{ height: '6px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                        <div style={{ width: `${Math.min(percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: '#00c1af' }} />
                       </div>
                     </div>
                   );
@@ -1094,12 +1093,12 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
                           </div>
                         </div>
                         <ListCell label="Instituição" value={iniciativa.instituicaoExecutora} />
-                        <ListCell label="Aportado" value={formatCurrency(iniciativa.valorAportado)} highlight />
-                        <ListCell label="Consumido" value={formatCurrency(iniciativa.valorConsumido)} detail={`${formatPercent(percentualConsumido)} da iniciativa`} />
-                        <ListCell label="Disponível" value={formatCurrency(saldo)} detail={`${formatPercent(iniciativa.valorAportado > 0 ? (saldo / iniciativa.valorAportado) * 100 : 0)} da iniciativa`} />
+                        <ListCell label="Aportado" value={formatCurrency(iniciativa.valorAportado)} strong />
+                        <ListCell label="Consumido" value={formatCurrency(iniciativa.valorConsumido)} strong detail={`${formatPercent(percentualConsumido)} da iniciativa`} />
+                        <ListCell label="Disponível" value={formatCurrency(saldo)} strong detail={`${formatPercent(iniciativa.valorAportado > 0 ? (saldo / iniciativa.valorAportado) * 100 : 0)} da iniciativa`} />
                       </div>
-                      <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                        <div style={{ width: `${Math.min(percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: percentualConsumido < 50 ? '#f59e0b' : '#22c55e' }} />
+                      <div style={{ height: '6px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                        <div style={{ width: `${Math.min(percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: '#00c1af' }} />
                       </div>
                     </div>
                   );
@@ -1210,6 +1209,15 @@ const Metric: React.FC<{
         {detail}
       </span>
     )}
+  </div>
+);
+
+const SectionTitle: React.FC<{ number: string; title: string }> = ({ number, title }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+    <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#171717' }}>{number}</span>
+    </div>
+    <p style={{ ...sectionTitleStyle, margin: 0 }}>{title}</p>
   </div>
 );
 

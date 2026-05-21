@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  ChevronRight, Home, ChevronDown, Save, BookOpen, Plus, X, Trash2,
+  ChevronRight, ChevronDown, Save, BookOpen, Plus, X, Trash2,
 } from 'lucide-react';
 import { useThemeTokens } from '../theme/ThemeContext';
 
@@ -54,18 +54,18 @@ const SectionHeader: React.FC<{ num: string; title: string; subtitle?: string }>
   <>
     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: subtitle ? '4px' : '0' }}>
       <div style={{
-        width: '24px', height: '24px', borderRadius: '50%',
-        backgroundColor: 'rgba(0,193,175,0.15)',
+        width: '22px', height: '22px', borderRadius: '50%',
+        backgroundColor: '#00c1af',
         display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
       }}>
-        <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>{num}</span>
+        <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', color: '#171717', fontWeight: 'var(--font-weight-medium)' }}>{num}</span>
       </div>
       <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: 0 }}>
         {title}
       </h2>
     </div>
     {subtitle && (
-      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: '2px 0 0 34px' }}>
+      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: '2px 0 24px 34px' }}>
         {subtitle}
       </p>
     )}
@@ -376,6 +376,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
   const [dataFim, setDataFim] = useState('');
   const [numeroCaptacao, setNumeroCaptacao] = useState(isEditMode ? 'CAP-001/2026' : '');
   const [linkEdital, setLinkEdital] = useState(isEditMode ? 'https://fapes.es.gov.br/editais/cap-001-2026' : '');
+  const [arquivoEdital, setArquivoEdital] = useState('');
   const [setorResponsavel, setSetorResponsavel] = useState(isEditMode ? 'geinov' : '');
   const [tipoFomento, setTipoFomento] = useState('');
   const [categoriasIniciativa, setCategoriasIniciativa] = useState<Record<string, boolean>>({
@@ -839,8 +840,6 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
 
         {/* Breadcrumb */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
-          <Home size={15} style={{ color: 'var(--form-text-muted)' }} />
-          <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
           <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)' }}>
             Captação
           </button>
@@ -869,7 +868,6 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
         {/* ══════ SESSÃO 1 — Identificação da Captação ══════ */}
         <div style={sectionCard}>
           <SectionHeader num="1" title="Identificação da Captação" subtitle="Informações básicas da captação" />
-          <div style={divider} />
 
           {/* Row 1: Código + Título da Captação + Tipo de Captação */}
           <div style={{ display: 'grid', gridTemplateColumns: '180px 1.6fr 1fr', gap: '20px', marginBottom: '20px' }}>
@@ -886,7 +884,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
             />
           </div>
 
-          <div style={{ marginBottom: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 220px', gap: '16px', alignItems: 'end', marginBottom: '20px' }}>
             <div>
               <label style={labelStyle}>Link do Edital</label>
               <input
@@ -898,6 +896,17 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                 onFocus={focusTeal}
                 onBlur={blurGray}
               />
+            </div>
+            <div>
+              <label style={labelStyle}>Anexar Arquivo</label>
+              <label style={{ ...inputStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: arquivoEdital ? 'var(--form-text-primary)' : '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>
+                {arquivoEdital || 'Selecionar arquivo'}
+                <input
+                  type="file"
+                  style={{ display: 'none' }}
+                  onChange={event => setArquivoEdital(event.target.files?.[0]?.name || '')}
+                />
+              </label>
             </div>
           </div>
 
@@ -1105,7 +1114,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
             </div>
           )}
 
-          <div style={{ ...innerCardStyle, marginBottom: '20px', backgroundColor: 'rgba(0,193,175,0.06)', borderColor: 'rgba(0,193,175,0.18)' }}>
+          <div style={{ ...innerCardStyle, marginBottom: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
               <div>
                 <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 6px' }}>
@@ -1115,20 +1124,12 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   Informe quais programas ou parcerias aportam recursos financeiros para esta captação.
                 </p>
               </div>
-              <div style={{ minWidth: '180px', padding: '10px 14px', border: '1px solid rgba(0,193,175,0.24)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(23, 23, 23,0.38)', textAlign: 'right' }}>
-                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.48)', marginBottom: '4px' }}>
-                  Total dos aportes
-                </div>
-                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-semibold)', color: '#00c1af' }}>
-                  {formatCurrency(valorTotalAportado)}
-                </div>
-              </div>
             </div>
             <div style={{ display: 'grid', gap: '16px' }}>
               {aportesFinanceiros.map((aporte, index) => (
                 <div key={aporte.id}>
                   {index > 0 && <div style={{ ...divider, margin: '0 0 16px' }} />}
-                  <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr 180px auto', gap: '16px', alignItems: 'end' }}>
+                  <div style={{ display: 'grid', gap: '12px' }}>
                     <RadioGroup
                       value={aporte.origemTipo}
                       onChange={(value) => {
@@ -1140,26 +1141,27 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                         { value: 'parceria', label: 'Parceria' },
                       ]}
                     />
-                    <SelectField
-                      label={aporte.origemTipo === 'programa' ? 'Programa aportador' : 'Parceria aportadora'}
-                      value={aporte.origemId}
-                      onChange={value => updateAporteFinanceiro(aporte.id, 'origemId', value)}
-                      placeholder={aporte.origemTipo === 'programa' ? 'Selecione o programa...' : 'Selecione a parceria...'}
-                      options={aporte.origemTipo === 'programa' ? programaOpts.filter(option => option.value !== 'nao_se_aplica') : parceriasData}
-                    />
-                    <div>
-                      <label style={labelStyle}>Valor aportado (R$)</label>
-                      <input
-                        type="text"
-                        placeholder="0,00"
-                        value={aporte.valor}
-                        onChange={e => updateAporteFinanceiro(aporte.id, 'valor', e.target.value)}
-                        style={inputStyle}
-                        onFocus={focusTeal}
-                        onBlur={blurGray}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 180px auto', gap: '16px', alignItems: 'end' }}>
+                      <SelectField
+                        label={aporte.origemTipo === 'programa' ? 'Programa aportador' : 'Parceria aportadora'}
+                        value={aporte.origemId}
+                        onChange={value => updateAporteFinanceiro(aporte.id, 'origemId', value)}
+                        placeholder={aporte.origemTipo === 'programa' ? 'Selecione o programa...' : 'Selecione a parceria...'}
+                        options={aporte.origemTipo === 'programa' ? programaOpts.filter(option => option.value !== 'nao_se_aplica') : parceriasData}
                       />
-                    </div>
-                    {aportesFinanceiros.length > 1 && (
+                      <div>
+                        <label style={labelStyle}>Valor aportado (R$)</label>
+                        <input
+                          type="text"
+                          placeholder="0,00"
+                          value={aporte.valor}
+                          onChange={e => updateAporteFinanceiro(aporte.id, 'valor', e.target.value)}
+                          style={inputStyle}
+                          onFocus={focusTeal}
+                          onBlur={blurGray}
+                        />
+                      </div>
+                      {aportesFinanceiros.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removeAporteFinanceiro(aporte.id)}
@@ -1167,11 +1169,20 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                       >
                         <Trash2 size={16} style={{ color: '#ef4444' }} />
                       </button>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '16px' }}>
+                <div>
+                  <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)' }}>
+                    Total dos aportes
+                  </span>
+                  <span style={{ display: 'block', marginTop: '4px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: '#00c1af' }}>
+                    {formatCurrency(valorTotalAportado)}
+                  </span>
+                </div>
                 <button
                   type="button"
                   onClick={addAporteFinanceiro}
@@ -1193,14 +1204,6 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                 <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>
                   Distribua o valor aportado em faixas com duração máxima e limites financeiros.
                 </p>
-              </div>
-              <div style={{ minWidth: '180px', padding: '10px 14px', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(23, 23, 23,0.38)', textAlign: 'right' }}>
-                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.48)', marginBottom: '4px' }}>
-                  Aportado nas faixas
-                </div>
-                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-semibold)', color: '#00c1af' }}>
-                  {formatCurrency(valorTotalFaixas)}
-                </div>
               </div>
             </div>
 
@@ -1287,38 +1290,46 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   </div>
                 </div>
               ))}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
-                <button
-                  type="button"
-                  onClick={addFaixa}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '10px 16px',
-                    backgroundColor: 'rgba(0,193,175,0.1)',
-                    border: '1px solid rgba(0,193,175,0.3)',
-                    borderRadius: 'var(--radius)',
-                    cursor: 'pointer',
-                    fontFamily: 'var(--font-family)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-weight-medium)',
-                    color: '#00c1af',
-                    transition: 'background-color 0.2s, border-color 0.2s',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.15)';
-                    e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.1)';
-                    e.currentTarget.style.borderColor = 'rgba(0,193,175,0.3)';
-                  }}
-                >
-                  <Plus size={16} />
-                  Adicionar Faixa
-                </button>
-              </div>
+            </div>
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '16px' }}>
+              <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)' }}>
+                Aportado nas faixas
+              </span>
+              <span style={{ display: 'block', marginTop: '4px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: '#00c1af' }}>
+                {formatCurrency(valorTotalFaixas)}
+              </span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
+              <button
+                type="button"
+                onClick={addFaixa}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 16px',
+                  backgroundColor: 'rgba(0,193,175,0.1)',
+                  border: '1px solid rgba(0,193,175,0.3)',
+                  borderRadius: 'var(--radius)',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  color: '#00c1af',
+                  transition: 'background-color 0.2s, border-color 0.2s',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.15)';
+                  e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.1)';
+                  e.currentTarget.style.borderColor = 'rgba(0,193,175,0.3)';
+                }}
+              >
+                <Plus size={16} />
+                Adicionar Faixa
+              </button>
             </div>
           </div>
 
@@ -1327,7 +1338,6 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
         {/* ══════ SESSÃO 2 — Cronograma da Captação ══════ */}
         <div style={sectionCard}>
           <SectionHeader num="2" title="Cronograma da Captação" subtitle="Configure as fases obrigatórias da captação" />
-          <div style={divider} />
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
             <div>
@@ -1371,9 +1381,9 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   style={{
                     padding: '6px 10px',
                     borderRadius: '999px',
-                    border: `1px solid ${concluida ? 'rgba(0,193,175,0.35)' : 'rgba(251,191,36,0.35)'}`,
-                    backgroundColor: concluida ? 'rgba(0,193,175,0.1)' : 'rgba(251,191,36,0.1)',
-                    color: concluida ? '#00c1af' : '#fbbf24',
+                    border: '1px solid rgba(0,193,175,0.35)',
+                    backgroundColor: 'rgba(0,193,175,0.1)',
+                    color: '#00c1af',
                     fontFamily: 'var(--font-family)',
                     fontSize: 'var(--text-xs)',
                   }}
@@ -1385,8 +1395,8 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
           </div>
 
           {!cronogramaCompleto && (
-            <div style={{ padding: '12px 14px', borderRadius: 'var(--radius)', border: '1px solid rgba(251,191,36,0.24)', backgroundColor: 'rgba(251,191,36,0.08)', marginBottom: '18px' }}>
-              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#fbbf24', margin: 0 }}>
+            <div style={{ padding: '12px 14px', borderRadius: 'var(--radius)', border: '1px solid rgba(0,193,175,0.24)', backgroundColor: 'rgba(0,193,175,0.08)', marginBottom: '18px' }}>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', margin: 0 }}>
                 Faltam etapas obrigatórias: {etapasCronogramaFaltantes.map(fase => fase.label).join(', ')}.
               </p>
             </div>
@@ -1497,7 +1507,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
           </div>
 
           {adiamentosCronograma.length > 0 && (
-            <div style={{ ...innerCardStyle, marginTop: '18px', backgroundColor: 'rgba(251,191,36,0.06)', borderColor: 'rgba(251,191,36,0.2)' }}>
+            <div style={{ ...innerCardStyle, marginTop: '18px', backgroundColor: 'rgba(0,193,175,0.06)', borderColor: 'rgba(0,193,175,0.2)' }}>
               <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 12px' }}>
                 Histórico de Adiamentos
               </p>
@@ -1511,7 +1521,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                         <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-primary)' }}>
                           {fase?.label || 'Etapa'} adiada em {adiamento.dias} dia(s)
                         </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#fbbf24', marginTop: '3px' }}>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#00c1af', marginTop: '3px' }}>
                           {formatDateLabel(adiamento.dataInicioOriginal)} → {formatDateLabel(adiamento.dataInicioNova)}
                           {adiamento.dataFimOriginal && ` · fim: ${formatDateLabel(adiamento.dataFimOriginal)} → ${formatDateLabel(adiamento.dataFimNova)}`}
                         </div>
@@ -1519,7 +1529,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                           {adiamento.justificativa}
                         </div>
                       </div>
-                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#fbbf24', whiteSpace: 'nowrap' }}>
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#00c1af', whiteSpace: 'nowrap' }}>
                         {adiamento.dataRegistro}
                       </span>
                     </div>
@@ -1562,7 +1572,6 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
         {/* ══════ SESSÃO 3 — Parametrizações Gerais ══════ */}
         <div style={sectionCard}>
           <SectionHeader num="3" title="Parametrizações Gerais" subtitle="Defina regras de submissão e limites das propostas" />
-          <div style={divider} />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
             {[
@@ -1665,7 +1674,6 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
         {/* ══════ SESSÃO 4 — Requisitos e Restrições ══════ */}
         <div style={sectionCard}>
           <SectionHeader num="4" title="Requisitos e Restrições" subtitle="Defina critérios e condições de elegibilidade" />
-          <div style={divider} />
 
           <div style={{ marginBottom: '24px' }}>
             <label style={labelStyle}>Direcionamento das propostas</label>
@@ -1730,7 +1738,6 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
         {/* ══════ SESSÃO 5 — Rubricas, Avaliação e Prestações ══════ */}
         <div style={sectionCard}>
           <SectionHeader num="5" title="Rubricas, Avaliação e Prestações" subtitle="Configure rubricas, avaliação ad hoc e prestações exigidas" />
-          <div style={divider} />
 
           <div style={{ marginBottom: '24px' }}>
             <label style={labelStyle}>Esta captação necessita de avaliação ad hoc?</label>
@@ -1748,7 +1755,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                 <input type="number" min="1" placeholder="2" value={quantidadeMinimaRevisores} onChange={e => setQuantidadeMinimaRevisores(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
               </div>
 
-              <div style={{ ...innerCardStyle, marginBottom: '24px', backgroundColor: 'rgba(0,193,175,0.06)', borderColor: 'rgba(0,193,175,0.18)' }}>
+              <div style={{ ...innerCardStyle, marginBottom: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '16px' }}>
                   <div>
                     <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 6px' }}>
@@ -2144,10 +2151,9 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
         {/* ══════ SESSÃO 6 — Documentos Exigidos ══════ */}
         <div style={sectionCard}>
           <SectionHeader num="6" title="Documentos Exigidos do Proponente" subtitle="Selecione documentos exigidos e cadastre novos parâmetros quando necessário" />
-          <div style={divider} />
 
-          <div style={{ padding: '12px 14px', borderRadius: 'var(--radius)', border: '1px solid rgba(251,191,36,0.24)', backgroundColor: 'rgba(251,191,36,0.08)', marginBottom: '18px' }}>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#fbbf24', margin: '0 0 4px' }}>
+          <div style={{ padding: '12px 14px', borderRadius: 'var(--radius)', border: '1px solid rgba(0,193,175,0.24)', backgroundColor: 'rgba(0,193,175,0.08)', marginBottom: '18px' }}>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', margin: '0 0 4px' }}>
               Observação
             </p>
             <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.68)', margin: 0, lineHeight: 1.45 }}>
@@ -2192,8 +2198,8 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                       <span style={{
                         padding: '3px 8px',
                         borderRadius: '999px',
-                        border: `1px solid ${item.obrigatorio ? 'rgba(251,191,36,0.3)' : 'rgba(255,255,255,0.14)'}`,
-                        color: item.obrigatorio ? '#fbbf24' : 'rgba(255,255,255,0.55)',
+                        border: `1px solid ${item.obrigatorio ? 'rgba(0,193,175,0.3)' : 'rgba(255,255,255,0.14)'}`,
+                        color: item.obrigatorio ? '#00c1af' : 'rgba(255,255,255,0.55)',
                         fontFamily: 'var(--font-family)',
                         fontSize: 'var(--text-xs)',
                       }}>

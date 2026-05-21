@@ -661,7 +661,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#00c1af'; }}
             >
               <Plus size={16} />
-              Nova Captação
+              Criar Captação
             </button>
           </div>
           <div className="mt-6" style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle }} />

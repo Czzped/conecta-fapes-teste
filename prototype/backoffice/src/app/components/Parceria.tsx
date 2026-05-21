@@ -575,7 +575,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
               }}
             >
               <Plus size={16} />
-              Nova Parceria
+              Criar Parceria
             </button>
           </div>
         </div>

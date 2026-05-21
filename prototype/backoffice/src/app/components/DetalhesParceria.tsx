@@ -642,7 +642,6 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
         <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '28px' }}>
           {[
             { id: 'resumo', label: 'Resumo' },
-            { id: 'financeiro', label: 'Financeiro' },
             { id: 'dashboard', label: 'Dashboard' },
           ].map(tab => (
             <button
@@ -913,11 +912,11 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
         {activeTab === 'dashboard' && (
           <>
             <div style={{ ...cardStyle, padding: '16px 18px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: 0, whiteSpace: 'nowrap' }}>
-                  Impactos da parceria
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+                  Impactos da Parceria
                 </p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '10px', flex: 1 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '10px' }}>
                   {[
                     { label: 'Programas', value: String(parceria.programasRelacionados), Icon: FolderOpen, color: '#38bdf8', bg: 'rgba(56,189,248,0.10)' },
                     { label: 'Demandas induzidas', value: String(Math.max(1, Math.floor(parceria.programasRelacionados / 2))), Icon: Handshake, color: '#fb7185', bg: 'rgba(251,113,133,0.10)' },
@@ -987,7 +986,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                         <Info label="Consumido" value={formatCurrency(programa.valorConsumido)} />
                         <Info label="Disponível" value={formatCurrency(programa.saldoDisponivelPrograma)} />
                       </div>
-                      <div style={{ height: '4px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                      <div style={{ height: '6px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
                         <div style={{ width: `${Math.min(programa.percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: T.accent }} />
                       </div>
                     </div>
@@ -1014,7 +1013,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                   const percentual = rubrica.alocado > 0 ? (rubrica.consumido / rubrica.alocado) * 100 : 0;
                   return (
                     <div key={rubrica.rubrica} style={{ padding: '16px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(23, 23, 23,0.35)' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr repeat(6, 1fr)', gap: '16px', alignItems: 'start', marginBottom: '14px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.15fr repeat(5, 1fr)', columnGap: '24px', rowGap: '16px', alignItems: 'start', marginBottom: '14px' }}>
                         <Info label="Rubrica" value={rubrica.rubrica} />
                         <Info label="Programas com rubrica" value={String(rubrica.programas.size)} />
                         <Info label="Aportado total" value={formatCurrency(rubrica.aportado)} />
@@ -1023,7 +1022,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                         <Info label="Disponível total" value={formatCurrency(rubrica.disponivel)} />
                         <Info label="Consumo" value={formatPercent(percentual)} />
                       </div>
-                      <div style={{ height: '4px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                      <div style={{ height: '6px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
                         <div style={{ width: `${Math.min(percentual, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: T.accent }} />
                       </div>
                     </div>
