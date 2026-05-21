@@ -1,0 +1,183 @@
+ontology: "Curriculo do Pesquisador (indice)"
+namespace: "post_award.curriculo"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: shared.people
+    path: path: "../../../ontology/shared/people.yaml"
+  - namespace: shared.classifications
+    path: path: "../../../ontology/shared/classifications.yaml"
+  - namespace: corporativo.instituicoes
+    path: path: "../M008-cadastros-corporativos/instituicoes/ontology.yaml"
+  - namespace: shared.geography
+    path: path: "../../../ontology/shared/geography.yaml"
+metadata:
+  module: "M024"
+  source: "docs/implementation/modules/M024-curriculo-pesquisador/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Raiz do dominio de curriculo do pesquisador importado da Plataforma Lattes, decomposto em 9 submodelos tematicos."
+
+submodules:
+  - context: "Curriculo"
+    namespace: "post_award.curriculo"
+    path: path: "ontology.yaml"
+    entities:
+      - Curriculo
+    description: "Raiz do curriculo, versionamento do snapshot, validade da sincronizacao e areas de atuacao."
+
+  - context: "Formacao Academica"
+    namespace: "post_award.curriculo.formacao"
+    path: path: "formacao.yaml"
+    entities:
+      - FormacaoAcademica
+    description: "Titulacoes academicas do pesquisador com nivel, instituicao e area de conhecimento."
+
+  - context: "Artigos"
+    namespace: "post_award.curriculo.artigos"
+    path: path: "artigos.yaml"
+    entities:
+      - Artigo
+      - Periodico
+    description: "Producao bibliografica em periodicos e anais; artigos sao compartilhados entre curriculos."
+
+  - context: "Livros e Capitulos"
+    namespace: "post_award.curriculo.livros"
+    path: path: "livros.yaml"
+    entities:
+      - Livro
+    description: "Livros completos e capitulos de livro publicados pelo pesquisador."
+
+  - context: "Orientacoes"
+    namespace: "post_award.curriculo.orientacoes"
+    path: path: "orientacoes.yaml"
+    entities:
+      - Orientacao
+      - NivelOrientacao
+    description: "Orientacoes academicas concluidas ou em andamento, com nivel e orientando."
+
+  - context: "Projetos"
+    namespace: "post_award.curriculo.projetos"
+    path: path: "projetos.yaml"
+    entities:
+      - Projeto
+      - ParticipacaoProjeto
+      - TipoProjeto
+    description: "Projetos de pesquisa e participacoes com papel por pessoa; projetos sao compartilhados entre curriculos."
+
+  - context: "Eventos"
+    namespace: "post_award.curriculo.eventos"
+    path: path: "eventos.yaml"
+    entities:
+      - ParticipacaoEvento
+    description: "Participacoes do pesquisador em eventos cientificos com papel e local."
+
+  - context: "Premios"
+    namespace: "post_award.curriculo.premios"
+    path: path: "premios.yaml"
+    entities:
+      - Premio
+    description: "Premios, titulos honorificos e homenagens recebidos pelo pesquisador."
+
+  - context: "Idiomas"
+    namespace: "post_award.curriculo.idiomas"
+    path: path: "idiomas.yaml"
+    entities:
+      - Idioma
+    description: "Idiomas declarados com niveis de proficiencia por habilidade."
+
+entities:
+  Curriculo:
+    description: "Raiz do curriculo do pesquisador importado da Plataforma Lattes; controla versionamento do snapshot e validade da sincronizacao."
+    extends: "shared.Auditavel"
+    fields:
+      numeroLattes:
+        type: "string"
+        required: true
+        description: "Identificador CNPq do curriculo — 16 digitos, unico no sistema."
+        max_length: 16
+        unique: true
+      versao:
+        type: "integer"
+        required: true
+        description: "Numero sequencial do snapshot importado — incrementado a cada sincronizacao bem-sucedida."
+      resumo:
+        type: "string"
+        required: false
+        description: "Resumo livre importado do Lattes."
+        max_length: 4000
+      dataAtualizacaoLattes:
+        type: "Date"
+        required: true
+        description: "Data de atualizacao declarada pela Plataforma Lattes."
+      dataUltimaSincronizacao:
+        type: "DateTime"
+        required: true
+        description: "Data e hora da ultima sincronizacao bem-sucedida pelo Conecta (ISO 8601)."
+
+relationships:
+  - from: "shared.people.PessoaFisica"
+    relation: "titular de"
+    to: "post_award.curriculo.Curriculo"
+    cardinality: "1:1"
+    note: "Uma PessoaFisica pode ter no maximo um Curriculo; um Curriculo pertence a exatamente uma PessoaFisica."
+  - from: "post_award.curriculo.Curriculo"
+    relation: "areas de atuacao"
+    to: "shared.classifications.AreaConhecimento"
+    cardinality: "N:N"
+
+axioms:
+  - id: "AX-M024-001"
+    natural_language: "Toda Pessoa identificada como Pesquisador deve possuir exatamente um Curriculo vinculado."
+    formal_rule: "PessoaFisica.isPesquisador => EXISTS EXACTLY ONE Curriculo WHERE Curriculo.pessoaFisicaId = PessoaFisica.Id"
+  - id: "AX-M024-002"
+    natural_language: "numeroLattes deve ser unico no sistema."
+    formal_rule: "UNIQUE(Curriculo.numeroLattes)"
+  - id: "AX-M024-003"
+    natural_language: "Curriculo valido exige dataUltimaSincronizacao nos ultimos 12 meses."
+    formal_rule: "Curriculo.dataUltimaSincronizacao >= NOW() - INTERVAL '12 months'"
+  - id: "AX-M024-004"
+    natural_language: "Falha na primeira importacao nao persiste vinculacao de Curriculo."
+    formal_rule: "ImportacaoFailed AND Curriculo.versao = 0 => ROLLBACK vinculacao"
+  - id: "AX-M024-005"
+    natural_language: "Falha em reimportacao preserva o snapshot anterior intacto."
+    formal_rule: "ImportacaoFailed AND Curriculo.versao > 0 => KEEP previous snapshot"
+
+invariants:
+  - id: "INV-M024-001"
+    rule: "Curriculo.numeroLattes MATCHES '^[0-9]{16}$'"
+    description: "numeroLattes deve ter exatamente 16 digitos numericos."
+  - id: "INV-M024-002"
+    rule: "Curriculo.versao >= 1"
+    description: "Versao deve ser pelo menos 1 apos a primeira importacao bem-sucedida."
+
+enums: {}
+
+value_objects: {}
+
+events:
+  - name: "CurriculoSincronizado"
+    description: "Emitido apos sincronizacao bem-sucedida do curriculo com a Plataforma Lattes."
+    payload_entity: "post_award.curriculo.Curriculo"
+    trigger: "Sincronizacao Lattes bem-sucedida via M023 adapter"
+  - name: "NivelAcademicoAtualizado"
+    description: "Emitido apos sincronizacao quando o nivel academico derivado da FormacaoAcademica mais alta concluida difere do nivel atual em PessoaFisica."
+    payload_entity: "post_award.curriculo.Curriculo"
+    trigger: "Curriculo.derivarNivelAcademico() detecta diferenca"
+
+workflows: null
+
+policies: null
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "Este arquivo e o indice do dominio M024; todas as entidades concretas pertencem aos submodulos."
+    - "M024 nao redefine entidades canonicas de M008 (PessoaFisica, Instituicao, AreaConhecimento, Cidade) — apenas referencia."
+    - "Snapshots sao importados via adapter M023/lattes; dados nao mapeados seguem politica match-or-create de M008."
+    - "Ao referenciar entidades de M008, usar o namespace do submodulo correto."
+  notes:
+    - "NivelAcademico em PessoaFisica e derivado da FormacaoAcademica mais alta concluida e atualizado apos cada sincronizacao."
+    - "O flag Pesquisador em PessoaFisica e derivado da existencia de um Curriculo vinculado — nao e entidade propria."
+    - "Lattes adapter M023 normaliza snapshots XML; dados nao mapeados reconciliados via M008 match-or-create."

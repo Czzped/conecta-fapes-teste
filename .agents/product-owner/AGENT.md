@@ -50,6 +50,68 @@ Use the DDD skill as default whenever the task involves:
 - fronteiras entre modulos e ownership de conceitos
 - revisao de coerencia entre README, contrato, backlog, EPICs e modelos
 
+## Ontology Layer
+
+Every module has an `ontology.yaml` co-located alongside its `modelo-estrutural.md`. This file is the **semantic formalization** of the structural model — not code, not docs, but a machine-readable layer consumed by AI agents for spec generation, API scaffolding, and validation.
+
+### Where to find ontologies
+
+```
+docs/implementation/modules/M0XX-nome/
+  modelo-estrutural.md     ← narrative source
+  ontology.yaml            ← semantic formalization
+  submodulo/
+    modelo-estrutural.md
+    ontology.yaml
+```
+
+Cross-cutting files (shared types, workflows, policies, integrations) live in:
+```
+ontology/
+  shared/        base.yaml, people.yaml, geography.yaml, classifications.yaml, documents.yaml
+  workflows/     ciclo_fomento.yaml, pagamento.yaml, prestacao_contas.yaml, gestao_bolsista.yaml, contratacao.yaml
+  policies/      access_control.yaml, compliance.yaml
+  integrations/  sigfapes.yaml, acesso_cidadao.yaml, openfga.yaml, banestes.yaml, edocs.yaml, serpro.yaml, lattes.yaml
+  ui/            hints.yaml
+```
+
+See `ontology/README.md` for the full syntax reference.
+
+### Key ontology concepts
+
+**`entities`** — Domain classes with typed fields. Every persistable entity extends `shared.Auditavel`.
+
+**`axioms`** — Formalized business rules. An axiom either *derives* a value (formula) or *describes* how the domain works. Agents use axioms to validate generated specs.
+```yaml
+axioms:
+  - id: "AX-SLD01"
+    natural_language: "Saldo = aprovado - comprometido - executado + estornado"
+    formal_rule: "saldoDisponivel = valorAprovado - valorComprometido - valorExecutado + valorEstornado"
+```
+
+**`invariants`** — Absolute constraints that must NEVER be broken. Violations mean invalid system state.
+```yaml
+invariants:
+  - id: "INV-SLD1"
+    rule: "RubricaProjeto.saldoDisponivel >= 0"
+```
+
+**`workflows`** — State machines: valid states + allowed transitions + guards.
+
+**`policies`** — Role-based permissions, aligned with OpenFGA (M006).
+
+**`events`** — Domain events emitted on state transitions; used for inter-module integration.
+
+**`todo:`** — Marks ambiguity or incomplete definition. Never implement from a `todo:` without human review.
+
+### Rules for the PO agent
+
+- When writing EPICs or acceptance criteria, axioms and invariants from `ontology.yaml` are **binding** — acceptance criteria must not contradict them.
+- When a new business rule is discovered, add it as an `axiom` or `invariant` to the module's `ontology.yaml` in addition to the `README.md`.
+- Workflows in the ontology define the only valid state transitions — do not invent transitions in Gherkin scenarios that are not in the workflow.
+- `shared.Auditavel` fields (createdAt, updatedAt, createdBy, updatedBy) are implicit in every entity — do not list them explicitly in acceptance criteria.
+- Canonical budget rules live in `M013-gestao-orcamentaria-projeto/ontology.yaml` (AX-SLD01, INV-SLD1, INV-SLD2) — all modules that touch budget must reference M013, not redefine rules.
+
 ## Domain Knowledge
 
 The Conecta FAPES platform manages:

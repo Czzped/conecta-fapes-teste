@@ -1,0 +1,282 @@
+# Policy — Controle de Acesso
+
+```yaml
+ontology: "Access Control — ConectaFAPES"
+namespace: "policies.access_control"
+
+imports:
+  - namespace: "shared.people"
+    path: "../shared/people.yaml"
+
+metadata:
+  type: "cross-cutting-policy"
+  version: "1.0.0"
+  description: "Modelo de controle de acesso baseado em papéis (RBAC) para todos os módulos do ConectaFAPES, implementado via OpenFGA."
+  authorization_engine: "integrations.openfga"
+  modules_covered: [M001, M002, M003, M004, M005, M006, M007, M008, M009, M010, M011, M012, M013, M014, M015, M017, M022, M023, M024]
+
+roles:
+  Coordenador:
+    description: "Pesquisador ou coordenador de projeto/bolsa. Responsável pela execução da iniciativa."
+    permissions:
+      - module: "M011"
+        namespace: "pre_award.captacao"
+        can:
+          - submeter_proposta
+          - editar_proposta_propria
+          - visualizar_resultado_captacao
+
+      - module: "M003"
+        namespace: "post_award.iniciativas"
+        can:
+          - visualizar_iniciativa_propria
+          - gerir_iniciativa
+          - solicitar_alteracao_iniciativa
+          - enviar_relatorio_tecnico
+
+      - module: "M014"
+        namespace: "financeiro.prestacao_contas"
+        can:
+          - elaborar_prestacao_contas
+          - classificar_transacao
+          - anexar_comprovante
+          - submeter_prestacao_contas
+
+      - module: "M004"
+        namespace: "financeiro.pagamento"
+        can:
+          - visualizar_folha_propria
+          - solicitar_diaria
+
+      - module: "M009"
+        namespace: "post_award.bolsas"
+        can:
+          - visualizar_bolsas_da_iniciativa
+
+  Bolsista:
+    description: "Beneficiário de bolsa de pesquisa. Acesso restrito à própria bolsa."
+    permissions:
+      - module: "M009"
+        namespace: "post_award.bolsas"
+        can:
+          - aceitar_bolsa
+          - recusar_bolsa
+          - enviar_documentos
+          - assinar_termo_compromisso
+          - visualizar_bolsa_propria
+
+      - module: "M014"
+        namespace: "financeiro.prestacao_contas"
+        can:
+          - visualizar_prestacao_propria
+
+      - module: "M024"
+        namespace: "corporativo.curriculo"
+        can:
+          - atualizar_curriculo_proprio
+          - vincular_lattes
+
+  Avaliador:
+    description: "Avaliador ad hoc de propostas em captações específicas. Acesso temporário."
+    permissions:
+      - module: "M011"
+        namespace: "pre_award.captacao"
+        can:
+          - visualizar_proposta_designada
+          - avaliar_proposta
+          - emitir_parecer
+          - visualizar_instrumento_captacao
+
+  GestorPlanejamento:
+    description: "Equipe de planejamento estratégico e programas de fomento da FAPES."
+    permissions:
+      - module: "M010"
+        namespace: "planejamento.programa"
+        can:
+          - criar_plano_estrategico
+          - editar_plano_estrategico
+          - criar_programa
+          - editar_programa
+          - ativar_programa
+          - inativar_programa
+          - aprovar_parceria
+
+      - module: "M001"
+        namespace: "corporativo.modalidade_bolsa"
+        can:
+          - criar_modalidade_bolsa
+          - editar_modalidade_bolsa
+          - inativar_modalidade_bolsa
+
+      - module: "M008"
+        namespace: "corporativo.pessoas"
+        can:
+          - visualizar_instituicoes
+          - visualizar_pesquisadores
+
+  GestorFinanceiro:
+    description: "Equipe financeira da FAPES. Responsável por pagamentos e análise de prestações."
+    permissions:
+      - module: "M004"
+        namespace: "financeiro.pagamento"
+        can:
+          - criar_folha_pagamento
+          - aprovar_folha_pagamento
+          - devolver_folha_pagamento
+          - cancelar_folha_pagamento
+          - processar_remessa
+          - liberar_pagamento
+          - visualizar_todas_folhas
+
+      - module: "M013"
+        namespace: "financeiro.saldo"
+        can:
+          - visualizar_saldo
+          - criar_conta_corrente
+          - registrar_provisao
+          - estornar_provisao
+
+      - module: "M014"
+        namespace: "financeiro.prestacao_contas"
+        can:
+          - analisar_prestacao_contas
+          - aprovar_prestacao_contas
+          - devolver_prestacao_contas
+          - negar_prestacao_contas
+          - visualizar_todas_prestacoes
+
+      - module: "M009"
+        namespace: "post_award.bolsas"
+        can:
+          - publicar_bolsa
+          - implementar_bolsa
+          - suspender_bolsa
+          - reativar_bolsa
+          - encerrar_bolsa
+          - cancelar_bolsa
+
+  GestorCaptacao:
+    description: "Equipe de captação da FAPES. Responsável por editais e seleção de propostas."
+    permissions:
+      - module: "M011"
+        namespace: "pre_award.captacao"
+        can:
+          - criar_captacao
+          - editar_captacao
+          - publicar_captacao
+          - suspender_captacao
+          - encerrar_submissoes
+          - designar_avaliador
+          - homologar_resultado
+          - aprovar_resultado
+          - visualizar_todas_propostas
+
+      - module: "M022"
+        namespace: "pre_award.contratacao"
+        can:
+          - iniciar_contratacao
+          - cancelar_contratacao
+          - aprovar_minuta_termo
+          - enviar_para_assinatura
+
+  CoordenadorAreaTecnica:
+    description: "Coordenador de área técnica da FAPES. Avalia relatórios e solicitações de alteração."
+    permissions:
+      - module: "M003"
+        namespace: "post_award.iniciativas"
+        can:
+          - visualizar_todas_iniciativas
+          - decidir_solicitacao_alteracao
+          - aprovar_relatorio_tecnico
+          - reprovar_relatorio_tecnico
+          - solicitar_complementacao_relatorio
+
+      - module: "M014"
+        namespace: "financeiro.prestacao_contas"
+        can:
+          - analisar_prestacao_contas
+          - devolver_prestacao_contas
+
+      - module: "M012"
+        namespace: "post_award.acompanhamento"
+        can:
+          - visualizar_dashboard_iniciativas
+          - gerar_relatorio_acompanhamento
+
+  Auditor:
+    description: "Auditor interno ou externo. Acesso de leitura a todos os módulos e ao painel de transparência."
+    permissions:
+      - module: "*"
+        namespace: "*"
+        can:
+          - read_only
+
+      - module: "M007"
+        namespace: "corporativo.transparencia"
+        can:
+          - acessar_painel_transparencia
+          - exportar_dados_publicos
+
+      - module: "M017"
+        namespace: "financeiro.aml"
+        can:
+          - visualizar_alertas_aml
+          - visualizar_transacoes_monitoradas
+
+  Admin:
+    description: "Administrador do sistema. Acesso completo a todas as operações."
+    permissions:
+      - module: "*"
+        namespace: "*"
+        can:
+          - all_operations
+
+      - module: "M005"
+        namespace: "corporativo.autenticacao"
+        can:
+          - gerenciar_usuarios
+          - gerenciar_sessoes
+          - visualizar_logs_acesso
+
+      - module: "M006"
+        namespace: "corporativo.autorizacao"
+        can:
+          - gerenciar_permission_tuples
+          - gerenciar_roles
+          - visualizar_modelo_autorizacao
+
+access_control_model:
+  engine: "OpenFGA"
+  model_type: "RBAC with resource-level conditions"
+  namespace_in_openfga: "conectafapes"
+
+  resource_conditions:
+    - resource: "Iniciativa"
+      condition: "coordenador_da_iniciativa == usuario_autenticado"
+      applies_to: [Coordenador]
+
+    - resource: "BolsaPesquisa"
+      condition: "bolsista_da_bolsa == usuario_autenticado"
+      applies_to: [Bolsista]
+
+    - resource: "Proposta"
+      condition: "proponente_da_proposta == usuario_autenticado OR avaliador_designado == usuario_autenticado"
+      applies_to: [Coordenador, Avaliador]
+
+  inheritance:
+    - Admin: inherits_all_from: [GestorPlanejamento, GestorFinanceiro, GestorCaptacao, CoordenadorAreaTecnica, Auditor]
+
+agent_instructions:
+  rules:
+    - "Não criar entidades fora da ontologia."
+    - "Todo controle de acesso é implementado via OpenFGA (integrations.openfga)."
+    - "Permissões de leitura (read_only) do Auditor não autorizam operações de escrita em nenhuma circunstância."
+    - "Avaliador tem acesso temporário; tuplas de permissão são criadas por captação e expiram."
+    - "Condições de recurso (resource_conditions) são avaliadas em runtime pelo OpenFGA."
+    - "Admin não deve ser usado para operações de negócio; apenas para administração do sistema."
+  notes:
+    - "Modelo OpenFGA detalhado em integrations/openfga.yaml."
+    - "Autenticação via AcessoCidadao (integrations/acesso_cidadao.yaml) — roles atribuídos após login."
+    - "Permissões ad hoc para Avaliador são gerenciadas em M011 (captacao) via tuplas OpenFGA."
+
+```

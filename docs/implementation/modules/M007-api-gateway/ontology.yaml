@@ -1,0 +1,43 @@
+ontology: "API Gateway — BFF Pattern"
+namespace: "infrastructure.gateway"
+imports: []
+metadata:
+  module: "M007"
+  source: "stub — no modelo-estrutural.md available"
+  version: "1.0.0"
+  description: "Gateway técnico interno (M007) e camada BFF por produto (ADR-005). Intermedia frontends e APIs modulares; compõe telas multi-módulo."
+  todo: "Complete when modelo-estrutural.md is created"
+
+entities:
+  todo: "Define entities when modelo-estrutural.md is available"
+
+relationships:
+  todo: "Define when modelo-estrutural.md is available"
+
+axioms:
+  todo: "Define when modelo-estrutural.md is available"
+
+invariants:
+  todo: "Define when modelo-estrutural.md is available"
+
+enums: {}
+
+value_objects: {}
+
+events: []
+
+workflows:
+  todo: "Define when modelo-estrutural.md is available"
+
+policies:
+  todo: "Define when modelo-estrutural.md is available"
+
+agent_instructions:
+  rules:
+    - "Este módulo é stub. Não gerar implementações sem modelo-estrutural.md."
+    - "Consultar arquitetura em docs/architecture/02-modulos-e-integracoes.md."
+  notes:
+    - "API Gateway / BFF pattern."
+    - "ADR-005 propõe BFF por produto (BFF Coordenador, BFF Admin) entre frontends e o gateway interno M007."
+    - "Implementação atual sem BFF — frontends chamam APIs modulares diretamente; BFF será introduzido incrementalmente."
+    - "Composto entre frontend e módulos de domínio."

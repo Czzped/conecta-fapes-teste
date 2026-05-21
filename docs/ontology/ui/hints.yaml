@@ -1,0 +1,306 @@
+ontology: "UI Hints — ConectaFAPES"
+namespace: "ui"
+imports: []
+metadata:
+  type: "ui-aggregate"
+  version: "1.0.0"
+  description: "Aggregated UI component hints for all ConectaFAPES modules."
+
+forms:
+  PlanoEstrategicoForm:
+    module: "M010"
+    entity: "planejamento.estrategia.PlanoEstrategico"
+    sections:
+      - name: "Identificação"
+        fields: [nome, descricao, dataInicio, dataFim]
+      - name: "Eixos Estratégicos"
+        fields: [eixosEstrategicos]
+
+  ParceriaForm:
+    module: "M010"
+    entity: "planejamento.parcerias.Parceria"
+    sections:
+      - name: "Dados da Parceria"
+        fields: [nome, instituicaoId, objeto]
+      - name: "Vigência"
+        fields: [dataInicio, dataFim]
+      - name: "Aportes Financeiros"
+        fields: [aportesFinanceiros]
+
+  ProgramaForm:
+    module: "M010"
+    entity: "planejamento.programas.Programa"
+    sections:
+      - name: "Identificação"
+        fields: [nome, descricao, instituicaoDemandanteId]
+      - name: "Eixos Estratégicos"
+        fields: [eixosEstrategicos]
+      - name: "Comitê de Governança"
+        fields: [comiteGovernanca]
+
+  CaptacaoForm:
+    module: "M011"
+    entity: "pre_award.captacao.Captacao"
+    sections:
+      - name: "Identificação"
+        fields: [titulo, tipoCaptacao, programaId, parcerias]
+      - name: "Cronograma"
+        fields: [cronograma]
+      - name: "Regras de Submissão"
+        fields: [regrasSubmissao, requisitosProponente]
+      - name: "Regras de Avaliação"
+        fields: [regrasAvaliacao]
+      - name: "Recursos Permitidos"
+        fields: [rubricasPermitidas, bolsasPermitidas]
+      - name: "Documentos Exigidos"
+        fields: [documentosExigidos]
+
+  ContratacaoOutorgaForm:
+    module: "M022"
+    entity: "post_award.contratacao.ContratacaoOutorga"
+    sections:
+      - name: "Dados da Contratação"
+        fields: [propostaAprovadaRefId, dataConvocacao]
+      - name: "Outorgado"
+        fields: [outorgadoId]
+      - name: "Termo de Outorga"
+        fields: [numeroTermo, documentoTermo, dataAssinaturaTermo]
+
+  IniciativaForm:
+    module: "M003"
+    entity: "post_award.iniciativas.Iniciativa"
+    sections:
+      - name: "Identificação"
+        fields: [titulo, tipoIniciativa, coordenadorId, instituicaoExecutoraId]
+      - name: "Plano de Trabalho"
+        fields: [objetivos, resultados, riscos, beneficios]
+      - name: "Cronograma"
+        fields: [atividadesCronograma]
+      - name: "Equipe"
+        fields: [membrosEquipe]
+      - name: "Orçamento"
+        fields: [orcamentoPlanejado]
+
+  RelatorioTecnicoForm:
+    module: "M012"
+    entity: "post_award.acompanhamento.RelatorioTecnico"
+    sections:
+      - name: "Período"
+        fields: [periodoInicio, periodoFim]
+      - name: "Conteúdo"
+        fields: [resumoAtividades, resultadosAlcancados, dificuldades]
+      - name: "Anexos"
+        fields: [documentos]
+
+  SolicitacaoOrcamentariaForm:
+    module: "M013"
+    entity: "post_award.orcamentaria.SolicitacaoOrcamentaria"
+    sections:
+      - name: "Tipo de Solicitação"
+        fields: [tipoSolicitacao]
+      - name: "Detalhamento"
+        fields: [rubricaOrigemId, rubricaDestinoId, valor, justificativa]
+
+  PrestacaoForm:
+    module: "M014"
+    entity: "post_award.prestacao_contas.Prestacao"
+    sections:
+      - name: "Conta Bancária"
+        fields: [contaBancariaId]
+      - name: "Transações"
+        fields: [transacoesFinanceiras]
+      - name: "Justificativas"
+        fields: [justificativas]
+
+  BolsaForm:
+    module: "M009"
+    entity: "post_award.bolsista.BolsaPesquisa"
+    sections:
+      - name: "Dados da Bolsa"
+        fields: [modalidadeId, nivelId, bolsistaId, orientadorId]
+      - name: "Período"
+        fields: [dataInicio, dataFim]
+      - name: "Documentação"
+        fields: [documentosBolsa]
+
+  CurriculoForm:
+    module: "M024"
+    entity: "post_award.curriculo.Curriculo"
+    sections:
+      - name: "Formação Acadêmica"
+        fields: [formacoesAcademicas]
+      - name: "Produção Científica"
+        fields: [artigos, livros]
+      - name: "Orientações"
+        fields: [orientacoes]
+      - name: "Idiomas"
+        fields: [idiomas]
+
+tables:
+  PlanoEstrategicoTable:
+    module: "M010"
+    entity: "planejamento.estrategia.PlanoEstrategico"
+    default_columns: [nome, estado, dataInicio, dataFim]
+    sortable: [nome, dataInicio]
+    filterable: [estado]
+
+  ParceriaTable:
+    module: "M010"
+    entity: "planejamento.parcerias.Parceria"
+    default_columns: [nome, instituicao, estado, vigenciaInicioCorrente, vigenciaFimCorrente, saldoAlocavelEmProgramas]
+    sortable: [nome, vigenciaInicioCorrente]
+    filterable: [estado]
+
+  ProgramaTable:
+    module: "M010"
+    entity: "planejamento.programas.Programa"
+    default_columns: [codigo, nome, estado, instituicaoDemandante]
+    sortable: [codigo, nome]
+    filterable: [estado]
+
+  CaptacaoTable:
+    module: "M011"
+    entity: "pre_award.captacao.Captacao"
+    default_columns: [titulo, tipoCaptacao, estado, programaNome]
+    sortable: [titulo]
+    filterable: [tipoCaptacao, estado]
+
+  IniciativaTable:
+    module: "M003"
+    entity: "post_award.iniciativas.Iniciativa"
+    default_columns: [titulo, tipoIniciativa, coordenador, estado, dataInicio, dataFim]
+    sortable: [titulo, dataInicio]
+    filterable: [tipoIniciativa, estado]
+
+  BolsaTable:
+    module: "M009"
+    entity: "post_award.bolsista.BolsaPesquisa"
+    default_columns: [bolsista, modalidade, nivel, orientador, estado, dataInicio, dataFim]
+    sortable: [bolsista, dataInicio]
+    filterable: [estado, modalidade]
+
+  RelatorioTecnicoTable:
+    module: "M012"
+    entity: "post_award.acompanhamento.RelatorioTecnico"
+    default_columns: [iniciativaTitulo, periodoInicio, periodoFim, estado]
+    sortable: [periodoInicio]
+    filterable: [estado]
+
+  RubricaProjetoTable:
+    module: "M013"
+    entity: "post_award.orcamentaria.RubricaProjeto"
+    default_columns: [rubricaNome, valorAprovado, valorComprometido, valorExecutado, saldoDisponivel]
+    sortable: [rubricaNome]
+    filterable: []
+
+  RemessaTable:
+    module: "M004"
+    entity: "financeiro.pagamento.Remessa"
+    default_columns: [tipo, estado, dataProcessamento, valor]
+    sortable: [dataProcessamento]
+    filterable: [tipo, estado]
+
+  FolhaTable:
+    module: "M004"
+    entity: "financeiro.pagamento.Folha"
+    default_columns: [competencia, estado, quantidadePagamentos, valorTotal]
+    sortable: [competencia]
+    filterable: [estado]
+
+  ImportJobTable:
+    module: "M002"
+    entity: "importacao.editais.ImportJob"
+    default_columns: [kind, estado, iniciadoEm, finalizadoEm, erros]
+    sortable: [iniciadoEm]
+    filterable: [kind, estado]
+
+  CurriculoTable:
+    module: "M024"
+    entity: "post_award.curriculo.Curriculo"
+    default_columns: [pesquisador, nivelFormacao, ultimaAtualizacao]
+    sortable: [pesquisador]
+    filterable: [nivelFormacao]
+
+dashboards:
+  - name: "DashboardPlanejamento"
+    module: "M010"
+    description: "Visão geral de programas, parcerias e eixos estratégicos ativos."
+    widgets:
+      - type: "kpi"
+        label: "Programas Ativos"
+        entity: "planejamento.programas.Programa"
+        filter: "estado == ATIVO"
+      - type: "kpi"
+        label: "Parcerias Vigentes"
+        entity: "planejamento.parcerias.Parceria"
+        filter: "estado == Vigente"
+      - type: "chart"
+        label: "Valor por Eixo Estratégico"
+        entity: "planejamento.estrategia.EixoEstrategico"
+        metric: "valorInvestido"
+
+  - name: "DashboardProjeto"
+    module: "M012"
+    description: "Métricas de projeto em execução: relatórios, solicitações pendentes."
+    entity: "post_award.acompanhamento.DashboardProjeto"
+    widgets:
+      - type: "kpi"
+        label: "Relatórios Pendentes"
+        field: "relatoriosPendentes"
+      - type: "kpi"
+        label: "Solicitações Pendentes"
+        field: "solicitacoesPendentes"
+      - type: "table"
+        label: "Últimos Relatórios"
+        entity: "post_award.acompanhamento.RelatorioTecnico"
+
+  - name: "DashboardPagamento"
+    module: "M004"
+    description: "Visão geral de folhas de pagamento e remessas."
+    widgets:
+      - type: "kpi"
+        label: "Folhas em Aprovação"
+        entity: "financeiro.pagamento.Folha"
+        filter: "estado == EM_APROVACAO"
+      - type: "kpi"
+        label: "Remessas Pendentes"
+        entity: "financeiro.pagamento.Remessa"
+        filter: "estado == PENDENTE"
+      - type: "table"
+        label: "Últimas Remessas"
+        entity: "financeiro.pagamento.Remessa"
+
+  - name: "DashboardBolsas"
+    module: "M009"
+    description: "Visão geral de bolsas de pesquisa ativas e em processo."
+    widgets:
+      - type: "kpi"
+        label: "Bolsas Implementadas"
+        entity: "post_award.bolsista.BolsaPesquisa"
+        filter: "estado == IMPLEMENTADA"
+      - type: "kpi"
+        label: "Aguardando Aceite"
+        entity: "post_award.bolsista.BolsaPesquisa"
+        filter: "estado == AGUARDANDO_ACEITE"
+
+  - name: "DashboardImportacao"
+    module: "M002"
+    description: "Status dos jobs de importação do SIGFAPES."
+    widgets:
+      - type: "table"
+        label: "Jobs Recentes"
+        entity: "importacao.editais.ImportJob"
+      - type: "kpi"
+        label: "Jobs com Falha"
+        entity: "importacao.editais.ImportJob"
+        filter: "estado == FAILED"
+
+agent_instructions:
+  rules:
+    - "Toda tela deve ter referência a uma entidade de domínio."
+    - "Formulários devem respeitar campos obrigatórios (required: true) definidos na ontologia do domínio."
+    - "Tabelas devem usar default_columns como base, podendo adicionar colunas opcionais."
+    - "Dashboards devem refletir métricas derivadas definidas nas entidades de domínio."
+  notes:
+    - "Este arquivo é um agregador. Cada form/table/dashboard referencia a entidade canônica no módulo de domínio."
+    - "Não duplicar definições de campos aqui — referenciar entidade de domínio e campo pelo nome."

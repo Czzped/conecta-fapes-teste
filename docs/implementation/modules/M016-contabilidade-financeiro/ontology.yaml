@@ -1,0 +1,36 @@
+ontology: "Contabilidade e Financeiro"
+namespace: "financeiro.contabilidade"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+metadata:
+  module: "M016"
+  source: "stub — no modelo-estrutural.md available"
+  version: "1.0.0"
+  description: "Contabilidade e financeiro da FAPES. Consolida informacoes financeiras de pagamentos e orcamento. Downstream de M004 (pagamentos) e M013 (orcamento). Integra com Banestes e BANDES."
+  todo: "Complete when modelo-estrutural.md is created"
+entities:
+  todo: "Define when modelo-estrutural.md is available"
+relationships:
+  todo: "Define when modelo-estrutural.md is available"
+axioms:
+  todo: "Define when modelo-estrutural.md is available"
+invariants:
+  todo: "Define when modelo-estrutural.md is available"
+enums: {}
+value_objects: {}
+events:
+  todo: "Define when modelo-estrutural.md is available"
+workflows:
+  todo: "Define when modelo-estrutural.md is available"
+policies:
+  todo: "Define when modelo-estrutural.md is available"
+
+agent_instructions:
+  rules:
+    - "Este módulo é stub. Não gerar implementações sem modelo-estrutural.md."
+    - "Consultar arquitetura em docs/architecture/02-modulos-e-integracoes.md."
+  notes:
+    - "Contabilidade e financeiro da FAPES."
+    - "Downstream de M004 (pagamentos) e M013 (orçamento)."
+    - "Integra com Banestes e BANDES."

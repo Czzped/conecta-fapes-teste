@@ -1,0 +1,113 @@
+# Integracao — Acesso Cidadao
+
+```yaml
+ontology: "Integração Acesso Cidadão — ConectaFAPES"
+namespace: "integrations.acesso_cidadao"
+
+imports: []
+
+metadata:
+  type: "integration"
+  version: "1.0.0"
+  description: "Autenticação SSO via Acesso Cidadão (PRODEST/ES) usando OpenID Connect. Identidade do usuário mapeada para PessoaFisica em M008."
+  modules_using: [M005, M008]
+  direction: "inbound"
+
+integration:
+  system: "Acesso Cidadão"
+  system_description: "Plataforma de identidade digital do Governo do Estado do Espírito Santo (PRODEST)"
+  direction: "inbound"
+  protocol: "OpenID Connect (OIDC)"
+  authentication: "OAuth 2.0 Authorization Code Flow com PKCE"
+  base_url: "todo: configure per environment"
+
+  scopes:
+    - openid
+    - profile
+    - email
+    - cpf
+    - phone
+
+  endpoints:
+    - path: "/.well-known/openid-configuration"
+      method: "GET"
+      description: "Discovery endpoint OIDC; fornece URLs de autorização, token e userinfo."
+      used_by: "M005.OIDCClient"
+
+    - path: "/authorize"
+      method: "GET"
+      description: "Endpoint de autorização; redireciona usuário para login."
+      used_by: "M005.AuthFlow"
+
+    - path: "/token"
+      method: "POST"
+      description: "Troca authorization code por access_token, id_token e refresh_token."
+      used_by: "M005.AuthFlow"
+
+    - path: "/userinfo"
+      method: "GET"
+      description: "Retorna claims do usuário autenticado (nome, CPF, email, telefone)."
+      used_by: "M005.UserProfile"
+      authentication: "Bearer access_token"
+
+    - path: "/logout"
+      method: "GET"
+      description: "Encerra sessão no provedor de identidade (single logout)."
+      used_by: "M005.AuthFlow"
+
+  token_claims:
+    - claim: "sub"
+      type: "string"
+      description: "Identificador único do usuário no Acesso Cidadão (UUID)."
+      mapped_to: "corporativo.pessoas.PessoaFisica.acesso_cidadao_id"
+
+    - claim: "cpf"
+      type: "string"
+      description: "CPF do usuário (formato sem pontuação, 11 dígitos)."
+      mapped_to: "corporativo.pessoas.PessoaFisica.cpf"
+
+    - claim: "name"
+      type: "string"
+      description: "Nome completo do usuário."
+      mapped_to: "corporativo.pessoas.PessoaFisica.nome"
+
+    - claim: "email"
+      type: "string"
+      description: "Endereço de email verificado."
+      mapped_to: "corporativo.pessoas.PessoaFisica.email"
+
+    - claim: "phone_number"
+      type: "string"
+      description: "Telefone do usuário (opcional)."
+      mapped_to: "corporativo.pessoas.PessoaFisica.telefone"
+
+data_mappings:
+  - external_entity: "AcessoCidadao.UserInfo"
+    internal_entity: "corporativo.pessoas.PessoaFisica"
+    mapping_notes: "Usuário autenticado é mapeado via CPF. Se PessoaFisica já existe (importada do SIGFAPES), faz match e vincula acesso_cidadao_id. Caso contrário, cria nova PessoaFisica."
+    strategy: "match-or-create via CPF"
+
+  - external_entity: "AcessoCidadao.Session"
+    internal_entity: "M005.Sessao"
+    mapping_notes: "Sessão local criada após troca bem-sucedida de token. Armazena access_token, refresh_token e expiração."
+
+session_management:
+  token_storage: "Server-side session (nunca expor access_token ao frontend)"
+  refresh_strategy: "Renovar access_token com refresh_token antes da expiração"
+  logout_strategy: "Invalidar sessão local E chamar endpoint /logout do Acesso Cidadão"
+  session_timeout_minutes: 480
+
+agent_instructions:
+  rules:
+    - "Não criar integrações fora deste arquivo."
+    - "Toda integração deve ter data_mappings definidos."
+    - "CPF é a chave de reconciliação entre AcessoCidadao.UserInfo e PessoaFisica (M008)."
+    - "access_token e refresh_token nunca devem ser expostos ao frontend ou logados."
+    - "Roles do ConectaFAPES não vêm do Acesso Cidadão; são atribuídos internamente via OpenFGA (M006)."
+    - "Primeiro login de usuário novo cria PessoaFisica em M008 e tupla de role mínima em OpenFGA."
+  notes:
+    - "Acesso Cidadão é o único provedor de autenticação suportado; sem autenticação local."
+    - "CPF retornado pelo Acesso Cidadão é considerado verificado; não revalidar."
+    - "URLs específicas por ambiente (homologação/produção) definidas em variáveis de ambiente."
+
+```

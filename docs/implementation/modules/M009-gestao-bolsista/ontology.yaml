@@ -1,0 +1,603 @@
+ontology: "Gestao de Bolsista de Pesquisa"
+namespace: "post_award.bolsista"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: shared.people
+    path: path: "../../../ontology/shared/people.yaml"
+  - namespace: corporativo.modalidade_bolsa
+    path: path: "../M001-modalidade-bolsa/ontology.yaml"
+  - namespace: post_award.iniciativas
+    path: path: "../M003-gestao-iniciativas-captadas/ontology.yaml"
+  - namespace: post_award.orcamentaria
+    path: path: "../M013-gestao-orcamentaria-projeto/ontology.yaml"
+metadata:
+  module: "M009"
+  source: "docs/implementation/modules/M009-gestao-bolsista/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Ciclo de vida completo de bolsas de pesquisa: indicacao, aceite do orientador, avaliacao documental, assinatura do termo, publicacao e implementacao."
+
+entities:
+  BolsaPesquisa:
+    description: "Bolsa de pesquisa concedida a um bolsista, vinculada a uma iniciativa e a um nivel de modalidade de bolsa, passando por ciclo de vida completo desde indicacao ate encerramento."
+    extends: "shared.Auditavel"
+    fields:
+      codigo:
+        type: "string"
+        required: true
+        generated: true
+        unique: true
+        description: "Codigo de identificacao unica da bolsa (ex: BP-2025-001)."
+      temaPesquisa:
+        type: "string"
+        required: true
+        max_length: 300
+        description: "Titulo do tema de pesquisa do bolsista."
+      descricaoTema:
+        type: "string"
+        required: true
+        max_length: 2000
+        description: "Descricao detalhada do tema, incluindo palavras-chave."
+      dataInicioBolsa:
+        type: "date"
+        required: true
+        description: "Data de inicio da vigencia da bolsa."
+      dataFimBolsa:
+        type: "date"
+        required: true
+        description: "Data de fim da vigencia da bolsa."
+      dataInicioCurso:
+        type: "date"
+        required: true
+        description: "Data de inicio do curso (mestrado/doutorado)."
+      dataFimCurso:
+        type: "date"
+        required: true
+        description: "Data prevista de conclusao do curso."
+      quantidadeCotas:
+        type: "integer"
+        required: true
+        description: "Quantidade de cotas utilizadas pela bolsa (ex: 24 de 30 disponiveis)."
+      estado:
+        type: "enum:EstadoBolsa"
+        required: true
+        generated: true
+        description: "Estado atual da bolsa no ciclo de vida."
+      iniciativa:
+        type: "ref:post_award.iniciativas.Iniciativa"
+        required: true
+        description: "Iniciativa (projeto) ao qual a bolsa esta vinculada."
+      cotaBolsa:
+        type: "ref:post_award.bolsista.CotaBolsa"
+        required: true
+        description: "Controle de cota de bolsa consumida por esta bolsa."
+      coordenador:
+        type: "ref:post_award.iniciativas.Coordenador"
+        required: true
+        description: "Coordenador que indicou a bolsa."
+      orientador:
+        type: "ref:post_award.iniciativas.Orientador"
+        required: true
+        description: "Orientador responsavel pela bolsa."
+      bolsista:
+        type: "ref:post_award.iniciativas.Bolsista"
+        required: true
+        description: "Pessoa fisica beneficiada pela bolsa."
+      versaoNivel:
+        type: "ref:corporativo.modalidade_bolsa.VersaoNivel"
+        required: true
+        description: "Nivel de modalidade de bolsa (valor mensal) associado a esta bolsa."
+      termoAceite:
+        type: "ref:post_award.bolsista.TermoAceite"
+        required: true
+        description: "Termo de aceite ou rejeicao do orientador."
+      documentos:
+        type: "list:ref:post_award.bolsista.DocumentoBolsa"
+        required: false
+        description: "Documentos enviados pelo bolsista para avaliacao."
+      pareceres:
+        type: "list:ref:post_award.bolsista.ParecerAvaliacao"
+        required: false
+        description: "Pareceres de avaliacao documental."
+      termo:
+        type: "ref:post_award.bolsista.TermoCompromisso"
+        required: false
+        description: "Termo de compromisso multi-assinatura, gerado apos aprovacao documental."
+      publicacao:
+        type: "ref:post_award.bolsista.PublicacaoDiarioOficial"
+        required: false
+        description: "Registro de publicacao no Diario Oficial."
+      historico:
+        type: "list:ref:post_award.bolsista.HistoricoBolsa"
+        required: false
+        description: "Historico de eventos do ciclo de vida da bolsa."
+      motivoEncerramento:
+        type: "enum:MotivoEncerramento"
+        required: false
+        description: "Motivo do encerramento da bolsa, quando aplicavel."
+
+  CotaBolsa:
+    description: "Contador independente de cotas de bolsa disponiveis para uma iniciativa. Nao substitui o saldo monetario governado por M013."
+    extends: "shared.Auditavel"
+    fields:
+      quantidadeDisponivel:
+        type: "integer"
+        required: true
+        description: "Quantidade de cotas de bolsa disponiveis para a iniciativa."
+
+  TermoAceite:
+    description: "Registro do aceite ou rejeicao do orientador para assumir a orientacao da bolsa."
+    extends: "shared.Auditavel"
+    fields:
+      dataAssinatura:
+        type: "date"
+        required: true
+        description: "Data em que o orientador assinou ou rejeitou."
+      aceito:
+        type: "boolean"
+        required: true
+        description: "Indica se o orientador aceitou a indicacao."
+      justificativa:
+        type: "string"
+        required: false
+        max_length: 500
+        description: "Justificativa em caso de rejeicao. Obrigatorio se aceito = false."
+
+  DocumentoBolsa:
+    description: "Documento enviado pelo bolsista para avaliacao no processo de concessao da bolsa."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: "string"
+        required: true
+        max_length: 200
+        description: "Nome do documento enviado (ex: Comprovante de matricula)."
+      tipo:
+        type: "string"
+        required: true
+        max_length: 100
+        description: "Tipo/categoria do documento (ex: Matricula, RG, CPF, Historico)."
+      url:
+        type: "url"
+        required: true
+        description: "URL de acesso ao documento armazenado."
+      dataEnvio:
+        type: "date"
+        required: true
+        description: "Data do envio ou reenvio do documento."
+      status:
+        type: "enum:StatusDocumento"
+        required: true
+        generated: true
+        description: "Status do documento na avaliacao."
+
+  ParecerAvaliacao:
+    description: "Parecer tecnico de avaliacao da documentacao do bolsista."
+    extends: "shared.Auditavel"
+    fields:
+      dataAvaliacao:
+        type: "date"
+        required: true
+        description: "Data em que o parecer foi emitido."
+      aprovado:
+        type: "boolean"
+        required: true
+        description: "Indica se a documentacao foi aprovada."
+      justificativa:
+        type: "string"
+        required: true
+        max_length: 1000
+        description: "Justificativa do parecer."
+
+  TermoCompromisso:
+    description: "Termo de compromisso gerado apos aprovacao documental, requerendo assinatura de multiplos signatarios (Coordenador, Orientador, Bolsista, DIRAF, DIPRE)."
+    extends: "shared.Auditavel"
+    fields:
+      codigo:
+        type: "string"
+        required: true
+        generated: true
+        unique: true
+        description: "Codigo de identificacao do termo (ex: TC-2025-001)."
+      dataGeracao:
+        type: "date"
+        required: true
+        generated: true
+        description: "Data em que o termo foi gerado."
+      estado:
+        type: "enum:EstadoTermo"
+        required: true
+        generated: true
+        description: "Estado do termo no fluxo de assinaturas."
+      assinaturas:
+        type: "list:ref:post_award.bolsista.AssinaturaTermo"
+        required: false
+        description: "Lista de assinaturas dos signatarios do termo."
+
+  AssinaturaTermo:
+    description: "Registro individual de assinatura ou recusa de um signatario no TermoCompromisso."
+    extends: "shared.Auditavel"
+    fields:
+      signatario:
+        type: "string"
+        required: true
+        max_length: 200
+        description: "Nome do signatario."
+      perfil:
+        type: "string"
+        required: true
+        max_length: 50
+        domain: "Coordenador | Orientador | Bolsista | DIRAF | DIPRE"
+        description: "Perfil do signatario no processo."
+      dataAssinatura:
+        type: "date"
+        required: false
+        description: "Data da assinatura ou recusa. Preenchida ao assinar/recusar."
+      assinado:
+        type: "boolean"
+        required: true
+        description: "Indica se o signatario assinou."
+      justificativa:
+        type: "string"
+        required: false
+        max_length: 500
+        description: "Justificativa em caso de recusa. Obrigatorio se assinado = false."
+
+  PublicacaoDiarioOficial:
+    description: "Registro da publicacao da bolsa no Diario Oficial, precedendo a implementacao."
+    extends: "shared.Auditavel"
+    fields:
+      numeroDiario:
+        type: "string"
+        required: true
+        max_length: 50
+        description: "Numero da edicao do Diario Oficial."
+      dataPublicacao:
+        type: "date"
+        required: true
+        description: "Data da publicacao."
+
+  HistoricoBolsa:
+    description: "Trilha de auditoria dos eventos do ciclo de vida de uma BolsaPesquisa."
+    extends: "shared.Auditavel"
+    fields:
+      data:
+        type: "date"
+        required: true
+        generated: true
+        description: "Data do evento."
+      tipo:
+        type: "enum:TipoEvento"
+        required: true
+        description: "Tipo do evento registrado."
+      descricao:
+        type: "string"
+        required: true
+        max_length: 500
+        description: "Descricao textual do evento."
+
+relationships:
+  - from: "post_award.bolsista.BolsaPesquisa"
+    relation: "vinculada a"
+    to: "post_award.iniciativas.Iniciativa"
+    cardinality: "N:1"
+    description: "Multiplas bolsas podem ser vinculadas a uma mesma iniciativa."
+  - from: "post_award.bolsista.BolsaPesquisa"
+    relation: "consome cota"
+    to: "post_award.bolsista.CotaBolsa"
+    cardinality: "N:1"
+    description: "Cada bolsa consome cotas do controle de cotas da iniciativa."
+  - from: "post_award.bolsista.BolsaPesquisa"
+    relation: "indicada por"
+    to: "post_award.iniciativas.Coordenador"
+    cardinality: "N:1"
+    description: "Bolsa indicada pelo coordenador do projeto."
+  - from: "post_award.bolsista.BolsaPesquisa"
+    relation: "orientada por"
+    to: "post_award.iniciativas.Orientador"
+    cardinality: "N:1"
+    description: "Bolsa orientada por um orientador."
+  - from: "post_award.bolsista.BolsaPesquisa"
+    relation: "concedida a"
+    to: "post_award.iniciativas.Bolsista"
+    cardinality: "N:1"
+    description: "Bolsa concedida ao bolsista beneficiado."
+  - from: "post_award.bolsista.BolsaPesquisa"
+    relation: "nivel de bolsa"
+    to: "corporativo.modalidade_bolsa.VersaoNivel"
+    cardinality: "N:1"
+    description: "Cada bolsa esta associada a uma VersaoNivel com valor monetario."
+  - from: "post_award.bolsista.BolsaPesquisa"
+    relation: "possui termo aceite"
+    to: "post_award.bolsista.TermoAceite"
+    cardinality: "1:1"
+    description: "Cada bolsa possui exatamente um TermoAceite do orientador."
+  - from: "post_award.bolsista.BolsaPesquisa"
+    relation: "possui documentos"
+    to: "post_award.bolsista.DocumentoBolsa"
+    cardinality: "1:N"
+    description: "Bolsa pode ter multiplos documentos enviados."
+  - from: "post_award.bolsista.BolsaPesquisa"
+    relation: "possui pareceres"
+    to: "post_award.bolsista.ParecerAvaliacao"
+    cardinality: "1:N"
+    description: "Bolsa pode ter multiplos pareceres de avaliacao."
+  - from: "post_award.bolsista.BolsaPesquisa"
+    relation: "possui termo"
+    to: "post_award.bolsista.TermoCompromisso"
+    cardinality: "1:1"
+    description: "Bolsa pode ter no maximo um TermoCompromisso."
+  - from: "post_award.bolsista.BolsaPesquisa"
+    relation: "publicada em"
+    to: "post_award.bolsista.PublicacaoDiarioOficial"
+    cardinality: "1:1"
+    description: "Bolsa pode ter no maximo uma publicacao no Diario Oficial."
+  - from: "post_award.bolsista.BolsaPesquisa"
+    relation: "registra historico"
+    to: "post_award.bolsista.HistoricoBolsa"
+    cardinality: "1:N"
+    description: "Trilha completa de eventos da bolsa."
+  - from: "post_award.bolsista.TermoCompromisso"
+    relation: "possui assinaturas"
+    to: "post_award.bolsista.AssinaturaTermo"
+    cardinality: "1:N"
+    description: "Termo pode ter multiplas assinaturas de signatarios distintos."
+
+axioms:
+  - id: "AX-M009-001"
+    natural_language: "Nova concessao de bolsa e bloqueada quando o valor total das mensalidades futuras supera o saldo disponivel da RubricaProjeto correspondente em M013."
+    formal_rule: "BolsaConcedida → valorBolsaSolicitada ≤ post_award.orcamentaria.RubricaProjeto.saldoDisponivel (RN-SLD02)"
+  - id: "AX-M009-002"
+    natural_language: "O aceite do orientador e obrigatorio para prosseguimento: bolsa em ACEITE_REJEITADO nao pode avancar para etapas seguintes."
+    formal_rule: "BolsaPesquisa.estado ≠ ACEITE_REJEITADO → TermoAceite.aceito = true"
+  - id: "AX-M009-003"
+    natural_language: "A concessao de bolsa gera Transacao de COMPROMETIMENTO em M013 reservando o valor total das mensalidades futuras."
+    formal_rule: "BolsaPesquisa.estado = IMPLEMENTADA → ∃Transacao(tipo=COMPROMETIMENTO) em M013"
+  - id: "AX-M009-004"
+    natural_language: "O cancelamento de bolsa antes do pagamento reverte o comprometimento em M013, liberando o saldo."
+    formal_rule: "BolsaPesquisa.estado = CANCELADA → ∃Transacao(tipo=CANCELAMENTO_COMPROMETIMENTO) em M013"
+  - id: "AX-M009-005"
+    natural_language: "CotaBolsa.quantidadeDisponivel e contador independente; nao substitui nem dispensa a validacao monetaria de saldo via M013."
+    formal_rule: "validar_cota(CotaBolsa) AND validar_saldo(post_award.orcamentaria.RubricaProjeto) sao verificacoes independentes e ambas obrigatorias"
+
+invariants:
+  - id: "INV-M009-001"
+    rule: "BolsaPesquisa.dataFimBolsa > BolsaPesquisa.dataInicioBolsa"
+    description: "A data de fim da bolsa deve ser posterior a data de inicio."
+  - id: "INV-M009-002"
+    rule: "BolsaPesquisa.quantidadeCotas > 0"
+    description: "A quantidade de cotas deve ser positiva."
+  - id: "INV-M009-003"
+    rule: "TermoAceite.justificativa != null when TermoAceite.aceito = false"
+    description: "Justificativa e obrigatoria quando o orientador rejeita."
+  - id: "INV-M009-004"
+    rule: "AssinaturaTermo.justificativa != null when AssinaturaTermo.assinado = false"
+    description: "Justificativa e obrigatoria quando signatario recusa assinar."
+  - id: "INV-M009-005"
+    rule: "CotaBolsa.quantidadeDisponivel >= 0"
+    description: "A quantidade disponivel de cotas nao pode ser negativa."
+
+enums:
+  EstadoBolsa:
+    description: "Estados do ciclo de vida de uma BolsaPesquisa, da indicacao ao encerramento."
+    values:
+      AGUARDANDO_ACEITE_ORIENTADOR: "Bolsa indicada, aguardando resposta do orientador."
+      ACEITE_REJEITADO: "Orientador rejeitou a indicacao. Estado terminal parcial — requer nova indicacao."
+      AGUARDANDO_DOCUMENTOS: "Orientador aceitou; aguardando envio de documentos pelo bolsista."
+      EM_AVALIACAO: "Documentos enviados e em processo de avaliacao."
+      DOCUMENTACAO_APROVADA: "Documentacao aprovada; aguardando geracao do termo de compromisso."
+      DOCUMENTACAO_REPROVADA: "Documentacao reprovada; bolsista deve reenviar documentos."
+      AGUARDANDO_ASSINATURAS: "Termo gerado, aguardando coleta de assinaturas."
+      ASSINATURA_RECUSADA: "Um ou mais signatarios recusaram assinar o termo."
+      TERMO_ASSINADO: "Todos os signatarios assinaram o termo; aguardando publicacao."
+      PUBLICADA: "Bolsa publicada no Diario Oficial; aguardando implementacao financeira."
+      IMPLEMENTADA: "Bolsa implementada e pagamentos iniciados."
+      NAO_IMPLEMENTADA: "Bolsa nao foi implementada apos publicacao."
+      SUSPENSA: "Bolsa temporariamente suspensa."
+      ENCERRADA: "Bolsa encerrada conforme motivo registrado."
+      CANCELADA: "Bolsa cancelada antes da implementacao."
+
+  MotivoEncerramento:
+    description: "Motivo do encerramento de uma BolsaPesquisa."
+    values:
+      CONCLUSAO: "Bolsista concluiu o curso ou projeto dentro do prazo."
+      DESISTENCIA: "Bolsista desistiu voluntariamente da bolsa."
+      CORTE_RECURSOS: "Bolsa encerrada por corte de recursos orcamentarios."
+      DESCUMPRIMENTO: "Bolsa encerrada por descumprimento de obrigacoes do bolsista."
+
+  StatusDocumento:
+    description: "Status de avaliacao de um DocumentoBolsa."
+    values:
+      ENVIADO: "Documento enviado, aguardando avaliacao."
+      APROVADO: "Documento avaliado e aprovado."
+      REPROVADO: "Documento avaliado e reprovado."
+      REENVIO_SOLICITADO: "Avaliador solicitou reenvio do documento."
+
+  EstadoTermo:
+    description: "Estado do ciclo de assinaturas de um TermoCompromisso."
+    values:
+      AGUARDANDO_ASSINATURAS: "Termo gerado, aguardando que todos os signatarios assinem."
+      ASSINATURA_RECUSADA: "Pelo menos um signatario recusou assinar o termo."
+      ASSINADO: "Todos os signatarios assinaram o termo."
+
+  TipoEvento:
+    description: "Tipos de evento registrados no historico de uma BolsaPesquisa."
+    values:
+      INDICACAO: "Bolsista indicado pelo coordenador."
+      ACEITE: "Orientador aceitou ou rejeitou a indicacao."
+      ENVIO_DOCUMENTOS: "Bolsista enviou ou reenviou documentos."
+      AVALIACAO: "Avaliacao documental realizada."
+      GERACAO_TERMO: "Termo de compromisso gerado."
+      ASSINATURA: "Signatario assinou ou recusou o termo."
+      PUBLICACAO: "Bolsa publicada no Diario Oficial."
+      IMPLEMENTACAO: "Bolsa implementada financeiramente."
+      RENOVACAO: "Bolsa renovada por periodo adicional."
+      SUSPENSAO: "Bolsa suspensa temporariamente."
+      REATIVACAO: "Bolsa reativada apos suspensao."
+      ENCERRAMENTO: "Bolsa encerrada."
+      CANCELAMENTO: "Bolsa cancelada."
+
+value_objects: {}
+
+events:
+  - name: "BolsaConcedida"
+    description: "Disparado quando a bolsa atinge estado IMPLEMENTADA. Aciona COMPROMETIMENTO em M013 para as mensalidades futuras."
+    payload_entity: "post_award.bolsista.BolsaPesquisa"
+    trigger: "BolsaPesquisa.estado = IMPLEMENTADA"
+  - name: "BolsaCancelada"
+    description: "Disparado quando a bolsa e cancelada antes do pagamento. Aciona CANCELAMENTO_COMPROMETIMENTO em M013."
+    payload_entity: "post_award.bolsista.BolsaPesquisa"
+    trigger: "BolsaPesquisa.estado = CANCELADA"
+  - name: "AceiteOrientadorRegistrado"
+    description: "Disparado quando o orientador registra aceite ou rejeicao."
+    payload_entity: "post_award.bolsista.TermoAceite"
+    trigger: "TermoAceite criado"
+  - name: "DocumentacaoAprovada"
+    description: "Disparado quando avaliador emite parecer favoravel, desbloqueando geracao do termo."
+    payload_entity: "post_award.bolsista.ParecerAvaliacao"
+    trigger: "ParecerAvaliacao.aprovado = true"
+  - name: "TermoAssinado"
+    description: "Disparado quando todos os signatarios assinam o TermoCompromisso."
+    payload_entity: "post_award.bolsista.TermoCompromisso"
+    trigger: "TermoCompromisso.estado = ASSINADO"
+
+workflows:
+  BolsaPesquisaStateMachine:
+    states:
+      - AGUARDANDO_ACEITE_ORIENTADOR
+      - ACEITE_REJEITADO
+      - AGUARDANDO_DOCUMENTOS
+      - EM_AVALIACAO
+      - DOCUMENTACAO_APROVADA
+      - DOCUMENTACAO_REPROVADA
+      - AGUARDANDO_ASSINATURAS
+      - ASSINATURA_RECUSADA
+      - TERMO_ASSINADO
+      - PUBLICADA
+      - IMPLEMENTADA
+      - NAO_IMPLEMENTADA
+      - SUSPENSA
+      - ENCERRADA
+      - CANCELADA
+    transitions:
+      - from: AGUARDANDO_ACEITE_ORIENTADOR
+        to: AGUARDANDO_DOCUMENTOS
+        trigger: "orientador aceita"
+        guard: "TermoAceite.aceito = true"
+      - from: AGUARDANDO_ACEITE_ORIENTADOR
+        to: ACEITE_REJEITADO
+        trigger: "orientador rejeita"
+        guard: "TermoAceite.aceito = false e justificativa preenchida"
+      - from: AGUARDANDO_DOCUMENTOS
+        to: EM_AVALIACAO
+        trigger: "bolsista envia documentos"
+        guard: "ao menos um DocumentoBolsa com status ENVIADO"
+      - from: EM_AVALIACAO
+        to: DOCUMENTACAO_APROVADA
+        trigger: "avaliador aprova documentacao"
+        guard: "ParecerAvaliacao.aprovado = true"
+      - from: EM_AVALIACAO
+        to: DOCUMENTACAO_REPROVADA
+        trigger: "avaliador reprova documentacao"
+        guard: "ParecerAvaliacao.aprovado = false"
+      - from: DOCUMENTACAO_REPROVADA
+        to: EM_AVALIACAO
+        trigger: "bolsista reenvia documentos"
+        guard: "DocumentoBolsa reenviado com status ENVIADO"
+      - from: DOCUMENTACAO_APROVADA
+        to: AGUARDANDO_ASSINATURAS
+        trigger: "sistema gera termo"
+        guard: "TermoCompromisso.estado = AGUARDANDO_ASSINATURAS"
+      - from: AGUARDANDO_ASSINATURAS
+        to: TERMO_ASSINADO
+        trigger: "todos assinam"
+        guard: "TermoCompromisso.estado = ASSINADO"
+      - from: AGUARDANDO_ASSINATURAS
+        to: ASSINATURA_RECUSADA
+        trigger: "signatario recusa"
+        guard: "AssinaturaTermo.assinado = false"
+      - from: TERMO_ASSINADO
+        to: PUBLICADA
+        trigger: "publicacao no Diario Oficial registrada"
+        guard: "PublicacaoDiarioOficial criada"
+      - from: PUBLICADA
+        to: IMPLEMENTADA
+        trigger: "implementacao financeira confirmada"
+        guard: "saldo disponivel em M013 suficiente"
+      - from: PUBLICADA
+        to: NAO_IMPLEMENTADA
+        trigger: "prazo de implementacao expirado sem execucao"
+        guard: null
+      - from: IMPLEMENTADA
+        to: SUSPENSA
+        trigger: "gestao suspende bolsa"
+        guard: null
+      - from: SUSPENSA
+        to: IMPLEMENTADA
+        trigger: "gestao reativa bolsa"
+        guard: null
+      - from: IMPLEMENTADA
+        to: ENCERRADA
+        trigger: "bolsa encerrada"
+        guard: "MotivoEncerramento preenchido"
+      - from: AGUARDANDO_ACEITE_ORIENTADOR
+        to: CANCELADA
+        trigger: "gestor cancela"
+        guard: null
+      - from: AGUARDANDO_DOCUMENTOS
+        to: CANCELADA
+        trigger: "gestor cancela"
+        guard: null
+      - from: DOCUMENTACAO_APROVADA
+        to: CANCELADA
+        trigger: "gestor cancela"
+        guard: null
+
+policies:
+  permissions:
+    Coordenador:
+      can:
+        - "indicar BolsaPesquisa"
+        - "visualizar status de BolsaPesquisa do proprio projeto"
+        - "cancelar BolsaPesquisa antes da implementacao"
+    Orientador:
+      can:
+        - "registrar TermoAceite"
+        - "assinar TermoCompromisso"
+    Bolsista:
+      can:
+        - "enviar e reenviar DocumentoBolsa"
+        - "assinar TermoCompromisso"
+    Avaliador:
+      can:
+        - "emitir ParecerAvaliacao"
+        - "solicitar reenvio de documentos"
+    GestorFAPES:
+      can:
+        - "publicar BolsaPesquisa no Diario Oficial"
+        - "implementar BolsaPesquisa"
+        - "suspender e reativar BolsaPesquisa"
+        - "encerrar BolsaPesquisa"
+    DIRAF:
+      can:
+        - "assinar TermoCompromisso"
+    DIPRE:
+      can:
+        - "assinar TermoCompromisso"
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "Antes de implementar uma bolsa, validar saldo em M013 via post_award.orcamentaria.RubricaProjeto.saldoDisponivel (RN-SLD02)."
+    - "Antes de indicar uma bolsa, validar CotaBolsa.quantidadeDisponivel (verificacao independente do saldo monetario)."
+    - "Concessao de bolsa gera Transacao COMPROMETIMENTO em M013; cancelamento gera CANCELAMENTO_COMPROMETIMENTO."
+    - "TermoAceite.justificativa e obrigatoria se aceito = false."
+    - "AssinaturaTermo.justificativa e obrigatoria se assinado = false."
+    - "Iniciativa, Coordenador, Orientador e Bolsista sao referencias externas de M003 — nao modelar aqui."
+    - "VersaoNivel e referencia externa de M001 — nao modelar aqui."
+    - "CotaBolsa e contador de cotas em quantidade; nao substitui validacao monetaria de M013."
+  notes:
+    - "Eventos que afetam saldo M013: BolsaConcedida (+Alocado), MensalidadePaga (-Alocado,+Consumido), BolsaCancelada (-Alocado,+Disponivel), MensalidadeEstornada (-Consumido,+Disponivel)."
+    - "MensalidadePaga e processada via M004 (Folha); este modulo apenas dispara o evento."

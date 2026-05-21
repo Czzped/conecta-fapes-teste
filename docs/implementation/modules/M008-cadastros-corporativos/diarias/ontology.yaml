@@ -1,0 +1,292 @@
+ontology: "Diarias"
+namespace: "corporativo.diarias"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: shared.geography
+    path: path: "../../../ontology/shared/geography.yaml"
+metadata:
+  module: "M008"
+  source: "docs/implementation/modules/M008-cadastros-corporativos/diarias/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Cadastros corporativos para calculo de diarias: abrangencia, tipos de diaria com valor vigente, parametros normativos, pontos de origem/destino e tabela de distancias entre pontos."
+
+entities:
+  Abrangencia:
+    description: "Classe corporativa que classifica o deslocamento para fins de diaria (ex: Dentro do Estado, Nacional, Internacional). Codigo deve ser unico."
+    extends: null
+    fields:
+      codigo:
+        type: "string"
+        required: true
+        description: "Codigo canonico da abrangencia (DENTRO_ESTADO, NACIONAL, INTERNACIONAL). Unico."
+        max_length: 40
+        unique: true
+        domain: "DENTRO_ESTADO | NACIONAL | INTERNACIONAL"
+      nome:
+        type: "string"
+        required: true
+        description: "Nome de exibicao da abrangencia (ex: Dentro do Estado)."
+        max_length: 150
+      descricao:
+        type: "string"
+        required: false
+        description: "Descricao da abrangencia."
+        max_length: 500
+      ativo:
+        type: "boolean"
+        required: true
+        description: "Indica se a abrangencia esta ativa para novos tipos de diaria."
+
+  TipoDiaria:
+    description: "Cadastro corporativo do valor vigente de diaria para uma Abrangencia. Nao pode haver vigencia ativa sobreposta para a mesma abrangencia. Consumido por M003 para calculo."
+    extends: null
+    fields:
+      abrangencia:
+        type: "ref:corporativo.diarias.Abrangencia"
+        required: true
+        description: "Abrangencia administrativa do deslocamento."
+      valorUnitario:
+        type: "decimal"
+        required: true
+        description: "Valor unitario vigente da diaria. Deve ser maior que zero."
+      vigenciaInicio:
+        type: "date"
+        required: true
+        description: "Inicio da vigencia do tipo de diaria."
+      vigenciaFim:
+        type: "date"
+        required: false
+        description: "Fim da vigencia do tipo de diaria. Nulo indica vigencia em aberto."
+      ativo:
+        type: "boolean"
+        required: true
+        description: "Indica se o cadastro esta ativo."
+
+  ParametroCalculoDiaria:
+    description: "Cadastro corporativo dos parametros normativos vigentes vinculados a um TipoDiaria, usados pelo M003 para calcular quantidade, acrescimos, bloqueios e memoria de calculo. Nao pode haver ativo com vigencia sobreposta para o mesmo TipoDiaria."
+    extends: null
+    fields:
+      tipoDiaria:
+        type: "ref:corporativo.diarias.TipoDiaria"
+        required: true
+        description: "Tipo de diaria ao qual os parametros pertencem."
+      normaReferencia:
+        type: "string"
+        required: true
+        description: "Decreto, resolucao ou ato normativo que fundamenta os parametros (ex: Decreto ES no 5533-R/2023)."
+        max_length: 200
+      percentualDiariaSemPernoite:
+        type: "decimal"
+        required: true
+        description: "Percentual aplicado quando nao ha pernoite e o afastamento atinge minimo normativo (ex: 0.40 = 40%)."
+      horasMinimasSemPernoite:
+        type: "integer"
+        required: true
+        description: "Quantidade minima de horas para caracterizar diaria sem pernoite (ex: 6)."
+      horaLimiteRetornoAcrescimo:
+        type: "integer"
+        required: true
+        description: "Hora de retorno a partir da qual ha acrescimo normativo (ex: 14). Valores: 0 a 23."
+      percentualAcrescimoRetorno:
+        type: "decimal"
+        required: true
+        description: "Percentual acrescido quando retorno ocorrer apos o horario limite (ex: 0.50 = 50%)."
+      distanciaMinimaKm:
+        type: "integer"
+        required: false
+        description: "Distancia minima em quilometros para elegibilidade quando prevista na norma (ex: 150). Deve ser >= 0."
+      limiteDiasConsecutivos:
+        type: "integer"
+        required: false
+        description: "Limite de dias consecutivos com diaria por viagem, quando previsto (ex: 15). Deve ser > 0."
+      limiteDiariasMes:
+        type: "integer"
+        required: false
+        description: "Limite mensal de diarias por beneficiario, quando previsto (ex: 15). Deve ser > 0."
+      percentualComplementoTransporte:
+        type: "decimal"
+        required: false
+        description: "Percentual de complemento para transporte urbano quando aplicavel (ex: 0.20 = 20%)."
+      bloqueiaRegiaoMetropolitanaSemPernoite:
+        type: "boolean"
+        required: true
+        description: "Indica se deslocamentos em regiao metropolitana sem pernoite sao bloqueados."
+      bloqueiaMunicipioLimitrofeSemPernoite:
+        type: "boolean"
+        required: true
+        description: "Indica se municipios limitrofes sem pernoite sao bloqueados."
+      ativo:
+        type: "boolean"
+        required: true
+        description: "Indica se os parametros estao vigentes para novas consultas."
+      vigenciaInicio:
+        type: "date"
+        required: true
+        description: "Inicio da vigencia normativa dos parametros."
+      vigenciaFim:
+        type: "date"
+        required: false
+        description: "Fim da vigencia normativa dos parametros. Nulo indica vigencia em aberto."
+
+  PontoDiaria:
+    description: "Cadastro corporativo dos pontos selecionaveis como origem ou destino da diaria. Para municipios do ES o ponto participa da tabela de distancias. Para destinos especiais (fora do Estado ou fora do Pais), serve apenas para classificar a abrangencia e nao exige distancia."
+    extends: null
+    fields:
+      nome:
+        type: "string"
+        required: true
+        description: "Nome exibido para selecao (ex: Vitoria, Linhares, Fora do Estado, Fora do Pais)."
+        max_length: 150
+      uf:
+        type: "string"
+        required: false
+        description: "Unidade federativa do ponto, quando aplicavel (ex: ES)."
+        max_length: 2
+      pais:
+        type: "string"
+        required: true
+        description: "Pais do ponto (ex: Brasil)."
+        max_length: 100
+      tipoPonto:
+        type: "string"
+        required: true
+        description: "Tipo operacional do ponto: MUNICIPIO_ES, FORA_ESTADO ou FORA_PAIS."
+        max_length: 40
+        domain: "MUNICIPIO_ES | FORA_ESTADO | FORA_PAIS"
+      permiteOrigem:
+        type: "boolean"
+        required: true
+        description: "Indica se o ponto pode ser usado como origem da viagem."
+      permiteDestino:
+        type: "boolean"
+        required: true
+        description: "Indica se o ponto pode ser usado como destino da viagem."
+      exigeDistancia:
+        type: "boolean"
+        required: true
+        description: "Indica se a solicitacao deve obter distancia para o par origem-destino deste ponto."
+      ativo:
+        type: "boolean"
+        required: true
+        description: "Indica se o ponto esta ativo para novas solicitacoes."
+
+  DistanciaPontoDiaria:
+    description: "Tabela/cache corporativo de distancia rodoviaria entre dois PontoDiaria. Utilizada por M003 na memoria de calculo de solicitacoes dentro do Estado. Par (origem, destino) deve ser unico quando ativo."
+    extends: null
+    fields:
+      origem:
+        type: "ref:corporativo.diarias.PontoDiaria"
+        required: true
+        description: "Ponto de origem. Deve ter permiteOrigem = true."
+      destino:
+        type: "ref:corporativo.diarias.PontoDiaria"
+        required: true
+        description: "Ponto de destino. Deve ter permiteDestino = true."
+      distanciaKm:
+        type: "decimal"
+        required: true
+        description: "Distancia rodoviaria em quilometros. Deve ser >= 0."
+      fonte:
+        type: "string"
+        required: true
+        description: "Origem da informacao de distancia: GOOGLE_ROUTES, TABELA_OFICIAL, MANUAL ou SEP_ES."
+        max_length: 40
+        domain: "GOOGLE_ROUTES | TABELA_OFICIAL | MANUAL | SEP_ES"
+      dataReferencia:
+        type: "date"
+        required: true
+        description: "Data em que a distancia foi calculada ou validada."
+      ativo:
+        type: "boolean"
+        required: true
+        description: "Indica se a distancia esta ativa para calculos."
+
+relationships:
+  - from: "corporativo.diarias.Abrangencia"
+    relation: "classifica"
+    to: "corporativo.diarias.TipoDiaria"
+    cardinality: "1:N"
+    description: "Uma Abrangencia pode ter multiplos TipoDiaria ao longo do tempo (historico de valores)."
+  - from: "corporativo.diarias.TipoDiaria"
+    relation: "possui parametros"
+    to: "corporativo.diarias.ParametroCalculoDiaria"
+    cardinality: "1:N"
+    description: "Um TipoDiaria possui um ou mais ParametroCalculoDiaria (historico normativo)."
+  - from: "corporativo.diarias.PontoDiaria"
+    relation: "e origem de"
+    to: "corporativo.diarias.DistanciaPontoDiaria"
+    cardinality: "1:N"
+    description: "Um PontoDiaria pode ser origem de multiplas distancias."
+  - from: "corporativo.diarias.PontoDiaria"
+    relation: "e destino de"
+    to: "corporativo.diarias.DistanciaPontoDiaria"
+    cardinality: "1:N"
+    description: "Um PontoDiaria pode ser destino de multiplas distancias."
+
+axioms:
+  - id: "AX001"
+    natural_language: "TipoDiaria sempre possui uma abrangencia."
+    formal_rule: "TipoDiaria.abrangencia IS NOT NULL"
+  - id: "AX002"
+    natural_language: "Nao pode haver vigencia ativa sobreposta para a mesma abrangencia."
+    formal_rule: "NOT EXISTS t1, t2: TipoDiaria WHERE t1 != t2 AND t1.abrangencia == t2.abrangencia AND t1.ativo AND t2.ativo AND overlaps(t1.vigenciaInicio, t1.vigenciaFim, t2.vigenciaInicio, t2.vigenciaFim)"
+  - id: "AX003"
+    natural_language: "ParametroCalculoDiaria sempre pertence a exatamente um TipoDiaria."
+    formal_rule: "ParametroCalculoDiaria.tipoDiaria IS NOT NULL"
+  - id: "AX004"
+    natural_language: "Nao pode haver ParametroCalculoDiaria ativo com vigencia sobreposta para o mesmo TipoDiaria."
+    formal_rule: "NOT EXISTS p1, p2: ParametroCalculoDiaria WHERE p1 != p2 AND p1.tipoDiaria == p2.tipoDiaria AND p1.ativo AND p2.ativo AND overlaps(p1.vigenciaInicio, p1.vigenciaFim, p2.vigenciaInicio, p2.vigenciaFim)"
+  - id: "AX005"
+    natural_language: "PontoDiaria com tipoPonto FORA_ESTADO ou FORA_PAIS deve ser usado apenas como destino especial, nao como origem."
+    formal_rule: "PontoDiaria.tipoPonto IN {FORA_ESTADO, FORA_PAIS} => PontoDiaria.permiteOrigem == false"
+  - id: "AX006"
+    natural_language: "DistanciaPontoDiaria deve ser preenchida apenas para pares entre municipios do Espirito Santo."
+    formal_rule: "DistanciaPontoDiaria.origem.tipoPonto == MUNICIPIO_ES AND DistanciaPontoDiaria.destino.tipoPonto == MUNICIPIO_ES"
+  - id: "AX007"
+    natural_language: "Nao pode existir mais de uma DistanciaPontoDiaria ativa para o mesmo par origem + destino."
+    formal_rule: "NOT EXISTS d1, d2: DistanciaPontoDiaria WHERE d1 != d2 AND d1.origem == d2.origem AND d1.destino == d2.destino AND d1.ativo AND d2.ativo"
+
+invariants:
+  - id: "INV001"
+    rule: "TipoDiaria.valorUnitario > 0"
+    description: "Valor unitario da diaria deve ser maior que zero."
+  - id: "INV002"
+    rule: "ParametroCalculoDiaria.distanciaMinimaKm IS NULL OR ParametroCalculoDiaria.distanciaMinimaKm >= 0"
+    description: "Distancia minima, quando informada, deve ser maior ou igual a zero."
+  - id: "INV003"
+    rule: "ParametroCalculoDiaria.limiteDiasConsecutivos IS NULL OR ParametroCalculoDiaria.limiteDiasConsecutivos > 0"
+    description: "Limite de dias consecutivos, quando informado, deve ser maior que zero."
+  - id: "INV004"
+    rule: "ParametroCalculoDiaria.limiteDiariasMes IS NULL OR ParametroCalculoDiaria.limiteDiariasMes > 0"
+    description: "Limite mensal de diarias, quando informado, deve ser maior que zero."
+  - id: "INV005"
+    rule: "DistanciaPontoDiaria.distanciaKm >= 0"
+    description: "Distancia em km deve ser maior ou igual a zero."
+  - id: "INV006"
+    rule: "DistanciaPontoDiaria.origem.permiteOrigem == true"
+    description: "O ponto de origem de uma DistanciaPontoDiaria deve ter permiteOrigem = true."
+  - id: "INV007"
+    rule: "DistanciaPontoDiaria.destino.permiteDestino == true"
+    description: "O ponto de destino de uma DistanciaPontoDiaria deve ter permiteDestino = true."
+
+enums: {}
+value_objects: {}
+events: []
+workflows: null
+policies: null
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "Nao permitir sobreposicao de vigencia ativa para o mesmo TipoDiaria ou ParametroCalculoDiaria."
+    - "PontoDiaria com tipoPonto FORA_ESTADO ou FORA_PAIS nao permite origem."
+    - "DistanciaPontoDiaria so deve ser cadastrada para pares MUNICIPIO_ES x MUNICIPIO_ES."
+    - "M003 consome TipoDiaria e ParametroCalculoDiaria por referencia e grava snapshots na SolicitacaoDiaria."
+    - "Para viagens dentro do Estado, buscar distancia primeiro em DistanciaPontoDiaria; se nao houver par ativo, acionar provedor externo autorizado e cachear."
+  notes:
+    - "ParametroCalculoDiaria tem campos opcionais que dependem da norma vigente — nao forcar preenchimento quando inaplicavel."
+    - "Fonte de distancia deve ser registrada para rastreabilidade."
+    - "Simetria de distancias: o sistema pode armazenar os dois sentidos ou normalizar a consulta desde que consistente no servico de calculo."

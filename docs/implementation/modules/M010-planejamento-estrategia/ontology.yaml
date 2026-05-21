@@ -1,0 +1,153 @@
+ontology: "M010 — Planejamento e Estrategia (index)"
+namespace: "planejamento"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: shared.people
+    path: path: "../../../ontology/shared/people.yaml"
+  - namespace: corporativo.instituicoes
+    path: path: "../M008-cadastros-corporativos/instituicoes/ontology.yaml"
+  - namespace: planejamento.estrategia
+    path: path: "planejamento/ontology.yaml"
+  - namespace: planejamento.parcerias
+    path: path: "parcerias/ontology.yaml"
+  - namespace: planejamento.programas
+    path: path: "programas/ontology.yaml"
+metadata:
+  module: "M010"
+  source: "docs/implementation/modules/M010-planejamento-estrategia/README.md"
+  version: "1.0.0"
+  description: "Indice do modulo M010: agrega os subdominios de Planejamento Estrategico, Parcerias e Programas de fomento da FAPES."
+
+# Este arquivo e um indice (index) do modulo M010.
+# Nao define entidades proprias — apenas agrega e documenta os subdominios.
+entities: null
+
+relationships:
+  # Resumo das relacoes inter-subdominios (detalhes em cada subdominio)
+  - from: "planejamento.estrategia.PlanoEstrategico"
+    relation: "possui_eixos"
+    to: "planejamento.estrategia.EixoEstrategico"
+    cardinality: "1:N"
+    description: "Um PlanoEstrategico possui um ou mais EixoEstrategico."
+  - from: "planejamento.estrategia.EixoEstrategico"
+    relation: "orienta"
+    to: "planejamento.programas.Programa"
+    cardinality: "N:N"
+    description: "EixoEstrategico orienta Programas (N:N); Programa deve ter ao menos um eixo (RN01)."
+  - from: "planejamento.programas.Programa"
+    relation: "demandado_por"
+    to: "corporativo.instituicoes.Instituicao"
+    cardinality: "N:1"
+    description: "Cada Programa e demandado por exatamente uma Instituicao (RN16)."
+  - from: "planejamento.parcerias.Parceria"
+    relation: "vinculada_a"
+    to: "corporativo.instituicoes.Instituicao"
+    cardinality: "N:1"
+    description: "Cada Parceria e vinculada a exatamente uma Instituicao (RN10)."
+  - from: "planejamento.parcerias.Parceria"
+    relation: "aloca_recursos_em"
+    to: "planejamento.programas.Programa"
+    cardinality: "N:N"
+    via: "planejamento.programas.AporteFinanceiroParceriaPrograma"
+    description: "Parceria aloca recursos em Programas exclusivamente via AporteFinanceiroParceriaPrograma (RN02)."
+
+axioms:
+  # Axiomas consolidados de M010 — definicoes oficiais em cada subdominio
+  - id: "AX-M010-RN01"
+    natural_language: "Um programa deve estar vinculado a pelo menos um eixo estrategico."
+    formal_rule: "∀p ∈ Programa: COUNT(EixoEstrategico orienta p) >= 1"
+  - id: "AX-M010-RN02"
+    natural_language: "Parcerias e Programas relacionam-se exclusivamente via AporteFinanceiroParceriaPrograma. Nao existe relacao direta 'parceria de referencia'."
+    formal_rule: "Parceria ↔ Programa ONLY VIA AporteFinanceiroParceriaPrograma"
+  - id: "AX-M010-RN09"
+    natural_language: "So pode haver um PlanoEstrategico ativo por vez."
+    formal_rule: "COUNT(PlanoEstrategico WHERE estado = 'Ativo') <= 1"
+  - id: "AX-M010-RN10"
+    natural_language: "Uma Parceria deve estar vinculada a exatamente uma Instituicao."
+    formal_rule: "∀p ∈ Parceria: COUNT(p.instituicao) = 1"
+  - id: "AX-M010-RN16"
+    natural_language: "Todo Programa deve ter exatamente uma Instituicao demandante."
+    formal_rule: "∀p ∈ Programa: COUNT(p.instituicaoDemandante) = 1"
+
+invariants:
+  - id: "INV-M010-GLOBAL-01"
+    rule: "COUNT(PlanoEstrategico WHERE estado = 'Ativo') <= 1"
+    description: "No maximo um PlanoEstrategico pode estar ativo simultaneamente (RN09)."
+  - id: "INV-M010-GLOBAL-02"
+    rule: "Parceria.saldoAlocavelEmProgramas >= 0"
+    description: "Saldo alocavel em Programas de qualquer Parceria nunca pode ser negativo (RN14, RN22)."
+  - id: "INV-M010-GLOBAL-03"
+    rule: "AporteFinanceiroParceriaPrograma.parceria.estado = 'Vigente' AT_TIME_OF create"
+    description: "Aportes em Programas exigem Parceria vigente no momento do registro (RN11)."
+
+enums: {}
+
+value_objects: {}
+
+events: []
+
+workflows: null
+
+policies:
+  permissions:
+    DiretoriaAgenciaFomento:
+      can:
+        - criar_plano_estrategico
+        - editar_plano_estrategico
+        - ativar_plano_estrategico
+        - encerrar_plano_estrategico
+        - criar_eixo_estrategico
+        - editar_eixo_estrategico
+        - visualizar_programa
+        - visualizar_parceria
+        - visualizar_dashboard_financeiro
+        - visualizar_dashboard_planejamento
+    ServidorAreaTecnica:
+      can:
+        - criar_programa
+        - editar_programa
+        - ativar_programa
+        - suspender_programa
+        - encerrar_programa
+        - remover_programa
+        - registrar_aporte_parceria_programa
+        - retirar_aporte_parceria_programa
+        - gerenciar_comite_governanca
+        - visualizar_eixo_estrategico
+        - visualizar_plano_estrategico
+    ServidorAreaParcerias:
+      can:
+        - criar_parceria
+        - editar_parceria
+        - formalizar_parceria
+        - registrar_aporte_financeiro
+        - registrar_vigencia_aditivo
+        - suspender_parceria
+        - encerrar_parceria
+        - anexar_documento
+        - visualizar_programa
+        - registrar_aporte_parceria_programa
+    GestorParceria:
+      can:
+        - visualizar_parceria
+        - visualizar_dashboard_financeiro
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "Programa deve sempre ter Instituicao demandante (RN16)."
+    - "AporteFinanceiro flui de Parceria para Programa via AporteFinanceiroParceriaPrograma antes de qualquer Captacao."
+    - "Parceria e Programa nao possuem relacao direta; usar exclusivamente AporteFinanceiroParceriaPrograma (RN02)."
+    - "Ao suspender Parceria, suspender em cascata todos os Programas aportados e suas Iniciativas (RI4)."
+    - "Ao encerrar Parceria, encerrar em cascata todos os Programas aportados apos confirmacao explicita (RI2)."
+    - "Acao Transversal e calculada uma unica vez na Parceria (RN20); o calculo da politica vem do M016."
+    - "So pode haver um PlanoEstrategico ativo por vez (RN09); validar antes de ativar."
+  notes:
+    - "Este arquivo e apenas o indice do modulo. Consultar os subdominios para detalhes: planejamento.yaml, parcerias.yaml, programas.yaml."
+    - "Subdominio de Acao Transversal: M010 calcula e bloqueia a reserva; M016 planeja, executa e presta financeiramente."
+    - "Editais sao configurados em M011. Iniciativas resultantes de contratos/outorgas pertencem ao M003."
+    - "Dependencias externas: M008 (Instituicao, Documento, PessoaFisica), M016 (ContaBancaria, politica Acao Transversal), M003 (Iniciativa), M014 (prestacao de contas)."
+    - "Referencia normativa Acao Transversal: Resolucao CCAF 334/2023 — FAPES."

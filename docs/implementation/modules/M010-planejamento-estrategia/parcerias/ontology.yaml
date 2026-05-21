@@ -1,0 +1,354 @@
+ontology: "Parcerias — Parceria, Vigencia e AporteFinanceiro"
+namespace: "planejamento.parcerias"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: shared.people
+    path: path: "../../../ontology/shared/people.yaml"
+  - namespace: corporativo.instituicoes
+    path: path: "../../M008-cadastros-corporativos/instituicoes/ontology.yaml"
+metadata:
+  module: "M010"
+  source: "docs/implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Define Parceria institucional com sua vigencia (original e aditivos), aportes financeiros recebidos e documentos regularizadores."
+
+entities:
+  Parceria:
+    description: "Instrumento formal de cooperacao entre a agencia de fomento e uma Instituicao, com vigencia, aportes financeiros e documentos. Vinculada a exatamente uma Instituicao (RN10)."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: "string"
+        required: true
+        description: "Nome da parceria."
+        max_length: 300
+      numeroDProcesso:
+        type: "string"
+        required: true
+        description: "Numero do processo administrativo (ex: PRC-2026-001). Unico."
+        max_length: 100
+        unique: true
+      dataAssinatura:
+        type: "date"
+        required: true
+        description: "Data da assinatura do instrumento de parceria."
+      objetivo:
+        type: "string"
+        required: true
+        description: "Objetivo geral da parceria."
+        max_length: 2000
+      estado:
+        type: "enum:EstadoParceria"
+        required: true
+        description: "Estado corrente da parceria. Gerado pelo sistema."
+        generated: true
+      instituicao:
+        type: "ref:corporativo.instituicoes.Instituicao"
+        required: true
+        description: "Instituicao unica vinculada a Parceria (RN10). Exatamente uma."
+      vigenciaInicioCorrente:
+        type: "date"
+        required: false
+        description: "Data de inicio efetiva: MIN(Vigencia.dataInicio). Atributo derivado (RN15)."
+        derived: true
+        formula: "MIN(Vigencia.dataInicio WHERE parceria = this)"
+      vigenciaFimCorrente:
+        type: "date"
+        required: false
+        description: "Data de fim efetiva: MAX(Vigencia.dataFim). Atributo derivado (RN15)."
+        derived: true
+        formula: "MAX(Vigencia.dataFim WHERE parceria = this)"
+      valorBrutoRecebido:
+        type: "decimal"
+        required: false
+        description: "SUM(AporteFinanceiro.valorInvestido). Atributo derivado. Sempre >= 0."
+        derived: true
+        formula: "SUM(AporteFinanceiro.valorInvestido WHERE parceria = this)"
+      valorReservadoAcaoTransversal:
+        type: "decimal"
+        required: false
+        description: "Valor reservado conforme politica de Acao Transversal parametrizada no M016; calculado uma unica vez por aporte (RN20, RN23). Nao compoe saldo alocavel em Programas (RN21)."
+        derived: true
+        formula: "SUM(ReservaAcaoTransversal.valorReservado WHERE parceria = this)"
+      saldoAlocavelEmProgramas:
+        type: "decimal"
+        required: false
+        description: "valorBrutoRecebido - valorReservadoAcaoTransversal - SUM(AporteFinanceiroParceriaPrograma.valor em estado ATIVO). Sempre >= 0 (RN14, RN22)."
+        derived: true
+        formula: "valorBrutoRecebido - valorReservadoAcaoTransversal - SUM(AporteFinanceiroParceriaPrograma.valor WHERE parceria = this AND estado = 'ATIVO')"
+
+  Vigencia:
+    description: "Janela temporal da Parceria, original ou aditivo. A Parceria deve ter exatamente uma Vigencia com isAditivo = false (RN15). Aditivos estendem a vigencia com justificativa e documento (RN06)."
+    extends: "shared.Auditavel"
+    fields:
+      dataInicio:
+        type: "date"
+        required: true
+        description: "Inicio da janela de vigencia."
+      dataFim:
+        type: "date"
+        required: true
+        description: "Fim da janela de vigencia; em aditivo deve ser posterior a vigenciaFimCorrente anterior (RN06)."
+      dataAssinatura:
+        type: "date"
+        required: true
+        description: "Data de assinatura desta vigencia; em aditivo deve ser posterior a da Vigencia original (RN06)."
+      isAditivo:
+        type: "boolean"
+        required: true
+        description: "Indica se e vigencia original (false) ou aditivo (true). Padrao false para a primeira vigencia."
+      justificativa:
+        type: "string"
+        required: false
+        description: "Justificativa da vigencia; obrigatoria quando isAditivo = true."
+        max_length: 2000
+      documento:
+        type: "ref:corporativo.instituicoes.Documento"
+        required: true
+        description: "Documento (M008) formalizador: Termo de Cooperacao na original; Termo Aditivo nos aditivos."
+      parceria:
+        type: "ref:planejamento.parcerias.Parceria"
+        required: true
+        description: "Parceria a qual esta vigencia pertence."
+
+  AporteFinanceiro:
+    description: "Registro de valor recebido pela Parceria oriundo da Instituicao vinculada. Cada aporte sujeito a Acao Transversal gera sua propria reserva com snapshot da politica (RN23)."
+    extends: "shared.Auditavel"
+    fields:
+      valorInvestido:
+        type: "decimal"
+        required: true
+        description: "Valor recebido no aporte. Deve ser > 0."
+      dataAporte:
+        type: "date"
+        required: true
+        description: "Data do aporte. Em aditivo deve ser posterior ao original (RN17)."
+      isAditivo:
+        type: "boolean"
+        required: true
+        description: "Indica se e aporte original (false) ou aditivo (true). Padrao false."
+      documento:
+        type: "ref:corporativo.instituicoes.Documento"
+        required: true
+        description: "Documento (M008) classificado como 'Termo de Descentralizacao' (RN12)."
+      instituicao:
+        type: "ref:corporativo.instituicoes.Instituicao"
+        required: true
+        description: "Instituicao de origem do aporte (M008). Deve ser a mesma Instituicao vinculada a Parceria (RN04, RN10)."
+      contaBancariaDestino:
+        type: "ref:m016.ContaBancaria"
+        required: true
+        description: "Conta bancaria (M016) da agencia de fomento que recebe o deposito do aporte."
+      parceria:
+        type: "ref:planejamento.parcerias.Parceria"
+        required: true
+        description: "Parceria a qual este aporte pertence."
+
+relationships:
+  - from: "planejamento.parcerias.Parceria"
+    relation: "possui"
+    to: "planejamento.parcerias.Vigencia"
+    cardinality: "1:N"
+    description: "Uma Parceria possui uma ou mais Vigencias (minimo: a original com isAditivo = false)."
+  - from: "planejamento.parcerias.Parceria"
+    relation: "tem"
+    to: "planejamento.parcerias.AporteFinanceiro"
+    cardinality: "1:N"
+    description: "Uma Parceria pode ter zero ou mais AportesFinanceiros."
+  - from: "planejamento.parcerias.Parceria"
+    relation: "vinculada_a"
+    to: "corporativo.instituicoes.Instituicao"
+    cardinality: "N:1"
+    description: "Cada Parceria esta vinculada a exatamente uma Instituicao (RN10)."
+  - from: "planejamento.parcerias.AporteFinanceiro"
+    relation: "origem"
+    to: "corporativo.instituicoes.Instituicao"
+    cardinality: "N:1"
+    description: "Cada AporteFinanceiro tem origem na Instituicao vinculada a Parceria (RN04)."
+  - from: "planejamento.parcerias.AporteFinanceiro"
+    relation: "regulariza"
+    to: "corporativo.instituicoes.Documento"
+    cardinality: "N:1"
+    description: "Cada AporteFinanceiro e formalizado por um Documento classificado como Termo de Descentralizacao (RN12)."
+  - from: "planejamento.parcerias.Vigencia"
+    relation: "formalizado_por"
+    to: "corporativo.instituicoes.Documento"
+    cardinality: "N:1"
+    description: "Cada Vigencia e formalizada por um Documento (Termo de Cooperacao ou Termo Aditivo)."
+  - from: "planejamento.parcerias.Parceria"
+    relation: "origem_de"
+    to: "planejamento.programas.AporteFinanceiroParceriaPrograma"
+    cardinality: "1:N"
+    description: "Uma Parceria pode ser origem de zero ou mais aportes em Programas via AporteFinanceiroParceriaPrograma (entidade vive em programas)."
+
+axioms:
+  - id: "AX-M010-RN03"
+    natural_language: "O registro de aporte financeiro requer que a parceria tenha data de assinatura preenchida."
+    formal_rule: "∀a ∈ AporteFinanceiro: a.parceria.dataAssinatura ≠ null"
+  - id: "AX-M010-RN04"
+    natural_language: "Cada aporte financeiro deve ter origem na Instituicao vinculada a Parceria, cadastrada em M008."
+    formal_rule: "∀a ∈ AporteFinanceiro: a.instituicao = a.parceria.instituicao"
+  - id: "AX-M010-RN06"
+    natural_language: "A primeira Vigencia tem isAditivo = false e e criada junto ao cadastro. Toda alteracao posterior ocorre via nova Vigencia com isAditivo = true, com justificativa e documento, dataAssinatura posterior a da original e dataFim posterior a vigenciaFimCorrente anterior."
+    formal_rule: "COUNT(Vigencia WHERE parceria = p AND isAditivo = false) = 1 AND ∀v ∈ Vigencia WHERE isAditivo = true: v.dataAssinatura > MIN(Vigencia.dataAssinatura WHERE parceria = p AND isAditivo = false) AND v.dataFim > MAX(Vigencia.dataFim WHERE parceria = p AND index < v.index)"
+  - id: "AX-M010-RN10"
+    natural_language: "Uma Parceria deve estar vinculada a exatamente uma Instituicao (M008)."
+    formal_rule: "∀p ∈ Parceria: COUNT(p.instituicao) = 1"
+  - id: "AX-M010-RN12"
+    natural_language: "Todo AporteFinanceiro deve estar formalizado por um Documento classificado como Termo de Descentralizacao."
+    formal_rule: "∀a ∈ AporteFinanceiro: a.documento.tipoDocumento = 'Termo de Descentralizacao'"
+  - id: "AX-M010-RN14"
+    natural_language: "A Parceria deve manter saldos financeiros nao negativos. O saldo operacional para Programas deve considerar a reserva transversal antes de permitir novos aportes."
+    formal_rule: "∀p ∈ Parceria: p.saldoAlocavelEmProgramas >= 0"
+  - id: "AX-M010-RN15"
+    natural_language: "A vigencia efetiva e derivada das instancias de Vigencia: vigenciaInicioCorrente = MIN(dataInicio), vigenciaFimCorrente = MAX(dataFim). Toda Parceria deve ter exatamente uma Vigencia com isAditivo = false."
+    formal_rule: "∀p ∈ Parceria: COUNT(Vigencia WHERE parceria = p AND isAditivo = false) = 1"
+  - id: "AX-M010-RN17"
+    natural_language: "O primeiro AporteFinanceiro de uma Parceria tem isAditivo = false. Um aditivo so pode ser registrado apos existir pelo menos um original, com dataAporte posterior."
+    formal_rule: "∀a ∈ AporteFinanceiro WHERE isAditivo = true: COUNT(AporteFinanceiro WHERE parceria = a.parceria AND isAditivo = false) >= 1 AND a.dataAporte > MIN(AporteFinanceiro.dataAporte WHERE parceria = a.parceria AND isAditivo = false)"
+  - id: "AX-M010-RN18"
+    natural_language: "Um AporteFinanceiro com isAditivo = true pode ser editado ou removido, e o saldo e recalculado. A operacao e rejeitada se o saldo resultante ficar negativo."
+    formal_rule: "∀op ∈ {edit, remove}(AporteFinanceiro WHERE isAditivo = true): saldoAlocavelEmProgramas_pos_op >= 0"
+  - id: "AX-M010-RN19"
+    natural_language: "Transicao EmElaboracao para Vigente exige: dataAssinatura preenchida, pelo menos um AporteFinanceiro original, Vigencia original, pelo menos um Documento anexado e data de hoje dentro de [vigenciaInicioCorrente, vigenciaFimCorrente]."
+    formal_rule: "Parceria.estado = 'EmElaboracao' → 'Vigente' REQUIRES dataAssinatura ≠ null AND COUNT(AporteFinanceiro WHERE isAditivo = false) >= 1 AND COUNT(Vigencia WHERE isAditivo = false) = 1 AND COUNT(Documento) >= 1 AND today() ∈ [vigenciaInicioCorrente, vigenciaFimCorrente]"
+  - id: "AX-M010-RN20"
+    natural_language: "A Acao Transversal e calculada uma unica vez na Parceria, com base na politica vigente parametrizada no M016; Programas nao recalculam Acao Transversal sobre aportes recebidos."
+    formal_rule: "AcaoTransversal.calculada_em = Parceria AND Programa.recalcula_acao_transversal = false"
+  - id: "AX-M010-RN21"
+    natural_language: "O valor reservado para Acao Transversal nao compoe o saldo alocavel em Programas."
+    formal_rule: "saldoAlocavelEmProgramas = valorBrutoRecebido - valorReservadoAcaoTransversal - SUM(AporteFinanceiroParceriaPrograma.valor em ATIVO)"
+  - id: "AX-M010-RN22"
+    natural_language: "O saldo alocavel em Programas e SUM(AporteFinanceiro.valorInvestido) - valorReservadoAcaoTransversal - SUM(AporteFinanceiroParceriaPrograma.valor em estado ATIVO), sempre >= 0."
+    formal_rule: "saldoAlocavelEmProgramas >= 0"
+  - id: "AX-M010-RN23"
+    natural_language: "Cada AporteFinanceiro sujeito a Acao Transversal gera sua propria reserva com snapshot da politica, faixa, percentual, base de calculo e valor reservado. Nao se recalcula retroativamente."
+    formal_rule: "∀a ∈ AporteFinanceiro: snapshot(politica, faixa, percentual) captured_at a.dataAporte"
+  - id: "AX-M010-RN24"
+    natural_language: "A prestacao financeira da Acao Transversal pertence ao M016; a prestacao de contas da Iniciativa/Projeto permanece no M014."
+    formal_rule: "AcaoTransversal.prestacao_financeira.owner = M016 AND Iniciativa.prestacao_contas.owner = M014"
+
+invariants:
+  - id: "INV-M010-PAR-01"
+    rule: "Parceria.saldoAlocavelEmProgramas >= 0"
+    description: "O saldo alocavel em Programas nunca pode ser negativo (RN14, RN22)."
+  - id: "INV-M010-PAR-02"
+    rule: "COUNT(Vigencia WHERE parceria = p AND isAditivo = false) = 1"
+    description: "Toda Parceria deve ter exatamente uma Vigencia original com isAditivo = false (RN15)."
+  - id: "INV-M010-PAR-03"
+    rule: "AporteFinanceiro.valorInvestido > 0"
+    description: "O valor de um AporteFinanceiro deve ser positivo."
+  - id: "INV-M010-PAR-04"
+    rule: "Vigencia.dataFim > Vigencia.dataInicio"
+    description: "A data de fim de uma Vigencia deve ser posterior a data de inicio."
+
+enums:
+  EstadoParceria:
+    description: "Estado do ciclo de vida da parceria."
+    values:
+      EmElaboracao: "Parceria em elaboracao, ainda nao formalizada."
+      Vigente: "Parceria formalizada e dentro da vigencia (RN19)."
+      Suspensa: "Parceria temporariamente suspensa; provoca suspensao em cascata de Programas e Iniciativas (RI4)."
+      Encerrada: "Parceria encerrada; provoca encerramento em cascata de Programas aportados (RI2)."
+
+value_objects: {}
+
+events:
+  - name: "ParceiraVigente"
+    description: "Emitido quando Parceria transita para Vigente apos satisfazer todos os pre-requisitos (RN19)."
+    payload_entity: "planejamento.parcerias.Parceria"
+    trigger: "state_transition.Vigente"
+  - name: "ParceriaSuspensa"
+    description: "Emitido quando Parceria transita para Suspensa; dispara suspensao em cascata de Programas e Iniciativas (RI4)."
+    payload_entity: "planejamento.parcerias.Parceria"
+    trigger: "state_transition.Suspensa"
+  - name: "ParceriaEncerrada"
+    description: "Emitido quando Parceria transita para Encerrada (solicitacao do usuario ou expiracao automatica); dispara encerramento em cascata de Programas aportados (RI2)."
+    payload_entity: "planejamento.parcerias.Parceria"
+    trigger: "state_transition.Encerrada"
+  - name: "AporteFinanceiroRegistrado"
+    description: "Emitido quando um AporteFinanceiro e registrado na Parceria; recalcula valorBrutoRecebido, valorReservadoAcaoTransversal e saldoAlocavelEmProgramas."
+    payload_entity: "planejamento.parcerias.AporteFinanceiro"
+    trigger: "create"
+  - name: "VigenciaAditivada"
+    description: "Emitido quando uma nova Vigencia aditivo e registrada; recalcula vigenciaInicioCorrente e vigenciaFimCorrente."
+    payload_entity: "planejamento.parcerias.Vigencia"
+    trigger: "create WHERE isAditivo = true"
+
+workflows:
+  Parceria:
+    states:
+      - EmElaboracao
+      - Vigente
+      - Suspensa
+      - Encerrada
+    transitions:
+      - from: EmElaboracao
+        to: Vigente
+        trigger: "formalizar_parceria"
+        guard: "dataAssinatura != null AND COUNT(AporteFinanceiro WHERE isAditivo = false) >= 1 AND COUNT(Vigencia WHERE isAditivo = false) = 1 AND COUNT(Documento) >= 1 AND today() IN [vigenciaInicioCorrente, vigenciaFimCorrente]"
+      - from: Vigente
+        to: Suspensa
+        trigger: "suspender_parceria"
+        guard: "justificativa preenchida"
+      - from: Suspensa
+        to: Vigente
+        trigger: "reativar_parceria"
+        guard: "justificativa preenchida AND today() <= vigenciaFimCorrente"
+      - from: Vigente
+        to: Encerrada
+        trigger: "encerrar_parceria"
+        guard: "justificativa obrigatoria AND confirmacao explicita de cascata em Programas"
+      - from: Vigente
+        to: Encerrada
+        trigger: "expiracao_automatica"
+        guard: "vigenciaFimCorrente < today() AND justificativa obrigatoria"
+      - from: Suspensa
+        to: Encerrada
+        trigger: "encerrar_parceria_suspensa"
+        guard: "justificativa obrigatoria AND confirmacao explicita de cascata em Programas"
+
+policies:
+  permissions:
+    ServidorAreaParcerias:
+      can:
+        - criar_parceria
+        - editar_parceria
+        - formalizar_parceria
+        - registrar_aporte_financeiro
+        - registrar_vigencia_aditivo
+        - suspender_parceria
+        - encerrar_parceria
+        - anexar_documento
+    GestorParceria:
+      can:
+        - visualizar_parceria
+        - visualizar_dashboard_financeiro
+    DiretoriaAgenciaFomento:
+      can:
+        - visualizar_parceria
+        - visualizar_dashboard_financeiro
+        - aprovar_suspensao_parceria
+        - aprovar_encerramento_parceria
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "Ao registrar AporteFinanceiro, verificar que dataAssinatura da Parceria esta preenchida (RN03)."
+    - "AporteFinanceiro.instituicao deve ser a mesma Instituicao vinculada a Parceria (RN04, RN10)."
+    - "Ao registrar Vigencia aditivo, verificar dataAssinatura posterior a original e dataFim posterior a vigenciaFimCorrente (RN06)."
+    - "Ao registrar AporteFinanceiro aditivo, verificar existencia de original e dataAporte posterior (RN17)."
+    - "Garantir saldoAlocavelEmProgramas >= 0 em toda operacao financeira (RN14, RN22)."
+    - "valorReservadoAcaoTransversal nao compoe saldo alocavel — calcular antes de permitir aportes em Programas (RN21)."
+    - "Ao suspender Parceria, disparar evento ParceriaSuspensa para cascata em Programas e Iniciativas (RI4)."
+    - "Ao encerrar Parceria, exigir confirmacao explicita e disparar encerramento em cascata de Programas aportados (RI2)."
+    - "Parceria so pode ser removida se nao houver AporteFinanceiroParceriaPrograma vinculado (RI3)."
+    - "A prestacao financeira da Acao Transversal pertence ao M016; nao modelar aqui (RN24)."
+  notes:
+    - "ContaBancaria e entidade externa do M016; apenas referenciada via FK."
+    - "ReservaAcaoTransversal e entidade externa do M016; M010 calcula e bloqueia, M016 planeja e executa."
+    - "AporteFinanceiroParceriaPrograma e entidade definida em planejamento.programas."
+    - "Percentuais e faixas de Acao Transversal sao parametrizados no M016 (Resolucao CCAF 334/2023)."

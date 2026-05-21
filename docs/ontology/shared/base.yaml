@@ -1,0 +1,107 @@
+ontology: "Shared Base — Mixins, Value Objects and Common Enums"
+namespace: "shared"
+imports: []
+metadata:
+  module: "shared"
+  source: "inferred"
+  version: "1.0.0"
+  description: "Base mixins, value objects and enums reused across all ConectaFAPES modules."
+
+entities: null
+
+relationships: []
+
+axioms:
+  - id: "AX-BASE-01"
+    natural_language: "Every auditable entity must record creation and last-update timestamps together with the identity of who performed each operation."
+    formal_rule: "∀e ∈ Auditavel: e.createdAt ≠ null ∧ e.updatedAt ≠ null ∧ e.createdBy ≠ null ∧ e.updatedBy ≠ null"
+  - id: "AX-BASE-02"
+    natural_language: "A soft-deleted entity has a non-null deletedAt and must not appear in active query results."
+    formal_rule: "∀e: e.deletedAt ≠ null → e ∉ ActiveResultSet"
+
+invariants:
+  - id: "INV-BASE-01"
+    rule: "createdAt ≤ updatedAt"
+    description: "Creation timestamp must not be later than the last update timestamp."
+  - id: "INV-BASE-02"
+    rule: "deletedAt = null ∨ deletedAt ≥ createdAt"
+    description: "Soft-delete timestamp, when set, must be on or after creation."
+
+enums:
+  Moeda:
+    description: "ISO 4217 currency codes supported by the system."
+    values:
+      BRL: "Real Brasileiro"
+      USD: "Dólar Americano"
+      EUR: "Euro"
+
+value_objects:
+  Auditavel:
+    fields:
+      createdAt:
+        type: datetime
+        required: true
+        description: "Timestamp of record creation, set automatically by the system."
+      updatedAt:
+        type: datetime
+        required: true
+        description: "Timestamp of the last update, maintained automatically by the system."
+      createdBy:
+        type: uuid
+        required: true
+        description: "Identifier of the user who created the record."
+      updatedBy:
+        type: uuid
+        required: true
+        description: "Identifier of the user who last updated the record."
+
+  SoftDelete:
+    fields:
+      deletedAt:
+        type: datetime
+        required: false
+        description: "Timestamp of logical deletion. Null means the record is active."
+
+  CPF:
+    fields:
+      value:
+        type: string
+        required: true
+        description: "CPF digits only, 11 characters, validated by check-digit algorithm."
+
+  CNPJ:
+    fields:
+      value:
+        type: string
+        required: true
+        description: "CNPJ digits only, 14 characters, validated by check-digit algorithm."
+
+  Email:
+    fields:
+      value:
+        type: string
+        required: true
+        description: "Email address, RFC 5321 compliant, max 200 characters."
+
+  UUID:
+    fields:
+      value:
+        type: uuid
+        required: true
+        description: "Universally unique identifier (UUID v4)."
+
+events: []
+workflows: null
+policies: null
+
+agent_instructions:
+  rules:
+    - "Não criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementação deve seguir workflows definidos."
+    - "Auditavel deve ser aplicado como mixin em todas as entidades persistidas do sistema."
+    - "SoftDelete deve ser aplicado em entidades que requerem exclusão lógica (não física)."
+    - "CPF e CNPJ são value objects imutáveis após persistência; qualquer correção gera novo registro."
+  notes:
+    - "Moeda enum values inferred from M001 usage patterns (BRL primary, USD/EUR for international grants)."
+    - "createdBy and updatedBy reference the system user identity; in most contexts this resolves to shared.people.PessoaFisica, but the field type is uuid to avoid circular imports."

@@ -1,0 +1,131 @@
+# Integracao — SERPRO
+
+```yaml
+ontology: "Integração SERPRO — ConectaFAPES"
+namespace: "integrations.serpro"
+
+imports: []
+
+metadata:
+  type: "integration"
+  version: "1.0.0"
+  description: "Validação de Notas Fiscais Eletrônicas (NF-e) via API do SERPRO. Usada em M014 para comprovar despesas na prestação de contas."
+  modules_using: [M014]
+  direction: "outbound"
+
+integration:
+  system: "SERPRO"
+  system_description: "Serviço Federal de Processamento de Dados — API de consulta à base NF-e da Receita Federal"
+  direction: "outbound"
+  protocol: "REST"
+  authentication: "OAuth 2.0 Client Credentials (client_id + client_secret SERPRO)"
+  base_url: "todo: configure per environment"
+
+  endpoints:
+    - path: "/nfe/v1/nota/{chave_acesso}"
+      method: "GET"
+      description: "Consulta dados completos de uma NF-e pela chave de acesso (44 dígitos)."
+      used_by: "M014.JustificativaNF"
+      authentication: "Bearer token (obtido via OAuth)"
+      response_fields:
+        - campo: "situacao"
+          description: "Situação da NF-e: AUTORIZADA, CANCELADA, DENEGADA, INUTILIZADA"
+          mapped_to: "M014.JustificativaNF.status_serpro"
+        - campo: "dataEmissao"
+          description: "Data de emissão da nota fiscal."
+          mapped_to: "M014.JustificativaNF.data_emissao_nfe"
+        - campo: "valorTotal"
+          description: "Valor total da nota fiscal."
+          mapped_to: "M014.JustificativaNF.valor_nfe"
+        - campo: "cnpjEmitente"
+          description: "CNPJ do emissor da nota."
+          mapped_to: "M014.JustificativaNF.cnpj_emitente"
+        - campo: "cpfDestinatario"
+          description: "CPF do destinatário (quando pessoa física)."
+          mapped_to: "M014.JustificativaNF.cpf_destinatario"
+        - campo: "descricaoProdutoServico"
+          description: "Descrição dos produtos ou serviços da nota."
+          mapped_to: "M014.JustificativaNF.descricao_nfe"
+
+    - path: "/oauth/v1/token"
+      method: "POST"
+      description: "Obtém access token OAuth para autenticação nas demais chamadas."
+      used_by: "M014.SERPROClient"
+      request_fields:
+        - campo: "grant_type"
+          value: "client_credentials"
+        - campo: "client_id"
+          value: "variável de ambiente SERPRO_CLIENT_ID"
+        - campo: "client_secret"
+          value: "variável de ambiente SERPRO_CLIENT_SECRET"
+
+validation_rules:
+  description: "Regras de validação aplicadas após retorno do SERPRO"
+
+  rules:
+    - id: "SERPRO-VAL-001"
+      description: "NF-e é válida somente se situacao == AUTORIZADA."
+      action_on_pass: "Marcar JustificativaNF como APROVADA"
+      action_on_fail: "Marcar JustificativaNF como REPROVADA com motivo"
+
+    - id: "SERPRO-VAL-002"
+      description: "Valor da NF-e deve ser compatível com o valor da despesa declarada (tolerância ±5%)."
+      action_on_fail: "Gerar alerta; não bloquear automaticamente — análise humana obrigatória"
+
+    - id: "SERPRO-VAL-003"
+      description: "Data de emissão da NF-e deve estar dentro do período de referência da prestação."
+      action_on_fail: "Marcar JustificativaNF como REPROVADA — NF fora do período"
+
+    - id: "SERPRO-VAL-004"
+      description: "CNPJ/CPF do emitente deve estar ativo na Receita Federal."
+      action_on_fail: "Gerar alerta; análise humana obrigatória"
+      note: "Requer consulta adicional à Receita Federal — não incluso nesta integração"
+
+data_mappings:
+  - external_entity: "SERPRO.NotaFiscal"
+    internal_entity: "financeiro.prestacao_contas.JustificativaNF"
+    mapping_notes: "Dados da NF-e retornados pelo SERPRO são armazenados em JustificativaNF para referência futura. A chave de acesso é o identificador primário."
+
+  - external_entity: "SERPRO.SituacaoNFe"
+    internal_entity: "financeiro.prestacao_contas.JustificativaNF.status_serpro"
+    mapping_notes: |
+      AUTORIZADA → JustificativaNF.status = APROVADA
+      CANCELADA   → JustificativaNF.status = REPROVADA (motivo: NF cancelada)
+      DENEGADA    → JustificativaNF.status = REPROVADA (motivo: NF denegada)
+      INUTILIZADA → JustificativaNF.status = REPROVADA (motivo: NF inutilizada)
+
+  todo: "Complete mapping when integration is implemented"
+
+error_handling:
+  - scenario: "SERPRO indisponível (timeout/5xx)"
+    action: "Retry com backoff exponencial (3 tentativas); se falhar, manter JustificativaNF em EM_VALIDACAO e alertar gestor"
+
+  - scenario: "NF-e não encontrada na base SERPRO (404)"
+    action: "Marcar JustificativaNF como REPROVADA com motivo 'NF-e não localizada na base SERPRO'"
+
+  - scenario: "Token OAuth expirado"
+    action: "Renovar token automaticamente antes da próxima chamada"
+
+  - scenario: "Chave de acesso com formato inválido"
+    action: "Rejeitar antes de chamar SERPRO; retornar erro de validação com formato esperado"
+
+chave_acesso_format:
+  description: "Formato da chave de acesso NF-e"
+  length: 44
+  composition: "cUF(2) + AAMM(4) + CNPJ(14) + mod(2) + serie(3) + nNF(9) + tpEmis(1) + cNF(8) + cDV(1)"
+  validation_regex: "^[0-9]{44}$"
+
+agent_instructions:
+  rules:
+    - "Não criar integrações fora deste arquivo."
+    - "Toda integração deve ter data_mappings definidos."
+    - "Toda despesa classificada como DESPESA em M014 deve ter JustificativaNF validada pelo SERPRO."
+    - "client_id e client_secret do SERPRO nunca devem ser versionados no código."
+    - "Resultados de validação SERPRO são imutáveis após geração — registrar na entidade para auditoria."
+    - "Validação SERPRO-VAL-001 é obrigatória e bloqueante; SERPRO-VAL-002 e SERPRO-VAL-004 são alertas."
+  notes:
+    - "SERPRO oferece ambiente de sandbox para desenvolvimento: usar chaves de teste."
+    - "Caching de tokens OAuth recomendado (reutilizar até expiração)."
+    - "API SERPRO pode ter limites de rate; implementar throttling se necessário."
+
+```

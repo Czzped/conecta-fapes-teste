@@ -1,0 +1,670 @@
+ontology: "Prestacao de Contas"
+namespace: "post_award.prestacao_contas"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: shared.people
+    path: path: "../../../ontology/shared/people.yaml"
+  - namespace: post_award.iniciativas
+    path: path: "../M003-gestao-iniciativas-captadas/ontology.yaml"
+  - namespace: post_award.orcamentaria
+    path: path: "../M013-gestao-orcamentaria-projeto/ontology.yaml"
+metadata:
+  module: "M014"
+  source: "docs/implementation/modules/M014-prestacao-contas/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Dominio de justificativa de despesas e conciliacao bancaria para prestacao de contas de projetos financiados pela FAPES."
+  backend: "SQL Server (separate from main PostgreSQL backend)"
+  technical_debts:
+    - id: "DT-M014-001"
+      description: "ContaBancaria, Orcamento, RubricaOrcamentaria e TransacaoFinanceira estao implementadas neste backend mas pertencem conceitualmente a M013 (Gestao Orcamentaria) e M016 (Contabilidade e Financeiro)."
+      todo: "Migrate to M013/M016"
+    - id: "DT-M014-005"
+      description: "RubricaOrcamentaria e o alias tecnico do backend legado para o termo canonico de dominio RubricaProjeto (M013). O nome de classe/tabela permanece como legado ate DT-M014-001 ser resolvido."
+      todo: "Rename class/table RubricaOrcamentaria to RubricaProjeto after DT-M014-001 migration"
+    - id: "DT-M014-006"
+      description: "TransacaoFinanceira deve permanecer separada de RubricaOrcamentaria. Qualquer FK legado de transacao financeira para rubrica deve ser migrado para classificacao oficial em justificativas, itens e Transacao (M013)."
+      todo: "Remove any legacy FK from TransacaoFinanceira to RubricaOrcamentaria"
+
+entities:
+  Prestacao:
+    description: "Agregado raiz da prestacao de contas de um projeto; agrupa justificativas de despesa e transacoes financeiras no ciclo de vida da prestacao."
+    extends: "shared.Auditavel"
+    fields:
+      data:
+        type: "DateTimeOffset"
+        required: true
+        description: "Data de referencia da prestacao de contas."
+      status:
+        type: "StatusPrestacao"
+        required: true
+        description: "Estado atual no ciclo de vida da prestacao — gerado e controlado pelos metodos da entidade."
+
+  TransacaoFinanceira:
+    description: "Registro de um movimento bancario (debito ou credito) importado via CNAB 240; representa o movimento financeiro — nao e rubrica e nao deve ser usada como fonte de verdade orcamentaria."
+    extends: "shared.Auditavel"
+    fields:
+      contaBancariaId:
+        type: "Guid"
+        required: true
+        description: "FK para ContaBancaria proprietaria da transacao."
+      prestacaoId:
+        type: "Guid"
+        required: false
+        description: "FK opcional para a Prestacao a qual a transacao esta vinculada; null enquanto nao vinculada."
+      transacaoEstornadaId:
+        type: "Guid"
+        required: false
+        description: "FK opcional para a TransacaoFinanceira de debito compensada por este credito de estorno; preenchido somente quando Classificacao = ESTORNO."
+      data:
+        type: "DateTimeOffset"
+        required: true
+        description: "Data do lancamento bancario."
+      valor:
+        type: "decimal"
+        required: true
+        description: "Valor monetario da transacao (>= 0)."
+      descricao:
+        type: "string"
+        required: true
+        description: "Descricao do lancamento conforme extrato bancario."
+      identificador:
+        type: "string"
+        required: true
+        description: "Identificador unico da transacao no arquivo CNAB 240."
+      fonte:
+        type: "string"
+        required: false
+        description: "Origem/fonte do lancamento usada para parear estorno com debito de mesmo valor e mesma fonte."
+      origemTerceiro:
+        type: "string"
+        required: false
+        description: "Nome, identificador ou descricao do terceiro que realizou o credito de estorno."
+      tipo:
+        type: "TipoOperacao"
+        required: true
+        description: "DEBITO ou CREDITO."
+      classificacao:
+        type: "TipoClassificacaoTransacao"
+        required: true
+        description: "Classificacao operacional da transacao: DESPESA, ESTORNO, RENDIMENTO ou PENDENTE_CLASSIFICACAO — gerada automaticamente."
+      status:
+        type: "StatusTransacao"
+        required: true
+        description: "Status derivado do Status da Prestacao vinculada; PENDENTE quando sem vinculo."
+
+  ContaBancaria:
+    description: "Conta bancaria de um projeto utilizada para movimentacao dos recursos, reconciliada via CNAB 240."
+    extends: "shared.Auditavel"
+    fields:
+      projetoId:
+        type: "Guid"
+        required: true
+        description: "FK para ProjetoRef — todo projeto possui exatamente uma conta bancaria."
+      banco:
+        type: "string"
+        required: true
+        description: "Nome do banco."
+      agencia:
+        type: "string"
+        required: true
+        description: "Numero da agencia bancaria."
+      numero:
+        type: "string"
+        required: true
+        description: "Numero da conta corrente do projeto."
+      titular:
+        type: "string"
+        required: true
+        description: "Nome do titular da conta."
+      saldoAtual:
+        type: "decimal"
+        required: true
+        description: "Saldo atual calculado a partir das transacoes — gerado."
+
+  JustificativaDespesa:
+    description: "Classe base das justificativas de despesa; instanciada apenas atraves das subclasses concretas. Agrupa campos comuns e orcamentos de fornecedor."
+    extends: "shared.Auditavel"
+    fields:
+      prestacaoId:
+        type: "Guid"
+        required: true
+        description: "FK para Prestacao proprietaria."
+      descricao:
+        type: "string"
+        required: false
+        description: "Descricao textual opcional da despesa justificada."
+      valorTotal:
+        type: "decimal"
+        required: true
+        description: "Valor total da despesa (>= 0) — atualizado por AtualizarValorTotal()."
+      urlArquivo:
+        type: "string"
+        required: false
+        description: "URL do arquivo comprovante armazenado no MinIO."
+
+  JustificativaNF:
+    description: "Justificativa via nota fiscal eletronica (NF-e) validada via SERPRO; herda JustificativaDespesa."
+    extends: "post_award.prestacao_contas.JustificativaDespesa"
+    fields:
+      documentoFiscalId:
+        type: "Guid"
+        required: true
+        description: "FK para DocumentoFiscal associado."
+
+  JustificativaDiaria:
+    description: "Justificativa de diaria de deslocamento referenciando solicitacao aprovada no M003; herda JustificativaDespesa."
+    extends: "post_award.prestacao_contas.JustificativaDespesa"
+    fields:
+      valorDiaria:
+        type: "decimal"
+        required: true
+        description: "Valor unitario de cada diaria (>= 0)."
+      quantidade:
+        type: "int"
+        required: true
+        description: "Numero de diarias (> 0)."
+      alocacaoBolsistaId:
+        type: "Guid"
+        required: true
+        description: "FK para AlocacaoBolsistaRef — bolsista beneficiario da diaria."
+      solicitacaoDiariaRef:
+        type: "string"
+        required: true
+        description: "Referencia externa da solicitacao de diaria aprovada no M003 — deve ser unica entre JustificativaDiaria ativas."
+
+  JustificativaPassagem:
+    description: "Justificativa de passagem comprada para viagem; sem validacao SERPRO; herda JustificativaDespesa."
+    extends: "post_award.prestacao_contas.JustificativaDespesa"
+    fields:
+      rubricaProjetoRef:
+        type: "Guid"
+        required: true
+        description: "Referencia a RubricaProjeto de passagem do M013 associada no momento do salvamento."
+      valorPassagemComprada:
+        type: "decimal"
+        required: true
+        description: "Valor efetivamente pago pela passagem (> 0) — usado como ValorTotal da justificativa."
+      origem:
+        type: "string"
+        required: true
+        description: "Origem da passagem comprada."
+      destino:
+        type: "string"
+        required: true
+        description: "Destino da passagem comprada."
+      dataViagem:
+        type: "DateTime"
+        required: true
+        description: "Data da viagem associada a passagem."
+      urlComprovantePagamento:
+        type: "string"
+        required: true
+        description: "URL do comprovante de pagamento da passagem."
+      urlComprovanteRealizacao:
+        type: "string"
+        required: true
+        description: "URL do comprovante ou registro da viagem realizada (cartao de embarque, declaracao, certificado ou equivalente)."
+
+  JustificativaInvoice:
+    description: "Justificativa de despesa em moeda estrangeira (invoice); herda JustificativaDespesa."
+    extends: "post_award.prestacao_contas.JustificativaDespesa"
+    fields:
+      valorCambio:
+        type: "decimal"
+        required: true
+        description: "Taxa de cambio aplicada na conversao para BRL."
+      moeda:
+        type: "TipoMoeda"
+        required: true
+        description: "Moeda estrangeira utilizada na transacao."
+
+  JustificativaProdutoSemNota:
+    description: "Justificativa excepcional de produto sem nota fiscal; exige comprovante alternativo e analise obrigatoria pela Area Tecnica; herda JustificativaDespesa."
+    extends: "post_award.prestacao_contas.JustificativaDespesa"
+    fields:
+      fornecedor:
+        type: "string"
+        required: true
+        description: "Nome ou razao social do fornecedor da compra."
+      identificadorFornecedor:
+        type: "string"
+        required: false
+        description: "CPF ou CNPJ do fornecedor, quando informado."
+      dataCompra:
+        type: "DateTime"
+        required: true
+        description: "Data da compra sem nota fiscal."
+      rubricaProjetoRef:
+        type: "Guid"
+        required: true
+        description: "Referencia a RubricaProjeto do M013 usada para classificar a despesa (alias legado: RubricaOrcamentariaId — DT-M014-001)."
+      justificativaAusenciaNota:
+        type: "string"
+        required: true
+        description: "Justificativa formal para ausencia da nota fiscal."
+      urlComprovanteAlternativo:
+        type: "string"
+        required: true
+        description: "URL do comprovante alternativo armazenado no MinIO."
+      analiseObrigatoria:
+        type: "bool"
+        required: true
+        description: "Indica que a despesa deve ser destacada para analise obrigatoria pela Area Tecnica — gerado automaticamente."
+
+  DocumentoFiscal:
+    description: "Nota fiscal (NF-e produto ou NFS-e servico) processada via SERPRO, com itens discriminados, dados tributarios e chave de acesso de 44 digitos."
+    extends: "shared.Auditavel"
+    fields:
+      justificativaNFId:
+        type: "Guid"
+        required: true
+        description: "FK para JustificativaNF associada (1:1)."
+      chaveAcesso:
+        type: "string"
+        required: true
+        description: "Chave de acesso da NF-e com 44 digitos — usada na consulta SERPRO."
+      nomeEmitente:
+        type: "string"
+        required: true
+        description: "Razao social do emitente da nota fiscal."
+      descricao:
+        type: "string"
+        required: true
+        description: "Descricao do objeto da nota fiscal."
+      valorTotal:
+        type: "decimal"
+        required: true
+        description: "Valor total da nota (>= 0)."
+      uf:
+        type: "string"
+        required: true
+        description: "Unidade federativa do emitente."
+      pais:
+        type: "string"
+        required: true
+        description: "Pais do emitente."
+      identificador:
+        type: "string"
+        required: true
+        description: "CPF ou CNPJ do emitente."
+      totalICMS:
+        type: "decimal"
+        required: true
+        description: "Total de ICMS destacado na nota (>= 0)."
+      totalPIS:
+        type: "decimal"
+        required: true
+        description: "Total de PIS destacado na nota (>= 0)."
+      totalIPI:
+        type: "decimal"
+        required: true
+        description: "Total de IPI destacado na nota (>= 0)."
+      totalISS:
+        type: "decimal"
+        required: true
+        description: "Total de ISS destacado na nota (>= 0)."
+      tipoNota:
+        type: "TipoNota"
+        required: true
+        description: "Tipo da nota: PRODUTO ou SERVICO."
+
+  ItemDocumentoFiscal:
+    description: "Item discriminado em DocumentoFiscal, classificado em uma RubricaOrcamentaria (alias de RubricaProjeto)."
+    extends: "shared.Auditavel"
+    fields:
+      documentoFiscalId:
+        type: "Guid"
+        required: true
+        description: "FK para DocumentoFiscal."
+      rubricaOrcamentariaId:
+        type: "Guid"
+        required: true
+        description: "FK para RubricaOrcamentaria (termo canonico: RubricaProjeto) — define a classificacao orcamentaria do item."
+      descricao:
+        type: "string"
+        required: true
+        description: "Descricao do item conforme nota fiscal."
+      quantidade:
+        type: "int"
+        required: true
+        description: "Quantidade do item (> 0)."
+      valorUnitario:
+        type: "decimal"
+        required: true
+        description: "Valor unitario do item (>= 0)."
+      valorTotal:
+        type: "decimal"
+        required: true
+        description: "Valor total do item — calculado como Quantidade * ValorUnitario (gerado)."
+      ncm:
+        type: "string"
+        required: false
+        description: "Codigo NCM — Nomenclatura Comum do Mercosul."
+      cfop:
+        type: "string"
+        required: false
+        description: "Codigo CFOP — Codigo Fiscal de Operacoes e Prestacoes."
+
+  OrcamentoFornecedor:
+    description: "Orcamento de fornecedor vinculado a uma justificativa de despesa, podendo ser marcado como vencedor."
+    extends: "shared.Auditavel"
+    fields:
+      justificativaDespesaId:
+        type: "Guid"
+        required: true
+        description: "FK para JustificativaDespesa proprietaria."
+      fornecedor:
+        type: "string"
+        required: true
+        description: "Nome ou razao social do fornecedor."
+      valor:
+        type: "decimal"
+        required: true
+        description: "Valor total do orcamento (>= 0)."
+      data:
+        type: "DateTime"
+        required: true
+        description: "Data de emissao do orcamento."
+      urlArquivoPDF:
+        type: "string"
+        required: true
+        description: "URL do PDF do orcamento armazenado no MinIO."
+      escolhido:
+        type: "bool"
+        required: true
+        description: "Indica se este orcamento foi selecionado como vencedor — controlado por MarcarComoEscolhido()."
+
+  Orcamento:
+    description: "Orcamento anual do projeto com rubricas orcamentarias (DT-M014-001: pertence conceitualmente a M013)."
+    extends: "shared.Auditavel"
+    fields:
+      projetoId:
+        type: "Guid"
+        required: false
+        description: "FK para ProjetoRef (view externa)."
+      ano:
+        type: "int"
+        required: true
+        description: "Ano de referencia do orcamento."
+      valorTotal:
+        type: "decimal"
+        required: true
+        description: "Valor total aprovado para o projeto no ano."
+      valorBolsasPrevisto:
+        type: "decimal"
+        required: true
+        description: "Valor previsto para pagamento de bolsas."
+      valorCapitalPrevisto:
+        type: "decimal"
+        required: true
+        description: "Valor previsto para aquisicao de capital."
+
+  RubricaOrcamentaria:
+    description: "Estrutura hierarquica de classificacao orcamentaria do projeto. Termo canonico de dominio: RubricaProjeto (M013). Nome de classe/tabela e alias tecnico legado ate DT-M014-001 (DT-M014-005)."
+    extends: "shared.Auditavel"
+    fields:
+      orcamentoId:
+        type: "Guid"
+        required: true
+        description: "FK para Orcamento."
+      parentId:
+        type: "Guid"
+        required: false
+        description: "FK auto-referenciante para RubricaOrcamentaria pai; null se rubrica raiz."
+      descricao:
+        type: "string"
+        required: true
+        description: "Descricao da rubrica orcamentaria."
+      limite:
+        type: "decimal"
+        required: true
+        description: "Limite de gasto aprovado para esta rubrica (>= 0)."
+
+  ProjetoRef:
+    description: "View externa somente leitura do sistema de Importacao de Editais (M002); mapeada a view de banco de dados — nao herda BaseEntity."
+    fields:
+      id:
+        type: "Guid"
+        required: true
+        description: "Identificador do projeto na view externa."
+      identificadorBancario:
+        type: "string"
+        required: true
+        description: "Identificador do projeto no sistema bancario, usado pelo importador CNAB 240 para reconciliar conta/projeto."
+
+  AlocacaoBolsistaRef:
+    description: "View externa somente leitura do sistema de Importacao de Editais (M002); mapeada a view de banco de dados — nao herda BaseEntity."
+    fields:
+      id:
+        type: "Guid"
+        required: true
+        description: "Identificador da alocacao de bolsista na view externa."
+
+relationships:
+  - from: "post_award.prestacao_contas.Prestacao"
+    relation: "contem"
+    to: "post_award.prestacao_contas.JustificativaDespesa"
+    cardinality: "1:N"
+  - from: "post_award.prestacao_contas.Prestacao"
+    relation: "contem"
+    to: "post_award.prestacao_contas.TransacaoFinanceira"
+    cardinality: "1:N"
+  - from: "post_award.prestacao_contas.TransacaoFinanceira"
+    relation: "pertence a"
+    to: "post_award.prestacao_contas.ContaBancaria"
+    cardinality: "N:1"
+  - from: "post_award.prestacao_contas.TransacaoFinanceira"
+    relation: "vinculada a"
+    to: "post_award.prestacao_contas.Prestacao"
+    cardinality: "N:1"
+    optional: true
+  - from: "post_award.prestacao_contas.TransacaoFinanceira"
+    relation: "estorna"
+    to: "post_award.prestacao_contas.TransacaoFinanceira"
+    cardinality: "1:1"
+    optional: true
+  - from: "post_award.prestacao_contas.JustificativaDespesa"
+    relation: "possui"
+    to: "post_award.prestacao_contas.OrcamentoFornecedor"
+    cardinality: "1:N"
+  - from: "post_award.prestacao_contas.JustificativaNF"
+    relation: "associada a"
+    to: "post_award.prestacao_contas.DocumentoFiscal"
+    cardinality: "1:1"
+  - from: "post_award.prestacao_contas.JustificativaProdutoSemNota"
+    relation: "classificada em"
+    to: "post_award.prestacao_contas.RubricaOrcamentaria"
+    cardinality: "N:1"
+    note: "Termo canonico RubricaProjeto (M013) — alias legado RubricaOrcamentaria."
+  - from: "post_award.prestacao_contas.DocumentoFiscal"
+    relation: "contem"
+    to: "post_award.prestacao_contas.ItemDocumentoFiscal"
+    cardinality: "1:N"
+  - from: "post_award.prestacao_contas.Orcamento"
+    relation: "possui"
+    to: "post_award.prestacao_contas.RubricaOrcamentaria"
+    cardinality: "1:N"
+  - from: "post_award.prestacao_contas.RubricaOrcamentaria"
+    relation: "subrubricas"
+    to: "post_award.prestacao_contas.RubricaOrcamentaria"
+    cardinality: "1:N"
+  - from: "post_award.prestacao_contas.RubricaOrcamentaria"
+    relation: "classifica"
+    to: "post_award.prestacao_contas.ItemDocumentoFiscal"
+    cardinality: "1:N"
+  - from: "post_award.prestacao_contas.ContaBancaria"
+    relation: "pertence a"
+    to: "post_award.prestacao_contas.ProjetoRef"
+    cardinality: "N:1"
+  - from: "post_award.prestacao_contas.Orcamento"
+    relation: "do projeto"
+    to: "post_award.prestacao_contas.ProjetoRef"
+    cardinality: "N:1"
+    optional: true
+  - from: "post_award.prestacao_contas.JustificativaDiaria"
+    relation: "para bolsista"
+    to: "post_award.prestacao_contas.AlocacaoBolsistaRef"
+    cardinality: "N:1"
+
+axioms:
+  - id: "AX-M014-001"
+    natural_language: "O saldo de uma Prestacao deve ser zero ou positivo no momento da submissao."
+    formal_rule: "Prestacao.Saldo() = ValorTotalTransacoes() - ValorTotalJustificativas() >= 0 at Submeter()"
+  - id: "AX-M014-002"
+    natural_language: "Uma TransacaoFinanceira do tipo ESTORNO deve referenciar uma TransacaoFinanceira de DEBITO de mesmo valor e mesma conta bancaria."
+    formal_rule: "transacao.Classificacao = ESTORNO => transacao.Tipo = CREDITO AND estornada.Tipo = DEBITO AND transacao.Valor = estornada.Valor AND transacao.ContaBancariaId = estornada.ContaBancariaId"
+  - id: "AX-M014-003"
+    natural_language: "TransacaoEstornadaId deve ser preenchido somente quando Classificacao = ESTORNO."
+    formal_rule: "transacao.TransacaoEstornadaId IS NOT NULL => transacao.Classificacao = ESTORNO"
+  - id: "AX-M014-004"
+    natural_language: "Um debito nao pode ter mais de um estorno confirmado que zere o mesmo valor."
+    formal_rule: "COUNT(TransacaoFinanceira WHERE TransacaoEstornadaId = debito.Id AND Classificacao = ESTORNO) <= 1"
+  - id: "AX-M014-005"
+    natural_language: "SolicitacaoDiariaRef deve ser unica entre JustificativaDiaria ativas, impedindo dupla prestacao da mesma diaria."
+    formal_rule: "UNIQUE(JustificativaDiaria.solicitacaoDiariaRef) WHERE DateDeleted IS NULL"
+  - id: "AX-M014-006"
+    natural_language: "ValorPassagemComprada em JustificativaPassagem deve ser maior que zero."
+    formal_rule: "JustificativaPassagem.valorPassagemComprada > 0"
+  - id: "AX-M014-007"
+    natural_language: "TransacaoFinanceira nao e rubrica e nao deve ser usada como fonte de verdade para saldo orcamentario."
+    formal_rule: "NO direct FK from TransacaoFinanceira to RubricaOrcamentaria in canonical model (DT-M014-006)"
+
+invariants:
+  - id: "INV-M014-001"
+    rule: "Prestacao.Status IN (RASCUNHO, EM_ANALISE, REVISAO, FINALIZADO, NEGADO)"
+    description: "Status da Prestacao deve ser um dos valores validos do ciclo de vida."
+  - id: "INV-M014-002"
+    rule: "TransacaoFinanceira.Valor >= 0"
+    description: "Valor de uma transacao financeira nao pode ser negativo."
+  - id: "INV-M014-003"
+    rule: "ItemDocumentoFiscal.ValorTotal = ItemDocumentoFiscal.Quantidade * ItemDocumentoFiscal.ValorUnitario"
+    description: "ValorTotal do item deve ser igual a Quantidade multiplicada pelo ValorUnitario."
+  - id: "INV-M014-004"
+    rule: "DocumentoFiscal.ChaveAcesso LENGTH = 44"
+    description: "Chave de acesso da NF-e deve ter exatamente 44 digitos."
+  - id: "INV-M014-005"
+    rule: "RubricaOrcamentaria.Limite >= 0"
+    description: "Limite de uma rubrica orcamentaria nao pode ser negativo."
+
+enums:
+  StatusPrestacao:
+    values:
+      RASCUNHO: "Prestacao em elaboracao pelo coordenador (valor 1)."
+      EM_ANALISE: "Prestacao submetida e em analise pela FAPES (valor 2)."
+      REVISAO: "Prestacao devolvida para revisao pelo coordenador (valor 3)."
+      FINALIZADO: "Prestacao aprovada e finalizada (valor 4)."
+      NEGADO: "Prestacao negada pela FAPES (valor 5)."
+
+  StatusTransacao:
+    values:
+      PENDENTE: "Transacao ainda nao vinculada a uma Prestacao (valor 1)."
+      EM_RASCUNHO: "Transacao vinculada a Prestacao em rascunho (valor 2)."
+      EM_ANALISE: "Transacao vinculada a Prestacao em analise (valor 3)."
+      EM_REVISAO: "Transacao vinculada a Prestacao em revisao (valor 4)."
+      APROVADA: "Transacao vinculada a Prestacao finalizada (valor 5)."
+      REJEITADA: "Transacao vinculada a Prestacao negada (valor 6)."
+
+  TipoOperacao:
+    values:
+      DEBITO: "Saida de recursos da conta bancaria (valor 1)."
+      CREDITO: "Entrada de recursos na conta bancaria (valor 2)."
+
+  TipoClassificacaoTransacao:
+    values:
+      DESPESA: "Movimento classificado como despesa do projeto (valor 1)."
+      ESTORNO: "Credito que anula um debito anterior (valor 2)."
+      RENDIMENTO: "Rendimento financeiro da conta do projeto (valor 3)."
+      PENDENTE_CLASSIFICACAO: "Classificacao ainda nao determinada (valor 4)."
+
+  TipoNota:
+    values:
+      PRODUTO: "Nota fiscal de produto (NF-e) (valor 1)."
+      SERVICO: "Nota fiscal de servico (NFS-e) (valor 2)."
+
+  TipoDocumentoFiscal:
+    values:
+      NFE_PRODUTO: "Nota Fiscal Eletronica de produto (valor 1)."
+      NFSE_SERVICO: "Nota Fiscal de Servico Eletronica (valor 2)."
+
+  TipoMoeda:
+    values:
+      BRL: "Real brasileiro."
+      USD: "Dolar americano."
+      EUR: "Euro."
+      GBP: "Libra esterlina."
+
+  TipoJustificativa:
+    values:
+      NF: "Justificativa por nota fiscal."
+      INVOICE: "Justificativa por invoice em moeda estrangeira."
+      DIARIA: "Justificativa por diaria de deslocamento."
+      PRODUTO_SEM_NOTA: "Justificativa por produto sem nota fiscal."
+
+value_objects: {}
+
+events:
+  - name: "PrestacaoSubmetida"
+    description: "Emitido quando o coordenador submete a prestacao para analise da FAPES."
+    payload_entity: "post_award.prestacao_contas.Prestacao"
+    trigger: "Prestacao.Submeter()"
+  - name: "PrestacaoAprovada"
+    description: "Emitido quando a FAPES aprova e finaliza a prestacao."
+    payload_entity: "post_award.prestacao_contas.Prestacao"
+    trigger: "Prestacao.Aprovar()"
+  - name: "PrestacaoNegada"
+    description: "Emitido quando a FAPES nega a prestacao."
+    payload_entity: "post_award.prestacao_contas.Prestacao"
+    trigger: "Prestacao.Negar()"
+  - name: "RevisaoSolicitada"
+    description: "Emitido quando a FAPES devolve a prestacao para revisao."
+    payload_entity: "post_award.prestacao_contas.Prestacao"
+    trigger: "Prestacao.SolicitarRevisao()"
+  - name: "EstornoAssociado"
+    description: "Emitido quando um credito de estorno e associado a um debito dentro de uma prestacao."
+    payload_entity: "post_award.prestacao_contas.TransacaoFinanceira"
+    trigger: "Prestacao.AssociarEstorno(debitoId, creditoEstornoId)"
+
+workflows:
+  PrestacaoStateMachine:
+    states:
+      - RASCUNHO
+      - EM_ANALISE
+      - REVISAO
+      - FINALIZADO
+      - NEGADO
+    transitions:
+      - from: RASCUNHO
+        to: EM_ANALISE
+        trigger: "Submeter()"
+        guard: "Saldo() >= 0 AND Justificativas.Count > 0"
+      - from: EM_ANALISE
+        to: REVISAO
+        trigger: "SolicitarRevisao()"
+      - from: EM_ANALISE
+        to: FINALIZADO
+        trigger: "Aprovar()"
+      - from: EM_ANALISE
+        to: NEGADO
+        trigger: "Negar()"
+      - from: REVISAO
+        to: EM_ANALISE
+        trigger: "Submeter()"
+
+policies: null
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "JustificativaDespesa nao e instanciada diretamente — usar somente as subclasses concretas (JustificativaNF, JustificativaDiaria, JustificativaPassagem, JustificativaInvoice, JustificativaProdutoSemNota)."
+    - "TransacaoFinanceira nao e rubrica; nao usar como fonte de verdade orcamentaria."
+    - "RubricaOrcamentaria e alias tecnico de RubricaProjeto (M013) — usar termo canonico RubricaProjeto em contratos e textos de dominio."
+    - "Orcamento e RubricaOrcamentaria sao tecnicamente debitos (DT-M014-001) e devem migrar para M013/M016."
+    - "Este modulo roda em backend SQL Server separado do PostgreSQL principal."
+    - "Toda operacao de arquivo (UrlArquivo, UrlComprovanteAlternativo, UrlArquivoPDF) deve passar pela API de Prestacao de Contas que orquestra o MinIO."
+  notes:
+    - "Integracao SERPRO: DocumentoFiscal e consultado por ChaveAcesso (44 digitos) via OAuth2 com cache de token em SerproTokenService."
+    - "Status de TransacaoFinanceira e derivado (nao persistido) do Status da Prestacao vinculada."
+    - "ProjetoRef e AlocacaoBolsistaRef sao views somente leitura do M002 — sem repositorio proprio."

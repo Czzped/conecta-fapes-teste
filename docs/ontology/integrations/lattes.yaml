@@ -1,0 +1,154 @@
+ontology: "Integração Lattes (CNPq) — ConectaFAPES"
+namespace: "integrations.lattes"
+
+imports: []
+
+metadata:
+  type: "integration"
+  version: "1.0.0"
+  description: "Importação e normalização de currículos Lattes (CNPq) para o modelo de currículo do ConectaFAPES (M024). Reconciliação de pesquisadores via M008."
+  modules_using: [M023, M024, M008]
+  direction: "inbound"
+
+integration:
+  system: "Plataforma Lattes (CNPq)"
+  system_description: "Plataforma de currículo e produção científica do Conselho Nacional de Desenvolvimento Científico e Tecnológico"
+  direction: "inbound"
+  protocol: "XML"
+  authentication: "API Key CNPq (se API disponível) ou scraping autorizado"
+  base_url: "todo: configure per environment"
+  note: "A CNPq não oferece API pública documentada; o acesso programático pode ser via acordo institucional ou download de XML via portal."
+
+  endpoints:
+    - path: "/curriculo-lattes/{id_lattes}"
+      method: "GET"
+      description: "Fetch do currículo Lattes em formato XML para um ID Lattes específico."
+      used_by: "M023.LattesAdapter"
+      authentication: "Acordo institucional CNPq ou API Key"
+      response_format: "XML (Lattes Curriculum XML Schema)"
+
+    - path: "/curriculo-lattes/cpf/{cpf}"
+      method: "GET"
+      description: "Busca currículo Lattes por CPF (se disponível via acordo institucional)."
+      used_by: "M023.LattesAdapter"
+      note: "Disponibilidade depende do nível de acordo com o CNPq"
+
+data_flow:
+  description: "Fluxo de importação e normalização de currículo Lattes"
+
+  steps:
+    - step: 1
+      actor: "ConectaFAPES (M023)"
+      action: "Fetch do XML Lattes pelo id_lattes ou CPF"
+      source: "CNPq Lattes API / portal"
+
+    - step: 2
+      actor: "ConectaFAPES (M023.LattesAdapter)"
+      action: "Parse do XML Lattes (snapshot)"
+      description: "XML é parseado e normalizado para estrutura interna M024"
+
+    - step: 3
+      actor: "ConectaFAPES (M008)"
+      action: "Reconciliação de entidades"
+      description: "Entidades não reconhecidas (instituições, periódicos, coautores) passam por match-or-create em M008"
+
+    - step: 4
+      actor: "ConectaFAPES (M024)"
+      action: "Persistência do currículo normalizado"
+      description: "CurriculoPesquisador atualizado ou criado em M024"
+
+    - step: 5
+      actor: "ConectaFAPES"
+      action: "Vinculação com PessoaFisica"
+      description: "CurriculoPesquisador vinculado a PessoaFisica em M008 via CPF"
+
+xml_mappings:
+  description: "Mapeamento dos principais elementos XML Lattes para M024"
+  source_schema: "Lattes Curriculum XML Schema (CNPq)"
+
+  mappings:
+    - lattes_element: "CURRICULO-VITAE/@ID-LATTES"
+      internal_entity: "corporativo.curriculo.CurriculoPesquisador.id_lattes"
+      notes: "Identificador único Lattes (16 dígitos)."
+
+    - lattes_element: "DADOS-GERAIS/NOME-COMPLETO"
+      internal_entity: "corporativo.pessoas.PessoaFisica.nome"
+      notes: "Usado na reconciliação com PessoaFisica em M008."
+
+    - lattes_element: "DADOS-GERAIS/CPF"
+      internal_entity: "corporativo.pessoas.PessoaFisica.cpf"
+      notes: "Chave de reconciliação principal."
+
+    - lattes_element: "FORMACAO-ACADEMICA-TITULACAO"
+      internal_entity: "corporativo.curriculo.FormacaoAcademica"
+      notes: "Lista de formações acadêmicas; cada item cria um registro em M024."
+
+    - lattes_element: "ATUACOES-PROFISSIONAIS/ATUACAO-PROFISSIONAL"
+      internal_entity: "corporativo.curriculo.AtuacaoProfissional"
+      notes: "Vínculos institucionais e projetos vinculados."
+
+    - lattes_element: "PRODUCAO-BIBLIOGRAFICA/ARTIGOS-PUBLICADOS"
+      internal_entity: "corporativo.curriculo.ProducaoBibliografica"
+      notes: "Artigos em periódicos; periódico reconciliado via M008."
+
+    - lattes_element: "PRODUCAO-BIBLIOGRAFICA/LIVROS-E-CAPITULOS"
+      internal_entity: "corporativo.curriculo.ProducaoBibliografica"
+      notes: "Livros e capítulos de livros."
+
+    - lattes_element: "ORIENTACOES/ORIENTACOES-CONCLUIDAS"
+      internal_entity: "corporativo.curriculo.Orientacao"
+      notes: "Orientações concluídas de graduação, mestrado e doutorado."
+
+    - lattes_element: "PROJETOS-DE-PESQUISA/PROJETO-DE-PESQUISA"
+      internal_entity: "corporativo.curriculo.ProjetoPesquisa"
+      notes: "Projetos de pesquisa listados no Lattes; reconciliar com Iniciativas ConectaFAPES quando possível."
+
+data_mappings:
+  - external_entity: "Lattes.CurriculoXML"
+    internal_entity: "corporativo.curriculo.CurriculoPesquisador"
+    mapping_notes: "Snapshot do XML Lattes na data de importação. Histórico de snapshots mantido para auditoria."
+
+  - external_entity: "Lattes.Pesquisador"
+    internal_entity: "corporativo.pessoas.PessoaFisica"
+    mapping_notes: "Reconciliação por CPF via M008 match-or-create. id_lattes armazenado em PessoaFisica."
+
+  - external_entity: "Lattes.Instituicao"
+    internal_entity: "corporativo.pessoas.Instituicao"
+    mapping_notes: "Instituições mencionadas no Lattes reconciliadas com base de instituições do ConectaFAPES (M008)."
+
+  todo: "Complete mapping when integration is implemented"
+
+reconciliation:
+  description: "Estratégia de reconciliação de entidades não reconhecidas"
+  primary_key: "CPF (pesquisador), CNPJ (instituição)"
+  fallback_key: "Nome normalizado (lower-case, sem acentos)"
+  strategy: "match-or-create via M008"
+
+  unmatched_handling:
+    - entity: "Pesquisador"
+      action: "Criar PessoaFisica provisória em M008; marcar como 'pendente_validacao'"
+
+    - entity: "Instituicao"
+      action: "Criar Instituicao provisória; notificar GestorPlanejamento para revisão"
+
+    - entity: "Periodico"
+      action: "Criar referência de periódico; associar ISSN se disponível"
+
+snapshot_management:
+  description: "Gestão de snapshots de currículo Lattes"
+  storage: "Snapshot XML armazenado como blob com data de captura"
+  frequency: "Sob demanda (quando pesquisador solicita atualização) ou na submissão de proposta"
+  retention: "Todos os snapshots mantidos por histórico (não deletar versões anteriores)"
+
+agent_instructions:
+  rules:
+    - "Não criar integrações fora deste arquivo."
+    - "Toda integração deve ter data_mappings definidos."
+    - "CPF é a chave de reconciliação obrigatória entre Lattes e PessoaFisica (M008)."
+    - "Snapshots Lattes são imutáveis após importação; novas importações criam novos snapshots."
+    - "Dados do Lattes complementam o perfil; nunca sobrescrever dados inseridos manualmente no ConectaFAPES."
+    - "Entidades provisórias criadas por match-or-create devem ser revisadas por GestorPlanejamento."
+  notes:
+    - "Acordo institucional com CNPq necessário para acesso programático ao XML Lattes."
+    - "M023 é o adapter; M024 é o modelo de destino — separação clara de responsabilidades."
+    - "Importação pode ser manual (upload de XML pelo pesquisador) como fallback se API indisponível."

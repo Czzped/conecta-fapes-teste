@@ -1,0 +1,259 @@
+ontology: "Contratacao e Outorga"
+namespace: "post_award.contratacao"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: shared.people
+    path: path: "../../../ontology/shared/people.yaml"
+  - namespace: pre_award.captacao
+    path: path: "../M011-configuracao-captacao/ontology.yaml"
+metadata:
+  module: "M022"
+  source: "docs/implementation/modules/M022-contratacao-outorga/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Representa a etapa de contratacao/outorga em que uma proposta aprovada no M011 e formalizada e transformada em iniciativa no M003."
+
+entities:
+  PropostaAprovadaRef:
+    description: "Referencia imutavel a uma proposta aprovada no M011, identificada por captacao, proposta e resultado final."
+    extends: null
+    fields:
+      captacaoId:
+        type: "string"
+        required: true
+        description: "Identificador da captacao no M011."
+      propostaId:
+        type: "string"
+        required: true
+        description: "Identificador da proposta aprovada no M011."
+      resultadoFinalId:
+        type: "string"
+        required: true
+        description: "Identificador do resultado final publicado no M011."
+
+  ContratacaoOutorga:
+    description: "Agregado raiz que gerencia o processo de formalizacao de uma proposta aprovada, do estado de convocacao ate a criacao da iniciativa no M003."
+    extends: "shared.Auditavel"
+    fields:
+      codigo:
+        type: "string"
+        required: true
+        generated: true
+        unique: true
+        description: "Codigo unico gerado automaticamente para a contratacao/outorga."
+      propostaAprovada:
+        type: "ref:post_award.contratacao.PropostaAprovadaRef"
+        required: true
+        description: "Referencia a proposta aprovada no M011 que originou esta contratacao."
+      outorgado:
+        type: "ref:post_award.contratacao.Outorgado"
+        required: true
+        description: "Pessoa fisica outorgada como responsavel pela iniciativa."
+      termoOutorga:
+        type: "ref:post_award.contratacao.TermoOutorga"
+        required: false
+        description: "Termo de outorga formalizado. Obrigatorio quando estado = FORMALIZADA."
+      iniciativa:
+        type: "ref:post_award.contratacao.IniciativaRef"
+        required: false
+        description: "Referencia a iniciativa criada no M003. Preenchida apos envio ao M003."
+      estado:
+        type: "enum:EstadoContratacaoOutorga"
+        required: true
+        description: "Estado corrente do processo de contratacao/outorga."
+      dataConvocacao:
+        type: "date"
+        required: true
+        description: "Data de convocacao da proposta aprovada."
+      dataFormalizacao:
+        type: "date"
+        required: false
+        description: "Data de formalizacao da contratacao/outorga. Obrigatoria quando estado = FORMALIZADA."
+
+  Outorgado:
+    description: "Pessoa fisica outorgada, referenciada a partir do cadastro corporativo M008."
+    extends: null
+    fields:
+      pessoaFisicaId:
+        type: "string"
+        required: true
+        description: "Identificador da pessoa fisica no M008."
+      nome:
+        type: "string"
+        required: true
+        description: "Nome da pessoa outorgada, desnormalizado para exibicao."
+
+  TermoOutorga:
+    description: "Documento de termo ou contrato que formaliza a outorga."
+    extends: "shared.Auditavel"
+    fields:
+      numero:
+        type: "string"
+        required: true
+        description: "Numero do termo ou contrato."
+      linkDocumento:
+        type: "string"
+        required: false
+        description: "Link ou referencia documental do termo."
+      dataAssinatura:
+        type: "date"
+        required: true
+        description: "Data de assinatura do termo."
+
+  IniciativaRef:
+    description: "Referencia a iniciativa criada no M003 apos a formalizacao da outorga."
+    extends: null
+    fields:
+      iniciativaId:
+        type: "string"
+        required: true
+        description: "Identificador da iniciativa criada no M003. Existente apos envio ao M003."
+
+relationships:
+  - from: "post_award.contratacao.PropostaAprovadaRef"
+    relation: "inicia"
+    to: "post_award.contratacao.ContratacaoOutorga"
+    cardinality: "1:1"
+    description: "Uma proposta aprovada inicia no maximo uma contratacao/outorga."
+  - from: "post_award.contratacao.ContratacaoOutorga"
+    relation: "outorgada a"
+    to: "post_award.contratacao.Outorgado"
+    cardinality: "1:1"
+    description: "Cada contratacao e outorgada a exatamente uma pessoa fisica."
+  - from: "post_award.contratacao.ContratacaoOutorga"
+    relation: "formalizada por"
+    to: "post_award.contratacao.TermoOutorga"
+    cardinality: "1:1"
+    description: "Quando formalizada, a contratacao e documentada por um TermoOutorga."
+  - from: "post_award.contratacao.ContratacaoOutorga"
+    relation: "gera"
+    to: "post_award.contratacao.IniciativaRef"
+    cardinality: "1:1"
+    description: "Contratacao formalizada gera exatamente uma iniciativa no M003."
+  - from: "post_award.contratacao.Outorgado"
+    relation: "referencia"
+    to: "shared.people.PessoaFisica"
+    cardinality: "N:1"
+    description: "Outorgado referencia a PessoaFisica do cadastro corporativo M008 via pessoaFisicaId."
+
+axioms:
+  - id: "AX-M022-001"
+    natural_language: "Quando o estado da ContratacaoOutorga for FORMALIZADA, o campo dataFormalizacao e o TermoOutorga devem estar preenchidos."
+    formal_rule: "ContratacaoOutorga.estado = FORMALIZADA → dataFormalizacao ≠ null ∧ termoOutorga ≠ null"
+  - id: "AX-M022-002"
+    natural_language: "A IniciativaRef so pode ser criada apos o estado da ContratacaoOutorga ser FORMALIZADA."
+    formal_rule: "IniciativaRef ≠ null → ContratacaoOutorga.estado = FORMALIZADA"
+  - id: "AX-M022-003"
+    natural_language: "Cada PropostaAprovadaRef pode originar no maximo uma ContratacaoOutorga."
+    formal_rule: "∀p ∈ PropostaAprovadaRef: |{c ∈ ContratacaoOutorga | c.propostaAprovada = p}| ≤ 1"
+  - id: "AX-M022-004"
+    natural_language: "Uma ContratacaoOutorga cancelada nao pode transitar para nenhum outro estado."
+    formal_rule: "ContratacaoOutorga.estado = CANCELADA → estado e terminal (sem transicoes de saida)"
+  - id: "AX-M022-005"
+    natural_language: "dataFormalizacao deve ser posterior ou igual a dataConvocacao."
+    formal_rule: "dataFormalizacao ≠ null → dataFormalizacao >= dataConvocacao"
+
+invariants:
+  - id: "INV-M022-001"
+    rule: "ContratacaoOutorga.estado = FORMALIZADA → ContratacaoOutorga.dataFormalizacao ≠ null"
+    description: "Contratacao formalizada exige data de formalizacao preenchida."
+  - id: "INV-M022-002"
+    rule: "ContratacaoOutorga.estado = FORMALIZADA → ContratacaoOutorga.termoOutorga ≠ null"
+    description: "Contratacao formalizada exige TermoOutorga preenchido."
+  - id: "INV-M022-003"
+    rule: "ContratacaoOutorga.iniciativa ≠ null → ContratacaoOutorga.estado = FORMALIZADA"
+    description: "IniciativaRef so pode existir em contratacoes formalizadas."
+  - id: "INV-M022-004"
+    rule: "ContratacaoOutorga.dataFormalizacao = null ∨ ContratacaoOutorga.dataFormalizacao >= ContratacaoOutorga.dataConvocacao"
+    description: "Data de formalizacao nao pode ser anterior a data de convocacao."
+
+enums:
+  EstadoContratacaoOutorga:
+    description: "Estado do ciclo de vida de uma ContratacaoOutorga."
+    values:
+      EM_CONVOCACAO: "Proposta aprovada convocada para formalizacao; aguarda documentacao do outorgado."
+      EM_FORMALIZACAO: "Documentacao recebida; processo de formalizacao em andamento."
+      FORMALIZADA: "Termo de outorga assinado; contratacao concluida e pronta para geracao de iniciativa no M003."
+      CANCELADA: "Processo cancelado; proposta aprovada nao sera contratada. Estado terminal."
+
+value_objects: {}
+
+events:
+  - name: "ContratacaoConvocada"
+    description: "Emitido quando uma proposta aprovada e convocada para formalizacao, criando a ContratacaoOutorga em EM_CONVOCACAO."
+    payload_entity: "post_award.contratacao.ContratacaoOutorga"
+    trigger: "Criacao de ContratacaoOutorga com estado EM_CONVOCACAO a partir de uma PropostaAprovadaRef."
+  - name: "ContratacaoFormalizada"
+    description: "Emitido quando o TermoOutorga e registrado e a ContratacaoOutorga transita para FORMALIZADA."
+    payload_entity: "post_award.contratacao.ContratacaoOutorga"
+    trigger: "Transicao de EM_FORMALIZACAO para FORMALIZADA com TermoOutorga e dataFormalizacao preenchidos."
+  - name: "IniciativaCriada"
+    description: "Emitido quando a iniciativa e criada no M003 e IniciativaRef e preenchida na ContratacaoOutorga."
+    payload_entity: "post_award.contratacao.IniciativaRef"
+    trigger: "Preenchimento de IniciativaRef apos envio bem-sucedido ao M003."
+  - name: "ContratacaoCancelada"
+    description: "Emitido quando uma ContratacaoOutorga e cancelada antes da formalizacao."
+    payload_entity: "post_award.contratacao.ContratacaoOutorga"
+    trigger: "Transicao para CANCELADA a partir de EM_CONVOCACAO ou EM_FORMALIZACAO."
+
+workflows:
+  ContratacaoOutorgaStateMachine:
+    states:
+      - EM_CONVOCACAO
+      - EM_FORMALIZACAO
+      - FORMALIZADA
+      - CANCELADA
+    transitions:
+      - from: EM_CONVOCACAO
+        to: EM_FORMALIZACAO
+        trigger: "iniciar formalizacao"
+        guard: "Outorgado confirmado e documentacao inicial recebida."
+      - from: EM_FORMALIZACAO
+        to: FORMALIZADA
+        trigger: "formalizar"
+        guard: "TermoOutorga preenchido com numero, dataAssinatura e linkDocumento; dataFormalizacao informada."
+      - from: FORMALIZADA
+        to: FORMALIZADA
+        trigger: "criar iniciativa no M003"
+        guard: "IniciativaRef ainda nao preenchida; comunicacao com M003 bem-sucedida."
+      - from: EM_CONVOCACAO
+        to: CANCELADA
+        trigger: "cancelar"
+        guard: "Justificativa de cancelamento registrada."
+      - from: EM_FORMALIZACAO
+        to: CANCELADA
+        trigger: "cancelar"
+        guard: "Justificativa de cancelamento registrada."
+
+policies:
+  permissions:
+    GestorFAPES:
+      can:
+        - criar ContratacaoOutorga (convocar proposta aprovada)
+        - editar ContratacaoOutorga em EM_CONVOCACAO e EM_FORMALIZACAO
+        - registrar TermoOutorga
+        - formalizar ContratacaoOutorga
+        - cancelar ContratacaoOutorga
+        - enviar iniciativa ao M003
+    AnalistaTecnico:
+      can:
+        - visualizar ContratacaoOutorga
+        - visualizar TermoOutorga
+        - visualizar IniciativaRef
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "ContratacaoOutorga.estado = FORMALIZADA exige termoOutorga e dataFormalizacao preenchidos — validar antes de qualquer transicao."
+    - "IniciativaRef so pode ser preenchida apos estado = FORMALIZADA."
+    - "CANCELADA e estado terminal — nenhuma transicao de saida permitida."
+    - "Cada PropostaAprovadaRef pode originar no maximo uma ContratacaoOutorga."
+    - "Outorgado e PessoaFisica do M008 referenciada por pessoaFisicaId; nao duplicar o cadastro completo aqui."
+    - "IniciativaRef e PropostaAprovadaRef sao referencias externas (M003 e M011 respectivamente) — apenas IDs."
+    - "O fluxo completo e: proposta aprovada (M011) → convocacao → formalizacao → criacao de iniciativa (M003)."
+  notes:
+    - "Outorgado.nome e desnormalizado para exibicao; a fonte de verdade do nome e o M008."
+    - "Este modulo nao gerencia o ciclo de vida da iniciativa — apenas cria a referencia inicial via IniciativaRef."
+    - "TermoOutorga.linkDocumento e condicional: pode ser preenchido apos a assinatura quando o documento digitalizado estiver disponivel."

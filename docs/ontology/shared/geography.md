@@ -1,0 +1,142 @@
+# Geografia — Cidade e Regiao
+
+```yaml
+ontology: "Shared Geography — Cities and Regions"
+namespace: "shared.geography"
+imports:
+  - namespace: "shared"
+    path: path: "base.yaml"
+metadata:
+  module: "M008"
+  source: "docs/implementation/modules/M008-cadastros-corporativos/geografia/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Geographic reference data for municipalities (Cidade) and territorial groupings (Regiao) used across ConectaFAPES modules."
+
+entities:
+  Cidade:
+    description: "Geographic reference for municipalities used in addresses, regions, territorial scope, calls and indicators. Identified uniquely by IBGE code."
+    extends: null
+    fields:
+      id:
+        type: uuid
+        required: true
+        description: "Surrogate primary key."
+      nome:
+        type: string
+        required: true
+        description: "Nome da cidade, máximo 200 caracteres. Ex: Vitória."
+      codigoIBGE:
+        type: string
+        required: true
+        unique: true
+        description: "Código IBGE da cidade, máximo 10 caracteres. Ex: 3205309. Deve ser único."
+      regiaoId:
+        type: uuid
+        required: false
+        description: "FK para Regiao — região de agrupamento territorial da cidade. Opcional conforme RN09."
+      # Auditavel mixin
+      createdAt:
+        type: datetime
+        required: true
+        description: "Timestamp de criação do registro."
+      updatedAt:
+        type: datetime
+        required: true
+        description: "Timestamp da última atualização."
+      createdBy:
+        type: uuid
+        required: true
+        description: "Identificador do usuário que criou o registro."
+      updatedBy:
+        type: uuid
+        required: true
+        description: "Identificador do usuário que realizou a última atualização."
+
+  Regiao:
+    description: "Territorial grouping of cities for regional analyses, call configurations, coverage monitoring and geographic organization of the state."
+    extends: null
+    fields:
+      id:
+        type: uuid
+        required: true
+        description: "Surrogate primary key."
+      nome:
+        type: string
+        required: true
+        unique: true
+        description: "Nome da região, máximo 200 caracteres. Ex: Grande Vitória. Deve ser único."
+      descricao:
+        type: string
+        required: false
+        description: "Descrição da região, máximo 500 caracteres."
+      # Auditavel mixin
+      createdAt:
+        type: datetime
+        required: true
+        description: "Timestamp de criação do registro."
+      updatedAt:
+        type: datetime
+        required: true
+        description: "Timestamp da última atualização."
+      createdBy:
+        type: uuid
+        required: true
+        description: "Identificador do usuário que criou o registro."
+      updatedBy:
+        type: uuid
+        required: true
+        description: "Identificador do usuário que realizou a última atualização."
+
+relationships:
+  - from: "shared.geography.Regiao"
+    relation: "groups"
+    to: "shared.geography.Cidade"
+    cardinality: "1..*"
+    description: "Uma Região agrupa zero ou mais Cidades para organização territorial."
+  - from: "shared.geography.Cidade"
+    relation: "belongsTo"
+    to: "shared.geography.Regiao"
+    cardinality: "0..1"
+    description: "Uma Cidade pode pertencer a uma Região quando houver agrupamento territorial definido (RN09)."
+
+axioms:
+  - id: "AX-GEO-01"
+    natural_language: "Código IBGE uniquely identifies a city."
+    formal_rule: "∀c1, c2 ∈ Cidade: c1.codigoIBGE = c2.codigoIBGE → c1 = c2"
+  - id: "AX-GEO-02"
+    natural_language: "A region name is unique within the system."
+    formal_rule: "∀r1, r2 ∈ Regiao: r1.nome = r2.nome → r1 = r2"
+  - id: "AX-GEO-03"
+    natural_language: "Cities remain queryable for historical records even when no longer used in new operations."
+    formal_rule: "∀c ∈ Cidade: HistoricalReference(c) → c.queryable = true"
+
+invariants:
+  - id: "INV-GEO-01"
+    rule: "Cidade.codigoIBGE.length ≤ 10 ∧ isNumeric(Cidade.codigoIBGE)"
+    description: "IBGE code must be numeric and at most 10 characters."
+  - id: "INV-GEO-02"
+    rule: "Regiao.nome is unique"
+    description: "Region name must be unique."
+
+enums: null
+
+value_objects: null
+
+events: []
+
+workflows: null
+policies: null
+
+agent_instructions:
+  rules:
+    - "Não criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementação deve seguir workflows definidos."
+    - "codigoIBGE é o identificador canônico de Cidade; nunca criar duplicata por nome."
+    - "Regiao não substitui o cadastro oficial da cidade; apenas organiza agrupamentos territoriais."
+    - "Cidade removida de uso ativo deve permanecer consultável para histórico (não aplicar hard delete)."
+  notes:
+    - "RN09 define que cidades devem pertencer a uma região quando houver agrupamento territorial definido; a associação é opcional."
+    - "Regiao.descricao é nullable conforme atributos documentados."
+
+```

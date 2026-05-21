@@ -1,0 +1,498 @@
+ontology: "Gestao Orcamentaria de Projeto"
+namespace: "post_award.orcamentaria"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: corporativo.rubricas
+    path: path: "../M008-cadastros-corporativos/rubricas/ontology.yaml"
+  - namespace: post_award.iniciativas
+    path: path: "../M003-gestao-iniciativas-captadas/ontology.yaml"
+metadata:
+  module: "M013"
+  source: "docs/implementation/modules/M013-gestao-orcamentaria-projeto/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Modulo canonico de orcamento de projeto: rubricas aprovadas, saldos derivados, transacoes e solicitacoes de ajuste orcamentario."
+  canonical_budget_module: true
+
+entities:
+  SolicitacaoOrcamentaria:
+    description: "Solicitacao formal de ajuste orcamentario (adicao, inclusao de rubrica, remanejamento ou realocacao de bolsa) vinculada a um projeto."
+    extends: "shared.Auditavel"
+    fields:
+      codigo:
+        type: "string"
+        required: true
+        generated: true
+        unique: true
+        description: "Codigo de identificacao unica da solicitacao (ex: SO-2026-001)."
+      tipo:
+        type: "enum:TipoSolicitacao"
+        required: true
+        description: "Tipo da solicitacao orcamentaria."
+      justificativa:
+        type: "string"
+        required: true
+        max_length: 2000
+        description: "Justificativa do coordenador para a solicitacao."
+      valorSolicitado:
+        type: "decimal"
+        required: true
+        description: "Valor monetario envolvido na solicitacao."
+      dataCriacao:
+        type: "date"
+        required: true
+        generated: true
+        description: "Data de criacao da solicitacao."
+      dataSubmissao:
+        type: "date"
+        required: false
+        description: "Data em que a solicitacao foi submetida. Preenchida ao submeter."
+      estado:
+        type: "enum:EstadoSolicitacaoOrcamentaria"
+        required: true
+        generated: true
+        description: "Estado atual da solicitacao no fluxo de aprovacao."
+      projeto:
+        type: "ref:post_award.iniciativas.Projeto"
+        required: true
+        description: "Projeto ao qual a solicitacao esta vinculada."
+      rubricaAlvo:
+        type: "ref:post_award.orcamentaria.RubricaProjeto"
+        required: false
+        description: "Rubrica alvo da solicitacao, quando aplicavel."
+      nivelBolsaAlvo:
+        type: "ref:corporativo.modalidade_bolsa.VersaoNivel"
+        required: false
+        description: "Nivel de bolsa alvo, para solicitacoes do tipo REALOCACAO_BOLSA."
+      parecer:
+        type: "ref:post_award.orcamentaria.ParecerSolicitacao"
+        required: false
+        description: "Parecer emitido sobre a solicitacao."
+      detalheRemanejamento:
+        type: "ref:post_award.orcamentaria.Remanejamento"
+        required: false
+        description: "Detalhamento do remanejamento, presente quando tipo = REMANEJAMENTO."
+
+  RubricaProjeto:
+    description: "Rubrica orcamentaria aprovada para o projeto, com snapshot dos metadados canonicos no momento da aprovacao e saldos financeiros derivados das transacoes."
+    extends: "shared.Auditavel"
+    fields:
+      codigo:
+        type: "string"
+        required: true
+        generated: true
+        unique: true
+        description: "Codigo de identificacao da rubrica no projeto (ex: RP-2026-001)."
+      rubricaRef:
+        type: "string"
+        required: true
+        max_length: 80
+        description: "Identificador da Rubrica canonica no M008 (ex: RUB-DIARIAS)."
+      codigoSnapshot:
+        type: "string"
+        required: true
+        max_length: 80
+        description: "Codigo canonico da Rubrica no momento da aprovacao do orcamento do projeto."
+      nomeSnapshot:
+        type: "string"
+        required: true
+        max_length: 150
+        description: "Nome da Rubrica no momento da aprovacao do orcamento do projeto."
+      descricaoSnapshot:
+        type: "string"
+        required: true
+        max_length: 500
+        description: "Descricao da Rubrica no momento da aprovacao do orcamento do projeto."
+      naturezaSnapshot:
+        type: "string"
+        required: true
+        max_length: 20
+        domain: "CUSTEIO | CAPITAL"
+        description: "Natureza da Rubrica no momento da aprovacao."
+      rubricaPaiSnapshot:
+        type: "string"
+        required: false
+        max_length: 220
+        description: "Codigo/nome da Rubrica pai no momento da aprovacao, quando houver."
+      documentoFonteSnapshot:
+        type: "string"
+        required: false
+        max_length: 300
+        description: "Documento fonte conhecido no momento da aprovacao (ex: Resolucao CCAF no 309/2022)."
+      valorAprovado:
+        type: "decimal"
+        required: true
+        description: "Valor total aprovado para a rubrica no projeto. Equivale a valorTotal nas RN-SLD."
+      valorComprometido:
+        type: "decimal"
+        required: true
+        generated: true
+        description: "Valor comprometido por transacoes ainda nao executadas. Equivale a valorAlocado nas RN-SLD."
+      valorExecutado:
+        type: "decimal"
+        required: true
+        generated: true
+        description: "Valor ja executado a partir de transacoes aprovadas. Equivale a valorConsumido nas RN-SLD."
+      valorEstornado:
+        type: "decimal"
+        required: true
+        generated: true
+        description: "Valor revertido por transacoes de estorno/cancelamento."
+      saldoDisponivel:
+        type: "decimal"
+        required: true
+        generated: true
+        derived: true
+        formula: "valorAprovado - valorComprometido - valorExecutado + valorEstornado"
+        description: "Saldo disponivel para novas despesas. Equivale a valorDisponivel nas RN-SLD. Formula: valorAprovado - valorComprometido - valorExecutado + valorEstornado."
+      projeto:
+        type: "ref:post_award.iniciativas.Projeto"
+        required: true
+        description: "Projeto ao qual a rubrica pertence."
+      rubrica:
+        type: "ref:corporativo.rubricas.Rubrica"
+        required: true
+        description: "Rubrica canonica do M008 referenciada por esta rubrica de projeto."
+      transacoes:
+        type: "list:ref:post_award.orcamentaria.Transacao"
+        required: false
+        description: "Transacoes que movimentam esta rubrica."
+
+  Remanejamento:
+    description: "Detalhamento de um remanejamento orcamentario entre duas rubricas de projeto. Auto-sinaliza aprovacao do diretor quando percentual de origem excede 25%."
+    extends: "shared.Auditavel"
+    fields:
+      valor:
+        type: "decimal"
+        required: true
+        description: "Valor a ser remanejado entre rubricas."
+      justificativa:
+        type: "string"
+        required: true
+        max_length: 2000
+        description: "Justificativa para o remanejamento."
+      percentualOrigem:
+        type: "decimal"
+        required: true
+        generated: true
+        description: "Percentual que o valor representa da rubrica de origem (ex: 18.5%)."
+      exigeAprovacaoDiretor:
+        type: "boolean"
+        required: true
+        generated: true
+        description: "Indica se o percentual excede 25% e exige aprovacao do Diretor."
+      dataAprovacao:
+        type: "date"
+        required: false
+        description: "Data da aprovacao do remanejamento. Preenchida quando aprovado."
+      rubricaOrigem:
+        type: "ref:post_award.orcamentaria.RubricaProjeto"
+        required: true
+        description: "Rubrica de origem do remanejamento (debito)."
+      rubricaDestino:
+        type: "ref:post_award.orcamentaria.RubricaProjeto"
+        required: true
+        description: "Rubrica de destino do remanejamento (credito)."
+
+  Transacao:
+    description: "Movimento financeiro que afeta os saldos de uma RubricaProjeto: comprometimento, execucao, estorno, remanejamento ou ajuste."
+    extends: "shared.Auditavel"
+    fields:
+      codigo:
+        type: "string"
+        required: true
+        generated: true
+        unique: true
+        description: "Codigo unico da transacao (ex: TR-2026-001)."
+      tipo:
+        type: "enum:TipoTransacao"
+        required: true
+        description: "Tipo do movimento que afeta a RubricaProjeto."
+      valor:
+        type: "decimal"
+        required: true
+        description: "Valor da transacao. Deve ser >= 0."
+      dataTransacao:
+        type: "datetime"
+        required: true
+        generated: true
+        description: "Data/hora da transacao."
+      origemModulo:
+        type: "string"
+        required: true
+        max_length: 30
+        domain: "M003 | M014 | M016 | BACKOFFICE"
+        description: "Modulo ou contexto que originou a transacao."
+      origemRef:
+        type: "string"
+        required: true
+        max_length: 120
+        description: "Referencia externa do fato de negocio que gerou a transacao (ex: SolicitacaoDiariaId, PrestacaoId, RemanejamentoId)."
+      movimentoBancarioRef:
+        type: "string"
+        required: false
+        max_length: 120
+        description: "Referencia opcional ao movimento bancario conciliado (TransacaoFinanceiraId / MovimentoBancarioId)."
+      descricao:
+        type: "string"
+        required: true
+        max_length: 500
+        description: "Descricao textual da transacao."
+      rubrica:
+        type: "ref:post_award.orcamentaria.RubricaProjeto"
+        required: true
+        description: "RubricaProjeto afetada por esta transacao."
+
+  ParecerSolicitacao:
+    description: "Parecer tecnico emitido por analista sobre uma SolicitacaoOrcamentaria."
+    extends: "shared.Auditavel"
+    fields:
+      dataAnalise:
+        type: "date"
+        required: true
+        description: "Data em que o parecer foi emitido."
+      aprovado:
+        type: "boolean"
+        required: true
+        description: "Indica se a solicitacao foi aprovada."
+      justificativa:
+        type: "string"
+        required: true
+        max_length: 1000
+        description: "Justificativa do parecer."
+
+  HistoricoOrcamentario:
+    description: "Trilha de auditoria orcamentaria de um projeto, registrando cada movimentacao relevante."
+    extends: "shared.Auditavel"
+    fields:
+      data:
+        type: "date"
+        required: true
+        generated: true
+        description: "Data do evento orcamentario."
+      tipo:
+        type: "enum:TipoMovimentacaoOrcamentaria"
+        required: true
+        description: "Tipo da movimentacao registrada."
+      descricao:
+        type: "string"
+        required: true
+        max_length: 500
+        description: "Descricao textual do evento."
+      valor:
+        type: "decimal"
+        required: true
+        description: "Valor envolvido na movimentacao."
+      projeto:
+        type: "ref:post_award.iniciativas.Projeto"
+        required: true
+        description: "Projeto ao qual este historico pertence."
+
+relationships:
+  - from: "post_award.orcamentaria.SolicitacaoOrcamentaria"
+    relation: "vinculada a"
+    to: "post_award.iniciativas.Projeto"
+    cardinality: "N:1"
+    description: "Multiplas solicitacoes podem existir para um mesmo projeto."
+  - from: "post_award.orcamentaria.SolicitacaoOrcamentaria"
+    relation: "possui parecer"
+    to: "post_award.orcamentaria.ParecerSolicitacao"
+    cardinality: "1:1"
+    description: "Uma solicitacao pode ter no maximo um parecer."
+  - from: "post_award.orcamentaria.SolicitacaoOrcamentaria"
+    relation: "detalha remanejamento"
+    to: "post_award.orcamentaria.Remanejamento"
+    cardinality: "1:1"
+    description: "Presente apenas quando tipo = REMANEJAMENTO."
+  - from: "post_award.orcamentaria.SolicitacaoOrcamentaria"
+    relation: "tem rubrica alvo"
+    to: "post_award.orcamentaria.RubricaProjeto"
+    cardinality: "N:1"
+    description: "Rubrica alvo da operacao, quando aplicavel."
+  - from: "post_award.orcamentaria.RubricaProjeto"
+    relation: "pertence a"
+    to: "post_award.iniciativas.Projeto"
+    cardinality: "N:1"
+    description: "Multiplas rubricas pertencem a um mesmo projeto."
+  - from: "post_award.orcamentaria.RubricaProjeto"
+    relation: "referencia"
+    to: "corporativo.rubricas.Rubrica"
+    cardinality: "N:1"
+    description: "Cada RubricaProjeto referencia uma Rubrica canonica do M008."
+  - from: "post_award.orcamentaria.RubricaProjeto"
+    relation: "possui transacoes"
+    to: "post_award.orcamentaria.Transacao"
+    cardinality: "1:N"
+    description: "Uma RubricaProjeto acumula multiplas Transacoes."
+  - from: "post_award.orcamentaria.Remanejamento"
+    relation: "debita rubrica"
+    to: "post_award.orcamentaria.RubricaProjeto"
+    cardinality: "N:1"
+    description: "Rubrica de origem do remanejamento."
+  - from: "post_award.orcamentaria.Remanejamento"
+    relation: "credita rubrica"
+    to: "post_award.orcamentaria.RubricaProjeto"
+    cardinality: "N:1"
+    description: "Rubrica de destino do remanejamento."
+  - from: "post_award.iniciativas.Projeto"
+    relation: "possui historico orcamentario"
+    to: "post_award.orcamentaria.HistoricoOrcamentario"
+    cardinality: "1:N"
+    description: "Trilha completa de movimentacoes orcamentarias do projeto."
+
+axioms:
+  - id: "AX-SLD01"
+    natural_language: "O saldo disponivel de uma rubrica e calculado subtraindo do valor aprovado o valor comprometido e o valor executado, somando os estornos."
+    formal_rule: "RubricaProjeto.saldoDisponivel = RubricaProjeto.valorAprovado - RubricaProjeto.valorComprometido - RubricaProjeto.valorExecutado + RubricaProjeto.valorEstornado"
+  - id: "AX-M013-001"
+    natural_language: "O flag exigeAprovacaoDiretor e derivado automaticamente: true quando percentualOrigem > 25%."
+    formal_rule: "Remanejamento.exigeAprovacaoDiretor = (Remanejamento.percentualOrigem > 25)"
+  - id: "AX-M013-002"
+    natural_language: "O percentualOrigem e calculado como (valor / RubricaOrigem.valorAprovado) * 100."
+    formal_rule: "Remanejamento.percentualOrigem = (Remanejamento.valor / rubricaOrigem.valorAprovado) * 100"
+  - id: "AX-M013-003"
+    natural_language: "M013 e fonte canonica de saldo monetario para M009 (bolsas) e M003 (diarias). Todos os modulos que alocam recursos devem ler RubricaProjeto.saldoDisponivel antes de confirmar a operacao."
+    formal_rule: "∀alocacao: alocacao.valorSolicitado ≤ RubricaProjeto.saldoDisponivel (verificado via M013)"
+
+invariants:
+  - id: "INV-SLD1"
+    rule: "RubricaProjeto.saldoDisponivel >= 0"
+    description: "O saldo disponivel de uma rubrica nunca pode ser negativo."
+  - id: "INV-SLD2"
+    rule: "RubricaProjeto.valorExecutado <= RubricaProjeto.valorComprometido"
+    description: "O valor executado nao pode superar o valor comprometido."
+  - id: "INV-M013-001"
+    rule: "Transacao.valor >= 0"
+    description: "O valor de uma transacao deve ser nao-negativo."
+  - id: "INV-M013-002"
+    rule: "RubricaProjeto.valorAprovado >= 0"
+    description: "O valor aprovado de uma rubrica deve ser nao-negativo."
+
+enums:
+  TipoSolicitacao:
+    description: "Tipos de solicitacao orcamentaria que um coordenador pode realizar."
+    values:
+      ADICAO_ORCAMENTARIA: "Adicao de novo valor orcamentario a uma rubrica ja existente."
+      INCLUSAO_RUBRICA: "Inclusao de uma nova rubrica no orcamento do projeto."
+      REMANEJAMENTO: "Transferencia de valor entre duas rubricas do mesmo projeto."
+      REALOCACAO_BOLSA: "Realocacao de recursos de bolsa entre niveis ou periodos."
+
+  EstadoSolicitacaoOrcamentaria:
+    description: "Estados do ciclo de vida de uma SolicitacaoOrcamentaria."
+    values:
+      RASCUNHO: "Solicitacao em elaboracao pelo coordenador, ainda nao submetida."
+      SUBMETIDA: "Solicitacao submetida para analise, aguardando parecer."
+      EM_ANALISE: "Solicitacao em analise pelo tecnico responsavel."
+      APROVADA: "Solicitacao aprovada e efeitos orcamentarios aplicados."
+      REJEITADA: "Solicitacao rejeitada com justificativa."
+
+  TipoTransacao:
+    description: "Tipos de movimento que afetam os saldos de uma RubricaProjeto."
+    values:
+      APORTE_INICIAL: "Aporte inicial do valor aprovado ao inicio do projeto."
+      ADITIVO: "Adicao de valor via aditivo contratual ou orcamentario."
+      REMANEJAMENTO_CREDITO: "Credito em rubrica de destino em um remanejamento."
+      REMANEJAMENTO_DEBITO: "Debito em rubrica de origem em um remanejamento."
+      COMPROMETIMENTO: "Reserva de valor para despesa futura (aumenta valorComprometido)."
+      CANCELAMENTO_COMPROMETIMENTO: "Cancelamento de reserva anterior (diminui valorComprometido)."
+      EXECUCAO: "Pagamento efetivo de despesa (aumenta valorExecutado)."
+      ESTORNO: "Reversao de execucao anterior (aumenta valorEstornado)."
+
+  TipoMovimentacaoOrcamentaria:
+    description: "Tipos de evento registrados no historico orcamentario do projeto."
+    values:
+      ADICAO: "Adicao de valor orcamentario."
+      INCLUSAO_RUBRICA: "Inclusao de nova rubrica no orcamento."
+      REMANEJAMENTO_CREDITO: "Credito de remanejamento em rubrica destino."
+      REMANEJAMENTO_DEBITO: "Debito de remanejamento em rubrica origem."
+      REALOCACAO_BOLSA: "Realocacao de recursos de bolsa."
+      EXECUCAO_DESPESA: "Execucao de despesa em rubrica."
+
+value_objects: {}
+
+events:
+  - name: "SolicitacaoOrcamentariaSubmetida"
+    description: "Disparado quando coordenador submete uma SolicitacaoOrcamentaria."
+    payload_entity: "post_award.orcamentaria.SolicitacaoOrcamentaria"
+    trigger: "SolicitacaoOrcamentaria.estado = SUBMETIDA"
+  - name: "SolicitacaoOrcamentariaAprovada"
+    description: "Disparado quando analista aprova a solicitacao. Aciona aplicacao dos efeitos orcamentarios na RubricaProjeto."
+    payload_entity: "post_award.orcamentaria.SolicitacaoOrcamentaria"
+    trigger: "SolicitacaoOrcamentaria.estado = APROVADA"
+  - name: "SolicitacaoOrcamentariaRejeitada"
+    description: "Disparado quando analista rejeita a solicitacao."
+    payload_entity: "post_award.orcamentaria.SolicitacaoOrcamentaria"
+    trigger: "SolicitacaoOrcamentaria.estado = REJEITADA"
+  - name: "TransacaoRegistrada"
+    description: "Disparado quando uma nova Transacao e registrada em uma RubricaProjeto, recalculando saldos."
+    payload_entity: "post_award.orcamentaria.Transacao"
+    trigger: "Transacao criada ou atualizada"
+
+workflows:
+  SolicitacaoOrcamentariaStateMachine:
+    states:
+      - RASCUNHO
+      - SUBMETIDA
+      - EM_ANALISE
+      - APROVADA
+      - REJEITADA
+    transitions:
+      - from: RASCUNHO
+        to: SUBMETIDA
+        trigger: "coordenador submete"
+        guard: "justificativa preenchida e valorSolicitado > 0"
+      - from: SUBMETIDA
+        to: EM_ANALISE
+        trigger: "analista abre analise"
+        guard: "analista responsavel atribuido"
+      - from: EM_ANALISE
+        to: APROVADA
+        trigger: "analista aprova"
+        guard: "ParecerSolicitacao.aprovado = true"
+      - from: EM_ANALISE
+        to: REJEITADA
+        trigger: "analista rejeita"
+        guard: "ParecerSolicitacao.aprovado = false e justificativa preenchida"
+      - from: SUBMETIDA
+        to: RASCUNHO
+        trigger: "coordenador retira"
+        guard: "nenhum analista em andamento"
+
+policies:
+  permissions:
+    Coordenador:
+      can:
+        - "criar SolicitacaoOrcamentaria"
+        - "submeter SolicitacaoOrcamentaria em estado RASCUNHO"
+        - "retirar SolicitacaoOrcamentaria em estado SUBMETIDA"
+        - "visualizar RubricaProjeto do proprio projeto"
+        - "visualizar HistoricoOrcamentario do proprio projeto"
+    Analista:
+      can:
+        - "abrir analise de SolicitacaoOrcamentaria"
+        - "emitir ParecerSolicitacao"
+        - "aprovar ou rejeitar SolicitacaoOrcamentaria"
+        - "visualizar todas as RubricaProjeto"
+    Diretor:
+      can:
+        - "aprovar Remanejamento com percentualOrigem > 25%"
+        - "visualizar todos os registros do modulo"
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "M013 e o modulo canonico de saldo: NUNCA recalcular saldo fora de RubricaProjeto."
+    - "AX-SLD01 e invariavel: saldoDisponivel = valorAprovado - valorComprometido - valorExecutado + valorEstornado."
+    - "INV-SLD1 deve ser verificado antes de qualquer alocacao (COMPROMETIMENTO ou EXECUCAO)."
+    - "INV-SLD2 deve ser verificado antes de registrar uma EXECUCAO."
+    - "Remanejamento com percentualOrigem > 25% exige aprovacao do Diretor antes de ser aplicado."
+    - "Transacao e imutavel apos criacao; correcoes geram nova Transacao do tipo ESTORNO."
+    - "RubricaProjeto.saldoDisponivel e campo derivado — nao aceitar input manual."
+    - "Projeto (M003) e Rubrica (M008) sao referencias externas — nao modelar aqui."
+    - "M009 e M003 devem consultar este modulo para validar saldo antes de nova alocacao."
+  notes:
+    - "Terminologia de mapeamento RN-SLD: valorAprovado=valorTotal, valorComprometido=valorAlocado, valorExecutado=valorConsumido, saldoDisponivel=valorDisponivel."
+    - "TransacaoFinanceira pertence a M014/M016; Transacao.movimentoBancarioRef e apenas referencia de conciliacao."
+    - "CotaBolsa (M009) e contador independente de cotas em quantidade; nao substitui o saldo monetario deste modulo."

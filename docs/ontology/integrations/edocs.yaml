@@ -1,0 +1,151 @@
+ontology: "Integração eDocs — ConectaFAPES"
+namespace: "integrations.edocs"
+
+imports: []
+
+metadata:
+  type: "integration"
+  version: "1.0.0"
+  description: "Armazenamento e recuperação de documentos oficiais via sistema eDocs (PRODEST). Usado para TermoOutorga, TermoCompromisso e documentos formais da FAPES."
+  modules_using: [M009, M022, M004]
+  direction: "bidirectional"
+
+integration:
+  system: "eDocs"
+  system_description: "Sistema de Gestão de Documentos e Processos Administrativos do Estado do Espírito Santo (PRODEST)"
+  direction: "bidirectional"
+  protocol: "REST"
+  authentication: "OAuth 2.0 / API Key (definir por ambiente)"
+  base_url: "todo: configure per environment"
+
+  endpoints:
+    - path: "/documentos"
+      method: "POST"
+      description: "Cria novo documento no eDocs com metadados e arquivo binário."
+      used_by: "M022.TermoOutorga, M009.TermoCompromisso, M004.GuiaDeLiberacao"
+      request_fields:
+        - campo: "tipo_documento"
+          description: "Tipo: TERMO_OUTORGA, TERMO_COMPROMISSO, GUIA_LIBERACAO, etc."
+        - campo: "assunto"
+          description: "Título/assunto do documento."
+        - campo: "arquivo"
+          description: "Arquivo binário (PDF) em base64 ou multipart."
+        - campo: "metadados"
+          description: "Metadados adicionais (iniciativa_id, bolsa_id, etc.)."
+
+    - path: "/documentos/{edocs_id}"
+      method: "GET"
+      description: "Recupera metadados de um documento pelo ID eDocs."
+      used_by: "M022.TermoOutorga, M009.TermoCompromisso"
+
+    - path: "/documentos/{edocs_id}/arquivo"
+      method: "GET"
+      description: "Download do arquivo binário de um documento."
+      used_by: "M022.TermoOutorga, M009.TermoCompromisso"
+
+    - path: "/documentos/{edocs_id}/assinaturas"
+      method: "POST"
+      description: "Solicita assinatura eletrônica de um documento por signatários especificados."
+      used_by: "M022.TermoOutorga, M009.TermoCompromisso"
+
+    - path: "/documentos/{edocs_id}/assinaturas"
+      method: "GET"
+      description: "Consulta status das assinaturas de um documento."
+      used_by: "M022.TermoOutorga, M009.TermoCompromisso"
+
+    - path: "/processos"
+      method: "POST"
+      description: "Cria processo administrativo no eDocs vinculando múltiplos documentos."
+      used_by: "M022.ProcessoContratacao"
+
+    - path: "/processos/{processo_id}/documentos"
+      method: "POST"
+      description: "Junta documentos a um processo administrativo existente."
+      used_by: "M022.ProcessoContratacao"
+
+document_types:
+  - type: "TERMO_OUTORGA"
+    description: "Instrumento jurídico de outorga entre FAPES e beneficiário."
+    module: "M022"
+    workflow: "workflows.contratacao.TermoOutorga"
+    required_signatures:
+      - "Presidente da FAPES"
+      - "Coordenador (beneficiário)"
+
+  - type: "TERMO_COMPROMISSO"
+    description: "Termo de compromisso do bolsista."
+    module: "M009"
+    workflow: "workflows.gestao_bolsista.TermoCompromisso"
+    required_signatures:
+      - "Gestor FAPES"
+      - "Bolsista"
+      - "Coordenador da Iniciativa (quando aplicável)"
+
+  - type: "GUIA_LIBERACAO"
+    description: "Guia de liberação de pagamento gerada após retorno positivo do Banestes."
+    module: "M004"
+    required_signatures: []
+
+  - type: "RELATORIO_TECNICO"
+    description: "Relatório técnico de atividades submetido pelo coordenador."
+    module: "M003"
+    required_signatures:
+      - "Coordenador"
+
+  - type: "DOCUMENTO_BOLSISTA"
+    description: "Documentos de habilitação enviados pelo bolsista (RG, CPF, comprovante bancário, etc.)."
+    module: "M009"
+    required_signatures: []
+
+data_mappings:
+  - external_entity: "eDocs.Documento"
+    internal_entity: "M022.TermoOutorga"
+    mapping_notes: "edocs_id armazenado como referência em TermoOutorga.edocs_id. Arquivo não é armazenado no ConectaFAPES."
+
+  - external_entity: "eDocs.Documento"
+    internal_entity: "post_award.bolsas.TermoCompromisso"
+    mapping_notes: "edocs_id armazenado em TermoCompromisso.edocs_id. Status de assinatura sincronizado via consulta periódica ou webhook."
+
+  - external_entity: "eDocs.Assinatura"
+    internal_entity: "M009.AssinaturaTermoCompromisso"
+    mapping_notes: "Cada assinatura no eDocs corresponde a um registro de assinatura no ConectaFAPES com timestamp e identidade do signatário."
+
+  - external_entity: "eDocs.Processo"
+    internal_entity: "M022.ProcessoContratacao"
+    mapping_notes: "Processo administrativo no eDocs agrupa documentos de uma contratação específica."
+
+  todo: "Complete mapping when integration is implemented"
+
+signature_flow:
+  description: "Fluxo de assinatura eletrônica via eDocs"
+  mechanism: "Assinatura digital ICP-Brasil via integração eDocs-Acesso Cidadão"
+
+  steps:
+    - step: 1
+      action: "ConectaFAPES gera PDF do documento e envia ao eDocs via POST /documentos"
+      result: "edocs_id retornado e armazenado na entidade correspondente"
+
+    - step: 2
+      action: "ConectaFAPES solicita assinatura via POST /documentos/{id}/assinaturas com lista de signatários"
+      result: "eDocs envia notificação/email para cada signatário"
+
+    - step: 3
+      action: "Signatário acessa eDocs (autenticado via Acesso Cidadão) e assina o documento"
+      result: "Assinatura registrada no eDocs"
+
+    - step: 4
+      action: "ConectaFAPES verifica status via GET /documentos/{id}/assinaturas (polling ou webhook)"
+      result: "Quando todos assinaram, atualiza status do TermoCompromisso/TermoOutorga"
+
+agent_instructions:
+  rules:
+    - "Não criar integrações fora deste arquivo."
+    - "Toda integração deve ter data_mappings definidos."
+    - "Arquivos binários (PDF) não são armazenados no ConectaFAPES; apenas o edocs_id como referência."
+    - "Status de assinatura deve ser sincronizado via polling ou webhook — não confiar apenas no estado local."
+    - "Documentos no eDocs são imutáveis após assinatura; para correções, criar nova versão."
+    - "Todo documento enviado ao eDocs deve ter tipo e metadados corretamente preenchidos."
+  notes:
+    - "eDocs é produto PRODEST; mesma entidade que mantém o Acesso Cidadão."
+    - "Webhook de status de assinatura: verificar disponibilidade com PRODEST."
+    - "Para ambientes de desenvolvimento, usar mock de eDocs que simula resposta de assinatura."

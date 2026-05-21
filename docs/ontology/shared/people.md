@@ -1,0 +1,236 @@
+# Pessoas — PessoaFisica e NivelAcademico
+
+```yaml
+ontology: "Shared People — Physical Persons, Academic Levels and Person History"
+namespace: "shared.people"
+imports:
+  - namespace: "shared"
+    path: path: "base.yaml"
+metadata:
+  module: "M008"
+  source: "docs/implementation/modules/M008-cadastros-corporativos/pessoas/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Canonical registry of physical persons (PessoaFisica), academic levels (NivelAcademico) and person lifecycle history (HistoricoPessoa) for ConectaFAPES."
+
+entities:
+  PessoaFisica:
+    description: "Canonical record of individuals interacting with FAPES: researchers, scholarship holders, coordinators, institutional managers, evaluators, consultants and other natural persons. Primary identity key is CPF."
+    extends: null
+    fields:
+      id:
+        type: uuid
+        required: true
+        description: "Surrogate primary key."
+      cpf:
+        type: string
+        required: true
+        unique: true
+        description: "CPF da pessoa, somente dígitos, 11 caracteres."
+      nome:
+        type: string
+        required: true
+        description: "Nome completo da pessoa, máximo 300 caracteres."
+      email:
+        type: string
+        required: true
+        description: "Email de contato, máximo 200 caracteres."
+      telefone:
+        type: string
+        required: false
+        description: "Telefone de contato, máximo 20 caracteres."
+      dataNascimento:
+        type: date
+        required: true
+        description: "Data de nascimento da pessoa."
+      lattes:
+        type: string
+        required: false
+        description: "URL do currículo Lattes, máximo 500 caracteres."
+      estado:
+        type: "enum:EstadoPessoa"
+        required: true
+        description: "Estado atual da pessoa no sistema. Valor gerado e mantido pelo sistema conforme eventos de ciclo de vida."
+      nivelAcademicoId:
+        type: uuid
+        required: false
+        description: "FK para NivelAcademico — maior nível acadêmico informado para a pessoa."
+      responsavelLegalId:
+        type: uuid
+        required: false
+        description: "FK auto-referencial para outra PessoaFisica que responde legalmente quando esta for menor de idade. Obrigatório quando idade < 18 anos completos na data de cadastro (RN19). Deve apontar para pessoa cadastrada, ativa e maior de idade (RI7). Auto-referência rejeitada."
+      # Auditavel mixin
+      createdAt:
+        type: datetime
+        required: true
+        description: "Timestamp de criação do registro."
+      updatedAt:
+        type: datetime
+        required: true
+        description: "Timestamp da última atualização."
+      createdBy:
+        type: uuid
+        required: true
+        description: "Identificador do usuário que criou o registro."
+      updatedBy:
+        type: uuid
+        required: true
+        description: "Identificador do usuário que realizou a última atualização."
+      deletedAt:
+        type: datetime
+        required: false
+        description: "Timestamp de exclusão lógica. Nulo indica registro ativo."
+
+  NivelAcademico:
+    description: "Reference table of academic levels used to record the highest academic qualification of a person and support eligibility validations in grants, scholarships and evaluations."
+    extends: null
+    fields:
+      id:
+        type: uuid
+        required: true
+        description: "Surrogate primary key."
+      nome:
+        type: string
+        required: true
+        unique: true
+        description: "Nome do nível acadêmico, máximo 100 caracteres. Ex: Graduação, Especialização, Mestrado, Doutorado, Pós-Doutorado."
+      descricao:
+        type: string
+        required: false
+        description: "Descrição do nível acadêmico, máximo 300 caracteres."
+      # Auditavel mixin
+      createdAt:
+        type: datetime
+        required: true
+        description: "Timestamp de criação do registro."
+      updatedAt:
+        type: datetime
+        required: true
+        description: "Timestamp da última atualização."
+      createdBy:
+        type: uuid
+        required: true
+        description: "Identificador do usuário que criou o registro."
+      updatedBy:
+        type: uuid
+        required: true
+        description: "Identificador do usuário que realizou a última atualização."
+
+  HistoricoPessoa:
+    description: "Records lifecycle events of a PessoaFisica for audit trail: registration, update, suspension and reactivation."
+    extends: null
+    fields:
+      id:
+        type: uuid
+        required: true
+        description: "Surrogate primary key."
+      pessoaId:
+        type: uuid
+        required: true
+        description: "FK para PessoaFisica — pessoa física relacionada ao evento."
+      data:
+        type: datetime
+        required: true
+        description: "Data/hora do evento. Valor gerado automaticamente pelo sistema."
+      tipo:
+        type: "enum:TipoEventoPessoa"
+        required: true
+        description: "Tipo do evento registrado."
+      descricao:
+        type: string
+        required: true
+        description: "Descrição textual do evento, máximo 500 caracteres."
+      justificativa:
+        type: string
+        required: false
+        description: "Justificativa do evento, máximo 500 caracteres. Obrigatória para eventos do tipo SUSPENSAO e REATIVACAO (RI2)."
+
+relationships:
+  - from: "shared.people.PessoaFisica"
+    relation: "has"
+    to: "shared.people.HistoricoPessoa"
+    cardinality: "1..*"
+    description: "A pessoa física possui um ou mais eventos de histórico de ciclo de vida."
+  - from: "shared.people.PessoaFisica"
+    relation: "references"
+    to: "shared.people.NivelAcademico"
+    cardinality: "0..1"
+    description: "A pessoa física pode informar o maior nível acadêmico obtido."
+  - from: "shared.people.PessoaFisica"
+    relation: "responsavelLegal"
+    to: "shared.people.PessoaFisica"
+    cardinality: "0..1"
+    description: "Pessoa física menor de idade deve ter outra PessoaFisica como responsável legal. Auto-referência proibida."
+
+axioms:
+  - id: "AX-PPL-01"
+    natural_language: "PessoaFisica is uniquely identified by CPF."
+    formal_rule: "∀p1, p2 ∈ PessoaFisica: p1.cpf = p2.cpf → p1 = p2"
+  - id: "AX-PPL-02"
+    natural_language: "A suspended person cannot participate in active operations (submission, scholarship, payment)."
+    formal_rule: "∀p ∈ PessoaFisica: p.estado = SUSPENSA → p ∉ ActiveOperations"
+  - id: "AX-PPL-03"
+    natural_language: "A person under 18 years of age at registration must have a responsavelLegal pointing to another active adult PessoaFisica."
+    formal_rule: "∀p ∈ PessoaFisica: age(p, p.createdAt) < 18 → p.responsavelLegalId ≠ null ∧ p.responsavelLegalId ≠ p.id"
+  - id: "AX-PPL-04"
+    natural_language: "responsavelLegal must be a different, active, adult PessoaFisica."
+    formal_rule: "∀p ∈ PessoaFisica: p.responsavelLegalId ≠ null → responsavel.estado = ATIVA ∧ age(responsavel) ≥ 18 ∧ responsavel.id ≠ p.id"
+
+invariants:
+  - id: "INV-PPL-01"
+    rule: "PessoaFisica.cpf.length = 11 ∧ isValidCPF(PessoaFisica.cpf)"
+    description: "CPF must have exactly 11 digits and pass check-digit validation."
+  - id: "INV-PPL-02"
+    rule: "HistoricoPessoa.tipo ∈ {SUSPENSAO, REATIVACAO} → HistoricoPessoa.justificativa ≠ null"
+    description: "Justification is mandatory for suspension and reactivation events."
+  - id: "INV-PPL-03"
+    rule: "NivelAcademico.nome is unique"
+    description: "Academic level name must be unique across the reference table."
+
+enums:
+  EstadoPessoa:
+    description: "Operational state of a PessoaFisica in the system."
+    values:
+      ATIVA: "Pessoa ativa, apta a participar de operações do sistema."
+      SUSPENSA: "Pessoa suspensa, bloqueada de operações como submissão, bolsa e pagamento."
+
+  TipoEventoPessoa:
+    description: "Type of lifecycle event recorded in HistoricoPessoa."
+    values:
+      CADASTRO: "Evento de cadastro inicial da pessoa no sistema."
+      ATUALIZACAO: "Evento de atualização de dados cadastrais."
+      SUSPENSAO: "Evento de suspensão da pessoa, requer justificativa."
+      REATIVACAO: "Evento de reativação de pessoa suspensa, requer justificativa."
+
+value_objects: null
+
+events:
+  - name: "PessoaCadastrada"
+    description: "Emitido quando uma nova PessoaFisica é cadastrada no sistema."
+    payload_entity: "shared.people.PessoaFisica"
+    trigger: "Criação de PessoaFisica com estado ATIVA e registro de HistoricoPessoa tipo CADASTRO."
+  - name: "PessoaSuspensa"
+    description: "Emitido quando uma PessoaFisica tem seu estado alterado para SUSPENSA."
+    payload_entity: "shared.people.HistoricoPessoa"
+    trigger: "Alteração de estado de ATIVA para SUSPENSA com justificativa obrigatória."
+  - name: "PessoaReativada"
+    description: "Emitido quando uma PessoaFisica suspensa é reativada."
+    payload_entity: "shared.people.HistoricoPessoa"
+    trigger: "Alteração de estado de SUSPENSA para ATIVA com justificativa obrigatória."
+
+workflows: null
+policies: null
+
+agent_instructions:
+  rules:
+    - "Não criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementação deve seguir workflows definidos."
+    - "CPF é a chave de identidade canônica de PessoaFisica; deduplicação deve usar CPF, não nome ou email."
+    - "Suspensão de pessoa deve sempre gerar HistoricoPessoa com justificativa; rejeitar operação sem justificativa."
+    - "Cadastro via Acesso Cidadão (RN10) deve criar ou vincular PessoaFisica pelo CPF; nunca criar duplicata."
+    - "responsavelLegal só é exigido quando idade < 18 anos na data de cadastro; não solicitar para adultos."
+  notes:
+    - "HistoricoPessoa.data é datetime (não apenas date) conforme README da entidade, diferindo do modelo estrutural consolidado que usa Date."
+    - "NivelAcademico é tabela de referência corporativa; alterações não devem apagar histórico de pessoas vinculadas."
+
+```

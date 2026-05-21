@@ -1,0 +1,41 @@
+ontology: "Autenticacao — Acesso Cidadao SSO"
+namespace: "auth.autenticacao"
+imports: []
+metadata:
+  module: "M005"
+  source: "stub — no modelo-estrutural.md available"
+  version: "1.0.0"
+  description: "Autenticação de usuários via Acesso Cidadão (OpenID Connect SSO do governo do ES). Único ponto de autenticação do ConectaFAPES."
+  todo: "Complete when modelo-estrutural.md is created"
+
+entities:
+  todo: "Define entities when modelo-estrutural.md is available"
+
+relationships:
+  todo: "Define when modelo-estrutural.md is available"
+
+axioms:
+  todo: "Define when modelo-estrutural.md is available"
+
+invariants:
+  todo: "Define when modelo-estrutural.md is available"
+
+enums: {}
+
+value_objects: {}
+
+events: []
+
+workflows:
+  todo: "Define when modelo-estrutural.md is available"
+
+policies:
+  todo: "Define when modelo-estrutural.md is available"
+
+agent_instructions:
+  rules:
+    - "Este módulo é stub. Não gerar implementações sem modelo-estrutural.md."
+    - "Consultar arquitetura em docs/architecture/02-modulos-e-integracoes.md."
+  notes:
+    - "Autenticação via Acesso Cidadão (OpenID Connect SSO)."
+    - "Integração externa: Acesso Cidadão (docs.acessocidadao.es.gov.br)."

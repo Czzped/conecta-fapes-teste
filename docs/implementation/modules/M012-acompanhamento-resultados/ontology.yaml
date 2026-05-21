@@ -1,0 +1,503 @@
+ontology: "Acompanhamento de Resultados de Projeto"
+namespace: "post_award.acompanhamento"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: shared.people
+    path: path: "../../../ontology/shared/people.yaml"
+  - namespace: post_award.iniciativas
+    path: path: "../M003-gestao-iniciativas-captadas/ontology.yaml"
+metadata:
+  module: "M012"
+  source: "docs/implementation/modules/M012-acompanhamento-resultados/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Monitoramento e prestacao de contas durante a execucao do projeto: relatorios tecnicos, contestacoes, pareceres e solicitacoes de alteracao."
+
+entities:
+  DashboardProjeto:
+    description: "Visao consolidada de metricas de execucao de um projeto: relatorios pendentes e submetidos, solicitacoes pendentes e status geral. Entidade derivada — nao persistida diretamente."
+    extends: "shared.Auditavel"
+    fields:
+      projetoId:
+        type: "string"
+        required: true
+        description: "Identificador do projeto no dashboard (ex: PRJ-2026-001)."
+      titulo:
+        type: "string"
+        required: true
+        max_length: 300
+        description: "Titulo do projeto."
+      statusProjeto:
+        type: "enum:StatusProjeto"
+        required: true
+        description: "Status atual do projeto apresentado no dashboard."
+      dataInicio:
+        type: "date"
+        required: true
+        description: "Data de inicio do projeto."
+      dataFim:
+        type: "date"
+        required: true
+        description: "Data prevista de fim do projeto."
+      relatoriosPendentes:
+        type: "integer"
+        required: true
+        generated: true
+        derived: true
+        formula: "COUNT(RelatorioTecnico WHERE estado = RASCUNHO AND projeto = projetoId)"
+        description: "Quantidade de relatorios pendentes de submissao. Campo derivado."
+      relatoriosSubmetidos:
+        type: "integer"
+        required: true
+        generated: true
+        derived: true
+        formula: "COUNT(RelatorioTecnico WHERE estado IN {SUBMETIDO, EM_ANALISE, APROVADO, CONTESTADO, EM_REANALISE, APROVADO_FINAL, REPROVADO_FINAL} AND projeto = projetoId)"
+        description: "Quantidade de relatorios ja submetidos. Campo derivado."
+      solicitacoesPendentes:
+        type: "integer"
+        required: true
+        generated: true
+        derived: true
+        formula: "COUNT(SolicitacaoAlteracao WHERE estado = PENDENTE AND projeto = projetoId)"
+        description: "Quantidade de solicitacoes de alteracao pendentes. Campo derivado."
+      projeto:
+        type: "ref:post_award.iniciativas.Projeto"
+        required: true
+        description: "Projeto cujas metricas sao consolidadas."
+
+  RelatorioTecnico:
+    description: "Relatorio tecnico periodico submetido pelo coordenador do projeto, sujeito a analise, aprovacao, reprovacao e contestacao."
+    extends: "shared.Auditavel"
+    fields:
+      codigo:
+        type: "string"
+        required: true
+        generated: true
+        unique: true
+        description: "Codigo de identificacao unica do relatorio (ex: RT-2026-001)."
+      titulo:
+        type: "string"
+        required: true
+        max_length: 300
+        description: "Titulo do relatorio tecnico."
+      periodoReferencia:
+        type: "string"
+        required: true
+        max_length: 100
+        description: "Periodo coberto pelo relatorio (ex: Jan/2026 a Jun/2026)."
+      conteudo:
+        type: "string"
+        required: true
+        max_length: 10000
+        description: "Conteudo textual do relatorio tecnico."
+      dataSubmissao:
+        type: "date"
+        required: false
+        generated: true
+        description: "Data em que o relatorio foi submetido. Preenchida ao submeter."
+      estado:
+        type: "enum:EstadoRelatorio"
+        required: true
+        generated: true
+        description: "Estado atual do relatorio no ciclo de vida."
+      projeto:
+        type: "ref:post_award.iniciativas.Projeto"
+        required: true
+        description: "Projeto ao qual o relatorio esta vinculado."
+      coordenador:
+        type: "ref:post_award.iniciativas.Coordenador"
+        required: true
+        description: "Coordenador que submeteu o relatorio."
+      pareceres:
+        type: "list:ref:post_award.acompanhamento.ParecerRelatorio"
+        required: false
+        description: "Pareceres emitidos sobre o relatorio (analise inicial e reanalise)."
+      contestacao:
+        type: "ref:post_award.acompanhamento.ContestacaoRelatorio"
+        required: false
+        description: "Contestacao apresentada pelo coordenador em caso de reprovacao."
+
+  ParecerRelatorio:
+    description: "Parecer tecnico emitido por analista sobre um RelatorioTecnico, podendo ser de analise inicial ou reanalise apos contestacao."
+    extends: "shared.Auditavel"
+    fields:
+      dataAnalise:
+        type: "date"
+        required: true
+        description: "Data em que o parecer foi emitido."
+      aprovado:
+        type: "boolean"
+        required: true
+        description: "Indica se o relatorio foi aprovado."
+      justificativa:
+        type: "string"
+        required: true
+        max_length: 2000
+        description: "Justificativa do parecer."
+      tipo:
+        type: "enum:TipoParecer"
+        required: true
+        description: "Tipo do parecer: analise inicial ou reanalise apos contestacao."
+
+  ContestacaoRelatorio:
+    description: "Contestacao registrada pelo coordenador em resposta a um RelatorioTecnico reprovado. Prazo limite de 15 dias apos notificacao."
+    extends: "shared.Auditavel"
+    fields:
+      justificativa:
+        type: "string"
+        required: true
+        max_length: 3000
+        description: "Justificativa da contestacao pelo coordenador."
+      dataContestacao:
+        type: "date"
+        required: true
+        generated: true
+        description: "Data em que a contestacao foi registrada."
+      prazoLimite:
+        type: "date"
+        required: true
+        generated: true
+        description: "Data limite para registro da contestacao (15 dias apos notificacao do relatorio reprovado)."
+      documentos:
+        type: "list:ref:post_award.acompanhamento.DocumentoContestacao"
+        required: false
+        description: "Documentos complementares enviados com a contestacao."
+
+  DocumentoContestacao:
+    description: "Documento complementar enviado pelo coordenador junto com a ContestacaoRelatorio."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: "string"
+        required: true
+        max_length: 200
+        description: "Nome do documento complementar."
+      tipo:
+        type: "string"
+        required: true
+        max_length: 100
+        description: "Tipo/categoria do documento."
+      url:
+        type: "url"
+        required: true
+        description: "URL de acesso ao documento armazenado."
+      dataEnvio:
+        type: "date"
+        required: true
+        description: "Data de envio do documento."
+
+  SolicitacaoAlteracao:
+    description: "Solicitacao formal do coordenador para alterar escopo, cronograma, equipe ou orcamento do projeto em execucao."
+    extends: "shared.Auditavel"
+    fields:
+      codigo:
+        type: "string"
+        required: true
+        generated: true
+        unique: true
+        description: "Codigo de identificacao da solicitacao (ex: SA-2026-001)."
+      tipo:
+        type: "enum:TipoAlteracao"
+        required: true
+        description: "Tipo de alteracao solicitada."
+      descricao:
+        type: "string"
+        required: true
+        max_length: 3000
+        description: "Descricao da alteracao pretendida."
+      justificativa:
+        type: "string"
+        required: true
+        max_length: 3000
+        description: "Justificativa para a alteracao."
+      dataSolicitacao:
+        type: "date"
+        required: true
+        generated: true
+        description: "Data em que a solicitacao foi registrada."
+      estado:
+        type: "enum:EstadoSolicitacaoAlteracao"
+        required: true
+        generated: true
+        description: "Estado atual da solicitacao."
+      projeto:
+        type: "ref:post_award.iniciativas.Projeto"
+        required: true
+        description: "Projeto ao qual a solicitacao se refere."
+      coordenador:
+        type: "ref:post_award.iniciativas.Coordenador"
+        required: true
+        description: "Coordenador que registrou a solicitacao."
+      decisao:
+        type: "ref:post_award.acompanhamento.DecisaoSolicitacao"
+        required: false
+        description: "Decisao proferida sobre a solicitacao."
+
+  DecisaoSolicitacao:
+    description: "Decisao proferida por gestor sobre uma SolicitacaoAlteracao."
+    extends: "shared.Auditavel"
+    fields:
+      dataDecisao:
+        type: "date"
+        required: true
+        description: "Data em que a decisao foi registrada."
+      deferida:
+        type: "boolean"
+        required: true
+        description: "Indica se a solicitacao foi deferida."
+      justificativa:
+        type: "string"
+        required: true
+        max_length: 2000
+        description: "Justificativa da decisao."
+
+relationships:
+  - from: "post_award.acompanhamento.DashboardProjeto"
+    relation: "consolida dados de"
+    to: "post_award.iniciativas.Projeto"
+    cardinality: "N:1"
+    description: "Dashboard consolida metricas de um projeto."
+  - from: "post_award.acompanhamento.RelatorioTecnico"
+    relation: "vinculado a"
+    to: "post_award.iniciativas.Projeto"
+    cardinality: "N:1"
+    description: "Multiplos relatorios podem existir para um mesmo projeto."
+  - from: "post_award.acompanhamento.RelatorioTecnico"
+    relation: "submetido por"
+    to: "post_award.iniciativas.Coordenador"
+    cardinality: "N:1"
+    description: "Relatorio submetido pelo coordenador do projeto."
+  - from: "post_award.acompanhamento.RelatorioTecnico"
+    relation: "possui pareceres"
+    to: "post_award.acompanhamento.ParecerRelatorio"
+    cardinality: "1:N"
+    description: "Um relatorio pode ter parecer de analise inicial e de reanalise."
+  - from: "post_award.acompanhamento.RelatorioTecnico"
+    relation: "possui contestacao"
+    to: "post_award.acompanhamento.ContestacaoRelatorio"
+    cardinality: "1:1"
+    description: "Um relatorio pode ter no maximo uma contestacao."
+  - from: "post_award.acompanhamento.ContestacaoRelatorio"
+    relation: "possui documentos"
+    to: "post_award.acompanhamento.DocumentoContestacao"
+    cardinality: "1:N"
+    description: "Contestacao pode ter multiplos documentos complementares."
+  - from: "post_award.acompanhamento.SolicitacaoAlteracao"
+    relation: "referente a"
+    to: "post_award.iniciativas.Projeto"
+    cardinality: "N:1"
+    description: "Multiplas solicitacoes de alteracao podem existir para um projeto."
+  - from: "post_award.acompanhamento.SolicitacaoAlteracao"
+    relation: "solicitada por"
+    to: "post_award.iniciativas.Coordenador"
+    cardinality: "N:1"
+    description: "Solicitacao registrada pelo coordenador do projeto."
+  - from: "post_award.acompanhamento.SolicitacaoAlteracao"
+    relation: "possui decisao"
+    to: "post_award.acompanhamento.DecisaoSolicitacao"
+    cardinality: "1:1"
+    description: "Solicitacao pode ter no maximo uma decisao."
+  - from: "post_award.iniciativas.Projeto"
+    relation: "vinculado a"
+    to: "post_award.iniciativas.Edital"
+    cardinality: "N:1"
+    description: "Projeto vinculado ao edital de origem (referencia externa M003)."
+
+axioms:
+  - id: "AX-M012-001"
+    natural_language: "O prazo limite para contestacao e calculado como dataReprovacao + 15 dias."
+    formal_rule: "ContestacaoRelatorio.prazoLimite = ParecerRelatorio.dataAnalise + 15 days (quando aprovado = false)"
+  - id: "AX-M012-002"
+    natural_language: "A contestacao so pode ser registrada se o relatorio esta em estado REPROVADO e dentro do prazo limite."
+    formal_rule: "ContestacaoRelatorio valida → RelatorioTecnico.estado = REPROVADO AND today() ≤ ContestacaoRelatorio.prazoLimite"
+  - id: "AX-M012-003"
+    natural_language: "DashboardProjeto e entidade derivada; seus campos de contagem sao sempre calculados em tempo de leitura a partir de RelatorioTecnico e SolicitacaoAlteracao."
+    formal_rule: "DashboardProjeto.relatoriosPendentes, relatoriosSubmetidos, solicitacoesPendentes = derived(RelatorioTecnico, SolicitacaoAlteracao)"
+  - id: "AX-M012-004"
+    natural_language: "Solicitacao de alteracao do tipo ORCAMENTO deve ser tratada tambem por M013 para efetivacao dos ajustes orcamentarios."
+    formal_rule: "SolicitacaoAlteracao.tipo = ORCAMENTO AND DecisaoSolicitacao.deferida = true → acionar post_award.orcamentaria para criar SolicitacaoOrcamentaria"
+
+invariants:
+  - id: "INV-M012-001"
+    rule: "RelatorioTecnico.dataSubmissao != null when RelatorioTecnico.estado != RASCUNHO"
+    description: "Relatorio fora do estado RASCUNHO deve ter data de submissao preenchida."
+  - id: "INV-M012-002"
+    rule: "ContestacaoRelatorio.dataContestacao <= ContestacaoRelatorio.prazoLimite"
+    description: "Contestacao deve ser registrada dentro do prazo limite de 15 dias."
+  - id: "INV-M012-003"
+    rule: "DashboardProjeto.relatoriosPendentes >= 0 AND DashboardProjeto.relatoriosSubmetidos >= 0 AND DashboardProjeto.solicitacoesPendentes >= 0"
+    description: "Contadores do dashboard nao podem ser negativos."
+
+enums:
+  StatusProjeto:
+    description: "Status operacional de um Projeto durante a execucao."
+    values:
+      ATIVO: "Projeto em execucao normal."
+      SUSPENSO: "Projeto temporariamente suspenso."
+      CONCLUIDO: "Projeto concluido com prestacao de contas finalizada."
+      ENCERRADO: "Projeto encerrado administrativamente."
+
+  EstadoRelatorio:
+    description: "Estados do ciclo de vida de um RelatorioTecnico."
+    values:
+      RASCUNHO: "Relatorio em elaboracao pelo coordenador, ainda nao submetido."
+      SUBMETIDO: "Relatorio submetido, aguardando analise."
+      EM_ANALISE: "Relatorio em analise pelo tecnico responsavel."
+      APROVADO: "Relatorio aprovado na analise inicial."
+      REPROVADO: "Relatorio reprovado na analise inicial. Coordenador pode contestar em 15 dias."
+      CONTESTADO: "Coordenador registrou contestacao; aguardando reanalise."
+      EM_REANALISE: "Relatorio em reanalise apos contestacao."
+      APROVADO_FINAL: "Relatorio aprovado apos reanalise."
+      REPROVADO_FINAL: "Relatorio reprovado definitivamente apos reanalise."
+
+  TipoParecer:
+    description: "Tipo do parecer emitido sobre um RelatorioTecnico."
+    values:
+      ANALISE_INICIAL: "Parecer da primeira analise do relatorio submetido."
+      REANALISE: "Parecer da reanalise apos contestacao do coordenador."
+
+  TipoAlteracao:
+    description: "Tipo de alteracao solicitada pelo coordenador durante a execucao do projeto."
+    values:
+      ESCOPO: "Alteracao no escopo ou objetivos do projeto."
+      CRONOGRAMA: "Alteracao nas datas ou cronograma de execucao."
+      EQUIPE: "Alteracao na composicao da equipe do projeto."
+      ORCAMENTO: "Alteracao orcamentaria (requer integracao com M013 para efetivacao)."
+
+  EstadoSolicitacaoAlteracao:
+    description: "Estados do ciclo de vida de uma SolicitacaoAlteracao."
+    values:
+      PENDENTE: "Solicitacao registrada, aguardando abertura de analise."
+      EM_ANALISE: "Solicitacao em analise pelo gestor."
+      DEFERIDA: "Solicitacao deferida e alteracao autorizada."
+      INDEFERIDA: "Solicitacao indeferida com justificativa."
+
+value_objects: {}
+
+events:
+  - name: "RelatorioTecnicoSubmetido"
+    description: "Disparado quando coordenador submete um RelatorioTecnico."
+    payload_entity: "post_award.acompanhamento.RelatorioTecnico"
+    trigger: "RelatorioTecnico.estado = SUBMETIDO"
+  - name: "RelatorioTecnicoAprovado"
+    description: "Disparado quando relatorio e aprovado (analise inicial ou reanalise)."
+    payload_entity: "post_award.acompanhamento.RelatorioTecnico"
+    trigger: "RelatorioTecnico.estado IN {APROVADO, APROVADO_FINAL}"
+  - name: "RelatorioTecnicoReprovado"
+    description: "Disparado quando relatorio e reprovado. Abre prazo de 15 dias para contestacao."
+    payload_entity: "post_award.acompanhamento.RelatorioTecnico"
+    trigger: "RelatorioTecnico.estado = REPROVADO"
+  - name: "ContestacaoRegistrada"
+    description: "Disparado quando coordenador registra contestacao dentro do prazo."
+    payload_entity: "post_award.acompanhamento.ContestacaoRelatorio"
+    trigger: "ContestacaoRelatorio criada"
+  - name: "SolicitacaoAlteracaoDeferida"
+    description: "Disparado quando solicitacao de alteracao e deferida. Para tipo ORCAMENTO, aciona M013."
+    payload_entity: "post_award.acompanhamento.SolicitacaoAlteracao"
+    trigger: "DecisaoSolicitacao.deferida = true"
+
+workflows:
+  RelatorioTecnicoStateMachine:
+    states:
+      - RASCUNHO
+      - SUBMETIDO
+      - EM_ANALISE
+      - APROVADO
+      - REPROVADO
+      - CONTESTADO
+      - EM_REANALISE
+      - APROVADO_FINAL
+      - REPROVADO_FINAL
+    transitions:
+      - from: RASCUNHO
+        to: SUBMETIDO
+        trigger: "coordenador submete"
+        guard: "conteudo e periodoReferencia preenchidos"
+      - from: SUBMETIDO
+        to: EM_ANALISE
+        trigger: "analista abre analise"
+        guard: "analista responsavel atribuido"
+      - from: EM_ANALISE
+        to: APROVADO
+        trigger: "analista aprova"
+        guard: "ParecerRelatorio.tipo = ANALISE_INICIAL e aprovado = true"
+      - from: EM_ANALISE
+        to: REPROVADO
+        trigger: "analista reprova"
+        guard: "ParecerRelatorio.tipo = ANALISE_INICIAL e aprovado = false"
+      - from: REPROVADO
+        to: CONTESTADO
+        trigger: "coordenador contesta"
+        guard: "today() <= ContestacaoRelatorio.prazoLimite"
+      - from: CONTESTADO
+        to: EM_REANALISE
+        trigger: "analista abre reanalise"
+        guard: null
+      - from: EM_REANALISE
+        to: APROVADO_FINAL
+        trigger: "analista aprova reanalise"
+        guard: "ParecerRelatorio.tipo = REANALISE e aprovado = true"
+      - from: EM_REANALISE
+        to: REPROVADO_FINAL
+        trigger: "analista reprova reanalise"
+        guard: "ParecerRelatorio.tipo = REANALISE e aprovado = false"
+      - from: SUBMETIDO
+        to: RASCUNHO
+        trigger: "coordenador retira para edicao"
+        guard: "nenhum analista em andamento"
+
+  SolicitacaoAlteracaoStateMachine:
+    states:
+      - PENDENTE
+      - EM_ANALISE
+      - DEFERIDA
+      - INDEFERIDA
+    transitions:
+      - from: PENDENTE
+        to: EM_ANALISE
+        trigger: "gestor abre analise"
+        guard: null
+      - from: EM_ANALISE
+        to: DEFERIDA
+        trigger: "gestor defere"
+        guard: "DecisaoSolicitacao.deferida = true"
+      - from: EM_ANALISE
+        to: INDEFERIDA
+        trigger: "gestor indefere"
+        guard: "DecisaoSolicitacao.deferida = false e justificativa preenchida"
+
+policies:
+  permissions:
+    Coordenador:
+      can:
+        - "criar e submeter RelatorioTecnico do proprio projeto"
+        - "retirar RelatorioTecnico em estado SUBMETIDO"
+        - "registrar ContestacaoRelatorio dentro do prazo"
+        - "enviar DocumentoContestacao"
+        - "criar SolicitacaoAlteracao do proprio projeto"
+        - "visualizar DashboardProjeto do proprio projeto"
+    Analista:
+      can:
+        - "abrir analise de RelatorioTecnico"
+        - "emitir ParecerRelatorio"
+        - "visualizar todos os RelatorioTecnico"
+    GestorFAPES:
+      can:
+        - "abrir analise de SolicitacaoAlteracao"
+        - "emitir DecisaoSolicitacao"
+        - "visualizar DashboardProjeto de todos os projetos"
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "ContestacaoRelatorio so pode ser criada se RelatorioTecnico.estado = REPROVADO e dentro do prazo de 15 dias."
+    - "prazoLimite de ContestacaoRelatorio = dataAnalise do parecer de reprovacao + 15 dias."
+    - "DashboardProjeto e entidade derivada — nao persistir diretamente; calcular em tempo de leitura."
+    - "SolicitacaoAlteracao do tipo ORCAMENTO, se deferida, deve acionar criacao de SolicitacaoOrcamentaria em M013."
+    - "Projeto, Coordenador e Edital sao referencias externas de M003 — nao modelar aqui."
+    - "Este modulo foca em iniciativas operacionalizadas como Projeto; outros tipos de iniciativa sao fora de escopo atual."
+  notes:
+    - "EstadoRelatorio tem dois caminhos terminais: APROVADO (sem contestacao) e APROVADO_FINAL/REPROVADO_FINAL (apos contestacao)."
+    - "A integracao de SolicitacaoAlteracao tipo ORCAMENTO com M013 e via evento SolicitacaoAlteracaoDeferida — os modulos nao se chamam diretamente."

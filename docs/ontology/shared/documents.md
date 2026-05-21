@@ -1,0 +1,147 @@
+# Documentos — Tipos Base de Documento
+
+```yaml
+ontology: "Shared Documents — Generic Document Entity"
+namespace: "shared.documents"
+imports:
+  - namespace: "shared"
+    path: path: "base.yaml"
+  - namespace: "shared.people"
+    path: path: "people.yaml"
+metadata:
+  module: "shared"
+  source: "inferred"
+  version: "1.0.0"
+  description: "Generic document attachment entity inferred from cross-module upload patterns across ConectaFAPES; fields not confirmed by a specific source are marked with todo."
+
+entities:
+  Document:
+    description: "Generic file attachment used across modules for supporting documents, evidence, contracts and other uploaded files. Concrete modules extend or reference this base entity."
+    extends: null
+    fields:
+      id:
+        type: uuid
+        required: true
+        description: "Surrogate primary key."
+      titulo:
+        type: string
+        required: true
+        description: "Título ou nome de exibição do documento, máximo 300 caracteres."
+      tipo:
+        type: string
+        required: true
+        description: "Tipo/categoria do documento, definido pelo contexto do módulo consumidor. Ex: CONTRATO, COMPROVANTE, RELATORIO."
+        todo: "needs clarification — consider enum:TipoDocumento once module-specific types are consolidated."
+      url:
+        type: string
+        required: true
+        description: "URL de acesso ao arquivo armazenado (storage interno ou CDN), máximo 1000 caracteres."
+      mimeType:
+        type: string
+        required: true
+        description: "MIME type do arquivo. Ex: application/pdf, image/png. Máximo 100 caracteres."
+        todo: "needs clarification — determine if a controlled enum is needed or if free-form MIME type is acceptable."
+      tamanho:
+        type: integer
+        required: true
+        description: "Tamanho do arquivo em bytes."
+      uploadedAt:
+        type: datetime
+        required: true
+        description: "Timestamp em que o upload foi concluído. Gerado automaticamente pelo sistema."
+      uploadedBy:
+        type: uuid
+        required: true
+        description: "Identificador do usuário que realizou o upload. Referencia shared.people.PessoaFisica."
+      # Auditavel mixin
+      createdAt:
+        type: datetime
+        required: true
+        description: "Timestamp de criação do registro."
+      updatedAt:
+        type: datetime
+        required: true
+        description: "Timestamp da última atualização."
+      createdBy:
+        type: uuid
+        required: true
+        description: "Identificador do usuário que criou o registro."
+      updatedBy:
+        type: uuid
+        required: true
+        description: "Identificador do usuário que realizou a última atualização."
+      deletedAt:
+        type: datetime
+        required: false
+        description: "Timestamp de exclusão lógica. Nulo indica documento ativo."
+
+relationships:
+  - from: "shared.documents.Document"
+    relation: "uploadedBy"
+    to: "shared.people.PessoaFisica"
+    cardinality: "1"
+    description: "Todo documento é associado à PessoaFisica que realizou o upload."
+
+axioms:
+  - id: "AX-DOC-01"
+    natural_language: "Every document has a non-empty URL pointing to its stored file."
+    formal_rule: "∀d ∈ Document: d.url ≠ null ∧ d.url ≠ ''"
+    todo: "needs clarification — confirm URL format constraints (signed URL vs. permanent path)."
+  - id: "AX-DOC-02"
+    natural_language: "A soft-deleted document must not be accessible for download."
+    formal_rule: "∀d ∈ Document: d.deletedAt ≠ null → d ∉ DownloadableDocuments"
+    todo: "needs clarification — confirm whether physical file deletion accompanies logical deletion."
+
+invariants:
+  - id: "INV-DOC-01"
+    rule: "Document.tamanho > 0"
+    description: "File size must be a positive integer (bytes)."
+    todo: "needs clarification — determine maximum allowed file size per document type."
+  - id: "INV-DOC-02"
+    rule: "Document.uploadedAt ≤ Document.createdAt OR Document.uploadedAt = Document.createdAt"
+    description: "Upload timestamp must not be after record creation; typically they are the same."
+    todo: "needs clarification — clarify if uploadedAt and createdAt can differ (e.g. async processing)."
+
+enums:
+  TipoDocumento:
+    description: "Generic document type classification. Module-specific values should extend this list."
+    values:
+      CONTRATO: "Documento de contrato ou acordo formal."
+      COMPROVANTE: "Comprovante de pagamento, despesa ou entrega."
+      RELATORIO: "Relatório técnico, financeiro ou de progresso."
+      PROPOSTA: "Proposta submetida em edital ou chamada."
+      CURRICULO: "Currículo ou CV do pesquisador ou bolsista."
+      OUTRO: "Tipo não classificado nas categorias acima."
+    todo: "needs clarification — list is inferred; consolidate with module-specific document type requirements."
+
+value_objects: null
+
+events:
+  - name: "DocumentoUploadado"
+    description: "Emitido quando um novo documento é carregado no sistema."
+    payload_entity: "shared.documents.Document"
+    trigger: "Criação de registro Document após upload bem-sucedido do arquivo."
+    todo: "needs clarification — confirm if upload is synchronous or goes through async processing pipeline."
+  - name: "DocumentoExcluido"
+    description: "Emitido quando um documento é marcado como excluído logicamente."
+    payload_entity: "shared.documents.Document"
+    trigger: "Preenchimento de Document.deletedAt."
+
+workflows: null
+policies: null
+
+agent_instructions:
+  rules:
+    - "Não criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementação deve seguir workflows definidos."
+    - "Document é uma entidade base genérica; módulos consumidores devem referenciar ou estender Document, não recriar campos de upload."
+    - "uploadedBy sempre referencia uma PessoaFisica ativa no momento do upload."
+    - "Hard delete de Document não deve ser realizado; usar SoftDelete (deletedAt)."
+    - "Campos marcados com todo devem ser confirmados antes da implementação."
+  notes:
+    - "Este arquivo é totalmente inferido (source: inferred). Nenhum modelo-estrutural específico de documentos foi localizado nas fontes M008. Todos os campos e regras devem ser validados contra os módulos que efetivamente consomem documentos antes da implementação."
+    - "Enum TipoDocumento é uma proposta inicial; cada módulo provavelmente terá tipos específicos que deverão ser consolidados aqui ou em namespaces próprios."
+    - "mimeType poderia ser restrito a uma lista de tipos permitidos (PDF, imagens, planilhas) — definir política no nível da plataforma."
+
+```

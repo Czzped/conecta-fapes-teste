@@ -1,0 +1,267 @@
+ontology: "Modalidade de Bolsa"
+namespace: "corporativo.modalidade_bolsa"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+metadata:
+  module: "M001"
+  source: "docs/implementation/modules/M001-modalidade-bolsa/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Define as modalidades de bolsa, seus niveis, valores versionados e requisitos conforme resolucoes FAPES."
+
+entities:
+  Resolucao:
+    description: "Resolucao legal emitida pela FAPES que cria e fundamenta modalidades de bolsa."
+    extends: null
+    fields:
+      numero:
+        type: "integer"
+        required: true
+        description: "Numero de identificacao da resolucao (ex: 332). Unico."
+        unique: true
+      data:
+        type: "date"
+        required: true
+        description: "Data em que foi lancada a resolucao (ex: 17/03/2024)."
+      ementa:
+        type: "string"
+        required: true
+        description: "Descricao dos objetivos da resolucao."
+        max_length: 500
+      url:
+        type: "string"
+        required: true
+        description: "URL de acesso a publicacao da resolucao."
+
+  ModalidadeBolsa:
+    description: "Categoria de bolsa identificada por sigla e nome, conforme definida em resolucao. Pode acumular versoes ao longo do tempo."
+    extends: null
+    fields:
+      sigla:
+        type: "string"
+        required: true
+        description: "Sigla de identificacao da modalidade (ex: BPIG, DTI-A). Unica."
+        unique: true
+      nome:
+        type: "string"
+        required: true
+        description: "Nome da modalidade apresentado na resolucao. Unico."
+        unique: true
+
+  VersaoModalidade:
+    description: "Versao versionada de uma ModalidadeBolsa, criada por uma Resolucao. Combina modalidade, ano e resolucao na sigla. Uma VersaoModalidade pode ser acumulativa com outras modalidades."
+    extends: null
+    fields:
+      sigla:
+        type: "string"
+        required: false
+        description: "Combinacao entre nome da modalidade, hifen, ano e resolucao (ex: BPIG-2023, DTI-A-2024). Gerado automaticamente. Unico."
+        unique: true
+        generated: true
+      descricao:
+        type: "string"
+        required: true
+        description: "Finalidade dessa modalidade definida na resolucao."
+      reducaoVinculo:
+        type: "integer"
+        required: true
+        description: "Percentual de valor da bolsa em caso de vinculo empregaticio. Default 100%; pode ser 0%."
+        domain: "100 ou 0"
+      dataInicioVigencia:
+        type: "date"
+        required: true
+        description: "Data de inicio de vigencia da versao."
+      dataFimVigencia:
+        type: "date"
+        required: true
+        description: "Data de termino da versao."
+      estado:
+        type: "enum:EstadoVersaoModalidade"
+        required: false
+        description: "Estado da versao da modalidade. Gerado automaticamente."
+        generated: true
+      resolucao:
+        type: "ref:corporativo.modalidade_bolsa.Resolucao"
+        required: true
+        description: "Resolucao que define esta versao da modalidade."
+      modalidade:
+        type: "ref:corporativo.modalidade_bolsa.ModalidadeBolsa"
+        required: true
+        description: "ModalidadeBolsa a qual esta versao pertence."
+      modalidadesAcumulativas:
+        type: "ref:corporativo.modalidade_bolsa.ModalidadeBolsa"
+        required: false
+        description: "Outras modalidades que podem ser acumuladas com esta versao (relacao N:N)."
+        cardinality: "N:N"
+
+  NivelBolsa:
+    description: "Nivel hierarquico de uma ModalidadeBolsa, identificado por sigla no formato: sigla modalidade + hifen + indice (ex: BPIG-I, DTI-A-1)."
+    extends: null
+    fields:
+      sigla:
+        type: "string"
+        required: true
+        description: "Sigla do nivel no formato: sigla modalidade + hifen + indice (ex: BPIG-I, DTI-A-1). Unica."
+        unique: true
+      modalidade:
+        type: "ref:corporativo.modalidade_bolsa.ModalidadeBolsa"
+        required: true
+        description: "ModalidadeBolsa a qual este nivel pertence."
+
+  VersaoNivel:
+    description: "Versao versionada de um NivelBolsa com valor monetario, definida em uma VersaoModalidade. Uma Bolsa (M009) e associada a uma VersaoNivel."
+    extends: null
+    fields:
+      valor:
+        type: "decimal"
+        required: true
+        description: "Valor monetario da versao do nivel."
+      moeda:
+        type: "ref:corporativo.modalidade_bolsa.Moeda"
+        required: true
+        description: "Moeda em que o valor e cotado."
+      nivel:
+        type: "ref:corporativo.modalidade_bolsa.NivelBolsa"
+        required: true
+        description: "NivelBolsa ao qual esta versao pertence."
+      versaoModalidade:
+        type: "ref:corporativo.modalidade_bolsa.VersaoModalidade"
+        required: true
+        description: "VersaoModalidade que define esta versao do nivel."
+
+  Moeda:
+    description: "Moeda utilizada para cotacao do valor de uma VersaoNivel. Cadastro corporativo pre-definido."
+    extends: null
+    fields:
+      nome:
+        type: "string"
+        required: true
+        description: "Nome da moeda (ex: Real, Dolar, Euro, Libra)."
+      sigla:
+        type: "string"
+        required: true
+        description: "Sigla da moeda (ex: BRL, USD, EUR, GBP)."
+
+  RequisitoBolsa:
+    description: "Requisito para implementacao de uma bolsa, podendo estar associado a uma VersaoModalidade ou a uma VersaoNivel."
+    extends: null
+    fields:
+      tipo:
+        type: "enum:TipoRequisitoBolsa"
+        required: true
+        description: "Tipo de requisito para implementacao da bolsa."
+      descricao:
+        type: "string"
+        required: true
+        description: "Descricao textual do requisito."
+
+relationships:
+  - from: "corporativo.modalidade_bolsa.Resolucao"
+    relation: "define"
+    to: "corporativo.modalidade_bolsa.VersaoModalidade"
+    cardinality: "1:N"
+    description: "Uma Resolucao pode definir multiplas VersaoModalidade."
+  - from: "corporativo.modalidade_bolsa.ModalidadeBolsa"
+    relation: "possui versoes"
+    to: "corporativo.modalidade_bolsa.VersaoModalidade"
+    cardinality: "1:N"
+    description: "Uma ModalidadeBolsa pode ter multiplas versoes ao longo do tempo."
+  - from: "corporativo.modalidade_bolsa.ModalidadeBolsa"
+    relation: "possui niveis"
+    to: "corporativo.modalidade_bolsa.NivelBolsa"
+    cardinality: "1:N"
+    description: "Uma ModalidadeBolsa possui um ou mais NivelBolsa."
+  - from: "corporativo.modalidade_bolsa.VersaoModalidade"
+    relation: "modalidades acumulativas"
+    to: "corporativo.modalidade_bolsa.ModalidadeBolsa"
+    cardinality: "N:N"
+    description: "VersaoModalidade pode ser acumulativa com outras ModalidadeBolsa."
+  - from: "corporativo.modalidade_bolsa.VersaoModalidade"
+    relation: "define versoes de nivel"
+    to: "corporativo.modalidade_bolsa.VersaoNivel"
+    cardinality: "1:N"
+    description: "Uma VersaoModalidade define as VersaoNivel vigentes para seus niveis."
+  - from: "corporativo.modalidade_bolsa.VersaoModalidade"
+    relation: "possui requisitos"
+    to: "corporativo.modalidade_bolsa.RequisitoBolsa"
+    cardinality: "1:N"
+    description: "Uma VersaoModalidade possui requisitos da modalidade."
+  - from: "corporativo.modalidade_bolsa.NivelBolsa"
+    relation: "possui versoes"
+    to: "corporativo.modalidade_bolsa.VersaoNivel"
+    cardinality: "1:N"
+    description: "Um NivelBolsa pode ter multiplas versoes de valor ao longo do tempo."
+  - from: "corporativo.modalidade_bolsa.VersaoNivel"
+    relation: "cotado em"
+    to: "corporativo.modalidade_bolsa.Moeda"
+    cardinality: "N:1"
+    description: "Cada VersaoNivel e cotado em uma Moeda."
+  - from: "corporativo.modalidade_bolsa.VersaoNivel"
+    relation: "possui requisitos"
+    to: "corporativo.modalidade_bolsa.RequisitoBolsa"
+    cardinality: "1:N"
+    description: "Uma VersaoNivel pode ter requisitos especificos do nivel."
+
+axioms:
+  - id: "AX001"
+    natural_language: "A sigla de VersaoModalidade e gerada automaticamente como combinacao entre sigla da modalidade, hifen, ano e numero da resolucao."
+    formal_rule: "VersaoModalidade.sigla = ModalidadeBolsa.sigla + '-' + year(Resolucao.data)"
+  - id: "AX002"
+    natural_language: "O reducaoVinculo so pode ser 100 (com vinculo, valor integral) ou 0 (sem reducao — bolsa nao e paga com vinculo)."
+    formal_rule: "VersaoModalidade.reducaoVinculo IN {0, 100}"
+  - id: "AX003"
+    natural_language: "O estado de VersaoModalidade e derivado automaticamente: EM_EDICAO quando nao ha datas de vigencia definidas, ATIVA quando dataInicioVigencia <= hoje <= dataFimVigencia, INATIVA quando dataFimVigencia < hoje."
+    formal_rule: "VersaoModalidade.estado = derived(dataInicioVigencia, dataFimVigencia, today())"
+  - id: "AX004"
+    natural_language: "A sigla do NivelBolsa segue o padrao: sigla da ModalidadeBolsa + hifen + indice sequencial."
+    formal_rule: "NivelBolsa.sigla starts_with ModalidadeBolsa.sigla + '-'"
+
+invariants:
+  - id: "INV001"
+    rule: "VersaoModalidade.dataFimVigencia >= VersaoModalidade.dataInicioVigencia"
+    description: "A data de fim de vigencia deve ser posterior ou igual a data de inicio."
+  - id: "INV002"
+    rule: "VersaoNivel.valor > 0"
+    description: "O valor monetario de um nivel de bolsa deve ser positivo."
+  - id: "INV003"
+    rule: "VersaoModalidade.reducaoVinculo IN {0, 100}"
+    description: "O percentual de reducao de vinculo so aceita os valores 0 ou 100."
+
+enums:
+  EstadoVersaoModalidade:
+    description: "Estado do ciclo de vida de uma VersaoModalidade."
+    values:
+      EM_EDICAO: "Versao em elaboracao, ainda nao publicada/ativada."
+      ATIVA: "Versao vigente, disponivel para associacao a projetos e bolsas."
+      INATIVA: "Versao encerrada, fora de vigencia."
+
+  TipoRequisitoBolsa:
+    description: "Categoria do requisito exigido para implementacao de uma bolsa."
+    values:
+      QUALIFICACAO: "Requisito de titulacao ou qualificacao academica/profissional."
+      VINCULO: "Requisito relativo a vinculo empregaticio do bolsista."
+      RESIDENCIA: "Requisito de residencia em determinado territorio."
+      DOCUMENTACAO: "Requisito de apresentacao de documentos especificos."
+      VIGENCIA: "Requisito temporal relacionado ao periodo de vigencia da bolsa."
+      PARENTESCO: "Restricao por relacao de parentesco com servidores ou gestores."
+      ADIMPLENCIA: "Requisito de adimplencia com prestacoes de contas anteriores."
+
+value_objects: {}
+events: []
+workflows: null
+policies: null
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "VersaoModalidade.sigla e campo gerado — nao aceitar input manual."
+    - "VersaoModalidade.estado e campo gerado — derivar de datas de vigencia."
+    - "Moeda e cadastro corporativo pre-existente; nao criar novas moedas sem aprovacao."
+    - "Projeto (M003) e Bolsa (M009) sao referencias externas — nao modelar aqui."
+    - "reducaoVinculo so aceita 0 ou 100."
+  notes:
+    - "Moeda esta fora do escopo de manutencao deste modulo; apenas referenciada."
+    - "Projeto e fora do escopo — pertence ao M003."
+    - "Bolsa e fora do escopo — pertence ao M009."

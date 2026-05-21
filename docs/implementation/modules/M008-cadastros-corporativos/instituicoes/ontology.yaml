@@ -1,0 +1,286 @@
+ontology: "Instituicoes e Unidades Organizacionais"
+namespace: "corporativo.instituicoes"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: shared.people
+    path: path: "../../../ontology/shared/people.yaml"
+  - namespace: shared.geography
+    path: path: "../../../ontology/shared/geography.yaml"
+metadata:
+  module: "M008"
+  source: "docs/implementation/modules/M008-cadastros-corporativos/instituicoes/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Cadastro de instituicoes juridicamente identificaveis, suas unidades organizacionais internas, tipos institucionais e mandatos de responsaveis."
+
+entities:
+  Instituicao:
+    description: "Entidade juridicamente identificavel pela posse de CNPJ proprio: matriz, filial ou campus. Pode conter subInstituicoes (filiais) e UnidadeOrganizacional (subdivisoes internas). Deve ter exatamente um Responsavel ativo."
+    extends: null
+    fields:
+      nome:
+        type: "string"
+        required: true
+        description: "Nome comum de exibicao da instituicao (ex: UFES, IFES Campus Serra)."
+        max_length: 300
+      sigla:
+        type: "string"
+        required: false
+        description: "Sigla comum da instituicao (ex: UFES)."
+        max_length: 20
+      cnpj:
+        type: "string"
+        required: true
+        description: "CNPJ proprio da instituicao, somente digitos. Unico."
+        max_length: 14
+        unique: true
+      razaoSocial:
+        type: "string"
+        required: true
+        description: "Razao social da instituicao."
+        max_length: 300
+      email:
+        type: "string"
+        required: true
+        description: "Email institucional da entidade juridica (nao confundir com email do Responsavel)."
+        max_length: 200
+      telefone:
+        type: "string"
+        required: false
+        description: "Telefone institucional da entidade juridica (nao confundir com telefone do Responsavel)."
+        max_length: 20
+      endereco:
+        type: "string"
+        required: true
+        description: "Endereco completo da instituicao."
+        max_length: 500
+      ativa:
+        type: "boolean"
+        required: true
+        description: "Indica se a instituicao esta ativa no sistema."
+      isExterna:
+        type: "boolean"
+        required: true
+        description: "Indica se a instituicao e externa a agencia de fomento (FAPES)."
+      isPublica:
+        type: "boolean"
+        required: true
+        description: "Indica se a instituicao e publica (true) ou privada (false)."
+      instituicaoSuperior:
+        type: "ref:corporativo.instituicoes.Instituicao"
+        required: false
+        description: "Instituicao matriz quando esta for filial juridicamente identificavel. No maximo uma matriz permitida (RI8)."
+      subInstituicoes:
+        type: "ref:corporativo.instituicoes.Instituicao"
+        required: false
+        description: "Lista de instituicoes filhas ligadas a esta como matriz."
+        cardinality: "1:N"
+      unidades:
+        type: "ref:corporativo.instituicoes.UnidadeOrganizacional"
+        required: false
+        description: "Unidades organizacionais internas diretamente vinculadas a esta instituicao (relacao N:N)."
+        cardinality: "N:N"
+      responsaveis:
+        type: "ref:corporativo.instituicoes.Responsavel"
+        required: false
+        description: "Vinculos de Responsavel associados a esta instituicao."
+        cardinality: "1:N"
+      tipoInstituicao:
+        type: "ref:corporativo.instituicoes.TipoInstituicao"
+        required: false
+        description: "Classificacao institucional (ex: Ensino, Empresa, Agencia de Fomento)."
+
+  UnidadeOrganizacional:
+    description: "Subdivisao interna de uma Instituicao, sem CNPJ proprio (ex: centro, departamento, coordenacao, laboratorio, setor). Pode ter multiplos pais entre Instituicoes e/ou outras UnidadeOrganizacional (relacao N:N). Deve ser rastreavel transitivamente a pelo menos uma Instituicao raiz."
+    extends: null
+    fields:
+      nome:
+        type: "string"
+        required: true
+        description: "Nome de exibicao da unidade (ex: Centro Tecnologico, Departamento de Informatica)."
+        max_length: 300
+      sigla:
+        type: "string"
+        required: false
+        description: "Sigla da unidade (ex: CT, DI)."
+        max_length: 20
+      descricao:
+        type: "string"
+        required: false
+        description: "Descricao da unidade."
+        max_length: 500
+      email:
+        type: "string"
+        required: false
+        description: "Email de contato da unidade."
+        max_length: 200
+      telefone:
+        type: "string"
+        required: false
+        description: "Telefone de contato da unidade."
+        max_length: 20
+      ativa:
+        type: "boolean"
+        required: true
+        description: "Indica se a unidade esta ativa."
+      instituicoesPai:
+        type: "ref:corporativo.instituicoes.Instituicao"
+        required: false
+        description: "Instituicoes as quais a unidade esta diretamente vinculada (N:N). Pelo menos um pai entre instituicoesPai e unidadesSuperiores deve existir (RI4)."
+        cardinality: "N:N"
+      unidadesSuperiores:
+        type: "ref:corporativo.instituicoes.UnidadeOrganizacional"
+        required: false
+        description: "Outras UnidadeOrganizacional pais (N:N). Pelo menos um pai entre instituicoesPai e unidadesSuperiores deve existir (RI4)."
+        cardinality: "N:N"
+      subUnidades:
+        type: "ref:corporativo.instituicoes.UnidadeOrganizacional"
+        required: false
+        description: "Unidades filhas vinculadas a esta unidade."
+        cardinality: "1:N"
+      responsaveis:
+        type: "ref:corporativo.instituicoes.Responsavel"
+        required: false
+        description: "Vinculos de Responsavel associados a esta unidade."
+        cardinality: "1:N"
+
+  TipoInstituicao:
+    description: "Classifica o tipo de uma Instituicao (ex: Ensino, Empresa, Agencia de Fomento). Nao se aplica a UnidadeOrganizacional."
+    extends: null
+    fields:
+      nome:
+        type: "string"
+        required: true
+        description: "Nome do tipo de instituicao (ex: Ensino, Empresa, Agencia de Fomento). Unico."
+        max_length: 200
+        unique: true
+      descricao:
+        type: "string"
+        required: false
+        description: "Descricao do tipo de instituicao."
+        max_length: 500
+
+  Responsavel:
+    description: "Vinculo temporal entre uma PessoaFisica e uma entidade organizacional (Instituicao OU UnidadeOrganizacional). Cada Responsavel aponta para exatamente uma das duas entidades (xor). Apenas um Responsavel pode estar ativo por entidade ao mesmo tempo (RI1, RI3)."
+    extends: null
+    fields:
+      dataInicioMandato:
+        type: "date"
+        required: true
+        description: "Data de inicio do mandato."
+      dataFimMandato:
+        type: "date"
+        required: false
+        description: "Data de termino do mandato. Obrigatorio quando Responsavel estiver inativo; opcional enquanto ativo (mandato em curso)."
+      ativo:
+        type: "boolean"
+        required: false
+        description: "Indica se o mandato esta vigente. Gerado automaticamente."
+        generated: true
+      pessoa:
+        type: "ref:shared.people.PessoaFisica"
+        required: true
+        description: "Pessoa fisica que assume o papel de responsavel."
+      instituicao:
+        type: "ref:corporativo.instituicoes.Instituicao"
+        required: false
+        description: "Instituicao onde a pessoa assume o papel (xor com unidade). Obrigatorio quando unidade nao informada."
+      unidade:
+        type: "ref:corporativo.instituicoes.UnidadeOrganizacional"
+        required: false
+        description: "Unidade organizacional onde a pessoa assume o papel (xor com instituicao). Obrigatorio quando instituicao nao informada."
+
+relationships:
+  - from: "corporativo.instituicoes.Instituicao"
+    relation: "contem"
+    to: "corporativo.instituicoes.Instituicao"
+    cardinality: "1:N"
+    description: "Uma Instituicao pode ser matriz de outras Instituicoes (filiais juridicamente identificaveis). Uma Instituicao tem no maximo um instituicaoSuperior (RI8)."
+  - from: "corporativo.instituicoes.Instituicao"
+    relation: "contem unidades"
+    to: "corporativo.instituicoes.UnidadeOrganizacional"
+    cardinality: "N:N"
+    description: "Uma Instituicao pode conter multiplas UnidadeOrganizacional; uma UnidadeOrganizacional pode pertencer a multiplas Instituicoes."
+  - from: "corporativo.instituicoes.UnidadeOrganizacional"
+    relation: "contem sub-unidades"
+    to: "corporativo.instituicoes.UnidadeOrganizacional"
+    cardinality: "N:N"
+    description: "Uma UnidadeOrganizacional pode conter outras UnidadeOrganizacional (hierarquia N:N)."
+  - from: "corporativo.instituicoes.Instituicao"
+    relation: "possui responsaveis"
+    to: "corporativo.instituicoes.Responsavel"
+    cardinality: "1:N"
+    description: "Uma Instituicao pode ter multiplos Responsavel (historico), mas apenas um ativo ao mesmo tempo (RI1)."
+  - from: "corporativo.instituicoes.UnidadeOrganizacional"
+    relation: "possui responsaveis"
+    to: "corporativo.instituicoes.Responsavel"
+    cardinality: "1:N"
+    description: "Uma UnidadeOrganizacional pode ter multiplos Responsavel (historico), mas apenas um ativo ao mesmo tempo (RI3)."
+  - from: "corporativo.instituicoes.Instituicao"
+    relation: "classificada como"
+    to: "corporativo.instituicoes.TipoInstituicao"
+    cardinality: "N:1"
+    description: "Uma Instituicao pode ser classificada por um TipoInstituicao."
+  - from: "shared.people.PessoaFisica"
+    relation: "assume mandato em"
+    to: "corporativo.instituicoes.Responsavel"
+    cardinality: "1:N"
+    description: "Uma PessoaFisica pode assumir multiplos mandatos ao longo do tempo em diferentes entidades."
+
+axioms:
+  - id: "AX001"
+    natural_language: "Toda Instituicao deve ser identificada por CNPJ proprio (raiz ou filial)."
+    formal_rule: "Instituicao.cnpj IS NOT NULL AND len(Instituicao.cnpj) == 14"
+  - id: "AX002"
+    natural_language: "Toda organizacao, campus ou filial com CNPJ proprio deve ser cadastrada como Instituicao, nao como UnidadeOrganizacional."
+    formal_rule: "IF entity HAS cnpj THEN entity IS Instituicao"
+  - id: "AX003"
+    natural_language: "Responsavel e vinculo temporal entre PessoaFisica e uma entidade organizacional (Instituicao OU UnidadeOrganizacional), com periodo de mandato definido."
+    formal_rule: "Responsavel.instituicao XOR Responsavel.unidade (exatamente um deve estar preenchido)"
+  - id: "AX004"
+    natural_language: "Toda UnidadeOrganizacional deve ser rastreavel transitivamente a pelo menos uma Instituicao raiz."
+    formal_rule: "FORALL uo: UnidadeOrganizacional => EXISTS inst: Instituicao SUCH THAT transitive_parent(uo, inst)"
+  - id: "AX005"
+    natural_language: "TipoInstituicao classifica apenas Instituicao; UnidadeOrganizacional nao possui classificacao tipologica neste modelo."
+    formal_rule: "TipoInstituicao.classifica ONLY Instituicao"
+
+invariants:
+  - id: "INV001"
+    rule: "COUNT(Responsavel WHERE ativo=true AND instituicao=X) <= 1 FOR ALL X: Instituicao"
+    description: "RI1: Uma Instituicao so pode ter um Responsavel ativo ao mesmo tempo."
+  - id: "INV002"
+    rule: "COUNT(Responsavel WHERE ativo=true AND unidade=X) <= 1 FOR ALL X: UnidadeOrganizacional"
+    description: "RI3: Uma UnidadeOrganizacional so pode ter um Responsavel ativo ao mesmo tempo."
+  - id: "INV003"
+    rule: "len(UnidadeOrganizacional.instituicoesPai) + len(UnidadeOrganizacional.unidadesSuperiores) >= 1"
+    description: "RI4: UnidadeOrganizacional deve ter pelo menos um pai entre Instituicoes e/ou outras UnidadeOrganizacional."
+  - id: "INV004"
+    rule: "RI5: Responsavel.instituicao IS NOT NULL XOR Responsavel.unidade IS NOT NULL"
+    description: "RI5: Em Responsavel, exatamente um entre instituicao e unidade deve estar preenchido."
+  - id: "INV005"
+    rule: "COUNT(Instituicao.instituicaoSuperior) <= 1"
+    description: "RI8: Instituicao tem no maximo um instituicaoSuperior; nao admite duas matrizes."
+  - id: "INV006"
+    rule: "IF Responsavel.ativo == false THEN Responsavel.dataFimMandato IS NOT NULL"
+    description: "dataFimMandato e obrigatorio quando Responsavel estiver inativo."
+
+enums: {}
+value_objects: {}
+events: []
+workflows: null
+policies: null
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "Toda Instituicao deve ter CNPJ proprio; entidade sem CNPJ deve ser modelada como UnidadeOrganizacional."
+    - "Responsavel.instituicao XOR Responsavel.unidade — nunca ambos preenchidos, nunca ambos nulos."
+    - "Apenas um Responsavel ativo por entidade organizacional ao mesmo tempo."
+    - "UnidadeOrganizacional deve ter pelo menos um pai (RI4)."
+    - "Instituicao tem no maximo um instituicaoSuperior (RI8)."
+  notes:
+    - "PessoaFisica pertence ao contexto Pessoas (M008/pessoas) — referenciada aqui via shared.people."
+    - "M010 consome Instituicao e UnidadeOrganizacional para Parcerias."
+    - "Responsavel.ativo e campo gerado a partir de dataInicioMandato, dataFimMandato e data atual."

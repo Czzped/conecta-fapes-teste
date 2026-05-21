@@ -1,0 +1,874 @@
+ontology: "Pagamento de Bolsistas"
+namespace: "financeiro.pagamento"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: shared.people
+    path: path: "../../../ontology/shared/people.yaml"
+  - namespace: post_award.bolsista
+    path: path: "../M009-gestao-bolsista/ontology.yaml"
+  - namespace: post_award.iniciativas
+    path: path: "../M003-gestao-iniciativas-captadas/ontology.yaml"
+metadata:
+  module: "M004"
+  source: "docs/implementation/modules/M004-pagamento-bolsista/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Gerencia pagamento mensal de bolsistas via folhas, remessas e guias de liberacao. Integra com Banestes (arquivos @-EDI) e BANDES para transferencia de recursos."
+
+entities:
+
+  PlanoMensal:
+    description: "Plano mensal de pagamento. Define os marcos temporais do ciclo de pagamento de um mes e agrega as competencias de editais a serem pagas."
+    extends: "shared.Auditavel"
+    fields:
+      mes:
+        type: "date"
+        required: true
+        unique: true
+        description: "Mes de competencia do plano (ex: 2024-10). Unico — um plano por mes."
+      marcoSolicitacao:
+        type: "date"
+        required: true
+        description: "Data limite de solicitacao de bolsas (M1)."
+      marcoGeracaoFolha:
+        type: "date"
+        required: true
+        description: "Data prevista de geracao da folha normal (M2)."
+      marcoPagamento:
+        type: "date"
+        required: true
+        description: "Data de pagamento da folha normal (M3)."
+      ehAtual:
+        type: "boolean"
+        required: false
+        generated: true
+        description: "Indica se este e o mes atual para efeito de pagamentos. Gerado automaticamente."
+
+  EditalCompetencia:
+    description: "Competencia mensal de um Edital dentro de um PlanoMensal. Registra o status de liberacao e os valores previstos e pagos para o edital no mes."
+    extends: "shared.Auditavel"
+    fields:
+      valorPrevisto:
+        type: "decimal"
+        required: true
+        description: "Valor previsto para o edital na competencia."
+      valorPago:
+        type: "decimal"
+        required: true
+        description: "Valor efetivamente pago."
+      bolsasVigentes:
+        type: "integer"
+        required: true
+        description: "Quantidade de bolsas vigentes no mes."
+      bolsasPendentes:
+        type: "integer"
+        required: true
+        description: "Quantidade de bolsas pendentes de pagamento."
+      ordemFolha:
+        type: "integer"
+        required: false
+        description: "Ordem do edital na folha de pagamento."
+      mesCompetencia:
+        type: "date"
+        required: true
+        description: "Mes de competencia."
+      status:
+        type: "enum:StatusEditalCompetencia"
+        required: false
+        generated: true
+        description: "Status de liberacao do edital na competencia. Gerado automaticamente."
+      planoMensal:
+        type: "ref:financeiro.pagamento.PlanoMensal"
+        required: true
+        description: "PlanoMensal ao qual esta competencia pertence."
+      edital:
+        type: "ref:post_award.iniciativas.Edital"
+        required: true
+        description: "Edital externo (M003) referenciado."
+
+  DecisaoLiberacao:
+    description: "Decisao de liberacao ou nao-liberacao de um EditalCompetencia para inclusao em folha. Registro imutavel de auditoria."
+    extends: null
+    fields:
+      horario:
+        type: "datetime"
+        required: true
+        description: "Data e hora da decisao."
+      ehLiberado:
+        type: "boolean"
+        required: true
+        description: "Indica se a decisao foi de liberar (true) ou nao liberar (false)."
+      justificativa:
+        type: "string"
+        required: false
+        description: "Justificativa obrigatoria quando ehLiberado = false."
+      usuario:
+        type: "ref:financeiro.pagamento.Usuario"
+        required: true
+        description: "Usuario que realizou a decisao."
+      editalCompetencia:
+        type: "ref:financeiro.pagamento.EditalCompetencia"
+        required: true
+        description: "EditalCompetencia alvo da decisao."
+
+  Usuario:
+    description: "Snapshot dos dados do usuario que realizou uma acao (DecisaoLiberacao ou DecisaoFolha). Denormalizado para preservar auditoria historica."
+    extends: null
+    fields:
+      nome:
+        type: "string"
+        required: true
+        description: "Nome do usuario que realizou a acao."
+      email:
+        type: "string"
+        required: true
+        description: "Email do usuario."
+      cpf:
+        type: "string"
+        required: true
+        description: "CPF do usuario."
+
+  Folha:
+    description: "Folha de pagamento mensal. ordem=0 indica Folha Normal; ordem>0 indica Folha Complementar. Agrega PagamentoBolsista e guias de liberacao."
+    extends: "shared.Auditavel"
+    fields:
+      ordem:
+        type: "integer"
+        required: false
+        generated: true
+        description: "Ordem da folha no mes. 0 = Folha Normal (primeira folha do mes); >0 = Folha Complementar (sequencial). Gerado automaticamente."
+      titulo:
+        type: "string"
+        required: false
+        generated: true
+        description: "Titulo da folha. Gerado automaticamente: 'FOLHA-NORMAL-DD/MM/YYYY' ou 'FOLHA-COMPLEMENTAR-N-DD/MM/YYYY'."
+      dataPagamento:
+        type: "date"
+        required: true
+        description: "Data de pagamento a ser enviada ao banco."
+      valorPrevisto:
+        type: "decimal"
+        required: true
+        description: "Valor previsto para pagamento."
+      valorPago:
+        type: "decimal"
+        required: true
+        description: "Valor efetivamente pago."
+      status:
+        type: "enum:StatusFolha"
+        required: false
+        generated: true
+        description: "Status atual da folha. Gerado automaticamente."
+      planoMensal:
+        type: "ref:financeiro.pagamento.PlanoMensal"
+        required: true
+        description: "PlanoMensal ao qual esta folha pertence."
+
+  DecisaoFolha:
+    description: "Registro de uma acao realizada sobre uma Folha (gerar, autorizar, cancelar, rejeitar). Imutavel — constitui trilha de auditoria."
+    extends: null
+    fields:
+      horario:
+        type: "datetime"
+        required: true
+        description: "Data e hora da decisao."
+      justificativa:
+        type: "string"
+        required: false
+        description: "Justificativa da decisao. Obrigatoria quando tipoAcao = CANCELAR."
+      tipoAcao:
+        type: "enum:TipoAcaoFolha"
+        required: true
+        description: "Tipo de acao da decisao."
+      usuario:
+        type: "ref:financeiro.pagamento.Usuario"
+        required: true
+        description: "Usuario que realizou a acao."
+      folha:
+        type: "ref:financeiro.pagamento.Folha"
+        required: true
+        description: "Folha alvo da decisao."
+
+  PagamentoBolsista:
+    description: "Registro individual de pagamento de uma cota de bolsa a um bolsista em uma competencia. Associado a uma AlocacaoBolsista (M009) e pode ser incluido em uma Folha."
+    extends: "shared.Auditavel"
+    fields:
+      ordem:
+        type: "integer"
+        required: true
+        description: "Numero sequencial da cota de pagamento."
+      dataPagamento:
+        type: "date"
+        required: false
+        description: "Data em que o pagamento foi efetuado. Preenchida apos confirmacao bancaria."
+      valorPago:
+        type: "decimal"
+        required: true
+        description: "Valor efetivamente pago (valorOriginal + valorBonus)."
+      valorOriginal:
+        type: "decimal"
+        required: true
+        description: "Valor original da bolsa conforme VersaoNivel (M001)."
+      valorBonus:
+        type: "decimal"
+        required: true
+        description: "Valor de bonus aplicado ao pagamento."
+      mesCompetencia:
+        type: "date"
+        required: true
+        description: "Mes de competencia do pagamento."
+      status:
+        type: "enum:StatusPagamentoBolsista"
+        required: false
+        generated: true
+        description: "Status atual do pagamento. Gerado automaticamente."
+      alocacaoBolsista:
+        type: "ref:post_award.bolsista.AlocacaoBolsista"
+        required: true
+        description: "AlocacaoBolsista (M009) que originou este pagamento."
+      folha:
+        type: "ref:financeiro.pagamento.Folha"
+        required: false
+        description: "Folha que inclui este pagamento. Nulo enquanto nao incluido em folha."
+      bonus:
+        type: "ref:financeiro.pagamento.BonusPagamento"
+        required: false
+        description: "BonusPagamento associado, se houver."
+
+  BonusPagamento:
+    description: "Bonus aplicado sobre pagamentos de bolsistas em um PlanoMensal. Pode ser valor fixo ou percentual sobre o valor original. Associado a VersaoModalidade (M001)."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: "string"
+        required: false
+        generated: true
+        description: "Nome do bonus. Gerado automaticamente."
+      valorFixo:
+        type: "decimal"
+        required: false
+        description: "Valor fixo do bonus. Obrigatorio quando tipoBonus = VALOR_FIXO."
+      porcentagem:
+        type: "decimal"
+        required: false
+        description: "Porcentagem do bonus. Obrigatoria quando tipoBonus = PORCENTAGEM."
+      tipoBonus:
+        type: "enum:TipoBonus"
+        required: true
+        description: "Tipo do bonus."
+      statusBonus:
+        type: "enum:StatusBonusPagamento"
+        required: false
+        generated: true
+        description: "Status do bonus de pagamento. Gerado automaticamente."
+      planoMensal:
+        type: "ref:financeiro.pagamento.PlanoMensal"
+        required: true
+        description: "PlanoMensal ao qual este bonus pertence."
+      versaoModalidades:
+        type: "ref:corporativo.modalidade_bolsa.VersaoModalidade"
+        required: false
+        cardinality: "N:N"
+        description: "VersaoModalidades (M001) elegíveis para este bonus."
+
+  GuiaDeLiberacao:
+    description: "Guia de liberacao financeira associada a uma Folha, enviada ao BANDES ou orgao competente para liberacao dos recursos. Pode ser Normal ou Alternativa."
+    extends: "shared.Auditavel"
+    fields:
+      tipo:
+        type: "enum:TipoGuiaLiberacao"
+        required: true
+        description: "Tipo da guia de liberacao."
+      dataEnvio:
+        type: "date"
+        required: true
+        description: "Data de envio da guia."
+      textoEmail:
+        type: "string"
+        required: true
+        description: "Texto do email associado a guia."
+      quantPagamentos:
+        type: "integer"
+        required: true
+        description: "Quantidade de pagamentos incluidos na guia."
+      valorTotal:
+        type: "decimal"
+        required: true
+        description: "Valor total da guia."
+      folha:
+        type: "ref:financeiro.pagamento.Folha"
+        required: true
+        description: "Folha a qual esta guia pertence."
+      pagamentos:
+        type: "ref:financeiro.pagamento.PagamentoBolsista"
+        required: false
+        cardinality: "0..1:N"
+        description: "PagamentoBolsista incluidos nesta guia."
+
+  Remessa:
+    description: "Entidade abstrata base para remessas bancarias. Representa o arquivo enviado ao banco e o retorno recebido. Especializada em RemessaCadastro e RemessaPagamento."
+    abstract: true
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: "string"
+        required: true
+        description: "Nome da remessa."
+      numero:
+        type: "integer"
+        required: false
+        unique: true
+        description: "Numero identificador da remessa, obtido via arquivo de retorno do banco."
+      dataEnvio:
+        type: "date"
+        required: false
+        description: "Data de envio da remessa ao banco."
+      dataRetorno:
+        type: "date"
+        required: false
+        description: "Data de retorno do processamento bancario."
+      arquivoEnviado:
+        type: "string"
+        required: true
+        description: "Conteudo ou referencia do arquivo enviado ao banco."
+      arquivoRetorno:
+        type: "string"
+        required: true
+        description: "Conteudo ou referencia do arquivo de retorno recebido do banco."
+      ehRemessaEnviada:
+        type: "boolean"
+        required: true
+        description: "Indica se a remessa foi enviada ao banco."
+      bolsistasEnviados:
+        type: "integer"
+        required: true
+        description: "Quantidade de bolsistas enviados na remessa."
+      bolsistasComErros:
+        type: "integer"
+        required: true
+        description: "Quantidade de bolsistas com erros no processamento."
+      hash:
+        type: "string"
+        required: false
+        description: "Hash SHA256 do arquivo para garantia de integridade."
+
+  RemessaCadastro:
+    description: "Remessa de cadastro de bolsistas no banco. Especializa Remessa. Envia dados cadastrais dos bolsistas para registro no sistema bancario (Banestes)."
+    extends: "financeiro.pagamento.Remessa"
+    fields:
+      enviados:
+        type: "ref:post_award.bolsista.AlocacaoBolsista"
+        required: false
+        cardinality: "1:N"
+        description: "AlocacaoBolsistas enviados nesta remessa de cadastro."
+      erros:
+        type: "ref:financeiro.pagamento.ErroCadastro"
+        required: false
+        cardinality: "1:N"
+        description: "Erros de cadastro retornados pelo banco."
+
+  RemessaPagamento:
+    description: "Remessa de pagamento de bolsistas. Especializa Remessa. Agenda pagamentos junto ao banco (Banestes) para uma ou mais Folhas."
+    extends: "financeiro.pagamento.Remessa"
+    fields:
+      status:
+        type: "enum:StatusRemessaPagamento"
+        required: false
+        generated: true
+        description: "Status atual da remessa de pagamento. Gerado automaticamente."
+      bolsistasAgendados:
+        type: "integer"
+        required: true
+        description: "Quantidade de bolsistas com pagamento agendado."
+      valorAgendado:
+        type: "decimal"
+        required: true
+        description: "Valor total agendado para pagamento."
+      folhas:
+        type: "ref:financeiro.pagamento.Folha"
+        required: false
+        cardinality: "N:N"
+        description: "Folhas incluidas nesta remessa de pagamento."
+      pagamentos:
+        type: "ref:financeiro.pagamento.PagamentoBolsista"
+        required: false
+        cardinality: "N:N"
+        description: "PagamentoBolsista incluidos nesta remessa."
+      erros:
+        type: "ref:financeiro.pagamento.ErroAgendamentoPagamento"
+        required: false
+        cardinality: "1:N"
+        description: "Erros de agendamento retornados pelo banco."
+
+  ErroCadastro:
+    description: "Registro de erros retornados pelo banco para uma AlocacaoBolsista em uma RemessaCadastro."
+    extends: null
+    fields:
+      erros:
+        type: "list:integer"
+        required: true
+        description: "Lista de codigos de erro retornados pelo banco para o cadastro do bolsista."
+      alocacaoBolsista:
+        type: "ref:post_award.bolsista.AlocacaoBolsista"
+        required: true
+        description: "AlocacaoBolsista com erros de cadastro."
+
+  ErroAgendamentoPagamento:
+    description: "Registro de erros retornados pelo banco para um PagamentoBolsista em uma RemessaPagamento."
+    extends: null
+    fields:
+      erros:
+        type: "list:integer"
+        required: true
+        description: "Lista de codigos de erro retornados pelo banco para o agendamento do pagamento."
+      pagamentoBolsista:
+        type: "ref:financeiro.pagamento.PagamentoBolsista"
+        required: true
+        description: "PagamentoBolsista com erros de agendamento."
+
+  ProcessoRemessa:
+    description: "Controle de processamento assincrono de uma Remessa. Rastreia tentativas, status e caminhos de arquivos no MinIO. Suporta retry ate o limite configurado."
+    extends: "shared.Auditavel"
+    fields:
+      dataInicio:
+        type: "datetime"
+        required: true
+        description: "Data e hora de inicio do processamento."
+      dataFinalizacao:
+        type: "datetime"
+        required: false
+        description: "Data e hora de finalizacao do processamento."
+      tentativa:
+        type: "integer"
+        required: true
+        description: "Numero da tentativa atual."
+      limite:
+        type: "integer"
+        required: true
+        description: "Limite maximo de tentativas antes de marcar como erro definitivo."
+      status:
+        type: "enum:StatusProcessoRemessa"
+        required: false
+        generated: true
+        description: "Status do processamento. Gerado automaticamente."
+      tipo:
+        type: "enum:TipoRemessa"
+        required: true
+        description: "Tipo de remessa processada."
+      pathMinio:
+        type: "string"
+        required: true
+        description: "Caminho do arquivo no MinIO (object storage)."
+      pathProcesso:
+        type: "string"
+        required: false
+        description: "Caminho do processo no sistema de workflow."
+      remessa:
+        type: "ref:financeiro.pagamento.Remessa"
+        required: true
+        description: "Remessa sendo processada."
+
+  Contratante:
+    description: "Dados bancarios e identificacao do contratante (FAPES ou orgao delegante) utilizados na geracao dos arquivos de remessa para o banco."
+    extends: "shared.Auditavel"
+    fields:
+      codigoContratante:
+        type: "string"
+        required: true
+        description: "Codigo do contratante no sistema bancario."
+      nomeContratante:
+        type: "string"
+        required: true
+        description: "Nome do contratante."
+      cnpj:
+        type: "string"
+        required: true
+        description: "CNPJ do contratante (14 digitos)."
+      contaBancaria:
+        type: "string"
+        required: true
+        description: "Numero da conta bancaria do contratante."
+      agenciaBancaria:
+        type: "string"
+        required: true
+        description: "Numero da agencia bancaria."
+      nomeBanco:
+        type: "string"
+        required: true
+        description: "Nome do banco."
+      codigoBanco:
+        type: "string"
+        required: true
+        description: "Codigo COMPE do banco."
+
+relationships:
+  - from: "financeiro.pagamento.PlanoMensal"
+    relation: "possui competencias"
+    to: "financeiro.pagamento.EditalCompetencia"
+    cardinality: "1:N"
+    description: "Um PlanoMensal agrega multiplas EditalCompetencia."
+  - from: "financeiro.pagamento.PlanoMensal"
+    relation: "possui folhas"
+    to: "financeiro.pagamento.Folha"
+    cardinality: "1:N"
+    description: "Um PlanoMensal possui uma ou mais Folhas (normal e complementares)."
+  - from: "financeiro.pagamento.PlanoMensal"
+    relation: "possui bonus"
+    to: "financeiro.pagamento.BonusPagamento"
+    cardinality: "1:N"
+    description: "Um PlanoMensal pode ter multiplos BonusPagamento."
+  - from: "financeiro.pagamento.EditalCompetencia"
+    relation: "registra decisoes"
+    to: "financeiro.pagamento.DecisaoLiberacao"
+    cardinality: "1:N"
+    description: "Uma EditalCompetencia pode ter multiplas DecisaoLiberacao ao longo do tempo."
+  - from: "post_award.iniciativas.Edital"
+    relation: "tem competencias"
+    to: "financeiro.pagamento.EditalCompetencia"
+    cardinality: "1:N"
+    description: "Um Edital (M003) possui competencias mensais em M004."
+  - from: "financeiro.pagamento.Folha"
+    relation: "registra decisoes"
+    to: "financeiro.pagamento.DecisaoFolha"
+    cardinality: "1:N"
+    description: "Uma Folha possui historico de decisoes (gerar, autorizar, cancelar, rejeitar)."
+  - from: "financeiro.pagamento.Folha"
+    relation: "contem pagamentos"
+    to: "financeiro.pagamento.PagamentoBolsista"
+    cardinality: "0..1:N"
+    description: "Uma Folha contem zero ou mais PagamentoBolsista."
+  - from: "financeiro.pagamento.Folha"
+    relation: "possui guias"
+    to: "financeiro.pagamento.GuiaDeLiberacao"
+    cardinality: "1:N"
+    description: "Uma Folha possui uma ou mais GuiaDeLiberacao."
+  - from: "financeiro.pagamento.Folha"
+    relation: "incluida em remessas"
+    to: "financeiro.pagamento.RemessaPagamento"
+    cardinality: "N:N"
+    description: "Uma Folha pode ser incluida em multiplas RemessaPagamento e vice-versa."
+  - from: "post_award.bolsista.AlocacaoBolsista"
+    relation: "gera pagamentos"
+    to: "financeiro.pagamento.PagamentoBolsista"
+    cardinality: "1:N"
+    description: "Uma AlocacaoBolsista (M009) gera multiplos PagamentoBolsista ao longo do tempo."
+  - from: "post_award.bolsista.AlocacaoBolsista"
+    relation: "tem erros de cadastro"
+    to: "financeiro.pagamento.ErroCadastro"
+    cardinality: "1:N"
+    description: "Uma AlocacaoBolsista pode ter erros de cadastro bancario."
+  - from: "post_award.bolsista.AlocacaoBolsista"
+    relation: "enviada em remessas cadastro"
+    to: "financeiro.pagamento.RemessaCadastro"
+    cardinality: "N:N"
+    description: "Uma AlocacaoBolsista pode ser enviada em multiplas RemessaCadastro."
+  - from: "financeiro.pagamento.PagamentoBolsista"
+    relation: "possui bonus"
+    to: "financeiro.pagamento.BonusPagamento"
+    cardinality: "N:0..1"
+    description: "Um PagamentoBolsista pode ter um BonusPagamento associado."
+  - from: "financeiro.pagamento.GuiaDeLiberacao"
+    relation: "abrange pagamentos"
+    to: "financeiro.pagamento.PagamentoBolsista"
+    cardinality: "0..1:N"
+    description: "Uma GuiaDeLiberacao abrange zero ou mais PagamentoBolsista."
+  - from: "financeiro.pagamento.RemessaCadastro"
+    relation: "contem erros"
+    to: "financeiro.pagamento.ErroCadastro"
+    cardinality: "1:N"
+    description: "Uma RemessaCadastro pode retornar erros de cadastro por bolsista."
+  - from: "financeiro.pagamento.RemessaPagamento"
+    relation: "inclui pagamentos"
+    to: "financeiro.pagamento.PagamentoBolsista"
+    cardinality: "N:N"
+    description: "Uma RemessaPagamento inclui multiplos PagamentoBolsista."
+  - from: "financeiro.pagamento.RemessaPagamento"
+    relation: "contem erros agendamento"
+    to: "financeiro.pagamento.ErroAgendamentoPagamento"
+    cardinality: "1:N"
+    description: "Uma RemessaPagamento pode retornar erros de agendamento por pagamento."
+  - from: "financeiro.pagamento.ProcessoRemessa"
+    relation: "processa"
+    to: "financeiro.pagamento.Remessa"
+    cardinality: "N:1"
+    description: "Multiplos ProcessoRemessa (tentativas) podem ser criados para uma Remessa."
+  - from: "financeiro.pagamento.BonusPagamento"
+    relation: "aplica a modalidades"
+    to: "corporativo.modalidade_bolsa.VersaoModalidade"
+    cardinality: "N:N"
+    description: "Um BonusPagamento se aplica a uma ou mais VersaoModalidade (M001)."
+
+axioms:
+  - id: "AX-M004-01"
+    natural_language: "Folha Normal e a primeira folha do mes (ordem = 0). Folhas Complementares tem ordem sequencial maior que zero."
+    formal_rule: "Folha.ordem = 0 → ehNormal = true; Folha.ordem > 0 → ehComplementar = true"
+  - id: "AX-M004-02"
+    natural_language: "O titulo da Folha e gerado automaticamente conforme a ordem: Normal usa 'FOLHA-NORMAL-DD/MM/YYYY', Complementar usa 'FOLHA-COMPLEMENTAR-N-DD/MM/YYYY'."
+    formal_rule: "Folha.titulo = IF ordem=0 THEN 'FOLHA-NORMAL-' + format(dataPagamento) ELSE 'FOLHA-COMPLEMENTAR-' + str(ordem) + '-' + format(dataPagamento)"
+  - id: "AX-M004-03"
+    natural_language: "Um pagamento de bolsista so pode ser incluido em folha se a AlocacaoBolsista referenciada estiver no estado IMPLEMENTADA em M009."
+    formal_rule: "PagamentoBolsista.status = EM_FOLHA → AlocacaoBolsista.estado = IMPLEMENTADA"
+  - id: "AX-M004-04"
+    natural_language: "BonusPagamento do tipo VALOR_FIXO deve ter valorFixo preenchido e porcentagem nula. Tipo PORCENTAGEM deve ter porcentagem preenchida e valorFixo nulo."
+    formal_rule: "BonusPagamento.tipoBonus = VALOR_FIXO → valorFixo ≠ null ∧ porcentagem = null; tipoBonus = PORCENTAGEM → porcentagem ≠ null ∧ valorFixo = null"
+  - id: "AX-M004-05"
+    natural_language: "O valorPago de PagamentoBolsista e a soma de valorOriginal e valorBonus."
+    formal_rule: "PagamentoBolsista.valorPago = valorOriginal + valorBonus"
+  - id: "AX-M004-06"
+    natural_language: "DecisaoLiberacao com ehLiberado = false deve ter justificativa preenchida."
+    formal_rule: "DecisaoLiberacao.ehLiberado = false → justificativa ≠ null ∧ len(justificativa) > 0"
+  - id: "AX-M004-07"
+    natural_language: "DecisaoFolha com tipoAcao = CANCELAR deve ter justificativa preenchida."
+    formal_rule: "DecisaoFolha.tipoAcao = CANCELAR → justificativa ≠ null ∧ len(justificativa) > 0"
+  - id: "AX-M004-08"
+    natural_language: "Um PlanoMensal tem exatamente um mes de competencia, que e unico no sistema."
+    formal_rule: "∀p1, p2 ∈ PlanoMensal: p1 ≠ p2 → p1.mes ≠ p2.mes"
+  - id: "AX-M004-09"
+    natural_language: "ProcessoRemessa incrementa tentativa a cada nova execucao e nao pode ultrapassar o limite."
+    formal_rule: "ProcessoRemessa.tentativa ≤ ProcessoRemessa.limite"
+  - id: "AX-M004-10"
+    natural_language: "O numero de uma Remessa so e preenchido apos retorno bancario e e unico."
+    formal_rule: "Remessa.numero ≠ null → ∀r1, r2 ∈ Remessa: r1 ≠ r2 → r1.numero ≠ r2.numero"
+
+invariants:
+  - id: "INV-M004-01"
+    rule: "PlanoMensal.marcoSolicitacao ≤ PlanoMensal.marcoGeracaoFolha ≤ PlanoMensal.marcoPagamento"
+    description: "Os marcos temporais do plano devem ser cronologicamente ordenados."
+  - id: "INV-M004-02"
+    rule: "Folha.valorPago ≤ Folha.valorPrevisto OR Folha.status ∈ {CANCELADA, REJEITADA}"
+    description: "Valor pago nao deve exceder valor previsto, exceto em folhas canceladas ou rejeitadas."
+  - id: "INV-M004-03"
+    rule: "PagamentoBolsista.valorBonus ≥ 0 ∧ PagamentoBolsista.valorOriginal > 0"
+    description: "Valor original deve ser positivo. Valor de bonus deve ser nao-negativo."
+  - id: "INV-M004-04"
+    rule: "RemessaPagamento.bolsistasAgendados ≤ RemessaPagamento.bolsistasEnviados"
+    description: "Bolsistas agendados nao podem exceder bolsistas enviados na remessa."
+  - id: "INV-M004-05"
+    rule: "ProcessoRemessa.dataFinalizacao = null ∨ ProcessoRemessa.dataFinalizacao ≥ ProcessoRemessa.dataInicio"
+    description: "Data de finalizacao, quando presente, deve ser posterior a data de inicio."
+  - id: "INV-M004-06"
+    rule: "EditalCompetencia.bolsasPendentes ≥ 0 ∧ EditalCompetencia.bolsasVigentes ≥ 0"
+    description: "Contadores de bolsas nao podem ser negativos."
+  - id: "INV-M004-07"
+    rule: "GuiaDeLiberacao.valorTotal > 0 ∧ GuiaDeLiberacao.quantPagamentos > 0"
+    description: "Guia de liberacao deve ter valor positivo e ao menos um pagamento."
+
+enums:
+  StatusEditalCompetencia:
+    description: "Status de liberacao de um EditalCompetencia no ciclo mensal de pagamento."
+    values:
+      SEM_DECISAO: "Aguardando decisao de liberacao do responsavel."
+      LIBERADO: "Edital liberado para inclusao em folha."
+      NAO_LIBERADO: "Edital nao liberado para o mes. Requer justificativa."
+      INCLUIDO_EM_FOLHA: "Edital ja incluido em folha de pagamento."
+
+  StatusFolha:
+    description: "Status do ciclo de vida de uma Folha de pagamento."
+    values:
+      GERADA: "Folha criada, aguardando autorizacao."
+      AUTORIZADA: "Folha autorizada pelo gestor financeiro."
+      CANCELADA: "Folha cancelada antes do pagamento."
+      REJEITADA: "Folha rejeitada pelo gestor."
+      EM_AGENDAMENTO: "Folha em processo de agendamento bancario."
+      AGENDADA: "Pagamentos agendados no banco."
+      PAGA: "Pagamentos confirmados como efetuados."
+      SOLICITADO_AO_BANDES:
+        value: "SOLICITADO_AO_BANDES"
+        todo: "Implementation pending — previsto no modelo comportamental para o fluxo completo BANDES, ainda nao implementado no codigo."
+      REMESSAS_AUTORIZADAS:
+        value: "REMESSAS_AUTORIZADAS"
+        todo: "Implementation pending — previsto no modelo comportamental para o fluxo completo BANDES, ainda nao implementado no codigo."
+
+  TipoAcaoFolha:
+    description: "Tipo de acao registrada em DecisaoFolha."
+    values:
+      GERAR: "Acao de geracao da folha."
+      CANCELAR: "Acao de cancelamento da folha."
+      AUTORIZAR: "Acao de autorizacao da folha."
+      REJEITAR: "Acao de rejeicao da folha."
+
+  StatusPagamentoBolsista:
+    description: "Status do ciclo de vida de um PagamentoBolsista."
+    values:
+      ALOCADO: "Bolsista alocado, pagamento previsto mas nao programado."
+      PROGRAMADO: "Pagamento programado para o mes."
+      AGENDADO: "Pagamento agendado no banco."
+      EM_FOLHA: "Incluido em folha de pagamento."
+      ENVIADO: "Enviado em remessa ao banco."
+      PAGO: "Pagamento confirmado."
+      CANCELADO: "Pagamento cancelado."
+      SUSPENSAO_POR_SOLICITACAO: "Pagamento suspenso a pedido do bolsista ou projeto."
+      FALHA_AGENDAMENTO: "Erro no agendamento bancario. Requer reprocessamento."
+      PAGAMENTO_EXTERNO: "Pagamento realizado fora do sistema (legado ou manual)."
+      INCLUIDO_EM_GL_ALTERNATIVA:
+        value: "INCLUIDO_EM_GL_ALTERNATIVA"
+        todo: "Implementation pending — previsto para fluxo de Guia de Liberacao Alternativa, ainda nao implementado no codigo."
+
+  StatusRemessaPagamento:
+    description: "Status do ciclo de vida de uma RemessaPagamento."
+    values:
+      GERANDO: "Arquivo de remessa sendo gerado."
+      GERADA: "Arquivo de remessa gerado, aguardando envio."
+      ENVIADA: "Arquivo enviado ao banco."
+      AGENDADA: "Pagamentos agendados pelo banco."
+      AUTORIZADA: "Remessa autorizada pelo banco."
+      EFETIVADA: "Pagamentos efetivados pelo banco."
+
+  TipoGuiaLiberacao:
+    description: "Tipo da GuiaDeLiberacao enviada ao BANDES."
+    values:
+      NORMAL: "Guia de liberacao padrao vinculada ao fluxo normal de folha."
+      ALTERNATIVA: "Guia de liberacao alternativa para casos especiais."
+
+  TipoBonus:
+    description: "Tipo de calculo do BonusPagamento."
+    values:
+      VALOR_FIXO: "Bonus de valor monetario fixo independente do valor da bolsa."
+      PORCENTAGEM: "Bonus calculado como percentual sobre o valor original da bolsa."
+
+  StatusBonusPagamento:
+    description: "Status do ciclo de vida de um BonusPagamento."
+    values:
+      AGUARDANDO_FOLHA: "Bonus criado, aguardando inclusao em folha."
+      INCLUSO_NA_FOLHA: "Bonus incluido em folha de pagamento."
+      PAGO: "Bonus pago ao bolsista."
+
+  StatusProcessoRemessa:
+    description: "Status de processamento assincrono de uma Remessa."
+    values:
+      AGUARDANDO_PROCESSAMENTO: "Processo na fila, aguardando worker disponivel."
+      EM_PROCESSAMENTO: "Processo sendo executado pelo worker."
+      PROCESSADA_COM_SUCESSO: "Processamento concluido sem erros."
+      PROCESSADA_COM_ERRO: "Processamento concluido com erros. Verificar bolsistasComErros."
+
+  TipoRemessa:
+    description: "Tipo de remessa bancaria gerada pelo sistema."
+    values:
+      REMESSA_CADASTRO_BOLSISTAS: "Remessa para cadastro de dados bancarios dos bolsistas."
+      REMESSA_PAGAMENTO: "Remessa para agendamento e efetivacao de pagamentos."
+
+value_objects: {}
+
+events:
+  - name: "FolhaGerada"
+    description: "Emitido quando uma Folha e criada no status GERADA."
+    payload_entity: "financeiro.pagamento.Folha"
+    trigger: "DecisaoFolha.tipoAcao = GERAR"
+  - name: "FolhaAutorizada"
+    description: "Emitido quando uma Folha tem status alterado para AUTORIZADA."
+    payload_entity: "financeiro.pagamento.Folha"
+    trigger: "DecisaoFolha.tipoAcao = AUTORIZAR"
+  - name: "FolhaCancelada"
+    description: "Emitido quando uma Folha e cancelada."
+    payload_entity: "financeiro.pagamento.Folha"
+    trigger: "DecisaoFolha.tipoAcao = CANCELAR"
+  - name: "RemessaProcessada"
+    description: "Emitido quando ProcessoRemessa completa com sucesso."
+    payload_entity: "financeiro.pagamento.Remessa"
+    trigger: "ProcessoRemessa.status = PROCESSADA_COM_SUCESSO"
+  - name: "RemessaProcessadaComErro"
+    description: "Emitido quando ProcessoRemessa termina com erro."
+    payload_entity: "financeiro.pagamento.ProcessoRemessa"
+    trigger: "ProcessoRemessa.status = PROCESSADA_COM_ERRO"
+  - name: "PagamentoBolsistaEfetuado"
+    description: "Emitido quando um PagamentoBolsista atinge status PAGO."
+    payload_entity: "financeiro.pagamento.PagamentoBolsista"
+    trigger: "PagamentoBolsista.status = PAGO"
+  - name: "EditalCompetenciaLiberada"
+    description: "Emitido quando uma EditalCompetencia tem decisao de liberacao aprovada."
+    payload_entity: "financeiro.pagamento.EditalCompetencia"
+    trigger: "DecisaoLiberacao.ehLiberado = true"
+
+workflows:
+  CicloMensalPagamento:
+    description: "Fluxo principal do ciclo mensal de pagamento de bolsistas."
+    states:
+      - PLANEJAMENTO
+      - LIBERACAO_EDITAIS
+      - GERACAO_FOLHA
+      - AUTORIZACAO_FOLHA
+      - AGENDAMENTO_BANCARIO
+      - PAGAMENTO_EFETUADO
+    transitions:
+      - from: "PLANEJAMENTO"
+        to: "LIBERACAO_EDITAIS"
+        trigger: "PlanoMensal criado com marcos definidos"
+      - from: "LIBERACAO_EDITAIS"
+        to: "GERACAO_FOLHA"
+        trigger: "Todos EditalCompetencia com status LIBERADO ou NAO_LIBERADO"
+      - from: "GERACAO_FOLHA"
+        to: "AUTORIZACAO_FOLHA"
+        trigger: "Folha gerada — DecisaoFolha.tipoAcao = GERAR"
+      - from: "AUTORIZACAO_FOLHA"
+        to: "AGENDAMENTO_BANCARIO"
+        trigger: "DecisaoFolha.tipoAcao = AUTORIZAR"
+      - from: "AUTORIZACAO_FOLHA"
+        to: "GERACAO_FOLHA"
+        trigger: "DecisaoFolha.tipoAcao = REJEITAR — nova folha necessaria"
+      - from: "AGENDAMENTO_BANCARIO"
+        to: "PAGAMENTO_EFETUADO"
+        trigger: "RemessaPagamento.status = EFETIVADA"
+
+  ProcessoRemessa:
+    description: "Fluxo assincrono de processamento de remessa bancaria com retry."
+    states:
+      - AGUARDANDO_PROCESSAMENTO
+      - EM_PROCESSAMENTO
+      - PROCESSADA_COM_SUCESSO
+      - PROCESSADA_COM_ERRO
+    transitions:
+      - from: "AGUARDANDO_PROCESSAMENTO"
+        to: "EM_PROCESSAMENTO"
+        trigger: "Worker disponivel pega processo da fila"
+      - from: "EM_PROCESSAMENTO"
+        to: "PROCESSADA_COM_SUCESSO"
+        trigger: "Processamento concluido sem falhas"
+      - from: "EM_PROCESSAMENTO"
+        to: "PROCESSADA_COM_ERRO"
+        trigger: "Erro no processamento OU tentativa >= limite"
+      - from: "PROCESSADA_COM_ERRO"
+        to: "AGUARDANDO_PROCESSAMENTO"
+        trigger: "Retry manual ou automatico se tentativa < limite"
+
+policies:
+  permissions:
+    GestorFinanceiro:
+      can:
+        - "criar PlanoMensal"
+        - "registrar DecisaoLiberacao"
+        - "gerar Folha"
+        - "autorizar Folha"
+        - "rejeitar Folha"
+        - "cancelar Folha"
+        - "criar GuiaDeLiberacao"
+        - "enviar RemessaCadastro"
+        - "enviar RemessaPagamento"
+        - "visualizar todos PagamentoBolsista"
+    Coordenador:
+      can:
+        - "visualizar PlanoMensal"
+        - "visualizar EditalCompetencia de seus editais"
+        - "visualizar PagamentoBolsista de seus projetos"
+    Bolsista:
+      can:
+        - "visualizar PagamentoBolsista proprios"
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "Pagamentos so podem ocorrer para AlocacaoBolsista no estado IMPLEMENTADA (M009)."
+    - "Folha.titulo e Folha.ordem sao campos gerados — nao aceitar input manual."
+    - "BonusPagamento.tipoBonus determina qual campo de valor e obrigatorio (valorFixo ou porcentagem)."
+    - "Enums marcados com todo: 'Implementation pending' nao devem ser usados em implementacoes ate aprovacao."
+    - "ProcessoRemessa usa retry — verificar tentativa vs limite antes de marcar como erro definitivo."
+    - "Remessa.numero so e preenchido apos retorno bancario — nao gerar localmente."
+    - "Usuario em DecisaoLiberacao e DecisaoFolha e snapshot denormalizado — nao referenciar entidade viva de usuarios."
+  notes:
+    - "Integra com Banestes via arquivos de remessa e retorno @-EDI. Envio e recebimento atualmente manuais."
+    - "GuiaDeLiberacao e gerada apos autorizacao de Folha e enviada ao BANDES."
+    - "Arquivos de remessa sao armazenados no MinIO (object storage). Referenciados por pathMinio em ProcessoRemessa."
+    - "Contratante contem dados bancarios da FAPES usados nos cabecalhos dos arquivos de remessa."
+    - "M002 (Importacao SIGFAPES) pode criar PagamentoBolsista com status PAGAMENTO_EXTERNO para historico legado."
+    - "Downstream: M016 (Contabilidade) e M017 (PLD) consomem eventos de pagamento. M018 (BI) consome todos os dados."

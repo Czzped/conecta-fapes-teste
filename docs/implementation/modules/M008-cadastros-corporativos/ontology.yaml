@@ -1,0 +1,90 @@
+ontology: "Cadastros Corporativos (indice)"
+namespace: "corporativo.cadastros"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+metadata:
+  module: "M008"
+  source: "docs/implementation/modules/M008-cadastros-corporativos/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Indice dos cadastros corporativos da FAPES, organizados em contextos de negocio: Pessoas, Instituicoes, Diarias, Rubricas, Geografia e Classificacoes."
+
+# Este arquivo e um indice. Cada contexto possui seu proprio arquivo de ontologia.
+submodules:
+  - context: "Pessoas"
+    namespace: "corporativo.pessoas"
+    path: "pessoas.yaml"
+    entities:
+      - PessoaFisica
+      - NivelAcademico
+      - HistoricoPessoa
+    description: "Cadastro de individuos, titulacao academica e auditoria de eventos."
+    todo: "pessoas.yaml nao gerado nesta rodada — fora do escopo solicitado."
+
+  - context: "Instituicoes"
+    namespace: "corporativo.instituicoes"
+    path: path: "instituicoes/ontology.yaml"
+    entities:
+      - Instituicao
+      - UnidadeOrganizacional
+      - TipoInstituicao
+      - Responsavel
+    description: "Instituicoes juridicamente identificaveis, suas unidades organizacionais internas e mandatos de responsaveis."
+
+  - context: "Diarias"
+    namespace: "corporativo.diarias"
+    path: path: "diarias/ontology.yaml"
+    entities:
+      - Abrangencia
+      - TipoDiaria
+      - ParametroCalculoDiaria
+      - PontoDiaria
+      - DistanciaPontoDiaria
+    description: "Cadastros corporativos para calculo de diarias por abrangencia, parametros normativos e tabela de distancias entre pontos."
+
+  - context: "Rubricas"
+    namespace: "corporativo.rubricas"
+    path: path: "rubricas/ontology.yaml"
+    entities:
+      - Rubrica
+      - NaturezaDespesa
+    description: "Catalogo corporativo de rubricas orcamentarias e sua natureza de despesa."
+
+  - context: "Geografia"
+    namespace: "corporativo.geografia"
+    path: "geografia.yaml"
+    entities:
+      - Cidade
+      - Regiao
+    description: "Tabelas territoriais de cidades e regioes."
+    todo: "geografia.yaml nao gerado nesta rodada — fora do escopo solicitado."
+
+  - context: "Classificacoes"
+    namespace: "corporativo.classificacoes"
+    path: "classificacoes.yaml"
+    entities:
+      - AreaConhecimento
+      - Finalidade
+    description: "Classificacoes transversais: areas de conhecimento CNPq e finalidades."
+    todo: "classificacoes.yaml nao gerado nesta rodada — fora do escopo solicitado."
+
+entities: {}
+relationships: []
+axioms: []
+invariants: []
+enums: {}
+value_objects: {}
+events: []
+workflows: null
+policies: null
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "Este arquivo e apenas indice; toda entidade concreta pertence aos submodulos."
+    - "Ao referenciar entidades de M008 em outros modulos, usar o namespace do submodulo correto (ex: corporativo.instituicoes.Instituicao)."
+  notes:
+    - "Pessoas, Geografia e Classificacoes estao fora do escopo desta geracao de ontologia."
+    - "Cadastros de Referencia consolidados em modelo-estrutural-referencia.md no repositorio de docs."

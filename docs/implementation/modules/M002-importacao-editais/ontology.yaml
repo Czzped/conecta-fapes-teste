@@ -1,0 +1,693 @@
+ontology: "Importacao de Editais SIGFAPES"
+namespace: "importacao.editais"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: shared.people
+    path: path: "../../../ontology/shared/people.yaml"
+metadata:
+  module: "M002"
+  source: "docs/implementation/modules/M002-importacao-editais/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Importação, versionamento e geração de JSONLs de editais, projetos e bolsistas a partir do sistema legado SIGFAPES via artefatos S3."
+
+entities:
+  Edital:
+    description: "Edital ofertado pela agência, originado do dump SIGFAPES via editais.parquet. É o agregado raiz do módulo."
+    extends: null
+    fields:
+      editalId:
+        type: string
+        required: true
+        description: "Identificador do edital no SIGFAPES (chave primária de negócio)."
+      editalTitulo:
+        type: string
+        required: true
+        description: "Título oficial do edital."
+      editalNumero:
+        type: string
+        required: true
+        description: "Número visível do edital (ex.: '18/2023')."
+      editalDataCadastro:
+        type: date
+        required: true
+        description: "Data de cadastro do edital no SIGFAPES. Base para cálculo do flag novoEsteMes."
+      novoEsteMes:
+        type: boolean
+        required: true
+        description: "True quando editalDataCadastro está dentro dos últimos 60 dias em relação ao instante da listagem. Derivado — ver AX-M002-005."
+
+  Projeto:
+    description: "Projeto vinculado a um edital no SIGFAPES, originado de projetos_por_edital.parquet."
+    extends: null
+    fields:
+      projetoId:
+        type: string
+        required: true
+        description: "Identificador do projeto no SIGFAPES."
+      projetoTitulo:
+        type: string
+        required: true
+        description: "Título do projeto, usado no mapa Programas→Área Técnica."
+
+  AlocacaoBolsistaSigfapes:
+    description: "Alocação de bolsa (bolsista + projeto + período), originada de bolsistas_projeto.parquet. Contém campos derivados calculados vetorizadamente."
+    extends: null
+    fields:
+      formularioBolsaId:
+        type: string
+        required: true
+        description: "Identificador da bolsa no formulário SIGFAPES."
+      bolsistaCpf:
+        type: string
+        required: true
+        description: "CPF do bolsista; chave de junção com RelatorioBeneficiario."
+      bolsistaNome:
+        type: string
+        required: true
+        description: "Nome do bolsista extraído de dados_pessoais."
+      formularioBolsaInicio:
+        type: date
+        required: true
+        description: "Data de início da bolsa."
+      formularioBolsaTermino:
+        type: date
+        required: true
+        description: "Data prevista de término da bolsa."
+      formularioCancelBolsaData:
+        type: date
+        required: false
+        description: "Data de cancelamento efetivo (null quando não cancelada)."
+      formularioBolsaSituacao:
+        type: string
+        required: true
+        description: "Situação da bolsa no SIGFAPES (ex.: ATIVA, CANCELADA)."
+      bolsaSigla:
+        type: string
+        required: true
+        description: "Sigla da bolsa/nível."
+      bolsaNivelNome:
+        type: string
+        required: true
+        description: "Nome do nível de bolsa (ex.: 'Nivel 1', '60% Nivel 3')."
+      bolsaNivelValor:
+        type: decimal
+        required: true
+        description: "Valor mensal da bolsa."
+      qtdBolsasPaga:
+        type: integer
+        required: true
+        description: "Quantidade de bolsas já pagas para a alocação."
+      coordenadorNome:
+        type: string
+        required: true
+        description: "Coordenador responsável pelo projeto."
+      formularioNumeroConta:
+        type: string
+        required: false
+        description: "Conta bancária informada no formulário (pode ser sobrescrita por RelatorioBeneficiario)."
+      formularioNumeroAgencia:
+        type: string
+        required: false
+        description: "Agência bancária informada no formulário (pode ser sobrescrita por RelatorioBeneficiario)."
+      effectiveEnd:
+        type: date
+        required: true
+        description: "Data efetiva de encerramento da bolsa. Campo derivado — ver AX-M002-001."
+      mesesDeAtividade:
+        type: integer
+        required: true
+        description: "Número de meses ativos no nível. Campo derivado — ver AX-M002-002."
+      totalDeveReceber:
+        type: decimal
+        required: true
+        description: "Total a receber pela alocação. Campo derivado — ver AX-M002-003."
+      reducao60Porcento:
+        type: string
+        required: true
+        description: "SIM se bolsaNivelNome contém '60', caso contrário NAO. Campo derivado — ver AX-M002-004."
+
+  RelatorioBeneficiario:
+    description: "Dados bancários atualizados do bolsista, oriundos de relatorio_beneficiario.json. Join por CPF sobrepõe conta/agência da AlocacaoBolsistaSigfapes."
+    extends: null
+    fields:
+      cpf:
+        type: string
+        required: true
+        description: "CPF do beneficiário; chave de junção."
+      numeroConta:
+        type: string
+        required: true
+        description: "Número de conta bancária atualizado."
+      numeroAgencia:
+        type: string
+        required: true
+        description: "Número de agência bancária atualizado."
+
+  PlanilhaVersao:
+    description: "Registro de auditoria de cada versão de planilha XLSX no S3, persistido em planilha_version_audit."
+    extends: null
+    fields:
+      id:
+        type: uuid
+        required: true
+        description: "Identificador da versão."
+      monthYear:
+        type: string
+        required: true
+        description: "Competência no formato MM_YYYY."
+      kind:
+        type: "enum:EnumKind"
+        required: true
+        description: "Tipo da planilha: editais ou programas."
+      editalId:
+        type: string
+        required: true
+        description: "Id do edital escopo da versão."
+      version:
+        type: integer
+        required: true
+        description: "Número de versão monotônico >= 0 por escopo (month_year, kind, edital_id)."
+      s3Key:
+        type: string
+        required: true
+        description: "Chave física única da versão no S3."
+      action:
+        type: "enum:EnumAcaoVersao"
+        required: true
+        description: "Ação que originou a versão."
+      actorUserId:
+        type: string
+        required: true
+        description: "Usuário que produziu a versão."
+      actorEmail:
+        type: string
+        required: false
+        description: "Email do ator (cache para logs)."
+      requestId:
+        type: string
+        required: false
+        description: "Correlação com a requisição HTTP."
+      createdAt:
+        type: datetime
+        required: true
+        description: "Instante de criação do registro."
+
+  ResourceLock:
+    description: "Lock exclusivo por recurso (planilha + mês + tipo) com heartbeat para detectar sessões abandonadas. Persiste em resource_locks."
+    extends: null
+    fields:
+      id:
+        type: uuid
+        required: true
+        description: "Identificador do lock."
+      resourceKey:
+        type: string
+        required: true
+        description: "Chave canônica <kind>/<MM_YYYY>/<edital_id>."
+      monthYear:
+        type: string
+        required: true
+        description: "Formato MM_YYYY (validado por regex)."
+      kind:
+        type: "enum:EnumKind"
+        required: true
+        description: "Tipo do recurso bloqueado."
+      editalId:
+        type: string
+        required: true
+        description: "Id numérico do edital."
+      ownerUserId:
+        type: string
+        required: true
+        description: "ID Supabase do operador que detém o lock."
+      ownerEmail:
+        type: string
+        required: false
+        description: "Email do dono do lock (cache para logs)."
+      lockToken:
+        type: uuid
+        required: true
+        description: "Token rotacionado que o cliente precisa apresentar em heartbeat/release."
+      acquiredAt:
+        type: datetime
+        required: true
+        description: "Instante de aquisição do lock."
+      heartbeatAt:
+        type: datetime
+        required: true
+        description: "Último heartbeat recebido do cliente."
+      expiresAt:
+        type: datetime
+        required: true
+        description: "Instante em que o lock é considerado expirado."
+      releasedAt:
+        type: datetime
+        required: false
+        description: "Nulo quando ativo; preenchido em release ou takeover."
+      releaseReason:
+        type: "enum:EnumMotivoLiberacao"
+        required: false
+        description: "Motivo da liberação do lock."
+      createdAt:
+        type: datetime
+        required: true
+        description: "Timestamp de criação da linha."
+      updatedAt:
+        type: datetime
+        required: true
+        description: "Timestamp de última atualização da linha."
+
+  ResourceKindState:
+    description: "Fonte de verdade do tipo ativo (editais ou programas) por edital_id + month_year. Persiste em resource_kind_state."
+    extends: null
+    fields:
+      id:
+        type: integer
+        required: true
+        description: "Identidade bigint."
+      editalId:
+        type: string
+        required: true
+        description: "Id numérico do edital."
+      monthYear:
+        type: string
+        required: true
+        description: "Competência MM_YYYY."
+      activeKind:
+        type: "enum:EnumKind"
+        required: true
+        description: "Tipo ativo corrente para este escopo."
+      updatedBy:
+        type: string
+        required: true
+        description: "Último ator que alterou o tipo ativo."
+      createdAt:
+        type: datetime
+        required: true
+        description: "Timestamp de criação."
+      updatedAt:
+        type: datetime
+        required: true
+        description: "Timestamp de última atualização."
+
+  ResourceKindSwitchLog:
+    description: "Histórico imutável de cada troca de tipo de planilha, com referência às chaves S3 do clone. Persiste em resource_kind_switch_log."
+    extends: null
+    fields:
+      id:
+        type: integer
+        required: true
+        description: "Identidade bigint."
+      editalId:
+        type: string
+        required: true
+        description: "Id numérico do edital."
+      monthYear:
+        type: string
+        required: true
+        description: "Competência MM_YYYY."
+      fromKind:
+        type: "enum:EnumKind"
+        required: true
+        description: "Tipo de origem antes da troca."
+      toKind:
+        type: "enum:EnumKind"
+        required: true
+        description: "Tipo de destino após a troca."
+      switchedBy:
+        type: string
+        required: true
+        description: "Usuário que executou a troca."
+      clonedSourceKey:
+        type: string
+        required: true
+        description: "Chave S3 da planilha original clonada."
+      clonedTargetKey:
+        type: string
+        required: true
+        description: "Chave S3 da planilha clonada resultante."
+      createdAt:
+        type: datetime
+        required: true
+        description: "Instante da troca."
+
+  ProgramaConfig:
+    description: "Mapeamento de projeto para área técnica e programa. Persiste em dados-programas.json no S3. Obrigatório antes da geração de JSONLs."
+    extends: null
+    fields:
+      projetoId:
+        type: string
+        required: true
+        description: "Chave de junção com Projeto."
+      areaTecnica:
+        type: string
+        required: true
+        description: "Área técnica (referência a M008)."
+      programa:
+        type: string
+        required: true
+        description: "Nome do programa ao qual o projeto pertence."
+
+  ImportJob:
+    description: "Job assíncrono na fila de processamento. Persiste em import_jobs. Gerencia operações pesadas como geração de JSONL fora do ciclo request/response."
+    extends: null
+    fields:
+      id:
+        type: uuid
+        required: true
+        description: "Identificador do job."
+      jobType:
+        type: string
+        required: true
+        description: "Tipo do job (ex.: gerar_jsonl)."
+      status:
+        type: "enum:EnumJobStatus"
+        required: true
+        description: "Estado atual do job."
+      payload:
+        type: object
+        required: false
+        description: "Parâmetros de entrada em JSONB."
+      result:
+        type: object
+        required: false
+        description: "Saída resumida em JSONB após conclusão."
+      error:
+        type: string
+        required: false
+        description: "Mensagem de erro em caso de falha."
+      attempts:
+        type: integer
+        required: true
+        description: "Contador de retentativas."
+      createdBy:
+        type: string
+        required: true
+        description: "Operador que criou o job."
+      workerId:
+        type: string
+        required: false
+        description: "Worker que executou o job."
+      createdAt:
+        type: datetime
+        required: true
+        description: "Timestamp de criação."
+      updatedAt:
+        type: datetime
+        required: true
+        description: "Timestamp de última atualização."
+      startedAt:
+        type: datetime
+        required: false
+        description: "Timestamp de início de execução."
+      finishedAt:
+        type: datetime
+        required: false
+        description: "Timestamp de conclusão ou falha."
+
+  ArquivoImportacaoJsonl:
+    description: "Artefato JSONL gerado por GenerateJsonlUseCase, pronto para consumo pelo M003 (Gestão de Iniciativas Captadas)."
+    extends: null
+    fields:
+      entidade:
+        type: string
+        required: true
+        description: "Nome da entidade exportada (editais, projetos, pessoas, alocacoes, etc.)."
+      s3Key:
+        type: string
+        required: true
+        description: "Chave S3 do arquivo: importacao/<MM_YYYY>/<edital_id>/<entidade>.jsonl."
+      linhas:
+        type: integer
+        required: true
+        description: "Número de registros no arquivo."
+      geradoEm:
+        type: datetime
+        required: true
+        description: "Instante de geração do arquivo."
+
+relationships:
+  - from: "importacao.editais.Edital"
+    relation: "possui"
+    to: "importacao.editais.Projeto"
+    cardinality: "1:N"
+  - from: "importacao.editais.Edital"
+    relation: "possui"
+    to: "importacao.editais.AlocacaoBolsistaSigfapes"
+    cardinality: "1:N"
+  - from: "importacao.editais.Projeto"
+    relation: "possui"
+    to: "importacao.editais.AlocacaoBolsistaSigfapes"
+    cardinality: "1:N"
+  - from: "importacao.editais.AlocacaoBolsistaSigfapes"
+    relation: "sobrescreveDadosBancarosDe"
+    to: "importacao.editais.RelatorioBeneficiario"
+    cardinality: "1:1"
+  - from: "importacao.editais.Edital"
+    relation: "possui"
+    to: "importacao.editais.PlanilhaVersao"
+    cardinality: "1:N"
+  - from: "importacao.editais.Edital"
+    relation: "possui"
+    to: "importacao.editais.ResourceLock"
+    cardinality: "1:1"
+  - from: "importacao.editais.Edital"
+    relation: "possui"
+    to: "importacao.editais.ResourceKindState"
+    cardinality: "1:1"
+  - from: "importacao.editais.Edital"
+    relation: "registraHistoricoDe"
+    to: "importacao.editais.ResourceKindSwitchLog"
+    cardinality: "1:N"
+  - from: "importacao.editais.Projeto"
+    relation: "mapeiaPara"
+    to: "importacao.editais.ProgramaConfig"
+    cardinality: "1:1"
+  - from: "importacao.editais.Edital"
+    relation: "geraArquivosDe"
+    to: "importacao.editais.ArquivoImportacaoJsonl"
+    cardinality: "1:N"
+  - from: "importacao.editais.ImportJob"
+    relation: "pertenceAo"
+    to: "importacao.editais.Edital"
+    cardinality: "N:1"
+
+axioms:
+  - id: "AX-M002-001"
+    natural_language: "O campo effectiveEnd é calculado a partir da data de cancelamento e da data de término da bolsa: (1) Se existe formularioCancelBolsaData e dia <= 15, effectiveEnd = primeiro dia do mês do cancelamento - 1 dia. (2) Se existe formularioCancelBolsaData e dia > 15, effectiveEnd = formularioCancelBolsaData. (3) Se não há cancelamento e formularioBolsaTermino é futuro (> fakeToday), effectiveEnd = primeiro dia de fakeToday - 1 dia. (4) Caso contrário, effectiveEnd = formularioBolsaTermino."
+    formal_rule: "effectiveEnd = IF (cancelBolsaData ≠ null ∧ day(cancelBolsaData) ≤ 15) THEN firstDayOfMonth(cancelBolsaData) - 1d ELSE IF (cancelBolsaData ≠ null ∧ day(cancelBolsaData) > 15) THEN cancelBolsaData ELSE IF (cancelBolsaData = null ∧ bolsaTermino > fakeToday) THEN firstDayOfMonth(fakeToday) - 1d ELSE bolsaTermino"
+  - id: "AX-M002-002"
+    natural_language: "MESES_DE_ATIVIDADE é o teto (ceil) dos meses entre effectiveEnd e formularioBolsaInicio, calculado com semântica Spark months_between, com clipe inferior em zero."
+    formal_rule: "mesesDeAtividade = max(0, ceil(sparkMonthsBetween(effectiveEnd, formularioBolsaInicio)))"
+  - id: "AX-M002-003"
+    natural_language: "TOTAL_DEVE_RECEBER é o produto do valor mensal da bolsa pelo número de meses de atividade."
+    formal_rule: "totalDeveReceber = bolsaNivelValor × mesesDeAtividade"
+  - id: "AX-M002-004"
+    natural_language: "O flag reducao60Porcento é SIM se o nome do nível de bolsa contém o literal '60', caso contrário NAO."
+    formal_rule: "reducao60Porcento = IF ('60' ∈ bolsaNivelNome) THEN 'SIM' ELSE 'NAO'"
+  - id: "AX-M002-005"
+    natural_language: "O flag novoEsteMes de um Edital é True quando editalDataCadastro está dentro dos últimos 60 dias em relação ao instante da listagem."
+    formal_rule: "novoEsteMes = (now() - editalDataCadastro) ≤ 60d"
+  - id: "AX-M002-006"
+    natural_language: "A geração de JSONL exige planilha existente com versão >= 1, mapeamento completo de programas e lock ativo do operador solicitante."
+    formal_rule: "generateJsonl(editalId, monthYear) → ∃pv: pv.editalId = editalId ∧ pv.version ≥ 1 ∧ ∀p ∈ Projetos(editalId): ∃pc: pc.projetoId = p.projetoId ∧ ∃rl: rl.editalId = editalId ∧ rl.releasedAt = null"
+  - id: "AX-M002-007"
+    natural_language: "Dados bancários do RelatorioBeneficiario sobrepõem os campos formularioNumeroConta e formularioNumeroAgencia na montagem da planilha, com join por CPF."
+    formal_rule: "planilhaConta(alocacao) = IF ∃rb: rb.cpf = alocacao.bolsistaCpf THEN rb.numeroConta ELSE alocacao.formularioNumeroConta"
+
+invariants:
+  - id: "INV-M002-001"
+    rule: "UNIQUE(planilha_version_audit, month_year, kind, edital_id, version)"
+    description: "Exatamente uma versão ativa por escopo (month_year, kind, edital_id, version), garantida pela constraint composta."
+  - id: "INV-M002-002"
+    rule: "UNIQUE_PARTIAL(resource_locks, resource_key) WHERE released_at IS NULL"
+    description: "Exatamente um lock ativo por resource_key, garantido pelo índice único parcial."
+  - id: "INV-M002-003"
+    rule: "UNIQUE(resource_kind_state, edital_id, month_year)"
+    description: "Um único tipo ativo por competência (edital_id, month_year)."
+  - id: "INV-M002-004"
+    rule: "resource_kind_state.active_kind change → ∃log ∈ resource_kind_switch_log ∧ ∃clone_s3_key"
+    description: "Alteração de tipo ativo exige clone da planilha e registro em resource_kind_switch_log."
+  - id: "INV-M002-005"
+    rule: "ArquivoImportacaoJsonl.geradoEm → planilha.version ≥ 1 ∧ ProgramaConfig completo ∧ ResourceLock ativo"
+    description: "JSONL só é gerado quando há planilha versionada, mapeamento de programas completo e lock ativo."
+  - id: "INV-M002-006"
+    rule: "PlanilhaVersao.version ≥ 0"
+    description: "Número de versão de planilha deve ser maior ou igual a zero."
+  - id: "INV-M002-007"
+    rule: "ResourceLock.expiresAt > ResourceLock.acquiredAt"
+    description: "O instante de expiração do lock deve ser posterior ao instante de aquisição."
+  - id: "INV-M002-008"
+    rule: "ImportJob.attempts ≥ 0"
+    description: "O contador de retentativas não pode ser negativo."
+
+enums:
+  EnumKind:
+    description: "Tipo de planilha/recurso gerenciado pelo módulo."
+    values:
+      EDITAIS: "Planilha organizada por edital — uma linha por bolsista."
+      PROGRAMAS: "Planilha reorganizada por programa/área técnica."
+
+  EnumAcaoVersao:
+    description: "Ação que originou uma versão de planilha em planilha_version_audit."
+    values:
+      CREATE_INITIAL: "Criação inicial da planilha pelo sistema a partir do dump SIGFAPES."
+      UPLOAD_CORRIGIDA: "Upload de planilha corrigida pelo operador."
+      SWITCH_CLONE: "Clone gerado automaticamente durante troca de tipo (editais <-> programas)."
+      LEGACY_BACKFILL: "Preenchimento retroativo de versão legada."
+
+  EnumMotivoLiberacao:
+    description: "Motivo da liberação de um ResourceLock."
+    values:
+      RELEASED: "Liberação explícita pelo operador."
+      EXPIRED: "Lock expirou por timeout de heartbeat."
+      TAKEOVER: "Tomada forçada por outro operador (administrativo)."
+      SHUTDOWN: "Liberação automática no desligamento do servidor."
+
+  EnumJobStatus:
+    description: "Estado do ciclo de vida de um ImportJob."
+    values:
+      PENDING: "Job enfileirado aguardando execução."
+      RUNNING: "Job em execução pelo worker."
+      COMPLETED: "Job concluído com sucesso."
+      FAILED: "Job falhou após tentativas esgotadas."
+
+value_objects:
+  NivelBolsaXlsx:
+    description: "Grupo de colunas de nível de bolsa no layout XLSX kind=editais. Até MAX_NIVEIS_BOLSA=5 grupos por linha."
+    fields:
+      indice:
+        type: integer
+        required: true
+        description: "Índice do grupo (1..5). Somente o índice 5 é preenchido pelo sistema; 1..4 são reservados para o operador."
+      bolsaNivel:
+        type: string
+        required: false
+        description: "Nome do nível para o grupo (coluna BOLSA NIVEL_{N})."
+      bolsaValor:
+        type: decimal
+        required: false
+        description: "Valor mensal do nível (coluna BOLSA VALOR_{N})."
+      sessentaDaBolsa:
+        type: string
+        required: false
+        description: "Flag SIM/NAO indicando redução de 60% (coluna 60 DA BOLSA_{N})."
+      mesesDeAtividade:
+        type: integer
+        required: false
+        description: "Número de meses ativos no nível (coluna MESES DE ATIVIDADE_{N})."
+      totalDeveReceber:
+        type: decimal
+        required: false
+        description: "Total a receber no nível (coluna TOTAL DEVE RECEBER_{N} = BOLSA VALOR_{N} × MESES DE ATIVIDADE_{N})."
+
+events:
+  - name: "ImportJobEnqueued"
+    description: "Job de importação foi adicionado à fila com status PENDING."
+    trigger: "Operador solicita geração de JSONL via POST /gerar-jsonl."
+  - name: "ImportJobStarted"
+    description: "Worker assumiu o job e status transicionou para RUNNING."
+    trigger: "JobExecutor seleciona job PENDING e inicia execução."
+  - name: "ImportJobCompleted"
+    description: "Job concluído com sucesso; JSONLs disponíveis no S3 para consumo pelo M003."
+    trigger: "GenerateJsonlUseCase conclui sem erros; status transiciona para COMPLETED."
+  - name: "ImportJobFailed"
+    description: "Job falhou; error preenchido com mensagem diagnóstica."
+    trigger: "GenerateJsonlUseCase lança exceção após tentativas esgotadas; status transiciona para FAILED."
+  - name: "PlanilhaVersaoCreated"
+    description: "Nova versão de planilha registrada em planilha_version_audit."
+    trigger: "CreatePlanilhaEditalUseCase ou UploadPlanilhaCorrigidaUseCase persiste nova versão no S3."
+  - name: "ResourceKindSwitched"
+    description: "Tipo ativo de planilha alterado de editais para programas ou vice-versa."
+    trigger: "SwitchResourceKindUseCase conclui clone e atualiza resource_kind_state."
+  - name: "ResourceLockAcquired"
+    description: "Lock exclusivo adquirido por um operador para um recurso."
+    trigger: "Operador inicia edição; sistema insere registro ativo em resource_locks."
+  - name: "ResourceLockReleased"
+    description: "Lock liberado (explícito, expirado, takeover ou shutdown)."
+    trigger: "release_reason preenchido e released_at registrado em resource_locks."
+
+workflows:
+  ImportJob:
+    description: "Ciclo de vida de um job assíncrono de geração de JSONL."
+    states:
+      - PENDING
+      - RUNNING
+      - COMPLETED
+      - FAILED
+    transitions:
+      - from: PENDING
+        to: RUNNING
+        trigger: "job_started"
+        description: "Worker seleciona job da fila e inicia processamento."
+      - from: RUNNING
+        to: COMPLETED
+        trigger: "job_succeeded"
+        description: "GenerateJsonlUseCase conclui sem erros."
+      - from: RUNNING
+        to: FAILED
+        trigger: "job_failed"
+        description: "Erro irrecuperável após esgotamento de tentativas."
+
+  ResourceLock:
+    description: "Ciclo de vida de um lock exclusivo de edição."
+    states:
+      - ACTIVE
+      - RELEASED
+    transitions:
+      - from: ACTIVE
+        to: RELEASED
+        trigger: "lock_released"
+        description: "Operador libera o lock explicitamente (releaseReason=RELEASED)."
+      - from: ACTIVE
+        to: RELEASED
+        trigger: "lock_expired"
+        description: "Heartbeat timeout detectado (releaseReason=EXPIRED)."
+      - from: ACTIVE
+        to: RELEASED
+        trigger: "lock_takeover"
+        description: "Administrador força tomada do lock (releaseReason=TAKEOVER)."
+      - from: ACTIVE
+        to: RELEASED
+        trigger: "server_shutdown"
+        description: "Servidor em desligamento libera todos os locks ativos (releaseReason=SHUTDOWN)."
+
+  PlanilhaVersao:
+    description: "Progressão de versões de planilha por escopo (month_year, kind, edital_id)."
+    states:
+      - v0_initial
+      - vN_uploaded
+      - switched_clone
+    transitions:
+      - from: v0_initial
+        to: vN_uploaded
+        trigger: "upload_corrigida"
+        description: "Operador faz upload de planilha corrigida; nova versão vN+1 criada."
+      - from: v0_initial
+        to: switched_clone
+        trigger: "switch_resource_kind"
+        description: "Operador alterna tipo; planilha clonada para novo kind."
+      - from: vN_uploaded
+        to: switched_clone
+        trigger: "switch_resource_kind"
+        description: "Operador alterna tipo após correções; planilha corrigida clonada."
+
+policies: null
+
+agent_instructions:
+  rules:
+    - "Não criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementação deve seguir workflows definidos."
+    - "Campos derivados (effectiveEnd, mesesDeAtividade, totalDeveReceber, reducao60Porcento, novoEsteMes) nunca devem ser persistidos via input direto — sempre recalcular conforme axioms AX-M002-001 a AX-M002-005."
+    - "Geração de JSONL só pode ser disparada quando todos os invariantes INV-M002-005 são satisfeitos."
+    - "Lock deve ser verificado antes de qualquer operação de escrita em planilha ou troca de tipo."
+    - "Toda versão de planilha deve ser registrada em planilha_version_audit."
+  notes:
+    - "Este módulo é de integração legada. Entidades são snapshots do SIGFAPES — não representam estado editável do ConectaFAPES."
+    - "Não modificar dados importados diretamente — usar processo de reconciliação via upload de planilha corrigida."
+    - "O backend usa feature flag USE_CASES_ENABLED para migração gradual do código legado (planilha_edital.py, geraArquivosImportacao.py) para use cases."
+    - "O padrão strangler-fig via app/gateways/ isola as funções monolíticas durante a migração."
+    - "JSONLs gerados são consumidos pelo M003 (Gestão de Iniciativas Captadas) e M004 (Pagamento Bolsistas)."
+    - "ProgramaConfig referencia Área Técnica definida no M008 (Cadastros Corporativos)."

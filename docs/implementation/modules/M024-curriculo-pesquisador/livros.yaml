@@ -1,0 +1,94 @@
+ontology: "Livros e Capitulos"
+namespace: "post_award.curriculo.livros"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: post_award.curriculo
+    path: path: "ontology.yaml"
+metadata:
+  module: "M024"
+  source: "docs/implementation/modules/M024-curriculo-pesquisador/submodelos/04-livros.md"
+  version: "1.0.0"
+  description: "Producao bibliografica em livro completo ou capitulo de livro registrada no curriculo Lattes do pesquisador."
+
+entities:
+  Livro:
+    description: "Livro completo ou capitulo de livro publicado pelo pesquisador; composicao de Curriculo, apagado e recriado a cada reimportacao."
+    extends: "shared.Auditavel"
+    fields:
+      curriculoId:
+        type: "Guid"
+        required: true
+        description: "FK para Curriculo ao qual o livro/capitulo pertence."
+      titulo:
+        type: "string"
+        required: true
+        description: "Titulo do livro ou capitulo."
+        max_length: 500
+      tipo:
+        type: "TipoProducaoLivro"
+        required: true
+        description: "Tipo da producao bibliografica: Livro (completo) ou Capitulo."
+      isbn:
+        type: "string"
+        required: false
+        description: "ISBN-10 ou ISBN-13 quando disponivel no Lattes."
+        max_length: 20
+      ano:
+        type: "integer"
+        required: true
+        description: "Ano de publicacao (4 digitos)."
+      papel:
+        type: "string"
+        required: false
+        description: "Papel do pesquisador na obra conforme Lattes (Autor, Organizador, Tradutor ou equivalente)."
+        max_length: 100
+      editoraId:
+        type: "Guid"
+        required: false
+        description: "FK para Instituicao (M008) editora da obra; opcional pois Lattes pode trazer informacao incompleta."
+
+relationships:
+  - from: "post_award.curriculo.Curriculo"
+    relation: "possui"
+    to: "post_award.curriculo.livros.Livro"
+    cardinality: "1:N"
+  - from: "post_award.curriculo.livros.Livro"
+    relation: "publicado por"
+    to: "corporativo.instituicoes.Instituicao"
+    cardinality: "N:1"
+    optional: true
+
+axioms:
+  - id: "AX-M024-L01"
+    natural_language: "Reimportacao apaga todos os Livro anteriores do curriculo e recria a partir do snapshot atual."
+    formal_rule: "ON reimportacao(curriculoId): DELETE Livro WHERE curriculoId = :id THEN INSERT FROM snapshot"
+  - id: "AX-M024-L02"
+    natural_language: "tipo discrimina livro completo e capitulo; nao ha entidade separada para capitulo."
+    formal_rule: "Livro.tipo IN (Livro, Capitulo)"
+
+invariants:
+  - id: "INV-M024-L01"
+    rule: "Livro.ano >= 1900 AND Livro.ano <= CURRENT_YEAR + 1"
+    description: "Ano de publicacao deve ser plausivel."
+
+enums:
+  TipoProducaoLivro:
+    values:
+      Livro: "Obra bibliografica completa (livro inteiro)."
+      Capitulo: "Capitulo de livro organizado por terceiro ou pelo proprio pesquisador."
+
+value_objects: {}
+events: []
+workflows: null
+policies: null
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "Livro e composicao de Curriculo — apagado e recriado na reimportacao."
+    - "Nao criar entidade separada para Capitulo; usar campo tipo = Capitulo em Livro."
+    - "editora e opcional — nao bloquear importacao por ausencia."
+  notes: []

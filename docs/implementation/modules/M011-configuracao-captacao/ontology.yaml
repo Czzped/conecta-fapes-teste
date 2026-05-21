@@ -1,0 +1,927 @@
+ontology: "Configuracao de Captacao"
+namespace: "pre_award.captacao"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: shared.people
+    path: path: "../../../ontology/shared/people.yaml"
+  - namespace: corporativo.instituicoes
+    path: path: "../M008-cadastros-corporativos/instituicoes/ontology.yaml"
+  - namespace: corporativo.modalidade_bolsa
+    path: path: "../M001-modalidade-bolsa/ontology.yaml"
+  - namespace: corporativo.rubricas
+    path: path: "../M008-cadastros-corporativos/rubricas/ontology.yaml"
+  - namespace: planejamento.programas
+    path: path: "../M010-planejamento-estrategia/programas/ontology.yaml"
+  - namespace: planejamento.parcerias
+    path: path: "../M010-planejamento-estrategia/parcerias/ontology.yaml"
+metadata:
+  module: "M011"
+  source: "docs/implementation/modules/M011-configuracao-captacao/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Define a configuracao completa de uma captacao de propostas, incluindo cronograma obrigatorio, regras de submissao e avaliacao, faixas de financiamento, rubricas e bolsas permitidas."
+
+entities:
+  Captacao:
+    description: "Agregado raiz que representa uma chamada ou demanda induzida configurada pela FAPES para recepcao de propostas."
+    extends: "shared.Auditavel"
+    fields:
+      codigo:
+        type: "string"
+        required: true
+        generated: true
+        unique: true
+        description: "Codigo unico gerado automaticamente para a captacao."
+      titulo:
+        type: "string"
+        required: true
+        max_length: 200
+        description: "Titulo da captacao."
+      descricao:
+        type: "string"
+        required: false
+        max_length: 1000
+        description: "Descricao resumida do objetivo e escopo da captacao."
+      linkEdital:
+        type: "string"
+        required: true
+        description: "Link ou referencia ao documento do edital."
+      tipoCaptacao:
+        type: "enum:TipoCaptacao"
+        required: true
+        description: "Tipo da captacao: chamada publica ou demanda induzida."
+      estadoConfiguracao:
+        type: "enum:EstadoConfiguracaoCaptacao"
+        required: true
+        description: "Estado corrente da configuracao da captacao."
+      cronograma:
+        type: "ref:pre_award.captacao.CronogramaCaptacao"
+        required: true
+        description: "Cronograma obrigatorio com os 8 periodos do fluxo da captacao."
+      aportes:
+        type: "list:ref:pre_award.captacao.AporteFinanceiroCaptacao"
+        required: true
+        description: "Um ou mais aportes financeiros que totalizam o valor da captacao."
+      areaTecnica:
+        type: "ref:corporativo.instituicoes.AreaTecnica"
+        required: true
+        description: "Area tecnica responsavel pela gestao das iniciativas captadas."
+      outorgadoDestinatario:
+        type: "ref:pre_award.captacao.OutorgadoDestinatario"
+        required: false
+        description: "Pessoa destinataria de uma demanda induzida. Obrigatorio quando tipoCaptacao = DEMANDA_INDUZIDA."
+      tiposIniciativa:
+        type: "list:ref:corporativo.instituicoes.TipoIniciativa"
+        required: true
+        description: "Um ou mais tipos de iniciativa aceitos pela captacao."
+      categoriasIniciativa:
+        type: "list:ref:pre_award.captacao.CategoriaIniciativa"
+        required: true
+        description: "Uma ou mais categorias de iniciativa aceitas pela captacao."
+      formularioSubmissao:
+        type: "ref:pre_award.captacao.FormularioSubmissaoRef"
+        required: true
+        description: "Referencia ao formulario de submissao publicado no M021."
+      formularioAvaliacao:
+        type: "ref:pre_award.captacao.FormularioAvaliacaoRef"
+        required: true
+        description: "Referencia ao formulario de avaliacao ad hoc publicado no M021."
+      formularioRevisao:
+        type: "ref:pre_award.captacao.FormularioRevisaoRef"
+        required: true
+        description: "Referencia ao formulario de revisao de resultado publicado no M021."
+      formularioAnexo:
+        type: "ref:pre_award.captacao.FormularioAnexoRef"
+        required: false
+        description: "Referencia opcional ao formulario de anexos publicado no M021."
+      faixasFinanciamento:
+        type: "list:ref:pre_award.captacao.FaixaFinanciamento"
+        required: false
+        description: "Faixas de financiamento disponiveis na captacao."
+      regraSubmissao:
+        type: "ref:pre_award.captacao.RegraSubmissao"
+        required: true
+        description: "Regras de submissao de propostas para esta captacao."
+      proponentesEscolhidos:
+        type: "list:ref:pre_award.captacao.ProponenteEscolhido"
+        required: false
+        description: "Lista de proponentes autorizados quando submissaoRestritaAEscolhidos = true."
+      requisitoProponente:
+        type: "ref:pre_award.captacao.RequisitoProponente"
+        required: true
+        description: "Requisitos impostos ao proponente da captacao."
+      regraAvaliacao:
+        type: "ref:pre_award.captacao.RegraAvaliacao"
+        required: true
+        description: "Regras de avaliacao ad hoc das propostas."
+      prestacaoExigida:
+        type: "ref:pre_award.captacao.PrestacaoExigida"
+        required: true
+        description: "Define se as iniciativas geradas exigem prestacao tecnica e/ou financeira."
+      revisoresAdHoc:
+        type: "list:ref:pre_award.captacao.RevisorAdHoc"
+        required: true
+        description: "Pool de revisores ad hoc disponivel para a captacao."
+      rubricasPermitidas:
+        type: "list:ref:pre_award.captacao.RubricaPermitida"
+        required: false
+        description: "Rubricas autorizadas para o orcamento das propostas."
+      bolsasPermitidas:
+        type: "list:ref:pre_award.captacao.BolsaPermitida"
+        required: false
+        description: "Versoes de niveis de bolsa permitidas na captacao."
+      documentosExigidos:
+        type: "list:ref:pre_award.captacao.DocumentoExigido"
+        required: false
+        description: "Documentos exigidos do proponente na submissao."
+
+  AporteFinanceiroCaptacao:
+    description: "Registro de aporte financeiro de um programa ou parceria para a captacao. Exatamente uma origem deve ser preenchida por registro."
+    extends: "shared.Auditavel"
+    fields:
+      origemTipo:
+        type: "enum:TipoOrigemAporte"
+        required: true
+        description: "Tipo da origem do aporte: PROGRAMA ou PARCERIA."
+      valorAportado:
+        type: "decimal"
+        required: true
+        description: "Valor financeiro aportado pela origem. Deve ser maior que zero."
+        domain: "> 0"
+      programa:
+        type: "ref:planejamento.programas.Programa"
+        required: false
+        description: "Programa que aporta recurso. Obrigatorio quando origemTipo = PROGRAMA."
+      parceria:
+        type: "ref:planejamento.parcerias.Parceria"
+        required: false
+        description: "Parceria que aporta recurso. Obrigatoria quando origemTipo = PARCERIA."
+
+  OutorgadoDestinatario:
+    description: "Pessoa destinataria de uma demanda induzida, referenciada a partir do M008."
+    extends: null
+    fields:
+      cpf:
+        type: "value_object:shared.CPF"
+        required: true
+        description: "CPF da pessoa para a qual a demanda induzida e direcionada."
+      nome:
+        type: "string"
+        required: true
+        max_length: 300
+        description: "Nome da pessoa destinataria."
+
+  CategoriaIniciativa:
+    description: "Categoria de iniciativa aceita pela captacao, com indicador de disponibilidade para selecao multipla."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: "string"
+        required: true
+        unique: true
+        max_length: 200
+        description: "Nome da categoria (ex: Pesquisa, Inovacao, Extensao, Difusao, Capacitacao)."
+      descricao:
+        type: "string"
+        required: false
+        max_length: 500
+        description: "Descricao da categoria."
+      selecionavelNoCadastro:
+        type: "boolean"
+        required: true
+        description: "Indica se a categoria esta disponivel para selecao multipla no cadastro da captacao."
+
+  CronogramaCaptacao:
+    description: "Cronograma da captacao composto exatamente pelos 8 periodos obrigatorios do fluxo."
+    extends: "shared.Auditavel"
+    fields:
+      descricao:
+        type: "string"
+        required: true
+        max_length: 500
+        description: "Descricao geral do cronograma da captacao."
+      periodos:
+        type: "list:ref:pre_award.captacao.PeriodoCronograma"
+        required: true
+        description: "Lista de exatamente 8 periodos, um para cada TipoPeriodo obrigatorio, em ordem sequencial."
+
+  PeriodoCronograma:
+    description: "Card operacional de uma fase do cronograma da captacao com data de inicio e fim."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: "string"
+        required: true
+        max_length: 200
+        description: "Nome descritivo da fase (ex: Periodo de Recebimento de Propostas)."
+      tipo:
+        type: "enum:TipoPeriodo"
+        required: true
+        description: "Tipo da fase no fluxo da captacao. Define a ordem obrigatoria."
+      dataInicio:
+        type: "date"
+        required: true
+        description: "Data de inicio do periodo."
+      dataFim:
+        type: "date"
+        required: true
+        description: "Data de fim do periodo."
+      adiamentos:
+        type: "list:ref:pre_award.captacao.AdiamentoPeriodoCronograma"
+        required: false
+        description: "Historico de adiamentos aplicados a este periodo."
+
+  AdiamentoPeriodoCronograma:
+    description: "Registro imutavel de um adiamento aplicado a um periodo do cronograma com justificativa e datas originais e novas."
+    extends: "shared.Auditavel"
+    fields:
+      dias:
+        type: "integer"
+        required: true
+        description: "Quantidade de dias acrescida ao periodo e a todos os periodos posteriores."
+        domain: "> 0"
+      justificativa:
+        type: "string"
+        required: true
+        max_length: 500
+        description: "Motivo informado para o adiamento da etapa."
+      dataRegistro:
+        type: "date"
+        required: true
+        generated: true
+        description: "Data em que o adiamento foi registrado. Gerada automaticamente."
+      dataInicioOriginal:
+        type: "date"
+        required: true
+        description: "Data inicial da etapa antes do adiamento."
+      dataFimOriginal:
+        type: "date"
+        required: true
+        description: "Data final da etapa antes do adiamento."
+      dataInicioNova:
+        type: "date"
+        required: true
+        description: "Data inicial da etapa apos o adiamento."
+      dataFimNova:
+        type: "date"
+        required: true
+        description: "Data final da etapa apos o adiamento."
+
+  FormularioSubmissaoRef:
+    description: "Referencia ao formulario de submissao publicado no M021."
+    extends: null
+    fields:
+      formularioId:
+        type: "string"
+        required: true
+        description: "Identificador do formulario no M021."
+      versaoFormularioId:
+        type: "string"
+        required: true
+        description: "Identificador da versao publicada selecionada no M021."
+
+  FormularioAvaliacaoRef:
+    description: "Referencia ao formulario de avaliacao ad hoc publicado no M021."
+    extends: null
+    fields:
+      formularioId:
+        type: "string"
+        required: true
+        description: "Identificador do formulario no M021."
+      versaoFormularioId:
+        type: "string"
+        required: true
+        description: "Identificador da versao publicada selecionada no M021."
+
+  FormularioRevisaoRef:
+    description: "Referencia ao formulario de revisao de resultado publicado no M021."
+    extends: null
+    fields:
+      formularioId:
+        type: "string"
+        required: true
+        description: "Identificador do formulario no M021."
+      versaoFormularioId:
+        type: "string"
+        required: true
+        description: "Identificador da versao publicada selecionada no M021."
+
+  FormularioAnexoRef:
+    description: "Referencia opcional ao formulario de anexos publicado no M021."
+    extends: null
+    fields:
+      formularioId:
+        type: "string"
+        required: false
+        description: "Identificador do formulario de anexos no M021."
+      versaoFormularioId:
+        type: "string"
+        required: false
+        description: "Identificador da versao publicada selecionada no M021."
+
+  FaixaFinanciamento:
+    description: "Faixa de valor para financiamento de iniciativas dentro da captacao, com duracao maxima e parcela do aporte reservada."
+    extends: "shared.Auditavel"
+    fields:
+      duracaoMaximaMeses:
+        type: "integer"
+        required: true
+        description: "Duracao maxima da iniciativa nessa faixa em meses."
+        domain: "> 0"
+      valorMinimo:
+        type: "decimal"
+        required: true
+        description: "Valor financeiro minimo da faixa."
+        domain: ">= 0"
+      valorMaximo:
+        type: "decimal"
+        required: true
+        description: "Valor financeiro maximo da faixa. Deve ser >= valorMinimo."
+        domain: ">= valorMinimo"
+      valorAportado:
+        type: "decimal"
+        required: true
+        description: "Parcela do total aportado na captacao reservada para esta faixa."
+        domain: ">= 0"
+
+  RegraSubmissao:
+    description: "Regras que governam quem pode submeter propostas e sob quais condicoes de acumulacao."
+    extends: "shared.Auditavel"
+    fields:
+      permiteMultiplasPropostas:
+        type: "boolean"
+        required: true
+        description: "Indica se o proponente pode enviar mais de uma proposta."
+      permiteParticiparEmOutraProposta:
+        type: "boolean"
+        required: true
+        description: "Indica se o coordenador/proponente pode participar de outra proposta da mesma captacao."
+      permiteAcumularBolsa:
+        type: "boolean"
+        required: true
+        description: "Indica se o coordenador/proponente pode acumular bolsa ativa em outro projeto."
+      submissaoRestritaAEscolhidos:
+        type: "boolean"
+        required: true
+        description: "Indica se apenas pessoas/instituicoes previamente escolhidas podem submeter proposta."
+
+  ProponenteEscolhido:
+    description: "Proponente autorizado a submeter quando submissaoRestritaAEscolhidos = true. Aponta para exatamente uma Instituicao ou PessoaFisica."
+    extends: null
+    fields:
+      tipo:
+        type: "enum:TipoProponenteEscolhido"
+        required: true
+        description: "Tipo do proponente escolhido: INSTITUICAO ou PESSOA."
+      instituicao:
+        type: "ref:corporativo.instituicoes.Instituicao"
+        required: false
+        description: "Instituicao autorizada. Obrigatoria quando tipo = INSTITUICAO."
+      pessoa:
+        type: "ref:shared.people.PessoaFisica"
+        required: false
+        description: "Pessoa fisica autorizada. Obrigatoria quando tipo = PESSOA."
+
+  RequisitoProponente:
+    description: "Requisitos impostos ao proponente: direcionamento, vinculo, gestor institucional e nivel academico minimo."
+    extends: "shared.Auditavel"
+    fields:
+      direcionamento:
+        type: "enum:TipoDirecionamentoProposta"
+        required: true
+        description: "Define se a proposta e aberta, direcionada a instituicao ou a tipo de instituicao."
+      permiteParceriaInstituicoes:
+        type: "boolean"
+        required: true
+        description: "Indica se a proposta pode envolver mais de uma instituicao."
+      exigeVinculoEmpregaticio:
+        type: "boolean"
+        required: true
+        description: "Indica se o proponente deve possuir vinculo empregaticio ativo."
+      exigeGestorInstitucional:
+        type: "boolean"
+        required: true
+        description: "Indica se a proposta deve informar gestor institucional."
+      instituicao:
+        type: "ref:corporativo.instituicoes.Instituicao"
+        required: false
+        description: "Instituicao permitida quando direcionamento = INSTITUICAO."
+      tipoInstituicao:
+        type: "ref:corporativo.instituicoes.TipoInstituicao"
+        required: false
+        description: "Tipo de instituicao permitido quando direcionamento = TIPO_INSTITUICAO."
+      nivelAcademicoMinimo:
+        type: "ref:corporativo.instituicoes.NivelAcademico"
+        required: false
+        description: "Nivel academico minimo exigido do proponente/coordenador."
+
+  RegraAvaliacao:
+    description: "Configuracao das regras de avaliacao ad hoc das propostas recebidas."
+    extends: "shared.Auditavel"
+    fields:
+      exigeAvaliacaoAdHoc:
+        type: "boolean"
+        required: true
+        description: "Indica se a captacao exige avaliacao ad hoc."
+      quantidadeMinimaRevisores:
+        type: "integer"
+        required: true
+        description: "Quantidade minima de revisores ad hoc por proposta."
+        domain: ">= 0"
+
+  PrestacaoExigida:
+    description: "Define se as iniciativas geradas por esta captacao exigirao prestacao tecnica e/ou financeira."
+    extends: "shared.Auditavel"
+    fields:
+      exigePrestacaoTecnica:
+        type: "boolean"
+        required: true
+        description: "Indica se as iniciativas geradas exigirao prestacao tecnica."
+      exigePrestacaoFinanceira:
+        type: "boolean"
+        required: true
+        description: "Indica se as iniciativas geradas exigirao prestacao financeira."
+
+  RevisorAdHoc:
+    description: "Papel operacional assumido por uma PessoaFisica como revisor ad hoc nesta captacao."
+    extends: "shared.Auditavel"
+    fields:
+      pessoa:
+        type: "ref:shared.people.PessoaFisica"
+        required: true
+        description: "Pessoa fisica que assume o papel de revisor ad hoc. Localizada por CPF ou nome na interface."
+      dataInclusao:
+        type: "date"
+        required: true
+        generated: true
+        description: "Data em que a pessoa foi incluida no pool de revisores da captacao."
+      areaAtuacao:
+        type: "string"
+        required: true
+        max_length: 200
+        description: "Area de conhecimento considerada para distribuicao das propostas."
+      titulacao:
+        type: "string"
+        required: true
+        max_length: 100
+        description: "Titulacao academica do revisor (ex: Doutor, Mestre)."
+
+  RubricaPermitida:
+    description: "Rubrica autorizada para o orcamento das propostas desta captacao, com limites e orientacoes especificas."
+    extends: "shared.Auditavel"
+    fields:
+      rubrica:
+        type: "ref:corporativo.rubricas.Rubrica"
+        required: true
+        description: "Rubrica do cadastro corporativo M008 autorizada para esta captacao."
+      permiteSubrubricas:
+        type: "boolean"
+        required: true
+        description: "Indica se a rubrica pode possuir subrubricas permitidas na captacao."
+      obrigatoria:
+        type: "boolean"
+        required: true
+        description: "Indica se a proposta deve usar esta rubrica quando informar orcamento."
+      limiteValor:
+        type: "decimal"
+        required: false
+        description: "Valor maximo permitido para a rubrica na captacao."
+        domain: ">= 0"
+      limitePercentual:
+        type: "decimal"
+        required: false
+        description: "Percentual maximo da faixa de financiamento permitido para a rubrica."
+        domain: "0 a 100"
+      comprovantesEsperados:
+        type: "string"
+        required: false
+        max_length: 1000
+        description: "Orientacao de comprovantes esperados para prestacao de contas."
+      restricoes:
+        type: "string"
+        required: false
+        max_length: 1000
+        description: "Exclusoes ou restricoes especificas do edital para esta rubrica."
+      observacao:
+        type: "string"
+        required: false
+        max_length: 500
+        description: "Orientacao de uso da rubrica na captacao."
+      rubricaPai:
+        type: "ref:pre_award.captacao.RubricaPermitida"
+        required: false
+        description: "RubricaPermitida pai quando este registro representa uma subrubrica. Nulo para rubrica raiz."
+      subRubricas:
+        type: "list:ref:pre_award.captacao.RubricaPermitida"
+        required: false
+        description: "Subrubricas permitidas vinculadas a esta rubrica, quando permiteSubrubricas = true."
+      bolsasPermitidas:
+        type: "list:ref:pre_award.captacao.BolsaPermitida"
+        required: false
+        description: "Configuracoes de bolsa habilitadas quando esta rubrica for do tipo Bolsa."
+
+  BolsaPermitida:
+    description: "Versao de nivel de bolsa permitida na captacao, com limites operacionais de cotas e bolsistas."
+    extends: "shared.Auditavel"
+    fields:
+      versaoNivel:
+        type: "ref:corporativo.modalidade_bolsa.VersaoNivel"
+        required: true
+        description: "Versao do nivel de bolsa do M001 permitida nesta captacao."
+      rubricaPermitida:
+        type: "ref:pre_award.captacao.RubricaPermitida"
+        required: true
+        description: "Rubrica Bolsa que habilita a configuracao desta modalidade/nivel."
+      quantidadeCotas:
+        type: "integer"
+        required: true
+        description: "Quantidade de cotas disponiveis para a versao de nivel na captacao."
+        domain: ">= 0"
+      maximoBolsistas:
+        type: "integer"
+        required: true
+        description: "Quantidade maxima de bolsistas que podem usar essa versao de nivel na captacao."
+        domain: ">= 0"
+      obrigatoria:
+        type: "boolean"
+        required: true
+        description: "Indica se a proposta deve usar esta bolsa quando informar orcamento de bolsas."
+      observacao:
+        type: "string"
+        required: false
+        max_length: 500
+        description: "Orientacao de uso da versao de bolsa na captacao."
+
+  DocumentoExigido:
+    description: "Documento exigido do proponente na submissao, com regras de reaproveitamento do cadastro corporativo."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: "string"
+        required: true
+        max_length: 200
+        description: "Nome do documento exigido."
+      descricao:
+        type: "string"
+        required: false
+        max_length: 500
+        description: "Descricao ou orientacao de envio do documento."
+      obrigatorio:
+        type: "boolean"
+        required: true
+        description: "Indica se o documento e obrigatorio na submissao."
+      reutilizarCadastroCorporativo:
+        type: "boolean"
+        required: true
+        description: "Indica se o documento deve ser reaproveitado do cadastro corporativo quando existir e estiver valido."
+      exigirNovoEnvioSeVencido:
+        type: "boolean"
+        required: true
+        description: "Indica se o proponente deve reenviar o documento quando o cadastro corporativo possuir documento vencido ou invalido."
+      formatosPermitidos:
+        type: "list:ref:pre_award.captacao.FormatoArquivo"
+        required: false
+        description: "Formatos de arquivo aceitos para este documento."
+
+  FormatoArquivo:
+    description: "Extensao de arquivo aceita para um DocumentoExigido."
+    extends: null
+    fields:
+      extensao:
+        type: "string"
+        required: true
+        max_length: 20
+        description: "Extensao permitida (ex: PDF, DOCX, XLSX)."
+
+relationships:
+  - from: "pre_award.captacao.Captacao"
+    relation: "configurada por"
+    to: "pre_award.captacao.CronogramaCaptacao"
+    cardinality: "1:1"
+    description: "Cada captacao possui exatamente um cronograma com os 8 periodos obrigatorios."
+  - from: "pre_award.captacao.Captacao"
+    relation: "possui aportes"
+    to: "pre_award.captacao.AporteFinanceiroCaptacao"
+    cardinality: "1:N"
+    description: "A captacao e financiada por um ou mais aportes de programas ou parcerias."
+  - from: "pre_award.captacao.AporteFinanceiroCaptacao"
+    relation: "origem programa"
+    to: "planejamento.programas.Programa"
+    cardinality: "N:1"
+    description: "Aporte oriundo de um Programa (M010). Exclusivo com parceria."
+  - from: "pre_award.captacao.AporteFinanceiroCaptacao"
+    relation: "origem parceria"
+    to: "planejamento.parcerias.Parceria"
+    cardinality: "N:1"
+    description: "Aporte oriundo de uma Parceria (M010). Exclusivo com programa."
+  - from: "pre_award.captacao.Captacao"
+    relation: "possui faixas"
+    to: "pre_award.captacao.FaixaFinanciamento"
+    cardinality: "1:N"
+  - from: "pre_award.captacao.Captacao"
+    relation: "define regra de submissao"
+    to: "pre_award.captacao.RegraSubmissao"
+    cardinality: "1:1"
+  - from: "pre_award.captacao.Captacao"
+    relation: "lista proponentes escolhidos"
+    to: "pre_award.captacao.ProponenteEscolhido"
+    cardinality: "1:N"
+  - from: "pre_award.captacao.Captacao"
+    relation: "define requisito proponente"
+    to: "pre_award.captacao.RequisitoProponente"
+    cardinality: "1:1"
+  - from: "pre_award.captacao.Captacao"
+    relation: "define regra de avaliacao"
+    to: "pre_award.captacao.RegraAvaliacao"
+    cardinality: "1:1"
+  - from: "pre_award.captacao.Captacao"
+    relation: "define prestacao exigida"
+    to: "pre_award.captacao.PrestacaoExigida"
+    cardinality: "1:1"
+  - from: "pre_award.captacao.Captacao"
+    relation: "pool de revisores"
+    to: "pre_award.captacao.RevisorAdHoc"
+    cardinality: "1:N"
+  - from: "pre_award.captacao.Captacao"
+    relation: "rubricas permitidas"
+    to: "pre_award.captacao.RubricaPermitida"
+    cardinality: "1:N"
+  - from: "pre_award.captacao.Captacao"
+    relation: "bolsas permitidas"
+    to: "pre_award.captacao.BolsaPermitida"
+    cardinality: "1:N"
+  - from: "pre_award.captacao.Captacao"
+    relation: "documentos exigidos"
+    to: "pre_award.captacao.DocumentoExigido"
+    cardinality: "1:N"
+  - from: "pre_award.captacao.CronogramaCaptacao"
+    relation: "composta por"
+    to: "pre_award.captacao.PeriodoCronograma"
+    cardinality: "1:8"
+    description: "Exatamente 8 periodos obrigatorios, um por TipoPeriodo, em ordem sequencial."
+  - from: "pre_award.captacao.PeriodoCronograma"
+    relation: "historico de adiamentos"
+    to: "pre_award.captacao.AdiamentoPeriodoCronograma"
+    cardinality: "1:N"
+  - from: "pre_award.captacao.RequisitoProponente"
+    relation: "instituicao direcionada"
+    to: "corporativo.instituicoes.Instituicao"
+    cardinality: "N:1"
+  - from: "pre_award.captacao.RequisitoProponente"
+    relation: "tipo de instituicao"
+    to: "corporativo.instituicoes.TipoInstituicao"
+    cardinality: "N:1"
+  - from: "pre_award.captacao.RequisitoProponente"
+    relation: "nivel academico minimo"
+    to: "corporativo.instituicoes.NivelAcademico"
+    cardinality: "N:1"
+  - from: "pre_award.captacao.ProponenteEscolhido"
+    relation: "instituicao autorizada"
+    to: "corporativo.instituicoes.Instituicao"
+    cardinality: "N:1"
+  - from: "pre_award.captacao.ProponenteEscolhido"
+    relation: "pessoa autorizada"
+    to: "shared.people.PessoaFisica"
+    cardinality: "N:1"
+  - from: "pre_award.captacao.RevisorAdHoc"
+    relation: "e pessoa"
+    to: "shared.people.PessoaFisica"
+    cardinality: "N:1"
+  - from: "pre_award.captacao.RubricaPermitida"
+    relation: "referencia rubrica"
+    to: "corporativo.rubricas.Rubrica"
+    cardinality: "N:1"
+  - from: "pre_award.captacao.RubricaPermitida"
+    relation: "pai de"
+    to: "pre_award.captacao.RubricaPermitida"
+    cardinality: "1:N"
+    description: "Auto-referencia hierarquica para subrubricas."
+  - from: "pre_award.captacao.RubricaPermitida"
+    relation: "habilita bolsas"
+    to: "pre_award.captacao.BolsaPermitida"
+    cardinality: "1:N"
+    description: "Quando a rubrica for do tipo Bolsa, habilita configuracoes de modalidade/nivel."
+  - from: "pre_award.captacao.BolsaPermitida"
+    relation: "referencia versao nivel"
+    to: "corporativo.modalidade_bolsa.VersaoNivel"
+    cardinality: "N:1"
+  - from: "pre_award.captacao.DocumentoExigido"
+    relation: "formatos permitidos"
+    to: "pre_award.captacao.FormatoArquivo"
+    cardinality: "N:N"
+
+axioms:
+  - id: "AX-M011-001"
+    natural_language: "O cronograma de uma captacao deve conter exatamente 8 periodos, um para cada TipoPeriodo obrigatorio, antes da publicacao."
+    formal_rule: "Captacao.estadoConfiguracao = PUBLICADO → |CronogramaCaptacao.periodos| = 8 ∧ ∀t ∈ TipoPeriodo: ∃p ∈ periodos: p.tipo = t"
+  - id: "AX-M011-002"
+    natural_language: "Um AporteFinanceiroCaptacao deve referenciar exatamente uma origem: Programa quando origemTipo = PROGRAMA, Parceria quando origemTipo = PARCERIA."
+    formal_rule: "(origemTipo = PROGRAMA → programa ≠ null ∧ parceria = null) ∧ (origemTipo = PARCERIA → parceria ≠ null ∧ programa = null)"
+  - id: "AX-M011-003"
+    natural_language: "O total dos valorAportado das FaixaFinanciamento nao deve ultrapassar a soma dos valorAportado de todos os AporteFinanceiroCaptacao da captacao."
+    formal_rule: "∑FaixaFinanciamento.valorAportado ≤ ∑AporteFinanceiroCaptacao.valorAportado"
+  - id: "AX-M011-004"
+    natural_language: "Quando tipoCaptacao = DEMANDA_INDUZIDA, o campo outorgadoDestinatario deve ser preenchido."
+    formal_rule: "Captacao.tipoCaptacao = DEMANDA_INDUZIDA → Captacao.outorgadoDestinatario ≠ null"
+  - id: "AX-M011-005"
+    natural_language: "ProponenteEscolhido e usado somente quando RegraSubmissao.submissaoRestritaAEscolhidos = true."
+    formal_rule: "∃ProponenteEscolhido → RegraSubmissao.submissaoRestritaAEscolhidos = true"
+  - id: "AX-M011-006"
+    natural_language: "ProponenteEscolhido deve apontar para exatamente uma Instituicao ou PessoaFisica, nunca ambas ou nenhuma."
+    formal_rule: "(tipo = INSTITUICAO → instituicao ≠ null ∧ pessoa = null) ∧ (tipo = PESSOA → pessoa ≠ null ∧ instituicao = null)"
+  - id: "AX-M011-007"
+    natural_language: "Um adiamento desloca todas as etapas posteriores pelo mesmo numero de dias."
+    formal_rule: "∀p_i: adiado → ∀p_j onde ordem(p_j) > ordem(p_i): p_j.dataInicio += dias ∧ p_j.dataFim += dias"
+  - id: "AX-M011-008"
+    natural_language: "RubricaPermitida que representa subrubrica deve ter rubricaPai preenchido; rubrica raiz tem rubricaPai nulo."
+    formal_rule: "(rubricaPai ≠ null → rubricaPai.permiteSubrubricas = true) ∧ (rubricaPai = null → registro e raiz)"
+  - id: "AX-M011-009"
+    natural_language: "BolsaPermitida so pode ser configurada quando a RubricaPermitida referenciada for do tipo Bolsa."
+    formal_rule: "BolsaPermitida.rubricaPermitida → corporativo.rubricas.Rubrica.tipo = BOLSA"
+  - id: "AX-M011-010"
+    natural_language: "FaixaFinanciamento.valorMaximo deve ser maior ou igual ao valorMinimo."
+    formal_rule: "FaixaFinanciamento.valorMaximo >= FaixaFinanciamento.valorMinimo"
+
+invariants:
+  - id: "INV-M011-001"
+    rule: "PeriodoCronograma.dataFim >= PeriodoCronograma.dataInicio"
+    description: "A data de fim de um periodo deve ser posterior ou igual a data de inicio."
+  - id: "INV-M011-002"
+    rule: "AdiamentoPeriodoCronograma.dias > 0"
+    description: "Um adiamento deve acrescentar pelo menos 1 dia."
+  - id: "INV-M011-003"
+    rule: "AporteFinanceiroCaptacao.valorAportado > 0"
+    description: "O valor aportado deve ser estritamente positivo."
+  - id: "INV-M011-004"
+    rule: "FaixaFinanciamento.duracaoMaximaMeses > 0"
+    description: "A duracao maxima de uma faixa deve ser de pelo menos 1 mes."
+  - id: "INV-M011-005"
+    rule: "RegraAvaliacao.quantidadeMinimaRevisores >= 0"
+    description: "A quantidade minima de revisores nao pode ser negativa."
+  - id: "INV-M011-006"
+    rule: "Captacao.estadoConfiguracao = PUBLICADO → Captacao.linkEdital ≠ null"
+    description: "Uma captacao publicada deve ter o link do edital preenchido."
+  - id: "INV-M011-007"
+    rule: "RubricaPermitida.limitePercentual = null ∨ (RubricaPermitida.limitePercentual >= 0 ∧ RubricaPermitida.limitePercentual <= 100)"
+    description: "O limite percentual de rubrica, quando informado, deve estar entre 0 e 100."
+
+enums:
+  TipoCaptacao:
+    description: "Tipo da captacao de propostas."
+    values:
+      CHAMADA_PUBLICA: "Chamada aberta ao publico para submissao de propostas."
+      DEMANDA_INDUZIDA: "Captacao direcionada a um destinatario especifico pre-definido."
+
+  EstadoConfiguracaoCaptacao:
+    description: "Estado do ciclo de vida da configuracao de uma captacao."
+    values:
+      EM_ANDAMENTO: "Captacao em processo de configuracao, ainda nao publicada."
+      PUBLICADO: "Captacao publicada e disponivel para submissao de propostas."
+      NAO_PUBLICADO: "Captacao despublicada apos ter sido publicada."
+      ENCERRADO: "Captacao encerrada, resultado final publicado."
+
+  TipoPeriodo:
+    description: "Tipo de periodo obrigatorio do cronograma de uma captacao. Os 8 valores definem a ordem sequencial do fluxo."
+    values:
+      PUBLICACAO_CAPTACAO: "Periodo de publicacao da captacao (1o periodo — inicio do fluxo)."
+      RECEBIMENTO_PROPOSTAS: "Periodo de recebimento de propostas dos proponentes (2o periodo)."
+      AVALIACAO_DOCUMENTAL: "Periodo de avaliacao documental das propostas recebidas (3o periodo)."
+      AVALIACAO_AD_HOC: "Periodo de avaliacao ad hoc por revisores especializados (4o periodo)."
+      RESULTADO_PRELIMINAR: "Periodo de divulgacao do resultado preliminar (5o periodo)."
+      RECEBIMENTO_REVISAO: "Periodo de recebimento de pedidos de revisao pelos proponentes (6o periodo)."
+      RESULTADO_APOS_REVISAO: "Periodo de divulgacao do resultado apos analise das revisoes (7o periodo)."
+      RESULTADO_FINAL: "Periodo de divulgacao do resultado final da captacao (8o periodo — fim do fluxo)."
+
+  TipoOrigemAporte:
+    description: "Tipo da origem do aporte financeiro para a captacao."
+    values:
+      PROGRAMA: "Aporte originado de um Programa (M010)."
+      PARCERIA: "Aporte originado de uma Parceria (M010)."
+
+  TipoProponenteEscolhido:
+    description: "Tipo do proponente pre-selecionado para submissao restrita."
+    values:
+      INSTITUICAO: "Proponente do tipo pessoa juridica/instituicao."
+      PESSOA: "Proponente do tipo pessoa fisica."
+
+  TipoDirecionamentoProposta:
+    description: "Define o direcionamento das propostas aceitas pela captacao."
+    values:
+      ABERTA: "Captacao aceita propostas de qualquer proponente habilitado."
+      INSTITUICAO: "Captacao direcionada a uma instituicao especifica."
+      TIPO_INSTITUICAO: "Captacao direcionada a um tipo de instituicao especifico."
+
+value_objects: {}
+
+events:
+  - name: "CaptacaoPublicada"
+    description: "Emitido quando a captacao transita para o estado PUBLICADO."
+    payload_entity: "pre_award.captacao.Captacao"
+    trigger: "Transicao de EM_ANDAMENTO para PUBLICADO com cronograma completo e link do edital preenchido."
+  - name: "CaptacaoEncerrada"
+    description: "Emitido quando a captacao transita para o estado ENCERRADO apos publicacao do resultado final."
+    payload_entity: "pre_award.captacao.Captacao"
+    trigger: "Publicacao do periodo RESULTADO_FINAL e transicao para ENCERRADO."
+  - name: "PeriodoCronogramaAdiado"
+    description: "Emitido quando um periodo do cronograma e adiado e as etapas posteriores sao deslocadas."
+    payload_entity: "pre_award.captacao.AdiamentoPeriodoCronograma"
+    trigger: "Registro de AdiamentoPeriodoCronograma com dias > 0 e justificativa."
+
+workflows:
+  CaptacaoStateMachine:
+    states:
+      - EM_ANDAMENTO
+      - PUBLICADO
+      - NAO_PUBLICADO
+      - ENCERRADO
+    transitions:
+      - from: EM_ANDAMENTO
+        to: PUBLICADO
+        trigger: "publicar"
+        guard: "Cronograma completo (8 periodos), linkEdital preenchido e formularios de submissao/avaliacao/revisao referenciados."
+      - from: PUBLICADO
+        to: NAO_PUBLICADO
+        trigger: "despublicar"
+        guard: "Nenhuma proposta submetida no periodo de recebimento ainda ativo."
+      - from: NAO_PUBLICADO
+        to: PUBLICADO
+        trigger: "republicar"
+        guard: "Ajustes realizados; cronograma e formularios ainda validos."
+      - from: PUBLICADO
+        to: ENCERRADO
+        trigger: "encerrar"
+        guard: "Periodo RESULTADO_FINAL concluido e resultado final publicado."
+
+  CronogramaPeriodosSequencia:
+    description: "Ordem obrigatoria dos 8 TipoPeriodo no fluxo da captacao."
+    states:
+      - PUBLICACAO_CAPTACAO
+      - RECEBIMENTO_PROPOSTAS
+      - AVALIACAO_DOCUMENTAL
+      - AVALIACAO_AD_HOC
+      - RESULTADO_PRELIMINAR
+      - RECEBIMENTO_REVISAO
+      - RESULTADO_APOS_REVISAO
+      - RESULTADO_FINAL
+    transitions:
+      - from: PUBLICACAO_CAPTACAO
+        to: RECEBIMENTO_PROPOSTAS
+        trigger: "inicio recebimento"
+      - from: RECEBIMENTO_PROPOSTAS
+        to: AVALIACAO_DOCUMENTAL
+        trigger: "encerramento recebimento"
+      - from: AVALIACAO_DOCUMENTAL
+        to: AVALIACAO_AD_HOC
+        trigger: "inicio avaliacao ad hoc"
+      - from: AVALIACAO_AD_HOC
+        to: RESULTADO_PRELIMINAR
+        trigger: "publicacao resultado preliminar"
+      - from: RESULTADO_PRELIMINAR
+        to: RECEBIMENTO_REVISAO
+        trigger: "abertura periodo de revisao"
+      - from: RECEBIMENTO_REVISAO
+        to: RESULTADO_APOS_REVISAO
+        trigger: "publicacao resultado apos revisao"
+      - from: RESULTADO_APOS_REVISAO
+        to: RESULTADO_FINAL
+        trigger: "publicacao resultado final"
+
+policies:
+  permissions:
+    GestorFAPES:
+      can:
+        - criar Captacao
+        - editar Captacao em EM_ANDAMENTO
+        - publicar Captacao
+        - despublicar Captacao
+        - encerrar Captacao
+        - adicionar RevisorAdHoc
+        - registrar AdiamentoPeriodoCronograma
+    AnalistaTecnico:
+      can:
+        - visualizar Captacao
+        - configurar CronogramaCaptacao
+        - configurar RubricaPermitida
+        - configurar BolsaPermitida
+        - configurar DocumentoExigido
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "CronogramaCaptacao deve sempre conter exatamente 8 PeriodoCronograma, um por TipoPeriodo, antes da publicacao."
+    - "A ordem dos TipoPeriodo e obrigatoria: PUBLICACAO_CAPTACAO → RECEBIMENTO_PROPOSTAS → AVALIACAO_DOCUMENTAL → AVALIACAO_AD_HOC → RESULTADO_PRELIMINAR → RECEBIMENTO_REVISAO → RESULTADO_APOS_REVISAO → RESULTADO_FINAL."
+    - "AporteFinanceiroCaptacao deve referenciar exatamente um de: Programa (PROGRAMA) ou Parceria (PARCERIA)."
+    - "O total financeiro da captacao e calculado pela soma dos aportes; nao aceitar entrada manual de total."
+    - "ProponenteEscolhido so e valido quando RegraSubmissao.submissaoRestritaAEscolhidos = true."
+    - "BolsaPermitida so pode ser configurada via RubricaPermitida do tipo Bolsa."
+    - "RubricaPermitida auto-referencia hierarquica: rubricaPai = null indica raiz; subrubricas so possiveis quando permiteSubrubricas = true na rubrica pai."
+    - "AdiamentoPeriodoCronograma deve deslocar todas as etapas posteriores pelo mesmo numero de dias."
+    - "Programa, Parceria, AreaTecnica, TipoIniciativa, Instituicao, TipoInstituicao, NivelAcademico, PessoaFisica e Rubrica sao referencias externas — nao modelar aqui."
+    - "Formularios (FormularioSubmissaoRef, FormularioAvaliacaoRef, FormularioRevisaoRef, FormularioAnexoRef) sao referencias ao M021 — apenas formularioId e versaoFormularioId."
+    - "O M022 consome propostas aprovadas desta captacao para contratacao/outorga."
+  notes:
+    - "OutorgadoDestinatario e um espelho desnormalizado de PessoaFisica (M008) para capturar o destinatario da demanda induzida no momento da configuracao."
+    - "CategoriaIniciativa e gerenciada dentro deste modulo e permite selecao multipla no cadastro da captacao."
+    - "Duvida em aberto: validar se todo comprovante deve ser DocumentoExigido ou se parte deles deve ser derivada de RequisitoProponente como evidencia documental de um requisito."

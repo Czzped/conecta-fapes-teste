@@ -1,0 +1,75 @@
+ontology: "Premios e Distincoes"
+namespace: "post_award.curriculo.premios"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: post_award.curriculo
+    path: path: "ontology.yaml"
+metadata:
+  module: "M024"
+  source: "docs/implementation/modules/M024-curriculo-pesquisador/submodelos/08-premios.md"
+  version: "1.0.0"
+  description: "Premios, titulos honorificos e homenagens recebidos pelo pesquisador registrados no curriculo Lattes."
+
+entities:
+  Premio:
+    description: "Premio, titulo honorifico ou homenagem recebido pelo pesquisador; composicao de Curriculo."
+    extends: "shared.Auditavel"
+    fields:
+      curriculoId:
+        type: "Guid"
+        required: true
+        description: "FK para Curriculo ao qual o premio pertence."
+      nome:
+        type: "string"
+        required: true
+        description: "Nome do premio, titulo honorifico ou homenagem."
+        max_length: 300
+      ano:
+        type: "integer"
+        required: true
+        description: "Ano em que o premio foi recebido (4 digitos)."
+      entidadeId:
+        type: "Guid"
+        required: false
+        description: "FK para Instituicao (M008) que conferiu o premio; opcional pois o Lattes pode nao informar entidade concedente identificavel."
+
+relationships:
+  - from: "post_award.curriculo.Curriculo"
+    relation: "possui"
+    to: "post_award.curriculo.premios.Premio"
+    cardinality: "1:N"
+  - from: "post_award.curriculo.premios.Premio"
+    relation: "concedido por"
+    to: "corporativo.instituicoes.Instituicao"
+    cardinality: "N:1"
+    optional: true
+
+axioms:
+  - id: "AX-M024-PR01"
+    natural_language: "Reimportacao apaga todos os Premio anteriores do curriculo e recria a partir do snapshot atual."
+    formal_rule: "ON reimportacao(curriculoId): DELETE Premio WHERE curriculoId = :id THEN INSERT FROM snapshot"
+  - id: "AX-M024-PR02"
+    natural_language: "entidade deve ser criada/associada durante a importacao quando houver entidade concedente identificavel no Lattes."
+    formal_rule: "IF Lattes.entidade IS IDENTIFIABLE => associar Instituicao via M008 match-or-create ELSE entidadeId = NULL"
+
+invariants:
+  - id: "INV-M024-PR01"
+    rule: "Premio.ano >= 1900 AND Premio.ano <= CURRENT_YEAR + 1"
+    description: "Ano do premio deve ser plausivel."
+
+enums: {}
+value_objects: {}
+events: []
+workflows: null
+policies: null
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "Premio e composicao de Curriculo — apagado e recriado na reimportacao."
+    - "entidade e opcional — nao rejeitar importacao por ausencia."
+    - "Um curriculo pode nao possuir premio registrado."
+  notes: []

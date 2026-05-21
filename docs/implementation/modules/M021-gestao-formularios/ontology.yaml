@@ -1,0 +1,35 @@
+ontology: "Gestão de Formulários"
+namespace: "suporte.formularios"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+metadata:
+  module: "M021"
+  source: "stub — no modelo-estrutural.md available"
+  version: "1.0.0"
+  description: "Gestao de formularios dinamicos. Utilizado por M011 (configuracao de captacao) para formularios de submissao e avaliacao de projetos e bolsas."
+  todo: "Complete when modelo-estrutural.md is created"
+entities:
+  todo: "Define when modelo-estrutural.md is available"
+relationships:
+  todo: "Define when modelo-estrutural.md is available"
+axioms:
+  todo: "Define when modelo-estrutural.md is available"
+invariants:
+  todo: "Define when modelo-estrutural.md is available"
+enums: {}
+value_objects: {}
+events:
+  todo: "Define when modelo-estrutural.md is available"
+workflows:
+  todo: "Define when modelo-estrutural.md is available"
+policies:
+  todo: "Define when modelo-estrutural.md is available"
+
+agent_instructions:
+  rules:
+    - "Este módulo é stub. Não gerar implementações sem modelo-estrutural.md."
+    - "Consultar arquitetura em docs/architecture/02-modulos-e-integracoes.md."
+  notes:
+    - "Gestão de formulários dinâmicos."
+    - "Usado por M011 (captacao) para formulários de submissão e avaliação."

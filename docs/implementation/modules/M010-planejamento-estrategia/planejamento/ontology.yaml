@@ -1,0 +1,162 @@
+ontology: "Planejamento Estrategico — Plano e Eixos"
+namespace: "planejamento.estrategia"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: shared.people
+    path: path: "../../../ontology/shared/people.yaml"
+  - namespace: corporativo.instituicoes
+    path: path: "../../M008-cadastros-corporativos/instituicoes/ontology.yaml"
+metadata:
+  module: "M010"
+  source: "docs/implementation/modules/M010-planejamento-estrategia/planejamento/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Define o Plano Estrategico e seus Eixos Estrategicos que orientam a criacao de Programas de fomento."
+
+entities:
+  PlanoEstrategico:
+    description: "Plano estrategico da agencia de fomento, com vigencia definida, composto por eixos estrategicos que orientam programas."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: "string"
+        required: true
+        description: "Nome do plano estrategico (ex: Plano Estrategico 2024-2027). Unico."
+        max_length: 300
+        unique: true
+      descricao:
+        type: "string"
+        required: true
+        description: "Descricao dos objetivos do plano."
+        max_length: 2000
+      dataInicio:
+        type: "date"
+        required: true
+        description: "Data de inicio da vigencia do plano."
+      dataFim:
+        type: "date"
+        required: true
+        description: "Data de fim da vigencia do plano."
+      estado:
+        type: "enum:EstadoPlanoEstrategico"
+        required: true
+        description: "Estado do planejamento estrategico."
+
+  EixoEstrategico:
+    description: "Eixo tematico que agrupa Programas dentro de um Plano Estrategico. Pertence a exatamente um plano (RN08)."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: "string"
+        required: true
+        description: "Nome do eixo estrategico (ex: Formacao de Recursos Humanos)."
+        max_length: 300
+      descricao:
+        type: "string"
+        required: true
+        description: "Descricao do escopo e objetivos do eixo."
+        max_length: 2000
+      planoEstrategico:
+        type: "ref:planejamento.estrategia.PlanoEstrategico"
+        required: true
+        description: "Plano estrategico ao qual este eixo pertence (RN08)."
+
+relationships:
+  - from: "planejamento.estrategia.PlanoEstrategico"
+    relation: "possui_eixos"
+    to: "planejamento.estrategia.EixoEstrategico"
+    cardinality: "1:N"
+    description: "Um PlanoEstrategico possui um ou mais EixoEstrategico."
+  - from: "planejamento.estrategia.EixoEstrategico"
+    relation: "orienta"
+    to: "planejamento.programas.Programa"
+    cardinality: "N:N"
+    description: "Um EixoEstrategico orienta zero ou mais Programas; um Programa deve estar vinculado a pelo menos um eixo (RN01)."
+
+axioms:
+  - id: "AX-M010-RN08"
+    natural_language: "Um eixo estrategico pertence a exatamente um plano estrategico."
+    formal_rule: "∀e ∈ EixoEstrategico: ∃!p ∈ PlanoEstrategico: e.planoEstrategico = p"
+  - id: "AX-M010-RN09"
+    natural_language: "Um plano estrategico possui vigencia definida (data inicio e fim); so pode haver um plano ativo por vez."
+    formal_rule: "COUNT(PlanoEstrategico WHERE estado = 'Ativo') <= 1"
+  - id: "AX-M010-RN01"
+    natural_language: "Um programa deve estar vinculado a pelo menos um eixo estrategico."
+    formal_rule: "∀p ∈ Programa: COUNT(EixoEstrategico orienta p) >= 1"
+
+invariants:
+  - id: "INV-M010-PLAN-01"
+    rule: "PlanoEstrategico.dataFim > PlanoEstrategico.dataInicio"
+    description: "A data de fim do plano deve ser posterior a data de inicio."
+  - id: "INV-M010-PLAN-02"
+    rule: "COUNT(PlanoEstrategico WHERE estado = 'Ativo') <= 1"
+    description: "No maximo um plano estrategico pode estar ativo ao mesmo tempo (RN09)."
+
+enums:
+  EstadoPlanoEstrategico:
+    description: "Estado do ciclo de vida do plano estrategico."
+    values:
+      EmElaboracao: "Plano em elaboracao, ainda nao publicado."
+      Ativo: "Plano vigente e em execucao."
+      Encerrado: "Plano encerrado ao fim de sua vigencia."
+
+value_objects: {}
+
+events:
+  - name: "PlanoEstrategicoAtivado"
+    description: "Emitido quando PlanoEstrategico transita para Ativo."
+    payload_entity: "planejamento.estrategia.PlanoEstrategico"
+    trigger: "state_transition.Ativo"
+  - name: "PlanoEstrategicoEncerrado"
+    description: "Emitido quando PlanoEstrategico transita para Encerrado."
+    payload_entity: "planejamento.estrategia.PlanoEstrategico"
+    trigger: "state_transition.Encerrado"
+
+workflows:
+  PlanoEstrategico:
+    states:
+      - EmElaboracao
+      - Ativo
+      - Encerrado
+    transitions:
+      - from: EmElaboracao
+        to: Ativo
+        trigger: "ativar_plano"
+        guard: "dataInicio preenchida AND dataFim preenchida AND COUNT(EixoEstrategico) >= 1 AND COUNT(PlanoEstrategico WHERE estado = 'Ativo') = 0"
+      - from: Ativo
+        to: Encerrado
+        trigger: "encerrar_plano"
+        guard: "justificativa preenchida"
+      - from: EmElaboracao
+        to: Encerrado
+        trigger: "encerrar_plano_sem_ativar"
+        guard: "justificativa preenchida"
+
+policies:
+  permissions:
+    DiretoriaAgenciaFomento:
+      can:
+        - criar_plano_estrategico
+        - editar_plano_estrategico
+        - ativar_plano_estrategico
+        - encerrar_plano_estrategico
+        - criar_eixo_estrategico
+        - editar_eixo_estrategico
+        - remover_eixo_estrategico
+    ServidorAreaTecnica:
+      can:
+        - visualizar_plano_estrategico
+        - visualizar_eixo_estrategico
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "Ao ativar um plano, verificar que nenhum outro plano esta ativo (RN09)."
+    - "EixoEstrategico pertence a exatamente um PlanoEstrategico (RN08); nao admitir eixo sem plano."
+    - "Os indicadores de dashboard sao calculados dinamicamente a partir dos Programas vinculados; nao persistir no EixoEstrategico."
+    - "O Planejamento nao duplica dados do Programa; apenas consulta e consolida."
+  notes:
+    - "Programa e entidade externa definida em planejamento.programas; a relacao de orientacao (N:N) e gerida em programas.yaml."
+    - "Indicadores derivados para dashboard nao sao atributos persistidos do Eixo."

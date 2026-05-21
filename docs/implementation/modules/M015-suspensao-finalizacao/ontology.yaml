@@ -1,0 +1,47 @@
+ontology: "Suspensão e Finalização de Projetos"
+namespace: "post_award.suspensao"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: post_award.iniciativas
+    path: path: "../M003-gestao-iniciativas-captadas/ontology.yaml"
+metadata:
+  module: "M015"
+  source: "stub — no modelo-estrutural.md available"
+  version: "1.0.0"
+  description: "Gerencia suspensão, reativação e finalização de projetos."
+  todo: "Complete when modelo-estrutural.md is created"
+
+entities:
+  todo: "Define when modelo-estrutural.md is available"
+
+relationships:
+  todo: "Define when modelo-estrutural.md is available"
+
+axioms:
+  todo: "Define when modelo-estrutural.md is available"
+
+invariants:
+  todo: "Define when modelo-estrutural.md is available"
+
+enums: {}
+
+value_objects: {}
+
+events:
+  todo: "Define when modelo-estrutural.md is available"
+
+workflows:
+  todo: "Expected: suspension/reactivation/finalization state machines"
+
+policies:
+  todo: "Define when modelo-estrutural.md is available"
+
+agent_instructions:
+  rules:
+    - "Este módulo é stub. Não gerar implementações sem modelo-estrutural.md."
+  notes:
+    - "Gerencia suspensão e finalização de Iniciativas/Projetos do M003."
+    - "Workflows esperados: suspender, reativar, finalizar, encerrar."
+    - "M015 é o módulo dono das transições SUSPENSA → EM_EXECUCAO, EM_EXECUCAO → CONCLUIDA e SUSPENSA → CONCLUIDA em post_award.iniciativas.Iniciativa."
+    - "M015 deve registrar EstagioCicloFomento com marcos SUSPENSA, EM_APROVACAO_CONTAS e CONCLUIDO com moduloOrigem = M015."

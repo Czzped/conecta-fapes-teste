@@ -1,0 +1,110 @@
+ontology: "Rubricas"
+namespace: "corporativo.rubricas"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: shared.classifications
+    path: path: "../../../ontology/shared/classifications.yaml"
+metadata:
+  module: "M008"
+  source: "docs/implementation/modules/M008-cadastros-corporativos/rubricas/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Catalogo corporativo de rubricas orcamentarias para classificacao normativa de despesas, com suporte a hierarquia via rubricaPai/subrubricas."
+
+entities:
+  Rubrica:
+    description: "Categoria normativa e orcamentaria para classificacao de despesas. Subrubrica e uma Rubrica filha de outra Rubrica (via rubricaPai), nao e entidade separada. Movimentos de saldo nao pertencem a este catalogo — pertencem ao M013."
+    extends: null
+    fields:
+      codigo:
+        type: "string"
+        required: true
+        description: "Codigo canonico da rubrica (ex: RUB-DIARIAS). Unico."
+        max_length: 40
+        unique: true
+      nome:
+        type: "string"
+        required: true
+        description: "Nome de exibicao da rubrica (ex: Diarias)."
+        max_length: 150
+      descricao:
+        type: "string"
+        required: true
+        description: "Descricao da rubrica."
+        max_length: 500
+      naturezaDespesa:
+        type: "enum:NaturezaDespesa"
+        required: true
+        description: "Natureza da despesa: CUSTEIO ou CAPITAL."
+      ativa:
+        type: "boolean"
+        required: true
+        description: "Indica se a rubrica esta ativa para uso em novos lancamentos."
+      rubricaPai:
+        type: "ref:corporativo.rubricas.Rubrica"
+        required: false
+        description: "Rubrica superior quando esta rubrica representar detalhamento/subrubrica. Nulo indica rubrica raiz."
+      subrubricas:
+        type: "ref:corporativo.rubricas.Rubrica"
+        required: false
+        description: "Rubricas filhas que detalham esta rubrica (via rubricaPai)."
+        cardinality: "1:N"
+
+  NaturezaDespesa:
+    description: "Enumeracao que classifica a natureza da despesa associada a uma Rubrica."
+    extends: null
+    fields:
+      todo: "needs clarification"
+      note: "NaturezaDespesa e modelada como enum — ver secao enums. Esta entrada existe apenas para referencia estrutural."
+
+relationships:
+  - from: "corporativo.rubricas.Rubrica"
+    relation: "e pai de"
+    to: "corporativo.rubricas.Rubrica"
+    cardinality: "1:N"
+    description: "Uma Rubrica pode ser pai de multiplas subrubricas. Subrubrica nao e entidade separada — e uma Rubrica com rubricaPai preenchido."
+
+axioms:
+  - id: "AX001"
+    natural_language: "Rubrica e categoria normativa/orcamentaria, nao transacao. Movimentacao de saldo pertence ao M013 como Transacao."
+    formal_rule: "Rubrica NOT_CONTAINS saldo OR transacoes"
+  - id: "AX002"
+    natural_language: "Subrubrica e uma Rubrica filha de outra Rubrica via rubricaPai; nao existe entidade separada Subrubrica."
+    formal_rule: "Subrubrica IS Rubrica WHERE rubricaPai IS NOT NULL"
+  - id: "AX003"
+    natural_language: "Toda Rubrica deve ter codigo unico."
+    formal_rule: "UNIQUE(Rubrica.codigo)"
+
+invariants:
+  - id: "INV001"
+    rule: "Rubrica.rubricaPai != Rubrica.self"
+    description: "Uma Rubrica nao pode ser pai de si mesma."
+  - id: "INV002"
+    rule: "NOT EXISTS ciclo em grafo de Rubrica.rubricaPai"
+    description: "A hierarquia de rubricas nao pode conter ciclos — deve ser uma arvore."
+
+enums:
+  NaturezaDespesa:
+    description: "Natureza da despesa associada a uma Rubrica, segundo classificacao orcamentaria."
+    values:
+      CUSTEIO: "Despesas de custeio: gastos operacionais e de manutencao (ex: diarias, passagens, servicos)."
+      CAPITAL: "Despesas de capital: investimentos em bens permanentes ou obras (ex: equipamentos, construcoes)."
+
+value_objects: {}
+events: []
+workflows: null
+policies: null
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "Rubrica e dado mestre de classificacao; movimentos de saldo pertencem ao M013 como Transacao."
+    - "Pagamentos e movimentos bancarios pertencem a M014/M016 e apenas referenciam Rubrica quando aplicavel."
+    - "Subrubrica nao e entidade separada — modelar como Rubrica com rubricaPai preenchido."
+    - "Nao permitir ciclos na hierarquia de rubricas."
+    - "codigo da Rubrica e imutavel apos criacao."
+  notes:
+    - "NaturezaDespesa e enum — valores validos: CUSTEIO e CAPITAL."
+    - "A hierarquia de rubricas deve ser uma arvore (sem multiplos pais)."

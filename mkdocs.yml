@@ -562,5 +562,31 @@ nav:
       - SPRINT-006: management/sprints/SPRINT-006.md
       - SPRINT-007: management/sprints/SPRINT-007.md
 
+  - Ontologia:
+      - ontology/README.md
+      - Shared:
+          - Base: ontology/shared/base.md
+          - Pessoas: ontology/shared/people.md
+          - Geografia: ontology/shared/geography.md
+          - Classificacoes: ontology/shared/classifications.md
+          - Documentos: ontology/shared/documents.md
+      - Workflows:
+          - Ciclo de Fomento: ontology/workflows/ciclo_fomento.md
+          - Pagamento: ontology/workflows/pagamento.md
+          - Prestacao de Contas: ontology/workflows/prestacao_contas.md
+          - Gestao de Bolsista: ontology/workflows/gestao_bolsista.md
+          - Contratacao: ontology/workflows/contratacao.md
+      - Policies:
+          - Controle de Acesso: ontology/policies/access_control.md
+          - Compliance: ontology/policies/compliance.md
+      - Integracoes:
+          - SIGFAPES: ontology/integrations/sigfapes.md
+          - Acesso Cidadao: ontology/integrations/acesso_cidadao.md
+          - OpenFGA: ontology/integrations/openfga.md
+          - Banestes: ontology/integrations/banestes.md
+          - EDOCS: ontology/integrations/edocs.md
+          - SERPRO: ontology/integrations/serpro.md
+          - Lattes: ontology/integrations/lattes.md
+
   - Agentes e Skills:
       - agentes/README.md

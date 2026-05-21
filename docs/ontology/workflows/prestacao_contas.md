@@ -1,0 +1,207 @@
+# Workflow — Prestacao de Contas
+
+```yaml
+ontology: "Workflow de Prestação de Contas — ConectaFAPES"
+namespace: "workflows.prestacao_contas"
+
+imports:
+  - namespace: "financeiro.prestacao_contas"
+    path: "../../implementation/modules/M014-prestacao-contas/ontology.yaml"
+  - namespace: "post_award.iniciativas"
+    path: "../../implementation/modules/M003-gestao-iniciativas-captadas/ontology.yaml"
+  - namespace: "financeiro.saldo"
+    path: "../../implementation/modules/M013-gestao-orcamentaria-projeto/ontology.yaml"
+
+metadata:
+  type: "cross-cutting-workflow"
+  version: "1.0.0"
+  description: "Fluxo de prestação de contas financeiras: classificação de transações, validação de notas fiscais e análise pela FAPES."
+  modules_involved: [M014, M003, M013]
+
+workflows:
+  PrestacaoContas:
+    description: "Ciclo de vida de uma PrestacaoContas, desde rascunho até aprovação ou negação."
+    entity: "financeiro.prestacao_contas.PrestacaoContas"
+    initial_state: "RASCUNHO"
+    final_states: [FINALIZADO, NEGADO]
+
+    states:
+      - name: "RASCUNHO"
+        description: "Prestação em elaboração pelo coordenador; transações sendo classificadas."
+      - name: "EM_ANALISE"
+        description: "Submetida para análise pela equipe técnica da FAPES."
+      - name: "REVISAO"
+        description: "Devolvida ao coordenador para complementação ou correção."
+      - name: "FINALIZADO"
+        description: "Prestação aprovada; contas consideradas quitadas para o período."
+      - name: "NEGADO"
+        description: "Prestação reprovada; pode gerar pendência para a iniciativa."
+
+    transitions:
+      - from: "RASCUNHO"
+        to: "EM_ANALISE"
+        trigger: "submeter_prestacao"
+        guard: "todas_transacoes_classificadas == true AND nfs_validadas == true"
+        module: "M014"
+        event_emitted: "PrestacaoSubmetida"
+
+      - from: "EM_ANALISE"
+        to: "FINALIZADO"
+        trigger: "aprovar_prestacao"
+        guard: "role == GestorFinanceiro OR role == CoordenadorAreaTecnica"
+        module: "M014"
+        event_emitted: "PrestacaoAprovada"
+
+      - from: "EM_ANALISE"
+        to: "REVISAO"
+        trigger: "devolver_para_revisao"
+        guard: "role == GestorFinanceiro OR role == CoordenadorAreaTecnica"
+        module: "M014"
+        event_emitted: "PrestacaoDevolvida"
+
+      - from: "REVISAO"
+        to: "EM_ANALISE"
+        trigger: "resubmeter_prestacao"
+        guard: "pendencias_sanadas == true"
+        module: "M014"
+
+      - from: "EM_ANALISE"
+        to: "NEGADO"
+        trigger: "negar_prestacao"
+        guard: "role == GestorFinanceiro"
+        module: "M014"
+        event_emitted: "PrestacaoNegada"
+
+  ClassificacaoTransacao:
+    description: "Classificação de uma TransacaoFinanceira importada do extrato bancário."
+    entity: "financeiro.prestacao_contas.TransacaoFinanceira"
+    initial_state: "PENDENTE_CLASSIFICACAO"
+    final_states: [DESPESA, ESTORNO, RENDIMENTO, DESCARTADA]
+
+    states:
+      - name: "PENDENTE_CLASSIFICACAO"
+        description: "Transação importada do extrato; aguardando classificação pelo coordenador."
+      - name: "DESPESA"
+        description: "Classificada como despesa; requer comprovante (NF-e ou recibo)."
+      - name: "ESTORNO"
+        description: "Classificada como estorno de pagamento anterior."
+      - name: "RENDIMENTO"
+        description: "Classificada como rendimento de aplicação financeira."
+      - name: "DESCARTADA"
+        description: "Transação descartada (duplicata ou erro de importação)."
+
+    transitions:
+      - from: "PENDENTE_CLASSIFICACAO"
+        to: "DESPESA"
+        trigger: "classificar_como_despesa"
+        guard: "role == Coordenador AND comprovante_anexado == true"
+        module: "M014"
+
+      - from: "PENDENTE_CLASSIFICACAO"
+        to: "ESTORNO"
+        trigger: "classificar_como_estorno"
+        guard: "role == Coordenador AND transacao_origem_identificada == true"
+        module: "M014"
+
+      - from: "PENDENTE_CLASSIFICACAO"
+        to: "RENDIMENTO"
+        trigger: "classificar_como_rendimento"
+        guard: "role == Coordenador"
+        module: "M014"
+
+      - from: "PENDENTE_CLASSIFICACAO"
+        to: "DESCARTADA"
+        trigger: "descartar_transacao"
+        guard: "role == Coordenador AND justificativa_descarte != null"
+        module: "M014"
+
+      - from: "DESPESA"
+        to: "PENDENTE_CLASSIFICACAO"
+        trigger: "reclassificar_transacao"
+        guard: "prestacao.status == RASCUNHO OR prestacao.status == REVISAO"
+        module: "M014"
+
+  ValidacaoNF:
+    description: "Validação de Nota Fiscal Eletrônica via SERPRO para justificativa de despesa."
+    entity: "financeiro.prestacao_contas.JustificativaNF"
+    initial_state: "PENDENTE_VALIDACAO"
+    final_states: [APROVADA, REPROVADA]
+
+    states:
+      - name: "PENDENTE_VALIDACAO"
+        description: "NF-e submetida; aguardando consulta ao SERPRO."
+      - name: "EM_VALIDACAO"
+        description: "Consulta ao SERPRO em andamento."
+      - name: "APROVADA"
+        description: "NF-e válida confirmada pelo SERPRO; despesa aceita."
+      - name: "REPROVADA"
+        description: "NF-e inválida ou inexistente; despesa não aceita."
+
+    transitions:
+      - from: "PENDENTE_VALIDACAO"
+        to: "EM_VALIDACAO"
+        trigger: "iniciar_validacao_serpro"
+        guard: "chave_nfe != null AND formato_chave_valido == true"
+        module: "M014"
+        integration: "integrations.serpro"
+
+      - from: "EM_VALIDACAO"
+        to: "APROVADA"
+        trigger: "serpro_retornou_valida"
+        guard: "serpro_response.situacao == AUTORIZADA"
+        module: "M014"
+        integration: "integrations.serpro"
+
+      - from: "EM_VALIDACAO"
+        to: "REPROVADA"
+        trigger: "serpro_retornou_invalida"
+        guard: "serpro_response.situacao != AUTORIZADA"
+        module: "M014"
+        integration: "integrations.serpro"
+
+      - from: "REPROVADA"
+        to: "PENDENTE_VALIDACAO"
+        trigger: "resubmeter_nf"
+        guard: "prestacao.status == RASCUNHO OR prestacao.status == REVISAO"
+        module: "M014"
+
+events:
+  - name: "PrestacaoSubmetida"
+    description: "Prestação de contas submetida para análise pela FAPES."
+    source_module: "M014"
+    payload: "financeiro.prestacao_contas.PrestacaoContas"
+
+  - name: "PrestacaoAprovada"
+    description: "Prestação aprovada; período financeiro considerado quitado."
+    source_module: "M014"
+    payload: "financeiro.prestacao_contas.PrestacaoContas"
+
+  - name: "PrestacaoDevolvida"
+    description: "Prestação devolvida ao coordenador para revisão."
+    source_module: "M014"
+    payload: "financeiro.prestacao_contas.PrestacaoContas"
+
+  - name: "PrestacaoNegada"
+    description: "Prestação reprovada; pode gerar pendência ou suspensão da iniciativa."
+    source_module: "M014"
+    payload: "financeiro.prestacao_contas.PrestacaoContas"
+
+  - name: "NFValidadaSERPRO"
+    description: "Nota fiscal validada com sucesso pelo SERPRO."
+    source_module: "M014"
+    payload: "financeiro.prestacao_contas.JustificativaNF"
+
+agent_instructions:
+  rules:
+    - "Não criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms definidos nos módulos de domínio."
+    - "Submissão da prestação só é permitida quando todas as TransacaoFinanceira do período estão classificadas."
+    - "Toda TransacaoFinanceira classificada como DESPESA deve ter JustificativaNF com status APROVADA."
+    - "Validação SERPRO é obrigatória para NF-e; outros comprovantes (recibos) têm fluxo alternativo."
+    - "PrestacaoNegada pode desencadear suspensão da Iniciativa (M003) — verificar regra de negócio."
+  notes:
+    - "AML (M017) monitora TransacaoFinanceira em paralelo ao fluxo de prestação de contas."
+    - "Integração com SERPRO detalhada em integrations/serpro.yaml."
+    - "Extrato bancário importado via integração com Banestes (integrations/banestes.yaml)."
+
+```

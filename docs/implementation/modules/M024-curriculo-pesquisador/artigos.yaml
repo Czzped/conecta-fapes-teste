@@ -1,0 +1,109 @@
+ontology: "Artigos e Periodicos"
+namespace: "post_award.curriculo.artigos"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: post_award.curriculo
+    path: path: "ontology.yaml"
+metadata:
+  module: "M024"
+  source: "docs/implementation/modules/M024-curriculo-pesquisador/submodelos/03-artigos.md"
+  version: "1.0.0"
+  description: "Producao bibliografica do pesquisador em periodicos e anais; artigos sao entidades compartilhadas que podem aparecer em multiplos curriculos."
+
+entities:
+  Artigo:
+    description: "Artigo publicado em periodico ou anais de conferencia; pode ser compartilhado entre curriculos de coautores, deduplicado por doi ou (titulo, ano, periodico)."
+    extends: "shared.Auditavel"
+    fields:
+      titulo:
+        type: "string"
+        required: true
+        description: "Titulo do artigo publicado."
+        max_length: 500
+      doi:
+        type: "string"
+        required: false
+        description: "Digital Object Identifier do artigo — chave de deduplicacao preferencial quando disponivel."
+        max_length: 100
+      ano:
+        type: "integer"
+        required: true
+        description: "Ano de publicacao (4 digitos)."
+      periodicoId:
+        type: "Guid"
+        required: true
+        description: "FK para Periodico que publicou o artigo."
+
+  Periodico:
+    description: "Periodico ou anais de conferencia; cadastro compartilhado deduplicado por issn ou nome normalizado."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: "string"
+        required: true
+        description: "Nome do periodico ou anais de conferencia."
+        max_length: 300
+      issn:
+        type: "string"
+        required: false
+        description: "Identificador internacional do periodico — chave de deduplicacao preferencial quando disponivel."
+        max_length: 20
+        unique: true
+      qualis:
+        type: "string"
+        required: false
+        description: "Estrato Qualis CAPES do periodico (A1, A2, A3, A4, B1, B2, B3, B4, C); vazio quando indisponivel."
+        max_length: 5
+
+relationships:
+  - from: "post_award.curriculo.Curriculo"
+    relation: "produz artigos"
+    to: "post_award.curriculo.artigos.Artigo"
+    cardinality: "N:N"
+    note: "Vinculo curriculo-artigo e apagado e recriado na reimportacao; o registro de Artigo permanece se vinculado a outro curriculo."
+  - from: "post_award.curriculo.artigos.Artigo"
+    relation: "publicado em"
+    to: "post_award.curriculo.artigos.Periodico"
+    cardinality: "N:1"
+  - from: "post_award.curriculo.artigos.Artigo"
+    relation: "autores"
+    to: "shared.people.PessoaFisica"
+    cardinality: "N:N"
+    note: "Match best-effort via M008 durante importacao Lattes."
+
+axioms:
+  - id: "AX-M024-A01"
+    natural_language: "Reimportacao apaga os vinculos Curriculo x Artigo do curriculo sincronizado e recria a partir do snapshot; o registro de Artigo nao e apagado se vinculado a outro curriculo."
+    formal_rule: "ON reimportacao(curriculoId): DELETE CurriculoArtigo WHERE curriculoId = :id THEN INSERT FROM snapshot; DELETE Artigo WHERE id NOT IN (SELECT artigoId FROM CurriculoArtigo)"
+  - id: "AX-M024-A02"
+    natural_language: "Periodico.issn e a chave de deduplicacao preferencial; quando ausente, M024 usa nome normalizado."
+    formal_rule: "DEDUP Periodico BY issn WHEN NOT NULL ELSE BY normalize(nome)"
+  - id: "AX-M024-A03"
+    natural_language: "Artigo.doi e a chave de deduplicacao preferencial; quando ausente, M024 usa (titulo, ano, periodico)."
+    formal_rule: "DEDUP Artigo BY doi WHEN NOT NULL ELSE BY (normalize(titulo), ano, periodicoId)"
+
+invariants:
+  - id: "INV-M024-A01"
+    rule: "Artigo.ano >= 1900 AND Artigo.ano <= CURRENT_YEAR + 1"
+    description: "Ano de publicacao deve ser plausivel."
+  - id: "INV-M024-A02"
+    rule: "Artigo.periodicoId IS NOT NULL"
+    description: "Todo artigo deve estar associado a um periodico."
+
+enums: {}
+value_objects: {}
+events: []
+workflows: null
+policies: null
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementacao deve seguir workflows definidos."
+    - "Artigo e entidade compartilhada — pode pertencer a multiplos curriculos; nao apagar se ainda referenciado."
+    - "Periodico e cadastro compartilhado — nao e composicao de Curriculo."
+    - "qualis nao e dado canonico do Lattes; deixar vazio quando indisponivel."
+  notes:
+    - "Artigos sustentam o filtro producaoMinima usado por M011 na selecao de pareceristas Ad Hoc."
