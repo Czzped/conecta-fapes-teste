@@ -38,6 +38,57 @@ Todo Programa possui exatamente uma Instituicao demandante, deve estar vinculado
 | Encerrar ou remover Programa | Remocao sem impacto quando nao ha Iniciativa vinculada; encerramento preserva historico quando ha execucao. |
 | Acompanhar Programa | Dashboard consolida estado, aportes, eixos, comite, editais e iniciativas. |
 
+---
+
+## Fluxo Financeiro
+
+O recurso no nivel do Programa percorre tres camadas. Cada camada tem conceito, formula e dono distintos.
+
+### 1. Entrada — AporteFinanceiroParceriaPrograma
+
+Uma ou mais Parcerias alocam recursos no Programa via entidade N:N `AporteFinanceiroParceriaPrograma`. O Programa **nao recalcula** Taxa de Gestao de Parcerias — ela ja foi calculada e deduzida na Parceria antes da alocacao (RN20, RN21).
+
+```
+valorAlocado = SUM(AporteFinanceiroParceriaPrograma.valor WHERE programa = this AND estado = 'ATIVO')
+```
+
+Regras de registro: Parceria deve estar `Vigente` (RN11); valor `>= 0`, negativo rejeitado (RN11); datas do Programa devem caber na vigencia de todas as Parcerias aportantes (RN13).
+
+### Retirada de Aporte
+
+Um `AporteFinanceiroParceriaPrograma` pode transitar para `RETIRADO` quando ainda nao houve alocacao operacional comprometida. Ao ser retirado:
+- Deixa de compor `valorAlocado` do Programa
+- Devolve o valor ao `saldoAlocavelEmProgramas` da Parceria de origem (RN14)
+- Exige `dataRetirada` e `justificativaRetirada`
+
+### 2. Saldo Disponivel do Programa
+
+```
+saldoDisponivelPrograma = valorAlocado - valorConsumido
+```
+
+Invariante: sempre `>= 0`.
+
+### 3. Execucao — Consumido pelas Iniciativas
+
+A execucao ocorre nas **Iniciativas (projetos)** vinculadas a este Programa — inclui projetos de **demanda induzida** e qualquer projeto ligado ao Programa.
+
+```
+valorConsumido = SUM(Iniciativa.valorExecutado WHERE Iniciativa.programa = this)
+```
+
+`valorExecutado` e calculado por M003 a partir das movimentacoes registradas em M014 (pagamentos, compromissos reconhecidos). O Programa nao armazena `valorConsumido` diretamente — acessa via consolidacao M003/M014.
+
+### Termos canonicos
+
+| Conceito | Definicao | Nao usar |
+|----------|-----------|----------|
+| `valorAlocado` | SUM dos AportesFinanceiroParceriaPrograma ATIVOS neste Programa | "recebido", "investido" |
+| `valorConsumido` | Consolidacao do executado nas Iniciativas ligadas ao Programa (M003/M014) | "pago", "executado" |
+| `saldoDisponivelPrograma` | valorAlocado - valorConsumido | "saldo livre", "saldo nao executado" |
+
+---
+
 ## Regras de Negocio
 
 As regras oficiais ficam centralizadas em [M010 — Regras de Negocio](../README.md#regras-de-negocio-consolidadas). Este subdominio referencia principalmente: `RN01`, `RN02`, `RN11`, `RN13`, `RN14`, `RN16`, `RI1`, `RI2`, `RI4`.

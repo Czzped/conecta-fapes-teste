@@ -110,7 +110,7 @@ classDiagram
 | Valor investido | Valor recebido pela Parceria a partir da Instituicao vinculada. | `AporteFinanceiro.valorInvestido` |
 | Valor alocado | Parcela do valor investido reservada para um Programa. | `AporteFinanceiroParceriaPrograma.valor` |
 | Valor aportado | Parcela da alocacao efetivamente disponibilizada para Programas, Rubricas ou Iniciativas. | Consolidacao M010/M003 |
-| Valor consumido | Parcela da alocacao ja comprometida ou utilizada pelas Iniciativas, incluindo pagamentos e compromissos reconhecidos. | M003 alimentado por M014 |
+| Valor consumido | Consolidacao dos valores efetivamente executados nas Iniciativas (projetos) vinculadas aos Programas aportados por esta Parceria — inclui projetos de demanda induzida e projetos ligados a Programas. Calculado por M003 a partir de pagamentos e compromissos registrados em M014. Parceria nao armazena diretamente; acessa via consolidacao. | M003 + M014 |
 | Valor da Taxa de Gestao de Parcerias | Percentual calculado uma unica vez por AporteFinanceiro, conforme PoliticaTaxaGestaoParcerias parametrizada no M016 (Resolucao CCAF 334/2023). Nao compoe saldo alocavel em Programas. | M010/M016 |
 | Saldo alocavel em Programas | No nivel da Parceria: `valorBrutoRecebido - valorTaxaGestao - valorAlocadoEmProgramas`. No nivel de Programa/Rubrica: `valorAlocado - valorConsumido`. | Derivado |
 

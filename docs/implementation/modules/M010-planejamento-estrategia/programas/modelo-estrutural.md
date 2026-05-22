@@ -118,9 +118,19 @@ Leitura da relacao `demandadoPor`: uma Instituicao pode demandar zero ou muitos 
 | | dataRetirada | Data em que o aporte foi retirado do Programa | Condicional | Date | Obrigatorio quando `estado = RETIRADO` | | |
 | | justificativaRetirada | Motivo da retirada do aporte do Programa | Condicional | String | Obrigatorio quando `estado = RETIRADO` | 1000 | |
 
+## Conceitos Financeiros Normalizados
+
+| Conceito | Definicao | Fonte |
+|----------|-----------|-------|
+| Valor alocado | SUM dos AportesFinanceiroParceriaPrograma em estado ATIVO destinados a este Programa. Taxa de Gestao de Parcerias ja foi deduzida na Parceria antes desta alocacao — Programa nao recalcula (RN20). | `AporteFinanceiroParceriaPrograma.valor[ATIVO]` |
+| Valor consumido | Consolidacao dos valores executados nas Iniciativas (projetos) vinculadas a este Programa — inclui projetos de demanda induzida. Calculado por M003 a partir de pagamentos e compromissos registrados em M014. Programa nao armazena diretamente. | M003 + M014 |
+| Saldo disponivel do Programa | `valorAlocado - valorConsumido`. Sempre `>= 0`. | Derivado |
+
+> Evitar os termos "pago", "executado", "saldo livre" e "saldo nao executado" nas telas e contratos do Programa. Usar os termos canonicos acima.
+
 ## Referencia de Regras
 
-O valor de `AporteFinanceiroParceriaPrograma` consome o saldo liquido alocavel da Parceria. O Programa nao recalcula Acao Transversal sobre aportes recebidos; a reserva transversal ja foi calculada na Parceria e bloqueada antes da alocacao.
+`AporteFinanceiroParceriaPrograma.valor` consome `saldoAlocavelEmProgramas` da Parceria. O Programa nao recalcula Taxa de Gestao de Parcerias — ela ja foi calculada e deduzida na Parceria antes da alocacao (RN20, RN21). Aporte retirado nao compoe `valorAlocado` e devolve saldo alocavel a Parceria (RN14).
 
 Regras aplicaveis ao modelo de Programas: `RN01`, `RN02`, `RN11`, `RN13`, `RN14`, `RN16`, `RN20`, `RN21`, `RN22`, `RI1`, `RI2`, `RI4`. As definicoes oficiais ficam em [M010 — Regras de Negocio](../README.md#regras-de-negocio-consolidadas).
 

@@ -2,11 +2,11 @@ ontology: "Parcerias — Parceria, Vigencia e AporteFinanceiro"
 namespace: "planejamento.parcerias"
 imports:
   - namespace: shared
-    path: path: "../../../ontology/shared/base.yaml"
+    path: "../../../ontology/shared/base.yaml"
   - namespace: shared.people
-    path: path: "../../../ontology/shared/people.yaml"
+    path: "../../../ontology/shared/people.yaml"
   - namespace: corporativo.instituicoes
-    path: path: "../../M008-cadastros-corporativos/instituicoes/ontology.yaml"
+    path: "../../M008-cadastros-corporativos/instituicoes/ontology.yaml"
 metadata:
   module: "M010"
   source: "docs/implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md"
@@ -183,6 +183,35 @@ relationships:
     description: "Uma Parceria pode ser origem de zero ou mais aportes em Programas via AporteFinanceiroParceriaPrograma (entidade vive em programas)."
 
 axioms:
+  # --- Fluxo financeiro ---
+  - id: "AX-M010-FIN-01"
+    natural_language: "valorBrutoRecebido e a soma de todos os valorInvestido dos AportesFinanceiros desta Parceria."
+    formal_rule: "∀p ∈ Parceria: p.valorBrutoRecebido = SUM(AporteFinanceiro.valorInvestido WHERE parceria = p)"
+  - id: "AX-M010-FIN-02"
+    natural_language: "valorTaxaGestao e a soma dos TaxaGestaoParcerias gerados por cada AporteFinanceiro desta Parceria, com snapshot imutavel da politica vigente no momento do aporte."
+    formal_rule: "∀p ∈ Parceria: p.valorTaxaGestao = SUM(TaxaGestaoParcerias.valorTaxaGestao WHERE parceria = p)"
+  - id: "AX-M010-FIN-03"
+    natural_language: "saldoAlocavelEmProgramas e valorBrutoRecebido menos valorTaxaGestao menos a soma dos valores dos AportesFinanceiroParceriaPrograma em estado ATIVO desta Parceria. Nunca negativo."
+    formal_rule: "∀p ∈ Parceria: p.saldoAlocavelEmProgramas = p.valorBrutoRecebido - p.valorTaxaGestao - SUM(AporteFinanceiroParceriaPrograma.valor WHERE parceria = p AND estado = 'ATIVO') AND p.saldoAlocavelEmProgramas >= 0"
+  - id: "AX-M010-FIN-04"
+    natural_language: >
+      valorConsumido (executado) e a consolidacao dos valores efetivamente executados nas Iniciativas (projetos)
+      vinculadas aos Programas que receberam alocacao desta Parceria — inclui projetos de demanda induzida e
+      projetos ligados a Programas aportados. Calculado por M003 a partir das movimentacoes registradas em M014.
+      Parceria nao armazena valorConsumido diretamente; acessa via consolidacao M003/M014.
+    formal_rule: >
+      ∀p ∈ Parceria:
+        programas_aportados = {prog | AporteFinanceiroParceriaPrograma.parceria = p AND estado = 'ATIVO'}
+        iniciativas_vinculadas = {ini | ini.programa ∈ programas_aportados}  # M003
+        p.valorConsumido = SUM(ini.valorExecutado WHERE ini ∈ iniciativas_vinculadas)  # alimentado por M014
+      p.valorConsumido IS READ-ONLY in M010; ownership = M003+M014
+  - id: "AX-M010-FIN-05"
+    natural_language: "valorTaxaGestao nao compoe saldoAlocavelEmProgramas. E deduzido antes de qualquer alocacao em Programa."
+    formal_rule: "saldoAlocavelEmProgramas = valorBrutoRecebido - valorTaxaGestao - valorAlocadoEmProgramas; valorTaxaGestao NOT IN saldoAlocavelEmProgramas"
+  - id: "AX-M010-FIN-06"
+    natural_language: "Os termos valorInvestido, valorBrutoRecebido, valorTaxaGestao, saldoAlocavelEmProgramas, valorAlocado e valorConsumido sao mutuamente exclusivos e nao sinonimos. Nenhum pode ser substituido por 'pago', 'executado', 'saldo livre' ou 'saldo nao alocado' nas interfaces e contratos."
+    formal_rule: "nomenclature_invariant: {valorInvestido, valorBrutoRecebido, valorTaxaGestao, saldoAlocavelEmProgramas, valorAlocado, valorConsumido} DISJOINT"
+  # --- Regras de negocio ---
   - id: "AX-M010-RN03"
     natural_language: "O registro de aporte financeiro requer que a parceria tenha data de assinatura preenchida."
     formal_rule: "∀a ∈ AporteFinanceiro: a.parceria.dataAssinatura ≠ null"
@@ -232,16 +261,34 @@ axioms:
 invariants:
   - id: "INV-M010-PAR-01"
     rule: "Parceria.saldoAlocavelEmProgramas >= 0"
-    description: "O saldo alocavel em Programas nunca pode ser negativo (RN14, RN22)."
+    description: "Saldo alocavel nunca negativo (RN14, RN22). Validar apos qualquer operacao financeira."
   - id: "INV-M010-PAR-02"
     rule: "COUNT(Vigencia WHERE parceria = p AND isAditivo = false) = 1"
     description: "Toda Parceria deve ter exatamente uma Vigencia original com isAditivo = false (RN15)."
   - id: "INV-M010-PAR-03"
     rule: "AporteFinanceiro.valorInvestido > 0"
-    description: "O valor de um AporteFinanceiro deve ser positivo."
+    description: "Valor de AporteFinanceiro deve ser positivo."
   - id: "INV-M010-PAR-04"
     rule: "Vigencia.dataFim > Vigencia.dataInicio"
-    description: "A data de fim de uma Vigencia deve ser posterior a data de inicio."
+    description: "Data de fim de Vigencia deve ser posterior a data de inicio."
+  - id: "INV-M010-PAR-05"
+    rule: "∀a ∈ AporteFinanceiro: a.instituicao = a.parceria.instituicao"
+    description: "Instituicao de origem do aporte deve ser a mesma vinculada a Parceria (RN04, RN10)."
+  - id: "INV-M010-PAR-06"
+    rule: "∀a ∈ AporteFinanceiro WHERE isAditivo = true: EXISTS(AporteFinanceiro WHERE parceria = a.parceria AND isAditivo = false)"
+    description: "Aporte aditivo so pode existir se houver pelo menos um aporte original (RN17)."
+  - id: "INV-M010-PAR-07"
+    rule: "∀a ∈ AporteFinanceiro WHERE isAditivo = true: a.dataAporte > MIN(AporteFinanceiro.dataAporte WHERE parceria = a.parceria AND isAditivo = false)"
+    description: "Aporte aditivo deve ter dataAporte posterior ao original (RN17)."
+  - id: "INV-M010-PAR-08"
+    rule: "TaxaGestaoParcerias.snapshot IS IMMUTABLE after create"
+    description: "Snapshot da politica, faixa e percentual na TaxaGestaoParcerias nao pode ser alterado apos criacao (RN23)."
+  - id: "INV-M010-PAR-09"
+    rule: "∀p ∈ Parceria: p.valorBrutoRecebido = SUM(AporteFinanceiro.valorInvestido WHERE parceria = p)"
+    description: "valorBrutoRecebido e sempre a soma dos valorInvestido dos aportes (AX-M010-FIN-01)."
+  - id: "INV-M010-PAR-10"
+    rule: "∀p ∈ Parceria: p.valorTaxaGestao = SUM(TaxaGestaoParcerias.valorTaxaGestao WHERE parceria = p)"
+    description: "valorTaxaGestao e sempre a soma das taxas calculadas por aporte (AX-M010-FIN-02)."
 
 enums:
   EstadoParceria:

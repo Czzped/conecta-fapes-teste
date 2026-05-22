@@ -1,0 +1,438 @@
+ontology: "M016 — Taxa de Gestao de Parcerias"
+namespace: "financeiro.taxa_gestao"
+imports:
+  - namespace: shared
+    path: "../../../../ontology/shared/base.yaml"
+  - namespace: corporativo.instituicoes
+    path: "../../M008-cadastros-corporativos/instituicoes/ontology.yaml"
+  - namespace: planejamento.parcerias
+    path: "../../M010-planejamento-estrategia/parcerias/ontology.yaml"
+
+metadata:
+  module: "M016/taxa-gestao"
+  source: "docs/implementation/modules/M016-contabilidade-financeiro/taxa-gestao/README.md"
+  version: "1.0.0"
+  legal_basis: "Resolucao CCAF n. 334/2023"
+  description: >
+    Mecanismo de retencao financeira: percentual retido sobre cada AporteFinanceiro
+    de uma Parceria, custodiado em conta BANESTES e classificado contabilmente.
+    M010 calcula; M016 custodia, classifica, repassa e vincula a AcaoTransversal.
+    Nao e rubrica do projeto. Nao compoe saldoAlocavelEmProgramas.
+
+entities:
+
+  PoliticaTaxaGestaoParcerias:
+    description: >
+      Entidade master estavel que representa a politica de Taxa de Gestao de Parcerias.
+      Nao contem percentuais nem vigencia — esses ficam em VersaoPoliticaTaxaGestao.
+      Analogia com M001/ModalidadeBolsa: politica permanente; versoes mudam com cada Resolucao.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      nome:
+        type: string
+        required: true
+        description: "Nome da politica (ex: Taxa de Gestao de Parcerias FAPES)."
+      descricao:
+        type: string
+        required: true
+      versoes:
+        type: "ref:financeiro.taxa_gestao.VersaoPoliticaTaxaGestao[]"
+        required: false
+        description: "Versoes vigentes e encerradas. Somente uma VIGENTE ao mesmo tempo (INV-TGP04)."
+        cardinality: "1:N"
+
+  VersaoPoliticaTaxaGestao:
+    description: >
+      Versao temporalmente delimitada da PoliticaTaxaGestaoParcerias, criada por Resolucao especifica.
+      Contem rubricas permitidas e faixas percentuais vigentes no periodo.
+      Analogia com M001/VersaoModalidade: cada Resolucao cria versao; anteriores ficam encerradas.
+      Novas versoes NAO alteram TaxaGestaoParcerias ja calculadas — snapshot imutavel.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      sigla:
+        type: string
+        required: false
+        description: "Sigla gerada automaticamente (ex: TGP-2023, TGP-2024a). Unica."
+        unique: true
+        generated: true
+      baseLegal:
+        type: string
+        required: true
+        description: "Base normativa desta versao (ex: Resolucao CCAF n. 334/2023)."
+      numeroResolucao:
+        type: string
+        required: true
+        description: "Numero da resolucao que criou esta versao (ex: CCAF 334/2023)."
+      dataInicioVigencia:
+        type: date
+        required: true
+      dataFimVigencia:
+        type: date
+        required: false
+        description: "null = vigente sem prazo determinado."
+      estado:
+        type: "enum:EstadoVersaoPoliticaTGP"
+        required: true
+        generated: true
+        description: "Derivado de dataInicioVigencia, dataFimVigencia e data atual."
+      rubricasPermitidas:
+        type: string[]
+        required: true
+        description: "Codigos das rubricas autorizadas para execucao de despesas das AcoesTransversais nesta versao."
+      politica:
+        type: "ref:financeiro.taxa_gestao.PoliticaTaxaGestaoParcerias"
+        required: true
+      faixas:
+        type: "ref:financeiro.taxa_gestao.VersaoFaixaPercentual[]"
+        required: true
+        description: "Faixas de percentual desta versao, ordenadas por valorMinimo ASC."
+        cardinality: "1:N"
+
+  FaixaPercentualTaxaGestao:
+    description: >
+      Faixa master estavel (ex: FAIXA-1, FAIXA-2, FAIXA-3). Sem percentuais.
+      Analogia com M001/NivelBolsa: faixa permanente; percentuais mudam por versao da politica.
+    extends: null
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      sigla:
+        type: string
+        required: true
+        description: "Ex: FAIXA-1, FAIXA-2, FAIXA-3. Unica dentro da politica."
+        unique: true
+      descricao:
+        type: string
+        required: true
+        description: "Ex: 'Ate R$ 2.000.000'."
+      politica:
+        type: "ref:financeiro.taxa_gestao.PoliticaTaxaGestaoParcerias"
+        required: true
+
+  VersaoFaixaPercentual:
+    description: >
+      Percentual especifico de uma FaixaPercentualTaxaGestao para uma versao da politica.
+      Analogia com M001/VersaoNivel: faixa estavel; percentual definido por versao.
+      TaxaGestaoParcerias captura VersaoFaixaPercentual como snapshot imutavel no aporte.
+    extends: null
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      valorMinimo:
+        type: decimal
+        required: true
+        description: "Limite inferior do valor do aporte para esta faixa (inclusivo)."
+      valorMaximo:
+        type: decimal
+        required: false
+        description: "Limite superior (inclusivo); null = sem limite superior."
+      percentual:
+        type: decimal
+        required: true
+        description: "Percentual aplicavel (ex: 0.05 para 5%)."
+      faixa:
+        type: "ref:financeiro.taxa_gestao.FaixaPercentualTaxaGestao"
+        required: true
+      versaoPolitica:
+        type: "ref:financeiro.taxa_gestao.VersaoPoliticaTaxaGestao"
+        required: true
+
+  TaxaGestaoParcerias:
+    description: >
+      Valor financeiro retido sobre o aporte de uma Parceria para custear despesas operacionais
+      da FAPES. Nasce ao registrar AporteFinanceiro no M010. Nao e rubrica do projeto.
+      Snapshot da politica aplicada e imutavel apos emissao.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      aporteFinanceiroId:
+        type: uuid
+        required: true
+        description: "ID do AporteFinanceiro (M010/parcerias) que originou esta taxa."
+      parceiraId:
+        type: uuid
+        required: true
+        description: "ID da Parceria (M010) para consultas agregadas."
+      valorBase:
+        type: decimal
+        required: true
+        description: "Valor do AporteFinanceiro usado como base de calculo."
+      versaoPoliticaId:
+        type: uuid
+        required: true
+        description: "ID da VersaoPoliticaTaxaGestao vigente no calculo. Snapshot imutavel (INV-TGP05)."
+      versaoPoliticaSigla:
+        type: string
+        required: true
+        description: "Sigla da versao da politica (ex: TGP-2023). Desnormalizado para auditoria."
+        max_length: 50
+      versaoFaixaId:
+        type: uuid
+        required: true
+        description: "ID da VersaoFaixaPercentual aplicada. Snapshot imutavel (INV-TGP06)."
+      faixaSigla:
+        type: string
+        required: true
+        description: "Sigla da faixa aplicada (ex: FAIXA-2). Desnormalizado para auditoria."
+        max_length: 20
+      percentualAplicado:
+        type: decimal
+        required: true
+        description: "Percentual da VersaoFaixaPercentual vigente no calculo. Imutavel apos emissao."
+      valorTaxaGestao:
+        type: decimal
+        required: true
+        derived: true
+        formula: "valorBase * percentualAplicado"
+      estado:
+        type: "enum:EstadoTaxaGestao"
+        required: true
+      isAditivo:
+        type: boolean
+        required: true
+        description: "true quando gerada por aporte aditivo."
+      contaBancariaId:
+        type: uuid
+        required: false
+        description: "ref:corporativo.instituicoes.ContaBancaria — conta BANESTES quando houver repasse."
+
+  ClassificacaoContabilTGP:
+    description: >
+      Classificacao da TaxaGestaoParcerias em conta contabil, fundo financeiro e centro de custo
+      institucional da FAPES para fins de escrituracao.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      taxaGestaoId:
+        type: uuid
+        required: true
+      contaContabil:
+        type: string
+        required: true
+        todo: "Formato e plano de contas FAPES a definir"
+      fundoFinanceiro:
+        type: string
+        required: true
+        todo: "Codigos de fundo a definir com equipe contabil"
+      centroCusto:
+        type: string
+        required: true
+        todo: "Estrutura de centros de custo a definir"
+
+relationships:
+
+  - from: "financeiro.taxa_gestao.PoliticaTaxaGestaoParcerias"
+    relation: "tem versoes"
+    to: "financeiro.taxa_gestao.VersaoPoliticaTaxaGestao"
+    cardinality: "1:N"
+    description: "Uma politica pode ter multiplas versoes; somente uma VIGENTE simultaneamente (INV-TGP04)."
+
+  - from: "financeiro.taxa_gestao.VersaoPoliticaTaxaGestao"
+    relation: "define faixas"
+    to: "financeiro.taxa_gestao.VersaoFaixaPercentual"
+    cardinality: "1:N"
+    description: "Cada versao define seus proprios percentuais por faixa."
+
+  - from: "financeiro.taxa_gestao.FaixaPercentualTaxaGestao"
+    relation: "tem versoes de percentual"
+    to: "financeiro.taxa_gestao.VersaoFaixaPercentual"
+    cardinality: "1:N"
+    description: "Faixa master pode ter percentuais distintos em cada versao da politica."
+
+  - from: "financeiro.taxa_gestao.TaxaGestaoParcerias"
+    relation: "snapshot de"
+    to: "financeiro.taxa_gestao.VersaoFaixaPercentual"
+    cardinality: "N:1"
+    description: "Taxa captura snapshot imutavel da VersaoFaixaPercentual vigente no calculo."
+
+  - from: "financeiro.taxa_gestao.ClassificacaoContabilTGP"
+    relation: "classifica"
+    to: "financeiro.taxa_gestao.TaxaGestaoParcerias"
+    cardinality: "1:1"
+
+  - from: "financeiro.taxa_gestao.TaxaGestaoParcerias"
+    relation: "custodiada_em"
+    to: "corporativo.instituicoes.ContaBancaria"
+    cardinality: "N:1"
+    description: "Conta bancaria BANESTES para repasse ao Coordenador Outorgado."
+
+axioms:
+
+  - id: "AX-TGP01"
+    natural_language: >
+      Valor da Taxa de Gestao calculado multiplicando valorBase pelo percentual da faixa
+      vigente na VersaoPoliticaTaxaGestao no momento do calculo. Imutavel apos emissao.
+    formal_rule: >
+      TaxaGestaoParcerias.valorTaxaGestao = valorBase * percentualAplicado
+
+  - id: "AX-TGP02"
+    natural_language: >
+      Percentual determinado pela faixa do valor do aporte: 5% para R$ 50k-2M, 4% para R$ 2M-5M,
+      3% acima de R$ 5M. Percentuais sao parametrizaveis — nao hardcoded.
+    formal_rule: >
+      faixa = VersaoPoliticaTaxaGestao.faixas.firstWhere(f =>
+        valorBase >= f.valorMinimo AND (f.valorMaximo IS NULL OR valorBase <= f.valorMaximo))
+      percentualAplicado = faixa.percentual
+
+  - id: "AX-TGP03"
+    natural_language: >
+      TaxaGestaoParcerias nao compoe o saldo alocavel em Programas da Parceria.
+      O calculo de saldoAlocavelEmProgramas ja desconta a taxa.
+    formal_rule: >
+      Parceria.saldoAlocavelEmProgramas = valorBrutoRecebido - valorTaxaGestao
+        - SUM(AporteFinanceiroParceriaPrograma.valor WHERE estado = 'ATIVO')
+
+  - id: "AX-TGP04"
+    natural_language: >
+      Ao registrar AporteFinanceiro, o sistema identifica VersaoPoliticaTaxaGestao com estado VIGENTE
+      e VersaoFaixaPercentual correspondente. Esses IDs e valores sao gravados como snapshot imutavel.
+    formal_rule: >
+      versaoVigente = VersaoPoliticaTaxaGestao WHERE estado = 'VIGENTE'
+        AND dataInicioVigencia <= aporte.dataAporte
+        AND (dataFimVigencia IS NULL OR dataFimVigencia >= aporte.dataAporte)
+      faixa = versaoVigente.faixas.firstWhere(f =>
+        aporte.valorInvestido >= f.valorMinimo
+        AND (f.valorMaximo IS NULL OR aporte.valorInvestido <= f.valorMaximo))
+      TaxaGestaoParcerias.versaoPoliticaId = versaoVigente.id
+      TaxaGestaoParcerias.versaoFaixaId = faixa.id
+      TaxaGestaoParcerias.percentualAplicado = faixa.percentual
+
+  - id: "AX-TGP05"
+    natural_language: >
+      TaxaGestaoParcerias calculada com versao v1 nao e afetada pela criacao de v1a.
+      Snapshot soberano: versaoPoliticaId, versaoFaixaId, percentualAplicado sao imutaveis.
+    formal_rule: >
+      ∀t ∈ TaxaGestaoParcerias: t.versaoPoliticaId, t.versaoFaixaId, t.percentualAplicado ARE IMMUTABLE after create
+      CREATE(VersaoPoliticaTaxaGestao) DOES NOT affect TaxaGestaoParcerias WHERE createdAt < novaVersao.dataInicioVigencia
+
+  - id: "AX-TGP06"
+    natural_language: >
+      Encerrar VersaoPoliticaTaxaGestao nao requer recalculo de taxas ja emitidas.
+      Versao encerrada permanece consultavel via versaoPoliticaSigla e faixaSigla desnormalizados.
+    formal_rule: >
+      VersaoPoliticaTaxaGestao.estado = 'ENCERRADA' DOES NOT trigger recalc on TaxaGestaoParcerias
+      TaxaGestaoParcerias.versaoPoliticaSigla + faixaSigla enable audit without JOIN to live policy tables
+
+invariants:
+
+  - id: "INV-TGP01"
+    rule: "SUM(OutorgaAcaoTransversal.valorVinculado WHERE taxaGestaoId = TaxaGestaoParcerias.id) <= TaxaGestaoParcerias.valorTaxaGestao"
+    description: "Total vinculado a AcoesTransversais nao pode exceder valorTaxaGestao."
+
+  - id: "INV-TGP03"
+    rule: "corporativo.instituicoes.ContaBancaria.banco = 'BANESTES' WHERE usada_em = TaxaGestaoParcerias"
+    description: "Resolucao CCAF n. 334/2023 exige conta BANESTES para repasse de Taxa de Gestao."
+
+  - id: "INV-TGP04"
+    rule: "COUNT(VersaoPoliticaTaxaGestao WHERE estado = 'VIGENTE') <= 1"
+    description: "Somente uma VersaoPoliticaTaxaGestao pode estar vigente simultaneamente."
+
+  - id: "INV-TGP05"
+    rule: "TaxaGestaoParcerias.versaoPoliticaId IS IMMUTABLE after create"
+    description: "Snapshot da versao da politica nao pode ser alterado apos emissao (AX-TGP05)."
+
+  - id: "INV-TGP06"
+    rule: "TaxaGestaoParcerias.versaoFaixaId IS IMMUTABLE after create"
+    description: "Snapshot da faixa de percentual nao pode ser alterado apos emissao (AX-TGP05)."
+
+enums:
+
+  EstadoVersaoPoliticaTGP:
+    description: "Estado de vigencia de uma versao da PoliticaTaxaGestaoParcerias. Derivado de datas."
+    values:
+      VIGENTE: "Versao ativa; usada nos calculos de novos aportes."
+      ENCERRADA: "Versao substituida por versao posterior; permanece consultavel para auditoria."
+      REVOGADA: "Versao cancelada antes de entrar em vigor ou por decisao administrativa."
+
+  EstadoTaxaGestao:
+    description: "Ciclo de vida da Taxa de Gestao de Parcerias dentro do M016."
+    values:
+      CALCULADA: "Taxa emitida pelo M010, aguardando classificacao contabil no M016."
+      CLASSIFICADA: "Classificada em conta contabil, fundo e centro de custo."
+      REPASSADA: "Valor repassado para conta bancaria BANESTES do Coordenador Outorgado."
+      VINCULADA: "Vinculada a uma ou mais AcoesTransversais via OutorgaAcaoTransversal."
+      ENCERRADA: "Prestacao da AcaoTransversal correspondente aprovada."
+
+events:
+
+  - name: "TaxaGestaoParcelasCalculada"
+    description: "Emitido quando M010 registra novo AporteFinanceiro e calcula TaxaGestaoParcerias. M016 recebe para classificacao."
+    payload_entity: "financeiro.taxa_gestao.TaxaGestaoParcerias"
+    trigger: "state_transition.CALCULADA"
+
+workflows:
+
+  TaxaGestaoParcelasLifecycle:
+    description: "Ciclo de vida da Taxa de Gestao de Parcerias no M016."
+    states:
+      - CALCULADA
+      - CLASSIFICADA
+      - REPASSADA
+      - VINCULADA
+      - ENCERRADA
+    transitions:
+      - from: CALCULADA
+        to: CLASSIFICADA
+        trigger: "classificar_taxa"
+        guard: "ClassificacaoContabilTGP criada com conta contabil, fundo e centro de custo"
+      - from: CLASSIFICADA
+        to: REPASSADA
+        trigger: "registrar_repasse"
+        guard: "ContaBancaria BANESTES informada (INV-TGP03)"
+      - from: CLASSIFICADA
+        to: VINCULADA
+        trigger: "vincular_a_acao_transversal"
+        guard: "AcaoTransversal valida com saldo suficiente (INV-TGP01)"
+      - from: REPASSADA
+        to: VINCULADA
+        trigger: "vincular_a_acao_transversal"
+      - from: VINCULADA
+        to: ENCERRADA
+        trigger: "encerrar_taxa"
+        guard: "PrestacaoContasAcaoTransversal APROVADA"
+
+policies:
+  permissions:
+    GestorFinanceiro:
+      can:
+        - parametrizar_politica_taxa_gestao
+        - criar_versao_politica
+        - classificar_taxa_gestao
+        - registrar_repasse_taxa
+        - vincular_taxa_a_acao_transversal
+    AnalistaFinanceiro:
+      can:
+        - consultar_historico_taxa
+        - auditar_snapshots
+
+agent_instructions:
+  rules:
+    - "M016/taxa-gestao recebe TaxaGestaoParcerias do M010 via evento — nunca calcule a taxa aqui."
+    - "ContaBancaria para repasse DEVE ser BANESTES — INV-TGP03. Entidade ContaBancaria vive em M008."
+    - "Percentuais vem da VersaoPoliticaTaxaGestao com estado VIGENTE — nunca hardcode 5/4/3 porcento."
+    - "Ao registrar TaxaGestaoParcerias, usar VersaoPoliticaTaxaGestao VIGENTE no dataAporte — nunca politica master."
+    - "Snapshot (versaoPoliticaId, versaoFaixaId, percentualAplicado) e imutavel — nunca atualizar retroativamente (AX-TGP05)."
+    - "Ao criar nova VersaoPoliticaTaxaGestao, encerrar a versao anterior antes de ativar a nova (INV-TGP04)."
+    - "TaxaGestaoParcerias e a retencao; AcaoTransversal (acao-transversal/ontology.yaml) e o projeto que gasta."
+  notes:
+    - "Base legal: Resolucao CCAF n. 334/2023."
+    - "Upstream: M010 (calcula e emite TaxaGestaoParcerias), M008 (ContaBancaria BANESTES)."
+    - "Downstream: financeiro.acao_transversal (AcaoTransversal consome os recursos custodiados aqui)."

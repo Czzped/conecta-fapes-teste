@@ -59,3 +59,43 @@ stateDiagram-v2
 Regras aplicaveis ao ciclo de vida de Parcerias: `RN13`, `RN14`, `RN19`, `RI2`, `RI4`. As definicoes oficiais ficam em [M010 — Regras de Negocio](../README.md#regras-de-negocio-consolidadas).
 
 - Prestacao de contas final: parte do processo de encerramento; criterios detalhados a serem definidos com o cliente.
+
+---
+
+## Regras Financeiras por Operacao
+
+### RegistrarAporteFinanceiro (original ou aditivo)
+
+1. Valida pre-condicoes: `dataAssinatura` da Parceria preenchida (RN03), origem = Instituicao vinculada (RN04), documento classificado como "Termo de Descentralizacao" (RN12).
+2. Se `isAditivo = true`: verifica existencia de original e `dataAporte` posterior (RN17).
+3. Calcula `TaxaGestaoParcerias` com snapshot da `PoliticaTaxaGestaoParcerias` vigente no M016 (RN20, RN23).
+4. Recalcula derivados: `valorBrutoRecebido`, `valorTaxaGestao`, `saldoAlocavelEmProgramas`.
+5. Emite evento `AporteFinanceiroRegistrado`.
+
+### EditarAporteFinanceiroAditivo / RemoverAporteFinanceiroAditivo (RN18)
+
+1. Operacao permitida apenas para `AporteFinanceiro.isAditivo = true`.
+2. Recalcula `valorBrutoRecebido`, `valorTaxaGestao` e `saldoAlocavelEmProgramas` com o novo estado.
+3. Rejeita se `saldoAlocavelEmProgramas_resultante < 0` (INV-M010-PAR-01).
+
+### RegistrarAporteFinanceiroParceriaPrograma (alocacao em Programa)
+
+1. Verifica `saldoAlocavelEmProgramas >= valor_alocado` (RN22).
+2. Verifica Parceria `Vigente` (RN11).
+3. Verifica que datas do Programa cabem na vigencia da Parceria (RN13).
+4. Debita do `saldoAlocavelEmProgramas`; emite evento de alocacao.
+
+### RetirarAporteFinanceiroParceriaPrograma
+
+1. Remove o `AporteFinanceiroParceriaPrograma`.
+2. Devolve valor ao `saldoAlocavelEmProgramas` da Parceria (RN14).
+
+### Impacto no Saldo por Operacao
+
+| Operacao | valorBrutoRecebido | valorTaxaGestao | saldoAlocavelEmProgramas |
+|----------|-------------------|-----------------|--------------------------|
+| Registrar AporteFinanceiro | +valorInvestido | +taxa calculada | recalculado |
+| Editar AporteFinanceiro aditivo | ajustado | ajustado | recalculado |
+| Remover AporteFinanceiro aditivo | -valorInvestido | -taxa do aditivo | recalculado |
+| Alocar em Programa | — | — | -valor alocado |
+| Retirar de Programa | — | — | +valor retirado |
