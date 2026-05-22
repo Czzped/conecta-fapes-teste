@@ -122,4 +122,4 @@ TaxaGestaoParcerias → VINCULADA
                TaxaGestaoParcerias → ENCERRADA
 ```
 
-Ver: [acao-transversal/processo.md](../../acao-transversal/processo.md)
+Ver: [acao-transversal/processo.md](../acao-transversal/processo.md)

@@ -353,6 +353,29 @@ invariants:
     rule: "TaxaGestaoParcerias.versaoFaixaId IS IMMUTABLE after create"
     description: "Snapshot da faixa de percentual nao pode ser alterado apos emissao (AX-TGP05)."
 
+  - id: "INV-TGP07"
+    rule: "VersaoFaixaPercentual.valorMinimo < VersaoFaixaPercentual.valorMaximo OR valorMaximo IS NULL"
+    description: "valorMinimo deve ser menor que valorMaximo na faixa. Faixa aberta (sem teto) usa valorMaximo = null."
+
+  - id: "INV-TGP08"
+    rule: >
+      ∀v ∈ VersaoPoliticaTaxaGestao:
+        ∀ (f1, f2) ∈ v.faixas WHERE f1 != f2:
+          NOT (f1.valorMinimo <= f2.valorMaximo AND f2.valorMinimo <= f1.valorMaximo)
+    description: "Faixas de uma mesma VersaoPoliticaTaxaGestao nao podem se sobrepor. Ranges devem ser disjuntos."
+
+  - id: "INV-TGP09"
+    rule: "VersaoPoliticaTaxaGestao.dataInicioVigencia < dataFimVigencia OR dataFimVigencia IS NULL"
+    description: "dataFimVigencia deve ser posterior a dataInicioVigencia quando informada."
+
+  - id: "INV-TGP10"
+    rule: "TaxaGestaoParcerias.valorBase > 0"
+    description: "Valor base da taxa deve ser positivo. Eventos com valorBase <= 0 sao rejeitados no recebimento."
+
+  - id: "INV-TGP11"
+    rule: "COUNT(VersaoFaixaPercentual WHERE versaoPolitica = v) >= 1 BEFORE VersaoPoliticaTaxaGestao.estado = 'VIGENTE'"
+    description: "VersaoPoliticaTaxaGestao deve ter ao menos uma VersaoFaixaPercentual definida antes de ser ativada."
+
 enums:
 
   EstadoVersaoPoliticaTGP:

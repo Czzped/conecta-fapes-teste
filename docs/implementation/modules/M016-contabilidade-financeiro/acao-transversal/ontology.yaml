@@ -292,6 +292,22 @@ invariants:
     rule: "PlanoAplicacaoAT.totalPlanejado <= SUM(OutorgaAcaoTransversal.valorVinculado WHERE acaoTransversalId = AcaoTransversal.id)"
     description: "Plano nao pode exceder total de taxas vinculadas a AcaoTransversal."
 
+  - id: "INV-AT04"
+    rule: "DespesaAcaoTransversal.valor > 0"
+    description: "Valor da despesa deve ser positivo. Despesa com valor zero ou negativo e rejeitada."
+
+  - id: "INV-AT05"
+    rule: "OutorgaAcaoTransversal.valorVinculado > 0"
+    description: "Valor vinculado na outorga deve ser positivo."
+
+  - id: "INV-AT06"
+    rule: "COUNT(ItemPlanoAplicacaoAT WHERE planoAplicacaoId = PlanoAplicacaoAT.id) >= 1"
+    description: "PlanoAplicacaoAT deve ter ao menos um ItemPlanoAplicacaoAT. Plano vazio nao pode ser aprovado."
+
+  - id: "INV-AT07"
+    rule: "DespesaAcaoTransversal ONLY created WHEN PlanoAplicacaoAT.estado = 'APROVADO'"
+    description: "Despesa so pode ser registrada contra PlanoAplicacaoAT aprovado. Plano em RASCUNHO ou EM_REVISAO bloqueia registro."
+
 enums:
 
   EstadoAcaoTransversal:
