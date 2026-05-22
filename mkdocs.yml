@@ -8,6 +8,35 @@ exclude_docs: |
   deprecated/
   templates/
 
+not_in_nav: |
+  architecture/adr/template.md
+  discovery/estornos-prestacao-contas.md
+  discovery/regras-calculo-diarias-es.md
+  discovery/regras-passagem-areas-fapes.md
+  discovery/regras-saldo-alocado-disponivel.md
+  discovery/integracoes/README.md
+  discovery/integracoes/e-docs.md
+  discovery/integracoes/organograma.md
+  implementation/modules/M003-gestao-iniciativas-captadas/epics/US-M003-042-acompanhamento-orcamentario-rubricas.md
+  implementation/modules/M008-cadastros-corporativos/implementacao-backend-admin-instituicao.md
+  implementation/modules/M014-prestacao-contas/epics/EPIC-M014-012.md
+  implementation/modules/M014-prestacao-contas/epics/EPIC-M014-013.md
+  implementation/modules/M016-contabilidade-financeiro/taxa-gestao/README.md
+  implementation/modules/M016-contabilidade-financeiro/taxa-gestao/processo.md
+  implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/README.md
+  implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/EPIC-M016-011.md
+  implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/EPIC-M016-012.md
+  implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/EPIC-M016-013.md
+  implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/EPIC-M016-014.md
+  implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/EPIC-M016-015.md
+  implementation/modules/M020-comunicacao/notificacoes/README.md
+  implementation/modules/M020-comunicacao/notificacoes/emails/email-notificacao-evento.md
+  implementation/modules/M023-integracoes/epics/EPIC-M023-001.md
+  implementation/modules/M023-integracoes/epics/EPIC-M023-002.md
+  implementation/modules/M023-integracoes/epics/EPIC-M023-003.md
+  management/deliveries.md
+  management/sprints/template-sprint.md
+
 theme:
   name: material
   custom_dir: overrides
@@ -265,16 +294,11 @@ nav:
                   - Visao Geral: implementation/modules/M008-cadastros-corporativos/instituicoes/README.md
                   - Backlog: implementation/modules/M008-cadastros-corporativos/instituicoes/backlog.md
                   - Modelo Estrutural: implementation/modules/M008-cadastros-corporativos/instituicoes/modelo-estrutural.md
-                  - Instituicao: implementation/modules/M008-cadastros-corporativos/instituicoes/instituicao/README.md
-                  - TipoInstituicao: implementation/modules/M008-cadastros-corporativos/instituicoes/tipo-instituicao/README.md
-                  - Dirigente: implementation/modules/M008-cadastros-corporativos/instituicoes/dirigente/README.md
                   - EPIC-002: implementation/modules/M008-cadastros-corporativos/instituicoes/epics/EPIC-M008-002.md
               - Diarias:
                   - Visao Geral: implementation/modules/M008-cadastros-corporativos/diarias/README.md
                   - Backlog: implementation/modules/M008-cadastros-corporativos/diarias/backlog.md
                   - Modelo Estrutural: implementation/modules/M008-cadastros-corporativos/diarias/modelo-estrutural.md
-                  - TipoViagem: implementation/modules/M008-cadastros-corporativos/diarias/tipo-viagem/README.md
-                  - TipoDiaria: implementation/modules/M008-cadastros-corporativos/diarias/tipo-diaria/README.md
                   - EPIC-005: implementation/modules/M008-cadastros-corporativos/diarias/epics/EPIC-M008-005.md
               - Rubricas:
                   - Visao Geral: implementation/modules/M008-cadastros-corporativos/rubricas/README.md
@@ -336,11 +360,6 @@ nav:
           - Parcerias:
               - Visao Geral: implementation/modules/M010-planejamento-estrategia/parcerias/README.md
               - Processo: implementation/modules/M010-planejamento-estrategia/parcerias/processo.md
-              - Jornadas:
-                  - Criacao da Parceria: implementation/modules/M010-planejamento-estrategia/parcerias/jornada-criacao-parceria.md
-                  - Aditivo da Parceria: implementation/modules/M010-planejamento-estrategia/parcerias/jornada-aditivo-parceria.md
-                  - Suspensao e Encerramento: implementation/modules/M010-planejamento-estrategia/parcerias/jornada-suspensao-encerramento-parceria.md
-                  - Suspensao em Cascata: implementation/modules/M010-planejamento-estrategia/parcerias/jornada-suspensao-cascata.md
               - Modelo Estrutural: implementation/modules/M010-planejamento-estrategia/parcerias/modelo-estrutural.md
               - Modelo Comportamental: implementation/modules/M010-planejamento-estrategia/parcerias/modelo-comportamental.md
               - EPIC-M010-002 Parcerias: implementation/modules/M010-planejamento-estrategia/parcerias/epics/EPIC-M010-002.md

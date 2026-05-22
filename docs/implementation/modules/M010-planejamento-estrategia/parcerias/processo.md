@@ -8,10 +8,10 @@
 
 O processo de Parcerias foi dividido em quatro fluxos principais:
 
-1. **[Criacao da Parceria](jornada-criacao-parceria.md)** — solicitacao pela Instituicao, envio do documento de solicitacao, cadastro, formalizacao documental, registro do aporte original e transicao para `Vigente`.
-2. **[Aditivo da Parceria](jornada-aditivo-parceria.md)** — inclusao de nova vigencia ou novo aporte financeiro apos a parceria estar vigente.
-3. **[Suspensao ou Encerramento da Parceria](jornada-suspensao-encerramento-parceria.md)** — interrupcao temporaria, reativacao ou encerramento definitivo com cascata para Programas aportados.
-4. **[Suspensao em Cascata](jornada-suspensao-cascata.md)** — suspensao dos Programas e Iniciativas vinculados quando a Parceria e suspensa.
+1. **[Criacao da Parceria](#fluxo-1-criacao-da-parceria)** — solicitacao pela Instituicao, envio do documento de solicitacao, cadastro, formalizacao documental, registro do aporte original e transicao para `Vigente`.
+2. **[Aditivo da Parceria](#fluxo-2-aditivo-da-parceria)** — inclusao de nova vigencia ou novo aporte financeiro apos a parceria estar vigente.
+3. **[Suspensao ou Encerramento da Parceria](#fluxo-3-suspensao-ou-encerramento-da-parceria)** — interrupcao temporaria, reativacao ou encerramento definitivo com cascata para Programas aportados.
+4. **[Suspensao em Cascata](#fluxo-4-suspensao-em-cascata-para-programas-e-iniciativas)** — suspensao dos Programas e Iniciativas vinculados quando a Parceria e suspensa.
 
 ---
 

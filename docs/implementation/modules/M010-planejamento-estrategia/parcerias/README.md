@@ -22,10 +22,10 @@ Uma Parceria pertence a exatamente uma Instituicao e pode aportar recursos em um
 | Documento | Finalidade |
 |-----------|------------|
 | [Processo](processo.md) | Fluxos operacionais de criacao, aditivo, suspensao, encerramento e suspensao em cascata. |
-| [Jornada — Criacao da Parceria](jornada-criacao-parceria.md) | Jornada visual da solicitacao ate a formalizacao da Parceria. |
-| [Jornada — Aditivo da Parceria](jornada-aditivo-parceria.md) | Jornada visual para aditivo de vigencia ou de aporte financeiro. |
-| [Jornada — Suspensao e Encerramento](jornada-suspensao-encerramento-parceria.md) | Jornada visual para suspender, reativar ou encerrar a Parceria. |
-| [Jornada — Suspensao em Cascata](jornada-suspensao-cascata.md) | Jornada visual do impacto da suspensao sobre Programas e Iniciativas. |
+| [Processo — Criacao da Parceria](processo.md#fluxo-1-criacao-da-parceria) | Jornada visual da solicitacao ate a formalizacao da Parceria. |
+| [Processo — Aditivo da Parceria](processo.md#fluxo-2-aditivo-da-parceria) | Jornada visual para aditivo de vigencia ou de aporte financeiro. |
+| [Processo — Suspensao e Encerramento](processo.md#fluxo-3-suspensao-ou-encerramento-da-parceria) | Jornada visual para suspender, reativar ou encerrar a Parceria. |
+| [Processo — Suspensao em Cascata](processo.md#fluxo-4-suspensao-em-cascata-para-programas-e-iniciativas) | Jornada visual do impacto da suspensao sobre Programas e Iniciativas. |
 | [Modelo Estrutural](modelo-estrutural.md) | Classes, atributos e relacionamentos do subdominio. |
 | [Modelo Comportamental](modelo-comportamental.md) | Estados, transicoes e regras de comportamento da Parceria. |
 | [EPIC-M010-002 — Gestao de Parcerias](epics/EPIC-M010-002.md) | Backlog principal de gestao de parcerias. |

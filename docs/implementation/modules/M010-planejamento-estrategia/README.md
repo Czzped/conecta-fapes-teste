@@ -66,10 +66,10 @@ Referencia normativa: [Resolucao CCAF nº 334/2023 - FAPES](https://fapes.es.gov
 | [Jornadas — Gestao do Programa](programas/jornada-gestao-programa.md) | Mapa das jornadas de Programas |
 | [Parcerias](parcerias/README.md) | Indice do subdominio, dores, capacidades e documentos |
 | [Parcerias — Processo](parcerias/processo.md) / [Estrutural](parcerias/modelo-estrutural.md) / [Comportamental](parcerias/modelo-comportamental.md) | Parcerias + Vigencias + Aportes + Documentos |
-| [Jornada — Criacao da Parceria](parcerias/jornada-criacao-parceria.md) | Solicitacao, cadastro, aporte original e formalizacao |
-| [Jornada — Aditivo da Parceria](parcerias/jornada-aditivo-parceria.md) | Aditivo de vigencia e aditivo de aporte |
-| [Jornada — Suspensao e Encerramento](parcerias/jornada-suspensao-encerramento-parceria.md) | Suspensao, reativacao e encerramento com cascata |
-| [Jornada — Suspensao em Cascata](parcerias/jornada-suspensao-cascata.md) | Impacto da suspensao sobre Programas e Iniciativas |
+| [Parcerias — Criacao da Parceria](parcerias/processo.md#fluxo-1-criacao-da-parceria) | Solicitacao, cadastro, aporte original e formalizacao |
+| [Parcerias — Aditivo da Parceria](parcerias/processo.md#fluxo-2-aditivo-da-parceria) | Aditivo de vigencia e aditivo de aporte |
+| [Parcerias — Suspensao e Encerramento](parcerias/processo.md#fluxo-3-suspensao-ou-encerramento-da-parceria) | Suspensao, reativacao e encerramento com cascata |
+| [Parcerias — Suspensao em Cascata](parcerias/processo.md#fluxo-4-suspensao-em-cascata-para-programas-e-iniciativas) | Impacto da suspensao sobre Programas e Iniciativas |
 
 ## Consumidores
 
