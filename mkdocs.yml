@@ -12,6 +12,7 @@ not_in_nav: |
   architecture/adr/template.md
   discovery/estornos-prestacao-contas.md
   discovery/regras-calculo-diarias-es.md
+  discovery/regras-liberacao-parcelas.md
   discovery/regras-passagem-areas-fapes.md
   discovery/regras-saldo-alocado-disponivel.md
   discovery/integracoes/README.md
@@ -232,6 +233,7 @@ nav:
           - EPIC-006 Diarias: implementation/modules/M003-gestao-iniciativas-captadas/diarias/epics/EPIC-M003-006.md
           - EPIC-007 Ciclo de Fomento: implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-007.md
           - EPIC-008 Vigencia e Aditivos: implementation/modules/M003-gestao-iniciativas-captadas/aditivos/epics/EPIC-M003-008.md
+          - EPIC-009 Liberacao de Parcelas: implementation/modules/M003-gestao-iniciativas-captadas/liberacao-parcelas/epics/EPIC-M003-009.md
           - Diarias:
               - implementation/modules/M003-gestao-iniciativas-captadas/diarias/README.md
               - Backlog: implementation/modules/M003-gestao-iniciativas-captadas/diarias/backlog.md
@@ -246,6 +248,11 @@ nav:
               - Contrato API: implementation/modules/M003-gestao-iniciativas-captadas/aditivos/contrato-api.md
               - Modelo Estrutural: implementation/modules/M003-gestao-iniciativas-captadas/aditivos/modelo-estrutural.md
               - Processo: implementation/modules/M003-gestao-iniciativas-captadas/aditivos/processo.md
+          - Liberacao de Parcelas:
+              - implementation/modules/M003-gestao-iniciativas-captadas/liberacao-parcelas/README.md
+              - Backlog: implementation/modules/M003-gestao-iniciativas-captadas/liberacao-parcelas/backlog.md
+              - Ontologia: implementation/modules/M003-gestao-iniciativas-captadas/liberacao-parcelas/ontology.yaml
+              - Processo: implementation/modules/M003-gestao-iniciativas-captadas/liberacao-parcelas/processo.md
           - Especificacoes:
               - Proposta Ciclo de Fomento: implementation/modules/M003-gestao-iniciativas-captadas/specifications/proposta-ciclo-fomento-iniciativa.md
       - M004 Pagamento de Bolsistas:
