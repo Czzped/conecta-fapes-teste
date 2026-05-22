@@ -22,6 +22,7 @@ Especificacao de referencia: [README.md](README.md)
 | EPIC-M003-006 | Solicitar Diarias da Iniciativa | RN22-RN33 | Must | To Do | [EPIC-M003-006](diarias/epics/EPIC-M003-006.md) |
 | EPIC-M003-007 | Consultar Ciclo de Fomento da Iniciativa | RN16-RN21 | Must | To Do | [EPIC-M003-007](epics/EPIC-M003-007.md) |
 | EPIC-M003-008 | Consultar Vigencia e Aditivos da Iniciativa | RN34-RN41 | Must | To Do | [EPIC-M003-008](aditivos/epics/EPIC-M003-008.md) |
+| EPIC-M003-009 | Solicitacao e Liberacao de Parcelas da Iniciativa | RN43-RN50 | Must | To Do | [EPIC-M003-009](liberacao-parcelas/epics/EPIC-M003-009.md) |
 
 > **Nota de fronteira:** Edital pertence ao M011; bolsas, cotas e alocacoes pertencem ao M009; prestacao de contas detalhada pertence ao M014. Solicitacao operacional de diaria pertence ao M003 e e referenciada por M014 na comprovacao.
 
@@ -87,4 +88,10 @@ EPIC-M003-008 (Consultar Vigencia e Aditivos da Iniciativa)
 ├── US-M003-039 Identificar aditivo de tempo
 ├── US-M003-040 Identificar aditivo financeiro
 └── US-M003-041 Listar dados dos aditivos no bloco Vigencia e aditivos
+
+EPIC-M003-009 (Solicitacao e Liberacao de Parcelas da Iniciativa)
+├── US-M003-043 Visualizar parcelas e situacao da iniciativa
+├── US-M003-044 Solicitar liberacao da proxima parcela
+├── US-M003-045 Validar condicoes de liberacao automaticamente
+└── US-M003-046 Consultar historico de solicitacoes de liberacao
 ```
