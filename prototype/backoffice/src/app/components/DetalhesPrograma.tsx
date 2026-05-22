@@ -193,8 +193,8 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
     { id: 2, nome: 'Dra. Fernanda Rocha' },
   ]);
   const [aportes, setAportes] = useState<AportePrograma[]>([
-    { id: 1, parceria: 'Parceria Internacional - Universidade de Lisboa', valor: '2.400.000,00', dataAporte: '2026-02-15', estado: 'Ativo', valorAlocado: 1400000 },
-    { id: 2, parceria: 'Parceria FAPES-CAPES', valor: '1.250.000,00', dataAporte: '2026-03-10', estado: 'Ativo', valorAlocado: 820000 },
+    { id: 1, parceria: 'Parceria Internacional - Universidade de Lisboa', valor: '2.400.000,00', dataAporte: '2026-02-15', estado: 'EM_EXECUCAO', valorAlocado: 1400000 },
+    { id: 2, parceria: 'Parceria FAPES-CAPES', valor: '1.250.000,00', dataAporte: '2026-03-10', estado: 'EM_EXECUCAO', valorAlocado: 820000 },
   ]);
   const [showAditivoTempo, setShowAditivoTempo] = useState(false);
   const [novaDataInicio, setNovaDataInicio] = useState(dataInicio);
@@ -298,7 +298,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
     setMembros(prev => prev.map(membro => membro.id === id ? { ...membro, nome: nomePessoa } : membro));
   };
 
-  const addAporte = () => setAportes(prev => [...prev, { id: Date.now(), parceria: '', valor: '', dataAporte: '', estado: 'Ativo', valorAlocado: 0 }]);
+  const addAporte = () => setAportes(prev => [...prev, { id: Date.now(), parceria: '', valor: '', dataAporte: '', estado: 'EM_EXECUCAO', valorAlocado: 0 }]);
   const removeAporte = (id: number) => setAportes(prev => prev.filter(aporte => aporte.id !== id));
   const updateAporte = (id: number, field: keyof Omit<AportePrograma, 'id'>, value: string) => {
     setAportes(prev => prev.map(aporte => aporte.id === id ? { ...aporte, [field]: value } : aporte));
@@ -879,7 +879,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
                   />
                   <DateField label="Data do aporte" value={aporte.dataAporte} onChange={value => updateAporte(aporte.id, 'dataAporte', value)} />
                   <ReadOnlyInfo label="Alocado em iniciativas" value={formatCurrency(aporte.valorAlocado)} />
-                  <Select label="Estado" value={aporte.estado} onChange={value => updateAporte(aporte.id, 'estado', value)} options={['Ativo', 'Suspenso', 'Encerrado']} />
+                  <Select label="Estado" value={aporte.estado} onChange={value => updateAporte(aporte.id, 'estado', value)} options={['EM_EXECUCAO', 'SUSPENSO', 'ENCERRADO']} />
                   <button
                     type="button"
                     onClick={() => abrirRetiradaAporte(aporte)}

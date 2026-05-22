@@ -9,13 +9,13 @@ interface Props {
   onOpenPrograma?: (programa: { codigo: string; nome: string }) => void;
 }
 
-type DetailStatus = ParceriaItem['status'] | 'Suspensa';
+type DetailStatus = ParceriaItem['status'] | 'SUSPENSA';
 
 const statusLabel: Record<DetailStatus, string> = {
-  Rascunho: 'Rascunho',
-  Ativo: 'Ativo',
-  Finalizado: 'Finalizado',
-  Suspensa: 'Suspensa',
+  EM_ELABORACAO: 'Em Elaboração',
+  VIGENTE: 'Vigente',
+  ENCERRADA: 'Encerrada',
+  SUSPENSA: 'Suspensa',
 };
 
 const formatCurrency = (value: number) => (
@@ -215,7 +215,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
   const reservaAditivoPreview = calcularReservaAcaoTransversal(valorAditivoPreview);
 
   const registrarAditivo = () => {
-    if (currentStatus === 'Suspensa' || currentStatus === 'Finalizado') return;
+    if (currentStatus === 'SUSPENSA' || currentStatus === 'ENCERRADA') return;
     if (aditivoTipo === 'financeiro') {
       const valor = parseCurrency(aditivoFinanceiro.valor);
       if (valor > 0) {
@@ -257,8 +257,8 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
   };
 
   const programas = [
-    { nome: 'Programa de Pesquisa Aplicada', valor: Math.min(cadastroData.valorAlocado, 950000), estado: currentStatus === 'Finalizado' ? 'Finalizado' : currentStatus === 'Suspensa' ? 'Suspenso' : 'Ativo' },
-    { nome: 'Programa de Inovação Regional', valor: Math.max(cadastroData.valorAlocado - 950000, 0), estado: currentStatus === 'Finalizado' ? 'Finalizado' : currentStatus === 'Suspensa' ? 'Suspenso' : 'Ativo' },
+    { nome: 'Programa de Pesquisa Aplicada', valor: Math.min(cadastroData.valorAlocado, 950000), estado: currentStatus === 'ENCERRADA' ? 'ENCERRADO' : currentStatus === 'SUSPENSA' ? 'SUSPENSO' : 'EM_EXECUCAO' },
+    { nome: 'Programa de Inovação Regional', valor: Math.max(cadastroData.valorAlocado - 950000, 0), estado: currentStatus === 'ENCERRADA' ? 'ENCERRADO' : currentStatus === 'SUSPENSA' ? 'SUSPENSO' : 'EM_EXECUCAO' },
   ].filter(p => p.valor > 0);
   const dashboardPorPrograma = programas.map((programa, index) => {
     const fatorAportado = index === 0 ? 0.62 : 0.38;
@@ -327,20 +327,20 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
 
   const confirmarSuspensao = () => {
     if (!suspensao.motivo.trim()) return;
-    setCurrentStatus('Suspensa');
+    setCurrentStatus('SUSPENSA');
     setSuspensaoRegistrada(suspensao);
     setShowSuspensao(false);
     setShowAditivo(false);
   };
 
   const reativarParceria = () => {
-    setCurrentStatus('Ativo');
+    setCurrentStatus('VIGENTE');
     setSuspensaoRegistrada(null);
   };
 
   const confirmarEncerramento = () => {
     if (!encerramento.justificativa.trim()) return;
-    setCurrentStatus('Finalizado');
+    setCurrentStatus('ENCERRADA');
     setEncerramentoRegistrado({ justificativa: encerramento.justificativa, programasAfetados });
     setShowEncerramento(false);
     setShowSuspensao(false);
@@ -390,9 +390,9 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
               {showActionDropdown && (
                 <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 4px)', minWidth: '190px', backgroundColor: T.bgSurface, border: `1px solid ${T.borderDefault}`, borderRadius: 'var(--radius)', overflow: 'hidden', zIndex: 30, boxShadow: T.shadowLg }}>
                   {[
-                    { label: 'Aditivo', onClick: () => setShowAditivo(true), disabled: currentStatus === 'Suspensa' || currentStatus === 'Finalizado' },
-                    { label: currentStatus === 'Suspensa' ? 'Reativar' : 'Suspender', onClick: () => currentStatus === 'Suspensa' ? reativarParceria() : setShowSuspensao(true), disabled: currentStatus === 'Finalizado' },
-                    { label: 'Encerrar', onClick: () => setShowEncerramento(true), disabled: currentStatus === 'Finalizado' },
+                    { label: 'Aditivo', onClick: () => setShowAditivo(true), disabled: currentStatus === 'SUSPENSA' || currentStatus === 'ENCERRADA' },
+                    { label: currentStatus === 'SUSPENSA' ? 'Reativar' : 'Suspender', onClick: () => currentStatus === 'SUSPENSA' ? reativarParceria() : setShowSuspensao(true), disabled: currentStatus === 'ENCERRADA' },
+                    { label: 'Encerrar', onClick: () => setShowEncerramento(true), disabled: currentStatus === 'ENCERRADA' },
                     { label: 'Deletar', onClick: () => setConfirmDelete(true), danger: true },
                   ].map(action => (
                     <button
@@ -527,7 +527,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
           </div>
         )}
 
-        {suspensaoRegistrada && currentStatus === 'Suspensa' && (
+        {suspensaoRegistrada && currentStatus === 'SUSPENSA' && (
           <div style={{ ...cardStyle, borderColor: 'rgba(249,115,22,0.35)', backgroundColor: 'rgba(249,115,22,0.08)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: '16px', alignItems: 'center' }}>
               <Info label="Origem da suspensão" value={suspensaoRegistrada.origem} />
@@ -537,7 +537,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
           </div>
         )}
 
-        {encerramentoRegistrado && currentStatus === 'Finalizado' && (
+        {encerramentoRegistrado && currentStatus === 'ENCERRADA' && (
           <div style={{ ...cardStyle, borderColor: 'rgba(163, 163, 163,0.35)', backgroundColor: 'rgba(163, 163, 163,0.08)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '16px', alignItems: 'center' }}>
               <Info label="Justificativa do encerramento" value={encerramentoRegistrado.justificativa} />

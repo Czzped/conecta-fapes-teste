@@ -5,7 +5,7 @@ import { DetalhesParceria } from './DetalhesParceria';
 import { DetalhesPrograma } from './DetalhesPrograma';
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
-type StatusFilter = 'Rascunho' | 'Ativo' | 'Finalizado';
+type StatusFilter = 'EM_ELABORACAO' | 'VIGENTE' | 'ENCERRADA';
 type ParceriaStatus = StatusFilter;
 type DataFimSort = 'Mais Recente' | 'Mais Antiga';
 
@@ -43,16 +43,16 @@ export interface ParceriaItem {
 }
 
 const statusLabel: Record<ParceriaStatus, string> = {
-  Rascunho: 'Rascunho',
-  Ativo: 'Ativo',
-  Finalizado: 'Finalizado',
+  EM_ELABORACAO: 'Em Elaboração',
+  VIGENTE: 'Vigente',
+  ENCERRADA: 'Encerrada',
 };
 
 const statusColor = (status: ParceriaStatus) => {
   switch (status) {
-    case 'Rascunho': return '#f59e0b';
-    case 'Ativo': return '#22c55e';
-    case 'Finalizado': return '#a3a3a3';
+    case 'EM_ELABORACAO': return '#f59e0b';
+    case 'VIGENTE': return '#22c55e';
+    case 'ENCERRADA': return '#a3a3a3';
     default: return '#a3a3a3';
   }
 };
@@ -142,7 +142,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
   const [selectedParceria, setSelectedParceria] = useState<ParceriaItem | null>(null);
   const [selectedProgramaFromParceria, setSelectedProgramaFromParceria] = useState<{ codigo: string; nome: string } | null>(null);
 
-  const statusOptions: StatusFilter[] = ['Rascunho', 'Ativo', 'Finalizado'];
+  const statusOptions: StatusFilter[] = ['EM_ELABORACAO', 'VIGENTE', 'ENCERRADA'];
   const dataFimOptions: DataFimSort[] = ['Mais Recente', 'Mais Antiga'];
   const parceriasBase = [
     {
@@ -152,7 +152,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       dataEnvio: '15/01/2026',
       aditivo: 'Sim',
       area: 'Pesquisa',
-      status: 'Ativo',
+      status: 'VIGENTE',
       investimento: 'R$ 2.500.000,00',
       dataAssinatura: '10/01/2026',
       vigenciaInicio: '01/02/2026',
@@ -180,7 +180,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       dataEnvio: '10/02/2026',
       aditivo: 'Não',
       area: 'Inovação',
-      status: 'Ativo',
+      status: 'VIGENTE',
       investimento: 'R$ 3.800.000,00',
       dataAssinatura: '05/02/2026',
       vigenciaInicio: '01/03/2026',
@@ -208,7 +208,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       dataEnvio: '05/03/2026',
       aditivo: 'Não',
       area: 'Extensão',
-      status: 'Rascunho',
+      status: 'EM_ELABORACAO',
       investimento: 'R$ 1.200.000,00',
       dataAssinatura: '',
       vigenciaInicio: '01/05/2026',
@@ -236,7 +236,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       dataEnvio: '20/12/2025',
       aditivo: 'Sim',
       area: 'Pesquisa',
-      status: 'Finalizado',
+      status: 'ENCERRADA',
       investimento: 'R$ 4.500.000,00',
       dataAssinatura: '15/12/2025',
       vigenciaInicio: '01/01/2026',
@@ -264,7 +264,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       dataEnvio: '15/11/2025',
       aditivo: 'Não',
       area: 'Internacional',
-      status: 'Finalizado',
+      status: 'ENCERRADA',
       investimento: 'R$ 8.900.000,00',
       dataAssinatura: '10/11/2025',
       vigenciaInicio: '01/12/2025',
@@ -292,7 +292,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       dataEnvio: '08/04/2026',
       aditivo: 'Não',
       area: 'Inovação',
-      status: 'Ativo',
+      status: 'VIGENTE',
       investimento: 'R$ 2.100.000,00',
       dataAssinatura: '02/04/2026',
       vigenciaInicio: '01/05/2026',
@@ -320,7 +320,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       dataEnvio: '12/04/2026',
       aditivo: 'Sim',
       area: 'Inovação',
-      status: 'Ativo',
+      status: 'VIGENTE',
       investimento: 'R$ 3.200.000,00',
       dataAssinatura: '07/04/2026',
       vigenciaInicio: '01/06/2026',
@@ -348,7 +348,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       dataEnvio: '18/04/2026',
       aditivo: 'Não',
       area: 'Pesquisa',
-      status: 'Ativo',
+      status: 'VIGENTE',
       investimento: 'R$ 2.850.000,00',
       dataAssinatura: '12/04/2026',
       vigenciaInicio: '01/06/2026',
@@ -376,7 +376,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       dataEnvio: '22/04/2026',
       aditivo: 'Não',
       area: 'Difusão',
-      status: 'Ativo',
+      status: 'VIGENTE',
       investimento: 'R$ 1.650.000,00',
       dataAssinatura: '18/04/2026',
       vigenciaInicio: '01/07/2026',
@@ -404,7 +404,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       dataEnvio: '28/04/2026',
       aditivo: 'Não',
       area: 'Extensão',
-      status: 'Ativo',
+      status: 'VIGENTE',
       investimento: 'R$ 1.950.000,00',
       dataAssinatura: '23/04/2026',
       vigenciaInicio: '01/07/2026',
@@ -460,7 +460,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
   const totalAlocado = parceriasData.reduce((acc, p) => acc + p.valorAlocado, 0);
   const saldoTotal = parceriasData.reduce((acc, p) => acc + p.saldoAlocavelEmProgramas, 0);
   const totalAportado = parceriasData.reduce((acc, p) => {
-    const fatorAportado = p.status === 'Finalizado' ? 0.92 : p.status === 'Rascunho' ? 0 : 0.58;
+    const fatorAportado = p.status === 'ENCERRADA' ? 0.92 : p.status === 'EM_ELABORACAO' ? 0 : 0.58;
     return acc + Math.min(p.valorAlocado * fatorAportado, p.valorAlocado);
   }, 0);
   const percentualAportadoPortfolio = totalAlocado > 0 ? (totalAportado / totalAlocado) * 100 : 0;

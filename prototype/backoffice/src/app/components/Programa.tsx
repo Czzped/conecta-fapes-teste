@@ -4,8 +4,8 @@ import { FormularioPrograma } from './FormularioPrograma';
 import { DetalhesPrograma } from './DetalhesPrograma';
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
-type StatusFilter = 'Todos' | 'Rascunho' | 'Ativo' | 'Finalizado';
-type ProgramaStatus = 'Rascunho' | 'Ativo' | 'Finalizado';
+type StatusFilter = 'Todos' | 'EM_PLANEJAMENTO' | 'EM_EXECUCAO' | 'ENCERRADO';
+type ProgramaStatus = 'EM_PLANEJAMENTO' | 'EM_EXECUCAO' | 'ENCERRADO';
 type ActiveTab = 'listagem' | 'dashboard';
 
 interface ProgramaItem {
@@ -24,11 +24,17 @@ interface ProgramaItem {
 
 const statusColor = (s: string) => {
   switch (s) {
-    case 'Rascunho': return '#f59e0b';
-    case 'Ativo': return '#22c55e';
-    case 'Finalizado': return '#a3a3a3';
+    case 'EM_PLANEJAMENTO': return '#f59e0b';
+    case 'EM_EXECUCAO': return '#22c55e';
+    case 'ENCERRADO': return '#a3a3a3';
     default:         return '#a3a3a3';
   }
+};
+
+const statusLabel: Record<ProgramaStatus, string> = {
+  EM_PLANEJAMENTO: 'Em Planejamento',
+  EM_EXECUCAO: 'Em Execução',
+  ENCERRADO: 'Encerrado',
 };
 
 const formatCurrency = (value: number) => (
@@ -64,19 +70,19 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
   const [showEixoDropdown, setShowEixoDropdown] = useState(false);
   const [selectedPrograma, setSelectedPrograma] = useState<ProgramaItem | null>(null);
 
-  const statusOptions: StatusFilter[] = ['Todos', 'Rascunho', 'Ativo', 'Finalizado'];
+  const statusOptions: StatusFilter[] = ['Todos', 'EM_PLANEJAMENTO', 'EM_EXECUCAO', 'ENCERRADO'];
 
   const programasData: ProgramaItem[] = [
-    { id: 1, nome: 'Programa de Bolsas de Pesquisa 2026', eixo: 'Ciência e Tecnologia', instituicaoDemandante: 'Ufes', dataVigencia: '01/01/2026 - 31/12/2026', status: 'Ativo', valorInvestido: 4200000, valorAlocado: 3600000, valorAportado: 2980000, valorConsumido: 1840000, iniciativas: 24 },
-    { id: 2, nome: 'Programa de Inovação Tecnológica', eixo: 'Inovação e Desenvolvimento', instituicaoDemandante: 'Findes', dataVigencia: '15/02/2026 - 14/02/2027', status: 'Ativo', valorInvestido: 3200000, valorAlocado: 2700000, valorAportado: 2180000, valorConsumido: 1490000, iniciativas: 18 },
-    { id: 3, nome: 'Programa de Extensão Universitária', eixo: 'Formação de Recursos Humanos', instituicaoDemandante: 'Ifes', dataVigencia: '01/03/2026 - 28/02/2027', status: 'Rascunho', valorInvestido: 1800000, valorAlocado: 920000, valorAportado: 430000, valorConsumido: 120000, iniciativas: 9 },
-    { id: 4, nome: 'Programa de Infraestrutura Laboratorial', eixo: 'Infraestrutura de Pesquisa', instituicaoDemandante: 'Ufes', dataVigencia: '01/04/2026 - 31/03/2027', status: 'Rascunho', valorInvestido: 2600000, valorAlocado: 1600000, valorAportado: 980000, valorConsumido: 360000, iniciativas: 11 },
-    { id: 5, nome: 'Programa de Carreira Científica 2025', eixo: 'Formação de Recursos Humanos', instituicaoDemandante: 'Fapes', dataVigencia: '01/01/2025 - 31/12/2025', status: 'Finalizado', valorInvestido: 1450000, valorAlocado: 1450000, valorAportado: 1320000, valorConsumido: 1280000, iniciativas: 17 },
-    { id: 6, nome: 'Programa de Difusão do Conhecimento', eixo: 'Ciência e Tecnologia', instituicaoDemandante: 'Secti', dataVigencia: '01/06/2025 - 31/05/2026', status: 'Finalizado', valorInvestido: 980000, valorAlocado: 760000, valorAportado: 540000, valorConsumido: 410000, iniciativas: 8 },
-    { id: 7, nome: 'Programa de Pesquisa Aplicada em Saúde', eixo: 'Ciência e Tecnologia', instituicaoDemandante: 'Sesa', dataVigencia: '01/07/2026 - 30/06/2027', status: 'Ativo', valorInvestido: 2100000, valorAlocado: 1680000, valorAportado: 1250000, valorConsumido: 640000, iniciativas: 13 },
-    { id: 8, nome: 'Programa de Internacionalização Científica', eixo: 'Formação de Recursos Humanos', instituicaoDemandante: 'Ufes', dataVigencia: '01/08/2026 - 31/07/2027', status: 'Rascunho', valorInvestido: 1750000, valorAlocado: 820000, valorAportado: 360000, valorConsumido: 90000, iniciativas: 6 },
-    { id: 9, nome: 'Programa Laboratórios Inteligentes', eixo: 'Infraestrutura de Pesquisa', instituicaoDemandante: 'Ifes', dataVigencia: '01/09/2026 - 31/08/2027', status: 'Ativo', valorInvestido: 3900000, valorAlocado: 3100000, valorAportado: 2440000, valorConsumido: 1120000, iniciativas: 15 },
-    { id: 10, nome: 'Programa Empreendedorismo Capixaba', eixo: 'Inovação e Desenvolvimento', instituicaoDemandante: 'Findes', dataVigencia: '01/10/2026 - 30/09/2027', status: 'Ativo', valorInvestido: 2400000, valorAlocado: 1740000, valorAportado: 1310000, valorConsumido: 530000, iniciativas: 10 },
+    { id: 1, nome: 'Programa de Bolsas de Pesquisa 2026', eixo: 'Ciência e Tecnologia', instituicaoDemandante: 'Ufes', dataVigencia: '01/01/2026 - 31/12/2026', status: 'EM_EXECUCAO', valorInvestido: 4200000, valorAlocado: 3600000, valorAportado: 2980000, valorConsumido: 1840000, iniciativas: 24 },
+    { id: 2, nome: 'Programa de Inovação Tecnológica', eixo: 'Inovação e Desenvolvimento', instituicaoDemandante: 'Findes', dataVigencia: '15/02/2026 - 14/02/2027', status: 'EM_EXECUCAO', valorInvestido: 3200000, valorAlocado: 2700000, valorAportado: 2180000, valorConsumido: 1490000, iniciativas: 18 },
+    { id: 3, nome: 'Programa de Extensão Universitária', eixo: 'Formação de Recursos Humanos', instituicaoDemandante: 'Ifes', dataVigencia: '01/03/2026 - 28/02/2027', status: 'EM_PLANEJAMENTO', valorInvestido: 1800000, valorAlocado: 920000, valorAportado: 430000, valorConsumido: 120000, iniciativas: 9 },
+    { id: 4, nome: 'Programa de Infraestrutura Laboratorial', eixo: 'Infraestrutura de Pesquisa', instituicaoDemandante: 'Ufes', dataVigencia: '01/04/2026 - 31/03/2027', status: 'EM_PLANEJAMENTO', valorInvestido: 2600000, valorAlocado: 1600000, valorAportado: 980000, valorConsumido: 360000, iniciativas: 11 },
+    { id: 5, nome: 'Programa de Carreira Científica 2025', eixo: 'Formação de Recursos Humanos', instituicaoDemandante: 'Fapes', dataVigencia: '01/01/2025 - 31/12/2025', status: 'ENCERRADO', valorInvestido: 1450000, valorAlocado: 1450000, valorAportado: 1320000, valorConsumido: 1280000, iniciativas: 17 },
+    { id: 6, nome: 'Programa de Difusão do Conhecimento', eixo: 'Ciência e Tecnologia', instituicaoDemandante: 'Secti', dataVigencia: '01/06/2025 - 31/05/2026', status: 'ENCERRADO', valorInvestido: 980000, valorAlocado: 760000, valorAportado: 540000, valorConsumido: 410000, iniciativas: 8 },
+    { id: 7, nome: 'Programa de Pesquisa Aplicada em Saúde', eixo: 'Ciência e Tecnologia', instituicaoDemandante: 'Sesa', dataVigencia: '01/07/2026 - 30/06/2027', status: 'EM_EXECUCAO', valorInvestido: 2100000, valorAlocado: 1680000, valorAportado: 1250000, valorConsumido: 640000, iniciativas: 13 },
+    { id: 8, nome: 'Programa de Internacionalização Científica', eixo: 'Formação de Recursos Humanos', instituicaoDemandante: 'Ufes', dataVigencia: '01/08/2026 - 31/07/2027', status: 'EM_PLANEJAMENTO', valorInvestido: 1750000, valorAlocado: 820000, valorAportado: 360000, valorConsumido: 90000, iniciativas: 6 },
+    { id: 9, nome: 'Programa Laboratórios Inteligentes', eixo: 'Infraestrutura de Pesquisa', instituicaoDemandante: 'Ifes', dataVigencia: '01/09/2026 - 31/08/2027', status: 'EM_EXECUCAO', valorInvestido: 3900000, valorAlocado: 3100000, valorAportado: 2440000, valorConsumido: 1120000, iniciativas: 15 },
+    { id: 10, nome: 'Programa Empreendedorismo Capixaba', eixo: 'Inovação e Desenvolvimento', instituicaoDemandante: 'Findes', dataVigencia: '01/10/2026 - 30/09/2027', status: 'EM_EXECUCAO', valorInvestido: 2400000, valorAlocado: 1740000, valorAportado: 1310000, valorConsumido: 530000, iniciativas: 10 },
   ];
 
   const filtered = programasData.filter(p => {
@@ -388,7 +394,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer',
               }}
             >
-              <span>{statusFilter}</span>
+              <span>{statusFilter === 'Todos' ? 'Todos' : statusLabel[statusFilter]}</span>
               <ChevronDown size={16} style={{ color: T.iconSubdued, transform: showStatusDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
             </button>
             {showStatusDropdown && (
@@ -411,7 +417,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
                     onMouseEnter={e => { if (statusFilter !== opt) e.currentTarget.style.backgroundColor = T.bgHover; }}
                     onMouseLeave={e => { if (statusFilter !== opt) e.currentTarget.style.backgroundColor = 'transparent'; }}
                   >
-                    {opt}
+                    {opt === 'Todos' ? 'Todos' : statusLabel[opt as ProgramaStatus]}
                   </button>
                 ))}
               </div>
@@ -494,7 +500,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
                       fontWeight: 'var(--font-weight-medium)',
                       color: statusColor(prog.status),
                     }}>
-                      {prog.status}
+                      {statusLabel[prog.status]}
                     </div>
                   </div>
 
