@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, ArrowLeft, ChevronDown, X, Save } from 'lucide-react';
+import { ChevronRight, ArrowLeft, ChevronDown, X, Save, FileText, CheckCircle, ClipboardCheck, ListChecks, RotateCcw, Trophy } from 'lucide-react';
 import { FormularioEdital } from './FormularioEdital';
 
 interface CaptacaoDetalhe {
@@ -24,6 +24,13 @@ const cardStyle: React.CSSProperties = {
   borderRadius: '10px',
   padding: '28px',
   marginBottom: '24px',
+};
+
+const metricCardStyle: React.CSSProperties = {
+  backgroundColor: 'rgba(38, 38, 38, 0.5)',
+  border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: '10px',
+  padding: '20px',
 };
 
 const labelStyle: React.CSSProperties = {
@@ -95,24 +102,24 @@ const avaliadores = [
 
 const fasesIniciativas = [
   { fase: 'Submetida', quantidade: 42, cor: '#38bdf8' },
-  { fase: 'Habilitação documental', quantidade: 31, cor: '#fbbf24' },
-  { fase: 'Avaliação ad hoc', quantidade: 24, cor: '#a78bfa' },
-  { fase: 'Resultado preliminar', quantidade: 18, cor: '#fb7185' },
-  { fase: 'Revisão de resultado', quantidade: 6, cor: '#f97316' },
-  { fase: 'Resultado final', quantidade: 12, cor: '#22c55e' },
+  { fase: 'Habilitação', quantidade: 31, cor: '#fbbf24' },
+  { fase: 'Avaliação Ad Hoc', quantidade: 24, cor: '#a78bfa' },
+  { fase: 'Resultado Preliminar', quantidade: 18, cor: '#fb7185' },
+  { fase: 'Recurso', quantidade: 6, cor: '#f97316' },
+  { fase: 'Resultado Final', quantidade: 12, cor: '#22c55e' },
 ];
 
 const iniciativasEnviadas = [
-  { codigo: 'INI-2026-001', titulo: 'Plataforma inteligente de monitoramento hídrico', proponente: 'Instituto Federal do Espírito Santo', ortogado: 'Mariana Lopes', fase: 'Avaliação ad hoc', data: '12/02/2026', categoria: 'Inovação', faixa: 'Faixa 2', valorSolicitado: 'R$ 420.000,00', valorNumerico: 420000, resumo: 'Solução para monitorar bacias hidrográficas com sensores conectados e painéis de alerta.', rubricas: [{ nome: 'Bolsas', valor: 140000, cor: '#38bdf8' }, { nome: 'Capital', valor: 180000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 100000, cor: '#22c55e' }] },
-  { codigo: 'INI-2026-002', titulo: 'Bioinsumos para agricultura de precisão', proponente: 'Universidade Federal do Espírito Santo', ortogado: 'André Carvalho', fase: 'Habilitação documental', data: '14/02/2026', categoria: 'Pesquisa', faixa: 'Faixa 1', valorSolicitado: 'R$ 180.000,00', valorNumerico: 180000, resumo: 'Pesquisa aplicada para validação de bioinsumos em cadeias produtivas regionais.', rubricas: [{ nome: 'Bolsas', valor: 90000, cor: '#38bdf8' }, { nome: 'Custeio', valor: 70000, cor: '#22c55e' }, { nome: 'Diárias e passagens', valor: 20000, cor: '#fb7185' }] },
-  { codigo: 'INI-2026-003', titulo: 'Sistema de rastreabilidade para cadeias produtivas', proponente: 'Findes Lab', ortogado: 'Patrícia Almeida', fase: 'Resultado preliminar', data: '20/02/2026', categoria: 'Inovação', faixa: 'Faixa 2', valorSolicitado: 'R$ 390.000,00', valorNumerico: 390000, resumo: 'Plataforma para rastrear origem, qualidade e movimentação de produtos industriais.', rubricas: [{ nome: 'Capital', valor: 170000, cor: '#a78bfa' }, { nome: 'Serviços de terceiros', valor: 150000, cor: '#fbbf24' }, { nome: 'Custeio', valor: 70000, cor: '#22c55e' }] },
-  { codigo: 'INI-2026-004', titulo: 'Tecnologia assistiva para educação inclusiva', proponente: 'Instituto Capixaba de Tecnologia', ortogado: 'Lucas Rocha', fase: 'Revisão de resultado', data: '22/02/2026', categoria: 'Extensão', faixa: 'Faixa 1', valorSolicitado: 'R$ 150.000,00', valorNumerico: 150000, resumo: 'Ferramentas digitais e dispositivos de apoio para estudantes com deficiência.', rubricas: [{ nome: 'Bolsas', valor: 60000, cor: '#38bdf8' }, { nome: 'Capital', valor: 50000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 40000, cor: '#22c55e' }] },
-  { codigo: 'INI-2026-005', titulo: 'Observatório de inovação em saúde pública', proponente: 'Hospital Universitário Cassiano Antônio Moraes', ortogado: 'Fernanda Costa', fase: 'Resultado final', data: '25/02/2026', categoria: 'Pesquisa', faixa: 'Faixa 2', valorSolicitado: 'R$ 480.000,00', valorNumerico: 480000, resumo: 'Observatório para consolidar indicadores, evidências e iniciativas de inovação em saúde.', rubricas: [{ nome: 'Bolsas', valor: 180000, cor: '#38bdf8' }, { nome: 'Capital', valor: 160000, cor: '#a78bfa' }, { nome: 'Serviços de terceiros', valor: 90000, cor: '#fbbf24' }, { nome: 'Custeio', valor: 50000, cor: '#22c55e' }] },
+  { codigo: 'INI-2026-001', titulo: 'Plataforma inteligente de monitoramento hídrico', proponente: 'Instituto Federal do Espírito Santo', ortogado: 'Mariana Lopes', fase: 'Avaliação Ad Hoc', data: '12/02/2026', categoria: 'Inovação', faixa: 'Faixa 2', valorSolicitado: 'R$ 420.000,00', valorNumerico: 420000, resumo: 'Solução para monitorar bacias hidrográficas com sensores conectados e painéis de alerta.', rubricas: [{ nome: 'Bolsas', valor: 140000, cor: '#38bdf8' }, { nome: 'Capital', valor: 180000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 100000, cor: '#22c55e' }] },
+  { codigo: 'INI-2026-002', titulo: 'Bioinsumos para agricultura de precisão', proponente: 'Universidade Federal do Espírito Santo', ortogado: 'André Carvalho', fase: 'Habilitação', data: '14/02/2026', categoria: 'Pesquisa', faixa: 'Faixa 1', valorSolicitado: 'R$ 180.000,00', valorNumerico: 180000, resumo: 'Pesquisa aplicada para validação de bioinsumos em cadeias produtivas regionais.', rubricas: [{ nome: 'Bolsas', valor: 90000, cor: '#38bdf8' }, { nome: 'Custeio', valor: 70000, cor: '#22c55e' }, { nome: 'Diárias e passagens', valor: 20000, cor: '#fb7185' }] },
+  { codigo: 'INI-2026-003', titulo: 'Sistema de rastreabilidade para cadeias produtivas', proponente: 'Findes Lab', ortogado: 'Patrícia Almeida', fase: 'Resultado Preliminar', data: '20/02/2026', categoria: 'Inovação', faixa: 'Faixa 2', valorSolicitado: 'R$ 390.000,00', valorNumerico: 390000, resumo: 'Plataforma para rastrear origem, qualidade e movimentação de produtos industriais.', rubricas: [{ nome: 'Capital', valor: 170000, cor: '#a78bfa' }, { nome: 'Serviços de terceiros', valor: 150000, cor: '#fbbf24' }, { nome: 'Custeio', valor: 70000, cor: '#22c55e' }] },
+  { codigo: 'INI-2026-004', titulo: 'Tecnologia assistiva para educação inclusiva', proponente: 'Instituto Capixaba de Tecnologia', ortogado: 'Lucas Rocha', fase: 'Recurso', data: '22/02/2026', categoria: 'Extensão', faixa: 'Faixa 1', valorSolicitado: 'R$ 150.000,00', valorNumerico: 150000, resumo: 'Ferramentas digitais e dispositivos de apoio para estudantes com deficiência.', rubricas: [{ nome: 'Bolsas', valor: 60000, cor: '#38bdf8' }, { nome: 'Capital', valor: 50000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 40000, cor: '#22c55e' }] },
+  { codigo: 'INI-2026-005', titulo: 'Observatório de inovação em saúde pública', proponente: 'Hospital Universitário Cassiano Antônio Moraes', ortogado: 'Fernanda Costa', fase: 'Resultado Final', data: '25/02/2026', categoria: 'Pesquisa', faixa: 'Faixa 2', valorSolicitado: 'R$ 480.000,00', valorNumerico: 480000, resumo: 'Observatório para consolidar indicadores, evidências e iniciativas de inovação em saúde.', rubricas: [{ nome: 'Bolsas', valor: 180000, cor: '#38bdf8' }, { nome: 'Capital', valor: 160000, cor: '#a78bfa' }, { nome: 'Serviços de terceiros', valor: 90000, cor: '#fbbf24' }, { nome: 'Custeio', valor: 50000, cor: '#22c55e' }] },
   { codigo: 'INI-2026-006', titulo: 'Rede de sensores para cidades resilientes', proponente: 'Prefeitura Municipal de Vitória', ortogado: 'Ricardo Torres', fase: 'Submetida', data: '28/02/2026', categoria: 'Inovação', faixa: 'Faixa 1', valorSolicitado: 'R$ 210.000,00', valorNumerico: 210000, resumo: 'Rede de sensores urbanos para apoiar resposta rápida a eventos climáticos.', rubricas: [{ nome: 'Capital', valor: 130000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 50000, cor: '#22c55e' }, { nome: 'Diárias e passagens', valor: 30000, cor: '#fb7185' }] },
-  { codigo: 'INI-2026-007', titulo: 'Modelos preditivos para gestão costeira', proponente: 'Universidade Vila Velha', ortogado: 'Beatriz Nascimento', fase: 'Avaliação ad hoc', data: '01/03/2026', categoria: 'Pesquisa', faixa: 'Faixa 2', valorSolicitado: 'R$ 360.000,00', valorNumerico: 360000, resumo: 'Modelos analíticos para apoiar decisões sobre erosão costeira e ocupação urbana.', rubricas: [{ nome: 'Bolsas', valor: 120000, cor: '#38bdf8' }, { nome: 'Capital', valor: 140000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 100000, cor: '#22c55e' }] },
-  { codigo: 'INI-2026-008', titulo: 'Automação para laboratórios de biotecnologia', proponente: 'SENAI Cimatec ES', ortogado: 'Gustavo Almeida', fase: 'Resultado preliminar', data: '03/03/2026', categoria: 'Inovação', faixa: 'Faixa 2', valorSolicitado: 'R$ 440.000,00', valorNumerico: 440000, resumo: 'Automação de processos laboratoriais para ampliar capacidade de pesquisa aplicada.', rubricas: [{ nome: 'Capital', valor: 210000, cor: '#a78bfa' }, { nome: 'Serviços de terceiros', valor: 150000, cor: '#fbbf24' }, { nome: 'Custeio', valor: 80000, cor: '#22c55e' }] },
-  { codigo: 'INI-2026-009', titulo: 'Plataforma de educação científica aberta', proponente: 'Fundação de Apoio à Educação Científica', ortogado: 'Camila Ribeiro', fase: 'Revisão de resultado', data: '05/03/2026', categoria: 'Extensão', faixa: 'Faixa 1', valorSolicitado: 'R$ 160.000,00', valorNumerico: 160000, resumo: 'Ambiente digital para divulgação científica e formação de professores da rede pública.', rubricas: [{ nome: 'Bolsas', valor: 70000, cor: '#38bdf8' }, { nome: 'Custeio', valor: 60000, cor: '#22c55e' }, { nome: 'Serviços de terceiros', valor: 30000, cor: '#fbbf24' }] },
-  { codigo: 'INI-2026-010', titulo: 'Energia renovável em comunidades isoladas', proponente: 'Instituto de Energia do Espírito Santo', ortogado: 'Thiago Monteiro', fase: 'Resultado final', data: '07/03/2026', categoria: 'Inovação', faixa: 'Faixa 2', valorSolicitado: 'R$ 510.000,00', valorNumerico: 510000, resumo: 'Implantação piloto de soluções renováveis para comunidades de difícil acesso.', rubricas: [{ nome: 'Capital', valor: 260000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 150000, cor: '#22c55e' }, { nome: 'Bolsas', valor: 100000, cor: '#38bdf8' }] },
+  { codigo: 'INI-2026-007', titulo: 'Modelos preditivos para gestão costeira', proponente: 'Universidade Vila Velha', ortogado: 'Beatriz Nascimento', fase: 'Avaliação Ad Hoc', data: '01/03/2026', categoria: 'Pesquisa', faixa: 'Faixa 2', valorSolicitado: 'R$ 360.000,00', valorNumerico: 360000, resumo: 'Modelos analíticos para apoiar decisões sobre erosão costeira e ocupação urbana.', rubricas: [{ nome: 'Bolsas', valor: 120000, cor: '#38bdf8' }, { nome: 'Capital', valor: 140000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 100000, cor: '#22c55e' }] },
+  { codigo: 'INI-2026-008', titulo: 'Automação para laboratórios de biotecnologia', proponente: 'SENAI Cimatec ES', ortogado: 'Gustavo Almeida', fase: 'Resultado Preliminar', data: '03/03/2026', categoria: 'Inovação', faixa: 'Faixa 2', valorSolicitado: 'R$ 440.000,00', valorNumerico: 440000, resumo: 'Automação de processos laboratoriais para ampliar capacidade de pesquisa aplicada.', rubricas: [{ nome: 'Capital', valor: 210000, cor: '#a78bfa' }, { nome: 'Serviços de terceiros', valor: 150000, cor: '#fbbf24' }, { nome: 'Custeio', valor: 80000, cor: '#22c55e' }] },
+  { codigo: 'INI-2026-009', titulo: 'Plataforma de educação científica aberta', proponente: 'Fundação de Apoio à Educação Científica', ortogado: 'Camila Ribeiro', fase: 'Recurso', data: '05/03/2026', categoria: 'Extensão', faixa: 'Faixa 1', valorSolicitado: 'R$ 160.000,00', valorNumerico: 160000, resumo: 'Ambiente digital para divulgação científica e formação de professores da rede pública.', rubricas: [{ nome: 'Bolsas', valor: 70000, cor: '#38bdf8' }, { nome: 'Custeio', valor: 60000, cor: '#22c55e' }, { nome: 'Serviços de terceiros', valor: 30000, cor: '#fbbf24' }] },
+  { codigo: 'INI-2026-010', titulo: 'Energia renovável em comunidades isoladas', proponente: 'Instituto de Energia do Espírito Santo', ortogado: 'Thiago Monteiro', fase: 'Resultado Final', data: '07/03/2026', categoria: 'Inovação', faixa: 'Faixa 2', valorSolicitado: 'R$ 510.000,00', valorNumerico: 510000, resumo: 'Implantação piloto de soluções renováveis para comunidades de difícil acesso.', rubricas: [{ nome: 'Capital', valor: 260000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 150000, cor: '#22c55e' }, { nome: 'Bolsas', valor: 100000, cor: '#38bdf8' }] },
 ];
 
 const avaliacoesAdHoc = [
@@ -173,7 +180,7 @@ const financeiroPorFaixaCaptacao = Array.from(new Set(iniciativasEnviadas.map(in
 });
 
 export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
-  const [activeTab, setActiveTab] = useState<'informacoes' | 'dashboard' | 'proposta' | 'avaliacao' | 'avaliacaoAdHoc' | 'recurso' | 'resultadoFinal'>('informacoes');
+  const [activeTab, setActiveTab] = useState<'informacoes' | 'dashboard' | 'proposta' | 'avaliacao' | 'avaliacaoAdHoc' | 'recurso' | 'recursoParcial' | 'resultadoFinal'>('informacoes');
   const [editingResumo, setEditingResumo] = useState(false);
   const [showFormularioEdicao, setShowFormularioEdicao] = useState(false);
   const [iniciativaSelecionadaCodigo, setIniciativaSelecionadaCodigo] = useState(iniciativasEnviadas[0].codigo);
@@ -227,6 +234,39 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
     color: '#ffffff',
     lineHeight: 1.4,
   };
+  const filtroCampoStyle: React.CSSProperties = {
+    ...inputStyle,
+    backgroundColor: 'rgba(38, 38, 38, 0.5)',
+    height: '40px',
+  };
+  const renderListFilters = (statusOptions: string[], includeDate = false) => (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: includeDate ? '1.3fr 180px 220px' : '1fr 220px',
+      gap: '16px',
+      marginBottom: '16px',
+      alignItems: 'end',
+    }}>
+      <div>
+        <label style={labelStyle}>Busca</label>
+        <input type="text" placeholder="Buscar" style={filtroCampoStyle} />
+      </div>
+      {includeDate && (
+        <div>
+          <label style={labelStyle}>Data</label>
+          <input type="text" placeholder="dd/mm/aaaa" style={filtroCampoStyle} />
+        </div>
+      )}
+      <div>
+        <label style={labelStyle}>Status</label>
+        <select defaultValue="Todos" style={{ ...filtroCampoStyle, appearance: 'none', cursor: 'pointer' }}>
+          {statusOptions.map(status => (
+            <option key={status} value={status}>{status}</option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
 
   if (showFormularioEdicao && podeEditar) {
     return <FormularioEdital mode="edit" onBack={() => setShowFormularioEdicao(false)} />;
@@ -618,8 +658,9 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
             { id: 'informacoes', label: 'Informações Gerais' },
             { id: 'dashboard', label: 'Dashboard' },
             { id: 'proposta', label: 'Proposta' },
-            { id: 'avaliacao', label: 'Avaliação de Documentos' },
+            { id: 'avaliacao', label: 'Habilitação' },
             { id: 'avaliacaoAdHoc', label: 'Avaliação Ad Hoc' },
+            { id: 'recursoParcial', label: 'Resultado Parcial' },
             { id: 'recurso', label: 'Recurso' },
             { id: 'resultadoFinal', label: 'Resultado Final' },
           ].map(tab => (
@@ -825,7 +866,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
               { etapa: 'Publicação da captação', inicio: '01/02/2026', fim: '01/02/2026' },
               { etapa: 'Recebimento das propostas', inicio: '01/02/2026', fim: '31/03/2026' },
               { etapa: 'Avaliação documental', inicio: '01/04/2026', fim: '15/04/2026' },
-              { etapa: 'Avaliação ad hoc', inicio: '16/04/2026', fim: '31/05/2026' },
+              { etapa: 'Avaliação Ad Hoc', inicio: '16/04/2026', fim: '31/05/2026' },
               { etapa: 'Publicação do resultado preliminar', inicio: '05/06/2026', fim: '05/06/2026' },
               { etapa: 'Recebimento de revisão do resultado', inicio: '06/06/2026', fim: '15/06/2026' },
               { etapa: 'Publicação do resultado após revisão', inicio: '20/06/2026', fim: '20/06/2026' },
@@ -885,46 +926,6 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
                 </div>
                 <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.55)' }}>
                   Necessidade de tempo adicional para conferência documental.
-                </div>
-              </div>
-
-              <div style={{
-                marginTop: '18px',
-                paddingTop: '18px',
-                borderTop: '1px solid rgba(255,255,255,0.08)',
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
-                    Rubricas da iniciativa selecionada
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)' }}>
-                    Total: {iniciativaSelecionada.valorSolicitado}
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gap: '12px' }}>
-                  {iniciativaSelecionada.rubricas.map(rubrica => {
-                    const percentual = Math.round((rubrica.valor / iniciativaSelecionada.valorNumerico) * 100);
-
-                    return (
-                      <div key={`${iniciativaSelecionada.codigo}-${rubrica.nome}`}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 160px 80px', gap: '12px', alignItems: 'center', marginBottom: '6px' }}>
-                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
-                            {rubrica.nome}
-                          </div>
-                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', textAlign: 'right' }}>
-                            {formatCurrency(rubrica.valor)}
-                          </div>
-                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', textAlign: 'right' }}>
-                            {percentual}%
-                          </div>
-                        </div>
-                        <div style={{ height: '7px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                          <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: '#00c1af' }} />
-                        </div>
-                      </div>
-                    );
-                  })}
                 </div>
               </div>
             </div>
@@ -1180,70 +1181,29 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
 
         {activeTab === 'dashboard' && (
           <>
-            <div style={cardStyle}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '16px' }}>
-                {fasesIniciativas.map(fase => {
-                  const maiorQuantidade = Math.max(...fasesIniciativas.map(item => item.quantidade));
-                  const percentual = Math.round((fase.quantidade / maiorQuantidade) * 100);
-
-                  return (
-                    <div
-                      key={fase.fase}
-                      style={{
-                        padding: '18px',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: 'var(--radius)',
-                        backgroundColor: 'rgba(23, 23, 23,0.35)',
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
-                        <div>
-                          <div style={{
-                            fontFamily: 'var(--font-family)',
-                            fontSize: 'var(--text-sm)',
-                            fontWeight: 'var(--font-weight-medium)',
-                            color: '#ffffff',
-                            marginBottom: '4px',
-                          }}>
-                            {fase.fase}
-                          </div>
-                          <div style={{
-                            fontFamily: 'var(--font-family)',
-                            fontSize: 'var(--text-xs)',
-                            color: 'rgba(255,255,255,0.5)',
-                          }}>
-                            iniciativas na fase
-                          </div>
-                        </div>
-                        <div style={{
-                          fontFamily: 'var(--font-family)',
-                          fontSize: 'var(--text-md)',
-                          fontWeight: 'var(--font-weight-medium)',
-                          color: '#00c1af',
-                          lineHeight: 1,
-                        }}>
-                          {fase.quantidade}
-                        </div>
-                      </div>
-
-                      <div style={{
-                        height: '6px',
-                        backgroundColor: 'rgba(255,255,255,0.08)',
-                        borderRadius: '999px',
-                        marginTop: '16px',
-                        overflow: 'hidden',
-                      }}>
-                        <div style={{
-                          width: `${percentual}%`,
-                          height: '100%',
-                          backgroundColor: '#00c1af',
-                          borderRadius: '999px',
-                        }} />
-                      </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: '16px', marginBottom: '24px' }}>
+              {[
+                { ...fasesIniciativas[0], Icon: FileText, bg: 'rgba(56,189,248,0.12)' },
+                { ...fasesIniciativas[1], Icon: CheckCircle, bg: 'rgba(34,197,94,0.12)' },
+                { ...fasesIniciativas[2], Icon: ClipboardCheck, bg: 'rgba(0,193,175,0.12)' },
+                { ...fasesIniciativas[3], Icon: ListChecks, bg: 'rgba(59,130,246,0.12)' },
+                { ...fasesIniciativas[4], Icon: RotateCcw, bg: 'rgba(245,158,11,0.12)' },
+                { ...fasesIniciativas[5], Icon: Trophy, bg: 'rgba(168,85,247,0.12)' },
+              ].map(({ fase, quantidade, Icon, bg }) => (
+                <div key={fase} style={metricCardStyle}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: bg, borderRadius: 'var(--radius)', flexShrink: 0 }}>
+                      <Icon size={20} style={{ color: '#00c1af' }} />
                     </div>
-                  );
-                })}
-              </div>
+                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', margin: 0 }}>
+                      {fase}
+                    </p>
+                  </div>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: '#ffffff', textAlign: 'center', margin: 0 }}>
+                    {quantidade}
+                  </p>
+                </div>
+              ))}
             </div>
 
             <div style={cardStyle}>
@@ -1466,51 +1426,6 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
             </div>
 
             <div style={cardStyle}>
-              <h2 style={sectionTitleStyle}>Detalhes da Iniciativa Selecionada</h2>
-
-              <div style={{ display: 'grid', gap: '18px' }}>
-                <div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', marginBottom: '8px' }}>
-                    {iniciativaSelecionada.titulo}
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.62)', lineHeight: 1.55 }}>
-                    {iniciativaSelecionada.resumo}
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '12px' }}>
-                  {[
-                    { label: 'Código', value: iniciativaSelecionada.codigo },
-                    { label: 'Fase atual', value: iniciativaSelecionada.fase },
-                    { label: 'Proponente', value: iniciativaSelecionada.proponente },
-                    { label: 'Ortogado', value: iniciativaSelecionada.ortogado },
-                    { label: 'Categoria', value: iniciativaSelecionada.categoria },
-                    { label: 'Faixa', value: iniciativaSelecionada.faixa },
-                    { label: 'Valor solicitado', value: iniciativaSelecionada.valorSolicitado },
-                    { label: 'Data de envio', value: iniciativaSelecionada.data },
-                  ].map(item => (
-                    <div
-                      key={item.label}
-                      style={{
-                        padding: '12px',
-                        borderRadius: 'var(--radius)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        backgroundColor: 'rgba(23, 23, 23,0.35)',
-                      }}
-                    >
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginBottom: '4px' }}>
-                        {item.label}
-                      </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', lineHeight: 1.35 }}>
-                        {item.value}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div style={cardStyle}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
                 <div>
                   <h2 style={{ ...sectionTitleStyle, marginBottom: '6px' }}>Revisores Ad Hoc</h2>
@@ -1579,91 +1494,12 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
               </div>
             </div>
 
-            <div style={cardStyle}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
-                <div>
-                  <h2 style={{ ...sectionTitleStyle, marginBottom: '6px' }}>Avaliações dos Revisores</h2>
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
-                    Pareceres registrados por revisor, com a iniciativa avaliada e situação atual.
-                  </p>
-                </div>
-                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#00c1af', padding: '6px 10px', borderRadius: '999px', border: '1px solid rgba(0,193,175,0.28)', backgroundColor: 'rgba(0,193,175,0.08)', whiteSpace: 'nowrap' }}>
-                  {avaliacoesAdHoc.length} avaliação(ões)
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gap: '12px' }}>
-                {avaliacoesAdHoc.map(avaliacao => {
-                  const iniciativaAvaliada = iniciativasEnviadas.find(item => item.codigo === avaliacao.iniciativaCodigo);
-
-                  return (
-                    <div
-                      key={`${avaliacao.iniciativaCodigo}-${avaliacao.revisor}`}
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1.1fr 1.3fr 150px 90px',
-                        gap: '16px',
-                        padding: '16px',
-                        borderRadius: 'var(--radius)',
-                        border: avaliacao.iniciativaCodigo === iniciativaSelecionada.codigo ? '1px solid rgba(0,193,175,0.38)' : '1px solid rgba(255,255,255,0.1)',
-                        backgroundColor: avaliacao.iniciativaCodigo === iniciativaSelecionada.codigo ? 'rgba(0,193,175,0.07)' : 'rgba(23, 23, 23,0.35)',
-                      }}
-                    >
-                      <div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', marginBottom: '3px' }}>
-                          {avaliacao.revisor}
-                        </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)' }}>
-                          {avaliacao.area}
-                        </div>
-                      </div>
-                      <div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', marginBottom: '3px' }}>
-                          {iniciativaAvaliada?.titulo || avaliacao.iniciativaCodigo}
-                        </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginBottom: '8px' }}>
-                          {avaliacao.iniciativaCodigo}
-                        </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.65)', lineHeight: 1.5 }}>
-                          {avaliacao.parecer}
-                        </div>
-                      </div>
-                      <div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginBottom: '6px' }}>
-                          Status
-                        </div>
-                        <span style={{
-                          display: 'inline-flex',
-                          padding: '6px 10px',
-                          borderRadius: '999px',
-                          border: avaliacao.status === 'Concluída' ? '1px solid rgba(34,197,94,0.38)' : avaliacao.status === 'Em avaliação' ? '1px solid rgba(167,139,250,0.38)' : '1px solid rgba(251,191,36,0.38)',
-                          backgroundColor: avaliacao.status === 'Concluída' ? 'rgba(34,197,94,0.12)' : avaliacao.status === 'Em avaliação' ? 'rgba(167,139,250,0.14)' : 'rgba(251,191,36,0.12)',
-                          color: avaliacao.status === 'Concluída' ? '#22c55e' : avaliacao.status === 'Em avaliação' ? '#a78bfa' : '#fbbf24',
-                          fontFamily: 'var(--font-family)',
-                          fontSize: 'var(--text-xs)',
-                          fontWeight: 'var(--font-weight-medium)',
-                        }}>
-                          {avaliacao.status}
-                        </span>
-                      </div>
-                      <div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)', marginBottom: '6px' }}>
-                          Nota
-                        </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>
-                          {avaliacao.nota}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
           </>
         )}
 
         {activeTab === 'proposta' && (
           <div style={{ display: 'grid', gap: '10px' }}>
+              {renderListFilters(['Todos', 'Submetida', 'Habilitação', 'Avaliação Ad Hoc', 'Resultado Final'], true)}
               {iniciativasEnviadas.map(iniciativa => (
                 <div
                   key={iniciativa.codigo}
@@ -1704,6 +1540,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
 
         {activeTab === 'avaliacao' && (
           <div style={{ display: 'grid', gap: '10px' }}>
+              {renderListFilters(['Todos', 'Habilitado', 'Não Habilitado'])}
               {iniciativasEnviadas.map((iniciativa, index) => {
                 const habilitado = index % 4 !== 2;
                 return (
@@ -1756,6 +1593,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
 
         {activeTab === 'avaliacaoAdHoc' && (
           <div style={{ display: 'grid', gap: '10px' }}>
+              {renderListFilters(['Todos', 'Concluída', 'Em avaliação', 'Solicitada revisão'])}
               {avaliacoesAdHoc.map(avaliacao => {
                 const iniciativaAvaliada = iniciativasEnviadas.find(item => item.codigo === avaliacao.iniciativaCodigo);
 
@@ -1818,6 +1656,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
 
         {activeTab === 'recurso' && (
           <div style={{ display: 'grid', gap: '10px' }}>
+              {renderListFilters(['Todos', 'Em análise', 'Aprovado', 'Recusado'])}
               {iniciativasEnviadas.map((iniciativa, index) => {
                 const recursoStatus = index % 3 === 0 ? 'Aprovado' : index % 3 === 1 ? 'Em análise' : 'Recusado';
                 const recursoColor = recursoStatus === 'Aprovado' ? '#22c55e' : recursoStatus === 'Recusado' ? '#ef4444' : '#00c1af';
@@ -1830,7 +1669,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
                   onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38, 0.5)'; }}
                   style={{
                     ...detalheLinhaStyle,
-                    gridTemplateColumns: '1.4fr 1.05fr 1fr 150px',
+                    gridTemplateColumns: '1.25fr 1fr 1fr 150px 150px',
                   }}
                 >
                   <div>
@@ -1846,6 +1685,69 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
                   <div>
                     <div style={detalheRotuloStyle}>Proponente</div>
                     <div style={detalheValorStyle}>{iniciativa.ortogado}</div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Fase</div>
+                    <div style={detalheValorStyle}>{index % 2 === 0 ? 'Habilitação' : 'Avaliação Ad Hoc'}</div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Status</div>
+                    <span style={{
+                      display: 'inline-flex',
+                      width: 'fit-content',
+                      padding: '6px 10px',
+                      borderRadius: '999px',
+                      border: recursoBorder,
+                      backgroundColor: recursoBg,
+                      color: recursoColor,
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-xs)',
+                      fontWeight: 'var(--font-weight-medium)',
+                    }}>
+                      {recursoStatus}
+                    </span>
+                  </div>
+                </div>
+                );
+              })}
+          </div>
+        )}
+
+        {activeTab === 'recursoParcial' && (
+          <div style={{ display: 'grid', gap: '10px' }}>
+              {renderListFilters(['Todos', 'Em análise', 'Aprovado parcialmente', 'Recusado parcialmente'])}
+              {iniciativasEnviadas.map((iniciativa, index) => {
+                const recursoStatus = index % 3 === 0 ? 'Aprovado parcialmente' : index % 3 === 1 ? 'Em análise' : 'Recusado parcialmente';
+                const recursoColor = recursoStatus === 'Aprovado parcialmente' ? '#22c55e' : recursoStatus === 'Recusado parcialmente' ? '#ef4444' : '#00c1af';
+                const recursoBg = recursoStatus === 'Aprovado parcialmente' ? 'rgba(34,197,94,0.12)' : recursoStatus === 'Recusado parcialmente' ? 'rgba(239,68,68,0.12)' : 'rgba(0,193,175,0.12)';
+                const recursoBorder = recursoStatus === 'Aprovado parcialmente' ? '1px solid rgba(34,197,94,0.38)' : recursoStatus === 'Recusado parcialmente' ? '1px solid rgba(239,68,68,0.38)' : '1px solid rgba(0,193,175,0.38)';
+                return (
+                <div
+                  key={iniciativa.codigo}
+                  onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38, 0.5)'; }}
+                  style={{
+                    ...detalheLinhaStyle,
+                    gridTemplateColumns: '1.25fr 1fr 1fr 150px 190px',
+                  }}
+                >
+                  <div>
+                    <div style={detalheRotuloStyle}>Proposta</div>
+                    <div style={{ ...detalheValorStyle, fontWeight: 'var(--font-weight-medium)' }}>
+                      {iniciativa.titulo}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Instituição</div>
+                    <div style={detalheValorStyle}>{iniciativa.proponente}</div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Proponente</div>
+                    <div style={detalheValorStyle}>{iniciativa.ortogado}</div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Fase</div>
+                    <div style={detalheValorStyle}>{index % 2 === 0 ? 'Habilitação' : 'Avaliação Ad Hoc'}</div>
                   </div>
                   <div>
                     <div style={detalheRotuloStyle}>Status</div>
@@ -1872,6 +1774,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
 
         {activeTab === 'resultadoFinal' && (
           <div style={{ display: 'grid', gap: '10px' }}>
+              {renderListFilters(['Todos', 'Aprovado', 'Reprovado'])}
               {iniciativasEnviadas.map((iniciativa, index) => {
                 const aprovado = index % 4 !== 2;
                 return (

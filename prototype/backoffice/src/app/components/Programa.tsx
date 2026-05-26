@@ -62,6 +62,8 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
   const [showFormulario, setShowFormulario] = useState(false);
   const [eixoFilter, setEixoFilter] = useState('Todos');
   const [showEixoDropdown, setShowEixoDropdown] = useState(false);
+  const [instituicaoFilter, setInstituicaoFilter] = useState('Todos');
+  const [showInstituicaoDropdown, setShowInstituicaoDropdown] = useState(false);
   const [selectedPrograma, setSelectedPrograma] = useState<ProgramaItem | null>(null);
 
   const statusOptions: StatusFilter[] = ['Todos', 'Rascunho', 'Ativo', 'Finalizado'];
@@ -78,13 +80,15 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
     { id: 9, nome: 'Programa Laboratórios Inteligentes', eixo: 'Infraestrutura de Pesquisa', instituicaoDemandante: 'Ifes', dataVigencia: '01/09/2026 - 31/08/2027', status: 'Ativo', valorInvestido: 3900000, valorAlocado: 3100000, valorAportado: 2440000, valorConsumido: 1120000, iniciativas: 15 },
     { id: 10, nome: 'Programa Empreendedorismo Capixaba', eixo: 'Inovação e Desenvolvimento', instituicaoDemandante: 'Findes', dataVigencia: '01/10/2026 - 30/09/2027', status: 'Ativo', valorInvestido: 2400000, valorAlocado: 1740000, valorAportado: 1310000, valorConsumido: 530000, iniciativas: 10 },
   ];
+  const instituicaoOptions = ['Todos', ...Array.from(new Set(programasData.map(programa => programa.instituicaoDemandante)))];
 
   const filtered = programasData.filter(p => {
     const matchSearch = `${p.nome} ${p.instituicaoDemandante}`.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchInstituicao = instituicaoFilter === 'Todos' || p.instituicaoDemandante === instituicaoFilter;
     const matchStatus = statusFilter === 'Todos' || p.status === statusFilter;
     const matchEixo = eixoFilter === 'Todos' || p.eixo === eixoFilter;
     const matchData = !dataFilter || p.dataVigencia.includes(dataFilter);
-    return matchSearch && matchStatus && matchEixo && matchData;
+    return matchSearch && matchInstituicao && matchStatus && matchEixo && matchData;
   });
 
   if (showFormulario) {
@@ -298,7 +302,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
         {activeTab === 'listagem' && (
         <>
         {/* Filtros */}
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.7fr 1fr 1fr 1fr 1fr', gap: '16px', marginBottom: '24px' }}>
 
           {/* Pesquisar */}
           <div>
@@ -317,13 +321,65 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
             </div>
           </div>
 
+          {/* Instituição */}
+          <div style={{ position: 'relative' }}>
+            <label style={filterLabelStyle}>
+              Instituição
+            </label>
+            <button
+              onClick={() => {
+                setShowInstituicaoDropdown(!showInstituicaoDropdown);
+                setShowEixoDropdown(false);
+                setShowStatusDropdown(false);
+              }}
+              style={{
+                ...inputBaseStyle,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer',
+              }}
+            >
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {instituicaoFilter}
+              </span>
+              <ChevronDown size={16} style={{ color: T.iconSubdued, flexShrink: 0, transform: showInstituicaoDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+            </button>
+            {showInstituicaoDropdown && (
+              <div style={{
+                position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%',
+                backgroundColor: T.bgSurface, border: `1px solid ${T.borderDefault}`,
+                borderRadius: '6px', overflow: 'hidden', zIndex: 100, boxShadow: T.shadowMd,
+              }}>
+                {instituicaoOptions.map(opt => (
+                  <button
+                    key={opt}
+                    onClick={() => { setInstituicaoFilter(opt); setShowInstituicaoDropdown(false); }}
+                    style={{
+                      width: '100%', padding: '10px 12px', textAlign: 'left',
+                      backgroundColor: instituicaoFilter === opt ? T.accentSoft : 'transparent',
+                      color: instituicaoFilter === opt ? T.accent : T.textPrimary,
+                      fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
+                      border: 'none', cursor: 'pointer',
+                    }}
+                    onMouseEnter={e => { if (instituicaoFilter !== opt) e.currentTarget.style.backgroundColor = T.bgHover; }}
+                    onMouseLeave={e => { if (instituicaoFilter !== opt) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Eixo Estratégico */}
           <div style={{ position: 'relative' }}>
             <label style={filterLabelStyle}>
               Eixo Estratégico
             </label>
             <button
-              onClick={() => { setShowEixoDropdown(!showEixoDropdown); setShowStatusDropdown(false); }}
+              onClick={() => {
+                setShowEixoDropdown(!showEixoDropdown);
+                setShowInstituicaoDropdown(false);
+                setShowStatusDropdown(false);
+              }}
               style={{
                 ...inputBaseStyle,
                 color: eixoFilter === 'Todos' ? T.iconSubdued : T.textPrimary,
@@ -382,7 +438,11 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
               Status
             </label>
             <button
-              onClick={() => { setShowStatusDropdown(!showStatusDropdown); setShowEixoDropdown(false); }}
+              onClick={() => {
+                setShowStatusDropdown(!showStatusDropdown);
+                setShowInstituicaoDropdown(false);
+                setShowEixoDropdown(false);
+              }}
               style={{
                 ...inputBaseStyle,
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer',
@@ -449,7 +509,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
               onClick={() => setSelectedPrograma(prog)}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '2.5fr 2fr 1.5fr 1fr', gap: '24px', alignItems: 'start' }}>
+                <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '2.1fr 1fr 1.5fr 1.5fr 1fr', gap: '24px', alignItems: 'start' }}>
 
                   <div>
                     <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '6px' }}>
@@ -462,13 +522,19 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
 
                   <div>
                     <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '6px' }}>
-                      Eixo / Instituição
+                      Instituição
                     </span>
-                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, marginBottom: '4px' }}>
-                      {prog.eixo}
-                    </span>
-                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
+                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                       {prog.instituicaoDemandante}
+                    </span>
+                  </div>
+
+                  <div>
+                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '6px' }}>
+                      Eixo
+                    </span>
+                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
+                      {prog.eixo}
                     </span>
                   </div>
 
@@ -476,7 +542,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
                     <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '6px' }}>
                       Data de Vigência
                     </span>
-                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary }}>
+                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                       {prog.dataVigencia}
                     </span>
                   </div>

@@ -57,6 +57,66 @@ const metricCardStyle: React.CSSProperties = {
   padding: '24px',
 };
 
+const modalOverlayStyle: React.CSSProperties = {
+  position: 'fixed',
+  inset: 0,
+  zIndex: 1000,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '24px',
+  backgroundColor: 'rgba(0,0,0,0.62)',
+};
+
+const modalContentStyle: React.CSSProperties = {
+  ...cardStyle,
+  backgroundColor: '#262626',
+  width: 'min(920px, 100%)',
+  maxHeight: 'calc(100vh - 48px)',
+  overflowY: 'auto',
+  marginBottom: 0,
+  boxShadow: '0 24px 80px rgba(0,0,0,0.42)',
+};
+
+const modalCloseButtonStyle: React.CSSProperties = {
+  width: '36px',
+  height: '36px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  border: 'none',
+  borderRadius: 'var(--radius)',
+  backgroundColor: 'transparent',
+  color: 'rgba(255,255,255,0.72)',
+  cursor: 'pointer',
+};
+
+const modalSecondaryButtonStyle: React.CSSProperties = {
+  minWidth: '120px',
+  height: '44px',
+  border: '1px solid rgba(255,255,255,0.14)',
+  borderRadius: 'var(--radius)',
+  backgroundColor: 'transparent',
+  color: '#ffffff',
+  fontFamily: 'var(--font-family)',
+  fontSize: 'var(--text-sm)',
+  fontWeight: 'var(--font-weight-medium)',
+  cursor: 'pointer',
+};
+
+const modalPrimaryButtonStyle: React.CSSProperties = {
+  minWidth: '120px',
+  height: '44px',
+  border: 'none',
+  borderRadius: 'var(--radius)',
+  backgroundColor: '#00c1af',
+  color: '#171717',
+  fontFamily: 'var(--font-family)',
+  fontSize: 'var(--text-sm)',
+  fontWeight: 'var(--font-weight-medium)',
+  cursor: 'pointer',
+};
+
 const labelStyle: React.CSSProperties = {
   fontFamily: 'var(--font-family)',
   fontSize: 'var(--text-xs)',
@@ -183,6 +243,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
   };
 
   const startEditingCadastro = () => {
+    if (!podeEditarCadastro) return;
     setDraftCadastroData(cadastroData);
     setEditingCadastro(true);
   };
@@ -213,6 +274,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
   const valorAditivoPreview = parseCurrency(aditivoFinanceiro.valor);
   const percentualAditivoPreview = calcularPercentualAcaoTransversal(valorAditivoPreview);
   const reservaAditivoPreview = calcularReservaAcaoTransversal(valorAditivoPreview);
+  const podeEditarCadastro = currentStatus === 'Rascunho' || currentStatus === 'Suspensa';
 
   const registrarAditivo = () => {
     if (currentStatus === 'Suspensa' || currentStatus === 'Finalizado') return;
@@ -358,7 +420,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
             Parcerias
           </button>
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
-          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
+          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>
             Detalhes da Parceria
           </span>
         </div>
@@ -417,8 +479,9 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
         </div>
 
         {confirmDelete && (
-          <div style={cardStyle}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: programas.length > 0 ? '20px' : 0 }}>
+          <div style={modalOverlayStyle}>
+          <div style={modalContentStyle}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
               <div>
                 <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
                   {programas.length > 0 ? 'Remoção bloqueada' : 'Confirmar exclusão da parceria'}
@@ -429,21 +492,26 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                     : 'Esta ação remove a parceria cadastrada por erro e registra a remoção no histórico de auditoria.'}
                 </p>
               </div>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <SmallButton icon={<X size={14} />} label={programas.length > 0 ? 'Fechar' : 'Cancelar'} onClick={() => setConfirmDelete(false)} muted />
-                {programas.length === 0 && (
-                  <SmallButton icon={<Trash2 size={14} />} label="Confirmar deleção" onClick={onBack} danger />
-                )}
-              </div>
+              <button type="button" onClick={() => setConfirmDelete(false)} style={modalCloseButtonStyle} aria-label="Fechar">
+                <X size={22} />
+              </button>
             </div>
             {programas.length > 0 && (
               <ImpactList title="Programas que impedem a remoção" items={programas.map(programa => `${programa.nome} (${formatCurrency(programa.valor)})`)} />
             )}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
+              <button type="button" onClick={() => setConfirmDelete(false)} style={modalSecondaryButtonStyle}>Cancelar</button>
+              {programas.length === 0 && (
+                <button type="button" onClick={onBack} style={modalPrimaryButtonStyle}>Salvar</button>
+              )}
+            </div>
+          </div>
           </div>
         )}
 
         {showEncerramento && (
-          <div style={cardStyle}>
+          <div style={modalOverlayStyle}>
+          <div style={modalContentStyle}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
               <div>
                 <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
@@ -455,7 +523,9 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                     : 'Esta parceria não possui programas aportados e pode ser encerrada diretamente.'}
                 </p>
               </div>
-              <SmallButton icon={<X size={14} />} label="Fechar" onClick={() => setShowEncerramento(false)} muted />
+              <button type="button" onClick={() => setShowEncerramento(false)} style={modalCloseButtonStyle} aria-label="Fechar">
+                <X size={22} />
+              </button>
             </div>
 
             <div style={{ marginBottom: '20px' }}>
@@ -466,49 +536,57 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
               <ImpactList title="Programas que serão encerrados" items={programasAfetados} />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-              <SmallButton icon={<X size={14} />} label="Cancelar" onClick={() => setShowEncerramento(false)} muted />
-              <SmallButton icon={<Archive size={14} />} label="Confirmar encerramento" onClick={confirmarEncerramento} danger />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              <button type="button" onClick={() => setShowEncerramento(false)} style={modalSecondaryButtonStyle}>Cancelar</button>
+              <button type="button" onClick={confirmarEncerramento} style={modalPrimaryButtonStyle}>Salvar</button>
             </div>
+          </div>
           </div>
         )}
 
         {showSuspensao && (
-          <div style={cardStyle}>
+          <div style={modalOverlayStyle}>
+          <div style={modalContentStyle}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
               <div>
                 <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
-                  Suspender parceria em cascata
+                  Suspender
                 </h2>
                 <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
                   A suspensão afeta os programas aportados e as iniciativas vinculadas.
                 </p>
               </div>
-              <SmallButton icon={<X size={14} />} label="Fechar" onClick={() => setShowSuspensao(false)} muted />
+              <button type="button" onClick={() => setShowSuspensao(false)} style={modalCloseButtonStyle} aria-label="Fechar">
+                <X size={22} />
+              </button>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '16px', marginBottom: '20px' }}>
               <div>
                 <div style={labelStyle}>Origem da solicitação</div>
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ display: 'grid', gap: '10px' }}>
                   {['Área de Parcerias', 'Instituição vinculada'].map(origem => (
-                    <button
+                    <label
                       key={origem}
-                      type="button"
-                      onClick={() => setSuspensao(prev => ({ ...prev, origem }))}
                       style={{
-                        padding: '9px 12px',
-                        borderRadius: 'var(--radius)',
-                        border: suspensao.origem === origem ? '1px solid rgba(0,193,175,0.55)' : '1px solid rgba(255,255,255,0.12)',
-                        backgroundColor: suspensao.origem === origem ? 'rgba(0,193,175,0.12)' : 'rgba(23, 23, 23,0.35)',
-                        color: suspensao.origem === origem ? '#00c1af' : 'rgba(255,255,255,0.72)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        color: '#ffffff',
                         fontFamily: 'var(--font-family)',
                         fontSize: 'var(--text-sm)',
                         cursor: 'pointer',
                       }}
                     >
+                      <input
+                        type="radio"
+                        name="origem-suspensao"
+                        checked={suspensao.origem === origem}
+                        onChange={() => setSuspensao(prev => ({ ...prev, origem }))}
+                        style={{ accentColor: '#00c1af' }}
+                      />
                       {origem}
-                    </button>
+                    </label>
                   ))}
                 </div>
               </div>
@@ -520,10 +598,11 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
               <ImpactList title="Iniciativas que serão suspensas" items={iniciativasAfetadas} />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-              <SmallButton icon={<X size={14} />} label="Cancelar" onClick={() => setShowSuspensao(false)} muted />
-              <SmallButton icon={<PauseCircle size={14} />} label="Confirmar suspensão" onClick={confirmarSuspensao} danger />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              <button type="button" onClick={() => setShowSuspensao(false)} style={modalSecondaryButtonStyle}>Cancelar</button>
+              <button type="button" onClick={confirmarSuspensao} style={modalPrimaryButtonStyle}>Salvar</button>
             </div>
+          </div>
           </div>
         )}
 
@@ -548,37 +627,42 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
         )}
 
         {showAditivo && (
-          <div style={cardStyle}>
+          <div style={modalOverlayStyle}>
+          <div style={modalContentStyle}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '20px' }}>
               <div>
                 <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 4px' }}>
-                  Registrar aditivo
+                  Adicionar Aditivo
                 </h2>
                 <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
                   Escolha se o aditivo altera o valor financeiro ou a vigência da parceria.
                 </p>
               </div>
-              <SmallButton icon={<X size={14} />} label="Fechar" onClick={() => setShowAditivo(false)} muted />
+              <button type="button" onClick={() => setShowAditivo(false)} style={modalCloseButtonStyle} aria-label="Fechar">
+                <X size={22} />
+              </button>
             </div>
 
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '20px' }}>
               {[
-                { id: 'financeiro', label: 'Aditivo financeiro' },
-                { id: 'tempo', label: 'Aditivo de tempo' },
+                { id: 'financeiro', label: 'Aditivo Financeiro' },
+                { id: 'tempo', label: 'Aditivo de Tempo' },
               ].map(option => (
                 <button
                   key={option.id}
                   type="button"
                   onClick={() => setAditivoTipo(option.id as 'financeiro' | 'tempo')}
                   style={{
-                    padding: '9px 14px',
-                    borderRadius: 'var(--radius)',
-                    border: aditivoTipo === option.id ? '1px solid rgba(0,193,175,0.55)' : '1px solid rgba(255,255,255,0.12)',
-                    backgroundColor: aditivoTipo === option.id ? 'rgba(0,193,175,0.12)' : 'rgba(23, 23, 23,0.35)',
-                    color: aditivoTipo === option.id ? '#00c1af' : 'rgba(255,255,255,0.72)',
+                    padding: '12px 20px',
+                    border: 'none',
+                    borderBottom: aditivoTipo === option.id ? '2px solid #00c1af' : '2px solid transparent',
+                    backgroundColor: 'transparent',
+                    color: aditivoTipo === option.id ? '#00c1af' : 'rgba(255,255,255,0.6)',
                     fontFamily: 'var(--font-family)',
                     fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
                     cursor: 'pointer',
+                    marginBottom: '-1px',
                   }}
                 >
                   {option.label}
@@ -607,10 +691,11 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
               </div>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '20px' }}>
-              <SmallButton icon={<X size={14} />} label="Cancelar" onClick={() => setShowAditivo(false)} muted />
-              <SmallButton icon={<Save size={14} />} label="Registrar aditivo" onClick={registrarAditivo} />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '20px' }}>
+              <button type="button" onClick={() => setShowAditivo(false)} style={modalSecondaryButtonStyle}>Cancelar</button>
+              <button type="button" onClick={registrarAditivo} style={modalPrimaryButtonStyle}>Salvar</button>
             </div>
+          </div>
           </div>
         )}
 
@@ -663,7 +748,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                   <SmallButton icon={<Save size={14} />} label="Salvar" onClick={saveCadastroData} />
                 </div>
               ) : (
-                <SmallButton icon={<Edit3 size={14} />} label="Editar" onClick={startEditingCadastro} />
+                podeEditarCadastro && <SmallButton icon={<Edit3 size={14} />} label="Editar" onClick={startEditingCadastro} />
               )}
             </div>
 

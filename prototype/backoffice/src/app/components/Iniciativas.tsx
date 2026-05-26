@@ -33,10 +33,12 @@ import {
 type StatusIniciativa = 'Submetida' | 'Aprovada' | 'Em contratação' | 'Em execução' | 'Suspensa' | 'Concluída' | 'Cancelada';
 type DiariaPanelTab = 'solicitadas' | 'nova' | 'minhas';
 type StatusPainelDiaria = 'ALOCADA' | 'APROVADA' | 'CANCELADA' | 'RECUSADA';
+type IniciativasTab = 'iniciativas' | 'dashboard';
 
 interface Iniciativa {
   codigo: string;
   titulo: string;
+  captacao: string;
   proponente: string;
   coordenador: string;
   edital: string;
@@ -111,6 +113,7 @@ const iniciativas: Iniciativa[] = [
   {
     codigo: 'INI-2026-001',
     titulo: 'Conecta Fapes',
+    captacao: 'Bolsas de Pesquisa 2026',
     proponente: 'Instituto Federal do Espírito Santo',
     coordenador: 'Marina Costa',
     edital: 'Edital 27/2025',
@@ -126,6 +129,7 @@ const iniciativas: Iniciativa[] = [
   {
     codigo: 'INI-2026-002',
     titulo: 'Bioinsumos para agricultura de precisão',
+    captacao: 'Inovação Tecnológica',
     proponente: 'Universidade Federal do Espírito Santo',
     coordenador: 'André Carvalho',
     edital: 'Edital 18/2025',
@@ -141,6 +145,7 @@ const iniciativas: Iniciativa[] = [
   {
     codigo: 'INI-2026-003',
     titulo: 'Observatório Capixaba de Inovação',
+    captacao: 'Difusão do Conhecimento',
     proponente: 'Fundação de Apoio à Pesquisa',
     coordenador: 'Helena Duarte',
     edital: 'Edital 21/2025',
@@ -156,6 +161,7 @@ const iniciativas: Iniciativa[] = [
   {
     codigo: 'INI-2026-004',
     titulo: 'Rede de sensores para cidades resilientes',
+    captacao: 'Desenvolvimento Regional',
     proponente: 'Prefeitura Municipal de Vitória',
     coordenador: 'Ricardo Torres',
     edital: 'Edital 03/2026',
@@ -171,6 +177,7 @@ const iniciativas: Iniciativa[] = [
   {
     codigo: 'INI-2025-017',
     titulo: 'Pesquisa aplicada em saúde digital',
+    captacao: 'Pesquisa Aplicada em Saúde',
     proponente: 'Hospital Universitário Cassiano Antonio Moraes',
     coordenador: 'Paula Nascimento',
     edital: 'Edital 09/2025',
@@ -186,6 +193,7 @@ const iniciativas: Iniciativa[] = [
   {
     codigo: 'INI-2024-042',
     titulo: 'Laboratório móvel de educação científica',
+    captacao: 'Carreira Científica',
     proponente: 'Universidade Vila Velha',
     coordenador: 'Lucas Moreira',
     edital: 'Edital 12/2024',
@@ -201,6 +209,7 @@ const iniciativas: Iniciativa[] = [
   {
     codigo: 'INI-2024-038',
     titulo: 'Plataforma de dados ambientais',
+    captacao: 'Laboratórios Inteligentes',
     proponente: 'Instituto Jones dos Santos Neves',
     coordenador: 'Sofia Almeida',
     edital: 'Edital 07/2024',
@@ -319,7 +328,7 @@ const statusStyle: Record<StatusIniciativa, { color: string; bg: string; Icon: R
 };
 
 const filtros: Array<'Todas' | StatusIniciativa> = ['Todas', 'Submetida', 'Aprovada', 'Em contratação', 'Em execução', 'Suspensa', 'Concluída', 'Cancelada'];
-type DetailTab = 'informacoes' | 'equipe' | 'diarias' | 'conta' | 'aditivos';
+type DetailTab = 'informacoes' | 'equipe' | 'aditivos';
 
 const projectStages = [
   { label: 'Submissão', date: '15/01/2024', Icon: Send, status: 'completed' },
@@ -512,10 +521,13 @@ const diariasPainelSolicitacoes: DiariaPainelSolicitacao[] = [
 
 export const Iniciativas: React.FC = () => {
   const [iniciativaSelecionada, setIniciativaSelecionada] = useState<Iniciativa | null>(null);
+  const [activeTab, setActiveTab] = useState<IniciativasTab>('iniciativas');
   const [statusFiltro, setStatusFiltro] = useState<'Todas' | StatusIniciativa>('Todas');
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [instituicaoFiltro, setInstituicaoFiltro] = useState('Todas');
   const [showInstituicaoDropdown, setShowInstituicaoDropdown] = useState(false);
+  const [iniciativaFiltro, setIniciativaFiltro] = useState('Todas');
+  const [showIniciativaDropdown, setShowIniciativaDropdown] = useState(false);
   const [busca, setBusca] = useState('');
   const [activeDetailTab, setActiveDetailTab] = useState<DetailTab>('informacoes');
   const [contasBancarias, setContasBancarias] = useState<Record<string, ContaBancariaIniciativa>>(contasIniciais);
@@ -527,17 +539,52 @@ export const Iniciativas: React.FC = () => {
     return iniciativas.filter((iniciativa) => {
       const matchStatus = statusFiltro === 'Todas' || iniciativa.status === statusFiltro;
       const matchInstituicao = instituicaoFiltro === 'Todas' || iniciativa.proponente === instituicaoFiltro;
+      const matchIniciativa = iniciativaFiltro === 'Todas' || iniciativa.titulo === iniciativaFiltro;
       const matchBusca =
         !normalizedBusca ||
         iniciativa.titulo.toLowerCase().includes(normalizedBusca) ||
+        iniciativa.captacao.toLowerCase().includes(normalizedBusca) ||
         iniciativa.proponente.toLowerCase().includes(normalizedBusca) ||
+        iniciativa.captacao.toLowerCase().includes(normalizedBusca) ||
         iniciativa.coordenador.toLowerCase().includes(normalizedBusca);
 
-      return matchStatus && matchInstituicao && matchBusca;
+      return matchStatus && matchInstituicao && matchIniciativa && matchBusca;
     });
-  }, [busca, instituicaoFiltro, statusFiltro]);
+  }, [busca, iniciativaFiltro, instituicaoFiltro, statusFiltro]);
 
   const instituicaoOptions = useMemo(() => ['Todas', ...Array.from(new Set(iniciativas.map((iniciativa) => iniciativa.proponente)))], []);
+  const iniciativaOptions = useMemo(() => ['Todas', ...iniciativas.map((iniciativa) => iniciativa.titulo)], []);
+  const dashboardCards: Array<{ label: string; value: number; status: StatusIniciativa }> = [
+    { label: 'Submetidas', value: 28, status: 'Submetida' },
+    { label: 'Aprovadas', value: 16, status: 'Aprovada' },
+    { label: 'Em contratação', value: 9, status: 'Em contratação' },
+    { label: 'Em execução', value: 14, status: 'Em execução' },
+    { label: 'Suspensas', value: 3, status: 'Suspensa' },
+    { label: 'Finalizadas', value: 22, status: 'Concluída' },
+    { label: 'Canceladas', value: 2, status: 'Cancelada' },
+  ];
+  const lineChartPoints = dashboardCards.map((item, index) => ({
+    ...item,
+    x: 42 + index * 136,
+    y: 244 - (item.value / 30) * 184,
+  }));
+  const lineChartPath = lineChartPoints.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ');
+  const dashboardSeries = [
+    { label: 'Submetidas', color: '#00c1af', values: [8, 12, 16, 21, 25, 28] },
+    { label: 'Aprovadas', color: '#22c55e', values: [3, 5, 8, 11, 14, 16] },
+    { label: 'Em Contratação', color: '#3b82f6', values: [1, 2, 4, 6, 7, 9] },
+    { label: 'Em Execução', color: '#a855f7', values: [4, 6, 8, 11, 12, 14] },
+    { label: 'Suspensas', color: '#f59e0b', values: [0, 1, 1, 2, 2, 3] },
+    { label: 'Finalizadas', color: '#14b8a6', values: [9, 12, 15, 18, 20, 22] },
+    { label: 'Canceladas', color: '#ef4444', values: [0, 1, 1, 1, 2, 2] },
+  ];
+  const dashboardMonths = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'];
+  const maxDashboardValue = 30;
+  const buildDashboardPath = (values: number[]) => values.map((value, index) => {
+    const x = 64 + index * 150;
+    const y = 238 - (value / maxDashboardValue) * 176;
+    return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+  }).join(' ');
 
   const totalPorStatus = (status: StatusIniciativa) => iniciativas.filter((iniciativa) => iniciativa.status === status).length;
   const contaAtual = iniciativaSelecionada
@@ -626,12 +673,13 @@ export const Iniciativas: React.FC = () => {
                 padding: 0,
                 color: 'var(--dash-text-secondary)',
                 cursor: 'pointer',
+                fontWeight: 'var(--font-weight-normal)',
               }}
             >
               Iniciativas
             </button>
             <span style={{ color: 'var(--dash-text-muted)', margin: '0 8px' }}>&gt;</span>
-            <span style={{ color: 'var(--dash-text-primary)' }}>Detalhe</span>
+            <span style={{ color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>Detalhes da Iniciativa</span>
           </nav>
 
           <div className="mb-8">
@@ -662,9 +710,7 @@ export const Iniciativas: React.FC = () => {
             {[
               { key: 'informacoes' as DetailTab, label: 'Informações Gerais' },
               { key: 'equipe' as DetailTab, label: 'Equipe' },
-              { key: 'diarias' as DetailTab, label: 'Diárias' },
-              { key: 'conta' as DetailTab, label: 'Conta bancária' },
-              { key: 'aditivos' as DetailTab, label: 'Dados dos Aditivos' },
+              { key: 'aditivos' as DetailTab, label: 'Aditivos' },
             ].map(({ key, label }) => (
               <button
                 key={key}
@@ -708,7 +754,7 @@ export const Iniciativas: React.FC = () => {
           <div className="rounded-lg p-5 mb-8" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
             <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(10, minmax(0, 1fr))', gap: '10px', padding: '16px 6px 8px' }}>
               <div style={{ position: 'absolute', left: '5%', right: '5%', top: '43px', height: '3px', backgroundColor: 'rgba(163, 163, 163, 0.22)', borderRadius: '999px' }} />
-              <div style={{ position: 'absolute', left: '5%', width: '50%', top: '43px', height: '3px', backgroundColor: '#14b8a6', borderRadius: '999px' }} />
+              <div style={{ position: 'absolute', left: '5%', width: '50%', top: '43px', height: '3px', backgroundColor: '#00c1af', borderRadius: '999px' }} />
               {projectStages.map((stage) => {
                 const Icon = stage.Icon;
                 const isCompleted = stage.status === 'completed';
@@ -721,9 +767,9 @@ export const Iniciativas: React.FC = () => {
                       style={{
                         width: '48px',
                         height: '48px',
-                        backgroundColor: isCompleted || isCurrent ? '#22d3ee' : '#1e293b',
+                        backgroundColor: isCompleted || isCurrent ? '#00c1af' : 'var(--dash-card-bg)',
                         color: isCompleted || isCurrent ? '#06111f' : 'var(--dash-text-muted)',
-                        boxShadow: isCurrent ? '0 0 0 7px rgba(34, 211, 238, 0.18)' : 'none',
+                        boxShadow: isCurrent ? '0 0 0 7px rgba(0, 193, 175, 0.18)' : 'none',
                       }}
                     >
                       <Icon size={18} />
@@ -859,13 +905,7 @@ export const Iniciativas: React.FC = () => {
 
           {activeDetailTab === 'aditivos' && (
             <>
-          <SectionHeader
-            Icon={FileEdit}
-            title="Dados dos Aditivos"
-            subtitle="Aditivos de prazo ou recurso aprovados para a iniciativa."
-          />
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+          <div className="space-y-4 mb-8">
               {[
                 {
                   title: 'TA-2026-014',
@@ -879,12 +919,12 @@ export const Iniciativas: React.FC = () => {
                 },
               ].map((aditivo) => (
                 <div key={aditivo.title} className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)' }}>
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <strong style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>{aditivo.title}</strong>
-                    <span className="px-2 py-1 rounded-full" style={{ color: '#00c1af', backgroundColor: 'rgba(0, 193, 175, 0.12)', fontSize: 'var(--text-xs)' }}>Aprovado</span>
+                  <div className="grid grid-cols-1 lg:grid-cols-[180px_280px_minmax(0,1fr)_110px] gap-4 items-center">
+                    <strong style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>{aditivo.title}</strong>
+                    <p style={{ color: 'var(--dash-text-muted)', fontSize: 'var(--text-xs)', margin: 0 }}>{aditivo.subtitle}</p>
+                    <p style={{ color: 'var(--dash-text-secondary)', fontSize: 'var(--text-sm)', margin: 0, lineHeight: 1.6 }}>{aditivo.description}</p>
+                    <span className="px-3 py-1 rounded-full justify-self-start lg:justify-self-end" style={{ color: '#00c1af', backgroundColor: 'rgba(0, 193, 175, 0.12)', border: '1px solid rgba(0, 193, 175, 0.28)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)' }}>Aprovado</span>
                   </div>
-                  <p style={{ color: 'var(--dash-text-muted)', fontSize: 'var(--text-xs)', margin: '0 0 8px' }}>{aditivo.subtitle}</p>
-                  <p style={{ color: 'var(--dash-text-secondary)', fontSize: 'var(--text-sm)', margin: 0, lineHeight: 1.6 }}>{aditivo.description}</p>
                 </div>
               ))}
           </div>
@@ -950,15 +990,7 @@ export const Iniciativas: React.FC = () => {
       ) : (
         <>
       <section className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-6">
-        {[
-          { label: 'Submetidas', value: totalPorStatus('Submetida'), status: 'Submetida' as StatusIniciativa },
-          { label: 'Aprovadas', value: totalPorStatus('Aprovada'), status: 'Aprovada' as StatusIniciativa },
-          { label: 'Em contratação', value: totalPorStatus('Em contratação'), status: 'Em contratação' as StatusIniciativa },
-          { label: 'Em execução', value: totalPorStatus('Em execução'), status: 'Em execução' as StatusIniciativa },
-          { label: 'Suspensas', value: totalPorStatus('Suspensa'), status: 'Suspensa' as StatusIniciativa },
-          { label: 'Finalizadas', value: totalPorStatus('Concluída'), status: 'Concluída' as StatusIniciativa },
-          { label: 'Canceladas', value: totalPorStatus('Cancelada'), status: 'Cancelada' as StatusIniciativa },
-        ].map(({ label, value, status }) => {
+        {dashboardCards.map(({ label, value, status }) => {
           const { color, bg, Icon } = statusStyle[status];
 
           return (
@@ -981,8 +1013,94 @@ export const Iniciativas: React.FC = () => {
         })}
       </section>
 
+      <div
+        role="tablist"
+        aria-label="Seções de iniciativas"
+        className="flex flex-wrap items-center mb-6"
+        style={{ borderBottom: '1px solid var(--dash-divider)', gap: '4px' }}
+      >
+        {[
+          { key: 'iniciativas' as IniciativasTab, label: 'Iniciativas' },
+          { key: 'dashboard' as IniciativasTab, label: 'Dashboard' },
+        ].map(({ key, label }) => (
+          <button
+            key={key}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === key}
+            onClick={() => setActiveTab(key)}
+            style={{
+              background: 'none',
+              border: 'none',
+              borderBottom: activeTab === key ? '2px solid #00c1af' : '2px solid transparent',
+              color: activeTab === key ? '#00c1af' : 'var(--dash-text-secondary)',
+              fontFamily: 'var(--font-family)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              cursor: 'pointer',
+              marginBottom: '-1px',
+              padding: '12px 24px',
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === 'dashboard' && (
+        <section className="rounded-lg p-5 mb-6" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
+          <div className="mb-5">
+            <h2 style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+              Evolução por status
+            </h2>
+            <p style={{ color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', margin: 0 }}>
+              Distribuição consolidada das iniciativas por etapa operacional.
+            </p>
+          </div>
+          <div style={{ width: '100%', overflowX: 'auto' }}>
+            <svg viewBox="0 0 900 340" role="img" aria-label="Gráfico de linha de iniciativas por status" style={{ width: '100%', minWidth: '760px', height: '340px', display: 'block' }}>
+              {[0, 10, 20, 30].map((tick) => {
+                const y = 238 - (tick / maxDashboardValue) * 176;
+                return (
+                  <g key={tick}>
+                    <line x1="64" y1={y} x2="814" y2={y} stroke="rgba(255,255,255,0.08)" />
+                    <text x="28" y={y + 4} fill="var(--dash-text-muted)" fontSize="11" fontFamily="var(--font-family)">{tick}</text>
+                  </g>
+                );
+              })}
+              {dashboardMonths.map((month, index) => (
+                <g key={month}>
+                  <line x1={64 + index * 150} y1="238" x2={64 + index * 150} y2="246" stroke="rgba(255,255,255,0.18)" />
+                  <text x={64 + index * 150} y="270" textAnchor="middle" fill="var(--dash-text-secondary)" fontSize="11" fontFamily="var(--font-family)">
+                    {month}
+                  </text>
+                </g>
+              ))}
+              {dashboardSeries.map((serie) => (
+                <g key={serie.label}>
+                  <path d={buildDashboardPath(serie.values)} fill="none" stroke={serie.color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                  {serie.values.map((value, index) => {
+                    const x = 64 + index * 150;
+                    const y = 238 - (value / maxDashboardValue) * 176;
+                    return <circle key={`${serie.label}-${index}`} cx={x} cy={y} r="4" fill={serie.color} stroke="#171717" strokeWidth="2" />;
+                  })}
+                </g>
+              ))}
+              {dashboardSeries.map((serie, index) => (
+                <g key={`legend-${serie.label}`} transform={`translate(${64 + (index % 4) * 190}, ${300 + Math.floor(index / 4) * 24})`}>
+                  <circle cx="0" cy="0" r="5" fill={serie.color} />
+                  <text x="12" y="4" fill="var(--dash-text-secondary)" fontSize="11" fontFamily="var(--font-family)">{serie.label}</text>
+                </g>
+              ))}
+            </svg>
+          </div>
+        </section>
+      )}
+
+      {activeTab === 'iniciativas' && (
+      <>
       <section className="mb-5">
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(220px,1fr)_260px] gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.5fr)_minmax(220px,1fr)_minmax(220px,1fr)_260px] gap-4">
           <div className="relative flex-1">
             <label style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginBottom: '8px' }}>
               Pesquisar
@@ -1006,12 +1124,70 @@ export const Iniciativas: React.FC = () => {
 
           <div style={{ position: 'relative' }}>
             <label style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginBottom: '8px' }}>
+              Iniciativa
+            </label>
+            <button
+              type="button"
+              onClick={() => {
+                setShowIniciativaDropdown(!showIniciativaDropdown);
+                setShowInstituicaoDropdown(false);
+                setShowStatusDropdown(false);
+              }}
+              className="w-full rounded-lg"
+              style={{
+                padding: '10px 12px',
+                backgroundColor: 'var(--dash-input-bg)',
+                border: '1px solid var(--dash-card-border)',
+                color: 'var(--dash-text-primary)',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                cursor: 'pointer',
+              }}
+            >
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{iniciativaFiltro}</span>
+              <ChevronDown size={16} style={{ flexShrink: 0, transform: showIniciativaDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+            </button>
+            {showIniciativaDropdown && (
+              <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: '#1e293b', border: '1px solid var(--dash-card-border)', borderRadius: 'var(--radius)', overflow: 'hidden', zIndex: 30, boxShadow: '0 12px 28px rgba(0,0,0,0.28)' }}>
+                {iniciativaOptions.map((iniciativa) => (
+                  <button
+                    key={iniciativa}
+                    type="button"
+                    onClick={() => {
+                      setIniciativaFiltro(iniciativa);
+                      setShowIniciativaDropdown(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      border: 'none',
+                      backgroundColor: iniciativaFiltro === iniciativa ? 'rgba(0, 193, 175, 0.16)' : '#1e293b',
+                      color: iniciativaFiltro === iniciativa ? '#00c1af' : 'var(--dash-text-primary)',
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-sm)',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {iniciativa}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div style={{ position: 'relative' }}>
+            <label style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginBottom: '8px' }}>
               Instituições
             </label>
             <button
               type="button"
               onClick={() => {
                 setShowInstituicaoDropdown(!showInstituicaoDropdown);
+                setShowIniciativaDropdown(false);
                 setShowStatusDropdown(false);
               }}
               className="w-full rounded-lg"
@@ -1068,6 +1244,7 @@ export const Iniciativas: React.FC = () => {
               type="button"
               onClick={() => {
                 setShowStatusDropdown(!showStatusDropdown);
+                setShowIniciativaDropdown(false);
                 setShowInstituicaoDropdown(false);
               }}
               className="w-full rounded-lg"
@@ -1137,7 +1314,14 @@ export const Iniciativas: React.FC = () => {
               }}
               style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)', cursor: 'pointer', padding: '18px 20px' }}
             >
-              <div className="grid grid-cols-1 xl:grid-cols-[2fr_1.5fr_1.1fr_1fr_1fr_40px] gap-5 items-center">
+              <div className="grid grid-cols-1 xl:grid-cols-[1.1fr_1.8fr_1.4fr_1.1fr_1fr_1fr_40px] gap-5 items-center">
+                <div>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', margin: '0 0 5px' }}>Captação</p>
+                  <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', fontWeight: 'var(--font-weight-medium)' }}>
+                    {iniciativa.captacao}
+                  </strong>
+                </div>
+
                 <div>
                   <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', margin: '0 0 5px' }}>Iniciativa</p>
                   <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', fontWeight: 'var(--font-weight-medium)' }}>
@@ -1147,17 +1331,17 @@ export const Iniciativas: React.FC = () => {
 
                 <div>
                   <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', margin: '0 0 5px' }}>Instituição</p>
-                  <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', fontWeight: 'var(--font-weight-normal)' }}>{iniciativa.proponente}</strong>
+                  <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', fontWeight: 'var(--font-weight-normal)' }}>{iniciativa.proponente}</strong>
                 </div>
 
                 <div style={{ paddingLeft: '24px' }}>
                   <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', margin: '0 0 5px' }}>Coordenador</p>
-                  <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', fontWeight: 'var(--font-weight-normal)' }}>{iniciativa.coordenador}</strong>
+                  <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', fontWeight: 'var(--font-weight-normal)' }}>{iniciativa.coordenador}</strong>
                 </div>
 
                 <div style={{ paddingLeft: '24px' }}>
                   <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', margin: '0 0 5px' }}>Submissão</p>
-                  <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', fontWeight: 'var(--font-weight-normal)' }}>{iniciativa.dataSubmissao}</strong>
+                  <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', fontWeight: 'var(--font-weight-normal)' }}>{iniciativa.dataSubmissao}</strong>
                 </div>
 
                 <div style={{ paddingLeft: '24px' }}>
@@ -1173,8 +1357,10 @@ export const Iniciativas: React.FC = () => {
           );
         })}
       </section>
-        </>
+      </>
       )}
+        </>
+        )}
     </div>
   );
 };
@@ -1229,9 +1415,11 @@ const MetricCard: React.FC<{
       boxShadow: 'var(--dash-shadow)',
     }}
   >
-    <div className="flex items-start justify-between gap-3 mb-3">
+    <div className="flex items-center gap-3 mb-3">
+      <span className="flex items-center justify-center rounded-lg" style={{ width: '40px', height: '40px', backgroundColor: 'rgba(0, 193, 175, 0.12)', flexShrink: 0 }}>
+        <Icon size={18} style={{ color: '#00c1af' }} />
+      </span>
       <span style={{ color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>{label}</span>
-      <Icon size={18} style={{ color: '#00c1af', flexShrink: 0 }} />
     </div>
     <strong style={{ display: 'block', color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', fontWeight: 'var(--font-weight-normal)', marginBottom: '6px' }}>
       {value}
@@ -1601,12 +1789,17 @@ const statusEquipeStyle: Record<MembroEquipeIniciativa['status'], { color: strin
   Suspenso: { color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', border: 'rgba(245, 158, 11, 0.30)' },
 };
 
+const statusEquipeLabel: Record<MembroEquipeIniciativa['status'], string> = {
+  Ativo: 'Em Andamento',
+  Alocado: 'Em Andamento',
+  Finalizado: 'Finalizada',
+  Suspenso: 'Doc. Pendente',
+};
+
 const IniciativaEquipePage: React.FC<{ membros: MembroEquipeIniciativa[] }> = ({ membros }) => {
-  const [activeTeamTab, setActiveTeamTab] = useState<'informacoes' | 'bolsistas'>('informacoes');
   const [search, setSearch] = useState('');
   const [modalidade, setModalidade] = useState('Todos');
   const [status, setStatus] = useState('Todos');
-  const [expandedMember, setExpandedMember] = useState<string | null>(null);
 
   const bolsistas = membros.filter((membro) => membro.papel === 'Bolsista');
   const modalidades = ['Todos', ...Array.from(new Set(bolsistas.map((membro) => membro.modalidade)))];
@@ -1619,6 +1812,21 @@ const IniciativaEquipePage: React.FC<{ membros: MembroEquipeIniciativa[] }> = ({
 
     return matchesSearch && matchesModalidade && matchesStatus;
   });
+  const membrosLista = [
+    ...filteredMembers,
+    ...[
+      { nome: 'Sofia de Alcantara Silva', papel: 'Bolsista', modalidade: 'BPIG-III', vigencia: '01/08/2025 - 01/08/2026', status: 'Alocado' as const, email: 'sofia.silva@instituicao.br', telefone: '(27) 99999-0201', inicio: '01/08/2025', termino: '01/08/2026' },
+      { nome: 'Vinícius de Jesus Estevam', papel: 'Bolsista', modalidade: 'BPIG-IV', vigencia: '01/08/2025 - 01/08/2026', status: 'Alocado' as const, email: 'vinicius.estevam@instituicao.br', telefone: '(27) 99999-0202', inicio: '01/08/2025', termino: '01/08/2026' },
+      { nome: 'Diogo Alves do Nascimento Barcelos', papel: 'Bolsista', modalidade: 'BPIG-V', vigencia: '01/08/2025 - 01/08/2026', status: 'Alocado' as const, email: 'diogo.barcelos@instituicao.br', telefone: '(27) 99999-0203', inicio: '01/08/2025', termino: '01/08/2026' },
+      { nome: 'João Pedro Hulle Gomes de Jesus', papel: 'Bolsista', modalidade: 'BPIG-VII', vigencia: '01/08/2025 - 01/08/2026', status: 'Alocado' as const, email: 'joao.hulle@instituicao.br', telefone: '(27) 99999-0204', inicio: '01/08/2025', termino: '01/08/2026' },
+      { nome: 'Fabiano Borges Ruy', papel: 'Bolsista', modalidade: 'BPIG-V', vigencia: '15/07/2025 - 15/07/2026', status: 'Finalizado' as const, email: 'fabiano.ruy@instituicao.br', telefone: '(27) 99999-0205', inicio: '15/07/2025', termino: '15/07/2026' },
+      { nome: 'Moisés Savedra Omena', papel: 'Bolsista', modalidade: 'BPIG-VII', vigencia: '15/07/2025 - 15/07/2026', status: 'Suspenso' as const, email: 'moises.omena@instituicao.br', telefone: '(27) 99999-0206', inicio: '15/07/2025', termino: '15/07/2026' },
+      { nome: 'Laura Martins Peixoto', papel: 'Bolsista', modalidade: 'BPIG-II', vigencia: '01/09/2025 - 01/09/2026', status: 'Alocado' as const, email: 'laura.peixoto@instituicao.br', telefone: '(27) 99999-0207', inicio: '01/09/2025', termino: '01/09/2026' },
+      { nome: 'Rafael Coutinho Reis', papel: 'Bolsista', modalidade: 'BPIG-I', vigencia: '01/09/2025 - 01/09/2026', status: 'Alocado' as const, email: 'rafael.reis@instituicao.br', telefone: '(27) 99999-0208', inicio: '01/09/2025', termino: '01/09/2026' },
+      { nome: 'Camila Duarte Ferreira', papel: 'Bolsista', modalidade: 'BPIG-III', vigencia: '10/09/2025 - 10/09/2026', status: 'Alocado' as const, email: 'camila.ferreira@instituicao.br', telefone: '(27) 99999-0209', inicio: '10/09/2025', termino: '10/09/2026' },
+      { nome: 'Thiago Nunes Amaral', papel: 'Bolsista', modalidade: 'BPIG-IV', vigencia: '10/09/2025 - 10/09/2026', status: 'Alocado' as const, email: 'thiago.amaral@instituicao.br', telefone: '(27) 99999-0210', inicio: '10/09/2025', termino: '10/09/2026' },
+    ].filter((mock) => !filteredMembers.some((membro) => membro.email === mock.email)),
+  ].slice(0, 10);
 
   const modalidadesResumo = modalidades
     .filter((item) => item !== 'Todos')
@@ -1629,149 +1837,102 @@ const IniciativaEquipePage: React.FC<{ membros: MembroEquipeIniciativa[] }> = ({
 
       return { name: item, total, usadas, disponiveis: Math.max(total - usadas, 0), percent };
     });
+  const modalidadesGrafico = modalidadesResumo.length >= 5 ? modalidadesResumo : [
+    { name: 'BPIG-I', total: 4, usadas: 2, disponiveis: 2, percent: 50 },
+    { name: 'BPIG-II', total: 3, usadas: 2, disponiveis: 1, percent: 67 },
+    { name: 'BPIG-III', total: 2, usadas: 1, disponiveis: 1, percent: 50 },
+    { name: 'BPIG-IV', total: 1, usadas: 0, disponiveis: 1, percent: 0 },
+    { name: 'BPIG-V', total: 2, usadas: 1, disponiveis: 1, percent: 50 },
+  ];
 
   return (
     <>
-      <SectionHeader
-        Icon={Users}
-        title="Equipe"
-        subtitle="Acompanhe as informações dos bolsistas da iniciativa."
-      />
-
-      <div className="flex gap-1 mb-6" style={{ borderBottom: '1px solid var(--dash-divider)' }}>
-        {[
-          { key: 'informacoes' as const, label: 'Informações das Bolsas' },
-          { key: 'bolsistas' as const, label: 'Bolsistas do Projeto' },
-        ].map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => setActiveTeamTab(tab.key)}
-            style={{
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTeamTab === tab.key ? '2px solid #00c1af' : '2px solid transparent',
-              color: activeTeamTab === tab.key ? '#00c1af' : 'var(--dash-text-secondary)',
-              cursor: 'pointer',
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 600,
-              marginBottom: '-1px',
-              padding: '10px 16px',
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {activeTeamTab === 'informacoes' && (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-            <div className="rounded-lg p-5" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
-              <p style={{ color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', margin: '0 0 14px' }}>Orçamento</p>
+      <>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+            <div className="rounded-lg" style={{ backgroundColor: '#061111', border: '1px solid rgba(0,193,175,0.16)', minHeight: '160px', padding: '24px 32px' }}>
+              <p style={{ color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', margin: '0 0 22px' }}>Orçamento</p>
               {[
                 { label: 'Total', value: 'R$ 300.000' },
                 { label: 'Utilizado', value: 'R$ 175.000' },
                 { label: 'Disponível', value: 'R$ 125.000,00', color: '#22d3ee' },
               ].map((item) => (
-                <div key={item.label} style={{ marginBottom: '12px' }}>
-                  <div style={{ color: 'var(--dash-text-muted)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>{item.label}</div>
+                <div key={item.label} style={{ marginBottom: '16px' }}>
+                  <div style={{ color: 'var(--dash-text-muted)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', marginBottom: '6px' }}>{item.label}</div>
                   <strong style={{ color: item.color ?? 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>{item.value}</strong>
                 </div>
               ))}
             </div>
 
             {[
-              { label: 'Ativas', value: bolsistas.filter((membro) => membro.status === 'Ativo').length || 60 },
-              { label: 'Alocadas', value: bolsistas.length || 82 },
-              { label: 'Utilizadas', value: bolsistas.filter((membro) => membro.status === 'Finalizado').length || 68 },
+              { label: 'Ativas', value: 60 },
+              { label: 'Alocadas', value: 82 },
+              { label: 'Utilizadas', value: 68 },
               { label: 'Disponíveis', value: 14 },
             ].map((item) => (
               <div
                 key={item.label}
-                className="rounded-lg p-5"
+                className="rounded-lg"
                 style={{
-                  backgroundColor: 'var(--dash-card-bg)',
-                  border: '1px solid var(--dash-card-border)',
-                  boxShadow: 'var(--dash-shadow)',
-                  minHeight: '150px',
+                  backgroundColor: '#061111',
+                  border: '1px solid rgba(0,193,175,0.16)',
+                  minHeight: '160px',
+                  position: 'relative',
                   display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   textAlign: 'center',
                 }}
               >
-                <p style={{ color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', margin: 0 }}>{item.label}</p>
-                <strong style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-3xl)' }}>{item.value}</strong>
+                <p style={{ position: 'absolute', top: '28px', left: 0, right: 0, color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>{item.label}</p>
+                <strong style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', fontWeight: 700, lineHeight: 1 }}>{item.value}</strong>
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-5 mb-8">
+          <div className="mb-8">
             <div className="rounded-lg p-5" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
               <h3 style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', margin: '0 0 6px' }}>Bolsas por Modalidade</h3>
-              <p style={{ color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', margin: '0 0 20px' }}>Quantidade alocada vs utilizada por tipo de bolsa.</p>
-              <div className="space-y-4">
-                {(modalidadesResumo.length ? modalidadesResumo : [{ name: 'BPIG-VII', total: 4, usadas: 2, disponiveis: 2, percent: 50 }]).map((item) => (
+              <p style={{ color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', margin: '0 0 28px' }}>Quantidade planejada vs utilizada por tipo de bolsa</p>
+              <div className="space-y-6">
+                {modalidadesGrafico.map((item) => (
                   <div key={item.name}>
-                    <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+                    <div className="flex flex-wrap items-end justify-between gap-3 mb-2">
                       <div>
-                        <strong style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>{item.name}</strong>
+                        <strong style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', display: 'block', marginBottom: '6px' }}>{item.name}</strong>
                         <div style={{ color: 'var(--dash-text-muted)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>{item.usadas} de {item.total} utilizadas</div>
                       </div>
                       <div className="flex items-center gap-2">
                         {item.disponiveis > 0 && (
-                          <span className="px-2 py-1 rounded-full" style={{ color: '#22c55e', backgroundColor: 'rgba(34,197,94,0.10)', border: '1px solid rgba(34,197,94,0.20)', fontSize: 'var(--text-xs)' }}>
-                            {item.disponiveis} disponíveis
+                          <span className="px-3 py-1 rounded-full" style={{ color: '#22c55e', backgroundColor: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.28)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)' }}>
+                            {item.disponiveis} {item.disponiveis === 1 ? 'disponível' : 'disponíveis'}
                           </span>
                         )}
-                        <span className="px-2 py-1 rounded-full" style={{ color: '#60a5fa', backgroundColor: 'rgba(96,165,250,0.12)', fontSize: 'var(--text-xs)', fontWeight: 700 }}>
+                        <span className="px-3 py-1 rounded-full" style={{ color: '#60a5fa', backgroundColor: 'rgba(96,165,250,0.12)', fontSize: 'var(--text-xs)', fontWeight: 700 }}>
                           {item.percent}%
                         </span>
                       </div>
                     </div>
-                    <div style={{ height: '6px', backgroundColor: 'var(--dash-muted)', borderRadius: '999px', overflow: 'hidden' }}>
+                    <div style={{ height: '6px', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '999px', overflow: 'hidden' }}>
                       <div style={{ width: `${item.percent}%`, height: '100%', backgroundColor: '#60a5fa' }} />
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-
-            <div className="rounded-lg p-5" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
-              <h3 style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', margin: '0 0 6px' }}>Quantidade de Bolsas</h3>
-              <p style={{ color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', margin: '0 0 18px' }}>Resumo operacional da equipe.</p>
-              {[
-                { label: 'Coordenadores', value: membros.filter((membro) => membro.papel.includes('Coordenador')).length, Icon: UserCheck },
-                { label: 'Bolsistas', value: bolsistas.length, Icon: GraduationCap },
-                { label: 'Pendentes/Alocados', value: membros.filter((membro) => membro.status === 'Alocado').length, Icon: Clock },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between py-3" style={{ borderBottom: '1px solid var(--dash-divider)' }}>
-                  <div className="flex items-center gap-3">
-                    <item.Icon size={18} style={{ color: '#00c1af' }} />
-                    <span style={{ color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>{item.label}</span>
-                  </div>
-                  <strong style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)' }}>{item.value}</strong>
-                </div>
-              ))}
-            </div>
           </div>
         </>
-      )}
 
-      {activeTeamTab === 'bolsistas' && (
-        <>
-          <div className="rounded-lg p-5 mb-5" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
-            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px_180px] gap-4">
-              <label style={{ color: 'var(--dash-text-muted)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>
+      <>
+          <div className="mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_180px_220px_180px] gap-4">
+              <label style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>
                 Pesquisar
                 <div style={{ position: 'relative', marginTop: '8px' }}>
-                  <Search size={16} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--dash-text-muted)' }} />
+                  <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--dash-text-muted)', pointerEvents: 'none' }} />
                   <input
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
-                    placeholder="Buscar"
+                    placeholder="Buscar por nome"
                     style={{
                       width: '100%',
                       height: '42px',
@@ -1782,10 +1943,31 @@ const IniciativaEquipePage: React.FC<{ membros: MembroEquipeIniciativa[] }> = ({
                       fontFamily: 'var(--font-family)',
                       fontSize: 'var(--text-sm)',
                       outline: 'none',
-                      padding: '0 38px 0 12px',
+                      padding: '0 12px 0 40px',
                     }}
                   />
                 </div>
+              </label>
+
+              <label style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>
+                Data
+                <input
+                  type="text"
+                  placeholder="Selecionar data"
+                  style={{
+                    width: '100%',
+                    height: '42px',
+                    borderRadius: 'var(--radius)',
+                    backgroundColor: 'var(--dash-input-bg)',
+                    border: '1px solid var(--dash-card-border)',
+                    color: 'var(--dash-text-primary)',
+                    fontFamily: 'var(--font-family)',
+                    fontSize: 'var(--text-sm)',
+                    marginTop: '8px',
+                    outline: 'none',
+                    padding: '0 12px',
+                  }}
+                />
               </label>
 
               <SelectFilter label="Modalidade" value={modalidade} options={modalidades} onChange={setModalidade} />
@@ -1793,60 +1975,83 @@ const IniciativaEquipePage: React.FC<{ membros: MembroEquipeIniciativa[] }> = ({
             </div>
           </div>
 
-          <div className="space-y-4 mb-8">
-            {filteredMembers.map((membro) => {
+          <div className="space-y-4 mb-8 max-w-full">
+            {membrosLista.map((membro) => {
               const statusStyle = statusEquipeStyle[membro.status];
-              const isExpanded = expandedMember === membro.nome;
+              const statusLabel = statusEquipeLabel[membro.status];
 
               return (
-                <article key={`${membro.nome}-${membro.email}`} className="rounded-lg" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
-                  <button
-                    type="button"
-                    onClick={() => setExpandedMember(isExpanded ? null : membro.nome)}
-                    className="w-full p-5 text-left"
-                    style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
-                  >
-                    <div className="grid grid-cols-1 lg:grid-cols-[32px_minmax(0,1fr)_140px_160px_170px_130px] gap-4 items-center">
-                      <ChevronDown size={16} style={{ color: 'var(--dash-text-muted)', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 160ms ease' }} />
-                      <div>
-                        <div style={{ color: 'var(--dash-text-muted)', fontSize: 'var(--text-xs)', marginBottom: '6px' }}>Nome</div>
-                        <strong style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>{membro.nome}</strong>
+                <article
+                  key={`${membro.nome}-${membro.email}`}
+                  className="rounded-lg"
+                  style={{
+                    backgroundColor: 'var(--dash-card-bg)',
+                    border: '1px solid var(--dash-card-border)',
+                    transition: 'border-color 160ms ease, background-color 160ms ease',
+                  }}
+                  onMouseEnter={(event) => {
+                    event.currentTarget.style.borderColor = 'rgba(0, 193, 175, 0.28)';
+                    event.currentTarget.style.backgroundColor = 'rgba(20, 20, 20, 0.96)';
+                  }}
+                  onMouseLeave={(event) => {
+                    event.currentTarget.style.borderColor = 'var(--dash-card-border)';
+                    event.currentTarget.style.backgroundColor = 'var(--dash-card-bg)';
+                  }}
+                >
+                  <div className="w-full p-5 text-left">
+                    <div className="grid grid-cols-12 gap-x-24 items-center">
+                      <div className="col-span-4">
+                        <div style={{ color: 'var(--dash-text-muted)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Nome</div>
+                        <div style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>{membro.nome}</div>
                       </div>
-                      <Info label="Início" value={membro.inicio ?? membro.vigencia.split(' - ')[0] ?? 'Pendente'} />
-                      <Info label="Término" value={membro.termino ?? membro.vigencia.split(' - ')[1] ?? 'Pendente'} />
-                      <Info label="Modalidade" value={membro.modalidade} />
-                      <div>
-                        <div style={{ color: 'var(--dash-text-muted)', fontSize: 'var(--text-xs)', marginBottom: '6px' }}>Status</div>
-                        <span className="inline-flex px-3 py-1 rounded-full" style={{ color: statusStyle.color, backgroundColor: statusStyle.bg, border: `1px solid ${statusStyle.border}`, fontSize: 'var(--text-xs)', fontWeight: 700 }}>
-                          {membro.status}
+                      <div className="col-span-2">
+                        <div style={{ color: 'var(--dash-text-muted)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Início</div>
+                        <div style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>
+                          {membro.inicio ?? membro.vigencia.split(' - ')[0] ?? 'Pendente'}
+                        </div>
+                      </div>
+                      <div className="col-span-2">
+                        <div style={{ color: 'var(--dash-text-muted)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                          Término
+                          <span style={{ color: 'var(--dash-primary)', fontSize: 'var(--text-sm)', lineHeight: 1 }}>↓</span>
+                        </div>
+                        <div style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>
+                          {membro.termino ?? membro.vigencia.split(' - ')[1] ?? 'Pendente'}
+                        </div>
+                      </div>
+                      <div className="col-span-2">
+                        <div style={{ color: 'var(--dash-text-muted)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Modalidade</div>
+                        <div style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>{membro.modalidade}</div>
+                      </div>
+                      <div className="col-span-2">
+                        <div style={{ color: 'var(--dash-text-muted)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Status</div>
+                        <span
+                          className="inline-flex items-center px-3 py-1 rounded-full"
+                          style={{
+                            color: statusStyle.color,
+                            backgroundColor: statusStyle.bg,
+                            border: `1px solid ${statusStyle.border}`,
+                            fontSize: 'var(--text-sm)',
+                            fontWeight: 'var(--font-weight-medium)',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {statusLabel}
                         </span>
                       </div>
                     </div>
-                  </button>
-
-                  {isExpanded && (
-                    <div className="px-5 pb-5">
-                      <div className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <Info label="Papel" value={membro.papel} />
-                          <Info label="E-mail" value={membro.email} />
-                          <Info label="Telefone" value={membro.telefone ?? 'Não informado'} />
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  </div>
                 </article>
               );
             })}
           </div>
         </>
-      )}
     </>
   );
 };
 
 const SelectFilter: React.FC<{ label: string; value: string; options: string[]; onChange: (value: string) => void }> = ({ label, value, options, onChange }) => (
-  <label style={{ color: 'var(--dash-text-muted)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>
+  <label style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>
     {label}
     <select
       value={value}

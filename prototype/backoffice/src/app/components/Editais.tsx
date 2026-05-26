@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, ChevronDown, FileText, Clock, Users, ClipboardList, ChevronRight, CheckCircle, Plus, Home, FolderOpen, BookOpen, ArrowLeft } from 'lucide-react';
+import { Search, ChevronDown, FileText, Users, ClipboardList, ChevronRight, CheckCircle, Plus, Home, FolderOpen, BookOpen, ArrowLeft } from 'lucide-react';
 import { FormularioInscricaoGeral } from './FormularioInscricaoGeral';
 import { Programa } from './Programa';
 import { FormularioPersonalizado } from './FormularioPersonalizado';
@@ -668,7 +668,17 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
         </div>
 
         {/* Cards de Estatísticas */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px', marginBottom: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+          <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <div style={{ backgroundColor: T.accentSoft, borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ClipboardList size={18} style={{ color: T.accent }} />
+              </div>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Total de captações</span>
+            </div>
+            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>10</div>
+          </div>
+
           <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               <div style={{ backgroundColor: T.accentSoft, borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -681,18 +691,8 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
 
           <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ backgroundColor: 'rgba(251, 191, 36, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Clock size={18} style={{ color: '#fbbf24' }} />
-              </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Rascunhos</span>
-            </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>2</div>
-          </div>
-
-          <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ backgroundColor: 'rgba(59, 130, 246, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Users size={18} style={{ color: '#3b82f6' }} />
+              <div style={{ backgroundColor: T.accentSoft, borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Users size={18} style={{ color: T.accent }} />
               </div>
               <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Propostas recebidas</span>
             </div>
@@ -701,22 +701,12 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
 
           <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ backgroundColor: 'rgba(34, 197, 94, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <CheckCircle size={18} style={{ color: '#22c55e' }} />
+              <div style={{ backgroundColor: T.accentSoft, borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <CheckCircle size={18} style={{ color: T.accent }} />
               </div>
               <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Finalizadas</span>
             </div>
             <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>1</div>
-          </div>
-
-          <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <ClipboardList size={18} style={{ color: '#ef4444' }} />
-              </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Total de captações</span>
-            </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>10</div>
           </div>
         </div>
 
@@ -765,26 +755,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
             padding: '24px',
             marginBottom: '24px',
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '20px' }}>
-              <div>
-                <h2 style={{
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  color: T.accent,
-                  margin: '0 0 6px',
-                }}>
-                  Dashboard das Captações
-                </h2>
-                <p style={{
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--text-sm)',
-                  color: T.textMuted,
-                  margin: 0,
-                }}>
-                  Visão consolidada das captações agrupadas pelo status atual.
-                </p>
-              </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-start', gap: '16px', marginBottom: '20px' }}>
               <div style={{
                 fontFamily: 'var(--font-family)',
                 fontSize: 'var(--text-xs)',

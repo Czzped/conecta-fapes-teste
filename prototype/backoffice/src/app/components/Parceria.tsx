@@ -779,13 +779,13 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
               }}
             >
               <ListCell label="Parceria" value={parceria.nome} strong />
-              <ListCell label="Instituição" value={parceria.instituicaoParceira} />
-              <ListCell label="Vigência" value={`${parceria.vigenciaInicio} - ${parceria.vigenciaFim}`} />
+              <ListCell label="Instituição" value={parceria.instituicaoParceira} primary />
+              <ListCell label="Vigência" value={`${parceria.vigenciaInicio} - ${parceria.vigenciaFim}`} primary />
               <div style={{ paddingLeft: '1.25rem' }}>
-                <ListCell label="Aporte total" value={formatCurrency(parceria.aporteTotal)} />
+                <ListCell label="Aporte total" value={formatCurrency(parceria.aporteTotal)} primary />
               </div>
               <div style={{ paddingLeft: '0.75rem' }}>
-                <ListCell label="Saldo com Programas" value={formatCurrency(parceria.saldoAlocavelEmProgramas)} />
+                <ListCell label="Saldo com Programas" value={formatCurrency(parceria.saldoAlocavelEmProgramas)} primary />
               </div>
               <div style={{ paddingLeft: '2.25rem' }}>
                 <CellLabel label="Status" />
@@ -813,12 +813,12 @@ const CellLabel: React.FC<{ label: string }> = ({ label }) => {
   );
 };
 
-const ListCell: React.FC<{ label: string; value: string; detail?: string; strong?: boolean; highlight?: boolean }> = ({ label, value, detail, strong, highlight }) => {
+const ListCell: React.FC<{ label: string; value: string; detail?: string; strong?: boolean; highlight?: boolean; primary?: boolean }> = ({ label, value, detail, strong, highlight, primary }) => {
   const { T } = useThemeTokens();
   return (
     <div>
       <CellLabel label={label} />
-      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: highlight ? '#22c55e' : strong ? T.textPrimary : T.textSecondary, fontWeight: strong ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)' }}>
+      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: highlight ? '#22c55e' : (strong || primary) ? T.textPrimary : T.textSecondary, fontWeight: strong ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)' }}>
         {value}
       </div>
       {detail && (
