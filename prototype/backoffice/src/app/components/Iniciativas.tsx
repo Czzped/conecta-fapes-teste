@@ -563,28 +563,41 @@ export const Iniciativas: React.FC = () => {
     { label: 'Finalizadas', value: 22, status: 'Concluída' },
     { label: 'Canceladas', value: 2, status: 'Cancelada' },
   ];
-  const lineChartPoints = dashboardCards.map((item, index) => ({
-    ...item,
-    x: 42 + index * 136,
-    y: 244 - (item.value / 30) * 184,
-  }));
-  const lineChartPath = lineChartPoints.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ');
   const dashboardSeries = [
-    { label: 'Submetidas', color: '#00c1af', values: [8, 12, 16, 21, 25, 28] },
-    { label: 'Aprovadas', color: '#22c55e', values: [3, 5, 8, 11, 14, 16] },
-    { label: 'Em Contratação', color: '#3b82f6', values: [1, 2, 4, 6, 7, 9] },
-    { label: 'Em Execução', color: '#a855f7', values: [4, 6, 8, 11, 12, 14] },
-    { label: 'Suspensas', color: '#f59e0b', values: [0, 1, 1, 2, 2, 3] },
-    { label: 'Finalizadas', color: '#14b8a6', values: [9, 12, 15, 18, 20, 22] },
-    { label: 'Canceladas', color: '#ef4444', values: [0, 1, 1, 1, 2, 2] },
+    { label: 'Submetidas', color: '#2563eb', values: [44, 48, 46, 45, 44, 44, 44, 39, 39, 31, 0, 0] },
+    { label: 'Aprovadas', color: '#0d9488', values: [0, 5, 6, 1, 2, 2, 1, 0, 1, 0, 0, 0] },
+    { label: 'Em contratação', color: '#d97706', values: [0, 0, 4, 1, 0, 0, 0, 0, 0, 8, 13, 0] },
+    { label: 'Em execução', color: '#4f46e5', values: [4, 6, 8, 11, 12, 14, 14, 15, 15, 15, 14, 14] },
+    { label: 'Suspensas', color: '#ea580c', values: [0, 1, 1, 1, 1, 2, 2, 3, 3, 2, 2, 3] },
+    { label: 'Finalizadas', color: '#16a34a', values: [9, 12, 15, 18, 20, 22, 23, 24, 24, 25, 25, 26] },
+    { label: 'Canceladas', color: '#dc2626', values: [0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3] },
   ];
-  const dashboardMonths = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'];
-  const maxDashboardValue = 30;
-  const buildDashboardPath = (values: number[]) => values.map((value, index) => {
-    const x = 64 + index * 150;
-    const y = 238 - (value / maxDashboardValue) * 176;
-    return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
-  }).join(' ');
+  const dashboardMonths = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+  const maxDashboardValue = 50;
+  const chartLeft = 30;
+  const chartRight = 1210;
+  const chartTop = 32;
+  const chartBottom = 260;
+  const chartWidth = chartRight - chartLeft;
+  const chartHeight = chartBottom - chartTop;
+  const chartPoint = (value: number, index: number) => ({
+    x: chartLeft + index * (chartWidth / (dashboardMonths.length - 1)),
+    y: chartBottom - (value / maxDashboardValue) * chartHeight,
+  });
+  const buildDashboardPath = (values: number[]) => {
+    const points = values.map(chartPoint);
+    if (points.length < 2) return '';
+
+    return points.reduce((path, point, index) => {
+      if (index === 0) return `M ${point.x} ${point.y}`;
+      if (index === points.length - 1) return `${path} L ${point.x} ${point.y}`;
+
+      const next = points[index + 1];
+      const midX = (point.x + next.x) / 2;
+      const midY = (point.y + next.y) / 2;
+      return `${path} Q ${point.x} ${point.y} ${midX} ${midY}`;
+    }, '');
+  };
 
   const totalPorStatus = (status: StatusIniciativa) => iniciativas.filter((iniciativa) => iniciativa.status === status).length;
   const contaAtual = iniciativaSelecionada
@@ -991,23 +1004,23 @@ export const Iniciativas: React.FC = () => {
         <>
       <section className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-6">
         {dashboardCards.map(({ label, value, status }) => {
-          const { color, bg, Icon } = statusStyle[status];
+          const { Icon } = statusStyle[status];
 
           return (
             <button
               key={label}
               type="button"
               onClick={() => setStatusFiltro(status)}
-              className="rounded-lg p-3 text-center"
-              style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)', cursor: 'pointer', minHeight: '118px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+              className="rounded-lg p-3 text-left"
+              style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)', cursor: 'pointer', minHeight: '118px', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between' }}
             >
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <div className="flex items-center justify-center rounded-lg" style={{ width: '32px', height: '32px', backgroundColor: bg, flexShrink: 0 }}>
-                  <Icon size={16} style={{ color }} />
+              <div className="flex items-center justify-start gap-2">
+                <div className="flex items-center justify-center rounded-lg" style={{ width: '32px', height: '32px', backgroundColor: 'rgba(0, 193, 175, 0.12)', flexShrink: 0 }}>
+                  <Icon size={16} style={{ color: '#00c1af' }} />
                 </div>
                 <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-secondary)', lineHeight: 1.3 }}>{label}</span>
               </div>
-              <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: 'var(--dash-text-primary)' }}>{value}</strong>
+              <strong style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'translateY(8px)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: 'var(--dash-text-primary)', pointerEvents: 'none' }}>{value}</strong>
             </button>
           );
         })}
@@ -1048,30 +1061,24 @@ export const Iniciativas: React.FC = () => {
       </div>
 
       {activeTab === 'dashboard' && (
-        <section className="rounded-lg p-5 mb-6" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
-          <div className="mb-5">
-            <h2 style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
-              Evolução por status
-            </h2>
-            <p style={{ color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', margin: 0 }}>
-              Distribuição consolidada das iniciativas por etapa operacional.
-            </p>
-          </div>
-          <div style={{ width: '100%', overflowX: 'auto' }}>
-            <svg viewBox="0 0 900 340" role="img" aria-label="Gráfico de linha de iniciativas por status" style={{ width: '100%', minWidth: '760px', height: '340px', display: 'block' }}>
-              {[0, 10, 20, 30].map((tick) => {
-                const y = 238 - (tick / maxDashboardValue) * 176;
+        <section className="rounded-lg mb-6" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)', padding: '20px 2px 14px' }}>
+          <h2 style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', margin: '0 18px 10px' }}>
+            Acompanhamento dos Status
+          </h2>
+          <div style={{ width: '100%' }}>
+            <svg viewBox="0 0 1220 360" role="img" aria-label="Gráfico de linha de iniciativas por status" style={{ width: '100%', height: '360px', display: 'block' }}>
+              {[0, 10, 20, 30, 40, 50].map((tick) => {
+                const y = chartBottom - (tick / maxDashboardValue) * chartHeight;
                 return (
                   <g key={tick}>
-                    <line x1="64" y1={y} x2="814" y2={y} stroke="rgba(255,255,255,0.08)" />
-                    <text x="28" y={y + 4} fill="var(--dash-text-muted)" fontSize="11" fontFamily="var(--font-family)">{tick}</text>
+                    <line x1={chartLeft} y1={y} x2={chartRight} y2={y} stroke="rgba(255,255,255,0.08)" />
+                    <text x="8" y={y + 5} fill="var(--dash-text-muted)" fontSize="13" fontFamily="var(--font-family)">{tick}</text>
                   </g>
                 );
               })}
               {dashboardMonths.map((month, index) => (
                 <g key={month}>
-                  <line x1={64 + index * 150} y1="238" x2={64 + index * 150} y2="246" stroke="rgba(255,255,255,0.18)" />
-                  <text x={64 + index * 150} y="270" textAnchor="middle" fill="var(--dash-text-secondary)" fontSize="11" fontFamily="var(--font-family)">
+                  <text x={chartLeft + index * (chartWidth / (dashboardMonths.length - 1))} y="285" textAnchor="middle" fill="var(--dash-text-secondary)" fontSize="13" fontFamily="var(--font-family)">
                     {month}
                   </text>
                 </g>
@@ -1080,16 +1087,15 @@ export const Iniciativas: React.FC = () => {
                 <g key={serie.label}>
                   <path d={buildDashboardPath(serie.values)} fill="none" stroke={serie.color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                   {serie.values.map((value, index) => {
-                    const x = 64 + index * 150;
-                    const y = 238 - (value / maxDashboardValue) * 176;
-                    return <circle key={`${serie.label}-${index}`} cx={x} cy={y} r="4" fill={serie.color} stroke="#171717" strokeWidth="2" />;
+                    const { x, y } = chartPoint(value, index);
+                    return <circle key={`${serie.label}-${index}`} cx={x} cy={y} r="4.5" fill={serie.color} />;
                   })}
                 </g>
               ))}
               {dashboardSeries.map((serie, index) => (
-                <g key={`legend-${serie.label}`} transform={`translate(${64 + (index % 4) * 190}, ${300 + Math.floor(index / 4) * 24})`}>
-                  <circle cx="0" cy="0" r="5" fill={serie.color} />
-                  <text x="12" y="4" fill="var(--dash-text-secondary)" fontSize="11" fontFamily="var(--font-family)">{serie.label}</text>
+                <g key={`legend-${serie.label}`} transform={`translate(${110 + index * 158}, 326)`}>
+                  <circle cx="0" cy="0" r="6" fill={serie.color} />
+                  <text x="14" y="5" fill="var(--dash-text-primary)" fontSize="12" fontFamily="var(--font-family)">{serie.label}</text>
                 </g>
               ))}
             </svg>

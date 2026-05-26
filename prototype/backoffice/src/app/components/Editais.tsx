@@ -198,7 +198,6 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
         propostas: captacoes.reduce((total, captacao) => total + captacao.propostasRecebidas, 0),
       };
     });
-  const maiorQuantidadePorStatus = Math.max(...statusCaptacaoDashboard.map(item => item.quantidade), 1);
   const financeiroCaptacaoDashboard = {
     totalSolicitado: 12840000,
     totalDisponivel: 5000000,
@@ -211,6 +210,16 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
     ],
   };
   const maiorValorRubricaCaptacao = Math.max(...financeiroCaptacaoDashboard.rubricas.map(item => item.valor), 1);
+  const bolsasSolicitadasCaptacao = [
+    { nome: 'Iniciação Científica', quantidade: 48, valor: 960000 },
+    { nome: 'Mestrado', quantidade: 32, valor: 1280000 },
+    { nome: 'Doutorado', quantidade: 24, valor: 1440000 },
+    { nome: 'BPIG-I', quantidade: 18, valor: 540000 },
+    { nome: 'BPIG-II', quantidade: 15, valor: 510000 },
+    { nome: 'BPIG-III', quantidade: 12, valor: 456000 },
+    { nome: 'BPIG-IV', quantidade: 9, valor: 378000 },
+  ];
+  const maiorQuantidadeBolsasCaptacao = Math.max(...bolsasSolicitadasCaptacao.map(item => item.quantidade), 1);
   const formatCurrency = (value: number) =>
     value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -748,89 +757,8 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
         </div>
 
         {activeTab === 'dashboard' && (
-          <div style={{
-            backgroundColor: T.bgCard,
-            border: `1px solid ${T.borderSubtle}`,
-            borderRadius: '8px',
-            padding: '24px',
-            marginBottom: '24px',
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-start', gap: '16px', marginBottom: '20px' }}>
-              <div style={{
-                fontFamily: 'var(--font-family)',
-                fontSize: 'var(--text-xs)',
-                color: T.accent,
-                padding: '6px 10px',
-                borderRadius: '999px',
-                border: '1px solid rgba(0,193,175,0.28)',
-                backgroundColor: T.accentSoft,
-                whiteSpace: 'nowrap',
-              }}>
-                {captacoesData.length} captação(ões)
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px', marginBottom: '22px' }}>
-              {statusCaptacaoDashboard.map(item => {
-                const color = getStatusColor(item.status);
-                const percentual = Math.round((item.quantidade / maiorQuantidadePorStatus) * 100);
-
-                return (
-                  <button
-                    key={item.status}
-                    type="button"
-                    onClick={() => {
-                      setSetorFilter(item.status);
-                      setActiveTab('captacoes');
-                    }}
-                    style={{
-                      padding: '16px',
-                      border: setorFilter === item.status ? `1px solid ${color}` : `1px solid ${T.borderSubtle}`,
-                      borderRadius: '8px',
-                      backgroundColor: setorFilter === item.status ? `${color}12` : T.bgSurfaceMuted,
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '12px' }}>
-                      <div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', marginBottom: '3px' }}>
-                          {item.status}
-                        </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
-                          {item.propostas} proposta(s)
-                        </div>
-                      </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color, fontWeight: 'var(--font-weight-medium)', lineHeight: 1 }}>
-                        {item.quantidade}
-                      </div>
-                    </div>
-                    <div style={{ height: '6px', borderRadius: '999px', backgroundColor: T.borderSubtle, overflow: 'hidden' }}>
-                      <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: color }} />
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '16px', marginBottom: '22px' }}>
-              <div style={{
-                border: `1px solid ${T.borderSubtle}`,
-                borderRadius: '8px',
-                backgroundColor: T.bgSurfaceMuted,
-                padding: '18px',
-              }}>
-                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '8px' }}>
-                  Total financeiro solicitado pelas iniciativas
-                </div>
-                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', marginBottom: '10px' }}>
-                  {formatCurrency(financeiroCaptacaoDashboard.totalSolicitado)}
-                </div>
-                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textMuted, lineHeight: 1.45 }}>
-                  Disponível na captação: <span style={{ color: T.accent }}>{formatCurrency(financeiroCaptacaoDashboard.totalDisponivel)}</span>
-                </div>
-              </div>
-
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '22px' }}>
               <div style={{
                 border: `1px solid ${T.borderSubtle}`,
                 borderRadius: '8px',
@@ -856,7 +784,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                           <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
                             {rubrica.nome}
                           </div>
-                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: rubrica.cor, textAlign: 'right' }}>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.accent, textAlign: 'right' }}>
                             {formatCurrency(rubrica.valor)}
                           </div>
                           <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, textAlign: 'right' }}>
@@ -864,7 +792,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                           </div>
                         </div>
                         <div style={{ height: '7px', borderRadius: '999px', backgroundColor: T.borderSubtle, overflow: 'hidden' }}>
-                          <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: rubrica.cor }} />
+                          <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: T.accent }} />
                         </div>
                       </div>
                     );
@@ -873,74 +801,45 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
-              {statusCaptacaoDashboard.map(item => {
-                const color = getStatusColor(item.status);
+            <div style={{
+              border: `1px solid ${T.borderSubtle}`,
+              borderRadius: '8px',
+              backgroundColor: T.bgSurfaceMuted,
+              padding: '18px',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '18px' }}>
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)' }}>
+                  Tipos de bolsas solicitadas
+                </div>
+                <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
+                  {bolsasSolicitadasCaptacao.length} modalidade(s)
+                </div>
+              </div>
 
-                return (
-                  <div
-                    key={`lista-${item.status}`}
-                    style={{
-                      border: `1px solid ${T.borderSubtle}`,
-                      borderRadius: '8px',
-                      backgroundColor: T.bgSurfaceMuted,
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      gap: '12px',
-                      padding: '13px 14px',
-                      borderBottom: `1px solid ${T.borderSubtle}`,
-                    }}>
-                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)' }}>
-                        {item.status}
-                      </span>
-                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color }}>
-                        {item.quantidade}
-                      </span>
-                    </div>
+              <div style={{ display: 'grid', gap: '14px' }}>
+                {bolsasSolicitadasCaptacao.map(bolsa => {
+                  const percentual = Math.round((bolsa.quantidade / maiorQuantidadeBolsasCaptacao) * 100);
 
-                    <div style={{ display: 'grid' }}>
-                      {item.captacoes.length > 0 ? item.captacoes.map((captacao, index) => (
-                        <button
-                          key={captacao.codigo}
-                          type="button"
-                          onClick={() => {
-                            setCaptacaoSelecionada(captacao);
-                            setShowDetalhesCaptacao(true);
-                          }}
-                          style={{
-                            width: '100%',
-                            padding: '13px 14px',
-                            border: 'none',
-                            borderBottom: index === item.captacoes.length - 1 ? 'none' : `1px solid ${T.borderSubtle}`,
-                            backgroundColor: 'transparent',
-                            cursor: 'pointer',
-                            textAlign: 'left',
-                          }}
-                        >
-                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, lineHeight: 1.35, marginBottom: '4px' }}>
-                            {captacao.titulo}
-                          </div>
-                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '6px' }}>
-                            {captacao.vinculoTipo}
-                          </div>
-                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
-                            {captacao.propostasRecebidas} proposta(s) · {captacao.dataPublicacao}
-                          </div>
-                        </button>
-                      )) : (
-                        <div style={{ padding: '14px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textMuted }}>
-                          Nenhuma captação neste status.
+                  return (
+                    <div key={bolsa.nome}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 170px 120px', gap: '12px', alignItems: 'center', marginBottom: '7px' }}>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
+                          {bolsa.nome}
                         </div>
-                      )}
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, textAlign: 'right' }}>
+                          {formatCurrency(bolsa.valor)}
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, textAlign: 'right' }}>
+                          {bolsa.quantidade} bolsa(s)
+                        </div>
+                      </div>
+                      <div style={{ height: '7px', borderRadius: '999px', backgroundColor: T.borderSubtle, overflow: 'hidden' }}>
+                        <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: T.accent }} />
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}

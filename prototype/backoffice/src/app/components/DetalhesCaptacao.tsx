@@ -184,6 +184,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
   const [editingResumo, setEditingResumo] = useState(false);
   const [showFormularioEdicao, setShowFormularioEdicao] = useState(false);
   const [iniciativaSelecionadaCodigo, setIniciativaSelecionadaCodigo] = useState(iniciativasEnviadas[0].codigo);
+  const [propostaOrdenacao, setPropostaOrdenacao] = useState<'data-recente' | 'data-antiga' | 'valor-maior' | 'valor-menor'>('data-recente');
   const [showModal, setShowModal] = useState(false);
   const [avaliador1, setAvaliador1] = useState('');
   const [avaliador2, setAvaliador2] = useState('');
@@ -234,6 +235,17 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
     color: '#ffffff',
     lineHeight: 1.4,
   };
+  const parseDataEnvio = (data: string) => {
+    const [dia, mes, ano] = data.split('/').map(Number);
+    return new Date(ano, mes - 1, dia).getTime();
+  };
+  const fasePropostaLabel = (fase: string) => fase === 'Submetida' ? 'Enviada' : fase === 'Resultado Preliminar' ? 'Resultado Parcial' : fase;
+  const propostasOrdenadas = [...iniciativasEnviadas].sort((a, b) => {
+    if (propostaOrdenacao === 'data-antiga') return parseDataEnvio(a.data) - parseDataEnvio(b.data);
+    if (propostaOrdenacao === 'valor-maior') return b.valorNumerico - a.valorNumerico;
+    if (propostaOrdenacao === 'valor-menor') return a.valorNumerico - b.valorNumerico;
+    return parseDataEnvio(b.data) - parseDataEnvio(a.data);
+  });
   const filtroCampoStyle: React.CSSProperties = {
     ...inputStyle,
     backgroundColor: 'rgba(38, 38, 38, 0.5)',
@@ -1183,12 +1195,12 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
           <>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: '16px', marginBottom: '24px' }}>
               {[
-                { ...fasesIniciativas[0], Icon: FileText, bg: 'rgba(56,189,248,0.12)' },
-                { ...fasesIniciativas[1], Icon: CheckCircle, bg: 'rgba(34,197,94,0.12)' },
+                { ...fasesIniciativas[0], Icon: FileText, bg: 'rgba(0,193,175,0.12)' },
+                { ...fasesIniciativas[1], Icon: CheckCircle, bg: 'rgba(0,193,175,0.12)' },
                 { ...fasesIniciativas[2], Icon: ClipboardCheck, bg: 'rgba(0,193,175,0.12)' },
-                { ...fasesIniciativas[3], Icon: ListChecks, bg: 'rgba(59,130,246,0.12)' },
-                { ...fasesIniciativas[4], Icon: RotateCcw, bg: 'rgba(245,158,11,0.12)' },
-                { ...fasesIniciativas[5], Icon: Trophy, bg: 'rgba(168,85,247,0.12)' },
+                { ...fasesIniciativas[3], Icon: ListChecks, bg: 'rgba(0,193,175,0.12)' },
+                { ...fasesIniciativas[4], Icon: RotateCcw, bg: 'rgba(0,193,175,0.12)' },
+                { ...fasesIniciativas[5], Icon: Trophy, bg: 'rgba(0,193,175,0.12)' },
               ].map(({ fase, quantidade, Icon, bg }) => (
                 <div key={fase} style={metricCardStyle}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
@@ -1209,24 +1221,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
             <div style={cardStyle}>
               <h2 style={sectionTitleStyle}>Financeiro da Captação</h2>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '16px' }}>
-                <div style={{
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: 'var(--radius)',
-                  backgroundColor: 'rgba(23, 23, 23,0.35)',
-                  padding: '18px',
-                }}>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>
-                    Total financeiro solicitado pelas iniciativas
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', marginBottom: '10px' }}>
-                    {formatCurrency(financeiroCaptacaoDetalhe.totalSolicitado)}
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', lineHeight: 1.45 }}>
-                    Disponível na captação: <span style={{ color: '#ffffff' }}>{formatCurrency(financeiroCaptacaoDetalhe.totalDisponivel)}</span>
-                  </div>
-                </div>
-
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                 <div style={{
                   border: '1px solid rgba(255,255,255,0.1)',
                   borderRadius: 'var(--radius)',
@@ -1269,160 +1264,6 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
                 </div>
               </div>
 
-              <div style={{ marginTop: '18px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
-                    Totais por faixa
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)' }}>
-                    {financeiroPorFaixaCaptacao.length} faixa(s)
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '16px' }}>
-                  {financeiroPorFaixaCaptacao.map(faixa => {
-                    const maiorValorRubricaFaixa = Math.max(...faixa.rubricas.map(rubrica => rubrica.valor), 1);
-
-                    return (
-                      <div
-                        key={faixa.faixa}
-                        style={{
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          borderRadius: 'var(--radius)',
-                          backgroundColor: 'rgba(23, 23, 23,0.35)',
-                          padding: '18px',
-                        }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
-                          <div>
-                            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', marginBottom: '4px' }}>
-                              {faixa.faixa}
-                            </div>
-                            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)' }}>
-                              {faixa.quantidadeIniciativas} iniciativa(s)
-                            </div>
-                          </div>
-                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', textAlign: 'right' }}>
-                            {formatCurrency(faixa.valorTotal)}
-                          </div>
-                        </div>
-
-                        <div style={{ display: 'grid', gap: '12px' }}>
-                          {faixa.rubricas.map(rubrica => {
-                            const percentual = Math.round((rubrica.valor / maiorValorRubricaFaixa) * 100);
-
-                            return (
-                              <div key={`${faixa.faixa}-${rubrica.nome}`}>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px 100px', gap: '12px', alignItems: 'center', marginBottom: '6px' }}>
-                                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
-                                    {rubrica.nome}
-                                  </div>
-                                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', textAlign: 'right' }}>
-                                    {formatCurrency(rubrica.valor)}
-                                  </div>
-                                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', textAlign: 'right' }}>
-                                    {rubrica.quantidade} item(ns)
-                                  </div>
-                                </div>
-                                <div style={{ height: '6px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                                  <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: '#00c1af' }} />
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            <div style={cardStyle}>
-              <h2 style={sectionTitleStyle}>Iniciativas Enviadas</h2>
-
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '130px 1.4fr 1.1fr 170px 210px 110px',
-                gap: '16px',
-                padding: '0 16px 10px',
-                borderBottom: '1px solid rgba(255,255,255,0.08)',
-                marginBottom: '8px',
-              }}>
-                {['Código', 'Iniciativa', 'Proponente', 'Valor solicitado', 'Fase atual', 'Envio'].map(coluna => (
-                  <div
-                    key={coluna}
-                    style={{
-                      fontFamily: 'var(--font-family)',
-                      fontSize: 'var(--text-xs)',
-                      fontWeight: 'var(--font-weight-medium)',
-                      color: 'rgba(255,255,255,0.5)',
-                    }}
-                  >
-                    {coluna}
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ display: 'grid', gap: '10px' }}>
-                {iniciativasEnviadas.map(iniciativa => {
-                  const fase = fasesIniciativas.find(item => item.fase === iniciativa.fase);
-                  const selecionada = iniciativa.codigo === iniciativaSelecionada.codigo;
-
-                  return (
-                    <button
-                      key={iniciativa.codigo}
-                      type="button"
-                      onClick={() => setIniciativaSelecionadaCodigo(iniciativa.codigo)}
-                      style={{
-                        width: '100%',
-                        display: 'grid',
-                        gridTemplateColumns: '130px 1.4fr 1.1fr 170px 210px 110px',
-                        gap: '16px',
-                        alignItems: 'center',
-                        padding: '14px 16px',
-                        border: selecionada ? '1px solid rgba(0,193,175,0.42)' : '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: 'var(--radius)',
-                        backgroundColor: selecionada ? 'rgba(0,193,175,0.08)' : 'rgba(23, 23, 23,0.35)',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                      }}
-                    >
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af' }}>
-                        {iniciativa.codigo}
-                      </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', lineHeight: 1.45 }}>
-                        {iniciativa.titulo}
-                      </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', lineHeight: 1.45 }}>
-                        {iniciativa.proponente}
-                      </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>
-                        {iniciativa.valorSolicitado}
-                      </div>
-                      <div>
-                        <span style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          padding: '6px 10px',
-                          borderRadius: '999px',
-                          border: `1px solid ${fase?.cor || 'rgba(255,255,255,0.2)'}`,
-                          backgroundColor: fase ? `${fase.cor}1f` : 'rgba(255,255,255,0.08)',
-                          color: fase?.cor || 'rgba(255,255,255,0.7)',
-                          fontFamily: 'var(--font-family)',
-                          fontSize: 'var(--text-xs)',
-                          fontWeight: 'var(--font-weight-medium)',
-                        }}>
-                          {iniciativa.fase}
-                        </span>
-                      </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.65)' }}>
-                        {iniciativa.data}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
             </div>
 
             <div style={cardStyle}>
@@ -1430,7 +1271,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
                 <div>
                   <h2 style={{ ...sectionTitleStyle, marginBottom: '6px' }}>Revisores Ad Hoc</h2>
                   <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
-                    Pool de revisores disponível para avaliação das iniciativas desta captação.
+                    Revisores selecionados para avaliação das Iniciativas desta Captação.
                   </p>
                 </div>
                 <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#00c1af', padding: '6px 10px', borderRadius: '999px', border: '1px solid rgba(0,193,175,0.28)', backgroundColor: 'rgba(0,193,175,0.08)', whiteSpace: 'nowrap' }}>
@@ -1447,9 +1288,9 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
                       key={revisor.nome}
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: '1.2fr 1fr 0.8fr 140px 120px',
+                        gridTemplateColumns: '1.2fr 1fr 0.9fr 1fr 150px',
                         gap: '16px',
-                        alignItems: 'center',
+                        alignItems: 'start',
                         padding: '14px 16px',
                         borderRadius: 'var(--radius)',
                         border: '1px solid rgba(255,255,255,0.1)',
@@ -1457,36 +1298,34 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
                       }}
                     >
                       <div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', marginBottom: '3px' }}>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '6px' }}>Revisor</div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
                           {revisor.nome}
                         </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)' }}>
+                      </div>
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '6px' }}>Instituição</div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
                           {revisor.instituicao}
                         </div>
                       </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>
-                        {revisor.area}
-                      </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)' }}>
-                        {revisor.titulacao}
-                      </div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af' }}>
-                        {quantidadeAvaliacoes} avaliação(ões)
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '6px' }}>Área</div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                          {revisor.area}
+                        </div>
                       </div>
                       <div>
-                        <span style={{
-                          display: 'inline-flex',
-                          padding: '6px 10px',
-                          borderRadius: '999px',
-                          border: '1px solid rgba(34,197,94,0.38)',
-                          backgroundColor: 'rgba(34,197,94,0.12)',
-                          color: '#22c55e',
-                          fontFamily: 'var(--font-family)',
-                          fontSize: 'var(--text-xs)',
-                          fontWeight: 'var(--font-weight-medium)',
-                        }}>
-                          {revisor.status}
-                        </span>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '6px' }}>Especialização</div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                          {revisor.titulacao}
+                        </div>
+                      </div>
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '6px' }}>Avaliações Realizadas</div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                          {quantidadeAvaliacoes}
+                        </div>
                       </div>
                     </div>
                   );
@@ -1499,15 +1338,45 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
 
         {activeTab === 'proposta' && (
           <div style={{ display: 'grid', gap: '10px' }}>
-              {renderListFilters(['Todos', 'Submetida', 'Habilitação', 'Avaliação Ad Hoc', 'Resultado Final'], true)}
-              {iniciativasEnviadas.map(iniciativa => (
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 250px 180px 220px', gap: '16px', marginBottom: '16px', alignItems: 'end' }}>
+                <div>
+                  <label style={labelStyle}>Busca</label>
+                  <input type="text" placeholder="Buscar" style={filtroCampoStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Ordenar por</label>
+                  <select
+                    value={propostaOrdenacao}
+                    onChange={(event) => setPropostaOrdenacao(event.target.value as typeof propostaOrdenacao)}
+                    style={{ ...filtroCampoStyle, appearance: 'none', cursor: 'pointer' }}
+                  >
+                    <option value="data-recente">Data de envio: mais recente</option>
+                    <option value="data-antiga">Data de envio: mais antiga</option>
+                    <option value="valor-maior">Valor: maior</option>
+                    <option value="valor-menor">Valor: menor</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>Data</label>
+                  <input type="text" placeholder="dd/mm/aaaa" style={filtroCampoStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Status</label>
+                  <select defaultValue="Todos" style={{ ...filtroCampoStyle, appearance: 'none', cursor: 'pointer' }}>
+                    {['Todos', 'Enviada', 'Habilitação', 'Avaliação Ad Hoc', 'Resultado Parcial', 'Recurso', 'Resultado Final'].map(status => (
+                      <option key={status} value={status}>{status}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              {propostasOrdenadas.map(iniciativa => (
                 <div
                   key={iniciativa.codigo}
                   onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; }}
                   onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38, 0.5)'; }}
                   style={{
                     ...detalheLinhaStyle,
-                    gridTemplateColumns: '1.35fr 1.05fr 24px 1fr 150px 120px',
+                    gridTemplateColumns: '1.25fr 1fr 24px 0.9fr 140px 110px 150px',
                   }}
                 >
                   <div>
@@ -1527,11 +1396,15 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
                   </div>
                   <div>
                     <div style={detalheRotuloStyle}>Valor solicitado</div>
-                    <div style={{ ...detalheValorStyle, color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>{iniciativa.valorSolicitado}</div>
+                    <div style={detalheValorStyle}>{iniciativa.valorSolicitado}</div>
                   </div>
                   <div>
                     <div style={detalheRotuloStyle}>Envio</div>
                     <div style={detalheValorStyle}>{iniciativa.data}</div>
+                  </div>
+                  <div>
+                    <div style={detalheRotuloStyle}>Fase</div>
+                    <div style={detalheValorStyle}>{fasePropostaLabel(iniciativa.fase)}</div>
                   </div>
                 </div>
               ))}
