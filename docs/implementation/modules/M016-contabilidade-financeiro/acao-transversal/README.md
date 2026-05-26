@@ -12,15 +12,17 @@ A modelagem inicial deste subdominio usa como base a **Resolucao CCAF nº 334/20
 
 Fonte oficial: [Resolucao CCAF nº 334/2023 - FAPES](https://fapes.es.gov.br/Media/fapes/Resolu%C3%A7%C3%B5es/Resolu%C3%A7%C3%A3o_CCAF_n%C2%BA_334.2023_-_utiliza%C3%A7%C3%A3o_recursos_financeiros_de_projetos_e-ou_programas_em_parcerias_destinados_a_A%C3%A7%C3%A3o_Transversal_para_a_FAPES..pdf)
 
-### Percentuais Parametrizados
+### Percentuais Parametrizados (Resolucao CCAF 334/2023)
 
-| Valor total do projeto/programa/parceria | Percentual de Acao Transversal |
-|------------------------------------------|--------------------------------|
-| R$ 50.000,00 a R$ 2.000.000,00 | 5% |
-| R$ 2.000.000,01 a R$ 5.000.000,00 | 4% |
-| Acima de R$ 5.000.000,00 | 3% |
+| Faixa | Valor do aporte | Percentual |
+|-------|-----------------|------------|
+| FAIXA-1 | R$ 50.000 a R$ 2.000.000 | 5% |
+| FAIXA-2 | R$ 2.000.000,01 a R$ 5.000.000 | 4% |
+| FAIXA-3 | Acima de R$ 5.000.000 | 3% |
 
-Esses percentuais devem ser cadastrados como `PoliticaAcaoTransversal` e `FaixaAcaoTransversal`, nunca como constantes fixas no codigo. A politica aplicada deve ficar registrada como snapshot na `ReservaAcaoTransversal`, preservando a base legal, a faixa, o percentual e o valor calculado mesmo que uma norma futura altere os parametros.
+Esses percentuais sao parametrizados como `VersaoPoliticaTaxaGestao` + `VersaoFaixaPercentual` no M016 — nunca constantes fixas no codigo. Cada `VersaoPoliticaTaxaGestao` e criada por uma Resolucao e tem `dataInicioVigencia` / `dataFimVigencia`. Somente uma versao pode estar vigente ao mesmo tempo.
+
+**Versioning:** quando uma nova Resolucao alterar os percentuais, cria-se uma nova `VersaoPoliticaTaxaGestao` (ex: TGP-2024) e encerra-se a anterior. Aportes registrados com a versao anterior mantem o snapshot original — sem recalculo retroativo (AX-TGP05).
 
 ## Fronteiras
 
@@ -46,12 +48,15 @@ Esses percentuais devem ser cadastrados como `PoliticaAcaoTransversal` e `FaixaA
 
 | Conceito | Definicao |
 |----------|-----------|
-| `PoliticaAcaoTransversal` | Norma vigente que define base de calculo e faixas percentuais. |
-| `FaixaAcaoTransversal` | Intervalo de valor e percentual aplicavel. |
-| `ReservaAcaoTransversal` | Valor reservado na Parceria e transferido para gestao financeira institucional. Cada reserva deve estar vinculada ao AporteFinanceiro que a originou, seja aporte original ou aditivo, e classificada em conta contabil/fundo/centro financeiro. |
-| `PlanoAplicacaoAcaoTransversal` | Previsao de uso da reserva por rubrica e unidade responsavel. |
-| `DespesaAcaoTransversal` | Despesa efetiva da agencia feita com recurso da reserva. |
-| `PrestacaoFinanceiraAcaoTransversal` | Processo institucional de consolidacao, analise, glosa e encerramento das despesas da reserva. |
+| `PoliticaTaxaGestaoParcerias` | Entidade master estavel da politica. Nao contem percentuais — esses ficam nas versoes. |
+| `VersaoPoliticaTaxaGestao` | Versao temporalmente delimitada da politica, criada por uma Resolucao. Contem `dataInicioVigencia`, `dataFimVigencia`, `baseLegal`, `rubricasPermitidas` e faixas com percentuais. Somente uma vigente ao mesmo tempo. |
+| `FaixaPercentualTaxaGestao` | Faixa hierarquica master (FAIXA-1, FAIXA-2, FAIXA-3). Estavel, sem percentuais. |
+| `VersaoFaixaPercentual` | Percentual especifico de uma faixa para uma versao da politica. Capturado como snapshot imutavel na `TaxaGestaoParcerias`. |
+| `TaxaGestaoParcerias` | Valor retido sobre o `AporteFinanceiro` da Parceria. Contem snapshot imutavel de `versaoPoliticaId`, `versaoFaixaId`, `percentualAplicado` e `valorTaxaGestao`. Calculada pelo M010, custodiada pelo M016. |
+| `AcaoTransversal` | Projeto institucional interno da FAPES financiado pelas taxas custodiadas. Tem `Coordenador Outorgado`, plano de aplicacao e prestacao de contas. |
+| `PlanoAplicacaoAT` | Previsao de uso do recurso da AcaoTransversal por rubrica e unidade responsavel. |
+| `DespesaAcaoTransversal` | Despesa efetiva da agencia feita com recurso da AcaoTransversal. |
+| `PrestacaoContasAcaoTransversal` | Processo institucional de consolidacao, analise, glosa e encerramento das despesas da AcaoTransversal. |
 
 ### Conta, Fundo, Centro e Rubrica
 
@@ -80,11 +85,11 @@ Quando houver repasse ao Coordenador Outorgado, a Acao Transversal tambem precis
 Essa conta bancaria e diferente da conta contabil. A conta contabil classifica a natureza do recurso ou despesa; a conta bancaria e onde o dinheiro e efetivamente creditado e movimentado. Portanto, o M016 deve manter as duas perspectivas:
 
 ```text
-ReservaAcaoTransversal
-  -> Conta contabil / Fundo financeiro / Centro de custo
-  -> OutorgaAcaoTransversal
-  -> ContaBancariaAcaoTransversal
-  -> RepasseAcaoTransversal
+TaxaGestaoParcerias (snapshot imutavel: versaoPoliticaId, versaoFaixaId, percentualAplicado)
+  -> ClassificacaoContabilTGP (conta contabil / fundo financeiro / centro de custo)
+  -> AcaoTransversal
+  -> OutorgaAcaoTransversal (Coordenador Outorgado designado pela Diretoria Executiva)
+  -> ContaBancaria BANESTES (M008 — INV-TGP03)
 ```
 
 A conta especifica nao deve ser modelada como uma conta unica global da FAPES para toda Acao Transversal. Tambem nao deve ser travada como exatamente uma conta por parceria. Ela deve estar vinculada ao escopo formal da outorga ou do repasse, podendo cobrir uma reserva, uma parceria, um conjunto de reservas ou outro agrupamento definido no Termo de Outorga.
@@ -106,19 +111,23 @@ A conta especifica nao deve ser modelada como uma conta unica global da FAPES pa
 ## Fluxo Macro
 
 ```text
-M010 Parceria
-  calcula reserva de Acao Transversal
-  bloqueia reserva para Programas
-  publica/expõe ReservaAcaoTransversal
+M010 — Parceria
+  identifica VersaoPoliticaTaxaGestao vigente + VersaoFaixaPercentual pelo valor do aporte
+  calcula TaxaGestaoParcerias com snapshot imutavel (versaoPoliticaId, versaoFaixaId, percentualAplicado)
+  bloqueia valorTaxaGestao — nao compoe saldoAlocavelEmProgramas
+  emite evento TaxaGestaoParcelasCalculada
 
-M016 Acao Transversal
-  recebe reserva
-  classifica em conta contabil/fundo/centro financeiro
-  define plano de aplicacao
-  registra despesas
-  analisa documentos
-  aprova/glosa/reprova
-  encerra prestacao financeira institucional
+M016 — Taxa de Gestao de Parcerias
+  recebe TaxaGestaoParcerias (CALCULADA)
+  ClassificacaoContabilTGP: conta contabil / fundo / centro de custo (CLASSIFICADA)
+  vincula a AcaoTransversal via OutorgaAcaoTransversal (VINCULADA)
+  repassa para ContaBancaria BANESTES quando aplicavel (REPASSADA)
+
+M016 — Acao Transversal
+  elabora PlanoAplicacaoAT por rubrica permitida
+  registra DespesaAcaoTransversal com documento comprobatorio
+  submete / analisa / aprova ou glosa PrestacaoContasAcaoTransversal
+  encerra AcaoTransversal (ENCERRADA)
 ```
 
 ## Backlog

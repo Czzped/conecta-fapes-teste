@@ -1,100 +1,128 @@
-# Domain 08 — Acao Transversal
+# Domain 08 — Taxa de Gestao de Parcerias e Acao Transversal
 
-Reserva normativa institucional criada a partir de recursos de parcerias, projetos ou programas para custear despesas operacionais e administrativas da FAPES relacionadas a execucao dos programas e projetos apoiados.
+Dois conceitos distintos que antes compartilhavam o mesmo nome "Acao Transversal". A separacao foi necessaria porque os dois mecanismos tem natureza, dono e ciclo de vida completamente diferentes.
 
 **Modulos que implementam este domain:** M010, M016
 
 ---
 
-## 8.1 Conceito
+## 8.1 Por Que Separar
 
-A Acao Transversal e uma reserva financeira institucional calculada sobre o valor de uma parceria, projeto ou programa. Ela nao e uma rubrica livre do projeto nem um recurso automaticamente disponivel ao coordenador da iniciativa apoiada. Sua finalidade e apoiar, estruturar, organizar e capacitar as areas meio e finalisticas da FAPES para operar programas e projetos.
+O nome "Acao Transversal" era usado de forma ambigua para descrever:
 
-Conforme a Resolucao CCAF nº 334/2023, esses recursos podem ser usados para despesas internas vinculadas a essas atividades, como diarias, passagens, publicacoes, material permanente, servicos de terceiros e demais itens permitidos pelas normas aplicaveis.
+1. **O mecanismo de retencao** — um percentual retido sobre o aporte de uma Parceria, custodiado em conta bancaria especifica no BANESTES. Mecanismo financeiro/tributario que nasce automaticamente ao registrar um aporte.
 
-## 8.2 Percentuais
+2. **O projeto de execucao** — uma acao ou projeto interno da FAPES que gasta esses recursos para custear despesas operacionais e administrativas. Tem plano de aplicacao, Coordenador Outorgado, despesas e prestacao de contas.
 
-Os percentuais da Acao Transversal devem ser parametrizados como politica normativa, mantendo vigencia, base legal e faixas aplicaveis.
+Modelar os dois como um unico conceito criava ambiguidade: quem e o dono do dinheiro? Quando ele "vira" acao? O Coordenador Outorgado gerencia a retencao ou o projeto? A conta bancaria pertence a reserva ou ao projeto?
 
-| Valor total do programa/projeto/parceria | Percentual de Acao Transversal |
-|------------------------------------------|--------------------------------|
+**Decisao:** separar em dois conceitos com nomes distintos na linguagem ubiqua do dominio.
+
+---
+
+## 8.2 Taxa de Gestao de Parcerias
+
+### Conceito
+
+A Taxa de Gestao de Parcerias e o percentual retido sobre o valor de cada AporteFinanceiro de uma Parceria, destinado a custear despesas operacionais e administrativas da FAPES relacionadas a execucao dos programas e projetos apoiados. Conforme a Resolucao CCAF n. 334/2023, esses recursos apoiam, estruturam, organizam e capacitam as areas meio e finalisticas da Fundacao.
+
+A Taxa **nao e** uma rubrica livre do projeto nem um recurso disponivel ao coordenador da iniciativa apoiada.
+
+### Percentuais
+
+Os percentuais devem ser parametrizados como politica normativa (PoliticaTaxaGestaoParcerias no M016), mantendo vigencia, base legal e faixas aplicaveis. A politica e imutavel para taxas ja calculadas — atualizacoes valem apenas para novos aportes.
+
+| Valor total do aporte | Percentual |
+|----------------------|------------|
 | R$ 50.000,00 a R$ 2.000.000,00 | 5% |
 | R$ 2.000.000,01 a R$ 5.000.000,00 | 4% |
 | Acima de R$ 5.000.000,00 | 3% |
 
-O M010 calcula a reserva na Parceria e desconta esse valor do saldo alocavel em Programas. O M016 recebe a reserva para classificacao contabil, fundo financeiro, centro de custo, plano de aplicacao, execucao e prestacao financeira institucional.
+### Responsabilidades por Modulo
 
-## 8.3 Conta Bancaria e Repasse
+| Modulo | Responsabilidade |
+|--------|-----------------|
+| M010 | Calcula a taxa no momento do registro do AporteFinanceiro; registra o snapshot da politica aplicada; bloqueia o valor do saldo alocavel em Programas. |
+| M016 | Recebe a TaxaGestaoParcerias; classifica em conta contabil, fundo e centro de custo; controla a conta bancaria BANESTES quando houver repasse. |
 
-Quando houver repasse ao outorgado, a Resolucao CCAF nº 334/2023 determina que a transferencia ocorra em conta bancaria especifica, aberta pela FAPES em nome do coordenador, no Banco do Estado do Espirito Santo - BANESTES.
+### Conta Bancaria
 
-A resolucao nao define numero de agencia ou conta. Ela define a regra de destino:
+Quando houver repasse ao Coordenador Outorgado, a Resolucao CCAF n. 334/2023 determina que a transferencia ocorra em conta bancaria especifica, aberta pela FAPES no BANESTES em nome do Coordenador Outorgado. Essa conta e cadastrada como `ContaBancaria` no M008 (cadastro corporativo) e referenciada pelo M016.
 
-```text
-Acao Transversal
-  -> conta bancaria especifica
-  -> aberta pela FAPES
-  -> em nome do Coordenador Outorgado
-  -> BANESTES
+A expressao "conta bancaria especifica" nao significa uma conta global para toda a Taxa de Gestao — significa uma conta vinculada ao escopo autorizado no Termo de Outorga.
+
+---
+
+## 8.3 Acao Transversal
+
+### Conceito
+
+A Acao Transversal e um projeto ou acao institucional interna da FAPES financiada por uma ou mais TaxaGestaoParcerias. Ela tem:
+
+- objetivo e descricao
+- periodo de vigencia
+- area responsavel na FAPES
+- Coordenador Outorgado designado via Termo de Outorga
+- plano de aplicacao por rubrica permitida
+- despesas institucionais registradas
+- prestacao de contas financeira
+
+A Acao Transversal **nao e** rubrica de projeto externo. Ela representa o mecanismo pelo qual a FAPES gasta, de forma rastreavel e com prestacao de contas, os recursos custodiados pela Taxa de Gestao de Parcerias.
+
+### Coordenador Outorgado
+
+O Coordenador Outorgado e o servidor publico vinculado a FAPES que recebe autorizacao formal da Diretoria Executiva para gerir os recursos de uma Acao Transversal por meio de Termo de Outorga (TO).
+
+**Regra critica:** o Coordenador Outorgado NAO pode ser inferido automaticamente a partir do coordenador da Parceria, do Programa ou do Projeto apoiado. A designacao depende do ato da Diretoria Executiva e do respectivo Termo de Outorga. O outorgado pode indicar membros para executar atividades previstas no TO, mas a responsabilidade pela gestao e prestacao de contas permanece vinculada a ele.
+
+---
+
+## 8.4 Relacao entre os Dois Conceitos
+
+```
+AporteFinanceiro (Parceria)
+  → gera TaxaGestaoParcerias (M010 calcula, M016 custodia)
+      → financia AcaoTransversal (via OutorgaAcaoTransversal)
+          → OutorgaAcaoTransversal
+              → ContaBancaria (BANESTES, cadastrada no M008)
+              → CoordenadorOutorgado (PessoaFisica do M008)
+          → PlanoAplicacaoAT
+          → DespesaAcaoTransversal
+          → PrestacaoContasAcaoTransversal
 ```
 
-A expressao "conta bancaria especifica" nao deve ser interpretada como uma conta corrente unica e global da FAPES para toda Acao Transversal. Tambem nao deve ser fixada, por regra de sistema, como exatamente uma conta para cada parceria. A conta deve ser especifica para o **escopo autorizado no Termo de Outorga ou no repasse**.
+Uma TaxaGestaoParcerias pode financiar uma ou mais AcoesTransversais. Uma AcaoTransversal pode ser financiada por multiplas Taxas (via OutorgaAcaoTransversal).
 
-Assim, o sistema deve permitir que a conta esteja vinculada a uma outorga/repasse de Acao Transversal e registre claramente o que ela cobre. O escopo pode ser uma reserva, uma parceria, um conjunto de reservas ou outro agrupamento definido formalmente no Termo de Outorga. O ponto obrigatorio e que a conta seja especifica, aberta pela FAPES, em nome do Coordenador Outorgado e no BANESTES.
-
-Modelo conceitual recomendado:
-
-```text
-OutorgaAcaoTransversal
-  -> escopoGestao
-  -> ContaBancariaAcaoTransversal
-  -> RepasseAcaoTransversal
-```
-
-## 8.4 Coordenador Outorgado
-
-O Coordenador Outorgado da Acao Transversal e o servidor publico vinculado a FAPES que recebe autorizacao formal da Diretoria Executiva para gerir os recursos da Acao Transversal por meio de Termo de Outorga (TO).
-
-Esse papel existe para operacionalizar a movimentacao, utilizacao e prestacao de contas dos recursos institucionais reservados. Ele nao deve ser inferido automaticamente a partir do coordenador da parceria, do programa ou do projeto apoiado.
-
-### Unidade de Designacao
-
-O outorgado da Acao Transversal nao deve ser modelado como uma pessoa unica global da FAPES para todas as parcerias. A designacao deve ser rastreada por Termo de Outorga e pelo recurso ao qual o termo se aplica.
-
-Modelo conceitual recomendado:
-
-```text
-Reserva/Repasse de Acao Transversal
-  -> Termo de Outorga
-  -> Coordenador Outorgado
-  -> Pessoa Fisica vinculada a FAPES
-```
-
-Isso permite dois cenarios validos:
-
-- uma parceria, reserva ou repasse possuir um Coordenador Outorgado especifico;
-- a mesma pessoa da FAPES ser designada em mais de um Termo de Outorga.
-
-Portanto, o sistema deve registrar quem foi autorizado, por qual TO, para qual recurso, em qual periodo e com qual responsabilidade de prestacao de contas. Quando necessario, o Coordenador Outorgado pode indicar membros para executar atividades previstas no TO, mas a responsabilidade pela gestao e pela prestacao de contas permanece vinculada ao outorgado.
+---
 
 ## 8.5 Fronteiras
 
 | Contexto | Responsabilidade |
-|----------|------------------|
-| M010 - Planejamento e Estrategia | Calcula a reserva na Parceria, registra a politica aplicada e bloqueia o valor para alocacao em Programas. |
-| M016 - Contabilidade e Financeiro | Recebe a reserva, classifica em conta contabil/fundo/centro de custo, controla conta bancaria quando houver repasse, planeja, executa e presta financeiramente. |
-| M008 - Cadastros Corporativos | Fornece Pessoa Fisica, vinculo institucional com a FAPES e dados cadastrais do Coordenador Outorgado. |
-| M014 - Prestacao de Contas | Trata a prestacao de contas de Iniciativas/Projetos; nao e dono da prestacao financeira institucional da Acao Transversal. |
+|----------|-----------------|
+| M010 - Planejamento e Estrategia | Calcula a TaxaGestaoParcerias na Parceria ao registrar AporteFinanceiro; registra snapshot da politica; bloqueia o valor do saldo alocavel em Programas. |
+| M016 - Contabilidade e Financeiro | Recebe a Taxa, classifica contabilmente, controla conta bancaria quando houver repasse; e dono da AcaoTransversal como projeto de gasto, incluindo plano de aplicacao, despesas e prestacao de contas. |
+| M008 - Cadastros Corporativos | Fornece PessoaFisica (Coordenador Outorgado), ContaBancaria como cadastro corporativo reutilizavel. |
+| M014 - Prestacao de Contas | Trata prestacao de contas de Iniciativas/Projetos externos; NAO e dono da prestacao financeira institucional da AcaoTransversal. |
+
+---
 
 ## 8.6 Funcionalidades
 
+### Taxa de Gestao de Parcerias
+
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|
-| 8.1.1 | Parametrizar Politica de Acao Transversal | Cadastrar base legal, vigencia, faixas percentuais e rubricas permitidas | Gestor Financeiro | Resolucao CCAF nº 334/2023 |
-| 8.1.2 | Calcular Reserva de Acao Transversal | Calcular reserva sobre aporte original ou aditivo, mantendo snapshot da politica aplicada | Servidor da Area de Parcerias | Resolucao CCAF nº 334/2023 |
-| 8.1.3 | Designar Coordenador Outorgado | Registrar Termo de Outorga, servidor FAPES designado, periodo e recurso abrangido | Diretoria Executiva, Gestor Financeiro | Resolucao CCAF nº 334/2023 |
-| 8.1.4 | Registrar Conta Bancaria Especifica | Registrar conta BANESTES aberta pela FAPES em nome do Coordenador Outorgado para movimentacao do recurso | Gestor Financeiro | Resolucao CCAF nº 334/2023 |
-| 8.1.5 | Classificar Reserva | Classificar a reserva em conta contabil, fundo financeiro e centro de custo institucional | Gestor Financeiro | Art. 25, III |
-| 8.1.6 | Planejar Aplicacao | Distribuir a reserva por rubricas permitidas sem ultrapassar o saldo disponivel | Gestor Financeiro | Resolucao CCAF nº 334/2023 |
-| 8.1.7 | Executar Despesa de Acao Transversal | Registrar despesa institucional com rubrica permitida, documento comprobatório e justificativa | Coordenador Outorgado, Gestor Financeiro | Resolucao CCAF nº 334/2023 |
-| 8.1.8 | Prestar Contas da Acao Transversal | Submeter e analisar prestacao financeira institucional do recurso gerido pelo outorgado | Coordenador Outorgado, Analista Financeiro | Resolucao CCAF nº 334/2023; Art. 27, II |
+| 8.1.1 | Parametrizar Politica de Taxa de Gestao | Cadastrar base legal, vigencia, faixas percentuais e rubricas permitidas | Gestor Financeiro | Resolucao CCAF n. 334/2023 |
+| 8.1.2 | Calcular Taxa de Gestao | Calcular taxa sobre aporte original ou aditivo, mantendo snapshot da politica aplicada | Servidor da Area de Parcerias | Resolucao CCAF n. 334/2023 |
+| 8.1.3 | Classificar Taxa de Gestao | Classificar em conta contabil, fundo financeiro e centro de custo institucional | Gestor Financeiro | Art. 25, III |
+| 8.1.4 | Registrar Conta Bancaria | Registrar conta BANESTES aberta pela FAPES em nome do Coordenador Outorgado | Gestor Financeiro | Resolucao CCAF n. 334/2023 |
+
+### Acao Transversal
+
+| # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
+|---|---------------|-----------|---------|---------------------|
+| 8.2.1 | Criar Acao Transversal | Registrar projeto interno FAPES com objetivo, periodo e area responsavel | Gestor Financeiro | Resolucao CCAF n. 334/2023 |
+| 8.2.2 | Designar Coordenador Outorgado | Registrar Termo de Outorga, servidor FAPES designado, periodo e recurso abrangido | Diretoria Executiva, Gestor Financeiro | Resolucao CCAF n. 334/2023 |
+| 8.2.3 | Planejar Aplicacao | Distribuir a taxa por rubricas permitidas sem ultrapassar o saldo disponivel | Gestor Financeiro | Resolucao CCAF n. 334/2023 |
+| 8.2.4 | Executar Despesa de Acao Transversal | Registrar despesa institucional com rubrica permitida, documento comprobatorio e justificativa | Coordenador Outorgado, Gestor Financeiro | Resolucao CCAF n. 334/2023 |
+| 8.2.5 | Prestar Contas da Acao Transversal | Submeter e analisar prestacao financeira institucional do recurso gerido pelo Coordenador Outorgado | Coordenador Outorgado, Analista Financeiro | Resolucao CCAF n. 334/2023; Art. 27, II |

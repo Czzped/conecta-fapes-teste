@@ -1,36 +1,47 @@
-ontology: "Contabilidade e Financeiro"
+ontology: "M016 — Contabilidade e Financeiro (coordenador)"
 namespace: "financeiro.contabilidade"
 imports:
-  - namespace: shared
-    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: financeiro.taxa_gestao
+    path: "./taxa-gestao/ontology.yaml"
+  - namespace: financeiro.acao_transversal
+    path: "./acao-transversal/ontology.yaml"
+
 metadata:
   module: "M016"
-  source: "stub — no modelo-estrutural.md available"
-  version: "1.0.0"
-  description: "Contabilidade e financeiro da FAPES. Consolida informacoes financeiras de pagamentos e orcamento. Downstream de M004 (pagamentos) e M013 (orcamento). Integra com Banestes e BANDES."
-  todo: "Complete when modelo-estrutural.md is created"
-entities:
-  todo: "Define when modelo-estrutural.md is available"
-relationships:
-  todo: "Define when modelo-estrutural.md is available"
-axioms:
-  todo: "Define when modelo-estrutural.md is available"
-invariants:
-  todo: "Define when modelo-estrutural.md is available"
-enums: {}
-value_objects: {}
-events:
-  todo: "Define when modelo-estrutural.md is available"
-workflows:
-  todo: "Define when modelo-estrutural.md is available"
-policies:
-  todo: "Define when modelo-estrutural.md is available"
+  version: "2.1.0"
+  description: >
+    Arquivo coordenador de M016. Agrega os dois subdominios:
+    (1) taxa-gestao: retencao, custodia e classificacao da Taxa de Gestao de Parcerias.
+    (2) acao-transversal: projeto institucional FAPES que gasta os recursos da taxa.
+    Ontologias detalhadas em cada subpasta.
 
-agent_instructions:
-  rules:
-    - "Este módulo é stub. Não gerar implementações sem modelo-estrutural.md."
-    - "Consultar arquitetura em docs/architecture/02-modulos-e-integracoes.md."
-  notes:
-    - "Contabilidade e financeiro da FAPES."
-    - "Downstream de M004 (pagamentos) e M013 (orçamento)."
-    - "Integra com Banestes e BANDES."
+  subdomains:
+    taxa_gestao:
+      path: "./taxa-gestao/ontology.yaml"
+      namespace: "financeiro.taxa_gestao"
+      description: >
+        Taxa de Gestao de Parcerias — percentual retido sobre AporteFinanceiro,
+        custodiado em conta BANESTES, classificado contabilmente.
+        Entidades: PoliticaTaxaGestaoParcerias, VersaoPoliticaTaxaGestao,
+        FaixaPercentualTaxaGestao, VersaoFaixaPercentual,
+        TaxaGestaoParcerias, ClassificacaoContabilTGP.
+      epics: "taxa-gestao/epics/ (EPIC-M016-011 a 015)"
+
+    acao_transversal:
+      path: "./acao-transversal/ontology.yaml"
+      namespace: "financeiro.acao_transversal"
+      description: >
+        Acao Transversal — projeto institucional interno da FAPES que gasta os
+        recursos custodiados pela Taxa de Gestao.
+        Entidades: AcaoTransversal, OutorgaAcaoTransversal, PlanoAplicacaoAT,
+        ItemPlanoAplicacaoAT, DespesaAcaoTransversal, PrestacaoContasAcaoTransversal.
+      epics: "acao-transversal/epics/ (EPIC-M016-008 a 010)"
+
+  fronteira:
+    - "M010 calcula TaxaGestaoParcerias e emite evento — M016/taxa-gestao custodia."
+    - "M016/taxa-gestao vincula taxa a AcaoTransversal via OutorgaAcaoTransversal."
+    - "M016/acao-transversal executa os recursos: plano, despesas, prestacao de contas."
+    - "M008 fornece ContaBancaria (conta BANESTES para repasse — INV-TGP03)."
+    - "M014 NAO e dono da prestacao de contas da AcaoTransversal."
+
+  legal_basis: "Resolucao CCAF n. 334/2023"

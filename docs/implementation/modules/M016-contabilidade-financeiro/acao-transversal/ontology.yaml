@@ -1,0 +1,438 @@
+ontology: "M016 — Acao Transversal"
+namespace: "financeiro.acao_transversal"
+imports:
+  - namespace: shared
+    path: "../../../../ontology/shared/base.yaml"
+  - namespace: shared.people
+    path: "../../../../ontology/shared/people.yaml"
+  - namespace: financeiro.taxa_gestao
+    path: "../taxa-gestao/ontology.yaml"
+
+metadata:
+  module: "M016/acao-transversal"
+  source: "docs/implementation/modules/M016-contabilidade-financeiro/acao-transversal/README.md"
+  version: "1.0.0"
+  legal_basis: "Resolucao CCAF n. 334/2023"
+  description: >
+    Projeto ou acao institucional interna da FAPES que gasta os recursos custodiados
+    pela Taxa de Gestao de Parcerias. Tem Coordenador Outorgado designado pela Diretoria
+    Executiva, PlanoAplicacaoAT por rubrica permitida, DespesaAcaoTransversal e
+    PrestacaoContasAcaoTransversal. M014 NAO e dono deste processo.
+
+entities:
+
+  AcaoTransversal:
+    description: >
+      Projeto ou acao institucional interna da FAPES financiada por uma ou mais
+      TaxaGestaoParcerias. Tem objetivo, periodo, area responsavel, Coordenador Outorgado
+      e plano de aplicacao por rubrica permitida. Nao e rubrica de projeto externo.
+      O Coordenador Outorgado gerencia a AcaoTransversal, nao a taxa diretamente.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      titulo:
+        type: string
+        required: true
+        max_length: 300
+      objetivo:
+        type: string
+        required: true
+        max_length: 2000
+      areaResponsavel:
+        type: string
+        required: true
+        description: "Area interna da FAPES responsavel pela acao."
+        max_length: 200
+      periodoInicio:
+        type: date
+        required: true
+      periodoFim:
+        type: date
+        required: false
+      estado:
+        type: "enum:EstadoAcaoTransversal"
+        required: true
+
+  OutorgaAcaoTransversal:
+    description: >
+      Termo de Outorga emitido pela Diretoria Executiva autorizando servidor FAPES
+      (Coordenador Outorgado) a gerir, movimentar e prestar contas dos recursos de
+      uma AcaoTransversal. Vincula o outorgado a uma AcaoTransversal especifica.
+      NAO vincula diretamente a TaxaGestaoParcerias.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      numeroTermoOutorga:
+        type: string
+        required: true
+        unique: true
+      acaoTransversalId:
+        type: uuid
+        required: true
+        description: "AcaoTransversal que este Termo de Outorga autoriza gerir."
+      coordenadorOutorgadoId:
+        type: uuid
+        required: true
+        description: "ref:shared.people.PessoaFisica — servidor FAPES autorizado pela Diretoria Executiva. NAO inferir do coordenador da Parceria, Programa ou Projeto."
+      valorVinculado:
+        type: decimal
+        required: true
+        description: "Valor total de TaxaGestaoParcerias vinculado a esta AcaoTransversal via esta outorga."
+      escopoDescricao:
+        type: string
+        required: true
+        description: "Descricao do escopo de gestao autorizado pelo TO."
+      periodoInicio:
+        type: date
+        required: true
+      periodoFim:
+        type: date
+        required: false
+      estado:
+        type: "enum:EstadoOutorgaAT"
+        required: true
+
+  PlanoAplicacaoAT:
+    description: >
+      Distribuicao planejada dos recursos da AcaoTransversal por rubricas permitidas.
+      Soma dos itens nao pode ultrapassar saldo disponivel proveniente das TaxaGestaoParcerias
+      vinculadas a esta AcaoTransversal.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      acaoTransversalId:
+        type: uuid
+        required: true
+      outorgaId:
+        type: uuid
+        required: true
+      itens:
+        type: "ref:financeiro.acao_transversal.ItemPlanoAplicacaoAT[]"
+        required: true
+      totalPlanejado:
+        type: decimal
+        required: true
+        derived: true
+        formula: "sum(itens[].valorPlanejado)"
+      estado:
+        type: "enum:EstadoPlanoAT"
+        required: true
+
+  ItemPlanoAplicacaoAT:
+    description: "Linha de distribuicao por rubrica dentro do PlanoAplicacaoAT."
+    extends: null
+    fields:
+      rubricaCodigo:
+        type: string
+        required: true
+        description: "Deve constar em VersaoPoliticaTaxaGestao.rubricasPermitidas."
+      descricao:
+        type: string
+        required: true
+      valorPlanejado:
+        type: decimal
+        required: true
+
+  DespesaAcaoTransversal:
+    description: >
+      Despesa institucional executada com recursos da AcaoTransversal. Deve ter rubrica
+      permitida, documento comprobatorio e justificativa. Reduz saldo do PlanoAplicacaoAT
+      na rubrica correspondente.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      acaoTransversalId:
+        type: uuid
+        required: true
+      outorgaId:
+        type: uuid
+        required: true
+      planoAplicacaoId:
+        type: uuid
+        required: true
+      rubricaCodigo:
+        type: string
+        required: true
+        description: "Deve constar em VersaoPoliticaTaxaGestao.rubricasPermitidas."
+      descricao:
+        type: string
+        required: true
+      valor:
+        type: decimal
+        required: true
+      dataExecucao:
+        type: date
+        required: true
+      documentoComprobatorioId:
+        type: uuid
+        required: false
+        todo: "Integracao com EDOCS a definir"
+      justificativa:
+        type: string
+        required: true
+      estado:
+        type: "enum:EstadoDespesaAT"
+        required: true
+
+  PrestacaoContasAcaoTransversal:
+    description: >
+      Prestacao financeira institucional dos recursos geridos pelo Coordenador Outorgado.
+      Escopo e a OutorgaAcaoTransversal, nao o projeto ou parceria que gerou a taxa.
+      M014 NAO e dono deste processo.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        generated: true
+      outorgaId:
+        type: uuid
+        required: true
+      acaoTransversalId:
+        type: uuid
+        required: true
+      periodoReferencia:
+        type: string
+        required: true
+        description: "Ex: 2024-01"
+      totalExecutado:
+        type: decimal
+        required: true
+        derived: true
+        formula: "sum(DespesaAcaoTransversal WHERE outorgaId = self.outorgaId AND periodoReferencia)"
+      estado:
+        type: "enum:EstadoPrestacaoAT"
+        required: true
+      dataSubmissao:
+        type: datetime
+        required: false
+      observacoesAnalista:
+        type: string
+        required: false
+
+relationships:
+
+  - from: "financeiro.taxa_gestao.TaxaGestaoParcerias"
+    relation: "financia"
+    to: "financeiro.acao_transversal.AcaoTransversal"
+    cardinality: "N:N"
+    description: "Uma taxa pode financiar multiplas acoes; uma acao pode receber de multiplas taxas. Mediada por OutorgaAcaoTransversal."
+
+  - from: "financeiro.acao_transversal.OutorgaAcaoTransversal"
+    relation: "autoriza_gestao_de"
+    to: "financeiro.acao_transversal.AcaoTransversal"
+    cardinality: "N:1"
+    description: "Uma outorga autoriza gestao de uma AcaoTransversal especifica."
+
+  - from: "financeiro.acao_transversal.PlanoAplicacaoAT"
+    relation: "distribui_recursos_de"
+    to: "financeiro.acao_transversal.AcaoTransversal"
+    cardinality: "N:1"
+
+  - from: "financeiro.acao_transversal.DespesaAcaoTransversal"
+    relation: "debita"
+    to: "financeiro.acao_transversal.PlanoAplicacaoAT"
+    cardinality: "N:1"
+
+  - from: "financeiro.acao_transversal.PrestacaoContasAcaoTransversal"
+    relation: "presta_contas_de"
+    to: "financeiro.acao_transversal.OutorgaAcaoTransversal"
+    cardinality: "N:1"
+
+axioms:
+
+  - id: "AX-AT01"
+    natural_language: >
+      PlanoAplicacaoAT nao pode ultrapassar o total de TaxaGestaoParcerias vinculadas
+      a AcaoTransversal via OutorgaAcaoTransversal.
+    formal_rule: >
+      PlanoAplicacaoAT.totalPlanejado <=
+        SUM(OutorgaAcaoTransversal.valorVinculado WHERE acaoTransversalId = AcaoTransversal.id)
+
+  - id: "AX-AT02"
+    natural_language: >
+      Toda despesa da AcaoTransversal deve usar rubrica autorizada pela VersaoPoliticaTaxaGestao
+      vigente na epoca do calculo das taxas vinculadas.
+    formal_rule: >
+      DespesaAcaoTransversal.rubricaCodigo IN
+        VersaoPoliticaTaxaGestao.rubricasPermitidas (versao aplicada as taxas vinculadas)
+
+  - id: "AX-AT03"
+    natural_language: >
+      Coordenador Outorgado NAO pode ser inferido automaticamente do coordenador da
+      Parceria, Programa ou Projeto. Deve ser designado explicitamente pela Diretoria
+      Executiva via Termo de Outorga (OutorgaAcaoTransversal).
+    formal_rule: >
+      OutorgaAcaoTransversal.coordenadorOutorgadoId != auto_inferred_from(
+        Parceria.coordenador OR Programa.coordenador OR Projeto.coordenador)
+
+invariants:
+
+  - id: "INV-AT01"
+    rule: "OutorgaAcaoTransversal.coordenadorOutorgadoId != auto_inferred_from(Parceria.coordenador OR Programa.coordenador OR Projeto.coordenador)"
+    description: "Coordenador Outorgado NAO pode ser inferido — deve ser designado explicitamente pela Diretoria Executiva."
+
+  - id: "INV-AT02"
+    rule: "DespesaAcaoTransversal.rubricaCodigo IN VersaoPoliticaTaxaGestao.rubricasPermitidas"
+    description: "Toda despesa AT deve usar rubrica autorizada pela politica vigente."
+
+  - id: "INV-AT03"
+    rule: "PlanoAplicacaoAT.totalPlanejado <= SUM(OutorgaAcaoTransversal.valorVinculado WHERE acaoTransversalId = AcaoTransversal.id)"
+    description: "Plano nao pode exceder total de taxas vinculadas a AcaoTransversal."
+
+  - id: "INV-AT04"
+    rule: "DespesaAcaoTransversal.valor > 0"
+    description: "Valor da despesa deve ser positivo. Despesa com valor zero ou negativo e rejeitada."
+
+  - id: "INV-AT05"
+    rule: "OutorgaAcaoTransversal.valorVinculado > 0"
+    description: "Valor vinculado na outorga deve ser positivo."
+
+  - id: "INV-AT06"
+    rule: "COUNT(ItemPlanoAplicacaoAT WHERE planoAplicacaoId = PlanoAplicacaoAT.id) >= 1"
+    description: "PlanoAplicacaoAT deve ter ao menos um ItemPlanoAplicacaoAT. Plano vazio nao pode ser aprovado."
+
+  - id: "INV-AT07"
+    rule: "DespesaAcaoTransversal ONLY created WHEN PlanoAplicacaoAT.estado = 'APROVADO'"
+    description: "Despesa so pode ser registrada contra PlanoAplicacaoAT aprovado. Plano em RASCUNHO ou EM_REVISAO bloqueia registro."
+
+enums:
+
+  EstadoAcaoTransversal:
+    description: "Ciclo de vida de uma Acao Transversal."
+    values:
+      EM_ELABORACAO: "Acao em definicao, sem outorga ativa."
+      ATIVA: "Outorga emitida; plano de aplicacao e despesas podem ser registrados."
+      EM_PRESTACAO: "Prestacao de contas em andamento."
+      ENCERRADA: "Prestacao aprovada; acao encerrada."
+      CANCELADA: "Cancelada antes de execucao."
+
+  EstadoOutorgaAT:
+    description: "Ciclo de vida do Termo de Outorga da Acao Transversal."
+    values:
+      EMITIDA: "Termo emitido pela Diretoria Executiva."
+      VIGENTE: "Outorgado em exercicio da gestao."
+      ENCERRADA: "Periodo expirado ou prestacao aprovada."
+      CANCELADA: "Cancelada antes do inicio da vigencia."
+
+  EstadoPlanoAT:
+    description: "Estado do Plano de Aplicacao da AT."
+    values:
+      RASCUNHO: "Em elaboracao pelo Gestor Financeiro."
+      APROVADO: "Plano aprovado; permite lancamento de despesas."
+      EM_REVISAO: "Enviado para revisao."
+
+  EstadoDespesaAT:
+    description: "Estado da despesa institucional de AT."
+    values:
+      LANCADA: "Despesa registrada."
+      COMPROVADA: "Documento comprobatorio vinculado."
+      REJEITADA: "Rejeitada na analise."
+
+  EstadoPrestacaoAT:
+    description: "Ciclo de vida da prestacao financeira da Acao Transversal."
+    values:
+      RASCUNHO: "Em elaboracao pelo Coordenador Outorgado."
+      SUBMETIDA: "Submetida para analise."
+      EM_ANALISE: "Em analise pelo Analista Financeiro."
+      APROVADA: "Prestacao aprovada."
+      REJEITADA: "Prestacao rejeitada; retorna ao Coordenador Outorgado."
+
+events:
+
+  - name: "AcaoTransversalAtivada"
+    description: "Emitido quando OutorgaAcaoTransversal e emitida e AcaoTransversal transita para ATIVA."
+    payload_entity: "financeiro.acao_transversal.AcaoTransversal"
+    trigger: "state_transition.ATIVA"
+
+  - name: "OutorgaAcaoTransversalEmitida"
+    description: "Emitido quando Diretoria Executiva emite Termo de Outorga para uma AcaoTransversal."
+    payload_entity: "financeiro.acao_transversal.OutorgaAcaoTransversal"
+    trigger: "state_transition.EMITIDA"
+
+  - name: "DespesaAcaoTransversalLancada"
+    description: "Emitido quando despesa institucional e registrada pelo Coordenador Outorgado."
+    payload_entity: "financeiro.acao_transversal.DespesaAcaoTransversal"
+    trigger: "state_transition.LANCADA"
+
+  - name: "PrestacaoAcaoTransversalSubmetida"
+    description: "Emitido quando Coordenador Outorgado submete prestacao de contas AT."
+    payload_entity: "financeiro.acao_transversal.PrestacaoContasAcaoTransversal"
+    trigger: "state_transition.SUBMETIDA"
+
+workflows:
+
+  AcaoTransversalLifecycle:
+    description: "Ciclo de vida de uma Acao Transversal."
+    states:
+      - EM_ELABORACAO
+      - ATIVA
+      - EM_PRESTACAO
+      - ENCERRADA
+      - CANCELADA
+    transitions:
+      - from: EM_ELABORACAO
+        to: ATIVA
+        trigger: "emitir_outorga"
+        guard: "OutorgaAcaoTransversal EMITIDA com coordenadorOutorgadoId definido (INV-AT01)"
+      - from: ATIVA
+        to: EM_PRESTACAO
+        trigger: "iniciar_prestacao"
+      - from: EM_PRESTACAO
+        to: ENCERRADA
+        trigger: "aprovar_prestacao"
+        guard: "PrestacaoContasAcaoTransversal APROVADA"
+      - from: EM_PRESTACAO
+        to: ATIVA
+        trigger: "rejeitar_prestacao"
+        guard: "PrestacaoContasAcaoTransversal REJEITADA"
+      - from: EM_ELABORACAO
+        to: CANCELADA
+        trigger: "cancelar_acao"
+
+policies:
+  permissions:
+    DiretoriaExecutiva:
+      can:
+        - emitir_outorga_at
+        - cancelar_outorga_at
+    GestorFinanceiro:
+      can:
+        - criar_acao_transversal
+        - aprovar_plano_aplicacao
+        - analisar_prestacao_at
+    CoordenadorOutorgado:
+      can:
+        - elaborar_plano_aplicacao
+        - lancar_despesa_at
+        - submeter_prestacao_at
+    AnalistaFinanceiro:
+      can:
+        - analisar_prestacao_at
+        - aprovar_prestacao_at
+        - rejeitar_prestacao_at
+
+agent_instructions:
+  rules:
+    - "CoordenadorOutorgado NUNCA pode ser inferido automaticamente do coordenador da Parceria ou Projeto (INV-AT01, AX-AT03)."
+    - "M014 NAO e dono da prestacao de contas da AcaoTransversal — PrestacaoContasAcaoTransversal vive aqui."
+    - "AcaoTransversal e o projeto que GASTA os recursos; TaxaGestaoParcerias (taxa-gestao/ontology.yaml) e a retencao."
+    - "OutorgaAcaoTransversal vincula Coordenador a AcaoTransversal — nao a TaxaGestaoParcerias diretamente."
+    - "PlanoAplicacaoAT nao pode ultrapassar SUM(OutorgaAcaoTransversal.valorVinculado) para a AcaoTransversal (INV-AT03)."
+    - "Rubricas de despesa devem estar em VersaoPoliticaTaxaGestao.rubricasPermitidas (INV-AT02)."
+  notes:
+    - "Base legal: Resolucao CCAF n. 334/2023."
+    - "Upstream: financeiro.taxa_gestao (TaxaGestaoParcerias custodiada aqui e financiadora das acoes)."
+    - "Integracoes: EDOCS (comprovantes de despesa), shared.people.PessoaFisica (Coordenador Outorgado)."

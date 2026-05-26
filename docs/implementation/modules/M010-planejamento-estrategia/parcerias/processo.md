@@ -8,10 +8,10 @@
 
 O processo de Parcerias foi dividido em quatro fluxos principais:
 
-1. **[Criacao da Parceria](jornada-criacao-parceria.md)** — solicitacao pela Instituicao, envio do documento de solicitacao, cadastro, formalizacao documental, registro do aporte original e transicao para `Vigente`.
-2. **[Aditivo da Parceria](jornada-aditivo-parceria.md)** — inclusao de nova vigencia ou novo aporte financeiro apos a parceria estar vigente.
-3. **[Suspensao ou Encerramento da Parceria](jornada-suspensao-encerramento-parceria.md)** — interrupcao temporaria, reativacao ou encerramento definitivo com cascata para Programas aportados.
-4. **[Suspensao em Cascata](jornada-suspensao-cascata.md)** — suspensao dos Programas e Iniciativas vinculados quando a Parceria e suspensa.
+1. **[Criacao da Parceria](#fluxo-1-criacao-da-parceria)** — solicitacao pela Instituicao, envio do documento de solicitacao, cadastro, formalizacao documental, registro do aporte original e transicao para `Vigente`.
+2. **[Aditivo da Parceria](#fluxo-2-aditivo-da-parceria)** — inclusao de nova vigencia ou novo aporte financeiro apos a parceria estar vigente.
+3. **[Suspensao ou Encerramento da Parceria](#fluxo-3-suspensao-ou-encerramento-da-parceria)** — interrupcao temporaria, reativacao ou encerramento definitivo com cascata para Programas aportados.
+4. **[Suspensao em Cascata](#fluxo-4-suspensao-em-cascata-para-programas-e-iniciativas)** — suspensao dos Programas e Iniciativas vinculados quando a Parceria e suspensa.
 
 ---
 
@@ -107,12 +107,18 @@ flowchart TB
 
 | Atividade | Responsavel | Resultado |
 |-----------|-------------|-----------|
-| Selecionar Parceria vigente | Area de Parcerias | Parceria apta a receber aditivo; parcerias encerradas nao podem ser alteradas. |
-| Registrar aditivo de vigencia | Area de Parcerias | Nova `Vigencia` criada com `isAditivo = true`, respeitando RN06. |
-| Anexar termo aditivo | Area de Parcerias | Documento que formaliza a alteracao de vigencia. |
-| Registrar aporte financeiro aditivo | Area de Parcerias / Financeiro | Novo `AporteFinanceiro` criado como aditivo, respeitando RN17. |
-| Recalcular vigencia corrente | Area de Parcerias | Atualiza `/vigenciaInicioCorrente` e `/vigenciaFimCorrente`. |
-| Recalcular saldo | Financeiro / M016 | Atualiza `/saldo` apos novo aporte e garante saldo nao negativo, conforme RN14. |
+| Selecionar Parceria vigente | Area de Parcerias | Parceria em estado `Vigente` apta a receber aditivo; parcerias encerradas ou suspensas bloqueadas. |
+| Registrar aditivo de vigencia | Area de Parcerias | Nova `Vigencia` com `isAditivo = true`; `dataAssinatura` posterior a original e `dataFim` posterior a `vigenciaFimCorrente` anterior (RN06). Recalcula `vigenciaInicioCorrente` e `vigenciaFimCorrente`. |
+| Anexar termo aditivo | Area de Parcerias | Documento de formalizacao da nova vigencia; obrigatorio para `Vigencia` com `isAditivo = true`. |
+| Registrar aporte financeiro aditivo | Area de Parcerias / Financeiro | Novo `AporteFinanceiro` com `isAditivo = true`; exige existencia de original e `dataAporte` posterior (RN17). Origem deve ser mesma Instituicao vinculada (RN04). Documento classificado como "Termo de Descentralizacao" (RN12). |
+| Calcular Taxa de Gestao de Parcerias | Sistema / M016 | `TaxaGestaoParcerias` gerada com snapshot imutavel da `PoliticaTaxaGestaoParcerias` vigente no M016; valor deduzido antes de aumentar saldo alocavel (RN20, RN21, RN23). |
+| Recalcular derivados da Parceria | Sistema | Atualiza `valorBrutoRecebido`, `valorTaxaGestao` e `saldoAlocavelEmProgramas`; garante saldo nao negativo (RN14, RN22, INV-M010-PAR-01). |
+| Validar conta bancaria | Financeiro / M016 | Conta bancaria (M008/ContaBancaria) valida para recepcao do deposito. |
+| Confirmar deposito | Financeiro / M016 | Deposito confirmado; aporte registrado no sistema. |
+
+### Edicao e remocao de aporte aditivo
+
+Um `AporteFinanceiro` com `isAditivo = true` pode ser editado ou removido apos criacao (RN18). O sistema recalcula `valorBrutoRecebido`, `valorTaxaGestao` e `saldoAlocavelEmProgramas` e rejeita a operacao se o saldo resultante ficar negativo.
 
 ---
 

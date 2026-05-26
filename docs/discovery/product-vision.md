@@ -26,7 +26,7 @@ Cada domain define uma capacidade de negocio. Um modulo e a implementacao de um 
 | 05 | [Financeiro](domains/05-financeiro.md) | Contabilidade, contas bancarias, pagamentos e PLD | M004, M016, M017 |
 | 06 | [Suporte e Inteligencia](domains/06-suporte-inteligencia.md) | BI, transparencia, auditoria e comunicacao | M018, M019, M020 |
 | 07 | [Importacao SIGFAPES](domains/07-importacao-sigfapes.md) | Migracao de editais, projetos, pessoas e pagamentos do sistema legado | M002 |
-| 08 | [Acao Transversal](domains/08-acao-transversal.md) | Reserva normativa institucional, outorga, conta especifica, execucao e prestacao financeira | M010, M016 |
+| 08 | [Taxa de Gestao e Acao Transversal](domains/08-acao-transversal.md) | Taxa de Gestao de Parcerias (percentual retido sobre aportes, custodiado em conta BANESTES) e Acao Transversal (projeto interno FAPES que gasta esses recursos, com Coordenador Outorgado e prestacao de contas) | M010, M016 |
 
 ---
 

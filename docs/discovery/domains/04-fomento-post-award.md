@@ -23,6 +23,10 @@ O M003 tambem oferece a leitura consolidada do `CicloFomentoIniciativa`, uma tim
 | 4.0.5 | Consultar Ciclo de Fomento da Iniciativa | Exibir timeline transversal com marcos de submissao, avaliacao, contratacao, execucao, prestacao de contas, conclusao ou cancelamento | Coordenador, Analista da Area Tecnica da Agencia | Art. 3, II |
 | 4.0.6 | Solicitar Diaria da Iniciativa | Coordenador solicita diaria para um ou mais bolsistas alocados, informando abrangencia, origem, destino, partida, chegada e motivo; o sistema calcula o valor com base no tipo de diaria vigente cadastrado pela FAPES e nas regras normativas de calculo, usando distancia automatica somente para viagens dentro do Estado, valida saldo na rubrica de diaria, gera alocacao/comprometimento sem aprovacao manual da FAPES, coleta aceite individual dos bolsistas, permite remocao com justificativa antes do inicio e regularizacao auditavel quando a diaria nao for utilizada apos o inicio previsto | Coordenador, Bolsista, Analista da Area Tecnica da Agencia | Art. 27, II; Art. 3, 1; Decretos ES no 5533-R/2023, 5669-R/2024 e 6202-R/2025 |
 
+| 4.0.7 | Solicitar Liberacao de Parcela | Coordenador solicita liberacao da proxima parcela do projeto; o sistema verifica automaticamente se a PCTF anterior foi apresentada (ou aprovada, para terceira parcela em diante), se pelo menos 60% da parcela anterior esta comprometida/gasta, e se nao existem impedimentos de inadimplencia ou certidoes invalidas; aprovada a verificacao, encaminha para M004 executar o pagamento | Coordenador, Responsavel FAPES | Resolucao CCAF 122/2014, itens 9.2.1, 9.2.2 e 9.4; Resolucao CCAF 340/2024 |
+
+As regras detalhadas de liberacao de parcelas (percentuais, composicao da PCTF, formularios obrigatorios, prazos do primeiro relatorio parcial) estao em [Regras de Liberacao de Parcelas](../regras-liberacao-parcelas.md).
+
 ### 4.0.6.1 Regras de Calculo de Diarias
 
 As regras de calculo de diarias pertencem ao subdominio de **Gestao de Iniciativas Captadas**, pois sao aplicadas no ato da solicitacao operacional da diaria e precisam ser preservadas como snapshot para prestacao de contas e auditoria. O discovery detalhado esta em [Regras de Calculo de Diarias - ES](../regras-calculo-diarias-es.md).
@@ -95,6 +99,7 @@ A hierarquia de rubricas/subrubricas deve usar o catalogo de discovery em [Rubri
 Fluxo de prestacao de contas do projeto: backoffice FAPES prepara a base operacional (extrato bancario, conta bancaria e orcamento do projeto por Rubrica), o Coordenador monta a prestacao vinculando transacoes e registrando justificativas (NF, diaria, passagem ou invoice internacional), e o Responsavel FAPES analisa, aprovando, negando ou devolvendo para revisao. A edicao das entidades da prestacao e bloqueada enquanto o status e `EM_ANALISE`. A classificacao contabil final pertence ao M016; o M014 classifica despesas contra a Rubrica do projeto aprovada no M013.
 
 Creditos bancarios importados podem ser classificados como **estorno** quando forem devolucoes de terceiro que anulam debito anterior do mesmo valor, como devolucao de vendedor/fornecedor por compra nao concluida. Esse pareamento pode ocorrer antes de o debito estar vinculado a uma prestacao ou validado pela FAPES. O discovery detalhado esta em [Estornos na Prestacao de Contas](../estornos-prestacao-contas.md).
+
 
 **Implementado por:** [M014 — Prestacao de Contas](../../implementation/modules/M014-prestacao-contas/README.md)
 

@@ -11,7 +11,8 @@
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclo de vida da ConciliacaoBancaria |
-| [Acao Transversal](acao-transversal/README.md) | Gestao financeira institucional da reserva de Acao Transversal vinculada a Parcerias |
+| [Taxa de Gestao de Parcerias](taxa-gestao/README.md) | Parametrizacao da politica, versionamento por Resolucao, ciclo de vida da TaxaGestaoParcerias e fronteiras com M010 e M008 |
+| [Acao Transversal](acao-transversal/README.md) | Projeto institucional interno da FAPES que gasta os recursos custodiados pela Taxa de Gestao, com Coordenador Outorgado, plano de aplicacao e prestacao de contas |
 
 ---
 

@@ -13,6 +13,7 @@
 | [Proposta: Ciclo de Fomento da Iniciativa](specifications/proposta-ciclo-fomento-iniciativa.md) | Proposta de timeline pre-award, award e post-award como read model transversal |
 | [Diarias da Iniciativa](diarias/README.md) | Subfluxo dedicado para solicitacao, aceite, alocacao, remocao antes do inicio e regularizacao de diarias; abrangencia, tipo de diaria e parametros de calculo sao referencias do M008 |
 | [Aditivos da Iniciativa](aditivos/README.md) | Subfluxo dedicado para vigencia, orcamento original e dados dos aditivos da iniciativa |
+| [Liberacao de Parcelas](liberacao-parcelas/README.md) | Subfluxo dedicado para solicitacao, validacao automatica e liberacao de parcelas financeiras; integra M014 (PCTF), M008 (certidoes) e M004 (pagamento) |
 
 ---
 
@@ -94,3 +95,11 @@ A consulta de vigencia e aditivos preserva a data de aprovacao original, a data 
 | RN40 | A aba **Dados dos aditivos** deve exibir data de aprovacao original, orcamento original e lista de aditivos vinculados ao projeto, quando existirem. | Must |
 | RN41 | Quando nao houver aditivos, a aba **Dados dos aditivos** deve exibir estado vazio objetivo. | Must |
 | RN42 | A visao orcamentaria por rubrica em **Meu Projeto** deve ser exibida somente para coordenador da iniciativa, contendo total, consumido, alocado quando aplicavel, disponivel e percentuais por rubrica. Saldos seguem definicao canonica de [RN-SLD01](../../../discovery/regras-saldo-alocado-disponivel.md). | Must |
+| RN43 | M003 e dono de `SolicitacaoLiberacaoParcela` e `ParcelaProjeto`. M004 executa o pagamento; M014 fornece estado da PCTF; M008 fornece situacao de inadimplencia e certidoes. | Must |
+| RN44 | Segunda parcela exige: PCTF anterior com estado >= APRESENTADA + comprometimento >= 60% da primeira parcela. | Must |
+| RN45 | Terceira parcela (e seguintes) exige: PCTF anterior no estado APROVADA + comprometimento >= 60% da parcela anterior. | Must |
+| RN46 | Qualquer solicitacao de liberacao e bloqueada enquanto o beneficiario possuir inadimplencia com a FAPES ou certidoes invalidas/vencidas (Federal, Estadual, Municipal, Trabalhista/FGTS). | Must |
+| RN47 | M003 consulta M014 via integracao para verificar o estado da PCTF anterior no momento de cada validacao; nao replica dados de prestacao de contas. | Must |
+| RN48 | O percentual comprometido da parcela anterior e calculado pelo M003 a partir de `OrcamentoExecutado` e lancamentos alocados vinculados aquela parcela. | Must |
+| RN49 | Aprovada a validacao automatica (ou revisao manual do responsavel FAPES), M003 emite evento `LiberacaoParcelaSolicitada`; M004 e o unico executor do pagamento. | Must |
+| RN50 | O snapshot da validacao deve ser preservado imutavel em `ValidacaoLiberacaoParcela` para auditoria; inclui estado da PCTF, percentual comprometido, situacao das certidoes e versao normativa vigente. | Must |
