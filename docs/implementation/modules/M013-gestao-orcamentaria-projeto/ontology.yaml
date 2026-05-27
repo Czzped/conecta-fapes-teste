@@ -353,6 +353,12 @@ axioms:
   - id: "AX-M013-003"
     natural_language: "M013 e fonte canonica de saldo monetario para M009 (bolsas) e M003 (diarias). Todos os modulos que alocam recursos devem ler RubricaProjeto.saldoDisponivel antes de confirmar a operacao."
     formal_rule: "∀alocacao: alocacao.valorSolicitado ≤ RubricaProjeto.saldoDisponivel (verificado via M013)"
+  - id: "AX-M013-004"
+    natural_language: "O valor aprovado da RubricaProjeto DOACI nao pode superar o limite calculado pela tabela normativa da Resolucao CCAF no 309/2022, item 2.4.8.1, aplicada sobre o valor total do projeto excluindo bolsas. Se o edital configurou limitePercentual menor via M011, o menor valor prevalece."
+    formal_rule: "RubricaProjeto.rubricaRef = RUB-DOACI → valorAprovado ≤ min(limiteEditalDOACI, tabelaDOACI(valorProjetoSemBolsas)) * valorProjetoSemBolsas"
+  - id: "AX-M013-005"
+    natural_language: "A base de calculo do limite DOACI e o valor total aprovado do projeto excluindo todos os valores de RubricaProjeto cuja rubricaRef pertenca ao grupo Bolsas."
+    formal_rule: "baseCalculoDOACI(Projeto) = SUM(RubricaProjeto.valorAprovado) WHERE rubricaRef ≠ RUB-BOLSAS"
 
 invariants:
   - id: "INV-SLD1"
@@ -367,6 +373,12 @@ invariants:
   - id: "INV-M013-002"
     rule: "RubricaProjeto.valorAprovado >= 0"
     description: "O valor aprovado de uma rubrica deve ser nao-negativo."
+  - id: "INV-DOACI-001"
+    rule: "RubricaProjeto.rubricaRef = RUB-DOACI → valorAprovado ≤ tabelaDOACI(baseCalculoDOACI) * baseCalculoDOACI"
+    description: "O valor aprovado de DOACI nao pode exceder o percentual normativo da tabela (Resolucao CCAF no 309/2022, item 2.4.8.1) sobre a base sem bolsas. Tabela: ate R$50k=15%; R$50k-R$100k=10%; R$100k-R$150k=5%; R$150k-R$300k=3%; R$300k-R$500k=1%; acima R$500k=0.5%."
+  - id: "INV-DOACI-002"
+    rule: "RubricaProjeto.rubricaRef = RUB-DOACI → Transacao.tipo ≠ REMUNERACAO_MEMBRO"
+    description: "DOACI nunca pode ser usado para remunerar membro ou pessoa vinculada ao projeto (Lei 10.973/04, art. que define DOACI na Resolucao CCAF no 309/2022, item 2.4.8)."
 
 enums:
   TipoSolicitacao:
@@ -492,7 +504,10 @@ agent_instructions:
     - "RubricaProjeto.saldoDisponivel e campo derivado — nao aceitar input manual."
     - "Projeto (M003) e Rubrica (M008) sao referencias externas — nao modelar aqui."
     - "M009 e M003 devem consultar este modulo para validar saldo antes de nova alocacao."
+    - "DOACI (RUB-DOACI): ao aprovar orcamento, validar INV-DOACI-001 — calcular baseCalculoDOACI (total sem bolsas), aplicar tabela progressiva da Resolucao CCAF no 309/2022 (2.4.8.1), usar o menor entre o limite normativo e o limitePercentual do edital. Bloquear aprovacao se valorAprovado exceder esse teto."
+    - "DOACI nunca remunera membro/pessoa vinculada ao projeto (INV-DOACI-002); transacoes de DOACI devem ser validadas quanto a beneficiario antes de comprometer/executar."
   notes:
     - "Terminologia de mapeamento RN-SLD: valorAprovado=valorTotal, valorComprometido=valorAlocado, valorExecutado=valorConsumido, saldoDisponivel=valorDisponivel."
     - "TransacaoFinanceira pertence a M014/M016; Transacao.movimentoBancarioRef e apenas referencia de conciliacao."
     - "CotaBolsa (M009) e contador independente de cotas em quantidade; nao substitui o saldo monetario deste modulo."
+    - "Tabela DOACI normativa (Resolucao CCAF no 309/2022, item 2.4.8.1): ate R$50k=15%; R$50k-R$100k=10%; R$100k-R$150k=5%; R$150k-R$300k=3%; R$300k-R$500k=1%; acima R$500k=0.5%. Base: total aprovado excluindo rubrica Bolsas."

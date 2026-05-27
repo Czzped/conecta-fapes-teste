@@ -74,6 +74,9 @@ axioms:
   - id: "AX003"
     natural_language: "Toda Rubrica deve ter codigo unico."
     formal_rule: "UNIQUE(Rubrica.codigo)"
+  - id: "AX004"
+    natural_language: "A Rubrica DOACI (codigo RUB-DOACI) possui limite percentual regressivo sobre o valor total do projeto excluindo bolsas, conforme tabela da Resolucao CCAF no 309/2022, item 2.4.8.1. O limite maximo absoluto da norma e 15%. A validacao do limite efetivo e responsabilidade do M013 no momento da aprovacao orcamentaria."
+    formal_rule: "Rubrica.codigo = RUB-DOACI → limiteDefinidoPorTabelaProgressiva(valorProjetoSemBolsas, Resolucao309_2022_2481)"
 
 invariants:
   - id: "INV001"
@@ -105,6 +108,8 @@ agent_instructions:
     - "Subrubrica nao e entidade separada — modelar como Rubrica com rubricaPai preenchido."
     - "Nao permitir ciclos na hierarquia de rubricas."
     - "codigo da Rubrica e imutavel apos criacao."
+    - "A Rubrica DOACI (RUB-DOACI) tem limite percentual regressivo definido por tabela normativa (Resolucao CCAF no 309/2022, item 2.4.8.1); o M008 armazena apenas a rubrica — a validacao do limite fica no M013."
   notes:
     - "NaturezaDespesa e enum — valores validos: CUSTEIO e CAPITAL."
     - "A hierarquia de rubricas deve ser uma arvore (sem multiplos pais)."
+    - "Tabela DOACI (Resolucao CCAF no 309/2022, item 2.4.8.1): ate R$50k=15%; R$50k-R$100k=10%; R$100k-R$150k=5%; R$150k-R$300k=3%; R$300k-R$500k=1%; acima R$500k=0.5%. Base: valor total aprovado excluindo bolsas."
