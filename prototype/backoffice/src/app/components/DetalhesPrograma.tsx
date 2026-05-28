@@ -185,7 +185,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
   const [instituicaoDemandante, setInstituicaoDemandante] = useState('FAPES - Fundação de Amparo à Pesquisa e Inovação do Espírito Santo');
   const [dataInicio, setDataInicio] = useState('2026-01-01');
   const [dataFim, setDataFim] = useState('2028-12-31');
-  const [resumo, setResumo] = useState('Programa voltado ao fomento de iniciativas estratégicas de pesquisa, inovação e desenvolvimento tecnológico alinhadas às prioridades institucionais da FAPES.');
+  const [resumo, setResumo] = useState('Programa voltado ao fomento de projetos estratégicos de pesquisa, inovação e desenvolvimento tecnológico alinhados às prioridades institucionais da FAPES.');
   const [planejamento, setPlanejamento] = useState('Planejamento Estratégico 2026-2029');
   const [eixos, setEixos] = useState(['Ciência e Tecnologia', 'Inovação e Desenvolvimento']);
   const [membros, setMembros] = useState<Membro[]>([
@@ -416,10 +416,10 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
           solicitante: instituicaoDemandante,
           registradoEm: new Date().toLocaleDateString('pt-BR'),
           situacao: 'Bloqueado',
-          impacto: 'Existem iniciativas ou execuções vinculadas ao aporte. Cancele, reduza ou realoque as iniciativas afetadas antes de retirar o recurso.',
+          impacto: 'Existem projetos ou execuções vinculadas ao aporte. Cancele, reduza ou realoque os projetos afetados antes de retirar o recurso.',
         },
       ]);
-      setErroRetirada('Retirada bloqueada: o aporte já possui valor alocado em iniciativas.');
+      setErroRetirada('Retirada bloqueada: o aporte já possui valor alocado em projetos.');
       return;
     }
 
@@ -741,7 +741,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
           <div style={{ ...cardStyle, borderColor: aporteParaRetirada.valorAlocado > 0 ? 'rgba(239,68,68,0.35)' : 'rgba(0,193,175,0.28)' }}>
             <h2 style={sectionTitleStyle}>Retirar Aporte de Parceria do Programa</h2>
             <p style={sectionSubtitleStyle}>
-              A retirada direta só é permitida quando o valor ainda não foi alocado em iniciativas ou execuções vinculadas.
+              A retirada direta só é permitida quando o valor ainda não foi alocado em projetos ou execuções vinculadas.
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.7fr 0.7fr 0.7fr', gap: '16px', marginBottom: '16px' }}>
@@ -763,7 +763,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
                 color: '#fca5a5',
                 lineHeight: 1.5,
               }}>
-                Este aporte já possui valor alocado. Para concluir a retirada, as iniciativas afetadas devem ser canceladas, reduzidas ou realocadas antes da confirmação.
+                Este aporte já possui valor alocado. Para concluir a retirada, os projetos afetados devem ser cancelados, reduzidos ou realocados antes da confirmação.
               </div>
             )}
 
@@ -878,7 +878,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
                     placeholder="0,00"
                   />
                   <DateField label="Data do aporte" value={aporte.dataAporte} onChange={value => updateAporte(aporte.id, 'dataAporte', value)} />
-                  <ReadOnlyInfo label="Alocado em iniciativas" value={formatCurrency(aporte.valorAlocado)} />
+                  <ReadOnlyInfo label="Alocado em projetos" value={formatCurrency(aporte.valorAlocado)} />
                   <Select label="Estado" value={aporte.estado} onChange={value => updateAporte(aporte.id, 'estado', value)} options={['EM_EXECUCAO', 'SUSPENSO', 'ENCERRADO']} />
                   <button
                     type="button"
@@ -1041,7 +1041,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
             <div style={{ ...dashboardCardStyle(), marginTop: '24px' }}>
               <h2 style={dashboardSectionTitleStyle}>Consumo por rubrica</h2>
               <p style={{ ...dashboardSectionSubtitleStyle, margin: '0 0 20px' }}>
-                Somatória das rubricas das iniciativas aportadas pelo programa.
+                Somatória das rubricas dos projetos aportados pelo programa.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {Object.entries(rubricasDashboard).map(([rubrica, valores]) => {
@@ -1067,9 +1067,9 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
             </div>
 
             <div style={{ ...dashboardCardStyle(), marginTop: '24px' }}>
-              <h2 style={dashboardSectionTitleStyle}>Iniciativas aportadas</h2>
+              <h2 style={dashboardSectionTitleStyle}>Projetos aportados</h2>
               <p style={{ ...dashboardSectionSubtitleStyle, margin: '0 0 20px' }}>
-                Iniciativas que receberam recursos deste programa, com visão de consumo e saldo.
+                Projetos que receberam recursos deste programa, com visão de consumo e saldo.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {iniciativasAportadas.map(iniciativa => {
@@ -1094,8 +1094,8 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
                         </div>
                         <ListCell label="Instituição" value={iniciativa.instituicaoExecutora} />
                         <ListCell label="Aportado" value={formatCurrency(iniciativa.valorAportado)} strong />
-                        <ListCell label="Consumido" value={formatCurrency(iniciativa.valorConsumido)} strong detail={`${formatPercent(percentualConsumido)} da iniciativa`} />
-                        <ListCell label="Disponível" value={formatCurrency(saldo)} strong detail={`${formatPercent(iniciativa.valorAportado > 0 ? (saldo / iniciativa.valorAportado) * 100 : 0)} da iniciativa`} />
+                        <ListCell label="Consumido" value={formatCurrency(iniciativa.valorConsumido)} strong detail={`${formatPercent(percentualConsumido)} do projeto`} />
+                        <ListCell label="Disponível" value={formatCurrency(saldo)} strong detail={`${formatPercent(iniciativa.valorAportado > 0 ? (saldo / iniciativa.valorAportado) * 100 : 0)} do projeto`} />
                       </div>
                       <div style={{ height: '6px', width: '100%', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
                         <div style={{ width: `${Math.min(percentualConsumido, 100)}%`, height: '100%', borderRadius: '999px', backgroundColor: '#00c1af' }} />

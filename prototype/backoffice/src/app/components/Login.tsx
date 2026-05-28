@@ -8,16 +8,10 @@ interface LoginProps {
 
 export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   return (
-    <div className="relative min-h-screen w-full overflow-hidden">
-      {/* Background com gradiente radial */}
-      <div 
-        className="absolute inset-0" 
-        style={{
-          background: 'radial-gradient(circle at 50% 24%, rgba(0, 193, 175, 0.32) 0%, rgba(10, 23, 42, 0.98) 46%, rgba(7, 13, 28, 1) 100%)',
-          backgroundColor: '#07101f'
-        }}
-      />
-
+    <div
+      className="relative min-h-screen w-full overflow-hidden"
+      style={{ backgroundColor: 'var(--color-neutral-950)' }}
+    >
       {/* Conteúdo */}
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4">
         {/* Marca Conecta */}

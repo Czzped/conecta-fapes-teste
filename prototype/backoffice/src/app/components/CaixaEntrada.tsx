@@ -72,11 +72,11 @@ const filasPorCargo: Record<Cargo, Fila[]> = {
 const itensPorCargo: Record<Cargo, InboxItem[]> = {
   financeiro: [
     { id: 'f1', tipo: 'pagamento',  titulo: '12 pagamentos em validação',                  contexto: 'Conecta Fapes',                       prazoDias: 2,  prioridade: 'alta',  acaoLabel: 'Validar lote',     destino: 'financeira' },
-    { id: 'f2', tipo: 'prestacao',  titulo: '3 prestações de contas pra revisar',          contexto: 'Outras Iniciativas',                  prazoDias: 5,  prioridade: 'alta',  acaoLabel: 'Abrir lista',       destino: 'financeira' },
+    { id: 'f2', tipo: 'prestacao',  titulo: '3 prestações de contas pra revisar',          contexto: 'Outros Projetos',                  prazoDias: 5,  prioridade: 'alta',  acaoLabel: 'Abrir lista',       destino: 'financeira' },
     { id: 'f3', tipo: 'documento',  titulo: '5 documentos fiscais inconsistentes',         contexto: 'Notas Magazine Luiza · Kalunga',      prazoDias: 1,  prioridade: 'alta',  acaoLabel: 'Revisar',           destino: 'documentos' },
     { id: 'f4', tipo: 'pagamento',  titulo: 'Boleto Magazine Luiza · R$ 3.456,70',         contexto: 'Conecta Fapes · vence hoje',          prazoDias: 0,  prioridade: 'alta',  acaoLabel: 'Validar',           destino: 'financeira' },
-    { id: 'f5', tipo: 'pagamento',  titulo: 'Pix Amazon · R$ 5.234,20',                    contexto: 'Outra Iniciativa Exemplo',            prazoDias: 3,  prioridade: 'media', acaoLabel: 'Validar',           destino: 'financeira' },
-    { id: 'f6', tipo: 'documento',  titulo: 'Recibo Kalunga sem CNPJ válido',              contexto: 'Mais uma Iniciativa Exemplo',         prazoDias: -1, prioridade: 'alta',  acaoLabel: 'Solicitar correção', destino: 'documentos' },
+    { id: 'f5', tipo: 'pagamento',  titulo: 'Pix Amazon · R$ 5.234,20',                    contexto: 'Outro Projeto Exemplo',            prazoDias: 3,  prioridade: 'media', acaoLabel: 'Validar',           destino: 'financeira' },
+    { id: 'f6', tipo: 'documento',  titulo: 'Recibo Kalunga sem CNPJ válido',              contexto: 'Mais um Projeto Exemplo',         prazoDias: -1, prioridade: 'alta',  acaoLabel: 'Solicitar correção', destino: 'documentos' },
     { id: 'f7', tipo: 'prestacao',  titulo: 'Conciliação bancária de fevereiro',           contexto: 'Conta corrente FAPES',                prazoDias: 7,  prioridade: 'media', acaoLabel: 'Iniciar',           destino: 'financeira' },
     { id: 'f8', tipo: 'documento',  titulo: 'Relatório financeiro mensal pendente',        contexto: 'Encerramento de fevereiro',           prazoDias: 10, prioridade: 'baixa', acaoLabel: 'Gerar relatório',    destino: 'financeira' },
   ],

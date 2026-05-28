@@ -342,13 +342,13 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
   const percentualConsumido = cadastroData.valorAlocado > 0 ? (valorConsumido / cadastroData.valorAlocado) * 100 : 0;
   const dashboardRubricas = dashboardPorPrograma.flatMap((programa, programaIndex) => {
     const itens = programaIndex === 0 ? [
-      { rubrica: 'Bolsas', subrubrica: 'Bolsas de mestrado', iniciativa: 'Iniciativa Pesquisa Aplicada em Saúde', peso: 0.36 },
-      { rubrica: 'Capital', subrubrica: 'Equipamentos de laboratório', iniciativa: 'Iniciativa Pesquisa Aplicada em Saúde', peso: 0.42 },
-      { rubrica: 'Custeio', subrubrica: 'Material de consumo', iniciativa: 'Iniciativa Formação Científica Integrada', peso: 0.22 },
+      { rubrica: 'Bolsas', subrubrica: 'Bolsas de mestrado', iniciativa: 'Projeto Pesquisa Aplicada em Saúde', peso: 0.36 },
+      { rubrica: 'Capital', subrubrica: 'Equipamentos de laboratório', iniciativa: 'Projeto Pesquisa Aplicada em Saúde', peso: 0.42 },
+      { rubrica: 'Custeio', subrubrica: 'Material de consumo', iniciativa: 'Projeto Formação Científica Integrada', peso: 0.22 },
     ] : [
-      { rubrica: 'Bolsas', subrubrica: 'Bolsas de inovação', iniciativa: 'Iniciativa Laboratório de Inovação Regional', peso: 0.30 },
-      { rubrica: 'Capital', subrubrica: 'Protótipos e equipamentos', iniciativa: 'Iniciativa Laboratório de Inovação Regional', peso: 0.50 },
-      { rubrica: 'Custeio', subrubrica: 'Serviços de terceiros', iniciativa: 'Iniciativa Formação Científica Integrada', peso: 0.20 },
+      { rubrica: 'Bolsas', subrubrica: 'Bolsas de inovação', iniciativa: 'Projeto Laboratório de Inovação Regional', peso: 0.30 },
+      { rubrica: 'Capital', subrubrica: 'Protótipos e equipamentos', iniciativa: 'Projeto Laboratório de Inovação Regional', peso: 0.50 },
+      { rubrica: 'Custeio', subrubrica: 'Serviços de terceiros', iniciativa: 'Projeto Formação Científica Integrada', peso: 0.20 },
     ];
 
     return itens.map(item => {
@@ -382,9 +382,9 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
   }, {}));
   const programasAfetados = programas.map(programa => programa.nome);
   const iniciativasAfetadas = [
-    'Iniciativa Pesquisa Aplicada em Saúde',
-    'Iniciativa Laboratório de Inovação Regional',
-    'Iniciativa Formação Científica Integrada',
+    'Projeto Pesquisa Aplicada em Saúde',
+    'Projeto Laboratório de Inovação Regional',
+    'Projeto Formação Científica Integrada',
   ];
 
   const confirmarSuspensao = () => {
@@ -553,7 +553,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                   Suspender
                 </h2>
                 <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
-                  A suspensão afeta os programas aportados e as iniciativas vinculadas.
+                  A suspensão afeta os programas aportados e os projetos vinculados.
                 </p>
               </div>
               <button type="button" onClick={() => setShowSuspensao(false)} style={modalCloseButtonStyle} aria-label="Fechar">
@@ -595,7 +595,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
               <ImpactList title="Programas que serão suspensos" items={programasAfetados} />
-              <ImpactList title="Iniciativas que serão suspensas" items={iniciativasAfetadas} />
+              <ImpactList title="Projetos que serão suspensos" items={iniciativasAfetadas} />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
@@ -1005,7 +1005,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                   {[
                     { label: 'Programas', value: String(parceria.programasRelacionados), Icon: FolderOpen, color: '#38bdf8', bg: 'rgba(56,189,248,0.10)' },
                     { label: 'Demandas induzidas', value: String(Math.max(1, Math.floor(parceria.programasRelacionados / 2))), Icon: Handshake, color: '#fb7185', bg: 'rgba(251,113,133,0.10)' },
-                    { label: 'Iniciativas', value: String(parceria.iniciativasImpactadas), Icon: Handshake, color: '#fbbf24', bg: 'rgba(251,191,36,0.10)' },
+                    { label: 'Projetos', value: String(parceria.iniciativasImpactadas), Icon: Handshake, color: '#fbbf24', bg: 'rgba(251,191,36,0.10)' },
                   ].map(({ label, value, Icon, color, bg }) => (
                     <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(23, 23, 23,0.28)' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '30px', height: '30px', backgroundColor: bg, borderRadius: '7px', flexShrink: 0 }}>

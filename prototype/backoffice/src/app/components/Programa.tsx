@@ -179,7 +179,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
                   Programa
                 </h1>
                 <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0, lineHeight: '1.5' }}>
-                  Crie e gerencie um conjunto organizado de iniciativas e editais voltados a um objetivo estratégico de fomento.
+                  Crie e gerencie um conjunto organizado de projetos e editais voltados a um objetivo estratégico de fomento.
                 </p>
               </div>
             </div>

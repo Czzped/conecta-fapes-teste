@@ -577,7 +577,7 @@ export const FormularioInscricaoGeral: React.FC<Props> = ({ onBack, onBackToEdit
   const [currentSection, setCurrentSection] = useState<number | null>(null);
   
   // Form metadata (for template editing)
-  const [formTitle, setFormTitle] = useState('Formulário de Inscrição Geral');
+  const [formTitle, setFormTitle] = useState('Formulário de Submissão Geral');
   const [formDescription, setFormDescription] = useState('');
   
   // Custom sections (user-created sections starting from 6)
@@ -703,7 +703,7 @@ export const FormularioInscricaoGeral: React.FC<Props> = ({ onBack, onBackToEdit
           </div>
           <div style={{ flex: 1 }}>
             <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 4px' }}>
-              {isTemplate ? 'Template - Formulário de Inscrição' : 'Submissão de Proposta'}
+              {isTemplate ? 'Template - Formulário de Submissão' : 'Submissão de Proposta'}
             </h1>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
               <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
@@ -761,7 +761,7 @@ export const FormularioInscricaoGeral: React.FC<Props> = ({ onBack, onBackToEdit
                 style={inputStyle}
                 value={formTitle}
                 onChange={e => setFormTitle(e.target.value)}
-                placeholder="Ex: Formulário de Inscrição - Edital 2026"
+                placeholder="Ex: Formulário de Submissão - Edital 2026"
               />
             </div>
             <div>

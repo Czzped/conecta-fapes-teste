@@ -159,14 +159,14 @@ const initialPessoas: PessoaFisicaItem[] = [
 ];
 
 const projetosPorPessoa: ProjetoPessoa[] = [
-  { pessoaId: 1, nome: 'Iniciativa Pesquisa Aplicada em Saúde', programa: 'Programa de Pesquisa Aplicada', papel: 'Coordenadora', status: 'Em execução', inicio: '2025-02-01', fim: '2027-01-31' },
+  { pessoaId: 1, nome: 'Projeto Pesquisa Aplicada em Saúde', programa: 'Programa de Pesquisa Aplicada', papel: 'Coordenadora', status: 'Em execução', inicio: '2025-02-01', fim: '2027-01-31' },
   { pessoaId: 1, nome: 'Plataforma de Dados para Políticas Públicas', programa: 'Programa Governo Digital', papel: 'Pesquisadora', status: 'Em execução', inicio: '2024-08-01', fim: '2026-07-31' },
   { pessoaId: 2, nome: 'Rede Capixaba de Inovação Industrial', programa: 'Programa de Inovação', papel: 'Pesquisador', status: 'Em execução', inicio: '2025-01-15', fim: '2026-12-15' },
   { pessoaId: 3, nome: 'Observatório de Indicadores Educacionais', programa: 'Programa de Educação Científica', papel: 'Consultora', status: 'Suspenso', inicio: '2024-03-01', fim: '2025-12-31' },
 ];
 
 const bolsasPorPessoa: BolsaPessoa[] = [
-  { pessoaId: 1, modalidade: 'Mestrado', nivel: 'MS-1', projeto: 'Iniciativa Pesquisa Aplicada em Saúde', valorMensal: 2100, inicio: '2025-03-01', fim: '2027-02-28', status: 'Recebendo' },
+  { pessoaId: 1, modalidade: 'Mestrado', nivel: 'MS-1', projeto: 'Projeto Pesquisa Aplicada em Saúde', valorMensal: 2100, inicio: '2025-03-01', fim: '2027-02-28', status: 'Recebendo' },
   { pessoaId: 1, modalidade: 'Pesquisa', nivel: 'DTI-B', projeto: 'Plataforma de Dados para Políticas Públicas', valorMensal: 3200, inicio: '2024-09-01', fim: '2025-08-31', status: 'Encerrada' },
   { pessoaId: 2, modalidade: 'Doutorado', nivel: 'DR-1', projeto: 'Rede Capixaba de Inovação Industrial', valorMensal: 3100, inicio: '2025-02-01', fim: '2028-01-31', status: 'Recebendo' },
 ];
@@ -400,7 +400,7 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-                <InfoCard title="Projetos em que a pessoa está presente" subtitle="Vínculos da pessoa com iniciativas/projetos captados.">
+                <InfoCard title="Projetos em que a pessoa está presente" subtitle="Vínculos da pessoa com projetos captados.">
                   {projetos.length === 0 ? (
                     <EmptyState text="Nenhum projeto vinculado." />
                   ) : (

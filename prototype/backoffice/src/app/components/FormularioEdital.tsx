@@ -390,7 +390,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
   const [formularioAvaliacao, setFormularioAvaliacao] = useState('');
   const [formularioRecurso, setFormularioRecurso] = useState('');
   const [formularioAnexo, setFormularioAnexo] = useState('');
-  const [descricaoCaptacao, setDescricaoCaptacao] = useState(isEditMode ? 'Edital voltado para fomentar iniciativas de inovação tecnológica no Estado do Espírito Santo, com foco em soluções que promovam o desenvolvimento econômico e social sustentável.' : '');
+  const [descricaoCaptacao, setDescricaoCaptacao] = useState(isEditMode ? 'Edital voltado para fomentar projetos de inovação tecnológica no Estado do Espírito Santo, com foco em soluções que promovam o desenvolvimento econômico e social sustentável.' : '');
   const [cronogramaCaptacao, setCronogramaCaptacao] = useState<EtapaCronograma[]>(isEditMode ? [
     { id: 1, tipo: 'publicacao', inicio: '2026-02-01', fim: '2026-02-01' },
     { id: 2, tipo: 'recebimento', inicio: '2026-02-01', fim: '2026-03-31' },
@@ -752,7 +752,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
     {
       key: 'materialConsumo',
       label: 'Material de Consumo',
-      descricao: 'Itens consumíveis usados na iniciativa.',
+      descricao: 'Itens consumíveis usados no projeto.',
       subRubricas: [
         { key: 'reagentes', label: 'Reagentes e insumos laboratoriais' },
         { key: 'materialGrafico', label: 'Material gráfico e expediente' },
@@ -770,7 +770,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
     {
       key: 'diaria',
       label: 'Diárias',
-      descricao: 'Diárias vinculadas às atividades da iniciativa.',
+      descricao: 'Diárias vinculadas às atividades do projeto.',
       subRubricas: [
         { key: 'diariaNacional', label: 'Diária nacional' },
         { key: 'diariaInternacional', label: 'Diária internacional' },
@@ -954,7 +954,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
 
           <div style={{ marginBottom: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <label style={{ ...labelStyle, marginBottom: 0 }}>Categorias de Iniciativas</label>
+              <label style={{ ...labelStyle, marginBottom: 0 }}>Categorias de Projetos</label>
               <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)' }}>
                 {categoriasSelecionadas.length} selecionada(s)
               </span>
@@ -1230,7 +1230,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
                   {index > 0 && <div style={{ ...divider, margin: '16px 0' }} />}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '20px', alignItems: 'end' }}>
                     <div>
-                      <label style={labelStyle}>Duração máxima da iniciativa (meses)</label>
+                      <label style={labelStyle}>Duração máxima do projeto (meses)</label>
                       <input
                         type="number"
                         placeholder="24"
@@ -1566,7 +1566,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
               Selecione os formulários usados nas etapas de inscrição, avaliação, recurso e anexos.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '20px' }}>
-              <SelectField label="Formulário de Inscrição" value={formularioInscricao} onChange={setFormularioInscricao}
+              <SelectField label="Formulário de Submissão" value={formularioInscricao} onChange={setFormularioInscricao}
                 placeholder="Selecione o formulário..."
                 options={formularioOpts}
               />
@@ -2184,7 +2184,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
               { key: 'balancoPatrimonial', label: 'Balanço patrimonial', descricao: 'Demonstração contábil usada para comprovar capacidade econômico-financeira.', formatos: 'PDF ou XLSX', obrigatorio: false },
               { key: 'certidaoRegularidadeFiscal', label: 'Certidões de regularidade fiscal', descricao: 'Comprovação de regularidade perante órgãos fiscais e trabalhistas, quando aplicável.', formatos: 'PDF', obrigatorio: false },
               { key: 'comprovanteRepresentanteLegal', label: 'Comprovante do representante legal', descricao: 'Documento que comprova poderes de representação do responsável pela submissão.', formatos: 'PDF', obrigatorio: true },
-              { key: 'declaracaoCapacidadeTecnica', label: 'Declaração de capacidade técnica', descricao: 'Declaração institucional de que o proponente possui estrutura para executar a iniciativa.', formatos: 'PDF', obrigatorio: false },
+              { key: 'declaracaoCapacidadeTecnica', label: 'Declaração de capacidade técnica', descricao: 'Declaração institucional de que o proponente possui estrutura para executar o projeto.', formatos: 'PDF', obrigatorio: false },
             ].map(item => {
               const checked = Boolean(docsSubmissao[item.key]);
 

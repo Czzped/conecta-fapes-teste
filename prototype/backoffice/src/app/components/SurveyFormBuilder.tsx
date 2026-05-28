@@ -148,7 +148,7 @@ const writeForms = (forms: StoredForm[]) => {
 const createInitialForm = (): StoredForm => ({
   id: makeId(),
   name: 'Formulario de Submissao',
-  description: 'Formulario base para captacao de iniciativas.',
+  description: 'Formulario base para captacao de projetos.',
   category: 'Submissao',
   status: 'Rascunho',
   version: 1,
@@ -326,7 +326,7 @@ const createSeedForms = (): StoredForm[] => [
   {
     id: 'FORM-SUBMISSAO-2026-001',
     name: 'Formulario de Submissao',
-    description: 'Formulario base para captacao de iniciativas.',
+    description: 'Formulario base para captacao de projetos.',
     category: 'Submissao',
     status: 'Rascunho',
     version: 1,
@@ -936,7 +936,7 @@ const MetricCard: React.FC<{ label: string; value: string }> = ({ label, value }
 const getUsageFlow = (category: string) => {
   if (category === 'Avaliacao') return 'Parecer de revisor';
   if (category === 'Recurso') return 'Solicitacao de recurso';
-  if (category === 'Prestacao de contas') return 'Acompanhamento da iniciativa';
+  if (category === 'Prestacao de contas') return 'Acompanhamento do projeto';
   if (category === 'Cadastro') return 'Cadastro administrativo';
   return 'Submissao de proposta';
 };

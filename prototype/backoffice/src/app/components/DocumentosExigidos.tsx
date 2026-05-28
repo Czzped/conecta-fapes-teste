@@ -44,7 +44,7 @@ const cardStyle: React.CSSProperties = {
 export const DocumentosExigidos: React.FC<DocumentosExigidosProps> = ({ onBack }) => {
   const [documentos, setDocumentos] = useState<DocumentoExigidoItem[]>([
     { id: 1, nome: 'Currículo Lattes', descricao: 'Currículo atualizado do proponente.', formatos: 'PDF', obrigatorio: true },
-    { id: 2, nome: 'Projeto da iniciativa', descricao: 'Documento técnico da proposta submetida.', formatos: 'PDF, DOCX', obrigatorio: true },
+    { id: 2, nome: 'Projeto', descricao: 'Documento técnico da proposta submetida.', formatos: 'PDF, DOCX', obrigatorio: true },
   ]);
   const [draft, setDraft] = useState({ nome: '', descricao: '', formatos: 'PDF', obrigatorio: true });
 

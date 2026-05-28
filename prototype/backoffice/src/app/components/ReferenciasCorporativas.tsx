@@ -116,9 +116,9 @@ const initialRegioes: RegiaoCidade[] = [
 ];
 
 const initialFinalidades: Finalidade[] = [
-  { id: 1, nome: 'Pesquisa', descricao: 'Fomento a iniciativas de pesquisa científica e tecnológica.' },
-  { id: 2, nome: 'Inovação', descricao: 'Fomento a iniciativas de inovação e transferência tecnológica.' },
-  { id: 3, nome: 'Extensão', descricao: 'Fomento a iniciativas de extensão e difusão de conhecimento.' },
+  { id: 1, nome: 'Pesquisa', descricao: 'Fomento a projetos de pesquisa científica e tecnológica.' },
+  { id: 2, nome: 'Inovação', descricao: 'Fomento a projetos de inovação e transferência tecnológica.' },
+  { id: 3, nome: 'Extensão', descricao: 'Fomento a projetos de extensão e difusão de conhecimento.' },
 ];
 
 export const ReferenciasCorporativas: React.FC<{ onBack: () => void }> = ({ onBack }) => {
@@ -313,7 +313,7 @@ export const ReferenciasCorporativas: React.FC<{ onBack: () => void }> = ({ onBa
         )}
 
         {activeTab === 'finalidades' && (
-          <ReferenceSection title="Finalidades" subtitle="Finalidades classificam parcerias e iniciativas em módulos consumidores.">
+          <ReferenceSection title="Finalidades" subtitle="Finalidades classificam parcerias e projetos em módulos consumidores.">
             <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.8fr auto', gap: '12px', alignItems: 'end', marginBottom: '18px' }}>
               <Field label="Nome" value={finalidadeDraft.nome} onChange={value => setFinalidadeDraft(prev => ({ ...prev, nome: value }))} placeholder="Pesquisa" />
               <Field label="Descrição" value={finalidadeDraft.descricao} onChange={value => setFinalidadeDraft(prev => ({ ...prev, descricao: value }))} placeholder="Descrição da finalidade" />

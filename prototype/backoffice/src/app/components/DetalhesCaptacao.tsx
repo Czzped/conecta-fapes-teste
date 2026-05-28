@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronRight, ArrowLeft, ChevronDown, X, Save, FileText, CheckCircle, ClipboardCheck, ListChecks, RotateCcw, Trophy } from 'lucide-react';
+import { toast } from 'sonner';
+import { ChevronRight, ArrowLeft, ChevronDown, X, Save, FileText, CheckCircle, ClipboardCheck, ListChecks, RotateCcw, Trophy, ShieldCheck } from 'lucide-react';
 import { FormularioEdital } from './FormularioEdital';
 
 interface CaptacaoDetalhe {
@@ -106,7 +107,8 @@ const fasesIniciativas = [
   { fase: 'Avaliação Ad Hoc', quantidade: 24, cor: '#a78bfa' },
   { fase: 'Resultado Preliminar', quantidade: 18, cor: '#fb7185' },
   { fase: 'Recurso', quantidade: 6, cor: '#f97316' },
-  { fase: 'Resultado Final', quantidade: 12, cor: '#22c55e' },
+  { fase: 'Aprovados', quantidade: 12, cor: '#22c55e' },
+  { fase: 'Reprovados', quantidade: 8, cor: '#ef4444' },
 ];
 
 const iniciativasEnviadas = [
@@ -114,7 +116,7 @@ const iniciativasEnviadas = [
   { codigo: 'INI-2026-002', titulo: 'Bioinsumos para agricultura de precisão', proponente: 'Universidade Federal do Espírito Santo', ortogado: 'André Carvalho', fase: 'Habilitação', data: '14/02/2026', categoria: 'Pesquisa', faixa: 'Faixa 1', valorSolicitado: 'R$ 180.000,00', valorNumerico: 180000, resumo: 'Pesquisa aplicada para validação de bioinsumos em cadeias produtivas regionais.', rubricas: [{ nome: 'Bolsas', valor: 90000, cor: '#38bdf8' }, { nome: 'Custeio', valor: 70000, cor: '#22c55e' }, { nome: 'Diárias e passagens', valor: 20000, cor: '#fb7185' }] },
   { codigo: 'INI-2026-003', titulo: 'Sistema de rastreabilidade para cadeias produtivas', proponente: 'Findes Lab', ortogado: 'Patrícia Almeida', fase: 'Resultado Preliminar', data: '20/02/2026', categoria: 'Inovação', faixa: 'Faixa 2', valorSolicitado: 'R$ 390.000,00', valorNumerico: 390000, resumo: 'Plataforma para rastrear origem, qualidade e movimentação de produtos industriais.', rubricas: [{ nome: 'Capital', valor: 170000, cor: '#a78bfa' }, { nome: 'Serviços de terceiros', valor: 150000, cor: '#fbbf24' }, { nome: 'Custeio', valor: 70000, cor: '#22c55e' }] },
   { codigo: 'INI-2026-004', titulo: 'Tecnologia assistiva para educação inclusiva', proponente: 'Instituto Capixaba de Tecnologia', ortogado: 'Lucas Rocha', fase: 'Recurso', data: '22/02/2026', categoria: 'Extensão', faixa: 'Faixa 1', valorSolicitado: 'R$ 150.000,00', valorNumerico: 150000, resumo: 'Ferramentas digitais e dispositivos de apoio para estudantes com deficiência.', rubricas: [{ nome: 'Bolsas', valor: 60000, cor: '#38bdf8' }, { nome: 'Capital', valor: 50000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 40000, cor: '#22c55e' }] },
-  { codigo: 'INI-2026-005', titulo: 'Observatório de inovação em saúde pública', proponente: 'Hospital Universitário Cassiano Antônio Moraes', ortogado: 'Fernanda Costa', fase: 'Resultado Final', data: '25/02/2026', categoria: 'Pesquisa', faixa: 'Faixa 2', valorSolicitado: 'R$ 480.000,00', valorNumerico: 480000, resumo: 'Observatório para consolidar indicadores, evidências e iniciativas de inovação em saúde.', rubricas: [{ nome: 'Bolsas', valor: 180000, cor: '#38bdf8' }, { nome: 'Capital', valor: 160000, cor: '#a78bfa' }, { nome: 'Serviços de terceiros', valor: 90000, cor: '#fbbf24' }, { nome: 'Custeio', valor: 50000, cor: '#22c55e' }] },
+  { codigo: 'INI-2026-005', titulo: 'Observatório de inovação em saúde pública', proponente: 'Hospital Universitário Cassiano Antônio Moraes', ortogado: 'Fernanda Costa', fase: 'Resultado Final', data: '25/02/2026', categoria: 'Pesquisa', faixa: 'Faixa 2', valorSolicitado: 'R$ 480.000,00', valorNumerico: 480000, resumo: 'Observatório para consolidar indicadores, evidências e projetos de inovação em saúde.', rubricas: [{ nome: 'Bolsas', valor: 180000, cor: '#38bdf8' }, { nome: 'Capital', valor: 160000, cor: '#a78bfa' }, { nome: 'Serviços de terceiros', valor: 90000, cor: '#fbbf24' }, { nome: 'Custeio', valor: 50000, cor: '#22c55e' }] },
   { codigo: 'INI-2026-006', titulo: 'Rede de sensores para cidades resilientes', proponente: 'Prefeitura Municipal de Vitória', ortogado: 'Ricardo Torres', fase: 'Submetida', data: '28/02/2026', categoria: 'Inovação', faixa: 'Faixa 1', valorSolicitado: 'R$ 210.000,00', valorNumerico: 210000, resumo: 'Rede de sensores urbanos para apoiar resposta rápida a eventos climáticos.', rubricas: [{ nome: 'Capital', valor: 130000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 50000, cor: '#22c55e' }, { nome: 'Diárias e passagens', valor: 30000, cor: '#fb7185' }] },
   { codigo: 'INI-2026-007', titulo: 'Modelos preditivos para gestão costeira', proponente: 'Universidade Vila Velha', ortogado: 'Beatriz Nascimento', fase: 'Avaliação Ad Hoc', data: '01/03/2026', categoria: 'Pesquisa', faixa: 'Faixa 2', valorSolicitado: 'R$ 360.000,00', valorNumerico: 360000, resumo: 'Modelos analíticos para apoiar decisões sobre erosão costeira e ocupação urbana.', rubricas: [{ nome: 'Bolsas', valor: 120000, cor: '#38bdf8' }, { nome: 'Capital', valor: 140000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 100000, cor: '#22c55e' }] },
   { codigo: 'INI-2026-008', titulo: 'Automação para laboratórios de biotecnologia', proponente: 'SENAI Cimatec ES', ortogado: 'Gustavo Almeida', fase: 'Resultado Preliminar', data: '03/03/2026', categoria: 'Inovação', faixa: 'Faixa 2', valorSolicitado: 'R$ 440.000,00', valorNumerico: 440000, resumo: 'Automação de processos laboratoriais para ampliar capacidade de pesquisa aplicada.', rubricas: [{ nome: 'Capital', valor: 210000, cor: '#a78bfa' }, { nome: 'Serviços de terceiros', valor: 150000, cor: '#fbbf24' }, { nome: 'Custeio', valor: 80000, cor: '#22c55e' }] },
@@ -123,34 +125,45 @@ const iniciativasEnviadas = [
 ];
 
 const avaliacoesAdHoc = [
-  { iniciativaCodigo: 'INI-2026-001', revisor: 'Dra. Helena Martins', area: 'Pesquisa em Saúde', status: 'Concluída', nota: '88', parecer: 'Proposta consistente, com boa clareza metodológica e impacto regional relevante.' },
-  { iniciativaCodigo: 'INI-2026-001', revisor: 'Dr. Rafael Nogueira', area: 'Inovação Tecnológica', status: 'Em avaliação', nota: '-', parecer: 'Avaliação técnica em andamento.' },
-  { iniciativaCodigo: 'INI-2026-003', revisor: 'Dra. Livia Barbosa', area: 'Educação e Extensão', status: 'Concluída', nota: '81', parecer: 'Boa aderência ao edital, com necessidade de detalhar indicadores de adoção.' },
-  { iniciativaCodigo: 'INI-2026-004', revisor: 'Dr. Marcos Teixeira', area: 'Ciências Agrárias', status: 'Solicitada revisão', nota: '74', parecer: 'Revisão solicitada para esclarecer plano de execução e orçamento.' },
-  { iniciativaCodigo: 'INI-2026-005', revisor: 'Dra. Helena Martins', area: 'Pesquisa em Saúde', status: 'Concluída', nota: '92', parecer: 'Excelente alinhamento com a política pública e boa capacidade de execução.' },
-  { iniciativaCodigo: 'INI-2026-006', revisor: 'Dr. Rafael Nogueira', area: 'Inovação Tecnológica', status: 'Em avaliação', nota: '-', parecer: 'Análise de viabilidade técnica em andamento.' },
-  { iniciativaCodigo: 'INI-2026-007', revisor: 'Dra. Livia Barbosa', area: 'Educação e Extensão', status: 'Concluída', nota: '86', parecer: 'Boa estrutura metodológica e impacto territorial mensurável.' },
-  { iniciativaCodigo: 'INI-2026-008', revisor: 'Dr. Marcos Teixeira', area: 'Ciências Agrárias', status: 'Concluída', nota: '89', parecer: 'Proposta robusta, com orçamento coerente e cronograma factível.' },
-  { iniciativaCodigo: 'INI-2026-009', revisor: 'Dra. Helena Martins', area: 'Pesquisa em Saúde', status: 'Solicitada revisão', nota: '76', parecer: 'Necessário detalhar indicadores de disseminação e governança.' },
-  { iniciativaCodigo: 'INI-2026-010', revisor: 'Dr. Rafael Nogueira', area: 'Inovação Tecnológica', status: 'Concluída', nota: '91', parecer: 'Excelente aderência ao edital e potencial de replicabilidade.' },
+  { iniciativaCodigo: 'INI-2026-001', revisor: 'Helena Martins', area: 'Pesquisa em Saúde', status: 'Concluída', nota: '88', parecer: 'Proposta consistente, com boa clareza metodológica e impacto regional relevante.' },
+  { iniciativaCodigo: 'INI-2026-001', revisor: 'Rafael Nogueira', area: 'Inovação Tecnológica', status: 'Em avaliação', nota: '-', parecer: 'Avaliação técnica em andamento.' },
+  { iniciativaCodigo: 'INI-2026-003', revisor: 'Livia Barbosa', area: 'Educação e Extensão', status: 'Concluída', nota: '81', parecer: 'Boa aderência ao edital, com necessidade de detalhar indicadores de adoção.' },
+  { iniciativaCodigo: 'INI-2026-004', revisor: 'Marcos Teixeira', area: 'Ciências Agrárias', status: 'Solicitada revisão', nota: '74', parecer: 'Revisão solicitada para esclarecer plano de execução e orçamento.' },
+  { iniciativaCodigo: 'INI-2026-005', revisor: 'Helena Martins', area: 'Pesquisa em Saúde', status: 'Concluída', nota: '92', parecer: 'Excelente alinhamento com a política pública e boa capacidade de execução.' },
+  { iniciativaCodigo: 'INI-2026-006', revisor: 'Rafael Nogueira', area: 'Inovação Tecnológica', status: 'Em avaliação', nota: '-', parecer: 'Análise de viabilidade técnica em andamento.' },
+  { iniciativaCodigo: 'INI-2026-007', revisor: 'Livia Barbosa', area: 'Educação e Extensão', status: 'Concluída', nota: '86', parecer: 'Boa estrutura metodológica e impacto territorial mensurável.' },
+  { iniciativaCodigo: 'INI-2026-008', revisor: 'Marcos Teixeira', area: 'Ciências Agrárias', status: 'Concluída', nota: '89', parecer: 'Proposta robusta, com orçamento coerente e cronograma factível.' },
+  { iniciativaCodigo: 'INI-2026-009', revisor: 'Helena Martins', area: 'Pesquisa em Saúde', status: 'Solicitada revisão', nota: '76', parecer: 'Necessário detalhar indicadores de disseminação e governança.' },
+  { iniciativaCodigo: 'INI-2026-010', revisor: 'Rafael Nogueira', area: 'Inovação Tecnológica', status: 'Concluída', nota: '91', parecer: 'Excelente aderência ao edital e potencial de replicabilidade.' },
 ];
 
 const revisoresAdHocDashboard = [
-  { nome: 'Dra. Helena Martins', area: 'Pesquisa em Saúde', titulacao: 'Doutorado', instituicao: 'UFES', status: 'Ativa' },
-  { nome: 'Dr. Rafael Nogueira', area: 'Inovação Tecnológica', titulacao: 'Doutorado', instituicao: 'IFES', status: 'Ativo' },
-  { nome: 'Dra. Livia Barbosa', area: 'Educação e Extensão', titulacao: 'Doutorado', instituicao: 'UFES', status: 'Ativa' },
-  { nome: 'Dr. Marcos Teixeira', area: 'Ciências Agrárias', titulacao: 'Mestrado', instituicao: 'Incaper', status: 'Ativo' },
+  { nome: 'Helena Martins', area: 'Pesquisa em Saúde', titulacao: 'Doutorado', instituicao: 'UFES', status: 'Ativa' },
+  { nome: 'Rafael Nogueira', area: 'Inovação Tecnológica', titulacao: 'Doutorado', instituicao: 'IFES', status: 'Ativo' },
+  { nome: 'Livia Barbosa', area: 'Educação e Extensão', titulacao: 'Doutorado', instituicao: 'UFES', status: 'Ativa' },
+  { nome: 'Marcos Teixeira', area: 'Ciências Agrárias', titulacao: 'Mestrado', instituicao: 'Incaper', status: 'Ativo' },
+];
+
+const avaliadoresAdHoc = [
+  { nome: 'Ana Beatriz Couto', area: 'Saúde', especializacao: 'Doutorado' },
+  { nome: 'Bruno Henrique Matos', area: 'Tecnologia', especializacao: 'Mestrado' },
+  { nome: 'Carolina Duarte Nunes', area: 'Meio Ambiente', especializacao: 'Pós-Graduação' },
+  { nome: 'Diego Ferreira Lima', area: 'Tecnologia', especializacao: 'Doutorado' },
+  { nome: 'Elisa Campos Rocha', area: 'Saúde', especializacao: 'Mestrado' },
+  { nome: 'Felipe Augusto Reis', area: 'Meio Ambiente', especializacao: 'Doutorado' },
 ];
 
 const financeiroCaptacaoDetalhe = {
   totalSolicitado: iniciativasEnviadas.reduce((total, iniciativa) => total + iniciativa.valorNumerico, 0),
   totalDisponivel: 5000000,
   rubricas: [
-    { nome: 'Bolsas', valor: 620000, quantidade: 4, cor: '#38bdf8' },
-    { nome: 'Capital', valor: 510000, quantidade: 3, cor: '#a78bfa' },
-    { nome: 'Custeio', valor: 430000, quantidade: 5, cor: '#22c55e' },
-    { nome: 'Serviços de terceiros', valor: 190000, quantidade: 2, cor: '#fbbf24' },
-    { nome: 'Diárias e passagens', valor: 80000, quantidade: 1, cor: '#fb7185' },
+    { nome: 'Bolsa', valor: 620000, quantidade: 4, cor: '#38bdf8' },
+    { nome: 'Material de Consumo', valor: 510000, quantidade: 3, cor: '#a78bfa' },
+    { nome: 'Material Permanente', valor: 430000, quantidade: 5, cor: '#22c55e' },
+    { nome: 'Passagem', valor: 190000, quantidade: 2, cor: '#fbbf24' },
+    { nome: 'Diária', valor: 80000, quantidade: 1, cor: '#fb7185' },
+    { nome: 'Pessoa Jurídica', valor: 260000, quantidade: 3, cor: '#00c1af' },
+    { nome: 'Pessoa Física', valor: 150000, quantidade: 2, cor: '#60a5fa' },
   ],
 };
 
@@ -192,6 +205,19 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
   const [showDropdown1, setShowDropdown1] = useState(false);
   const [showDropdown2, setShowDropdown2] = useState(false);
   const [showDropdown3, setShowDropdown3] = useState(false);
+  const [fasePropostaFiltro, setFasePropostaFiltro] = useState('Todos');
+  const [showOrdenacaoDropdown, setShowOrdenacaoDropdown] = useState(false);
+  const [showFaseDropdown, setShowFaseDropdown] = useState(false);
+  const [showAvaliadorModal, setShowAvaliadorModal] = useState(false);
+  const [avaliadorBusca, setAvaliadorBusca] = useState('');
+  const [avaliadorSelecionado, setAvaliadorSelecionado] = useState<typeof avaliadoresAdHoc[number] | null>(null);
+  const [propostaAvaliadorSelecionada, setPropostaAvaliadorSelecionada] = useState('');
+  const [habilitacaoSelecionada, setHabilitacaoSelecionada] = useState<typeof iniciativasEnviadas[number] | null>(null);
+  const [resultadoHabilitacao, setResultadoHabilitacao] = useState<'Habilitada' | 'Não Habilitada' | ''>('');
+  const [statusHabilitacaoFiltro, setStatusHabilitacaoFiltro] = useState('Habilitado');
+  const [showStatusHabilitacaoDropdown, setShowStatusHabilitacaoDropdown] = useState(false);
+  const [statusAvaliacaoAdHocFiltro, setStatusAvaliacaoAdHocFiltro] = useState('Aguardando Avaliador');
+  const [showStatusAvaliacaoAdHocDropdown, setShowStatusAvaliacaoAdHocDropdown] = useState(false);
   const resumoInputStyle: React.CSSProperties = {
     ...inputStyle,
     backgroundColor: editingResumo ? 'rgba(23, 23, 23,0.95)' : inputStyle.backgroundColor,
@@ -246,10 +272,130 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
     if (propostaOrdenacao === 'valor-menor') return a.valorNumerico - b.valorNumerico;
     return parseDataEnvio(b.data) - parseDataEnvio(a.data);
   });
+  const propostasExibidas = propostasOrdenadas.filter(iniciativa =>
+    fasePropostaFiltro === 'Todos' || fasePropostaLabel(iniciativa.fase) === fasePropostaFiltro
+  );
+  const ordenacaoOptions: Array<{ value: typeof propostaOrdenacao; label: string }> = [
+    { value: 'data-recente', label: 'Data de envio: mais recente' },
+    { value: 'data-antiga', label: 'Data de envio: mais antiga' },
+    { value: 'valor-maior', label: 'Valor: maior' },
+    { value: 'valor-menor', label: 'Valor: menor' },
+  ];
+  const fasePropostaOptions = ['Todos', 'Enviada', 'Habilitação', 'Avaliação Ad Hoc', 'Resultado Parcial', 'Recurso', 'Resultado Final'];
+  const avaliadoresFiltrados = avaliadoresAdHoc.filter((avaliador) =>
+    `${avaliador.nome} ${avaliador.area} ${avaliador.especializacao}`.toLowerCase().includes(avaliadorBusca.toLowerCase())
+  );
+  const propostasPorInstituicao = [
+    { instituicao: 'Ifes', quantidade: 18 },
+    { instituicao: 'Ufes', quantidade: 14 },
+    { instituicao: 'UVV', quantidade: 9 },
+    { instituicao: 'Senai', quantidade: 7 },
+    { instituicao: 'Findes', quantidade: 11 },
+  ];
+  const maiorQuantidadeInstituicao = Math.max(...propostasPorInstituicao.map(item => item.quantidade), 1);
+  const tiposBolsasSolicitadas = [
+    { tipo: 'Iniciação Científica', quantidade: 24 },
+    { tipo: 'Mestrado', quantidade: 18 },
+    { tipo: 'Doutorado', quantidade: 12 },
+    { tipo: 'BPIG - IV', quantidade: 9 },
+  ];
+  const maiorQuantidadeBolsa = Math.max(...tiposBolsasSolicitadas.map(item => item.quantidade), 1);
+  const propostasPorLocalizacao = [
+    { localizacao: 'Vitória', quantidade: 16 },
+    { localizacao: 'Vila Velha', quantidade: 13 },
+    { localizacao: 'Serra', quantidade: 11 },
+    { localizacao: 'Cariacica', quantidade: 8 },
+    { localizacao: 'Guarapari', quantidade: 6 },
+    { localizacao: 'Viana', quantidade: 5 },
+    { localizacao: 'Colatina', quantidade: 4 },
+  ];
+  const maiorQuantidadeLocalizacao = Math.max(...propostasPorLocalizacao.map(item => item.quantidade), 1);
   const filtroCampoStyle: React.CSSProperties = {
     ...inputStyle,
     backgroundColor: 'rgba(38, 38, 38, 0.5)',
     height: '40px',
+  };
+  const renderCustomDropdown = <T extends string,>({
+    label,
+    value,
+    options,
+    open,
+    setOpen,
+    onSelect,
+  }: {
+    label: string;
+    value: T;
+    options: Array<{ value: T; label: string }>;
+    open: boolean;
+    setOpen: (open: boolean) => void;
+    onSelect: (value: T) => void;
+  }) => {
+    const selectedLabel = options.find(option => option.value === value)?.label || value;
+
+    return (
+      <div style={{ position: 'relative' }}>
+        <label style={labelStyle}>{label}</label>
+        <button
+          type="button"
+          onClick={() => {
+            setOpen(!open);
+            if (label === 'Ordenar por') setShowFaseDropdown(false);
+            if (label === 'Fase') setShowOrdenacaoDropdown(false);
+          }}
+          style={{
+            ...filtroCampoStyle,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            cursor: 'pointer',
+            textAlign: 'left',
+          }}
+        >
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedLabel}</span>
+          <ChevronDown size={16} style={{ color: 'rgba(255,255,255,0.55)', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+        </button>
+        {open && (
+          <div style={{
+            position: 'absolute',
+            top: 'calc(100% + 6px)',
+            left: 0,
+            right: 0,
+            zIndex: 40,
+            overflow: 'hidden',
+            borderRadius: 'var(--radius)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            backgroundColor: '#262626',
+            boxShadow: '0 18px 38px rgba(0,0,0,0.38)',
+          }}>
+            {options.map(option => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => {
+                  onSelect(option.value);
+                  setOpen(false);
+                }}
+                onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.14)'; }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = option.value === value ? 'rgba(0,193,175,0.12)' : 'transparent'; }}
+                style={{
+                  width: '100%',
+                  padding: '11px 14px',
+                  border: 'none',
+                  backgroundColor: option.value === value ? 'rgba(0,193,175,0.12)' : 'transparent',
+                  color: option.value === value ? '#00c1af' : '#ffffff',
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-sm)',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                }}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
   };
   const renderListFilters = (statusOptions: string[], includeDate = false) => (
     <div style={{
@@ -589,6 +735,480 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
     );
   };
 
+  const abrirModalAvaliador = (avaliacao: typeof avaliacoesAdHoc[number]) => {
+    const iniciativaAvaliada = iniciativasEnviadas.find(item => item.codigo === avaliacao.iniciativaCodigo);
+    const avaliadorAtual = avaliadoresAdHoc.find(avaliador => avaliacao.revisor.includes(avaliador.nome.split(' ').slice(-1)[0]));
+
+    setPropostaAvaliadorSelecionada(iniciativaAvaliada?.titulo || avaliacao.iniciativaCodigo);
+    setAvaliadorBusca('');
+    setAvaliadorSelecionado(avaliadorAtual || null);
+    setShowAvaliadorModal(true);
+  };
+
+  const renderAvaliadorModal = () => {
+    if (!showAvaliadorModal) return null;
+
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 1100,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '24px',
+          backgroundColor: 'rgba(0,0,0,0.72)',
+        }}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) setShowAvaliadorModal(false);
+        }}
+      >
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-avaliador-title"
+          style={{
+            width: 'min(760px, 100%)',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            borderRadius: '12px',
+            border: '1px solid rgba(255,255,255,0.14)',
+            backgroundColor: '#262626',
+            boxShadow: '0 24px 70px rgba(0,0,0,0.55)',
+            padding: '28px',
+          }}
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '24px' }}>
+            <div>
+              <h2 id="modal-avaliador-title" style={{
+                margin: '0 0 8px',
+                color: '#ffffff',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-md)',
+                fontWeight: 'var(--font-weight-medium)',
+              }}>
+                Selecione o Avaliador
+              </h2>
+              <p style={{
+                margin: 0,
+                color: 'rgba(255,255,255,0.62)',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+              }}>
+                Escolha a pessoa que irá avaliar essa proposta.
+              </p>
+            </div>
+            <button
+              type="button"
+              aria-label="Fechar"
+              onClick={() => setShowAvaliadorModal(false)}
+              style={{
+                border: 'none',
+                background: 'transparent',
+                color: 'rgba(255,255,255,0.58)',
+                cursor: 'pointer',
+                padding: '4px',
+              }}
+            >
+              <X size={22} />
+            </button>
+          </div>
+
+          <div style={{ display: 'grid', gap: '18px' }}>
+            <div>
+              <label style={{ ...labelStyle, color: '#ffffff' }}>Proposta</label>
+              <div style={{
+                minHeight: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                borderRadius: 'var(--radius)',
+                border: 'none',
+                backgroundColor: 'transparent',
+                color: '#ffffff',
+                padding: '10px 0',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+              }}>
+                {propostaAvaliadorSelecionada}
+              </div>
+            </div>
+
+            <div>
+              <label style={{ ...labelStyle, color: '#ffffff' }}>Buscar avaliador</label>
+              <input
+                value={avaliadorBusca}
+                onChange={(event) => setAvaliadorBusca(event.target.value)}
+                placeholder="Digite o nome, área ou especialização"
+                style={inputStyle}
+              />
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gap: '8px',
+              maxHeight: '220px',
+              overflowY: 'auto',
+              paddingRight: '4px',
+            }}>
+              {avaliadoresFiltrados.map(avaliador => {
+                const selected = avaliadorSelecionado?.nome === avaliador.nome;
+
+                return (
+                  <button
+                    key={avaliador.nome}
+                    type="button"
+                    onClick={() => setAvaliadorSelecionado(avaliador)}
+                    onMouseEnter={e => { if (!selected) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.04)'; }}
+                    onMouseLeave={e => { if (!selected) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1.2fr 0.8fr 0.8fr',
+                      gap: '14px',
+                      alignItems: 'center',
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: '8px',
+                      border: selected ? '1px solid rgba(0,193,175,0.5)' : '1px solid rgba(255,255,255,0.1)',
+                      backgroundColor: selected ? 'rgba(0,193,175,0.14)' : 'transparent',
+                      color: '#ffffff',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <div>
+                      <div style={detalheRotuloStyle}>Nome</div>
+                      <div style={detalheValorStyle}>{avaliador.nome}</div>
+                    </div>
+                    <div>
+                      <div style={detalheRotuloStyle}>Área</div>
+                      <div style={detalheValorStyle}>{avaliador.area}</div>
+                    </div>
+                    <div>
+                      <div style={detalheRotuloStyle}>Especialização</div>
+                      <div style={detalheValorStyle}>{avaliador.especializacao}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {avaliadorSelecionado && (
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1.2fr 0.8fr 0.8fr',
+                gap: '16px',
+                borderRadius: '8px',
+                border: '1px solid rgba(0,193,175,0.28)',
+                backgroundColor: 'rgba(0,193,175,0.08)',
+                padding: '16px',
+              }}>
+                <div>
+                  <div style={detalheRotuloStyle}>Nome</div>
+                  <div style={detalheValorStyle}>{avaliadorSelecionado.nome}</div>
+                </div>
+                <div>
+                  <div style={detalheRotuloStyle}>Área</div>
+                  <div style={detalheValorStyle}>{avaliadorSelecionado.area}</div>
+                </div>
+                <div>
+                  <div style={detalheRotuloStyle}>Especialização</div>
+                  <div style={detalheValorStyle}>{avaliadorSelecionado.especializacao}</div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '26px' }}>
+            <button
+              type="button"
+              onClick={() => setShowAvaliadorModal(false)}
+              style={{
+                padding: '11px 22px',
+                borderRadius: 'var(--radius)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                backgroundColor: 'transparent',
+                color: '#ffffff',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+              }}
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowAvaliadorModal(false)}
+              style={{
+                padding: '11px 24px',
+                borderRadius: 'var(--radius)',
+                border: 'none',
+                backgroundColor: '#00c1af',
+                color: '#171717',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+              }}
+            >
+              Salvar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderRadioOptions = (name: string) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flexWrap: 'wrap' }}>
+      {['Atende', 'Não Atende', 'Revisar'].map(option => (
+        <label key={option} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}>
+          <input type="radio" name={name} value={option} style={{ accentColor: '#00c1af' }} />
+          {option}
+        </label>
+      ))}
+    </div>
+  );
+
+  const renderHabilitacaoSectionTitle = (number: string, title: string) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '18px' }}>
+      <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#00c1af', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: '#171717' }}>{number}</span>
+      </div>
+      <h2 style={{ ...sectionTitleStyle, color: '#ffffff', margin: 0 }}>{title}</h2>
+    </div>
+  );
+
+  const salvarHabilitacao = () => {
+    setHabilitacaoSelecionada(null);
+    toast.success('Proposta mudou de status com sucesso.', {
+      duration: 10000,
+      style: {
+        backgroundColor: '#16a34a',
+        border: '1px solid #15803d',
+        color: '#ffffff',
+      },
+    });
+  };
+
+  const renderHabilitacaoPage = () => {
+    if (!habilitacaoSelecionada) return null;
+
+    const criteriosElegibilidade = [
+      'Ser o primeiro autor responsável pela submissão do artigo',
+      'Ser o único dentre os autores do artigo a submeter proposta',
+      'Ter cadastro na Plataforma Lattes atualizado há menos de 6 (seis) meses do momento do envio da proposta',
+      'Morar no Espírito Santo ou em municípios limítrofes',
+      'Estar regularizado junto à Fapes',
+    ];
+    const documentosProposta = [
+      'Formulário de Submissão do Projeto',
+      'Formulário de Pontuação',
+      'Declaração do proponente',
+      'Versão Final do artigo aceito para publicação',
+      'Documento oficial emitido pelo periódico, informando o valor da taxa de publicação a ser paga',
+      'Comprovante de classificação do periódico no qual o artigo será publicado',
+      'Aceite do coordenador do projeto de pesquisa, caso esse não seja um dos autores do artigo',
+    ];
+
+    return (
+      <div style={{ backgroundColor: '#171717', minHeight: '100vh' }}>
+        <div className="pt-8 px-8 pb-8">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
+            <button
+              type="button"
+              onClick={() => {
+                setHabilitacaoSelecionada(null);
+                onBack();
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+                color: 'rgba(255,255,255,0.5)',
+                cursor: 'pointer',
+                padding: 0,
+              }}
+            >
+              Captação
+            </button>
+            <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
+            <button
+              type="button"
+              onClick={() => setHabilitacaoSelecionada(null)}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+                color: 'rgba(255,255,255,0.5)',
+                cursor: 'pointer',
+                padding: 0,
+              }}
+            >
+              Detalhes da Captação
+            </button>
+            <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
+            <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)' }}>
+              Habilitação
+            </span>
+            <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
+            <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>
+              {habilitacaoSelecionada.titulo}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '24px', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+              <div style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderRadius: 'var(--radius)', backgroundColor: 'rgba(0,193,175,0.12)' }}>
+                <ShieldCheck size={20} style={{ color: '#00c1af' }} />
+              </div>
+              <div>
+                <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 8px', lineHeight: 1.4 }}>
+                  Habilitação
+                </h1>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.62)', margin: 0 }}>
+                  {habilitacaoSelecionada.titulo}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              style={{
+                padding: '11px 18px',
+                borderRadius: 'var(--radius)',
+                border: '1px solid rgba(0,193,175,0.34)',
+                backgroundColor: 'transparent',
+                color: '#00c1af',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Abrir Proposta
+            </button>
+          </div>
+
+          <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', marginBottom: '24px' }} />
+
+          <div style={{ display: 'grid', gap: '24px' }}>
+            <section style={cardStyle}>
+              {renderHabilitacaoSectionTitle('1', 'Critérios de Elegibilidade')}
+              <div style={{ display: 'grid', gap: '16px' }}>
+                {criteriosElegibilidade.map((pergunta, index) => (
+                  <div key={pergunta} style={{ display: 'grid', gap: '12px', padding: '14px 0' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 320px', gap: '18px', alignItems: 'center' }}>
+                      <p style={{ margin: 0, color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', lineHeight: 1.5 }}>
+                        {`1.${index + 1} - ${pergunta}`}
+                      </p>
+                      {renderRadioOptions(`criterio-${index}`)}
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Observação</label>
+                      <input type="text" placeholder="Digite uma observação" style={inputStyle} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section style={cardStyle}>
+              {renderHabilitacaoSectionTitle('2', 'Documentos para envio da proposta')}
+              <div style={{ display: 'grid', gap: '16px' }}>
+                {documentosProposta.map((documento, index) => (
+                  <div key={documento} style={{ display: 'grid', gap: '12px', padding: '14px 0' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 320px', gap: '18px', alignItems: 'center' }}>
+                      <p style={{ margin: 0, color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', lineHeight: 1.5 }}>
+                        {`2.${index + 1} - ${documento}`}
+                      </p>
+                      {renderRadioOptions(`documento-${index}`)}
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Observação</label>
+                      <input type="text" placeholder="Digite uma observação" style={inputStyle} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section style={cardStyle}>
+              <h2 style={{ ...sectionTitleStyle, color: '#ffffff', marginBottom: '18px' }}>Resultado da Habilitação</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
+                {(['Habilitada', 'Não Habilitada'] as const).map(option => (
+                  <label key={option} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#ffffff', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}>
+                    <input
+                      type="radio"
+                      name="resultado-habilitacao"
+                      value={option}
+                      checked={resultadoHabilitacao === option}
+                      onChange={() => setResultadoHabilitacao(option)}
+                      style={{ accentColor: '#00c1af' }}
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
+
+              {resultadoHabilitacao === 'Não Habilitada' && (
+                <div style={{ marginTop: '18px' }}>
+                  <label style={labelStyle}>Por não cumprimento dos itens:</label>
+                  <input type="text" placeholder="Informe os itens não cumpridos" style={inputStyle} />
+                </div>
+              )}
+            </section>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              <button
+                type="button"
+                onClick={salvarHabilitacao}
+                style={{
+                  padding: '11px 20px',
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  backgroundColor: 'transparent',
+                  color: '#ffffff',
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                }}
+              >
+                Salvar Rascunho
+              </button>
+              <button
+                type="button"
+                onClick={salvarHabilitacao}
+                style={{
+                  padding: '11px 24px',
+                  borderRadius: 'var(--radius)',
+                  border: 'none',
+                  backgroundColor: '#00c1af',
+                  color: '#171717',
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                }}
+              >
+                Enviar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  if (habilitacaoSelecionada) {
+    return renderHabilitacaoPage();
+  }
+
   return (
     <div style={{ backgroundColor: '#171717', minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
@@ -753,7 +1373,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
             <div>
               <label style={labelStyle}>Descrição da Captação</label>
               <textarea
-                defaultValue="Edital voltado para fomentar iniciativas de inovação tecnológica no Estado do Espírito Santo, com foco em soluções que promovam o desenvolvimento econômico e social sustentável."
+                defaultValue="Edital voltado para fomentar projetos de inovação tecnológica no Estado do Espírito Santo, com foco em soluções que promovam o desenvolvimento econômico e social sustentável."
                 readOnly={!editingResumo}
                 rows={3}
                 style={{
@@ -770,14 +1390,14 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
                 <input type="text" defaultValue="GEINOV" readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
               <div>
-                <label style={labelStyle}>Categorias de Iniciativas</label>
+                <label style={labelStyle}>Categorias de Projetos</label>
                 <input type="text" defaultValue="Inovação, Pesquisa" readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={labelStyle}>Tipos de Iniciativas Aceitos</label>
+                <label style={labelStyle}>Tipos de Projetos Aceitos</label>
                 <input type="text" defaultValue="Projeto de inovação, Projeto de pesquisa" readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
               <div>
@@ -948,7 +1568,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
               <h3 style={subSectionTitleStyle}>Formulários da Captação</h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
                 <div>
-                  <label style={labelStyle}>Formulário de Inscrição</label>
+                  <label style={labelStyle}>Formulário de Submissão</label>
                   <input type="text" defaultValue="Formulário de Inovação" readOnly={!editingResumo} style={resumoInputStyle} />
                 </div>
                 <div>
@@ -1066,7 +1686,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
               <div style={{ display: 'grid', gap: '12px' }}>
                 {[
                   { label: 'Material Permanente', descricao: 'Bens permanentes e equipamentos.' },
-                  { label: 'Material de Consumo', descricao: 'Itens consumíveis usados na iniciativa.' },
+                  { label: 'Material de Consumo', descricao: 'Itens consumíveis usados no projeto.' },
                   { label: 'Bolsa', descricao: 'Modalidades e níveis de bolsa permitidos na captação.' },
                 ].map(rubrica => (
                   <div key={rubrica.label} style={{
@@ -1193,7 +1813,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
 
         {activeTab === 'dashboard' && (
           <>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: '16px', marginBottom: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: '16px', marginBottom: '24px' }}>
               {[
                 { ...fasesIniciativas[0], Icon: FileText, bg: 'rgba(0,193,175,0.12)' },
                 { ...fasesIniciativas[1], Icon: CheckCircle, bg: 'rgba(0,193,175,0.12)' },
@@ -1201,6 +1821,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
                 { ...fasesIniciativas[3], Icon: ListChecks, bg: 'rgba(0,193,175,0.12)' },
                 { ...fasesIniciativas[4], Icon: RotateCcw, bg: 'rgba(0,193,175,0.12)' },
                 { ...fasesIniciativas[5], Icon: Trophy, bg: 'rgba(0,193,175,0.12)' },
+                { ...fasesIniciativas[6], Icon: X, bg: 'rgba(0,193,175,0.12)' },
               ].map(({ fase, quantidade, Icon, bg }) => (
                 <div key={fase} style={metricCardStyle}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
@@ -1218,26 +1839,39 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
               ))}
             </div>
 
-            <div style={cardStyle}>
-              <h2 style={sectionTitleStyle}>Financeiro da Captação</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '16px', marginBottom: '16px' }}>
+              {[
+                { label: 'Valor Total Disponível', value: formatCurrency(financeiroCaptacaoDetalhe.totalDisponivel), Icon: CheckCircle },
+                { label: 'Valor Total Solicitado pelos Projetos', value: formatCurrency(financeiroCaptacaoDetalhe.totalSolicitado), Icon: FileText },
+              ].map(({ label, value, Icon }) => (
+                <div key={label} style={metricCardStyle}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '18px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: 'rgba(0,193,175,0.12)', borderRadius: 'var(--radius)', flexShrink: 0 }}>
+                      <Icon size={20} style={{ color: '#00c1af' }} />
+                    </div>
+                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', margin: 0 }}>
+                      {label}
+                    </p>
+                  </div>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: '#ffffff', margin: 0 }}>
+                    {value}
+                  </p>
+                </div>
+              ))}
+            </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
-                <div style={{
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: 'var(--radius)',
-                  backgroundColor: 'rgba(23, 23, 23,0.35)',
-                  padding: '18px',
-                }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '16px', marginBottom: '16px' }}>
+              <div style={{ ...cardStyle, marginBottom: 0 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
                     <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
-                      Totais solicitados por rubrica
+                      Valor total solicitado por rubrica
                     </div>
                     <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.45)' }}>
                       {financeiroCaptacaoDetalhe.rubricas.length} rubrica(s)
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gap: '12px' }}>
+                  <div style={{ display: 'grid', gap: '16px', maxHeight: financeiroCaptacaoDetalhe.rubricas.length > 5 ? '270px' : undefined, overflowY: financeiroCaptacaoDetalhe.rubricas.length > 5 ? 'auto' : undefined, paddingRight: financeiroCaptacaoDetalhe.rubricas.length > 5 ? '6px' : undefined }}>
                     {financeiroCaptacaoDetalhe.rubricas.map(rubrica => {
                       const percentual = Math.round((rubrica.valor / maiorValorRubricaDetalhe) * 100);
 
@@ -1251,7 +1885,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
                               {formatCurrency(rubrica.valor)}
                             </div>
                             <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', textAlign: 'right' }}>
-                              {rubrica.quantidade} iniciativa(s)
+                              {rubrica.quantidade} projeto(s)
                             </div>
                           </div>
                           <div style={{ height: '6px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
@@ -1261,17 +1895,92 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
                       );
                     })}
                   </div>
+              </div>
+
+              <div style={{ ...cardStyle, marginBottom: 0 }}>
+                <h2 style={{ ...sectionTitleStyle, color: '#ffffff' }}>Tipos de bolsas solicitadas</h2>
+                <div style={{ display: 'grid', gap: '16px', maxHeight: tiposBolsasSolicitadas.length > 5 ? '270px' : undefined, overflowY: tiposBolsasSolicitadas.length > 5 ? 'auto' : undefined, paddingRight: tiposBolsasSolicitadas.length > 5 ? '6px' : undefined }}>
+                  {tiposBolsasSolicitadas.map(item => {
+                    const percentual = Math.round((item.quantidade / maiorQuantidadeBolsa) * 100);
+
+                    return (
+                      <div key={item.tipo}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px', gap: '12px', alignItems: 'center', marginBottom: '6px' }}>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                            {item.tipo}
+                          </div>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', textAlign: 'right' }}>
+                            {item.quantidade}
+                          </div>
+                        </div>
+                        <div style={{ height: '6px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                          <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: '#00c1af' }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '16px', marginBottom: '16px' }}>
+              <div style={{ ...cardStyle, marginBottom: 0 }}>
+                <h2 style={{ ...sectionTitleStyle, color: '#ffffff' }}>Propostas por Instituição</h2>
+                <div style={{ display: 'grid', gap: '16px', maxHeight: propostasPorInstituicao.length > 5 ? '270px' : undefined, overflowY: propostasPorInstituicao.length > 5 ? 'auto' : undefined, paddingRight: propostasPorInstituicao.length > 5 ? '6px' : undefined }}>
+                  {propostasPorInstituicao.map(item => {
+                    const percentual = Math.round((item.quantidade / maiorQuantidadeInstituicao) * 100);
+
+                    return (
+                      <div key={item.instituicao}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px', gap: '12px', alignItems: 'center', marginBottom: '6px' }}>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                            {item.instituicao}
+                          </div>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', textAlign: 'right' }}>
+                            {item.quantidade}
+                          </div>
+                        </div>
+                        <div style={{ height: '6px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                          <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: '#00c1af' }} />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
+              <div style={{ ...cardStyle, marginBottom: 0 }}>
+                <h2 style={{ ...sectionTitleStyle, color: '#ffffff' }}>Proposta por Localização</h2>
+                <div style={{ display: 'grid', gap: '16px', maxHeight: propostasPorLocalizacao.length > 5 ? '270px' : undefined, overflowY: propostasPorLocalizacao.length > 5 ? 'auto' : undefined, paddingRight: propostasPorLocalizacao.length > 5 ? '6px' : undefined }}>
+                  {propostasPorLocalizacao.map(item => {
+                    const percentual = Math.round((item.quantidade / maiorQuantidadeLocalizacao) * 100);
+
+                    return (
+                      <div key={item.localizacao}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px', gap: '12px', alignItems: 'center', marginBottom: '6px' }}>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff' }}>
+                            {item.localizacao}
+                          </div>
+                          <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', textAlign: 'right' }}>
+                            {item.quantidade}
+                          </div>
+                        </div>
+                        <div style={{ height: '6px', borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                          <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: '#00c1af' }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
 
             <div style={cardStyle}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
                 <div>
-                  <h2 style={{ ...sectionTitleStyle, marginBottom: '6px' }}>Revisores Ad Hoc</h2>
+                  <h2 style={{ ...sectionTitleStyle, color: '#ffffff', marginBottom: '6px' }}>Revisores Ad Hoc</h2>
                   <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
-                    Revisores selecionados para avaliação das Iniciativas desta Captação.
+                    Revisores selecionados para avaliação dos Projetos desta Captação.
                   </p>
                 </div>
                 <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#00c1af', padding: '6px 10px', borderRadius: '999px', border: '1px solid rgba(0,193,175,0.28)', backgroundColor: 'rgba(0,193,175,0.08)', whiteSpace: 'nowrap' }}>
@@ -1343,33 +2052,28 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
                   <label style={labelStyle}>Busca</label>
                   <input type="text" placeholder="Buscar" style={filtroCampoStyle} />
                 </div>
-                <div>
-                  <label style={labelStyle}>Ordenar por</label>
-                  <select
-                    value={propostaOrdenacao}
-                    onChange={(event) => setPropostaOrdenacao(event.target.value as typeof propostaOrdenacao)}
-                    style={{ ...filtroCampoStyle, appearance: 'none', cursor: 'pointer' }}
-                  >
-                    <option value="data-recente">Data de envio: mais recente</option>
-                    <option value="data-antiga">Data de envio: mais antiga</option>
-                    <option value="valor-maior">Valor: maior</option>
-                    <option value="valor-menor">Valor: menor</option>
-                  </select>
-                </div>
+                {renderCustomDropdown({
+                  label: 'Ordenar por',
+                  value: propostaOrdenacao,
+                  options: ordenacaoOptions,
+                  open: showOrdenacaoDropdown,
+                  setOpen: setShowOrdenacaoDropdown,
+                  onSelect: setPropostaOrdenacao,
+                })}
                 <div>
                   <label style={labelStyle}>Data</label>
                   <input type="text" placeholder="dd/mm/aaaa" style={filtroCampoStyle} />
                 </div>
-                <div>
-                  <label style={labelStyle}>Status</label>
-                  <select defaultValue="Todos" style={{ ...filtroCampoStyle, appearance: 'none', cursor: 'pointer' }}>
-                    {['Todos', 'Enviada', 'Habilitação', 'Avaliação Ad Hoc', 'Resultado Parcial', 'Recurso', 'Resultado Final'].map(status => (
-                      <option key={status} value={status}>{status}</option>
-                    ))}
-                  </select>
-                </div>
+                {renderCustomDropdown({
+                  label: 'Fase',
+                  value: fasePropostaFiltro,
+                  options: fasePropostaOptions.map(fase => ({ value: fase, label: fase })),
+                  open: showFaseDropdown,
+                  setOpen: setShowFaseDropdown,
+                  onSelect: setFasePropostaFiltro,
+                })}
               </div>
-              {propostasOrdenadas.map(iniciativa => (
+              {propostasExibidas.map(iniciativa => (
                 <div
                   key={iniciativa.codigo}
                   onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; }}
@@ -1413,14 +2117,43 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
 
         {activeTab === 'avaliacao' && (
           <div style={{ display: 'grid', gap: '10px' }}>
-              {renderListFilters(['Todos', 'Habilitado', 'Não Habilitado'])}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 220px',
+                gap: '16px',
+                marginBottom: '16px',
+                alignItems: 'end',
+              }}>
+                <div>
+                  <label style={labelStyle}>Busca</label>
+                  <input type="text" placeholder="Buscar" style={filtroCampoStyle} />
+                </div>
+                {renderCustomDropdown({
+                  label: 'Status',
+                  value: statusHabilitacaoFiltro,
+                  options: ['Habilitado', 'Não Habilitado', 'Rascunho'].map(status => ({ value: status, label: status })),
+                  open: showStatusHabilitacaoDropdown,
+                  setOpen: setShowStatusHabilitacaoDropdown,
+                  onSelect: setStatusHabilitacaoFiltro,
+                })}
+              </div>
               {iniciativasEnviadas.map((iniciativa, index) => {
                 const habilitado = index % 4 !== 2;
                 return (
                 <div
                   key={`documentos-${iniciativa.codigo}`}
-                  onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38, 0.5)'; }}
+                  onClick={() => {
+                    setHabilitacaoSelecionada(iniciativa);
+                    setResultadoHabilitacao('');
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)';
+                    e.currentTarget.style.borderColor = '#00c1af';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38, 0.5)';
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                  }}
                   style={{
                     ...detalheLinhaStyle,
                     gridTemplateColumns: '1.4fr 1.05fr 24px 1fr 190px',
@@ -1466,22 +2199,48 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
 
         {activeTab === 'avaliacaoAdHoc' && (
           <div style={{ display: 'grid', gap: '10px' }}>
-              {renderListFilters(['Todos', 'Concluída', 'Em avaliação', 'Solicitada revisão'])}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 260px',
+                gap: '16px',
+                marginBottom: '16px',
+                alignItems: 'end',
+              }}>
+                <div>
+                  <label style={labelStyle}>Busca</label>
+                  <input type="text" placeholder="Buscar" style={filtroCampoStyle} />
+                </div>
+                {renderCustomDropdown({
+                  label: 'Status',
+                  value: statusAvaliacaoAdHocFiltro,
+                  options: ['Aguardando Avaliador', 'Aguardando Aceite', 'Em Avaliação', 'Concluída', 'Em Revisão'].map(status => ({ value: status, label: status })),
+                  open: showStatusAvaliacaoAdHocDropdown,
+                  setOpen: setShowStatusAvaliacaoAdHocDropdown,
+                  onSelect: setStatusAvaliacaoAdHocFiltro,
+                })}
+              </div>
               {avaliacoesAdHoc.map(avaliacao => {
                 const iniciativaAvaliada = iniciativasEnviadas.find(item => item.codigo === avaliacao.iniciativaCodigo);
 
                 return (
                   <div
                     key={`${avaliacao.iniciativaCodigo}-${avaliacao.revisor}`}
-                    onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38, 0.5)'; }}
+                    onClick={() => abrirModalAvaliador(avaliacao)}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)';
+                      e.currentTarget.style.borderColor = '#00c1af';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38, 0.5)';
+                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                    }}
                     style={{
                       ...detalheLinhaStyle,
                       gridTemplateColumns: '1.1fr 1.35fr 24px 1.05fr 24px 1fr 130px 70px',
                     }}
                   >
                     <div>
-                      <div style={detalheRotuloStyle}>Revisor</div>
+                      <div style={detalheRotuloStyle}>Avaliador</div>
                       <div style={{ ...detalheValorStyle, fontWeight: 'var(--font-weight-medium)' }}>
                         {avaliacao.revisor}
                       </div>
@@ -1597,8 +2356,14 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
                 return (
                 <div
                   key={iniciativa.codigo}
-                  onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38, 0.5)'; }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)';
+                    e.currentTarget.style.borderColor = '#00c1af';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.backgroundColor = 'rgba(38, 38, 38, 0.5)';
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                  }}
                   style={{
                     ...detalheLinhaStyle,
                     gridTemplateColumns: '1.25fr 1fr 1fr 150px 190px',
@@ -1701,6 +2466,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
 
       {/* Modal de Avaliadores */}
       {renderModal()}
+      {renderAvaliadorModal()}
     </div>
   );
 };

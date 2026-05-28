@@ -495,7 +495,7 @@ export const FormularioPersonalizado: React.FC<Props> = ({ onBack }) => {
             <div ref={editalRef} style={{ ...CARD, marginBottom: '16px', overflow: 'visible' }}>
               <div style={{ padding: '20px 24px' }}>
                 <label style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: '8px' }}>
-                  Vincular Formulário de Inscrição ao Edital:
+                  Vincular Formulário de Submissão ao Edital:
                 </label>
                 <div style={{ position: 'relative' }}>
                   <button

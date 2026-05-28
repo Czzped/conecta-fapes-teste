@@ -76,7 +76,7 @@ export const CicloFomentoIniciativa: React.FC = () => {
                 lineHeight: '1.5',
               }}
             >
-              Ciclo de Fomento da Iniciativa
+              Ciclo de Fomento do Projeto
             </h1>
             <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }}>
               Timeline transversal com marcos de captacao, contratacao, execucao e encerramento.
@@ -88,7 +88,7 @@ export const CicloFomentoIniciativa: React.FC = () => {
 
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
         {[
-          { label: 'Iniciativa', value: 'INI-2024-014' },
+          { label: 'Projeto', value: 'INI-2024-014' },
           { label: 'Marco atual', value: atual?.marco.replaceAll('_', ' ') ?? 'Nao definido' },
           { label: 'Origem atual', value: atual ? `${atual.moduloOrigem} · ${atual.referenciaOrigemId}` : 'Nao definida' },
         ].map(({ label, value }) => (

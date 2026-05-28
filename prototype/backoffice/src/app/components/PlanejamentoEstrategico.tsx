@@ -92,7 +92,7 @@ const planosIniciais: PlanoEstrategico[] = [
       {
         id: 1,
         nome: 'Ciência, tecnologia e inovação',
-        descricao: 'Fomento a iniciativas de pesquisa aplicada, inovação e transferência de conhecimento.',
+        descricao: 'Fomento a projetos de pesquisa aplicada, inovação e transferência de conhecimento.',
         programas: 4,
         valorInvestido: 8400000,
         programasAssociados: [

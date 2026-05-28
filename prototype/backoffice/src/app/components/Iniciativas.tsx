@@ -663,10 +663,10 @@ export const Iniciativas: React.FC = () => {
           </div>
           <div className="flex-1" style={{ marginTop: '4px' }}>
             <h1 className="mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: 'var(--dash-text-primary)', lineHeight: '1.5' }}>
-              Iniciativas
+              Projetos
             </h1>
             <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', margin: 0 }}>
-              Consulte as iniciativas submetidas, aprovadas, contratadas e em execução.
+              Consulte os projetos submetidos, aprovados, contratados e em execução.
             </p>
           </div>
         </div>
@@ -689,10 +689,10 @@ export const Iniciativas: React.FC = () => {
                 fontWeight: 'var(--font-weight-normal)',
               }}
             >
-              Iniciativas
+              Projetos
             </button>
             <span style={{ color: 'var(--dash-text-muted)', margin: '0 8px' }}>&gt;</span>
-            <span style={{ color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>Detalhes da Iniciativa</span>
+            <span style={{ color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>Detalhes do Projeto</span>
           </nav>
 
           <div className="mb-8">
@@ -716,7 +716,7 @@ export const Iniciativas: React.FC = () => {
 
           <div
             role="tablist"
-            aria-label="Seções da iniciativa"
+            aria-label="Seções do projeto"
             className="flex flex-wrap items-center mb-8"
             style={{ borderBottom: '1px solid var(--dash-divider)', gap: '4px' }}
           >
@@ -753,7 +753,7 @@ export const Iniciativas: React.FC = () => {
             <>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
               {[
-                { label: 'Data inicial da iniciativa', value: iniciativaSelecionada.dataInicio, helper: 'Início formal da execução', Icon: PlayCircle },
+                { label: 'Data inicial do projeto', value: iniciativaSelecionada.dataInicio, helper: 'Início formal da execução', Icon: PlayCircle },
                 { label: 'Data final vigente', value: iniciativaSelecionada.dataFimVigente, helper: `Original: ${iniciativaSelecionada.dataFimOriginal}`, Icon: Clock },
                 { label: 'Data de aprovação original', value: iniciativaSelecionada.dataAprovacaoOriginal, helper: 'Aprovação inicial antes de aditivos', Icon: CalendarDays },
                 { label: 'Orçamento original', value: iniciativaSelecionada.orcamentoOriginal, helper: 'Valor aprovado na contratação original', Icon: Wallet },
@@ -762,7 +762,7 @@ export const Iniciativas: React.FC = () => {
               ))}
           </div>
 
-          <SectionHeader Icon={Clock} title="Ciclo de Fomento" subtitle="Acompanhe a jornada consolidada da iniciativa." />
+          <SectionHeader Icon={Clock} title="Ciclo de Fomento" subtitle="Acompanhe a jornada consolidada do projeto." />
 
           <div className="rounded-lg p-5 mb-8" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
             <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(10, minmax(0, 1fr))', gap: '10px', padding: '16px 6px 8px' }}>
@@ -799,7 +799,7 @@ export const Iniciativas: React.FC = () => {
             </div>
           </div>
 
-          <SectionHeader Icon={Wallet} title="Orçamento por rubrica" subtitle="Total, consumido, alocado e disponível por rubrica da iniciativa." />
+          <SectionHeader Icon={Wallet} title="Orçamento por rubrica" subtitle="Total, consumido, alocado e disponível por rubrica do projeto." />
 
           <div className="space-y-4 mb-8">
               {budgetCategories.map(({ name, total, consumido, alocado, disponivel, consumidoPercent, alocadoPercent, Icon, color }) => (
@@ -876,7 +876,7 @@ export const Iniciativas: React.FC = () => {
           <SectionHeader
             Icon={Landmark}
             title="Conta Bancária"
-            subtitle="Campo administrativo da FAPES para definir a conta de movimentação da iniciativa."
+            subtitle="Campo administrativo da FAPES para definir a conta de movimentação do projeto."
           />
 
           <div className="rounded-lg p-5 mb-8" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
@@ -904,12 +904,12 @@ export const Iniciativas: React.FC = () => {
                 }}
               >
                 <Save size={16} />
-                Salvar conta da iniciativa
+                Salvar conta do projeto
               </button>
             </div>
             {contaSalvaCodigo === iniciativaSelecionada.codigo && (
               <p style={{ color: '#22c55e', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', margin: '12px 0 0' }}>
-                Conta da iniciativa atualizada nesta sessão.
+                Conta do projeto atualizada nesta sessão.
               </p>
             )}
           </div>
@@ -928,7 +928,7 @@ export const Iniciativas: React.FC = () => {
                 {
                   title: 'TA-2025-009',
                   subtitle: 'Financeiro · aprovado em 10/09/2025',
-                  description: 'Acréscimo financeiro para ampliação de rubricas de execução da iniciativa.',
+                  description: 'Acréscimo financeiro para ampliação de rubricas de execução do projeto.',
                 },
               ].map((aditivo) => (
                 <div key={aditivo.title} className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)' }}>
@@ -952,8 +952,8 @@ export const Iniciativas: React.FC = () => {
             <>
           <SectionHeader
             Icon={Landmark}
-            title="Conta bancária da iniciativa"
-            subtitle="Campo administrativo da FAPES para definir a conta de movimentação da iniciativa."
+            title="Conta bancária do projeto"
+            subtitle="Campo administrativo da FAPES para definir a conta de movimentação do projeto."
           />
 
           <div className="rounded-lg p-5 mb-8" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
@@ -967,7 +967,7 @@ export const Iniciativas: React.FC = () => {
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-5 pt-5" style={{ borderTop: '1px solid var(--dash-divider)' }}>
               <span style={{ color: contaAtual.banco && contaAtual.agencia && contaAtual.conta ? '#00c1af' : 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>
-                {contaAtual.banco && contaAtual.agencia && contaAtual.conta ? 'Conta bancária definida para a iniciativa.' : 'Conta bancária ainda pendente de definição.'}
+                {contaAtual.banco && contaAtual.agencia && contaAtual.conta ? 'Conta bancária definida para o projeto.' : 'Conta bancária ainda pendente de definição.'}
               </span>
               <button
                 type="button"
@@ -984,12 +984,12 @@ export const Iniciativas: React.FC = () => {
                 }}
               >
                 <Save size={16} />
-                Salvar conta da iniciativa
+                Salvar conta do projeto
               </button>
             </div>
             {contaSalvaCodigo === iniciativaSelecionada.codigo && (
               <p style={{ color: '#22c55e', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', margin: '12px 0 0' }}>
-                Conta da iniciativa atualizada nesta sessão.
+                Conta do projeto atualizada nesta sessão.
               </p>
             )}
           </div>
@@ -1028,12 +1028,12 @@ export const Iniciativas: React.FC = () => {
 
       <div
         role="tablist"
-        aria-label="Seções de iniciativas"
+        aria-label="Seções de projetos"
         className="flex flex-wrap items-center mb-6"
         style={{ borderBottom: '1px solid var(--dash-divider)', gap: '4px' }}
       >
         {[
-          { key: 'iniciativas' as IniciativasTab, label: 'Iniciativas' },
+          { key: 'iniciativas' as IniciativasTab, label: 'Projetos' },
           { key: 'dashboard' as IniciativasTab, label: 'Dashboard' },
         ].map(({ key, label }) => (
           <button
@@ -1066,7 +1066,7 @@ export const Iniciativas: React.FC = () => {
             Acompanhamento dos Status
           </h2>
           <div style={{ width: '100%' }}>
-            <svg viewBox="0 0 1220 360" role="img" aria-label="Gráfico de linha de iniciativas por status" style={{ width: '100%', height: '360px', display: 'block' }}>
+            <svg viewBox="0 0 1220 360" role="img" aria-label="Gráfico de linha de projetos por status" style={{ width: '100%', height: '360px', display: 'block' }}>
               {[0, 10, 20, 30, 40, 50].map((tick) => {
                 const y = chartBottom - (tick / maxDashboardValue) * chartHeight;
                 return (
@@ -1130,7 +1130,7 @@ export const Iniciativas: React.FC = () => {
 
           <div style={{ position: 'relative' }}>
             <label style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginBottom: '8px' }}>
-              Iniciativa
+              Projeto
             </label>
             <button
               type="button"
@@ -1329,7 +1329,7 @@ export const Iniciativas: React.FC = () => {
                 </div>
 
                 <div>
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', margin: '0 0 5px' }}>Iniciativa</p>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', margin: '0 0 5px' }}>Projeto</p>
                   <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', fontWeight: 'var(--font-weight-medium)' }}>
                     {iniciativa.titulo}
                   </strong>
@@ -1598,7 +1598,7 @@ const IniciativaDiariasPanel: React.FC<{ iniciativaTitulo: string }> = ({ inicia
         <h2 style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', margin: 0 }}>Painel de Diárias</h2>
       </div>
       <p style={{ color: 'var(--dash-text-secondary)', fontSize: 'var(--text-sm)', margin: '0 0 24px 48px' }}>
-        Controle solicitações, aceites e remoções de diárias da iniciativa.
+        Controle solicitações, aceites e remoções de diárias do projeto.
       </p>
 
       <section

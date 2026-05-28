@@ -34,7 +34,7 @@ type DashboardTab = 'financeiro' | 'captacao';
 type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
-type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outra Iniciativa Exemplo' | 'Mais uma Iniciativa Exemplo';
+type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outro Projeto Exemplo' | 'Mais um Projeto Exemplo';
 
 interface PagamentoCard {
   id: number;
@@ -135,21 +135,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
   const statusOptions: StatusFilter[] = ['Todos', 'Pendente', 'Em Validação', 'Validado', 'Revisar', 'Reprovado'];
   const categoriaOptions: CategoriaFilter[] = ['Todos', 'Material Permanente', 'Material de Consumo', 'Passagem', 'Diária', 'Pessoa Física', 'Pessoa Jurídica'];
-  const projetoOptions: ProjetoFilter[] = ['Todos', 'Conecta Fapes', 'Outra Iniciativa Exemplo', 'Mais uma Iniciativa Exemplo'];
+  const projetoOptions: ProjetoFilter[] = ['Todos', 'Conecta Fapes', 'Outro Projeto Exemplo', 'Mais um Projeto Exemplo'];
   const isReadyForDevPage = activePage === 'parceria' || activePage === 'programa';
 
   // Mock data para os cards de pagamento
   const pagamentosData: PagamentoCard[] = [
     { id: 1, tipo: 'Boleto', valor: 'R$ 3.456,70', data: '27/02/2026 - 09:35', cnpj: 'Magazine Luiza', projeto: 'Conecta Fapes', status: 'Em Validação' },
-    { id: 2, tipo: 'Pix', valor: 'R$ 4.567,90', data: '25/02/2026 - 10:05', cnpj: 'Magazine Luiza', projeto: 'Outra Iniciativa', status: 'Em Validação' },
-    { id: 3, tipo: 'Pix', valor: 'R$ 789,00', data: '23/02/2026 - 12:50', cnpj: 'Kalunga', projeto: 'Mais uma Iniciativa', status: 'Em Validação' },
+    { id: 2, tipo: 'Pix', valor: 'R$ 4.567,90', data: '25/02/2026 - 10:05', cnpj: 'Magazine Luiza', projeto: 'Outro Projeto', status: 'Em Validação' },
+    { id: 3, tipo: 'Pix', valor: 'R$ 789,00', data: '23/02/2026 - 12:50', cnpj: 'Kalunga', projeto: 'Mais um Projeto', status: 'Em Validação' },
     { id: 4, tipo: 'Boleto', valor: 'R$ 2.100,00', data: '22/02/2026 - 11:20', cnpj: 'Kalunga', projeto: 'Conecta Fapes', status: 'Em Validação' },
-    { id: 5, tipo: 'Boleto', valor: 'R$ 1.890,50', data: '20/02/2026 - 11:45', cnpj: 'Americanas', projeto: 'Outra Iniciativa', status: 'Em Validação' },
-    { id: 6, tipo: 'Boleto', valor: 'R$ 2.345,60', data: '19/02/2026 - 17:25', cnpj: 'Americanas', projeto: 'Mais uma Iniciativa', status: 'Em Validação' },
+    { id: 5, tipo: 'Boleto', valor: 'R$ 1.890,50', data: '20/02/2026 - 11:45', cnpj: 'Americanas', projeto: 'Outro Projeto', status: 'Em Validação' },
+    { id: 6, tipo: 'Boleto', valor: 'R$ 2.345,60', data: '19/02/2026 - 17:25', cnpj: 'Americanas', projeto: 'Mais um Projeto', status: 'Em Validação' },
     { id: 7, tipo: 'Pix', valor: 'R$ 567,80', data: '18/02/2026 - 16:45', cnpj: 'Americanas', projeto: 'Conecta Fapes', status: 'Em Validação' },
     { id: 8, tipo: 'Pix', valor: 'R$ 2.567,30', data: '15/02/2026 - 16:00', cnpj: 'Amazon', projeto: 'Conecta Fapes', status: 'Em Validação' },
-    { id: 9, tipo: 'Pix', valor: 'R$ 5.234,20', data: '14/02/2026 - 08:40', cnpj: 'Amazon', projeto: 'Outra Iniciativa', status: 'Em Validação' },
-    { id: 10, tipo: 'Boleto', valor: 'R$ 3.690,00', data: '12/02/2026 - 08:15', cnpj: 'Amazon', projeto: 'Mais uma Iniciativa', status: 'Em Validação' },
+    { id: 9, tipo: 'Pix', valor: 'R$ 5.234,20', data: '14/02/2026 - 08:40', cnpj: 'Amazon', projeto: 'Outro Projeto', status: 'Em Validação' },
+    { id: 10, tipo: 'Boleto', valor: 'R$ 3.690,00', data: '12/02/2026 - 08:15', cnpj: 'Amazon', projeto: 'Mais um Projeto', status: 'Em Validação' },
   ];
 
   const getStatusColor = (status: StatusFilter): string => {
@@ -355,7 +355,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             {/* Espaçamento entre seções */}
             <div style={{ height: '24px' }} />
 
-            {/* Seção PROJETOS */}
+            {/* Seção FOMENTO */}
             {sidebarExpanded && (
               <h3 
                 className="mb-3 px-2"
@@ -368,16 +368,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   transition: 'color 0.3s',
                 }}
               >
-                PROJETOS
+                FOMENTO
               </h3>
             )}
             
-            {/* Itens do menu PROJETOS */}
+            {/* Itens do menu FOMENTO */}
             {([
               { key: 'parceria' as ActivePage, Icon: Handshake, label: 'Parceria' },
               { key: 'programa' as ActivePage, Icon: FolderOpen, label: 'Programa' },
               { key: 'editais' as ActivePage, Icon: FileText, label: 'Captação' },
-              { key: 'iniciativas' as ActivePage, Icon: FolderOpen, label: 'Iniciativas' },
+              { key: 'iniciativas' as ActivePage, Icon: FolderOpen, label: 'Projetos' },
             ]).map(({ key, Icon, label }, index) => {
               const active = activePage === key;
               return (
@@ -1061,7 +1061,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   <>
                     {[
                       { mes: 'FEV', dia: '20', title: 'Inscrições Edital 04/2026',  desc: 'Data limite para submissão de propostas de inovação.' },
-                      { mes: 'MAR', dia: '15', title: 'Resultado da captação 27/2025',   desc: 'Divulgação das iniciativas aprovadas para apoio à publicação.' },
+                      { mes: 'MAR', dia: '15', title: 'Resultado da captação 27/2025',   desc: 'Divulgação dos projetos aprovados para apoio à publicação.' },
                     ].map(({ mes, dia, title, desc }) => (
                       <div key={title} className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
                         <div className="mb-3 flex items-start justify-between">
@@ -1142,7 +1142,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                       lineHeight: '1.5'
                     }}
                   >
-                    Acompanhe a comprovação dos gastos das iniciativas
+                    Acompanhe a comprovação dos gastos dos projetos
                   </p>
                 </div>
               </div>
@@ -1161,7 +1161,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             {/* Cards de Estatísticas */}
             <div className="grid grid-cols-4 gap-4 mb-6">
               {[
-                { label: 'Iniciativas ativas', value: '12', Icon: FolderOpen, iconColor: '#14b8a6', iconBg: 'rgba(20,184,166,0.12)' },
+                { label: 'Projetos ativos', value: '12', Icon: FolderOpen, iconColor: '#14b8a6', iconBg: 'rgba(20,184,166,0.12)' },
                 { label: 'Pendente',         value: '8',  Icon: Clock,       iconColor: '#fbbf24', iconBg: 'rgba(251,191,36,0.12)' },
                 { label: 'Em Validação',     value: '5',  Icon: Eye,         iconColor: '#3b82f6', iconBg: 'rgba(59,130,246,0.12)'  },
                 { label: 'Revisão',          value: '3',  Icon: AlertTriangle,iconColor: '#ef4444', iconBg: 'rgba(239,68,68,0.12)'  },
@@ -1240,7 +1240,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
                 {/* Filtros de dropdown genéricos */}
                 {([
-                  { label: 'Iniciativa',    value: projetoFilter,   options: projetoOptions,   show: showProjetoDropdown,   setShow: setShowProjetoDropdown,   setValue: setProjetoFilter,   others: [setShowDateDropdown, setShowStatusDropdown, setShowCategoriaDropdown] },
+                  { label: 'Projeto',    value: projetoFilter,   options: projetoOptions,   show: showProjetoDropdown,   setShow: setShowProjetoDropdown,   setValue: setProjetoFilter,   others: [setShowDateDropdown, setShowStatusDropdown, setShowCategoriaDropdown] },
                   { label: 'Data',       value: dateFilter,      options: [] as string[],   show: false,                 setShow: () => {},                 setValue: setDateFilter,      others: [] },
                   { label: 'Status',     value: statusFilter,    options: statusOptions,    show: showStatusDropdown,    setShow: setShowStatusDropdown,    setValue: setStatusFilter,    others: [setShowDateDropdown, setShowCategoriaDropdown, setShowProjetoDropdown] },
                   { label: 'Categoria',  value: categoriaFilter, options: categoriaOptions, show: showCategoriaDropdown, setShow: setShowCategoriaDropdown, setValue: setCategoriaFilter, others: [setShowDateDropdown, setShowStatusDropdown, setShowProjetoDropdown] },
@@ -1323,7 +1323,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     >
                       <div className="grid grid-cols-6 gap-6 flex-1">
                         {[
-                          { label: 'Iniciativa',       value: pagamento.projeto, cls: '' },
+                          { label: 'Projeto',       value: pagamento.projeto, cls: '' },
                           { label: 'Pagamento',     value: pagamento.tipo,    cls: '' },
                           { label: 'Valor',         value: pagamento.valor,   cls: '' },
                           { label: 'Data de Envio', value: pagamento.data,    cls: '' },
@@ -1394,7 +1394,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             <div className="rounded-lg p-5" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
               <div className="grid grid-cols-6 gap-6">
                 {[
-                  { label: 'Iniciativa',       value: selectedPagamento.projeto, cls: '' },
+                  { label: 'Projeto',       value: selectedPagamento.projeto, cls: '' },
                   { label: 'Pagamento',     value: selectedPagamento.tipo,    cls: '' },
                   { label: 'Valor',         value: selectedPagamento.valor,   cls: '' },
                   { label: 'Data de Envio', value: selectedPagamento.data,    cls: '' },
@@ -1928,14 +1928,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     },
                     {
                       title: 'Avisos de avaliação',
-                      subtitle: 'Bolsas e iniciativas',
+                      subtitle: 'Bolsas e projetos',
                       Icon: Bell,
                       tone: '#f59e0b',
                       action: 'Ver avisos',
                       page: 'financeira' as ActivePage,
                       rows: [
                         { label: 'Avaliação de bolsa sem parecer', value: '5', meta: 'responsável definido', status: '#ef4444' },
-                        { label: 'Iniciativas com avaliação parcial pendente', value: '8', meta: 'aguardando área técnica', status: '#f59e0b' },
+                        { label: 'Projetos com avaliação parcial pendente', value: '8', meta: 'aguardando área técnica', status: '#f59e0b' },
                         { label: 'Relatórios finais para homologação', value: '11', meta: 'fila regular', status: '#00c1af' },
                       ],
                     },

@@ -365,7 +365,7 @@ export const EditaisLight: React.FC = () => {
               }}
             >
               <Plus size={15} />
-              <span className="hidden sm:inline">Formulário de Inscrição</span>
+              <span className="hidden sm:inline">Formulário de Submissão</span>
               <span className="sm:hidden">Novo</span>
             </button>
           </div>

@@ -467,7 +467,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
           {/* Conteúdo condicional baseado na aba ativa */}
           {formularioTab === 'biblioteca' && (
             <>
-              {/* Card — Template - Formulário de Inscrição */}
+              {/* Card — Template - Formulário de Submissão */}
               <button
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center',
@@ -495,7 +495,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     fontWeight: 'var(--font-weight-medium)', color: T.textPrimary,
                     margin: '0 0 6px',
                   }}>
-                    Template - Formulário de Inscrição
+                    Template - Formulário de Submissão
                   </p>
                   <p style={{
                     fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
@@ -788,7 +788,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                             {formatCurrency(rubrica.valor)}
                           </div>
                           <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, textAlign: 'right' }}>
-                            {rubrica.quantidade} iniciativa(s)
+                            {rubrica.quantidade} projeto(s)
                           </div>
                         </div>
                         <div style={{ height: '7px', borderRadius: '999px', backgroundColor: T.borderSubtle, overflow: 'hidden' }}>

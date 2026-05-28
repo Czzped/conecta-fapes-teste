@@ -172,7 +172,7 @@ export const Rubricas: React.FC = () => {
                   Rubricas
                 </h1>
                 <p style={{ margin: '8px 0 0', color: T.textSecondary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', lineHeight: 1.5, maxWidth: '760px' }}>
-                  Cadastre a categoria orçamentária usada por editais, iniciativas e prestação de contas, informando a natureza da despesa. Rubrica é categoria; movimentação de saldo acontece por transação no orçamento do projeto.
+                  Cadastre a categoria orçamentária usada por editais, projetos e prestação de contas, informando a natureza da despesa. Rubrica é categoria; movimentação de saldo acontece por transação no orçamento do projeto.
                 </p>
               </div>
             </div>
