@@ -741,6 +741,9 @@ axioms:
   - id: "AX-M011-010"
     natural_language: "FaixaFinanciamento.valorMaximo deve ser maior ou igual ao valorMinimo."
     formal_rule: "FaixaFinanciamento.valorMaximo >= FaixaFinanciamento.valorMinimo"
+  - id: "AX-M011-011"
+    natural_language: "Quando a RubricaPermitida configurada for DOACI (RUB-DOACI), o campo limitePercentual representa o teto imposto pelo edital e nunca pode exceder o percentual maximo da tabela normativa da Resolucao CCAF no 309/2022, item 2.4.8.1, para a faixa de valor maxima da captacao. Se o edital omitir limitePercentual para DOACI, o M013 aplica a tabela normativa diretamente no momento da validacao orcamentaria."
+    formal_rule: "RubricaPermitida.rubrica = RUB-DOACI → (limitePercentual = null ∨ limitePercentual ≤ tabelaDOACI(FaixaFinanciamento.valorMaximo))"
 
 invariants:
   - id: "INV-M011-001"
@@ -921,7 +924,9 @@ agent_instructions:
     - "Programa, Parceria, AreaTecnica, TipoIniciativa, Instituicao, TipoInstituicao, NivelAcademico, PessoaFisica e Rubrica sao referencias externas — nao modelar aqui."
     - "Formularios (FormularioSubmissaoRef, FormularioAvaliacaoRef, FormularioRevisaoRef, FormularioAnexoRef) sao referencias ao M021 — apenas formularioId e versaoFormularioId."
     - "O M022 consome propostas aprovadas desta captacao para contratacao/outorga."
+    - "DOACI (RUB-DOACI): quando configurar RubricaPermitida com esta rubrica, limitePercentual e o teto do edital — nao pode superar o limite da tabela normativa (Resolucao CCAF no 309/2022, item 2.4.8.1) para o valor maximo da faixa. Se omitido, a tabela normativa prevalece e o M013 valida."
   notes:
     - "OutorgadoDestinatario e um espelho desnormalizado de PessoaFisica (M008) para capturar o destinatario da demanda induzida no momento da configuracao."
     - "CategoriaIniciativa e gerenciada dentro deste modulo e permite selecao multipla no cadastro da captacao."
     - "Duvida em aberto: validar se todo comprovante deve ser DocumentoExigido ou se parte deles deve ser derivada de RequisitoProponente como evidencia documental de um requisito."
+    - "Tabela DOACI normativa (Resolucao CCAF no 309/2022, 2.4.8.1): ate R$50k=15%; R$50k-R$100k=10%; R$100k-R$150k=5%; R$150k-R$300k=3%; R$300k-R$500k=1%; acima R$500k=0.5%. Base de calculo: valor total aprovado excluindo bolsas."

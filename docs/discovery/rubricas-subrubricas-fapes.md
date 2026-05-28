@@ -174,9 +174,37 @@ Assim, a gestao fica mais simples porque cada modulo preserva seu vocabulario: p
 | `Despesa de Locomocao` | Passagens aereas, terrestres, fluviais, maritimas; taxas de embarque; seguros; locacao, fretamento ou uso de veiculos; transporte de pessoas e bagagens; vale-transporte; pedagios. | Em muitos editais aparece agrupada com diarias. Para prestacao de contas, passagens exigem comprovantes especificos. | Resolucao CCAF no 309/2022; Edital 08/2025 |
 | `Diarias` | Diaria estadual, nacional ou internacional; tipo de viagem; fracao de calculo; beneficiario; aceite; comprovante de pagamento. | O valor e calculo devem seguir cadastro vigente de tipo de diaria e instrucoes de diaria da FAPES. | Resolucao CCAF no 309/2022; Instrucoes de Uso de Diarias |
 | `Adequacao de Espaco Fisico` | Material de consumo para adaptacao; servicos de terceiros para adaptacao. | A norma geral traz limite em VRTE; editais podem restringir ou excluir. | Resolucao CCAF no 309/2022 |
-| `DOACI` | Despesas operacionais e administrativas de carater indivisivel. | Pode aparecer com percentual proprio no edital ou na norma; nao deve remunerar membro/pessoa vinculada ao projeto. | Resolucao CCAF no 309/2022; Edital NISA 02/2025 |
+| `DOACI` | Despesas operacionais e administrativas de carater indivisivel. | Limite percentual regressivo sobre valor total aprovado excluindo bolsas; nao pode remunerar membro/pessoa vinculada ao projeto; percentuais definidos na tabela DOACI da norma (ver secao abaixo). | Resolucao CCAF no 309/2022, item 2.4.8 e 2.4.8.1; Edital NISA 02/2025; Edital FAPES no 13/2025 - UNIVERSAL |
 | `Vencimentos e Vantagens Fixas` | Salarios, 13o, adicional de ferias, salarios de estagiarios, profissionais de equipe sob CLT. | Rubrica aplicavel em contextos especificos, especialmente projetos de subvencao economica para empresa. | Edital FAPES no 06/2026 - Clusters Inovadores |
 | `Obrigacoes Patronais` | INSS, FGTS, Sistema S/INCRA, seguro de acidente de trabalho, vale-transporte e encargos correlatos. | Rubrica aplicavel em contextos especificos; pode ter limite percentual sobre vencimentos e vantagens. | Edital FAPES no 06/2026 - Clusters Inovadores |
+
+### DOACI — Regras e Tabela de Limites
+
+Fonte normativa: **Resolucao CCAF no 309/2022, itens 2.4.8 e 2.4.8.1** (confirmar atualizacoes via pagina de resolucoes da FAPES).
+
+**Definicao (item 2.4.8):** Despesas Operacionais e Administrativas de Carater Indivisivel — destinadas a custear gastos indivisíveis, usuais e necessarios a consecucao do objeto do projeto. Nao podem remunerar qualquer membro ou pessoa vinculada ao projeto, na forma da Lei no 10.973/04 (Lei da Inovacao).
+
+**Base de calculo:** valor total aprovado no projeto, **excluindo** o valor destinado a bolsas.
+
+**Tabela de valores DOACI (item 2.4.8.1):**
+
+| Valor do Projeto (base sem bolsas) | Percentual maximo de DOACI |
+|------------------------------------|---------------------------|
+| R$ 0 a R$ 50.000,00 | 15% |
+| R$ 50.000,01 a R$ 100.000,00 | 10% |
+| R$ 100.000,01 a R$ 150.000,00 | 5% |
+| R$ 150.000,01 a R$ 300.000,00 | 3% |
+| R$ 300.000,01 a R$ 500.000,00 | 1% |
+| Acima de R$ 500.000,00 | 0,5% |
+
+**Regras criticas:**
+- Percentual e regressivo: quanto maior o projeto, menor o percentual permitido.
+- Teto absoluto da norma: 15% (projetos ate R$ 50.000,00).
+- Editais podem impor limites mais restritivos que a norma (verificar item especifico do edital).
+- Nao constitui remuneracao de pessoal vinculado ao projeto em nenhuma hipotese.
+- O sistema deve parametrizar o limite de DOACI por edital/iniciativa, nao fixar apenas no catalogo global (ver RD-RUB-008).
+
+**Exemplo (Edital FAPES no 13/2025 - UNIVERSAL, Categoria C):** projeto R$ 240.000,00 sem bolsas → faixa de 3% → DOACI maximo = R$ 7.200,00. Se houver bolsas, a base de calculo e reduzida pelo valor das bolsas aprovadas.
 
 ### Rubricas de Capital
 
