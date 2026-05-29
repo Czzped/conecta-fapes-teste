@@ -19,7 +19,7 @@ metadata:
 
 entities:
   BolsaPesquisa:
-    description: "Bolsa de pesquisa concedida a um bolsista, vinculada a uma iniciativa e a um nivel de modalidade de bolsa, passando por ciclo de vida completo desde indicacao ate encerramento."
+    description: "Bolsa de pesquisa concedida a um bolsista, vinculada a um projeto e a um nivel de modalidade de bolsa, passando por ciclo de vida completo desde indicacao ate encerramento."
     extends: "shared.Auditavel"
     fields:
       codigo:
@@ -66,7 +66,7 @@ entities:
       iniciativa:
         type: "ref:post_award.iniciativas.Iniciativa"
         required: true
-        description: "Iniciativa (projeto) ao qual a bolsa esta vinculada."
+        description: "Projeto ao qual a bolsa esta vinculada."
       cotaBolsa:
         type: "ref:post_award.bolsista.CotaBolsa"
         required: true
@@ -117,13 +117,13 @@ entities:
         description: "Motivo do encerramento da bolsa, quando aplicavel."
 
   CotaBolsa:
-    description: "Contador independente de cotas de bolsa disponiveis para uma iniciativa. Nao substitui o saldo monetario governado por M013."
+    description: "Contador independente de cotas de bolsa disponiveis para um projeto. Nao substitui o saldo monetario governado por M013."
     extends: "shared.Auditavel"
     fields:
       quantidadeDisponivel:
         type: "integer"
         required: true
-        description: "Quantidade de cotas de bolsa disponiveis para a iniciativa."
+        description: "Quantidade de cotas de bolsa disponiveis para o projeto."
 
   TermoAceite:
     description: "Registro do aceite ou rejeicao do orientador para assumir a orientacao da bolsa."
@@ -281,12 +281,12 @@ relationships:
     relation: "vinculada a"
     to: "post_award.iniciativas.Iniciativa"
     cardinality: "N:1"
-    description: "Multiplas bolsas podem ser vinculadas a uma mesma iniciativa."
+    description: "Multiplas bolsas podem ser vinculadas a um mesmo projeto."
   - from: "post_award.bolsista.BolsaPesquisa"
     relation: "consome cota"
     to: "post_award.bolsista.CotaBolsa"
     cardinality: "N:1"
-    description: "Cada bolsa consome cotas do controle de cotas da iniciativa."
+    description: "Cada bolsa consome cotas do controle de cotas do projeto."
   - from: "post_award.bolsista.BolsaPesquisa"
     relation: "indicada por"
     to: "post_award.iniciativas.Coordenador"
@@ -595,7 +595,7 @@ agent_instructions:
     - "Concessao de bolsa gera Transacao COMPROMETIMENTO em M013; cancelamento gera CANCELAMENTO_COMPROMETIMENTO."
     - "TermoAceite.justificativa e obrigatoria se aceito = false."
     - "AssinaturaTermo.justificativa e obrigatoria se assinado = false."
-    - "Iniciativa, Coordenador, Orientador e Bolsista sao referencias externas de M003 — nao modelar aqui."
+    - "Projeto, Coordenador, Orientador e Bolsista sao referencias externas de M003 — nao modelar aqui."
     - "VersaoNivel e referencia externa de M001 — nao modelar aqui."
     - "CotaBolsa e contador de cotas em quantidade; nao substitui validacao monetaria de M013."
   notes:

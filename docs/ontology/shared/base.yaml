@@ -28,6 +28,13 @@ invariants:
     description: "Soft-delete timestamp, when set, must be on or after creation."
 
 enums:
+  TipoResultado:
+    description: "Tipo de resultado gerado por um projeto ou fomento. Usado em M003 (ResultadoProjeto) e M011 (ResultadoEsperadoFomento)."
+    values:
+      PRODUTO: "Resultado tangivel gerado pelo projeto (ex: software, equipamento, publicacao, prototipo)."
+      SERVICO: "Servico prestado ou capacidade instalada gerada pelo projeto."
+      PROCESSO: "Processo ou metodologia desenvolvida ou melhorada pelo projeto."
+
   Moeda:
     description: "ISO 4217 currency codes supported by the system."
     values:

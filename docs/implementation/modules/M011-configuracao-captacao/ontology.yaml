@@ -340,9 +340,9 @@ entities:
     extends: null
     fields:
       tipo:
-        type: "enum:TipoResultado"
+        type: "enum:shared.TipoResultado"
         required: true
-        description: "Tipo do resultado esperado: PRODUTO, SERVICO ou PROCESSO."
+        description: "Tipo do resultado esperado: PRODUTO, SERVICO ou PROCESSO. Ver shared.TipoResultado."
       descricao:
         type: "string"
         required: true
@@ -1229,13 +1229,6 @@ enums:
       INTERROMPIDO: "Fomento suspenso temporariamente pelo GestorFomento. Captacoes e projetos vinculados sao suspensos enquanto o fomento estiver neste estado."
       ENCERRADO: "Fomento cancelado pelo GestorFomento antes do prazo. Captacoes e projetos vinculados sao cancelados."
       CONCLUIDO: "Fomento concluido naturalmente ao atingir a dataFim. Nao aceita novos projetos."
-
-  TipoResultado:
-    description: "Tipo de resultado esperado do fomento."
-    values:
-      PRODUTO: "Resultado tangivel gerado pelos projetos fomentados (ex: software, equipamento, publicacao)."
-      SERVICO: "Servico prestado ou capacidade instalada gerada pelos projetos fomentados."
-      PROCESSO: "Processo ou metodologia desenvolvida ou melhorada pelos projetos fomentados."
 
   TipoOutorgado:
     description: "Tipo do destinatario de uma demanda induzida."
