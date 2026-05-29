@@ -3,13 +3,14 @@ import { ArrowLeft, Building2, ChevronDown, ChevronRight, Plus, Save, Search, Tr
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
 type NaturezaJuridica = 'Publica' | 'Privada';
-type SituacaoInstituicao = 'Ativa' | 'Inativa';
+type SituacaoInstituicao = 'Ativa' | 'Inativa' | 'Rascunho';
 type ActiveTab = 'listagem' | 'dashboard';
 
 interface InstituicaoItem {
   id: number;
   nome: string;
   sigla: string;
+  filial: string;
   cnpj: string;
   razaoSocial: string;
   email: string;
@@ -23,6 +24,9 @@ interface InstituicaoItem {
   responsavel: string;
   dataInicioMandato: string;
   dataFimMandato: string;
+  projetosAtivos: number;
+  bolsasAtivas: number;
+  valorRecebido: number;
   superior?: string;
   situacao: SituacaoInstituicao;
 }
@@ -131,6 +135,7 @@ const emptyInstituicao: InstituicaoItem = {
   id: 0,
   nome: '',
   sigla: '',
+  filial: '',
   cnpj: '',
   razaoSocial: '',
   email: '',
@@ -144,17 +149,24 @@ const emptyInstituicao: InstituicaoItem = {
   responsavel: '',
   dataInicioMandato: '',
   dataFimMandato: '',
+  projetosAtivos: 0,
+  bolsasAtivas: 0,
+  valorRecebido: 0,
   superior: '',
   situacao: 'Ativa',
 };
 
 const initialInstituicoes: InstituicaoItem[] = [
-  { id: 1, nome: 'Universidade Federal do Espírito Santo', sigla: 'UFES', cnpj: '32.479.123/0001-43', razaoSocial: 'Universidade Federal do Espírito Santo', email: 'gabinete@ufes.br', telefone: '(27) 4009-2000', endereco: 'Av. Fernando Ferrari, 514 - Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Prof. Paulo Vargas', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', situacao: 'Ativa' },
-  { id: 2, nome: 'Centro Tecnológico da UFES', sigla: 'CT-UFES', cnpj: '', razaoSocial: '', email: 'ct@ufes.br', telefone: '(27) 4009-2600', endereco: 'Campus Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Prof. Ana Ribeiro', dataInicioMandato: '2023-03-01', dataFimMandato: '2027-02-28', superior: 'Universidade Federal do Espírito Santo', situacao: 'Ativa' },
-  { id: 3, nome: 'Instituto Federal do Espírito Santo', sigla: 'IFES', cnpj: '10.838.653/0001-06', razaoSocial: 'Instituto Federal de Educação, Ciência e Tecnologia do Espírito Santo', email: 'reitoria@ifes.edu.br', telefone: '(27) 3357-7500', endereco: 'Av. Rio Branco, 50 - Santa Lúcia', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Jadir Pela', dataInicioMandato: '2021-10-01', dataFimMandato: '2025-09-30', situacao: 'Ativa' },
-  { id: 4, nome: 'IFES Campus Serra', sigla: 'IFES Serra', cnpj: '10.838.653/0010-99', razaoSocial: 'Instituto Federal do Espírito Santo - Campus Serra', email: 'campus.serra@ifes.edu.br', telefone: '(27) 3348-9200', endereco: 'Rodovia ES-010, Km 6,5 - Manguinhos', natureza: 'Publica', municipio: 'Serra', uf: 'ES', responsavel: 'Marta Souza', dataInicioMandato: '2022-01-01', dataFimMandato: '2026-12-31', superior: 'Instituto Federal do Espírito Santo', situacao: 'Ativa' },
-  { id: 5, nome: 'Fucape Business School', sigla: 'FUCAPE', cnpj: '03.389.451/0001-66', razaoSocial: 'Fundação Instituto Capixaba de Pesquisas em Contabilidade, Economia e Finanças', email: 'contato@fucape.br', telefone: '(27) 4009-4444', endereco: 'Av. Fernando Ferrari, 1358 - Boa Vista', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', responsavel: 'Valcemiro Nossa', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', situacao: 'Ativa' },
-  { id: 6, nome: 'Departamento de Pesquisa Aplicada', sigla: 'DPA', cnpj: '', razaoSocial: '', email: 'pesquisa@fucape.br', telefone: '(27) 4009-4450', endereco: 'Sede Fucape', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', responsavel: 'Carla Mendes', dataInicioMandato: '2024-02-01', dataFimMandato: '2026-01-31', superior: 'Fucape Business School', situacao: 'Inativa' },
+  { id: 1, nome: 'Universidade Federal do Espírito Santo', sigla: 'UFES', filial: 'PPGI', cnpj: '32.479.123/0001-43', razaoSocial: 'Universidade Federal do Espírito Santo', email: 'gabinete@ufes.br', telefone: '(27) 4009-2000', endereco: 'Av. Fernando Ferrari, 514 - Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Paulo Vargas', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 18, bolsasAtivas: 11, valorRecebido: 2450000, situacao: 'Ativa' },
+  { id: 2, nome: 'Universidade Federal do Espírito Santo', sigla: 'UFES', filial: 'Centro Tecnológico', cnpj: '32.479.123/0001-43', razaoSocial: 'Universidade Federal do Espírito Santo', email: 'ct@ufes.br', telefone: '(27) 4009-2600', endereco: 'Campus Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Ana Ribeiro', dataInicioMandato: '2023-03-01', dataFimMandato: '2027-02-28', projetosAtivos: 9, bolsasAtivas: 17, valorRecebido: 1280000, superior: 'Universidade Federal do Espírito Santo', situacao: 'Ativa' },
+  { id: 3, nome: 'Universidade Federal do Espírito Santo', sigla: 'UFES', filial: 'Centro de Saúde', cnpj: '32.479.123/0001-43', razaoSocial: 'Universidade Federal do Espírito Santo', email: 'saude@ufes.br', telefone: '(27) 4009-2100', endereco: 'Campus Maruípe', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Mariana Duarte', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 12, bolsasAtivas: 32, valorRecebido: 1640000, superior: 'Universidade Federal do Espírito Santo', situacao: 'Ativa' },
+  { id: 4, nome: 'Ifes Campus Serra', sigla: 'IFES', filial: 'Mestrado em Informática', cnpj: '10.838.653/0001-06', razaoSocial: 'Instituto Federal de Educação, Ciência e Tecnologia do Espírito Santo', email: 'reitoria@ifes.edu.br', telefone: '(27) 3357-7500', endereco: 'Av. Rio Branco, 50 - Santa Lúcia', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Jadir Pela', dataInicioMandato: '2021-10-01', dataFimMandato: '2025-09-30', projetosAtivos: 14, bolsasAtivas: 46, valorRecebido: 1980000, situacao: 'Ativa' },
+  { id: 5, nome: 'Fucape Business School', sigla: 'FUCAPE', filial: 'Não Possui', cnpj: '03.389.451/0001-66', razaoSocial: 'Fundação Instituto Capixaba de Pesquisas em Contabilidade, Economia e Finanças', email: 'contato@fucape.br', telefone: '(27) 4009-4444', endereco: 'Av. Fernando Ferrari, 1358 - Boa Vista', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', responsavel: 'Valcemiro Nossa', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 6, bolsasAtivas: 11, valorRecebido: 640000, situacao: 'Ativa' },
+  { id: 6, nome: 'Universidade Vila Velha', sigla: 'UVV', filial: 'Não Possui', cnpj: '39.268.702/0001-28', razaoSocial: 'Universidade Vila Velha', email: 'contato@uvv.br', telefone: '(27) 3421-2000', endereco: 'Av. Comissário José Dantas de Melo, 21', natureza: 'Privada', municipio: 'Vila Velha', uf: 'ES', responsavel: 'Carolina Nunes', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 8, bolsasAtivas: 17, valorRecebido: 720000, situacao: 'Ativa' },
+  { id: 7, nome: 'Instituto Jones dos Santos Neves', sigla: 'IJSN', filial: 'Não Possui', cnpj: '27.316.918/0001-23', razaoSocial: 'Instituto Jones dos Santos Neves', email: 'contato@ijsn.es.gov.br', telefone: '(27) 3636-8050', endereco: 'Av. Marechal Mascarenhas de Moraes, 2524', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Rafael Oliveira', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 5, bolsasAtivas: 32, valorRecebido: 510000, situacao: 'Ativa' },
+  { id: 8, nome: 'Senai', sigla: 'SENAI', filial: 'Não Possui', cnpj: '03.810.480/0001-85', razaoSocial: 'Serviço Nacional de Aprendizagem Industrial', email: 'contato@senai-es.org.br', telefone: '(27) 3334-5600', endereco: 'Av. Nossa Senhora da Penha, 2053', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', responsavel: 'Bruno Matos', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 4, bolsasAtivas: 46, valorRecebido: 430000, situacao: 'Ativa' },
+  { id: 9, nome: 'Vale', sigla: 'VALE', filial: 'Não Possui', cnpj: '33.592.510/0001-54', razaoSocial: 'Vale S.A.', email: 'inovacao@vale.com', telefone: '(27) 3333-3000', endereco: 'Complexo de Tubarão', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', responsavel: 'Fernanda Costa', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 7, bolsasAtivas: 11, valorRecebido: 950000, situacao: 'Ativa' },
+  { id: 10, nome: 'Arcelor', sigla: 'ARCELOR', filial: 'Não Possui', cnpj: '17.469.701/0001-77', razaoSocial: 'ArcelorMittal Brasil S.A.', email: 'pesquisa@arcelor.com', telefone: '(27) 3348-9000', endereco: 'Av. Brigadeiro Eduardo Gomes, 930', natureza: 'Privada', municipio: 'Serra', uf: 'ES', responsavel: 'Marcelo Lima', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 3, bolsasAtivas: 17, valorRecebido: 390000, situacao: 'Ativa' },
 ];
 
 const instituicoesParceiras = [
@@ -170,6 +182,45 @@ const instituicoesParceiras = [
   { nome: 'UFMG', totalInvestido: 1200000 },
 ];
 
+const projetosPorInstituicao: Record<string, Array<{
+  projeto: string;
+  unidade: string;
+  coordenador: string;
+  area: string;
+  periodo: string;
+  valorRecebido: number;
+  bolsistasAtivos: number;
+  status: 'Ativo' | 'Finalizado';
+}>> = {
+  'Universidade Federal do Espírito Santo': [
+    { projeto: 'Monitoramento Inteligente de Recursos Hídricos', unidade: 'PPGI', coordenador: 'Mariana Duarte', area: 'Tecnologia', periodo: '2025-2027', valorRecebido: 620000, bolsistasAtivos: 11, status: 'Ativo' },
+    { projeto: 'Materiais Avançados para Energia Limpa', unidade: 'Centro Tecnológico', coordenador: 'Paulo Vargas', area: 'Engenharia', periodo: '2024-2026', valorRecebido: 480000, bolsistasAtivos: 17, status: 'Ativo' },
+    { projeto: 'Saúde Digital no SUS Capixaba', unidade: 'Centro de Saúde', coordenador: 'Ana Ribeiro', area: 'Saúde', periodo: '2023-2025', valorRecebido: 540000, bolsistasAtivos: 32, status: 'Finalizado' },
+  ],
+  'Ifes Campus Serra': [
+    { projeto: 'Computação Aplicada à Indústria 4.0', unidade: 'Mestrado em Informática', coordenador: 'Jadir Pela', area: 'Tecnologia', periodo: '2025-2027', valorRecebido: 720000, bolsistasAtivos: 46, status: 'Ativo' },
+    { projeto: 'Automação de Processos Educacionais', unidade: 'Mestrado em Informática', coordenador: 'Marta Souza', area: 'Educação', periodo: '2024-2026', valorRecebido: 390000, bolsistasAtivos: 17, status: 'Ativo' },
+  ],
+  'Fucape Business School': [
+    { projeto: 'Gestão Pública Baseada em Evidências', unidade: 'Não Possui', coordenador: 'Valcemiro Nossa', area: 'Gestão', periodo: '2024-2026', valorRecebido: 320000, bolsistasAtivos: 11, status: 'Ativo' },
+  ],
+  'Universidade Vila Velha': [
+    { projeto: 'Biotecnologia Marinha Aplicada', unidade: 'Não Possui', coordenador: 'Carolina Nunes', area: 'Meio Ambiente', periodo: '2025-2027', valorRecebido: 420000, bolsistasAtivos: 17, status: 'Ativo' },
+  ],
+  'Instituto Jones dos Santos Neves': [
+    { projeto: 'Indicadores Territoriais do Espírito Santo', unidade: 'Não Possui', coordenador: 'Rafael Oliveira', area: 'Políticas Públicas', periodo: '2024-2025', valorRecebido: 260000, bolsistasAtivos: 32, status: 'Finalizado' },
+  ],
+  Senai: [
+    { projeto: 'Manufatura Inteligente Capixaba', unidade: 'Não Possui', coordenador: 'Bruno Matos', area: 'Indústria', periodo: '2025-2027', valorRecebido: 430000, bolsistasAtivos: 46, status: 'Ativo' },
+  ],
+  Vale: [
+    { projeto: 'Mineração Sustentável e Segurança Operacional', unidade: 'Não Possui', coordenador: 'Fernanda Costa', area: 'Sustentabilidade', periodo: '2024-2026', valorRecebido: 950000, bolsistasAtivos: 11, status: 'Ativo' },
+  ],
+  Arcelor: [
+    { projeto: 'Aços Verdes para Cadeias Produtivas', unidade: 'Não Possui', coordenador: 'Marcelo Lima', area: 'Materiais', periodo: '2025-2027', valorRecebido: 390000, bolsistasAtivos: 17, status: 'Ativo' },
+  ],
+};
+
 const getClassificacao = (item: Pick<InstituicaoItem, 'cnpj' | 'superior'>) => {
   if (!item.cnpj) return 'Setor sem CNPJ';
   return item.superior ? 'Unidade com CNPJ' : 'Instituição raiz';
@@ -182,13 +233,24 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('listagem');
   const [searchTerm, setSearchTerm] = useState('');
   const [naturezaFilter, setNaturezaFilter] = useState<'Todos' | NaturezaJuridica>('Todos');
+  const [statusFilter, setStatusFilter] = useState<'Todos' | SituacaoInstituicao>('Todos');
   const [showNaturezaDropdown, setShowNaturezaDropdown] = useState(false);
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [selected, setSelected] = useState<InstituicaoItem | null>(null);
   const [draft, setDraft] = useState<InstituicaoItem>(emptyInstituicao);
   const [draftFiliais, setDraftFiliais] = useState<SubestruturaDraft[]>([]);
   const [draftUnidades, setDraftUnidades] = useState<SubestruturaDraft[]>([]);
+  const [estruturaUnidade, setEstruturaUnidade] = useState('');
+  const [estruturaSigla, setEstruturaSigla] = useState('');
+  const [estruturaResponsavel, setEstruturaResponsavel] = useState('');
   const [instituicoes, setInstituicoes] = useState<InstituicaoItem[]>(initialInstituicoes);
+  const [dashboardInstituicao, setDashboardInstituicao] = useState('Universidade Federal do Espírito Santo');
+  const [projetoSearch, setProjetoSearch] = useState('');
+  const [projetoUnidade, setProjetoUnidade] = useState('');
+  const [projetoCoordenador, setProjetoCoordenador] = useState('');
+  const [projetoData, setProjetoData] = useState('');
+  const [projetoStatus, setProjetoStatus] = useState('Todos');
 
   const filtered = instituicoes.filter(item => {
     const query = searchTerm.toLowerCase();
@@ -199,7 +261,8 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       item.email.toLowerCase().includes(query) ||
       item.cnpj.toLowerCase().includes(query);
     const matchNatureza = naturezaFilter === 'Todos' || item.natureza === naturezaFilter;
-    return matchSearch && matchNatureza;
+    const matchStatus = statusFilter === 'Todos' || item.situacao === statusFilter;
+    return matchSearch && matchNatureza && matchStatus;
   });
 
   const totalPublicas = instituicoes.filter(item => item.natureza === 'Publica').length;
@@ -213,11 +276,31 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     { nome: 'Unidades com CNPJ', valor: instituicoes.filter(item => item.cnpj && item.superior).length, color: '#22c55e' },
     { nome: 'Setores sem CNPJ', valor: instituicoes.filter(item => !item.cnpj).length, color: '#f59e0b' },
   ]), [instituicoes]);
+  const instituicaoOptions = Array.from(new Set(instituicoes.map(item => item.nome)));
+  const dashboardInstituicoesSelecionadas = instituicoes.filter(item => item.nome === dashboardInstituicao);
+  const dashboardProjetos = projetosPorInstituicao[dashboardInstituicao] || [];
+  const projetoUnidadeOptions = Array.from(new Set(dashboardProjetos.map(projeto => projeto.unidade)));
+  const projetoCoordenadorOptions = Array.from(new Set(dashboardProjetos.map(projeto => projeto.coordenador)));
+  const dashboardProjetosFiltrados = dashboardProjetos.filter(projeto => {
+    const query = projetoSearch.toLowerCase();
+    const matchSearch = !query || projeto.projeto.toLowerCase().includes(query) || projeto.unidade.toLowerCase().includes(query) || projeto.coordenador.toLowerCase().includes(query);
+    const matchUnidade = !projetoUnidade || projeto.unidade.toLowerCase().includes(projetoUnidade.toLowerCase());
+    const matchCoordenador = !projetoCoordenador || projeto.coordenador.toLowerCase().includes(projetoCoordenador.toLowerCase());
+    const matchData = !projetoData || projeto.periodo.toLowerCase().includes(projetoData.toLowerCase());
+    const matchStatus = projetoStatus === 'Todos' || projeto.status === projetoStatus;
+    return matchSearch && matchUnidade && matchCoordenador && matchData && matchStatus;
+  });
+  const dashboardProjetosAtivos = dashboardInstituicoesSelecionadas.reduce((total, item) => total + item.projetosAtivos, 0);
+  const dashboardBolsasAtivas = dashboardInstituicoesSelecionadas.reduce((total, item) => total + item.bolsasAtivas, 0);
+  const dashboardValorRecebido = dashboardInstituicoesSelecionadas.reduce((total, item) => total + item.valorRecebido, 0);
 
   const openNew = () => {
     setDraft({ ...emptyInstituicao, id: Date.now() });
     setDraftFiliais([]);
     setDraftUnidades([]);
+    setEstruturaUnidade('');
+    setEstruturaSigla('');
+    setEstruturaResponsavel('');
     setShowForm(true);
     setSelected(null);
   };
@@ -237,6 +320,9 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     );
     setSelected(item);
     setShowForm(false);
+    setEstruturaUnidade(item.filial === 'Não Possui' ? '' : item.filial);
+    setEstruturaSigla('');
+    setEstruturaResponsavel(item.responsavel);
   };
 
   const updateDraft = (field: keyof InstituicaoItem, value: string | boolean) => {
@@ -264,6 +350,7 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   const filiaisOps = makeSetter(setDraftFiliais);
   const unidadesOps = makeSetter(setDraftUnidades);
+  const responsaveisOptions = ['Paulo Vargas', 'Ana Ribeiro', 'Jadir Pela', 'Marta Souza', 'Valcemiro Nossa', 'Carla Mendes'];
 
   const saveDraft = () => {
     const isSetorSemCnpj = !draft.cnpj;
@@ -281,6 +368,10 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         natureza: saved.natureza,
         municipio: saved.municipio,
         uf: saved.uf,
+        filial: '',
+        projetosAtivos: 0,
+        bolsasAtivas: 0,
+        valorRecebido: 0,
         superior: saved.nome,
         situacao: 'Ativa',
       }));
@@ -302,7 +393,6 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   if (showForm || selected) {
     const isSetorSemCnpj = !draft.cnpj;
-    const isSituacaoAtiva = draft.situacao === 'Ativa';
     const superiorOptions = [
       '',
       ...instituicoes
@@ -413,11 +503,11 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     );
 
     // Mock — em producao vira de GET /api/v1/m008/responsaveis?instituicaoId={id}&estado=encerrado
-    const historicoDoSelecionado: { pessoa: string; papel: string; dataInicio: string; dataFim: string; motivo: string }[] = !showForm && selected
+    const historicoDoSelecionado: { pessoa: string; dataInicio: string; dataFim: string }[] = !showForm && selected
       ? [
-          { pessoa: 'Prof. Joao Silva',  papel: 'Reitor',     dataInicio: '2020-01-01', dataFim: '2023-12-31', motivo: 'Fim de mandato' },
-          { pessoa: 'Prof. Pedro Lima',  papel: 'Reitor Pro Tempore', dataInicio: '2017-01-01', dataFim: '2019-12-31', motivo: 'Fim de mandato' },
-          { pessoa: 'Profa. Carla Mendes', papel: 'Reitora', dataInicio: '2013-01-01', dataFim: '2016-12-31', motivo: 'Fim de mandato' },
+          { pessoa: 'Joao Silva', dataInicio: '2020-01-01', dataFim: '2023-12-31' },
+          { pessoa: 'Pedro Lima', dataInicio: '2017-01-01', dataFim: '2019-12-31' },
+          { pessoa: 'Carla Mendes', dataInicio: '2013-01-01', dataFim: '2016-12-31' },
         ]
       : [];
 
@@ -425,43 +515,44 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
         <div className="pt-8 px-8 pb-8">
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '28px' }}>
-            <button
-              onClick={() => { setShowForm(false); setSelected(null); }}
-              style={{ width: '36px', height: '36px', border: 'none', borderRadius: 'var(--radius)', backgroundColor: T.accentSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-            >
-              <ArrowLeft size={18} style={{ color: T.accent }} />
-            </button>
             <div style={{ flex: 1 }}>
-              <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 8px' }}>
-                {showForm ? 'Nova Instituição' : draft.nome}
-              </h1>
-              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
-                Cadastre instituições, unidades com CNPJ e setores sem CNPJ na mesma estrutura organizacional.
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>
+                <button
+                  type="button"
+                  onClick={() => { setShowForm(false); setSelected(null); }}
+                  style={{ background: 'none', border: 'none', padding: 0, color: T.textMuted, cursor: 'pointer', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}
+                >
+                  {showForm ? 'Instituições' : 'Instituição'}
+                </button>
+                <ChevronRight size={14} style={{ color: T.iconSubdued }} />
+                <span style={{ color: T.accent, fontWeight: 'var(--font-weight-medium)' }}>{showForm ? 'Criar Instituição' : 'Detalhes da Instituição'}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                <button
+                  onClick={() => { setShowForm(false); setSelected(null); }}
+                  style={{ width: '36px', height: '36px', border: 'none', borderRadius: 'var(--radius)', backgroundColor: T.accentSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
+                >
+                  <ArrowLeft size={18} style={{ color: T.accent }} />
+                </button>
+                <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+                  {showForm ? 'Criar Instituição' : draft.nome}
+                </h1>
+              </div>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: '0 0 0 48px' }}>
+                {showForm ? 'Preencha as informações abaixo para criar uma nova Instituição' : 'Cadastre instituições, unidades com CNPJ e setores sem CNPJ na mesma estrutura organizacional.'}
               </p>
             </div>
-            {selected && (
-              <button
-                type="button"
-                onClick={openNew}
-                style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: T.accentSoft, border: `1px solid ${T.accent}`, borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.accent, cursor: 'pointer' }}
-              >
-                <Plus size={15} />
-                Nova Instituição
-              </button>
-            )}
           </div>
 
-          <FormSection number="1" title="Identificação" subtitle="Dados básicos da instituição (nome, CNPJ, natureza) + dados institucionais de contato (email, telefone, endereço da entidade jurídica). Não confundir com email/telefone do Responsável (PessoaFísica).">
+          <FormSection number="1" title="Identificação" subtitle="Dados básicos">
             <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 0.6fr', gap: '16px', marginBottom: '16px' }}>
               <Field label="Nome" value={draft.nome} onChange={value => updateDraft('nome', value)} placeholder="Nome da instituição ou unidade" />
               <Field label="Sigla" value={draft.sigla} onChange={value => updateDraft('sigla', value)} placeholder="Sigla" />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '16px', marginBottom: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '0.7fr 1.2fr 0.8fr', gap: '16px', marginBottom: '16px' }}>
+              <Select label="Natureza" value={draft.natureza} onChange={value => updateDraft('natureza', value)} options={['Publica', 'Privada']} />
               <Field label={isSetorSemCnpj ? 'Razão social' : 'Razão social obrigatória'} value={draft.razaoSocial} onChange={value => updateDraft('razaoSocial', value)} placeholder={isSetorSemCnpj ? 'Não se aplica a setor interno' : 'Razão social da instituição'} disabled={isSetorSemCnpj} />
               <Field label="CNPJ" value={draft.cnpj} onChange={value => updateDraft('cnpj', maskCnpj(value))} placeholder="Deixe vazio para setor sem CNPJ" />
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '16px' }}>
-              <Select label="Natureza" value={draft.natureza} onChange={value => updateDraft('natureza', value)} options={['Publica', 'Privada']} />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 0.6fr', gap: '16px', marginBottom: '16px' }}>
               <Field label="Email institucional" value={draft.email} onChange={value => updateDraft('email', value)} placeholder="email@instituicao.br" />
@@ -492,105 +583,99 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
           </FormSection>
 
-          <FormSection number="2" title="Estrutura Organizacional" subtitle="Vínculo hierárquico. Instituição sem CNPJ deve possuir superior.">
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '20px' }}>
-              <Select label="Instituição superior" value={draft.superior || ''} onChange={value => updateDraft('superior', value)} options={superiorOptions} />
-            </div>
-
-            {renderSubestruturaBlock({
-              T,
-              titulo: 'Filiais',
-              subtitulo: 'Outras Instituições com CNPJ próprio vinculadas a esta como matriz (campus, filial, unidade jurídica).',
-              draftItens: draftFiliais,
-              ops: filiaisOps,
-              opcoesExistentes: instituicoes.filter(i => i.id !== draft.id && !!i.cnpj),
-              labelExistente: 'Selecione uma Instituição com CNPJ',
-              labelNova: { nome: 'Nome da filial', sigla: 'Sigla', cnpj: 'CNPJ' },
-              cnpjObrigatorio: true,
-              vazio: 'Nenhuma filial vinculada.',
-            })}
-
-            {renderSubestruturaBlock({
-              T,
-              titulo: 'Unidades Organizacionais',
-              subtitulo: 'Subdivisões internas sem CNPJ próprio (centro, departamento, coordenação, laboratório, setor).',
-              draftItens: draftUnidades,
-              ops: unidadesOps,
-              opcoesExistentes: instituicoes.filter(i => i.id !== draft.id && !i.cnpj),
-              labelExistente: 'Selecione uma Unidade Organizacional sem CNPJ',
-              labelNova: { nome: 'Nome da unidade', sigla: 'Sigla', cnpj: '' },
-              cnpjObrigatorio: false,
-              vazio: 'Nenhuma unidade organizacional cadastrada.',
-            })}
-          </FormSection>
-
-          <FormSection number="3" title="Responsável" subtitle="Responsável é o vínculo temporal entre uma Pessoa Física já cadastrada e uma Instituição, com mandato definido (RN04/RN11).">
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.5fr 0.6fr 0.5fr', gap: '16px' }}>
-              <Select label="Pessoa responsável" value={draft.responsavel} onChange={value => updateDraft('responsavel', value)} options={['', 'Prof. Paulo Vargas', 'Prof. Ana Ribeiro', 'Jadir Pela', 'Marta Souza', 'Valcemiro Nossa', 'Carla Mendes']} />
+          <FormSection number="2" title="Responsável" subtitle="Pessoa responsável pela Instituição">
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.5fr 0.6fr', gap: '16px' }}>
+              <ComboField label="Pessoa responsável" value={draft.responsavel} onChange={value => updateDraft('responsavel', value)} options={responsaveisOptions} placeholder="Digite ou selecione uma pessoa" />
               <Field label="Início do mandato" value={draft.dataInicioMandato} onChange={value => updateDraft('dataInicioMandato', value)} placeholder="AAAA-MM-DD" />
               <Field
-                label={isSituacaoAtiva ? 'Fim do mandato (opcional)' : 'Fim do mandato'}
+                label="Fim do mandato"
                 value={draft.dataFimMandato}
                 onChange={value => updateDraft('dataFimMandato', value)}
-                placeholder={isSituacaoAtiva ? 'Em aberto enquanto ativa' : 'AAAA-MM-DD'}
+                placeholder="AAAA-MM-DD"
               />
-              <Select label="Situação" value={draft.situacao} onChange={value => updateDraft('situacao', value)} options={['Ativa', 'Inativa']} />
             </div>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, margin: '8px 0 0' }}>
-              {isSituacaoAtiva
-                ? 'Mandato em curso — fim do mandato não é obrigatório enquanto a situação for Ativa.'
-                : 'Mandato encerrado — preencha o fim do mandato.'}
-            </p>
 
-            <div style={{ marginTop: '24px', borderTop: `1px solid ${T.borderSubtle}`, paddingTop: '18px' }}>
-              <div style={{ marginBottom: '12px' }}>
-                <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 4px' }}>
-                  Histórico de Responsáveis
-                </h3>
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, margin: 0 }}>
-                  Mandatos encerrados desta instituição (ordenados por mandato mais recente).
-                </p>
-              </div>
-              {historicoDoSelecionado.length === 0 ? (
-                <div style={{ border: `1px dashed ${T.borderDefault}`, borderRadius: '8px', padding: '16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textMuted }}>
-                  Nenhum responsável anterior registrado.
+            {!showForm && selected && (
+              <div style={{ marginTop: '24px', borderTop: `1px solid ${T.borderSubtle}`, paddingTop: '18px' }}>
+                <div style={{ marginBottom: '12px' }}>
+                  <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 4px' }}>
+                    Histórico de Responsáveis
+                  </h3>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, margin: 0 }}>
+                    Mandatos encerrados desta instituição (ordenados por mandato mais recente).
+                  </p>
                 </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {historicoDoSelecionado.map((h, idx) => (
+                {historicoDoSelecionado.length === 0 ? (
+                  <div style={{ border: `1px dashed ${T.borderDefault}`, borderRadius: '8px', padding: '16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textMuted }}>
+                    Nenhum responsável anterior registrado.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <div
-                      key={`${h.pessoa}-${idx}`}
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: '2fr 1.2fr 1.6fr 2fr',
+                        gridTemplateColumns: '2fr 1fr 1fr',
                         gap: '12px',
-                        padding: '10px 14px',
-                        border: `1px solid ${T.borderSubtle}`,
-                        borderRadius: '8px',
-                        backgroundColor: T.bgSurfaceMuted,
+                        padding: '0 14px',
                         fontFamily: 'var(--font-family)',
-                        fontSize: 'var(--text-sm)',
-                        color: T.textPrimary,
+                        fontSize: 'var(--text-xs)',
+                        color: T.textMuted,
                       }}
                     >
-                      <span style={{ fontWeight: 'var(--font-weight-medium)' }}>{h.pessoa}</span>
-                      <span>{h.papel}</span>
-                      <span>{h.dataInicio} → {h.dataFim}</span>
-                      <span style={{ color: T.textMuted }}>{h.motivo}</span>
+                      <span>Responsável</span>
+                      <span>Início do Mandato</span>
+                      <span>Fim do Mandato</span>
                     </div>
-                  ))}
-                </div>
-              )}
+                    {historicoDoSelecionado.map((h, idx) => (
+                      <div
+                        key={`${h.pessoa}-${idx}`}
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '2fr 1fr 1fr',
+                          gap: '12px',
+                          padding: '10px 14px',
+                          border: `1px solid ${T.borderSubtle}`,
+                          borderRadius: '8px',
+                          backgroundColor: T.bgSurfaceMuted,
+                          fontFamily: 'var(--font-family)',
+                          fontSize: 'var(--text-sm)',
+                          color: T.textPrimary,
+                        }}
+                      >
+                        <span style={{ fontWeight: 'var(--font-weight-medium)' }}>{h.pessoa}</span>
+                        <span>{h.dataInicio}</span>
+                        <span>{h.dataFim}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </FormSection>
+
+          <FormSection number="3" title="Estrutura organizacional" subtitle="Se na instituição houver, inclua as unidades">
+            <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 0.5fr 1fr', gap: '16px' }}>
+              <Field label="Unidade" value={estruturaUnidade} onChange={setEstruturaUnidade} placeholder="Exemplos: Filial, Centro, Setor, Laboratório, Mestrado ou Doutorado" />
+              <Field label="Sigla" value={estruturaSigla} onChange={setEstruturaSigla} placeholder="Sigla" />
+              <ComboField label="Responsável" value={estruturaResponsavel} onChange={setEstruturaResponsavel} options={responsaveisOptions} placeholder="Digite ou selecione uma pessoa" />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setEstruturaUnidade('');
+                  setEstruturaSigla('');
+                  setEstruturaResponsavel('');
+                }}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: T.accentSoft, border: `1px solid ${T.accent}`, borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.accent, cursor: 'pointer' }}
+              >
+                <Plus size={15} />
+                Adicionar
+              </button>
             </div>
           </FormSection>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-            {selected && (
-              <button type="button" onClick={removeDraft} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.35)', borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.danger, cursor: 'pointer' }}>
-                <Trash2 size={15} />
-                Remover
-              </button>
-            )}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', flex: 1 }}>
               <button type="button" onClick={() => { setShowForm(false); setSelected(null); }} style={{ backgroundColor: 'transparent', border: `1px solid ${T.borderStrong}`, borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, cursor: 'pointer' }}>
                 Cancelar
@@ -626,7 +711,7 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
             <button onClick={openNew} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: T.accent, border: 'none', borderRadius: 'var(--radius)', padding: '10px 18px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: T.accentText, cursor: 'pointer', flexShrink: 0 }}>
               <Plus size={16} />
-              Nova Instituição
+              Criar Instituição
             </button>
           </div>
         </div>
@@ -644,63 +729,51 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
         {activeTab === 'dashboard' && (
           <div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-              <Metric label="Total de instituições" value={String(instituicoes.length)} color={T.textPrimary} bg={T.bgChip} />
-              <Metric label="Públicas" value={String(totalPublicas)} color="#38bdf8" bg="rgba(56,189,248,0.12)" />
-              <Metric label="Privadas" value={String(totalPrivadas)} color="#a855f7" bg="rgba(168,85,247,0.12)" />
-              <Metric label="Raiz" value={String(instituicoesRaiz)} color="#f59e0b" bg="rgba(245,158,11,0.12)" />
+            <div style={{ marginBottom: '24px', maxWidth: '520px' }}>
+              <Select label="Instituição" value={dashboardInstituicao} onChange={setDashboardInstituicao} options={instituicaoOptions} />
             </div>
 
-            <div style={S.card}>
-              <h2 style={S.sectionTitle}>Estruturas por tipo</h2>
-              <p style={{ ...S.sectionSubtitle, marginBottom: '20px' }}>
-                Distribuição entre instituições raiz, unidades que possuem CNPJ e setores sem CNPJ.
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {estruturasPorTipo.map(item => {
-                  const percentual = instituicoes.length > 0 ? (item.valor / instituicoes.length) * 100 : 0;
-                  return (
-                    <div key={item.nome} style={{ padding: '16px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.6fr 0.8fr', gap: '16px', marginBottom: '12px' }}>
-                        <ListCell label="Tipo" value={item.nome} strong />
-                        <ListCell label="Quantidade" value={String(item.valor)} highlight />
-                        <ListCell label="Participação" value={`${percentual.toFixed(2).replace('.', ',')}%`} />
-                      </div>
-                      <div style={{ height: '8px', width: '100%', borderRadius: '999px', backgroundColor: T.bgChip, overflow: 'hidden' }}>
-                        <div style={{ width: `${percentual}%`, height: '100%', borderRadius: '999px', backgroundColor: item.color }} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
+              <Metric label="Projetos Ativos" value={String(dashboardProjetosAtivos)} color={T.accent} bg={T.accentSoft} />
+              <Metric label="Bolsas Ativas" value={String(dashboardBolsasAtivas)} color={T.accent} bg={T.accentSoft} />
+              <Metric label="Valor Recebido" value={formatCurrency(dashboardValorRecebido)} color={T.accent} bg={T.accentSoft} />
             </div>
 
-            <div style={{ ...S.card, marginTop: '24px' }}>
-              <h2 style={S.sectionTitle}>Identificação fiscal</h2>
-              <p style={{ ...S.sectionSubtitle, marginBottom: '20px' }}>
-                Controle de estruturas que possuem CNPJ próprio e estruturas internas cadastradas como setores.
-              </p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <Metric label="Com CNPJ" value={String(totalComCnpj)} color="#22c55e" bg="rgba(34,197,94,0.12)" />
-                <Metric label="Sem CNPJ" value={String(totalSemCnpj)} color="#f59e0b" bg="rgba(245,158,11,0.12)" />
-              </div>
-            </div>
-
-            <div style={{ ...S.card, marginTop: '24px' }}>
-              <h2 style={S.sectionTitle}>Instituições parceiras</h2>
+            <div>
+              <h2 style={S.sectionTitle}>Projetos da Instituição</h2>
               <p style={{ ...S.sectionSubtitle, marginBottom: '18px' }}>
-                Total investido por instituição parceira.
+                Lista de projetos vinculados à instituição selecionada.
               </p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 0.7fr 0.8fr', gap: '16px', marginBottom: '18px' }}>
+                <div>
+                  <label style={S.label}>Pesquisar</label>
+                  <div style={{ position: 'relative' }}>
+                    <input type="text" placeholder="Buscar" value={projetoSearch} onChange={event => setProjetoSearch(event.target.value)} style={{ ...S.input, paddingRight: '36px' }} />
+                    <Search size={16} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
+                  </div>
+                </div>
+                <ComboField label="Unidade" value={projetoUnidade} onChange={setProjetoUnidade} options={projetoUnidadeOptions} placeholder="Todos" />
+                <ComboField label="Coordenador" value={projetoCoordenador} onChange={setProjetoCoordenador} options={projetoCoordenadorOptions} placeholder="Todos" />
+                <Field label="Data" value={projetoData} onChange={setProjetoData} placeholder="AAAA" />
+                <Select label="Status" value={projetoStatus} onChange={setProjetoStatus} options={['Todos', 'Ativo', 'Finalizado']} />
+              </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {instituicoesParceiras.map(instituicao => {
-                  const percentualInvestido = totalInvestidoParceiras > 0 ? (instituicao.totalInvestido / totalInvestidoParceiras) * 100 : 0;
-                  return (
-                    <div key={instituicao.nome} style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '16px', alignItems: 'center', padding: '14px 16px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
-                      <ListCell label="Instituição" value={instituicao.nome} strong />
-                      <ListCell label="Total investido" value={formatCurrency(instituicao.totalInvestido)} detail={`${formatPercent(percentualInvestido)} do total`} highlight />
+                {dashboardProjetosFiltrados.map(projeto => (
+                  <div key={projeto.projeto} style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 0.9fr 0.9fr 0.7fr 0.7fr', gap: '14px', alignItems: 'start', padding: '14px 16px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
+                    <ListCell label="Projeto" value={projeto.projeto} strong />
+                    <ListCell label="Unidade" value={projeto.unidade} />
+                    <ListCell label="Coordenador" value={projeto.coordenador} />
+                    <ListCell label="Período de Execução" value={projeto.periodo} />
+                    <ListCell label="Valor Recebido" value={formatCurrency(projeto.valorRecebido)} />
+                    <ListCell label="Bolsistas Ativos" value={String(projeto.bolsistasAtivos)} />
+                    <div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>Status</div>
+                      <span style={{ display: 'inline-block', backgroundColor: `${statusColor(projeto.status === 'Ativo' ? 'Ativa' : 'Inativa')}20`, border: `1px solid ${statusColor(projeto.status === 'Ativo' ? 'Ativa' : 'Inativa')}`, borderRadius: '999px', padding: '3px 12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: statusColor(projeto.status === 'Ativo' ? 'Ativa' : 'Inativa') }}>
+                        {projeto.status}
+                      </span>
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -708,7 +781,7 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
         {activeTab === 'listagem' && (
           <>
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', marginBottom: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '16px', marginBottom: '24px' }}>
               <div>
                 <label style={S.label}>Pesquisar</label>
                 <div style={{ position: 'relative' }}>
@@ -717,24 +790,23 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 </div>
               </div>
               <DropdownFilter label="Natureza" value={naturezaFilter} options={['Todos', 'Publica', 'Privada']} open={showNaturezaDropdown} setOpen={setShowNaturezaDropdown} onSelect={value => setNaturezaFilter(value as typeof naturezaFilter)} />
+              <DropdownFilter label="Status" value={statusFilter} options={['Todos', 'Ativa', 'Inativa', 'Rascunho']} open={showStatusDropdown} setOpen={setShowStatusDropdown} onSelect={value => setStatusFilter(value as typeof statusFilter)} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {filtered.map(item => (
                 <button key={item.id} onClick={() => openDetails(item)} style={{ textAlign: 'left', backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '10px', padding: '18px 20px', cursor: 'pointer' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 0.8fr 1fr 1.2fr 1fr 0.7fr auto', gap: '18px', alignItems: 'start' }}>
-                    <ListCell label="Instituição" value={`${item.sigla} · ${item.nome}`} strong />
+                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.1fr 0.9fr minmax(92px, 0.8fr) 18px', gap: '14px', alignItems: 'start' }}>
+                    <ListCell label="Instituição" value={item.nome} strong />
+                    <ListCell label="Unidade" value={item.filial} />
                     <ListCell label="Natureza" value={item.natureza === 'Publica' ? 'Pública' : 'Privada'} />
-                    <ListCell label="Classificação" value={getClassificacao(item)} />
-                    <ListCell label="CNPJ" value={item.cnpj || 'Não possui'} detail={item.superior ? `Superior: ${item.superior}` : 'Sem superior'} />
-                    <ListCell label="Responsavel" value={item.responsavel} detail={`${item.dataInicioMandato || '-'} a ${item.dataFimMandato || '-'}`} />
                     <div>
-                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>Situação</div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>Status</div>
                       <span style={{ display: 'inline-block', backgroundColor: `${statusColor(item.situacao)}20`, border: `1px solid ${statusColor(item.situacao)}`, borderRadius: '999px', padding: '3px 12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: statusColor(item.situacao) }}>
                         {item.situacao}
                       </span>
                     </div>
-                    <ChevronRight size={18} style={{ color: T.iconSubdued, marginTop: '20px' }} />
+                    <ChevronRight size={18} style={{ color: T.iconSubdued, marginTop: '20px', justifySelf: 'end' }} />
                   </div>
                 </button>
               ))}
@@ -757,17 +829,131 @@ const Field: React.FC<{ label: string; value: string; onChange: (value: string) 
   );
 };
 
-const Select: React.FC<{ label: string; value: string; onChange: (value: string) => void; options: string[]; disabled?: boolean }> = ({ label, value, onChange, options, disabled }) => {
-  const { T, isLight } = useThemeTokens();
+const ComboField: React.FC<{ label: string; value: string; onChange: (value: string) => void; options: string[]; placeholder?: string; disabled?: boolean }> = ({ label, value, onChange, options, placeholder, disabled }) => {
+  const { T } = useThemeTokens();
   const S = buildStyles(T);
+  const [open, setOpen] = useState(false);
+  const filteredOptions = options.filter(option => option.toLowerCase().includes(value.toLowerCase()));
+  const visibleOptions = filteredOptions.length > 0 ? filteredOptions : options;
+
   return (
-    <div>
+    <div style={{ position: 'relative' }}>
       <label style={S.label}>{label}</label>
-      <select value={disabled ? '' : value} disabled={disabled} onChange={event => onChange(event.target.value)} style={{ ...S.input, colorScheme: isLight ? 'light' : 'dark', opacity: disabled ? 0.55 : 1 }}>
-        {options.map(option => (
-          <option key={option} value={option}>{option || 'Nenhuma'}</option>
-        ))}
-      </select>
+      <input
+        type="text"
+        value={value}
+        placeholder={placeholder}
+        disabled={disabled}
+        onChange={event => {
+          onChange(event.target.value);
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(true)}
+        style={{ ...S.input, paddingRight: '36px', opacity: disabled ? 0.55 : 1 }}
+      />
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen(prev => !prev)}
+        style={{ position: 'absolute', right: '8px', top: '34px', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', background: 'transparent', color: T.iconSubdued, cursor: disabled ? 'not-allowed' : 'pointer' }}
+        aria-label="Abrir opções"
+      >
+        <ChevronDown size={16} style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+      </button>
+      {open && !disabled && (
+        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: T.bgSurface, border: `1px solid ${T.borderDefault}`, borderRadius: '6px', overflow: 'hidden', zIndex: 100, boxShadow: T.shadowMd }}>
+          {visibleOptions.map(option => {
+            const active = value === option;
+            return (
+              <button
+                key={option}
+                type="button"
+                onMouseDown={event => event.preventDefault()}
+                onClick={() => {
+                  onChange(option);
+                  setOpen(false);
+                }}
+                onMouseEnter={event => {
+                  if (!active) event.currentTarget.style.backgroundColor = T.bgHover;
+                }}
+                onMouseLeave={event => {
+                  if (!active) event.currentTarget.style.backgroundColor = 'transparent';
+                }}
+                style={{ width: '100%', padding: '10px 12px', textAlign: 'left', backgroundColor: active ? T.accentSoft : 'transparent', color: active ? T.accent : T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', border: 'none', cursor: 'pointer' }}
+              >
+                {option}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Select: React.FC<{ label: string; value: string; onChange: (value: string) => void; options: string[]; disabled?: boolean }> = ({ label, value, onChange, options, disabled }) => {
+  const { T } = useThemeTokens();
+  const S = buildStyles(T);
+  const [open, setOpen] = useState(false);
+  const displayValue = value || 'Nenhuma';
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <label style={S.label}>{label}</label>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen(prev => !prev)}
+        style={{
+          ...S.input,
+          opacity: disabled ? 0.55 : 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          textAlign: 'left',
+        }}
+      >
+        <span>{displayValue}</span>
+        <ChevronDown size={16} style={{ color: T.iconSubdued, transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+      </button>
+      {open && !disabled && (
+        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: T.bgSurface, border: `1px solid ${T.borderDefault}`, borderRadius: '6px', overflow: 'hidden', zIndex: 100, boxShadow: T.shadowMd }}>
+          {options.map(option => {
+            const labelOption = option || 'Nenhuma';
+            const active = value === option;
+            return (
+              <button
+                key={option || 'empty'}
+                type="button"
+                onClick={() => {
+                  onChange(option);
+                  setOpen(false);
+                }}
+                onMouseEnter={event => {
+                  if (!active) event.currentTarget.style.backgroundColor = T.bgHover;
+                }}
+                onMouseLeave={event => {
+                  if (!active) event.currentTarget.style.backgroundColor = 'transparent';
+                }}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  textAlign: 'left',
+                  backgroundColor: active ? T.accentSoft : 'transparent',
+                  color: active ? T.accent : T.textPrimary,
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-sm)',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                {labelOption}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
