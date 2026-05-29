@@ -21,6 +21,7 @@ O M011 termina na publicacao do resultado final. Assinatura do termo de outorga 
 | Ator | Papel no processo |
 |------|-------------------|
 | AnalistaTecnico | Publica captacao, conduz analise documental, distribui para revisores, consolida, classifica e publica resultados |
+| GestorFAPES | Pode pausar e retomar a captacao em qualquer ponto do processo de selecao apos a publicacao |
 | Proponente | Elabora e submete a proposta; solicita revisao do resultado preliminar |
 | ResponsavelInstitucional | Assina a proposta antes da submissao formal — apenas quando `exigeAprovacaoInstitucional = true` |
 | RevisorAdHoc | Registra parecer e nota de merito para cada proposta distribuida |
@@ -105,6 +106,36 @@ flowchart TD
 
 ---
 
+## Subprocesso: Pausa da Captacao
+
+O GestorFAPES pode pausar a captacao em qualquer momento apos a publicacao. Durante a pausa, todas as operacoes do processo de selecao ficam bloqueadas. A retomada exige verificacao obrigatoria das datas do cronograma — periodos futuros expirados devem ser aditados antes de o sistema permitir a retomada.
+
+```mermaid
+flowchart TD
+    subgraph GestorFAPES[GestorFAPES]
+        P1[Registrar pausa com justificativa]
+        P4[Solicitar retomada]
+        P5[Registrar AdiamentoPeriodoCronograma\npara cada periodo expirado]
+        P6[Solicitar retomada novamente]
+    end
+
+    subgraph Sistema[Sistema]
+        S1[Bloquear operacoes de selecao:\nsubmissao, parecer, avanco de etapas]
+        S2[Captacao PAUSADO — aguarda retomada]
+        S3{Todos os periodos futuros\ncom dataFim >= hoje?}
+        S4[Rejeitar retomada —\nexibir periodos expirados]
+        S5[Retomada autorizada —\nCaptacao volta a PUBLICADO]
+    end
+
+    PUBLICADO --> P1 --> S1 --> S2
+    S2 --> P4 --> S3
+    S3 -->|Nao| S4 --> P5 --> P6 --> S3
+    S3 -->|Sim| S5
+    S5 --> PUBLICADO_retomado[PUBLICADO — processo continua\ndo ponto em que estava]
+```
+
+---
+
 ## Subprocesso: Demanda Induzida
 
 ```mermaid
@@ -183,6 +214,20 @@ stateDiagram-v2
     ResultadoPreliminarPublicado --> ResultadoFinalPublicado : Sem revisoes admissiveis
     EmRevisao --> ResultadoFinalPublicado : Revisoes analisadas e resultado final publicado
     ResultadoFinalPublicado --> [*]
+
+    Publicada --> Pausada : GestorFAPES pausa com justificativa
+    RecebendoPropostas --> Pausada : GestorFAPES pausa com justificativa
+    EmHabilitacao --> Pausada : GestorFAPES pausa com justificativa
+    EmAnalise --> Pausada : GestorFAPES pausa com justificativa
+    ResultadoPreliminarPublicado --> Pausada : GestorFAPES pausa com justificativa
+    EmRevisao --> Pausada : GestorFAPES pausa com justificativa
+    Pausada --> Publicada : GestorFAPES retoma (apos aditamento de cronograma se necessario)
+
+    note right of Pausada
+        Todas as operacoes bloqueadas.
+        Cronograma nao avanca.
+        GestorFAPES pode aditaretapas antes de retomar.
+    end note
 ```
 
 ---
@@ -203,6 +248,9 @@ stateDiagram-v2
 | RN-SP10 | AnalistaTecnico | A publicacao do resultado final encerra o processo de selecao no M011. |
 | RN-SP11 | AnalistaTecnico | Quando `tipoCaptacao = DEMANDA_INDUZIDA` e outorgado for PJ, a proposta e conduzida pelo contato PF indicado na configuracao. |
 | RN-SP12 | AnalistaTecnico | Propostas aprovadas ficam disponiveis para consumo pelo M022 apos a publicacao do resultado final. |
+| RN-SP13 | GestorFAPES | O processo de selecao pode ser pausado em qualquer ponto apos a publicacao da captacao. A pausa requer justificativa obrigatoria. |
+| RN-SP14 | Sistema | Durante a pausa, nenhuma operacao e permitida: proponentes nao podem submeter nem solicitar revisao, revisores nao podem registrar pareceres, e o AnalistaTecnico nao pode avancar etapas. |
+| RN-SP15 | Sistema | A retomada e bloqueada pelo sistema enquanto existir qualquer periodo futuro nao concluido com `dataFim` anterior a data de retomada. O GestorFAPES deve registrar `AdiamentoPeriodoCronograma` para cada periodo expirado antes de acionar a retomada. O sistema nao compensa automaticamente o tempo de pausa. |
 
 ---
 

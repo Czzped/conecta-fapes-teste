@@ -1112,6 +1112,12 @@ axioms:
   - id: "AX-M011-012"
     natural_language: "Uma Captacao somente pode ser criada a partir de um Fomento com estado APROVADO."
     formal_rule: "Captacao.fomento → Fomento.estado = APROVADO"
+  - id: "AX-M011-032"
+    natural_language: "Enquanto a Captacao estiver no estado PAUSADO, nenhuma operacao do processo de selecao pode ser executada: proponentes nao podem submeter nem solicitar revisao, revisores ad hoc nao podem registrar parecer, e o AnalistaTecnico nao pode avancar etapas do cronograma. O contador de dias dos periodos do cronograma nao avanca automaticamente durante a pausa — a responsabilidade de aditamento do cronograma caso necessario e do GestorFAPES ao retomar."
+    formal_rule: "Captacao.estadoConfiguracao = PAUSADO → operacoesSelecao.bloqueadas = true ∧ cronograma.avancaAutomatico = false"
+  - id: "AX-M011-033"
+    natural_language: "A retomada de uma Captacao PAUSADO e bloqueada enquanto existir qualquer PeriodoCronograma futuro (nao concluido) com dataFim anterior a data de retomada. O GestorFAPES deve registrar AdiamentoPeriodoCronograma para cada periodo afetado antes de acionar a retomada. O sistema deve validar esta condicao e rejeitar a retomada se houver periodos expirados nao aditados."
+    formal_rule: "retomar(Captacao) → ∀p ∈ CronogramaCaptacao.periodos where nao_concluido(p): p.dataFim >= dataRetomada"
   - id: "AX-M011-031"
     natural_language: "Quando tipoCaptacao = DEMANDA_INDUZIDA, o tipoOutorgado da Captacao deve coincidir com o tipo do outorgadoDestinatario."
     formal_rule: "tipoCaptacao = DEMANDA_INDUZIDA → tipoOutorgado = outorgadoDestinatario.tipo"
@@ -1246,6 +1252,7 @@ enums:
       EM_ANDAMENTO: "Captacao em processo de configuracao, ainda nao publicada."
       PUBLICADO: "Captacao publicada e disponivel para execucao do processo de selecao."
       NAO_PUBLICADO: "Captacao despublicada apos ter sido publicada."
+      PAUSADO: "Captacao com processo de selecao temporariamente interrompido pelo GestorFAPES. Nenhuma acao de proponente, revisor ou analistaTecnico e permitida ate retomada. O periodo do cronograma em andamento nao avanca automaticamente."
       ENCERRADO: "Captacao encerrada, resultado final publicado."
 
   TipoPeriodo:
@@ -1344,6 +1351,7 @@ workflows:
       - EM_ANDAMENTO
       - PUBLICADO
       - NAO_PUBLICADO
+      - PAUSADO
       - ENCERRADO
     transitions:
       - from: EM_ANDAMENTO
@@ -1361,6 +1369,16 @@ workflows:
         trigger: "reabrir"
         actor: "AnalistaTecnico"
         guard: "Configuracao ainda valida."
+      - from: PUBLICADO
+        to: PAUSADO
+        trigger: "pausar"
+        actor: "GestorFAPES"
+        guard: "Justificativa informada. Captacao deve estar PUBLICADO. Fomento nao pode estar ENCERRADO ou CONCLUIDO."
+      - from: PAUSADO
+        to: PUBLICADO
+        trigger: "retomar"
+        actor: "GestorFAPES"
+        guard: "Fomento ainda APROVADO. Todos os PeriodoCronograma futuros com dataFim >= data de retomada — se algum periodo tiver expirado, o GestorFAPES deve registrar AdiamentoPeriodoCronograma para cada periodo afetado antes de retomar. Retomada bloqueada enquanto existir periodo futuro com dataFim < hoje."
       - from: PUBLICADO
         to: ENCERRADO
         trigger: "encerrar"
@@ -1428,6 +1446,8 @@ policies:
         - publicar Captacao
         - despublicar Captacao
         - reabrir Captacao para EM_ANDAMENTO
+        - pausar Captacao PUBLICADO (requer justificativa)
+        - retomar Captacao PAUSADO
         - encerrar Captacao
     AnalistaTecnico:
       can:
@@ -1482,6 +1502,7 @@ agent_instructions:
     - "EixoEstrategico, Programa, Parceria, AreaTecnica, TipoIniciativa, Instituicao, TipoInstituicao, NivelAcademico, PessoaFisica e Rubrica sao referencias externas — nao modelar aqui."
     - "Formularios (FormularioSubmissaoRef, FormularioAvaliacaoRef, FormularioRevisaoRef, FormularioAnexoRef) sao referencias ao M021 — apenas formularioId e versaoFormularioId."
     - "M011 termina no ResultadoFinal. Assinatura do termo de outorga e contratacao pertencem ao M022."
+    - "Captacao PAUSADO bloqueia todas as operacoes do processo de selecao (submissao, parecer, avanco de cronograma). Ao retomar, o GestorFAPES deve avaliar se as datas dos PeriodoCronograma ainda sao validas e, se necessario, registrar AdiamentoPeriodoCronograma antes de retomar (AX-M011-032)."
     - "DOACI (RUB-DOACI): limitePercentual na RubricaPermitidaFaixa e o teto do edital — nao pode superar a tabela normativa (Resolucao CCAF no 309/2022, item 2.4.8.1) para o valorMaximo da faixa (AX-M011-011)."
   notes:
     - "CategoriaIniciativa e gerenciada dentro deste modulo e permite selecao multipla no cadastro da captacao."
