@@ -30,6 +30,8 @@ Todas as rotas exigem autenticacao. O perfil do chamador determina o acesso:
 | Perfil | Descricao |
 |--------|-----------|
 | `ANALISTA_AGENCIA` | Analista da Agencia de Fomento — configura cronograma, formularios, categorias, regras, requisitos, documentos exigidos e revisores |
+| `GESTOR_FOMENTO` | Gestor de Fomento — cria e aprova Fomentos, registra aditivos e remanejamentos, interrompe/retoma/encerra Fomento |
+| `GESTOR_FAPES` | Gestor da FAPES — pausa, retoma e cancela Captacoes por decisao administrativa |
 | `DIRETORIA_FAPES` | Diretoria da FAPES — pode instanciar processo de captacao a partir de configuracao publicada |
 | `AREA_TECNICA` | Area tecnica responsavel pela captacao — executa publicacao, avaliacao documental, distribuicao, consolidacao, revisao e resultados |
 | `PROPONENTE` | Pessoa ou instituicao que submete proposta e solicita revisao de resultado |
@@ -87,16 +89,19 @@ Registra ou versiona as fases do cronograma da captacao.
 
 ```json
 {
+  "descricao": "Cronograma da chamada publica 2026",
   "periodos": [
     {
+      "nome": "Recebimento de Propostas",
       "tipo": "RECEBIMENTO_PROPOSTAS",
-      "inicio": "2026-06-01",
-      "fim": "2026-06-30"
+      "dataInicio": "2026-06-01",
+      "dataFim": "2026-06-30"
     },
     {
+      "nome": "Avaliacao Ad Hoc",
       "tipo": "AVALIACAO_AD_HOC",
-      "inicio": "2026-07-01",
-      "fim": "2026-07-31"
+      "dataInicio": "2026-07-01",
+      "dataFim": "2026-07-31"
     }
   ],
   "versao": 1
@@ -105,10 +110,12 @@ Registra ou versiona as fases do cronograma da captacao.
 
 | Campo | Tipo | Obrigatorio | Descricao |
 |-------|------|-------------|-----------|
-| `periodos` | array | Sim | Lista de periodos do cronograma |
+| `descricao` | string | Sim | Descricao do cronograma da captacao |
+| `periodos` | array | Sim | Lista de periodos do cronograma (exatamente 8, um por TipoPeriodo — AX-M011-001) |
+| `periodos[].nome` | string | Sim | Nome descritivo do periodo |
 | `periodos[].tipo` | string (enum) | Sim | Um de: `PUBLICACAO_CAPTACAO`, `RECEBIMENTO_PROPOSTAS`, `AVALIACAO_DOCUMENTAL`, `AVALIACAO_AD_HOC`, `RESULTADO_PRELIMINAR`, `RECEBIMENTO_REVISAO`, `RESULTADO_APOS_REVISAO`, `RESULTADO_FINAL` |
-| `periodos[].inicio` | string (date) | Sim | Data de inicio do periodo |
-| `periodos[].fim` | string (date) | Sim | Data de fim do periodo |
+| `periodos[].dataInicio` | string (date) | Sim | Data de inicio do periodo |
+| `periodos[].dataFim` | string (date) | Sim | Data de fim do periodo |
 | `versao` | integer | Sim | Numero da versao do cronograma |
 
 **Response `201 Created`**
@@ -167,7 +174,12 @@ Registra o adiamento de uma etapa do cronograma e desloca automaticamente as eta
     "id": "ADI-2026-001",
     "tipoPeriodo": "AVALIACAO_DOCUMENTAL",
     "dias": 5,
-    "dataRegistro": "2026-06-10"
+    "justificativa": "Necessidade de tempo adicional para conferencia documental",
+    "dataRegistro": "2026-06-10",
+    "dataInicioOriginal": "2026-07-01",
+    "dataFimOriginal": "2026-07-15",
+    "dataInicioNova": "2026-07-06",
+    "dataFimNova": "2026-07-20"
   },
   "cronogramaAtualizado": true
 }
@@ -181,6 +193,7 @@ Registra o adiamento de uma etapa do cronograma e desloca automaticamente as eta
 | `404` | `ETAPA_CRONOGRAMA_NAO_ENCONTRADA` | A etapa informada nao existe no cronograma da captacao. |
 | `400` | `ADIAMENTO_DADOS_INVALIDOS` | O adiamento deve possuir quantidade de dias positiva e justificativa. |
 | `422` | `CRONOGRAMA_SEQUENCIA_INVALIDA` | O adiamento gerou uma sequencia invalida no cronograma. |
+| `422` | `CAPTACAO_PAUSADA_BLOQUEIA_OPERACAO` | A captacao esta PAUSADA. Operacoes de selecao estao bloqueadas (AX-M011-032). |
 
 ---
 
@@ -212,9 +225,10 @@ Consulta o cronograma vigente de uma captacao.
     "versao": 1,
     "periodos": [
       {
+        "nome": "Recebimento de Propostas",
         "tipo": "RECEBIMENTO_PROPOSTAS",
-        "inicio": "2026-06-01",
-        "fim": "2026-06-30"
+        "dataInicio": "2026-06-01",
+        "dataFim": "2026-06-30"
       }
     ],
     "adiamentos": [
@@ -223,7 +237,11 @@ Consulta o cronograma vigente de uma captacao.
         "tipoPeriodo": "AVALIACAO_DOCUMENTAL",
         "dias": 5,
         "justificativa": "Necessidade de tempo adicional para conferencia documental",
-        "dataRegistro": "2026-06-10"
+        "dataRegistro": "2026-06-10",
+        "dataInicioOriginal": "2026-07-01",
+        "dataFimOriginal": "2026-07-15",
+        "dataInicioNova": "2026-07-06",
+        "dataFimNova": "2026-07-20"
       }
     ]
   }
@@ -629,7 +647,7 @@ Quando o documento exigido for institucional e o proponente for empresa ou insti
 
 ---
 
-### 7. Revisores Ad Hoc
+### 6. Revisores Ad Hoc
 
 #### `POST /api/v1/m011/captacoes/{captacaoId}/revisores`
 
@@ -754,7 +772,230 @@ Sem corpo na resposta.
 
 ---
 
-### 7. Validacao de Prontidao
+### 7. Operacoes de Estado da Captacao
+
+As rotas abaixo cobrem as transicoes de estado da maquina de estados da Captacao (ver modelo-comportamental.md).
+
+#### `POST /api/v1/m011/captacoes/{captacaoId}/publicar`
+
+Publica a captacao, tornando-a acessivel a proponentes.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Operacao de origem:** `PublicarCaptacao`
+- **Guard:** Fomento APROVADO; cronograma com 8 periodos; edital associado; formularios obrigatorios selecionados (AX-M011-001, AX-M011-012)
+
+**Path parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `captacaoId` | string | Identificador da captacao |
+
+**Response `200 OK`**
+
+```json
+{
+  "captacaoId": "CAP-2026-001",
+  "estado": "PUBLICADO"
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
+| `422` | `FOMENTO_NAO_APROVADO` | A captacao nao pode ser publicada pois o fomento associado nao esta APROVADO (AX-M011-012). |
+| `422` | `CRONOGRAMA_INCOMPLETO` | O cronograma deve conter exatamente 8 periodos (AX-M011-001). |
+| `422` | `CONFIGURACAO_CAPTACAO_INCOMPLETA` | A captacao ainda possui pendencias de edital, formulario ou configuracao obrigatoria. |
+| `422` | `ESTADO_INVALIDO_PARA_PUBLICAR` | A captacao deve estar em estado EM_ANDAMENTO para ser publicada. |
+
+---
+
+#### `POST /api/v1/m011/captacoes/{captacaoId}/despublicar`
+
+Reverte a captacao para NAO_PUBLICADO enquanto nao ha propostas no periodo ativo de submissao.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Operacao de origem:** `DespublicarCaptacao`
+- **Guard:** Nao pode haver propostas recebidas no periodo ativo de submissao
+
+**Path parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `captacaoId` | string | Identificador da captacao |
+
+**Response `200 OK`**
+
+```json
+{
+  "captacaoId": "CAP-2026-001",
+  "estado": "NAO_PUBLICADO"
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
+| `422` | `ESTADO_INVALIDO_PARA_DESPUBLICAR` | A captacao deve estar PUBLICADA para ser despublicada. |
+| `422` | `PROPOSTAS_RECEBIDAS_NO_PERIODO` | Nao e possivel despublicar a captacao com propostas recebidas no periodo de submissao ativo. |
+
+---
+
+#### `POST /api/v1/m011/captacoes/{captacaoId}/reabrir`
+
+Retorna uma captacao NAO_PUBLICADO para EM_ANDAMENTO para reconfigurar antes de republicar.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Operacao de origem:** `ReabrirCaptacao`
+
+**Path parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `captacaoId` | string | Identificador da captacao |
+
+**Response `200 OK`**
+
+```json
+{
+  "captacaoId": "CAP-2026-001",
+  "estado": "EM_ANDAMENTO"
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
+| `422` | `ESTADO_INVALIDO_PARA_REABRIR` | A captacao deve estar em NAO_PUBLICADO para ser reaberta. |
+
+---
+
+#### `POST /api/v1/m011/captacoes/{captacaoId}/pausar`
+
+Pausa administrativamente uma captacao PUBLICADA. Bloqueia todas as operacoes de selecao (AX-M011-032).
+
+- **Autorizacao:** `GESTOR_FAPES`
+- **Operacao de origem:** `PausarCaptacao`
+
+**Path parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `captacaoId` | string | Identificador da captacao |
+
+**Request body**
+
+```json
+{
+  "justificativa": "Suspensao administrativa por determinacao do conselho diretor."
+}
+```
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| `justificativa` | string | Sim | Motivo da pausa administrativa |
+
+**Response `200 OK`**
+
+```json
+{
+  "captacaoId": "CAP-2026-001",
+  "estado": "PAUSADO"
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
+| `400` | `JUSTIFICATIVA_OBRIGATORIA` | A justificativa e obrigatoria para pausar a captacao. |
+| `422` | `ESTADO_INVALIDO_PARA_PAUSAR` | A captacao deve estar PUBLICADA para ser pausada. |
+
+---
+
+#### `POST /api/v1/m011/captacoes/{captacaoId}/retomar`
+
+Retoma uma captacao PAUSADA, reativando o estado PUBLICADO. Bloqueado se qualquer periodo futuro tiver dataFim anterior a hoje (AX-M011-033).
+
+- **Autorizacao:** `GESTOR_FAPES`
+- **Operacao de origem:** `RetomarCaptacao`
+
+**Path parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `captacaoId` | string | Identificador da captacao |
+
+**Response `200 OK`**
+
+```json
+{
+  "captacaoId": "CAP-2026-001",
+  "estado": "PUBLICADO"
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
+| `422` | `ESTADO_INVALIDO_PARA_RETOMAR` | A captacao deve estar PAUSADA para ser retomada. |
+| `422` | `PERIODOS_EXPIRADOS_IMPEDEM_RETOMADA` | Existem periodos futuros com dataFim anterior a hoje. Realize adiamentos antes de retomar (AX-M011-033). |
+
+---
+
+#### `POST /api/v1/m011/captacoes/{captacaoId}/cancelar`
+
+Cancela administrativamente uma captacao PUBLICADA ou PAUSADA com justificativa. Encerra a captacao de forma definitiva.
+
+- **Autorizacao:** `GESTOR_FAPES`
+- **Operacao de origem:** `CancelarCaptacao`
+
+**Path parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `captacaoId` | string | Identificador da captacao |
+
+**Request body**
+
+```json
+{
+  "justificativa": "Cancelamento por decisao administrativa do conselho diretor em reuniao de 2026-05-10."
+}
+```
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| `justificativa` | string | Sim | Motivo do cancelamento administrativo |
+
+**Response `200 OK`**
+
+```json
+{
+  "captacaoId": "CAP-2026-001",
+  "estado": "ENCERRADO"
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
+| `400` | `JUSTIFICATIVA_OBRIGATORIA` | A justificativa e obrigatoria para cancelar a captacao. |
+| `422` | `ESTADO_INVALIDO_PARA_CANCELAR` | A captacao deve estar PUBLICADA ou PAUSADA para ser cancelada. |
+
+---
+
+### 8. Validacao de Prontidao
 
 #### `GET /api/v1/m011/captacoes/{captacaoId}/validar-configuracao`
 
@@ -801,14 +1042,324 @@ Exemplo com pendencias:
 
 ---
 
-### 8. Operacoes da Instancia da Captacao
+### 9. Fomento — Aditivos e Remanejamentos
+
+Estas rotas cobrem as operacoes de GestorFomento sobre um Fomento existente.
+
+#### `POST /api/v1/m011/fomentos/{fomentoId}/aditivos`
+
+Registra um aditivo de valor ou de data sobre o Fomento (GestorFomento).
+
+- **Autorizacao:** `GESTOR_FOMENTO`
+- **Operacao de origem:** `RegistrarAditivoFomento`
+
+**Path parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `fomentoId` | string | Identificador do Fomento |
+
+**Request body**
+
+```json
+{
+  "tipo": "DATA",
+  "novaDataFim": "2027-12-31",
+  "justificativa": "Prorrogacao por atraso na aprovacao orcamentaria."
+}
+```
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| `tipo` | string (enum) | Sim | `VALOR` ou `DATA` |
+| `valorAdicionado` | number | Condicional | Valor adicional aportado — obrigatorio quando `tipo=VALOR` |
+| `novaDataFim` | string (date) | Condicional | Nova data de encerramento — obrigatoria quando `tipo=DATA` |
+| `justificativa` | string | Sim | Justificativa do aditivo |
+
+**Response `201 Created`**
+
+```json
+{
+  "aditivo": {
+    "id": "ADIT-2026-001",
+    "fomentoId": "FOM-2026-001",
+    "tipo": "DATA",
+    "novaDataFim": "2027-12-31",
+    "dataFimAnterior": "2026-12-31",
+    "valorTotalAnterior": 800000.0,
+    "justificativa": "Prorrogacao por atraso na aprovacao orcamentaria.",
+    "dataRegistro": "2026-05-29"
+  }
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `FOMENTO_NAO_ENCONTRADO` | O fomento informado nao foi encontrado. |
+| `400` | `ADITIVO_DADOS_INVALIDOS` | Os dados do aditivo sao invalidos ou incompletos para o tipo informado. |
+| `422` | `FOMENTO_ESTADO_INVALIDO_PARA_ADITIVO` | O fomento deve estar APROVADO para receber aditivos. |
+
+---
+
+#### `POST /api/v1/m011/fomentos/{fomentoId}/remanejamentos`
+
+Registra um remanejamento de valor entre duas faixas de investimento do Fomento.
+
+- **Autorizacao:** `GESTOR_FOMENTO`
+- **Operacao de origem:** `RegistrarRemanejamentoFaixas`
+
+**Path parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `fomentoId` | string | Identificador do Fomento |
+
+**Request body**
+
+```json
+{
+  "faixaOrigemId": "FAIXA-2026-001",
+  "faixaDestinoId": "FAIXA-2026-002",
+  "valor": 50000.0,
+  "justificativa": "Remanejamento para reforco da faixa de maior demanda."
+}
+```
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| `faixaOrigemId` | string | Sim | Identificador da faixa de origem |
+| `faixaDestinoId` | string | Sim | Identificador da faixa de destino |
+| `valor` | number | Sim | Valor a ser remanejado (deve ser positivo) |
+| `justificativa` | string | Sim | Justificativa do remanejamento |
+
+**Response `201 Created`**
+
+```json
+{
+  "remanejamento": {
+    "id": "REMAN-2026-001",
+    "fomentoId": "FOM-2026-001",
+    "faixaOrigemId": "FAIXA-2026-001",
+    "faixaDestinoId": "FAIXA-2026-002",
+    "valor": 50000.0,
+    "valorOrigemAnterior": 300000.0,
+    "valorDestinoAnterior": 200000.0,
+    "justificativa": "Remanejamento para reforco da faixa de maior demanda.",
+    "dataRegistro": "2026-05-29"
+  }
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `FOMENTO_NAO_ENCONTRADO` | O fomento informado nao foi encontrado. |
+| `404` | `FAIXA_NAO_ENCONTRADA` | Uma das faixas informadas nao pertence ao fomento. |
+| `400` | `REMANEJAMENTO_VALOR_INVALIDO` | O valor do remanejamento deve ser positivo. |
+| `422` | `FOMENTO_ESTADO_INVALIDO_PARA_REMANEJAMENTO` | O fomento deve estar APROVADO para remanejamento entre faixas. |
+| `422` | `SALDO_INSUFICIENTE_NA_FAIXA_ORIGEM` | O valor a remanejamento excede o saldo disponivel na faixa de origem. |
+
+---
+
+#### `GET /api/v1/m011/fomentos/{fomentoId}/aditivos`
+
+Lista os aditivos registrados para um Fomento.
+
+- **Autorizacao:** `GESTOR_FOMENTO`, `ANALISTA_AGENCIA`, `MODULO_INTERNO`
+
+**Path parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `fomentoId` | string | Identificador do Fomento |
+
+**Response `200 OK`**
+
+```json
+{
+  "fomentoId": "FOM-2026-001",
+  "items": [
+    {
+      "id": "ADIT-2026-001",
+      "tipo": "DATA",
+      "novaDataFim": "2027-12-31",
+      "dataFimAnterior": "2026-12-31",
+      "valorTotalAnterior": 800000.0,
+      "justificativa": "Prorrogacao por atraso na aprovacao orcamentaria.",
+      "dataRegistro": "2026-05-29"
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "pageSize": 20
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `FOMENTO_NAO_ENCONTRADO` | O fomento informado nao foi encontrado. |
+
+---
+
+#### `GET /api/v1/m011/fomentos/{fomentoId}/remanejamentos`
+
+Lista os remanejamentos registrados para um Fomento.
+
+- **Autorizacao:** `GESTOR_FOMENTO`, `ANALISTA_AGENCIA`, `MODULO_INTERNO`
+
+**Path parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `fomentoId` | string | Identificador do Fomento |
+
+**Response `200 OK`**
+
+```json
+{
+  "fomentoId": "FOM-2026-001",
+  "items": [
+    {
+      "id": "REMAN-2026-001",
+      "faixaOrigemId": "FAIXA-2026-001",
+      "faixaDestinoId": "FAIXA-2026-002",
+      "valor": 50000.0,
+      "valorOrigemAnterior": 300000.0,
+      "valorDestinoAnterior": 200000.0,
+      "justificativa": "Remanejamento para reforco da faixa de maior demanda.",
+      "dataRegistro": "2026-05-29"
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "pageSize": 20
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `FOMENTO_NAO_ENCONTRADO` | O fomento informado nao foi encontrado. |
+
+---
+
+### 10. Matriz de Configuracao da Iniciativa
+
+#### `PUT /api/v1/m011/captacoes/{captacaoId}/matriz-configuracao`
+
+Configura a obrigatoriedade dos blocos estruturais da proposta de iniciativa para a captacao.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`
+- **Operacao de origem:** `ConfigurarMatrizConfiguracaoIniciativa`
+
+**Path parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `captacaoId` | string | Identificador da captacao |
+
+**Request body**
+
+```json
+{
+  "equipe": "EXIGIDO",
+  "resultados": "EXIGIDO",
+  "riscos": "DISPENSADO",
+  "cronogramaProj": "EXIGIDO",
+  "orcamento": "EXIGIDO",
+  "objetivos": "EXIGIDO",
+  "beneficios": "DISPENSADO"
+}
+```
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| `equipe` | string (enum) | Sim | `EXIGIDO` ou `DISPENSADO` |
+| `resultados` | string (enum) | Sim | `EXIGIDO` ou `DISPENSADO` |
+| `riscos` | string (enum) | Sim | `EXIGIDO` ou `DISPENSADO` |
+| `cronogramaProj` | string (enum) | Sim | `EXIGIDO` ou `DISPENSADO` |
+| `orcamento` | string (enum) | Sim | `EXIGIDO` ou `DISPENSADO` |
+| `objetivos` | string (enum) | Sim | `EXIGIDO` ou `DISPENSADO` |
+| `beneficios` | string (enum) | Sim | `EXIGIDO` ou `DISPENSADO` |
+
+**Response `200 OK`**
+
+```json
+{
+  "captacaoId": "CAP-2026-001",
+  "matrizConfiguracao": {
+    "equipe": "EXIGIDO",
+    "resultados": "EXIGIDO",
+    "riscos": "DISPENSADO",
+    "cronogramaProj": "EXIGIDO",
+    "orcamento": "EXIGIDO",
+    "objetivos": "EXIGIDO",
+    "beneficios": "DISPENSADO"
+  }
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
+| `400` | `MATRIZ_CONFIGURACAO_DADOS_INVALIDOS` | Todos os sete blocos da matriz de configuracao devem ser informados como EXIGIDO ou DISPENSADO. |
+| `422` | `CONFIGURACAO_CAPTACAO_PUBLICADA_IMUTAVEL` | Uma configuracao de captacao publicada nao pode ser alterada diretamente. |
+
+---
+
+#### `GET /api/v1/m011/captacoes/{captacaoId}/matriz-configuracao`
+
+Consulta a matriz de configuracao de blocos da iniciativa para a captacao.
+
+- **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
+
+**Path parameters**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `captacaoId` | string | Identificador da captacao |
+
+**Response `200 OK`**
+
+```json
+{
+  "captacaoId": "CAP-2026-001",
+  "matrizConfiguracao": {
+    "equipe": "EXIGIDO",
+    "resultados": "EXIGIDO",
+    "riscos": "DISPENSADO",
+    "cronogramaProj": "EXIGIDO",
+    "orcamento": "EXIGIDO",
+    "objetivos": "EXIGIDO",
+    "beneficios": "DISPENSADO"
+  }
+}
+```
+
+**Erros**
+
+| HTTP | Codigo | Mensagem |
+|------|--------|----------|
+| `404` | `CAPTACAO_NAO_ENCONTRADA` | A captacao informada nao foi encontrada. |
+| `404` | `MATRIZ_CONFIGURACAO_NAO_ENCONTRADA` | A matriz de configuracao nao foi configurada para esta captacao. |
+
+---
+
+### 11. Operacoes da Instancia da Captacao
 
 Estas rotas representam o processo operacional descrito em [process.md](process.md). O detalhamento completo de payload de cada formulario continua dependente das versoes selecionadas no M021.
 
 | Metodo | Path | Operacao | Autorizacao |
 |--------|------|----------|-------------|
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/instancias` | InstanciarProcessoCaptacao | DIRETORIA_FAPES, AREA_TECNICA |
-| `POST` | `/api/v1/m011/captacoes/{captacaoId}/publicacao` | PublicarCaptacao | AREA_TECNICA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/propostas` | SubmeterProposta | PROPONENTE |
 | `GET` | `/api/v1/m011/captacoes/{captacaoId}/propostas` | ListarPropostasDaCaptacao | AREA_TECNICA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/propostas/{propostaId}/avaliacao-documental` | RegistrarAvaliacaoDocumental | AREA_TECNICA |
@@ -818,6 +1369,7 @@ Estas rotas representam o processo operacional descrito em [process.md](process.
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/propostas/{propostaId}/revisoes` | SubmeterRevisaoResultado | PROPONENTE |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/revisoes/{revisaoId}/decisao` | AnalisarRevisaoResultado | AREA_TECNICA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/resultados/final` | PublicarResultado | AREA_TECNICA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/encerrar` | EncerrarCaptacao | ANALISTA_AGENCIA |
 
 ---
 
@@ -848,9 +1400,20 @@ Estas rotas representam o processo operacional descrito em [process.md](process.
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/revisores` | AssociarRevisorAdHoc | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/m011/captacoes/{captacaoId}/revisores` | ListarRevisoresAdHoc | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `DELETE` | `/api/v1/m011/captacoes/{captacaoId}/revisores/{revisorId}` | RemoverRevisorAdHoc | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/publicar` | PublicarCaptacao | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/despublicar` | DespublicarCaptacao | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/reabrir` | ReabrirCaptacao | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/pausar` | PausarCaptacao | GESTOR_FAPES |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/retomar` | RetomarCaptacao | GESTOR_FAPES |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/cancelar` | CancelarCaptacao | GESTOR_FAPES |
 | `GET` | `/api/v1/m011/captacoes/{captacaoId}/validar-configuracao` | ValidarConfiguracaoDaCaptacao | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/m011/fomentos/{fomentoId}/aditivos` | RegistrarAditivoFomento | GESTOR_FOMENTO |
+| `GET` | `/api/v1/m011/fomentos/{fomentoId}/aditivos` | ListarAditivosFomento | GESTOR_FOMENTO, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `POST` | `/api/v1/m011/fomentos/{fomentoId}/remanejamentos` | RegistrarRemanejamentoFaixas | GESTOR_FOMENTO |
+| `GET` | `/api/v1/m011/fomentos/{fomentoId}/remanejamentos` | ListarRemanejamentosFomento | GESTOR_FOMENTO, ANALISTA_AGENCIA, MODULO_INTERNO |
+| `PUT` | `/api/v1/m011/captacoes/{captacaoId}/matriz-configuracao` | ConfigurarMatrizConfiguracaoIniciativa | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/m011/captacoes/{captacaoId}/matriz-configuracao` | ConsultarMatrizConfiguracaoIniciativa | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/instancias` | InstanciarProcessoCaptacao | DIRETORIA_FAPES, AREA_TECNICA |
-| `POST` | `/api/v1/m011/captacoes/{captacaoId}/publicacao` | PublicarCaptacao | AREA_TECNICA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/propostas` | SubmeterProposta | PROPONENTE |
 | `GET` | `/api/v1/m011/captacoes/{captacaoId}/propostas` | ListarPropostasDaCaptacao | AREA_TECNICA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/propostas/{propostaId}/avaliacao-documental` | RegistrarAvaliacaoDocumental | AREA_TECNICA |
@@ -871,12 +1434,26 @@ Estas rotas representam o processo operacional descrito em [process.md](process.
 {
   "id": "string",
   "captacaoId": "string",
+  "descricao": "string",
   "versao": "integer",
   "periodos": [
     {
+      "nome": "string",
       "tipo": "PUBLICACAO_CAPTACAO | RECEBIMENTO_PROPOSTAS | AVALIACAO_DOCUMENTAL | AVALIACAO_AD_HOC | RESULTADO_PRELIMINAR | RECEBIMENTO_REVISAO | RESULTADO_APOS_REVISAO | RESULTADO_FINAL",
-      "inicio": "string (YYYY-MM-DD)",
-      "fim": "string (YYYY-MM-DD)"
+      "dataInicio": "string (YYYY-MM-DD)",
+      "dataFim": "string (YYYY-MM-DD)",
+      "adiamentos": [
+        {
+          "id": "string",
+          "dias": "integer (>0)",
+          "justificativa": "string",
+          "dataRegistro": "string (YYYY-MM-DD)",
+          "dataInicioOriginal": "string (YYYY-MM-DD)",
+          "dataFimOriginal": "string (YYYY-MM-DD)",
+          "dataInicioNova": "string (YYYY-MM-DD)",
+          "dataFimNova": "string (YYYY-MM-DD)"
+        }
+      ]
     }
   ]
 }
@@ -912,6 +1489,56 @@ Estas rotas representam o processo operacional descrito em [process.md](process.
   "captacaoId": "string",
   "prontoParaPublicacao": "boolean",
   "pendencias": ["string"]
+}
+```
+
+### EstadoConfiguracaoCaptacao (enum)
+
+`EM_ANDAMENTO` | `PUBLICADO` | `NAO_PUBLICADO` | `PAUSADO` | `ENCERRADO`
+
+### AditivoFomento
+
+```json
+{
+  "id": "string",
+  "fomentoId": "string",
+  "tipo": "VALOR | DATA",
+  "valorAdicionado": "number (opcional — presente quando tipo=VALOR)",
+  "novaDataFim": "string (YYYY-MM-DD, opcional — presente quando tipo=DATA)",
+  "justificativa": "string",
+  "dataRegistro": "string (YYYY-MM-DD, gerado pelo sistema)",
+  "dataFimAnterior": "string (YYYY-MM-DD)",
+  "valorTotalAnterior": "number"
+}
+```
+
+### RemanejamentoFaixas
+
+```json
+{
+  "id": "string",
+  "fomentoId": "string",
+  "faixaOrigemId": "string",
+  "faixaDestinoId": "string",
+  "valor": "number (>0)",
+  "justificativa": "string",
+  "dataRegistro": "string (YYYY-MM-DD, gerado pelo sistema)",
+  "valorOrigemAnterior": "number",
+  "valorDestinoAnterior": "number"
+}
+```
+
+### MatrizConfiguracaoIniciativa
+
+```json
+{
+  "equipe": "EXIGIDO | DISPENSADO",
+  "resultados": "EXIGIDO | DISPENSADO",
+  "riscos": "EXIGIDO | DISPENSADO",
+  "cronogramaProj": "EXIGIDO | DISPENSADO",
+  "orcamento": "EXIGIDO | DISPENSADO",
+  "objetivos": "EXIGIDO | DISPENSADO",
+  "beneficios": "EXIGIDO | DISPENSADO"
 }
 ```
 

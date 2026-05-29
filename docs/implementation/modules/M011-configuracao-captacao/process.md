@@ -9,9 +9,9 @@ sequenciais e dependentes.
 
 | # | Processo | Responsavel principal | Descricao resumida |
 |---|----------|-----------------------|--------------------|
-| 1 | [Fomento](process-fomento.md) | GestorFAPES | Aporte financeiro de Programa ou Parceria para um eixo estrategico. Define faixas de investimento, rubricas por faixa e resultados esperados. |
-| 2 | [Configuracao da Selecao](process-configuracao-selecao.md) | AnalistaTecnico | A Area Tecnica define tipo de chamamento, cronograma das etapas, formularios e regras de selecao sobre um Fomento aprovado. |
-| 3 | [Selecao dos Projetos](process-selecao-projetos.md) | AnalistaTecnico | Execucao da captacao: recebimento de propostas, analise documental, analise de merito, resultado preliminar, revisao e resultado final. |
+| 1 | [Fomento](process-fomento.md) | GestorFomento | Aporte financeiro de Programa ou Parceria para um eixo estrategico. Define faixas de investimento, rubricas por faixa e resultados esperados. |
+| 2 | [Configuracao da Selecao](process-configuracao-selecao.md) | AnalistaTecnico | A Area Tecnica configura o tipo de chamamento, cronograma com 8 etapas obrigatorias, formularios e regras de selecao sobre um Fomento aprovado. GestorFAPES e responsavel por publicar, pausar, retomar e cancelar a Captacao. |
+| 3 | [Selecao dos Projetos](process-selecao-projetos.md) | AnalistaTecnico | Execucao da captacao: recebimento de propostas, analise documental, analise de merito, resultado preliminar, revisao e resultado final. Envolve tambem Proponente, RevisorAdHoc e ResponsavelInstitucional. |
 
 ---
 
@@ -25,7 +25,8 @@ flowchart LR
 ```
 
 - O Processo 2 exige um Fomento com estado `APROVADO`.
-- O Processo 3 exige uma Captacao com estado `PUBLICADO`.
+- O Processo 3 exige uma Captacao com estado `PUBLICADO`. Uma Captacao pode ser pausada (`PAUSADO`) por GestorFAPES, bloqueando todas as operacoes de selecao ate ser retomada.
+- A Captacao pode ser encerrada de tres formas: encerramento normal pelo AnalistaTecnico apos publicacao do resultado final, expiracao automatica pelo sistema ao fim do periodo `RESULTADO_FINAL`, ou cancelamento administrativo por GestorFAPES com justificativa.
 - O M011 termina na publicacao do resultado final. A assinatura do termo de outorga e contratacao pertencem ao M022.
 
 ---
@@ -34,11 +35,13 @@ flowchart LR
 
 | Ator | Processos |
 |------|-----------|
-| GestorFomento | 1 — papel atribuivel a qualquer funcionario da FAPES autorizado a buscar aportes de Programas e Parcerias |
-| GestorFAPES | 2 (publicacao/encerramento da captacao) |
-| AnalistaTecnico (Area Tecnica) | 1 (rubricas/bolsas por faixa), 2, 3 |
-| Proponente | 3 |
-| RevisorAdHoc | 3 |
+| GestorFomento | 1 — cria, edita e aprova Fomento; registra aportes, aditivos e remanejamentos de faixas; interrompe, retoma e encerra Fomento |
+| GestorFAPES | 2 — publica, despublica, pausa, retoma e cancela Captacao |
+| AnalistaTecnico (Area Tecnica) | 2 — configura Captacao (cronograma, formularios, regras); 3 — conduz selecao e encerra Captacao apos resultado final |
+| Proponente | 3 — submete proposta e solicita revisao |
+| RevisorAdHoc | 3 — registra parecer de avaliacao ad hoc |
+| ResponsavelInstitucional | 3 — aprova ou recusa proposta quando exigeAprovacaoInstitucional=true |
+| Sistema | Transicoes automaticas: conclui Fomento quando hoje >= dataFimEfetiva; expira Captacao ao fim do periodo RESULTADO_FINAL |
 
 ---
 

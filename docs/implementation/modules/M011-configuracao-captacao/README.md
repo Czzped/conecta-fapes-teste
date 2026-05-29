@@ -25,11 +25,37 @@ Atualmente esse processo e realizado por meio de documentos manuais, sem templat
 
 ---
 
+## Processos
+
+O modulo M011 compreende 3 processos principais no namespace `pre_award.captacao`:
+
+| # | Processo | Ator Principal | Descricao |
+|---|----------|----------------|-----------|
+| 1 | Fomento | GestorFomento | Criacao e gestao do fomento: configuracao de aportes, faixas de investimento, tipos de iniciativa e ciclo de vida (EM_ELABORACAO → APROVADO → INTERROMPIDO / ENCERRADO / CONCLUIDO). Prerequisito para qualquer captacao. |
+| 2 | Configuracao da Selecao | AnalistaTecnico | Configuracao completa da captacao vinculada a um fomento APROVADO: cronograma com 8 etapas, formularios, regras, faixas, rubricas, revisores e publicacao. Estados: EM_ANDAMENTO, PUBLICADO, NAO_PUBLICADO, PAUSADO, ENCERRADO. |
+| 3 | Selecao dos Projetos | AnalistaTecnico, Proponente, RevisorAdHoc, ResponsavelInstitucional | Execucao do fluxo de selecao apos publicacao: recebimento de propostas, avaliacao documental, avaliacao ad hoc, revisao de resultado e publicacao do resultado final. |
+
+---
+
+## Atores
+
+| Ator | Responsabilidades no M011 |
+|------|--------------------------|
+| GestorFomento | Criar, editar e aprovar Fomento; registrar aditivos e remanejamentos de faixas; interromper, retomar e encerrar Fomento |
+| GestorFAPES | Criar, publicar, despublicar, reabrir, pausar, retomar e cancelar Captacao |
+| AnalistaTecnico | Configurar Captacao; encerrar apos publicacao do resultado final; conduzir o processo de selecao |
+| Proponente | Submeter proposta dentro do periodo de recebimento; solicitar revisao do resultado preliminar |
+| RevisorAdHoc | Registrar parecer e nota no formulario de avaliacao ad hoc |
+| ResponsavelInstitucional | Aprovar ou recusar proposta quando `exigeAprovacaoInstitucional = true` |
+| Sistema | Transicoes automaticas: Fomento → CONCLUIDO quando `hoje >= dataFimEfetiva`; Captacao → ENCERRADO por expiracao quando `RESULTADO_FINAL.dataFim` e atingida sem publicacao manual |
+
+---
+
 ## Dominio
 
 A agencia de fomento publica captacoes de fomento (`Chamada Publica` ou `Demanda Induzida`) para selecionar iniciativas. O processo de captacao de iniciativas possui as seguintes etapas:
 
-**1. Configuracao da Captacao** — A agencia configura a captacao com: aportes financeiros de programas ou parcerias, area tecnica responsavel pela gestao das iniciativas, tipo de captacao, ortogado destinatario quando for demanda induzida, categorias e tipos de iniciativas aceitos, cronograma da captacao, selecao de formularios da base M021 (submissao, avaliacao ad hoc, revisao de resultado e anexos quando aplicavel), faixas de financiamento, regras de submissao, requisitos do proponente, documentos exigidos, criterios de avaliacao, rubricas e subrubricas permitidas, modalidades e niveis de bolsa quando a rubrica Bolsa estiver permitida, pool de revisores ad hoc e regras de distribuicao.
+**1. Configuracao da Captacao** — A agencia configura a captacao com: aportes financeiros de programas ou parcerias, area tecnica responsavel pela gestao das iniciativas, tipo de captacao, outorgado destinatario quando for demanda induzida, categorias e tipos de iniciativas aceitos, cronograma da captacao com exatamente 8 etapas obrigatorias (publicacao, recebimento de propostas, avaliacao documental, avaliacao ad hoc, resultado preliminar, recebimento de revisao, resultado apos revisao, resultado final), selecao de formularios da base M021 (submissao, avaliacao ad hoc, revisao de resultado e anexos quando aplicavel), faixas de financiamento, regras de submissao, requisitos do proponente, documentos exigidos, criterios de avaliacao, rubricas e subrubricas permitidas, modalidades e niveis de bolsa quando a rubrica Bolsa estiver permitida, pool de revisores ad hoc e regras de distribuicao.
 
 **2. Publicacao da Captacao** — A captacao fica visivel apenas na data de publicacao definida no cronograma da captacao. A configuracao precisa estar publicada para que uma instancia de captacao seja criada.
 
@@ -45,6 +71,16 @@ Uma captacao pode receber aporte financeiro de um ou mais programas ou parcerias
 
 > O M011 termina na publicacao do resultado final. O M022 formaliza a contratacao/outorga e o M003 gerencia a iniciativa pos-contratacao.
 
+### Estados da Captacao
+
+| Estado | Descricao |
+|--------|-----------|
+| EM_ANDAMENTO | Configuracao em elaboracao pelo AnalistaTecnico. |
+| PUBLICADO | Captacao visivel e operacional para recebimento de propostas e selecao. |
+| NAO_PUBLICADO | Captacao despublicada apos publicacao inicial; pode ser reaberta. |
+| PAUSADO | Captacao suspensa administrativamente pelo GestorFAPES com justificativa. Bloqueia todas as operacoes de selecao (AX-M011-032). Para retomar, todos os periodos futuros do cronograma devem ter `dataFim >= hoje` (AX-M011-033). |
+| ENCERRADO | Estado final; atingido por encerramento normal apos resultado final, expiracao automatica ou cancelamento administrativo. |
+
 ---
 
 ## Regras de Negocio
@@ -55,7 +91,7 @@ Uma captacao pode receber aporte financeiro de um ou mais programas ou parcerias
 | RN02 | Toda configuracao de captacao deve possuir tipo: `Chamada Publica` ou `Demanda Induzida`. | Must |
 | RN03 | Um revisor ad hoc nao pode avaliar propostas da propria instituicao (conflito de interesses). | Must |
 | RN04 | Toda configuracao deve possuir edital ou link do edital antes de ser aprovada. | Must |
-| RN05 | O cronograma da captacao deve possuir fases sequenciais obrigatorias. | Must |
+| RN05 | O cronograma da captacao deve possuir exatamente 8 etapas sequenciais obrigatorias: PUBLICACAO_CAPTACAO, RECEBIMENTO_PROPOSTAS, AVALIACAO_DOCUMENTAL, AVALIACAO_AD_HOC, RESULTADO_PRELIMINAR, RECEBIMENTO_REVISAO, RESULTADO_APOS_REVISAO, RESULTADO_FINAL. | Must |
 | RN06 | Formularios usados na captacao devem ser selecionados a partir de versoes publicadas no M021. | Must |
 | RN07 | O total financeiro da captacao deve ser calculado pela soma dos aportes financeiros configurados. | Must |
 | RN08 | Uma configuracao de captacao so pode ser publicada quando cronograma, formularios e configuracoes obrigatorias estiverem completos. | Must |
@@ -67,7 +103,7 @@ Uma captacao pode receber aporte financeiro de um ou mais programas ou parcerias
 | RN14 | Quando a rubrica Bolsa estiver permitida, a captacao deve definir modalidades e niveis de bolsa vinculados as versoes de niveis do M001, maximo de bolsistas e quantidade de cotas. | Must |
 | RN15 | Uma proposta submetida fora do periodo de recebimento deve ser recusada automaticamente. | Must |
 | RN16 | O resultado final so pode ser publicado apos o encerramento e a analise das revisoes admissiveis. | Must |
-| RN17 | Toda captacao do tipo `Demanda Induzida` deve ser direcionada para um ortogado destinatario. | Must |
+| RN17 | Toda captacao do tipo `Demanda Induzida` deve ser direcionada para um outorgado destinatario. | Must |
 | RN18 | A publicacao do resultado final encerra o processo de captacao no M011 e disponibiliza propostas aprovadas para o M022. | Must |
 | RN19 | A captacao deve permitir selecionar uma ou mais categorias de iniciativas aceitas. | Must |
 | RN20 | A captacao pode possuir varias faixas de financiamento, cada uma com duracao maxima da iniciativa, valor minimo, valor maximo e valor aportado. | Should |
@@ -79,9 +115,9 @@ Uma captacao pode receber aporte financeiro de um ou mais programas ou parcerias
 | RN26 | Rubricas permitidas devem ser selecionadas a partir de Rubricas ativas do M008. | Must |
 | RN27 | A captacao pode definir limite por Rubrica em valor absoluto ou percentual da faixa de financiamento. | Must |
 | RN28 | Restricoes, exclusoes e comprovantes esperados por Rubrica devem ser registrados na configuracao da captacao quando o edital trouxer regra especifica. | Should |
-| RN26 | Quando a submissao for restrita a proponentes escolhidos, a captacao deve indicar as instituicoes ou pessoas autorizadas a submeter proposta. | Must |
-| RN27 | A soma dos valores aportados nas faixas de financiamento nao deve ultrapassar o total financeiro calculado pelos aportes da captacao. | Must |
-| RN28 | Ao adiar uma etapa do cronograma, o sistema deve registrar historico com justificativa, datas originais e novas datas. | Must |
+| RN30 | Quando a submissao for restrita a proponentes escolhidos, a captacao deve indicar as instituicoes ou pessoas autorizadas a submeter proposta. | Must |
+| RN31 | A soma dos valores aportados nas faixas de financiamento nao deve ultrapassar o total financeiro calculado pelos aportes da captacao. | Must |
+| RN32 | Ao adiar uma etapa do cronograma, o sistema deve registrar historico com justificativa, datas originais e novas datas. | Must |
 | RN29 | Ao adiar uma etapa do cronograma, as etapas posteriores devem ser deslocadas pela mesma quantidade de dias. | Must |
 | RI1 | Um revisor nao pode ser associado mais de uma vez ao mesmo pool da captacao. | Must |
 | RI2 | Uma captacao nao pode ter dois formularios de submissao ativos simultaneamente. | Must |

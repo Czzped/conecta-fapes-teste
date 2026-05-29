@@ -53,11 +53,14 @@ flowchart TD
         R[Definir exigencia de prestacao tecnica e financeira]
         S[Selecionar formularios no M021]
         MX[Configurar matriz de campos da proposta]
+        W0[Definir data de publicacao da captacao]
         W1[Definir periodo de submissao de propostas]
         W2[Definir periodo de analise documental]
-        W3[Definir periodo de analise de merito]
-        W4[Definir periodo de recursos]
-        W5[Definir data de publicacao do resultado final]
+        W3[Definir periodo de avaliacao ad hoc]
+        W4[Definir data de publicacao do resultado preliminar]
+        W5[Definir periodo de recebimento de revisoes]
+        W6[Definir data de publicacao do resultado apos revisao]
+        W7[Definir data de publicacao do resultado final]
         X[Validar configuracao]
         Y{Configuracao valida?}
         Z[Publicar Captacao]
@@ -74,8 +77,8 @@ flowchart TD
     K -->|Sim| L --> M
     K -->|Nao| M
     M --> N --> O --> P --> R --> S
-    S --> MX --> W1 --> W2 --> W3 --> W4 --> W5
-    W5 --> X --> Y
+    S --> MX --> W0 --> W1 --> W2 --> W3 --> W4 --> W5 --> W6 --> W7
+    W7 --> X --> Y
     Y -->|Nao| C
     Y -->|Sim| Z
     Z --> ZA[Captacao disponivel para o Processo 3]
@@ -105,7 +108,7 @@ flowchart TD
 | 15 | Definir exigencia de prestacao | AnalistaTecnico | Define se os projetos gerados exigirao prestacao tecnica e/ou financeira. |
 | 16 | Selecionar formularios no M021 | AnalistaTecnico | Seleciona na base do M021: formulario de submissao da proposta, formulario de avaliacao ad hoc (usado pelos revisores para registrar parecer e nota), formulario de revisao de resultado e formulario de anexos (opcional). |
 | 17 | Configurar matriz de campos da proposta | AnalistaTecnico | Para cada bloco fixo da proposta define se e `EXIGIDO` ou `DISPENSADO`. Os blocos configurados aqui determinam o que aparece no formulario de submissao para o proponente. |
-| 18 | Configurar datas do processo de selecao | AnalistaTecnico | Define as 5 etapas obrigatorias do cronograma. Todas as datas devem estar dentro da vigencia do Fomento. |
+| 18 | Configurar datas do processo de selecao | AnalistaTecnico | Define as 8 etapas obrigatorias do cronograma: PUBLICACAO_CAPTACAO, RECEBIMENTO_PROPOSTAS, AVALIACAO_DOCUMENTAL, AVALIACAO_AD_HOC, RESULTADO_PRELIMINAR, RECEBIMENTO_REVISAO, RESULTADO_APOS_REVISAO e RESULTADO_FINAL. Todas as datas devem estar dentro da vigencia do Fomento. |
 | 19 | Validar e publicar Captacao | AnalistaTecnico | Verifica configuracao completa e publica. Captacao transita para `PUBLICADO`. |
 
 ---
@@ -132,13 +135,16 @@ formulario de submissao. Blocos exigidos sao obrigatorios para a submissao ser c
 
 ## Cronograma da Selecao
 
-| Etapa | Tipo | Obrigatoriedade | Descricao |
-|-------|------|-----------------|-----------|
-| Submissao de Propostas | Periodo (inicio + fim) | Obrigatoria | Janela em que proponentes podem enviar propostas. Quando `exigeAprovacaoInstitucional = true`, o ResponsavelInstitucional deve assinar a proposta **dentro deste mesmo periodo** — nao ha etapa separada para aprovacao. |
-| Analise Documental | Periodo (inicio + fim) | Obrigatoria | AnalistaTecnico confere documentacao e habilita ou inabilita propostas. |
-| Analise de Merito | Periodo (inicio + fim) | Obrigatoria | Revisores ad hoc registram pareceres e notas das propostas habilitadas. |
-| Recursos | Periodo (inicio + fim) | Obrigatoria | Proponentes podem solicitar revisao do resultado preliminar. |
-| Publicacao do Resultado Final | Data | Obrigatoria | Data em que o resultado final e divulgado e o processo de selecao e encerrado no M011. |
+| Etapa | TipoPeriodo | Tipo | Obrigatoriedade | Descricao |
+|-------|-------------|------|-----------------|-----------|
+| Publicacao da Captacao | PUBLICACAO_CAPTACAO | Data (inicio + fim) | Obrigatoria | Data em que a captacao e tornada publica para os proponentes. Marca o inicio formal do processo. |
+| Recebimento de Propostas | RECEBIMENTO_PROPOSTAS | Periodo (inicio + fim) | Obrigatoria | Janela em que proponentes podem enviar propostas. Quando `exigeAprovacaoInstitucional = true`, o ResponsavelInstitucional deve assinar a proposta **dentro deste mesmo periodo** — nao ha etapa separada para aprovacao. |
+| Avaliacao Documental | AVALIACAO_DOCUMENTAL | Periodo (inicio + fim) | Obrigatoria | AnalistaTecnico confere documentacao e habilita ou inabilita propostas. |
+| Avaliacao Ad Hoc | AVALIACAO_AD_HOC | Periodo (inicio + fim) | Obrigatoria | Revisores ad hoc registram pareceres e notas das propostas habilitadas. |
+| Resultado Preliminar | RESULTADO_PRELIMINAR | Data (inicio + fim) | Obrigatoria | Data em que o resultado preliminar e divulgado aos proponentes, abrindo prazo para interposicao de recursos. |
+| Recebimento de Revisoes | RECEBIMENTO_REVISAO | Periodo (inicio + fim) | Obrigatoria | Proponentes podem solicitar revisao do resultado preliminar. |
+| Resultado Apos Revisao | RESULTADO_APOS_REVISAO | Data (inicio + fim) | Obrigatoria | Data em que e publicado o resultado apos analise dos recursos e revisoes interpostos. |
+| Resultado Final | RESULTADO_FINAL | Data | Obrigatoria | Data em que o resultado final e divulgado e o processo de selecao e encerrado no M011. Quando atingida sem publicacao manual, o Sistema encerra a Captacao automaticamente. |
 
 Qualquer etapa pode ser adiada pelo AnalistaTecnico mediante justificativa. O sistema desloca
 automaticamente todas as etapas posteriores pelo mesmo numero de dias e preserva historico com
@@ -162,7 +168,7 @@ Captacao publicada contendo:
 - regras de avaliacao de merito e pool de revisores ad hoc;
 - exigencia de prestacao tecnica e/ou financeira;
 - formularios de submissao, avaliacao, recursos e anexos selecionados no M021;
-- cronograma com as 5 etapas obrigatorias.
+- cronograma com as 8 etapas obrigatorias (PUBLICACAO_CAPTACAO, RECEBIMENTO_PROPOSTAS, AVALIACAO_DOCUMENTAL, AVALIACAO_AD_HOC, RESULTADO_PRELIMINAR, RECEBIMENTO_REVISAO, RESULTADO_APOS_REVISAO, RESULTADO_FINAL).
 
 ---
 
@@ -197,7 +203,7 @@ stateDiagram-v2
 | RN-CS05 | AnalistaTecnico | A Captacao deve selecionar ao menos uma faixa do Fomento. |
 | RN-CS06 | AnalistaTecnico | As faixas selecionadas devem pertencer ao Fomento referenciado. |
 | RN-CS07 | AnalistaTecnico | A Captacao deve ter link do edital preenchido antes da publicacao. |
-| RN-CS08 | AnalistaTecnico | O cronograma deve conter as 5 etapas obrigatorias antes da publicacao. |
+| RN-CS08 | AnalistaTecnico | O cronograma deve conter as 8 etapas obrigatorias antes da publicacao: PUBLICACAO_CAPTACAO, RECEBIMENTO_PROPOSTAS, AVALIACAO_DOCUMENTAL, AVALIACAO_AD_HOC, RESULTADO_PRELIMINAR, RECEBIMENTO_REVISAO, RESULTADO_APOS_REVISAO e RESULTADO_FINAL. |
 | RN-CS09 | AnalistaTecnico | Todas as datas do cronograma devem estar dentro da vigencia do Fomento (dataInicio a dataFim efetiva). |
 | RN-CS10 | AnalistaTecnico | Toda Captacao deve selecionar formulario de submissao, avaliacao ad hoc e revisao de resultado no M021. |
 | RN-CS11 | AnalistaTecnico | Quando submissao restrita a escolhidos, deve ser selecionada ao menos uma instituicao ou pessoa autorizada. |

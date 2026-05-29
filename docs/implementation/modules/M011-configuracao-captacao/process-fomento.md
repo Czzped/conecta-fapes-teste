@@ -108,7 +108,7 @@ Fomento aprovado contendo:
 | Restricao | Regra |
 |-----------|-------|
 | Total de aportes | Soma dos `valorAportado` de todos os `AporteFomento` |
-| Limite das faixas | `∑FaixaInvestimento.valorMaximo ≤ ∑AporteFomento.valorAportado` |
+| Limite das faixas | `∑FaixaInvestimento.valorAportado ≤ ∑AporteFomento.valorAportado` |
 | Aporte individual | Cada aporte deve ser maior que zero |
 | Origem exclusiva | Cada aporte referencia exatamente um Programa ou uma Parceria |
 
@@ -116,9 +116,7 @@ Fomento aprovado contendo:
 
 ## Subprocesso: Aditivo de Fomento
 
-Apos aprovacao, o GestorFomento pode aditivar o Fomento para ampliar o valor disponivel,
-prorrogar a data de fim ou ambos. Cada aditivo e um registro imutavel com historico dos
-valores anteriores.
+Apos aprovacao, o GestorFomento pode aditivar o Fomento para ampliar o valor disponivel (tipo VALOR) ou prorrogar a data de fim (tipo DATA). Cada aditivo e um registro imutavel com historico dos valores anteriores.
 
 ```mermaid
 flowchart TD
@@ -141,8 +139,8 @@ flowchart TD
 
 | # | Atividade | Responsavel | Descricao |
 |---|-----------|-------------|-----------|
-| 1 | Identificar necessidade de aditivo | GestorFomento | Identifica que o fomento precisa de ampliacao de valor, prorrogacao de prazo ou ambos. |
-| 2 | Selecionar tipo do aditivo | GestorFomento | Define se o aditivo e de VALOR, DATA ou VALOR_E_DATA. |
+| 1 | Identificar necessidade de aditivo | GestorFomento | Identifica que o fomento precisa de ampliacao de valor (tipo VALOR) ou prorrogacao de prazo (tipo DATA). |
+| 2 | Selecionar tipo do aditivo | GestorFomento | Define se o aditivo e de VALOR ou DATA. |
 | 3 | Informar valor adicionado | GestorFomento | Quando tipo = VALOR, informa o valor financeiro a ser acrescido ao total do fomento. Deve ser maior que zero. |
 | 4 | Informar nova data de fim | GestorFomento | Quando tipo = DATA, informa a nova data de fim. Deve ser posterior a data de fim vigente. |
 | 5 | Informar justificativa | GestorFomento | Registra o motivo do aditivo. Obrigatorio. |
@@ -239,7 +237,7 @@ stateDiagram-v2
 | RN-F03 | GestorFomento | Todo Fomento deve possuir ao menos uma faixa de investimento antes de ser aprovado. |
 | RN-F04 | GestorFomento | Todo Fomento deve possuir ao menos um tipo de iniciativa declarado antes de ser aprovado. |
 | RN-F05 | GestorFomento | Cada aporte deve indicar exatamente uma origem (PROGRAMA ou PARCERIA) e possuir valor aportado maior que zero. |
-| RN-F06 | GestorFomento / AnalistaTecnico | A soma dos valores maximos das faixas de investimento nao deve ultrapassar o total financeiro calculado pelos aportes. |
+| RN-F06 | GestorFomento / AnalistaTecnico | A soma dos valores aportados das faixas de investimento nao deve ultrapassar o total financeiro calculado pelos aportes (`∑FaixaInvestimento.valorAportado ≤ ∑AporteFomento.valorAportado`). |
 | RN-F07 | GestorFomento / AnalistaTecnico | Cada faixa deve ter ao menos um tipo de iniciativa associado, valor maximo maior ou igual ao valor minimo e duracao maxima de ao menos 1 mes. |
 | RN-F08 | GestorFomento / AnalistaTecnico | Os tipos de iniciativa de uma faixa devem pertencer ao conjunto de tipos declarados no Fomento. |
 | RN-F09 | AnalistaTecnico | Rubricas e subrubricas sao configuradas por faixa de investimento. |
