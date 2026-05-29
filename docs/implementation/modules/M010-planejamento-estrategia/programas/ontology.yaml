@@ -69,11 +69,11 @@ entities:
         type: "decimal"
         required: false
         description: >
-          Consolidacao dos valores executados nas Iniciativas (projetos) vinculadas a este Programa —
+          Consolidacao dos valores executados nos Projetos vinculados a este Programa —
           inclui projetos de demanda induzida e projetos ligados ao Programa.
           Calculado por M003 a partir de pagamentos e compromissos registrados em M014. Somente leitura neste modulo.
         derived: true
-        formula: "SUM(Iniciativa.valorExecutado WHERE Iniciativa.programa = this)  # M003 + M014"
+        formula: "SUM(Projeto.valorExecutado WHERE Projeto.programa = this)  # M003 + M014"
         readonly: true
       saldoDisponivelPrograma:
         type: "decimal"
@@ -227,13 +227,13 @@ axioms:
     formal_rule: "∀p ∈ Programa: p.valorAlocado = SUM(AporteFinanceiroParceriaPrograma.valor WHERE programa = p AND estado = 'ATIVO')"
   - id: "AX-M010-PROG-FIN-02"
     natural_language: >
-      valorConsumido do Programa e a consolidacao dos valores executados nas Iniciativas (projetos)
-      vinculadas a este Programa — inclui projetos de demanda induzida. Calculado por M003 via M014.
+      valorConsumido do Programa e a consolidacao dos valores executados nos Projetos
+      vinculados a este Programa — inclui projetos de demanda induzida. Calculado por M003 via M014.
       Programa nao armazena diretamente; acessa via consolidacao.
     formal_rule: >
       ∀p ∈ Programa:
-        iniciativas = {ini | ini.programa = p}  # M003
-        p.valorConsumido = SUM(ini.valorExecutado WHERE ini ∈ iniciativas)  # alimentado por M014
+        projetos = {ini | ini.programa = p}  # M003
+        p.valorConsumido = SUM(ini.valorExecutado WHERE ini ∈ projetos)  # alimentado por M014
       p.valorConsumido IS READ-ONLY in M010; ownership = M003+M014
   - id: "AX-M010-PROG-FIN-03"
     natural_language: "saldoDisponivelPrograma e valorAlocado menos valorConsumido. Nunca negativo."
@@ -259,8 +259,8 @@ invariants:
     rule: "Programa.dataFim > Programa.dataInicio"
     description: "A data de fim do Programa deve ser posterior a data de inicio."
   - id: "INV-M010-PROG-RI1"
-    rule: "Programa.estado = 'ENCERRADO' OR COUNT(Iniciativa WHERE programa = p) = 0 REQUIRED_FOR remove(Programa)"
-    description: "Um Programa so pode ser removido se nao possui Iniciativas vinculadas; caso contrario deve ser encerrado para preservar historico (RI1)."
+    rule: "Programa.estado = 'ENCERRADO' OR COUNT(Projeto WHERE programa = p) = 0 REQUIRED_FOR remove(Programa)"
+    description: "Um Programa so pode ser removido se nao possui Projetos vinculados; caso contrario deve ser encerrado para preservar historico (RI1)."
   - id: "INV-M010-PROG-RI2"
     rule: "Programa.estado = 'ENCERRADO' WHEN parceria.estado = 'Encerrada'"
     description: "Ao encerrar uma Parceria, todos os Programas aportados devem ser encerrados em cascata, apos confirmacao explicita (RI2)."
@@ -281,7 +281,7 @@ enums:
       EM_PLANEJAMENTO: "Programa em elaboracao, ainda nao ativo."
       ATIVO: "Programa ativo e em execucao."
       SUSPENSO: "Programa suspenso temporariamente (pode ser por cascata de Parceria suspensa — RI4)."
-      ENCERRADO: "Programa encerrado; preserva historico de Iniciativas vinculadas."
+      ENCERRADO: "Programa encerrado; preserva historico de Projetos vinculados."
 
   EstadoAportePrograma:
     description: "Estado do aporte financeiro de uma Parceria em um Programa."
@@ -351,7 +351,7 @@ workflows:
       - from: EM_PLANEJAMENTO
         to: ENCERRADO
         trigger: "cancelar_programa"
-        guard: "COUNT(Iniciativa) = 0 AND justificativa preenchida"
+        guard: "COUNT(Projeto) = 0 AND justificativa preenchida"
   AporteFinanceiroParceriaPrograma:
     states:
       - ATIVO
@@ -397,12 +397,12 @@ agent_instructions:
     - "Parceria e Programa nao possuem relacao direta; usar exclusivamente AporteFinanceiroParceriaPrograma (RN02)."
     - "Aporte RETIRADO nao compoe total alocado; devolve saldo alocavel a Parceria (RN14)."
     - "Programa nao recalcula Taxa de Gestao de Parcerias sobre aportes recebidos — ja foi calculada e deduzida na Parceria antes da alocacao (RN20, RN21)."
-    - "valorConsumido do Programa e somente leitura neste modulo; calculado por M003 a partir de M014 (Iniciativas de demanda induzida e projetos ligados ao Programa)."
-    - "Remocao de Programa e bloqueada se houver Iniciativas vinculadas; encerrar para preservar historico (RI1)."
+    - "valorConsumido do Programa e somente leitura neste modulo; calculado por M003 a partir de M014 (Projetos de demanda induzida e projetos ligados ao Programa)."
+    - "Remocao de Programa e bloqueada se houver Projetos vinculados; encerrar para preservar historico (RI1)."
     - "Programa.codigo e campo gerado automaticamente; nao aceitar input manual."
     - "dataEncerramento so e preenchida quando estado = ENCERRADO."
   notes:
     - "EixoEstrategico e entidade definida em planejamento.estrategia; a relacao N:N e registrada aqui no lado do Programa."
     - "Parceria e entidade definida em planejamento.parcerias; AporteFinanceiroParceriaPrograma e a entidade associativa que vive neste namespace."
-    - "Iniciativa e entidade externa do M003; nao modelar aqui."
+    - "Projeto e entidade externa do M003; nao modelar aqui."
     - "PessoaFisica e entidade externa do M008; referenciada via shared.people."

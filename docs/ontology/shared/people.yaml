@@ -3,6 +3,8 @@ namespace: "shared.people"
 imports:
   - namespace: "shared"
     path: path: "base.yaml"
+  - namespace: "shared.geography"
+    path: path: "geography.yaml"
 metadata:
   module: "M008"
   source: "docs/implementation/modules/M008-cadastros-corporativos/pessoas/modelo-estrutural.md"
@@ -39,6 +41,10 @@ entities:
         type: date
         required: true
         description: "Data de nascimento da pessoa."
+      naturalidadeId:
+        type: uuid
+        required: false
+        description: "FK para shared.geography.Cidade — município de nascimento da pessoa conforme IBGE. Referencia Cidade.codigoIBGE. Opcional; obrigatório apenas em contextos que exijam naturalidade (ex: bolsas internacionais, relatórios estatísticos)."
       lattes:
         type: string
         required: false
@@ -157,6 +163,11 @@ relationships:
     to: "shared.people.PessoaFisica"
     cardinality: "0..1"
     description: "Pessoa física menor de idade deve ter outra PessoaFisica como responsável legal. Auto-referência proibida."
+  - from: "shared.people.PessoaFisica"
+    relation: "naturalidade"
+    to: "shared.geography.Cidade"
+    cardinality: "0..1"
+    description: "Município de nascimento da pessoa. Identificado pelo codigoIBGE da Cidade. Opcional."
 
 axioms:
   - id: "AX-PPL-01"
@@ -171,6 +182,9 @@ axioms:
   - id: "AX-PPL-04"
     natural_language: "responsavelLegal must be a different, active, adult PessoaFisica."
     formal_rule: "∀p ∈ PessoaFisica: p.responsavelLegalId ≠ null → responsavel.estado = ATIVA ∧ age(responsavel) ≥ 18 ∧ responsavel.id ≠ p.id"
+  - id: "AX-PPL-05"
+    natural_language: "When naturalidadeId is set, it must reference an existing Cidade with a valid IBGE code."
+    formal_rule: "∀p ∈ PessoaFisica: p.naturalidadeId ≠ null → ∃c ∈ shared.geography.Cidade: c.id = p.naturalidadeId ∧ isValidCodigoIBGE(c.codigoIBGE)"
 
 invariants:
   - id: "INV-PPL-01"
@@ -182,6 +196,9 @@ invariants:
   - id: "INV-PPL-03"
     rule: "NivelAcademico.nome is unique"
     description: "Academic level name must be unique across the reference table."
+  - id: "INV-PPL-04"
+    rule: "PessoaFisica.naturalidadeId ≠ null → EXISTS(shared.geography.Cidade WHERE id = naturalidadeId)"
+    description: "naturalidadeId, when informed, must reference a valid municipality in the IBGE geography table."
 
 enums:
   EstadoPessoa:
@@ -226,6 +243,7 @@ agent_instructions:
     - "Suspensão de pessoa deve sempre gerar HistoricoPessoa com justificativa; rejeitar operação sem justificativa."
     - "Cadastro via Acesso Cidadão (RN10) deve criar ou vincular PessoaFisica pelo CPF; nunca criar duplicata."
     - "responsavelLegal só é exigido quando idade < 18 anos na data de cadastro; não solicitar para adultos."
+    - "naturalidadeId é opcional; quando informado deve referenciar uma Cidade válida da tabela IBGE (shared.geography.Cidade). Usar codigoIBGE como chave de lookup na integração com a API IBGE (leds-conectafapes/banestes ibge/naturalidade.ts)."
   notes:
     - "HistoricoPessoa.data é datetime (não apenas date) conforme README da entidade, diferindo do modelo estrutural consolidado que usa Date."
     - "NivelAcademico é tabela de referência corporativa; alterações não devem apagar histórico de pessoas vinculadas."

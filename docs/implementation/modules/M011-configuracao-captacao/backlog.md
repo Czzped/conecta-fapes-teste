@@ -4,7 +4,7 @@
 
 ## Sobre o Modulo
 
-A agencia de fomento configura e publica captacoes para selecionar iniciativas. O ciclo do M011 envolve: configuracao da captacao, cronograma da captacao, selecao de formularios publicados no M021, recebimento de propostas, avaliacao documental, avaliacao ad hoc, revisao de resultado e publicacao do resultado final. Atualmente esse processo e manual, sem padronizacao, gerando inconsistencias e retrabalho. Este modulo termina na publicacao do resultado final; contratacao/outorga segue no M022.
+A agencia de fomento configura e publica captacoes para selecionar projetos. O ciclo do M011 envolve: configuracao da captacao, cronograma da captacao, selecao de formularios publicados no M021, recebimento de propostas, avaliacao documental, avaliacao ad hoc, revisao de resultado e publicacao do resultado final. Atualmente esse processo e manual, sem padronizacao, gerando inconsistencias e retrabalho. Este modulo termina na publicacao do resultado final; contratacao/outorga segue no M022.
 
 Especificacao de referencia: [README.md](README.md)
 
@@ -22,6 +22,8 @@ Especificacao de referencia: [README.md](README.md)
 | EPIC-M011-006 | Revisao de Resultado | UC06 | Must | To Do | [EPIC-M011-006](epics/EPIC-M011-006.md) |
 | EPIC-M011-007 | Publicacao de Resultado | UC07 | Must | To Do | [EPIC-M011-007](epics/EPIC-M011-007.md) |
 | EPIC-M011-008 | Rubricas Permitidas da Captacao | UC08 | Must | To Do | [EPIC-M011-008](epics/EPIC-M011-008.md) |
+| EPIC-M011-009 | Gestao do Fomento | UC09 | Must | To Do | [EPIC-M011-009](epics/EPIC-M011-009.md) |
+| EPIC-M011-010 | Controles Operacionais da Captacao (Pausa, Retomada e Encerramento) | UC10 | Must | To Do | [EPIC-M011-010](epics/EPIC-M011-010.md) |
 
 > **Nota:** EPICs 004-007 foram identificados na [analise do prototipo backoffice](specifications/analise-prototipo-captacao.md) — funcionalidades presentes no prototipo sem cobertura na documentacao anterior.
 
@@ -40,7 +42,7 @@ EPIC-M011-001 (Configuracao da Captacao)
 ├── US-M011-012 Definir Requisitos do Proponente
 ├── US-M011-013 Configurar Rubricas e Subrubricas Permitidas  -> detalhado em EPIC-M011-008
 ├── US-M011-014 Configurar Versoes de Bolsas Permitidas
-├── US-M011-029 Definir Categorias de Iniciativas
+├── US-M011-029 Definir Categorias de projeto
 ├── US-M011-030 Configurar Faixas de Financiamento
 ├── US-M011-031 Configurar Documentos Exigidos do Proponente
 ├── US-M011-032 Definir Prestacoes Exigidas
@@ -85,6 +87,25 @@ EPIC-M011-008 (Rubricas Permitidas da Captacao)  <- depende de M008, EPIC-M011-0
 ├── US-M011-038 Definir Limites por Rubrica
 ├── US-M011-039 Definir Restricoes e Comprovantes por Rubrica
 └── US-M011-040 Validar Orcamento da Proposta contra Rubricas Permitidas
+
+EPIC-M011-009 (Gestao do Fomento)  <- depende de M010, M008; pre-requisito de todos os demais EPICs do M011
+├── US-M011-042 Criar Fomento
+├── US-M011-043 Configurar Aportes do Fomento
+├── US-M011-044 Configurar Faixas de Investimento do Fomento
+├── US-M011-045 Aprovar Fomento
+├── US-M011-046 Registrar Aditivo de Valor ou Data no Fomento
+├── US-M011-047 Registrar Remanejamento entre Faixas
+├── US-M011-048 Interromper e Retomar Fomento
+├── US-M011-049 Encerrar Fomento
+├── US-M011-050 Conclusao Automatica do Fomento pelo Sistema
+└── US-M011-051 Registrar Resultados Esperados do Fomento
+
+EPIC-M011-010 (Controles Operacionais da Captacao)  <- depende de EPIC-M011-001, EPIC-M011-007
+├── US-M011-052 Pausar Processo de Selecao
+├── US-M011-053 Retomar Processo de Selecao com Validacao de Datas
+├── US-M011-054 Bloquear Operacoes durante Pausa
+├── US-M011-055 Encerramento Automatico por Expiracao
+└── US-M011-056 Cancelamento Administrativo da Captacao
 ```
 
 ## Observacoes do Prototipo Backoffice

@@ -497,7 +497,7 @@ agent_instructions:
     - "DashboardProjeto e entidade derivada — nao persistir diretamente; calcular em tempo de leitura."
     - "SolicitacaoAlteracao do tipo ORCAMENTO, se deferida, deve acionar criacao de SolicitacaoOrcamentaria em M013."
     - "Projeto, Coordenador e Edital sao referencias externas de M003 — nao modelar aqui."
-    - "Este modulo foca em iniciativas operacionalizadas como Projeto; outros tipos de iniciativa sao fora de escopo atual."
+    - "Este modulo foca em projetos operacionalizados como Projeto; outros tipos de projeto sao fora de escopo atual."
   notes:
     - "EstadoRelatorio tem dois caminhos terminais: APROVADO (sem contestacao) e APROVADO_FINAL/REPROVADO_FINAL (apos contestacao)."
     - "A integracao de SolicitacaoAlteracao tipo ORCAMENTO com M013 e via evento SolicitacaoAlteracaoDeferida — os modulos nao se chamam diretamente."

@@ -41,7 +41,7 @@ agent_instructions:
   rules:
     - "Este módulo é stub. Não gerar implementações sem modelo-estrutural.md."
   notes:
-    - "Gerencia suspensão e finalização de Iniciativas/Projetos do M003."
+    - "Gerencia suspensão e finalização de Projetos do M003."
     - "Workflows esperados: suspender, reativar, finalizar, encerrar."
-    - "M015 é o módulo dono das transições SUSPENSA → EM_EXECUCAO, EM_EXECUCAO → CONCLUIDA e SUSPENSA → CONCLUIDA em post_award.iniciativas.Iniciativa."
+    - "M015 é o módulo dono das transições SUSPENSA → EM_EXECUCAO, EM_EXECUCAO → CONCLUIDA e SUSPENSA → CONCLUIDA em post_award.iniciativas.Projeto."
     - "M015 deve registrar EstagioCicloFomento com marcos SUSPENSA, EM_APROVACAO_CONTAS e CONCLUIDO com moduloOrigem = M015."

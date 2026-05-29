@@ -1,4 +1,4 @@
-ontology: "Solicitações de Diária da Iniciativa"
+ontology: "Solicitações de Diária do Projeto"
 namespace: "post_award.iniciativas.diarias"
 imports:
   - namespace: shared
@@ -11,7 +11,7 @@ metadata:
   module: "M003"
   source: "docs/implementation/modules/M003-gestao-iniciativas-captadas/diarias/modelo-estrutural.md"
   version: "1.0.0"
-  description: "Gerencia solicitações operacionais de diária dentro de uma iniciativa, incluindo cálculo, aceite, comprometimento de saldo e regularização."
+  description: "Gerencia solicitações operacionais de diária dentro de um projeto, incluindo cálculo, aceite, comprometimento de saldo e regularização."
 
 entities:
 
@@ -24,18 +24,18 @@ entities:
         required: true
         unique: true
         description: "Identificador da solicitação gerado pelo sistema. Formato: SD-YYYY-NNN."
-      iniciativaId:
+      projetoId:
         type: "ref:post_award.iniciativas.Iniciativa"
         required: true
-        description: "Iniciativa à qual a solicitação pertence."
+        description: "Projeto ao qual a solicitação pertence."
       ortogadoId:
         type: "ref:post_award.iniciativas.Ortogado"
         required: true
-        description: "Coordenador/ortogado solicitante. Deve ser o ortogado ativo da iniciativa."
+        description: "Coordenador/ortogado solicitante. Deve ser o ortogado ativo do projeto."
       alocacaoBolsistaRef:
         type: uuid
         required: true
-        description: "Referência à AlocacaoBolsista do M009. Bolsista que receberá a diária. Deve pertencer à mesma iniciativa."
+        description: "Referência à AlocacaoBolsista do M009. Bolsista que receberá a diária. Deve pertencer ao mesmo projeto."
       dataHoraPartida:
         type: datetime
         required: true
@@ -339,8 +339,8 @@ axioms:
     formal_rule: "∀s ∈ SolicitacaoDiaria: ∃!td ∈ M008.TipoDiaria: td.ativo = true ∧ td.abrangencia = s.abrangenciaRef ∧ td.vigenciaInicio ≤ s.dataHoraPartida ≤ td.vigenciaFim"
 
   - id: "AX-M003-D012"
-    natural_language: "Solicitação de diária deve estar associada a uma iniciativa com estado EM_EXECUCAO e ser solicitada pelo Ortogado ativo."
-    formal_rule: "∀s ∈ SolicitacaoDiaria: s.iniciativa.estado = EM_EXECUCAO ∧ s.ortogado.ativo = true"
+    natural_language: "Solicitação de diária deve estar associada a um projeto com estado EM_EXECUCAO e ser solicitada pelo Ortogado ativo."
+    formal_rule: "∀s ∈ SolicitacaoDiaria: s.projeto.estado = EM_EXECUCAO ∧ s.ortogado.ativo = true"
 
 invariants:
   - id: "INV-M003-D001"
@@ -348,8 +348,8 @@ invariants:
     description: "A chegada deve ser posterior à partida."
 
   - id: "INV-M003-D002"
-    rule: "SolicitacaoDiaria.alocacaoBolsistaRef.iniciativaId = SolicitacaoDiaria.iniciativaId"
-    description: "O bolsista referenciado deve pertencer à mesma iniciativa da solicitação."
+    rule: "SolicitacaoDiaria.alocacaoBolsistaRef.projetoId = SolicitacaoDiaria.projetoId"
+    description: "O bolsista referenciado deve pertencer ao mesmo projeto da solicitação."
 
   - id: "INV-M003-D003"
     rule: "SolicitacaoDiaria possui exatamente uma abrangenciaRef"
@@ -488,7 +488,7 @@ policies:
   permissions:
     Coordenador:
       can:
-        - "criar SolicitacaoDiaria para bolsistas ativos da iniciativa"
+        - "criar SolicitacaoDiaria para bolsistas ativos do projeto"
         - "cancelar SolicitacaoDiaria ALOCADA ou APROVADA antes da dataHoraPartida com justificativa"
         - "regularizar diária não utilizada após dataHoraPartida com justificativa"
     Bolsista:
