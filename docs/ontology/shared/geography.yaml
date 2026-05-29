@@ -31,6 +31,10 @@ entities:
         type: uuid
         required: false
         description: "FK para Regiao — região de agrupamento territorial da cidade. Opcional conforme RN09."
+      estadoId:
+        type: uuid
+        required: true
+        description: "FK para Estado — UF à qual o município pertence conforme IBGE."
       # Auditavel mixin
       createdAt:
         type: datetime
@@ -84,6 +88,49 @@ entities:
         required: true
         description: "Identificador do usuário que realizou a última atualização."
 
+  Estado:
+    description: "Unidade Federativa brasileira. Tabela de referência carregada a partir dos dados oficiais do IBGE (estados-brasil.json). Identificada de forma única pela sigla."
+    extends: null
+    fields:
+      id:
+        type: uuid
+        required: true
+        description: "Surrogate primary key."
+      codigoIBGE:
+        type: string
+        required: true
+        unique: true
+        description: "Código numérico IBGE da UF (ex: '32' para Espírito Santo). Máximo 2 caracteres."
+      sigla:
+        type: string
+        required: true
+        unique: true
+        description: "Sigla da UF, 2 caracteres maiúsculos. Ex: ES, SP, RJ."
+      nome:
+        type: string
+        required: true
+        description: "Nome completo da UF. Ex: Espírito Santo. Máximo 100 caracteres."
+      regiaoFederativa:
+        type: "enum:RegiaoFederativa"
+        required: true
+        description: "Macrorregião federativa do IBGE à qual a UF pertence."
+      createdAt:
+        type: datetime
+        required: true
+        description: "Timestamp de criação do registro."
+      updatedAt:
+        type: datetime
+        required: true
+        description: "Timestamp da última atualização."
+      createdBy:
+        type: uuid
+        required: true
+        description: "Identificador do usuário que criou o registro."
+      updatedBy:
+        type: uuid
+        required: true
+        description: "Identificador do usuário que realizou a última atualização."
+
 relationships:
   - from: "shared.geography.Regiao"
     relation: "groups"
@@ -95,6 +142,16 @@ relationships:
     to: "shared.geography.Regiao"
     cardinality: "0..1"
     description: "Uma Cidade pode pertencer a uma Região quando houver agrupamento territorial definido (RN09)."
+  - from: "shared.geography.Cidade"
+    relation: "pertence a"
+    to: "shared.geography.Estado"
+    cardinality: "N:1"
+    description: "Cada município pertence a uma UF conforme cadastro IBGE."
+  - from: "shared.geography.Estado"
+    relation: "agrupa municípios"
+    to: "shared.geography.Cidade"
+    cardinality: "1:N"
+    description: "Uma UF possui um ou mais municípios."
 
 axioms:
   - id: "AX-GEO-01"
@@ -106,6 +163,12 @@ axioms:
   - id: "AX-GEO-03"
     natural_language: "Cities remain queryable for historical records even when no longer used in new operations."
     formal_rule: "∀c ∈ Cidade: HistoricalReference(c) → c.queryable = true"
+  - id: "AX-GEO-04"
+    natural_language: "Estado.sigla is unique and has exactly 2 uppercase characters."
+    formal_rule: "∀e ∈ Estado: e.sigla.length = 2 ∧ isUppercase(e.sigla) ∧ unique(e.sigla)"
+  - id: "AX-GEO-05"
+    natural_language: "Every Cidade must reference a valid Estado."
+    formal_rule: "∀c ∈ Cidade: ∃e ∈ Estado: c.estadoId = e.id"
 
 invariants:
   - id: "INV-GEO-01"
@@ -114,8 +177,19 @@ invariants:
   - id: "INV-GEO-02"
     rule: "Regiao.nome is unique"
     description: "Region name must be unique."
+  - id: "INV-GEO-03"
+    rule: "Estado.sigla.length = 2 ∧ Estado.sigla = Estado.sigla.toUpperCase()"
+    description: "UF sigla must be exactly 2 uppercase characters."
 
-enums: null
+enums:
+  RegiaoFederativa:
+    description: "Macrorregião federativa do IBGE. Agrupa as 27 Unidades Federativas brasileiras em 5 regiões."
+    values:
+      NORTE: "Região Norte — AC, AM, AP, PA, RO, RR, TO."
+      NORDESTE: "Região Nordeste — AL, BA, CE, MA, PB, PE, PI, RN, SE."
+      CENTRO_OESTE: "Região Centro-Oeste — DF, GO, MS, MT."
+      SUDESTE: "Região Sudeste — ES, MG, RJ, SP."
+      SUL: "Região Sul — PR, RS, SC."
 
 value_objects: null
 
@@ -135,3 +209,5 @@ agent_instructions:
   notes:
     - "RN09 define que cidades devem pertencer a uma região quando houver agrupamento territorial definido; a associação é opcional."
     - "Regiao.descricao é nullable conforme atributos documentados."
+    - "Estado é tabela de referência carregada do IBGE; os 26 estados + DF somam 27 registros fixos. Não permitir criação manual avulsa."
+    - "codigoIBGE de Cidade deve ser consistente com o estadoId informado — validar via tabela IBGE."
