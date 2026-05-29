@@ -1256,7 +1256,7 @@ enums:
       PUBLICADO: "Captacao publicada e disponivel para execucao do processo de selecao."
       NAO_PUBLICADO: "Captacao despublicada apos ter sido publicada."
       PAUSADO: "Captacao com processo de selecao temporariamente interrompido pelo GestorFAPES. Nenhuma acao de proponente, revisor ou analistaTecnico e permitida ate retomada. O periodo do cronograma em andamento nao avanca automaticamente."
-      ENCERRADO: "Captacao encerrada. Pode ocorrer de duas formas: (1) encerramento natural — AnalistaTecnico publica o resultado final ou Sistema encerra automaticamente ao atingir RESULTADO_FINAL.dataFim; (2) cancelamento administrativo — GestorFAPES cancela com justificativa a partir de PUBLICADO ou PAUSADO."
+      ENCERRADO: "Captacao encerrada. Pode ocorrer de tres formas: (1) encerramento natural — AnalistaTecnico publica o resultado final; (2) expiracao automatica — Sistema encerra ao atingir RESULTADO_FINAL.dataFim sem publicacao manual; (3) cancelamento administrativo — GestorFAPES cancela com justificativa a partir de PUBLICADO ou PAUSADO."
 
   TipoPeriodo:
     description: "Tipo de periodo obrigatorio do cronograma de uma captacao. Os 8 valores definem a ordem sequencial do fluxo."
