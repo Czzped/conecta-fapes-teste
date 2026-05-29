@@ -30,7 +30,7 @@ Todas as rotas exigem autenticacao. O perfil do chamador determina o acesso:
 | Perfil | Descricao |
 |--------|-----------|
 | `ANALISTA_AGENCIA` | Analista da Agencia de Fomento — configura cronograma, formularios, categorias, regras, requisitos, documentos exigidos e revisores |
-| `GESTOR_FOMENTO` | Gestor de Fomento — cria e aprova Fomentos, registra aditivos e remanejamentos, interrompe/retoma/encerra Fomento |
+| `GESTOR_FOMENTO` | Gestor de Fomento — cria e aprova Fomentos, registra aportes aditivos e remanejamentos, interrompe/retoma/encerra Fomento |
 | `GESTOR_FAPES` | Gestor da FAPES — pausa, retoma e cancela Captacoes por decisao administrativa |
 | `DIRETORIA_FAPES` | Diretoria da FAPES — pode instanciar processo de captacao a partir de configuracao publicada |
 | `AREA_TECNICA` | Area tecnica responsavel pela captacao — executa publicacao, avaliacao documental, distribuicao, consolidacao, revisao e resultados |
@@ -531,8 +531,8 @@ As rotas abaixo mantem as configuracoes complementares descobertas no processo e
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/formularios/anexos` | SelecionarFormularioAnexos | `formularioId`, `versaoFormularioId` |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/categorias-projetos` | ConfigurarCategoriasDeProjetos | `categorias[]` |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/aportes-financeiros` | ConfigurarAportesFinanceirosCaptacao | origem Programa/Parceria e valor aportado |
-| `POST` | `/api/v1/m011/captacoes/{captacaoId}/faixas-financiamento` | ConfigurarFaixasFinanciamento | `duracaoMaximaMeses`, `valorMinimo`, `valorMaximo`, `valorAportado` |
-| `POST` | `/api/v1/m011/captacoes/{captacaoId}/rubricas-permitidas` | ConfigurarRubricasPermitidas | `rubricaId`, limites, restricoes e comprovantes esperados |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/faixas` | ConfigurarFaixasSelecionadas | `faixasIds[]` |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/rubricas-permitidas` | ConfigurarRubricasPermitidas | `rubricaId`, percentuais, restricoes e observacao |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/regras-submissao` | ConfigurarRegrasSubmissao | flags de multiplas propostas, acumulo de bolsa e restricao a escolhidos |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/proponentes-escolhidos` | ConfigurarProponentesEscolhidos | tipo INSTITUICAO/PESSOA e IDs autorizados |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/requisitos-proponente` | ConfigurarRequisitosProponente | direcionamento, instituicao/tipo de instituicao, nivel academico minimo e restricoes |
@@ -540,18 +540,11 @@ As rotas abaixo mantem as configuracoes complementares descobertas no processo e
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/prestacoes-exigidas` | ConfigurarPrestacoesExigidas | `exigePrestacaoTecnica`, `exigePrestacaoFinanceira` |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/regra-avaliacao` | ConfigurarRegraAvaliacao | `exigeAvaliacaoAdHoc`, `quantidadeMinimaRevisores` |
 
-**Exemplo: faixas de financiamento**
+**Exemplo: faixas selecionadas**
 
 ```json
 {
-  "faixas": [
-    {
-      "duracaoMaximaMeses": 24,
-      "valorMinimo": 50000.0,
-      "valorMaximo": 200000.0,
-      "valorAportado": 500000.0
-    }
-  ]
+  "faixasIds": ["FAIXA-FON-001", "FAIXA-FON-002"]
 }
 ```
 
@@ -562,12 +555,10 @@ As rotas abaixo mantem as configuracoes complementares descobertas no processo e
   "rubricas": [
     {
       "rubricaId": "RUB-DIARIAS",
-      "obrigatoria": false,
-      "permiteSubrubricas": true,
-      "limiteValor": 10000.0,
-      "limitePercentual": null,
-      "comprovantesEsperados": "Comprovante de pagamento da diaria e vinculo com solicitacao de diaria.",
-      "restricoes": "Somente para atividades diretamente vinculadas ao projeto."
+      "percentualMinimo": null,
+      "percentualMaximo": 20,
+      "restricoes": "Somente para atividades diretamente vinculadas ao projeto.",
+      "observacao": "Aplicavel a diarias vinculadas ao plano de trabalho."
     }
   ]
 }
@@ -581,12 +572,26 @@ As rotas abaixo mantem as configuracoes complementares descobertas no processo e
     {
       "origemTipo": "PROGRAMA",
       "programaId": "PROG-2026-001",
-      "valorAportado": 500000.0
+      "valorAportado": 500000.0,
+      "dataAporte": "2026-01-10",
+      "isAditivo": false,
+      "justificativa": null
     },
     {
       "origemTipo": "PARCERIA",
       "parceriaId": "PAR-2026-003",
-      "valorAportado": 300000.0
+      "valorAportado": 300000.0,
+      "dataAporte": "2026-01-15",
+      "isAditivo": false,
+      "justificativa": null
+    },
+    {
+      "origemTipo": "RECURSO_INTERNO",
+      "contaContabilId": "CTB-FAPES-001",
+      "valorAportado": 100000.0,
+      "dataAporte": "2026-02-01",
+      "isAditivo": true,
+      "justificativa": "Complementacao com recurso interno da FAPES."
     }
   ]
 }
@@ -981,7 +986,7 @@ Cancela administrativamente uma captacao PUBLICADA ou PAUSADA com justificativa.
 ```json
 {
   "captacaoId": "CAP-2026-001",
-  "estado": "ENCERRADO"
+  "estado": "CANCELADO"
 }
 ```
 
@@ -1042,66 +1047,9 @@ Exemplo com pendencias:
 
 ---
 
-### 9. Fomento — Aditivos e Remanejamentos
+### 9. Fomento - Remanejamentos
 
 Estas rotas cobrem as operacoes de GestorFomento sobre um Fomento existente.
-
-#### `POST /api/v1/m011/fomentos/{fomentoId}/aditivos`
-
-Registra um aditivo de valor ou de data sobre o Fomento (GestorFomento).
-
-- **Autorizacao:** `GESTOR_FOMENTO`
-- **Operacao de origem:** `RegistrarAditivoFomento`
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `fomentoId` | string | Identificador do Fomento |
-
-**Request body**
-
-```json
-{
-  "tipo": "DATA",
-  "novaDataFim": "2027-12-31",
-  "justificativa": "Prorrogacao por atraso na aprovacao orcamentaria."
-}
-```
-
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `tipo` | string (enum) | Sim | `VALOR` ou `DATA` |
-| `valorAdicionado` | number | Condicional | Valor adicional aportado — obrigatorio quando `tipo=VALOR` |
-| `novaDataFim` | string (date) | Condicional | Nova data de encerramento — obrigatoria quando `tipo=DATA` |
-| `justificativa` | string | Sim | Justificativa do aditivo |
-
-**Response `201 Created`**
-
-```json
-{
-  "aditivo": {
-    "id": "ADIT-2026-001",
-    "fomentoId": "FOM-2026-001",
-    "tipo": "DATA",
-    "novaDataFim": "2027-12-31",
-    "dataFimAnterior": "2026-12-31",
-    "valorTotalAnterior": 800000.0,
-    "justificativa": "Prorrogacao por atraso na aprovacao orcamentaria.",
-    "dataRegistro": "2026-05-29"
-  }
-}
-```
-
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `FOMENTO_NAO_ENCONTRADO` | O fomento informado nao foi encontrado. |
-| `400` | `ADITIVO_DADOS_INVALIDOS` | Os dados do aditivo sao invalidos ou incompletos para o tipo informado. |
-| `422` | `FOMENTO_ESTADO_INVALIDO_PARA_ADITIVO` | O fomento deve estar APROVADO para receber aditivos. |
-
----
 
 #### `POST /api/v1/m011/fomentos/{fomentoId}/remanejamentos`
 
@@ -1161,48 +1109,6 @@ Registra um remanejamento de valor entre duas faixas de investimento do Fomento.
 | `400` | `REMANEJAMENTO_VALOR_INVALIDO` | O valor do remanejamento deve ser positivo. |
 | `422` | `FOMENTO_ESTADO_INVALIDO_PARA_REMANEJAMENTO` | O fomento deve estar APROVADO para remanejamento entre faixas. |
 | `422` | `SALDO_INSUFICIENTE_NA_FAIXA_ORIGEM` | O valor a remanejamento excede o saldo disponivel na faixa de origem. |
-
----
-
-#### `GET /api/v1/m011/fomentos/{fomentoId}/aditivos`
-
-Lista os aditivos registrados para um Fomento.
-
-- **Autorizacao:** `GESTOR_FOMENTO`, `ANALISTA_AGENCIA`, `MODULO_INTERNO`
-
-**Path parameters**
-
-| Parametro | Tipo | Descricao |
-|-----------|------|-----------|
-| `fomentoId` | string | Identificador do Fomento |
-
-**Response `200 OK`**
-
-```json
-{
-  "fomentoId": "FOM-2026-001",
-  "items": [
-    {
-      "id": "ADIT-2026-001",
-      "tipo": "DATA",
-      "novaDataFim": "2027-12-31",
-      "dataFimAnterior": "2026-12-31",
-      "valorTotalAnterior": 800000.0,
-      "justificativa": "Prorrogacao por atraso na aprovacao orcamentaria.",
-      "dataRegistro": "2026-05-29"
-    }
-  ],
-  "total": 1,
-  "page": 1,
-  "pageSize": 20
-}
-```
-
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `FOMENTO_NAO_ENCONTRADO` | O fomento informado nao foi encontrado. |
 
 ---
 
@@ -1389,7 +1295,7 @@ Estas rotas representam o processo operacional descrito em [process.md](process.
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/formularios/anexos` | SelecionarFormularioAnexos | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/categorias-projetos` | ConfigurarCategoriasDeProjetos | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/aportes-financeiros` | ConfigurarAportesFinanceirosCaptacao | ANALISTA_AGENCIA |
-| `POST` | `/api/v1/m011/captacoes/{captacaoId}/faixas-financiamento` | ConfigurarFaixasFinanciamento | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/faixas` | ConfigurarFaixasSelecionadas | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/rubricas-permitidas` | ConfigurarRubricasPermitidas | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/regras-submissao` | ConfigurarRegrasSubmissao | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/proponentes-escolhidos` | ConfigurarProponentesEscolhidos | ANALISTA_AGENCIA |
@@ -1407,8 +1313,6 @@ Estas rotas representam o processo operacional descrito em [process.md](process.
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/retomar` | RetomarCaptacao | GESTOR_FAPES |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/cancelar` | CancelarCaptacao | GESTOR_FAPES |
 | `GET` | `/api/v1/m011/captacoes/{captacaoId}/validar-configuracao` | ValidarConfiguracaoDaCaptacao | ANALISTA_AGENCIA, MODULO_INTERNO |
-| `POST` | `/api/v1/m011/fomentos/{fomentoId}/aditivos` | RegistrarAditivoFomento | GESTOR_FOMENTO |
-| `GET` | `/api/v1/m011/fomentos/{fomentoId}/aditivos` | ListarAditivosFomento | GESTOR_FOMENTO, ANALISTA_AGENCIA, MODULO_INTERNO |
 | `POST` | `/api/v1/m011/fomentos/{fomentoId}/remanejamentos` | RegistrarRemanejamentoFaixas | GESTOR_FOMENTO |
 | `GET` | `/api/v1/m011/fomentos/{fomentoId}/remanejamentos` | ListarRemanejamentosFomento | GESTOR_FOMENTO, ANALISTA_AGENCIA, MODULO_INTERNO |
 | `PUT` | `/api/v1/m011/captacoes/{captacaoId}/matriz-configuracao` | ConfigurarMatrizConfiguracaoProjeto | ANALISTA_AGENCIA |
@@ -1494,23 +1398,7 @@ Estas rotas representam o processo operacional descrito em [process.md](process.
 
 ### EstadoConfiguracaoCaptacao (enum)
 
-`EM_ANDAMENTO` | `PUBLICADO` | `NAO_PUBLICADO` | `PAUSADO` | `ENCERRADO`
-
-### AditivoFomento
-
-```json
-{
-  "id": "string",
-  "fomentoId": "string",
-  "tipo": "VALOR | DATA",
-  "valorAdicionado": "number (opcional — presente quando tipo=VALOR)",
-  "novaDataFim": "string (YYYY-MM-DD, opcional — presente quando tipo=DATA)",
-  "justificativa": "string",
-  "dataRegistro": "string (YYYY-MM-DD, gerado pelo sistema)",
-  "dataFimAnterior": "string (YYYY-MM-DD)",
-  "valorTotalAnterior": "number"
-}
-```
+`EM_ANDAMENTO` | `PUBLICADO` | `NAO_PUBLICADO` | `PAUSADO` | `ENCERRADO` | `CANCELADO`
 
 ### RemanejamentoFaixas
 

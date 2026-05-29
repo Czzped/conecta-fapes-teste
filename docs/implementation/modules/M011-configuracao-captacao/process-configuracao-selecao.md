@@ -204,7 +204,7 @@ stateDiagram-v2
 | RN-CS06 | AnalistaTecnico | As faixas selecionadas devem pertencer ao Fomento referenciado. |
 | RN-CS07 | AnalistaTecnico | A Captacao deve ter link do edital preenchido antes da publicacao. |
 | RN-CS08 | AnalistaTecnico | O cronograma deve conter as 8 etapas obrigatorias antes da publicacao: PUBLICACAO_CAPTACAO, RECEBIMENTO_PROPOSTAS, AVALIACAO_DOCUMENTAL, AVALIACAO_AD_HOC, RESULTADO_PRELIMINAR, RECEBIMENTO_REVISAO, RESULTADO_APOS_REVISAO e RESULTADO_FINAL. |
-| RN-CS09 | AnalistaTecnico | Todas as datas do cronograma devem estar dentro da vigencia do Fomento (dataInicio a dataFim efetiva). |
+| RN-CS09 | AnalistaTecnico | Todas as datas do cronograma devem estar dentro da vigencia do Fomento (dataInicio a dataFim). |
 | RN-CS10 | AnalistaTecnico | Toda Captacao deve selecionar formulario de submissao, avaliacao ad hoc e revisao de resultado no M021. |
 | RN-CS11 | AnalistaTecnico | Quando submissao restrita a escolhidos, deve ser selecionada ao menos uma instituicao ou pessoa autorizada. |
 | RN-CS12 | AnalistaTecnico | Qualquer etapa do cronograma pode ser adiada mediante justificativa, preservando historico das datas originais. |
@@ -230,7 +230,7 @@ stateDiagram-v2
 
 | Modulo | Papel |
 |--------|-------|
-| M011/Fomento | Fornece as faixas de investimento, rubricas, bolsas, tipos de projeto e vigencia. |
+| M011/Fomento | Fornece as faixas, rubricas, bolsas, tipos de projeto e vigencia. |
 | M008 | Fornece AreaTecnica, Instituicoes, TiposInstituicao, NivelAcademico e PessoaFisica. |
 | M021 | Fornece a base de formularios reutilizaveis e versionados. |
 
@@ -264,7 +264,7 @@ flowchart TD
 
     A --> B --> C --> D --> E --> F --> G --> H
     H -->|Dentro da vigencia| I[Cronograma atualizado]
-    H -->|Fora da vigencia| J[Erro — prorrogacao requer aditivo de data no Fomento primeiro]
+    H -->|Fora da vigencia| J[Erro — prorrogacao requer ajuste da dataFim do Fomento primeiro]
 ```
 
 ### Atividades
@@ -278,7 +278,7 @@ flowchart TD
 | 5 | Confirmar prorrogacao | AnalistaTecnico | Confirma a operacao. |
 | 6 | Registrar adiamento | Sistema | Grava registro imutavel com datas originais, novas datas e data do registro. |
 | 7 | Deslocar etapas posteriores | Sistema | Todas as etapas com ordem posterior a etapa prorrogada sao deslocadas pelo mesmo numero de dias automaticamente. |
-| 8 | Validar vigencia do Fomento | Sistema | Verifica se as novas datas estao dentro da vigencia efetiva do Fomento. Se nao estiverem, bloqueia a prorrogacao e orienta o GestorFomento a registrar aditivo de data no Fomento primeiro. |
+| 8 | Validar vigencia do Fomento | Sistema | Verifica se as novas datas estao dentro da vigencia do Fomento. Se nao estiverem, bloqueia a prorrogacao e orienta o GestorFomento a ajustar a dataFim do Fomento primeiro. |
 
 ### Regras
 
@@ -289,4 +289,4 @@ flowchart TD
 | RN-PR03 | AnalistaTecnico | Justificativa e obrigatoria para toda prorrogacao. |
 | RN-PR04 | Sistema | Ao prorrogar uma etapa, todas as etapas com ordem posterior sao deslocadas pelo mesmo numero de dias. |
 | RN-PR05 | Sistema | O registro da prorrogacao e imutavel — preserva dataInicioOriginal, dataFimOriginal, dataInicioNova e dataFimNova. |
-| RN-PR06 | Sistema | As novas datas nao podem ultrapassar a dataFim efetiva do Fomento. Se ultrapassarem, a prorrogacao e bloqueada ate que o GestorFomento registre um aditivo de data no Fomento. |
+| RN-PR06 | Sistema | As novas datas nao podem ultrapassar a dataFim do Fomento. Se ultrapassarem, a prorrogacao e bloqueada ate que o GestorFomento ajuste a vigencia do Fomento. |

@@ -37,8 +37,8 @@ Este contrato documenta a superficie publica do modulo M011 como contexto de con
 | SelecionarFormularioRevisao | Command | Selecionar versao publicada do formulario de revisao de resultado no M021 | captacao, formularioId, versaoFormularioId | `FormularioRevisaoRef` selecionado | RN06 | Captacao existente; versao publicada no M021; Captacao nao PAUSADO | Etapa de revisao sem formulario, formulario inexistente, versao nao publicada, AX-M011-032 | Nao | AnalistaTecnico | API interna/backoffice a definir |
 | SelecionarFormularioAnexos | Command | Selecionar versao publicada do formulario de anexos no M021, quando aplicavel | captacao, formularioId, versaoFormularioId | `FormularioAnexoRef` selecionado (optional) | RN06 | Captacao existente; versao publicada no M021; Captacao nao PAUSADO | Formulario inexistente, versao nao publicada, AX-M011-032 | Nao | AnalistaTecnico | API interna/backoffice a definir |
 | ConfigurarCategoriasDeIniciativas | Command | Definir categorias de projetos aceitas pela captacao | captacao, categorias | `CategoriaProjeto` list associada | RN19 | Captacao existente | Categoria inexistente, lista vazia | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| ConfigurarFaixasSelecionadas | Command | Selecionar faixas de investimento do Fomento que participam desta captacao (AX-M011-029: faixas devem pertencer ao Fomento vinculado; AX-M011-030: >= 1 faixa exigida) | captacao, faixasInvestimentoIds | `faixasSelecionadas` atualizadas | RN10, AX-M011-029, AX-M011-030 | Captacao existente; faixas pertencem ao Fomento APROVADO vinculado | Lista vazia, faixa nao pertence ao Fomento, AX-M011-012 | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| ConfigurarRubricasPermitidas | Command | Definir RubricaPermitidaFaixa e subrubricas nas faixas selecionadas, com limites, restricoes, comprovantes esperados e bolsas (AX-M011-008, AX-M011-009, AX-M011-011) | captacao, faixaId, rubricasPermitidas | `RubricaPermitidaFaixa` list persistida | RN13, RN26, RN27, AX-M011-008, AX-M011-009, AX-M011-011 | Captacao existente; rubricas ativas no M008 | Rubrica inexistente/inativa, limite invalido, subrubrica sem rubricaPai com permiteSubrubricas=true, BolsaPermitidaFaixa em rubrica nao-BOLSA | Nao | AnalistaTecnico | API interna/backoffice a definir |
+| ConfigurarFaixasSelecionadas | Command | Selecionar faixas do Fomento que participam desta captacao (AX-M011-029: faixas devem pertencer ao Fomento vinculado; AX-M011-030: >= 1 faixa exigida) | captacao, faixasIds | `faixasSelecionadas` atualizadas | RN10, AX-M011-029, AX-M011-030 | Captacao existente; faixas pertencem ao Fomento APROVADO vinculado | Lista vazia, faixa nao pertence ao Fomento, AX-M011-012 | Nao | AnalistaTecnico | API interna/backoffice a definir |
+| ConfigurarRubricasPermitidas | Command | Definir RubricaPermitidaFaixa e subrubricas nas faixas selecionadas, com percentuais, restricoes, observacoes e bolsas (AX-M011-008, AX-M011-009, AX-M011-011) | captacao, faixaId, rubricasPermitidas | `RubricaPermitidaFaixa` list persistida | RN13, RN26, RN27, AX-M011-008, AX-M011-009, AX-M011-011 | Captacao existente; rubricas ativas no M008 | Rubrica inexistente/inativa, percentual invalido, subrubrica sem rubricaPai, BolsaPermitidaFaixa sem rubrica Bolsa na faixa | Nao | AnalistaTecnico | API interna/backoffice a definir |
 | ConfigurarRegrasSubmissao | Command | Definir regras de participacao e submissao | captacao, regras | `RegraSubmissao` persistida | RN11 | Captacao existente | Regra invalida | Nao | AnalistaTecnico | API interna/backoffice a definir |
 | ConfigurarProponentesEscolhidos | Command | Definir instituicoes ou pessoas autorizadas quando a submissao for restrita a escolhidos (TipoProponenteEscolhido: INSTITUICAO|PESSOA) | captacao, tipo, proponentes | `proponentesEscolhidos` persistidos | RN26 | Captacao existente; instituicao ou pessoa existente | Lista vazia, proponente inexistente | Nao | AnalistaTecnico | API interna/backoffice a definir |
 | ConfigurarRequisitosProponente | Command | Definir requisitos e direcionamento da proposta (TipoDirecionamentoProposta: ABERTA|INSTITUICAO|TIPO_INSTITUICAO) | captacao, requisitos | `RequisitoProponente` persistido | RN12, RN21 | Captacao existente | Instituicao/tipo/nivel inexistente, direcionamento invalido | Nao | AnalistaTecnico | API interna/backoffice a definir |
@@ -53,7 +53,7 @@ Este contrato documenta a superficie publica do modulo M011 como contexto de con
 | ReabrirCaptacao | Command | Transicao NAO_PUBLICADO -> EM_ANDAMENTO: reabrir captacao para edicao de configuracao | captacao | Captacao com estadoConfiguracao=EM_ANDAMENTO | — | estadoConfiguracao=NAO_PUBLICADO | — | Nao | AnalistaTecnico | API interna/backoffice a definir |
 | PausarCaptacao | Command | Transicao PUBLICADO -> PAUSADO: suspender operacionalmente a captacao com justificativa (AX-M011-032: bloqueia todas as operacoes de selecao) | captacao, justificativa | Captacao com estadoConfiguracao=PAUSADO | AX-M011-032 | estadoConfiguracao=PUBLICADO; justificativa obrigatoria | Justificativa ausente | Nao | GestorFAPES | API interna/backoffice a definir |
 | RetomarCaptacao | Command | Transicao PAUSADO -> PUBLICADO: retomar captacao pausada (AX-M011-033: bloqueado se qualquer periodo futuro com dataFim < hoje) | captacao | Captacao com estadoConfiguracao=PUBLICADO | AX-M011-033 | estadoConfiguracao=PAUSADO; todos os periodos futuros com dataFim >= hoje | Periodo futuro com dataFim expirado (sistema bloqueia) | Nao | GestorFAPES | API interna/backoffice a definir |
-| CancelarCaptacao | Command | Transicao PUBLICADO|PAUSADO -> ENCERRADO por cancelamento administrativo com justificativa | captacao, justificativa | Captacao com estadoConfiguracao=ENCERRADO | AX-M011-034 | estadoConfiguracao=PUBLICADO ou PAUSADO; justificativa obrigatoria | Justificativa ausente; estadoConfiguracao invalido | Nao | GestorFAPES | API interna/backoffice a definir |
+| CancelarCaptacao | Command | Transicao PUBLICADO|PAUSADO -> CANCELADO por cancelamento administrativo com justificativa | captacao, justificativa | Captacao com estadoConfiguracao=CANCELADO | AX-M011-034 | estadoConfiguracao=PUBLICADO ou PAUSADO; justificativa obrigatoria | Justificativa ausente; estadoConfiguracao invalido | Nao | GestorFAPES | API interna/backoffice a definir |
 | SubmeterProposta | Command | Proponente submete proposta de projeto durante periodo RECEBIMENTO_PROPOSTAS | captacao, formularioPreenchido, proponente | Proposta criada | RN15, AX-M011-032 | estadoConfiguracao=PUBLICADO; periodo RECEBIMENTO_PROPOSTAS aberto; Captacao nao PAUSADO | Periodo encerrado, formulario incompleto, captacao PAUSADO | Nao | Proponente | API publica a definir |
 | ListarPropostasDaCaptacao | Query | Consultar propostas de uma captacao com filtros por area, status e instituicao | captacao, filtros | Lista de propostas | — | Captacao existente | Captacao nao encontrada | N/A | AnalistaTecnico | API interna a definir |
 | RegistrarAvaliacaoDocumental | Command | Registrar habilitacao ou inabilitacao documental de proposta durante periodo AVALIACAO_DOCUMENTAL | captacao, proposta, decisao, justificativa | Situacao documental registrada | RN15, RN35, AX-M011-032 | Periodo AVALIACAO_DOCUMENTAL aberto; Captacao nao PAUSADO | Proposta inexistente, fase incorreta, captacao PAUSADO | Nao | AnalistaTecnico | API interna/backoffice a definir |
@@ -67,7 +67,7 @@ Este contrato documenta a superficie publica do modulo M011 como contexto de con
 ## Enumeracoes Relevantes
 
 ### EstadoConfiguracaoCaptacao
-`EM_ANDAMENTO` | `PUBLICADO` | `NAO_PUBLICADO` | `PAUSADO` | `ENCERRADO`
+`EM_ANDAMENTO` | `PUBLICADO` | `NAO_PUBLICADO` | `PAUSADO` | `ENCERRADO` | `CANCELADO`
 
 ### EstadoFomento
 `EM_ELABORACAO` | `APROVADO` | `INTERROMPIDO` | `ENCERRADO` | `CONCLUIDO`
@@ -88,9 +88,6 @@ Este contrato documenta a superficie publica do modulo M011 como contexto de con
 ### TipoOutorgado
 `PESSOA_FISICA` | `PESSOA_JURIDICA`
 
-### TipoAditivoFomento
-`VALOR` | `DATA`
-
 ### TipoResultado
 `PRODUTO` | `SERVICO` | `PROCESSO`
 
@@ -98,7 +95,7 @@ Este contrato documenta a superficie publica do modulo M011 como contexto de con
 `EXIGIDO` | `DISPENSADO`
 
 ### TipoOrigemAporte
-`PROGRAMA` | `PARCERIA`
+`PROGRAMA` | `PARCERIA` | `RECURSO_INTERNO`
 
 ### TipoProponenteEscolhido
 `INSTITUICAO` | `PESSOA`
@@ -316,14 +313,14 @@ Nota: AX-M011-007 — o adiamento cascateia para todos os periodos subsequentes 
 
 ### ConfigurarFaixasSelecionadas
 
-Seleciona quais `FaixaInvestimento` do Fomento vinculado participam desta captacao. As faixas ja existem no Fomento; este comando apenas associa (AX-M011-029: devem pertencer ao Fomento; AX-M011-030: >= 1 exigida).
+Seleciona quais `Faixa` do Fomento vinculado participam desta captacao. As faixas ja existem no Fomento; este comando apenas associa (AX-M011-029: devem pertencer ao Fomento; AX-M011-030: >= 1 exigida).
 
 **Exemplo de entrada**
 
 ```json
 {
   "captacaoId": "CAP-2026-001",
-  "faixasInvestimentoIds": ["FAIXA-FON-001", "FAIXA-FON-002"]
+  "faixasIds": ["FAIXA-FON-001", "FAIXA-FON-002"]
 }
 ```
 
@@ -335,18 +332,12 @@ Seleciona quais `FaixaInvestimento` do Fomento vinculado participam desta captac
     {
       "id": "FAIXA-FON-001",
       "nome": "Faixa A",
-      "valorMinimo": 50000.0,
-      "valorMaximo": 200000.0,
-      "valorAportado": 500000.0,
-      "duracaoMaximaMeses": 24
+      "descricao": "Projetos de menor complexidade operacional."
     },
     {
       "id": "FAIXA-FON-002",
       "nome": "Faixa B",
-      "valorMinimo": 200000.01,
-      "valorMaximo": 500000.0,
-      "valorAportado": 1000000.0,
-      "duracaoMaximaMeses": 36
+      "descricao": "Projetos estruturantes."
     }
   ]
 }
@@ -469,7 +460,7 @@ Seleciona quais `FaixaInvestimento` do Fomento vinculado participam desta captac
 - `DespublicarCaptacao` transiciona `PUBLICADO` para `NAO_PUBLICADO`; `ReabrirCaptacao` devolve para `EM_ANDAMENTO`.
 - `PausarCaptacao` (GestorFAPES) transiciona `PUBLICADO` para `PAUSADO` e bloqueia todas as operacoes de selecao (AX-M011-032).
 - `RetomarCaptacao` (GestorFAPES) transiciona `PAUSADO` para `PUBLICADO`; o sistema bloqueia se qualquer periodo futuro tiver `dataFim < hoje` (AX-M011-033).
-- `CancelarCaptacao` (GestorFAPES) transiciona `PUBLICADO` ou `PAUSADO` para `ENCERRADO` por cancelamento administrativo.
+- `CancelarCaptacao` (GestorFAPES) transiciona `PUBLICADO` ou `PAUSADO` para `CANCELADO` por cancelamento administrativo.
 - `PublicarResultado` com `tipo=RESULTADO_FINAL` encerra o processo no M011 (transicao para `ENCERRADO`) e disponibiliza propostas aprovadas para o M022.
 - A expiracao automatica ocorre quando `RESULTADO_FINAL.dataFim` e atingida sem publicacao manual do resultado final (Sistema transiciona para `ENCERRADO`).
 - Quando o Fomento vinculado e interrompido (GestorFomento), a captacao tem sua operacao suspensa em cascata.

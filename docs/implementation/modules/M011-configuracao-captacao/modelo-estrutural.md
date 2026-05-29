@@ -29,36 +29,33 @@ classDiagram
     class AporteFomento {
         +TipoOrigemAporte origemTipo
         +double valorAportado
+        +Date dataAporte
+        +bool isAditivo
+        +String justificativa
     }
 
     class TipoOrigemAporte {
         <<enumeration>>
         PROGRAMA
         PARCERIA
+        RECURSO_INTERNO
     }
 
-    class FaixaInvestimento {
+    class Faixa {
         +String nome
-        +double valorMinimo
-        +double valorMaximo
-        +int duracaoMaximaMeses
-        +double valorAportado
+        +String descricao
     }
 
     class RubricaPermitidaFaixa {
-        +boolean obrigatoria
-        +boolean permiteSubrubricas
-        +double limiteValor
-        +double limitePercentual
-        +String comprovantesEsperados
+        +double percentualMinimo
+        +double percentualMaximo
         +String restricoes
         +String observacao
     }
 
     class BolsaPermitidaFaixa {
-        +int quantidadeCotas
-        +int maximoBolsistas
-        +boolean obrigatoria
+        +int quantidadeMinimaCotas
+        +int minimoBolsistas
         +String observacao
     }
 
@@ -73,22 +70,6 @@ classDiagram
         PRODUTO
         SERVICO
         PROCESSO
-    }
-
-    class AditivoFomento {
-        +TipoAditivoFomento tipo
-        +double valorAdicionado
-        +Date novaDataFim
-        +String justificativa
-        +Date dataRegistro
-        +Date dataFimAnterior
-        +double valorTotalAnterior
-    }
-
-    class TipoAditivoFomento {
-        <<enumeration>>
-        VALOR
-        DATA
     }
 
     class RemanejamentoFaixas {
@@ -222,6 +203,7 @@ classDiagram
         NAO_PUBLICADO
         PAUSADO
         ENCERRADO
+        CANCELADO
     }
 
     class FormularioSubmissaoRef {
@@ -327,30 +309,32 @@ classDiagram
         +double valor
     }
 
+    class ContaContabil {
+        <<fora do escopo - M016>>
+    }
+
     %% Fomento aggregate
     Fomento "1" --> "1" EixoEstrategico : eixo estrategico
     Fomento "1" --> "1" AreaTecnica : area tecnica
-    Fomento "1" --> "1..*" TipoIniciativa : tipos de projeto fomentados
     Fomento "1" --> "1..*" AporteFomento : aportes
-    Fomento "1" --> "1..*" FaixaInvestimento : faixas de investimento
+    Fomento "1" --> "1..*" Faixa : faixas
     Fomento "1" --> "*" ResultadoEsperadoFomento : resultados esperados
-    Fomento "1" --> "*" AditivoFomento : aditivos
     Fomento "1" --> "*" RemanejamentoFaixas : remanejamentos
+    Fomento "*" --> "1" TipoIniciativa : tipos de projeto
     AporteFomento "*" --> "0..1" Programa : origem programa
     AporteFomento "*" --> "0..1" Parceria : origem parceria
-    FaixaInvestimento "1" --> "1..*" TipoIniciativa : tipos de projeto
-    FaixaInvestimento "1" --> "*" RubricaPermitidaFaixa : rubricas permitidas
+    AporteFomento "*" --> "0..1" ContaContabil : recurso interno
+    Faixa "1" --> "*" RubricaPermitidaFaixa : rubricas permitidas
+    Faixa "1" --> "*" BolsaPermitidaFaixa : bolsas permitidas
     RubricaPermitidaFaixa "*" --> "1" Rubrica : rubrica
     RubricaPermitidaFaixa "0..1" --> "*" RubricaPermitidaFaixa : subrubricas
-    RubricaPermitidaFaixa "1" --> "*" BolsaPermitidaFaixa : bolsas permitidas
     BolsaPermitidaFaixa "*" --> "1" VersaoNivel : versao de nivel
-    BolsaPermitidaFaixa "*" --> "1" RubricaPermitidaFaixa : rubrica bolsa
-    RemanejamentoFaixas "*" --> "1" FaixaInvestimento : faixaOrigem
-    RemanejamentoFaixas "*" --> "1" FaixaInvestimento : faixaDestino
+    RemanejamentoFaixas "*" --> "1" Faixa : faixaOrigem
+    RemanejamentoFaixas "*" --> "1" Faixa : faixaDestino
 
     %% Captacao aggregate
     Captacao "1" --> "1" Fomento : fomento
-    Captacao "1" --> "1..*" FaixaInvestimento : faixas selecionadas
+    Captacao "1" --> "1..*" Faixa : faixas selecionadas
     Captacao "1" --> "1" AreaTecnica : area tecnica
     Captacao "1" --> "0..1" OutorgadoDestinatario : demanda induzida
     Captacao "1" --> "1..*" TipoIniciativa : tipos de projeto
@@ -393,45 +377,32 @@ classDiagram
 | | dataFim | Data de fim da vigencia do fomento | Sim | Date | | | |
 | | eixoEstrategico (relacao) | Eixo estrategico ao qual o fomento esta vinculado | Sim | FK -> EixoEstrategico | Via M010 | | |
 | | areaTecnica (relacao) | Area tecnica responsavel pelo fomento | Sim | FK -> AreaTecnica | Via M008 | | |
-| | tiposProjetoFomentados (relacao) | Tipos de projeto suportados pelo fomento | Sim | List<FK -> TipoIniciativa> | Via M003. >= 1 | | |
-| **AporteFomento** | origemTipo | Tipo da origem que aporta recurso no fomento | Sim | TipoOrigemAporte | PROGRAMA, PARCERIA | | |
+| **AporteFomento** | origemTipo | Tipo da origem que aporta recurso no fomento | Sim | TipoOrigemAporte | PROGRAMA, PARCERIA, RECURSO_INTERNO | | |
 | | valorAportado | Valor financeiro aportado pela origem no fomento | Sim | Double | > 0 | | |
+| | dataAporte | Data em que o aporte financeiro foi registrado para o fomento | Sim | Date | | | |
+| | isAditivo | Indica se o aporte e aditivo em relacao ao aporte original da mesma origem | Sim | Boolean | true/false | | |
+| | justificativa | Motivo do aporte, obrigatorio quando isAditivo=true ou origemTipo=RECURSO_INTERNO | Cond. | String | | 500 | |
 | | programa (relacao) | Programa que aporta recurso, quando origemTipo for PROGRAMA | Cond. | FK -> Programa | Via M010. Obrigatorio somente para origemTipo PROGRAMA | | |
 | | parceria (relacao) | Parceria que aporta recurso, quando origemTipo for PARCERIA | Cond. | FK -> Parceria | Via M010. Obrigatorio somente para origemTipo PARCERIA | | |
-| **FaixaInvestimento** | nome | Nome da faixa de investimento | Sim | String | | 200 | |
-| | tiposProjeto (relacao) | Tipos de projeto contemplados por esta faixa; deve ser subconjunto de Fomento.tiposProjetoFomentados | Sim | List<FK -> TipoIniciativa> | Via M003. >= 1 | | |
-| | publicoAlvo | Descricao do publico alvo da faixa | Nao | String | | 500 | |
-| | valorMinimo | Valor financeiro minimo da faixa | Sim | Double | >= 0 | | |
-| | valorMaximo | Valor financeiro maximo da faixa | Sim | Double | >= valorMinimo | | |
-| | duracaoMaximaMeses | Duracao maxima do projeto nessa faixa | Sim | Int | > 0 | | |
-| | valorAportado | Valor do aporte total do fomento reservado para a faixa | Sim | Double | >= 0 | | |
+| | contaContabil (relacao) | Conta contabil interna da FAPES usada como origem quando origemTipo for RECURSO_INTERNO | Cond. | FK -> ContaContabil | Via M016. Obrigatorio somente para origemTipo RECURSO_INTERNO | | |
+| **Faixa** | nome | Nome da faixa do fomento | Sim | String | | 200 | |
+| | descricao | Descricao da finalidade ou recorte da faixa | Nao | String | | 500 | |
 | **RubricaPermitidaFaixa** | rubrica (relacao) | Rubrica autorizada ou orientadora para propostas da faixa | Sim | FK -> Rubrica | Via M008 | | |
-| | obrigatoria | Indica se a proposta deve usar esta rubrica quando informar orcamento | Sim | Boolean | true/false | | |
-| | permiteSubrubricas | Indica se a rubrica pode possuir subrubricas permitidas na faixa | Sim | Boolean | true/false | | |
-| | limiteValor | Valor maximo permitido para a rubrica na faixa | Nao | Double | >= 0 | | |
-| | limitePercentual | Percentual maximo da faixa de investimento permitido para a rubrica | Nao | Double | 0 a 100 | | |
-| | comprovantesEsperados | Orientacao de comprovantes esperados para prestacao de contas | Nao | String | | 1000 | |
+| | percentualMinimo | Percentual minimo permitido para a rubrica na faixa | Nao | Double | 0 a 100 | | |
+| | percentualMaximo | Percentual maximo permitido para a rubrica na faixa | Nao | Double | 0 a 100; >= percentualMinimo quando ambos informados | | |
 | | restricoes | Exclusoes ou restricoes especificas para esta rubrica | Nao | String | | 1000 | |
 | | observacao | Orientacao de uso da rubrica na faixa | Nao | String | | 500 | |
-| | rubricaPai (relacao) | Rubrica permitida pai quando o registro representar uma subrubrica; nulo para rubrica raiz | Cond. | FK -> RubricaPermitidaFaixa | Nulo para rubrica raiz. Pai deve ter permiteSubrubricas=true | | |
-| **BolsaPermitidaFaixa** | versaoNivel (relacao) | Versao do nivel de bolsa permitida na faixa | Sim | FK -> VersaoNivel | Via M001 | | |
-| | rubricaPermitida (relacao) | Rubrica do tipo BOLSA que habilita a configuracao desta modalidade | Sim | FK -> RubricaPermitidaFaixa | Deve apontar para rubrica de tipo BOLSA | | |
-| | quantidadeCotas | Quantidade de cotas disponiveis para a versao de nivel na faixa | Sim | Int | >= 0 | | |
-| | maximoBolsistas | Quantidade maxima de bolsistas que podem usar essa versao de nivel na faixa | Sim | Int | >= 0 | | |
-| | obrigatoria | Indica se a proposta deve usar esta bolsa quando informar orcamento de bolsas | Sim | Boolean | true/false | | |
+| | rubricaPai (relacao) | Rubrica permitida pai quando o registro representar uma subrubrica; nulo para rubrica raiz | Cond. | FK -> RubricaPermitidaFaixa | Nulo para rubrica raiz | | |
+| **BolsaPermitidaFaixa** | faixa (relacao) | Faixa na qual a bolsa e permitida | Sim | FK -> Faixa | | | |
+| | versaoNivel (relacao) | Versao do nivel de bolsa permitida na faixa | Sim | FK -> VersaoNivel | Via M001 | | |
+| | quantidadeMinimaCotas | Quantidade minima de cotas exigida para a versao de nivel na faixa | Sim | Int | >= 0 | | |
+| | minimoBolsistas | Quantidade minima de bolsistas exigida para essa versao de nivel na faixa | Sim | Int | >= 0 | | |
 | | observacao | Orientacao de uso da versao de bolsa na faixa | Nao | String | | 500 | |
 | **ResultadoEsperadoFomento** | tipo | Tipo do resultado esperado | Sim | TipoResultado | PRODUTO, SERVICO, PROCESSO | | |
 | | descricao | Descricao do resultado esperado | Sim | String | | 500 | |
 | | indicador | Indicador de medicao do resultado | Nao | String | | 300 | |
-| **AditivoFomento** | tipo | Tipo do aditivo (valor ou data) | Sim | TipoAditivoFomento | VALOR, DATA | | |
-| | valorAdicionado | Valor financeiro adicionado ao fomento quando tipo for VALOR | Cond. | Double | > 0. Obrigatorio somente para tipo VALOR | | |
-| | novaDataFim | Nova data de fim do fomento quando tipo for DATA | Cond. | Date | Obrigatorio somente para tipo DATA | | |
-| | justificativa | Motivo do aditivo | Sim | String | | 500 | |
-| | dataRegistro | Data de registro do aditivo | Gerado | Date | | | |
-| | dataFimAnterior | Data de fim anterior ao aditivo | Gerado | Date | | | |
-| | valorTotalAnterior | Valor total do fomento anterior ao aditivo | Gerado | Double | | | |
-| **RemanejamentoFaixas** | faixaOrigem (relacao) | Faixa de origem do remanejamento | Sim | FK -> FaixaInvestimento | | | |
-| | faixaDestino (relacao) | Faixa de destino do remanejamento | Sim | FK -> FaixaInvestimento | | | |
+| **RemanejamentoFaixas** | faixaOrigem (relacao) | Faixa de origem do remanejamento | Sim | FK -> Faixa | | | |
+| | faixaDestino (relacao) | Faixa de destino do remanejamento | Sim | FK -> Faixa | | | |
 | | valor | Valor remanejado entre as faixas | Sim | Double | > 0 | | |
 | | justificativa | Motivo do remanejamento | Sim | String | | 500 | |
 | | dataRegistro | Data de registro do remanejamento | Gerado | Date | | | |
@@ -449,9 +420,9 @@ classDiagram
 | | descricao | Descricao resumida do objetivo e escopo da captacao | Nao | String | | 1000 | |
 | | tipoCaptacao | Tipo da captacao | Sim | TipoCaptacao | CHAMADA_PUBLICA, DEMANDA_INDUZIDA | | |
 | | tipoOutorgado | Tipo do outorgado da captacao | Sim | TipoOutorgado | PESSOA_FISICA, PESSOA_JURIDICA | | |
-| | estadoConfiguracao | Status da configuracao da captacao | Sim | EstadoConfiguracaoCaptacao | EM_ANDAMENTO, PUBLICADO, NAO_PUBLICADO, PAUSADO, ENCERRADO | | |
+| | estadoConfiguracao | Status da configuracao da captacao | Sim | EstadoConfiguracaoCaptacao | EM_ANDAMENTO, PUBLICADO, NAO_PUBLICADO, PAUSADO, ENCERRADO, CANCELADO | | |
 | | fomento (relacao) | Fomento ao qual a captacao esta vinculada; deve estar no estado APROVADO | Sim | FK -> Fomento | Fomento.estado = APROVADO | | |
-| | faixasSelecionadas (relacao) | Faixas do fomento selecionadas para esta captacao | Sim | List<FK -> FaixaInvestimento> | >= 1. Cada faixa deve pertencer ao Fomento vinculado | | |
+| | faixasSelecionadas (relacao) | Faixas do fomento selecionadas para esta captacao | Sim | List<FK -> Faixa> | >= 1. Cada faixa deve pertencer ao Fomento vinculado | | |
 | | areaTecnica (relacao) | Area tecnica responsavel pela captacao | Sim | FK -> AreaTecnica | Via M008 | | |
 | | edital (relacao) | Edital publicado vinculado a captacao | Sim | FK -> Edital | | | |
 | | outorgadoDestinatario (relacao) | Destinatario da demanda induzida | Cond. | FK -> OutorgadoDestinatario | Via M008. Obrigatorio para tipoCaptacao = DEMANDA_INDUZIDA | | |
@@ -525,11 +496,11 @@ classDiagram
 - Captacao: gerenciada por M011 ate a publicacao do resultado final. O M022 consome propostas aprovadas para contratacao/outorga.
 - M003: recebe o projeto apos contratacao/outorga no M022.
 - Programa e Parceria: gerenciados por M010 (Planejamento e Estrategia). No M011, aparecem como origem de `AporteFomento`, ou seja, aportam financeiramente para o fomento.
-- AporteFomento: cada registro deve possuir exatamente uma origem. Quando `origemTipo = PROGRAMA`, apenas a relacao com `Programa` deve ser preenchida; quando `origemTipo = PARCERIA`, apenas a relacao com `Parceria` deve ser preenchida. O total financeiro do fomento e calculado pela soma dos aportes e nao deve ser informado manualmente.
-- FaixaInvestimento: `valorAportado` representa quanto do total aportado no fomento sera reservado para aquela faixa. A soma dos valores aportados nas faixas nao deve ultrapassar o total financeiro calculado pelos aportes do fomento. Cada faixa deve ter pelo menos um tipo de projeto, e esses tipos devem ser subconjunto dos tipos fomentados.
-- RubricaPermitidaFaixa: as rubricas permitidas sao configuradas por faixa de investimento. Quando uma rubrica possuir subrubricas, a interface deve permitir selecionar uma ou mais subrubricas vinculadas a ela; o pai deve ter `permiteSubrubricas=true`. Rubricas raiz tem `rubricaPai=null`.
-- BolsaPermitidaFaixa: configurada apenas quando a rubrica referenciada for do tipo BOLSA.
-- AditivoFomento: registra alteracoes de valor ou de data de fim do fomento. O tipo VALOR requer `valorAdicionado`; o tipo DATA requer `novaDataFim`. Valores historicos (dataFimAnterior, valorTotalAnterior) sao capturados automaticamente no momento do registro.
+- ContaContabil: gerenciada por M016 (Contabilidade e Financeiro). No M011, aparece como origem quando `AporteFomento.origemTipo = RECURSO_INTERNO`.
+- AporteFomento: cada registro deve possuir exatamente uma origem. Quando `origemTipo = PROGRAMA`, apenas a relacao com `Programa` deve ser preenchida; quando `origemTipo = PARCERIA`, apenas a relacao com `Parceria` deve ser preenchida; quando `origemTipo = RECURSO_INTERNO`, apenas a relacao com `ContaContabil` deve ser preenchida. `dataAporte` registra a data do aporte, `isAditivo` indica se o aporte complementa um aporte original da mesma origem e `justificativa` registra o motivo do aporte aditivo ou do uso de recurso interno. O total financeiro do fomento e calculado pela soma dos aportes e nao deve ser informado manualmente.
+- Faixa: representa um recorte de configuracao do fomento. Rubricas e bolsas sao configuradas por faixa.
+- RubricaPermitidaFaixa: as rubricas permitidas sao configuradas por faixa. Quando uma rubrica possuir subrubricas, a interface deve permitir selecionar uma ou mais subrubricas vinculadas a ela. Rubricas raiz tem `rubricaPai=null`.
+- BolsaPermitidaFaixa: configurada diretamente na faixa quando houver bolsas permitidas para os projetos daquela faixa.
 - RemanejamentoFaixas: permite realocar valor entre faixas do mesmo fomento. Os valores anteriores de origem e destino sao capturados automaticamente.
 - MatrizConfiguracaoProjeto: define a obrigatoriedade de cada bloco estrutural da proposta (equipe, resultados, riscos, cronograma do projeto, orcamento, objetivos, beneficios).
 - Proponente pessoa juridica: quando uma empresa ou instituicao submeter proposta, deve haver uma pessoa fisica representante vinculada a ela no cadastro corporativo do M008. Documentos recorrentes da pessoa juridica devem preferencialmente ser mantidos no cadastro do proponente. O M011 referencia a exigencia documental da captacao e evita duplicar documentos que ja estejam vigentes no cadastro corporativo.

@@ -43,7 +43,7 @@ EPIC-M011-001 (Configuracao da Captacao)
 ├── US-M011-013 Configurar Rubricas e Subrubricas Permitidas  -> detalhado em EPIC-M011-008
 ├── US-M011-014 Configurar Versoes de Bolsas Permitidas
 ├── US-M011-029 Definir Categorias de projeto
-├── US-M011-030 Configurar Faixas de Financiamento
+├── US-M011-030 Configurar faixas
 ├── US-M011-031 Configurar Documentos Exigidos do Proponente
 ├── US-M011-032 Definir Prestacoes Exigidas
 ├── US-M011-033 Configurar Aportes Financeiros da Captacao
@@ -91,9 +91,9 @@ EPIC-M011-008 (Rubricas Permitidas da Captacao)  <- depende de M008, EPIC-M011-0
 EPIC-M011-009 (Gestao do Fomento)  <- depende de M010, M008; pre-requisito de todos os demais EPICs do M011
 ├── US-M011-042 Criar Fomento
 ├── US-M011-043 Configurar Aportes do Fomento
-├── US-M011-044 Configurar Faixas de Investimento do Fomento
+├── US-M011-044 Configurar faixas do Fomento
 ├── US-M011-045 Aprovar Fomento
-├── US-M011-046 Registrar Aditivo de Valor ou Data no Fomento
+├── US-M011-046 Registrar aporte aditivo no Fomento
 ├── US-M011-047 Registrar Remanejamento entre Faixas
 ├── US-M011-048 Interromper e Retomar Fomento
 ├── US-M011-049 Encerrar Fomento

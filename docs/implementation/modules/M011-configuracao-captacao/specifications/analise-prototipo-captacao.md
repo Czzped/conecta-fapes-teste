@@ -32,7 +32,7 @@ O prototipo do backoffice (`prototype/backoffice/`) possui um modulo completo de
 - Categorias de projeto aceitas (Capacitacao, Difusao, Extensao, Inovacao, Pesquisa), selecionadas em campo multi-opcao com chips das categorias marcadas
 - Tipos de projeto aceitos
 - Codigo da Captacao
-- Aportes financeiros de Programa ou Parceria
+- Aportes financeiros de Programa, Parceria ou recurso interno
 - Descricao da Captacao
 
 ### 2. Formularios (FormularioEdital, secao Cronograma da Captacao)
@@ -61,7 +61,7 @@ O prototipo do backoffice (`prototype/backoffice/`) possui um modulo completo de
 ### 4. Aportes e Faixas de Financiamento (FormularioEdital, secao 1)
 
 - Total financeiro calculado pela soma dos aportes financeiros
-- Aportes financeiros originados de Programa ou Parceria
+- Aportes financeiros originados de Programa, Parceria ou recurso interno
 - Faixas de Financiamento
 - Para cada faixa: duracao maxima do projeto, valor minimo, valor maximo e valor aportado na faixa
 - Multiplas faixas com adicao/remocao dinamica
@@ -153,7 +153,7 @@ O prototipo trata **toda a gestao de captacao** como um unico fluxo (componente 
 | Criar/registrar captacao | Nao previsto | US-M011-001 Criar Configuracao de Captacao | FormularioEdital (unico formulario) |
 | Cronograma | Nao previsto | ConfigurarCronogramaDaCaptacao | Secao "Cronograma da Captacao" |
 | Formularios | Nao previsto | SelecionarFormulario no M021 | Secao "Formularios" |
-| Aportes e faixas de financiamento | Nao previsto | ConfigurarAportesFinanceirosCaptacao, ConfigurarFaixasFinanciamento | Secoes "Aportes Financeiros" e "Faixas de Financiamento" |
+| Aportes e faixas | Nao previsto | ConfigurarAportesFinanceirosCaptacao, ConfigurarFaixasSelecionadas | Secoes "Aportes Financeiros" e "Faixas" |
 | Adiamento de cronograma | Nao previsto | AdiarEtapaCronogramaDaCaptacao | Cards do cronograma da captacao |
 | Revisores/Avaliadores | Nao previsto | AssociarRevisorAdHoc | Modal "Enviar para Avaliacao" |
 | Propostas | Nao previsto | EPIC-M011-004 Recebimento de Propostas | Tab "Inscricoes" |

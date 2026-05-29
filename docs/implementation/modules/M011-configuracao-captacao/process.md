@@ -3,13 +3,15 @@
 O modulo M011 cobre o fluxo **pre-award** da captacao de projetos, dividido em tres processos
 sequenciais e dependentes.
 
+Modelo estrutural por processo: [modelo-estrutural-por-processo.md](modelo-estrutural-por-processo.md).
+
 ---
 
 ## Processos
 
 | # | Processo | Responsavel principal | Descricao resumida |
 |---|----------|-----------------------|--------------------|
-| 1 | [Fomento](process-fomento.md) | GestorFomento | Aporte financeiro de Programa ou Parceria para um eixo estrategico. Define faixas de investimento, rubricas por faixa e resultados esperados. |
+| 1 | [Fomento](process-fomento.md) | GestorFomento | Aporte financeiro de Programa, Parceria ou recurso interno para um eixo estrategico. Define faixas de investimento, rubricas por faixa e resultados esperados. |
 | 2 | [Configuracao da Selecao](process-configuracao-selecao.md) | AnalistaTecnico | A Area Tecnica configura o tipo de chamamento, cronograma com 8 etapas obrigatorias, formularios e regras de selecao sobre um Fomento aprovado. GestorFAPES e responsavel por publicar, pausar, retomar e cancelar a Captacao. |
 | 3 | [Selecao dos Projetos](process-selecao-projetos.md) | AnalistaTecnico | Execucao da captacao: recebimento de propostas, analise documental, analise de merito, resultado preliminar, revisao e resultado final. Envolve tambem Proponente, RevisorAdHoc e ResponsavelInstitucional. |
 
@@ -35,13 +37,13 @@ flowchart LR
 
 | Ator | Processos |
 |------|-----------|
-| GestorFomento | 1 — cria, edita e aprova Fomento; registra aportes, aditivos e remanejamentos de faixas; interrompe, retoma e encerra Fomento |
+| GestorFomento | 1 — cria, edita e aprova Fomento; registra aportes, aportes aditivos e remanejamentos de faixas; interrompe, retoma e encerra Fomento |
 | GestorFAPES | 2 — publica, despublica, pausa, retoma e cancela Captacao |
 | AnalistaTecnico (Area Tecnica) | 2 — configura Captacao (cronograma, formularios, regras); 3 — conduz selecao e encerra Captacao apos resultado final |
 | Proponente | 3 — submete proposta e solicita revisao |
 | RevisorAdHoc | 3 — registra parecer de avaliacao ad hoc |
 | ResponsavelInstitucional | 3 — aprova ou recusa proposta quando exigeAprovacaoInstitucional=true |
-| Sistema | Transicoes automaticas: conclui Fomento quando hoje >= dataFimEfetiva; expira Captacao ao fim do periodo RESULTADO_FINAL |
+| Sistema | Transicoes automaticas: conclui Fomento quando hoje >= dataFim; expira Captacao ao fim do periodo RESULTADO_FINAL |
 
 ---
 
@@ -50,6 +52,7 @@ flowchart LR
 | Modulo | Papel |
 |--------|-------|
 | M010 | Fornece Programa, Parceria e EixoEstrategico para o Fomento. |
+| M016 | Fornece a referencia de recurso interno quando o aporte do Fomento vier de fundo/carteira financeira da FAPES. |
 | M001 | Fornece modalidades, niveis e versoes ativas de bolsa configuradas por faixa. |
 | M008 | Fornece Rubricas, AreaTecnica, Instituicoes, NivelAcademico e PessoaFisica. |
 | M021 | Fornece a base de formularios versionados usados na selecao. |

@@ -216,8 +216,8 @@ stateDiagram-v2
     EmRevisao --> ResultadoFinalPublicado : Revisoes analisadas e resultado final publicado
     ResultadoFinalPublicado --> Encerrada : AnalistaTecnico encerra apos publicar resultado final
     ResultadoFinalPublicado --> Encerrada : Sistema expira ao atingir RESULTADO_FINAL.dataFim
-    Publicada --> Encerrada : GestorFAPES cancela administrativamente
-    Pausada --> Encerrada : GestorFAPES cancela administrativamente
+    Publicada --> Cancelada : GestorFAPES cancela administrativamente
+    Pausada --> Cancelada : GestorFAPES cancela administrativamente
     Encerrada --> [*]
 
     Publicada --> Pausada : GestorFAPES pausa com justificativa

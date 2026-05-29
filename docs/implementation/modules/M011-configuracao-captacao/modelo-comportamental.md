@@ -20,7 +20,7 @@ stateDiagram-v2
 
     APROVADO --> ENCERRADO : encerrar / GestorFomento\n[cascata: cancela Captacoes]
 
-    APROVADO --> CONCLUIDO : concluir / Sistema\n[auto: hoje >= dataFimEfetiva]
+    APROVADO --> CONCLUIDO : concluir / Sistema\n[auto: hoje >= dataFim]
 
     ENCERRADO --> [*]
     CONCLUIDO --> [*]
@@ -48,18 +48,19 @@ stateDiagram-v2
 
     PUBLICADO --> ENCERRADO : expirar / Sistema\n[auto: RESULTADO_FINAL.dataFim atingido\nsem publicacao manual]
 
-    PUBLICADO --> ENCERRADO : cancelar / GestorFAPES\n[cancelamento administrativo com justificativa]
+    PUBLICADO --> CANCELADO : cancelar / GestorFAPES\n[cancelamento administrativo com justificativa]
 
-    PAUSADO --> ENCERRADO : cancelar / GestorFAPES\n[cancelamento administrativo com justificativa]
+    PAUSADO --> CANCELADO : cancelar / GestorFAPES\n[cancelamento administrativo com justificativa]
 
     ENCERRADO --> [*]
+    CANCELADO --> [*]
 ```
 
 **Observacoes da maquina de Captacao:**
 
 - O estado PAUSADO bloqueia todas as operacoes de selecao (AX-M011-032).
 - `retomar` e bloqueado pelo Sistema enquanto qualquer periodo futuro tiver `dataFim < hoje` (AX-M011-033).
-- Ha tres modos de encerramento: `encerrar` (manual, apos resultado final), `expirar` (automatico) e `cancelar` (administrativo) — AX-M011-034.
+- Ha dois modos de encerramento: `encerrar` (manual, apos resultado final) e `expirar` (automatico). O `cancelar` administrativo leva a Captacao para `CANCELADO` - AX-M011-034.
 - `publicar` exige exatamente 8 TipoPeriodo no cronograma (AX-M011-001).
 - O Fomento referenciado deve estar no estado APROVADO (AX-M011-012).
 
