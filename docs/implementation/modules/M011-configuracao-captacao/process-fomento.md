@@ -39,7 +39,7 @@ flowchart TD
         I[Definir resultados esperados]
         J[Definir faixas de investimento]
         K[Informar nome, publico-alvo, valor minimo, valor maximo e duracao maxima]
-        TA[Associar tipos de iniciativa a cada faixa]
+        TA[Associar tipos de projeto a cada faixa]
         P[Revisar fomento]
         Q{Fomento valido?}
         R[Aprovar Fomento]
@@ -76,15 +76,15 @@ flowchart TD
 | 2 | Criar Fomento com titulo e descricao | GestorFomento | Registra o Fomento com titulo, descricao do objetivo, data de inicio e data de fim da vigencia. Inicia no estado `EM_ELABORACAO`. |
 | 3 | Definir area tecnica responsavel | GestorFomento | Seleciona a Area Tecnica da FAPES responsavel pela gestao deste fomento. |
 | 4 | Vincular ao eixo estrategico | GestorFomento | Seleciona o eixo do planejamento estrategico (M010) que o Fomento pretende atingir. |
-| 5 | Definir tipos de projetos fomentados | GestorFomento | Seleciona os tipos de iniciativa que o fomento deseja apoiar (ex: Pesquisa, Inovacao, Extensao, Visita Tecnica). Esse conjunto e a lista master — cada faixa so pode referenciar tipos presentes aqui. |
+| 5 | Definir tipos de projetos fomentados | GestorFomento | Seleciona os tipos de projeto que o fomento deseja apoiar (ex: Pesquisa, Inovacao, Extensao, Visita Tecnica). Esse conjunto e a lista master — cada faixa so pode referenciar tipos presentes aqui. |
 | 6 | Adicionar aportes financeiros | GestorFomento | Inclui um ou mais aportes com tipo de origem (PROGRAMA ou PARCERIA), referencia ao Programa ou Parceria do M010 e valor aportado. |
 | 7 | Definir resultados esperados | GestorFomento | Declara os produtos, servicos ou processos esperados dos projetos financiados. Opcional. |
-| 8 | Definir faixas de investimento | GestorFomento / AnalistaTecnico | Cria uma ou mais faixas. Cada faixa e a regua de valor e duracao para um ou mais tipos de iniciativa especificos. Informa nome, valor minimo, valor maximo, duracao maxima e publico-alvo quando diferenciado. |
-| 9 | Associar tipos de iniciativa a cada faixa | GestorFomento / AnalistaTecnico | Para cada faixa, seleciona quais tipos de iniciativa ela cobre. Ex: "Pesquisa — Faixa A" cobre apenas Pesquisa; uma faixa pode cobrir mais de um tipo quando os limites de investimento sao iguais. |
+| 8 | Definir faixas de investimento | GestorFomento / AnalistaTecnico | Cria uma ou mais faixas. Cada faixa e a regua de valor e duracao para um ou mais tipos de projeto especificos. Informa nome, valor minimo, valor maximo, duracao maxima e publico-alvo quando diferenciado. |
+| 9 | Associar tipos de projeto a cada faixa | GestorFomento / AnalistaTecnico | Para cada faixa, seleciona quais tipos de projeto ela cobre. Ex: "Pesquisa — Faixa A" cobre apenas Pesquisa; uma faixa pode cobrir mais de um tipo quando os limites de investimento sao iguais. |
 | 10 | Selecionar rubricas permitidas por faixa | AnalistaTecnico | Para cada faixa, seleciona do catalogo M008 rubricas e subrubricas autorizadas para o orcamento dos projetos daquela faixa. Define obrigatoriedade, limites de valor ou percentual, comprovantes esperados e restricoes especificas. |
 | 11 | Configurar modalidades e niveis de bolsa por faixa | AnalistaTecnico | Quando rubrica do tipo Bolsa selecionada, configura modalidades e niveis com cotas e limite de bolsistas. Sistema resolve automaticamente ultima versao ativa de cada nivel no M001. |
 | 12 | Revisar fomento | GestorFomento | Confere vigencia, area tecnica, faixas, tipos associados, aportes e rubricas antes da aprovacao. Retorna para ajustes se necessario. |
-| 13 | Aprovar Fomento | GestorFomento | Transita para `APROVADO`. Exige ao menos um aporte, uma faixa, um tipo de iniciativa e area tecnica definida. Disponivel para uso em Captacoes. |
+| 13 | Aprovar Fomento | GestorFomento | Transita para `APROVADO`. Exige ao menos um aporte, uma faixa, um tipo de projeto e area tecnica definida. Disponivel para uso em Captacoes. |
 
 ---
 
@@ -94,8 +94,8 @@ Fomento aprovado contendo:
 
 - ao menos um aporte financeiro com origem em Programa ou Parceria do M010;
 - eixo estrategico atingido;
-- tipos de iniciativa que o fomento deseja apoiar;
-- ao menos uma faixa de investimento com tipos de iniciativa associados, valor minimo, valor maximo e duracao maxima;
+- tipos de projeto que o fomento deseja apoiar;
+- ao menos uma faixa de investimento com tipos de projeto associados, valor minimo, valor maximo e duracao maxima;
 - publico-alvo de cada faixa, quando diferenciado;
 - rubricas e subrubricas permitidas por faixa, com limites de valor ou percentual quando aplicavel;
 - configuracoes de modalidade e nivel de bolsa por faixa, com a ultima versao ativa resolvida no M001, quando a rubrica Bolsa estiver selecionada;
@@ -235,11 +235,11 @@ stateDiagram-v2
 | RN-F01 | GestorFomento | Todo Fomento deve possuir ao menos um aporte financeiro originado de Programa ou Parceria do M010. |
 | RN-F02 | GestorFomento | Todo Fomento deve estar vinculado a exatamente um eixo estrategico do M010. |
 | RN-F03 | GestorFomento | Todo Fomento deve possuir ao menos uma faixa de investimento antes de ser aprovado. |
-| RN-F04 | GestorFomento | Todo Fomento deve possuir ao menos um tipo de iniciativa declarado antes de ser aprovado. |
+| RN-F04 | GestorFomento | Todo Fomento deve possuir ao menos um tipo de projeto declarado antes de ser aprovado. |
 | RN-F05 | GestorFomento | Cada aporte deve indicar exatamente uma origem (PROGRAMA ou PARCERIA) e possuir valor aportado maior que zero. |
 | RN-F06 | GestorFomento / AnalistaTecnico | A soma dos valores aportados das faixas de investimento nao deve ultrapassar o total financeiro calculado pelos aportes (`∑FaixaInvestimento.valorAportado ≤ ∑AporteFomento.valorAportado`). |
-| RN-F07 | GestorFomento / AnalistaTecnico | Cada faixa deve ter ao menos um tipo de iniciativa associado, valor maximo maior ou igual ao valor minimo e duracao maxima de ao menos 1 mes. |
-| RN-F08 | GestorFomento / AnalistaTecnico | Os tipos de iniciativa de uma faixa devem pertencer ao conjunto de tipos declarados no Fomento. |
+| RN-F07 | GestorFomento / AnalistaTecnico | Cada faixa deve ter ao menos um tipo de projeto associado, valor maximo maior ou igual ao valor minimo e duracao maxima de ao menos 1 mes. |
+| RN-F08 | GestorFomento / AnalistaTecnico | Os tipos de projeto de uma faixa devem pertencer ao conjunto de tipos declarados no Fomento. |
 | RN-F09 | AnalistaTecnico | Rubricas e subrubricas sao configuradas por faixa de investimento. |
 | RN-F10 | AnalistaTecnico | Quando a rubrica Bolsa estiver permitida em uma faixa, devem ser configuradas as modalidades e niveis de bolsa permitidos. Para cada nivel, o processo recupera automaticamente a ultima versao ativa do M001. |
 | RN-F11 | AnalistaTecnico | BolsaPermitidaFaixa so pode ser configurada quando a RubricaPermitidaFaixa referenciada for do tipo Bolsa. |

@@ -54,4 +54,4 @@ flowchart LR
 | M008 | Fornece Rubricas, AreaTecnica, Instituicoes, NivelAcademico e PessoaFisica. |
 | M021 | Fornece a base de formularios versionados usados na selecao. |
 | M022 | Consome propostas aprovadas para contratacao e assinatura do termo de outorga. |
-| M003 | Recebe a iniciativa apos contratacao no M022. |
+| M003 | Recebe o projeto apos contratacao no M022. |

@@ -99,7 +99,7 @@ classDiagram
         +double valorDestinoAnterior
     }
 
-    class MatrizConfiguracaoIniciativa {
+    class MatrizConfiguracaoProjeto {
         +ObrigatoriedadeBloco equipe
         +ObrigatoriedadeBloco resultados
         +ObrigatoriedadeBloco riscos
@@ -163,7 +163,7 @@ classDiagram
         +String nome
     }
 
-    class CategoriaIniciativa {
+    class CategoriaProjeto {
         +String nome
         +String descricao
         +boolean selecionavelNoCadastro
@@ -338,7 +338,7 @@ classDiagram
     Fomento "1" --> "*" RemanejamentoFaixas : remanejamentos
     AporteFomento "*" --> "0..1" Programa : origem programa
     AporteFomento "*" --> "0..1" Parceria : origem parceria
-    FaixaInvestimento "1" --> "1..*" TipoIniciativa : tipos de iniciativa
+    FaixaInvestimento "1" --> "1..*" TipoIniciativa : tipos de projeto
     FaixaInvestimento "1" --> "*" RubricaPermitidaFaixa : rubricas permitidas
     RubricaPermitidaFaixa "*" --> "1" Rubrica : rubrica
     RubricaPermitidaFaixa "0..1" --> "*" RubricaPermitidaFaixa : subrubricas
@@ -353,8 +353,8 @@ classDiagram
     Captacao "1" --> "1..*" FaixaInvestimento : faixas selecionadas
     Captacao "1" --> "1" AreaTecnica : area tecnica
     Captacao "1" --> "0..1" OutorgadoDestinatario : demanda induzida
-    Captacao "1" --> "1..*" TipoIniciativa : tipos de iniciativa
-    Captacao "1" --> "1..*" CategoriaIniciativa : categorias aceitas
+    Captacao "1" --> "1..*" TipoIniciativa : tipos de projeto
+    Captacao "1" --> "1..*" CategoriaProjeto : categorias aceitas
     Captacao "1" --> "1" Edital : edital
     Captacao "1" --> "1" CronogramaCaptacao : cronograma
     Captacao "1" --> "1" RegraSubmissao : regras de submissao
@@ -368,7 +368,7 @@ classDiagram
     Captacao "1" --> "1" FormularioAvaliacaoRef : formulario de avaliacao
     Captacao "1" --> "1" FormularioRevisaoRef : formulario de revisao
     Captacao "1" --> "0..1" FormularioAnexoRef : formulario de anexos
-    Captacao "1" --> "1" MatrizConfiguracaoIniciativa : matriz de configuracao
+    Captacao "1" --> "1" MatrizConfiguracaoProjeto : matriz de configuracao
 
     RequisitoProponente "0..1" --> "1" Instituicao : instituicao direcionada
     RequisitoProponente "0..1" --> "1" TipoInstituicao : tipo de instituicao
@@ -393,17 +393,17 @@ classDiagram
 | | dataFim | Data de fim da vigencia do fomento | Sim | Date | | | |
 | | eixoEstrategico (relacao) | Eixo estrategico ao qual o fomento esta vinculado | Sim | FK -> EixoEstrategico | Via M010 | | |
 | | areaTecnica (relacao) | Area tecnica responsavel pelo fomento | Sim | FK -> AreaTecnica | Via M008 | | |
-| | tiposProjetoFomentados (relacao) | Tipos de iniciativa suportados pelo fomento | Sim | List<FK -> TipoIniciativa> | Via M003. >= 1 | | |
+| | tiposProjetoFomentados (relacao) | Tipos de projeto suportados pelo fomento | Sim | List<FK -> TipoIniciativa> | Via M003. >= 1 | | |
 | **AporteFomento** | origemTipo | Tipo da origem que aporta recurso no fomento | Sim | TipoOrigemAporte | PROGRAMA, PARCERIA | | |
 | | valorAportado | Valor financeiro aportado pela origem no fomento | Sim | Double | > 0 | | |
 | | programa (relacao) | Programa que aporta recurso, quando origemTipo for PROGRAMA | Cond. | FK -> Programa | Via M010. Obrigatorio somente para origemTipo PROGRAMA | | |
 | | parceria (relacao) | Parceria que aporta recurso, quando origemTipo for PARCERIA | Cond. | FK -> Parceria | Via M010. Obrigatorio somente para origemTipo PARCERIA | | |
 | **FaixaInvestimento** | nome | Nome da faixa de investimento | Sim | String | | 200 | |
-| | tiposIniciativa (relacao) | Tipos de iniciativa contemplados por esta faixa; deve ser subconjunto de Fomento.tiposProjetoFomentados | Sim | List<FK -> TipoIniciativa> | Via M003. >= 1 | | |
+| | tiposProjeto (relacao) | Tipos de projeto contemplados por esta faixa; deve ser subconjunto de Fomento.tiposProjetoFomentados | Sim | List<FK -> TipoIniciativa> | Via M003. >= 1 | | |
 | | publicoAlvo | Descricao do publico alvo da faixa | Nao | String | | 500 | |
 | | valorMinimo | Valor financeiro minimo da faixa | Sim | Double | >= 0 | | |
 | | valorMaximo | Valor financeiro maximo da faixa | Sim | Double | >= valorMinimo | | |
-| | duracaoMaximaMeses | Duracao maxima da iniciativa nessa faixa | Sim | Int | > 0 | | |
+| | duracaoMaximaMeses | Duracao maxima do projeto nessa faixa | Sim | Int | > 0 | | |
 | | valorAportado | Valor do aporte total do fomento reservado para a faixa | Sim | Double | >= 0 | | |
 | **RubricaPermitidaFaixa** | rubrica (relacao) | Rubrica autorizada ou orientadora para propostas da faixa | Sim | FK -> Rubrica | Via M008 | | |
 | | obrigatoria | Indica se a proposta deve usar esta rubrica quando informar orcamento | Sim | Boolean | true/false | | |
@@ -437,7 +437,7 @@ classDiagram
 | | dataRegistro | Data de registro do remanejamento | Gerado | Date | | | |
 | | valorOrigemAnterior | Valor da faixa de origem antes do remanejamento | Gerado | Double | | | |
 | | valorDestinoAnterior | Valor da faixa de destino antes do remanejamento | Gerado | Double | | | |
-| **MatrizConfiguracaoIniciativa** | equipe | Obrigatoriedade do bloco de equipe na proposta | Sim | ObrigatoriedadeBloco | EXIGIDO, DISPENSADO | | |
+| **MatrizConfiguracaoProjeto** | equipe | Obrigatoriedade do bloco de equipe na proposta | Sim | ObrigatoriedadeBloco | EXIGIDO, DISPENSADO | | |
 | | resultados | Obrigatoriedade do bloco de resultados na proposta | Sim | ObrigatoriedadeBloco | EXIGIDO, DISPENSADO | | |
 | | riscos | Obrigatoriedade do bloco de riscos na proposta | Sim | ObrigatoriedadeBloco | EXIGIDO, DISPENSADO | | |
 | | cronogramaProj | Obrigatoriedade do bloco de cronograma do projeto na proposta | Sim | ObrigatoriedadeBloco | EXIGIDO, DISPENSADO | | |
@@ -455,11 +455,11 @@ classDiagram
 | | areaTecnica (relacao) | Area tecnica responsavel pela captacao | Sim | FK -> AreaTecnica | Via M008 | | |
 | | edital (relacao) | Edital publicado vinculado a captacao | Sim | FK -> Edital | | | |
 | | outorgadoDestinatario (relacao) | Destinatario da demanda induzida | Cond. | FK -> OutorgadoDestinatario | Via M008. Obrigatorio para tipoCaptacao = DEMANDA_INDUZIDA | | |
-| **AreaTecnica** | nome | Area tecnica responsavel pela gestao das iniciativas captadas | Sim | String | | 200 | |
+| **AreaTecnica** | nome | Area tecnica responsavel pela gestao dos projetos captados | Sim | String | | 200 | |
 | **OutorgadoDestinatario** | cpf | CPF da pessoa para a qual uma demanda induzida e direcionada | Cond. | String | Obrigatorio para DEMANDA_INDUZIDA | 11 | |
 | | nome | Nome da pessoa para a qual uma demanda induzida e direcionada | Cond. | String | Obrigatorio para DEMANDA_INDUZIDA | 300 | |
-| **TipoIniciativa** | nome | Tipo de iniciativa aceito pela captacao | Sim | String | | 200 | |
-| **CategoriaIniciativa** | nome | Categoria de iniciativa aceita pela captacao | Sim | String | Ex: Pesquisa, Inovacao, Extensao, Difusao, Capacitacao | 200 | Sim |
+| **TipoIniciativa** | nome | Tipo de projeto aceito pela captacao | Sim | String | | 200 | |
+| **CategoriaProjeto** | nome | Categoria de projeto aceita pela captacao | Sim | String | Ex: Pesquisa, Inovacao, Extensao, Difusao, Capacitacao | 200 | Sim |
 | | descricao | Descricao da categoria | Nao | String | | 500 | |
 | | selecionavelNoCadastro | Indica se a categoria esta disponivel para selecao multipla no cadastro da captacao | Sim | Boolean | true/false | | |
 | **PessoaFisica** | cpf | CPF da pessoa no cadastro corporativo | Sim | String | Gerenciado pelo M008 | 11 | Sim |
@@ -501,8 +501,8 @@ classDiagram
 | | nivelAcademicoMinimo (relacao) | Nivel academico minimo exigido do proponente/coordenador | Nao | FK -> NivelAcademico | Via M008 | | |
 | **RegraAvaliacao** | exigeAvaliacaoAdHoc | Indica se a captacao exige avaliacao ad hoc | Sim | Boolean | true/false | | |
 | | quantidadeMinimaRevisores | Quantidade minima de revisores ad hoc por proposta | Sim | Int | >= 0 | | |
-| **PrestacaoExigida** | exigePrestacaoTecnica | Indica se as iniciativas geradas exigirao prestacao tecnica | Sim | Boolean | true/false | | |
-| | exigePrestacaoFinanceira | Indica se as iniciativas geradas exigirao prestacao financeira | Sim | Boolean | true/false | | |
+| **PrestacaoExigida** | exigePrestacaoTecnica | Indica se os projetos gerados exigirao prestacao tecnica | Sim | Boolean | true/false | | |
+| | exigePrestacaoFinanceira | Indica se os projetos gerados exigirao prestacao financeira | Sim | Boolean | true/false | | |
 | **DocumentoExigido** | nome | Nome do documento exigido do proponente | Sim | String | | 200 | |
 | | descricao | Descricao ou orientacao de envio do documento | Nao | String | | 500 | |
 | | obrigatorio | Indica se o documento e obrigatorio na submissao | Sim | Boolean | true/false | | |
@@ -523,23 +523,23 @@ classDiagram
 **Entidades externas:**
 - Fomento: entidade raiz do processo de fomento, gerenciada pelo GestorFomento. A Captacao e subordinada a um Fomento no estado APROVADO.
 - Captacao: gerenciada por M011 ate a publicacao do resultado final. O M022 consome propostas aprovadas para contratacao/outorga.
-- M003: recebe a iniciativa apos contratacao/outorga no M022.
+- M003: recebe o projeto apos contratacao/outorga no M022.
 - Programa e Parceria: gerenciados por M010 (Planejamento e Estrategia). No M011, aparecem como origem de `AporteFomento`, ou seja, aportam financeiramente para o fomento.
 - AporteFomento: cada registro deve possuir exatamente uma origem. Quando `origemTipo = PROGRAMA`, apenas a relacao com `Programa` deve ser preenchida; quando `origemTipo = PARCERIA`, apenas a relacao com `Parceria` deve ser preenchida. O total financeiro do fomento e calculado pela soma dos aportes e nao deve ser informado manualmente.
-- FaixaInvestimento: `valorAportado` representa quanto do total aportado no fomento sera reservado para aquela faixa. A soma dos valores aportados nas faixas nao deve ultrapassar o total financeiro calculado pelos aportes do fomento. Cada faixa deve ter pelo menos um tipo de iniciativa, e esses tipos devem ser subconjunto dos tipos fomentados.
+- FaixaInvestimento: `valorAportado` representa quanto do total aportado no fomento sera reservado para aquela faixa. A soma dos valores aportados nas faixas nao deve ultrapassar o total financeiro calculado pelos aportes do fomento. Cada faixa deve ter pelo menos um tipo de projeto, e esses tipos devem ser subconjunto dos tipos fomentados.
 - RubricaPermitidaFaixa: as rubricas permitidas sao configuradas por faixa de investimento. Quando uma rubrica possuir subrubricas, a interface deve permitir selecionar uma ou mais subrubricas vinculadas a ela; o pai deve ter `permiteSubrubricas=true`. Rubricas raiz tem `rubricaPai=null`.
 - BolsaPermitidaFaixa: configurada apenas quando a rubrica referenciada for do tipo BOLSA.
 - AditivoFomento: registra alteracoes de valor ou de data de fim do fomento. O tipo VALOR requer `valorAdicionado`; o tipo DATA requer `novaDataFim`. Valores historicos (dataFimAnterior, valorTotalAnterior) sao capturados automaticamente no momento do registro.
 - RemanejamentoFaixas: permite realocar valor entre faixas do mesmo fomento. Os valores anteriores de origem e destino sao capturados automaticamente.
-- MatrizConfiguracaoIniciativa: define a obrigatoriedade de cada bloco estrutural da proposta (equipe, resultados, riscos, cronograma do projeto, orcamento, objetivos, beneficios).
+- MatrizConfiguracaoProjeto: define a obrigatoriedade de cada bloco estrutural da proposta (equipe, resultados, riscos, cronograma do projeto, orcamento, objetivos, beneficios).
 - Proponente pessoa juridica: quando uma empresa ou instituicao submeter proposta, deve haver uma pessoa fisica representante vinculada a ela no cadastro corporativo do M008. Documentos recorrentes da pessoa juridica devem preferencialmente ser mantidos no cadastro do proponente. O M011 referencia a exigencia documental da captacao e evita duplicar documentos que ja estejam vigentes no cadastro corporativo.
 - CronogramaCaptacao: cada `PeriodoCronograma` representa um card operacional do cronograma. A configuracao deve possuir exatamente um card para cada um dos 8 `TipoPeriodo` antes da publicacao da captacao. Na edicao, uma etapa pode ser adiada mediante justificativa; o adiamento deve ser registrado em `AdiamentoPeriodoCronograma` e as etapas posteriores devem ser deslocadas pela mesma quantidade de dias.
 - ProponenteEscolhido: usado somente quando `RegraSubmissao.submissaoRestritaAEscolhidos = true`. Cada registro deve apontar para exatamente uma `Instituicao` ou uma `PessoaFisica`, conforme o tipo selecionado.
 - Formularios: gerenciados por M021 (Gestao de Formularios). O M011 referencia apenas `formularioId` e `versaoFormularioId` publicados para submissao, avaliacao ad hoc e revisao de resultado.
-- CategoriaIniciativa: a captacao deve permitir selecao multipla de categorias. Cada categoria marcada no cadastro gera uma associacao da captacao com a categoria correspondente.
+- CategoriaProjeto: a captacao deve permitir selecao multipla de categorias. Cada categoria marcada no cadastro gera uma associacao da captacao com a categoria correspondente.
 - PessoaFisica e NivelAcademico: gerenciados por M008 (Cadastros Corporativos). O M011 usa `RevisorAdHoc` como papel operacional assumido por uma `PessoaFisica`, localizada por CPF ou nome na tela de cadastro; `OutorgadoDestinatario` indica a pessoa destinataria de uma demanda induzida; `NivelAcademico` representa requisito minimo do proponente.
 - Instituicao e TipoInstituicao: gerenciados por M008. A captacao pode aceitar propostas abertas, direcionadas a uma instituicao especifica ou direcionadas a um tipo de instituicao.
-- Rubrica: gerenciada por M008 (Cadastros Corporativos). O M011 seleciona rubricas e subrubricas permitidas por faixa de investimento para orientar o orcamento das propostas. A execucao orcamentaria fica nos modulos posteriores do ciclo da iniciativa.
+- Rubrica: gerenciada por M008 (Cadastros Corporativos). O M011 seleciona rubricas e subrubricas permitidas por faixa de investimento para orientar o orcamento das propostas. A execucao orcamentaria fica nos modulos posteriores do ciclo do projeto.
 - VersaoNivel: gerenciada por M001 (Modalidade Bolsa). O M011 seleciona quais versoes de niveis de bolsa podem ser usadas por faixa e define limites operacionais, como cotas e maximo de bolsistas.
 - DocumentoExigido: gerenciado como item reutilizavel de configuracao, mas associado a captacao para definir documentos exigidos do proponente, formatos permitidos, obrigatoriedade e regra de reaproveitamento do cadastro corporativo.
 - Duvida em aberto: validar se todo comprovante deve ser `DocumentoExigido` ou se parte deles deve ser derivada de `RequisitoProponente` como evidencia documental de um requisito.

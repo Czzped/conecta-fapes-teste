@@ -36,9 +36,9 @@ entities:
   Fomento:
     description: >
       Agregado raiz do Processo 1. Representa o aporte financeiro de um ou mais Programas ou Parcerias
-      do M010 para fomentar projetos de um eixo estrategico. Declara os tipos de iniciativa que deseja
+      do M010 para fomentar projetos de um eixo estrategico. Declara os tipos de projeto que deseja
       apoiar e define faixas de investimento — cada faixa e a regua de valor e duracao para um ou mais
-      tipos de iniciativa especificos.
+      tipos de projeto especificos.
     extends: "shared.Auditavel"
     fields:
       codigo:
@@ -80,7 +80,7 @@ entities:
       tiposProjetoFomentados:
         type: "list:ref:corporativo.instituicoes.TipoIniciativa"
         required: true
-        description: "Tipos de iniciativa que este fomento deseja apoiar (ex: Pesquisa, Inovacao, Extensao, Visita Tecnica)."
+        description: "Tipos de projeto que este fomento deseja apoiar (ex: Pesquisa, Inovacao, Extensao, Visita Tecnica)."
       aportes:
         type: "list:ref:pre_award.captacao.AporteFomento"
         required: true
@@ -88,7 +88,7 @@ entities:
       faixasInvestimento:
         type: "list:ref:pre_award.captacao.FaixaInvestimento"
         required: true
-        description: "Uma ou mais faixas de investimento, cada uma vinculada a um ou mais tipos de iniciativa."
+        description: "Uma ou mais faixas de investimento, cada uma vinculada a um ou mais tipos de projeto."
       resultadosEsperados:
         type: "list:ref:pre_award.captacao.ResultadoEsperadoFomento"
         required: false
@@ -205,7 +205,7 @@ entities:
 
   FaixaInvestimento:
     description: >
-      Regua de valor e duracao para um ou mais tipos de iniciativa dentro do fomento. Define quanto
+      Regua de valor e duracao para um ou mais tipos de projeto dentro do fomento. Define quanto
       e por quanto tempo um projeto daquele(s) tipo(s) pode ser financiado. Pode ser direcionada a
       um publico especifico e configura as rubricas permitidas para o orcamento dos projetos.
     extends: "shared.Auditavel"
@@ -215,10 +215,10 @@ entities:
         required: true
         max_length: 200
         description: "Nome da faixa (ex: Pesquisa — Faixa A, Visita Tecnica)."
-      tiposIniciativa:
+      tiposProjeto:
         type: "list:ref:corporativo.instituicoes.TipoIniciativa"
         required: true
-        description: "Tipos de iniciativa para os quais esta faixa define os limites de investimento. Deve ter ao menos um tipo."
+        description: "Tipos de projeto para os quais esta faixa define os limites de investimento. Deve ter ao menos um tipo."
       publicoAlvo:
         type: "string"
         required: false
@@ -389,7 +389,7 @@ entities:
       faixasSelecionadas:
         type: "list:ref:pre_award.captacao.FaixaInvestimento"
         required: true
-        description: "Uma ou mais faixas do Fomento ativadas nesta captacao. Definem os limites de investimento, tipos de iniciativa, rubricas e bolsas disponiveis para as propostas."
+        description: "Uma ou mais faixas do Fomento ativadas nesta captacao. Definem os limites de investimento, tipos de projeto, rubricas e bolsas disponiveis para as propostas."
       areaTecnica:
         type: "ref:corporativo.instituicoes.AreaTecnica"
         required: true
@@ -414,14 +414,14 @@ entities:
         type: "ref:pre_award.captacao.OutorgadoDestinatario"
         required: false
         description: "Destinatario de uma demanda induzida. Obrigatorio quando tipoCaptacao = DEMANDA_INDUZIDA."
-      tiposIniciativa:
+      tiposProjeto:
         type: "list:ref:corporativo.instituicoes.TipoIniciativa"
         required: true
-        description: "Um ou mais tipos de iniciativa aceitos pela captacao."
-      categoriasIniciativa:
-        type: "list:ref:pre_award.captacao.CategoriaIniciativa"
+        description: "Um ou mais tipos de projeto aceitos pela captacao."
+      categoriasProjeto:
+        type: "list:ref:pre_award.captacao.CategoriaProjeto"
         required: true
-        description: "Uma ou mais categorias de iniciativa aceitas pela captacao."
+        description: "Uma ou mais categorias de projeto aceitas pela captacao."
       cronograma:
         type: "ref:pre_award.captacao.CronogramaCaptacao"
         required: true
@@ -471,7 +471,7 @@ entities:
         required: false
         description: "Referencia opcional ao formulario de anexos publicado no M021."
       matrizConfiguracao:
-        type: "ref:pre_award.captacao.MatrizConfiguracaoIniciativa"
+        type: "ref:pre_award.captacao.MatrizConfiguracaoProjeto"
         required: true
         description: "Define quais blocos fixos da proposta sao exigidos, opcionais ou dispensados nesta captacao."
 
@@ -508,8 +508,8 @@ entities:
         required: false
         description: "Pessoa fisica de contato na pessoa juridica destinataria. Obrigatoria quando tipo = PESSOA_JURIDICA."
 
-  CategoriaIniciativa:
-    description: "Categoria de iniciativa aceita pela captacao, com indicador de disponibilidade para selecao multipla."
+  CategoriaProjeto:
+    description: "Categoria de projeto aceita pela captacao, com indicador de disponibilidade para selecao multipla."
     extends: "shared.Auditavel"
     fields:
       nome:
@@ -532,9 +532,9 @@ entities:
 # ENTIDADES DE SUPORTE — COMPARTILHADAS ENTRE PROCESSOS 2 E 3
 # ─────────────────────────────────────────────────────────────
 
-  MatrizConfiguracaoIniciativa:
+  MatrizConfiguracaoProjeto:
     description: >
-      Define quais blocos fixos da proposta/iniciativa sao exigidos, opcionais ou dispensados
+      Define quais blocos fixos da proposta/projeto sao exigidos, opcionais ou dispensados
       nesta captacao. Evita que o M003 trate todos os blocos como obrigatorios — a obrigatoriedade
       concreta nasce aqui.
     extends: "shared.Auditavel"
@@ -926,19 +926,19 @@ relationships:
     cardinality: "N:1"
     description: "O fomento esta vinculado a um eixo do planejamento estrategico."
   - from: "pre_award.captacao.Fomento"
-    relation: "fomenta tipos de iniciativa"
+    relation: "fomenta tipos de projeto"
     to: "corporativo.instituicoes.TipoIniciativa"
     cardinality: "N:N"
-    description: "Tipos de iniciativa que o fomento deseja apoiar (ex: Pesquisa, Inovacao, Extensao, Visita Tecnica)."
+    description: "Tipos de projeto que o fomento deseja apoiar (ex: Pesquisa, Inovacao, Extensao, Visita Tecnica)."
   - from: "pre_award.captacao.Fomento"
     relation: "possui faixas"
     to: "pre_award.captacao.FaixaInvestimento"
     cardinality: "1:N"
   - from: "pre_award.captacao.FaixaInvestimento"
-    relation: "aplica-se a tipos de iniciativa"
+    relation: "aplica-se a tipos de projeto"
     to: "corporativo.instituicoes.TipoIniciativa"
     cardinality: "N:N"
-    description: "Tipos de iniciativa para os quais esta faixa define os limites de valor e duracao."
+    description: "Tipos de projeto para os quais esta faixa define os limites de valor e duracao."
   - from: "pre_award.captacao.Fomento"
     relation: "resultados esperados"
     to: "pre_award.captacao.ResultadoEsperadoFomento"
@@ -1137,11 +1137,11 @@ axioms:
     natural_language: "OutorgadoDestinatario do tipo PESSOA_JURIDICA deve ter cnpj, razaoSocial e contatoPF preenchidos; cpf e nome devem ser nulos."
     formal_rule: "(tipo = PESSOA_JURIDICA → cnpj ≠ null ∧ razaoSocial ≠ null ∧ contatoPF ≠ null ∧ cpf = null ∧ nome = null)"
   - id: "AX-M011-015"
-    natural_language: "Todo tipo de iniciativa declarado em FaixaInvestimento.tiposIniciativa deve constar em Fomento.tiposProjetoFomentados."
-    formal_rule: "∀f ∈ FaixaInvestimento: ∀t ∈ f.tiposIniciativa: t ∈ Fomento.tiposProjetoFomentados"
+    natural_language: "Todo tipo de projeto declarado em FaixaInvestimento.tiposProjeto deve constar em Fomento.tiposProjetoFomentados."
+    formal_rule: "∀f ∈ FaixaInvestimento: ∀t ∈ f.tiposProjeto: t ∈ Fomento.tiposProjetoFomentados"
   - id: "AX-M011-016"
-    natural_language: "Cada FaixaInvestimento deve ter ao menos um tipo de iniciativa associado."
-    formal_rule: "|FaixaInvestimento.tiposIniciativa| >= 1"
+    natural_language: "Cada FaixaInvestimento deve ter ao menos um tipo de projeto associado."
+    formal_rule: "|FaixaInvestimento.tiposProjeto| >= 1"
   - id: "AX-M011-019"
     natural_language: "AditivoFomento so pode ser registrado em Fomento com estado APROVADO."
     formal_rule: "AditivoFomento → Fomento.estado = APROVADO"
@@ -1176,7 +1176,7 @@ axioms:
     natural_language: "O cronograma de uma Captacao nao pode ter datas fora da vigencia do Fomento referenciado. A data do primeiro periodo deve ser >= Fomento.dataInicio e a data do ultimo periodo deve ser <= Fomento.dataFim."
     formal_rule: "∀p ∈ CronogramaCaptacao.periodos: p.dataInicio >= Fomento.dataInicio ∧ p.dataFim <= Fomento.dataFim"
   - id: "AX-M011-018"
-    natural_language: "Projetos (iniciativas) gerados por uma Captacao nao podem ter data de inicio anterior a Fomento.dataInicio nem data de fim posterior a Fomento.dataFim."
+    natural_language: "Projetos gerados por uma Captacao nao podem ter data de inicio anterior a Fomento.dataInicio nem data de fim posterior a Fomento.dataFim."
     formal_rule: "Projeto.dataInicio >= Fomento.dataInicio ∧ Projeto.dataFim <= Fomento.dataFim"
 
 invariants:
@@ -1322,7 +1322,7 @@ workflows:
         to: APROVADO
         trigger: "aprovar"
         actor: "GestorFomento"
-        guard: "Ao menos um AporteFomento, uma FaixaInvestimento e um tipo de iniciativa cadastrados."
+        guard: "Ao menos um AporteFomento, uma FaixaInvestimento e um tipo de projeto cadastrados."
       - from: APROVADO
         to: INTERROMPIDO
         trigger: "interromper"
@@ -1525,7 +1525,7 @@ agent_instructions:
     - "Captacao PAUSADO bloqueia todas as operacoes do processo de selecao (submissao, parecer, avanco de cronograma). Ao retomar, o GestorFAPES deve avaliar se as datas dos PeriodoCronograma ainda sao validas e, se necessario, registrar AdiamentoPeriodoCronograma antes de retomar (AX-M011-032)."
     - "DOACI (RUB-DOACI): limitePercentual na RubricaPermitidaFaixa e o teto do edital — nao pode superar a tabela normativa (Resolucao CCAF no 309/2022, item 2.4.8.1) para o valorMaximo da faixa (AX-M011-011)."
   notes:
-    - "CategoriaIniciativa e gerenciada dentro deste modulo e permite selecao multipla no cadastro da captacao."
+    - "CategoriaProjeto e gerenciada dentro deste modulo e permite selecao multipla no cadastro da captacao."
     - "OutorgadoDestinatario e um registro desnormalizado — captura o destinatario da demanda induzida no momento da configuracao. Para PJ, o contatoPF e a referencia viva ao M008."
     - "Tabela DOACI normativa (Resolucao CCAF no 309/2022, 2.4.8.1): ate R$50k=15%; R$50k-R$100k=10%; R$100k-R$150k=5%; R$150k-R$300k=3%; R$300k-R$500k=1%; acima R$500k=0.5%. Base de calculo: valor total aprovado excluindo bolsas."
     - "Duvida em aberto: validar se todo comprovante deve ser DocumentoExigido ou se parte deles deve ser derivada de RequisitoProponente como evidencia documental de um requisito."

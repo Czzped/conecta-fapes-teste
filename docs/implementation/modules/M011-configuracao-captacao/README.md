@@ -17,9 +17,9 @@
 
 ## Sobre o Modulo
 
-A agencia de fomento configura e publica captacoes para selecionar iniciativas de pesquisa, desenvolvimento e inovacao. O ciclo do M011 envolve: configuracao da captacao, definicao do cronograma da captacao, selecao de formularios publicados no M021, recebimento de propostas, avaliacao documental, avaliacao ad hoc, revisao de resultado e publicacao do resultado final.
+A agencia de fomento configura e publica captacoes para selecionar projetos de pesquisa, desenvolvimento e inovacao. O ciclo do M011 envolve: configuracao da captacao, definicao do cronograma da captacao, selecao de formularios publicados no M021, recebimento de propostas, avaliacao documental, avaliacao ad hoc, revisao de resultado e publicacao do resultado final.
 
-Atualmente esse processo e realizado por meio de documentos manuais, sem templates nem padronizacao, o que gera inconsistencias entre captacoes e retrabalho frequente. Este modulo visa resolver esse problema ao permitir a gestao do processo de captacao de iniciativas, desde a configuracao da captacao ate a publicacao do resultado final. O sucesso sera medido pela reducao do tempo de configuracao de captacoes, pela eliminacao de inconsistencias e pelo tempo medio do ciclo de captacao.
+Atualmente esse processo e realizado por meio de documentos manuais, sem templates nem padronizacao, o que gera inconsistencias entre captacoes e retrabalho frequente. Este modulo visa resolver esse problema ao permitir a gestao do processo de captacao de projetos, desde a configuracao da captacao ate a publicacao do resultado final. O sucesso sera medido pela reducao do tempo de configuracao de captacoes, pela eliminacao de inconsistencias e pelo tempo medio do ciclo de captacao.
 
 > **Referencia:** A [analise do prototipo backoffice](specifications/analise-prototipo-captacao.md) detalha todas as funcionalidades extraidas do prototipo e as lacunas identificadas na documentacao.
 
@@ -31,7 +31,7 @@ O modulo M011 compreende 3 processos principais no namespace `pre_award.captacao
 
 | # | Processo | Ator Principal | Descricao |
 |---|----------|----------------|-----------|
-| 1 | Fomento | GestorFomento | Criacao e gestao do fomento: configuracao de aportes, faixas de investimento, tipos de iniciativa e ciclo de vida (EM_ELABORACAO → APROVADO → INTERROMPIDO / ENCERRADO / CONCLUIDO). Prerequisito para qualquer captacao. |
+| 1 | Fomento | GestorFomento | Criacao e gestao do fomento: configuracao de aportes, faixas de investimento, tipos de projeto e ciclo de vida (EM_ELABORACAO → APROVADO → INTERROMPIDO / ENCERRADO / CONCLUIDO). Prerequisito para qualquer captacao. |
 | 2 | Configuracao da Selecao | AnalistaTecnico | Configuracao completa da captacao vinculada a um fomento APROVADO: cronograma com 8 etapas, formularios, regras, faixas, rubricas, revisores e publicacao. Estados: EM_ANDAMENTO, PUBLICADO, NAO_PUBLICADO, PAUSADO, ENCERRADO. |
 | 3 | Selecao dos Projetos | AnalistaTecnico, Proponente, RevisorAdHoc, ResponsavelInstitucional | Execucao do fluxo de selecao apos publicacao: recebimento de propostas, avaliacao documental, avaliacao ad hoc, revisao de resultado e publicacao do resultado final. |
 
@@ -53,9 +53,9 @@ O modulo M011 compreende 3 processos principais no namespace `pre_award.captacao
 
 ## Dominio
 
-A agencia de fomento publica captacoes de fomento (`Chamada Publica` ou `Demanda Induzida`) para selecionar iniciativas. O processo de captacao de iniciativas possui as seguintes etapas:
+A agencia de fomento publica captacoes de fomento (`Chamada Publica` ou `Demanda Induzida`) para selecionar projetos. O processo de captacao de projetos possui as seguintes etapas:
 
-**1. Configuracao da Captacao** — A agencia configura a captacao com: aportes financeiros de programas ou parcerias, area tecnica responsavel pela gestao das iniciativas, tipo de captacao, outorgado destinatario quando for demanda induzida, categorias e tipos de iniciativas aceitos, cronograma da captacao com exatamente 8 etapas obrigatorias (publicacao, recebimento de propostas, avaliacao documental, avaliacao ad hoc, resultado preliminar, recebimento de revisao, resultado apos revisao, resultado final), selecao de formularios da base M021 (submissao, avaliacao ad hoc, revisao de resultado e anexos quando aplicavel), faixas de financiamento, regras de submissao, requisitos do proponente, documentos exigidos, criterios de avaliacao, rubricas e subrubricas permitidas, modalidades e niveis de bolsa quando a rubrica Bolsa estiver permitida, pool de revisores ad hoc e regras de distribuicao.
+**1. Configuracao da Captacao** — A agencia configura a captacao com: aportes financeiros de programas ou parcerias, area tecnica responsavel pela gestao dos projetos, tipo de captacao, outorgado destinatario quando for demanda induzida, categorias e tipos de projeto aceitos, cronograma da captacao com exatamente 8 etapas obrigatorias (publicacao, recebimento de propostas, avaliacao documental, avaliacao ad hoc, resultado preliminar, recebimento de revisao, resultado apos revisao, resultado final), selecao de formularios da base M021 (submissao, avaliacao ad hoc, revisao de resultado e anexos quando aplicavel), faixas de financiamento, regras de submissao, requisitos do proponente, documentos exigidos, criterios de avaliacao, rubricas e subrubricas permitidas, modalidades e niveis de bolsa quando a rubrica Bolsa estiver permitida, pool de revisores ad hoc e regras de distribuicao.
 
 **2. Publicacao da Captacao** — A captacao fica visivel apenas na data de publicacao definida no cronograma da captacao. A configuracao precisa estar publicada para que uma instancia de captacao seja criada.
 
@@ -67,9 +67,9 @@ A agencia de fomento publica captacoes de fomento (`Chamada Publica` ou `Demanda
 
 **6. Resultado Final** — A area tecnica publica o resultado final. Esse marco encerra o processo de captacao no M011.
 
-Uma captacao pode receber aporte financeiro de um ou mais programas ou parcerias do M010. A contratacao/outorga das propostas aprovadas ocorre no M022. Apos a contratacao/outorga, a iniciativa passa a ser gerenciada no M003.
+Uma captacao pode receber aporte financeiro de um ou mais programas ou parcerias do M010. A contratacao/outorga das propostas aprovadas ocorre no M022. Apos a contratacao/outorga, o projeto passa a ser gerenciado no M003.
 
-> O M011 termina na publicacao do resultado final. O M022 formaliza a contratacao/outorga e o M003 gerencia a iniciativa pos-contratacao.
+> O M011 termina na publicacao do resultado final. O M022 formaliza a contratacao/outorga e o M003 gerencia o projeto pos-contratacao.
 
 ### Estados da Captacao
 
@@ -97,19 +97,19 @@ Uma captacao pode receber aporte financeiro de um ou mais programas ou parcerias
 | RN08 | Uma configuracao de captacao so pode ser publicada quando cronograma, formularios e configuracoes obrigatorias estiverem completos. | Must |
 | RN09 | Alteracoes relevantes apos a publicacao devem gerar nova versao de configuracao vinculada a mesma captacao. | Must |
 | RN10 | Uma captacao pode definir faixas de financiamento com duracao, valor minimo, valor maximo e valor aportado por faixa. | Should |
-| RN11 | As regras de submissao definem se multiplas propostas sao permitidas e se o proponente pode ter outra iniciativa ativa. | Must |
+| RN11 | As regras de submissao definem se multiplas propostas sao permitidas e se o proponente pode ter outro projeto ativo. | Must |
 | RN12 | Os requisitos do proponente podem exigir nivel academico minimo, vinculo institucional e restricao de vinculo empregaticio. | Must |
-| RN13 | A captacao deve definir as rubricas e subrubricas permitidas para as iniciativas financiadas, incluindo a rubrica Bolsa quando houver bolsas. | Must |
+| RN13 | A captacao deve definir as rubricas e subrubricas permitidas para os projetos financiados, incluindo a rubrica Bolsa quando houver bolsas. | Must |
 | RN14 | Quando a rubrica Bolsa estiver permitida, a captacao deve definir modalidades e niveis de bolsa vinculados as versoes de niveis do M001, maximo de bolsistas e quantidade de cotas. | Must |
 | RN15 | Uma proposta submetida fora do periodo de recebimento deve ser recusada automaticamente. | Must |
 | RN16 | O resultado final so pode ser publicado apos o encerramento e a analise das revisoes admissiveis. | Must |
 | RN17 | Toda captacao do tipo `Demanda Induzida` deve ser direcionada para um outorgado destinatario. | Must |
 | RN18 | A publicacao do resultado final encerra o processo de captacao no M011 e disponibiliza propostas aprovadas para o M022. | Must |
-| RN19 | A captacao deve permitir selecionar uma ou mais categorias de iniciativas aceitas. | Must |
-| RN20 | A captacao pode possuir varias faixas de financiamento, cada uma com duracao maxima da iniciativa, valor minimo, valor maximo e valor aportado. | Should |
+| RN19 | A captacao deve permitir selecionar uma ou mais categorias de projetos aceitos. | Must |
+| RN20 | A captacao pode possuir varias faixas de financiamento, cada uma com duracao maxima do projeto, valor minimo, valor maximo e valor aportado. | Should |
 | RN21 | A captacao deve explicitar regras de submissao e requisitos do proponente, incluindo direcionamento aberto, para instituicao ou para tipo de instituicao. | Must |
 | RN22 | A captacao deve definir a quantidade minima de revisores ad hoc por proposta quando exigir avaliacao ad hoc. | Must |
-| RN23 | A captacao deve indicar se as iniciativas resultantes exigirao prestacao tecnica e/ou financeira. | Must |
+| RN23 | A captacao deve indicar se os projetos resultantes exigirao prestacao tecnica e/ou financeira. | Must |
 | RN24 | Documentos exigidos do proponente devem ser cadastraveis como itens reutilizaveis e associados a captacao com formatos permitidos, obrigatoriedade e regra de reaproveitamento do cadastro corporativo. | Must |
 | RN25 | Cada aporte financeiro da captacao deve indicar origem do tipo Programa ou Parceria e valor aportado maior que zero. | Must |
 | RN26 | Rubricas permitidas devem ser selecionadas a partir de Rubricas ativas do M008. | Must |

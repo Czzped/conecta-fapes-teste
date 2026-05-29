@@ -4,7 +4,7 @@ Data: 2026-04-15
 
 ## Contexto
 
-O prototipo do backoffice (`prototype/backoffice/`) possui um modulo completo de **Captacao** implementado nos componentes React listados abaixo. Esta analise cruza as funcionalidades do prototipo com a documentacao atual do M011 (Configuracao de Captacao) e do M003 (Gestao de Iniciativas Captadas) para identificar inconsistencias e lacunas.
+O prototipo do backoffice (`prototype/backoffice/`) possui um modulo completo de **Captacao** implementado nos componentes React listados abaixo. Esta analise cruza as funcionalidades do prototipo com a documentacao atual do M011 (Configuracao de Captacao) e do M003 (Gestao de Projetos Captados) para identificar inconsistencias e lacunas.
 
 ## Componentes do Prototipo
 
@@ -13,7 +13,7 @@ O prototipo do backoffice (`prototype/backoffice/`) possui um modulo completo de
 | Editais | `Editais.tsx` | Tela principal de captacao: listagem de editais/captacoes com filtros (area, status, instituicao), tabs operacionais de propostas/avaliacao/recurso/finalizado e Dashboard como ultima aba |
 | EditaisLight | `EditaisLight.tsx` | Versao simplificada da listagem com KPIs (editais abertos, em andamento, em avaliacao, avaliados, total inscricoes) |
 | FormularioEdital | `FormularioEdital.tsx` | Formulario completo de criacao de captacao com 6 secoes |
-| DetalhesCaptacao | `DetalhesCaptacao.tsx` | Visualizacao detalhada de uma captacao, com aba Resumo e aba Dashboard para acompanhamento financeiro, fases, iniciativas e avaliadores |
+| DetalhesCaptacao | `DetalhesCaptacao.tsx` | Visualizacao detalhada de uma captacao, com aba Resumo e aba Dashboard para acompanhamento financeiro, fases, projetos e avaliadores |
 | FormularioAvaliacao | `FormularioAvaliacao.tsx` | Template de formulario de avaliacao com perguntas, justificativa, nota e peso |
 | FormularioRecurso | `FormularioRecurso.tsx` | Formulario de recurso do proponente |
 | FormularioInscricaoGeral | `FormularioInscricaoGeral.tsx` | Template de formulario de inscricao/submissao |
@@ -29,8 +29,8 @@ O prototipo do backoffice (`prototype/backoffice/`) possui um modulo completo de
 - Tipo de Captacao (`Chamada Publica` ou `Demanda Induzida`)
 - Ortogado destinatario, quando for `Demanda Induzida`
 - Area Tecnica Responsavel
-- Categorias de Iniciativas aceitas (Capacitacao, Difusao, Extensao, Inovacao, Pesquisa), selecionadas em campo multi-opcao com chips das categorias marcadas
-- Tipos de Iniciativas aceitos
+- Categorias de projeto aceitas (Capacitacao, Difusao, Extensao, Inovacao, Pesquisa), selecionadas em campo multi-opcao com chips das categorias marcadas
+- Tipos de projeto aceitos
 - Codigo da Captacao
 - Aportes financeiros de Programa ou Parceria
 - Descricao da Captacao
@@ -63,17 +63,17 @@ O prototipo do backoffice (`prototype/backoffice/`) possui um modulo completo de
 - Total financeiro calculado pela soma dos aportes financeiros
 - Aportes financeiros originados de Programa ou Parceria
 - Faixas de Financiamento
-- Para cada faixa: duracao maxima da iniciativa, valor minimo, valor maximo e valor aportado na faixa
+- Para cada faixa: duracao maxima do projeto, valor minimo, valor maximo e valor aportado na faixa
 - Multiplas faixas com adicao/remocao dinamica
 - Na visao de detalhe da captacao, o painel financeiro apresenta:
-  - total solicitado pelas iniciativas e total disponivel da captacao
+  - total solicitado pelos projetos e total disponivel da captacao
   - totais solicitados por rubrica
-  - totais por faixa, incluindo valor total, quantidade de iniciativas e totais das rubricas dentro de cada faixa
+  - totais por faixa, incluindo valor total, quantidade de projetos e totais das rubricas dentro de cada faixa
 
 ### 5. Regras de Submissao (FormularioEdital, secao 3)
 
 - Multiplas submissoes por proponente (permitido/nao permitido)
-- Proponente pode ter outra iniciativa ativa (sim/nao)
+- Proponente pode ter outro projeto ativo (sim/nao)
 - Coordenador pode acumular bolsa (sim/nao)
 - Apenas proponentes escolhidos podem submeter proposta (sim/nao)
 
@@ -137,8 +137,8 @@ O prototipo do backoffice (`prototype/backoffice/`) possui um modulo completo de
 - Na tela principal de captacao, o Dashboard e a ultima aba, apos Captacoes, Propostas, Avaliacao, Revisao e Resultado final.
 - A tela abre inicialmente em **Captacoes**, pois esse e o fluxo operacional primario.
 - O Dashboard consolida KPIs e visoes de acompanhamento, sem substituir as abas operacionais.
-- No detalhe da captacao, a aba Dashboard consolida fases das iniciativas, financeiro da captacao, iniciativas enviadas, detalhe da iniciativa selecionada, revisores ad hoc e avaliacoes dos revisores.
-- Em "Detalhes da Iniciativa Selecionada", os metadados da iniciativa ficam abaixo do nome e do resumo, em grade unica para leitura sequencial.
+- No detalhe da captacao, a aba Dashboard consolida fases dos projetos, financeiro da captacao, projetos enviados, detalhe do projeto selecionado, revisores ad hoc e avaliacoes dos revisores.
+- Em "Detalhes do Projeto Selecionado", os metadados do projeto ficam abaixo do nome e do resumo, em grade unica para leitura sequencial.
 
 ---
 
@@ -148,7 +148,7 @@ O prototipo do backoffice (`prototype/backoffice/`) possui um modulo completo de
 
 O prototipo trata **toda a gestao de captacao** como um unico fluxo (componente `Editais`), mas a documentacao divide em dois modulos:
 
-| Funcionalidade | M003 (Gestao de Iniciativas Captadas) | M011 (Config. Captacao) | Prototipo |
+| Funcionalidade | M003 (Gestao de Projetos Captados) | M011 (Config. Captacao) | Prototipo |
 |---------------|--------------------------|------------------------|-----------|
 | Criar/registrar captacao | Nao previsto | US-M011-001 Criar Configuracao de Captacao | FormularioEdital (unico formulario) |
 | Cronograma | Nao previsto | ConfigurarCronogramaDaCaptacao | Secao "Cronograma da Captacao" |
@@ -161,7 +161,7 @@ O prototipo trata **toda a gestao de captacao** como um unico fluxo (componente 
 | Revisao de resultado | Nao previsto | EPIC-M011-006 Revisao de Resultado | Tab "Recurso" |
 | Resultado final | Nao previsto | EPIC-M011-007 Publicacao de Resultado | Tab "Finalizado" |
 
-**Conclusao:** M011 cobre o processo de captacao ate a publicacao do resultado final. M022 cobre a contratacao/outorga posterior. M003 assume a iniciativa apos a contratacao/outorga.
+**Conclusao:** M011 cobre o processo de captacao ate a publicacao do resultado final. M022 cobre a contratacao/outorga posterior. M003 assume o projeto apos a contratacao/outorga.
 
 ### I2. Funcionalidades do prototipo sem cobertura em nenhum modulo
 
@@ -183,7 +183,7 @@ O prototipo trata **toda a gestao de captacao** como um unico fluxo (componente 
 | Entidade | Prototipo | M011 modelo-estrutural | M003 modelo-estrutural |
 |----------|-----------|----------------------|----------------------|
 | FaixaFinanciamento | Duracao maxima, valor min, valor max | Presente | Ausente |
-| RegraSubmissao | Multiplas submissoes, proponente com outra iniciativa ativa, acumulo de bolsa, restricao a escolhidos | Presente | Ausente |
+| RegraSubmissao | Multiplas submissoes, proponente com outro projeto ativo, acumulo de bolsa, restricao a escolhidos | Presente | Ausente |
 | RequisitoProponente | Nivel academico, direcionamento, vinculo empregaticio, parceria institucional | Presente | Ausente |
 | RubricaPermitida | Lista de rubricas habilitadas para a captacao | Presente | Ausente |
 | BolsaPermitida | Modalidade, nivel, versao, max bolsistas, cotas, institucional | Presente por referencia ao M001 | Parcial |
@@ -199,7 +199,7 @@ O EPIC-M011-001 (Configuracao da Captacao) tem historias fundacionais:
 - US-M011-003 Visualizar Total Financeiro da Captacao
 - US-M011-004 Publicar Configuracao de Captacao
 
-O prototipo mostra que a configuracao da captacao e mais abrangente do que as historias fundacionais. Pontos como categorias de iniciativas, faixas de financiamento, regras de submissao, requisitos do proponente, documentos exigidos, rubricas permitidas, prestacoes exigidas, bolsas da captacao e adiamento de etapas do cronograma devem permanecer rastreados como detalhamento da configuracao.
+O prototipo mostra que a configuracao da captacao e mais abrangente do que as historias fundacionais. Pontos como categorias de projeto, faixas de financiamento, regras de submissao, requisitos do proponente, documentos exigidos, rubricas permitidas, prestacoes exigidas, bolsas da captacao e adiamento de etapas do cronograma devem permanecer rastreados como detalhamento da configuracao.
 
 ---
 
@@ -211,4 +211,4 @@ O prototipo mostra que a configuracao da captacao e mais abrangente do que as hi
 4. **Esclarecer fronteira M003/M011** com a seguinte separacao:
    - **M011 — Configuracao de Captacao**: cobre configuracao, recebimento de propostas, avaliacao, revisao e resultado final.
    - **M022 — Contratacao e Outorga**: formaliza propostas aprovadas.
-   - **M003 — Gestao de Iniciativas Captadas**: gerencia a iniciativa apos contratacao/outorga.
+   - **M003 — Gestao de Projetos Captados**: gerencia o projeto apos contratacao/outorga.

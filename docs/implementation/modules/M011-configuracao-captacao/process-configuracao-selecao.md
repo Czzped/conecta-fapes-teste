@@ -40,7 +40,7 @@ flowchart TD
         GB[Informar CPF e nome — PF]
         GC[Informar CNPJ, razao social e contato PF — PJ]
         FAI[Selecionar faixas do Fomento para esta captacao]
-        H[Definir categorias e tipos de iniciativas aceitos]
+        H[Definir categorias e tipos de projetos aceitos]
         J[Configurar regras de submissao]
         JA{Exige aprovacao institucional?}
         JB[Habilitar solicitacao de assinatura institucional na submissao]
@@ -96,8 +96,8 @@ flowchart TD
 | 4 | Definir tipo do outorgado | AnalistaTecnico | Define se o outorgado e `PESSOA_FISICA` ou `PESSOA_JURIDICA`. Em `CHAMADA_PUBLICA` declara o perfil dos proponentes habilitados a receber outorga. Em `DEMANDA_INDUZIDA` deve coincidir com o tipo do destinatario informado no passo seguinte. |
 | 5 | Selecionar outorgado destinatario | AnalistaTecnico | Apenas quando `DEMANDA_INDUZIDA`. Informa o destinatario especifico: PF (CPF + nome) ou PJ (CNPJ + razao social + contato PF). O tipo deve coincidir com o definido no passo anterior. |
 | 6 | Adicionar edital | AnalistaTecnico | Informa o titulo do edital e ao menos um dos seguintes: link externo (URL) ou upload do documento. Pode informar versao quando houver rerratificacoes. Obrigatorio antes da publicacao. |
-| 7 | Selecionar faixas do Fomento | AnalistaTecnico | Seleciona uma ou mais faixas do Fomento que serao ativadas nesta captacao. As faixas determinam os limites de investimento, tipos de iniciativa, rubricas e bolsas disponiveis para as propostas. Herdados do Fomento — nao reconfigurados aqui. |
-| 8 | Definir categorias e tipos de iniciativas aceitos | AnalistaTecnico | Seleciona quais categorias e tipos de iniciativa a captacao aceita, dentre os tipos cobertos pelas faixas selecionadas. |
+| 7 | Selecionar faixas do Fomento | AnalistaTecnico | Seleciona uma ou mais faixas do Fomento que serao ativadas nesta captacao. As faixas determinam os limites de investimento, tipos de projeto, rubricas e bolsas disponiveis para as propostas. Herdados do Fomento — nao reconfigurados aqui. |
+| 8 | Definir categorias e tipos de projetos aceitos | AnalistaTecnico | Seleciona quais categorias e tipos de projeto a captacao aceita, dentre os tipos cobertos pelas faixas selecionadas. |
 | 9 | Configurar regras de submissao | AnalistaTecnico | Define se permite multiplas propostas, acumulo de bolsa, participacao em outra proposta e se a submissao e restrita a proponentes escolhidos. Tambem define se exige aprovacao institucional (`exigeAprovacaoInstitucional`). |
 | 9b | Habilitar solicitacao de assinatura institucional | AnalistaTecnico | **Condicional — apenas quando `exigeAprovacaoInstitucional = true`.** Configura que o proponente devera solicitar a assinatura do ResponsavelInstitucional durante o periodo de submissao. A proposta so pode ser submetida formalmente apos a assinatura ser obtida. |
 | 10 | Selecionar proponentes autorizados | AnalistaTecnico | Quando submissao restrita, seleciona as instituicoes ou pessoas autorizadas a submeter proposta. |
@@ -113,7 +113,7 @@ flowchart TD
 
 ---
 
-> ⚠️ **IDEIA EM AVALIACAO** — Associar tipos de resultados, riscos e metricas de sucesso por tipo de iniciativa. Ao selecionar o tipo de iniciativa na proposta, esses campos viriam pre-preenchidos para o coordenador aceitar ou ajustar. Objetivo: padronizar a analise de impacto para a FAPES. Requer modelagem em M008 (TipoIniciativa) ou novo modulo de templates. Nao implementado nesta versao.
+> ⚠️ **IDEIA EM AVALIACAO** — Associar tipos de resultados, riscos e metricas de sucesso por tipo de projeto. Ao selecionar o tipo de projeto na proposta, esses campos viriam pre-preenchidos para o coordenador aceitar ou ajustar. Objetivo: padronizar a analise de impacto para a FAPES. Requer modelagem em M008 (TipoIniciativa) ou novo modulo de templates. Nao implementado nesta versao.
 
 ## Matriz de Campos da Proposta
 
@@ -161,7 +161,7 @@ Captacao publicada contendo:
 - tipo de chamamento: `CHAMADA_PUBLICA` ou `DEMANDA_INDUZIDA`;
 - outorgado destinatario (PF ou PJ com contato PF), quando `DEMANDA_INDUZIDA`;
 - link do edital;
-- categorias e tipos de iniciativa aceitos;
+- categorias e tipos de projeto aceitos;
 - regras de submissao e proponentes autorizados quando restrita;
 - requisitos do proponente;
 - documentos exigidos com formatos e obrigatoriedade;
@@ -230,7 +230,7 @@ stateDiagram-v2
 
 | Modulo | Papel |
 |--------|-------|
-| M011/Fomento | Fornece as faixas de investimento, rubricas, bolsas, tipos de iniciativa e vigencia. |
+| M011/Fomento | Fornece as faixas de investimento, rubricas, bolsas, tipos de projeto e vigencia. |
 | M008 | Fornece AreaTecnica, Instituicoes, TiposInstituicao, NivelAcademico e PessoaFisica. |
 | M021 | Fornece a base de formularios reutilizaveis e versionados. |
 

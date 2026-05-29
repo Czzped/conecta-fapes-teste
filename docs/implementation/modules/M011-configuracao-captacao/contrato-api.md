@@ -4,7 +4,7 @@ Referencia de dominio e regras de negocio: [contrato.md](contrato.md) | [README.
 
 ## Visao Geral
 
-Este documento especifica o contrato HTTP REST do modulo M011 como bounded context responsavel pela configuracao de captacoes: cronograma, formularios de submissao, avaliacao, revisao e anexos, categorias de iniciativas, aportes financeiros, faixas de financiamento, regras e requisitos de submissao, documentos exigidos, prestacoes exigidas e revisores ad hoc. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
+Este documento especifica o contrato HTTP REST do modulo M011 como bounded context responsavel pela configuracao de captacoes: cronograma, formularios de submissao, avaliacao, revisao e anexos, categorias de projeto, aportes financeiros, faixas de financiamento, regras e requisitos de submissao, documentos exigidos, prestacoes exigidas e revisores ad hoc. O `contrato.md` define **o que** o modulo expoe; este documento define **como** acessar via HTTP.
 
 ### Base URL
 
@@ -529,7 +529,7 @@ As rotas abaixo mantem as configuracoes complementares descobertas no processo e
 | Metodo | Path | Operacao | Payload principal |
 |--------|------|----------|-------------------|
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/formularios/anexos` | SelecionarFormularioAnexos | `formularioId`, `versaoFormularioId` |
-| `POST` | `/api/v1/m011/captacoes/{captacaoId}/categorias-iniciativas` | ConfigurarCategoriasDeIniciativas | `categorias[]` |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/categorias-projetos` | ConfigurarCategoriasDeProjetos | `categorias[]` |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/aportes-financeiros` | ConfigurarAportesFinanceirosCaptacao | origem Programa/Parceria e valor aportado |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/faixas-financiamento` | ConfigurarFaixasFinanciamento | `duracaoMaximaMeses`, `valorMinimo`, `valorMaximo`, `valorAportado` |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/rubricas-permitidas` | ConfigurarRubricasPermitidas | `rubricaId`, limites, restricoes e comprovantes esperados |
@@ -1249,14 +1249,14 @@ Lista os remanejamentos registrados para um Fomento.
 
 ---
 
-### 10. Matriz de Configuracao da Iniciativa
+### 10. Matriz de Configuracao do Projeto
 
 #### `PUT /api/v1/m011/captacoes/{captacaoId}/matriz-configuracao`
 
-Configura a obrigatoriedade dos blocos estruturais da proposta de iniciativa para a captacao.
+Configura a obrigatoriedade dos blocos estruturais da proposta de projeto para a captacao.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`
-- **Operacao de origem:** `ConfigurarMatrizConfiguracaoIniciativa`
+- **Operacao de origem:** `ConfigurarMatrizConfiguracaoProjeto`
 
 **Path parameters**
 
@@ -1317,7 +1317,7 @@ Configura a obrigatoriedade dos blocos estruturais da proposta de iniciativa par
 
 #### `GET /api/v1/m011/captacoes/{captacaoId}/matriz-configuracao`
 
-Consulta a matriz de configuracao de blocos da iniciativa para a captacao.
+Consulta a matriz de configuracao de blocos do projeto para a captacao.
 
 - **Autorizacao:** `ANALISTA_AGENCIA`, `MODULO_INTERNO`
 
@@ -1387,7 +1387,7 @@ Estas rotas representam o processo operacional descrito em [process.md](process.
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/formularios/revisao` | SelecionarFormularioRevisao | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/m011/captacoes/{captacaoId}/formularios/revisao` | ConsultarFormularioRevisao | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/formularios/anexos` | SelecionarFormularioAnexos | ANALISTA_AGENCIA |
-| `POST` | `/api/v1/m011/captacoes/{captacaoId}/categorias-iniciativas` | ConfigurarCategoriasDeIniciativas | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/m011/captacoes/{captacaoId}/categorias-projetos` | ConfigurarCategoriasDeProjetos | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/aportes-financeiros` | ConfigurarAportesFinanceirosCaptacao | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/faixas-financiamento` | ConfigurarFaixasFinanciamento | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/rubricas-permitidas` | ConfigurarRubricasPermitidas | ANALISTA_AGENCIA |
@@ -1411,8 +1411,8 @@ Estas rotas representam o processo operacional descrito em [process.md](process.
 | `GET` | `/api/v1/m011/fomentos/{fomentoId}/aditivos` | ListarAditivosFomento | GESTOR_FOMENTO, ANALISTA_AGENCIA, MODULO_INTERNO |
 | `POST` | `/api/v1/m011/fomentos/{fomentoId}/remanejamentos` | RegistrarRemanejamentoFaixas | GESTOR_FOMENTO |
 | `GET` | `/api/v1/m011/fomentos/{fomentoId}/remanejamentos` | ListarRemanejamentosFomento | GESTOR_FOMENTO, ANALISTA_AGENCIA, MODULO_INTERNO |
-| `PUT` | `/api/v1/m011/captacoes/{captacaoId}/matriz-configuracao` | ConfigurarMatrizConfiguracaoIniciativa | ANALISTA_AGENCIA |
-| `GET` | `/api/v1/m011/captacoes/{captacaoId}/matriz-configuracao` | ConsultarMatrizConfiguracaoIniciativa | ANALISTA_AGENCIA, MODULO_INTERNO |
+| `PUT` | `/api/v1/m011/captacoes/{captacaoId}/matriz-configuracao` | ConfigurarMatrizConfiguracaoProjeto | ANALISTA_AGENCIA |
+| `GET` | `/api/v1/m011/captacoes/{captacaoId}/matriz-configuracao` | ConsultarMatrizConfiguracaoProjeto | ANALISTA_AGENCIA, MODULO_INTERNO |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/instancias` | InstanciarProcessoCaptacao | DIRETORIA_FAPES, AREA_TECNICA |
 | `POST` | `/api/v1/m011/captacoes/{captacaoId}/propostas` | SubmeterProposta | PROPONENTE |
 | `GET` | `/api/v1/m011/captacoes/{captacaoId}/propostas` | ListarPropostasDaCaptacao | AREA_TECNICA |
@@ -1528,7 +1528,7 @@ Estas rotas representam o processo operacional descrito em [process.md](process.
 }
 ```
 
-### MatrizConfiguracaoIniciativa
+### MatrizConfiguracaoProjeto
 
 ```json
 {

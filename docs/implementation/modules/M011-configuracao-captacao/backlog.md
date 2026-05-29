@@ -4,7 +4,7 @@
 
 ## Sobre o Modulo
 
-A agencia de fomento configura e publica captacoes para selecionar iniciativas. O ciclo do M011 envolve: configuracao da captacao, cronograma da captacao, selecao de formularios publicados no M021, recebimento de propostas, avaliacao documental, avaliacao ad hoc, revisao de resultado e publicacao do resultado final. Atualmente esse processo e manual, sem padronizacao, gerando inconsistencias e retrabalho. Este modulo termina na publicacao do resultado final; contratacao/outorga segue no M022.
+A agencia de fomento configura e publica captacoes para selecionar projetos. O ciclo do M011 envolve: configuracao da captacao, cronograma da captacao, selecao de formularios publicados no M021, recebimento de propostas, avaliacao documental, avaliacao ad hoc, revisao de resultado e publicacao do resultado final. Atualmente esse processo e manual, sem padronizacao, gerando inconsistencias e retrabalho. Este modulo termina na publicacao do resultado final; contratacao/outorga segue no M022.
 
 Especificacao de referencia: [README.md](README.md)
 
@@ -42,7 +42,7 @@ EPIC-M011-001 (Configuracao da Captacao)
 ├── US-M011-012 Definir Requisitos do Proponente
 ├── US-M011-013 Configurar Rubricas e Subrubricas Permitidas  -> detalhado em EPIC-M011-008
 ├── US-M011-014 Configurar Versoes de Bolsas Permitidas
-├── US-M011-029 Definir Categorias de Iniciativas
+├── US-M011-029 Definir Categorias de projeto
 ├── US-M011-030 Configurar Faixas de Financiamento
 ├── US-M011-031 Configurar Documentos Exigidos do Proponente
 ├── US-M011-032 Definir Prestacoes Exigidas
