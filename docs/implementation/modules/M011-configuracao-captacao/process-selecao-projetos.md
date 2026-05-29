@@ -25,6 +25,7 @@ contratacao das propostas aprovadas pertencem ao M022.
 |------|-------------------|
 | AnalistaTecnico | Conduz todas as etapas operacionais: publicacao, analise documental, distribuicao para revisores, consolidacao, publicacao de resultados e analise de revisoes |
 | Proponente | Submete a proposta e solicita revisao do resultado preliminar |
+| ResponsavelInstitucional | Aprova ou recusa a submissao do projeto em nome da instituicao ou setor do proponente (apenas quando `exigeAprovacaoInstitucional = true`) |
 | RevisorAdHoc | Registra parecer e nota de merito para cada proposta distribuida |
 | GestorFAPES | Pode encerrar a captacao apos publicacao do resultado final |
 
@@ -54,8 +55,14 @@ flowchart TD
     end
 
     subgraph Proponente[Proponente]
-        D[Submeter proposta dentro do periodo de recebimento]
+        D[Elaborar proposta e solicitar assinatura institucional quando exigido]
         N[Solicitar revisao do resultado preliminar]
+    end
+
+    subgraph ResponsavelInstitucional[ResponsavelInstitucional — quando exigeAprovacaoInstitucional]
+        AI_DEC{Aprova submissao?}
+        AI_OK[Assinar proposta — dentro do prazo de submissao]
+        AI_NOK[Recusar com justificativa — devolve ao proponente]
     end
 
     subgraph Revisor[RevisorAdHoc]
@@ -64,7 +71,9 @@ flowchart TD
 
     A --> A1
     A1 --> D
-    D --> E
+    D --> AI_DEC
+    AI_DEC -->|Aprovado| AI_OK --> E
+    AI_DEC -->|Recusado| AI_NOK --> D
     E --> F
     F --> G
     G -->|Nao| H
@@ -131,7 +140,8 @@ Processo 2.
 |---------------------|-------------------|-------------|
 | Data de publicacao da captacao | Captacao fica visivel e disponivel para os proponentes | AnalistaTecnico |
 | Periodo de recebimento das propostas | Proponentes podem submeter propostas apenas entre a data inicial e a data final | Proponente |
-| Encerramento do recebimento | Nenhuma nova proposta e aceita apos a data final | AnalistaTecnico |
+| Periodo de recebimento das propostas — com aprovacao institucional | Quando `exigeAprovacaoInstitucional = true`: proponente elabora a proposta, ResponsavelInstitucional assina **dentro deste mesmo periodo** e so entao a proposta e formalmente submetida. Prazo unico para ambas as acoes. | Proponente + ResponsavelInstitucional |
+| Encerramento do recebimento | Nenhuma nova proposta e aceita apos a data final. Propostas sem assinatura institucional sao descartadas quando exigido. | AnalistaTecnico |
 | Periodo de analise documental | AnalistaTecnico habilita ou inabilita propostas com base na documentacao enviada | AnalistaTecnico |
 | Periodo de analise de merito | RevisoresAdHoc podem registrar pareceres e notas apenas dentro deste periodo | RevisorAdHoc |
 | Data de publicacao do resultado preliminar | Classificacao preliminar fica disponivel aos proponentes | AnalistaTecnico |

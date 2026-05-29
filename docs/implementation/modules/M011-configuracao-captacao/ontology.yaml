@@ -386,6 +386,10 @@ entities:
         type: "ref:pre_award.captacao.Fomento"
         required: true
         description: "Fomento aprovado que financia esta captacao. Deve estar no estado APROVADO."
+      faixasSelecionadas:
+        type: "list:ref:pre_award.captacao.FaixaInvestimento"
+        required: true
+        description: "Uma ou mais faixas do Fomento ativadas nesta captacao. Definem os limites de investimento, tipos de iniciativa, rubricas e bolsas disponiveis para as propostas."
       areaTecnica:
         type: "ref:corporativo.instituicoes.AreaTecnica"
         required: true
@@ -394,14 +398,18 @@ entities:
         type: "enum:TipoCaptacao"
         required: true
         description: "Tipo da captacao: CHAMADA_PUBLICA ou DEMANDA_INDUZIDA."
+      tipoOutorgado:
+        type: "enum:TipoOutorgado"
+        required: true
+        description: "Tipo do outorgado esperado: PESSOA_FISICA ou PESSOA_JURIDICA. Em CHAMADA_PUBLICA define o perfil dos proponentes habilitados a receber outorga. Em DEMANDA_INDUZIDA deve coincidir com o tipo do outorgadoDestinatario."
       estadoConfiguracao:
         type: "enum:EstadoConfiguracaoCaptacao"
         required: true
         description: "Estado corrente da configuracao da captacao."
-      linkEdital:
-        type: "string"
+      edital:
+        type: "ref:pre_award.captacao.Edital"
         required: true
-        description: "Link ou referencia ao documento do edital."
+        description: "Edital da captacao com as regras, podendo conter link externo e/ou documento anexado."
       outorgadoDestinatario:
         type: "ref:pre_award.captacao.OutorgadoDestinatario"
         required: false
@@ -462,6 +470,10 @@ entities:
         type: "ref:pre_award.captacao.FormularioAnexoRef"
         required: false
         description: "Referencia opcional ao formulario de anexos publicado no M021."
+      matrizConfiguracao:
+        type: "ref:pre_award.captacao.MatrizConfiguracaoIniciativa"
+        required: true
+        description: "Define quais blocos fixos da proposta sao exigidos, opcionais ou dispensados nesta captacao."
 
   OutorgadoDestinatario:
     description: >
@@ -519,6 +531,77 @@ entities:
 # ─────────────────────────────────────────────────────────────
 # ENTIDADES DE SUPORTE — COMPARTILHADAS ENTRE PROCESSOS 2 E 3
 # ─────────────────────────────────────────────────────────────
+
+  MatrizConfiguracaoIniciativa:
+    description: >
+      Define quais blocos fixos da proposta/iniciativa sao exigidos, opcionais ou dispensados
+      nesta captacao. Evita que o M003 trate todos os blocos como obrigatorios — a obrigatoriedade
+      concreta nasce aqui.
+    extends: "shared.Auditavel"
+    fields:
+      equipe:
+        type: "enum:ObrigatoriedadeBloco"
+        required: true
+        description: "Define se a proposta deve informar equipe (papeis, quantidade prevista ou membros)."
+      resultados:
+        type: "enum:ObrigatoriedadeBloco"
+        required: true
+        description: "Define se a proposta deve declarar resultados esperados (entregas)."
+      riscos:
+        type: "enum:ObrigatoriedadeBloco"
+        required: true
+        description: "Define se a proposta deve declarar riscos, impacto, probabilidade e mitigacao."
+      cronogramaProj:
+        type: "enum:ObrigatoriedadeBloco"
+        required: true
+        description: "Define se a proposta deve informar cronograma de atividades com datas."
+      orcamento:
+        type: "enum:ObrigatoriedadeBloco"
+        required: true
+        description: "Define se a proposta deve informar valores planejados por rubrica."
+      objetivos:
+        type: "enum:ObrigatoriedadeBloco"
+        required: true
+        description: "Define se a proposta deve informar objetivo geral e/ou objetivos especificos."
+      beneficios:
+        type: "enum:ObrigatoriedadeBloco"
+        required: true
+        description: "Define se a proposta deve declarar beneficios e indicadores."
+
+  Edital:
+    description: >
+      Documento oficial com as regras da captacao. Deve conter ao menos um link externo ou
+      um arquivo anexado. Ambos podem ser informados simultaneamente.
+    extends: "shared.Auditavel"
+    fields:
+      titulo:
+        type: "string"
+        required: true
+        max_length: 200
+        description: "Titulo ou identificacao do edital."
+      descricao:
+        type: "string"
+        required: false
+        max_length: 1000
+        description: "Resumo do conteudo ou escopo do edital."
+      link:
+        type: "string"
+        required: false
+        description: "URL para o edital publicado externamente (DOU, site da FAPES, etc.)."
+      nomeArquivo:
+        type: "string"
+        required: false
+        max_length: 255
+        description: "Nome do arquivo do edital anexado. Preenchido quando o documento for carregado diretamente."
+      urlArquivo:
+        type: "string"
+        required: false
+        description: "URL de acesso ao arquivo armazenado. Gerada automaticamente apos upload."
+      versao:
+        type: "string"
+        required: false
+        max_length: 20
+        description: "Versao do edital, quando houver rerratificacoes (ex: 1.0, 1.1)."
 
   CronogramaCaptacao:
     description: "Cronograma da captacao composto exatamente pelos 8 periodos obrigatorios do fluxo de selecao."
@@ -668,6 +751,10 @@ entities:
         type: "boolean"
         required: true
         description: "Indica se apenas proponentes previamente escolhidos podem submeter proposta."
+      exigeAprovacaoInstitucional:
+        type: "boolean"
+        required: true
+        description: "Indica se a proposta submetida deve ser aprovada pelo responsavel da instituicao ou setor do proponente antes de seguir para analise documental."
 
   ProponenteEscolhido:
     description: "Proponente autorizado a submeter quando submissaoRestritaAEscolhidos = true. Aponta para exatamente uma Instituicao ou PessoaFisica."
@@ -898,10 +985,20 @@ relationships:
     cardinality: "N:1"
   # Captacao
   - from: "pre_award.captacao.Captacao"
+    relation: "possui edital"
+    to: "pre_award.captacao.Edital"
+    cardinality: "1:1"
+    description: "Edital com as regras da captacao — link externo e/ou arquivo anexado."
+  - from: "pre_award.captacao.Captacao"
     relation: "baseada em"
     to: "pre_award.captacao.Fomento"
     cardinality: "N:1"
     description: "A captacao utiliza um Fomento aprovado como base financeira e de faixas de investimento."
+  - from: "pre_award.captacao.Captacao"
+    relation: "ativa faixas de"
+    to: "pre_award.captacao.FaixaInvestimento"
+    cardinality: "N:N"
+    description: "Faixas do Fomento selecionadas pelo AnalistaTecnico para esta captacao. Devem pertencer ao Fomento referenciado."
   - from: "pre_award.captacao.Captacao"
     relation: "configurada por"
     to: "pre_award.captacao.CronogramaCaptacao"
@@ -980,8 +1077,8 @@ relationships:
 
 axioms:
   - id: "AX-M011-001"
-    natural_language: "O cronograma de uma captacao deve conter exatamente 8 periodos, um para cada TipoPeriodo obrigatorio, antes da publicacao."
-    formal_rule: "Captacao.estadoConfiguracao = PUBLICADO → |CronogramaCaptacao.periodos| = 8 ∧ ∀t ∈ TipoPeriodo: ∃p ∈ periodos: p.tipo = t"
+    natural_language: "O cronograma deve conter os periodos obrigatorios antes da publicacao. Quando exigeAprovacaoInstitucional = true, a assinatura do ResponsavelInstitucional deve ocorrer dentro do periodo RECEBIMENTO_PROPOSTAS — nao ha periodo separado para aprovacao institucional."
+    formal_rule: "Captacao.estadoConfiguracao = PUBLICADO → periodosObrigatorios ⊆ CronogramaCaptacao.periodos ∧ (exigeAprovacaoInstitucional = true → assinaturaInstitucional.data <= RECEBIMENTO_PROPOSTAS.dataFim)"
   - id: "AX-M011-002"
     natural_language: "Um AporteFomento deve referenciar exatamente uma origem: Programa quando origemTipo = PROGRAMA, Parceria quando origemTipo = PARCERIA."
     formal_rule: "(origemTipo = PROGRAMA → programa ≠ null ∧ parceria = null) ∧ (origemTipo = PARCERIA → parceria ≠ null ∧ programa = null)"
@@ -1015,6 +1112,15 @@ axioms:
   - id: "AX-M011-012"
     natural_language: "Uma Captacao somente pode ser criada a partir de um Fomento com estado APROVADO."
     formal_rule: "Captacao.fomento → Fomento.estado = APROVADO"
+  - id: "AX-M011-031"
+    natural_language: "Quando tipoCaptacao = DEMANDA_INDUZIDA, o tipoOutorgado da Captacao deve coincidir com o tipo do outorgadoDestinatario."
+    formal_rule: "tipoCaptacao = DEMANDA_INDUZIDA → tipoOutorgado = outorgadoDestinatario.tipo"
+  - id: "AX-M011-029"
+    natural_language: "Todas as faixas selecionadas em uma Captacao devem pertencer ao Fomento referenciado por essa Captacao."
+    formal_rule: "∀f ∈ Captacao.faixasSelecionadas: f ∈ Captacao.fomento.faixasInvestimento"
+  - id: "AX-M011-030"
+    natural_language: "Uma Captacao deve selecionar ao menos uma faixa do Fomento."
+    formal_rule: "|Captacao.faixasSelecionadas| >= 1"
   - id: "AX-M011-013"
     natural_language: "OutorgadoDestinatario do tipo PESSOA_FISICA deve ter cpf e nome preenchidos; cnpj, razaoSocial e contatoPF devem ser nulos."
     formal_rule: "(tipo = PESSOA_FISICA → cpf ≠ null ∧ nome ≠ null ∧ cnpj = null ∧ razaoSocial = null ∧ contatoPF = null)"
@@ -1081,8 +1187,8 @@ invariants:
     rule: "RegraAvaliacao.quantidadeMinimaRevisores >= 0"
     description: "A quantidade minima de revisores nao pode ser negativa."
   - id: "INV-M011-006"
-    rule: "Captacao.estadoConfiguracao = PUBLICADO → Captacao.linkEdital ≠ null"
-    description: "Uma captacao publicada deve ter o link do edital preenchido."
+    rule: "Captacao.estadoConfiguracao = PUBLICADO → Captacao.edital ≠ null ∧ (Captacao.edital.link ≠ null ∨ Captacao.edital.urlArquivo ≠ null)"
+    description: "Uma captacao publicada deve ter edital com ao menos um link externo ou arquivo anexado."
   - id: "INV-M011-007"
     rule: "RubricaPermitidaFaixa.limitePercentual = null ∨ (RubricaPermitidaFaixa.limitePercentual >= 0 ∧ RubricaPermitidaFaixa.limitePercentual <= 100)"
     description: "O limite percentual de rubrica, quando informado, deve estar entre 0 e 100."
@@ -1094,6 +1200,12 @@ invariants:
     description: "A data de fim do fomento deve ser posterior a data de inicio."
 
 enums:
+  ObrigatoriedadeBloco:
+    description: "Visibilidade e obrigatoriedade de um bloco fixo da proposta na captacao."
+    values:
+      EXIGIDO: "Bloco aparece na proposta e o proponente deve preenche-lo obrigatoriamente para submeter."
+      DISPENSADO: "Bloco nao aparece para o proponente. Nao e solicitado nem exibido no formulario de submissao desta captacao."
+
   TipoAditivoFomento:
     description: "Tipo de aditivo aplicavel a um Fomento aprovado."
     values:
@@ -1345,6 +1457,11 @@ policies:
     RevisorAdHoc:
       can:
         - registrar PareceAdHoc
+    ResponsavelInstitucional:
+      description: "Responsavel pela instituicao ou setor do proponente. Aprova ou recusa a submissao do projeto em nome da instituicao quando exigeAprovacaoInstitucional = true."
+      can:
+        - aprovar SubmissaoProposta
+        - recusar SubmissaoProposta
 
 agent_instructions:
   rules:
