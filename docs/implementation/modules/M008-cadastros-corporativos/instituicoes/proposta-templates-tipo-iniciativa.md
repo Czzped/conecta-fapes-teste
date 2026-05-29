@@ -1,5 +1,8 @@
 # Proposta — Templates por Tipo de Iniciativa
 
+!!! warning "Em Elaboracao"
+    Este documento e uma proposta em elaboracao. O conteudo ainda nao foi validado pela equipe tecnica da FAPES e nao representa uma decisao de implementacao.
+
 ## Objetivo
 
 Associar a cada `TipoIniciativa` um conjunto de sugestoes padrao de resultados esperados,
