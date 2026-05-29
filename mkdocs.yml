@@ -301,6 +301,7 @@ nav:
                   - Visao Geral: implementation/modules/M008-cadastros-corporativos/instituicoes/README.md
                   - Backlog: implementation/modules/M008-cadastros-corporativos/instituicoes/backlog.md
                   - Modelo Estrutural: implementation/modules/M008-cadastros-corporativos/instituicoes/modelo-estrutural.md
+                  - Proposta Templates Tipo Iniciativa: implementation/modules/M008-cadastros-corporativos/instituicoes/proposta-templates-tipo-iniciativa.md
                   - EPIC-002: implementation/modules/M008-cadastros-corporativos/instituicoes/epics/EPIC-M008-002.md
               - Diarias:
                   - Visao Geral: implementation/modules/M008-cadastros-corporativos/diarias/README.md
