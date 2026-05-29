@@ -1115,6 +1115,9 @@ axioms:
   - id: "AX-M011-032"
     natural_language: "Enquanto a Captacao estiver no estado PAUSADO, nenhuma operacao do processo de selecao pode ser executada: proponentes nao podem submeter nem solicitar revisao, revisores ad hoc nao podem registrar parecer, e o AnalistaTecnico nao pode avancar etapas do cronograma. O contador de dias dos periodos do cronograma nao avanca automaticamente durante a pausa — a responsabilidade de aditamento do cronograma caso necessario e do GestorFAPES ao retomar."
     formal_rule: "Captacao.estadoConfiguracao = PAUSADO → operacoesSelecao.bloqueadas = true ∧ cronograma.avancaAutomatico = false"
+  - id: "AX-M011-034"
+    natural_language: "Uma Captacao pode ser encerrada de tres formas: (1) encerramento normal — AnalistaTecnico aciona apos publicar o resultado final; (2) expiração automatica — Sistema encerra quando RESULTADO_FINAL.dataFim e atingida sem publicacao manual; (3) cancelamento administrativo — GestorFAPES cancela a partir de PUBLICADO ou PAUSADO com justificativa obrigatoria. Em qualquer caso, o estado final e ENCERRADO e nenhuma nova operacao de selecao e permitida."
+    formal_rule: "Captacao.estadoConfiguracao = ENCERRADO ← (trigger = encerrar ∧ actor = AnalistaTecnico ∧ RESULTADO_FINAL.publicado = true) ∨ (trigger = expirar ∧ actor = Sistema ∧ hoje >= RESULTADO_FINAL.dataFim) ∨ (trigger = cancelar ∧ actor = GestorFAPES ∧ justificativa ≠ null)"
   - id: "AX-M011-033"
     natural_language: "A retomada de uma Captacao PAUSADO e bloqueada enquanto existir qualquer PeriodoCronograma futuro (nao concluido) com dataFim anterior a data de retomada. O GestorFAPES deve registrar AdiamentoPeriodoCronograma para cada periodo afetado antes de acionar a retomada. O sistema deve validar esta condicao e rejeitar a retomada se houver periodos expirados nao aditados."
     formal_rule: "retomar(Captacao) → ∀p ∈ CronogramaCaptacao.periodos where nao_concluido(p): p.dataFim >= dataRetomada"
@@ -1253,7 +1256,7 @@ enums:
       PUBLICADO: "Captacao publicada e disponivel para execucao do processo de selecao."
       NAO_PUBLICADO: "Captacao despublicada apos ter sido publicada."
       PAUSADO: "Captacao com processo de selecao temporariamente interrompido pelo GestorFAPES. Nenhuma acao de proponente, revisor ou analistaTecnico e permitida ate retomada. O periodo do cronograma em andamento nao avanca automaticamente."
-      ENCERRADO: "Captacao encerrada, resultado final publicado."
+      ENCERRADO: "Captacao encerrada. Pode ocorrer de duas formas: (1) encerramento natural — AnalistaTecnico publica o resultado final ou Sistema encerra automaticamente ao atingir RESULTADO_FINAL.dataFim; (2) cancelamento administrativo — GestorFAPES cancela com justificativa a partir de PUBLICADO ou PAUSADO."
 
   TipoPeriodo:
     description: "Tipo de periodo obrigatorio do cronograma de uma captacao. Os 8 valores definem a ordem sequencial do fluxo."
@@ -1383,7 +1386,22 @@ workflows:
         to: ENCERRADO
         trigger: "encerrar"
         actor: "AnalistaTecnico"
-        guard: "Periodo RESULTADO_FINAL concluido e resultado final publicado."
+        guard: "Periodo RESULTADO_FINAL concluido e resultado final publicado. Encerramento normal ao fim do fluxo de selecao."
+      - from: PUBLICADO
+        to: ENCERRADO
+        trigger: "expirar"
+        actor: "Sistema"
+        guard: "RESULTADO_FINAL.dataFim atingida e resultado final nao publicado manualmente. Sistema encerra automaticamente."
+      - from: PUBLICADO
+        to: ENCERRADO
+        trigger: "cancelar"
+        actor: "GestorFAPES"
+        guard: "Justificativa de cancelamento informada. Nenhuma proposta aprovada e consumida pelo M022 apos cancelamento."
+      - from: PAUSADO
+        to: ENCERRADO
+        trigger: "cancelar"
+        actor: "GestorFAPES"
+        guard: "Justificativa de cancelamento informada. Captacao cancelada enquanto pausada."
 
   CronogramaPeriodosSequencia:
     description: "Ordem obrigatoria dos 8 TipoPeriodo no fluxo da captacao."
@@ -1448,11 +1466,13 @@ policies:
         - reabrir Captacao para EM_ANDAMENTO
         - pausar Captacao PUBLICADO (requer justificativa)
         - retomar Captacao PAUSADO
-        - encerrar Captacao
+        - cancelar Captacao PUBLICADO (requer justificativa)
+        - cancelar Captacao PAUSADO (requer justificativa)
     AnalistaTecnico:
       can:
         - visualizar Fomento
         - visualizar Captacao
+        - encerrar Captacao PUBLICADO apos publicacao do resultado final
         - configurar CronogramaCaptacao
         - configurar RubricaPermitidaFaixa
         - configurar BolsaPermitidaFaixa

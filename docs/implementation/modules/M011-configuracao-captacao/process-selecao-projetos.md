@@ -197,7 +197,8 @@ flowchart TD
 | Data de publicacao do resultado preliminar | Classificacao preliminar disponivel aos proponentes | AnalistaTecnico |
 | Periodo de recursos | Proponentes podem solicitar revisao do resultado preliminar | Proponente |
 | Data de publicacao do resultado apos revisao | Decisoes sobre recursos disponibilizadas | AnalistaTecnico |
-| Data de publicacao do resultado final | Resultado final disponivel; M011 encerrado; propostas aprovadas consumidas pelo M022 | AnalistaTecnico |
+| Data de publicacao do resultado final | Resultado final disponivel; M011 encerrado pelo AnalistaTecnico; propostas aprovadas consumidas pelo M022 | AnalistaTecnico |
+| `RESULTADO_FINAL.dataFim` sem publicacao manual | Sistema encerra automaticamente a captacao por expiracao. Propostas aprovadas ate entao ficam disponiveis ao M022 | Sistema |
 
 ---
 
@@ -213,7 +214,11 @@ stateDiagram-v2
     ResultadoPreliminarPublicado --> EmRevisao : Ha solicitacoes de revisao admissiveis
     ResultadoPreliminarPublicado --> ResultadoFinalPublicado : Sem revisoes admissiveis
     EmRevisao --> ResultadoFinalPublicado : Revisoes analisadas e resultado final publicado
-    ResultadoFinalPublicado --> [*]
+    ResultadoFinalPublicado --> Encerrada : AnalistaTecnico encerra apos publicar resultado final
+    ResultadoFinalPublicado --> Encerrada : Sistema expira ao atingir RESULTADO_FINAL.dataFim
+    Publicada --> Encerrada : GestorFAPES cancela administrativamente
+    Pausada --> Encerrada : GestorFAPES cancela administrativamente
+    Encerrada --> [*]
 
     Publicada --> Pausada : GestorFAPES pausa com justificativa
     RecebendoPropostas --> Pausada : GestorFAPES pausa com justificativa
@@ -245,7 +250,9 @@ stateDiagram-v2
 | RN-SP07 | AnalistaTecnico | O resultado preliminar deve ser publicado antes do inicio do periodo de recursos. |
 | RN-SP08 | Proponente | Solicitacoes de revisao somente podem ser enviadas dentro do periodo de recursos. |
 | RN-SP09 | AnalistaTecnico | O resultado final somente pode ser publicado apos o encerramento e analise de todas as revisoes admissiveis. |
-| RN-SP10 | AnalistaTecnico | A publicacao do resultado final encerra o processo de selecao no M011. |
+| RN-SP10 | AnalistaTecnico | A publicacao do resultado final pelo AnalistaTecnico encerra o processo de selecao no M011 (encerramento normal). |
+| RN-SP16 | Sistema | Quando `RESULTADO_FINAL.dataFim` e atingida sem publicacao manual do resultado final, o Sistema encerra a captacao automaticamente (expiração). |
+| RN-SP17 | GestorFAPES | O GestorFAPES pode cancelar a captacao administrativamente a partir dos estados PUBLICADO ou PAUSADO, com justificativa obrigatoria. Propostas aprovadas nao sao consumidas pelo M022 apos cancelamento. |
 | RN-SP11 | AnalistaTecnico | Quando `tipoCaptacao = DEMANDA_INDUZIDA` e outorgado for PJ, a proposta e conduzida pelo contato PF indicado na configuracao. |
 | RN-SP12 | AnalistaTecnico | Propostas aprovadas ficam disponiveis para consumo pelo M022 apos a publicacao do resultado final. |
 | RN-SP13 | GestorFAPES | O processo de selecao pode ser pausado em qualquer ponto apos a publicacao da captacao. A pausa requer justificativa obrigatoria. |

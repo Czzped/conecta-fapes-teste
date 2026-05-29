@@ -18,8 +18,9 @@ O resultado e uma `Captacao` com estado `PUBLICADO`, pronta para iniciar o Proce
 
 | Ator | Papel no processo |
 |------|-------------------|
-| AnalistaTecnico | Configura e publica a captacao |
-| GestorFAPES | Pode encerrar a captacao |
+| AnalistaTecnico | Configura e publica a captacao; encerra apos publicar resultado final |
+| GestorFAPES | Pausa, retoma e cancela administrativamente a captacao |
+| Sistema | Encerra automaticamente a captacao quando `RESULTADO_FINAL.dataFim` e atingida sem publicacao manual |
 
 ---
 
@@ -173,7 +174,12 @@ stateDiagram-v2
     EmAndamento --> Publicado : AnalistaTecnico publica
     Publicado --> NaoPublicado : AnalistaTecnico despublica
     NaoPublicado --> EmAndamento : AnalistaTecnico reabre para ajustes
-    Publicado --> Encerrado : Resultado final publicado
+    Publicado --> Pausado : GestorFAPES pausa com justificativa
+    Pausado --> Publicado : GestorFAPES retoma (datas validas)
+    Publicado --> Encerrado : AnalistaTecnico encerra apos resultado final
+    Publicado --> Encerrado : Sistema expira ao atingir RESULTADO_FINAL.dataFim
+    Publicado --> Encerrado : GestorFAPES cancela administrativamente
+    Pausado --> Encerrado : GestorFAPES cancela administrativamente
     Encerrado --> [*]
 ```
 
