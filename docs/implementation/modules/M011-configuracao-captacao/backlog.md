@@ -25,7 +25,7 @@ Especificacao de referencia: [README.md](README.md)
 | EPIC-M011-009 | Gestao do Fomento | UC09 | Must | To Do | [EPIC-M011-009](epics/EPIC-M011-009.md) |
 | EPIC-M011-010 | Controles Operacionais da Captacao (Pausa, Retomada e Encerramento) | UC10 | Must | To Do | [EPIC-M011-010](epics/EPIC-M011-010.md) |
 
-> **Nota:** EPICs 004-007 foram identificados na [analise do prototipo backoffice](specifications/analise-prototipo-captacao.md) — funcionalidades presentes no prototipo sem cobertura na documentacao anterior.
+> **Nota:** EPICs 004-007 foram identificados na analise do prototipo backoffice — funcionalidades presentes no prototipo sem cobertura na documentacao anterior.
 
 ---
 

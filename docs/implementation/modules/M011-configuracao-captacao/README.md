@@ -11,7 +11,6 @@
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
 | [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclo de vida da configuracao e da instancia de captacao |
-| [Analise Prototipo](specifications/analise-prototipo-captacao.md) | Cruzamento prototipo backoffice vs documentacao — funcionalidades descobertas |
 
 ---
 
@@ -21,7 +20,7 @@ A agencia de fomento configura e publica captacoes para selecionar projetos de p
 
 Atualmente esse processo e realizado por meio de documentos manuais, sem templates nem padronizacao, o que gera inconsistencias entre captacoes e retrabalho frequente. Este modulo visa resolver esse problema ao permitir a gestao do processo de captacao de projetos, desde a configuracao da captacao ate a publicacao do resultado final. O sucesso sera medido pela reducao do tempo de configuracao de captacoes, pela eliminacao de inconsistencias e pelo tempo medio do ciclo de captacao.
 
-> **Referencia:** A [analise do prototipo backoffice](specifications/analise-prototipo-captacao.md) detalha todas as funcionalidades extraidas do prototipo e as lacunas identificadas na documentacao.
+> **Referencia:** A analise do prototipo backoffice detalha todas as funcionalidades extraidas do prototipo e as lacunas identificadas na documentacao.
 
 ---
 

@@ -388,7 +388,6 @@ nav:
           - Modelo Estrutural por Processo: implementation/modules/M011-configuracao-captacao/modelo-estrutural-por-processo.md
           - Class Diagram: implementation/modules/M011-configuracao-captacao/classdiagram.md
           - Modelo Comportamental: implementation/modules/M011-configuracao-captacao/modelo-comportamental.md
-          - Analise Prototipo: implementation/modules/M011-configuracao-captacao/specifications/analise-prototipo-captacao.md
           - Epics:
               - EPIC-001: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-001.md
               - EPIC-002: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-002.md
