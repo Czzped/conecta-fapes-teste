@@ -250,5 +250,5 @@ stateDiagram-v2
 |--------|-------|
 | M010 | Fornece Programa, Parceria e EixoEstrategico que alimentam o Fomento. |
 | M016 | Fornece a referencia de recurso interno quando o aporte vier de fundo/carteira financeira da FAPES. |
-| M008 | Fornece o catalogo de TipoIniciativa e de Rubricas disponivel para configuracao por faixa. |
+| M008 | Fornece o catalogo de TipoProjeto e de Rubricas disponivel para configuracao por faixa. |
 | M001 | Fornece modalidades, niveis e a ultima versao ativa de cada nivel de bolsa configurado por faixa. |

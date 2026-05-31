@@ -102,7 +102,7 @@ classDiagram
         <<externo M008>>
     }
 
-    class TipoIniciativa {
+    class TipoProjeto {
         <<externo M008>>
     }
 
@@ -124,7 +124,7 @@ classDiagram
     Fomento "1" --> "1..*" Faixa : faixas
     Fomento "1" --> "*" ResultadoEsperadoFomento : resultados esperados
     Fomento "1" --> "*" RemanejamentoFaixas : remanejamentos
-    Fomento "*" --> "1" TipoIniciativa : tipos de projeto
+    Fomento "*" --> "1" TipoProjeto : tipos de projeto
 
     AporteFomento "*" --> "0..1" Programa : origem programa
     AporteFomento "*" --> "0..1" Parceria : origem parceria
@@ -339,7 +339,7 @@ classDiagram
         <<P1>>
     }
 
-    class TipoIniciativa {
+    class TipoProjeto {
         <<externo M008>>
     }
 
@@ -368,7 +368,7 @@ classDiagram
     Captacao "1" --> "1" AreaTecnica : area tecnica
     Captacao "1" --> "1" Edital : edital
     Captacao "1" --> "0..1" OutorgadoDestinatario : destinatario
-    Captacao "1" --> "1..*" TipoIniciativa : tipos aceitos
+    Captacao "1" --> "1..*" TipoProjeto : tipos aceitos
     Captacao "1" --> "1..*" CategoriaProjeto : categorias
     Captacao "1" --> "1" CronogramaCaptacao : cronograma
     Captacao "1" --> "1" RegraSubmissao : regra submissao
@@ -553,7 +553,7 @@ classDiagram
         <<P1>>
     }
 
-    class TipoIniciativa {
+    class TipoProjeto {
         <<externo M008>>
     }
 
@@ -563,7 +563,7 @@ classDiagram
 
     Proposta "*" --> "1" Proponente : proponente
     Proposta "*" --> "1" Faixa : faixa escolhida
-    Proposta "*" --> "1" TipoIniciativa : tipo projeto
+    Proposta "*" --> "1" TipoProjeto : tipo projeto
     Proposta "1" --> "1" RespostaFormularioSubmissao : submissao
     Proposta "1" --> "1" DocumentacaoProposta : documentacao
     Proposta "1" --> "0..1" AssinaturaInstitucional : assinatura

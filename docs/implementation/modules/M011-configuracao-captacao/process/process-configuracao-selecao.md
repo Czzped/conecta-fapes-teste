@@ -113,7 +113,7 @@ flowchart TD
 
 ---
 
-> ⚠️ **IDEIA EM AVALIACAO** — Associar tipos de resultados, riscos e metricas de sucesso por tipo de projeto. Ao selecionar o tipo de projeto na proposta, esses campos viriam pre-preenchidos para o coordenador aceitar ou ajustar. Objetivo: padronizar a analise de impacto para a FAPES. Requer modelagem em M008 (TipoIniciativa) ou novo modulo de templates. Nao implementado nesta versao.
+> ⚠️ **IDEIA EM AVALIACAO** — Associar tipos de resultados, riscos e metricas de sucesso por tipo de projeto. Ao selecionar o tipo de projeto na proposta, esses campos viriam pre-preenchidos para o coordenador aceitar ou ajustar. Objetivo: padronizar a analise de impacto para a FAPES. Requer modelagem em M008 (TipoProjeto) ou novo modulo de templates. Nao implementado nesta versao.
 
 ## Matriz de Campos da Proposta
 

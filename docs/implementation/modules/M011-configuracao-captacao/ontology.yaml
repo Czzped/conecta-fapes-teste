@@ -84,7 +84,7 @@ entities:
         required: true
         description: "Um ou mais aportes financeiros de Programas, Parcerias ou recursos internos."
       tiposProjeto:
-        type: "list:ref:corporativo.instituicoes.TipoIniciativa"
+        type: "list:ref:corporativo.instituicoes.TipoProjeto"
         required: true
         description: "Um ou mais tipos de projeto aceitos pelo fomento."
       faixas:
@@ -340,7 +340,7 @@ entities:
         required: false
         description: "Destinatario de uma demanda induzida. Obrigatorio quando tipoCaptacao = DEMANDA_INDUZIDA."
       tiposProjeto:
-        type: "list:ref:corporativo.instituicoes.TipoIniciativa"
+        type: "list:ref:corporativo.instituicoes.TipoProjeto"
         required: true
         description: "Um ou mais tipos de projeto aceitos pela captacao."
       categoriasProjeto:
@@ -861,7 +861,7 @@ relationships:
     cardinality: "1:N"
   - from: "pre_award.captacao.Fomento"
     relation: "aceita tipos de projeto"
-    to: "corporativo.instituicoes.TipoIniciativa"
+    to: "corporativo.instituicoes.TipoProjeto"
     cardinality: "N:N"
     description: "Tipos de projeto aceitos pelo fomento."
   - from: "pre_award.captacao.Fomento"
@@ -1420,7 +1420,7 @@ agent_instructions:
     - "AdiamentoPeriodoCronograma deve deslocar todas as etapas posteriores pelo mesmo numero de dias (AX-M011-007)."
     - "OutorgadoDestinatario tipo PESSOA_FISICA: apenas cpf+nome; tipo PESSOA_JURIDICA: cnpj+razaoSocial+contatoPF (AX-M011-013 e AX-M011-014)."
     - "ProponenteEscolhido so e valido quando RegraSubmissao.submissaoRestritaAEscolhidos = true (AX-M011-005)."
-    - "EixoEstrategico, Programa, Parceria, AreaTecnica, TipoIniciativa, Instituicao, TipoInstituicao, NivelAcademico, PessoaFisica e Rubrica sao referencias externas — nao modelar aqui."
+    - "EixoEstrategico, Programa, Parceria, AreaTecnica, TipoProjeto, Instituicao, TipoInstituicao, NivelAcademico, PessoaFisica e Rubrica sao referencias externas — nao modelar aqui."
     - "Formularios (FormularioSubmissaoRef, FormularioAvaliacaoRef, FormularioRevisaoRef, FormularioAnexoRef) sao referencias ao M021 — apenas formularioId e versaoFormularioId."
     - "M011 termina no ResultadoFinal. Assinatura do termo de outorga e contratacao pertencem ao M022."
     - "Captacao PAUSADO bloqueia todas as operacoes do processo de selecao (submissao, parecer, avanco de cronograma). Ao retomar, o GestorFAPES deve avaliar se as datas dos PeriodoCronograma ainda sao validas e, se necessario, registrar AdiamentoPeriodoCronograma antes de retomar (AX-M011-032)."

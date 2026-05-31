@@ -1,12 +1,12 @@
-# Proposta — Templates por Tipo de Iniciativa
+# Proposta — Templates por Tipo de Projeto
 
 !!! warning "Em Elaboracao"
     Este documento e uma proposta em elaboracao. O conteudo ainda nao foi validado pela equipe tecnica da FAPES e nao representa uma decisao de implementacao.
 
 ## Objetivo
 
-Associar a cada `TipoIniciativa` um conjunto de sugestoes padrao de resultados esperados,
-indicadores, beneficios e riscos. Quando o coordenador seleciona o tipo de iniciativa na
+Associar a cada `TipoProjeto` um conjunto de sugestoes padrao de resultados esperados,
+indicadores, beneficios e riscos. Quando o coordenador seleciona o tipo de projeto na
 proposta, esses campos vem pre-preenchidos com os valores do template. O coordenador pode
 aceitar, editar ou remover cada item. O que nao se aplica ao projeto e simplesmente descartado.
 
@@ -19,8 +19,8 @@ partida, nao uma camisa de forca.
 ## Conceito
 
 ```
-TipoIniciativa (ex: Pesquisa, Inovacao, Extensao, Visita Tecnica)
-    └── TemplateIniciativa
+TipoProjeto (ex: Pesquisa, Inovacao, Extensao, Visita Tecnica)
+    └── TemplateProjeto
             ├── ResultadoSugerido[]     (ex: "Artigo cientifico publicado")
             ├── IndicadorSugerido[]     (ex: "Numero de publicacoes em periodico A1/A2")
             ├── BeneficioSugerido[]     (ex: "Formacao de pesquisadores na area de X")
@@ -32,7 +32,7 @@ Cada sugestao tem:
 - `obrigatorio` — se `true`, o coordenador pode editar mas nao pode remover
 - `categoria` — agrupa sugestoes para facilitar a visualizacao
 
-Quando o coordenador seleciona o `TipoIniciativa` na proposta:
+Quando o coordenador seleciona o `TipoProjeto` na proposta:
 1. Sistema carrega o template ativo do tipo
 2. Campos de resultados, indicadores, beneficios e riscos sao pre-preenchidos
 3. Coordenador aceita, edita ou remove cada item (exceto os marcados como obrigatorios)
@@ -45,17 +45,17 @@ Quando o coordenador seleciona o `TipoIniciativa` na proposta:
 ### Entidades novas em M008
 
 ```yaml
-TipoIniciativa:
-  description: "Tipo de iniciativa gerenciado pela FAPES (ex: Pesquisa, Inovacao, Extensao, Visita Tecnica)."
+TipoProjeto:
+  description: "Tipo de projeto gerenciado pela FAPES (ex: Pesquisa, Inovacao, Extensao, Visita Tecnica)."
   fields:
     codigo:       string, required, unique, generated
     nome:         string, required, max 100
     descricao:    string, optional, max 500
     ativo:        boolean, required
-    template:     ref:TemplateIniciativa, optional
+    template:     ref:TemplateProjeto, optional
 
-TemplateIniciativa:
-  description: "Template de sugestoes associado a um TipoIniciativa. Versionado — cada publicacao gera nova versao."
+TemplateProjeto:
+  description: "Template de sugestoes associado a um TipoProjeto. Versionado — cada publicacao gera nova versao."
   fields:
     versao:          string, required, generated
     publicado:       boolean, required
@@ -103,7 +103,7 @@ RiscoSugerido:
 ```mermaid
 flowchart TD
     subgraph GestorCorporativo[GestorCorporativo — M008]
-        A[Selecionar TipoIniciativa]
+        A[Selecionar TipoProjeto]
         B[Criar ou editar template]
         C[Adicionar ResultadoSugerido, IndicadorSugerido, BeneficioSugerido, RiscoSugerido]
         D[Marcar itens obrigatorios]
@@ -111,7 +111,7 @@ flowchart TD
     end
 
     A --> B --> C --> D --> E
-    E --> F[Template ativo associado ao TipoIniciativa]
+    E --> F[Template ativo associado ao TipoProjeto]
 ```
 
 ### Uso na proposta (M011/M013 — Proponente)
@@ -119,7 +119,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     subgraph Proponente[Proponente]
-        A[Selecionar TipoIniciativa na proposta]
+        A[Selecionar TipoProjeto na proposta]
         B[Sistema pre-preenche campos com template ativo]
         C[Revisar itens sugeridos]
         D[Aceitar, editar ou remover itens nao obrigatorios]
@@ -135,9 +135,9 @@ flowchart TD
 
 | Modulo | Impacto |
 |--------|---------|
-| M008 | Adicionar entidade `TipoIniciativa`, `TemplateIniciativa` e tipos de sugestao. CRUD no backoffice. |
-| M011 | `Fomento.tiposProjetoFomentados` e `FaixaInvestimento.tiposIniciativa` ja referenciam `TipoIniciativa`. Nenhuma mudança na ontologia do M011. |
-| M013 (proposta) | Ao selecionar tipo de iniciativa, carregar template ativo e pre-preencher campos. Salvar estado final na proposta, nao o template. |
+| M008 | Adicionar entidade `TipoProjeto`, `TemplateProjeto` e tipos de sugestao. CRUD no backoffice. |
+| M011 | `Fomento.tiposProjetoFomentados` e `FaixaInvestimento.tiposIniciativa` ja referenciam `TipoProjeto`. Nenhuma mudança na ontologia do M011. |
+| M013 (proposta) | Ao selecionar tipo de projeto, carregar template ativo e pre-preencher campos. Salvar estado final na proposta, nao o template. |
 | M003 (iniciativa) | Iniciativa herda os campos finais da proposta aprovada. Template ja foi consumido — nao ha referencia ao template na iniciativa. |
 
 ---
@@ -146,20 +146,20 @@ flowchart TD
 
 | ID | Responsavel | Regra |
 |----|-------------|-------|
-| RN-TI01 | GestorCorporativo | Cada TipoIniciativa pode ter no maximo um template publicado ativo por vez. |
+| RN-TI01 | GestorCorporativo | Cada TipoProjeto pode ter no maximo um template publicado ativo por vez. |
 | RN-TI02 | GestorCorporativo | Publicar nova versao do template nao altera propostas ja submetidas — snapshot na submissao. |
-| RN-TI03 | Sistema | Ao selecionar TipoIniciativa, o sistema carrega a versao ativa do template no momento da selecao. |
+| RN-TI03 | Sistema | Ao selecionar TipoProjeto, o sistema carrega a versao ativa do template no momento da selecao. |
 | RN-TI04 | Proponente | Itens marcados como `obrigatorio = true` podem ser editados mas nao removidos. |
 | RN-TI05 | Proponente | Itens marcados como `obrigatorio = false` podem ser removidos ou substituidos livremente. |
 | RN-TI06 | Sistema | A proposta registra o conteudo final dos campos — nao referencia o template. Template e apenas ponto de partida. |
-| RN-TI07 | GestorCorporativo | TipoIniciativa sem template publicado funciona normalmente — campos aparecem vazios para o proponente preencher livremente. |
+| RN-TI07 | GestorCorporativo | TipoProjeto sem template publicado funciona normalmente — campos aparecem vazios para o proponente preencher livremente. |
 
 ---
 
 ## Pendencias antes da Implementacao
 
-- [ ] Definir quais tipos de iniciativa existem hoje na FAPES (Pesquisa, Inovacao, Extensao, Visita Tecnica — outros?)
-- [ ] Definir quem e o `GestorCorporativo` — mesmo papel que gerencia o M008 ou papel especifico por tipo de iniciativa?
+- [ ] Definir quais tipos de projeto existem hoje na FAPES (Pesquisa, Inovacao, Extensao, Visita Tecnica — outros?)
+- [ ] Definir quem e o `GestorCorporativo` — mesmo papel que gerencia o M008 ou papel especifico por tipo de projeto?
 - [ ] Definir se indicadores tem meta minima obrigatoria ou apenas sugestao
 - [ ] Definir se o template de riscos deve incluir plano de mitigacao obrigatorio ou opcional
 - [ ] Validar com a equipe tecnica da FAPES quais resultados/indicadores sao comparaveis entre captacoes

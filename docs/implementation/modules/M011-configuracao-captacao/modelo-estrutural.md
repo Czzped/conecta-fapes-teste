@@ -139,7 +139,7 @@ classDiagram
         +String nome
     }
 
-    class TipoIniciativa {
+    class TipoProjeto {
         <<fora do escopo - M003>>
         +String nome
     }
@@ -320,7 +320,7 @@ classDiagram
     Fomento "1" --> "1..*" Faixa : faixas
     Fomento "1" --> "*" ResultadoEsperadoFomento : resultados esperados
     Fomento "1" --> "*" RemanejamentoFaixas : remanejamentos
-    Fomento "*" --> "1" TipoIniciativa : tipos de projeto
+    Fomento "*" --> "1" TipoProjeto : tipos de projeto
     AporteFomento "*" --> "0..1" Programa : origem programa
     AporteFomento "*" --> "0..1" Parceria : origem parceria
     AporteFomento "*" --> "0..1" ContaContabil : recurso interno
@@ -337,7 +337,7 @@ classDiagram
     Captacao "1" --> "1..*" Faixa : faixas selecionadas
     Captacao "1" --> "1" AreaTecnica : area tecnica
     Captacao "1" --> "0..1" OutorgadoDestinatario : demanda induzida
-    Captacao "1" --> "1..*" TipoIniciativa : tipos de projeto
+    Captacao "1" --> "1..*" TipoProjeto : tipos de projeto
     Captacao "1" --> "1..*" CategoriaProjeto : categorias aceitas
     Captacao "1" --> "1" Edital : edital
     Captacao "1" --> "1" CronogramaCaptacao : cronograma
@@ -429,7 +429,7 @@ classDiagram
 | **AreaTecnica** | nome | Area tecnica responsavel pela gestao dos projetos captados | Sim | String | | 200 | |
 | **OutorgadoDestinatario** | cpf | CPF da pessoa para a qual uma demanda induzida e direcionada | Cond. | String | Obrigatorio para DEMANDA_INDUZIDA | 11 | |
 | | nome | Nome da pessoa para a qual uma demanda induzida e direcionada | Cond. | String | Obrigatorio para DEMANDA_INDUZIDA | 300 | |
-| **TipoIniciativa** | nome | Tipo de projeto aceito pela captacao | Sim | String | | 200 | |
+| **TipoProjeto** | nome | Tipo de projeto aceito pela captacao | Sim | String | | 200 | |
 | **CategoriaProjeto** | nome | Categoria de projeto aceita pela captacao | Sim | String | Ex: Pesquisa, Inovacao, Extensao, Difusao, Capacitacao | 200 | Sim |
 | | descricao | Descricao da categoria | Nao | String | | 500 | |
 | | selecionavelNoCadastro | Indica se a categoria esta disponivel para selecao multipla no cadastro da captacao | Sim | Boolean | true/false | | |
