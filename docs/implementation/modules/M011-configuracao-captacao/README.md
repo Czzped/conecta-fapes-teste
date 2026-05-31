@@ -9,7 +9,7 @@
 | [Contrato](contrato.md) | Superficie publica do modulo: comandos, consultas, jobs e eventos |
 | [Contrato API](contrato-api.md) | Especificacao HTTP REST concreta: endpoints, payloads, erros e autorizacao |
 | [Backlog](backlog.md) | EPICs, rastreabilidade e metricas do modulo |
-| [Modelo Estrutural](modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
+| [Modelo Estrutural](modelo-estrutural/modelo-estrutural.md) | Diagrama de classes e dicionario de dados |
 | [Modelo Comportamental](modelo-comportamental.md) | Ciclo de vida da configuracao e da instancia de captacao |
 
 ---

@@ -3,7 +3,7 @@
 O modulo M011 cobre o fluxo **pre-award** da captacao de projetos, dividido em tres processos
 sequenciais e dependentes.
 
-Modelo estrutural por processo: [modelo-estrutural-por-processo.md](../modelo-estrutural-por-processo.md).
+Modelo estrutural por processo: [modelo-estrutural-por-processo.md](../modelo-estrutural/modelo-estrutural-p1-fomento.md).
 
 ---
 

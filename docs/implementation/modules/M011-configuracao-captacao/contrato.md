@@ -469,5 +469,5 @@ Seleciona quais `Faixa` do Fomento vinculado participam desta captacao. As faixa
 
 - Dominio e regras: [README.md](README.md)
 - Backlog e EPICs: [backlog.md](backlog.md)
-- Modelo estrutural: [modelo-estrutural.md](modelo-estrutural.md)
+- Modelo estrutural: [modelo-estrutural.md](modelo-estrutural/modelo-estrutural.md)
 - Modelo comportamental: [modelo-comportamental.md](modelo-comportamental.md)

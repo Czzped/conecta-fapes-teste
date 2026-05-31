@@ -1,6 +1,6 @@
 # Modelo Estrutural
 
-Dominio e regras de negocio: ver [README.md](README.md)
+Dominio e regras de negocio: ver [README.md](../README.md)
 
 ### Diagrama de Classes
 

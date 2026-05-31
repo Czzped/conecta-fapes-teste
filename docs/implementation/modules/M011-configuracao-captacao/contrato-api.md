@@ -1438,7 +1438,7 @@ Estas rotas representam o processo operacional descrito em [process.md](process/
 |----------|------|
 | Contrato de aplicacao (operacoes) | [contrato.md](contrato.md) |
 | Dominio e regras de negocio | [README.md](README.md) |
-| Modelo estrutural | [modelo-estrutural.md](modelo-estrutural.md) |
+| Modelo estrutural | [modelo-estrutural.md](modelo-estrutural/modelo-estrutural.md) |
 | Modelo comportamental | [modelo-comportamental.md](modelo-comportamental.md) |
 | EPIC-M011-001 (Configuracao da Captacao) | [epics/EPIC-M011-001.md](epics/EPIC-M011-001.md) |
 | EPIC-M011-002 (Selecao de Formularios) | [epics/EPIC-M011-002.md](epics/EPIC-M011-002.md) |
