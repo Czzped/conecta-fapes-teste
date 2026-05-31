@@ -66,6 +66,10 @@ theme:
 plugins:
   - search:
       lang: pt
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: datetime
+      locale: pt
 
 extra:
   giscus:
