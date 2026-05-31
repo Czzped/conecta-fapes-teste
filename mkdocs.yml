@@ -389,16 +389,17 @@ nav:
           - Class Diagram: implementation/modules/M011-configuracao-captacao/classdiagram.md
           - Modelo Comportamental: implementation/modules/M011-configuracao-captacao/modelo-comportamental.md
           - Analise Prototipo: implementation/modules/M011-configuracao-captacao/specifications/analise-prototipo-captacao.md
-          - EPIC-001: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-001.md
-          - EPIC-002: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-002.md
-          - EPIC-003: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-003.md
-          - EPIC-004: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-004.md
-          - EPIC-005: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-005.md
-          - EPIC-006: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-006.md
-          - EPIC-007: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-007.md
-          - EPIC-008 Rubricas Permitidas: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-008.md
-          - EPIC-009: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-009.md
-          - EPIC-010: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-010.md
+          - Epics:
+              - EPIC-001: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-001.md
+              - EPIC-002: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-002.md
+              - EPIC-003: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-003.md
+              - EPIC-004: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-004.md
+              - EPIC-005: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-005.md
+              - EPIC-006: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-006.md
+              - EPIC-007: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-007.md
+              - EPIC-008 Rubricas Permitidas: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-008.md
+              - EPIC-009: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-009.md
+              - EPIC-010: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-010.md
       - M012 Acompanhamento e Resultados:
           - implementation/modules/M012-acompanhamento-resultados/README.md
           - Backlog: implementation/modules/M012-acompanhamento-resultados/backlog.md
