@@ -262,3 +262,16 @@ classDiagram
 | RN-SP15 | Sistema | A retomada e bloqueada enquanto existir periodo futuro nao concluido com dataFim anterior a data de retomada. O GestorFAPES deve registrar AdiamentoPeriodoCronograma para cada periodo expirado antes de acionar a retomada. |
 | RN-SP16 | Sistema | Quando RESULTADO_FINAL.dataFim e atingida sem publicacao manual do resultado final, o Sistema encerra a captacao automaticamente. |
 | RN-SP17 | GestorFAPES | O GestorFAPES pode cancelar a captacao administrativamente a partir dos estados PUBLICADO ou PAUSADO, com justificativa obrigatoria. Projetos aprovadas nao sao consumidas pelo M022 apos cancelamento. |
+
+---
+
+## Historico de Alteracoes
+
+| Commit | Data | Autor | Descricao |
+|--------|------|-------|-----------|
+| `76c474f` | 2026-05-31 | Paulo Sergio Santos Junior | RevisorAdHoc modelado como papel de PessoaFisica; DistribuicaoAvaliacao passa a referenciar PessoaFisica diretamente |
+| `3373b22` | 2026-05-31 | Paulo Sergio Santos Junior | Adiciona estado NAO_RESPONDEU e campo dataLimiteResposta em DistribuicaoAvaliacao |
+| `5e8a6c3` | 2026-05-31 | Paulo Sergio Santos Junior | Modela recusa de avaliacao ad hoc (RECUSADA + justificativa) e distribuicao multipla de revisores |
+| `b2caa00` | 2026-05-31 | Paulo Sergio Santos Junior | Atualiza modelo P3: Proposta renomeada para Projeto (externo M008); adiciona datas de submissao e avaliacao; respostasFormulario em AvaliacaoAdHoc |
+| `db4a22b` | 2026-05-31 | Paulo Sergio Santos Junior | Adiciona dicionario de dados e regras de negocio ao modelo P3 |
+| `23d82e4` | 2026-05-31 | Paulo Sergio Santos Junior | Reorganizacao dos modelos estruturais em pasta modelo-estrutural/ |
