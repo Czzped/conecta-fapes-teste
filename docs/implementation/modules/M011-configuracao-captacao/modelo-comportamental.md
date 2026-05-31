@@ -118,3 +118,17 @@ stateDiagram-v2
 - Alteracoes de cronograma por adiamento nao criam novo estado da Captacao; elas registram historico em `AdiamentoPeriodoCronograma` e deslocam o periodo alterado e todos os posteriores pelo mesmo numero de dias (AX-M011-007).
 - Quando o proponente for empresa ou instituicao, a proposta deve identificar uma pessoa fisica representante vinculada ao cadastro corporativo do M008. Documentos institucionais recorrentes devem ser reaproveitados do cadastro quando validos.
 - `tipoCaptacao=DEMANDA_INDUZIDA` exige exatamente um `ProponenteEscolhido` que identifica o destinatario: `tipo=PESSOA` quando `tipoOutorgado=PESSOA_FISICA` ou `tipo=INSTITUICAO` quando `tipoOutorgado=PESSOA_JURIDICA` (AX-M011-004).
+
+---
+
+## Historico de Alteracoes
+
+| Commit | Data | Autor | Descricao |
+|--------|------|-------|-----------|
+| `05b4edb` | 2026-05-31 | Paulo Sergio Santos Junior | Substitui referencia stale outorgadoDestinatario por ProponenteEscolhido (AX-M011-004) |
+| `6b209d7` | 2026-05-29 | victoriocarvalho | Adicao da classe Fomento e outros ajustes |
+| `b5e6ef8` | 2026-05-29 | Paulo Sergio Santos Junior | Normaliza terminologia iniciativa -> projeto |
+| `985c5f0` | 2026-05-29 | Paulo Sergio Santos Junior | Alinha documentos com a ontologia |
+| `d09825b` | 2026-04-26 | Paulo Sergio Santos Junior | Atualiza configuracao de captacao |
+| `5cdf1a9` | 2026-04-25 | Paulo Sergio Santos Junior | Atualiza documentacao da captacao |
+| `c1cc2c3` | 2026-04-13 | Paulo Sergio dos Santos Júnior | Atualizacao geral |

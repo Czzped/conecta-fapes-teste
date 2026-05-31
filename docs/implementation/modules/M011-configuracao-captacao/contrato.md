@@ -396,3 +396,20 @@ Seleciona quais `Faixa` do Fomento vinculado participam desta captacao. As faixa
 - Backlog e EPICs: [backlog.md](backlog.md)
 - Modelo estrutural: [modelo-estrutural.md](modelo-estrutural/modelo-estrutural.md)
 - Modelo comportamental: [modelo-comportamental.md](modelo-comportamental.md)
+
+---
+
+## Historico de Alteracoes
+
+| Commit | Data | Autor | Descricao |
+|--------|------|-------|-----------|
+| `05b4edb` | 2026-05-31 | Paulo Sergio Santos Junior | Sincroniza contrato com ontologia: consolida FormularioRef, remove entidades stale, adiciona erros ausentes |
+| `750a190` | 2026-05-31 | Paulo Sergio Santos Junior | Corrige links quebrados apos reorganizacao para modelo-estrutural/ |
+| `6b209d7` | 2026-05-29 | victoriocarvalho | Adicao da classe Fomento e outros ajustes |
+| `b5e6ef8` | 2026-05-29 | Paulo Sergio Santos Junior | Normaliza terminologia iniciativa -> projeto |
+| `985c5f0` | 2026-05-29 | Paulo Sergio Santos Junior | Alinha documentos com a ontologia |
+| `0b08850` | 2026-05-01 | Paulo Sergio Santos Junior | Consolida cadastros e fluxo de diarias |
+| `d09825b` | 2026-04-26 | Paulo Sergio Santos Junior | Atualiza configuracao de captacao |
+| `5cdf1a9` | 2026-04-25 | Paulo Sergio Santos Junior | Atualiza documentacao da captacao |
+| `97be706` | 2026-04-15 | Paulo Sergio dos Santos Júnior | Corrige 27 inconsistencias identificadas na analise cruzada |
+| `ed91c8b` | 2026-04-13 | Paulo Sergio dos Santos Júnior | Consolida documentacao e contratos dos modulos |

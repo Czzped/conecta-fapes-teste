@@ -223,3 +223,10 @@ classDiagram
 | RN-R05 | Sistema | O registro e imutavel — preserva valorOrigemAnterior e valorDestinoAnterior para rastreabilidade. |
 | RN-R06 | Sistema | Apos remanejamento, o valorAportado efetivo de cada faixa e recalculado considerando todos os remanejamentos registrados. |
 
+
+## Historico de Alteracoes
+
+| Commit | Data | Autor | Descricao |
+|--------|------|-------|-----------|
+| `de606b0` | 2026-05-31 | Paulo Sergio Santos Junior | Adiciona dicionario de dados e regras de negocio ao modelo P1 Fomento |
+| `23d82e4` | 2026-05-31 | Paulo Sergio Santos Junior | Reorganizacao dos modelos estruturais em pasta modelo-estrutural/ |

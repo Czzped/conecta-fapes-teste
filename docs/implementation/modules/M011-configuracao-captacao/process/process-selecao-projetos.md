@@ -318,3 +318,18 @@ stateDiagram-v2
 | M008 | Fornece dados de PessoaFisica para revisores e para o contato PF do outorgado PJ. |
 | M021 | Formularios selecionados na configuracao estruturam a coleta na submissao, avaliacao e revisao. |
 | M022 | Consome propostas aprovadas para contratacao e assinatura do termo de outorga. |
+
+---
+
+## Historico de Alteracoes
+
+| Commit | Data | Autor | Descricao |
+|--------|------|-------|-----------|
+| `fbc28c3` | 2026-05-31 | Paulo Sergio Santos Junior | Adiciona fluxo de recusa e nao resposta de revisores ad hoc (subprocesso e regras) |
+| `3756666` | 2026-05-31 | Paulo Sergio Santos Junior | Move arquivos de processo para subpasta process/ |
+| `6b209d7` | 2026-05-29 | victoriocarvalho | Adicao da classe Fomento e outros ajustes |
+| `d716bab` | 2026-05-29 | Paulo Sergio Santos Junior | Normaliza encerramento de captacao em tres modalidades |
+| `1ebd87b` | 2026-05-29 | Paulo Sergio Santos Junior | Adiciona pausa e retomada do processo de selecao |
+| `dc13020` | 2026-05-29 | Paulo Sergio Santos Junior | Reescreve process-selecao-projetos com raias e tabela de atividades |
+| `da8e2b6` | 2026-05-29 | Paulo Sergio Santos Junior | Refina processos, ontologia e navegacao |
+| `e722e02` | 2026-05-29 | Paulo Sergio Santos Junior | Reestrutura ontologia e processos do modulo de captacao |
