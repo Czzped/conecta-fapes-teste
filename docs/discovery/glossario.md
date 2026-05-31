@@ -54,8 +54,8 @@ M010 e o modulo responsavel pelos tres pilares do ciclo estrategico da Agencia: 
 | **Edital** | Documento publico que formaliza uma Captacao, contendo regras, cronograma e requisitos. | [M011 configuracao-captacao](../implementation/modules/M011-configuracao-captacao/README.md) |
 | **Captacao** | Processo de recepcao de propostas, associado a um Edital. Tipos: **Chamada Publica** (aberta) ou **Demanda Induzida** (direcionada). Vinculada a um Programa ou a uma Parceria. | [M011](../implementation/modules/M011-configuracao-captacao/README.md), [Domain 03](domains/03-fomento-pre-award.md) |
 | **Iniciativa** | Proposta de trabalho apoiada pela agencia: projeto de pesquisa, visita tecnica, publicacao, evento cientifico etc. | [Domain 03](domains/03-fomento-pre-award.md) |
-| **Projeto Contratado** | Iniciativa aprovada, formalizada por Termo de Outorga, em execucao com coordenador, datas e orcamento. | [M003](../implementation/modules/M003-gestao-iniciativas-captadas/README.md) |
-| **Termo de Outorga** | Instrumento formal de fomento assinado pelo Coordenador que contrata a iniciativa aprovada. | [M003](../implementation/modules/M003-gestao-iniciativas-captadas/README.md), [Art. 28, I] |
+| **Projeto Contratado** | Iniciativa aprovada, formalizada por Termo de Outorga, em execucao com coordenador, datas e orcamento. | [M003](../implementation/modules/M003-gestao-projetos-captados/README.md) |
+| **Termo de Outorga** | Instrumento formal de fomento assinado pelo Coordenador que contrata a iniciativa aprovada. | [M003](../implementation/modules/M003-gestao-projetos-captados/README.md), [Art. 28, I] |
 
 ---
 
@@ -106,7 +106,7 @@ Conceitos centrais a M010 (Parcerias e Programas).
 | **Modalidade de Bolsa** | Classe de bolsa definida por Resolucao da Agencia (ex.: IC, PIBIC, Mestrado, Doutorado). | [M001](../implementation/modules/M001-modalidade-bolsa/README.md) |
 | **Nivel de Bolsa** | Subdivisao da Modalidade com valor e requisitos de elegibilidade. Versionado por Resolucao. | M001 |
 | **Resolucao** | Ato normativo que cria ou altera modalidades/niveis de bolsa. | M001 |
-| **Cota de Bolsa** | Quantidade de bolsas disponiveis por versao de Nivel em um Edital operacional. | [M003](../implementation/modules/M003-gestao-iniciativas-captadas/README.md) |
+| **Cota de Bolsa** | Quantidade de bolsas disponiveis por versao de Nivel em um Edital operacional. | [M003](../implementation/modules/M003-gestao-projetos-captados/README.md) |
 | **Plano de Trabalho** | Secao dedicada do bolsista contendo atividades previstas, cronograma e entregas. Vinculado a solicitacao de bolsa. | [M009](../implementation/modules/M009-gestao-bolsista/README.md) |
 | **Alocacao Operacional de Bolsista** | Vinculo do bolsista a um Projeto Contratado, consumindo Cota, com orientador designado. | M003 |
 

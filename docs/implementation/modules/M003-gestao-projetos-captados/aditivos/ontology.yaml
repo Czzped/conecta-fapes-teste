@@ -1,0 +1,245 @@
+ontology: "Aditivos do Projeto"
+namespace: "post_award.iniciativas.aditivos"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: post_award.iniciativas
+    path: path: "../ontology.yaml"
+metadata:
+  module: "M003"
+  source: "docs/implementation/modules/M003-gestao-projetos-captados/aditivos/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Gerencia termos aditivos de tempo e financeiros vinculados a um projeto, e mantém o read model de vigência consolidada."
+
+entities:
+
+  VigenciaProjeto:
+    description: "Read model consultivo da vigência e dados originais do projeto. Consolida dados de prazo e valor considerando todos os aditivos aprovados. Não é o agregado de escrita — é uma projeção calculada a partir de Projeto e AditivoProjeto."
+    extends: "shared.Auditavel"
+    fields:
+      projetoId:
+        type: "ref:post_award.iniciativas.Iniciativa"
+        required: true
+        description: "Projeto vinculado a este read model."
+      dataAprovacaoOriginal:
+        type: date
+        required: true
+        description: "Data de aprovação original do projeto."
+      dataInicio:
+        type: date
+        required: true
+        description: "Data inicial formal do projeto."
+      dataFimOriginal:
+        type: date
+        required: true
+        description: "Data final originalmente aprovada. Não é sobrescrita por aditivos de tempo."
+      dataFimVigente:
+        type: date
+        required: true
+        description: "Data final atual, considerando aditivos de tempo aprovados. Igual a dataFimOriginal quando não houver aditivo de tempo aprovado."
+      orcamentoOriginal:
+        type: decimal
+        required: true
+        description: "Orçamento originalmente aprovado. Não é sobrescrito por aditivos financeiros."
+      possuiAditivoTempo:
+        type: boolean
+        required: true
+        description: "Indica se existe ao menos um aditivo de tempo aprovado."
+      possuiAditivoFinanceiro:
+        type: boolean
+        required: true
+        description: "Indica se existe ao menos um aditivo financeiro aprovado."
+      valorAditivadoTotal:
+        type: decimal
+        required: false
+        description: "Soma dos valores aditivados financeiramente por aditivos aprovados. Nulo quando não houver aditivo financeiro aprovado."
+
+  AditivoProjeto:
+    description: "Registro de cada termo aditivo vinculado ao projeto, seja de tempo, financeiro ou ambos. Não altera automaticamente os campos originais de Projeto — a consolidação é responsabilidade de VigenciaProjeto."
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: string
+        required: true
+        unique: true
+        description: "Identificador único do aditivo."
+      projetoId:
+        type: "ref:post_award.iniciativas.Iniciativa"
+        required: true
+        description: "Projeto ao qual o aditivo está vinculado."
+      tipo:
+        type: "enum:TipoAditivoProjeto"
+        required: true
+        description: "Tipo do aditivo: TEMPO, FINANCEIRO ou TEMPO_E_FINANCEIRO."
+      situacao:
+        type: "enum:SituacaoAditivoProjeto"
+        required: true
+        description: "Situação atual do aditivo no ciclo de análise."
+      dataFormalizacao:
+        type: date
+        required: false
+        description: "Data de aprovação, publicação ou formalização do aditivo."
+      dataFimAnterior:
+        type: date
+        required: false
+        description: "Data final vigente antes do aditivo de tempo. Condicional: obrigatório para aditivos TEMPO ou TEMPO_E_FINANCEIRO."
+      dataFimAditada:
+        type: date
+        required: false
+        description: "Nova data final aprovada pelo aditivo de tempo. Condicional: obrigatório para aditivos TEMPO ou TEMPO_E_FINANCEIRO."
+      valorAditivado:
+        type: decimal
+        required: false
+        description: "Valor acrescido pelo aditivo financeiro. Condicional: obrigatório para aditivos FINANCEIRO ou TEMPO_E_FINANCEIRO."
+      documentoReferencia:
+        type: string
+        required: false
+        description: "Número, link ou identificação do termo/documento do aditivo."
+      observacao:
+        type: string
+        required: false
+        description: "Observação resumida do aditivo."
+
+relationships:
+  - from: "post_award.iniciativas.Iniciativa"
+    relation: "possui vigência consolidada"
+    to: "post_award.iniciativas.aditivos.VigenciaProjeto"
+    cardinality: "1:1"
+    note: "Read model calculado. Um Projeto tem exatamente uma VigenciaProjeto."
+
+  - from: "post_award.iniciativas.Iniciativa"
+    relation: "possui aditivos"
+    to: "post_award.iniciativas.aditivos.AditivoProjeto"
+    cardinality: "1:N"
+    optional: true
+
+  - from: "post_award.iniciativas.aditivos.AditivoProjeto"
+    relation: "referencia documento"
+    to: "Documento"
+    cardinality: "N:1"
+    optional: true
+    note: "Referência opcional a documento de formalização do aditivo."
+
+axioms:
+  - id: "AX-M003-A001"
+    natural_language: "A dataFimVigente deve ser igual à dataFimOriginal quando não houver aditivo de tempo aprovado."
+    formal_rule: "∀v ∈ VigenciaProjeto: ¬∃a ∈ AditivoProjeto: a.projetoId = v.projetoId ∧ a.tipo ∈ {TEMPO, TEMPO_E_FINANCEIRO} ∧ a.situacao = APROVADO → v.dataFimVigente = v.dataFimOriginal"
+
+  - id: "AX-M003-A002"
+    natural_language: "orcamentoOriginal não deve ser sobrescrito por aditivo financeiro; o impacto financeiro é refletido apenas em valorAditivadoTotal."
+    formal_rule: "∀v ∈ VigenciaProjeto: APPROVAL(AditivoProjeto.tipo = FINANCEIRO) → v.orcamentoOriginal = UNCHANGED"
+
+  - id: "AX-M003-A003"
+    natural_language: "A existência de aditivo financeiro não altera a data final vigente."
+    formal_rule: "∀a ∈ AditivoProjeto: a.tipo = FINANCEIRO ∧ a.situacao = APROVADO → VigenciaProjeto.dataFimVigente = UNCHANGED"
+
+  - id: "AX-M003-A004"
+    natural_language: "A existência de aditivo de tempo não altera automaticamente o orcamentoOriginal."
+    formal_rule: "∀a ∈ AditivoProjeto: a.tipo = TEMPO ∧ a.situacao = APROVADO → VigenciaProjeto.orcamentoOriginal = UNCHANGED"
+
+  - id: "AX-M003-A005"
+    natural_language: "Para aditivos de tempo, dataFimAditada deve ser posterior à dataFimAnterior."
+    formal_rule: "∀a ∈ AditivoProjeto: a.tipo ∈ {TEMPO, TEMPO_E_FINANCEIRO} → a.dataFimAditada > a.dataFimAnterior"
+
+  - id: "AX-M003-A006"
+    natural_language: "Para aditivos financeiros, valorAditivado deve ser maior que zero."
+    formal_rule: "∀a ∈ AditivoProjeto: a.tipo ∈ {FINANCEIRO, TEMPO_E_FINANCEIRO} → a.valorAditivado > 0"
+
+invariants:
+  - id: "INV-M003-A001"
+    rule: "VigenciaProjeto.dataFimVigente ≥ VigenciaProjeto.dataFimOriginal"
+    description: "A data final vigente não pode ser anterior à data final original (aditivos só podem estender o prazo, não reduzi-lo)."
+
+  - id: "INV-M003-A002"
+    rule: "AditivoProjeto.dataFimAditada > AditivoProjeto.dataFimAnterior when tipo ∈ {TEMPO, TEMPO_E_FINANCEIRO}"
+    description: "A nova data final aprovada deve ser posterior à data final anterior."
+
+  - id: "INV-M003-A003"
+    rule: "AditivoProjeto.valorAditivado > 0 when tipo ∈ {FINANCEIRO, TEMPO_E_FINANCEIRO}"
+    description: "O valor aditivado financeiramente deve ser maior que zero."
+
+  - id: "INV-M003-A004"
+    rule: "VigenciaProjeto.dataFimVigente = VigenciaProjeto.dataFimOriginal when VigenciaProjeto.possuiAditivoTempo = false"
+    description: "Sem aditivos de tempo aprovados, dataFimVigente deve ser igual a dataFimOriginal."
+
+  - id: "INV-M003-A005"
+    rule: "VigenciaProjeto.valorAditivadoTotal = SUM(a.valorAditivado | a.situacao = APROVADO ∧ a.tipo ∈ {FINANCEIRO, TEMPO_E_FINANCEIRO})"
+    description: "valorAditivadoTotal deve ser a soma exata dos aditivos financeiros aprovados."
+
+enums:
+  TipoAditivoProjeto:
+    description: "Tipo do termo aditivo vinculado ao projeto."
+    values:
+      TEMPO: "Aditivo apenas de prazo — estende a data final vigente."
+      FINANCEIRO: "Aditivo apenas financeiro — acresce valor ao projeto sem alterar prazo."
+      TEMPO_E_FINANCEIRO: "Aditivo que combina extensão de prazo e acréscimo financeiro."
+
+  SituacaoAditivoProjeto:
+    description: "Situação do ciclo de vida de um aditivo do projeto."
+    values:
+      RASCUNHO: "Aditivo em elaboração, ainda não submetido para análise."
+      EM_ANALISE: "Aditivo submetido e em análise pela equipe responsável."
+      APROVADO: "Aditivo aprovado e formalizado. Refletido na VigenciaProjeto."
+      REJEITADO: "Aditivo rejeitado. Não altera a VigenciaProjeto."
+      CANCELADO: "Aditivo cancelado sem ter sido aprovado."
+
+value_objects: {}
+
+events:
+  - name: "AditivoAprovado"
+    description: "Emitido quando um AditivoProjeto passa para situacao APROVADO. Dispara recálculo do VigenciaProjeto."
+    payload_entity: "post_award.iniciativas.aditivos.AditivoProjeto"
+    trigger: "AditivoProjeto.situacao → APROVADO"
+
+workflows:
+  AditivoProjeto:
+    description: "Ciclo de vida de um aditivo do projeto."
+    states:
+      - RASCUNHO
+      - EM_ANALISE
+      - APROVADO
+      - REJEITADO
+      - CANCELADO
+    transitions:
+      - from: RASCUNHO
+        to: EM_ANALISE
+        trigger: "Submissão do aditivo para análise."
+      - from: EM_ANALISE
+        to: APROVADO
+        trigger: "Aprovação pela equipe responsável. Dispara recálculo de VigenciaProjeto."
+      - from: EM_ANALISE
+        to: REJEITADO
+        trigger: "Rejeição pela equipe responsável."
+      - from: RASCUNHO
+        to: CANCELADO
+        trigger: "Cancelamento pelo usuário antes de submeter para análise."
+      - from: EM_ANALISE
+        to: CANCELADO
+        trigger: "Cancelamento durante análise quando permitido."
+
+policies:
+  permissions:
+    Coordenador:
+      can:
+        - "visualizar aditivos do próprio projeto"
+    FAPES:
+      can:
+        - "criar e analisar AditivoProjeto"
+        - "aprovar ou rejeitar AditivoProjeto"
+    Sistema:
+      can:
+        - "recalcular VigenciaProjeto após aprovação de aditivo"
+        - "filtrar lista de aditivos por projeto e perfil do usuário"
+
+agent_instructions:
+  rules:
+    - "Não criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementação deve seguir workflows definidos."
+    - "VigenciaProjeto é read model — nunca atualizar diretamente; sempre recalcular a partir de Projeto e aditivos aprovados."
+    - "orcamentoOriginal nunca deve ser sobrescrito por aditivo financeiro."
+    - "dataFimOriginal nunca deve ser sobrescrita; apenas dataFimVigente é atualizada via aditivo de tempo."
+    - "A lista de aditivos deve ser filtrada por projeto e perfil do usuário."
+  notes:
+    - "Aditivos aprovados refletem em VigenciaProjeto via evento AditivoAprovado."
+    - "Aditivos de tempo estendem o prazo; aditivos financeiros acrescem valor — nunca reduzem."

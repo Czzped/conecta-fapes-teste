@@ -4,7 +4,7 @@ imports:
   - namespace: shared
     path: path: "../../../ontology/shared/base.yaml"
   - namespace: post_award.iniciativas
-    path: path: "../M003-gestao-iniciativas-captadas/ontology.yaml"
+    path: path: "../M003-gestao-projetos-captados/ontology.yaml"
 metadata:
   module: "M015"
   source: "stub — no modelo-estrutural.md available"

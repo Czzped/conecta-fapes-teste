@@ -2,7 +2,7 @@
 
 > **Documento depreciado.** As entidades de dominio pertencem aos modulos backend, nao ao produto frontend. Consulte o `modelo-estrutural.md` de cada modulo:
 > - [M001 — Modalidades de Bolsa](../../implementation/modules/M001-modalidade-bolsa/modelo-estrutural.md)
-> - [M003 — Gerenciar Editais](../../implementation/modules/M003-gestao-iniciativas-captadas/modelo-estrutural.md)
+> - [M003 — Gerenciar Editais](../../implementation/modules/M003-gestao-projetos-captados/modelo-estrutural.md)
 > - [M004 — Pagamento Bolsistas](../../implementation/modules/M004-pagamento-bolsista/modelo-estrutural.md)
 > - [M008 — Cadastros Corporativos](../../implementation/modules/M008-cadastros-corporativos/modelo-estrutural.md)
 > - [M009 — Gestao Bolsista](../../implementation/modules/M009-gestao-bolsista/modelo-estrutural.md)

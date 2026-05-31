@@ -8,7 +8,7 @@ imports:
   - namespace: "financeiro.prestacao_contas"
     path: "../../implementation/modules/M014-prestacao-contas/ontology.yaml"
   - namespace: "post_award.iniciativas"
-    path: "../../implementation/modules/M003-gestao-iniciativas-captadas/ontology.yaml"
+    path: "../../implementation/modules/M003-gestao-projetos-captados/ontology.yaml"
   - namespace: "financeiro.saldo"
     path: "../../implementation/modules/M013-gestao-orcamentaria-projeto/ontology.yaml"
 

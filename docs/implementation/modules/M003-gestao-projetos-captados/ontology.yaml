@@ -1,0 +1,1035 @@
+ontology: "Gestão de Projetos Captados"
+namespace: "post_award.iniciativas"
+imports:
+  - namespace: shared
+    path: path: "../../../ontology/shared/base.yaml"
+  - namespace: shared.people
+    path: path: "../../../ontology/shared/people.yaml"
+  - namespace: corporativo.instituicoes
+    path: path: "../M008-cadastros-corporativos/instituicoes/ontology.yaml"
+  - namespace: corporativo.diarias
+    path: path: "../M008-cadastros-corporativos/diarias/ontology.yaml"
+  - namespace: corporativo.rubricas
+    path: path: "../M008-cadastros-corporativos/rubricas/ontology.yaml"
+  - namespace: pre_award.captacao
+    path: path: "../M011-configuracao-captacao/ontology.yaml"
+  - namespace: post_award.contratacao
+    path: path: "../M022-contratacao-outorga/ontology.yaml"
+metadata:
+  module: "M003"
+  source: "docs/implementation/modules/M003-gestao-projetos-captados/modelo-estrutural.md"
+  version: "1.0.0"
+  description: "Gerencia projetos captados (projetos apoiados pela FAPES) desde a contratação até a conclusão, incluindo versões de plano, equipe, cronograma, orçamento e ciclo de fomento."
+
+entities:
+
+  Projeto:
+    description: "Agregado central do módulo. Representa o item apoiado pela agência após a contratação — projeto de pesquisa, inovação, visita técnica ou outro tipo definido em TipoProjeto. Criada a partir de ContratacaoOutorga formalizada no M022."
+    extends: "shared.Auditavel"
+    fields:
+      codigo:
+        type: string
+        required: true
+        unique: true
+        description: "Código identificador gerado pelo sistema. Formato: PRJ-YYYY-NNN."
+      titulo:
+        type: string
+        required: true
+        max_length: 300
+        description: "Título principal do projeto."
+      resumo:
+        type: string
+        required: true
+        max_length: 2000
+        description: "Resumo descritivo do projeto contratado."
+      restricoes:
+        type: string
+        required: false
+        max_length: 2000
+        description: "Restrições conhecidas para execução do projeto."
+      viabilidadeTecnica:
+        type: string
+        required: false
+        max_length: 2000
+        description: "Análise ou justificativa da viabilidade técnica do projeto."
+      tipo:
+        type: "ref:post_award.iniciativas.TipoProjeto"
+        required: false
+        description: "Tipo do projeto. Obrigatório quando a captação exigir classificação por TipoProjeto (condicional via M011)."
+      dataInicio:
+        type: date
+        required: true
+        description: "Data prevista ou efetiva de início do projeto."
+      dataFim:
+        type: date
+        required: false
+        description: "Data prevista ou efetiva de encerramento do projeto."
+      dataContratacao:
+        type: date
+        required: true
+        description: "Data em que o projeto foi formalmente contratado."
+      valorAprovado:
+        type: decimal
+        required: false
+        description: "Valor financeiro aprovado para o projeto, quando aplicável."
+      estado:
+        type: "enum:EstadoIniciativa"
+        required: true
+        description: "Estado atual do projeto no ciclo operacional. Gerado pelo sistema."
+
+  TipoProjeto:
+    description: "Cadastro controlado dos tipos de projeto apoiados pela agência (ex.: Projeto de Pesquisa, Projeto de Inovação, Visita Técnica)."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: string
+        required: true
+        unique: true
+        max_length: 150
+        description: "Nome do tipo de projeto."
+      descricao:
+        type: string
+        required: false
+        max_length: 500
+        description: "Descrição do tipo de projeto e sua finalidade."
+
+  Ortogado:
+    description: "Papel operacional assumido por uma PessoaFisica cadastrada no M008 que recebe a outorga de um projeto. Registra código, data da outorga e situação ativa."
+    extends: "shared.Auditavel"
+    fields:
+      codigo:
+        type: string
+        required: true
+        unique: true
+        description: "Código identificador gerado pelo sistema. Formato: ORT-YYYY-NNN."
+      dataOutorga:
+        type: date
+        required: true
+        description: "Data em que o projeto foi outorgado ao ortogado."
+      ativo:
+        type: boolean
+        required: true
+        description: "Indica se o ortogado está ativo para operações no projeto. Gerado/mantido pelo sistema."
+      pessoaFisicaRef:
+        type: uuid
+        required: true
+        description: "Referência à PessoaFisica do M008 que assume o papel de ortogado."
+
+  VersaoPlanoIniciativa:
+    description: "Versão do plano de execução de um projeto. Permite evoluir o plano sem apagar histórico; cada alteração em blocos configuráveis gera nova versão com justificativa."
+    extends: "shared.Auditavel"
+    fields:
+      numero:
+        type: integer
+        required: true
+        description: "Número sequencial da versão do plano por projeto. Obrigatório quando houver plano configurado."
+      dataCriacao:
+        type: date
+        required: true
+        description: "Data em que a versão do plano foi criada. Gerado pelo sistema."
+      dataVigenciaInicio:
+        type: date
+        required: true
+        description: "Data a partir da qual a versão do plano passa a valer."
+      justificativa:
+        type: string
+        required: false
+        max_length: 2000
+        description: "Justificativa para criação ou alteração da versão do plano."
+      estado:
+        type: "enum:EstadoVersaoPlano"
+        required: true
+        description: "Estado atual da versão do plano. Gerado pelo sistema."
+
+  Objetivo:
+    description: "Objetivo geral ou específico de uma versão do plano do projeto. Condicional: obrigatório apenas quando a captação (M011) exigir objetivos."
+    extends: "shared.Auditavel"
+    fields:
+      descricao:
+        type: string
+        required: true
+        max_length: 1000
+        description: "Texto do objetivo declarado para o projeto."
+      tipo:
+        type: "enum:TipoObjetivo"
+        required: true
+        description: "Tipo do objetivo: GERAL ou ESPECIFICO."
+      percentualImportancia:
+        type: decimal
+        required: false
+        description: "Percentual de importância do objetivo específico em relação aos demais específicos (0 a 100). Aplicável somente a objetivos ESPECIFICO."
+
+  Resultado:
+    description: "Entrega esperada do projeto. Condicional: obrigatório apenas quando a captação (M011) exigir resultados."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: string
+        required: true
+        max_length: 200
+        description: "Nome do resultado esperado do projeto."
+      descricao:
+        type: string
+        required: true
+        max_length: 1000
+        description: "Descrição do resultado esperado."
+      tipo:
+        type: "ref:post_award.iniciativas.TipoResultado"
+        required: false
+        description: "Classificação do resultado. Obrigatório quando a captação exigir classificação do resultado."
+      beneficiosEsperados:
+        type: "list:ref:post_award.iniciativas.Beneficio"
+        required: false
+        description: "Benefícios esperados que este resultado deve gerar — sociais, econômicos, ambientais, tecnológicos ou científicos."
+      indicadores:
+        type: "list:ref:post_award.iniciativas.IndicadorBeneficio"
+        required: false
+        description: "Indicadores de medição que verificam se este resultado foi alcançado. Compartilham a mesma estrutura dos indicadores de benefício."
+
+  TipoResultado:
+    description: "Cadastro controlado dos tipos de resultado (ex.: Serviço, Processo, Produto)."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: string
+        required: true
+        unique: true
+        max_length: 150
+        description: "Nome do tipo de resultado."
+      descricao:
+        type: string
+        required: false
+        max_length: 500
+        description: "Descrição do tipo de resultado e sua finalidade."
+
+  Risco:
+    description: "Risco identificado para a execução do projeto, vinculado a uma versão do plano. Condicional: obrigatório apenas quando a captação (M011) exigir matriz de riscos."
+    extends: "shared.Auditavel"
+    fields:
+      descricao:
+        type: string
+        required: true
+        max_length: 1000
+        description: "Descrição do risco identificado."
+      impacto:
+        type: "ref:post_award.iniciativas.NivelRisco"
+        required: false
+        description: "Nível de impacto previsto caso o risco ocorra. Obrigatório quando a captação exigir impacto."
+      probabilidade:
+        type: "ref:post_award.iniciativas.NivelRisco"
+        required: false
+        description: "Nível de probabilidade estimada de ocorrência. Obrigatório quando a captação exigir probabilidade."
+      planoMitigacao:
+        type: string
+        required: false
+        max_length: 1000
+        description: "Plano de mitigação ou resposta ao risco."
+
+  NivelRisco:
+    description: "Cadastro controlado dos níveis de risco usados para impacto e probabilidade (ex.: Pequeno, Médio, Grande). A mesma classe serve impacto e probabilidade."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: string
+        required: true
+        unique: true
+        max_length: 100
+        description: "Nome do nível de risco."
+      descricao:
+        type: string
+        required: false
+        max_length: 500
+        description: "Descrição do nível e seus critérios de enquadramento."
+
+  Beneficio:
+    description: "Ganho esperado ou gerado pelo projeto. Condicional: obrigatório apenas quando a captação (M011) exigir benefícios."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: string
+        required: true
+        max_length: 200
+        description: "Nome do benefício esperado ou gerado pelo projeto."
+      descricao:
+        type: string
+        required: true
+        max_length: 1000
+        description: "Descrição do benefício esperado ou gerado."
+      publicoBeneficiado:
+        type: string
+        required: false
+        max_length: 300
+        description: "Público, instituição ou grupo beneficiado."
+
+  IndicadorBeneficio:
+    description: "Indicador de medição de um benefício do projeto. Condicional: obrigatório apenas quando a captação (M011) exigir indicadores."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: string
+        required: true
+        max_length: 200
+        description: "Nome do indicador usado para medir o benefício."
+      descricao:
+        type: string
+        required: false
+        max_length: 1000
+        description: "Descrição do que o indicador mede."
+      unidadeMedida:
+        type: string
+        required: true
+        max_length: 50
+        description: "Unidade usada na medição do indicador."
+      valorBase:
+        type: decimal
+        required: false
+        description: "Valor de referência antes do projeto ou no início da medição."
+      valorMeta:
+        type: decimal
+        required: true
+        description: "Valor esperado para demonstrar o alcance do benefício."
+      periodicidadeMedicao:
+        type: string
+        required: false
+        max_length: 50
+        description: "Frequência de medição do indicador (ex.: Mensal, Trimestral, Anual, Final)."
+      fonteVerificacao:
+        type: string
+        required: false
+        max_length: 300
+        description: "Fonte dos dados usados para verificar o indicador."
+
+  OrcamentoPlanejado:
+    description: "Previsão aprovada de recursos necessários para implementar o projeto. Pertence a uma VersaoPlanoIniciativa. Condicional: obrigatório apenas quando a captação exigir orçamento."
+    extends: "shared.Auditavel"
+    fields:
+      valorTotal:
+        type: decimal
+        required: true
+        description: "Valor total planejado para o projeto."
+      valorBolsas:
+        type: decimal
+        required: false
+        description: "Valor planejado para bolsas."
+      valorCapital:
+        type: decimal
+        required: false
+        description: "Valor planejado para capital."
+
+  ItemOrcamento:
+    description: "Item de orçamento planejado em nível inicial dentro de um OrcamentoPlanejado. Deve estar associado a uma RubricaOrcamentaria."
+    extends: "shared.Auditavel"
+    fields:
+      descricao:
+        type: string
+        required: true
+        max_length: 500
+        description: "Descrição do item orçamentário planejado."
+      valorPrevisto:
+        type: decimal
+        required: true
+        description: "Valor previsto para o item orçamentário."
+      rubricaRef:
+        type: uuid
+        required: true
+        description: "Referência à RubricaOrcamentaria do M008 associada ao item."
+
+  OrcamentoExecutado:
+    description: "Visão consolidada da execução financeira do projeto. Calculado a partir dos LancamentoExecucao; o total executado não é sobrescrito manualmente."
+    extends: "shared.Auditavel"
+    fields:
+      valorExecutadoTotal:
+        type: decimal
+        required: true
+        description: "Valor total executado consolidado a partir dos lançamentos. Gerado pelo sistema."
+      valorExecutadoBolsas:
+        type: decimal
+        required: true
+        description: "Valor executado consolidado em rubricas de bolsa. Gerado pelo sistema."
+      valorExecutadoCapital:
+        type: decimal
+        required: true
+        description: "Valor executado consolidado em rubricas de capital. Gerado pelo sistema."
+      dataAtualizacao:
+        type: date
+        required: true
+        description: "Data da última atualização da visão consolidada de execução. Gerado pelo sistema."
+
+  LancamentoExecucao:
+    description: "Lançamento de execução financeira do projeto. Preserva histórico de movimentos. Todo lançamento deve estar associado a uma RubricaOrcamentaria."
+    extends: "shared.Auditavel"
+    fields:
+      data:
+        type: date
+        required: true
+        description: "Data do lançamento de execução financeira."
+      descricao:
+        type: string
+        required: true
+        max_length: 500
+        description: "Descrição do movimento financeiro executado."
+      valor:
+        type: decimal
+        required: true
+        description: "Valor do lançamento financeiro. Deve ser maior que zero."
+      tipo:
+        type: "enum:TipoLancamentoExecucao"
+        required: true
+        description: "Tipo do lançamento de execução."
+      origem:
+        type: string
+        required: false
+        max_length: 200
+        description: "Origem do lançamento (ex.: Prestacao de contas, extrato bancario, importacao). Formato: ModuloOrigem:Entidade:ID."
+      rubricaRef:
+        type: uuid
+        required: true
+        description: "Referência à RubricaOrcamentaria associada ao lançamento."
+
+  SolicitacaoAlteracaoRubrica:
+    description: "Solicitação do Ortogado para incluir ou retirar uma rubrica orçamentária do projeto. Não altera automaticamente o OrcamentoPlanejado; passa por análise e, quando aprovada, gera nova VersaoPlanoIniciativa."
+    extends: "shared.Auditavel"
+    fields:
+      dataSolicitacao:
+        type: date
+        required: true
+        description: "Data em que o ortogado solicitou a alteração. Gerado pelo sistema."
+      tipoAlteracao:
+        type: "enum:TipoAlteracaoRubrica"
+        required: true
+        description: "Tipo de alteração solicitada: INCLUSAO ou RETIRADA."
+      justificativa:
+        type: string
+        required: true
+        max_length: 2000
+        description: "Justificativa apresentada pelo ortogado para a alteração."
+      estado:
+        type: "enum:EstadoSolicitacaoRubrica"
+        required: true
+        description: "Estado atual da solicitação. Gerado/mantido pelo sistema."
+      rubricaRef:
+        type: uuid
+        required: true
+        description: "Referência à RubricaOrcamentaria do M008 a ser incluída ou retirada."
+
+  PapelEquipe:
+    description: "Papel planejado para a equipe de um projeto. Define o papel esperado, a quantidade prevista de pessoas e os resultados pelos quais este papel é responsável. Condicional: obrigatório quando a captação exigir equipe."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: string
+        required: true
+        max_length: 150
+        description: "Nome do papel planejado para a equipe do projeto."
+      descricao:
+        type: string
+        required: false
+        max_length: 500
+        description: "Descrição das responsabilidades esperadas para o papel."
+      quantidadePrevista:
+        type: integer
+        required: false
+        description: "Quantidade prevista de pessoas para este papel. Obrigatório quando a captação definir quantidade por papel."
+      resultadosResponsaveis:
+        type: "list:ref:post_award.iniciativas.Resultado"
+        required: false
+        description: "Resultados pelos quais este papel é responsável por entregar. Um papel pode ser responsável por um ou mais resultados do projeto."
+
+  MembroEquipe:
+    description: "Associação entre uma PessoaFisica (M008) e um PapelEquipe planejado na versão do plano. Preenche a necessidade definida em PapelEquipe com pessoas reais."
+    extends: "shared.Auditavel"
+    fields:
+      dataInicio:
+        type: date
+        required: false
+        description: "Data de início da participação da pessoa na equipe."
+      dataFim:
+        type: date
+        required: false
+        description: "Data de encerramento da participação na equipe."
+      ativo:
+        type: boolean
+        required: true
+        description: "Indica se o membro está ativo na equipe. Gerado/mantido pelo sistema."
+      pessoaFisicaRef:
+        type: uuid
+        required: true
+        description: "Referência à PessoaFisica do M008 que compõe o papel planejado."
+
+  AtividadeCronograma:
+    description: "Atividade planejada no cronograma de uma versão do plano do projeto. Vincula período de execução, resultados a entregar e papéis executores. Condicional: obrigatório quando a captação exigir cronograma."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: string
+        required: true
+        max_length: 200
+        description: "Nome da atividade planejada no cronograma."
+      descricao:
+        type: string
+        required: true
+        max_length: 500
+        description: "Descrição da atividade planejada."
+      dataInicio:
+        type: date
+        required: false
+        description: "Data prevista ou efetiva de início da atividade. Obrigatório quando o cronograma exigir datas."
+      dataFim:
+        type: date
+        required: false
+        description: "Data prevista ou efetiva de encerramento da atividade. Obrigatório quando o cronograma exigir datas."
+      estado:
+        type: "enum:EstadoAtividadeCronograma"
+        required: true
+        description: "Estado atual da atividade do cronograma. Gerado/mantido pelo sistema."
+      resultados:
+        type: "list:ref:post_award.iniciativas.Resultado"
+        required: false
+        description: "Um ou mais resultados do projeto a que esta atividade contribui. Permite rastrear quais atividades constroem cada resultado."
+      papeis:
+        type: "list:ref:post_award.iniciativas.PapelEquipe"
+        required: false
+        description: "Um ou mais papéis da equipe responsáveis por executar esta atividade."
+
+  EstagioCicloFomento:
+    description: "Read model de timeline transversal do projeto, desde a submissão até a conclusão, suspensão ou cancelamento. Cada módulo dono registra seus próprios marcos sem transferir ownership. Deve aparecer no máximo uma vez por marco por projeto."
+    extends: "shared.Auditavel"
+    fields:
+      ordem:
+        type: integer
+        required: true
+        description: "Posição do estágio na timeline do projeto. Sequência iniciando em 1. Único por projeto."
+      fase:
+        type: "enum:FaseCicloFomento"
+        required: true
+        description: "Macrofase do ciclo de fomento: PRE_AWARD, AWARD ou POST_AWARD."
+      marco:
+        type: "enum:MarcoCicloFomento"
+        required: true
+        description: "Marco específico exibido na timeline. Único por projeto."
+      estado:
+        type: "enum:EstadoEstagioCiclo"
+        required: true
+        description: "Estado atual do marco na timeline. Gerado/mantido pelo sistema."
+      dataPrevistaInicio:
+        type: date
+        required: false
+        description: "Data planejada para início do marco, quando houver cronograma."
+      dataPrevistaFim:
+        type: date
+        required: false
+        description: "Data planejada para conclusão do marco, quando houver cronograma."
+      dataInicio:
+        type: date
+        required: false
+        description: "Data efetiva em que o marco foi iniciado ou atingido."
+      dataFim:
+        type: date
+        required: false
+        description: "Data efetiva em que o marco foi concluído."
+      moduloOrigem:
+        type: string
+        required: true
+        max_length: 20
+        description: "Módulo dono do evento que originou o marco (ex.: M011, M022, M003, M014, M015)."
+      referenciaOrigemId:
+        type: string
+        required: false
+        max_length: 100
+        description: "Identificador do objeto dono no módulo de origem (ex.: propostaId, termoOutorgaId)."
+      observacao:
+        type: string
+        required: false
+        max_length: 1000
+        description: "Detalhe opcional para exibição ou auditoria do marco."
+
+relationships:
+  - from: "post_award.iniciativas.Iniciativa"
+    relation: "classificada por"
+    to: "post_award.iniciativas.TipoProjeto"
+    cardinality: "N:1"
+    optional: true
+    note: "Condicional: apenas quando a captação exigir classificação por tipo."
+
+  - from: "post_award.iniciativas.Iniciativa"
+    relation: "outorgada a"
+    to: "post_award.iniciativas.Ortogado"
+    cardinality: "N:1"
+
+  - from: "post_award.iniciativas.Iniciativa"
+    relation: "possui versões do plano"
+    to: "post_award.iniciativas.VersaoPlanoIniciativa"
+    cardinality: "1:N"
+    optional: true
+
+  - from: "post_award.iniciativas.Iniciativa"
+    relation: "possui estágios de ciclo"
+    to: "post_award.iniciativas.EstagioCicloFomento"
+    cardinality: "1:N"
+
+  - from: "post_award.iniciativas.Iniciativa"
+    relation: "possui orçamento executado"
+    to: "post_award.iniciativas.OrcamentoExecutado"
+    cardinality: "1:1"
+
+  - from: "post_award.iniciativas.Iniciativa"
+    relation: "possui solicitações de alteração de rubrica"
+    to: "post_award.iniciativas.SolicitacaoAlteracaoRubrica"
+    cardinality: "1:N"
+
+  - from: "post_award.iniciativas.VersaoPlanoIniciativa"
+    relation: "possui objetivo geral"
+    to: "post_award.iniciativas.Objetivo"
+    cardinality: "1:1"
+    optional: true
+    note: "Condicional: somente quando captação exigir objetivos."
+
+  - from: "post_award.iniciativas.VersaoPlanoIniciativa"
+    relation: "possui objetivos específicos"
+    to: "post_award.iniciativas.Objetivo"
+    cardinality: "1:N"
+    optional: true
+    note: "Condicional: somente quando captação exigir objetivos."
+
+  - from: "post_award.iniciativas.VersaoPlanoIniciativa"
+    relation: "possui resultados"
+    to: "post_award.iniciativas.Resultado"
+    cardinality: "1:N"
+    optional: true
+
+  - from: "post_award.iniciativas.VersaoPlanoIniciativa"
+    relation: "possui riscos"
+    to: "post_award.iniciativas.Risco"
+    cardinality: "1:N"
+    optional: true
+
+  - from: "post_award.iniciativas.VersaoPlanoIniciativa"
+    relation: "possui benefícios"
+    to: "post_award.iniciativas.Beneficio"
+    cardinality: "1:N"
+    optional: true
+
+  - from: "post_award.iniciativas.VersaoPlanoIniciativa"
+    relation: "possui orçamento planejado"
+    to: "post_award.iniciativas.OrcamentoPlanejado"
+    cardinality: "1:1"
+    optional: true
+    note: "Condicional: somente quando captação exigir orçamento."
+
+  - from: "post_award.iniciativas.VersaoPlanoIniciativa"
+    relation: "possui cronograma"
+    to: "post_award.iniciativas.AtividadeCronograma"
+    cardinality: "1:N"
+    optional: true
+
+  - from: "post_award.iniciativas.VersaoPlanoIniciativa"
+    relation: "define papéis de equipe"
+    to: "post_award.iniciativas.PapelEquipe"
+    cardinality: "1:N"
+    optional: true
+
+  - from: "post_award.iniciativas.Objetivo"
+    relation: "associado a resultados"
+    to: "post_award.iniciativas.Resultado"
+    cardinality: "1:N"
+    optional: true
+
+  - from: "post_award.iniciativas.Resultado"
+    relation: "classificado por"
+    to: "post_award.iniciativas.TipoResultado"
+    cardinality: "N:1"
+    optional: true
+
+  - from: "post_award.iniciativas.Risco"
+    relation: "ameaça"
+    to: "post_award.iniciativas.Resultado"
+    cardinality: "N:N"
+    optional: true
+
+  - from: "post_award.iniciativas.Risco"
+    relation: "possui nível de impacto"
+    to: "post_award.iniciativas.NivelRisco"
+    cardinality: "N:1"
+    optional: true
+
+  - from: "post_award.iniciativas.Risco"
+    relation: "possui nível de probabilidade"
+    to: "post_award.iniciativas.NivelRisco"
+    cardinality: "N:1"
+    optional: true
+
+  - from: "post_award.iniciativas.Beneficio"
+    relation: "gerado por"
+    to: "post_award.iniciativas.Resultado"
+    cardinality: "N:N"
+    optional: true
+
+  - from: "post_award.iniciativas.Beneficio"
+    relation: "medido por"
+    to: "post_award.iniciativas.IndicadorBeneficio"
+    cardinality: "1:N"
+    optional: true
+
+  - from: "post_award.iniciativas.OrcamentoPlanejado"
+    relation: "possui itens"
+    to: "post_award.iniciativas.ItemOrcamento"
+    cardinality: "1:N"
+    optional: true
+
+  - from: "post_award.iniciativas.OrcamentoExecutado"
+    relation: "derivado de lançamentos"
+    to: "post_award.iniciativas.LancamentoExecucao"
+    cardinality: "1:N"
+
+  - from: "post_award.iniciativas.SolicitacaoAlteracaoRubrica"
+    relation: "solicitada por"
+    to: "post_award.iniciativas.Ortogado"
+    cardinality: "N:1"
+
+  - from: "post_award.iniciativas.SolicitacaoAlteracaoRubrica"
+    relation: "gera versão do plano"
+    to: "post_award.iniciativas.VersaoPlanoIniciativa"
+    cardinality: "1:1"
+    optional: true
+    note: "Gerada somente quando aprovada."
+
+  - from: "post_award.iniciativas.PapelEquipe"
+    relation: "possui membros"
+    to: "post_award.iniciativas.MembroEquipe"
+    cardinality: "1:N"
+
+  - from: "post_award.iniciativas.AtividadeCronograma"
+    relation: "executada por papéis"
+    to: "post_award.iniciativas.PapelEquipe"
+    cardinality: "N:N"
+    optional: true
+    description: "Uma atividade pode ser executada por um ou mais papéis da equipe."
+
+  - from: "post_award.iniciativas.AtividadeCronograma"
+    relation: "constrói"
+    to: "post_award.iniciativas.Resultado"
+    cardinality: "N:N"
+    optional: true
+    description: "Uma atividade pode contribuir para um ou mais resultados do projeto."
+
+  - from: "post_award.iniciativas.PapelEquipe"
+    relation: "responsável por entregar"
+    to: "post_award.iniciativas.Resultado"
+    cardinality: "N:N"
+    optional: true
+    description: "Um papel pode ser responsável por entregar um ou mais resultados."
+
+  - from: "post_award.iniciativas.Resultado"
+    relation: "gera benefícios esperados"
+    to: "post_award.iniciativas.Beneficio"
+    cardinality: "1:N"
+    optional: true
+    description: "Um resultado pode gerar um ou mais benefícios esperados."
+
+  - from: "post_award.iniciativas.Resultado"
+    relation: "medido por indicadores"
+    to: "post_award.iniciativas.IndicadorBeneficio"
+    cardinality: "1:N"
+    optional: true
+    description: "Um resultado pode ser medido por um ou mais indicadores de verificação."
+
+axioms:
+  - id: "AX-M003-001"
+    natural_language: "Um Projeto só pode ser criado a partir de uma ContratacaoOutorga com estado FORMALIZADA no M022."
+    formal_rule: "∀i ∈ Projeto: ∃c ∈ post_award.contratacao.ContratacaoOutorga: c.estado = FORMALIZADA ∧ i.origemContratacao = c.id"
+
+  - id: "AX-M003-002"
+    natural_language: "Apenas uma versão do plano pode estar com estado VIGENTE por projeto em qualquer momento."
+    formal_rule: "∀i ∈ Projeto: |{v ∈ i.versoesPlano | v.estado = VIGENTE}| ≤ 1"
+
+  - id: "AX-M003-003"
+    natural_language: "Alterações em blocos configuráveis (resultados, cronograma, objetivos, riscos, benefícios, orçamento ou papéis planejados) devem gerar nova VersaoPlanoIniciativa quando esses blocos existirem."
+    formal_rule: "∀i ∈ Projeto: CHANGE(i.versoesPlano[VIGENTE].{objetivos, resultados, riscos, beneficios, orcamento, papeis, cronograma}) → NEW(VersaoPlanoIniciativa)"
+
+  - id: "AX-M003-004"
+    natural_language: "Apenas um EstagioCicloFomento por projeto pode estar com estado ATUAL em qualquer momento."
+    formal_rule: "∀i ∈ Projeto: |{e ∈ i.estagios | e.estado = ATUAL}| ≤ 1"
+
+  - id: "AX-M003-005"
+    natural_language: "Cada marco do EstagioCicloFomento deve aparecer no máximo uma vez por projeto."
+    formal_rule: "∀i ∈ Projeto: ∀m ∈ MarcoCicloFomento: |{e ∈ i.estagios | e.marco = m}| ≤ 1"
+
+  - id: "AX-M003-006"
+    natural_language: "Um projeto não pode possuir simultaneamente os marcos CONCLUIDO e CANCELADA ambos com estado CONCLUIDO."
+    formal_rule: "∀i ∈ Projeto: ¬(∃e1, e2 ∈ i.estagios: e1.marco = CONCLUIDO ∧ e2.marco = CANCELADA ∧ e1.estado = CONCLUIDO ∧ e2.estado = CONCLUIDO)"
+
+  - id: "AX-M003-007"
+    natural_language: "Todo LancamentoExecucao deve estar associado a uma RubricaOrcamentaria."
+    formal_rule: "∀l ∈ LancamentoExecucao: l.rubricaRef ≠ null"
+
+  - id: "AX-M003-008"
+    natural_language: "O valor executado consolidado considera lançamentos EXECUCAO e DEBITO, deduz CREDITO e ESTORNO, e preserva COMPROMETIMENTO e RENDIMENTO como movimentos identificáveis."
+    formal_rule: "OrcamentoExecutado.valorExecutadoTotal = SUM(l.valor | l.tipo ∈ {EXECUCAO, DEBITO}) − SUM(l.valor | l.tipo ∈ {CREDITO, ESTORNO})"
+
+  - id: "AX-M003-009"
+    natural_language: "Somente o Ortogado ativo do projeto pode solicitar inclusão ou retirada de rubrica orçamentária."
+    formal_rule: "∀s ∈ SolicitacaoAlteracaoRubrica: s.ortogado.ativo = true ∧ s.ortogado ∈ s.projeto.ortogados"
+
+  - id: "AX-M003-010"
+    natural_language: "Aprovação de solicitação de alteração de rubrica deve gerar nova VersaoPlanoIniciativa."
+    formal_rule: "∀s ∈ SolicitacaoAlteracaoRubrica: s.estado = APROVADA → NEW(VersaoPlanoIniciativa)"
+
+  - id: "AX-M003-011"
+    natural_language: "Retirada de rubrica deve ser bloqueada quando houver lançamento de execução impeditivo para a rubrica."
+    formal_rule: "∀s ∈ SolicitacaoAlteracaoRubrica: s.tipoAlteracao = RETIRADA ∧ ∃l ∈ LancamentoExecucao: l.rubricaRef = s.rubricaRef ∧ l.tipo ∈ {COMPROMETIMENTO, EXECUCAO, DEBITO} → BLOCKED(s)"
+
+  - id: "AX-M003-012"
+    natural_language: "Quando a captação definir quantidade prevista por papel de equipe, o número de membros vinculados não deve exceder a quantidade prevista."
+    formal_rule: "∀p ∈ PapelEquipe: p.quantidadePrevista ≠ null → |p.membros| ≤ p.quantidadePrevista"
+
+invariants:
+  - id: "INV-M003-001"
+    rule: "EstagioCicloFomento.dataFim ≥ EstagioCicloFomento.dataInicio when both non-null"
+    description: "Data de fim de um estágio não pode ser anterior à data de início quando ambas existirem."
+
+  - id: "INV-M003-002"
+    rule: "EstagioCicloFomento.estado = CONCLUIDO → (dataInicio ≠ null ∨ dataFim ≠ null)"
+    description: "Estágio com estado CONCLUIDO deve possuir dataInicio ou dataFim."
+
+  - id: "INV-M003-003"
+    rule: "VersaoPlanoIniciativa.numero unique per Projeto"
+    description: "O número da versão do plano deve ser único por projeto."
+
+  - id: "INV-M003-004"
+    rule: "EstagioCicloFomento.ordem unique per Projeto"
+    description: "A ordem do estágio deve ser única por projeto."
+
+  - id: "INV-M003-005"
+    rule: "LancamentoExecucao.valor > 0"
+    description: "O valor do lançamento de execução deve ser maior que zero."
+
+  - id: "INV-M003-006"
+    rule: "Objetivo.percentualImportancia ∈ [0, 100] when non-null"
+    description: "O percentual de importância do objetivo específico deve estar entre 0 e 100."
+
+  - id: "INV-M003-007"
+    rule: "Projeto.dataFim ≥ Projeto.dataInicio when both non-null"
+    description: "A data de fim do projeto não pode ser anterior à data de início."
+
+enums:
+  EstadoIniciativa:
+    description: "Estado operacional do projeto no ciclo de execução."
+    values:
+      CONTRATADA: "Projeto formalmente contratado, ainda não em execução."
+      EM_EXECUCAO: "Projeto em execução ativa."
+      SUSPENSA: "Projeto com execução temporariamente suspensa."
+      CONCLUIDA: "Projeto concluído com todas as obrigações cumpridas."
+      CANCELADA: "Projeto cancelado em qualquer fase do ciclo."
+
+  EstadoVersaoPlano:
+    description: "Estado do ciclo de vida de uma versão do plano do projeto."
+    values:
+      RASCUNHO: "Versão em elaboração, não vigente."
+      VIGENTE: "Versão atualmente válida para o projeto."
+      SUBSTITUIDA: "Versão substituída por uma versão mais recente."
+      CANCELADA: "Versão cancelada sem ter entrado em vigor."
+
+  TipoObjetivo:
+    description: "Classificação do objetivo do projeto."
+    values:
+      GERAL: "Objetivo geral do projeto."
+      ESPECIFICO: "Objetivo específico, podendo ter percentual de importância."
+
+  TipoAlteracaoRubrica:
+    description: "Tipo de alteração solicitada para uma rubrica orçamentária."
+    values:
+      INCLUSAO: "Solicitação de inclusão de nova rubrica no plano."
+      RETIRADA: "Solicitação de retirada de rubrica existente do plano."
+
+  EstadoSolicitacaoRubrica:
+    description: "Estado do ciclo de vida de uma solicitação de alteração de rubrica."
+    values:
+      SOLICITADA: "Solicitação registrada, aguardando análise."
+      EM_ANALISE: "Solicitação em análise pela equipe responsável."
+      APROVADA: "Solicitação aprovada; deve gerar nova VersaoPlanoIniciativa."
+      REJEITADA: "Solicitação rejeitada."
+      CANCELADA: "Solicitação cancelada pelo ortogado."
+
+  EstadoAtividadeCronograma:
+    description: "Estado de execução de uma atividade do cronograma."
+    values:
+      PREVISTA: "Atividade planejada, ainda não iniciada."
+      EM_EXECUCAO: "Atividade em andamento."
+      CONCLUIDA: "Atividade concluída."
+      CANCELADA: "Atividade cancelada."
+
+  FaseCicloFomento:
+    description: "Macrofase do ciclo de fomento de um projeto."
+    values:
+      PRE_AWARD: "Fase anterior à contratação (submissão, avaliação)."
+      AWARD: "Fase de contratação e outorga."
+      POST_AWARD: "Fase de execução, acompanhamento e encerramento."
+
+  MarcoCicloFomento:
+    description: "Marco específico exibido na timeline transversal do projeto."
+    values:
+      SUBMISSAO: "Proposta submetida pelo pesquisador."
+      AVALIACAO_DOCUMENTOS: "Documentação em avaliação."
+      AVALIACAO_AD_HOC: "Avaliação técnica ad hoc."
+      EM_CONTRATACAO: "Processo de contratação em andamento."
+      CONTRATADO: "Projeto formalmente contratado."
+      EM_EXECUCAO: "Projeto em execução."
+      SUSPENSA: "Execução suspensa temporariamente."
+      EM_APROVACAO_CONTAS: "Prestação de contas em análise."
+      CONCLUIDO: "Projeto concluído."
+      CANCELADA: "Projeto cancelado."
+
+  EstadoEstagioCiclo:
+    description: "Estado atual de um estágio na timeline de ciclo de fomento."
+    values:
+      PENDENTE: "Estágio ainda não atingido."
+      ATUAL: "Estágio em andamento no momento presente."
+      CONCLUIDO: "Estágio concluído."
+      CANCELADO: "Estágio cancelado."
+
+  TipoLancamentoExecucao:
+    description: "Tipo do lançamento de execução financeira do projeto."
+    values:
+      COMPROMETIMENTO: "Saldo comprometido/alocado mas não executado."
+      CREDITO: "Crédito ou reversão de valor."
+      DEBITO: "Débito direto na rubrica."
+      EXECUCAO: "Execução financeira efetiva."
+      ESTORNO: "Estorno de lançamento anterior."
+      RENDIMENTO: "Rendimento financeiro gerado."
+
+value_objects: {}
+
+events:
+  - name: "ProjetoCriado"
+    description: "Emitido quando um Projeto é criado a partir de ContratacaoOutorga formalizada no M022."
+    payload_entity: "post_award.iniciativas.Projeto"
+    trigger: "post_award.contratacao.ContratacaoOutorga.FORMALIZADA"
+
+  - name: "VersaoPlanoAtivada"
+    description: "Emitido quando uma nova VersaoPlanoIniciativa passa para estado VIGENTE, substituindo a anterior."
+    payload_entity: "post_award.iniciativas.VersaoPlanoIniciativa"
+    trigger: "VersaoPlanoIniciativa.estado → VIGENTE"
+
+  - name: "EstagioCicloAvancado"
+    description: "Emitido quando um EstagioCicloFomento passa para estado ATUAL ou CONCLUIDO."
+    payload_entity: "post_award.iniciativas.EstagioCicloFomento"
+    trigger: "EstagioCicloFomento.estado ∈ {ATUAL, CONCLUIDO}"
+
+  - name: "SolicitacaoRubricaAprovada"
+    description: "Emitido quando uma SolicitacaoAlteracaoRubrica é aprovada, disparando geração de nova VersaoPlanoIniciativa."
+    payload_entity: "post_award.iniciativas.SolicitacaoAlteracaoRubrica"
+    trigger: "SolicitacaoAlteracaoRubrica.estado → APROVADA"
+
+workflows:
+  Projeto:
+    description: "Ciclo de vida operacional de um Projeto."
+    states:
+      - CONTRATADA
+      - EM_EXECUCAO
+      - SUSPENSA
+      - CONCLUIDA
+      - CANCELADA
+    transitions:
+      - from: CONTRATADA
+        to: EM_EXECUCAO
+        trigger: "Início formal da execução registrado pelo M003 ou M022."
+      - from: EM_EXECUCAO
+        to: SUSPENSA
+        trigger: "Suspensão registrada pelo M015."
+      - from: SUSPENSA
+        to: EM_EXECUCAO
+        trigger: "Reativação registrada pelo M015."
+      - from: EM_EXECUCAO
+        to: CONCLUIDA
+        trigger: "Conclusão após aprovação de contas pelo M014/M015."
+      - from: SUSPENSA
+        to: CONCLUIDA
+        trigger: "Conclusão de projeto suspenso via M015."
+      - from: CONTRATADA
+        to: CANCELADA
+        trigger: "Cancelamento registrado pelo módulo responsável."
+      - from: EM_EXECUCAO
+        to: CANCELADA
+        trigger: "Cancelamento registrado pelo módulo responsável."
+      - from: SUSPENSA
+        to: CANCELADA
+        trigger: "Cancelamento registrado pelo módulo responsável."
+
+  VersaoPlanoIniciativa:
+    description: "Ciclo de vida de uma versão do plano do projeto."
+    states:
+      - RASCUNHO
+      - VIGENTE
+      - SUBSTITUIDA
+      - CANCELADA
+    transitions:
+      - from: RASCUNHO
+        to: VIGENTE
+        trigger: "Ativação da versão do plano."
+      - from: VIGENTE
+        to: SUBSTITUIDA
+        trigger: "Nova versão do plano ativada."
+      - from: RASCUNHO
+        to: CANCELADA
+        trigger: "Cancelamento antes de entrar em vigor."
+
+  SolicitacaoAlteracaoRubrica:
+    description: "Fluxo de análise de uma solicitação de alteração de rubrica."
+    states:
+      - SOLICITADA
+      - EM_ANALISE
+      - APROVADA
+      - REJEITADA
+      - CANCELADA
+    transitions:
+      - from: SOLICITADA
+        to: EM_ANALISE
+        trigger: "Analista inicia avaliação da solicitação."
+      - from: EM_ANALISE
+        to: APROVADA
+        trigger: "Analista aprova; gera nova VersaoPlanoIniciativa."
+      - from: EM_ANALISE
+        to: REJEITADA
+        trigger: "Analista rejeita a solicitação."
+      - from: SOLICITADA
+        to: CANCELADA
+        trigger: "Ortogado cancela antes do início da análise."
+
+policies:
+  permissions:
+    Coordenador:
+      can:
+        - "criar SolicitacaoDiaria para bolsistas do projeto"
+        - "remover SolicitacaoDiaria ALOCADA ou APROVADA antes da dataHoraPartida com justificativa"
+        - "solicitar inclusão ou retirada de rubrica (SolicitacaoAlteracaoRubrica)"
+        - "editar VersaoPlanoIniciativa em estado RASCUNHO"
+    FAPES:
+      can:
+        - "analisar e aprovar/rejeitar SolicitacaoAlteracaoRubrica"
+        - "registrar EstagioCicloFomento"
+        - "criar TipoProjeto, TipoResultado, NivelRisco"
+    Sistema:
+      can:
+        - "gerar código de Projeto e Ortogado"
+        - "calcular OrcamentoExecutado a partir de LancamentoExecucao"
+        - "avançar EstagioCicloFomento conforme eventos de outros módulos"
+
+agent_instructions:
+  rules:
+    - "Não criar entidades fora da ontologia."
+    - "Toda spec deve respeitar axioms."
+    - "Toda implementação deve seguir workflows definidos."
+    - "Projeto é criado exclusivamente a partir de ContratacaoOutorga formalizada no M022."
+    - "A obrigatoriedade dos blocos (objetivos, resultados, riscos, benefícios, equipe, cronograma, orçamento) é condicional à configuração da captação no M011 — nunca fixar obrigatoriedade no M003."
+    - "Alterações em qualquer bloco configurável de VersaoPlanoIniciativa VIGENTE devem gerar nova versão com justificativa."
+    - "OrcamentoExecutado é sempre calculado a partir de LancamentoExecucao — nunca atualizado manualmente."
+    - "EstagioCicloFomento é read model de timeline; M003 não é o único dono dos marcos — M011, M022, M014 e M015 registram seus próprios marcos."
+    - "SolicitacaoDiaria é gerenciada pelo submódulo diarias.yaml (post_award.iniciativas.diarias)."
+    - "Aditivos de vigência e financeiros são gerenciados pelo submódulo aditivos.yaml (post_award.iniciativas.aditivos)."
+    - "Consumers de M003: M009 (bolsista), M012 (acompanhamento), M013 (orcamentaria), M014 (prestacao contas), M022 (contratacao)."
+  notes:
+    - "TipoProjeto, TipoResultado e NivelRisco são cadastros controlados pela FAPES."
+    - "Abrangencia, TipoDiaria e ParametroCalculoDiaria são entidades do M008 — não modelar no M003."
+    - "AlocacaoBolsista pertence ao M009 — M003 referencia apenas por ID."
+    - "RubricaOrcamentaria é referenciada do M008/M013 — M003 armazena apenas a referência (uuid)."
+    - "PessoaFisica é gerenciada pelo M008 — M003 referencia por pessoaFisicaRef (uuid)."

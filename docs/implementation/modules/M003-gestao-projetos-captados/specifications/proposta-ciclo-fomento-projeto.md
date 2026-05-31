@@ -1,0 +1,341 @@
+# Proposta: Ciclo de Fomento da Projeto
+
+## Contexto
+
+O modelo atual do M003 trata a `Projeto` como unidade operacional pos-contratacao. Isso esta correto para o ownership do modulo, mas nao cobre a visao de jornada apresentada na linha do tempo do produto:
+
+```text
+Submissao -> Avaliacao de Documentos -> Avaliacao Ad Hoc -> Em Contratacao -> Contratado -> Em Execucao -> Em Aprovacao de Contas -> Concluido
+```
+
+Essa jornada atravessa tres macrofases de fomento:
+
+| Macrofase | Estados da linha do tempo | Contexto dono |
+|-----------|---------------------------|---------------|
+| Pre-award | Submissao, Avaliacao de Documentos, Avaliacao Ad Hoc | M011 - Configuracao/Captacao |
+| Award | Em Contratacao, Contratado | M022 - Contratacao/Outorga, quando formalizado |
+| Post-award | Em Execucao, Em Aprovacao de Contas, Concluido | M003, M014, M015 |
+
+## Avaliacao do modelo atual
+
+O M003 hoje possui `EstadoProjeto` com:
+
+```text
+CONTRATADA, EM_EXECUCAO, CONCLUIDA, CANCELADA
+```
+
+Esse recorte e insuficiente para a experiencia do usuario, porque:
+
+- A tela precisa mostrar eventos anteriores a criacao operacional da projeto no M003.
+- `Em Aprovacao de Contas` pertence ao fluxo de prestacao de contas do M014, mas precisa aparecer na timeline da projeto.
+- `Em Contratacao` e um estado intermediario de outorga, citado como M022 em M011, e nao deve ser misturado com o estado operacional pos-award do M003.
+- A documentacao de Domain 04 ainda diz que M003 concentra edital, cotas e alocacoes, enquanto o README do M003 ja corrige essa fronteira dizendo que edital e M011, bolsas/alocacoes sao M009 e prestacao detalhada e M014.
+
+## Proposta de mudanca
+
+Introduzir uma visao transversal chamada `CicloFomentoProjeto`, tratada como uma projecao/read model de timeline. Ela nao substitui os estados internos dos modulos donos; apenas consolida marcos relevantes para exibicao, consulta e auditoria.
+
+### 1. Manter `EstadoProjeto` como estado operacional do M003
+
+O `EstadoProjeto` continua representando apenas a vida pos-contratacao sob responsabilidade do M003/M015:
+
+```text
+CONTRATADA
+EM_EXECUCAO
+SUSPENSA
+CONCLUIDA
+CANCELADA
+```
+
+Mudanca sugerida: adicionar `SUSPENSA`, pois o Domain 04 possui fluxo de suspensao/finalizacao.
+
+### 2. Criar entidade transversal `EstagioCicloFomento`
+
+A timeline deve ser representada por uma entidade de estagio/fase, associada a projeto:
+
+```text
+EstagioCicloFomento
+- ordem
+- fase: FaseCicloFomento
+- marco: MarcoCicloFomento
+- estado: EstadoEstagioCiclo
+- dataPrevistaInicio
+- dataPrevistaFim
+- dataInicio
+- dataFim
+- moduloOrigem
+- referenciaOrigemId
+- observacao
+```
+
+`FaseCicloFomento`:
+
+```text
+PRE_AWARD
+AWARD
+POST_AWARD
+```
+
+`MarcoCicloFomento`:
+
+```text
+SUBMISSAO
+AVALIACAO_DOCUMENTOS
+AVALIACAO_AD_HOC
+EM_CONTRATACAO
+CONTRATADO
+EM_EXECUCAO
+SUSPENSA
+EM_APROVACAO_CONTAS
+CONCLUIDO
+CANCELADA
+```
+
+`EstadoEstagioCiclo`:
+
+```text
+PENDENTE
+ATUAL
+CONCLUIDO
+CANCELADO
+```
+
+Cada estagio deve possuir:
+
+| Campo | Descricao |
+|-------|-----------|
+| `marco` | Valor do enum `MarcoCicloFomento` |
+| `fase` | `PRE_AWARD`, `AWARD` ou `POST_AWARD` |
+| `dataInicio` | Data em que o marco foi atingido |
+| `dataFim` | Data opcional de conclusao do marco |
+| `estado` | `PENDENTE`, `ATUAL`, `CONCLUIDO`, `CANCELADO` |
+| `moduloOrigem` | M011, M022, M003, M014 ou M015 |
+| `referenciaOrigemId` | ID do objeto dono do evento no modulo de origem |
+| `observacao` | Texto opcional para detalhamento |
+
+### 3. Mapear os marcos aos eventos dos modulos
+
+| Marco | Evento ou gatilho esperado | Dono |
+|-------|----------------------------|------|
+| `SUBMISSAO` | Proposta submetida na captacao | M011 |
+| `AVALIACAO_DOCUMENTOS` | Proposta entra em analise documental / habilitacao | M011 |
+| `AVALIACAO_AD_HOC` | Proposta enviada para avaliacao de merito | M011 |
+| `EM_CONTRATACAO` | Resultado homologado e proposta encaminhada para termo de outorga | M022 |
+| `CONTRATADO` | Termo de outorga assinado/contratacao formalizada | M022 -> M003 |
+| `EM_EXECUCAO` | Projeto inicia execucao operacional | M003 |
+| `SUSPENSA` | Projeto suspensa temporariamente durante o post-award | M015 |
+| `EM_APROVACAO_CONTAS` | Prestacao final submetida para analise | M014 |
+| `CONCLUIDO` | Prestacao final aprovada e projeto encerrada | M014/M015 |
+| `CANCELADA` | Projeto cancelada antes da conclusao regular | Modulo dono da transicao |
+
+### 4. Adicionar consulta consolidada
+
+Adicionar ao contrato do M003 uma query de leitura:
+
+```text
+ConsultarCicloFomentoProjeto(projetoId | propostaId)
+```
+
+Saida esperada:
+
+```json
+{
+  "projetoId": "INI-2026-014",
+  "propostaId": "PROP-2026-088",
+  "estadoAtual": "EM_EXECUCAO",
+  "marcoAtual": "EM_EXECUCAO",
+  "ciclo": [
+    {
+      "ordem": 1,
+      "marco": "SUBMISSAO",
+      "fase": "PRE_AWARD",
+      "dataInicio": "2024-01-15",
+      "estado": "CONCLUIDO",
+      "moduloOrigem": "M011"
+    },
+    {
+      "ordem": 2,
+      "marco": "AVALIACAO_DOCUMENTOS",
+      "fase": "PRE_AWARD",
+      "dataInicio": "2024-01-20",
+      "estado": "CONCLUIDO",
+      "moduloOrigem": "M011"
+    },
+    {
+      "ordem": 3,
+      "marco": "AVALIACAO_AD_HOC",
+      "fase": "PRE_AWARD",
+      "dataInicio": "2024-02-05",
+      "estado": "CONCLUIDO",
+      "moduloOrigem": "M011"
+    },
+    {
+      "ordem": 4,
+      "marco": "EM_CONTRATACAO",
+      "fase": "AWARD",
+      "dataInicio": "2024-02-20",
+      "estado": "CONCLUIDO",
+      "moduloOrigem": "M022"
+    },
+    {
+      "ordem": 5,
+      "marco": "CONTRATADO",
+      "fase": "AWARD",
+      "dataInicio": "2024-03-01",
+      "estado": "CONCLUIDO",
+      "moduloOrigem": "M003"
+    },
+    {
+      "ordem": 6,
+      "marco": "EM_EXECUCAO",
+      "fase": "POST_AWARD",
+      "dataInicio": "2024-03-16",
+      "estado": "ATUAL",
+      "moduloOrigem": "M003"
+    },
+    {
+      "ordem": 7,
+      "marco": "SUSPENSA",
+      "fase": "POST_AWARD",
+      "estado": "PENDENTE",
+      "moduloOrigem": "M015"
+    },
+    {
+      "ordem": 8,
+      "marco": "EM_APROVACAO_CONTAS",
+      "fase": "POST_AWARD",
+      "estado": "PENDENTE",
+      "moduloOrigem": "M014"
+    },
+    {
+      "ordem": 9,
+      "marco": "CONCLUIDO",
+      "fase": "POST_AWARD",
+      "estado": "PENDENTE",
+      "moduloOrigem": "M015"
+    },
+    {
+      "ordem": 10,
+      "marco": "CANCELADA",
+      "fase": "POST_AWARD",
+      "estado": "PENDENTE",
+      "moduloOrigem": "M015"
+    }
+  ]
+}
+```
+
+### 5. Incluir solicitacao operacional de diaria no M003
+
+A solicitacao de diaria deve pertencer ao M003 por nascer da execucao operacional da projeto, antes da prestacao de contas. Os cadastros de `Abrangencia`, `TipoDiaria` e `ParametroCalculoDiaria` usados no calculo pertencem ao M008; o M003 apenas referencia esses cadastros e grava snapshots na solicitacao. O M014 deve apenas consumir a solicitacao aprovada quando o coordenador comprovar o pagamento da diaria.
+
+Fluxo proposto:
+
+1. FAPES mantem `Abrangencia`, `TipoDiaria` e `ParametroCalculoDiaria` no M008, com valor unitario, vigencia, parametros normativos e status ativo.
+2. Coordenador/ortogado solicita `SolicitacaoDiaria` na projeto.
+3. Informa abrangencia, data/hora de partida, data/hora de chegada, destino e motivo.
+4. Seleciona uma `AlocacaoBolsista` valida da projeto.
+5. M003 consulta M009 para validar a `alocacaoBolsistaRef` e M008 para validar abrangencia, localizar tipo de diaria vigente, localizar parametros de calculo vinculados e consultar dados bancarios quando necessario.
+6. Sistema calcula automaticamente a quantidade de diarias e usa o tipo de diaria vigente no momento da solicitacao.
+7. Sistema persiste `abrangenciaRef`, `tipoDiariaRef`, `parametroCalculoDiariaRef`, valor unitario, memoria de calculo, quantidade e total calculado como snapshot da solicitacao.
+8. Sistema valida existencia e saldo da rubrica de Diarias e Passagens.
+9. Quando houver saldo, a solicitacao gera debito/comprometimento na rubrica de Diarias e Passagens sem permissao ou aprovacao manual da FAPES.
+10. O bolsista registra o aceite na propria `SolicitacaoDiaria`, declarando aceite da diaria na conta bancaria cadastrada.
+11. Quando o aceite for registrado, a solicitacao passa automaticamente para aprovada.
+12. Solicitacao aprovada fica disponivel para referencia posterior em M014 na `JustificativaDiaria`.
+13. Coordenador pode remover uma solicitacao alocada ou aprovada com justificativa somente antes da data/hora de inicio da viagem.
+14. Quando uma solicitacao alocada/aprovada e removida, ou quando houver recusa de bolsista em solicitacao ja comprometida, o M003 gera credito de reversao na rubrica de Diarias e Passagens.
+15. Depois da data/hora de inicio da viagem, diaria nao utilizada deve seguir regularizacao com justificativa e auditoria, sem exclusao fisica.
+
+Entidades do M003 e referencias externas:
+
+```text
+SolicitacaoDiaria
+- codigo
+- projetoId
+- ortogadoId
+- alocacaoBolsistaRef
+- dataHoraPartida
+- dataHoraChegada
+- destino
+- motivo
+- abrangenciaRef
+- abrangenciaSnapshot
+- tipoDiariaRef
+- parametroCalculoDiariaRef
+- quantidadeDiariasCalculada
+- valorUnitarioDiaria
+- memoriaCalculoSnapshot
+- valorTotalCalculado
+- contaBancariaSnapshot
+- estadoAceite
+- dataAssinaturaAceite
+- dataRecusaAceite
+- usuarioAssinanteRef
+- usuarioRecusaRef
+- versaoAceite
+- hashAceite
+- rubricaDebitoRef
+- lancamentoDebitoRef
+- justificativaCancelamento
+- justificativaRegularizacao
+- lancamentoCreditoRef
+- estado
+
+Referencias externas
+- AbrangenciaRef -> M008
+- TipoDiariaRef -> M008
+- ParametroCalculoDiariaRef -> M008
+- AlocacaoBolsistaRef -> M009
+```
+
+Estados sugeridos para `SolicitacaoDiaria`:
+
+```text
+ALOCADA
+AGUARDANDO_ACEITES
+APROVADA
+CANCELADA
+RECUSADA
+REGULARIZADA_NAO_UTILIZADA
+DISPONIVEL_PRESTACAO
+```
+
+Regras principais:
+
+- O coordenador nao informa manualmente o valor da diaria.
+- O valor deve ser calculado a partir do `TipoDiaria` vigente no M008 para a abrangencia e dos parametros vinculados ao tipo no momento da solicitacao.
+- O calculo deve ser preservado como snapshot para manter historico.
+- A solicitacao deve possuir exatamente uma `alocacaoBolsistaRef` valida no M009.
+- A solicitacao somente pode ser criada quando houver rubrica de Diarias e Passagens e saldo suficiente.
+- A criacao com saldo suficiente deve gerar debito/comprometimento na rubrica de Diarias e Passagens sem aprovacao manual da FAPES.
+- O aceite deve ser registrado na propria `SolicitacaoDiaria` para ela passar automaticamente para aprovada.
+- Diaria com saldo comprometido e viagem futura deve ficar `ALOCADA` ate o aceite ou remocao.
+- A remocao de diaria `ALOCADA` ou `APROVADA` exige justificativa do coordenador e so pode ocorrer antes da data/hora de partida.
+- Depois da data/hora de partida, diaria nao utilizada deve seguir regularizacao auditavel, sem exclusao fisica.
+- A remocao, regularizacao ou recusa de bolsista deve gerar credito na rubrica de Diarias e Passagens pelo valor debitado, quando houver debito anterior.
+- M014 deve exigir referencia da solicitacao aprovada ao registrar a comprovacao da diaria.
+
+## Impacto na documentacao
+
+Arquivos a ajustar em uma proxima implementacao:
+
+| Arquivo | Mudanca |
+|---------|---------|
+| `docs/implementation/modules/M003-gestao-projetos-captadas/README.md` | Explicar que M003 e dono do estado operacional pos-award, mas oferece/projeta a timeline consolidada. |
+| `docs/implementation/modules/M003-gestao-projetos-captadas/modelo-estrutural.md` | Adicionar `EstagioCicloFomento`, `FaseCicloFomento`, `MarcoCicloFomento` e `EstadoEstagioCiclo`. |
+| `docs/implementation/modules/M003-gestao-projetos-captadas/contrato.md` | Adicionar query `ConsultarCicloFomentoProjeto` e evento/projecao de marcos. |
+| `docs/discovery/domains/04-fomento-post-award.md` | Corrigir a fronteira de M003, removendo ownership de edital, cotas e alocacoes. |
+| `docs/discovery/domains/03-fomento-pre-award.md` | Alinhar a fase de contratacao com a macrofase `AWARD`, idealmente separando M022. |
+
+## Decisao recomendada
+
+Adotar o ciclo como **read model transversal**, nao como novo agregado dono de todos os estados. Assim:
+
+- M011 continua dono de captacao, submissao e avaliacoes.
+- M022 deve ser o dono natural de contratacao/outorga.
+- M003 continua dono da projeto pos-contratacao e da visao operacional consolidada.
+- M014 continua dono da prestacao de contas.
+- M015 continua dono de suspensao e finalizacao.
+
+Essa abordagem atende a experiencia da timeline sem violar ownership dos modulos.

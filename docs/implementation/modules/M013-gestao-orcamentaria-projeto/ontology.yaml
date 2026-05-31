@@ -6,7 +6,7 @@ imports:
   - namespace: corporativo.rubricas
     path: path: "../M008-cadastros-corporativos/rubricas/ontology.yaml"
   - namespace: post_award.iniciativas
-    path: path: "../M003-gestao-iniciativas-captadas/ontology.yaml"
+    path: path: "../M003-gestao-projetos-captados/ontology.yaml"
 metadata:
   module: "M013"
   source: "docs/implementation/modules/M013-gestao-orcamentaria-projeto/modelo-estrutural.md"

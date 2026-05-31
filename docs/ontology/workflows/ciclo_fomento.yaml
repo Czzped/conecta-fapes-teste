@@ -9,7 +9,7 @@ imports:
   - namespace: "pre_award.contratacao"
     path: "../../implementation/modules/M022-contratacao-outorga/ontology.yaml"
   - namespace: "post_award.iniciativas"
-    path: "../../implementation/modules/M003-gestao-iniciativas-captadas/ontology.yaml"
+    path: "../../implementation/modules/M003-gestao-projetos-captados/ontology.yaml"
   - namespace: "post_award.encerramento"
     path: "../../implementation/modules/M015-suspensao-finalizacao/ontology.yaml"
 

@@ -13,7 +13,7 @@ docs/implementation/modules/
   M001-modalidade-bolsa/
     modelo-estrutural.md
     ontology.yaml              ← ontologia do módulo
-  M003-gestao-iniciativas-captadas/
+  M003-gestao-projetos-captados/
     modelo-estrutural.md
     ontology.yaml
     diarias/

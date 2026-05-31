@@ -1,0 +1,433 @@
+ontology: "Liberacao de Parcelas do Projeto"
+namespace: "post_award.iniciativas.liberacao_parcelas"
+imports:
+  - namespace: shared
+    path: "../../../ontology/shared/base.yaml"
+  - namespace: post_award.iniciativas
+    path: "../ontology.yaml"
+metadata:
+  module: "M003"
+  source: "docs/implementation/modules/M003-gestao-projetos-captados/liberacao-parcelas/"
+  version: "1.0.0"
+  normative_sources:
+    - "Resolucao CCAF 122/2014, itens 9.2.1, 9.2.2 e 9.4"
+    - "Resolucao CCAF 340/2024"
+  description: >
+    Gerencia o ciclo de solicitacao, validacao automatica e aprovacao de liberacao
+    de parcelas financeiras de projetos apoiados. M003 valida as condicoes;
+    M004 executa o pagamento apos receber o evento de aprovacao.
+
+entities:
+
+  ParcelaProjeto:
+    description: >
+      Representa cada parcela financeira planejada de um projeto. Registra o
+      numero da parcela, valor previsto, valor liberado e estado. Criada quando o
+      projeto e contratado, com base no cronograma financeiro do termo de outorga.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        unique: true
+      projetoId:
+        type: "ref:post_award.iniciativas.Iniciativa"
+        required: true
+        description: "Projeto ao qual esta parcela pertence."
+      numeroParcela:
+        type: integer
+        required: true
+        description: "Numero sequencial da parcela (1, 2, 3...)."
+      valorPrevisto:
+        type: decimal
+        required: true
+        description: "Valor financeiro previsto para esta parcela conforme termo de outorga."
+      valorLiberado:
+        type: decimal
+        required: false
+        description: "Valor efetivamente liberado apos aprovacao. Nulo enquanto nao liberada."
+      dataPrevistaLiberacao:
+        type: date
+        required: false
+        description: "Data prevista de liberacao conforme cronograma do termo de outorga."
+      dataEfetivaLiberacao:
+        type: date
+        required: false
+        description: "Data em que o pagamento foi efetivamente executado pelo M004."
+      estado:
+        type: "enum:EstadoParcelaProjeto"
+        required: true
+        description: "Estado atual da parcela no ciclo de liberacao."
+
+  SolicitacaoLiberacaoParcela:
+    description: >
+      Solicitacao formal de liberacao da proxima parcela de um projeto, criada
+      pelo coordenador. Ao ser criada, o sistema executa automaticamente a validacao
+      das condicoes normativas. Aprovada a validacao, emite evento para M004 executar
+      o pagamento.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        unique: true
+      projetoId:
+        type: "ref:post_award.iniciativas.Iniciativa"
+        required: true
+      parcelaId:
+        type: "ref:post_award.iniciativas.liberacao_parcelas.ParcelaProjeto"
+        required: true
+        description: "Parcela cuja liberacao esta sendo solicitada."
+      numeroParcela:
+        type: integer
+        required: true
+        description: "Numero da parcela solicitada (snapshot para rastreabilidade)."
+      estado:
+        type: "enum:EstadoSolicitacaoLiberacao"
+        required: true
+      solicitanteId:
+        type: "ref:shared.PessoaFisica"
+        required: true
+        description: "Coordenador que criou a solicitacao."
+      dataSolicitacao:
+        type: datetime
+        required: true
+      justificativa:
+        type: string
+        required: false
+        description: "Justificativa opcional do coordenador para a solicitacao."
+      parecer:
+        type: string
+        required: false
+        description: "Parecer do responsavel FAPES ao aprovar ou rejeitar manualmente."
+      responsavelFapesId:
+        type: "ref:shared.PessoaFisica"
+        required: false
+        description: "Responsavel FAPES que aprovou ou rejeitou (quando revisao manual)."
+      dataDecisao:
+        type: datetime
+        required: false
+        description: "Data/hora da decisao final (aprovacao ou rejeicao)."
+      versaoNormativa:
+        type: string
+        required: true
+        description: "Versao da norma vigente no momento da solicitacao (ex: CCAF-122/2014+340/2024). Snapshot para auditoria."
+
+  ValidacaoLiberacaoParcela:
+    description: >
+      Snapshot auditavel das condicoes verificadas no momento da solicitacao de
+      liberacao. Preserva o resultado de cada verificacao individual para rastreabilidade
+      e auditoria. Uma ValidacaoLiberacaoParcela por SolicitacaoLiberacaoParcela.
+    extends: "shared.Auditavel"
+    fields:
+      id:
+        type: uuid
+        required: true
+        unique: true
+      solicitacaoId:
+        type: "ref:post_award.iniciativas.liberacao_parcelas.SolicitacaoLiberacaoParcela"
+        required: true
+        unique: true
+        description: "Solicitacao a qual esta validacao pertence (1:1)."
+      dataValidacao:
+        type: datetime
+        required: true
+      resultadoGeral:
+        type: "enum:ResultadoValidacao"
+        required: true
+        description: "APROVADA se todas as condicoes passaram; REPROVADA se ao menos uma falhou."
+
+      # --- Condicao 1: PCTF anterior ---
+      pctfAnteriorEstado:
+        type: string
+        required: true
+        description: "Estado da PCTF anterior consultado no M014 no momento da validacao (ex: APRESENTADA, APROVADA, PENDENTE)."
+      pctfAnteriorExigida:
+        type: "enum:ExigenciaPCTF"
+        required: true
+        description: "APRESENTADA para segunda parcela; APROVADA para terceira parcela em diante."
+      pctfAnteriorPassou:
+        type: boolean
+        required: true
+        description: "True se a PCTF atingiu o estado exigido."
+
+      # --- Condicao 2: comprometimento minimo ---
+      percentualComprometido:
+        type: decimal
+        required: true
+        description: "Percentual do valor da parcela anterior que esta comprometido/gasto no momento da validacao."
+      percentualMinimoExigido:
+        type: decimal
+        required: true
+        description: "Percentual minimo exigido pela norma (60.0 por padrao)."
+      comprometimentoPassou:
+        type: boolean
+        required: true
+
+      # --- Condicao 3: inadimplencia e certidoes ---
+      inadimplenteFapes:
+        type: boolean
+        required: true
+        description: "True se o beneficiario esta inadimplente com a FAPES."
+      certidoesFederalValida:
+        type: boolean
+        required: true
+      certidoesEstadualValida:
+        type: boolean
+        required: true
+      certidoesMunicipalValida:
+        type: boolean
+        required: true
+      certidoesTrabalhistaValida:
+        type: boolean
+        required: true
+      impedimentosPassou:
+        type: boolean
+        required: true
+        description: "True se nao ha inadimplencia e todas as certidoes estao validas."
+
+      # --- Disponibilidade das integracoes ---
+      integracaoM014Disponivel:
+        type: boolean
+        required: true
+        description: "False quando o servico M014 estava indisponivel durante a validacao. Forcara PENDENTE_REVISAO independente das demais condicoes."
+      integracaoM008Disponivel:
+        type: boolean
+        required: true
+        description: "False quando o servico M008/certidoes estava indisponivel durante a validacao. Forcara PENDENTE_REVISAO independente das demais condicoes."
+
+      motivosReprovacao:
+        type: "array:string"
+        required: false
+        description: "Lista de motivos de reprovacao ou pendencia quando resultadoGeral = REPROVADA ou integracao indisponivel."
+
+relationships:
+  - from: "post_award.iniciativas.Iniciativa"
+    relation: "possui parcelas"
+    to: "post_award.iniciativas.liberacao_parcelas.ParcelaProjeto"
+    cardinality: "1:N"
+
+  - from: "post_award.iniciativas.liberacao_parcelas.ParcelaProjeto"
+    relation: "possui solicitacoes de liberacao"
+    to: "post_award.iniciativas.liberacao_parcelas.SolicitacaoLiberacaoParcela"
+    cardinality: "1:N"
+    note: "Pode haver mais de uma solicitacao por parcela (resubmissao apos rejeicao). Apenas uma pode estar ativa (nao terminal) por vez."
+
+  - from: "post_award.iniciativas.liberacao_parcelas.SolicitacaoLiberacaoParcela"
+    relation: "possui validacao"
+    to: "post_award.iniciativas.liberacao_parcelas.ValidacaoLiberacaoParcela"
+    cardinality: "1:1"
+
+axioms:
+  - id: "AX-M003-LP001"
+    natural_language: "Segunda parcela requer PCTF anterior com estado >= APRESENTADA e percentual comprometido >= 60%."
+    formal_rule: "∀s ∈ SolicitacaoLiberacaoParcela: s.numeroParcela = 2 → ValidacaoLiberacaoParcela.pctfAnteriorExigida = APRESENTADA ∧ ValidacaoLiberacaoParcela.percentualComprometido >= 60.0"
+
+  - id: "AX-M003-LP002"
+    natural_language: "Terceira parcela (e seguintes) requer PCTF anterior APROVADA e percentual comprometido >= 60%."
+    formal_rule: "∀s ∈ SolicitacaoLiberacaoParcela: s.numeroParcela >= 3 → ValidacaoLiberacaoParcela.pctfAnteriorExigida = APROVADA ∧ ValidacaoLiberacaoParcela.percentualComprometido >= 60.0"
+
+  - id: "AX-M003-LP003"
+    natural_language: "Qualquer solicitacao e bloqueada por inadimplencia FAPES ou certidoes invalidas."
+    formal_rule: "∀s ∈ SolicitacaoLiberacaoParcela: ValidacaoLiberacaoParcela.inadimplenteFapes = true ∨ ANY(certidao = false) → ValidacaoLiberacaoParcela.resultadoGeral = REPROVADA"
+
+  - id: "AX-M003-LP004"
+    natural_language: "Nao pode existir mais de uma SolicitacaoLiberacaoParcela em estado nao-terminal para a mesma parcela simultaneamente."
+    formal_rule: "∀p ∈ ParcelaProjeto: COUNT(s ∈ SolicitacaoLiberacaoParcela | s.parcelaId = p.id ∧ s.estado ∉ {APROVADA, REJEITADA, CANCELADA}) <= 1"
+
+  - id: "AX-M003-LP005"
+    natural_language: "A liberacao de parcela N so pode ser solicitada se parcela N-1 foi efetivamente liberada (estado LIBERADA)."
+    formal_rule: "∀s ∈ SolicitacaoLiberacaoParcela: s.numeroParcela > 1 → ParcelaProjeto[numeroParcela = s.numeroParcela - 1].estado = LIBERADA"
+
+  - id: "AX-M003-LP006"
+    natural_language: "O projeto deve estar ATIVO no momento da criacao de SolicitacaoLiberacaoParcela."
+    formal_rule: "∀s ∈ SolicitacaoLiberacaoParcela: Iniciativa[id = s.projetoId].estado = ATIVA"
+
+  - id: "AX-M003-LP007"
+    natural_language: "ValidacaoLiberacaoParcela e imutavel apos criacao — nenhum campo pode ser alterado depois de persistido."
+    formal_rule: "∀v ∈ ValidacaoLiberacaoParcela: AFTER_CREATE(v) → ALL_FIELDS(v) = IMMUTABLE"
+
+  - id: "AX-M003-LP008"
+    natural_language: "Falha de integracao (M014 ou M008 indisponivel) force PENDENTE_REVISAO independente do resultado das demais condicoes."
+    formal_rule: "∀v ∈ ValidacaoLiberacaoParcela: v.integracaoM014Disponivel = false ∨ v.integracaoM008Disponivel = false → SolicitacaoLiberacaoParcela.estado = PENDENTE_REVISAO"
+
+invariants:
+  - id: "INV-M003-LP001"
+    rule: "ParcelaProjeto.valorPrevisto > 0"
+    description: "Valor previsto de parcela deve ser positivo."
+
+  - id: "INV-M003-LP002"
+    rule: "SolicitacaoLiberacaoParcela: COUNT(estado NOT IN {APROVADA, REJEITADA, CANCELADA}) <= 1 per ParcelaProjeto"
+    description: "No maximo uma solicitacao ativa por parcela."
+
+  - id: "INV-M003-LP003"
+    rule: "ValidacaoLiberacaoParcela.percentualMinimoExigido = 60.0 (versionado por norma vigente)"
+    description: "O percentual minimo exigido de 60% deve ser parametrizado pela norma vigente, nao hardcoded."
+
+  - id: "INV-M003-LP004"
+    rule: "SolicitacaoLiberacaoParcela: numeroParcela = ParcelaProjeto.numeroParcela"
+    description: "Numero da parcela na solicitacao deve ser consistente com a ParcelaProjeto referenciada."
+
+  - id: "INV-M003-LP005"
+    rule: "UNIQUE(ParcelaProjeto.projetoId, ParcelaProjeto.numeroParcela)"
+    description: "Par (projetoId, numeroParcela) deve ser unico — nao pode haver duas ParcelaProjeto com o mesmo numero para o mesmo projeto."
+
+  - id: "INV-M003-LP006"
+    rule: "SolicitacaoLiberacaoParcela criada somente se Iniciativa.estado = ATIVA"
+    description: "Projeto SUSPENSO, ENCERRADO ou CANCELADO nao aceita nova SolicitacaoLiberacaoParcela."
+
+  - id: "INV-M003-LP007"
+    rule: "ValidacaoLiberacaoParcela: todos os campos sao imutaveis apos persistencia"
+    description: "Snapshot de validacao nao pode ser alterado apos criacao — garante rastreabilidade auditavel."
+
+  - id: "INV-M003-LP008"
+    rule: "ValidacaoLiberacaoParcela.integracaoM014Disponivel = false ∨ integracaoM008Disponivel = false → SolicitacaoLiberacaoParcela.estado = PENDENTE_REVISAO"
+    description: "Integracao indisponivel nunca gera erro HTTP — sempre encaminha para revisao manual."
+
+enums:
+  EstadoParcelaProjeto:
+    description: "Estado da parcela no ciclo de liberacao financeira."
+    values:
+      AGUARDANDO_LIBERACAO: "Parcela ainda nao solicitada ou aguardando condicoes de elegibilidade."
+      EM_SOLICITACAO: "Existe SolicitacaoLiberacaoParcela ativa para esta parcela."
+      LIBERADA: "Parcela foi aprovada e pagamento executado pelo M004."
+      CANCELADA: "Parcela cancelada (projeto encerrado/cancelado antes da liberacao)."
+
+  EstadoSolicitacaoLiberacao:
+    description: "Estado do ciclo de vida da solicitacao de liberacao de parcela."
+    values:
+      EM_VALIDACAO: "Criada; validacao automatica em andamento."
+      PENDENTE_REVISAO: "Validacao automatica detectou impeditivo; aguarda revisao manual do responsavel FAPES."
+      APROVADA: "Todas as condicoes passaram; evento emitido para M004."
+      REJEITADA: "Reprovada por validacao automatica ou decisao manual. Estado terminal."
+      CANCELADA: "Cancelada pelo coordenador antes da decisao. Estado terminal."
+
+  ResultadoValidacao:
+    description: "Resultado consolidado da validacao das condicoes de liberacao."
+    values:
+      APROVADA: "Todas as condicoes satisfeitas."
+      REPROVADA: "Ao menos uma condicao falhou."
+
+  ExigenciaPCTF:
+    description: "Nivel de exigencia do estado da PCTF anterior conforme numero da parcela."
+    values:
+      APRESENTADA: "Basta ter sido submetida/apresentada (segunda parcela)."
+      APROVADA: "Precisa estar formalmente aprovada (terceira parcela em diante)."
+
+events:
+  - name: "LiberacaoParcelaSolicitada"
+    description: "Emitido quando SolicitacaoLiberacaoParcela transita para APROVADA. Consumido pelo M004 para executar o pagamento da parcela."
+    payload_entity: "post_award.iniciativas.liberacao_parcelas.SolicitacaoLiberacaoParcela"
+    trigger: "SolicitacaoLiberacaoParcela.estado → APROVADA"
+    consumers:
+      - module: "M004"
+        action: "Executar pagamento da parcela conforme valorPrevisto de ParcelaProjeto."
+
+  - name: "ParcelaLiberada"
+    description: "Emitido pelo M004 de volta ao M003 apos pagamento executado. M003 transita ParcelaProjeto para LIBERADA e registra dataEfetivaLiberacao e valorLiberado."
+    trigger: "M004 confirma pagamento executado"
+    consumers:
+      - module: "M003"
+        action: "Atualizar ParcelaProjeto.estado = LIBERADA e registrar dataEfetivaLiberacao."
+
+  - name: "SolicitacaoLiberacaoCancelada"
+    description: "Emitido quando SolicitacaoLiberacaoParcela transita para CANCELADA. M003 reverte ParcelaProjeto para AGUARDANDO_LIBERACAO para permitir nova tentativa."
+    payload_entity: "post_award.iniciativas.liberacao_parcelas.SolicitacaoLiberacaoParcela"
+    trigger: "SolicitacaoLiberacaoParcela.estado → CANCELADA"
+    consumers:
+      - module: "M003"
+        action: "Reverter ParcelaProjeto.estado = AGUARDANDO_LIBERACAO."
+
+workflows:
+  ParcelaProjeto:
+    description: "Ciclo de vida da parcela financeira do projeto."
+    states:
+      - AGUARDANDO_LIBERACAO
+      - EM_SOLICITACAO
+      - LIBERADA
+      - CANCELADA
+    transitions:
+      - from: AGUARDANDO_LIBERACAO
+        to: EM_SOLICITACAO
+        trigger: "SolicitacaoLiberacaoParcela criada para esta parcela."
+      - from: EM_SOLICITACAO
+        to: AGUARDANDO_LIBERACAO
+        trigger: "SolicitacaoLiberacaoParcela cancelada ou rejeitada — parcela volta a estar disponivel para nova tentativa."
+      - from: EM_SOLICITACAO
+        to: LIBERADA
+        trigger: "M004 confirma pagamento executado (evento ParcelaLiberada). Estado terminal positivo."
+      - from: AGUARDANDO_LIBERACAO
+        to: CANCELADA
+        trigger: "Projeto encerrado ou cancelado antes da liberacao desta parcela. Estado terminal."
+      - from: EM_SOLICITACAO
+        to: CANCELADA
+        trigger: "Projeto encerrado ou cancelado enquanto havia solicitacao ativa. Solicitacao correspondente tambem transita para CANCELADA."
+
+  SolicitacaoLiberacaoParcela:
+    description: "Ciclo de vida da solicitacao de liberacao de parcela."
+    states:
+      - EM_VALIDACAO
+      - PENDENTE_REVISAO
+      - APROVADA
+      - REJEITADA
+      - CANCELADA
+    transitions:
+      - from: EM_VALIDACAO
+        to: APROVADA
+        trigger: "Validacao automatica aprovada em todas as condicoes (PCTF, comprometimento, certidoes). Emite LiberacaoParcelaSolicitada."
+      - from: EM_VALIDACAO
+        to: PENDENTE_REVISAO
+        trigger: "Validacao automatica detectou impeditivo — encaminha para revisao manual do responsavel FAPES."
+      - from: PENDENTE_REVISAO
+        to: APROVADA
+        trigger: "Responsavel FAPES aprova manualmente apos analise do impeditivo. Emite LiberacaoParcelaSolicitada."
+      - from: PENDENTE_REVISAO
+        to: REJEITADA
+        trigger: "Responsavel FAPES rejeita apos analise. Estado terminal."
+      - from: EM_VALIDACAO
+        to: CANCELADA
+        trigger: "Coordenador cancela antes da decisao. Estado terminal."
+      - from: PENDENTE_REVISAO
+        to: CANCELADA
+        trigger: "Coordenador cancela antes da decisao manual. Estado terminal."
+
+policies:
+  permissions:
+    Coordenador:
+      can:
+        - "criar SolicitacaoLiberacaoParcela para proprio projeto"
+        - "cancelar SolicitacaoLiberacaoParcela propria em estado EM_VALIDACAO ou PENDENTE_REVISAO"
+        - "consultar historico de solicitacoes e parcelas do proprio projeto"
+    ResponsavelFAPES:
+      can:
+        - "analisar solicitacoes em PENDENTE_REVISAO"
+        - "aprovar ou rejeitar manualmente solicitacao em PENDENTE_REVISAO"
+        - "consultar historico de solicitacoes de qualquer projeto"
+    Sistema:
+      can:
+        - "executar validacao automatica ao criar SolicitacaoLiberacaoParcela"
+        - "emitir evento LiberacaoParcelaSolicitada apos aprovacao"
+        - "atualizar ParcelaProjeto.estado ao receber ParcelaLiberada do M004"
+
+agent_instructions:
+  rules:
+    - "Nao criar entidades fora da ontologia."
+    - "ValidacaoLiberacaoParcela e imutavel apos criacao — representa snapshot da validacao no momento da solicitacao."
+    - "Percentual minimo de 60% deve ser lido de parametro versionado por norma, nunca hardcoded."
+    - "Estado da PCTF anterior deve ser consultado no M014 via integracao — nao replicar dados de prestacao de contas no M003."
+    - "Certidoes e inadimplencia devem ser consultadas no M008 ou integracao externa no momento da validacao."
+    - "M003 nao executa pagamento — apenas emite LiberacaoParcelaSolicitada para M004."
+    - "AX-M003-LP004 deve ser validado antes de aceitar nova solicitacao para a mesma parcela."
+    - "AX-M003-LP005 deve ser validado — nao permitir solicitacao de parcela N sem parcela N-1 LIBERADA."
+    - "AX-M003-LP006 deve ser verificado antes de criar SolicitacaoLiberacaoParcela — rejeitar com HTTP 422 se projeto nao estiver ATIVO."
+    - "Verificar se o solicitante e o Ortogado ativo do projeto antes de criar a solicitacao — rejeitar com HTTP 403 se nao for."
+    - "Verificar se a ParcelaProjeto.numeroParcela existe para o projeto antes de aceitar a solicitacao."
+    - "Falha de integracao M014 ou M008 deve registrar o campo correspondente como false e forcar PENDENTE_REVISAO — nunca propagar o erro como HTTP 5xx para o coordenador."
+    - "Ao cancelar ou rejeitar SolicitacaoLiberacaoParcela, reverter ParcelaProjeto.estado para AGUARDANDO_LIBERACAO via evento SolicitacaoLiberacaoCancelada."
+    - "dataSolicitacao (nao datasolicitacao) — respeitar casing correto do campo."
+  notes:
+    - "Segunda parcela exige PCTF APRESENTADA; terceira em diante exige PCTF APROVADA (AX-M003-LP001 e LP002)."
+    - "Qualquer certidao invalida ou inadimplencia bloqueia a solicitacao (AX-M003-LP003)."
+    - "PENDENTE_REVISAO existe para: (a) validacao automatica com impeditivo, (b) falha de integracao M014/M008, (c) revisao manual solicitada pelo responsavel FAPES."
+    - "Par (projetoId, numeroParcela) e unico em ParcelaProjeto (INV-M003-LP005) — garantir constraint no banco."
+    - "ValidacaoLiberacaoParcela e imutavel — nunca permitir UPDATE apos INSERT (INV-M003-LP007)."

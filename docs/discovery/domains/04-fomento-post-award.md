@@ -12,7 +12,7 @@ Apos a contratacao, as iniciativas aprovadas passam a ser gerenciadas operaciona
 
 O M003 tambem oferece a leitura consolidada do `CicloFomentoIniciativa`, uma timeline transversal que exibe marcos de pre-award, award e post-award sem transferir ownership dos eventos de origem. A estrutura de rubricas e subrubricas deve seguir o catalogo de discovery em [Rubricas e Subrubricas FAPES](../rubricas-subrubricas-fapes.md), sempre filtrado pelo edital, termo de outorga, plano aprovado e aditivos da iniciativa. As regras operacionais de calculo de diaria devem seguir o discovery em [Regras de Calculo de Diarias - ES](../regras-calculo-diarias-es.md), versionadas pela norma vigente.
 
-**Implementado por:** [M003 — Gestao de Iniciativas Captadas](../../implementation/modules/M003-gestao-iniciativas-captadas/README.md)
+**Implementado por:** [M003 — Gestao de Iniciativas Captadas](../../implementation/modules/M003-gestao-projetos-captados/README.md)
 
 | # | Funcionalidade | Descricao | Persona | Fundamentacao Legal |
 |---|---------------|-----------|---------|---------------------|

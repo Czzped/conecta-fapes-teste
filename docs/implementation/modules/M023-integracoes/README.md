@@ -159,4 +159,4 @@ A Familia 2 opera de forma **sincrona**: os adapters Lattes e ORCID retornam o s
 - [M010 — Parcerias](../M010-planejamento-estrategia/parcerias/modelo-estrutural.md)
 - [M020 — Comunicacao](../M020-comunicacao/README.md)
 - [M022 — Contratacao Outorga](../M022-contratacao-outorga/modelo-estrutural.md)
-- [M003 — Iniciativas Captadas](../M003-gestao-iniciativas-captadas/README.md)
+- [M003 — Iniciativas Captadas](../M003-gestao-projetos-captados/README.md)

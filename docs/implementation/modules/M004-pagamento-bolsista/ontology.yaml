@@ -8,7 +8,7 @@ imports:
   - namespace: post_award.bolsista
     path: path: "../M009-gestao-bolsista/ontology.yaml"
   - namespace: post_award.iniciativas
-    path: path: "../M003-gestao-iniciativas-captadas/ontology.yaml"
+    path: path: "../M003-gestao-projetos-captados/ontology.yaml"
 metadata:
   module: "M004"
   source: "docs/implementation/modules/M004-pagamento-bolsista/modelo-estrutural.md"

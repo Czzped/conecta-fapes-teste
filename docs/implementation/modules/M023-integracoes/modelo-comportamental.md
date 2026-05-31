@@ -258,4 +258,4 @@ Estes eventos sao **publicados no barramento interno** e disparam reacoes em mod
   - [M009](../M009-gestao-bolsista/modelo-comportamental.md) — Bolsa transita para `TermoAssinado` apos `DocumentoAssinadoCompletamente`
   - [M010](../M010-planejamento-estrategia/parcerias/modelo-comportamental.md) — Parceria transita para `Vigente` apos assinatura
   - [M022](../M022-contratacao-outorga/modelo-estrutural.md) — Termo de Outorga formalizado
-  - [M003](../M003-gestao-iniciativas-captadas/README.md) — Aceite/Plano vigente
+  - [M003](../M003-gestao-projetos-captados/README.md) — Aceite/Plano vigente

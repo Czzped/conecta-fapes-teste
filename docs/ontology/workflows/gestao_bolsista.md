@@ -8,7 +8,7 @@ imports:
   - namespace: "post_award.bolsas"
     path: "../../implementation/modules/M009-gestao-bolsista/ontology.yaml"
   - namespace: "post_award.iniciativas"
-    path: "../../implementation/modules/M003-gestao-iniciativas-captadas/ontology.yaml"
+    path: "../../implementation/modules/M003-gestao-projetos-captados/ontology.yaml"
   - namespace: "corporativo.pessoas"
     path: "../shared/people.yaml"
 

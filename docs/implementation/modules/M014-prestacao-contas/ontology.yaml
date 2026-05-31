@@ -6,7 +6,7 @@ imports:
   - namespace: shared.people
     path: path: "../../../ontology/shared/people.yaml"
   - namespace: post_award.iniciativas
-    path: path: "../M003-gestao-iniciativas-captadas/ontology.yaml"
+    path: path: "../M003-gestao-projetos-captados/ontology.yaml"
   - namespace: post_award.orcamentaria
     path: path: "../M013-gestao-orcamentaria-projeto/ontology.yaml"
 metadata:

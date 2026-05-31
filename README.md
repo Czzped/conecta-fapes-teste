@@ -128,7 +128,7 @@ Roadmap       → sequencia de domains (longo prazo)
 |----|--------|---|--------------|
 | M001 | Modalidades de Bolsas | 0% | [README](docs/implementation/modules/M001-modalidade-bolsa/README.md) |
 | M002 | Importacao SIGFAPES | 100% | [README](docs/implementation/modules/M002-importacao-editais/README.md) |
-| M003 | Gestao de Iniciativas Captadas | 100% | [README](docs/implementation/modules/M003-gestao-iniciativas-captadas/README.md) |
+| M003 | Gestao de Iniciativas Captadas | 100% | [README](docs/implementation/modules/M003-gestao-projetos-captados/README.md) |
 | M004 | Pagamento de Bolsistas | 100% | [README](docs/implementation/modules/M004-pagamento-bolsista/README.md) |
 | M005 | Autenticacao | — | [README](docs/implementation/modules/M005-autenticacao/README.md) |
 | M006 | Autorizacao | — | [README](docs/implementation/modules/M006-autorizacao/README.md) |

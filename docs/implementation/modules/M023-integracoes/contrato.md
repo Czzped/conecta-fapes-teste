@@ -193,4 +193,4 @@ Este contrato documenta a superficie publica do M023 — como modulos consumidor
   - [Captura](https://docs.e-docs.es.gov.br/api/Captura) — endpoints por tipo
 - **Sistemas integrados**: [Acesso Cidadao](https://acessocidadao.es.gov.br), [Organograma](https://api.organograma.es.gov.br)
 - **Lei 14.063/20** — base juridica das assinaturas
-- **Modulos consumidores**: [M008](../M008-cadastros-corporativos/contrato.md), [M009](../M009-gestao-bolsista/contrato.md), [M020](../M020-comunicacao/README.md), [M022](../M022-contratacao-outorga/contrato.md), [M003](../M003-gestao-iniciativas-captadas/contrato.md), [M010](../M010-planejamento-estrategia/contrato.md)
+- **Modulos consumidores**: [M008](../M008-cadastros-corporativos/contrato.md), [M009](../M009-gestao-bolsista/contrato.md), [M020](../M020-comunicacao/README.md), [M022](../M022-contratacao-outorga/contrato.md), [M003](../M003-gestao-projetos-captados/contrato.md), [M010](../M010-planejamento-estrategia/contrato.md)

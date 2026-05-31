@@ -18,7 +18,7 @@ not_in_nav: |
   discovery/integracoes/README.md
   discovery/integracoes/e-docs.md
   discovery/integracoes/organograma.md
-  implementation/modules/M003-gestao-iniciativas-captadas/epics/US-M003-042-acompanhamento-orcamentario-rubricas.md
+  implementation/modules/M003-gestao-projetos-captados/epics/US-M003-042-acompanhamento-orcamentario-rubricas.md
   implementation/modules/M008-cadastros-corporativos/implementacao-backend-admin-instituicao.md
   implementation/modules/M014-prestacao-contas/epics/EPIC-M014-012.md
   implementation/modules/M014-prestacao-contas/epics/EPIC-M014-013.md
@@ -220,41 +220,41 @@ nav:
           - EPIC-002: implementation/modules/M002-importacao-editais/epics/EPIC-M002-002.md
           - EPIC-003: implementation/modules/M002-importacao-editais/epics/EPIC-M002-003.md
       - M003 Gestao de Iniciativas Captadas:
-          - implementation/modules/M003-gestao-iniciativas-captadas/README.md
-          - Backlog: implementation/modules/M003-gestao-iniciativas-captadas/backlog.md
-          - Contrato: implementation/modules/M003-gestao-iniciativas-captadas/contrato.md
-          - Contrato API: implementation/modules/M003-gestao-iniciativas-captadas/contrato-api.md
-          - Modelo Estrutural: implementation/modules/M003-gestao-iniciativas-captadas/modelo-estrutural.md
-          - EPIC-001: implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-001.md
-          - EPIC-002: implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-002.md
-          - EPIC-003: implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-003.md
-          - EPIC-004: implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-004.md
-          - EPIC-005: implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-005.md
-          - EPIC-006 Diarias: implementation/modules/M003-gestao-iniciativas-captadas/diarias/epics/EPIC-M003-006.md
-          - EPIC-007 Ciclo de Fomento: implementation/modules/M003-gestao-iniciativas-captadas/epics/EPIC-M003-007.md
-          - EPIC-008 Vigencia e Aditivos: implementation/modules/M003-gestao-iniciativas-captadas/aditivos/epics/EPIC-M003-008.md
-          - EPIC-009 Liberacao de Parcelas: implementation/modules/M003-gestao-iniciativas-captadas/liberacao-parcelas/epics/EPIC-M003-009.md
+          - implementation/modules/M003-gestao-projetos-captados/README.md
+          - Backlog: implementation/modules/M003-gestao-projetos-captados/backlog.md
+          - Contrato: implementation/modules/M003-gestao-projetos-captados/contrato.md
+          - Contrato API: implementation/modules/M003-gestao-projetos-captados/contrato-api.md
+          - Modelo Estrutural: implementation/modules/M003-gestao-projetos-captados/modelo-estrutural.md
+          - EPIC-001: implementation/modules/M003-gestao-projetos-captados/epics/EPIC-M003-001.md
+          - EPIC-002: implementation/modules/M003-gestao-projetos-captados/epics/EPIC-M003-002.md
+          - EPIC-003: implementation/modules/M003-gestao-projetos-captados/epics/EPIC-M003-003.md
+          - EPIC-004: implementation/modules/M003-gestao-projetos-captados/epics/EPIC-M003-004.md
+          - EPIC-005: implementation/modules/M003-gestao-projetos-captados/epics/EPIC-M003-005.md
+          - EPIC-006 Diarias: implementation/modules/M003-gestao-projetos-captados/diarias/epics/EPIC-M003-006.md
+          - EPIC-007 Ciclo de Fomento: implementation/modules/M003-gestao-projetos-captados/epics/EPIC-M003-007.md
+          - EPIC-008 Vigencia e Aditivos: implementation/modules/M003-gestao-projetos-captados/aditivos/epics/EPIC-M003-008.md
+          - EPIC-009 Liberacao de Parcelas: implementation/modules/M003-gestao-projetos-captados/liberacao-parcelas/epics/EPIC-M003-009.md
           - Diarias:
-              - implementation/modules/M003-gestao-iniciativas-captadas/diarias/README.md
-              - Backlog: implementation/modules/M003-gestao-iniciativas-captadas/diarias/backlog.md
-              - Contrato: implementation/modules/M003-gestao-iniciativas-captadas/diarias/contrato.md
-              - Contrato API: implementation/modules/M003-gestao-iniciativas-captadas/diarias/contrato-api.md
-              - Modelo Estrutural: implementation/modules/M003-gestao-iniciativas-captadas/diarias/modelo-estrutural.md
-              - Processo: implementation/modules/M003-gestao-iniciativas-captadas/diarias/processo.md
+              - implementation/modules/M003-gestao-projetos-captados/diarias/README.md
+              - Backlog: implementation/modules/M003-gestao-projetos-captados/diarias/backlog.md
+              - Contrato: implementation/modules/M003-gestao-projetos-captados/diarias/contrato.md
+              - Contrato API: implementation/modules/M003-gestao-projetos-captados/diarias/contrato-api.md
+              - Modelo Estrutural: implementation/modules/M003-gestao-projetos-captados/diarias/modelo-estrutural.md
+              - Processo: implementation/modules/M003-gestao-projetos-captados/diarias/processo.md
           - Aditivos:
-              - implementation/modules/M003-gestao-iniciativas-captadas/aditivos/README.md
-              - Backlog: implementation/modules/M003-gestao-iniciativas-captadas/aditivos/backlog.md
-              - Contrato: implementation/modules/M003-gestao-iniciativas-captadas/aditivos/contrato.md
-              - Contrato API: implementation/modules/M003-gestao-iniciativas-captadas/aditivos/contrato-api.md
-              - Modelo Estrutural: implementation/modules/M003-gestao-iniciativas-captadas/aditivos/modelo-estrutural.md
-              - Processo: implementation/modules/M003-gestao-iniciativas-captadas/aditivos/processo.md
+              - implementation/modules/M003-gestao-projetos-captados/aditivos/README.md
+              - Backlog: implementation/modules/M003-gestao-projetos-captados/aditivos/backlog.md
+              - Contrato: implementation/modules/M003-gestao-projetos-captados/aditivos/contrato.md
+              - Contrato API: implementation/modules/M003-gestao-projetos-captados/aditivos/contrato-api.md
+              - Modelo Estrutural: implementation/modules/M003-gestao-projetos-captados/aditivos/modelo-estrutural.md
+              - Processo: implementation/modules/M003-gestao-projetos-captados/aditivos/processo.md
           - Liberacao de Parcelas:
-              - implementation/modules/M003-gestao-iniciativas-captadas/liberacao-parcelas/README.md
-              - Backlog: implementation/modules/M003-gestao-iniciativas-captadas/liberacao-parcelas/backlog.md
-              - Ontologia: implementation/modules/M003-gestao-iniciativas-captadas/liberacao-parcelas/ontology.yaml
-              - Processo: implementation/modules/M003-gestao-iniciativas-captadas/liberacao-parcelas/processo.md
+              - implementation/modules/M003-gestao-projetos-captados/liberacao-parcelas/README.md
+              - Backlog: implementation/modules/M003-gestao-projetos-captados/liberacao-parcelas/backlog.md
+              - Ontologia: implementation/modules/M003-gestao-projetos-captados/liberacao-parcelas/ontology.yaml
+              - Processo: implementation/modules/M003-gestao-projetos-captados/liberacao-parcelas/processo.md
           - Especificacoes:
-              - Proposta Ciclo de Fomento: implementation/modules/M003-gestao-iniciativas-captadas/specifications/proposta-ciclo-fomento-iniciativa.md
+              - Proposta Ciclo de Fomento: implementation/modules/M003-gestao-projetos-captados/specifications/proposta-ciclo-fomento-projeto.md
       - M004 Pagamento de Bolsistas:
           - implementation/modules/M004-pagamento-bolsista/README.md
           - Backlog: implementation/modules/M004-pagamento-bolsista/backlog.md

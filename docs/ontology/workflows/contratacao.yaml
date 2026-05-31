@@ -7,7 +7,7 @@ imports:
   - namespace: "pre_award.captacao"
     path: "../../implementation/modules/M011-configuracao-captacao/ontology.yaml"
   - namespace: "post_award.iniciativas"
-    path: "../../implementation/modules/M003-gestao-iniciativas-captadas/ontology.yaml"
+    path: "../../implementation/modules/M003-gestao-projetos-captados/ontology.yaml"
 
 metadata:
   type: "cross-cutting-workflow"
