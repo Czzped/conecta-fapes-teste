@@ -613,6 +613,199 @@ entities:
         required: true
         description: "Extensoes de arquivo aceitas. Ex: PDF, DOCX, XLSX."
 
+# ─────────────────────────────────────────────────────────────
+# PROCESSO 3 — SELECAO DOS PROJETOS
+# Responsavel: Proponente (submeter), AnalistaTecnico (avaliar/publicar), RevisorAdHoc (parecer)
+# Nota: Projeto e entidade externa (M008). Este processo opera sobre projetos captados.
+# ─────────────────────────────────────────────────────────────
+
+  RespostaFormularioSubmissao:
+    description: "Snapshot imutavel das respostas preenchidas pelo proponente no formulario de submissao do M021. Registrado no momento da submissao formal."
+    extends: null
+    fields:
+      formularioId:
+        type: "string"
+        required: true
+        description: "Identificador do formulario no M021."
+      versaoFormularioId:
+        type: "string"
+        required: true
+        description: "Versao do formulario usada na submissao."
+      respostas:
+        type: "json"
+        required: true
+        description: "Conteudo das respostas em formato estruturado. Imutavel apos submissao."
+      dataSubmissao:
+        type: "datetime"
+        required: true
+        generated: true
+        description: "Data e hora em que a proposta foi submetida formalmente."
+
+  DocumentacaoProjeto:
+    description: "Registro da analise documental realizada pelo AnalistaTecnico sobre a documentacao entregue pelo proponente."
+    extends: "shared.Auditavel"
+    fields:
+      estado:
+        type: "enum:EstadoDocumentacao"
+        required: true
+        description: "Estado da analise documental: PENDENTE, HABILITADA ou INABILITADA."
+      justificativa:
+        type: "string"
+        required: false
+        max_length: 500
+        description: "Justificativa da inabilitacao. Obrigatoria quando estado=INABILITADA."
+      dataInicioAvaliacao:
+        type: "date"
+        required: false
+        description: "Data de inicio da analise documental."
+      dataFimAvaliacao:
+        type: "date"
+        required: false
+        description: "Data de conclusao da analise documental."
+
+  AssinaturaInstitucional:
+    description: "Solicitacao de aprovacao institucional enviada ao ResponsavelInstitucional durante o periodo de submissao. Criada apenas quando exigeAprovacaoInstitucional=true."
+    extends: "shared.Auditavel"
+    fields:
+      estado:
+        type: "enum:EstadoAssinatura"
+        required: true
+        description: "Estado: SOLICITADA, ASSINADA, RECUSADA ou EXPIRADA."
+      dataSolicitacao:
+        type: "datetime"
+        required: true
+        generated: true
+        description: "Data e hora em que a assinatura foi solicitada ao responsavel."
+      dataDecisao:
+        type: "datetime"
+        required: false
+        description: "Data e hora em que o responsavel assinou ou recusou."
+      justificativaRecusa:
+        type: "string"
+        required: false
+        max_length: 500
+        description: "Motivo da recusa. Obrigatorio quando estado=RECUSADA."
+
+  DistribuicaoAvaliacao:
+    description: "Registro da distribuicao de um projeto a um RevisorAdHoc para analise de merito."
+    extends: "shared.Auditavel"
+    fields:
+      dataDistribuicao:
+        type: "datetime"
+        required: true
+        generated: true
+        description: "Data e hora em que o projeto foi distribuido ao revisor."
+      estado:
+        type: "enum:EstadoDistribuicao"
+        required: true
+        description: "Estado: DISTRIBUIDA, AVALIADA ou CANCELADA."
+
+  AvaliacaoAdHoc:
+    description: "Parecer tecnico registrado por um RevisorAdHoc sobre um projeto durante o periodo de avaliacao de merito."
+    extends: "shared.Auditavel"
+    fields:
+      nota:
+        type: "decimal"
+        required: true
+        description: "Nota atribuida pelo revisor ao projeto."
+        domain: ">= 0"
+      parecer:
+        type: "string"
+        required: true
+        max_length: 3000
+        description: "Texto do parecer tecnico do revisor."
+      recomendacao:
+        type: "string"
+        required: true
+        max_length: 200
+        description: "Recomendacao do revisor. Ex: Aprovada, Reprovada, Aprovada com ressalvas."
+      dataRegistro:
+        type: "datetime"
+        required: true
+        generated: true
+        description: "Data e hora do registro da avaliacao."
+      respostasFormulario:
+        type: "json"
+        required: true
+        description: "Snapshot das respostas do revisor no formulario de avaliacao do M021. Imutavel apos registro."
+
+  ResultadoSelecao:
+    description: "Publicacao de resultado de uma etapa do processo de selecao (preliminar, apos revisao ou final) para um ou mais projetos."
+    extends: "shared.Auditavel"
+    fields:
+      tipo:
+        type: "enum:TipoResultadoSelecao"
+        required: true
+        description: "Tipo do resultado: PRELIMINAR, APOS_REVISAO ou FINAL."
+      dataPublicacao:
+        type: "datetime"
+        required: true
+        generated: true
+        description: "Data e hora de publicacao do resultado."
+      classificacao:
+        type: "integer"
+        required: false
+        description: "Posicao do projeto no resultado. Nulo para projetos reprovados."
+        domain: ">= 1"
+      decisao:
+        type: "string"
+        required: true
+        max_length: 200
+        description: "Decisao registrada. Ex: Aprovado, Reprovado, Em lista de espera."
+
+  RevisaoResultado:
+    description: "Solicitacao de revisao do resultado preliminar submetida por um proponente dentro do periodo de recursos."
+    extends: "shared.Auditavel"
+    fields:
+      motivo:
+        type: "string"
+        required: true
+        max_length: 200
+        description: "Motivo principal da solicitacao de revisao."
+      descricao:
+        type: "string"
+        required: true
+        max_length: 3000
+        description: "Descricao detalhada da contestacao."
+      estado:
+        type: "enum:EstadoRevisao"
+        required: true
+        description: "Estado: SUBMETIDA, ADMISSIVEL, INADMISSIVEL, DEFERIDA ou INDEFERIDA."
+      decisao:
+        type: "string"
+        required: false
+        max_length: 200
+        description: "Decisao final da revisao. Obrigatoria quando estado=DEFERIDA ou INDEFERIDA."
+      justificativaDecisao:
+        type: "string"
+        required: false
+        max_length: 1000
+        description: "Justificativa da decisao sobre a revisao."
+      dataSolicitacao:
+        type: "datetime"
+        required: true
+        generated: true
+        description: "Data e hora da submissao da solicitacao."
+      dataDecisao:
+        type: "datetime"
+        required: false
+        description: "Data e hora em que a decisao foi registrada."
+
+  AnexoRevisao:
+    description: "Arquivo anexado a uma RevisaoResultado como evidencia ou suporte da contestacao."
+    extends: null
+    fields:
+      nomeArquivo:
+        type: "string"
+        required: true
+        max_length: 300
+        description: "Nome do arquivo anexado."
+      urlArquivo:
+        type: "string"
+        required: true
+        max_length: 500
+        description: "URL de acesso ao arquivo armazenado."
+
 relationships:
   # Fomento
   - from: "pre_award.captacao.Fomento"
@@ -765,6 +958,58 @@ relationships:
     to: "shared.documents.TipoDocumento"
     cardinality: "N:1"
     description: "Ancora no catalogo compartilhado de tipos de documento."
+  # P3 — Selecao dos Projetos
+  - from: "pre_award.captacao.Captacao"
+    relation: "recebe projetos"
+    to: "corporativo.M008.Projeto"
+    cardinality: "1:N"
+    description: "Projetos submetidos na captacao durante o periodo de recebimento."
+  - from: "pre_award.captacao.Captacao"
+    relation: "publica resultado"
+    to: "pre_award.captacao.ResultadoSelecao"
+    cardinality: "1:N"
+  - from: "corporativo.M008.Projeto"
+    relation: "submissao"
+    to: "pre_award.captacao.RespostaFormularioSubmissao"
+    cardinality: "1:1"
+  - from: "corporativo.M008.Projeto"
+    relation: "documentacao"
+    to: "pre_award.captacao.DocumentacaoProjeto"
+    cardinality: "1:1"
+  - from: "corporativo.M008.Projeto"
+    relation: "assinatura institucional"
+    to: "pre_award.captacao.AssinaturaInstitucional"
+    cardinality: "1:0..1"
+    description: "Presente apenas quando RegraSubmissao.exigeAprovacaoInstitucional=true."
+  - from: "corporativo.M008.Projeto"
+    relation: "distribuicoes avaliacao"
+    to: "pre_award.captacao.DistribuicaoAvaliacao"
+    cardinality: "1:N"
+  - from: "corporativo.M008.Projeto"
+    relation: "revisoes resultado"
+    to: "pre_award.captacao.RevisaoResultado"
+    cardinality: "1:N"
+  - from: "pre_award.captacao.DistribuicaoAvaliacao"
+    relation: "revisor"
+    to: "shared.people.PessoaFisica"
+    cardinality: "N:1"
+    description: "Revisor ad hoc do pool configurado no P2."
+  - from: "pre_award.captacao.DistribuicaoAvaliacao"
+    relation: "parecer"
+    to: "pre_award.captacao.AvaliacaoAdHoc"
+    cardinality: "1:0..1"
+  - from: "pre_award.captacao.AssinaturaInstitucional"
+    relation: "responsavel"
+    to: "shared.people.PessoaFisica"
+    cardinality: "N:1"
+  - from: "pre_award.captacao.ResultadoSelecao"
+    relation: "classifica projetos"
+    to: "corporativo.M008.Projeto"
+    cardinality: "N:N"
+  - from: "pre_award.captacao.RevisaoResultado"
+    relation: "anexos"
+    to: "pre_award.captacao.AnexoRevisao"
+    cardinality: "1:N"
 
 axioms:
   - id: "AX-M011-001"
@@ -888,6 +1133,46 @@ invariants:
     description: "A data de fim do fomento deve ser posterior a data de inicio."
 
 enums:
+  # ── P3 enums ──
+  EstadoDocumentacao:
+    description: "Estado da analise documental de um projeto no processo de selecao."
+    values:
+      PENDENTE: "Analise documental ainda nao iniciada."
+      HABILITADA: "Documentacao aprovada — projeto segue para avaliacao de merito."
+      INABILITADA: "Documentacao reprovada — projeto eliminado do processo com justificativa."
+
+  EstadoAssinatura:
+    description: "Estado do ciclo de aprovacao institucional da proposta."
+    values:
+      SOLICITADA: "Assinatura solicitada ao ResponsavelInstitucional."
+      ASSINADA: "Responsavel aprovou — proposta pode ser submetida formalmente."
+      RECUSADA: "Responsavel recusou — proposta devolvida ao proponente com justificativa."
+      EXPIRADA: "Periodo de submissao encerrado sem decisao do responsavel."
+
+  EstadoDistribuicao:
+    description: "Estado da distribuicao de um projeto a um revisor ad hoc."
+    values:
+      DISTRIBUIDA: "Projeto distribuido ao revisor, aguardando parecer."
+      AVALIADA: "Revisor registrou parecer."
+      CANCELADA: "Distribuicao cancelada — revisor substituido ou projeto inabilitado."
+
+  TipoResultadoSelecao:
+    description: "Tipo de resultado publicado no processo de selecao."
+    values:
+      PRELIMINAR: "Resultado preliminar — abre prazo para recursos."
+      APOS_REVISAO: "Resultado apos analise dos recursos interpostos."
+      FINAL: "Resultado final — encerra o processo de selecao no M011."
+
+  EstadoRevisao:
+    description: "Estado do processamento de uma solicitacao de revisao de resultado."
+    values:
+      SUBMETIDA: "Solicitacao recebida, aguardando admissibilidade."
+      ADMISSIVEL: "Admitida para analise de merito."
+      INADMISSIVEL: "Rejeitada por nao atender os criterios de admissibilidade."
+      DEFERIDA: "Analise concluida — recurso aceito, classificacao alterada."
+      INDEFERIDA: "Analise concluida — recurso negado, classificacao mantida."
+
+  # ── P1/P2 enums ──
   ObrigatoriedadeBloco:
     description: "Visibilidade e obrigatoriedade de um bloco fixo da proposta na captacao."
     values:
