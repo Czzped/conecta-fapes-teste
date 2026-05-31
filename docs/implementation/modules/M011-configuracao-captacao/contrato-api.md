@@ -1261,7 +1261,7 @@ Consulta a matriz de configuracao de blocos do projeto para a captacao.
 
 ### 11. Operacoes da Instancia da Captacao
 
-Estas rotas representam o processo operacional descrito em [process.md](process.md). O detalhamento completo de payload de cada formulario continua dependente das versoes selecionadas no M021.
+Estas rotas representam o processo operacional descrito em [process.md](process/process.md). O detalhamento completo de payload de cada formulario continua dependente das versoes selecionadas no M021.
 
 | Metodo | Path | Operacao | Autorizacao |
 |--------|------|----------|-------------|
