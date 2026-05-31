@@ -8,7 +8,7 @@ aprovado. Neste processo sao definidos:
 - o tipo de chamamento (Chamada Publica ou Demanda Induzida);
 - as faixas do Fomento ativadas nesta captacao;
 - as datas das etapas do processo de selecao;
-- os formularios, regras de submissao, requisitos do proponente, revisores ad hoc e exigencias de prestacao.
+- os formularios, regras de submissao, requisitos do proponente e exigencias de prestacao.
 
 O resultado e uma `Captacao` com estado `PUBLICADO`, pronta para iniciar o Processo 3.
 
@@ -40,7 +40,6 @@ flowchart TD
         GB[Informar CPF e nome — PF]
         GC[Informar CNPJ, razao social e contato PF — PJ]
         FAI[Selecionar faixas do Fomento para esta captacao]
-        H[Definir categorias e tipos de projetos aceitos]
         J[Configurar regras de submissao]
         JA{Exige aprovacao institucional?}
         JB[Habilitar solicitacao de assinatura institucional na submissao]
@@ -48,19 +47,10 @@ flowchart TD
         L[Selecionar proponentes autorizados]
         M[Configurar requisitos do proponente]
         N[Configurar documentos exigidos]
-        O[Configurar regras de avaliacao de merito]
-        P[Selecionar pool de revisores ad hoc]
         R[Definir exigencia de prestacao tecnica e financeira]
-        S[Selecionar formularios no M021]
+        S[Selecionar formulario de Submissao de Propostas, Avaliacao de Proposta e Recursos de Nota]
         MX[Configurar matriz de campos da proposta]
-        W0[Definir data de publicacao da captacao]
-        W1[Definir periodo de submissao de propostas]
-        W2[Definir periodo de analise documental]
-        W3[Definir periodo de avaliacao ad hoc]
-        W4[Definir data de publicacao do resultado preliminar]
-        W5[Definir periodo de recebimento de revisoes]
-        W6[Definir data de publicacao do resultado apos revisao]
-        W7[Definir data de publicacao do resultado final]
+        W[Definir Cronograma]
         X[Validar configuracao]
         Y{Configuracao valida?}
         Z[Publicar Captacao]
@@ -71,14 +61,13 @@ flowchart TD
     E -->|DEMANDA_INDUZIDA| G --> GA
     GA -->|PESSOA_FISICA| GB --> F
     GA -->|PESSOA_JURIDICA| GC --> F
-    F --> FAI --> H --> J --> JA
+    F --> FAI --> J --> JA
     JA -->|Sim| JB --> K
     JA -->|Nao| K
     K -->|Sim| L --> M
     K -->|Nao| M
-    M --> N --> O --> P --> R --> S
-    S --> MX --> W0 --> W1 --> W2 --> W3 --> W4 --> W5 --> W6 --> W7
-    W7 --> X --> Y
+    M --> N --> R --> S
+    S --> MX --> W --> X --> Y
     Y -->|Nao| C
     Y -->|Sim| Z
     Z --> ZA[Captacao disponivel para o Processo 3]
@@ -97,18 +86,15 @@ flowchart TD
 | 5 | Selecionar outorgado destinatario | AnalistaTecnico | Apenas quando `DEMANDA_INDUZIDA`. Informa o destinatario especifico: PF (CPF + nome) ou PJ (CNPJ + razao social + contato PF). O tipo deve coincidir com o definido no passo anterior. |
 | 6 | Adicionar edital | AnalistaTecnico | Informa o titulo do edital e ao menos um dos seguintes: link externo (URL) ou upload do documento. Pode informar versao quando houver rerratificacoes. Obrigatorio antes da publicacao. |
 | 7 | Selecionar faixas do Fomento | AnalistaTecnico | Seleciona uma ou mais faixas do Fomento que serao ativadas nesta captacao. As faixas determinam os limites de investimento, tipos de projeto, rubricas e bolsas disponiveis para as propostas. Herdados do Fomento — nao reconfigurados aqui. |
-| 8 | Definir categorias e tipos de projetos aceitos | AnalistaTecnico | Seleciona quais categorias e tipos de projeto a captacao aceita, dentre os tipos cobertos pelas faixas selecionadas. |
 | 9 | Configurar regras de submissao | AnalistaTecnico | Define se permite multiplas propostas, acumulo de bolsa, participacao em outra proposta e se a submissao e restrita a proponentes escolhidos. Tambem define se exige aprovacao institucional (`exigeAprovacaoInstitucional`). |
 | 9b | Habilitar solicitacao de assinatura institucional | AnalistaTecnico | **Condicional — apenas quando `exigeAprovacaoInstitucional = true`.** Configura que o proponente devera solicitar a assinatura do ResponsavelInstitucional durante o periodo de submissao. A proposta so pode ser submetida formalmente apos a assinatura ser obtida. |
 | 10 | Selecionar proponentes autorizados | AnalistaTecnico | Quando submissao restrita, seleciona as instituicoes ou pessoas autorizadas a submeter proposta. |
 | 11 | Configurar requisitos do proponente | AnalistaTecnico | Define direcionamento (aberto, instituicao, tipo de instituicao), exigencia de vinculo empregaticio, gestor institucional e nivel academico minimo. |
 | 12 | Configurar documentos adicionais exigidos | AnalistaTecnico | Define quais documentos o proponente deve anexar na submissao, alem dos blocos estruturais da proposta. Exemplos: certidoes, contratos sociais, comprovantes de vinculo, declaracoes especificas do edital. Para cada documento informa: nome, descricao, formatos permitidos (PDF, DOCX, etc.), obrigatoriedade, e se pode ser reaproveitado do cadastro corporativo do M008 quando valido. |
-| 13 | Configurar regras de avaliacao de merito | AnalistaTecnico | Define se a captacao exige avaliacao ad hoc e a quantidade minima de revisores por proposta. |
-| 14 | Selecionar pool de revisores ad hoc | AnalistaTecnico | Adiciona as pessoas fisicas que comporao o pool de revisores, com area de atuacao e titulacao. |
 | 15 | Definir exigencia de prestacao | AnalistaTecnico | Define se os projetos gerados exigirao prestacao tecnica e/ou financeira. |
-| 16 | Selecionar formularios no M021 | AnalistaTecnico | Seleciona na base do M021: formulario de submissao da proposta, formulario de avaliacao ad hoc (usado pelos revisores para registrar parecer e nota), formulario de revisao de resultado e formulario de anexos (opcional). |
+| 16 | Selecionar formulario de Submissao de Propostas, Avaliacao de Proposta e Recursos de Nota | AnalistaTecnico | Seleciona na base do M021: formulario de submissao da proposta, formulario de avaliacao ad hoc (usado pelos revisores para registrar parecer e nota), formulario de revisao de resultado e formulario de anexos (opcional). As regras de avaliacao de merito — se exige avaliacao ad hoc e quantidade minima de revisores por proposta — sao configuradas diretamente no formulario de avaliacao selecionado. |
 | 17 | Configurar matriz de campos da proposta | AnalistaTecnico | Para cada bloco fixo da proposta define se e `EXIGIDO` ou `DISPENSADO`. Os blocos configurados aqui determinam o que aparece no formulario de submissao para o proponente. |
-| 18 | Configurar datas do processo de selecao | AnalistaTecnico | Define as 8 etapas obrigatorias do cronograma: PUBLICACAO_CAPTACAO, RECEBIMENTO_PROPOSTAS, AVALIACAO_DOCUMENTAL, AVALIACAO_AD_HOC, RESULTADO_PRELIMINAR, RECEBIMENTO_REVISAO, RESULTADO_APOS_REVISAO e RESULTADO_FINAL. Todas as datas devem estar dentro da vigencia do Fomento. |
+| 18 | Definir Cronograma | AnalistaTecnico | Define as 8 etapas obrigatorias do cronograma da captacao: (1) data de publicacao da captacao — data em que a captacao e tornada publica; (2) periodo de submissao de propostas — janela em que proponentes enviam propostas; (3) periodo de analise documental — AnalistaTecnico confere documentacao e habilita ou inabilita propostas; (4) periodo de avaliacao ad hoc — revisores registram pareceres e notas; (5) data de publicacao do resultado preliminar — divulgado aos proponentes, abre prazo para recursos; (6) periodo de recebimento de revisoes — proponentes podem solicitar revisao do resultado; (7) data de publicacao do resultado apos revisao — publicado apos analise dos recursos; (8) data de publicacao do resultado final — encerra o processo de selecao. Todas as datas devem estar dentro da vigencia do Fomento. |
 | 19 | Validar e publicar Captacao | AnalistaTecnico | Verifica configuracao completa e publica. Captacao transita para `PUBLICADO`. |
 
 ---
@@ -161,11 +147,9 @@ Captacao publicada contendo:
 - tipo de chamamento: `CHAMADA_PUBLICA` ou `DEMANDA_INDUZIDA`;
 - outorgado destinatario (PF ou PJ com contato PF), quando `DEMANDA_INDUZIDA`;
 - link do edital;
-- categorias e tipos de projeto aceitos;
 - regras de submissao e proponentes autorizados quando restrita;
 - requisitos do proponente;
 - documentos exigidos com formatos e obrigatoriedade;
-- regras de avaliacao de merito e pool de revisores ad hoc;
 - exigencia de prestacao tecnica e/ou financeira;
 - formularios de submissao, avaliacao, recursos e anexos selecionados no M021;
 - cronograma com as 8 etapas obrigatorias (PUBLICACAO_CAPTACAO, RECEBIMENTO_PROPOSTAS, AVALIACAO_DOCUMENTAL, AVALIACAO_AD_HOC, RESULTADO_PRELIMINAR, RECEBIMENTO_REVISAO, RESULTADO_APOS_REVISAO, RESULTADO_FINAL).

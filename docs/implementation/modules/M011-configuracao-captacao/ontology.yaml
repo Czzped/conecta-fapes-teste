@@ -19,6 +19,8 @@ imports:
     path: path: "../M010-planejamento-estrategia/eixos/ontology.yaml"
   - namespace: financeiro.contabilidade
     path: path: "../M016-contabilidade-financeiro/ontology.yaml"
+  - namespace: shared.documents
+    path: path: "../../../ontology/shared/documents.yaml"
 metadata:
   module: "M011"
   source: "docs/implementation/modules/M011-configuracao-captacao/modelo-estrutural.md"
@@ -296,7 +298,7 @@ entities:
         required: true
         generated: true
         unique: true
-        description: "Codigo unico gerado automaticamente para a captacao."
+        description: "Codigo unico gerado automaticamente."
       titulo:
         type: "string"
         required: true
@@ -306,152 +308,86 @@ entities:
         type: "string"
         required: false
         max_length: 1000
-        description: "Descricao resumida do objetivo e escopo da captacao."
+        description: "Descricao resumida do objetivo e escopo."
       fomento:
         type: "ref:pre_award.captacao.Fomento"
         required: true
-        description: "Fomento aprovado que financia esta captacao. Deve estar no estado APROVADO."
+        description: "Fomento aprovado que financia esta captacao. Estado = APROVADO."
       faixasSelecionadas:
         type: "list:ref:pre_award.captacao.Faixa"
         required: true
-        description: "Uma ou mais faixas do Fomento ativadas nesta captacao. Definem rubricas e bolsas disponiveis para as propostas."
-      areaTecnica:
-        type: "ref:corporativo.instituicoes.AreaTecnica"
-        required: true
-        description: "Area Tecnica responsavel pela configuracao e conducao da selecao."
+        description: "Faixas do Fomento ativadas nesta captacao."
       tipoCaptacao:
         type: "enum:TipoCaptacao"
         required: true
-        description: "Tipo da captacao: CHAMADA_PUBLICA ou DEMANDA_INDUZIDA."
+        description: "CHAMADA_PUBLICA ou DEMANDA_INDUZIDA."
       tipoOutorgado:
         type: "enum:TipoOutorgado"
         required: true
-        description: "Tipo do outorgado esperado: PESSOA_FISICA ou PESSOA_JURIDICA. Em CHAMADA_PUBLICA define o perfil dos proponentes habilitados a receber outorga. Em DEMANDA_INDUZIDA deve coincidir com o tipo do outorgadoDestinatario."
+        description: "PESSOA_FISICA ou PESSOA_JURIDICA."
       estadoConfiguracao:
         type: "enum:EstadoConfiguracaoCaptacao"
         required: true
-        description: "Estado corrente da configuracao da captacao."
-      edital:
-        type: "ref:pre_award.captacao.Edital"
-        required: true
-        description: "Edital da captacao com as regras, podendo conter link externo e/ou documento anexado."
-      outorgadoDestinatario:
-        type: "ref:pre_award.captacao.OutorgadoDestinatario"
+        description: "Estado corrente da configuracao."
+      editalLink:
+        type: "string"
         required: false
-        description: "Destinatario de uma demanda induzida. Obrigatorio quando tipoCaptacao = DEMANDA_INDUZIDA."
-      tiposProjeto:
-        type: "list:ref:corporativo.instituicoes.TipoProjeto"
+        max_length: 500
+        description: "URL externa do edital. Ao menos editalLink ou editalNomeArquivo obrigatorio antes da publicacao."
+      editalNomeArquivo:
+        type: "string"
+        required: false
+        max_length: 300
+        description: "Nome do arquivo do edital anexado."
+      editalVersao:
+        type: "string"
+        required: false
+        max_length: 50
+        description: "Versao do edital; incrementada a cada retificacao."
+      exigePrestacaoTecnica:
+        type: "boolean"
         required: true
-        description: "Um ou mais tipos de projeto aceitos pela captacao."
-      categoriasProjeto:
-        type: "list:ref:pre_award.captacao.CategoriaProjeto"
+        description: "Indica se os projetos gerados exigirao prestacao tecnica."
+      exigePrestacaoFinanceira:
+        type: "boolean"
         required: true
-        description: "Uma ou mais categorias de projeto aceitas pela captacao."
-      cronograma:
-        type: "ref:pre_award.captacao.CronogramaCaptacao"
+        description: "Indica se os projetos gerados exigirao prestacao financeira."
+      periodosCronograma:
+        type: "list:ref:pre_award.captacao.PeriodoCronograma"
         required: true
-        description: "Cronograma com os 8 periodos obrigatorios do fluxo de selecao."
+        description: "Lista de exatamente 8 periodos, um por TipoPeriodo, formando cadeia via precede."
       regraSubmissao:
         type: "ref:pre_award.captacao.RegraSubmissao"
         required: true
-        description: "Regras que governam quem pode submeter propostas e sob quais condicoes."
+        description: "Regras de submissao e requisitos do proponente."
       proponentesEscolhidos:
         type: "list:ref:pre_award.captacao.ProponenteEscolhido"
         required: false
-        description: "Proponentes autorizados quando regraSubmissao.submissaoRestritaAEscolhidos = true."
-      requisitoProponente:
-        type: "ref:pre_award.captacao.RequisitoProponente"
-        required: true
-        description: "Requisitos impostos ao proponente desta captacao."
-      regraAvaliacao:
-        type: "ref:pre_award.captacao.RegraAvaliacao"
-        required: true
-        description: "Regras de analise de merito das propostas."
-      prestacaoExigida:
-        type: "ref:pre_award.captacao.PrestacaoExigida"
-        required: true
-        description: "Define se os projetos gerados exigem prestacao tecnica e/ou financeira."
-      revisoresAdHoc:
-        type: "list:ref:pre_award.captacao.RevisorAdHoc"
-        required: true
-        description: "Pool de revisores ad hoc disponivel para analise de merito nesta captacao."
+        description: "Proponentes autorizados quando regraSubmissao.submissaoRestritaAEscolhidos=true."
       documentosExigidos:
         type: "list:ref:pre_award.captacao.DocumentoExigido"
         required: false
         description: "Documentos exigidos do proponente na submissao."
       formularioSubmissao:
-        type: "ref:pre_award.captacao.FormularioSubmissaoRef"
+        type: "ref:pre_award.captacao.FormularioRef"
         required: true
-        description: "Referencia ao formulario de submissao publicado no M021."
+        description: "Formulario de submissao da proposta no M021."
       formularioAvaliacao:
-        type: "ref:pre_award.captacao.FormularioAvaliacaoRef"
+        type: "ref:pre_award.captacao.FormularioRef"
         required: true
-        description: "Referencia ao formulario de avaliacao ad hoc publicado no M021."
+        description: "Formulario de avaliacao ad hoc no M021."
       formularioRevisao:
-        type: "ref:pre_award.captacao.FormularioRevisaoRef"
+        type: "ref:pre_award.captacao.FormularioRef"
         required: true
-        description: "Referencia ao formulario de revisao de resultado publicado no M021."
+        description: "Formulario de revisao de resultado no M021."
       formularioAnexo:
-        type: "ref:pre_award.captacao.FormularioAnexoRef"
+        type: "ref:pre_award.captacao.FormularioRef"
         required: false
-        description: "Referencia opcional ao formulario de anexos publicado no M021."
+        description: "Formulario de anexos no M021. Opcional."
       matrizConfiguracao:
         type: "ref:pre_award.captacao.MatrizConfiguracaoProjeto"
         required: true
-        description: "Define quais blocos fixos da proposta sao exigidos, opcionais ou dispensados nesta captacao."
-
-  OutorgadoDestinatario:
-    description: >
-      Destinatario de uma demanda induzida. Pode ser Pessoa Fisica ou Pessoa Juridica.
-      Quando Pessoa Juridica, deve indicar uma Pessoa Fisica como contato responsavel.
-    extends: null
-    fields:
-      tipo:
-        type: "enum:TipoOutorgado"
-        required: true
-        description: "Tipo do destinatario: PESSOA_FISICA ou PESSOA_JURIDICA."
-      cpf:
-        type: "value_object:shared.CPF"
-        required: false
-        description: "CPF do destinatario. Obrigatorio quando tipo = PESSOA_FISICA."
-      nome:
-        type: "string"
-        required: false
-        max_length: 300
-        description: "Nome do destinatario pessoa fisica. Obrigatorio quando tipo = PESSOA_FISICA."
-      cnpj:
-        type: "value_object:shared.CNPJ"
-        required: false
-        description: "CNPJ do destinatario. Obrigatorio quando tipo = PESSOA_JURIDICA."
-      razaoSocial:
-        type: "string"
-        required: false
-        max_length: 300
-        description: "Razao social da pessoa juridica destinataria. Obrigatoria quando tipo = PESSOA_JURIDICA."
-      contatoPF:
-        type: "ref:shared.people.PessoaFisica"
-        required: false
-        description: "Pessoa fisica de contato na pessoa juridica destinataria. Obrigatoria quando tipo = PESSOA_JURIDICA."
-
-  CategoriaProjeto:
-    description: "Categoria de projeto aceita pela captacao, com indicador de disponibilidade para selecao multipla."
-    extends: "shared.Auditavel"
-    fields:
-      nome:
-        type: "string"
-        required: true
-        unique: true
-        max_length: 200
-        description: "Nome da categoria (ex: Pesquisa, Inovacao, Extensao, Difusao, Capacitacao)."
-      descricao:
-        type: "string"
-        required: false
-        max_length: 500
-        description: "Descricao da categoria."
-      selecionavelNoCadastro:
-        type: "boolean"
-        required: true
-        description: "Indica se a categoria esta disponivel para selecao multipla no cadastro da captacao."
+        description: "Define quais blocos fixos da proposta sao EXIGIDO ou DISPENSADO."
 
 # ─────────────────────────────────────────────────────────────
 # ENTIDADES DE SUPORTE — COMPARTILHADAS ENTRE PROCESSOS 2 E 3
@@ -493,55 +429,6 @@ entities:
         required: true
         description: "Define se a proposta deve declarar beneficios e indicadores."
 
-  Edital:
-    description: >
-      Documento oficial com as regras da captacao. Deve conter ao menos um link externo ou
-      um arquivo anexado. Ambos podem ser informados simultaneamente.
-    extends: "shared.Auditavel"
-    fields:
-      titulo:
-        type: "string"
-        required: true
-        max_length: 200
-        description: "Titulo ou identificacao do edital."
-      descricao:
-        type: "string"
-        required: false
-        max_length: 1000
-        description: "Resumo do conteudo ou escopo do edital."
-      link:
-        type: "string"
-        required: false
-        description: "URL para o edital publicado externamente (DOU, site da FAPES, etc.)."
-      nomeArquivo:
-        type: "string"
-        required: false
-        max_length: 255
-        description: "Nome do arquivo do edital anexado. Preenchido quando o documento for carregado diretamente."
-      urlArquivo:
-        type: "string"
-        required: false
-        description: "URL de acesso ao arquivo armazenado. Gerada automaticamente apos upload."
-      versao:
-        type: "string"
-        required: false
-        max_length: 20
-        description: "Versao do edital, quando houver rerratificacoes (ex: 1.0, 1.1)."
-
-  CronogramaCaptacao:
-    description: "Cronograma da captacao composto exatamente pelos 8 periodos obrigatorios do fluxo de selecao."
-    extends: "shared.Auditavel"
-    fields:
-      descricao:
-        type: "string"
-        required: true
-        max_length: 500
-        description: "Descricao geral do cronograma."
-      periodos:
-        type: "list:ref:pre_award.captacao.PeriodoCronograma"
-        required: true
-        description: "Lista de exatamente 8 periodos, um para cada TipoPeriodo obrigatorio, em ordem sequencial."
-
   PeriodoCronograma:
     description: "Card operacional de uma fase do cronograma da captacao com data de inicio e fim."
     extends: "shared.Auditavel"
@@ -563,6 +450,10 @@ entities:
         type: "date"
         required: true
         description: "Data de fim do periodo."
+      proximo:
+        type: "ref:pre_award.captacao.PeriodoCronograma"
+        required: false
+        description: "Proximo periodo na cadeia do cronograma. Nulo para o periodo final (RESULTADO_FINAL)."
       adiamentos:
         type: "list:ref:pre_award.captacao.AdiamentoPeriodoCronograma"
         required: false
@@ -604,58 +495,6 @@ entities:
         required: true
         description: "Data final da etapa apos o adiamento."
 
-  FormularioSubmissaoRef:
-    description: "Referencia ao formulario de submissao publicado no M021."
-    extends: null
-    fields:
-      formularioId:
-        type: "string"
-        required: true
-        description: "Identificador do formulario no M021."
-      versaoFormularioId:
-        type: "string"
-        required: true
-        description: "Identificador da versao publicada selecionada no M021."
-
-  FormularioAvaliacaoRef:
-    description: "Referencia ao formulario de avaliacao ad hoc publicado no M021."
-    extends: null
-    fields:
-      formularioId:
-        type: "string"
-        required: true
-        description: "Identificador do formulario no M021."
-      versaoFormularioId:
-        type: "string"
-        required: true
-        description: "Identificador da versao publicada selecionada no M021."
-
-  FormularioRevisaoRef:
-    description: "Referencia ao formulario de revisao de resultado publicado no M021."
-    extends: null
-    fields:
-      formularioId:
-        type: "string"
-        required: true
-        description: "Identificador do formulario no M021."
-      versaoFormularioId:
-        type: "string"
-        required: true
-        description: "Identificador da versao publicada selecionada no M021."
-
-  FormularioAnexoRef:
-    description: "Referencia opcional ao formulario de anexos publicado no M021."
-    extends: null
-    fields:
-      formularioId:
-        type: "string"
-        required: false
-        description: "Identificador do formulario de anexos no M021."
-      versaoFormularioId:
-        type: "string"
-        required: false
-        description: "Identificador da versao publicada selecionada no M021."
-
   RegraSubmissao:
     description: "Regras que governam quem pode submeter propostas e sob quais condicoes de acumulacao."
     extends: "shared.Auditavel"
@@ -680,6 +519,47 @@ entities:
         type: "boolean"
         required: true
         description: "Indica se a proposta submetida deve ser aprovada pelo responsavel da instituicao ou setor do proponente antes de seguir para analise documental."
+      direcionamento:
+        type: "enum:TipoDirecionamentoProposta"
+        required: true
+        description: "Define se a proposta e aberta, direcionada a instituicao ou tipo de instituicao."
+      permiteParceriaInstituicoes:
+        type: "boolean"
+        required: true
+        description: "Proposta pode envolver mais de uma instituicao."
+      exigeVinculoEmpregaticio:
+        type: "boolean"
+        required: true
+        description: "Proponente deve ter vinculo empregaticio ativo."
+      exigeGestorInstitucional:
+        type: "boolean"
+        required: true
+        description: "Proposta deve informar gestor institucional."
+      instituicao:
+        type: "ref:corporativo.instituicoes.Instituicao"
+        required: false
+        description: "Instituicao permitida quando direcionamento=INSTITUICAO."
+      tipoInstituicao:
+        type: "ref:corporativo.instituicoes.TipoInstituicao"
+        required: false
+        description: "Tipo de instituicao quando direcionamento=TIPO_INSTITUICAO."
+      nivelAcademicoMinimo:
+        type: "ref:corporativo.instituicoes.NivelAcademico"
+        required: false
+        description: "Nivel academico minimo exigido do proponente."
+
+  FormularioRef:
+    description: "Referencia a um formulario publicado no M021. Usado para submissao, avaliacao ad hoc, revisao de resultado e anexos."
+    extends: null
+    fields:
+      formularioId:
+        type: "string"
+        required: true
+        description: "Identificador do formulario no M021."
+      versaoFormularioId:
+        type: "string"
+        required: true
+        description: "Identificador da versao publicada selecionada no M021."
 
   ProponenteEscolhido:
     description: "Proponente autorizado a submeter quando submissaoRestritaAEscolhidos = true. Aponta para exatamente uma Instituicao ou PessoaFisica."
@@ -698,99 +578,19 @@ entities:
         required: false
         description: "Pessoa fisica autorizada. Obrigatoria quando tipo = PESSOA."
 
-  RequisitoProponente:
-    description: "Requisitos impostos ao proponente: direcionamento, vinculo, gestor institucional e nivel academico minimo."
-    extends: "shared.Auditavel"
-    fields:
-      direcionamento:
-        type: "enum:TipoDirecionamentoProposta"
-        required: true
-        description: "Define se a proposta e aberta, direcionada a instituicao ou a tipo de instituicao."
-      permiteParceriaInstituicoes:
-        type: "boolean"
-        required: true
-        description: "Indica se a proposta pode envolver mais de uma instituicao."
-      exigeVinculoEmpregaticio:
-        type: "boolean"
-        required: true
-        description: "Indica se o proponente deve possuir vinculo empregaticio ativo."
-      exigeGestorInstitucional:
-        type: "boolean"
-        required: true
-        description: "Indica se a proposta deve informar gestor institucional."
-      instituicao:
-        type: "ref:corporativo.instituicoes.Instituicao"
-        required: false
-        description: "Instituicao permitida quando direcionamento = INSTITUICAO."
-      tipoInstituicao:
-        type: "ref:corporativo.instituicoes.TipoInstituicao"
-        required: false
-        description: "Tipo de instituicao permitido quando direcionamento = TIPO_INSTITUICAO."
-      nivelAcademicoMinimo:
-        type: "ref:corporativo.instituicoes.NivelAcademico"
-        required: false
-        description: "Nivel academico minimo exigido do proponente/coordenador."
-
-  RegraAvaliacao:
-    description: "Configuracao das regras de analise de merito (avaliacao ad hoc) das propostas recebidas."
-    extends: "shared.Auditavel"
-    fields:
-      exigeAvaliacaoAdHoc:
-        type: "boolean"
-        required: true
-        description: "Indica se a captacao exige analise de merito por revisores ad hoc."
-      quantidadeMinimaRevisores:
-        type: "integer"
-        required: true
-        description: "Quantidade minima de revisores ad hoc por proposta."
-        domain: ">= 0"
-
-  PrestacaoExigida:
-    description: "Define se os projetos gerados por esta captacao exigirao prestacao tecnica e/ou financeira."
-    extends: "shared.Auditavel"
-    fields:
-      exigePrestacaoTecnica:
-        type: "boolean"
-        required: true
-        description: "Indica se os projetos gerados exigirao prestacao tecnica."
-      exigePrestacaoFinanceira:
-        type: "boolean"
-        required: true
-        description: "Indica se os projetos gerados exigirao prestacao financeira."
-
-  RevisorAdHoc:
-    description: "Papel operacional assumido por uma PessoaFisica como revisor ad hoc para analise de merito nesta captacao."
-    extends: "shared.Auditavel"
-    fields:
-      pessoa:
-        type: "ref:shared.people.PessoaFisica"
-        required: true
-        description: "Pessoa fisica que assume o papel de revisor ad hoc."
-      dataInclusao:
-        type: "date"
-        required: true
-        generated: true
-        description: "Data em que a pessoa foi incluida no pool de revisores."
-      areaAtuacao:
-        type: "string"
-        required: true
-        max_length: 200
-        description: "Area de conhecimento considerada para distribuicao das propostas."
-      titulacao:
-        type: "string"
-        required: true
-        max_length: 100
-        description: "Titulacao academica do revisor (ex: Doutor, Mestre)."
-
   DocumentoExigido:
     description: "Documento exigido do proponente na submissao, com regras de reaproveitamento do cadastro corporativo."
     extends: "shared.Auditavel"
     fields:
+      tipoDocumento:
+        type: "ref:shared.documents.TipoDocumento"
+        required: true
+        description: "Tipo do documento exigido, ancorado no catalogo compartilhado."
       nome:
         type: "string"
-        required: true
+        required: false
         max_length: 200
-        description: "Nome do documento exigido."
+        description: "Label especifico do edital; sobrescreve o nome do TipoDocumento quando preenchido."
       descricao:
         type: "string"
         required: false
@@ -808,20 +608,10 @@ entities:
         type: "boolean"
         required: true
         description: "Indica se o proponente deve reenviar o documento quando o cadastro corporativo possuir documento vencido ou invalido."
-      formatosPermitidos:
-        type: "list:ref:pre_award.captacao.FormatoArquivo"
-        required: false
-        description: "Formatos de arquivo aceitos para este documento."
-
-  FormatoArquivo:
-    description: "Extensao de arquivo aceita para um DocumentoExigido."
-    extends: null
-    fields:
-      extensao:
-        type: "string"
+      formatos:
+        type: "list:string"
         required: true
-        max_length: 20
-        description: "Extensao permitida (ex: PDF, DOCX, XLSX)."
+        description: "Extensoes de arquivo aceitas. Ex: PDF, DOCX, XLSX."
 
 relationships:
   # Fomento
@@ -905,11 +695,6 @@ relationships:
     cardinality: "N:1"
   # Captacao
   - from: "pre_award.captacao.Captacao"
-    relation: "possui edital"
-    to: "pre_award.captacao.Edital"
-    cardinality: "1:1"
-    description: "Edital com as regras da captacao — link externo e/ou arquivo anexado."
-  - from: "pre_award.captacao.Captacao"
     relation: "baseada em"
     to: "pre_award.captacao.Fomento"
     cardinality: "N:1"
@@ -920,11 +705,6 @@ relationships:
     cardinality: "N:N"
     description: "Faixas do Fomento selecionadas pelo AnalistaTecnico para esta captacao. Devem pertencer ao Fomento referenciado."
   - from: "pre_award.captacao.Captacao"
-    relation: "configurada por"
-    to: "pre_award.captacao.CronogramaCaptacao"
-    cardinality: "1:1"
-    description: "Cada captacao possui exatamente um cronograma com os 8 periodos obrigatorios."
-  - from: "pre_award.captacao.Captacao"
     relation: "define regra de submissao"
     to: "pre_award.captacao.RegraSubmissao"
     cardinality: "1:1"
@@ -933,46 +713,33 @@ relationships:
     to: "pre_award.captacao.ProponenteEscolhido"
     cardinality: "1:N"
   - from: "pre_award.captacao.Captacao"
-    relation: "define requisito proponente"
-    to: "pre_award.captacao.RequisitoProponente"
-    cardinality: "1:1"
-  - from: "pre_award.captacao.Captacao"
-    relation: "define regra de avaliacao"
-    to: "pre_award.captacao.RegraAvaliacao"
-    cardinality: "1:1"
-  - from: "pre_award.captacao.Captacao"
-    relation: "define prestacao exigida"
-    to: "pre_award.captacao.PrestacaoExigida"
-    cardinality: "1:1"
-  - from: "pre_award.captacao.Captacao"
-    relation: "pool de revisores"
-    to: "pre_award.captacao.RevisorAdHoc"
-    cardinality: "1:N"
-  - from: "pre_award.captacao.Captacao"
     relation: "documentos exigidos"
     to: "pre_award.captacao.DocumentoExigido"
     cardinality: "1:N"
-  - from: "pre_award.captacao.CronogramaCaptacao"
-    relation: "composta por"
+  - from: "pre_award.captacao.Captacao"
+    relation: "destinatario PJ"
+    to: "corporativo.instituicoes.Instituicao"
+    cardinality: "N:0..1"
+    description: "Instituicao destinataria quando tipoCaptacao=DEMANDA_INDUZIDA e tipoOutorgado=PESSOA_JURIDICA."
+  - from: "pre_award.captacao.Captacao"
+    relation: "contato destinatario PJ"
+    to: "shared.people.PessoaFisica"
+    cardinality: "N:0..1"
+    description: "Pessoa fisica de contato da instituicao destinataria."
+  - from: "pre_award.captacao.Captacao"
+    relation: "periodos cronograma"
     to: "pre_award.captacao.PeriodoCronograma"
     cardinality: "1:8"
-    description: "Exatamente 8 periodos obrigatorios, um por TipoPeriodo, em ordem sequencial."
+    description: "Exatamente 8 periodos formando cadeia via precede."
+  - from: "pre_award.captacao.PeriodoCronograma"
+    relation: "precede"
+    to: "pre_award.captacao.PeriodoCronograma"
+    cardinality: "1:0..1"
+    description: "Proximo periodo na sequencia. Nulo para RESULTADO_FINAL."
   - from: "pre_award.captacao.PeriodoCronograma"
     relation: "historico de adiamentos"
     to: "pre_award.captacao.AdiamentoPeriodoCronograma"
     cardinality: "1:N"
-  - from: "pre_award.captacao.RequisitoProponente"
-    relation: "instituicao direcionada"
-    to: "corporativo.instituicoes.Instituicao"
-    cardinality: "N:1"
-  - from: "pre_award.captacao.RequisitoProponente"
-    relation: "tipo de instituicao"
-    to: "corporativo.instituicoes.TipoInstituicao"
-    cardinality: "N:1"
-  - from: "pre_award.captacao.RequisitoProponente"
-    relation: "nivel academico minimo"
-    to: "corporativo.instituicoes.NivelAcademico"
-    cardinality: "N:1"
   - from: "pre_award.captacao.ProponenteEscolhido"
     relation: "instituicao autorizada"
     to: "corporativo.instituicoes.Instituicao"
@@ -981,24 +748,28 @@ relationships:
     relation: "pessoa autorizada"
     to: "shared.people.PessoaFisica"
     cardinality: "N:1"
-  - from: "pre_award.captacao.RevisorAdHoc"
-    relation: "e pessoa"
-    to: "shared.people.PessoaFisica"
-    cardinality: "N:1"
-  - from: "pre_award.captacao.OutorgadoDestinatario"
-    relation: "contato PJ"
-    to: "shared.people.PessoaFisica"
-    cardinality: "N:1"
-    description: "Pessoa fisica de contato quando OutorgadoDestinatario for pessoa juridica."
+  - from: "pre_award.captacao.RegraSubmissao"
+    relation: "instituicao direcionada"
+    to: "corporativo.instituicoes.Instituicao"
+    cardinality: "N:0..1"
+  - from: "pre_award.captacao.RegraSubmissao"
+    relation: "tipo instituicao"
+    to: "corporativo.instituicoes.TipoInstituicao"
+    cardinality: "N:0..1"
+  - from: "pre_award.captacao.RegraSubmissao"
+    relation: "nivel academico minimo"
+    to: "corporativo.instituicoes.NivelAcademico"
+    cardinality: "N:0..1"
   - from: "pre_award.captacao.DocumentoExigido"
-    relation: "formatos permitidos"
-    to: "pre_award.captacao.FormatoArquivo"
-    cardinality: "N:N"
+    relation: "tipo documento"
+    to: "shared.documents.TipoDocumento"
+    cardinality: "N:1"
+    description: "Ancora no catalogo compartilhado de tipos de documento."
 
 axioms:
   - id: "AX-M011-001"
     natural_language: "O cronograma deve conter os periodos obrigatorios antes da publicacao. Quando exigeAprovacaoInstitucional = true, a assinatura do ResponsavelInstitucional deve ocorrer dentro do periodo RECEBIMENTO_PROPOSTAS — nao ha periodo separado para aprovacao institucional."
-    formal_rule: "Captacao.estadoConfiguracao = PUBLICADO → periodosObrigatorios ⊆ CronogramaCaptacao.periodos ∧ (exigeAprovacaoInstitucional = true → assinaturaInstitucional.data <= RECEBIMENTO_PROPOSTAS.dataFim)"
+    formal_rule: "Captacao.estadoConfiguracao = PUBLICADO → periodosObrigatorios ⊆ Captacao.periodosCronograma ∧ (exigeAprovacaoInstitucional = true → assinaturaInstitucional.data <= RECEBIMENTO_PROPOSTAS.dataFim)"
   - id: "AX-M011-002"
     natural_language: "Um AporteFomento deve referenciar exatamente uma origem: Programa quando origemTipo = PROGRAMA, Parceria quando origemTipo = PARCERIA, ou recurso interno quando origemTipo = RECURSO_INTERNO."
     formal_rule: "(origemTipo = PROGRAMA → programa ≠ null ∧ parceria = null ∧ contaContabil = null) ∧ (origemTipo = PARCERIA → parceria ≠ null ∧ programa = null ∧ contaContabil = null) ∧ (origemTipo = RECURSO_INTERNO → contaContabil ≠ null ∧ programa = null ∧ parceria = null)"
@@ -1006,8 +777,8 @@ axioms:
     natural_language: "O valor financeiro total do Fomento e calculado pela soma dos valorAportado de todos os AporteFomento do fomento."
     formal_rule: "Fomento.valorTotal = ∑AporteFomento.valorAportado"
   - id: "AX-M011-004"
-    natural_language: "Quando tipoCaptacao = DEMANDA_INDUZIDA, o campo outorgadoDestinatario deve ser preenchido."
-    formal_rule: "Captacao.tipoCaptacao = DEMANDA_INDUZIDA → Captacao.outorgadoDestinatario ≠ null"
+    natural_language: "Quando tipoCaptacao = DEMANDA_INDUZIDA, deve existir exatamente um ProponenteEscolhido que identifica o destinatario: tipo=PESSOA para PESSOA_FISICA ou tipo=INSTITUICAO para PESSOA_JURIDICA."
+    formal_rule: "Captacao.tipoCaptacao = DEMANDA_INDUZIDA → |Captacao.proponentesEscolhidos| = 1 ∧ (tipoOutorgado = PESSOA_FISICA → proponentesEscolhidos[0].tipo = PESSOA) ∧ (tipoOutorgado = PESSOA_JURIDICA → proponentesEscolhidos[0].tipo = INSTITUICAO)"
   - id: "AX-M011-005"
     natural_language: "ProponenteEscolhido e usado somente quando RegraSubmissao.submissaoRestritaAEscolhidos = true."
     formal_rule: "∃ProponenteEscolhido → RegraSubmissao.submissaoRestritaAEscolhidos = true"
@@ -1016,7 +787,7 @@ axioms:
     formal_rule: "(tipo = INSTITUICAO → instituicao ≠ null ∧ pessoa = null) ∧ (tipo = PESSOA → pessoa ≠ null ∧ instituicao = null)"
   - id: "AX-M011-007"
     natural_language: "Um adiamento desloca todas as etapas posteriores pelo mesmo numero de dias."
-    formal_rule: "∀p_i: adiado → ∀p_j onde ordem(p_j) > ordem(p_i): p_j.dataInicio += dias ∧ p_j.dataFim += dias"
+    formal_rule: "∀p_i: adiado → ∀p_j alcancavel via cadeia precede a partir de p_i: p_j.dataInicio += dias ∧ p_j.dataFim += dias"
   - id: "AX-M011-008"
     natural_language: "RubricaPermitidaFaixa que representa subrubrica deve ter rubricaPai preenchido; rubrica raiz tem rubricaPai nulo."
     formal_rule: "(rubricaPai ≠ null → registro e subrubrica) ∧ (rubricaPai = null → registro e raiz)"
@@ -1040,10 +811,10 @@ axioms:
     formal_rule: "(Captacao.estadoConfiguracao = ENCERRADO ← (trigger = encerrar ∧ actor = AnalistaTecnico ∧ RESULTADO_FINAL.publicado = true) ∨ (trigger = expirar ∧ actor = Sistema ∧ hoje >= RESULTADO_FINAL.dataFim)) ∧ (Captacao.estadoConfiguracao = CANCELADO ← trigger = cancelar ∧ actor = GestorFAPES ∧ justificativa ≠ null)"
   - id: "AX-M011-033"
     natural_language: "A retomada de uma Captacao PAUSADO e bloqueada enquanto existir qualquer PeriodoCronograma futuro (nao concluido) com dataFim anterior a data de retomada. O GestorFAPES deve registrar AdiamentoPeriodoCronograma para cada periodo afetado antes de acionar a retomada. O sistema deve validar esta condicao e rejeitar a retomada se houver periodos expirados nao aditados."
-    formal_rule: "retomar(Captacao) → ∀p ∈ CronogramaCaptacao.periodos where nao_concluido(p): p.dataFim >= dataRetomada"
+    formal_rule: "retomar(Captacao) → ∀p ∈ Captacao.periodosCronograma where nao_concluido(p): p.dataFim >= dataRetomada"
   - id: "AX-M011-031"
-    natural_language: "Quando tipoCaptacao = DEMANDA_INDUZIDA, o tipoOutorgado da Captacao deve coincidir com o tipo do outorgadoDestinatario."
-    formal_rule: "tipoCaptacao = DEMANDA_INDUZIDA → tipoOutorgado = outorgadoDestinatario.tipo"
+    natural_language: "Quando tipoCaptacao = DEMANDA_INDUZIDA, o preenchimento dos campos de destinatario deve ser consistente com tipoOutorgado: PESSOA_FISICA requer destinatarioCpf e destinatarioNome; PESSOA_JURIDICA requer destinatarioPJ e contatoDestinatarioPJ."
+    formal_rule: "tipoCaptacao = DEMANDA_INDUZIDA → (tipoOutorgado = PESSOA_FISICA → destinatarioCpf ≠ null ∧ destinatarioNome ≠ null ∧ destinatarioPJ = null ∧ contatoDestinatarioPJ = null) ∧ (tipoOutorgado = PESSOA_JURIDICA → destinatarioPJ ≠ null ∧ contatoDestinatarioPJ ≠ null ∧ destinatarioCpf = null ∧ destinatarioNome = null)"
   - id: "AX-M011-029"
     natural_language: "Todas as faixas selecionadas em uma Captacao devem pertencer ao Fomento referenciado por essa Captacao."
     formal_rule: "∀f ∈ Captacao.faixasSelecionadas: f ∈ Captacao.fomento.faixas"
@@ -1051,11 +822,11 @@ axioms:
     natural_language: "Uma Captacao deve selecionar ao menos uma faixa do Fomento."
     formal_rule: "|Captacao.faixasSelecionadas| >= 1"
   - id: "AX-M011-013"
-    natural_language: "OutorgadoDestinatario do tipo PESSOA_FISICA deve ter cpf e nome preenchidos; cnpj, razaoSocial e contatoPF devem ser nulos."
-    formal_rule: "(tipo = PESSOA_FISICA → cpf ≠ null ∧ nome ≠ null ∧ cnpj = null ∧ razaoSocial = null ∧ contatoPF = null)"
+    natural_language: "Quando tipoCaptacao=DEMANDA_INDUZIDA e tipoOutorgado=PESSOA_FISICA, destinatarioCpf e destinatarioNome devem ser preenchidos; destinatarioPJ e contatoDestinatarioPJ devem ser nulos."
+    formal_rule: "(tipoCaptacao = DEMANDA_INDUZIDA ∧ tipoOutorgado = PESSOA_FISICA → destinatarioCpf ≠ null ∧ destinatarioNome ≠ null ∧ destinatarioPJ = null ∧ contatoDestinatarioPJ = null)"
   - id: "AX-M011-014"
-    natural_language: "OutorgadoDestinatario do tipo PESSOA_JURIDICA deve ter cnpj, razaoSocial e contatoPF preenchidos; cpf e nome devem ser nulos."
-    formal_rule: "(tipo = PESSOA_JURIDICA → cnpj ≠ null ∧ razaoSocial ≠ null ∧ contatoPF ≠ null ∧ cpf = null ∧ nome = null)"
+    natural_language: "Quando tipoCaptacao=DEMANDA_INDUZIDA e tipoOutorgado=PESSOA_JURIDICA, destinatarioPJ e contatoDestinatarioPJ devem ser preenchidos; destinatarioCpf e destinatarioNome devem ser nulos."
+    formal_rule: "(tipoCaptacao = DEMANDA_INDUZIDA ∧ tipoOutorgado = PESSOA_JURIDICA → destinatarioPJ ≠ null ∧ contatoDestinatarioPJ ≠ null ∧ destinatarioCpf = null ∧ destinatarioNome = null)"
   - id: "AX-M011-016"
     natural_language: "Cada Fomento deve ter ao menos um tipo de projeto associado."
     formal_rule: "|Fomento.tiposProjeto| >= 1"
@@ -1085,7 +856,7 @@ axioms:
     formal_rule: "(AporteFomento.isAditivo = true ∨ AporteFomento.origemTipo = RECURSO_INTERNO) → justificativa ≠ null"
   - id: "AX-M011-017"
     natural_language: "O cronograma de uma Captacao nao pode ter datas fora da vigencia do Fomento referenciado. A data do primeiro periodo deve ser >= Fomento.dataInicio e a data do ultimo periodo deve ser <= Fomento.dataFim."
-    formal_rule: "∀p ∈ CronogramaCaptacao.periodos: p.dataInicio >= Fomento.dataInicio ∧ p.dataFim <= Fomento.dataFim"
+    formal_rule: "∀p ∈ Captacao.periodosCronograma: p.dataInicio >= Fomento.dataInicio ∧ p.dataFim <= Fomento.dataFim"
   - id: "AX-M011-018"
     natural_language: "Projetos gerados por uma Captacao nao podem ter data de inicio anterior a Fomento.dataInicio nem data de fim posterior a Fomento.dataFim."
     formal_rule: "Projeto.dataInicio >= Fomento.dataInicio ∧ Projeto.dataFim <= Fomento.dataFim"
@@ -1103,12 +874,9 @@ invariants:
   - id: "INV-M011-004"
     rule: "Faixa.nome != null"
     description: "Uma faixa deve possuir nome."
-  - id: "INV-M011-005"
-    rule: "RegraAvaliacao.quantidadeMinimaRevisores >= 0"
-    description: "A quantidade minima de revisores nao pode ser negativa."
   - id: "INV-M011-006"
-    rule: "Captacao.estadoConfiguracao = PUBLICADO → Captacao.edital ≠ null ∧ (Captacao.edital.link ≠ null ∨ Captacao.edital.urlArquivo ≠ null)"
-    description: "Uma captacao publicada deve ter edital com ao menos um link externo ou arquivo anexado."
+    rule: "Captacao.estadoConfiguracao = PUBLICADO → (Captacao.editalLink ≠ null ∨ Captacao.editalNomeArquivo ≠ null)"
+    description: "Uma captacao publicada deve ter ao menos editalLink ou editalNomeArquivo preenchido."
   - id: "INV-M011-007"
     rule: "(RubricaPermitidaFaixa.percentualMinimo = null ∨ (RubricaPermitidaFaixa.percentualMinimo >= 0 ∧ RubricaPermitidaFaixa.percentualMinimo <= 100)) ∧ (RubricaPermitidaFaixa.percentualMaximo = null ∨ (RubricaPermitidaFaixa.percentualMaximo >= 0 ∧ RubricaPermitidaFaixa.percentualMaximo <= 100))"
     description: "Os percentuais de rubrica, quando informados, devem estar entre 0 e 100."
@@ -1374,11 +1142,10 @@ policies:
         - visualizar Fomento
         - visualizar Captacao
         - encerrar Captacao PUBLICADO apos publicacao do resultado final
-        - configurar CronogramaCaptacao
+        - configurar PeriodoCronograma
         - configurar RubricaPermitidaFaixa
         - configurar BolsaPermitidaFaixa
         - configurar DocumentoExigido
-        - adicionar RevisorAdHoc
         - registrar AdiamentoPeriodoCronograma
         - conferir DocumentacaoProposta
         - habilitar Proposta
@@ -1415,18 +1182,17 @@ agent_instructions:
     - "Faixa pertence ao Fomento, nao a Captacao — rubricas e bolsas sao configuradas por faixa."
     - "BolsaPermitidaFaixa so pode ser configurada em faixa com RubricaPermitidaFaixa do tipo Bolsa (AX-M011-009)."
     - "RubricaPermitidaFaixa: rubricaPai = null indica raiz; rubricaPai preenchido indica subrubrica (AX-M011-008)."
-    - "CronogramaCaptacao deve sempre conter exatamente 8 PeriodoCronograma, um por TipoPeriodo, antes da publicacao (AX-M011-001)."
+    - "Captacao.periodosCronograma deve conter exatamente 8 PeriodoCronograma, um por TipoPeriodo, antes da publicacao (AX-M011-001)."
     - "Ordem dos TipoPeriodo obrigatoria: PUBLICACAO_CAPTACAO → RECEBIMENTO_PROPOSTAS → AVALIACAO_DOCUMENTAL → AVALIACAO_AD_HOC → RESULTADO_PRELIMINAR → RECEBIMENTO_REVISAO → RESULTADO_APOS_REVISAO → RESULTADO_FINAL."
     - "AdiamentoPeriodoCronograma deve deslocar todas as etapas posteriores pelo mesmo numero de dias (AX-M011-007)."
-    - "OutorgadoDestinatario tipo PESSOA_FISICA: apenas cpf+nome; tipo PESSOA_JURIDICA: cnpj+razaoSocial+contatoPF (AX-M011-013 e AX-M011-014)."
+    - "Destinatario DEMANDA_INDUZIDA: tipoOutorgado=PESSOA_FISICA requer destinatarioCpf+destinatarioNome; tipoOutorgado=PESSOA_JURIDICA requer destinatarioPJ+contatoDestinatarioPJ (AX-M011-013 e AX-M011-014)."
     - "ProponenteEscolhido so e valido quando RegraSubmissao.submissaoRestritaAEscolhidos = true (AX-M011-005)."
     - "EixoEstrategico, Programa, Parceria, AreaTecnica, TipoProjeto, Instituicao, TipoInstituicao, NivelAcademico, PessoaFisica e Rubrica sao referencias externas — nao modelar aqui."
-    - "Formularios (FormularioSubmissaoRef, FormularioAvaliacaoRef, FormularioRevisaoRef, FormularioAnexoRef) sao referencias ao M021 — apenas formularioId e versaoFormularioId."
+    - "Formularios (formularioSubmissao, formularioAvaliacao, formularioRevisao, formularioAnexo) usam FormularioRef — referencia unica ao M021 com formularioId e versaoFormularioId."
     - "M011 termina no ResultadoFinal. Assinatura do termo de outorga e contratacao pertencem ao M022."
     - "Captacao PAUSADO bloqueia todas as operacoes do processo de selecao (submissao, parecer, avanco de cronograma). Ao retomar, o GestorFAPES deve avaliar se as datas dos PeriodoCronograma ainda sao validas e, se necessario, registrar AdiamentoPeriodoCronograma antes de retomar (AX-M011-032)."
     - "DOACI (RUB-DOACI): percentualMaximo na RubricaPermitidaFaixa e o teto do edital — nao pode superar a tabela normativa (Resolucao CCAF no 309/2022, item 2.4.8.1) para o contexto da faixa (AX-M011-011)."
   notes:
-    - "CategoriaProjeto e gerenciada dentro deste modulo e permite selecao multipla no cadastro da captacao."
-    - "OutorgadoDestinatario e um registro desnormalizado — captura o destinatario da demanda induzida no momento da configuracao. Para PJ, o contatoPF e a referencia viva ao M008."
+    - "Destinatario DEMANDA_INDUZIDA e capturado diretamente em Captacao via campos destinatarioCpf/destinatarioNome (PF) ou destinatarioPJ/contatoDestinatarioPJ (PJ). Nao existe mais entidade OutorgadoDestinatario."
     - "Tabela DOACI normativa (Resolucao CCAF no 309/2022, 2.4.8.1): ate R$50k=15%; R$50k-R$100k=10%; R$100k-R$150k=5%; R$150k-R$300k=3%; R$300k-R$500k=1%; acima R$500k=0.5%. Base de calculo: valor total aprovado excluindo bolsas."
-    - "Duvida em aberto: validar se todo comprovante deve ser DocumentoExigido ou se parte deles deve ser derivada de RequisitoProponente como evidencia documental de um requisito."
+    - "Requisitos do proponente (direcionamento, vinculo, gestor institucional, nivel academico) estao em RegraSubmissao — nao existe mais entidade RequisitoProponente separada."
