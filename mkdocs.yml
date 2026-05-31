@@ -384,9 +384,12 @@ nav:
           - Backlog: implementation/modules/M011-configuracao-captacao/backlog.md
           - Contrato: implementation/modules/M011-configuracao-captacao/contrato.md
           - Contrato API: implementation/modules/M011-configuracao-captacao/contrato-api.md
-          - Modelo Estrutural: implementation/modules/M011-configuracao-captacao/modelo-estrutural.md
-          - Modelo Estrutural por Processo: implementation/modules/M011-configuracao-captacao/modelo-estrutural-por-processo.md
-          - Class Diagram: implementation/modules/M011-configuracao-captacao/classdiagram.md
+          - Modelo Estrutural:
+              - implementation/modules/M011-configuracao-captacao/modelo-estrutural/modelo-estrutural.md
+              - Class Diagram: implementation/modules/M011-configuracao-captacao/modelo-estrutural/classdiagram.md
+              - P1 Fomento: implementation/modules/M011-configuracao-captacao/modelo-estrutural/modelo-estrutural-p1-fomento.md
+              - P2 Configuracao da Selecao: implementation/modules/M011-configuracao-captacao/modelo-estrutural/modelo-estrutural-p2-configuracao-selecao.md
+              - P3 Selecao dos Projetos: implementation/modules/M011-configuracao-captacao/modelo-estrutural/modelo-estrutural-p3-selecao-projetos.md
           - Modelo Comportamental: implementation/modules/M011-configuracao-captacao/modelo-comportamental.md
           - Epics:
               - EPIC-001: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-001.md
