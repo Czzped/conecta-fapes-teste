@@ -65,7 +65,9 @@ flowchart TD
     end
 
     subgraph RevisorAdHoc[RevisorAdHoc]
-        J[Registrar parecer, nota e recomendacao]
+        J{Aceita avaliar?}
+        J1[Registrar parecer, nota e recomendacao]
+        J2[Recusar com justificativa]
     end
 
     A1 --> D --> D1
@@ -75,7 +77,12 @@ flowchart TD
     D1 -->|Nao| D3
     D3 --> E --> F --> G
     G -->|Nao| H
-    G -->|Sim| I --> J --> K --> L --> M --> N --> O
+    G -->|Sim| I --> J
+    J -->|Sim| J1 --> K
+    J -->|Nao| J2 --> I2[Redistribuir a outro revisor]
+    I2 --> J
+    J3[Marcar NAO_RESPONDEU e redistribuir] --> I2
+    K --> L --> M --> N --> O
     O -->|Sim| P --> Q --> S
     O -->|Nao| R --> S
     S --> T
@@ -94,8 +101,10 @@ flowchart TD
 | 5 | Submeter proposta formalmente | Proponente | Proposta e submetida ao sistema. Quando exigida, so pode ser submetida apos assinatura institucional. |
 | 6 | Encerrar periodo de recebimento | AnalistaTecnico | Ao atingir a data final, nenhuma nova proposta e aceita. Propostas sem assinatura institucional sao descartadas quando exigido. |
 | 7 | Analisar documentacao | AnalistaTecnico | Confere a documentacao enviada por cada proponente e habilita ou inabilita a proposta. Inabilitacao requer justificativa. |
-| 8 | Distribuir propostas aos revisores | AnalistaTecnico | Propostas habilitadas sao distribuidas ao pool de revisores ad hoc conforme regras de distribuicao configuradas. |
-| 9 | Registrar parecer e nota | RevisorAdHoc | Cada revisor registra parecer, nota e recomendacao de merito para as propostas distribuidas, dentro do periodo de analise de merito. |
+| 8 | Distribuir propostas aos revisores | AnalistaTecnico | Seleciona revisores do pool configurado no P2 e distribui projetos habilitados, definindo um prazo de resposta (`dataLimiteResposta`) para cada distribuicao. Um projeto pode ser distribuido a mais de um revisor. |
+| 8b | Aceitar ou recusar avaliacao | RevisorAdHoc | Revisor aceita a distribuicao e registra parecer, ou recusa informando justificativa obrigatoria. A recusa devolve o projeto ao AnalistaTecnico para redistribuicao. |
+| 8c | Tratar nao resposta | AnalistaTecnico | Quando um revisor nao responde ate o `dataLimiteResposta`, o AnalistaTecnico marca a distribuicao como `NAO_RESPONDEU` e pode redistribuir o projeto a outro revisor do pool. Nao e exigida justificativa — a nao resposta e o proprio motivo. |
+| 9 | Registrar parecer e nota | RevisorAdHoc | Revisor que aceitou registra parecer, nota e recomendacao de merito, respondendo o formulario de avaliacao do M021. Snapshot imutavel gerado no momento do registro. |
 | 10 | Consolidar pareceres | AnalistaTecnico | Reune pareceres e notas de todos os revisores por proposta. |
 | 11 | Classificar propostas | AnalistaTecnico | Ordena propostas habilitadas com base nas notas consolidadas. |
 | 12 | Publicar resultado preliminar | AnalistaTecnico | Classificacao preliminar fica disponivel aos proponentes. |
@@ -103,6 +112,41 @@ flowchart TD
 | 14 | Analisar revisoes | AnalistaTecnico | Confere admissibilidade e reavalia o ponto questionado. Atualiza classificacao quando pertinente ou mantem sem alteracao. |
 | 15 | Publicar resultado apos revisao | AnalistaTecnico | Decisoes sobre recursos e eventuais ajustes de classificacao ficam disponiveis. |
 | 16 | Publicar resultado final | AnalistaTecnico | Resultado final publicado. Processo de selecao encerrado no M011. Propostas aprovadas disponibilizadas para o M022. |
+
+---
+
+## Subprocesso: Distribuicao e Gestao de Avaliadores Ad Hoc
+
+```mermaid
+flowchart TD
+    subgraph AnalistaTecnico[AnalistaTecnico]
+        A[Selecionar revisor do pool]
+        B[Registrar DistribuicaoAvaliacao com dataLimiteResposta]
+        F{Revisor respondeu ate o prazo?}
+        G[Marcar NAO_RESPONDEU]
+        H[Selecionar outro revisor do pool]
+    end
+
+    subgraph RevisorAdHoc[RevisorAdHoc]
+        C{Aceita avaliar?}
+        D[Registrar parecer, nota e respostasFormulario]
+        E[Recusar com justificativa obrigatoria]
+    end
+
+    A --> B --> C
+    C -->|Sim| D --> FIM[DistribuicaoAvaliacao AVALIADA]
+    C -->|Nao| E --> G2[DistribuicaoAvaliacao RECUSADA] --> H --> A
+    F -->|Nao| G --> G3[DistribuicaoAvaliacao NAO_RESPONDEU] --> H
+    B --> F
+```
+
+| # | Atividade | Responsavel | Descricao |
+|---|-----------|-------------|-----------|
+| 1 | Selecionar revisor | AnalistaTecnico | Escolhe revisor do pool configurado no P2; verifica ausencia de conflito de interesses com a instituicao do proponente. |
+| 2 | Registrar distribuicao | AnalistaTecnico | Cria `DistribuicaoAvaliacao` com estado `DISTRIBUIDA` e define `dataLimiteResposta`. |
+| 3 | Aceitar ou recusar | RevisorAdHoc | Revisor aceita e registra parecer, ou recusa informando justificativa — transicao para `AVALIADA` ou `RECUSADA`. |
+| 4 | Tratar nao resposta | AnalistaTecnico | Apos `dataLimiteResposta`, AnalistaTecnico marca `NAO_RESPONDEU` e redistribui a outro revisor. Sem exigencia de justificativa. |
+| 5 | Redistribuir | AnalistaTecnico | Seleciona novo revisor do pool para substituir o que recusou ou nao respondeu. Distribuicao anterior permanece no historico. |
 
 ---
 
@@ -247,6 +291,12 @@ stateDiagram-v2
 | RN-SP04 | ResponsavelInstitucional | A assinatura institucional deve ocorrer dentro do periodo de submissao. Recusa deve ter justificativa e devolve a proposta ao proponente. |
 | RN-SP05 | AnalistaTecnico | Somente propostas com documentacao habilitada seguem para analise de merito. Inabilitacao requer justificativa. |
 | RN-SP06 | RevisorAdHoc | Revisores somente podem registrar pareceres dentro do periodo de analise de merito. |
+| RN-SP18 | AnalistaTecnico | O AnalistaTecnico seleciona os revisores do pool configurado no P2 e distribui projetos com prazo de resposta (`dataLimiteResposta`). |
+| RN-SP19 | AnalistaTecnico | Um projeto pode ser distribuido a um ou mais revisores. Cada distribuicao gera um registro independente de `DistribuicaoAvaliacao`. |
+| RN-SP20 | RevisorAdHoc | Um revisor pode recusar avaliar um projeto informando justificativa obrigatoria. A distribuicao transiciona para `RECUSADA`. |
+| RN-SP21 | AnalistaTecnico | Apos recusa, o AnalistaTecnico pode redistribuir o projeto a outro revisor. A distribuicao recusada permanece no historico. |
+| RN-SP22 | Sistema | Um revisor nao pode avaliar projetos de sua propria instituicao (conflito de interesses). |
+| RN-SP23 | AnalistaTecnico | Quando um revisor nao responde ate o `dataLimiteResposta`, o AnalistaTecnico marca `NAO_RESPONDEU` e pode redistribuir. Nao e exigida justificativa. |
 | RN-SP07 | AnalistaTecnico | O resultado preliminar deve ser publicado antes do inicio do periodo de recursos. |
 | RN-SP08 | Proponente | Solicitacoes de revisao somente podem ser enviadas dentro do periodo de recursos. |
 | RN-SP09 | AnalistaTecnico | O resultado final somente pode ser publicado apos o encerramento e analise de todas as revisoes admissiveis. |
