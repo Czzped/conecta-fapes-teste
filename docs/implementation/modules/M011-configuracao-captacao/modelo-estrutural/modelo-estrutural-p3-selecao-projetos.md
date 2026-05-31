@@ -129,8 +129,8 @@ classDiagram
         <<externo M008>>
     }
 
-    class RevisorAdHoc {
-        <<P2>>
+    class PessoaFisica {
+        <<shared>>
     }
 
     class PeriodoCronograma {
@@ -167,7 +167,7 @@ classDiagram
     Projeto "1" --> "*" RevisaoResultado : revisoes
 
     AssinaturaInstitucional "*" --> "1" ResponsavelInstitucional : responsavel
-    DistribuicaoAvaliacao "*" --> "1" RevisorAdHoc : revisor
+    DistribuicaoAvaliacao "*" --> "1" PessoaFisica : revisor ad hoc
     DistribuicaoAvaliacao "1" --> "0..1" AvaliacaoAdHoc : parecer
     AvaliacaoAdHoc "*" --> "1" FormularioAvaliacaoRef : formulario
     RevisaoResultado "*" --> "1" FormularioRevisaoRef : formulario
@@ -199,7 +199,7 @@ classDiagram
 | | estado | Estado da distribuicao | Sim | EstadoDistribuicao | DISTRIBUIDA, RECUSADA, NAO_RESPONDEU, AVALIADA, CANCELADA | | |
 | | justificativaRecusa | Motivo informado pelo revisor ao recusar | Cond. | String | Obrigatoria quando estado=RECUSADA | 500 | |
 | | dataRecusa | Data em que o revisor registrou a recusa | Cond. | Date | | | |
-| | revisor (relacao) | Revisor ad hoc selecionado pelo AnalistaTecnico do pool configurado no P2 | Sim | FK → RevisorAdHoc | Do pool configurado no P2 | | |
+| | revisor (relacao) | Pessoa fisica que atua como revisor ad hoc; selecionada do pool configurado no P2 | Sim | FK → PessoaFisica | Via shared.people | | |
 | **AvaliacaoAdHoc** | nota | Nota atribuida pelo revisor a proposta | Sim | Decimal | >= 0 | | |
 | | parecer | Texto do parecer tecnico do revisor | Sim | String | | 3000 | |
 | | recomendacao | Recomendacao do revisor sobre a proposta | Sim | String | Ex: Aprovada, Reprovada, Aprovada com ressalvas | 200 | |
