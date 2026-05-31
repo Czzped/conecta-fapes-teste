@@ -293,10 +293,8 @@ nav:
                   - Visao Geral: implementation/modules/M008-cadastros-corporativos/pessoas/README.md
                   - Backlog: implementation/modules/M008-cadastros-corporativos/pessoas/backlog.md
                   - Modelo Estrutural: implementation/modules/M008-cadastros-corporativos/pessoas/modelo-estrutural.md
-                  - PessoaFisica: implementation/modules/M008-cadastros-corporativos/pessoas/pessoa-fisica/README.md
-                  - NivelAcademico: implementation/modules/M008-cadastros-corporativos/pessoas/nivel-academico/README.md
-                  - HistoricoPessoa: implementation/modules/M008-cadastros-corporativos/pessoas/historico-pessoa/README.md
                   - EPIC-001: implementation/modules/M008-cadastros-corporativos/pessoas/epics/EPIC-M008-001.md
+                  - EPIC-007: implementation/modules/M008-cadastros-corporativos/pessoas/epics/EPIC-M008-007.md
               - Instituicoes:
                   - Visao Geral: implementation/modules/M008-cadastros-corporativos/instituicoes/README.md
                   - Backlog: implementation/modules/M008-cadastros-corporativos/instituicoes/backlog.md
@@ -383,6 +381,8 @@ nav:
           - Contrato: implementation/modules/M011-configuracao-captacao/contrato.md
           - Contrato API: implementation/modules/M011-configuracao-captacao/contrato-api.md
           - Modelo Estrutural: implementation/modules/M011-configuracao-captacao/modelo-estrutural.md
+          - Modelo Estrutural por Processo: implementation/modules/M011-configuracao-captacao/modelo-estrutural-por-processo.md
+          - Class Diagram: implementation/modules/M011-configuracao-captacao/classdiagram.md
           - Modelo Comportamental: implementation/modules/M011-configuracao-captacao/modelo-comportamental.md
           - Analise Prototipo: implementation/modules/M011-configuracao-captacao/specifications/analise-prototipo-captacao.md
           - EPIC-001: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-001.md
@@ -393,6 +393,8 @@ nav:
           - EPIC-006: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-006.md
           - EPIC-007: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-007.md
           - EPIC-008 Rubricas Permitidas: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-008.md
+          - EPIC-009: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-009.md
+          - EPIC-010: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-010.md
       - M012 Acompanhamento e Resultados:
           - implementation/modules/M012-acompanhamento-resultados/README.md
           - Backlog: implementation/modules/M012-acompanhamento-resultados/backlog.md

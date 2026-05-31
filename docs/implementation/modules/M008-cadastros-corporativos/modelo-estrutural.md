@@ -20,7 +20,7 @@ Para facilitar a leitura, o modelo esta dividido em contextos de negocio. Cada c
 
 | Contexto | Entidades |
 |----------|-----------|
-| [Pessoas](pessoas/README.md) | [PessoaFisica](pessoas/pessoa-fisica/README.md), [NivelAcademico](pessoas/nivel-academico/README.md), [HistoricoPessoa](pessoas/historico-pessoa/README.md) |
+| [Pessoas](pessoas/README.md) | PessoaFisica, NivelAcademico, HistoricoPessoa, ResponsavelLegal |
 | [Instituicoes](instituicoes/README.md) | Instituicao, UnidadeOrganizacional, TipoInstituicao, Responsavel |
 | [Diarias](diarias/README.md) | Abrangencia, TipoDiaria, ParametroCalculoDiaria |
 | [Rubricas](rubricas/README.md) | [Rubrica](rubricas/rubrica/README.md) |

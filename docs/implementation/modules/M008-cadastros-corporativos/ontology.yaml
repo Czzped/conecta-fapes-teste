@@ -18,7 +18,8 @@ submodules:
       - PessoaFisica
       - NivelAcademico
       - HistoricoPessoa
-    description: "Cadastro de individuos, titulacao academica e auditoria de eventos."
+      - ResponsavelLegal
+    description: "Cadastro de individuos, titulacao academica, auditoria de eventos e papeis de responsabilidade legal sobre menores de idade."
     todo: "pessoas.yaml nao gerado nesta rodada — fora do escopo solicitado."
 
   - context: "Instituicoes"
@@ -70,7 +71,23 @@ submodules:
 
 entities: {}
 relationships: []
-axioms: []
+axioms:
+  - id: "AX-PESSOAS-001"
+    context: "Pessoas"
+    label: "Menor de idade exige responsavel legal vigente"
+    statement: >
+      Toda PessoaFisica cuja idade seja inferior a 18 anos na data de cadastro ou de qualquer operacao
+      que exija assinatura deve possuir exatamente um ResponsavelLegal vigente, vinculando-a a
+      outra PessoaFisica cadastrada, ativa e maior de idade.
+    formal: "∀ p: PessoaFisica | idade(p) < 18 → ∃! r: ResponsavelLegal | r.menor = p ∧ r.ativo = true ∧ idade(r.responsavel) ≥ 18"
+    invariants:
+      - "r.responsavel ≠ r.menor (auto-referencia proibida)"
+      - "r.responsavel.estado = ATIVA"
+      - "r.responsavel nao pode ser ele proprio menor de idade"
+    triggers:
+      - "Submissao de documentos de bolsa (4.5.2)"
+      - "Assinatura de qualquer documento via E-Docs"
+      - "Cadastro de PessoaFisica com dataNascimento resultando em idade < 18"
 invariants: []
 enums: {}
 value_objects: {}

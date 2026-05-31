@@ -25,11 +25,11 @@ M024 nao redefine entidades canonicas de outros modulos. As entidades abaixo sao
 
 | Entidade canonica | Modulo | Onde aparece em M024 | Forma de referencia |
 |-------------------|--------|----------------------|---------------------|
-| [PessoaFisica](../M008-cadastros-corporativos/pessoas/pessoa-fisica/README.md) | M008 | Raiz da vinculacao do curriculo; tambem em `Orientacao.orientando` e `Artigo.autores` | Relacao 1:1 com `Curriculo`; relacoes N:N/N:1 em producoes e orientacoes |
+| [PessoaFisica](../M008-cadastros-corporativos/pessoas/modelo-estrutural.md) | M008 | Raiz da vinculacao do curriculo; tambem em `Orientacao.orientando` e `Artigo.autores` | Relacao 1:1 com `Curriculo`; relacoes N:N/N:1 em producoes e orientacoes |
 | [Instituicao](../M008-cadastros-corporativos/instituicoes/README.md) | M008 | `FormacaoAcademica.instituicao`, `Orientacao.instituicao`, `Projeto.financiador`, `Premio.entidade`, `Livro.editora` | M024 associa instituicoes canonicas durante a persistencia do snapshot; nomes vindos do Lattes sem correspondencia seguem para reconciliacao/match-or-create conforme politica de M008 |
 | [AreaConhecimento](../M008-cadastros-corporativos/classificacoes/area-conhecimento/README.md) | M008 §1.3.6 | `FormacaoAcademica.areaConhecimento`, `Curriculo.areasDeAtuacao` | Cadastro canonico CNPq; areas nao mapeadas vao para log de discrepancia |
 | [Cidade](../M008-cadastros-corporativos/geografia/cidade/README.md) | M008 §1.3.4 | `ParticipacaoEvento.local` | M024 associa cidade canonica durante a persistencia do snapshot; locais sem correspondencia seguem politica de reconciliacao/match-or-create de M008 |
-| [NivelAcademico](../M008-cadastros-corporativos/pessoas/nivel-academico/README.md) | M008 | Derivado de `FormacaoAcademica.nivel` mais alto concluido | M024 solicita atualizacao de `PessoaFisica.nivelAcademico` apos sincronizacao |
+| [NivelAcademico](../M008-cadastros-corporativos/pessoas/modelo-estrutural.md) | M008 | Derivado de `FormacaoAcademica.nivel` mais alto concluido | M024 solicita atualizacao de `PessoaFisica.nivelAcademico` apos sincronizacao |
 | [Documento](../M008-cadastros-corporativos/README.md) | M008 | XML bruto do Lattes quando fonte for upload manual | Arquivado em M008.Documento para auditoria |
 | [Pesquisador (persona)](../../../discovery/personas.md) | Discovery | Flag derivado em `PessoaFisica` quando existe `Curriculo` | Nao e entidade propria -- ver [README.md#dominio](README.md#dominio) |
 

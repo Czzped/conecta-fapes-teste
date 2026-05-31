@@ -46,7 +46,7 @@ classDiagram
 
 | Relacao | Cardinalidade | Descricao |
 |---------|----------------|-----------|
-| titular | 1 | [M008 PessoaFisica](../../M008-cadastros-corporativos/pessoas/pessoa-fisica/README.md) titular do curriculo |
+| titular | 1 | [M008 PessoaFisica](../../M008-cadastros-corporativos/pessoas/modelo-estrutural.md) titular do curriculo |
 | areasDeAtuacao | 0..* | [M008 AreaConhecimento](../../M008-cadastros-corporativos/classificacoes/area-conhecimento/README.md) associadas ao curriculo |
 
 ## Regras

@@ -54,7 +54,7 @@ classDiagram
 |---------|----------------|-----------|
 | curriculos | 0..* | `Curriculo` em que o artigo aparece como producao do pesquisador titular |
 | periodico | 1 | `Periodico` que publicou o artigo |
-| autores | 1..* | [M008 PessoaFisica](../../M008-cadastros-corporativos/pessoas/pessoa-fisica/README.md) dos autores/coautores, com match best-effort |
+| autores | 1..* | [M008 PessoaFisica](../../M008-cadastros-corporativos/pessoas/modelo-estrutural.md) dos autores/coautores, com match best-effort |
 
 ## Regras
 

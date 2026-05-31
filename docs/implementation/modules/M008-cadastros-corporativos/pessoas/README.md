@@ -6,6 +6,7 @@ Agrupa os cadastros corporativos de pessoas naturais, titulacao e historico cada
 
 | Entidade | Responsabilidade |
 |----------|------------------|
-| [PessoaFisica](pessoa-fisica/README.md) | Cadastro canonico de individuos identificados por CPF |
-| [NivelAcademico](nivel-academico/README.md) | Tabela corporativa de niveis academicos |
-| [HistoricoPessoa](historico-pessoa/README.md) | Linha de auditoria/evento do ciclo de vida da pessoa |
+| PessoaFisica | Cadastro canonico de individuos identificados por CPF |
+| NivelAcademico | Tabela corporativa de niveis academicos |
+| HistoricoPessoa | Linha de auditoria/evento do ciclo de vida da pessoa |
+| ResponsavelLegal | Vinculo de responsabilidade legal sobre menor de idade |

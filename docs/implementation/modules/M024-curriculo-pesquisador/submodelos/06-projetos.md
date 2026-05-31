@@ -80,7 +80,7 @@ classDiagram
 |---------|----------------|-----------|
 | participacoes | 0..* | Participacoes do curriculo em projetos academicos |
 | projeto | 1 | `Projeto` compartilhado ao qual a participacao se refere |
-| participante | 1 | [M008 PessoaFisica](../../M008-cadastros-corporativos/pessoas/pessoa-fisica/README.md) que exerce o papel no projeto; normalmente a titular do curriculo |
+| participante | 1 | [M008 PessoaFisica](../../M008-cadastros-corporativos/pessoas/modelo-estrutural.md) que exerce o papel no projeto; normalmente a titular do curriculo |
 | tipo | 1 | `TipoProjeto` -- cadastro local de tipos |
 | financiador | 0..1 | [M008 Instituicao](../../M008-cadastros-corporativos/instituicoes/README.md) financiadora, quando declarada no Lattes |
 

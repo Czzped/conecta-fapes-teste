@@ -65,7 +65,7 @@ classDiagram
 |---------|----------------|-----------|
 | curriculo | 1 | `Curriculo` ao qual a orientacao pertence |
 | nivel | 1 | `NivelOrientacao` -- cadastro local de niveis |
-| orientando | 1 | [M008 PessoaFisica](../../M008-cadastros-corporativos/pessoas/pessoa-fisica/README.md) do orientando |
+| orientando | 1 | [M008 PessoaFisica](../../M008-cadastros-corporativos/pessoas/modelo-estrutural.md) do orientando |
 | instituicao | 1 | [M008 Instituicao](../../M008-cadastros-corporativos/instituicoes/README.md) onde a orientacao ocorre |
 
 ## Regras
