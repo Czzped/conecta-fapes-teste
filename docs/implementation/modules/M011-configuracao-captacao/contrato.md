@@ -30,25 +30,17 @@ Este contrato documenta a superficie publica do modulo M011 como contexto de con
 
 | Nome da Operacao | Tipo | Objetivo | Entrada | Saida | Regras relacionadas | Pre-condicoes | Recusas/erros | Idempotencia | Autorizacao | Mapeamento de transporte |
 |------------------|------|----------|---------|-------|---------------------|---------------|---------------|--------------|-------------|--------------------------|
-| ConfigurarCronogramaDaCaptacao | Command | Registrar ou versionar periodos do cronograma da captacao (exige exatamente 8 periodos, um de cada TipoPeriodo) | captacao, periodos, versao | `CronogramaCaptacao` persistido | RN01, RN05, RN09, AX-M011-001 | Configuracao de captacao existente | Sequencia de datas invalida, captacao nao encontrada, quantidade de periodos diferente de 8 | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| AdiarEtapaCronogramaDaCaptacao | Command | Registrar adiamento de uma etapa e deslocar etapas posteriores (AX-M011-007: cascateia para todos os periodos subsequentes) | captacao, tipoPeriodo, dias, justificativa | `AdiamentoPeriodoCronograma` registrado e cronograma atualizado | RN28, RN29, AX-M011-007 | Cronograma existente; periodo existente | Dias invalidos (<=0), justificativa ausente, sequencia invalida | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| SelecionarFormularioSubmissao | Command | Selecionar versao publicada do formulario de submissao no M021 | captacao, formularioId, versaoFormularioId | `FormularioSubmissaoRef` selecionado | RN06, RI2 | Captacao existente; versao publicada no M021; Captacao nao PAUSADO | Formulario inexistente, versao nao publicada, formulario duplicado, AX-M011-032 | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| SelecionarFormularioAvaliacao | Command | Selecionar versao publicada do formulario de avaliacao ad hoc no M021 | captacao, formularioId, versaoFormularioId | `FormularioAvaliacaoRef` selecionado | RN02, RN06 | Captacao existente; versao publicada no M021; Captacao nao PAUSADO | Inicio da avaliacao sem formulario, formulario inexistente, AX-M011-032 | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| SelecionarFormularioRevisao | Command | Selecionar versao publicada do formulario de revisao de resultado no M021 | captacao, formularioId, versaoFormularioId | `FormularioRevisaoRef` selecionado | RN06 | Captacao existente; versao publicada no M021; Captacao nao PAUSADO | Etapa de revisao sem formulario, formulario inexistente, versao nao publicada, AX-M011-032 | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| SelecionarFormularioAnexos | Command | Selecionar versao publicada do formulario de anexos no M021, quando aplicavel | captacao, formularioId, versaoFormularioId | `FormularioAnexoRef` selecionado (optional) | RN06 | Captacao existente; versao publicada no M021; Captacao nao PAUSADO | Formulario inexistente, versao nao publicada, AX-M011-032 | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| ConfigurarCategoriasDeIniciativas | Command | Definir categorias de projetos aceitas pela captacao | captacao, categorias | `CategoriaProjeto` list associada | RN19 | Captacao existente | Categoria inexistente, lista vazia | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| ConfigurarFaixasSelecionadas | Command | Selecionar faixas do Fomento que participam desta captacao (AX-M011-029: faixas devem pertencer ao Fomento vinculado; AX-M011-030: >= 1 faixa exigida) | captacao, faixasIds | `faixasSelecionadas` atualizadas | RN10, AX-M011-029, AX-M011-030 | Captacao existente; faixas pertencem ao Fomento APROVADO vinculado | Lista vazia, faixa nao pertence ao Fomento, AX-M011-012 | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| ConfigurarRubricasPermitidas | Command | Definir RubricaPermitidaFaixa e subrubricas nas faixas selecionadas, com percentuais, restricoes, observacoes e bolsas (AX-M011-008, AX-M011-009, AX-M011-011) | captacao, faixaId, rubricasPermitidas | `RubricaPermitidaFaixa` list persistida | RN13, RN26, RN27, AX-M011-008, AX-M011-009, AX-M011-011 | Captacao existente; rubricas ativas no M008 | Rubrica inexistente/inativa, percentual invalido, subrubrica sem rubricaPai, BolsaPermitidaFaixa sem rubrica Bolsa na faixa | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| ConfigurarRegrasSubmissao | Command | Definir regras de participacao e submissao | captacao, regras | `RegraSubmissao` persistida | RN11 | Captacao existente | Regra invalida | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| ConfigurarProponentesEscolhidos | Command | Definir instituicoes ou pessoas autorizadas quando a submissao for restrita a escolhidos (TipoProponenteEscolhido: INSTITUICAO|PESSOA) | captacao, tipo, proponentes | `proponentesEscolhidos` persistidos | RN26 | Captacao existente; instituicao ou pessoa existente | Lista vazia, proponente inexistente | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| ConfigurarRequisitosProponente | Command | Definir requisitos e direcionamento da proposta (TipoDirecionamentoProposta: ABERTA|INSTITUICAO|TIPO_INSTITUICAO) | captacao, requisitos | `RequisitoProponente` persistido | RN12, RN21 | Captacao existente | Instituicao/tipo/nivel inexistente, direcionamento invalido | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| ConfigurarDocumentosExigidos | Command | Definir documentos exigidos do proponente, formatos, obrigatoriedade e regra de reaproveitamento do cadastro corporativo | captacao, documentos | `DocumentoExigido` list associada | RN24 | Captacao existente; documentos cadastrados | Documento inexistente, formato invalido | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| ConfigurarPrestacoesExigidas | Command | Definir exigencia de prestacao tecnica e/ou financeira | captacao, exigePrestacaoTecnica, exigePrestacaoFinanceira | `PrestacaoExigida` persistida | RN23 | Captacao existente | Configuracao invalida | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| ConfigurarRegraAvaliacao | Command | Definir se ha avaliacao ad hoc e a quantidade minima de revisores por proposta | captacao, exigeAvaliacaoAdHoc, quantidadeMinimaRevisores | `RegraAvaliacao` persistida | RN22 | Captacao existente | Quantidade minima invalida | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| ConfigurarMatrizConfiguracao | Command | Definir obrigatoriedade de cada bloco do projeto: equipe, resultados, riscos, cronogramaProj, orcamento, objetivos, beneficios (ObrigatoriedadeBloco: EXIGIDO|DISPENSADO) | captacao, matrizConfiguracao | `MatrizConfiguracaoProjeto` persistida | — | Captacao existente | Bloco invalido | Nao | AnalistaTecnico | API interna/backoffice a definir |
-| AssociarRevisorAdHoc | Command | Associar revisor ad hoc a captacao com validacao de conflito | captacao, revisor, instituicao | `RevisorAdHoc` associado | RN03, RI1 | Captacao existente | Conflito de interesses, revisor duplicado | Nao | AnalistaTecnico | API interna/backoffice a definir |
+| ConfigurarCronogramaDaCaptacao | Command | Registrar os 8 periodos do cronograma da captacao, um de cada TipoPeriodo, encadeados via relacao precede | captacao, periodos | `PeriodoCronograma` list persistida e encadeada | RN01, RN05, RN09, AX-M011-001 | Configuracao de captacao existente | CRONOGRAMA_PERIODOS_INCOMPLETOS, CRONOGRAMA_SEQUENCIA_INVALIDA, CAPTACAO_NAO_ENCONTRADA, CAPTACAO_PAUSADA | Nao | AnalistaTecnico | API interna/backoffice a definir |
+| AdiarEtapaCronogramaDaCaptacao | Command | Registrar adiamento de uma etapa e deslocar etapas posteriores via cadeia precede (AX-M011-007) | captacao, tipoPeriodo, dias, justificativa | `AdiamentoPeriodoCronograma` registrado e cadeia precede atualizada | RN28, RN29, AX-M011-007 | Captacao PUBLICADO; periodo existente | DIAS_INVALIDOS, JUSTIFICATIVA_AUSENTE, CAPTACAO_PAUSADA, NOVAS_DATAS_FORA_VIGENCIA_FOMENTO | Nao | AnalistaTecnico | API interna/backoffice a definir |
+| SelecionarFormularios | Command | Selecionar versoes publicadas dos formularios de submissao, avaliacao ad hoc, revisao de resultado e anexos (opcional) no M021 | captacao, submissaoRef, avaliacaoRef, revisaoRef, anexoRef? | `FormularioRef` x3 (+ 1 opcional) persistidos na captacao | RN06, RI2 | Captacao existente; versoes publicadas no M021; Captacao nao PAUSADO | FORMULARIO_NAO_ENCONTRADO, VERSAO_NAO_PUBLICADA, FORMULARIO_SUBMISSAO_AUSENTE, FORMULARIO_AVALIACAO_AUSENTE, FORMULARIO_REVISAO_AUSENTE, CAPTACAO_PAUSADA | Nao | AnalistaTecnico | API interna/backoffice a definir |
+| ConfigurarFaixasSelecionadas | Command | Selecionar faixas do Fomento que participam desta captacao — tipos de projeto e rubricas sao herdados das faixas (AX-M011-029, AX-M011-030) | captacao, faixasIds | `faixasSelecionadas` atualizadas | RN10, AX-M011-029, AX-M011-030 | Captacao existente; faixas pertencem ao Fomento APROVADO vinculado | LISTA_FAIXAS_VAZIA, FAIXA_NAO_PERTENCE_AO_FOMENTO, FOMENTO_NAO_APROVADO | Nao | AnalistaTecnico | API interna/backoffice a definir |
+| ConfigurarRubricasPermitidas | Command | Definir RubricaPermitidaFaixa e subrubricas nas faixas selecionadas, com percentuais, restricoes, observacoes e bolsas (AX-M011-008, AX-M011-009, AX-M011-011) | captacao, faixaId, rubricasPermitidas | `RubricaPermitidaFaixa` list persistida | RN13, RN26, RN27, AX-M011-008, AX-M011-009, AX-M011-011 | Captacao existente; rubricas ativas no M008 | RUBRICA_INEXISTENTE, PERCENTUAL_INVALIDO, SUBRUBRICA_SEM_PAI, BOLSA_SEM_RUBRICA_BOLSA | Nao | AnalistaTecnico | API interna/backoffice a definir |
+| ConfigurarRegrasSubmissao | Command | Definir regras de participacao, submissao e requisitos do proponente (TipoDirecionamentoProposta: ABERTA\|INSTITUICAO\|TIPO_INSTITUICAO) | captacao, regraSubmissao | `RegraSubmissao` persistida (inclui requisitos do proponente) | RN11, RN12 | Captacao existente | REGRA_INVALIDA, INSTITUICAO_INEXISTENTE, NIVEL_ACADEMICO_INEXISTENTE, DIRECIONAMENTO_INVALIDO | Nao | AnalistaTecnico | API interna/backoffice a definir |
+| ConfigurarProponentesEscolhidos | Command | Definir proponentes autorizados quando submissao restrita; para DEMANDA_INDUZIDA define exatamente um ProponenteEscolhido que identifica o destinatario (AX-M011-004, AX-M011-005, AX-M011-006) | captacao, tipo, proponentes | `proponentesEscolhidos` persistidos | RN26, AX-M011-004, AX-M011-005, AX-M011-006 | Captacao existente; instituicao ou pessoa existente | LISTA_VAZIA, PROPONENTE_INEXISTENTE, DEMANDA_INDUZIDA_EXIGE_EXATAMENTE_UM_PROPONENTE, TIPO_PROPONENTE_INCOMPATIVEL_COM_TIPO_OUTORGADO | Nao | AnalistaTecnico | API interna/backoffice a definir |
+| ConfigurarDocumentosExigidos | Command | Definir documentos exigidos do proponente, tipos (TipoDocumento via shared.documents), formatos, obrigatoriedade e regra de reaproveitamento do cadastro corporativo | captacao, documentos | `DocumentoExigido` list associada | RN24 | Captacao existente | TIPO_DOCUMENTO_INEXISTENTE, FORMATO_INVALIDO, CAPTACAO_PAUSADA | Nao | AnalistaTecnico | API interna/backoffice a definir |
+| ConfigurarMatrizConfiguracao | Command | Definir obrigatoriedade de cada bloco do projeto: equipe, resultados, riscos, cronogramaProj, orcamento, objetivos, beneficios (ObrigatoriedadeBloco: EXIGIDO\|DISPENSADO) | captacao, matrizConfiguracao | `MatrizConfiguracaoProjeto` persistida | — | Captacao existente | BLOCO_INVALIDO | Nao | AnalistaTecnico | API interna/backoffice a definir |
 | ValidarConfiguracaoDaCaptacao | Query | Validar se a captacao possui configuracao minima para publicacao: Fomento APROVADO, 8 periodos, edital, formularios obrigatorios e >= 1 faixa selecionada | captacao | Checklist de prontidao | RN01, RN02, RN04, RN08, RN09, AX-M011-001, AX-M011-030 | Captacao existente | Captacao nao encontrada | N/A | AnalistaTecnico ou modulo interno autorizado | API interna a definir |
-| PublicarCaptacao | Command | Transicao EM_ANDAMENTO -> PUBLICADO: tornar a captacao visivel (guard: Fomento APROVADO, 8 periodos, edital, formularios) | captacao | Captacao com estadoConfiguracao=PUBLICADO | RN34, RN35, AX-M011-001, AX-M011-012 | estadoConfiguracao=EM_ANDAMENTO; Fomento APROVADO; 8 periodos configurados; edital vinculado; formularios obrigatorios selecionados | Fomento nao APROVADO, cronograma incompleto, formulario ausente, AX-M011-030 | Sim | AnalistaTecnico | API interna/backoffice a definir |
+| PublicarCaptacao | Command | Transicao EM_ANDAMENTO -> PUBLICADO: tornar a captacao visivel (guard: Fomento APROVADO, 8 periodos, edital com link ou arquivo, formularios obrigatorios, >= 1 faixa) | captacao | Captacao com estadoConfiguracao=PUBLICADO | RN34, RN35, AX-M011-001, AX-M011-012 | estadoConfiguracao=EM_ANDAMENTO; Fomento APROVADO; 8 periodos configurados; edital com ao menos editalLink ou editalNomeArquivo; formularios submissao/avaliacao/revisao selecionados; >= 1 faixa | FOMENTO_NAO_APROVADO, CRONOGRAMA_INCOMPLETO, EDITAL_SEM_LINK_OU_ARQUIVO, FORMULARIO_SUBMISSAO_AUSENTE, FORMULARIO_AVALIACAO_AUSENTE, FORMULARIO_REVISAO_AUSENTE, SEM_FAIXAS_SELECIONADAS, DEMANDA_INDUZIDA_SEM_PROPONENTE_ESCOLHIDO | Sim | AnalistaTecnico | API interna/backoffice a definir |
 | DespublicarCaptacao | Command | Transicao PUBLICADO -> NAO_PUBLICADO: retirar captacao de circulacao sem cancelar (guard: sem propostas em periodo de submissao ativo) | captacao, justificativa | Captacao com estadoConfiguracao=NAO_PUBLICADO | — | estadoConfiguracao=PUBLICADO; nenhuma proposta em periodo de recebimento ativo | Propostas recebidas no periodo ativo | Nao | AnalistaTecnico | API interna/backoffice a definir |
 | ReabrirCaptacao | Command | Transicao NAO_PUBLICADO -> EM_ANDAMENTO: reabrir captacao para edicao de configuracao | captacao | Captacao com estadoConfiguracao=EM_ANDAMENTO | — | estadoConfiguracao=NAO_PUBLICADO | — | Nao | AnalistaTecnico | API interna/backoffice a definir |
 | PausarCaptacao | Command | Transicao PUBLICADO -> PAUSADO: suspender operacionalmente a captacao com justificativa (AX-M011-032: bloqueia todas as operacoes de selecao) | captacao, justificativa | Captacao com estadoConfiguracao=PAUSADO | AX-M011-032 | estadoConfiguracao=PUBLICADO; justificativa obrigatoria | Justificativa ausente | Nao | GestorFAPES | API interna/backoffice a definir |
@@ -151,14 +143,9 @@ Nota: exatamente 8 periodos sao exigidos (AX-M011-001), um para cada TipoPeriodo
 
 ```json
 {
-  "cronograma": {
-    "id": "CRON-2026-001",
-    "descricao": "Cronograma CAP-2026-001",
-    "versao": 1,
-    "periodos": [
-      { "nome": "Publicacao da Captacao", "tipo": "PUBLICACAO_CAPTACAO", "dataInicio": "2026-06-01", "dataFim": "2026-06-01", "adiamentos": [] }
-    ]
-  }
+  "periodos": [
+    { "nome": "Publicacao da Captacao", "tipo": "PUBLICACAO_CAPTACAO", "dataInicio": "2026-06-01", "dataFim": "2026-06-01", "proximo": "RECEBIMENTO_PROPOSTAS", "adiamentos": [] }
+  ]
 }
 ```
 
@@ -212,15 +199,17 @@ Nota: AX-M011-007 — o adiamento cascateia para todos os periodos subsequentes 
 | ETAPA_CRONOGRAMA_NAO_ENCONTRADA | A etapa informada nao existe no cronograma da captacao. |
 | ADIAMENTO_DADOS_INVALIDOS | O adiamento deve possuir quantidade de dias positiva e justificativa. |
 
-### SelecionarFormularioSubmissao
+### SelecionarFormularios
 
 **Exemplo de entrada**
 
 ```json
 {
   "captacaoId": "CAP-2026-001",
-  "formularioId": "FORM-2026-001",
-  "versaoFormularioId": "VF-2026-002"
+  "submissao":  { "formularioId": "FORM-2026-001", "versaoFormularioId": "VF-2026-002" },
+  "avaliacao":  { "formularioId": "FORM-2026-010", "versaoFormularioId": "VF-2026-015" },
+  "revisao":    { "formularioId": "FORM-2026-020", "versaoFormularioId": "VF-2026-021" },
+  "anexos":     null
 }
 ```
 
@@ -228,12 +217,11 @@ Nota: AX-M011-007 — o adiamento cascateia para todos os periodos subsequentes 
 
 ```json
 {
-  "formularioSelecionado": {
-    "captacaoId": "CAP-2026-001",
-    "formularioId": "FORM-2026-001",
-    "versaoFormularioId": "VF-2026-002",
-    "tipo": "SUBMISSAO"
-  }
+  "formularios": [
+    { "tipo": "SUBMISSAO",         "formularioId": "FORM-2026-001", "versaoFormularioId": "VF-2026-002" },
+    { "tipo": "AVALIACAO_AD_HOC",  "formularioId": "FORM-2026-010", "versaoFormularioId": "VF-2026-015" },
+    { "tipo": "REVISAO_RESULTADO", "formularioId": "FORM-2026-020", "versaoFormularioId": "VF-2026-021" }
+  ]
 }
 ```
 
@@ -241,75 +229,12 @@ Nota: AX-M011-007 — o adiamento cascateia para todos os periodos subsequentes 
 
 | Codigo | Mensagem de erro exemplo |
 |--------|---------------------------|
-| FORMULARIO_SUBMISSAO_DUPLICADO | Nao pode haver dois formularios de submissao ativos simultaneamente. |
 | FORMULARIO_NAO_ENCONTRADO | O formulario informado nao foi encontrado no M021. |
 | VERSAO_FORMULARIO_NAO_PUBLICADA | A versao informada nao esta publicada no M021. |
-
-### SelecionarFormularioAvaliacao
-
-**Exemplo de entrada**
-
-```json
-{
-  "captacaoId": "CAP-2026-001",
-  "formularioId": "FORM-2026-010",
-  "versaoFormularioId": "VF-2026-015"
-}
-```
-
-**Exemplo de saida**
-
-```json
-{
-  "formularioSelecionado": {
-    "captacaoId": "CAP-2026-001",
-    "formularioId": "FORM-2026-010",
-    "versaoFormularioId": "VF-2026-015",
-    "tipo": "AVALIACAO_AD_HOC"
-  }
-}
-```
-
-**Excecoes e mensagens**
-
-| Codigo | Mensagem de erro exemplo |
-|--------|---------------------------|
-| FORMULARIO_AVALIACAO_OBRIGATORIO | A captacao precisa possuir formulario de avaliacao antes da fase de merito. |
-| FORMULARIO_NAO_ENCONTRADO | O formulario informado nao foi encontrado no M021. |
-| VERSAO_FORMULARIO_NAO_PUBLICADA | A versao informada nao esta publicada no M021. |
-
-### SelecionarFormularioRevisao
-
-**Exemplo de entrada**
-
-```json
-{
-  "captacaoId": "CAP-2026-001",
-  "formularioId": "FORM-2026-020",
-  "versaoFormularioId": "VF-2026-021"
-}
-```
-
-**Exemplo de saida**
-
-```json
-{
-  "formularioSelecionado": {
-    "captacaoId": "CAP-2026-001",
-    "formularioId": "FORM-2026-020",
-    "versaoFormularioId": "VF-2026-021",
-    "tipo": "REVISAO_RESULTADO"
-  }
-}
-```
-
-**Excecoes e mensagens**
-
-| Codigo | Mensagem de erro exemplo |
-|--------|---------------------------|
-| FORMULARIO_REVISAO_OBRIGATORIO | A captacao precisa possuir formulario de revisao de resultado. |
-| FORMULARIO_NAO_ENCONTRADO | O formulario informado nao foi encontrado no M021. |
-| VERSAO_FORMULARIO_NAO_PUBLICADA | A versao informada nao esta publicada no M021. |
+| FORMULARIO_SUBMISSAO_AUSENTE | O formulario de submissao e obrigatorio. |
+| FORMULARIO_AVALIACAO_AUSENTE | O formulario de avaliacao ad hoc e obrigatorio. |
+| FORMULARIO_REVISAO_AUSENTE | O formulario de revisao de resultado e obrigatorio. |
+| CAPTACAO_PAUSADA | Operacao bloqueada — captacao esta no estado PAUSADO (AX-M011-032). |
 
 ### ConfigurarFaixasSelecionadas
 
@@ -454,7 +379,7 @@ Seleciona quais `Faixa` do Fomento vinculado participam desta captacao. As faixa
 ## Eventos e Efeitos Colaterais
 
 - `ConfigurarCronogramaDaCaptacao` define os 8 periodos (AX-M011-001) que condicionam recebimento, avaliacao, revisao e publicacao de resultados.
-- `SelecionarFormularioSubmissao`, `SelecionarFormularioAvaliacao`, `SelecionarFormularioRevisao` e `SelecionarFormularioAnexos` apenas referenciam versoes publicadas no M021 via `FormularioSubmissaoRef`, `FormularioAvaliacaoRef`, `FormularioRevisaoRef` e `FormularioAnexoRef`.
+- `SelecionarFormularios` referencia versoes publicadas no M021 via `FormularioRef` (unica classe) com tipo SUBMISSAO, AVALIACAO_AD_HOC, REVISAO_RESULTADO e ANEXOS.
 - `ValidarConfiguracaoDaCaptacao` fornece a prontidao necessaria para publicacao da captacao.
 - `PublicarCaptacao` transiciona `EstadoConfiguracaoCaptacao` de `EM_ANDAMENTO` para `PUBLICADO`.
 - `DespublicarCaptacao` transiciona `PUBLICADO` para `NAO_PUBLICADO`; `ReabrirCaptacao` devolve para `EM_ANDAMENTO`.

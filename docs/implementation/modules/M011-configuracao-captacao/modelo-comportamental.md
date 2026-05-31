@@ -117,4 +117,4 @@ stateDiagram-v2
 - O projeto somente passa ao M003 apos contratacao/outorga formalizada no M022.
 - Alteracoes de cronograma por adiamento nao criam novo estado da Captacao; elas registram historico em `AdiamentoPeriodoCronograma` e deslocam o periodo alterado e todos os posteriores pelo mesmo numero de dias (AX-M011-007).
 - Quando o proponente for empresa ou instituicao, a proposta deve identificar uma pessoa fisica representante vinculada ao cadastro corporativo do M008. Documentos institucionais recorrentes devem ser reaproveitados do cadastro quando validos.
-- `tipoCaptacao=DEMANDA_INDUZIDA` exige que `tipoOutorgado` corresponda ao tipo do `outorgadoDestinatario` (AX-M011-031).
+- `tipoCaptacao=DEMANDA_INDUZIDA` exige exatamente um `ProponenteEscolhido` que identifica o destinatario: `tipo=PESSOA` quando `tipoOutorgado=PESSOA_FISICA` ou `tipo=INSTITUICAO` quando `tipoOutorgado=PESSOA_JURIDICA` (AX-M011-004).
