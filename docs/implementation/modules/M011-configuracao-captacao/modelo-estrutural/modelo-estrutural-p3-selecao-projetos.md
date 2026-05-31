@@ -45,6 +45,7 @@ classDiagram
 
     class DistribuicaoAvaliacao {
         +Date dataDistribuicao
+        +Date dataLimiteResposta
         +EstadoDistribuicao estado
         +String justificativaRecusa
         +Date dataRecusa
@@ -99,6 +100,7 @@ classDiagram
         <<enumeration>>
         DISTRIBUIDA
         RECUSADA
+        NAO_RESPONDEU
         AVALIADA
         CANCELADA
     }
@@ -192,8 +194,9 @@ classDiagram
 | | dataDecisao | Data em que o responsavel assinou ou recusou | Cond. | Date | | | |
 | | justificativaRecusa | Motivo da recusa informado pelo responsavel | Cond. | String | Obrigatoria quando estado=RECUSADA | 500 | |
 | | responsavel (relacao) | Responsavel institucional que deve assinar a proposta | Sim | FK → ResponsavelInstitucional | Via M008 | | |
-| **DistribuicaoAvaliacao** | dataDistribuicao | Data em que o projeto foi distribuido ao revisor pelo AnalistaTecnico | Gerado | Date | | | |
-| | estado | Estado da distribuicao | Sim | EstadoDistribuicao | DISTRIBUIDA, RECUSADA, AVALIADA, CANCELADA | | |
+| **DistribuicaoAvaliacao** | dataDistribuicao | Data em que o AnalistaTecnico distribuiu o projeto ao revisor | Gerado | Date | | | |
+| | dataLimiteResposta | Prazo para o revisor aceitar, recusar ou registrar parecer | Sim | Date | Definido pelo AnalistaTecnico no momento da distribuicao | | |
+| | estado | Estado da distribuicao | Sim | EstadoDistribuicao | DISTRIBUIDA, RECUSADA, NAO_RESPONDEU, AVALIADA, CANCELADA | | |
 | | justificativaRecusa | Motivo informado pelo revisor ao recusar | Cond. | String | Obrigatoria quando estado=RECUSADA | 500 | |
 | | dataRecusa | Data em que o revisor registrou a recusa | Cond. | Date | | | |
 | | revisor (relacao) | Revisor ad hoc selecionado pelo AnalistaTecnico do pool configurado no P2 | Sim | FK → RevisorAdHoc | Do pool configurado no P2 | | |
@@ -243,6 +246,7 @@ classDiagram
 | RN-SP20 | RevisorAdHoc | Um revisor ad hoc pode recusar avaliar um projeto informando justificativa obrigatoria. A recusa transiciona a DistribuicaoAvaliacao para RECUSADA. |
 | RN-SP21 | AnalistaTecnico | Quando um revisor recusa, o AnalistaTecnico pode distribuir o projeto a outro revisor do pool. A distribuicao recusada permanece no historico. |
 | RN-SP22 | Sistema | Um revisor ad hoc nao pode avaliar projetos de sua propria instituicao (conflito de interesses). |
+| RN-SP23 | AnalistaTecnico | Quando um revisor nao responde ao chamado ate o dataLimiteResposta, o AnalistaTecnico marca a distribuicao como NAO_RESPONDEU e pode distribuir o projeto a outro revisor do pool. Nao e exigida justificativa — a nao resposta e o proprio motivo. |
 | RN-SP07 | AnalistaTecnico | O resultado preliminar deve ser publicado antes do inicio do periodo de recursos. |
 | RN-SP08 | Proponente | Solicitacoes de revisao somente podem ser enviadas dentro do periodo de recursos. |
 | RN-SP09 | AnalistaTecnico | O resultado final somente pode ser publicado apos o encerramento e analise de todas as revisoes admissiveis. |

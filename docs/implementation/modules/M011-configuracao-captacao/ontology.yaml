@@ -695,15 +695,19 @@ entities:
         required: true
         generated: true
         description: "Data e hora em que o AnalistaTecnico distribuiu o projeto ao revisor."
+      dataLimiteResposta:
+        type: "date"
+        required: true
+        description: "Prazo para o revisor aceitar, recusar ou registrar parecer. Definido pelo AnalistaTecnico no momento da distribuicao."
       estado:
         type: "enum:EstadoDistribuicao"
         required: true
-        description: "Estado: DISTRIBUIDA, RECUSADA, AVALIADA ou CANCELADA."
+        description: "Estado: DISTRIBUIDA, RECUSADA, NAO_RESPONDEU, AVALIADA ou CANCELADA."
       justificativaRecusa:
         type: "string"
         required: false
         max_length: 500
-        description: "Motivo informado pelo revisor ao recusar a distribuicao. Obrigatorio quando estado=RECUSADA."
+        description: "Motivo informado pelo revisor ao recusar. Obrigatorio quando estado=RECUSADA. Nao aplicavel para NAO_RESPONDEU — a nao resposta e o proprio motivo."
       dataRecusa:
         type: "datetime"
         required: false
@@ -1162,7 +1166,8 @@ enums:
     description: "Estado da distribuicao de um projeto a um revisor ad hoc."
     values:
       DISTRIBUIDA: "Projeto distribuido ao revisor pelo AnalistaTecnico, aguardando parecer."
-      RECUSADA: "Revisor recusou avaliar o projeto — justificativa obrigatoria. AnalistaTecnico pode redistribuir a outro revisor do pool."
+      RECUSADA: "Revisor recusou ativamente avaliar o projeto — justificativa obrigatoria. AnalistaTecnico pode redistribuir a outro revisor do pool."
+      NAO_RESPONDEU: "Revisor nao respondeu ao chamado ate dataLimiteResposta. AnalistaTecnico marca e pode redistribuir. Nao exige justificativa — a nao resposta e o motivo."
       AVALIADA: "Revisor registrou parecer com nota, texto e respostas do formulario."
       CANCELADA: "Distribuicao cancelada administrativamente pelo AnalistaTecnico — revisor substituido ou projeto inabilitado."
 
