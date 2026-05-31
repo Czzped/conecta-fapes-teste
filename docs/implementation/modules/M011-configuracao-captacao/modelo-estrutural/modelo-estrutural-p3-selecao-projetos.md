@@ -46,6 +46,8 @@ classDiagram
     class DistribuicaoAvaliacao {
         +Date dataDistribuicao
         +EstadoDistribuicao estado
+        +String justificativaRecusa
+        +Date dataRecusa
     }
 
     class AvaliacaoAdHoc {
@@ -96,6 +98,7 @@ classDiagram
     class EstadoDistribuicao {
         <<enumeration>>
         DISTRIBUIDA
+        RECUSADA
         AVALIADA
         CANCELADA
     }
@@ -189,9 +192,11 @@ classDiagram
 | | dataDecisao | Data em que o responsavel assinou ou recusou | Cond. | Date | | | |
 | | justificativaRecusa | Motivo da recusa informado pelo responsavel | Cond. | String | Obrigatoria quando estado=RECUSADA | 500 | |
 | | responsavel (relacao) | Responsavel institucional que deve assinar a proposta | Sim | FK → ResponsavelInstitucional | Via M008 | | |
-| **DistribuicaoAvaliacao** | dataDistribuicao | Data em que a proposta foi distribuida ao revisor | Gerado | Date | | | |
-| | estado | Estado da distribuicao | Sim | EstadoDistribuicao | DISTRIBUIDA, AVALIADA, CANCELADA | | |
-| | revisor (relacao) | Revisor ad hoc que recebeu a proposta | Sim | FK → RevisorAdHoc | Do pool configurado no P2 | | |
+| **DistribuicaoAvaliacao** | dataDistribuicao | Data em que o projeto foi distribuido ao revisor pelo AnalistaTecnico | Gerado | Date | | | |
+| | estado | Estado da distribuicao | Sim | EstadoDistribuicao | DISTRIBUIDA, RECUSADA, AVALIADA, CANCELADA | | |
+| | justificativaRecusa | Motivo informado pelo revisor ao recusar | Cond. | String | Obrigatoria quando estado=RECUSADA | 500 | |
+| | dataRecusa | Data em que o revisor registrou a recusa | Cond. | Date | | | |
+| | revisor (relacao) | Revisor ad hoc selecionado pelo AnalistaTecnico do pool configurado no P2 | Sim | FK → RevisorAdHoc | Do pool configurado no P2 | | |
 | **AvaliacaoAdHoc** | nota | Nota atribuida pelo revisor a proposta | Sim | Decimal | >= 0 | | |
 | | parecer | Texto do parecer tecnico do revisor | Sim | String | | 3000 | |
 | | recomendacao | Recomendacao do revisor sobre a proposta | Sim | String | Ex: Aprovada, Reprovada, Aprovada com ressalvas | 200 | |
@@ -231,8 +236,13 @@ classDiagram
 
 | ID | Responsavel | Regra |
 |----|-------------|-------|
-| RN-SP05 | AnalistaTecnico | Somente propostas com documentacao habilitada seguem para analise de merito. Inabilitacao requer justificativa. |
+| RN-SP05 | AnalistaTecnico | Somente projetos com documentacao habilitada seguem para analise de merito. Inabilitacao requer justificativa. |
 | RN-SP06 | RevisorAdHoc | Revisores somente podem registrar pareceres dentro do periodo de analise de merito. |
+| RN-SP18 | AnalistaTecnico | O AnalistaTecnico seleciona os revisores ad hoc do pool configurado no P2 e distribui projetos a eles durante o periodo AVALIACAO_AD_HOC. |
+| RN-SP19 | AnalistaTecnico | Um projeto pode ser distribuido a um ou mais revisores ad hoc. Cada distribuicao gera um registro independente de DistribuicaoAvaliacao. |
+| RN-SP20 | RevisorAdHoc | Um revisor ad hoc pode recusar avaliar um projeto informando justificativa obrigatoria. A recusa transiciona a DistribuicaoAvaliacao para RECUSADA. |
+| RN-SP21 | AnalistaTecnico | Quando um revisor recusa, o AnalistaTecnico pode distribuir o projeto a outro revisor do pool. A distribuicao recusada permanece no historico. |
+| RN-SP22 | Sistema | Um revisor ad hoc nao pode avaliar projetos de sua propria instituicao (conflito de interesses). |
 | RN-SP07 | AnalistaTecnico | O resultado preliminar deve ser publicado antes do inicio do periodo de recursos. |
 | RN-SP08 | Proponente | Solicitacoes de revisao somente podem ser enviadas dentro do periodo de recursos. |
 | RN-SP09 | AnalistaTecnico | O resultado final somente pode ser publicado apos o encerramento e analise de todas as revisoes admissiveis. |

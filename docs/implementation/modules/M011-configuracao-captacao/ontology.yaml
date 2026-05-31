@@ -694,11 +694,20 @@ entities:
         type: "datetime"
         required: true
         generated: true
-        description: "Data e hora em que o projeto foi distribuido ao revisor."
+        description: "Data e hora em que o AnalistaTecnico distribuiu o projeto ao revisor."
       estado:
         type: "enum:EstadoDistribuicao"
         required: true
-        description: "Estado: DISTRIBUIDA, AVALIADA ou CANCELADA."
+        description: "Estado: DISTRIBUIDA, RECUSADA, AVALIADA ou CANCELADA."
+      justificativaRecusa:
+        type: "string"
+        required: false
+        max_length: 500
+        description: "Motivo informado pelo revisor ao recusar a distribuicao. Obrigatorio quando estado=RECUSADA."
+      dataRecusa:
+        type: "datetime"
+        required: false
+        description: "Data e hora em que o revisor registrou a recusa."
 
   AvaliacaoAdHoc:
     description: "Parecer tecnico registrado por um RevisorAdHoc sobre um projeto durante o periodo de avaliacao de merito."
@@ -1152,9 +1161,10 @@ enums:
   EstadoDistribuicao:
     description: "Estado da distribuicao de um projeto a um revisor ad hoc."
     values:
-      DISTRIBUIDA: "Projeto distribuido ao revisor, aguardando parecer."
-      AVALIADA: "Revisor registrou parecer."
-      CANCELADA: "Distribuicao cancelada — revisor substituido ou projeto inabilitado."
+      DISTRIBUIDA: "Projeto distribuido ao revisor pelo AnalistaTecnico, aguardando parecer."
+      RECUSADA: "Revisor recusou avaliar o projeto — justificativa obrigatoria. AnalistaTecnico pode redistribuir a outro revisor do pool."
+      AVALIADA: "Revisor registrou parecer com nota, texto e respostas do formulario."
+      CANCELADA: "Distribuicao cancelada administrativamente pelo AnalistaTecnico — revisor substituido ou projeto inabilitado."
 
   TipoResultadoSelecao:
     description: "Tipo de resultado publicado no processo de selecao."
