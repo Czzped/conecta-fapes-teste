@@ -313,3 +313,30 @@ classDiagram
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: Responsavel.pessoa: PessoaFisica)
 - Cardinalidade N: atributo lista do tipo da classe destino (ex: Instituicao.subInstituicoes: List<Instituicao>, Instituicao.unidades: List<UnidadeOrganizacional>)
+
+## Referência funcional de Diária
+
+### Contexto
+
+Diária é um recurso financeiro destinado a cobrir despesas com alimentação, hospedagem e locomoção decorrentes de afastamento da sede, em caráter eventual, para outro ponto do estado, do país ou do exterior relacionadas a atividades de pesquisa, inovação, extensão e capacitação vinculadas aos objetivos do projeto financiado apoiado pela Fundação de Amparo à Pesquisa e Inovação do Espírito Santo (FAPES).
+
+Os valores atuais de Diária são:
+
+- Dentro do Estado do Espírito Santo: R$ 220,00
+- Fora do Estado (Brasil): R$ 450,00
+- Internacional: US$ 220,00 a US$ 550,00, conforme o grupo de países de destino
+
+Esses valores devem ser parametrizados para quando forem alterados no futuro.
+
+### Comportamento
+
+- Para o projeto usar Diária, ele deve ter esse recurso disponibilizado em seu Edital.
+- Se o valor total da Diária for maior que o valor que o projeto tiver disponível para essa categoria, o coordenador deve fazer primeiro o Remanejamento de Recursos, pegar um valor que não usou em outra categoria e incluir em Diária.
+- Antes de realizar a Diária é necessário fazer a Solicitação. Nela todas as informações ficam registradas.
+- O Bolsista selecionado para a Diária deve fazer o aceite.
+- A distância mínima para solicitar uma Diária é de 150km.
+- Diária deve ter o período máximo de 15 dias por viagem dentro de um mês (Decreto Estadual e Norma Itens Financiáveis). Pode permitir mais de 15 dias entre um mês e outro, pois o Decreto não especifica essa situação.
+- Diária é destinada apenas a membros do projeto. É proibido pagar diária para terceiros.
+- O Coordenador deve retirar o valor da Diária da conta do Projeto e enviar para a conta Banestes do Bolsista.
+- Após a data da Diária, o Bolsista ou Coordenador devem comprovar com texto e imagem que foram na viagem.
+- Após o valor sair da conta do projeto, a Diária acontecer e seu relatório ser enviado, o Coordenador deve em Prestação de Contas Financeira associar a saída do valor a Diária solicitada.
