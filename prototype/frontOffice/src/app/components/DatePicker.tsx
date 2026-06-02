@@ -138,7 +138,7 @@ export function DatePicker({ value, onChange, placeholder = 'dd/mm/yyyy' }: Date
                 padding: '0.25rem 0.5rem',
               }}
             >
-              Clear
+              Limpar
             </button>
             <button
               type="button"
@@ -154,7 +154,7 @@ export function DatePicker({ value, onChange, placeholder = 'dd/mm/yyyy' }: Date
                 padding: '0.25rem 0.5rem',
               }}
             >
-              Today
+              Hoje
             </button>
           </div>
         </div>

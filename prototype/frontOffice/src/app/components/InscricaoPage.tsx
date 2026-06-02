@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import {
   ChevronLeft, FileText, User, Users, Receipt, CalendarDays, Eye,
   Plus, CheckCircle2, Moon,
@@ -293,6 +294,8 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
   const edital = editais.find(e => e.id === editalId) ?? editais[0];
   const [showAccessibility, setShowAccessibility] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Dados Gerais
   const [titulo, setTitulo] = useState('');
@@ -319,7 +322,20 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
   // Cronograma
   const [atividades, setAtividades] = useState<Atividade[]>([{ descricao: '', inicio: '', conclusao: '' }]);
 
-  const handleSubmit = () => setSubmitted(true);
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      await new Promise<void>((resolve) => setTimeout(resolve, 800));
+      setSubmitted(true);
+    } catch {
+      const msg = 'Falha ao enviar a proposta. Verifique sua conexão e tente novamente.';
+      setSubmitError(msg);
+      toast.error(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // ── Success screen ──
   if (submitted) {
@@ -743,23 +759,30 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
           </button>
           <button
             onClick={handleSubmit}
+            disabled={isSubmitting}
             style={{
               padding: '0.6rem 1.75rem',
               borderRadius: RADIUS,
               border: 'none',
-              backgroundColor: CLR_TEAL_MID,
+              backgroundColor: isSubmitting ? 'rgba(6,182,212,0.4)' : CLR_TEAL_MID,
               color: '#0a0a0a',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-semibold)',
-              cursor: 'pointer',
+              cursor: isSubmitting ? 'not-allowed' : 'pointer',
               fontFamily: FF,
               transition: 'all 0.18s',
+              opacity: isSubmitting ? 0.7 : 1,
             }}
-            onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#0891b2'; }}
-            onMouseLeave={e => { e.currentTarget.style.backgroundColor = CLR_TEAL_MID; }}
+            onMouseEnter={e => { if (!isSubmitting) e.currentTarget.style.backgroundColor = '#0891b2'; }}
+            onMouseLeave={e => { if (!isSubmitting) e.currentTarget.style.backgroundColor = CLR_TEAL_MID; }}
           >
-            Submeter Proposta
+            {isSubmitting ? 'Enviando...' : 'Submeter Proposta'}
           </button>
+          {submitError && (
+            <p style={{ color: '#ef4444', fontSize: 'var(--text-xs)', fontFamily: FF, marginTop: '0.5rem', textAlign: 'right' }}>
+              {submitError}
+            </p>
+          )}
         </div>
       </div>
     </div>

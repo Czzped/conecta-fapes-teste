@@ -101,6 +101,13 @@ Para skills proprias do projeto (Tipo 1, com frontmatter), veja `.agents/skills/
 
 ## Design e UX
 
+### `nielsen-heuristics` *(skill local do projeto)*
+
+- **Origem**: [`.agents/skills/nielsen-heuristics/SKILL.md`](skills/nielsen-heuristics/SKILL.md)
+- **Descricao**: Avaliacao de usabilidade pelas 10 Heuristicas de Nielsen — visibilidade de estado, linguagem do dominio, controle do usuario, consistencia, prevencao de erros, reconhecimento, eficiencia, minimalismo, recuperacao de erros e documentacao contextual.
+- **Quando usar**: ao revisar telas antes de merge; ao definir criterios de aceitacao de EPICs com componente de UI; ao auditar fluxos complexos (pagamento M004, gestao de bolsa M009, prestacao de contas); ao avaliar mensagens de erro do backend antes de expor no frontend.
+- **Complementa**: `web-design-guidelines` (WCAG/acessibilidade), `nuxt-ui` (consistencia de componentes), skill DDD (linguagem da interface)
+
 ### `web-design-guidelines`
 
 - **Origem**: Anthropic (skill do sistema)

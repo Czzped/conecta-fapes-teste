@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   ChevronRight, ChevronDown, Save, BookOpen, Plus, X, Trash2,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { useThemeTokens } from '../theme/ThemeContext';
 
 /* ─── Shared style tokens ─────────────────────────────────── */
@@ -568,17 +569,17 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
     const dias = Number(diasAdiamentoPorEtapa[etapa.id]);
     const justificativa = (justificativaAdiamentoPorEtapa[etapa.id] || '').trim();
     if (!Number.isFinite(dias) || dias <= 0) {
-      window.alert('Informe a quantidade de dias do adiamento.');
+      toast.error('Informe a quantidade de dias do adiamento.');
       return;
     }
     if (!justificativa) {
-      window.alert('Informe a justificativa do adiamento.');
+      toast.error('Informe a justificativa do adiamento.');
       return;
     }
 
     const ordemEtapa = fasesCronograma.findIndex(fase => fase.key === etapa.tipo);
     if (ordemEtapa < 0) {
-      window.alert('Selecione uma etapa válida para aplicar o adiamento.');
+      toast.error('Selecione uma etapa válida para aplicar o adiamento.');
       return;
     }
     const dataInicioNova = addDaysToDate(etapa.inicio, dias);
@@ -2311,7 +2312,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
             type="button"
             onClick={() => {
               if (!cronogramaCompleto) {
-                window.alert(`Inclua um card para cada etapa obrigatória do cronograma: ${etapasCronogramaFaltantes.map(fase => fase.label).join(', ')}.`);
+                toast.error(`Inclua um card para cada etapa obrigatória do cronograma: ${etapasCronogramaFaltantes.map(fase => fase.label).join(', ')}.`);
               }
             }}
             style={{

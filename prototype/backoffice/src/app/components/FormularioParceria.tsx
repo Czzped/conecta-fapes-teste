@@ -238,6 +238,8 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
   const [contaBancariaDestino, setContaBancariaDestino] = useState('');
   const [contaBancariaAcaoTransversal, setContaBancariaAcaoTransversal] = useState('');
   const [documentos, setDocumentos] = useState<Documento[]>([{ id: 1, tipo: '', arquivo: '' }]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isConfirmingFormalizar, setIsConfirmingFormalizar] = useState(false);
   const valorAporteOriginalNumerico = parseCurrencyValue(valorAporteOriginal);
   const percentualAcaoTransversal = calcularPercentualAcaoTransversal(valorAporteOriginalNumerico);
   const faixaAcaoTransversal = definirFaixaAcaoTransversal(valorAporteOriginalNumerico);
@@ -275,13 +277,20 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
   };
 
   const handleSalvarElaboracao = () => {
+    setIsLoading(true);
     toast.success('Parceria salva como rascunho.');
-    setTimeout(onBack, 800);
+    setTimeout(() => { setIsLoading(false); onBack(); }, 800);
   };
 
   const handleFormalizarParceria = () => {
+    setIsConfirmingFormalizar(true);
+  };
+
+  const handleConfirmFormalizar = () => {
+    setIsConfirmingFormalizar(false);
+    setIsLoading(true);
     toast.success('Parceria formalizada como ativa.');
-    setTimeout(onBack, 800);
+    setTimeout(() => { setIsLoading(false); onBack(); }, 800);
   };
 
   return (
@@ -413,19 +422,48 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '8px' }}>
           <button
             onClick={handleSalvarElaboracao}
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 'var(--radius)', color: 'var(--form-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}
+            disabled={isLoading}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 'var(--radius)', color: 'var(--form-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.6 : 1 }}
           >
             <Save size={16} />
-            Salvar Rascunho
+            {isLoading ? 'Salvando...' : 'Salvar Rascunho'}
           </button>
           <button
             onClick={handleFormalizarParceria}
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}
+            disabled={isLoading}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.6 : 1 }}
           >
             <Send size={16} />
             Formalizar Parceria
           </button>
         </div>
+
+        {isConfirmingFormalizar && (
+          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 500 }}>
+            <div style={{ backgroundColor: 'var(--form-card-bg)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', padding: '28px', maxWidth: '440px', width: '90%' }}>
+              <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 12px' }}>
+                Formalizar Parceria
+              </h3>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: '0 0 24px', lineHeight: 1.6 }}>
+                Esta ação tornará a parceria <strong style={{ color: '#00c1af' }}>{nomeParceria || 'sem nome'}</strong> ativa e não poderá ser desfeita. Confirmar?
+              </p>
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                <button
+                  onClick={() => setIsConfirmingFormalizar(false)}
+                  style={{ padding: '8px 18px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 'var(--radius)', color: 'var(--form-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleConfirmFormalizar}
+                  style={{ padding: '8px 18px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}
+                >
+                  Confirmar Formalização
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

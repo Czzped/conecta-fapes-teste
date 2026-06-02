@@ -262,6 +262,16 @@ export function InscricaoEditalFlow({ edital, onBack }: InscricaoEditalFlowProps
           >
             {edital.numero}
           </div>
+          <div
+            style={{
+              color: 'var(--primary)',
+              fontSize: 'var(--text-xs)',
+              fontWeight: 'var(--font-weight-semibold)',
+              marginTop: '2px',
+            }}
+          >
+            Etapa {currentStep} de {steps.length}
+          </div>
         </div>
       </div>
 
