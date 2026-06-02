@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { Save, User, ChevronDown, FileText, Upload, Trash2, Paperclip } from 'lucide-react';
+import { Save, User, ChevronDown, FileText, Upload, Trash2, Paperclip, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { usePageScenarios } from '@/mocks/ScenarioContext';
+import { toast } from 'sonner';
 import { Dropdown } from '@/app/components/Dropdown';
 import exampleImage from 'figma:asset/5fdde35260b51e236743e92a6751fa016c01ebe7.png';
 import nivelSuperiorImage from 'figma:asset/877199cc9131136997bf49056564eb43fea94ad3.png';
@@ -21,8 +23,16 @@ import termoPg2Image from 'figma:asset/963c600cd797ac50aeadf77e4cd0d47a2df288d6.
 type TabType = 'dados' | 'documentos';
 
 export function MyInfoPage() {
+  usePageScenarios([
+    'doc-upload-ok',
+    'doc-upload-formato-invalido',
+    'doc-upload-tamanho-excedido',
+    'doc-upload-sistema-indisponivel',
+  ]);
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<TabType>('documentos');
+  const [uploadingDocId, setUploadingDocId] = useState<number | null>(null);
+  const [uploadErros, setUploadErros] = useState<Record<number, string>>({});
   const [expandedDocId, setExpandedDocId] = useState<number | null>(null);
   const [expandedCanceledScholarship, setExpandedCanceledScholarship] = useState(false);
   const [dragActive, setDragActive] = useState<number | null>(null);
@@ -111,24 +121,39 @@ export function MyInfoPage() {
     e.stopPropagation();
   };
 
+  const uploadFile = async (file: File, docId: number) => {
+    setUploadingDocId(docId);
+    setUploadErros(prev => { const n = { ...prev }; delete n[docId]; return n; });
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      form.append('docId', String(docId));
+      const res = await fetch('/api/documentos/upload', { method: 'POST', body: form });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setUploadErros(prev => ({ ...prev, [docId]: body.erro ?? 'Erro ao enviar documento.' }));
+        return;
+      }
+      const data = await res.json();
+      toast.success(data.mensagem ?? 'Documento enviado com sucesso!');
+    } catch {
+      setUploadErros(prev => ({ ...prev, [docId]: 'Não foi possível conectar ao servidor de armazenamento. Tente novamente.' }));
+    } finally {
+      setUploadingDocId(null);
+    }
+  };
+
   const handleDrop = (e: React.DragEvent, docId: number) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(null);
-    
     const files = e.dataTransfer.files;
-    if (files && files.length > 0) {
-      console.log(`Arquivo(s) anexado(s) ao documento ${docId}:`, files);
-      // Aqui você implementaria o upload do arquivo
-    }
+    if (files && files.length > 0) uploadFile(files[0], docId);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, docId: number) => {
     const files = e.target.files;
-    if (files && files.length > 0) {
-      console.log(`Arquivo(s) selecionado(s) para o documento ${docId}:`, files);
-      // Aqui você implementaria o upload do arquivo
-    }
+    if (files && files.length > 0) uploadFile(files[0], docId);
   };
 
   const handleDeleteDocument = (docId: number) => {

@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { ScenarioSwitcher } from '@/mocks/ScenarioSwitcher';
+import { ScenarioProvider } from '@/mocks/ScenarioContext';
 import { LoginPage } from './components/LoginPage';
 import { CidadaoHomePage } from './components/CidadaoHomePage';
 import { EditalDetailPage } from './components/EditalDetailPage';
@@ -153,7 +155,8 @@ export default function App() {
   };
 
   return (
-    <>
+    <ScenarioProvider>
+      {import.meta.env.DEV && <ScenarioSwitcher />}
       {/* Show login page if not logged in */}
       {!isLoggedIn ? (
         <LoginPage onLogin={handleLogin} />
@@ -256,6 +259,6 @@ export default function App() {
           </div>
         </div>
       )}
-    </>
+    </ScenarioProvider>
   );
 }

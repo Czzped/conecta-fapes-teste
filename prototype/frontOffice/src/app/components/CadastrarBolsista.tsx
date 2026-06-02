@@ -1,16 +1,26 @@
-import { UserPlus, Search, ChevronRight, X, AlertCircle, Calendar, ChevronLeft } from 'lucide-react';
+import { UserPlus, Search, ChevronRight, X, AlertCircle, Calendar, ChevronLeft, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { usePageScenarios } from '@/mocks/ScenarioContext';
 
 interface CadastrarBolsistaProps {
   onBack: (tab?: 'bolsistas' | 'informacoes' | 'pagamentos') => void;
 }
 
 export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
+  usePageScenarios([
+    'bolsista-encontrado',
+    'bolsista-nao-cadastrado',
+    'bolsista-sistema-indisponivel',
+    'bolsista-cpf-invalido-backend',
+  ]);
   const { t } = useLanguage();
   const [cpf, setCpf] = useState('');
   const [bolsistaName, setBolsistaName] = useState('');
+  const [bolsistaInfo, setBolsistaInfo] = useState<{ email: string; instituicao: string; titulacao: string } | null>(null);
+  const [cpfBuscando, setCpfBuscando] = useState(false);
+  const [cpfErro, setCpfErro] = useState<string | null>(null);
   const [orientador, setOrientador] = useState('');
   const [orientadorIsCoordinator, setOrientadorIsCoordinator] = useState(false);
   const [modalidade, setModalidade] = useState('BPIG-X');
@@ -64,10 +74,26 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
     `${area.nivel1} ${area.nivel2} ${area.nivel3}`.toLowerCase().includes(areaConhecimentoSearch.toLowerCase()),
   );
 
-  const handleBuscarCPF = () => {
-    // Mock: populate bolsista name from CPF search
-    if (cpf.length >= 3) {
-      setBolsistaName('Marcela Starling');
+  const handleBuscarCPF = async () => {
+    if (!cpf || cpf.replace(/\D/g, '').length < 11) return;
+    setCpfBuscando(true);
+    setCpfErro(null);
+    setBolsistaName('');
+    setBolsistaInfo(null);
+    try {
+      const res = await fetch(`/api/bolsistas/cpf/${cpf.replace(/\D/g, '')}`);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setCpfErro(body.erro ?? 'Erro ao buscar bolsista. Tente novamente.');
+        return;
+      }
+      const data = await res.json();
+      setBolsistaName(data.nome);
+      setBolsistaInfo({ email: data.email, instituicao: data.instituicao, titulacao: data.titulacao });
+    } catch {
+      setCpfErro('Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
+    } finally {
+      setCpfBuscando(false);
     }
   };
 
@@ -397,30 +423,64 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
             />
             <button
               onClick={handleBuscarCPF}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.625rem 1rem', backgroundColor: 'var(--muted)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', transition: 'all 0.2s', whiteSpace: 'nowrap', fontFamily: 'var(--font-family)' }}
-              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--primary) 10%, transparent)'; e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.color = 'var(--primary)'; }}
+              disabled={cpfBuscando}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.625rem 1rem', backgroundColor: 'var(--muted)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: cpfBuscando ? 'not-allowed' : 'pointer', opacity: cpfBuscando ? 0.6 : 1, transition: 'all 0.2s', whiteSpace: 'nowrap', fontFamily: 'var(--font-family)' }}
+              onMouseEnter={(e) => { if (!cpfBuscando) { e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--primary) 10%, transparent)'; e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.color = 'var(--primary)'; } }}
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--muted)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--foreground)'; }}
             >
-              <Search size={16} />
-              Buscar
+              {cpfBuscando ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+              {cpfBuscando ? 'Buscando...' : 'Buscar'}
             </button>
           </div>
-          {bolsistaName && (
+
+          {/* H9: Mensagem de erro específica com hint de correção */}
+          {cpfErro && (
             <div
-              className="flex items-center gap-2 mt-2 px-3 py-2"
+              className="flex items-start gap-2 mt-2 px-3 py-2"
               style={{
-                backgroundColor: 'color-mix(in srgb, var(--primary) 8%, transparent)',
-                border: '1px solid color-mix(in srgb, var(--primary) 20%, transparent)',
+                backgroundColor: 'rgba(239,68,68,0.08)',
+                border: '1px solid rgba(239,68,68,0.3)',
                 borderRadius: 'var(--radius)',
               }}
             >
-              <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--primary)', flexShrink: 0 }} />
-              <span style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
-                {bolsistaName}
+              <AlertCircle size={15} style={{ color: '#ef4444', flexShrink: 0, marginTop: 1 }} />
+              <span style={{ color: '#ef4444', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
+                {cpfErro}
               </span>
-              <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)' }}>
-                encontrado
-              </span>
+            </div>
+          )}
+
+          {/* H1: Card de sucesso com dados do bolsista encontrado */}
+          {bolsistaName && bolsistaInfo && (
+            <div
+              className="mt-2 px-3 py-3"
+              style={{
+                backgroundColor: 'color-mix(in srgb, var(--primary) 6%, transparent)',
+                border: '1px solid color-mix(in srgb, var(--primary) 25%, transparent)',
+                borderRadius: 'var(--radius)',
+              }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: 'var(--primary)', flexShrink: 0 }} />
+                <span style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)', fontFamily: 'var(--font-family)' }}>
+                  {bolsistaName}
+                </span>
+                <span style={{ color: 'var(--primary)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)' }}>
+                  encontrado
+                </span>
+              </div>
+              <div style={{ paddingLeft: 15, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {[
+                  { label: 'Instituição', value: bolsistaInfo.instituicao },
+                  { label: 'Titulação', value: bolsistaInfo.titulacao },
+                  { label: 'E-mail', value: bolsistaInfo.email },
+                ].map(({ label, value }) => (
+                  <div key={label} style={{ display: 'flex', gap: 6 }}>
+                    <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)', minWidth: 70 }}>{label}:</span>
+                    <span style={{ color: 'var(--foreground)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)' }}>{value}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
