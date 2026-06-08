@@ -115,6 +115,7 @@ Cada US na tabela do epic inclui o numero da issue:
 | [sprints](sprints/SPRINT-007.md) | Um arquivo por sprint, referenciando features de releases-2026.csv | Sim — execucao do sprint |
 | [deliveries.md](deliveries.md) | Entregas comprometidas por sprint, organizadas por mes | Derivado dos sprints |
 | [technical-debt.md](technical-debt.md) | Indice consolidado de debito tecnico de todos os modulos | Derivado dos backlogs dos modulos |
+| [git-flow-conectafapes.md](git-flow-conectafapes.md) | Git Flow operacional e automações de branch, PR, release e hotfix | Processo técnico da equipe |
 
 ## Relacao entre os arquivos
 
