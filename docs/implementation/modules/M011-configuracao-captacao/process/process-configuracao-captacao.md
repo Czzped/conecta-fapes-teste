@@ -30,16 +30,16 @@ flowchart TD
     subgraph AnalistaTecnico[AnalistaTecnico]
         A[Selecionar Fomento aprovado]
         B[Criar Captacao com titulo e descricao]
+        VAC[Definir o valor do aporte na captacao com o recurso do fomento]
         FSB[Definir fase de Submissao]
         FHA[Definir fase de Avaliacao de Habilitacao]
-        FME[Definir fase de Avaliacao de Merito]
-        RFN[Definir calculo do resultado final]
+        FME[Definir Fase de Classificacao]
         F[Informar link do edital ou anexar documento]
         X[Validar configuracao]
         Z[Publicar Captacao]
     end
 
-    A --> B --> FSB --> FHA --> FME --> RFN --> F --> X --> Z
+    A --> B --> VAC --> FSB --> FHA --> FME --> F --> X --> Z
     Z --> ZA[Captacao disponivel para o Processo 3]
 ```
 
@@ -51,10 +51,10 @@ flowchart TD
 |---|-----------|-------------|-----------|
 | 1 | Selecionar Fomento aprovado | AnalistaTecnico | Escolhe o Fomento com estado APROVADO que financiara esta captacao. |
 | 2 | Criar Captacao com titulo e descricao | AnalistaTecnico | Registra a Captacao vinculada ao Fomento. Inicia no estado `EM_ANDAMENTO`. |
+| 2b | Definir o valor do aporte na captacao com o recurso do fomento | AnalistaTecnico | Define o valor do Fomento destinado a esta captacao especifica. O valor e distribuido por faixa dentro da captacao. Um mesmo Fomento pode ter multiplas captacoes com valores distintos alocados; a soma dos valores alocados nao pode exceder o total do Fomento. |
 | 3 | Definir fase de Submissao | AnalistaTecnico | Define o periodo de submissao de propostas: data de inicio e data de fim. |
-| 4 | Definir fase de Avaliacao de Habilitacao | AnalistaTecnico (Area Tecnica) | Configura a fase de habilitacao documental. Pode ter uma ou mais subatividades, cada uma com: data limite, formulario utilizado pelos avaliadores, quem executara a avaliacao (pessoa interna a FAPES ou avaliador externo), e peso percentual dentro da fase. Define tambem o tipo geral da fase (classificatoria ou eliminatoria) e o peso percentual desta fase na composicao da nota final. |
-| 5 | Definir fase de Avaliacao de Merito | AnalistaTecnico | Configura a fase de avaliacao de merito e seu peso percentual na nota final. Pode ter uma ou mais subatividades de avaliacao, cada uma com modalidade propria: avaliacao ad hoc (revisores externos), apresentacao/pitch do proponente, ou visita in loco. Para cada subatividade define: data limite, quantidade minima de respostas por proposta, quem executara a avaliacao (pessoa interna a FAPES ou avaliador externo), formula de calculo da nota da subatividade, e peso percentual da subatividade dentro desta fase. Tipo geral da fase: classificatoria ou eliminatoria. |
-| 5b | Definir calculo do resultado final | AnalistaTecnico | Define o peso percentual de cada fase (Habilitacao e Merito) e de cada subatividade da fase de Merito na composicao da nota final. A soma dos pesos das fases deve ser 100%. Dentro da fase de Merito, a soma dos pesos das subatividades tambem deve ser 100%. |
+| 4 | Definir fase de Avaliacao de Habilitacao | AnalistaTecnico (Area Tecnica) | Configura a fase de habilitacao documental. Pode ter uma ou mais subatividades, cada uma com: data limite, formulario utilizado pelos avaliadores, quem executara a avaliacao (pessoa interna a FAPES ou avaliador externo), e peso percentual dentro da fase. Define tambem o tipo geral da fase (classificatoria ou eliminatoria) e o peso percentual desta fase na composicao da nota final. Inclui subatividade de **Recurso**: data limite para interposicao de recurso e formulario de envio do recurso pelo proponente. |
+| 5 | Definir fase de Classificacao | AnalistaTecnico | Configura a fase de classificacao e seu peso percentual na nota final. Pode ter uma ou mais subatividades de avaliacao, cada uma com modalidade propria: avaliacao ad hoc (revisores externos), apresentacao/pitch do proponente, ou visita in loco. Para cada subatividade define: data limite, quantidade minima de respostas por proposta, quem executara a avaliacao (pessoa interna a FAPES ou avaliador externo), formula de calculo da nota da subatividade, e peso percentual da subatividade dentro desta fase. Tipo geral da fase: classificatoria ou eliminatoria. Inclui subatividade de **Recurso**: data limite para interposicao de recurso e formulario de envio do recurso pelo proponente. |
 | 6 | Adicionar edital | AnalistaTecnico | Informa o titulo do edital e ao menos um dos seguintes: link externo (URL) ou upload do documento. Pode informar versao quando houver rerratificacoes. Obrigatorio antes da publicacao. |
 | 19 | Validar e publicar Captacao | AnalistaTecnico | Verifica configuracao completa e publica. Captacao transita para `PUBLICADO`. |
 

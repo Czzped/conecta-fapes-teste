@@ -280,6 +280,7 @@ stateDiagram-v2
 | RN-F21 | AnalistaTecnico | Quando `DEMANDA_INDUZIDA`, deve ser indicado o outorgado destinatario (PF ou PJ). |
 | RN-F22 | AnalistaTecnico | OutorgadoDestinatario do tipo PJ deve ter pessoa fisica de contato informada. |
 | RN-F23 | Sistema | O tipo do outorgado deve ser definido em qualquer tipo de chamamento: em `CHAMADA_PUBLICA` declara o perfil esperado dos proponentes; em `DEMANDA_INDUZIDA` deve coincidir com o tipo do outorgado destinatario selecionado. |
+| RN-F24 | AnalistaTecnico | O valor total do Fomento pode ser distribuido em dois niveis: por captacao (cada Captacao recebe uma parcela do valor total do Fomento) e por faixa dentro de cada captacao. Um mesmo Fomento pode ter multiplas Captacoes com valores distintos alocados. |
 
 > ⚠️ **PENDENTE DE DETALHAMENTO** — `CHAMADA_PUBLICA` pode ser **continua** (sem prazo fixo de encerramento, recebe propostas de forma permanente ou por ciclos) ou **nao continua** (prazo fixo de submissao). A distincao afeta o cronograma, o encerramento da captacao e possivelmente as regras de publicacao do resultado. Nao ha definicao de como cada modalidade funciona nesta versao.
 

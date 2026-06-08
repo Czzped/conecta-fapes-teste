@@ -7,4 +7,5 @@ Reunião 08/06/2026
 - Na V1, No caso da rubrica "Bolsa" seleciona também as modalidades/níveis permitidos.
 - Para V2 precisamos discutir as outras restrições sobre rubricas, em especial sobre bolsas. 
 - Alterar o processo de fomento para dizer se ele será chamada pública ou demanda induzida.
-
+- Configurar tipos fixos que podem ou não aparecer no fomrulário de submissão (e.g., Equipe, Objetivos, Resultados, Cronograma, .....)
+- Dividir o recurso do fomento entre faixa e captacao
