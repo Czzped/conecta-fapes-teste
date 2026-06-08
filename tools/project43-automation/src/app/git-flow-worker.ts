@@ -79,6 +79,21 @@ async function defaultGatewayFactory(
   return new GitFlowGateway(new GitHubRestClient(token, USER_AGENT), config.org);
 }
 
+function createTokenGateway(
+  env: WorkerEnvironment,
+  token: string,
+  userAgent = USER_AGENT
+): GitFlowGateway {
+  const config = createGitFlowConfig(env);
+  return new GitFlowGateway(new GitHubRestClient(token, userAgent), config.org);
+}
+
+function getWebhookSecrets(env: WorkerEnvironment): string[] {
+  return [env.GITHUB_WEBHOOK_SECRET, env.GITHUB_REPO_WEBHOOK_SECRET]
+    .map((value) => value?.trim())
+    .filter((value): value is string => Boolean(value));
+}
+
 /**
  * Worker das automacoes de Git Flow do Projeto 43.
  *
@@ -138,6 +153,19 @@ export class GitFlowWorker {
     }
   }
 
+  private async createCommitStatusGateway(
+    env: WorkerEnvironment,
+    installationId?: string | number
+  ): Promise<GitFlowGateway> {
+    const statusToken = env.GITHUB_STATUS_TOKEN?.trim();
+
+    if (statusToken) {
+      return createTokenGateway(env, statusToken);
+    }
+
+    return this.gatewayFactory(env, installationId);
+  }
+
   private async readJson(request: Request): Promise<Record<string, unknown> | undefined> {
     const text = await request.text();
 
@@ -158,14 +186,15 @@ export class GitFlowWorker {
     config: GitFlowConfig
   ): Promise<Response> {
     const rawBody = await request.text();
-    const secret = env.GITHUB_WEBHOOK_SECRET?.trim();
+    const secrets = getWebhookSecrets(env);
 
-    if (secret) {
-      const valid = await verifyWebhookSignature(
-        secret,
-        request.headers.get("x-hub-signature-256"),
-        rawBody
-      );
+    if (secrets.length > 0) {
+      const signature = request.headers.get("x-hub-signature-256");
+      const valid = (
+        await Promise.all(
+          secrets.map((secret) => verifyWebhookSignature(secret, signature, rawBody))
+        )
+      ).some(Boolean);
 
       if (!valid) {
         return new Response("Invalid signature", { status: 401 });
@@ -195,7 +224,10 @@ export class GitFlowWorker {
       let statusResult: CommitStatusResult | null = null;
 
       if (refs.repository && refs.headSha) {
-        const gateway = await this.gatewayFactory(env, payload.installation?.id);
+        const gateway = await this.createCommitStatusGateway(
+          env,
+          payload.installation?.id
+        );
         statusResult = await gateway.createCommitStatus(refs.repository, refs.headSha, {
           state: validation.valid ? "success" : "failure",
           context: validation.checkName,

@@ -211,7 +211,15 @@ npm run sync:fields
 As automacoes de Git Flow reutilizam os segredos do GitHub App
 (`GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`, `GITHUB_APP_PRIVATE_KEY`) para
 executar acoes quando `execute: true`, e `GITHUB_WEBHOOK_SECRET` para validar
-a assinatura do webhook `pull_request`.
+a assinatura do webhook principal do GitHub App/Project.
+
+Para webhooks diretos de repositorio que disparam a validacao de PR, use
+`GITHUB_REPO_WEBHOOK_SECRET`. Isso permite configurar `pull_request` nos repos
+tecnicos sem rotacionar o secret ja usado pelo webhook do Project.
+
+A publicacao do status `git-flow/pr-policy` pode usar `GITHUB_STATUS_TOKEN`
+quando o GitHub App ainda nao tiver permissao `Commit statuses: write`; se esse
+secret nao existir, o worker usa o token da instalacao do GitHub App.
 
 ### Segredo de execucao do Git Flow
 
@@ -226,6 +234,8 @@ a assinatura do webhook `pull_request`.
 - `GITHUB_APP_INSTALLATION_ID`
 - `GITHUB_APP_PRIVATE_KEY`
 - `GITHUB_WEBHOOK_SECRET`
+- `GITHUB_REPO_WEBHOOK_SECRET` (opcional; webhooks diretos dos repositorios)
+- `GITHUB_STATUS_TOKEN` (opcional; fallback para publicar commit statuses)
 
 Para o rollover executado pelo GitHub Actions, use um token com permissao de
 Projects em `GITHUB_LEDS`/`PROJECTS_PAT` ou os segredos do GitHub App

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHmac } from "node:crypto";
 import test from "node:test";
 
 import { GitFlowWorker } from "../src/app/git-flow-worker.js";
@@ -18,6 +19,20 @@ function post(path: string, body: unknown, headers: Record<string, string> = {})
     method: "POST",
     headers,
     body: JSON.stringify(body),
+  });
+}
+
+function signedPullRequestWebhook(body: unknown, secret: string): Request {
+  const rawBody = JSON.stringify(body);
+  const signature = createHmac("sha256", secret).update(rawBody).digest("hex");
+
+  return new Request("https://worker.example/", {
+    method: "POST",
+    headers: {
+      "x-github-event": "pull_request",
+      "x-hub-signature-256": `sha256=${signature}`,
+    },
+    body: rawBody,
   });
 }
 
@@ -174,6 +189,55 @@ test("pull_request webhook publishes git-flow policy as commit status", async ()
       description: "production_pr_must_come_from_release_or_hotfix",
     },
   ]);
+});
+
+test("pull_request webhook accepts the repo webhook secret without rotating the Project secret", async () => {
+  const state = recordingWorker();
+  const body = {
+    action: "opened",
+    installation: { id: 123 },
+    pull_request: {
+      base: { ref: "develop" },
+      head: { ref: "feature/login", sha: "head-sha" },
+    },
+    repository: { name: "leds-conectafapes-backend-admin" },
+  };
+
+  const response = await state.worker.fetch(
+    signedPullRequestWebhook(body, "repo-secret"),
+    {
+      GITHUB_WEBHOOK_SECRET: "project-secret",
+      GITHUB_REPO_WEBHOOK_SECRET: "repo-secret",
+    }
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(state.built, 1);
+  assert.equal(state.statuses[0]?.state, "success");
+});
+
+test("pull_request webhook rejects signatures that match neither configured secret", async () => {
+  const state = recordingWorker();
+  const response = await state.worker.fetch(
+    signedPullRequestWebhook(
+      {
+        action: "opened",
+        pull_request: {
+          base: { ref: "develop" },
+          head: { ref: "feature/login", sha: "head-sha" },
+        },
+        repository: { name: "leds-conectafapes-backend-admin" },
+      },
+      "wrong-secret"
+    ),
+    {
+      GITHUB_WEBHOOK_SECRET: "project-secret",
+      GITHUB_REPO_WEBHOOK_SECRET: "repo-secret",
+    }
+  );
+
+  assert.equal(response.status, 401);
+  assert.equal(state.built, 0);
 });
 
 test("merged release PR creates the production tag automatically", async () => {
