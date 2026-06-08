@@ -2,8 +2,10 @@ export interface PullRequestWebhookPayload {
   action?: string;
   installation?: { id?: number | string };
   pull_request?: {
+    merged?: boolean;
+    merge_commit_sha?: string | null;
     base?: { ref?: string };
-    head?: { ref?: string };
+    head?: { ref?: string; sha?: string };
   };
   repository?: { name?: string };
 }
@@ -11,6 +13,8 @@ export interface PullRequestWebhookPayload {
 export interface PullRequestRefs {
   baseBranch: string;
   headBranch: string;
+  headSha: string | null;
+  mergeCommitSha: string | null;
   repository: string | null;
 }
 
@@ -46,6 +50,8 @@ export function extractPullRequestRefs(
   return {
     baseBranch,
     headBranch,
+    headSha: payload.pull_request?.head?.sha ?? null,
+    mergeCommitSha: payload.pull_request?.merge_commit_sha ?? null,
     repository: payload.repository?.name ?? null,
   };
 }

@@ -15,6 +15,9 @@ prototype/backoffice/package-lock.json
 prototype/frontOffice/dist/
 prototype/frontOffice/node_modules/
 
+# Project 43 automation
+tools/project43-automation/node_modules/
+
 # IDEs
 .idea/
 .vscode/

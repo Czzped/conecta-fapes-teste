@@ -1,13 +1,17 @@
 import { ExpiringValueCache } from "../cache/expiring-value-cache.js";
+import { createGitFlowConfig } from "../config/git-flow-config.js";
 import { loadWorkerConfig, type WorkerEnvironment } from "../config/worker-config.js";
 import { buildDateMutations, formatToday } from "../domain/date-mutations.js";
+import { planBranchCreation } from "../domain/branch-planning.js";
 import {
   shouldHandleStatusChange,
   type ProjectsV2ItemWebhookPayload,
 } from "../domain/project-webhook.js";
 import { createInstallationToken } from "../github/app-auth.js";
 import { GitHubGraphqlClient } from "../github/github-graphql-client.js";
+import { GitFlowGateway } from "../github/git-flow-gateway.js";
 import { GitHubProjectRepository } from "../github/project-repository.js";
+import { GitHubRestClient } from "../github/github-rest-client.js";
 import type { ProjectFieldMetadata } from "../github/project-types.js";
 import { verifyWebhookSignature } from "../github/webhook-signature.js";
 
@@ -113,21 +117,44 @@ export class ProjectStatusDateWorker {
       statusNames: config.project.statusNames,
     });
 
-    if (mutations.length === 0) {
-      return json({ applied: 0, statusName: itemState.statusName });
+    if (mutations.length > 0) {
+      await repository.applyDateMutations(
+        config.project.projectId,
+        itemId,
+        metadata,
+        mutations
+      );
     }
 
-    await repository.applyDateMutations(
-      config.project.projectId,
+    const gitFlowConfig = createGitFlowConfig(env);
+    const itemContext = await repository.getItemGitFlowContext(
       itemId,
-      metadata,
-      mutations
+      config.project.fieldNames.repositoryAliases
     );
+    const branchPlan = planBranchCreation(gitFlowConfig, {
+      statusName: itemState.statusName,
+      repositoryName: itemContext.repositoryName,
+      issueNumber: itemContext.issueNumber,
+      title: itemContext.title,
+    });
+    const branchResult =
+      branchPlan.decision === "create_branch"
+        ? await new GitFlowGateway(
+            new GitHubRestClient(accessToken, config.userAgent),
+            gitFlowConfig.org
+          ).executeAction(branchPlan.action)
+        : null;
 
     return json({
       applied: mutations.length,
       statusName: itemState.statusName,
       operations: mutations,
+      branch: {
+        decision: branchPlan.decision,
+        ...(branchPlan.decision === "create_branch"
+          ? { name: branchPlan.action.branch, result: branchResult }
+          : { reason: branchPlan.reason }),
+      },
     });
   }
 }

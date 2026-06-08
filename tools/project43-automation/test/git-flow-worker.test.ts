@@ -21,9 +21,19 @@ function post(path: string, body: unknown, headers: Record<string, string> = {})
   });
 }
 
+interface CommitStatusRecord {
+  repo: string;
+  sha: string;
+  state: string;
+  context: string;
+  description: string;
+}
+
 interface RecordingGateway {
   worker: GitFlowWorker;
   executed: GitFlowAction[];
+  statuses: CommitStatusRecord[];
+  releaseBranches: string[];
   built: number;
 }
 
@@ -32,6 +42,8 @@ function recordingWorker(): RecordingGateway {
   const state: RecordingGateway = {
     worker: undefined as unknown as GitFlowWorker,
     executed: [],
+    statuses: [],
+    releaseBranches: [],
     built: 0,
   };
 
@@ -39,6 +51,19 @@ function recordingWorker(): RecordingGateway {
     executeAction(action: GitFlowAction) {
       state.executed.push(action);
       return Promise.resolve({ action, status: "created" as const });
+    },
+    createCommitStatus(
+      repo: string,
+      sha: string,
+      status: { state: string; context: string; description: string }
+    ) {
+      state.statuses.push({ repo, sha, ...status });
+      return Promise.resolve({ status: "created" as const });
+    },
+    listBranchNames(repo: string, prefix: string) {
+      return Promise.resolve(
+        state.releaseBranches.filter((branch) => branch.startsWith(prefix))
+      );
     },
   } as unknown as GitFlowGateway;
 
@@ -66,7 +91,7 @@ test("validates a PR via JSON route and returns 422 when invalid", async () => {
 
 test("branch route returns needs_review when repository is unclear", async () => {
   const response = await worker.fetch(
-    post("/git-flow/branch", { statusName: "Pronto para desenvolvimento" }),
+    post("/git-flow/branch", { statusName: "In Progress" }),
     {}
   );
 
@@ -116,6 +141,112 @@ test("pull_request webhook returns the validation decision", async () => {
   assert.equal(payload.validation.valid, true);
   assert.equal(payload.validation.reason, "ok_develop_work_branch");
   assert.equal(payload.repository, "leds-conectafapes-backend-admin");
+});
+
+test("pull_request webhook publishes git-flow policy as commit status", async () => {
+  const state = recordingWorker();
+
+  const response = await state.worker.fetch(
+    new Request("https://worker.example/", {
+      method: "POST",
+      headers: { "x-github-event": "pull_request" },
+      body: JSON.stringify({
+        action: "opened",
+        installation: { id: 123 },
+        pull_request: {
+          base: { ref: "main" },
+          head: { ref: "feature/login", sha: "head-sha" },
+        },
+        repository: { name: "leds-conectafapes-backend-admin" },
+      }),
+    }),
+    {}
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(state.built, 1);
+  assert.deepEqual(state.statuses, [
+    {
+      repo: "leds-conectafapes-backend-admin",
+      sha: "head-sha",
+      state: "failure",
+      context: "git-flow/pr-policy",
+      description: "production_pr_must_come_from_release_or_hotfix",
+    },
+  ]);
+});
+
+test("merged release PR creates the production tag automatically", async () => {
+  const state = recordingWorker();
+
+  const response = await state.worker.fetch(
+    new Request("https://worker.example/", {
+      method: "POST",
+      headers: { "x-github-event": "pull_request" },
+      body: JSON.stringify({
+        action: "closed",
+        installation: { id: 123 },
+        pull_request: {
+          merged: true,
+          merge_commit_sha: "merge-sha",
+          base: { ref: "main" },
+          head: { ref: "release/v1.6.0" },
+        },
+        repository: { name: "leds-conectafapes-backend-admin" },
+      }),
+    }),
+    {}
+  );
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(state.executed, [
+    {
+      type: "create_tag",
+      repo: "leds-conectafapes-backend-admin",
+      tag: "v1.6.0",
+      ref: "main",
+      targetSha: "merge-sha",
+    },
+  ]);
+});
+
+test("merged hotfix PR creates tag and opens return PRs", async () => {
+  const state = recordingWorker();
+  state.releaseBranches = ["release/v1.7.0"];
+
+  const response = await state.worker.fetch(
+    new Request("https://worker.example/", {
+      method: "POST",
+      headers: { "x-github-event": "pull_request" },
+      body: JSON.stringify({
+        action: "closed",
+        installation: { id: 123 },
+        pull_request: {
+          merged: true,
+          merge_commit_sha: "merge-sha",
+          base: { ref: "main" },
+          head: { ref: "hotfix/v1.6.1-2090" },
+        },
+        repository: { name: "leds-conectafapes-backend-admin" },
+      }),
+    }),
+    {}
+  );
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(
+    state.executed.map((action) => action.type),
+    ["create_tag", "open_pull_request", "open_pull_request"]
+  );
+  assert.deepEqual(state.executed[1], {
+    type: "open_pull_request",
+    repo: "leds-conectafapes-backend-admin",
+    head: "hotfix/v1.6.1-2090",
+    base: "develop",
+    title: "Hotfix v1.6.1 -> develop",
+    body: "Retorno automatico do hotfix v1.6.1 para `develop`.",
+  });
+  assert.equal((state.executed[2] as { base: string }).base, "release/v1.7.0");
 });
 
 test("execute without admin token configured returns 403 and never builds gateway", async () => {

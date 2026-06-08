@@ -6,6 +6,7 @@ import type {
   ProjectFieldMetadata,
   ProjectFieldNode,
   ProjectItemForSprintRollover,
+  ProjectItemGitFlowContext,
   ProjectItemState,
   ProjectV2IterationField,
   ProjectV2SingleSelectField,
@@ -82,6 +83,48 @@ const PROJECT_ITEM_QUERY = `
               field {
                 ... on ProjectV2SingleSelectField {
                   id
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const PROJECT_ITEM_GIT_FLOW_CONTEXT_QUERY = `
+  query ProjectItemGitFlowContext($itemId: ID!) {
+    node(id: $itemId) {
+      ... on ProjectV2Item {
+        content {
+          __typename
+          ... on DraftIssue {
+            title
+          }
+          ... on Issue {
+            title
+            number
+            repository {
+              name
+            }
+          }
+          ... on PullRequest {
+            title
+            number
+            repository {
+              name
+            }
+          }
+        }
+        fieldValues(first: 50) {
+          nodes {
+            __typename
+            ... on ProjectV2ItemFieldSingleSelectValue {
+              name
+              field {
+                ... on ProjectV2SingleSelectField {
                   name
                 }
               }
@@ -338,6 +381,22 @@ interface ProjectItemQueryResult {
   } | null;
 }
 
+interface ProjectItemGitFlowContentNode {
+  __typename: "DraftIssue" | "Issue" | "PullRequest";
+  title?: string | null;
+  number?: number | null;
+  repository?: { name?: string | null } | null;
+}
+
+interface ProjectItemGitFlowContextQueryResult {
+  node: {
+    content: ProjectItemGitFlowContentNode | null;
+    fieldValues?: {
+      nodes: ProjectItemFieldSingleSelectValueNode[];
+    } | null;
+  } | null;
+}
+
 interface ProjectItemContentNode {
   __typename: "DraftIssue" | "Issue" | "PullRequest";
   title: string;
@@ -435,6 +494,27 @@ function resolveTrackedField(
 
 function createFieldNameSet(fieldNames: string[]): Set<string> {
   return new Set(fieldNames.map((fieldName) => fieldName.trim()).filter(Boolean));
+}
+
+function resolveProjectRepositorySelection(
+  values: ProjectItemFieldSingleSelectValueNode[] | undefined,
+  repositoryFieldNames: string[]
+): string | null {
+  const fieldNameSet = createFieldNameSet(repositoryFieldNames);
+
+  if (fieldNameSet.size === 0) {
+    return null;
+  }
+
+  for (const value of values ?? []) {
+    const fieldName = value.field?.name;
+
+    if (fieldName && fieldNameSet.has(fieldName) && value.name) {
+      return value.name;
+    }
+  }
+
+  return null;
 }
 
 function createRolloverItem(
@@ -623,6 +703,34 @@ export class GitHubProjectRepository {
     }
 
     return result;
+  }
+
+  async getItemGitFlowContext(
+    itemId: string,
+    repositoryFieldNames: string[] = []
+  ): Promise<ProjectItemGitFlowContext> {
+    const data = await this.client.request<ProjectItemGitFlowContextQueryResult>(
+      PROJECT_ITEM_GIT_FLOW_CONTEXT_QUERY,
+      { itemId }
+    );
+
+    if (!data.node) {
+      throw new Error(`project item not found: ${itemId}`);
+    }
+
+    const content = data.node.content;
+    const repositoryFromField = resolveProjectRepositorySelection(
+      data.node.fieldValues?.nodes ?? [],
+      repositoryFieldNames
+    );
+    const repositoryFromIssue =
+      content?.__typename === "Issue" ? content.repository?.name ?? null : null;
+
+    return {
+      title: content?.title ?? null,
+      repositoryName: repositoryFromField ?? repositoryFromIssue,
+      issueNumber: content?.__typename === "Issue" ? content.number ?? null : null,
+    };
   }
 
   async applyDateMutations(

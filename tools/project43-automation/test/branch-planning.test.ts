@@ -6,9 +6,13 @@ import { planBranchCreation } from "../src/domain/branch-planning.js";
 
 const config = createGitFlowConfig();
 
-test("ignores items that are not in the ready-for-dev status", () => {
+test("uses In Progress as the automatic branch trigger status", () => {
+  assert.equal(config.readyForDevStatusName, "In Progress");
+});
+
+test("ignores items that are not in the branch trigger status", () => {
   const plan = planBranchCreation(config, {
-    statusName: "In Progress",
+    statusName: "Pronto para desenvolvimento",
     repositoryName: "leds-conectafapes-backend-admin",
   });
 

@@ -1,6 +1,6 @@
-const DEFAULT_GIT_FLOW_ORG = "leds-conectafapes";
+export const DEFAULT_GIT_FLOW_ORG = "leds-conectafapes";
 const DEFAULT_DEVELOP_BRANCH = "develop";
-const DEFAULT_READY_FOR_DEV_STATUS = "Pronto para desenvolvimento";
+const DEFAULT_READY_FOR_DEV_STATUS = "In Progress";
 
 const DEFAULT_WORK_BRANCH_PREFIXES = [
   "feature/",

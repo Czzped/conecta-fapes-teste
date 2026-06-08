@@ -4,6 +4,7 @@ const DEFAULT_PROJECT_NUMBER = "43";
 const DEFAULT_STATUS_FIELD_NAME = "Status";
 const DEFAULT_STARTED_AT_FIELD_NAME = "Iniciado em";
 const DEFAULT_DONE_AT_FIELD_NAME = "Data de Conclusao";
+const DEFAULT_REPOSITORY_FIELD_NAME = "Repositório";
 const DEFAULT_IN_PROGRESS_STATUS_NAME = "In Progress";
 const DEFAULT_DONE_STATUS_NAME = "Done";
 
@@ -20,6 +21,8 @@ export interface ProjectFieldNames {
   startedAtAliases: string[];
   doneAt: string;
   doneAtAliases: string[];
+  repository: string;
+  repositoryAliases: string[];
 }
 
 export interface ProjectStatusNames {
@@ -91,6 +94,11 @@ export function createProjectConfig(
     "DONE_AT_FIELD_NAME",
     DEFAULT_DONE_AT_FIELD_NAME
   );
+  const repositoryFieldName = getOptionalValue(
+    source,
+    "REPOSITORY_FIELD_NAME",
+    DEFAULT_REPOSITORY_FIELD_NAME
+  );
 
   return {
     githubOrg: getOptionalValue(source, "GITHUB_ORG", DEFAULT_PROJECT_ORG),
@@ -109,6 +117,11 @@ export function createProjectConfig(
       ]),
       doneAt: doneAtFieldName,
       doneAtAliases: createAliases(doneAtFieldName, LEGACY_DONE_AT_FIELD_ALIASES),
+      repository: repositoryFieldName,
+      repositoryAliases: createAliases(repositoryFieldName, [
+        DEFAULT_REPOSITORY_FIELD_NAME,
+        "Repositorio",
+      ]),
     },
     statusNames: {
       inProgress: getOptionalValue(

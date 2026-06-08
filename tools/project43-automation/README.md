@@ -12,6 +12,10 @@ do GitHub App e atualiza as datas do Project 43 da organizacao
 - limpa `Data de Conclusao` quando o item sai de `Done`
 - move automaticamente para a proxima sprint os cards da sprint encerrada
   que nao estao em `Done`
+- cria branch de tarefa quando uma issue/card entra em `In Progress` com repo resolvido
+- publica o status `git-flow/pr-policy` nos PRs
+- cria tag automaticamente depois do merge de release/hotfix em producao
+- abre PRs de retorno de hotfix para `develop` e para release aberta
 
 ## Estrutura
 
@@ -49,8 +53,8 @@ aplicadas de forma **idempotente** — branch/PR/tag ja existentes retornam
 #### Webhook `pull_request`
 
 Qualquer request com header `x-github-event: pull_request` e roteado para a
-validacao de politica (sem side-effect). Se `GITHUB_WEBHOOK_SECRET` estiver
-configurado, a assinatura `x-hub-signature-256` e verificada.
+validacao de politica. Se `GITHUB_WEBHOOK_SECRET` estiver configurado, a
+assinatura `x-hub-signature-256` e verificada.
 
 Regras validadas:
 
@@ -59,9 +63,13 @@ Regras validadas:
   branch protegido (`main`/`master`/`develop`).
 
 Resposta: `{ "validation": { "valid": true|false, "reason": "...",
-"checkName": "git-flow/pr-policy" }, "repository": "..." }`. A resposta serve
-como ponto de integracao para status/check/comment/dispatch (ainda sem
-side-effect real).
+"checkName": "git-flow/pr-policy" }, "repository": "..." }`. Quando o PR tem
+`head.sha` e repositorio, o worker tambem publica o status
+`git-flow/pr-policy` no commit do PR.
+
+Quando um PR de `release/*` ou `hotfix/*` e mergeado em producao, o mesmo
+webhook executa a etapa pos-merge: cria a tag no commit de merge. Para hotfix,
+tambem abre os PRs de retorno para `develop` e para qualquer `release/*` aberta.
 
 #### `POST /git-flow/pull-request`
 
@@ -74,26 +82,22 @@ Valida a politica via JSON (util para testes/integracao manual). Retorna
 
 #### `POST /git-flow/branch`
 
-Cria um branch a partir de `develop` quando uma demanda entra em
-"Pronto para desenvolvimento". Exige `repository` (nome puro ou `org/repo`);
-sem repositorio reconhecido retorna `needs_review`.
+Cria um branch a partir de `develop` quando uma demanda entra em `In Progress`.
+Na rota manual, aceita `repository` (nome puro ou `org/repo`); sem repositorio
+reconhecido retorna `needs_review`. A mesma regra tambem roda no webhook
+`projects_v2_item`: o worker resolve titulo/numero/repositorio via GraphQL,
+priorizando o campo single-select `Repositório` do Project e usando a Issue
+vinculada como fallback. Com repositorio reconhecido, cria a branch automaticamente.
 
 ```json
 {
-  "statusName": "Pronto para desenvolvimento",
+  "statusName": "In Progress",
   "repository": "leds-conectafapes-backend-admin",
   "issueNumber": 42,
   "title": "Cadastro de Diarias",
   "execute": false
 }
 ```
-
-> Limite atual: o webhook `projects_v2_item` consultado pelo worker so traz os
-> campos de status/data do item — nao traz repositorio, numero da issue nem
-> titulo de forma confiavel. Por isso a branch automatica NAO e disparada
-> diretamente no webhook; o dominio e a rota estao prontos e o `repository`
-> e obrigatorio. A automacao do Project (ou uma Action) deve chamar
-> `/git-flow/branch` com o repositorio resolvido.
 
 #### `POST /git-flow/release`
 
@@ -135,7 +139,7 @@ aberta, PR de retorno para ela.
   `status: "planned"` e nao chama o GitHub. Dry-run NAO exige token.
 - `execute: true`: exige autorizacao de admin. E preciso ter
   `GIT_FLOW_ADMIN_TOKEN` configurado no env E enviar o mesmo valor no header
-  `authorization: Bearer <token>` ou `x-git-flow-token: <token>`.
+  `authorization` usando Bearer, ou no header `x-git-flow-token`.
   - sem `GIT_FLOW_ADMIN_TOKEN` configurado: `403 execution_not_configured`
     (o gateway nao e construido);
   - token ausente/incorreto: `401 unauthorized` (o gateway nao e construido);
@@ -145,16 +149,18 @@ aberta, PR de retorno para ela.
 
 ### Tag e etapa pos-merge (seguranca)
 
-A tag de release/hotfix so deve existir **depois** do merge em producao. Por
-isso, mesmo com `execute: true`, as acoes `create_tag` **nao** sao executadas
-automaticamente:
+A tag de release/hotfix so deve existir **depois** do merge em producao.
+Por isso, as rotas manuais `/git-flow/release` e `/git-flow/hotfix` continuam
+planejando a tag, mas nao executam `create_tag` durante a preparacao da release
+ou do hotfix.
 
-- release/hotfix em execucao criam **branch** e abrem **PR** normalmente;
-- as acoes de tag retornam `blocked` (em execucao) ou `planned` (em dry-run)
-  com `detail: "tag_deferred_until_production_merge"`;
-- para criar a tag de fato, faca uma chamada explicita com `createTags: true`
-  **alem de** `execute: true` e token admin valido — tipicamente apos
-  confirmar o merge do PR de producao.
+O caminho automatico e o webhook `pull_request`: quando o PR de `release/*` ou
+`hotfix/*` e mergeado em `main`/`master`, o worker cria a tag no
+`merge_commit_sha`. Em hotfix, ele tambem abre os PRs de retorno para
+`develop` e para as branches `release/*` abertas.
+
+`createTags: true` continua existindo para execucao administrativa manual, caso
+seja necessario reprocessar/conferir uma tag com autorizacao explicita.
 
 ```json
 {
@@ -185,7 +191,9 @@ npm run sync:fields
 - `STATUS_FIELD_NAME`
 - `STARTED_AT_FIELD_NAME`
 - `DONE_AT_FIELD_NAME`
+- `REPOSITORY_FIELD_NAME`
 - `IN_PROGRESS_OPTION_NAME`
+- `READY_FOR_DEV_OPTION_NAME`
 - `DONE_OPTION_NAME`
 - `ITERATION_FIELD_NAME` ou `SPRINT_FIELD_NAME`
 - `SPRINT_ROLLOVER_DRY_RUN`
@@ -193,7 +201,7 @@ npm run sync:fields
 
 ### Git Flow (`wrangler.jsonc`, opcionais)
 
-- `READY_FOR_DEV_OPTION_NAME` (default `Pronto para desenvolvimento`)
+- `READY_FOR_DEV_OPTION_NAME` (default `In Progress`)
 - `GIT_FLOW_DEVELOP_BRANCH` (default `develop`)
 - `GIT_FLOW_WORK_BRANCH_PREFIXES` (lista separada por virgula; default
   `feature/,feat/,fix/,bugfix/,chore/,docs/,refactor/,test/`)
@@ -208,9 +216,9 @@ a assinatura do webhook `pull_request`.
 ### Segredo de execucao do Git Flow
 
 - `GIT_FLOW_ADMIN_TOKEN` — token obrigatorio para autorizar qualquer rota
-  `/git-flow/*` chamada com `execute: true`. Enviar no header
-  `authorization: Bearer <token>` ou `x-git-flow-token: <token>`. Sem ele,
-  execucoes sao recusadas (`403`/`401`); dry-run continua liberado.
+  `/git-flow/*` chamada com `execute: true`. Enviar no header `authorization`
+  usando Bearer, ou no header `x-git-flow-token`. Sem ele, execucoes sao
+  recusadas (`403`/`401`); dry-run continua liberado.
 
 ### Segredos
 

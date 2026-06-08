@@ -1,4 +1,8 @@
 import type { ProjectFieldNames } from "../config/project-config.js";
+import {
+  DEFAULT_GIT_FLOW_ORG,
+  DEFAULT_REPOSITORIES,
+} from "../config/git-flow-config.js";
 import type { ProjectFieldDefinition } from "../github/project-types.js";
 
 export function createManagedProjectFields(
@@ -54,6 +58,18 @@ export function createManagedProjectFields(
       dataType: "DATE",
       legacyNames: fieldNames.doneAtAliases.filter(
         (alias) => alias !== fieldNames.doneAt
+      ),
+    },
+    {
+      name: fieldNames.repository,
+      dataType: "SINGLE_SELECT",
+      singleSelectOptions: DEFAULT_REPOSITORIES.map((repo) => ({
+        name: `${DEFAULT_GIT_FLOW_ORG}/${repo.name}`,
+        color: "GRAY",
+        description: `Repositorio tecnico ${repo.name}`,
+      })),
+      legacyNames: fieldNames.repositoryAliases.filter(
+        (alias) => alias !== fieldNames.repository
       ),
     },
   ];

@@ -29,6 +29,8 @@ export interface CreateTagAction {
   tag: string;
   /** Branch/ref de onde a tag deve apontar, ex.: `main`. */
   ref: string;
+  /** SHA exato do merge de producao, quando a tag deve apontar para ele. */
+  targetSha?: string;
 }
 
 export type GitFlowAction = CreateBranchAction | OpenPullRequestAction | CreateTagAction;

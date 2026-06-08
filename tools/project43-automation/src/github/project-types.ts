@@ -58,6 +58,12 @@ export interface ProjectItemForSprintRollover {
   iterationId: string | null;
 }
 
+export interface ProjectItemGitFlowContext {
+  title: string | null;
+  repositoryName: string | null;
+  issueNumber: number | null;
+}
+
 export type ProjectCustomFieldType = "DATE" | "SINGLE_SELECT";
 
 export interface ProjectSingleSelectOptionInput {

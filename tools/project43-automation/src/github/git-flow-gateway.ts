@@ -11,9 +11,30 @@ interface GitRefResponse {
   object?: { sha?: string };
 }
 
+interface BranchResponse {
+  name?: string;
+}
+
 interface PullRequestResponse {
   number?: number;
   html_url?: string;
+}
+
+interface CommitStatusRequest {
+  state: "error" | "failure" | "pending" | "success";
+  context: string;
+  description: string;
+  target_url?: string;
+}
+
+interface CommitStatusResponse {
+  id?: number;
+  state?: string;
+}
+
+export interface CommitStatusResult {
+  status: "created" | "failed";
+  detail?: string;
 }
 
 interface ExecuteOptions {
@@ -146,7 +167,8 @@ export class GitFlowGateway {
       return { action, status: "already_exists" };
     }
 
-    const targetSha = await this.getRefSha(action.repo, "heads", action.ref);
+    const targetSha =
+      action.targetSha ?? (await this.getRefSha(action.repo, "heads", action.ref));
 
     if (!targetSha) {
       return {
@@ -171,6 +193,46 @@ export class GitFlowGateway {
     }
 
     return { action, status: "created" };
+  }
+
+  async createCommitStatus(
+    repo: string,
+    sha: string,
+    status: CommitStatusRequest
+  ): Promise<CommitStatusResult> {
+    const response = await this.client.request<CommitStatusResponse>(
+      "POST",
+      `${this.repoPath(repo)}/statuses/${encodeURIComponent(sha)}`,
+      status
+    );
+
+    if (!response.ok) {
+      return {
+        status: "failed",
+        detail: `status ${response.status}`,
+      };
+    }
+
+    return {
+      status: "created",
+      detail: response.data?.state,
+    };
+  }
+
+  async listBranchNames(repo: string, prefix: string): Promise<string[]> {
+    const response = await this.client.request<BranchResponse[]>(
+      "GET",
+      `${this.repoPath(repo)}/branches?per_page=100`
+    );
+
+    if (!response.ok || !response.data) {
+      throw new Error(`failed to list branches on ${repo}: ${response.status}`);
+    }
+
+    return response.data
+      .map((branch) => branch.name)
+      .filter((name): name is string => Boolean(name))
+      .filter((name) => name.startsWith(prefix));
   }
 
   async executeAction(action: GitFlowAction): Promise<GitFlowActionResult> {

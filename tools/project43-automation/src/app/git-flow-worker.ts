@@ -10,6 +10,7 @@ import type {
 } from "../domain/git-flow-actions.js";
 import { planHotfix } from "../domain/hotfix-planning.js";
 import { validatePullRequest } from "../domain/pr-validation.js";
+import { planProductionMerge } from "../domain/production-merge-planning.js";
 import {
   extractPullRequestRefs,
   shouldValidatePullRequest,
@@ -17,7 +18,7 @@ import {
 } from "../domain/pull-request-webhook.js";
 import { planRelease } from "../domain/release-planning.js";
 import { createInstallationToken } from "../github/app-auth.js";
-import { GitFlowGateway } from "../github/git-flow-gateway.js";
+import { GitFlowGateway, type CommitStatusResult } from "../github/git-flow-gateway.js";
 import { GitHubRestClient } from "../github/github-rest-client.js";
 import { verifyWebhookSignature } from "../github/webhook-signature.js";
 
@@ -179,22 +180,76 @@ export class GitFlowWorker {
       return json({ ignored: true, reason: "invalid_json" }, 400);
     }
 
-    if (!shouldValidatePullRequest("pull_request", payload)) {
-      return json({ ignored: true, reason: "action_not_handled" }, 202);
-    }
-
     const refs = extractPullRequestRefs(payload);
 
     if (!refs) {
       return json({ ignored: true, reason: "missing_refs" }, 202);
     }
 
-    const validation = validatePullRequest(config, {
-      baseBranch: refs.baseBranch,
-      headBranch: refs.headBranch,
-    });
+    if (shouldValidatePullRequest("pull_request", payload)) {
+      const validation = validatePullRequest(config, {
+        baseBranch: refs.baseBranch,
+        headBranch: refs.headBranch,
+      });
 
-    return json({ validation, repository: refs.repository });
+      let statusResult: CommitStatusResult | null = null;
+
+      if (refs.repository && refs.headSha) {
+        const gateway = await this.gatewayFactory(env, payload.installation?.id);
+        statusResult = await gateway.createCommitStatus(refs.repository, refs.headSha, {
+          state: validation.valid ? "success" : "failure",
+          context: validation.checkName,
+          description: validation.reason,
+        });
+      }
+
+      return json({ validation, repository: refs.repository, statusResult });
+    }
+
+    if (payload.action === "closed" && payload.pull_request?.merged === true) {
+      const isGitFlowBranch =
+        refs.headBranch.startsWith(config.releaseBranchPrefix) ||
+        refs.headBranch.startsWith(config.hotfixBranchPrefix);
+
+      if (!isGitFlowBranch) {
+        return json({ ignored: true, reason: "not_release_or_hotfix" }, 202);
+      }
+
+      if (!refs.repository) {
+        return json({ valid: false, reason: "repository_unclear" }, 202);
+      }
+
+      const gateway = await this.gatewayFactory(env, payload.installation?.id);
+      const openReleaseBranches = await gateway.listBranchNames(
+        refs.repository,
+        config.releaseBranchPrefix
+      );
+      const plan = planProductionMerge(config, {
+        repositoryName: refs.repository,
+        baseBranch: refs.baseBranch,
+        headBranch: refs.headBranch,
+        mergeCommitSha: refs.mergeCommitSha,
+        openReleaseBranches,
+      });
+
+      if (!plan.valid) {
+        return json({ valid: false, reason: plan.reason, repository: plan.repo }, 202);
+      }
+
+      const results: GitFlowActionResult[] = [];
+      for (const action of plan.actions) {
+        results.push(await gateway.executeAction(action));
+      }
+
+      return json({
+        valid: true,
+        repository: plan.repo,
+        tag: plan.tag,
+        results,
+      });
+    }
+
+    return json({ ignored: true, reason: "action_not_handled" }, 202);
   }
 
   private handlePullRequestJson(
