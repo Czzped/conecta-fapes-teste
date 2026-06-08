@@ -94,6 +94,24 @@ function getWebhookSecrets(env: WorkerEnvironment): string[] {
     .filter((value): value is string => Boolean(value));
 }
 
+async function isWebhookSignatureValid(
+  env: WorkerEnvironment,
+  signature: string | null,
+  rawBody: string
+): Promise<boolean> {
+  const secrets = getWebhookSecrets(env);
+
+  if (secrets.length === 0) {
+    return true;
+  }
+
+  return (
+    await Promise.all(
+      secrets.map((secret) => verifyWebhookSignature(secret, signature, rawBody))
+    )
+  ).some(Boolean);
+}
+
 /**
  * Worker das automacoes de Git Flow do Projeto 43.
  *
@@ -122,6 +140,10 @@ export class GitFlowWorker {
     const config = createGitFlowConfig(env);
     const url = new URL(request.url);
     const eventName = request.headers.get("x-github-event");
+
+    if (eventName === "ping") {
+      return this.handlePingWebhook(request, env);
+    }
 
     if (eventName === "pull_request") {
       return this.handlePullRequestWebhook(request, env, config);
@@ -180,25 +202,38 @@ export class GitFlowWorker {
     }
   }
 
+  private async handlePingWebhook(
+    request: Request,
+    env: WorkerEnvironment
+  ): Promise<Response> {
+    const rawBody = await request.text();
+    const valid = await isWebhookSignatureValid(
+      env,
+      request.headers.get("x-hub-signature-256"),
+      rawBody
+    );
+
+    if (!valid) {
+      return new Response("Invalid signature", { status: 401 });
+    }
+
+    return json({ ok: true, event: "ping" });
+  }
+
   private async handlePullRequestWebhook(
     request: Request,
     env: WorkerEnvironment,
     config: GitFlowConfig
   ): Promise<Response> {
     const rawBody = await request.text();
-    const secrets = getWebhookSecrets(env);
+    const valid = await isWebhookSignatureValid(
+      env,
+      request.headers.get("x-hub-signature-256"),
+      rawBody
+    );
 
-    if (secrets.length > 0) {
-      const signature = request.headers.get("x-hub-signature-256");
-      const valid = (
-        await Promise.all(
-          secrets.map((secret) => verifyWebhookSignature(secret, signature, rawBody))
-        )
-      ).some(Boolean);
-
-      if (!valid) {
-        return new Response("Invalid signature", { status: 401 });
-      }
+    if (!valid) {
+      return new Response("Invalid signature", { status: 401 });
     }
 
     let payload: PullRequestWebhookPayload;

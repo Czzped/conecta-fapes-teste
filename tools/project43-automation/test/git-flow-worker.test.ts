@@ -22,14 +22,18 @@ function post(path: string, body: unknown, headers: Record<string, string> = {})
   });
 }
 
-function signedPullRequestWebhook(body: unknown, secret: string): Request {
+function signedPullRequestWebhook(
+  body: unknown,
+  secret: string,
+  eventName = "pull_request"
+): Request {
   const rawBody = JSON.stringify(body);
   const signature = createHmac("sha256", secret).update(rawBody).digest("hex");
 
   return new Request("https://worker.example/", {
     method: "POST",
     headers: {
-      "x-github-event": "pull_request",
+      "x-github-event": eventName,
       "x-hub-signature-256": `sha256=${signature}`,
     },
     body: rawBody,
@@ -132,6 +136,22 @@ test("release route returns a dry-run plan without executing", async () => {
   assert.equal(payload.valid, true);
   assert.ok(payload.results.length > 0);
   assert.ok(payload.results.every((result) => result.status === "planned"));
+});
+
+test("signed ping webhook returns ok for repo webhook health checks", async () => {
+  const state = recordingWorker();
+  const response = await state.worker.fetch(
+    signedPullRequestWebhook(
+      { zen: "Keep it logically awesome." },
+      "repo-secret",
+      "ping"
+    ),
+    { GITHUB_REPO_WEBHOOK_SECRET: "repo-secret" }
+  );
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { ok: true, event: "ping" });
+  assert.equal(state.built, 0);
 });
 
 test("pull_request webhook returns the validation decision", async () => {

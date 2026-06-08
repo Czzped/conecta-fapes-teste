@@ -12,7 +12,9 @@ function isGitFlowRequest(request: Request): boolean {
     return true;
   }
 
-  return request.headers.get("x-github-event") === "pull_request";
+  const eventName = request.headers.get("x-github-event");
+
+  return eventName === "pull_request" || eventName === "ping";
 }
 
 export default {
