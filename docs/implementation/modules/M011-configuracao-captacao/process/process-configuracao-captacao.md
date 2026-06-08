@@ -5,7 +5,6 @@
 O Processo de Configuracao da Selecao e conduzido pelo AnalistaTecnico a partir de um Fomento
 aprovado. Neste processo sao definidos:
 
-- o tipo de chamamento (Chamada Publica ou Demanda Induzida);
 - as faixas do Fomento ativadas nesta captacao;
 - as datas das etapas do processo de selecao;
 - os formularios, regras de submissao, requisitos do proponente e exigencias de prestacao.
@@ -31,45 +30,16 @@ flowchart TD
     subgraph AnalistaTecnico[AnalistaTecnico]
         A[Selecionar Fomento aprovado]
         B[Criar Captacao com titulo e descricao]
-        C[Definir tipo de chamamento]
-        E{Tipo de chamamento}
-        TO[Definir tipo do outorgado — PF ou PJ]
+        FSB[Definir fase de Submissao]
+        FHA[Definir fase de Avaliacao de Habilitacao]
+        FME[Definir fase de Avaliacao de Merito]
+        RFN[Definir calculo do resultado final]
         F[Informar link do edital ou anexar documento]
-        G[Selecionar outorgado destinatario]
-        GA{Tipo do outorgado}
-        GB[Informar CPF e nome — PF]
-        GC[Informar CNPJ, razao social e contato PF — PJ]
-        FAI[Selecionar faixas do Fomento para esta captacao]
-        J[Configurar regras de submissao]
-        JA{Exige aprovacao institucional?}
-        JB[Habilitar solicitacao de assinatura institucional na submissao]
-        K{Submissao restrita a escolhidos?}
-        L[Selecionar proponentes autorizados]
-        M[Configurar requisitos do proponente]
-        N[Configurar documentos exigidos]
-        R[Definir exigencia de prestacao tecnica e financeira]
-        S[Selecionar formulario de Submissao de Propostas, Avaliacao de Proposta e Recursos de Nota]
-        MX[Configurar matriz de campos da proposta]
-        W[Definir Cronograma]
         X[Validar configuracao]
-        Y{Configuracao valida?}
         Z[Publicar Captacao]
     end
 
-    A --> B --> C --> E
-    E -->|CHAMADA_PUBLICA| TO --> F
-    E -->|DEMANDA_INDUZIDA| G --> GA
-    GA -->|PESSOA_FISICA| GB --> F
-    GA -->|PESSOA_JURIDICA| GC --> F
-    F --> FAI --> J --> JA
-    JA -->|Sim| JB --> K
-    JA -->|Nao| K
-    K -->|Sim| L --> M
-    K -->|Nao| M
-    M --> N --> R --> S
-    S --> MX --> W --> X --> Y
-    Y -->|Nao| C
-    Y -->|Sim| Z
+    A --> B --> FSB --> FHA --> FME --> RFN --> F --> X --> Z
     Z --> ZA[Captacao disponivel para o Processo 3]
 ```
 
@@ -81,20 +51,11 @@ flowchart TD
 |---|-----------|-------------|-----------|
 | 1 | Selecionar Fomento aprovado | AnalistaTecnico | Escolhe o Fomento com estado APROVADO que financiara esta captacao. |
 | 2 | Criar Captacao com titulo e descricao | AnalistaTecnico | Registra a Captacao vinculada ao Fomento. Inicia no estado `EM_ANDAMENTO`. |
-| 3 | Definir tipo de chamamento | AnalistaTecnico | Define se a captacao e `CHAMADA_PUBLICA` (edital aberto) ou `DEMANDA_INDUZIDA` (destinatario especifico). |
-| 4 | Definir tipo do outorgado | AnalistaTecnico | Define se o outorgado e `PESSOA_FISICA` ou `PESSOA_JURIDICA`. Em `CHAMADA_PUBLICA` declara o perfil dos proponentes habilitados a receber outorga. Em `DEMANDA_INDUZIDA` deve coincidir com o tipo do destinatario informado no passo seguinte. |
-| 5 | Selecionar outorgado destinatario | AnalistaTecnico | Apenas quando `DEMANDA_INDUZIDA`. Informa o destinatario especifico: PF (CPF + nome) ou PJ (CNPJ + razao social + contato PF). O tipo deve coincidir com o definido no passo anterior. |
+| 3 | Definir fase de Submissao | AnalistaTecnico | Define o periodo de submissao de propostas: data de inicio e data de fim. |
+| 4 | Definir fase de Avaliacao de Habilitacao | AnalistaTecnico (Area Tecnica) | Configura a fase de habilitacao documental. Pode ter uma ou mais subatividades, cada uma com: data limite, formulario utilizado pelos avaliadores, quem executara a avaliacao (pessoa interna a FAPES ou avaliador externo), e peso percentual dentro da fase. Define tambem o tipo geral da fase (classificatoria ou eliminatoria) e o peso percentual desta fase na composicao da nota final. |
+| 5 | Definir fase de Avaliacao de Merito | AnalistaTecnico | Configura a fase de avaliacao de merito e seu peso percentual na nota final. Pode ter uma ou mais subatividades de avaliacao, cada uma com modalidade propria: avaliacao ad hoc (revisores externos), apresentacao/pitch do proponente, ou visita in loco. Para cada subatividade define: data limite, quantidade minima de respostas por proposta, quem executara a avaliacao (pessoa interna a FAPES ou avaliador externo), formula de calculo da nota da subatividade, e peso percentual da subatividade dentro desta fase. Tipo geral da fase: classificatoria ou eliminatoria. |
+| 5b | Definir calculo do resultado final | AnalistaTecnico | Define o peso percentual de cada fase (Habilitacao e Merito) e de cada subatividade da fase de Merito na composicao da nota final. A soma dos pesos das fases deve ser 100%. Dentro da fase de Merito, a soma dos pesos das subatividades tambem deve ser 100%. |
 | 6 | Adicionar edital | AnalistaTecnico | Informa o titulo do edital e ao menos um dos seguintes: link externo (URL) ou upload do documento. Pode informar versao quando houver rerratificacoes. Obrigatorio antes da publicacao. |
-| 7 | Selecionar faixas do Fomento | AnalistaTecnico | Seleciona uma ou mais faixas do Fomento que serao ativadas nesta captacao. As faixas determinam os limites de investimento, tipos de projeto, rubricas e bolsas disponiveis para as propostas. Herdados do Fomento — nao reconfigurados aqui. |
-| 9 | Configurar regras de submissao | AnalistaTecnico | Define se permite multiplas propostas, acumulo de bolsa, participacao em outra proposta e se a submissao e restrita a proponentes escolhidos. Tambem define se exige aprovacao institucional (`exigeAprovacaoInstitucional`). |
-| 9b | Habilitar solicitacao de assinatura institucional | AnalistaTecnico | **Condicional — apenas quando `exigeAprovacaoInstitucional = true`.** Configura que o proponente devera solicitar a assinatura do ResponsavelInstitucional durante o periodo de submissao. A proposta so pode ser submetida formalmente apos a assinatura ser obtida. |
-| 10 | Selecionar proponentes autorizados | AnalistaTecnico | Quando submissao restrita, seleciona as instituicoes ou pessoas autorizadas a submeter proposta. |
-| 11 | Configurar requisitos do proponente | AnalistaTecnico | Define direcionamento (aberto, instituicao, tipo de instituicao), exigencia de vinculo empregaticio, gestor institucional e nivel academico minimo. |
-| 12 | Configurar documentos adicionais exigidos | AnalistaTecnico | Define quais documentos o proponente deve anexar na submissao, alem dos blocos estruturais da proposta. Exemplos: certidoes, contratos sociais, comprovantes de vinculo, declaracoes especificas do edital. Para cada documento informa: nome, descricao, formatos permitidos (PDF, DOCX, etc.), obrigatoriedade, e se pode ser reaproveitado do cadastro corporativo do M008 quando valido. |
-| 15 | Definir exigencia de prestacao | AnalistaTecnico | Define se os projetos gerados exigirao prestacao tecnica e/ou financeira. |
-| 16 | Selecionar formulario de Submissao de Propostas, Avaliacao de Proposta e Recursos de Nota | AnalistaTecnico | Seleciona na base do M021: formulario de submissao da proposta, formulario de avaliacao ad hoc (usado pelos revisores para registrar parecer e nota), formulario de revisao de resultado e formulario de anexos (opcional). As regras de avaliacao de merito — se exige avaliacao ad hoc e quantidade minima de revisores por proposta — sao configuradas diretamente no formulario de avaliacao selecionado. |
-| 17 | Configurar matriz de campos da proposta | AnalistaTecnico | Para cada bloco fixo da proposta define se e `EXIGIDO` ou `DISPENSADO`. Os blocos configurados aqui determinam o que aparece no formulario de submissao para o proponente. |
-| 18 | Definir Cronograma | AnalistaTecnico | Define as 8 etapas obrigatorias do cronograma da captacao: (1) data de publicacao da captacao — data em que a captacao e tornada publica; (2) periodo de submissao de propostas — janela em que proponentes enviam propostas; (3) periodo de analise documental — AnalistaTecnico confere documentacao e habilita ou inabilita propostas; (4) periodo de avaliacao ad hoc — revisores registram pareceres e notas; (5) data de publicacao do resultado preliminar — divulgado aos proponentes, abre prazo para recursos; (6) periodo de recebimento de revisoes — proponentes podem solicitar revisao do resultado; (7) data de publicacao do resultado apos revisao — publicado apos analise dos recursos; (8) data de publicacao do resultado final — encerra o processo de selecao. Todas as datas devem estar dentro da vigencia do Fomento. |
 | 19 | Validar e publicar Captacao | AnalistaTecnico | Verifica configuracao completa e publica. Captacao transita para `PUBLICADO`. |
 
 ---
@@ -144,8 +105,6 @@ Captacao publicada contendo:
 
 - referencia ao Fomento aprovado;
 - faixas do Fomento selecionadas para esta captacao;
-- tipo de chamamento: `CHAMADA_PUBLICA` ou `DEMANDA_INDUZIDA`;
-- outorgado destinatario (PF ou PJ com contato PF), quando `DEMANDA_INDUZIDA`;
 - link do edital;
 - regras de submissao e proponentes autorizados quando restrita;
 - requisitos do proponente;
@@ -181,9 +140,6 @@ stateDiagram-v2
 |----|-------------|-------|
 | RN-CS00 | AnalistaTecnico | Rubricas e tipos de projetos sao definidos no Fomento e herdados pela Captacao atraves das faixas selecionadas. Nao sao reconfigurados no processo de selecao. |
 | RN-CS01 | AnalistaTecnico | A Captacao deve referenciar um Fomento com estado APROVADO. |
-| RN-CS02 | AnalistaTecnico | A Captacao deve ter tipo CHAMADA_PUBLICA ou DEMANDA_INDUZIDA. |
-| RN-CS03 | AnalistaTecnico | Quando DEMANDA_INDUZIDA, deve ser indicado o outorgado destinatario (PF ou PJ). |
-| RN-CS04 | AnalistaTecnico | OutorgadoDestinatario PJ deve ter pessoa fisica de contato informada. |
 | RN-CS05 | AnalistaTecnico | A Captacao deve selecionar ao menos uma faixa do Fomento. |
 | RN-CS06 | AnalistaTecnico | As faixas selecionadas devem pertencer ao Fomento referenciado. |
 | RN-CS07 | AnalistaTecnico | A Captacao deve ter link do edital preenchido antes da publicacao. |
@@ -195,7 +151,6 @@ stateDiagram-v2
 | RN-CS13 | AnalistaTecnico | Ao adiar uma etapa, todas as etapas posteriores sao deslocadas pela mesma quantidade de dias. |
 | RN-CS14 | AnalistaTecnico | A Captacao so pode ser publicada quando toda a configuracao obrigatoria estiver preenchida. |
 | RN-CS15 | AnalistaTecnico | A Captacao so pode ser despublicada quando nenhuma proposta estiver submetida no periodo ativo. |
-| RN-CS16 | AnalistaTecnico | O tipo do outorgado deve ser definido em qualquer tipo de chamamento: em CHAMADA_PUBLICA declara o perfil esperado; em DEMANDA_INDUZIDA deve coincidir com o tipo do outorgado destinatario selecionado. |
 | RN-CS17 | AnalistaTecnico | O edital deve conter ao menos um link externo ou um arquivo anexado antes da publicacao da captacao. |
 | RN-CS18 | AnalistaTecnico | O edital pode ser rerratificado informando nova versao. O historico de versoes deve ser preservado. |
 | RN-CS19 | AnalistaTecnico | Cada bloco fixo da proposta deve ser configurado como EXIGIDO ou DISPENSADO antes da publicacao. |

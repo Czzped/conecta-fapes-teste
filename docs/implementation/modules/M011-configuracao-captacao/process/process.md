@@ -12,7 +12,7 @@ Modelo estrutural por processo: [modelo-estrutural-por-processo.md](../modelo-es
 | # | Processo | Responsavel principal | Descricao resumida |
 |---|----------|-----------------------|--------------------|
 | 1 | [Fomento](process-fomento.md) | GestorFomento | Aporte financeiro de Programa, Parceria ou recurso interno para um eixo estrategico. Define faixas de investimento, rubricas por faixa e resultados esperados. |
-| 2 | [Configuracao da Selecao](process-configuracao-selecao.md) | AnalistaTecnico | A Area Tecnica configura o tipo de chamamento, cronograma com 8 etapas obrigatorias, formularios e regras de selecao sobre um Fomento aprovado. GestorFAPES e responsavel por publicar, pausar, retomar e cancelar a Captacao. |
+| 2 | [Configuracao da Selecao](process-configuracao-captacao.md) | AnalistaTecnico | A Area Tecnica configura o tipo de chamamento, cronograma com 8 etapas obrigatorias, formularios e regras de selecao sobre um Fomento aprovado. GestorFAPES e responsavel por publicar, pausar, retomar e cancelar a Captacao. |
 | 3 | [Selecao dos Projetos](process-selecao-projetos.md) | AnalistaTecnico | Execucao da captacao: recebimento de propostas, analise documental, analise de merito, resultado preliminar, revisao e resultado final. Envolve tambem Proponente, RevisorAdHoc e ResponsavelInstitucional. |
 
 ---

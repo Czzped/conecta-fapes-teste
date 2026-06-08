@@ -88,3 +88,4 @@ Cada contexto e dono do seu `README.md`, `modelo-estrutural.md`, `backlog.md` e 
 | RI8 | Instituicao tem no maximo um pai (`instituicaoSuperior`). Nao e permitido vincular uma mesma Instituicao a duas matrizes diferentes. | Must |
 | RI5 | Em Responsavel, exatamente um entre `instituicao` e `unidade` deve estar preenchido. | Must |
 | RI7 | `responsavelLegal` de uma PessoaFisica deve apontar para outra PessoaFisica cadastrada, ativa e maior de idade. Auto-referencia (pessoa apontando para si mesma) e rejeitada. | Must |
+| RN27 | PessoaFisica atuando como coordenador nao pode submeter nova proposta quando o numero de projetos ativos (contratados ou em execucao) atingir o limite maximo configurado no Fomento (M011). O limite e definido pelo AnalistaTecnico por fomento; valor zero ou ausente significa sem restricao. | Must |

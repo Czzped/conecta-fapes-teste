@@ -379,7 +379,7 @@ nav:
           - Processos:
               - Index: implementation/modules/M011-configuracao-captacao/process/process.md
               - P1 Fomento: implementation/modules/M011-configuracao-captacao/process/process-fomento.md
-              - P2 Configuracao da Selecao: implementation/modules/M011-configuracao-captacao/process/process-configuracao-selecao.md
+              - P2 Configuracao da Captacao: implementation/modules/M011-configuracao-captacao/process/process-configuracao-captacao.md
               - P3 Selecao dos Projetos: implementation/modules/M011-configuracao-captacao/process/process-selecao-projetos.md
           - Backlog: implementation/modules/M011-configuracao-captacao/backlog.md
           - Contrato: implementation/modules/M011-configuracao-captacao/contrato.md
