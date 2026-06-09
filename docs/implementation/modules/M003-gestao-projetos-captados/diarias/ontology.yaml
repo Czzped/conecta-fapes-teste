@@ -10,13 +10,13 @@ imports:
 metadata:
   module: "M003"
   source: "docs/implementation/modules/M003-gestao-projetos-captados/diarias/modelo-estrutural.md"
-  version: "2.0.0"
-  description: "Gerencia solicitações operacionais de diária dentro de um projeto, incluindo aceite dos bolsistas e cancelamento."
+  version: "2.1.0"
+  description: "Gerencia solicitações operacionais de diária dentro de um projeto, incluindo snapshots de calculo, aceite dos bolsistas e ciclo de vida completo."
 
 entities:
 
   SolicitacaoDiaria:
-    description: "Pedido operacional de diária criado pelo coordenador para um conjunto de bolsistas do projeto. Cada bolsista gera um AceiteViagem próprio dentro da solicitação."
+    description: "Pedido operacional de diária criado pelo coordenador para um conjunto de bolsistas do projeto. Congela snapshots de calculo e referências ao M008 no momento da criação. Cada bolsista gera um SolicitacaoDiariaBolsista próprio dentro da solicitação."
     extends: "shared.Auditavel"
     fields:
       origem:
@@ -27,10 +27,14 @@ entities:
         type: "ref:post_award.iniciativas.diarias.Localidade"
         required: true
         description: "Destino da viagem. Pode ser uma Cidade ou um Pais."
-      tipo:
-        type: "ref:M008.TipoDiaria"
+      tipoDiariaRef:
+        type: "ref:corporativo.diarias.TipoDiaria"
         required: true
-        description: "Tipo de diária (DENTRO_ESTADO, NACIONAL ou INTERNACIONAL). Referência ao cadastro corporativo do M008."
+        description: "Referencia ao TipoDiaria vigente no momento da criacao. Imutavel apos criacao."
+      parametroCalculoDiariaRef:
+        type: "ref:corporativo.diarias.ParametroCalculoDiaria"
+        required: true
+        description: "Referencia ao ParametroCalculoDiaria vigente no momento da criacao. Imutavel apos criacao."
       dataHoraSaida:
         type: datetime
         required: true
@@ -47,6 +51,26 @@ entities:
         type: string
         required: true
         description: "Motivo da viagem declarado pelo coordenador."
+      valorUnitarioDiaria:
+        type: decimal
+        required: true
+        description: "Snapshot de TipoDiaria.valorUnitario no momento da criacao. Imutavel."
+      distanciaKm:
+        type: decimal
+        required: false
+        description: "Distancia calculada entre origem e destino em km. Preenchida apenas para abrangencia DENTRO_ESTADO."
+      provedorDistancia:
+        type: string
+        required: false
+        description: "Identificador do provedor usado para calcular distanciaKm (ex: google_routes_v2). Preenchido quando distanciaKm for preenchido."
+      regraCalculoSnapshot:
+        type: string
+        required: true
+        description: "Texto da norma e parametro vigente aplicado no calculo. Snapshot imutavel para auditoria."
+      memoriaCalculoSnapshot:
+        type: string
+        required: true
+        description: "Entradas, parametros, formula aplicada e resultado do calculo. Snapshot imutavel para auditoria."
       quantidadeDiariasCalculada:
         type: decimal
         required: true
@@ -59,14 +83,34 @@ entities:
         type: "enum:EstadoSolicitacaoDiaria"
         required: true
         description: "Estado atual da solicitação."
+      justificativaCancelamento:
+        type: string
+        required: false
+        description: "Justificativa do coordenador ao cancelar. Obrigatorio quando estado = CANCELADA."
       projeto:
         type: "ref:post_award.iniciativas.Iniciativa"
         required: true
         description: "Projeto ao qual a solicitação pertence."
-      listaAceiteViagem:
-        type: "AceiteViagem[]"
+      rubricaProjeto:
+        type: "ref:M013.RubricaProjeto"
         required: true
-        description: "Lista de aceites, um por bolsista. Mínimo 1. Todos viram CANCELADO quando a solicitação é cancelada. Ao criar cada AceiteViagem, o sistema envia uma notificação de diária para o bolsista correspondente."
+        description: "Link de débito — referência à RubricaProjeto do tipo viagem debitada na criação. Imutável após criação. Toda reversão (cancelamento, recusa, regularizacao_nao_utilizada) usa obrigatoriamente essa referência."
+      listaSolicitacaoDiariaBolsista:
+        type: "SolicitacaoDiariaBolsista[]"
+        required: true
+        description: "Lista de aceites, um por bolsista. Mínimo 1. Todos viram CANCELADO quando a solicitação é cancelada."
+
+  RelatorioDiariaBolsista:
+    description: "Comprovação da realização da viagem pelo bolsista. Composto por descrição textual e arquivo anexo. Um por SolicitacaoDiariaBolsista. Preenchido após o retorno da viagem."
+    fields:
+      descricao:
+        type: string
+        required: true
+        description: "Descrição da viagem realizada pelo bolsista."
+      arquivo:
+        type: arquivo
+        required: true
+        description: "Comprovante da realização da viagem (imagem ou PDF)."
 
   Localidade:
     description: "Tipo abstrato que representa a origem ou o destino de uma viagem. Pode ser Cidade ou Pais."
@@ -94,21 +138,49 @@ entities:
     description: "Localidade do tipo país. Usada como destino em viagens internacionais sem cidade específica."
     extends: "Localidade"
 
-  AceiteViagem:
+  SolicitacaoDiariaBolsista:
     description: "Registra a manifestação de um bolsista sobre uma SolicitacaoDiaria. Entidade embarcada — persiste dentro da SolicitacaoDiaria."
     fields:
       bolsista:
         type: "ref:M009.AlocacaoBolsista"
         required: true
         description: "Bolsista que deve aceitar ou recusar a viagem."
+      dataEnvio:
+        type: datetime
+        required: true
+        description: "Data e hora em que a solicitacao foi enviada ao bolsista."
       dataAceite:
         type: datetime
         required: false
         description: "Data e hora em que o bolsista registrou a manifestação. Nulo enquanto estado = AGUARDANDO_ACEITE."
       estado:
-        type: "enum:EstadoAceiteViagem"
+        type: "enum:EstadoSolicitacaoDiariaBolsista"
         required: true
         description: "Estado do aceite pelo bolsista."
+      valorIndividual:
+        type: decimal
+        required: true
+        description: "Valor calculado para este bolsista. Snapshot imutável após criação."
+      justificativaRecusa:
+        type: string
+        required: false
+        description: "Justificativa preenchida pelo bolsista ao recusar. Obrigatório quando estado = NAO_ACEITO."
+      versaoAceite:
+        type: string
+        required: false
+        description: "Versao do texto de aceite apresentado ao bolsista no momento da assinatura. Snapshot imutavel. Preenchido ao aceitar."
+      contaBancariaSnapshot:
+        type: string
+        required: false
+        description: "Snapshot da conta bancaria confirmada pelo bolsista no momento do aceite. Snapshot imutavel. Preenchido ao aceitar."
+      transacaoDiaria:
+        type: "ref:M014.TransacaoDiaria"
+        required: false
+        description: "Referência à transação financeira registrada no M014 após pagamento pelo M004. Nulo enquanto não houver pagamento processado."
+      relatorio:
+        type: "ref:post_award.iniciativas.diarias.RelatorioDiariaBolsista"
+        required: false
+        description: "Comprovacao da realizacao da viagem. Preenchida apos o retorno. Nulo enquanto nao registrado."
 
 relationships:
   - from: "post_award.iniciativas.diarias.SolicitacaoDiaria"
@@ -117,22 +189,46 @@ relationships:
     cardinality: "N:1"
 
   - from: "post_award.iniciativas.diarias.SolicitacaoDiaria"
-    relation: "usa tipo de diária"
-    to: "M008.TipoDiaria"
+    relation: "snapshot tipo de diaria"
+    to: "corporativo.diarias.TipoDiaria"
     cardinality: "N:1"
-    note: "Entidade externa — referenciada por uuid opaco."
+    note: "Referencia imutavel gravada na criacao. Entidade externa — referenciada por uuid opaco."
+
+  - from: "post_award.iniciativas.diarias.SolicitacaoDiaria"
+    relation: "snapshot parametro calculo"
+    to: "corporativo.diarias.ParametroCalculoDiaria"
+    cardinality: "N:1"
+    note: "Referencia imutavel gravada na criacao. Entidade externa — referenciada por uuid opaco."
+
+  - from: "post_award.iniciativas.diarias.SolicitacaoDiaria"
+    relation: "link de débito"
+    to: "M013.RubricaProjeto"
+    cardinality: "N:1"
+    note: "Referência imutável gravada na criação. Comprometimento gerado ao criar; reversão usa obrigatoriamente essa mesma referência."
 
   - from: "post_award.iniciativas.diarias.SolicitacaoDiaria"
     relation: "contém aceites"
-    to: "post_award.iniciativas.diarias.AceiteViagem"
+    to: "post_award.iniciativas.diarias.SolicitacaoDiariaBolsista"
     cardinality: "1:N"
-    note: "Composição — AceiteViagem não existe fora da SolicitacaoDiaria."
+    note: "Composição — SolicitacaoDiariaBolsista não existe fora da SolicitacaoDiaria."
 
-  - from: "post_award.iniciativas.diarias.AceiteViagem"
+  - from: "post_award.iniciativas.diarias.SolicitacaoDiariaBolsista"
     relation: "referencia bolsista"
     to: "M009.AlocacaoBolsista"
     cardinality: "N:1"
     note: "Entidade externa — referenciada por uuid opaco."
+
+  - from: "post_award.iniciativas.diarias.SolicitacaoDiariaBolsista"
+    relation: "vinculada a transacao financeira"
+    to: "M014.TransacaoDiaria"
+    cardinality: "1:0..1"
+    note: "Referência opcional. Preenchida pelo M004 após processamento do pagamento bancário. M003 não cria nem altera a TransacaoDiaria."
+
+  - from: "post_award.iniciativas.diarias.SolicitacaoDiariaBolsista"
+    relation: "possui relatorio"
+    to: "post_award.iniciativas.diarias.RelatorioDiariaBolsista"
+    cardinality: "1:0..1"
+    note: "Composição — RelatorioDiariaBolsista não existe fora da SolicitacaoDiariaBolsista. Um por bolsista. Preenchido após o retorno da viagem."
 
 axioms:
   - id: "AX-M003-D001"
@@ -140,20 +236,36 @@ axioms:
     formal_rule: "∀s ∈ SolicitacaoDiaria: s.dataHoraChegada > s.dataHoraSaida"
 
   - id: "AX-M003-D002"
-    natural_language: "Uma SolicitacaoDiaria deve ter pelo menos um AceiteViagem."
-    formal_rule: "∀s ∈ SolicitacaoDiaria: |s.listaAceiteViagem| ≥ 1"
+    natural_language: "Uma SolicitacaoDiaria deve ter pelo menos um SolicitacaoDiariaBolsista."
+    formal_rule: "∀s ∈ SolicitacaoDiaria: |s.listaSolicitacaoDiariaBolsista| ≥ 1"
 
   - id: "AX-M003-D003"
-    natural_language: "Ao cancelar uma SolicitacaoDiaria, todos os AceiteViagem são automaticamente marcados como CANCELADO."
-    formal_rule: "∀s ∈ SolicitacaoDiaria: s.estado = CANCELADA → ∀a ∈ s.listaAceiteViagem: a.estado = CANCELADO"
+    natural_language: "Ao cancelar uma SolicitacaoDiaria, todos os SolicitacaoDiariaBolsista são automaticamente marcados como CANCELADO."
+    formal_rule: "∀s ∈ SolicitacaoDiaria: s.estado = CANCELADA → ∀a ∈ s.listaSolicitacaoDiariaBolsista: a.estado = CANCELADO"
 
   - id: "AX-M003-D004"
-    natural_language: "dataAceite só pode ser preenchida quando estado do AceiteViagem for ACEITO ou NAO_ACEITO."
-    formal_rule: "∀a ∈ AceiteViagem: a.dataAceite ≠ null → a.estado ∈ {ACEITO, NAO_ACEITO}"
+    natural_language: "dataAceite só pode ser preenchida quando estado do SolicitacaoDiariaBolsista for ACEITO ou NAO_ACEITO."
+    formal_rule: "∀a ∈ SolicitacaoDiariaBolsista: a.dataAceite ≠ null → a.estado ∈ {ACEITO, NAO_ACEITO}"
 
   - id: "AX-M003-D005"
-    natural_language: "SolicitacaoDiaria só pode passar para ATIVA a partir de RASCUNHO."
-    formal_rule: "∀s ∈ SolicitacaoDiaria: TRANSITION(s, ATIVA) → s.estadoAnterior = RASCUNHO"
+    natural_language: "versaoAceite e contaBancariaSnapshot só são preenchidos quando estado = ACEITO."
+    formal_rule: "∀a ∈ SolicitacaoDiariaBolsista: a.versaoAceite ≠ null → a.estado = ACEITO"
+
+  - id: "AX-M003-D006"
+    natural_language: "SolicitacaoDiaria passa para APROVADA quando todos os SolicitacaoDiariaBolsista estiverem ACEITO."
+    formal_rule: "∀s ∈ SolicitacaoDiaria: (∀a ∈ s.listaSolicitacaoDiariaBolsista: a.estado = ACEITO) → s.estado = APROVADA"
+
+  - id: "AX-M003-D007"
+    natural_language: "SolicitacaoDiaria passa para RECUSADA quando qualquer SolicitacaoDiariaBolsista for NAO_ACEITO."
+    formal_rule: "∀s ∈ SolicitacaoDiaria: (∃a ∈ s.listaSolicitacaoDiariaBolsista: a.estado = NAO_ACEITO) → s.estado = RECUSADA"
+
+  - id: "AX-M003-D008"
+    natural_language: "SolicitacaoDiariaBolsistas so sao criados quando SolicitacaoDiaria transiciona de RASCUNHO para ALOCADA."
+    formal_rule: "∀s ∈ SolicitacaoDiaria: s.estado = RASCUNHO → s.listaSolicitacaoDiariaBolsista IS EMPTY"
+
+  - id: "AX-M003-D009"
+    natural_language: "Quando o unico bolsista da solicitacao for o proprio coordenador do projeto, o aceite e dispensado e a solicitacao transiciona diretamente para APROVADA ao ser enviada."
+    formal_rule: "∀s ∈ SolicitacaoDiaria: TRANSITION(s, RASCUNHO → ENVIO) AND (∀a ∈ s.listaSolicitacaoDiariaBolsistas: a.bolsista = s.projeto.coordenador) → s.estado = APROVADA"
 
 invariants:
   - id: "INV-M003-D001"
@@ -161,22 +273,29 @@ invariants:
     description: "A chegada deve ser posterior à partida."
 
   - id: "INV-M003-D002"
-    rule: "SolicitacaoDiaria.listaAceiteViagem não pode ser vazia"
+    rule: "SolicitacaoDiaria.listaSolicitacaoDiariaBolsista não pode ser vazia"
     description: "Toda solicitação deve ter ao menos um aceite associado."
 
   - id: "INV-M003-D003"
-    rule: "AceiteViagem.estado = CANCELADO quando SolicitacaoDiaria.estado = CANCELADA"
+    rule: "SolicitacaoDiariaBolsista.estado = CANCELADO quando SolicitacaoDiaria.estado = CANCELADA"
     description: "Cancelamento da solicitação propaga para todos os aceites."
+
+  - id: "INV-M003-D004"
+    rule: "SolicitacaoDiaria.distanciaKm IS NOT NULL → SolicitacaoDiaria.provedorDistancia IS NOT NULL"
+    description: "Quando distancia for preenchida, o provedor deve ser identificado."
 
 enums:
   EstadoSolicitacaoDiaria:
     description: "Estado operacional de uma solicitação de diária."
     values:
-      RASCUNHO: "Solicitação iniciada pelo coordenador mas ainda não enviada aos bolsistas."
-      ATIVA: "Solicitação enviada. Aceites podem estar pendentes, aceitos ou recusados."
-      CANCELADA: "Solicitação cancelada pelo coordenador. Todos os AceiteViagem viram CANCELADO automaticamente."
+      RASCUNHO: "Solicitacao criada mas ainda nao enviada aos bolsistas. Nenhum SolicitacaoDiariaBolsista criado."
+      ALOCADA: "Solicitacao enviada aos bolsistas. SolicitacaoDiariaBolsistas criados e notificados. Pelo menos um aceite pendente."
+      APROVADA: "Todos os bolsistas aceitaram. Viagem confirmada. Solicitacao pronta para execucao."
+      RECUSADA: "Pelo menos um bolsista recusou. Coordenador deve revisar ou cancelar."
+      CANCELADA: "Solicitação cancelada pelo coordenador. Todos os SolicitacaoDiariaBolsista viram CANCELADO automaticamente."
+      REGULARIZADA_NAO_UTILIZADA: "Data da viagem passou sem utilizacao. Comprometimento revertido na rubrica."
 
-  EstadoAceiteViagem:
+  EstadoSolicitacaoDiariaBolsista:
     description: "Estado do aceite da viagem pelo bolsista."
     values:
       AGUARDANDO_ACEITE: "Bolsista ainda não se manifestou."
@@ -189,20 +308,35 @@ workflows:
     description: "Ciclo de vida de uma solicitação de diária."
     states:
       - RASCUNHO
-      - ATIVA
+      - ALOCADA
+      - APROVADA
+      - RECUSADA
       - CANCELADA
+      - REGULARIZADA_NAO_UTILIZADA
     transitions:
       - from: RASCUNHO
-        to: ATIVA
-        trigger: "Coordenador envia a solicitação aos bolsistas."
+        to: ALOCADA
+        trigger: "Coordenador envia a solicitacao. Sistema cria os SolicitacaoDiariaBolsistas e notifica os bolsistas."
       - from: RASCUNHO
         to: CANCELADA
-        trigger: "Coordenador descarta o rascunho."
-      - from: ATIVA
+        trigger: "Coordenador descarta o rascunho antes do envio."
+      - from: ALOCADA
+        to: APROVADA
+        trigger: "Todos os SolicitacaoDiariaBolsista passam para ACEITO."
+      - from: ALOCADA
+        to: RECUSADA
+        trigger: "Qualquer SolicitacaoDiariaBolsista passa para NAO_ACEITO."
+      - from: ALOCADA
         to: CANCELADA
-        trigger: "Coordenador cancela a solicitação. Propaga CANCELADO para todos os AceiteViagem."
+        trigger: "Coordenador cancela antes da viagem. Propaga CANCELADO para todos os SolicitacaoDiariaBolsista."
+      - from: APROVADA
+        to: CANCELADA
+        trigger: "Coordenador cancela antes da viagem."
+      - from: APROVADA
+        to: REGULARIZADA_NAO_UTILIZADA
+        trigger: "Data da viagem passou sem uso. Sistema regulariza e reverte comprometimento."
 
-  AceiteViagem:
+  SolicitacaoDiariaBolsista:
     description: "Ciclo de vida do aceite de um bolsista."
     states:
       - AGUARDANDO_ACEITE
@@ -212,10 +346,10 @@ workflows:
     transitions:
       - from: AGUARDANDO_ACEITE
         to: ACEITO
-        trigger: "Bolsista confirma a viagem."
+        trigger: "Bolsista confirma a viagem. Grava versaoAceite e contaBancariaSnapshot."
       - from: AGUARDANDO_ACEITE
         to: NAO_ACEITO
-        trigger: "Bolsista recusa a viagem."
+        trigger: "Bolsista recusa a viagem com justificativa."
       - from: AGUARDANDO_ACEITE
         to: CANCELADO
         trigger: "SolicitacaoDiaria é cancelada."
@@ -228,26 +362,43 @@ policies:
     Coordenador:
       can:
         - "criar SolicitacaoDiaria em RASCUNHO"
-        - "enviar SolicitacaoDiaria (RASCUNHO → ATIVA)"
-        - "cancelar SolicitacaoDiaria em RASCUNHO ou ATIVA"
+        - "enviar SolicitacaoDiaria (RASCUNHO → ALOCADA)"
+        - "cancelar SolicitacaoDiaria em RASCUNHO, ALOCADA ou APROVADA antes da viagem"
     Bolsista:
       can:
-        - "aceitar AceiteViagem (AGUARDANDO_ACEITE → ACEITO)"
-        - "recusar AceiteViagem (AGUARDANDO_ACEITE → NAO_ACEITO)"
+        - "aceitar SolicitacaoDiariaBolsista (AGUARDANDO_ACEITE → ACEITO)"
+        - "recusar SolicitacaoDiariaBolsista (AGUARDANDO_ACEITE → NAO_ACEITO)"
     Sistema:
       can:
-        - "propagar CANCELADO para todos os AceiteViagem ao cancelar SolicitacaoDiaria"
+        - "propagar CANCELADO para todos os SolicitacaoDiariaBolsista ao cancelar SolicitacaoDiaria"
+        - "transicionar SolicitacaoDiaria para APROVADA quando todos os aceites forem ACEITO"
+        - "transicionar SolicitacaoDiaria diretamente para APROVADA ao enviar quando o bolsista for o proprio coordenador (aceite dispensado)"
+        - "transicionar SolicitacaoDiaria para RECUSADA quando qualquer aceite for NAO_ACEITO"
+        - "transicionar SolicitacaoDiaria para REGULARIZADA_NAO_UTILIZADA apos data da viagem sem uso"
 
 events:
-  - name: "AceiteViagemCriado"
-    description: "Emitido quando um AceiteViagem é criado dentro de uma SolicitacaoDiaria. Dispara envio de notificação de diária para o bolsista correspondente."
-    payload_entity: "post_award.iniciativas.diarias.AceiteViagem"
-    trigger: "AceiteViagem criado com estado = AGUARDANDO_ACEITE"
+  - name: "SolicitacaoDiariaBolsistaCriado"
+    description: "Emitido quando um SolicitacaoDiariaBolsista é criado dentro de uma SolicitacaoDiaria. Dispara envio de notificação de diária para o bolsista correspondente."
+    payload_entity: "post_award.iniciativas.diarias.SolicitacaoDiariaBolsista"
+    trigger: "SolicitacaoDiariaBolsista criado com estado = AGUARDANDO_ACEITE"
+
+  - name: "SolicitacaoDiariaAprovada"
+    description: "Emitido quando todos os bolsistas aceitam e a SolicitacaoDiaria transiciona para APROVADA."
+    payload_entity: "post_award.iniciativas.diarias.SolicitacaoDiaria"
+    trigger: "SolicitacaoDiaria.estado transiciona para APROVADA"
+
+  - name: "SolicitacaoDiariaRecusada"
+    description: "Emitido quando qualquer bolsista recusa e a SolicitacaoDiaria transiciona para RECUSADA."
+    payload_entity: "post_award.iniciativas.diarias.SolicitacaoDiaria"
+    trigger: "SolicitacaoDiaria.estado transiciona para RECUSADA"
 
 agent_instructions:
   rules:
     - "Não criar entidades fora da ontologia."
-    - "TipoDiaria pertence ao M008 — M003 apenas referencia por uuid."
+    - "TipoDiaria e ParametroCalculoDiaria pertencem ao M008 — M003 apenas referencia por uuid e armazena snapshots imutaveis."
     - "AlocacaoBolsista pertence ao M009 — M003 apenas referencia por uuid."
-    - "AceiteViagem é entidade embarcada — não existe nem persiste fora da SolicitacaoDiaria."
-    - "Cancelar SolicitacaoDiaria deve propagar CANCELADO para todos os AceiteViagem na mesma operação."
+    - "SolicitacaoDiariaBolsista é entidade embarcada — não existe nem persiste fora da SolicitacaoDiaria."
+    - "Cancelar SolicitacaoDiaria deve propagar CANCELADO para todos os SolicitacaoDiariaBolsista na mesma operação."
+    - "TransacaoDiaria pertence ao M014 — M003 apenas armazena a referência por uuid opaco. Criação e gestão da transação são responsabilidade do M004/M014."
+    - "versaoAceite e contaBancariaSnapshot so podem ser gravados no momento do aceite (estado → ACEITO). Sao imutaveis apos isso."
+    - "distanciaKm e provedorDistancia so se aplicam a abrangencia DENTRO_ESTADO. Para NACIONAL e INTERNACIONAL deixar nulo."
