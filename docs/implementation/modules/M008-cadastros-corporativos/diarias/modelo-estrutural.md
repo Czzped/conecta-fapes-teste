@@ -4,13 +4,13 @@
 
 ## Entidades
 
-| Entidade | Documento | Responsabilidade |
-|----------|-----------|------------------|
-| Abrangencia | [Contexto Diarias](README.md#abrangencia) | Classifica o deslocamento para diaria |
-| TipoDiaria | [Contexto Diarias](README.md#tipodiaria) | Define valor vigente, vigencia e abrangencia da viagem |
-| ParametroCalculoDiaria | [Contexto Diarias](README.md#parametrocalculodiaria) | Define parametros normativos vigentes vinculados a um TipoDiaria |
-| PontoDiaria | Este documento | Define pontos selecionaveis como origem ou destino da viagem |
-| DistanciaPontoDiaria | Este documento | Mantem tabela/cache de distancias entre pontos para viagens dentro do Estado |
+| Entidade | Responsabilidade |
+|----------|------------------|
+| Abrangencia | Classifica o deslocamento para diaria |
+| TipoDiaria | Define valor vigente, vigencia e abrangencia da viagem |
+| ParametroCalculoDiaria | Define parametros normativos vigentes vinculados a um TipoDiaria |
+| PontoDiaria | Define pontos selecionaveis como origem ou destino da viagem |
+| DistanciaPontoDiaria | Mantem tabela/cache de distancias entre pontos para viagens dentro do Estado |
 
 ## Diagrama
 

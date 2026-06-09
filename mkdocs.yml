@@ -279,6 +279,9 @@ nav:
           - EPIC-010: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-010.md
           - EPIC-011: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-011.md
           - EPIC-012: implementation/modules/M004-pagamento-bolsista/epics/EPIC-M004-012.md
+          - Diarias:
+              - implementation/modules/M004-pagamento-bolsista/diarias/README.md
+              - Processo: implementation/modules/M004-pagamento-bolsista/diarias/processo.md
       - M005 Autenticacao:
           - implementation/modules/M005-autenticacao/README.md
       - M006 Autorizacao:
