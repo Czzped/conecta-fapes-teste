@@ -19,6 +19,7 @@ import {
 import { planRelease } from "../domain/release-planning.js";
 import { createInstallationToken } from "../github/app-auth.js";
 import { GitFlowGateway, type CommitStatusResult } from "../github/git-flow-gateway.js";
+import { resolveGitFlowRepositoryToken } from "../github/git-flow-token.js";
 import { GitHubRestClient } from "../github/github-rest-client.js";
 import { verifyWebhookSignature } from "../github/webhook-signature.js";
 
@@ -71,9 +72,12 @@ async function defaultGatewayFactory(
     throw new Error("missing GitHub App credentials for git-flow execution");
   }
 
-  const token = await createInstallationToken(
-    { appId, privateKey, userAgent: USER_AGENT },
-    resolvedInstallationId
+  const token = resolveGitFlowRepositoryToken(
+    env,
+    await createInstallationToken(
+      { appId, privateKey, userAgent: USER_AGENT },
+      resolvedInstallationId
+    )
   );
 
   return new GitFlowGateway(new GitHubRestClient(token, USER_AGENT), config.org);

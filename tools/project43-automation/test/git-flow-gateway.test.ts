@@ -87,6 +87,25 @@ test("createBranch is idempotent when the branch already exists", async () => {
   assert.equal(calls.filter((call) => call.method === "POST").length, 0);
 });
 
+test("createBranch returns a failed result instead of throwing when refs are not readable", async () => {
+  installFetch((call) => {
+    if (call.method === "GET" && call.url.includes("/git/ref/heads/release/v1.2")) {
+      return json({ message: "Resource not accessible by integration" }, 403);
+    }
+    throw new Error(`unexpected call ${call.method} ${call.url}`);
+  });
+
+  const result = await buildGateway().createBranch({
+    type: "create_branch",
+    repo: "leds-conectafapes-backend-admin",
+    branch: "release/v1.2",
+    baseBranch: "develop",
+  });
+
+  assert.equal(result.status, "failed");
+  assert.match(result.detail ?? "", /Resource not accessible by integration/);
+});
+
 test("openPullRequest creates a PR when none is open", async () => {
   installFetch((call) => {
     if (call.method === "GET" && call.url.includes("/pulls?")) {

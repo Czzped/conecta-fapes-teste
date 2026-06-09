@@ -208,10 +208,17 @@ npm run sync:fields
 - `GIT_FLOW_RELEASE_PREFIX` (default `release/`)
 - `GIT_FLOW_HOTFIX_PREFIX` (default `hotfix/`)
 
-As automacoes de Git Flow reutilizam os segredos do GitHub App
+As automacoes de Git Flow usam, por padrao, os segredos do GitHub App
 (`GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`, `GITHUB_APP_PRIVATE_KEY`) para
-executar acoes quando `execute: true`, e `GITHUB_WEBHOOK_SECRET` para validar
-a assinatura do webhook principal do GitHub App/Project.
+ler o Project e criar o token da instalacao. Para side-effects em repositorios
+tecnicos (criar branch/PR/tag), o worker pode usar um token de repositorio
+quando o GitHub App nao tiver `Contents: write`: configure
+`GITHUB_GIT_FLOW_TOKEN` (preferido) ou `GITHUB_REPOSITORY_TOKEN`. O secret
+legado `GITHUB_STATUS_TOKEN` tambem e aceito como fallback para manter
+compatibilidade. A chave privada do GitHub App pode estar em PKCS#8 ou no
+formato RSA/PKCS#1 emitido pelo GitHub; o worker normaliza antes de gerar o
+JWT da instalacao. `GITHUB_WEBHOOK_SECRET` valida a assinatura do webhook
+principal do GitHub App/Project.
 
 Para webhooks diretos de repositorio que disparam a validacao de PR, use
 `GITHUB_REPO_WEBHOOK_SECRET`. Isso permite configurar `pull_request` nos repos

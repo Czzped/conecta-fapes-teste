@@ -45,6 +45,19 @@ function encodeRef(value: string): string {
   return value.split("/").map(encodeURIComponent).join("/");
 }
 
+interface GitHubErrorData {
+  message?: string;
+  documentation_url?: string;
+}
+
+function describeGitHubFailure<TData>(response: {
+  status: number;
+  data: TData | null;
+}): string {
+  const data = response.data as GitHubErrorData | null;
+  return data?.message ? `status ${response.status}: ${data.message}` : `status ${response.status}`;
+}
+
 /**
  * Gateway que executa acoes de Git Flow contra a API REST do GitHub.
  *
@@ -78,7 +91,7 @@ export class GitFlowGateway {
 
     if (!response.ok) {
       throw new Error(
-        `failed to read ${refType}/${name} on ${repo}: ${response.status}`
+        `failed to read ${refType}/${name} on ${repo}: ${describeGitHubFailure(response)}`
       );
     }
 
@@ -86,19 +99,39 @@ export class GitFlowGateway {
   }
 
   async createBranch(action: CreateBranchAction): Promise<GitFlowActionResult> {
-    const existing = await this.getRefSha(action.repo, "heads", action.branch);
+    let existing: string | null;
+
+    try {
+      existing = await this.getRefSha(action.repo, "heads", action.branch);
+    } catch (error) {
+      return {
+        action,
+        status: "failed",
+        detail: error instanceof Error ? error.message : String(error),
+      };
+    }
 
     if (existing) {
       return { action, status: "already_exists" };
     }
 
-    const baseSha = await this.getRefSha(action.repo, "heads", action.baseBranch);
+    let baseSha: string | null;
+
+    try {
+      baseSha = await this.getRefSha(action.repo, "heads", action.baseBranch);
+    } catch (error) {
+      return {
+        action,
+        status: "failed",
+        detail: error instanceof Error ? error.message : String(error),
+      };
+    }
 
     if (!baseSha) {
       return {
         action,
         status: "failed",
-        detail: `base branch not found: ${action.baseBranch}`,
+        detail: `base branch not found or not visible: ${action.baseBranch}`,
       };
     }
 
@@ -113,7 +146,7 @@ export class GitFlowGateway {
     }
 
     if (!response.ok) {
-      return { action, status: "failed", detail: `status ${response.status}` };
+      return { action, status: "failed", detail: describeGitHubFailure(response) };
     }
 
     return { action, status: "created" };

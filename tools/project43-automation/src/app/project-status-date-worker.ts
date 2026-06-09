@@ -10,6 +10,7 @@ import {
 import { createInstallationToken } from "../github/app-auth.js";
 import { GitHubGraphqlClient } from "../github/github-graphql-client.js";
 import { GitFlowGateway } from "../github/git-flow-gateway.js";
+import { resolveGitFlowRepositoryToken } from "../github/git-flow-token.js";
 import { GitHubProjectRepository } from "../github/project-repository.js";
 import { GitHubRestClient } from "../github/github-rest-client.js";
 import type { ProjectFieldMetadata } from "../github/project-types.js";
@@ -140,10 +141,24 @@ export class ProjectStatusDateWorker {
     const branchResult =
       branchPlan.decision === "create_branch"
         ? await new GitFlowGateway(
-            new GitHubRestClient(accessToken, config.userAgent),
+            new GitHubRestClient(
+              resolveGitFlowRepositoryToken(env, accessToken),
+              config.userAgent
+            ),
             gitFlowConfig.org
           ).executeAction(branchPlan.action)
         : null;
+
+    if (branchResult?.status === "failed") {
+      console.warn(
+        "git_flow_branch_failed",
+        JSON.stringify({
+          repo: branchResult.action.repo,
+          branch: "branch" in branchResult.action ? branchResult.action.branch : undefined,
+          detail: branchResult.detail,
+        })
+      );
+    }
 
     return json({
       applied: mutations.length,
