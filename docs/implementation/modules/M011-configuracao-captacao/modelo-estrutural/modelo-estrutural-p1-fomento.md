@@ -17,10 +17,10 @@ classDiagram
         +EstadoFomento estado
         +Date dataInicio
         +Date dataFim
+        +String resultadoEsperado
     }
 
     class AporteFomento {
-        +TipoOrigemAporte origemTipo
         +Decimal valorAportado
         +Date dataAporte
         +Boolean isAditivo
@@ -45,20 +45,6 @@ classDiagram
         +String observacao
     }
 
-    class ResultadoEsperadoFomento {
-        +TipoResultado tipo
-        +String descricao
-        +String indicador
-    }
-
-    class RemanejamentoFaixas {
-        +Decimal valor
-        +String justificativa
-        +Date dataRegistro
-        +Decimal valorOrigemAnterior
-        +Decimal valorDestinoAnterior
-    }
-
     class EstadoFomento {
         <<enumeration>>
         EM_ELABORACAO
@@ -66,17 +52,6 @@ classDiagram
         INTERROMPIDO
         ENCERRADO
         CONCLUIDO
-    }
-
-    class TipoOrigemAporte {
-        <<enumeration>>
-        PROGRAMA
-        PARCERIA
-        RECURSO_INTERNO
-    }
-
-    class TipoResultado {
-        <<externo shared>>
     }
 
     class Programa {
@@ -111,26 +86,33 @@ classDiagram
         <<externo M016>>
     }
 
+    class Captacao {
+        <<M011 P2>>
+    }
+
+    class Projeto {
+        <<externo M012>>
+    }
+
     Fomento "1" --> "1" EixoEstrategico : atinge
-    Fomento "1" --> "1" AreaTecnica : gerenciado por
+    Fomento "*" --> "1" AreaTecnica : gerenciado por
     Fomento "1" --> "1..*" AporteFomento : aportes
     Fomento "1" --> "1..*" Faixa : faixas
-    Fomento "1" --> "*" ResultadoEsperadoFomento : resultados esperados
-    Fomento "1" --> "*" RemanejamentoFaixas : remanejamentos
+    Fomento "1" --> "1..*" Captacao : captacoes
     Fomento "*" --> "1" TipoProjeto : tipos de projeto
 
     AporteFomento "*" --> "0..1" Programa : origem programa
     AporteFomento "*" --> "0..1" Parceria : origem parceria
     AporteFomento "*" --> "0..1" ContaContabil : recurso interno
 
+    Projeto "*" --> "1" Faixa : faixa
+    Projeto "*" --> "1" TipoProjeto : tipo
+    Projeto "*" --> "1" Captacao : captacao
+
     Faixa "1" --> "*" RubricaPermitidaFaixa : rubricas permitidas
     Faixa "1" --> "*" BolsaPermitidaFaixa : bolsas permitidas
     RubricaPermitidaFaixa "*" --> "1" Rubrica : rubrica
-    RubricaPermitidaFaixa "0..1" --> "*" RubricaPermitidaFaixa : subrubricas
     BolsaPermitidaFaixa "*" --> "1" VersaoNivel : versao nivel
-
-    RemanejamentoFaixas "*" --> "1" Faixa : origem
-    RemanejamentoFaixas "*" --> "1" Faixa : destino
 ```
 
 ---
@@ -145,10 +127,10 @@ classDiagram
 | | estado | Estado do fomento | Sim | EstadoFomento | EM_ELABORACAO, APROVADO, INTERROMPIDO, ENCERRADO, CONCLUIDO | | |
 | | dataInicio | Data de inicio da vigencia do fomento | Sim | Date | | | |
 | | dataFim | Data de fim da vigencia do fomento | Sim | Date | | | |
+| | resultadoEsperado | Descricao livre dos resultados esperados dos projetos financiados | Nao | String | | 1000 | |
 | | eixoEstrategico (relacao) | Eixo estrategico ao qual o fomento esta vinculado | Sim | FK → EixoEstrategico | Via M010 | | |
 | | areaTecnica (relacao) | Area tecnica responsavel pelo fomento | Sim | FK → AreaTecnica | Via M008 | | |
-| **AporteFomento** | origemTipo | Tipo da origem que aporta recurso no fomento | Sim | TipoOrigemAporte | PROGRAMA, PARCERIA, RECURSO_INTERNO | | |
-| | valorAportado | Valor financeiro aportado | Sim | Double | > 0 | | |
+| **AporteFomento** | valorAportado | Valor financeiro aportado | Sim | Double | > 0 | | |
 | | dataAporte | Data do registro do aporte | Sim | Date | | | |
 | | isAditivo | Indica se e aporte adicional ao original da mesma origem | Sim | Boolean | true/false | | |
 | | justificativa | Motivo do aporte; obrigatorio quando isAditivo=true ou origemTipo=RECURSO_INTERNO | Cond. | String | | 500 | |
@@ -167,16 +149,6 @@ classDiagram
 | | quantidadeMinimaCotas | Quantidade minima de cotas exigida | Sim | Int | >= 0 | | |
 | | minimoBolsistas | Quantidade minima de bolsistas exigida | Sim | Int | >= 0 | | |
 | | observacao | Orientacao de uso da versao de bolsa na faixa | Nao | String | | 500 | |
-| **ResultadoEsperadoFomento** | tipo | Tipo do resultado esperado | Sim | TipoResultado | PRODUTO, SERVICO, PROCESSO | | |
-| | descricao | Descricao do resultado esperado | Sim | String | | 500 | |
-| | indicador | Indicador de medicao do resultado | Nao | String | | 300 | |
-| **RemanejamentoFaixas** | faixaOrigem (relacao) | Faixa de origem do remanejamento | Sim | FK → Faixa | | | |
-| | faixaDestino (relacao) | Faixa de destino do remanejamento | Sim | FK → Faixa | | | |
-| | valor | Valor remanejado entre as faixas | Sim | Double | > 0 | | |
-| | justificativa | Motivo do remanejamento | Sim | String | | 500 | |
-| | dataRegistro | Data de registro do remanejamento | Gerado | Date | | | |
-| | valorOrigemAnterior | Valor da faixa de origem antes do remanejamento | Gerado | Double | | | |
-| | valorDestinoAnterior | Valor da faixa de destino antes do remanejamento | Gerado | Double | | | |
 
 ---
 
@@ -192,6 +164,7 @@ classDiagram
 | RN-F05 | GestorFomento | Cada aporte deve indicar exatamente uma origem, possuir valor > 0, data do aporte e justificativa quando aplicavel. |
 | RN-F06 | GestorFomento | O total financeiro do Fomento e calculado pela soma dos aportes; nao ha total manual. |
 | RN-F07 | GestorFomento | Todo Fomento deve possuir ao menos um tipo de projeto aceito. |
+| RN-F08 | Sistema | O TipoProjeto de um Projeto captado deve estar na lista de tipos permitidos do Fomento vinculado. |
 | RN-F09 | AnalistaTecnico | Rubricas e subrubricas sao configuradas por faixa. |
 | RN-F10 | AnalistaTecnico | Quando a rubrica Bolsa estiver permitida em uma faixa, devem ser configuradas as modalidades e niveis de bolsa permitidos. |
 | RN-F11 | AnalistaTecnico | BolsaPermitidaFaixa so pode ser configurada em faixa que permite rubrica do tipo Bolsa. |
@@ -211,18 +184,6 @@ classDiagram
 | RN-A02 | GestorFomento | Aporte aditivo deve possuir valor > 0, data do aporte e justificativa. |
 | RN-A03 | GestorFomento | Quando a origem for RECURSO_INTERNO, o aporte deve referenciar uma ContaContabil interna da FAPES. |
 | RN-A04 | Sistema | O total financeiro do Fomento e recalculado pela soma de todos os AporteFomento, incluindo os com isAditivo=true. |
-
-### Remanejamento de Faixas
-
-| ID | Responsavel | Regra |
-|----|-------------|-------|
-| RN-R01 | GestorFomento | Remanejamento so pode ser registrado em Fomento com estado APROVADO. |
-| RN-R02 | GestorFomento | Faixa de origem e faixa de destino devem pertencer ao mesmo Fomento. |
-| RN-R03 | GestorFomento | Faixa de origem e faixa de destino devem ser diferentes. |
-| RN-R04 | GestorFomento | Valor remanejado deve ser > 0 e nao pode exceder o valorAportado efetivo da faixa de origem. |
-| RN-R05 | Sistema | O registro e imutavel — preserva valorOrigemAnterior e valorDestinoAnterior para rastreabilidade. |
-| RN-R06 | Sistema | Apos remanejamento, o valorAportado efetivo de cada faixa e recalculado considerando todos os remanejamentos registrados. |
-
 
 ## Historico de Alteracoes
 

@@ -93,10 +93,6 @@ entities:
         type: "list:ref:pre_award.captacao.Faixa"
         required: true
         description: "Uma ou mais faixas do fomento."
-      resultadosEsperados:
-        type: "list:ref:pre_award.captacao.ResultadoEsperadoFomento"
-        required: false
-        description: "Produtos, servicos ou processos esperados do fomento."
       remanejamentos:
         type: "list:ref:pre_award.captacao.RemanejamentoFaixas"
         required: false
@@ -261,25 +257,6 @@ entities:
         required: false
         max_length: 500
         description: "Orientacao de uso da versao de bolsa na faixa."
-
-  ResultadoEsperadoFomento:
-    description: "Produto, servico ou processo esperado como resultado dos projetos financiados pelo fomento."
-    extends: null
-    fields:
-      tipo:
-        type: "enum:shared.TipoResultado"
-        required: true
-        description: "Tipo do resultado esperado: PRODUTO, SERVICO ou PROCESSO. Ver shared.TipoResultado."
-      descricao:
-        type: "string"
-        required: true
-        max_length: 500
-        description: "Descricao do resultado esperado."
-      indicador:
-        type: "string"
-        required: false
-        max_length: 300
-        description: "Indicador de medicao ou criterio de alcance do resultado."
 
 # ─────────────────────────────────────────────────────────────
 # PROCESSO 2 — CONFIGURACAO DA SELECAO
@@ -860,10 +837,6 @@ relationships:
     to: "corporativo.instituicoes.TipoProjeto"
     cardinality: "N:N"
     description: "Tipos de projeto aceitos pelo fomento."
-  - from: "pre_award.captacao.Fomento"
-    relation: "resultados esperados"
-    to: "pre_award.captacao.ResultadoEsperadoFomento"
-    cardinality: "1:N"
   - from: "pre_award.captacao.Fomento"
     relation: "historico de remanejamentos"
     to: "pre_award.captacao.RemanejamentoFaixas"

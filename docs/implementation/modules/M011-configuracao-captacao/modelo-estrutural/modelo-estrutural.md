@@ -59,19 +59,6 @@ classDiagram
         +String observacao
     }
 
-    class ResultadoEsperadoFomento {
-        +TipoResultado tipo
-        +String descricao
-        +String indicador
-    }
-
-    class TipoResultado {
-        <<enumeration>>
-        PRODUTO
-        SERVICO
-        PROCESSO
-    }
-
     class RemanejamentoFaixas {
         +double valor
         +String justificativa
@@ -318,7 +305,6 @@ classDiagram
     Fomento "1" --> "1" AreaTecnica : area tecnica
     Fomento "1" --> "1..*" AporteFomento : aportes
     Fomento "1" --> "1..*" Faixa : faixas
-    Fomento "1" --> "*" ResultadoEsperadoFomento : resultados esperados
     Fomento "1" --> "*" RemanejamentoFaixas : remanejamentos
     Fomento "*" --> "1" TipoProjeto : tipos de projeto
     AporteFomento "*" --> "0..1" Programa : origem programa
@@ -398,9 +384,6 @@ classDiagram
 | | quantidadeMinimaCotas | Quantidade minima de cotas exigida para a versao de nivel na faixa | Sim | Int | >= 0 | | |
 | | minimoBolsistas | Quantidade minima de bolsistas exigida para essa versao de nivel na faixa | Sim | Int | >= 0 | | |
 | | observacao | Orientacao de uso da versao de bolsa na faixa | Nao | String | | 500 | |
-| **ResultadoEsperadoFomento** | tipo | Tipo do resultado esperado | Sim | TipoResultado | PRODUTO, SERVICO, PROCESSO | | |
-| | descricao | Descricao do resultado esperado | Sim | String | | 500 | |
-| | indicador | Indicador de medicao do resultado | Nao | String | | 300 | |
 | **RemanejamentoFaixas** | faixaOrigem (relacao) | Faixa de origem do remanejamento | Sim | FK -> Faixa | | | |
 | | faixaDestino (relacao) | Faixa de destino do remanejamento | Sim | FK -> Faixa | | | |
 | | valor | Valor remanejado entre as faixas | Sim | Double | > 0 | | |

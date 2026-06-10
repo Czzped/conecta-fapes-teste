@@ -50,15 +50,16 @@ flowchart TD
         M{Rubrica do tipo Bolsa selecionada?}
         N[Configurar modalidades e niveis de bolsa para a faixa]
         O[Sistema resolve ultima versao ativa de cada nivel no M001]
-        CRS[Configurar regras de submissao]
-        JPA{Exige aprovacao institucional?}
-        JPB[Habilitar solicitacao de assinatura institucional na submissao]
-        SRE{Submissao restrita a escolhidos?}
-        SPA[Selecionar proponentes autorizados]
-        CRP[Configurar requisitos do proponente]
-        PRE[Configurar pre-requisitos para submissao]
-        CDE[Configurar documentos exigidos]
-        DEP[Definir exigencia de prestacao tecnica e financeira]
+        subgraph CRS[Configurar regras de submissao]
+            JPA{Exige aprovacao institucional?}
+            JPB[Habilitar solicitacao de assinatura institucional na submissao]
+            SRE{Submissao restrita a escolhidos?}
+            SPA[Selecionar proponentes autorizados]
+            CRP[Configurar requisitos do proponente]
+            PRE[Configurar pre-requisitos para submissao]
+            CDE[Configurar documentos exigidos]
+            DEP[Definir exigencia de prestacao tecnica e financeira]
+        end
         P[Revisar fomento]
         Q{Fomento valido?}
         R[Aprovar Fomento]
@@ -75,9 +76,8 @@ flowchart TD
     E -->|RECURSO_INTERNO| RI --> H
     H --> I --> J --> K --> L
     L --> REM --> M
-    M -->|Sim| N --> O --> CRS
-    M -->|Nao| CRS
-    CRS --> JPA
+    M -->|Sim| N --> O --> JPA
+    M -->|Nao| JPA
     JPA -->|Sim| JPB --> SRE
     JPA -->|Nao| SRE
     SRE -->|Sim| SPA --> CRP
@@ -108,7 +108,7 @@ flowchart TD
 | 11 | Selecionar rubricas permitidas por faixa | AnalistaTecnico | Para cada faixa, seleciona do catalogo M008 rubricas e subrubricas autorizadas para o orcamento dos projetos daquela faixa. Define obrigatoriedade, limites de valor ou percentual, observacoes e restricoes especificas. |
 | 12 | Configurar remanejamento entre rubricas | AnalistaTecnico | Define se o fomento permite que o coordenador solicite remanejamento de valores entre rubricas durante a execucao do projeto. Quando habilitado, configura quais rubricas podem ser origem e quais podem ser destino de remanejamentos — podendo restringir o destino apenas as rubricas do edital ou permitir qualquer rubrica do catalogo. **Pendente:** verificar se o remanejamento exige aprovacao da FAPES ou e autorizado diretamente pelo coordenador. |
 | 13 | Configurar modalidades e niveis de bolsa por faixa | AnalistaTecnico | Quando rubrica do tipo Bolsa selecionada, configura modalidades e niveis com cotas e limite de bolsistas. Sistema resolve automaticamente ultima versao ativa de cada nivel no M001. |
-| 14 | Configurar regras de submissao | AnalistaTecnico | Define se permite multiplas propostas, acumulo de bolsa, participacao em outra proposta e se a submissao e restrita a proponentes escolhidos. Tambem define se exige aprovacao institucional (`exigeAprovacaoInstitucional`). |
+| 14 | Configurar regras de submissao | AnalistaTecnico | Define se permite multiplas propostas, acumulo de bolsa, participacao em outra proposta e se a submissao e restrita a proponentes escolhidos. Tambem define se exige aprovacao institucional (`exigeAprovacaoInstitucional`). Inclui as seguintes sub-tarefas: (a) **Configurar requisitos do proponente** — define direcionamento, vinculo empregaticio, gestor institucional, nivel academico minimo e limites de submissao por instituicao ou departamento; (b) **Configurar pre-requisitos para submissao** — define restricoes que impedem a submissao, habilitaveis individualmente (proposta contratada em fomento anterior, sem titulacao minima, ja contratado na mesma chamada, em chamada continua com contratacao ativa, limite de submissoes excedido, vinculo empregaticio ativo, numero maximo de projetos ativos atingido); (c) **Configurar documentos exigidos** — define documentos adicionais que o proponente deve anexar na submissao, com nome, descricao, formatos permitidos, obrigatoriedade e possibilidade de reaproveitamento do M008; (d) **Definir exigencia de prestacao tecnica e financeira** — define se os projetos gerados exigirao prestacao tecnica e/ou financeira. |
 | 14b | Habilitar solicitacao de assinatura institucional | AnalistaTecnico | **Condicional — apenas quando `exigeAprovacaoInstitucional = true`.** Configura que o proponente devera solicitar a assinatura do ResponsavelInstitucional durante o periodo de submissao. A proposta so pode ser submetida formalmente apos a assinatura ser obtida. |
 | 15 | Selecionar proponentes autorizados | AnalistaTecnico | Quando submissao restrita, seleciona as instituicoes ou pessoas autorizadas a submeter proposta. |
 | 16 | Configurar requisitos do proponente | AnalistaTecnico | Define direcionamento (aberto, instituicao, tipo de instituicao), exigencia de vinculo empregaticio, gestor institucional e nivel academico minimo. Permite configurar limite de submissoes por instituicao ou por departamento da instituicao — alguns editais restringem a uma unica proposta por instituicao ou unidade organizacional. |
