@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Save, User, ChevronDown, FileText, Upload, Trash2, Paperclip, Loader2 } from 'lucide-react';
+import { User, ChevronDown, FileText, Upload, Trash2, Paperclip, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePageScenarios } from '@/mocks/ScenarioContext';
 import { toast } from 'sonner';
@@ -44,6 +44,11 @@ export function MyInfoPage() {
   const [termoStatus, setTermoStatus] = useState<string>('Pendente');
   const [selectedEthnicity, setSelectedEthnicity] = useState('Parda');
   const [selectedAcademicLevel, setSelectedAcademicLevel] = useState('Ensino superior');
+  const [selectedDocumentType, setSelectedDocumentType] = useState('Identidade');
+  const [showProfessionalAddress, setShowProfessionalAddress] = useState(false);
+  const [bankAccountOption, setBankAccountOption] = useState<'existing' | 'open'>('existing');
+  const [selectedAgency, setSelectedAgency] = useState('0220');
+  const [receiveInformativos, setReceiveInformativos] = useState(false);
 
   const academicLevels = [
     'Selecione',
@@ -63,6 +68,25 @@ export function MyInfoPage() {
     'Indígena',
     'Parda',
     'Preta',
+  ];
+
+  const documentTypes = [
+    'Identidade',
+    'Carteira de Trabalho',
+    'Habilitação',
+  ];
+
+  const banestesAgencies = [
+    { value: '0220', label: '0220 - PA-Tribunal de contas do estado do ES' },
+    { value: '0083', label: '0083 - Jardim da Penha' },
+    { value: '0236', label: '0236 - Bento Ferreira' },
+    { value: '0255', label: '0255 - PA-Hospital da Polícia Militar do ES' },
+    { value: '0271', label: '0271 - Tribunal de Justiça' },
+    { value: '0274', label: '0274 - Reta da Penha' },
+    { value: '0001', label: '0001 - Agência Bizi' },
+    { value: '0276', label: '0276 - São Pedro' },
+    { value: '0044', label: '0044 - Jardim Camburi' },
+    { value: '0277', label: '0277 - PA-Assembleia Legislativa' },
   ];
 
   // Documentos gerais (não específicos de bolsa)
@@ -336,11 +360,124 @@ export function MyInfoPage() {
     borderRadius: 'var(--radius)',
     padding: '1.5rem',
   };
-  const dataFieldBackground = '#262626';
+  const dataFieldBackground = 'var(--input-background)';
   const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
     <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
       {children}
       <span style={{ color: 'var(--destructive-foreground)', marginLeft: '4px' }}>*</span>
+    </label>
+  );
+  const TextField = ({ label, defaultValue = '', required = true, readOnly = false }: { label: string; defaultValue?: string; required?: boolean; readOnly?: boolean }) => (
+    <div>
+      {required ? (
+        <RequiredLabel>{label}</RequiredLabel>
+      ) : (
+        <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
+          {label}
+        </label>
+      )}
+      <input
+        type="text"
+        defaultValue={defaultValue}
+        readOnly={readOnly}
+        className="w-full px-4 py-2 border transition-colors"
+        style={{
+          backgroundColor: dataFieldBackground,
+          color: 'var(--foreground)',
+          borderColor: 'var(--border)',
+          borderRadius: 'var(--radius)',
+          cursor: readOnly ? 'not-allowed' : 'text',
+          fontSize: 'var(--text-sm)',
+        }}
+      />
+    </div>
+  );
+  const AddressFields = ({ defaults }: { defaults: Record<string, string> }) => (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <TextField label="CEP" defaultValue={defaults.cep} />
+        <TextField label="Rua" defaultValue={defaults.rua} />
+        <TextField label="Número" defaultValue={defaults.numero} />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <TextField label="Complemento" defaultValue={defaults.complemento} required={false} />
+        <TextField label="Bairro" defaultValue={defaults.bairro} />
+        <TextField label="Municipio" defaultValue={defaults.municipio} />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <TextField label="Estado" defaultValue={defaults.estado} />
+        <TextField label="País" defaultValue={defaults.pais} />
+      </div>
+    </div>
+  );
+  const CheckboxRow = ({ checked, onChange, label, controlSize = 18 }: { checked: boolean; onChange: (checked: boolean) => void; label: string; controlSize?: number }) => (
+    <label className="flex items-center gap-3" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}
+      />
+      <span
+        aria-hidden="true"
+        className="flex items-center justify-center"
+        style={{
+          width: `${controlSize}px`,
+          height: `${controlSize}px`,
+          border: `2px solid ${checked ? 'var(--primary)' : 'var(--border)'}`,
+          borderRadius: '4px',
+          backgroundColor: checked ? 'var(--primary)' : 'transparent',
+          color: 'var(--primary-foreground)',
+          fontSize: controlSize > 18 ? '16px' : '12px',
+          lineHeight: 1,
+          flexShrink: 0,
+        }}
+      >
+        {checked ? '✓' : ''}
+      </span>
+      <span>{label}</span>
+    </label>
+  );
+  const RadioOption = ({ value, label }: { value: 'existing' | 'open'; label: string }) => (
+    <label className="flex items-center gap-3" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}>
+      {(() => {
+        const checked = bankAccountOption === value;
+        return (
+          <>
+      <input
+        type="radio"
+        name="banestes-account-option"
+        checked={checked}
+        onChange={() => setBankAccountOption(value)}
+        style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}
+      />
+      <span
+        aria-hidden="true"
+        className="flex items-center justify-center"
+        style={{
+          width: '18px',
+          height: '18px',
+          border: `2px solid ${checked ? 'var(--primary)' : 'var(--border)'}`,
+          borderRadius: '9999px',
+          backgroundColor: checked ? 'var(--primary)' : 'transparent',
+          flexShrink: 0,
+        }}
+      >
+        {checked && (
+          <span
+            style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '9999px',
+              backgroundColor: 'var(--primary-foreground)',
+            }}
+          />
+        )}
+      </span>
+      <span>{label}</span>
+          </>
+        );
+      })()}
     </label>
   );
 
@@ -616,201 +753,138 @@ export function MyInfoPage() {
             </div>
           </section>
 
-          {/* Endereço Residencial Section */}
+          {/* Documento de Identificação Section */}
           <section style={dataSectionStyle}>
-            <SectionHeader number={2} title="Endereço Residencial" />
+            <SectionHeader number={2} title="Documento de Identificação" />
 
             <div className="space-y-6">
-              {/* Row 1: Rua | Número | Complemento */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-1">
-                  <RequiredLabel>Rua</RequiredLabel>
-                  <input
-                    type="text"
-                    defaultValue="Rua das Flores"
-                    className="w-full px-4 py-2 border transition-colors"
-                    style={{
-                      backgroundColor: dataFieldBackground,
-                      color: 'var(--foreground)',
-                      borderColor: 'var(--border)',
-                      borderRadius: 'var(--radius)',
-                      fontSize: 'var(--text-sm)',
-                    }}
-                  />
-                </div>
-                <div>
-                  <RequiredLabel>Número</RequiredLabel>
-                  <input
-                    type="text"
-                    defaultValue="123"
-                    className="w-full px-4 py-2 border transition-colors"
-                    style={{
-                      backgroundColor: dataFieldBackground,
-                      color: 'var(--foreground)',
-                      borderColor: 'var(--border)',
-                      borderRadius: 'var(--radius)',
-                      fontSize: 'var(--text-sm)',
-                    }}
-                  />
-                </div>
-                <div>
-                  <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
-                    Complemento
-                  </label>
-                  <input
-                    type="text"
-                    defaultValue="Apto 101"
-                    className="w-full px-4 py-2 border transition-colors"
-                    style={{
-                      backgroundColor: dataFieldBackground,
-                      color: 'var(--foreground)',
-                      borderColor: 'var(--border)',
-                      borderRadius: 'var(--radius)',
-                      fontSize: 'var(--text-sm)',
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Row 2: CEP | Bairro | Município */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <RequiredLabel>CEP</RequiredLabel>
-                  <input
-                    type="text"
-                    defaultValue="29000-000"
-                    className="w-full px-4 py-2 border transition-colors"
-                    style={{
-                      backgroundColor: dataFieldBackground,
-                      color: 'var(--foreground)',
-                      borderColor: 'var(--border)',
-                      borderRadius: 'var(--radius)',
-                      fontSize: 'var(--text-sm)',
-                    }}
-                  />
-                </div>
-                <div>
-                  <RequiredLabel>Bairro</RequiredLabel>
-                  <input
-                    type="text"
-                    defaultValue="Centro"
-                    className="w-full px-4 py-2 border transition-colors"
-                    style={{
-                      backgroundColor: dataFieldBackground,
-                      color: 'var(--foreground)',
-                      borderColor: 'var(--border)',
-                      borderRadius: 'var(--radius)',
-                      fontSize: 'var(--text-sm)',
-                    }}
-                  />
-                </div>
-                <div>
-                  <RequiredLabel>Município</RequiredLabel>
-                  <input
-                    type="text"
-                    defaultValue="Vitória"
-                    className="w-full px-4 py-2 border transition-colors"
-                    style={{
-                      backgroundColor: dataFieldBackground,
-                      color: 'var(--foreground)',
-                      borderColor: 'var(--border)',
-                      borderRadius: 'var(--radius)',
-                      fontSize: 'var(--text-sm)',
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Row 3: Estado | País */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <RequiredLabel>Estado</RequiredLabel>
-                  <input
-                    type="text"
-                    defaultValue="Espírito Santo"
-                    className="w-full px-4 py-2 border transition-colors"
-                    style={{
-                      backgroundColor: dataFieldBackground,
-                      color: 'var(--foreground)',
-                      borderColor: 'var(--border)',
-                      borderRadius: 'var(--radius)',
-                      fontSize: 'var(--text-sm)',
-                    }}
+                  <RequiredLabel>Tipo de Documento</RequiredLabel>
+                  <Dropdown
+                    value={selectedDocumentType}
+                    onChange={setSelectedDocumentType}
+                    options={documentTypes.map(type => ({ value: type, label: type }))}
+                    backgroundColor={dataFieldBackground}
                   />
                 </div>
-                <div>
-                  <RequiredLabel>País</RequiredLabel>
-                  <input
-                    type="text"
-                    defaultValue="Brasil"
-                    className="w-full px-4 py-2 border transition-colors"
-                    style={{
-                      backgroundColor: dataFieldBackground,
-                      color: 'var(--foreground)',
-                      borderColor: 'var(--border)',
-                      borderRadius: 'var(--radius)',
-                      fontSize: 'var(--text-sm)',
-                    }}
-                  />
-                </div>
+                <TextField label="Número" defaultValue="1234567" />
               </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <TextField label="Órgão Emissor" defaultValue="SSP" />
+                <TextField label="UF do Órgão Emissor" defaultValue="ES" />
+                <TextField label="Data de Emissão" defaultValue="10/03/2015" />
+              </div>
+            </div>
+          </section>
+
+          {/* Endereço Residencial Section */}
+          <section style={dataSectionStyle}>
+            <SectionHeader number={3} title="Endereço Residencial" />
+
+            <div className="space-y-8">
+              <AddressFields
+                defaults={{
+                  cep: '29000-000',
+                  rua: 'Rua das Flores',
+                  numero: '123',
+                  complemento: 'Apto 101',
+                  bairro: 'Centro',
+                  municipio: 'Vitória',
+                  estado: 'Espírito Santo',
+                  pais: 'Brasil',
+                }}
+              />
+
+              <CheckboxRow
+                checked={showProfessionalAddress}
+                onChange={setShowProfessionalAddress}
+                label="Informar endereço profissional diferente do residencial."
+              />
+
+              {showProfessionalAddress && (
+                <div>
+                  <h3 style={{ color: 'var(--foreground)', fontSize: '16px', margin: '0 0 2rem' }}>
+                    Endereço Profissional
+                  </h3>
+                  <AddressFields
+                    defaults={{
+                      cep: '',
+                      rua: '',
+                      numero: '',
+                      complemento: '',
+                      bairro: '',
+                      municipio: '',
+                      estado: '',
+                      pais: 'Brasil',
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </section>
 
           {/* Dados Bancários Section */}
           <section style={dataSectionStyle}>
-            <SectionHeader number={3} title="Dados Bancários" />
+            <SectionHeader number={4} title="Dados Bancários" />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <RequiredLabel>Banco</RequiredLabel>
-                <input
-                  type="text"
-                  value="Banestes"
-                  readOnly
-                  className="w-full px-4 py-2 border transition-colors"
-                  style={{
-                    backgroundColor: dataFieldBackground,
-                    color: 'var(--foreground)',
-                    borderColor: 'var(--border)',
-                    borderRadius: 'var(--radius)',
-                    cursor: 'not-allowed',
-                    fontSize: 'var(--text-sm)',
-                  }}
-                />
+            <div className="space-y-6">
+              <div className="flex flex-col gap-4">
+                <RadioOption value="existing" label="Já tenho uma conta do Banestes para informar." />
+                <RadioOption value="open" label="Não tenho uma conta do Banestes." />
               </div>
-              <div>
-                <RequiredLabel>Agência</RequiredLabel>
-                <input
-                  type="text"
-                  defaultValue="0001"
-                  className="w-full px-4 py-2 border transition-colors"
-                  style={{
-                    backgroundColor: dataFieldBackground,
-                    color: 'var(--foreground)',
-                    borderColor: 'var(--border)',
-                    borderRadius: 'var(--radius)',
-                    fontSize: 'var(--text-sm)',
-                  }}
-                />
-              </div>
-              <div>
-                <RequiredLabel>Conta</RequiredLabel>
-                <input
-                  type="text"
-                  defaultValue="12345678-9"
-                  className="w-full px-4 py-2 border transition-colors"
-                  style={{
-                    backgroundColor: dataFieldBackground,
-                    color: 'var(--foreground)',
-                    borderColor: 'var(--border)',
-                    borderRadius: 'var(--radius)',
-                    fontSize: 'var(--text-sm)',
-                  }}
-                />
-              </div>
+
+              {bankAccountOption === 'existing' ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <TextField label="Banco" defaultValue="Banestes" readOnly />
+                  <TextField label="Agência" defaultValue="0001" />
+                  <TextField label="Conta" defaultValue="12345678-9" />
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div
+                    style={{
+                      backgroundColor: 'rgba(59,130,246,.1)',
+                      border: '1px solid rgba(59,130,246,.3)',
+                      borderRadius: 'var(--radius)',
+                      padding: '1rem',
+                    }}
+                  >
+                    <h3 style={{ color: 'var(--foreground)', fontSize: '16px', margin: '0 0 0.5rem' }}>
+                      Vamos abrir sua conta no Banestes
+                    </h3>
+                    <p style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', lineHeight: 1.6, margin: 0 }}>
+                      Você não precisa abrir a conta antes. Selecione a agência de sua preferência e, ao salvar, a FAPES solicitará ao Banestes a abertura da sua conta nessa agência. Assim que a conta for criada, será exibida aqui.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <TextField label="Banco" defaultValue="Banestes" readOnly />
+                    <div>
+                      <RequiredLabel>Agência</RequiredLabel>
+                      <Dropdown
+                        value={selectedAgency}
+                        onChange={setSelectedAgency}
+                        options={banestesAgencies}
+                        backgroundColor={dataFieldBackground}
+                        showSelectedIcon={false}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </section>
+
+          <div style={{ paddingLeft: '1.5rem' }}>
+            <CheckboxRow
+              checked={receiveInformativos}
+              onChange={setReceiveInformativos}
+              label="Desejo receber informativos da Fapes por e-mail"
+              controlSize={24}
+            />
+          </div>
 
           {/* Update Button */}
           <div className="flex justify-end">
@@ -830,7 +904,6 @@ export function MyInfoPage() {
                 e.currentTarget.style.opacity = '1';
               }}
             >
-              <Save size={16} />
               Salvar Alterações
             </button>
           </div>
@@ -1025,7 +1098,7 @@ export function MyInfoPage() {
                         </div>
 
                         {/* Documento */}
-                        <div className="col-span-4" style={{ marginLeft: '2.5rem' }}>
+                        <div className="col-span-4" style={{ marginLeft: '4.5rem' }}>
                           <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                             Documento
                           </div>
@@ -1035,7 +1108,7 @@ export function MyInfoPage() {
                         </div>
 
                         {/* Data de Envio */}
-                        <div className="col-span-2" style={{ marginLeft: '2.5rem' }}>
+                        <div className="col-span-2" style={{ marginLeft: '4.5rem' }}>
                           <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                             Data de Envio
                           </div>
@@ -1045,7 +1118,7 @@ export function MyInfoPage() {
                         </div>
 
                         {/* Status */}
-                        <div className="col-span-2" style={{ marginLeft: '2.5rem' }}>
+                        <div className="col-span-2" style={{ marginLeft: '4.5rem' }}>
                           <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                             Status
                           </div>
@@ -1566,7 +1639,7 @@ export function MyInfoPage() {
                         </div>
 
                         {/* Documento */}
-                        <div className="col-span-4" style={{ marginLeft: '2.5rem' }}>
+                        <div className="col-span-4" style={{ marginLeft: '4.5rem' }}>
                           <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                             Documento
                           </div>

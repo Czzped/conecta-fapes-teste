@@ -4,12 +4,19 @@ import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
 type NaturezaJuridica = 'Publica' | 'Privada';
 type SituacaoInstituicao = 'Ativa' | 'Inativa' | 'Rascunho';
+type ClassificacaoInstituicao =
+  | ''
+  | 'Instituição Científica, Tecnológica e de Inovação (ICT)'
+  | 'Instituição de Ensino Superior (IES)'
+  | 'Organização Sem Fins Lucrativos (OSFL)'
+  | 'Empresa';
 type ActiveTab = 'listagem' | 'dashboard';
 
 interface InstituicaoItem {
   id: number;
   nome: string;
   sigla: string;
+  classificacao: ClassificacaoInstituicao;
   filial: string;
   cnpj: string;
   razaoSocial: string;
@@ -131,10 +138,18 @@ const maskCnpj = (value: string) => {
     .replace(/(\d{4})(\d)/, '$1-$2');
 };
 
+const classificacaoOptions: ClassificacaoInstituicao[] = [
+  'Instituição Científica, Tecnológica e de Inovação (ICT)',
+  'Instituição de Ensino Superior (IES)',
+  'Organização Sem Fins Lucrativos (OSFL)',
+  'Empresa',
+];
+
 const emptyInstituicao: InstituicaoItem = {
   id: 0,
   nome: '',
   sigla: '',
+  classificacao: '',
   filial: '',
   cnpj: '',
   razaoSocial: '',
@@ -157,16 +172,16 @@ const emptyInstituicao: InstituicaoItem = {
 };
 
 const initialInstituicoes: InstituicaoItem[] = [
-  { id: 1, nome: 'Universidade Federal do Espírito Santo', sigla: 'UFES', filial: 'PPGI', cnpj: '32.479.123/0001-43', razaoSocial: 'Universidade Federal do Espírito Santo', email: 'gabinete@ufes.br', telefone: '(27) 4009-2000', endereco: 'Av. Fernando Ferrari, 514 - Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Paulo Vargas', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 18, bolsasAtivas: 11, valorRecebido: 2450000, situacao: 'Ativa' },
-  { id: 2, nome: 'Universidade Federal do Espírito Santo', sigla: 'UFES', filial: 'Centro Tecnológico', cnpj: '32.479.123/0001-43', razaoSocial: 'Universidade Federal do Espírito Santo', email: 'ct@ufes.br', telefone: '(27) 4009-2600', endereco: 'Campus Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Ana Ribeiro', dataInicioMandato: '2023-03-01', dataFimMandato: '2027-02-28', projetosAtivos: 9, bolsasAtivas: 17, valorRecebido: 1280000, superior: 'Universidade Federal do Espírito Santo', situacao: 'Ativa' },
-  { id: 3, nome: 'Universidade Federal do Espírito Santo', sigla: 'UFES', filial: 'Centro de Saúde', cnpj: '32.479.123/0001-43', razaoSocial: 'Universidade Federal do Espírito Santo', email: 'saude@ufes.br', telefone: '(27) 4009-2100', endereco: 'Campus Maruípe', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Mariana Duarte', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 12, bolsasAtivas: 32, valorRecebido: 1640000, superior: 'Universidade Federal do Espírito Santo', situacao: 'Ativa' },
-  { id: 4, nome: 'Ifes Campus Serra', sigla: 'IFES', filial: 'Mestrado em Informática', cnpj: '10.838.653/0001-06', razaoSocial: 'Instituto Federal de Educação, Ciência e Tecnologia do Espírito Santo', email: 'reitoria@ifes.edu.br', telefone: '(27) 3357-7500', endereco: 'Av. Rio Branco, 50 - Santa Lúcia', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Jadir Pela', dataInicioMandato: '2021-10-01', dataFimMandato: '2025-09-30', projetosAtivos: 14, bolsasAtivas: 46, valorRecebido: 1980000, situacao: 'Ativa' },
-  { id: 5, nome: 'Fucape Business School', sigla: 'FUCAPE', filial: 'Não Possui', cnpj: '03.389.451/0001-66', razaoSocial: 'Fundação Instituto Capixaba de Pesquisas em Contabilidade, Economia e Finanças', email: 'contato@fucape.br', telefone: '(27) 4009-4444', endereco: 'Av. Fernando Ferrari, 1358 - Boa Vista', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', responsavel: 'Valcemiro Nossa', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 6, bolsasAtivas: 11, valorRecebido: 640000, situacao: 'Ativa' },
-  { id: 6, nome: 'Universidade Vila Velha', sigla: 'UVV', filial: 'Não Possui', cnpj: '39.268.702/0001-28', razaoSocial: 'Universidade Vila Velha', email: 'contato@uvv.br', telefone: '(27) 3421-2000', endereco: 'Av. Comissário José Dantas de Melo, 21', natureza: 'Privada', municipio: 'Vila Velha', uf: 'ES', responsavel: 'Carolina Nunes', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 8, bolsasAtivas: 17, valorRecebido: 720000, situacao: 'Ativa' },
-  { id: 7, nome: 'Instituto Jones dos Santos Neves', sigla: 'IJSN', filial: 'Não Possui', cnpj: '27.316.918/0001-23', razaoSocial: 'Instituto Jones dos Santos Neves', email: 'contato@ijsn.es.gov.br', telefone: '(27) 3636-8050', endereco: 'Av. Marechal Mascarenhas de Moraes, 2524', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Rafael Oliveira', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 5, bolsasAtivas: 32, valorRecebido: 510000, situacao: 'Ativa' },
-  { id: 8, nome: 'Senai', sigla: 'SENAI', filial: 'Não Possui', cnpj: '03.810.480/0001-85', razaoSocial: 'Serviço Nacional de Aprendizagem Industrial', email: 'contato@senai-es.org.br', telefone: '(27) 3334-5600', endereco: 'Av. Nossa Senhora da Penha, 2053', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', responsavel: 'Bruno Matos', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 4, bolsasAtivas: 46, valorRecebido: 430000, situacao: 'Ativa' },
-  { id: 9, nome: 'Vale', sigla: 'VALE', filial: 'Não Possui', cnpj: '33.592.510/0001-54', razaoSocial: 'Vale S.A.', email: 'inovacao@vale.com', telefone: '(27) 3333-3000', endereco: 'Complexo de Tubarão', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', responsavel: 'Fernanda Costa', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 7, bolsasAtivas: 11, valorRecebido: 950000, situacao: 'Ativa' },
-  { id: 10, nome: 'Arcelor', sigla: 'ARCELOR', filial: 'Não Possui', cnpj: '17.469.701/0001-77', razaoSocial: 'ArcelorMittal Brasil S.A.', email: 'pesquisa@arcelor.com', telefone: '(27) 3348-9000', endereco: 'Av. Brigadeiro Eduardo Gomes, 930', natureza: 'Privada', municipio: 'Serra', uf: 'ES', responsavel: 'Marcelo Lima', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 3, bolsasAtivas: 17, valorRecebido: 390000, situacao: 'Ativa' },
+  { id: 1, nome: 'Universidade Federal do Espírito Santo', sigla: 'UFES', classificacao: 'Instituição de Ensino Superior (IES)', filial: 'PPGI', cnpj: '32.479.123/0001-43', razaoSocial: 'Universidade Federal do Espírito Santo', email: 'gabinete@ufes.br', telefone: '(27) 4009-2000', endereco: 'Av. Fernando Ferrari, 514 - Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Paulo Vargas', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 18, bolsasAtivas: 11, valorRecebido: 2450000, situacao: 'Ativa' },
+  { id: 2, nome: 'Universidade Federal do Espírito Santo', sigla: 'UFES', classificacao: 'Instituição de Ensino Superior (IES)', filial: 'Centro Tecnológico', cnpj: '32.479.123/0001-43', razaoSocial: 'Universidade Federal do Espírito Santo', email: 'ct@ufes.br', telefone: '(27) 4009-2600', endereco: 'Campus Goiabeiras', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Ana Ribeiro', dataInicioMandato: '2023-03-01', dataFimMandato: '2027-02-28', projetosAtivos: 9, bolsasAtivas: 17, valorRecebido: 1280000, superior: 'Universidade Federal do Espírito Santo', situacao: 'Ativa' },
+  { id: 3, nome: 'Universidade Federal do Espírito Santo', sigla: 'UFES', classificacao: 'Instituição de Ensino Superior (IES)', filial: 'Centro de Saúde', cnpj: '32.479.123/0001-43', razaoSocial: 'Universidade Federal do Espírito Santo', email: 'saude@ufes.br', telefone: '(27) 4009-2100', endereco: 'Campus Maruípe', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Mariana Duarte', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 12, bolsasAtivas: 32, valorRecebido: 1640000, superior: 'Universidade Federal do Espírito Santo', situacao: 'Ativa' },
+  { id: 4, nome: 'Ifes Campus Serra', sigla: 'IFES', classificacao: 'Instituição de Ensino Superior (IES)', filial: 'Mestrado em Informática', cnpj: '10.838.653/0001-06', razaoSocial: 'Instituto Federal de Educação, Ciência e Tecnologia do Espírito Santo', email: 'reitoria@ifes.edu.br', telefone: '(27) 3357-7500', endereco: 'Av. Rio Branco, 50 - Santa Lúcia', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Jadir Pela', dataInicioMandato: '2021-10-01', dataFimMandato: '2025-09-30', projetosAtivos: 14, bolsasAtivas: 46, valorRecebido: 1980000, situacao: 'Ativa' },
+  { id: 5, nome: 'Fucape Business School', sigla: 'FUCAPE', classificacao: 'Instituição de Ensino Superior (IES)', filial: 'Não Possui', cnpj: '03.389.451/0001-66', razaoSocial: 'Fundação Instituto Capixaba de Pesquisas em Contabilidade, Economia e Finanças', email: 'contato@fucape.br', telefone: '(27) 4009-4444', endereco: 'Av. Fernando Ferrari, 1358 - Boa Vista', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', responsavel: 'Valcemiro Nossa', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 6, bolsasAtivas: 11, valorRecebido: 640000, situacao: 'Ativa' },
+  { id: 6, nome: 'Universidade Vila Velha', sigla: 'UVV', classificacao: 'Instituição de Ensino Superior (IES)', filial: 'Não Possui', cnpj: '39.268.702/0001-28', razaoSocial: 'Universidade Vila Velha', email: 'contato@uvv.br', telefone: '(27) 3421-2000', endereco: 'Av. Comissário José Dantas de Melo, 21', natureza: 'Privada', municipio: 'Vila Velha', uf: 'ES', responsavel: 'Carolina Nunes', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 8, bolsasAtivas: 17, valorRecebido: 720000, situacao: 'Ativa' },
+  { id: 7, nome: 'Instituto Jones dos Santos Neves', sigla: 'IJSN', classificacao: 'Instituição Científica, Tecnológica e de Inovação (ICT)', filial: 'Não Possui', cnpj: '27.316.918/0001-23', razaoSocial: 'Instituto Jones dos Santos Neves', email: 'contato@ijsn.es.gov.br', telefone: '(27) 3636-8050', endereco: 'Av. Marechal Mascarenhas de Moraes, 2524', natureza: 'Publica', municipio: 'Vitória', uf: 'ES', responsavel: 'Rafael Oliveira', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 5, bolsasAtivas: 32, valorRecebido: 510000, situacao: 'Ativa' },
+  { id: 8, nome: 'Senai', sigla: 'SENAI', classificacao: 'Organização Sem Fins Lucrativos (OSFL)', filial: 'Não Possui', cnpj: '03.810.480/0001-85', razaoSocial: 'Serviço Nacional de Aprendizagem Industrial', email: 'contato@senai-es.org.br', telefone: '(27) 3334-5600', endereco: 'Av. Nossa Senhora da Penha, 2053', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', responsavel: 'Bruno Matos', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 4, bolsasAtivas: 46, valorRecebido: 430000, situacao: 'Ativa' },
+  { id: 9, nome: 'Vale', sigla: 'VALE', classificacao: 'Empresa', filial: 'Não Possui', cnpj: '33.592.510/0001-54', razaoSocial: 'Vale S.A.', email: 'inovacao@vale.com', telefone: '(27) 3333-3000', endereco: 'Complexo de Tubarão', natureza: 'Privada', municipio: 'Vitória', uf: 'ES', responsavel: 'Fernanda Costa', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 7, bolsasAtivas: 11, valorRecebido: 950000, situacao: 'Ativa' },
+  { id: 10, nome: 'Arcelor', sigla: 'ARCELOR', classificacao: 'Empresa', filial: 'Não Possui', cnpj: '17.469.701/0001-77', razaoSocial: 'ArcelorMittal Brasil S.A.', email: 'pesquisa@arcelor.com', telefone: '(27) 3348-9000', endereco: 'Av. Brigadeiro Eduardo Gomes, 930', natureza: 'Privada', municipio: 'Serra', uf: 'ES', responsavel: 'Marcelo Lima', dataInicioMandato: '2024-01-01', dataFimMandato: '2028-12-31', projetosAtivos: 3, bolsasAtivas: 17, valorRecebido: 390000, situacao: 'Ativa' },
 ];
 
 const instituicoesParceiras = [
@@ -549,13 +564,20 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <Field label="Nome" value={draft.nome} onChange={value => updateDraft('nome', value)} placeholder="Nome da instituição ou unidade" />
               <Field label="Sigla" value={draft.sigla} onChange={value => updateDraft('sigla', value)} placeholder="Sigla" />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '0.7fr 1.2fr 0.8fr', gap: '16px', marginBottom: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 0.45fr 1.2fr', gap: '16px', marginBottom: '16px' }}>
+              <Select
+                label="Classificação"
+                value={draft.classificacao}
+                onChange={value => updateDraft('classificacao', value)}
+                options={classificacaoOptions}
+                placeholder="Selecione"
+              />
               <Select label="Natureza" value={draft.natureza} onChange={value => updateDraft('natureza', value)} options={['Publica', 'Privada']} />
-              <Field label={isSetorSemCnpj ? 'Razão social' : 'Razão social obrigatória'} value={draft.razaoSocial} onChange={value => updateDraft('razaoSocial', value)} placeholder={isSetorSemCnpj ? 'Não se aplica a setor interno' : 'Razão social da instituição'} disabled={isSetorSemCnpj} />
-              <Field label="CNPJ" value={draft.cnpj} onChange={value => updateDraft('cnpj', maskCnpj(value))} placeholder="Deixe vazio para setor sem CNPJ" />
+              <Field label={isSetorSemCnpj ? 'Razão Social' : 'Razão Social obrigatória'} value={draft.razaoSocial} onChange={value => updateDraft('razaoSocial', value)} placeholder={isSetorSemCnpj ? 'Não se aplica a setor interno' : 'Razão social da instituição'} disabled={isSetorSemCnpj} />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 0.6fr', gap: '16px', marginBottom: '16px' }}>
-              <Field label="Email institucional" value={draft.email} onChange={value => updateDraft('email', value)} placeholder="email@instituicao.br" />
+            <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.2fr 0.7fr', gap: '16px', marginBottom: '16px' }}>
+              <Field label="CNPJ" value={draft.cnpj} onChange={value => updateDraft('cnpj', maskCnpj(value))} placeholder="Deixe vazio para setor sem CNPJ" />
+              <Field label="E-mail Institucional" value={draft.email} onChange={value => updateDraft('email', value)} placeholder="email@instituicao.br" />
               <Field label="Telefone" value={draft.telefone} onChange={value => updateDraft('telefone', value)} placeholder="(00) 0000-0000" />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '0.6fr 1.6fr 1fr', gap: '16px', marginBottom: '16px' }}>
@@ -891,11 +913,11 @@ const ComboField: React.FC<{ label: string; value: string; onChange: (value: str
   );
 };
 
-const Select: React.FC<{ label: string; value: string; onChange: (value: string) => void; options: string[]; disabled?: boolean }> = ({ label, value, onChange, options, disabled }) => {
+const Select: React.FC<{ label: string; value: string; onChange: (value: string) => void; options: string[]; disabled?: boolean; placeholder?: string }> = ({ label, value, onChange, options, disabled, placeholder = 'Nenhuma' }) => {
   const { T } = useThemeTokens();
   const S = buildStyles(T);
   const [open, setOpen] = useState(false);
-  const displayValue = value || 'Nenhuma';
+  const displayValue = value || placeholder;
 
   return (
     <div style={{ position: 'relative' }}>
