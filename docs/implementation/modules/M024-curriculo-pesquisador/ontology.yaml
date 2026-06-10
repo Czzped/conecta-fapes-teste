@@ -1,4 +1,4 @@
-ontology: "Curriculo do Pesquisador (indice)"
+ontology: "Curriculo do Pesquisador"
 namespace: "post_award.curriculo"
 imports:
   - namespace: shared
@@ -14,78 +14,13 @@ imports:
 metadata:
   module: "M024"
   source: "docs/implementation/modules/M024-curriculo-pesquisador/modelo-estrutural.md"
-  version: "1.0.0"
-  description: "Raiz do dominio de curriculo do pesquisador importado da Plataforma Lattes, decomposto em 9 submodelos tematicos."
-
-submodules:
-  - context: "Curriculo"
-    namespace: "post_award.curriculo"
-    path: path: "ontology.yaml"
-    entities:
-      - Curriculo
-    description: "Raiz do curriculo, versionamento do snapshot, validade da sincronizacao e areas de atuacao."
-
-  - context: "Formacao Academica"
-    namespace: "post_award.curriculo.formacao"
-    path: path: "formacao.yaml"
-    entities:
-      - FormacaoAcademica
-    description: "Titulacoes academicas do pesquisador com nivel, instituicao e area de conhecimento."
-
-  - context: "Artigos"
-    namespace: "post_award.curriculo.artigos"
-    path: path: "artigos.yaml"
-    entities:
-      - Artigo
-      - Periodico
-    description: "Producao bibliografica em periodicos e anais; artigos sao compartilhados entre curriculos."
-
-  - context: "Livros e Capitulos"
-    namespace: "post_award.curriculo.livros"
-    path: path: "livros.yaml"
-    entities:
-      - Livro
-    description: "Livros completos e capitulos de livro publicados pelo pesquisador."
-
-  - context: "Orientacoes"
-    namespace: "post_award.curriculo.orientacoes"
-    path: path: "orientacoes.yaml"
-    entities:
-      - Orientacao
-      - NivelOrientacao
-    description: "Orientacoes academicas concluidas ou em andamento, com nivel e orientando."
-
-  - context: "Projetos"
-    namespace: "post_award.curriculo.projetos"
-    path: path: "projetos.yaml"
-    entities:
-      - Projeto
-      - ParticipacaoProjeto
-      - TipoProjeto
-    description: "Projetos de pesquisa e participacoes com papel por pessoa; projetos sao compartilhados entre curriculos."
-
-  - context: "Eventos"
-    namespace: "post_award.curriculo.eventos"
-    path: path: "eventos.yaml"
-    entities:
-      - ParticipacaoEvento
-    description: "Participacoes do pesquisador em eventos cientificos com papel e local."
-
-  - context: "Premios"
-    namespace: "post_award.curriculo.premios"
-    path: path: "premios.yaml"
-    entities:
-      - Premio
-    description: "Premios, titulos honorificos e homenagens recebidos pelo pesquisador."
-
-  - context: "Idiomas"
-    namespace: "post_award.curriculo.idiomas"
-    path: path: "idiomas.yaml"
-    entities:
-      - Idioma
-    description: "Idiomas declarados com niveis de proficiencia por habilidade."
+  version: "3.0.0"
+  description: "Ontologia completa do dominio de curriculo do pesquisador importado da Plataforma Lattes; todos os submodelos unificados em arquivo unico. FormaCitacao e juncao entre Curriculo e Artigo — substitui o N:N implicito Artigo x PessoaFisica."
 
 entities:
+
+  # --- Raiz ---
+
   Curriculo:
     description: "Raiz do curriculo do pesquisador importado da Plataforma Lattes; controla versionamento do snapshot e validade da sincronizacao."
     extends: "shared.Auditavel"
@@ -114,7 +49,365 @@ entities:
         required: true
         description: "Data e hora da ultima sincronizacao bem-sucedida pelo Conecta (ISO 8601)."
 
+  # --- Formacao Academica ---
+
+  FormacaoAcademica:
+    description: "Titulacao academica do pesquisador registrada no curriculo Lattes; alimenta elegibilidade, titulacao maxima e busca por expertise."
+    extends: "shared.Auditavel"
+    fields:
+      curriculoId:
+        type: "Guid"
+        required: true
+        description: "FK para Curriculo ao qual a formacao pertence."
+      nivel:
+        type: "NivelFormacao"
+        required: true
+        description: "Nivel da titulacao academica."
+      curso:
+        type: "string"
+        required: true
+        description: "Nome do curso ou programa de pos-graduacao."
+        max_length: 300
+      anoInicio:
+        type: "integer"
+        required: true
+        description: "Ano de inicio da formacao (4 digitos)."
+      anoConclusao:
+        type: "integer"
+        required: false
+        description: "Ano de conclusao — obrigatorio quando status = Concluida; vazio quando status = EmAndamento."
+      status:
+        type: "StatusFormacao"
+        required: true
+        description: "Estado atual da formacao."
+      instituicaoId:
+        type: "Guid"
+        required: true
+        description: "FK para Instituicao (M008) onde a formacao foi realizada."
+      areaConhecimentoId:
+        type: "Guid"
+        required: false
+        description: "FK para AreaConhecimento (M008 CNPq) associada a formacao; vazio quando area nao mapeada."
+
+  # --- Artigos e Periodicos ---
+
+  FormaCitacao:
+    description: "Juncao entre Curriculo e Artigo; registra o nome como o pesquisador foi citado naquela publicacao. PessoaFisica e alcancada atraves do Curriculo titular. Composicao de Curriculo — apagada e recriada a cada reimportacao."
+    extends: "shared.Auditavel"
+    fields:
+      curriculoId:
+        type: "Guid"
+        required: true
+        description: "FK para Curriculo ao qual a forma de citacao pertence."
+      artigoId:
+        type: "Guid"
+        required: false
+        description: "FK para Artigo em que o pesquisador foi citado com esse nome; nulo quando forma declarada sem publicacao associada."
+      nome:
+        type: "string"
+        required: true
+        description: "Nome como o pesquisador foi citado na publicacao (ex.: PEREIRA, J. C.; Joao C. Pereira)."
+        max_length: 200
+
+  Artigo:
+    description: "Artigo publicado em periodico ou anais de conferencia; pode ser compartilhado entre curriculos de coautores, deduplicado por doi ou (titulo, ano, periodico)."
+    extends: "shared.Auditavel"
+    fields:
+      titulo:
+        type: "string"
+        required: true
+        description: "Titulo do artigo publicado."
+        max_length: 500
+      doi:
+        type: "string"
+        required: false
+        description: "Digital Object Identifier do artigo — chave de deduplicacao preferencial quando disponivel."
+        max_length: 100
+      ano:
+        type: "integer"
+        required: true
+        description: "Ano de publicacao (4 digitos)."
+      periodicoId:
+        type: "Guid"
+        required: true
+        description: "FK para Periodico que publicou o artigo."
+
+  Periodico:
+    description: "Periodico ou anais de conferencia; cadastro compartilhado deduplicado por issn ou nome normalizado."
+    extends: "shared.Auditavel"
+    fields:
+      nome:
+        type: "string"
+        required: true
+        description: "Nome do periodico ou anais de conferencia."
+        max_length: 300
+      issn:
+        type: "string"
+        required: false
+        description: "Identificador internacional do periodico — chave de deduplicacao preferencial quando disponivel."
+        max_length: 20
+        unique: true
+      qualis:
+        type: "string"
+        required: false
+        description: "Estrato Qualis CAPES do periodico (A1, A2, A3, A4, B1, B2, B3, B4, C); vazio quando indisponivel."
+        max_length: 5
+
+  # --- Livros e Capitulos ---
+
+  Livro:
+    description: "Livro completo ou capitulo de livro publicado pelo pesquisador; composicao de Curriculo, apagado e recriado a cada reimportacao."
+    extends: "shared.Auditavel"
+    fields:
+      curriculoId:
+        type: "Guid"
+        required: true
+        description: "FK para Curriculo ao qual o livro/capitulo pertence."
+      titulo:
+        type: "string"
+        required: true
+        description: "Titulo do livro ou capitulo."
+        max_length: 500
+      tipo:
+        type: "TipoProducaoLivro"
+        required: true
+        description: "Tipo da producao bibliografica: Livro (completo) ou Capitulo."
+      isbn:
+        type: "string"
+        required: false
+        description: "ISBN-10 ou ISBN-13 quando disponivel no Lattes."
+        max_length: 20
+      ano:
+        type: "integer"
+        required: true
+        description: "Ano de publicacao (4 digitos)."
+      papel:
+        type: "string"
+        required: false
+        description: "Papel do pesquisador na obra conforme Lattes (Autor, Organizador, Tradutor ou equivalente)."
+        max_length: 100
+      editoraId:
+        type: "Guid"
+        required: false
+        description: "FK para Instituicao (M008) editora da obra; opcional pois Lattes pode trazer informacao incompleta."
+
+  # --- Orientacoes Academicas ---
+
+  Orientacao:
+    description: "Orientacao academica (IC, mestrado, doutorado, pos-doutorado) realizada pelo pesquisador; composicao de Curriculo."
+    extends: "shared.Auditavel"
+    fields:
+      curriculoId:
+        type: "Guid"
+        required: true
+        description: "FK para Curriculo ao qual a orientacao pertence."
+      anoInicio:
+        type: "integer"
+        required: true
+        description: "Ano de inicio da orientacao (4 digitos)."
+      anoConclusao:
+        type: "integer"
+        required: false
+        description: "Ano de conclusao — obrigatorio quando status = Concluida; vazio quando status = EmAndamento."
+      status:
+        type: "StatusOrientacao"
+        required: true
+        description: "Estado atual da orientacao."
+      nivelOrientacaoId:
+        type: "Guid"
+        required: true
+        description: "FK para NivelOrientacao — cadastro local de niveis."
+      orientandoId:
+        type: "Guid"
+        required: true
+        description: "FK para PessoaFisica (M008) do orientando."
+      instituicaoId:
+        type: "Guid"
+        required: true
+        description: "FK para Instituicao (M008) onde a orientacao ocorre."
+
+  NivelOrientacao:
+    description: "Cadastro local de niveis de orientacao academica; compartilhado entre curriculos, nao apagado por reimportacao."
+    extends: "shared.Auditavel"
+    fields:
+      codigo:
+        type: "string"
+        required: true
+        description: "Codigo canonico do nivel de orientacao (IC, M, D, PD)."
+        max_length: 5
+        unique: true
+      nome:
+        type: "string"
+        required: true
+        description: "Nome do nivel de orientacao."
+        max_length: 100
+      descricao:
+        type: "string"
+        required: false
+        description: "Descricao do nivel de orientacao."
+        max_length: 500
+
+  # --- Projetos Academicos ---
+
+  Projeto:
+    description: "Projeto academico registrado no Lattes; entidade compartilhada que pode aparecer em multiplos curriculos via ParticipacaoProjeto, deduplicado por (titulo, dataInicio, tipo, financiador)."
+    extends: "shared.Auditavel"
+    fields:
+      titulo:
+        type: "string"
+        required: true
+        description: "Titulo do projeto de pesquisa."
+        max_length: 500
+      dataInicio:
+        type: "Date"
+        required: true
+        description: "Data de inicio do projeto."
+      dataFim:
+        type: "Date"
+        required: false
+        description: "Data de encerramento — obrigatoria quando status = Concluido; vazia quando status = EmAndamento."
+      status:
+        type: "StatusProjeto"
+        required: true
+        description: "Estado atual do projeto."
+      tipoProjetoId:
+        type: "Guid"
+        required: true
+        description: "FK para TipoProjeto — cadastro local de tipos."
+      financiadorId:
+        type: "Guid"
+        required: false
+        description: "FK para Instituicao (M008) financiadora, quando declarada no Lattes."
+
+  ParticipacaoProjeto:
+    description: "Vinculo entre um Curriculo e um Projeto; carrega o papel exercido pelo pesquisador no projeto, pois pessoas diferentes podem ter papeis distintos no mesmo projeto."
+    extends: "shared.Auditavel"
+    fields:
+      curriculoId:
+        type: "Guid"
+        required: true
+        description: "FK para Curriculo ao qual a participacao pertence."
+      projetoId:
+        type: "Guid"
+        required: true
+        description: "FK para Projeto ao qual a participacao se refere."
+      participanteId:
+        type: "Guid"
+        required: true
+        description: "FK para PessoaFisica (M008) que exerce o papel no projeto; normalmente o titular do curriculo."
+      papel:
+        type: "PapelProjeto"
+        required: true
+        description: "Papel da pessoa no projeto."
+
+  TipoProjeto:
+    description: "Cadastro local de tipos de projeto academico; compartilhado entre curriculos, nao apagado por reimportacao."
+    extends: "shared.Auditavel"
+    fields:
+      codigo:
+        type: "string"
+        required: true
+        description: "Codigo canonico do tipo de projeto (PESQUISA, EXTENSAO, DESENVOLVIMENTO, ENSINO, OUTRO)."
+        max_length: 20
+        unique: true
+      nome:
+        type: "string"
+        required: true
+        description: "Nome do tipo de projeto."
+        max_length: 100
+      descricao:
+        type: "string"
+        required: false
+        description: "Descricao do tipo de projeto."
+        max_length: 500
+
+  # --- Participacoes em Eventos ---
+
+  ParticipacaoEvento:
+    description: "Participacao do pesquisador em evento cientifico registrada no curriculo Lattes; composicao de Curriculo."
+    extends: "shared.Auditavel"
+    fields:
+      curriculoId:
+        type: "Guid"
+        required: true
+        description: "FK para Curriculo ao qual a participacao pertence."
+      nome:
+        type: "string"
+        required: true
+        description: "Nome do evento cientifico."
+        max_length: 500
+      papel:
+        type: "PapelEvento"
+        required: true
+        description: "Papel do pesquisador no evento."
+      ano:
+        type: "integer"
+        required: true
+        description: "Ano de realizacao do evento (4 digitos)."
+      localId:
+        type: "Guid"
+        required: false
+        description: "FK para Cidade (M008) onde o evento ocorreu; opcional pois o Lattes nem sempre informa cidade de forma estruturada."
+
+  # --- Premios e Distincoes ---
+
+  Premio:
+    description: "Premio, titulo honorifico ou homenagem recebido pelo pesquisador; composicao de Curriculo."
+    extends: "shared.Auditavel"
+    fields:
+      curriculoId:
+        type: "Guid"
+        required: true
+        description: "FK para Curriculo ao qual o premio pertence."
+      nome:
+        type: "string"
+        required: true
+        description: "Nome do premio, titulo honorifico ou homenagem."
+        max_length: 300
+      ano:
+        type: "integer"
+        required: true
+        description: "Ano em que o premio foi recebido (4 digitos)."
+      entidadeId:
+        type: "Guid"
+        required: false
+        description: "FK para Instituicao (M008) que conferiu o premio; opcional pois o Lattes pode nao informar entidade concedente identificavel."
+
+  # --- Idiomas e Proficiencia ---
+
+  Idioma:
+    description: "Idioma declarado pelo pesquisador no curriculo Lattes com proficiencia discriminada por habilidade; composicao de Curriculo — cada idioma deve aparecer uma unica vez por curriculo."
+    extends: "shared.Auditavel"
+    fields:
+      curriculoId:
+        type: "Guid"
+        required: true
+        description: "FK para Curriculo ao qual o idioma pertence."
+      idioma:
+        type: "string"
+        required: true
+        description: "Nome do idioma declarado no Lattes."
+        max_length: 100
+      compreensao:
+        type: "NivelProficienciaIdioma"
+        required: true
+        description: "Nivel de proficiencia em compreensao oral."
+      fala:
+        type: "NivelProficienciaIdioma"
+        required: true
+        description: "Nivel de proficiencia na fala."
+      leitura:
+        type: "NivelProficienciaIdioma"
+        required: true
+        description: "Nivel de proficiencia na leitura."
+      escrita:
+        type: "NivelProficienciaIdioma"
+        required: true
+        description: "Nivel de proficiencia na escrita."
+
 relationships:
+
+  # --- Raiz ---
   - from: "shared.people.PessoaFisica"
     relation: "titular de"
     to: "post_award.curriculo.Curriculo"
@@ -125,7 +418,131 @@ relationships:
     to: "shared.classifications.AreaConhecimento"
     cardinality: "N:N"
 
+  # --- Formacao ---
+  - from: "post_award.curriculo.Curriculo"
+    relation: "possui"
+    to: "post_award.curriculo.FormacaoAcademica"
+    cardinality: "1:N"
+  - from: "post_award.curriculo.FormacaoAcademica"
+    relation: "realizada em"
+    to: "corporativo.instituicoes.Instituicao"
+    cardinality: "N:1"
+  - from: "post_award.curriculo.FormacaoAcademica"
+    relation: "area de conhecimento"
+    to: "shared.classifications.AreaConhecimento"
+    cardinality: "N:1"
+    optional: true
+
+  # --- Artigos ---
+  - from: "post_award.curriculo.FormaCitacao"
+    relation: "citado em"
+    to: "post_award.curriculo.Artigo"
+    cardinality: "N:1"
+    optional: true
+    note: "Nulo quando forma declarada sem publicacao associada."
+  - from: "post_award.curriculo.FormaCitacao"
+    relation: "pesquisador"
+    to: "shared.people.PessoaFisica"
+    cardinality: "N:1"
+    note: "Derivada via Curriculo — FormaCitacao.curriculoId -> Curriculo -> PessoaFisica."
+  - from: "post_award.curriculo.Artigo"
+    relation: "curriculos"
+    to: "post_award.curriculo.Curriculo"
+    cardinality: "N:N"
+    note: "Derivada via FormaCitacao — Artigo <- FormaCitacao -> Curriculo."
+  - from: "post_award.curriculo.Artigo"
+    relation: "autores"
+    to: "shared.people.PessoaFisica"
+    cardinality: "N:N"
+    note: "Derivada via FormaCitacao — Artigo <- FormaCitacao -> Curriculo -> PessoaFisica."
+  - from: "post_award.curriculo.Artigo"
+    relation: "publicado em"
+    to: "post_award.curriculo.Periodico"
+    cardinality: "N:1"
+
+  # --- Livros ---
+  - from: "post_award.curriculo.Curriculo"
+    relation: "possui"
+    to: "post_award.curriculo.Livro"
+    cardinality: "1:N"
+  - from: "post_award.curriculo.Livro"
+    relation: "publicado por"
+    to: "corporativo.instituicoes.Instituicao"
+    cardinality: "N:1"
+    optional: true
+
+  # --- Orientacoes ---
+  - from: "post_award.curriculo.Curriculo"
+    relation: "possui"
+    to: "post_award.curriculo.Orientacao"
+    cardinality: "1:N"
+  - from: "post_award.curriculo.Orientacao"
+    relation: "nivel"
+    to: "post_award.curriculo.NivelOrientacao"
+    cardinality: "N:1"
+  - from: "post_award.curriculo.Orientacao"
+    relation: "orientando"
+    to: "shared.people.PessoaFisica"
+    cardinality: "N:1"
+  - from: "post_award.curriculo.Orientacao"
+    relation: "realizada em"
+    to: "corporativo.instituicoes.Instituicao"
+    cardinality: "N:1"
+
+  # --- Projetos ---
+  - from: "post_award.curriculo.Curriculo"
+    relation: "participa de"
+    to: "post_award.curriculo.ParticipacaoProjeto"
+    cardinality: "1:N"
+  - from: "post_award.curriculo.ParticipacaoProjeto"
+    relation: "referencia"
+    to: "post_award.curriculo.Projeto"
+    cardinality: "N:1"
+  - from: "post_award.curriculo.ParticipacaoProjeto"
+    relation: "participante"
+    to: "shared.people.PessoaFisica"
+    cardinality: "N:1"
+  - from: "post_award.curriculo.Projeto"
+    relation: "tipo"
+    to: "post_award.curriculo.TipoProjeto"
+    cardinality: "N:1"
+  - from: "post_award.curriculo.Projeto"
+    relation: "financiado por"
+    to: "corporativo.instituicoes.Instituicao"
+    cardinality: "N:1"
+    optional: true
+
+  # --- Eventos ---
+  - from: "post_award.curriculo.Curriculo"
+    relation: "possui"
+    to: "post_award.curriculo.ParticipacaoEvento"
+    cardinality: "1:N"
+  - from: "post_award.curriculo.ParticipacaoEvento"
+    relation: "realizado em"
+    to: "shared.geography.Cidade"
+    cardinality: "N:1"
+    optional: true
+
+  # --- Premios ---
+  - from: "post_award.curriculo.Curriculo"
+    relation: "possui"
+    to: "post_award.curriculo.Premio"
+    cardinality: "1:N"
+  - from: "post_award.curriculo.Premio"
+    relation: "concedido por"
+    to: "corporativo.instituicoes.Instituicao"
+    cardinality: "N:1"
+    optional: true
+
+  # --- Idiomas ---
+  - from: "post_award.curriculo.Curriculo"
+    relation: "possui"
+    to: "post_award.curriculo.Idioma"
+    cardinality: "1:N"
+
 axioms:
+
+  # --- Raiz ---
   - id: "AX-M024-001"
     natural_language: "Toda Pessoa identificada como Pesquisador deve possuir exatamente um Curriculo vinculado."
     formal_rule: "PessoaFisica.isPesquisador => EXISTS EXACTLY ONE Curriculo WHERE Curriculo.pessoaFisicaId = PessoaFisica.Id"
@@ -142,7 +559,91 @@ axioms:
     natural_language: "Falha em reimportacao preserva o snapshot anterior intacto."
     formal_rule: "ImportacaoFailed AND Curriculo.versao > 0 => KEEP previous snapshot"
 
+  # --- Formacao ---
+  - id: "AX-M024-F01"
+    natural_language: "anoConclusao e obrigatorio quando status = Concluida e deve ser vazio quando status = EmAndamento."
+    formal_rule: "FormacaoAcademica.status = Concluida => anoConclusao IS NOT NULL; FormacaoAcademica.status = EmAndamento => anoConclusao IS NULL"
+  - id: "AX-M024-F02"
+    natural_language: "Reimportacao apaga todas as FormacaoAcademica anteriores do curriculo e recria a partir do snapshot atual."
+    formal_rule: "ON reimportacao(curriculoId): DELETE FormacaoAcademica WHERE curriculoId = :id THEN INSERT FROM snapshot"
+  - id: "AX-M024-F03"
+    natural_language: "Areas de conhecimento nao mapeadas geram log de discrepancia e o campo areaConhecimentoId fica vazio, sem bloquear a sincronizacao."
+    formal_rule: "areaCNPq NOT IN AreaConhecimento => LOG discrepancia AND areaConhecimentoId = NULL"
+
+  # --- Artigos ---
+  - id: "AX-M024-A01"
+    natural_language: "Reimportacao apaga todas as FormaCitacao do curriculo sincronizado e recria a partir do snapshot. O registro compartilhado de Artigo nao e apagado se referenciado por FormaCitacao de outro curriculo."
+    formal_rule: "ON reimportacao(curriculoId): DELETE FormaCitacao WHERE curriculoId = :id; INSERT FROM snapshot; DELETE Artigo WHERE id NOT IN (SELECT artigoId FROM FormaCitacao WHERE artigoId IS NOT NULL)"
+  - id: "AX-M024-A02"
+    natural_language: "Periodico.issn e a chave de deduplicacao preferencial; quando ausente, M024 usa nome normalizado."
+    formal_rule: "DEDUP Periodico BY issn WHEN NOT NULL ELSE BY normalize(nome)"
+  - id: "AX-M024-A03"
+    natural_language: "Artigo.doi e a chave de deduplicacao preferencial; quando ausente, M024 usa (titulo, ano, periodico)."
+    formal_rule: "DEDUP Artigo BY doi WHEN NOT NULL ELSE BY (normalize(titulo), ano, periodicoId)"
+  - id: "AX-M024-A04"
+    natural_language: "Durante a importacao, o adapter cria FormaCitacao com artigoId para cada autor do snapshot que seja resolvido para uma PessoaFisica em M008 (por CPF, nome normalizado ou numero Lattes). Autores sem correspondencia nao geram registro."
+    formal_rule: "FOR EACH autor IN snapshot.autores: curriculo = RESOLVE(autor) VIA M008.PessoaFisica; IF curriculo IS NOT NULL THEN INSERT FormaCitacao(curriculoId = curriculo.id, artigoId = artigo.id, nome = autor.nomeOriginal)"
+
+  # --- Livros ---
+  - id: "AX-M024-L01"
+    natural_language: "Reimportacao apaga todos os Livro anteriores do curriculo e recria a partir do snapshot atual."
+    formal_rule: "ON reimportacao(curriculoId): DELETE Livro WHERE curriculoId = :id THEN INSERT FROM snapshot"
+  - id: "AX-M024-L02"
+    natural_language: "tipo discrimina livro completo e capitulo; nao ha entidade separada para capitulo."
+    formal_rule: "Livro.tipo IN (Livro, Capitulo)"
+
+  # --- Orientacoes ---
+  - id: "AX-M024-O01"
+    natural_language: "anoConclusao e obrigatorio quando status = Concluida e deve ser vazio quando status = EmAndamento."
+    formal_rule: "Orientacao.status = Concluida => anoConclusao IS NOT NULL; Orientacao.status = EmAndamento => anoConclusao IS NULL"
+  - id: "AX-M024-O02"
+    natural_language: "Reimportacao apaga todas as Orientacao anteriores do curriculo e recria a partir do snapshot atual."
+    formal_rule: "ON reimportacao(curriculoId): DELETE Orientacao WHERE curriculoId = :id THEN INSERT FROM snapshot"
+  - id: "AX-M024-O03"
+    natural_language: "NivelOrientacao e cadastro local compartilhado — nao e composicao de Curriculo e nao e apagado por reimportacao."
+    formal_rule: "NivelOrientacao persists independently of reimportacao"
+
+  # --- Projetos ---
+  - id: "AX-M024-P01"
+    natural_language: "dataFim e obrigatoria quando status = Concluido; deve ser vazia quando status = EmAndamento."
+    formal_rule: "Projeto.status = Concluido => dataFim IS NOT NULL; Projeto.status = EmAndamento => dataFim IS NULL"
+  - id: "AX-M024-P02"
+    natural_language: "Reimportacao apaga as ParticipacaoProjeto do curriculo sincronizado e recria a partir do snapshot; o registro de Projeto nao e apagado se vinculado a outro curriculo."
+    formal_rule: "ON reimportacao(curriculoId): DELETE ParticipacaoProjeto WHERE curriculoId = :id THEN INSERT FROM snapshot; DELETE Projeto WHERE id NOT IN (SELECT projetoId FROM ParticipacaoProjeto)"
+  - id: "AX-M024-P03"
+    natural_language: "PapelProjeto pertence a ParticipacaoProjeto, nao a Projeto."
+    formal_rule: "PapelProjeto IS ATTRIBUTE OF ParticipacaoProjeto NOT Projeto"
+  - id: "AX-M024-P04"
+    natural_language: "Projeto deve ser deduplicado por (titulo, dataInicio, tipo, financiador) quando nao houver identificador externo confiavel no Lattes."
+    formal_rule: "DEDUP Projeto BY (normalize(titulo), dataInicio, tipoProjetoId, financiadorId)"
+
+  # --- Eventos ---
+  - id: "AX-M024-E01"
+    natural_language: "Reimportacao apaga todas as ParticipacaoEvento anteriores do curriculo e recria a partir do snapshot atual."
+    formal_rule: "ON reimportacao(curriculoId): DELETE ParticipacaoEvento WHERE curriculoId = :id THEN INSERT FROM snapshot"
+  - id: "AX-M024-E02"
+    natural_language: "local e opcional — nao bloquear importacao quando Lattes nao informar cidade estruturada."
+    formal_rule: "ParticipacaoEvento.localId MAY BE NULL"
+
+  # --- Premios ---
+  - id: "AX-M024-PR01"
+    natural_language: "Reimportacao apaga todos os Premio anteriores do curriculo e recria a partir do snapshot atual."
+    formal_rule: "ON reimportacao(curriculoId): DELETE Premio WHERE curriculoId = :id THEN INSERT FROM snapshot"
+  - id: "AX-M024-PR02"
+    natural_language: "entidade deve ser criada/associada durante a importacao quando houver entidade concedente identificavel no Lattes."
+    formal_rule: "IF Lattes.entidade IS IDENTIFIABLE => associar Instituicao via M008 match-or-create ELSE entidadeId = NULL"
+
+  # --- Idiomas ---
+  - id: "AX-M024-I01"
+    natural_language: "Reimportacao apaga todos os Idioma anteriores do curriculo e recria a partir do snapshot atual."
+    formal_rule: "ON reimportacao(curriculoId): DELETE Idioma WHERE curriculoId = :id THEN INSERT FROM snapshot"
+  - id: "AX-M024-I02"
+    natural_language: "Cada idioma deve aparecer uma unica vez por curriculo."
+    formal_rule: "UNIQUE(Idioma.curriculoId, normalize(Idioma.idioma))"
+
 invariants:
+
+  # --- Raiz ---
   - id: "INV-M024-001"
     rule: "Curriculo.numeroLattes MATCHES '^[0-9]{16}$'"
     description: "numeroLattes deve ter exatamente 16 digitos numericos."
@@ -150,7 +651,113 @@ invariants:
     rule: "Curriculo.versao >= 1"
     description: "Versao deve ser pelo menos 1 apos a primeira importacao bem-sucedida."
 
-enums: {}
+  # --- Formacao ---
+  - id: "INV-M024-F01"
+    rule: "FormacaoAcademica.status = Concluida => FormacaoAcademica.anoConclusao IS NOT NULL"
+    description: "Formacao concluida deve ter ano de conclusao preenchido."
+  - id: "INV-M024-F02"
+    rule: "FormacaoAcademica.anoInicio <= COALESCE(FormacaoAcademica.anoConclusao, FormacaoAcademica.anoInicio)"
+    description: "Ano de inicio nao pode ser posterior ao ano de conclusao."
+
+  # --- Artigos ---
+  - id: "INV-M024-A01"
+    rule: "Artigo.ano >= 1900 AND Artigo.ano <= CURRENT_YEAR + 1"
+    description: "Ano de publicacao deve ser plausivel."
+  - id: "INV-M024-A02"
+    rule: "Artigo.periodicoId IS NOT NULL"
+    description: "Todo artigo deve estar associado a um periodico."
+  - id: "INV-M024-A03"
+    rule: "UNIQUE(FormaCitacao.curriculoId, FormaCitacao.artigoId) WHERE artigoId IS NOT NULL"
+    description: "Um curriculo so aparece uma vez por artigo."
+
+  # --- Livros ---
+  - id: "INV-M024-L01"
+    rule: "Livro.ano >= 1900 AND Livro.ano <= CURRENT_YEAR + 1"
+    description: "Ano de publicacao deve ser plausivel."
+
+  # --- Orientacoes ---
+  - id: "INV-M024-O01"
+    rule: "Orientacao.status = Concluida => Orientacao.anoConclusao IS NOT NULL"
+    description: "Orientacao concluida deve ter ano de conclusao preenchido."
+  - id: "INV-M024-O02"
+    rule: "Orientacao.anoInicio <= COALESCE(Orientacao.anoConclusao, Orientacao.anoInicio)"
+    description: "Ano de inicio nao pode ser posterior ao ano de conclusao."
+  - id: "INV-M024-O03"
+    rule: "NivelOrientacao.codigo IN ('IC', 'M', 'D', 'PD')"
+    description: "Codigo do nivel de orientacao deve ser um dos valores canonicos iniciais."
+
+  # --- Projetos ---
+  - id: "INV-M024-P01"
+    rule: "Projeto.status = Concluido => Projeto.dataFim IS NOT NULL"
+    description: "Projeto concluido deve ter data de encerramento preenchida."
+  - id: "INV-M024-P02"
+    rule: "Projeto.dataInicio <= COALESCE(Projeto.dataFim, Projeto.dataInicio)"
+    description: "Data de inicio nao pode ser posterior a data de encerramento."
+
+  # --- Eventos ---
+  - id: "INV-M024-E01"
+    rule: "ParticipacaoEvento.ano >= 1900 AND ParticipacaoEvento.ano <= CURRENT_YEAR + 1"
+    description: "Ano do evento deve ser plausivel."
+
+  # --- Premios ---
+  - id: "INV-M024-PR01"
+    rule: "Premio.ano >= 1900 AND Premio.ano <= CURRENT_YEAR + 1"
+    description: "Ano do premio deve ser plausivel."
+
+  # --- Idiomas ---
+  - id: "INV-M024-I01"
+    rule: "UNIQUE(Idioma.curriculoId, Idioma.idioma)"
+    description: "Um mesmo idioma nao pode aparecer duas vezes no mesmo curriculo."
+
+enums:
+
+  NivelFormacao:
+    values:
+      Graduacao: "Curso de graduacao de nivel superior."
+      Especializacao: "Curso de especializacao lato sensu."
+      Mestrado: "Programa de mestrado stricto sensu."
+      Doutorado: "Programa de doutorado stricto sensu."
+      PosDoutorado: "Estagio pos-doutoral."
+
+  StatusFormacao:
+    values:
+      Concluida: "Formacao concluida com ano de conclusao registrado."
+      EmAndamento: "Formacao em curso, sem ano de conclusao."
+
+  TipoProducaoLivro:
+    values:
+      Livro: "Obra bibliografica completa (livro inteiro)."
+      Capitulo: "Capitulo de livro organizado por terceiro ou pelo proprio pesquisador."
+
+  StatusOrientacao:
+    values:
+      Concluida: "Orientacao finalizada com ano de conclusao registrado."
+      EmAndamento: "Orientacao em curso, sem ano de conclusao."
+
+  PapelProjeto:
+    values:
+      Coordenador: "Pesquisador exerce papel de coordenador ou lider do projeto."
+      Membro: "Pesquisador exerce papel de membro ou colaborador do projeto."
+
+  StatusProjeto:
+    values:
+      EmAndamento: "Projeto em execucao, sem data de encerramento."
+      Concluido: "Projeto finalizado com data de encerramento registrada."
+      Suspenso: "Projeto temporariamente suspenso."
+
+  PapelEvento:
+    values:
+      Apresentador: "Pesquisador apresentou trabalho no evento."
+      Ouvinte: "Pesquisador participou como ouvinte."
+      Organizador: "Pesquisador integrou a comissao organizadora do evento."
+      Convidado: "Pesquisador participou como convidado ou palestrante especial."
+
+  NivelProficienciaIdioma:
+    values:
+      Pouco: "Conhecimento basico ou elementar no idioma."
+      Razoavel: "Conhecimento intermediario no idioma."
+      Bom: "Bom dominio no idioma."
+      Fluente: "Dominio pleno e fluente no idioma."
 
 value_objects: {}
 
@@ -173,11 +780,23 @@ agent_instructions:
     - "Nao criar entidades fora da ontologia."
     - "Toda spec deve respeitar axioms."
     - "Toda implementacao deve seguir workflows definidos."
-    - "Este arquivo e o indice do dominio M024; todas as entidades concretas pertencem aos submodulos."
     - "M024 nao redefine entidades canonicas de M008 (PessoaFisica, Instituicao, AreaConhecimento, Cidade) — apenas referencia."
     - "Snapshots sao importados via adapter M023/lattes; dados nao mapeados seguem politica match-or-create de M008."
     - "Ao referenciar entidades de M008, usar o namespace do submodulo correto."
+    - "Artigo e Projeto sao entidades compartilhadas — podem pertencer a multiplos curriculos; nao apagar se ainda referenciados."
+    - "Periodico, NivelOrientacao e TipoProjeto sao cadastros locais compartilhados — nao apagar por reimportacao."
+    - "FormacaoAcademica, Orientacao, Livro, ParticipacaoProjeto, ParticipacaoEvento, Premio, Idioma e FormaCitacao sao composicoes de Curriculo — apagados e recriados a cada reimportacao."
+    - "FormaCitacao e a juncao entre Curriculo e Artigo — PessoaFisica e alcancada atraves do Curriculo, nao diretamente pelo artigo."
+    - "Autores nao resolvidos para um Curriculo nao geram FormaCitacao — nunca armazenar referencia pendente."
+    - "Nao criar entidade separada para Capitulo; usar campo tipo = Capitulo em Livro."
+    - "Cada idioma deve aparecer uma unica vez por curriculo — deduplicar por nome normalizado durante importacao."
+    - "local em ParticipacaoEvento e opcional — nao rejeitar importacao por ausencia."
+    - "entidade em Premio e opcional — nao rejeitar importacao por ausencia."
+    - "Valores iniciais de NivelOrientacao: IC (Iniciacao Cientifica), M (Mestrado), D (Doutorado), PD (Pos-Doutorado)."
+    - "Valores iniciais de TipoProjeto: PESQUISA, EXTENSAO, DESENVOLVIMENTO, ENSINO, OUTRO."
+    - "qualis em Periodico nao e dado canonico do Lattes; deixar vazio quando indisponivel."
   notes:
     - "NivelAcademico em PessoaFisica e derivado da FormacaoAcademica mais alta concluida e atualizado apos cada sincronizacao."
     - "O flag Pesquisador em PessoaFisica e derivado da existencia de um Curriculo vinculado — nao e entidade propria."
     - "Lattes adapter M023 normaliza snapshots XML; dados nao mapeados reconciliados via M008 match-or-create."
+    - "Artigos sustentam o filtro producaoMinima usado por M011 na selecao de pareceristas Ad Hoc."
