@@ -204,6 +204,7 @@ nav:
   - Design System: design-system.md
 
   - Modulos:
+      - Visao Geral: implementation/modules/README.md
       - M001 Modalidade de Bolsa:
           - implementation/modules/M001-modalidade-bolsa/README.md
           - Backlog: implementation/modules/M001-modalidade-bolsa/backlog.md
