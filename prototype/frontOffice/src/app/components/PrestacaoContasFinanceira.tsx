@@ -2,15 +2,8 @@ import { Check, DollarSign, Search, Calendar, ChevronDown, ChevronRight } from '
 import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationPrevious,
-  PaginationNext,
-} from '@/app/components/ui/pagination';
 import { DatePicker } from '@/app/components/DatePicker';
+import { ListPagination } from '@/app/components/ListPagination';
 
 interface PrestacaoContasFinanceiraProps {
   onBack?: () => void;
@@ -25,6 +18,7 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
   const [openMultiSelect, setOpenMultiSelect] = useState<'status' | 'categoria' | null>(null);
+  const [paymentsPage, setPaymentsPage] = useState(1);
 
   const categoriesConsumed = [
     { name: 'Material Permanente', value: 'R$ 200.000,00' },
@@ -57,6 +51,9 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
     { tipo: 'Pix', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 2.567,30', data: '15/02/2026 - 16:00', cnpj: 'Amazon', status: 'Pendente', statusColor: { bg: 'rgba(249, 115, 22, 0.1)', color: 'rgb(249, 115, 22)', border: 'rgba(249, 115, 22, 0.3)' } },
     { tipo: 'Pix', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 5.234,20', data: '14/02/2026 - 08:40', cnpj: 'Amazon', status: 'Validado', statusColor: { bg: 'rgba(34, 197, 94, 0.1)', color: 'rgb(34, 197, 94)', border: 'rgba(34, 197, 94, 0.3)' } },
     { tipo: 'Boleto', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 3.890,00', data: '12/02/2026 - 09:15', cnpj: 'Amazon', status: 'Em Validação', statusColor: { bg: 'rgba(59, 130, 246, 0.1)', color: 'rgb(59, 130, 246)', border: 'rgba(59, 130, 246, 0.3)' } },
+    { tipo: 'Boleto', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 1.320,45', data: '10/02/2026 - 14:20', cnpj: 'Casa do Cientista', status: 'Validado', statusColor: { bg: 'rgba(34, 197, 94, 0.1)', color: 'rgb(34, 197, 94)', border: 'rgba(34, 197, 94, 0.3)' } },
+    { tipo: 'Pix', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 845,90', data: '09/02/2026 - 11:05', cnpj: 'Papelaria Central', status: 'Revisar', statusColor: { bg: 'rgba(234, 179, 8, 0.1)', color: 'rgb(234, 179, 8)', border: 'rgba(234, 179, 8, 0.3)' } },
+    { tipo: 'Boleto', operacao: 'DEBITO', classificacao: 'DESPESA', valor: 'R$ 2.760,00', data: '07/02/2026 - 10:30', cnpj: 'Laboratório Vitória', status: 'Pendente', statusColor: { bg: 'rgba(249, 115, 22, 0.1)', color: 'rgb(249, 115, 22)', border: 'rgba(249, 115, 22, 0.3)' } },
   ];
 
   const statusOptions = [
@@ -75,6 +72,10 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
     { value: 'diaria', label: 'Diária' },
     { value: 'pessoal', label: 'Pessoal' },
   ];
+  const pageSize = 10;
+  const totalPaymentPages = Math.max(1, Math.ceil(payments.length / pageSize));
+  const safePaymentsPage = Math.min(paymentsPage, totalPaymentPages);
+  const paginatedPayments = payments.slice((safePaymentsPage - 1) * pageSize, safePaymentsPage * pageSize);
 
   const toggleMultiSelectOption = (
     value: string,
@@ -685,7 +686,12 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
 
       {/* Payments List */}
       <div className="space-y-4 mb-8">
-        {payments.map((payment, index) => {
+        <div className="flex justify-start">
+          <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
+            Mostrando {Math.min(pageSize, payments.length)} resultados de {payments.length}
+          </span>
+        </div>
+        {paginatedPayments.map((payment, index) => {
           const canOpenPaymentDetails =
             payment.status === 'Pendente' ||
             payment.status === 'Em Validação' ||
@@ -871,90 +877,9 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
         })}
       </div>
 
-      {/* Pagination */}
-      <div className="flex justify-end">
-        <Pagination className="mx-0 w-auto justify-end">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                style={{
-                  padding: '0.5rem 0.75rem',
-                  backgroundColor: 'transparent',
-                  color: 'var(--muted-foreground)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-normal)',
-                  border: 'none',
-                  borderRadius: 'var(--radius)',
-                  cursor: 'pointer',
-                  transition: 'color 0.2s',
-                  textDecoration: 'none',
-                }}
-              >
-                Anterior
-              </PaginationPrevious>
-            </PaginationItem>
-
-            <PaginationItem>
-              <PaginationLink
-                isActive
-                style={{
-                  padding: '0.5rem 0.75rem',
-                  backgroundColor: 'var(--primary)',
-                  color: 'var(--primary-foreground)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  border: 'none',
-                  borderRadius: 'var(--radius)',
-                  cursor: 'pointer',
-                  minWidth: '2.5rem',
-                  textDecoration: 'none',
-                }}
-              >
-                1
-              </PaginationLink>
-            </PaginationItem>
-
-            <PaginationItem>
-              <PaginationLink
-                style={{
-                  padding: '0.5rem 0.75rem',
-                  backgroundColor: 'transparent',
-                  color: 'var(--muted-foreground)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-normal)',
-                  border: 'none',
-                  borderRadius: 'var(--radius)',
-                  cursor: 'pointer',
-                  transition: 'color 0.2s',
-                  minWidth: '2.5rem',
-                  textDecoration: 'none',
-                }}
-              >
-                2
-              </PaginationLink>
-            </PaginationItem>
-
-            <PaginationItem>
-              <PaginationNext
-                style={{
-                  padding: '0.5rem 0.75rem',
-                  backgroundColor: 'transparent',
-                  color: 'var(--muted-foreground)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-normal)',
-                  border: 'none',
-                  borderRadius: 'var(--radius)',
-                  cursor: 'pointer',
-                  transition: 'color 0.2s',
-                  textDecoration: 'none',
-                }}
-              >
-                Próximo
-              </PaginationNext>
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
+      {payments.length > pageSize && (
+        <ListPagination currentPage={safePaymentsPage} totalPages={totalPaymentPages} onPageChange={setPaymentsPage} />
+      )}
 
     </div>
   );

@@ -851,10 +851,10 @@ export function MyInfoPage() {
                       padding: '1rem',
                     }}
                   >
-                    <h3 style={{ color: 'var(--foreground)', fontSize: '16px', margin: '0 0 0.5rem' }}>
+                    <h3 style={{ color: 'rgb(59, 130, 246)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)', margin: '0 0 0.5rem' }}>
                       Vamos abrir sua conta no Banestes
                     </h3>
-                    <p style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', lineHeight: 1.6, margin: 0 }}>
+                    <p style={{ color: 'rgb(59, 130, 246)', fontSize: 'var(--text-sm)', lineHeight: 1.6, margin: 0 }}>
                       Você não precisa abrir a conta antes. Selecione a agência de sua preferência e, ao salvar, a FAPES solicitará ao Banestes a abertura da sua conta nessa agência. Assim que a conta for criada, será exibida aqui.
                     </p>
                   </div>

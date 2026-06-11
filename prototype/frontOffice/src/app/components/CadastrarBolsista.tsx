@@ -1,4 +1,4 @@
-import { UserPlus, Search, ChevronRight, X, AlertCircle, Calendar, ChevronLeft, Loader2 } from 'lucide-react';
+import { UserPlus, Search, ChevronRight, X, AlertCircle, Calendar, ChevronLeft, Loader2, Check, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -30,7 +30,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
   const [dataInicio, setDataInicio] = useState('');
   const [dataTermino, setDataTermino] = useState('');
   const [nomeAtividade, setNomeAtividade] = useState('');
-  const [planoTrabalho, setPlanoTrabalho] = useState('');
+  const [planoTrabalhoAtividades, setPlanoTrabalhoAtividades] = useState(['']);
   const [objetivos, setObjetivos] = useState('');
   const [areaConhecimentoSearch, setAreaConhecimentoSearch] = useState('');
   const [selectedAreaConhecimento, setSelectedAreaConhecimento] = useState<{
@@ -113,6 +113,22 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
 
   const handleCancel = () => {
     onBack();
+  };
+
+  const handlePlanoTrabalhoAtividadeChange = (index: number, value: string) => {
+    setPlanoTrabalhoAtividades((atividades) =>
+      atividades.map((atividade, atividadeIndex) => (atividadeIndex === index ? value : atividade)),
+    );
+  };
+
+  const handleAdicionarAtividade = () => {
+    setPlanoTrabalhoAtividades((atividades) => [...atividades, '']);
+  };
+
+  const handleRemoverAtividade = (index: number) => {
+    setPlanoTrabalhoAtividades((atividades) =>
+      atividades.length === 1 ? [''] : atividades.filter((_, atividadeIndex) => atividadeIndex !== index),
+    );
   };
 
   const formatCPF = (value: string) => {
@@ -245,45 +261,45 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
           <>
             <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setIsOpen(false)} />
             <div
-              className="p-5"
+              className="p-3"
               style={{
                 position: 'absolute',
-                top: 'calc(100% + 0.75rem)',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 'min(100vw - 2rem, 520px)',
-                backgroundColor: 'var(--card)',
+                top: 'calc(100% + 0.5rem)',
+                left: 0,
+                right: 0,
+                width: '100%',
+                backgroundColor: '#262626',
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--radius)',
                 boxShadow: 'var(--elevation-sm)',
                 zIndex: 50,
               }}
             >
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-3">
                 <button
                   type="button"
                   onClick={() => setDisplayYear((current) => current - 1)}
-                  className="p-2"
-                  style={{ backgroundColor: 'transparent', color: 'var(--foreground)', border: 'none', cursor: 'pointer' }}
+                  className="flex items-center justify-center"
+                  style={{ width: '28px', height: '28px', backgroundColor: 'transparent', color: 'var(--foreground)', border: 'none', cursor: 'pointer' }}
                   aria-label="Ano anterior"
                 >
-                  <ChevronLeft size={20} />
+                  <ChevronLeft size={16} />
                 </button>
-                <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)' }}>
+                <strong style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
                   {displayYear}
                 </strong>
                 <button
                   type="button"
                   onClick={() => setDisplayYear((current) => current + 1)}
-                  className="p-2"
-                  style={{ backgroundColor: 'transparent', color: 'var(--foreground)', border: 'none', cursor: 'pointer' }}
+                  className="flex items-center justify-center"
+                  style={{ width: '28px', height: '28px', backgroundColor: 'transparent', color: 'var(--foreground)', border: 'none', cursor: 'pointer' }}
                   aria-label="Próximo ano"
                 >
-                  <ChevronRight size={20} />
+                  <ChevronRight size={16} />
                 </button>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2">
                 {mesesCurtos.map((mes, index) => {
                   const monthValue = `${displayYear}-${String(index + 1).padStart(2, '0')}`;
                   const isSelected = value === monthValue;
@@ -296,8 +312,10 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
                         onChange(monthValue);
                         setIsOpen(false);
                       }}
-                      className="px-4 py-3"
                       style={{
+                        minWidth: 0,
+                        height: '32px',
+                        padding: '0 0.375rem',
                         backgroundColor: isSelected ? 'var(--primary)' : 'transparent',
                         color: isSelected ? 'var(--primary-foreground)' : 'var(--foreground)',
                         border: `1px solid ${isSelected ? 'var(--primary)' : 'var(--border)'}`,
@@ -504,7 +522,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
             onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; }}
             onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
           />
-          <label className="flex items-center gap-2 mt-3" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
+          <label className="flex items-center gap-2 mt-3" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', cursor: 'pointer' }}>
             <input
               type="checkbox"
               checked={orientadorIsCoordinator}
@@ -512,9 +530,24 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
                 setOrientadorIsCoordinator(event.target.checked);
                 setOrientador(event.target.checked ? coordenadorProjeto : '');
               }}
-              style={{ accentColor: 'var(--primary)' }}
+              className="sr-only"
             />
-            Orientador é o coordenador do projeto.
+            <span
+              aria-hidden="true"
+              className="flex items-center justify-center"
+              style={{
+                width: '16px',
+                height: '16px',
+                borderRadius: '4px',
+                border: `1px solid ${orientadorIsCoordinator ? 'var(--primary)' : 'var(--border)'}`,
+                backgroundColor: orientadorIsCoordinator ? 'var(--primary)' : 'transparent',
+                color: 'var(--primary-foreground)',
+                flexShrink: 0,
+              }}
+            >
+              {orientadorIsCoordinator && <Check size={12} />}
+            </span>
+            Orientador é o coordenador do projeto
           </label>
         </div>
 
@@ -594,7 +627,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
         </div>
 
         {/* Quantidade de Cotas, Início das Atividades, and Fim das Atividades */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-0">
           <div>
             <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
               Quantidade de Cotas <Required />
@@ -627,22 +660,6 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
         <section style={formSectionStyle}>
           <SectionHeader number={2} title="Informações Gerais" />
 
-        {/* Plano de Trabalho */}
-        <div className="mb-6">
-          <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
-            Plano de Trabalho <Required />
-          </label>
-          <textarea
-            value={planoTrabalho}
-            onChange={(e) => setPlanoTrabalho(e.target.value)}
-            placeholder="Descreva o plano de trabalho do bolsista, incluindo atividades previstas e metodologia..."
-            rows={4}
-            style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', resize: 'vertical', fontFamily: 'var(--font-family)' }}
-            onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; }}
-            onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
-          />
-        </div>
-
         <div className="mb-6">
           <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
             Nome da Atividade <Required />
@@ -666,7 +683,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
           <textarea
             value={objetivos}
             onChange={(e) => setObjetivos(e.target.value)}
-            placeholder="Liste os objetivos do bolsista (um por linha) 1. Objetivo 1 2. Objetivo 2 3. Objetivo 3"
+            placeholder="Liste os objetivos do bolsista no projeto"
             rows={4}
             style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', resize: 'vertical', fontFamily: 'var(--font-family)' }}
             onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; }}
@@ -674,7 +691,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
           />
         </div>
 
-        <div className="mb-8">
+        <div className="mb-6">
           <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
             Área do Conhecimento <Required />
           </label>
@@ -727,6 +744,81 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
             </div>
           )}
         </div>
+
+        {/* Plano de Trabalho */}
+        <div className="mb-0">
+          <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+            Plano de Trabalho <Required />
+          </label>
+          <div className="space-y-3">
+            {planoTrabalhoAtividades.map((atividade, index) => (
+              <div key={index} className="flex items-center gap-3">
+                <span
+                  className="flex items-center justify-center"
+                  style={{
+                    color: 'var(--foreground)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    width: '40px',
+                    height: '40px',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                    backgroundColor: 'transparent',
+                    flexShrink: 0,
+                    fontFamily: 'var(--font-family)',
+                  }}
+                >
+                  A.{index + 1}
+                </span>
+                <input
+                  type="text"
+                  value={atividade}
+                  onChange={(e) => handlePlanoTrabalhoAtividadeChange(index, e.target.value)}
+                  placeholder="Descreva a atividade prevista"
+                  style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
+                />
+                <button
+                  type="button"
+                  aria-label={`Excluir atividade A.${index + 1}`}
+                  onClick={() => handleRemoverAtividade(index)}
+                  className="flex items-center justify-center"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    border: '1px solid rgb(239, 68, 68)',
+                    borderRadius: 'var(--radius)',
+                    backgroundColor: 'transparent',
+                    color: 'rgb(239, 68, 68)',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-end mt-6">
+            <button
+              type="button"
+              onClick={handleAdicionarAtividade}
+              style={{ padding: '0.625rem 1rem', backgroundColor: 'transparent', color: 'var(--primary)', border: '1px solid var(--primary)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'var(--font-family)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--primary) 10%, transparent)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+            >
+              + Adicionar Atividade
+            </button>
+          </div>
+        </div>
         </section>
 
         {/* Action Buttons */}
@@ -737,7 +829,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
             onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--muted)'; }}
             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
           >
-            Cancelar
+            Salvar Rascunho
           </button>
           <button
             onClick={handleCadastrar}

@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Dropdown } from '@/app/components/Dropdown';
 import { BolsaCard } from '@/app/components/BolsaCard';
+import { ListPagination } from '@/app/components/ListPagination';
 import { Save } from 'lucide-react';
 
 export function RemanejamentoPage() {
@@ -15,6 +16,7 @@ export function RemanejamentoPage() {
   const [transferValue, setTransferValue] = useState('');
   const [justification, setJustification] = useState('');
   const [expandedCategory, setExpandedCategory] = useState<number | null>(null);
+  const [categoriesPage, setCategoriesPage] = useState(1);
 
   // Fapes states
   const [fapesType, setFapesType] = useState<'category' | 'item'>('item');
@@ -173,7 +175,93 @@ export function RemanejamentoPage() {
       progress: 0.0,
       history: [],
     },
+    {
+      id: 7,
+      name: 'Serviços de Terceiros',
+      approved: 'R$ 148.000,00',
+      used: 'R$ 22.450,00',
+      available: 'R$ 125.550,00',
+      progress: 15.2,
+      history: [],
+    },
+    {
+      id: 8,
+      name: 'Equipamentos de Laboratório',
+      approved: 'R$ 312.500,00',
+      used: 'R$ 96.300,00',
+      available: 'R$ 216.200,00',
+      progress: 30.8,
+      history: [],
+    },
+    {
+      id: 9,
+      name: 'Software e Licenças',
+      approved: 'R$ 84.000,00',
+      used: 'R$ 31.200,00',
+      available: 'R$ 52.800,00',
+      progress: 37.1,
+      history: [],
+    },
+    {
+      id: 10,
+      name: 'Comunicação e Divulgação',
+      approved: 'R$ 42.000,00',
+      used: 'R$ 9.850,00',
+      available: 'R$ 32.150,00',
+      progress: 23.5,
+      history: [],
+    },
+    {
+      id: 11,
+      name: 'Manutenção de Equipamentos',
+      approved: 'R$ 67.500,00',
+      used: 'R$ 18.920,00',
+      available: 'R$ 48.580,00',
+      progress: 28.0,
+      history: [],
+    },
+    {
+      id: 12,
+      name: 'Treinamento e Capacitação',
+      approved: 'R$ 35.000,00',
+      used: 'R$ 7.200,00',
+      available: 'R$ 27.800,00',
+      progress: 20.6,
+      history: [],
+    },
+    {
+      id: 13,
+      name: 'Publicação Científica',
+      approved: 'R$ 58.000,00',
+      used: 'R$ 12.600,00',
+      available: 'R$ 45.400,00',
+      progress: 21.7,
+      history: [],
+    },
+    {
+      id: 14,
+      name: 'Importação',
+      approved: 'R$ 120.000,00',
+      used: 'R$ 41.340,00',
+      available: 'R$ 78.660,00',
+      progress: 34.5,
+      history: [],
+    },
+    {
+      id: 15,
+      name: 'Outros Custeios',
+      approved: 'R$ 25.000,00',
+      used: 'R$ 3.750,00',
+      available: 'R$ 21.250,00',
+      progress: 15.0,
+      history: [],
+    },
   ];
+
+  const categoriesPageSize = 10;
+  const totalCategoriesPages = Math.max(1, Math.ceil(categories.length / categoriesPageSize));
+  const safeCategoriesPage = Math.min(categoriesPage, totalCategoriesPages);
+  const paginatedCategories = categories.slice((safeCategoriesPage - 1) * categoriesPageSize, safeCategoriesPage * categoriesPageSize);
 
   const handleClear = () => {
     setFromCategory('');
@@ -721,7 +809,12 @@ export function RemanejamentoPage() {
 
             {/* Category Cards */}
             <div className="grid grid-cols-1 gap-4 w-full max-w-full">
-              {categories.map((category) => {
+              <div className="flex justify-start">
+                <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
+                  Mostrando {Math.min(categoriesPageSize, categories.length)} resultados de {categories.length}
+                </span>
+              </div>
+              {paginatedCategories.map((category) => {
                 const isExpanded = expandedCategory === category.id;
                 
                 return (
@@ -1039,6 +1132,13 @@ export function RemanejamentoPage() {
                   </div>
                 );
               })}
+              {categories.length > categoriesPageSize && (
+                <ListPagination
+                  currentPage={safeCategoriesPage}
+                  totalPages={totalCategoriesPages}
+                  onPageChange={setCategoriesPage}
+                />
+              )}
             </div>
           </div>
         </>

@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { Dropdown } from '@/app/components/Dropdown';
+import { ListPagination } from '@/app/components/ListPagination';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -385,6 +386,8 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
   const [minhasDiariasStatusFilter, setMinhasDiariasStatusFilter] = useState<StatusDiaria | 'TODOS'>('TODOS');
   const [minhasDiariasTipoViagemFilter, setMinhasDiariasTipoViagemFilter] = useState<TipoViagemCodigo | 'TODOS'>('TODOS');
   const [minhasDiariasDataPartidaSort, setMinhasDiariasDataPartidaSort] = useState<OrdenacaoDataPartida>('RECENTE');
+  const [diariasSolicitadasPage, setDiariasSolicitadasPage] = useState(1);
+  const [minhasDiariasPage, setMinhasDiariasPage] = useState(1);
   const [partida, setPartida] = useState('');
   const [chegada, setChegada] = useState('');
   const [tipoViagemSelecionado, setTipoViagemSelecionado] = useState<TipoViagemCodigo | ''>('');
@@ -933,6 +936,96 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
         tipoDiaria: 'INTERNACIONAL',
         tipoViagem: 'INTERNACIONAL',
       },
+      {
+        id: 'SD-2026-111',
+        alocacaoBolsistaRef: 'ALO-2026-007',
+        bolsistaNome: bolsistaMinhasDiarias,
+        partida: '2026-09-14T08:00',
+        chegada: '2026-09-15T17:30',
+        destino: 'Colatina/ES',
+        distanciaKm: 129.2,
+        status: 'APROVADA',
+        estadoAceite: 'ASSINADO',
+        quantidade: 1.5,
+        valorUnitario: 260,
+        valorTotal: 390,
+        tipoDiariaRef: 'DIA-2026-001',
+        parametroCalculoDiariaRef: 'PCD-2026-001',
+        tipoDiaria: 'NACIONAL',
+        tipoViagem: 'DENTRO_ESTADO',
+      },
+      {
+        id: 'SD-2026-112',
+        alocacaoBolsistaRef: 'ALO-2026-007',
+        bolsistaNome: bolsistaMinhasDiarias,
+        partida: '2026-10-02T07:30',
+        chegada: '2026-10-03T18:00',
+        destino: 'Rio de Janeiro/RJ',
+        distanciaKm: 0,
+        status: 'ALOCADA',
+        estadoAceite: 'PENDENTE',
+        quantidade: 1.5,
+        valorUnitario: 320,
+        valorTotal: 480,
+        tipoDiariaRef: 'DIA-2026-002',
+        parametroCalculoDiariaRef: 'PCD-2026-002',
+        tipoDiaria: 'NACIONAL',
+        tipoViagem: 'FORA_ESTADO',
+      },
+      {
+        id: 'SD-2026-113',
+        alocacaoBolsistaRef: 'ALO-2026-007',
+        bolsistaNome: bolsistaMinhasDiarias,
+        partida: '2026-10-28T09:00',
+        chegada: '2026-10-30T19:00',
+        destino: 'Curitiba/PR',
+        distanciaKm: 0,
+        status: 'RECUSADA',
+        estadoAceite: 'RECUSADO',
+        quantidade: 2.5,
+        valorUnitario: 320,
+        valorTotal: 800,
+        tipoDiariaRef: 'DIA-2026-002',
+        parametroCalculoDiariaRef: 'PCD-2026-002',
+        tipoDiaria: 'NACIONAL',
+        tipoViagem: 'FORA_ESTADO',
+      },
+      {
+        id: 'SD-2026-114',
+        alocacaoBolsistaRef: 'ALO-2026-007',
+        bolsistaNome: bolsistaMinhasDiarias,
+        partida: '2026-11-06T08:30',
+        chegada: '2026-11-06T17:30',
+        destino: 'Guarapari/ES',
+        distanciaKm: 53.1,
+        status: 'APROVADA',
+        estadoAceite: 'ASSINADO',
+        quantidade: 0.5,
+        valorUnitario: 260,
+        valorTotal: 130,
+        tipoDiariaRef: 'DIA-2026-001',
+        parametroCalculoDiariaRef: 'PCD-2026-001',
+        tipoDiaria: 'NACIONAL',
+        tipoViagem: 'DENTRO_ESTADO',
+      },
+      {
+        id: 'SD-2026-115',
+        alocacaoBolsistaRef: 'ALO-2026-007',
+        bolsistaNome: bolsistaMinhasDiarias,
+        partida: '2026-12-08T08:00',
+        chegada: '2026-12-11T18:00',
+        destino: 'Buenos Aires/Argentina',
+        distanciaKm: 0,
+        status: 'ALOCADA',
+        estadoAceite: 'PENDENTE',
+        quantidade: 3.5,
+        valorUnitario: 620,
+        valorTotal: 2170,
+        tipoDiariaRef: 'DIA-2026-003',
+        parametroCalculoDiariaRef: 'PCD-2026-003',
+        tipoDiaria: 'INTERNACIONAL',
+        tipoViagem: 'INTERNACIONAL',
+      },
     ] as const).map((solicitacao): DiariaRequest => ({
       origem: 'Vitória/ES',
       deslocamentoRegiaoMetropolitana: false,
@@ -1025,10 +1118,15 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
   const diariasSolicitadasExibidas = useMemo(() => {
     const idsExemplo = new Set([
       'SD-2026-105',
+      'SD-2026-104',
+      'SD-2026-103',
+      'SD-2026-102',
+      'SD-2026-101',
       'SD-2026-208',
       'SD-2026-207',
       'SD-2026-206',
       'SD-2026-205',
+      'SD-2026-203',
       'SD-2026-108',
       'SD-2026-202',
       'SD-2026-107',
@@ -1038,6 +1136,10 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
 
     return diariasPorBeneficiario.filter((solicitacao) => idsExemplo.has(solicitacao.id));
   }, [diariasPorBeneficiario]);
+  const diariaPageSize = 10;
+  const diariasSolicitadasTotalPages = Math.max(1, Math.ceil(diariasSolicitadasExibidas.length / diariaPageSize));
+  const diariasSolicitadasSafePage = Math.min(diariasSolicitadasPage, diariasSolicitadasTotalPages);
+  const diariasSolicitadasPaginadas = diariasSolicitadasExibidas.slice((diariasSolicitadasSafePage - 1) * diariaPageSize, diariasSolicitadasSafePage * diariaPageSize);
   const totalComprometido = solicitacoesDiaria
     .filter((solicitacao) => solicitacao.status === 'APROVADA' || statusPendenteAceite(solicitacao))
     .reduce((total, solicitacao) => total + solicitacao.valorTotal, 0);
@@ -1127,6 +1229,15 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
 
     return ordenarPorDataPartida(filtradas, minhasDiariasDataPartidaSort);
   }, [beneficiarioLogado, minhasDiariasDataPartidaSort, minhasDiariasSearch, minhasDiariasStatusFilter, minhasDiariasTipoViagemFilter, solicitacoesDiaria]);
+  const minhasDiariasTotalPages = Math.max(1, Math.ceil(minhasDiariasFiltradas.length / diariaPageSize));
+  const minhasDiariasSafePage = Math.min(minhasDiariasPage, minhasDiariasTotalPages);
+  const minhasDiariasPaginadas = minhasDiariasFiltradas.slice((minhasDiariasSafePage - 1) * diariaPageSize, minhasDiariasSafePage * diariaPageSize);
+  useEffect(() => {
+    setDiariasSolicitadasPage(1);
+  }, [diariaDataPartidaSort, diariaSearch, diariaStatusFilter, diariaTipoViagemFilter]);
+  useEffect(() => {
+    setMinhasDiariasPage(1);
+  }, [minhasDiariasDataPartidaSort, minhasDiariasSearch, minhasDiariasStatusFilter, minhasDiariasTipoViagemFilter]);
   const bolsistasEncontrados = useMemo(() => {
     const query = bolsistaSearch.trim().toLowerCase();
 
@@ -1420,6 +1531,14 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
     setArquivoComprovacaoExpandidoIdx((current) => (current === index ? null : current));
   };
 
+  const renderListaInfo = (total: number) => (
+    <div className="flex justify-start mb-4">
+      <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
+        Mostrando {Math.min(diariaPageSize, total)} resultados de {total}
+      </span>
+    </div>
+  );
+
   const renderMinhasDiarias = () => (
     <section>
       <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_220px_220px_220px] gap-3 mb-4">
@@ -1497,7 +1616,8 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
       </div>
 
       <div className="space-y-3">
-        {minhasDiariasFiltradas.slice(0, 10).map((solicitacao) => (
+        {renderListaInfo(minhasDiariasFiltradas.length)}
+        {minhasDiariasPaginadas.map((solicitacao) => (
           <button
             key={solicitacao.id}
             type="button"
@@ -1594,6 +1714,13 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
             </div>
           </button>
         ))}
+        {minhasDiariasFiltradas.length > diariaPageSize && (
+          <ListPagination
+            currentPage={minhasDiariasSafePage}
+            totalPages={minhasDiariasTotalPages}
+            onPageChange={setMinhasDiariasPage}
+          />
+        )}
         {minhasDiariasFiltradas.length === 0 && (
           <div
             className="p-5"
@@ -2643,6 +2770,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                       { value: '2022', label: '2022' },
                       { value: '2021', label: '2021' },
                     ]}
+                    showSelectedIcon={false}
                   />
                 </div>
               </div>
@@ -3677,7 +3805,8 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
               </div>
 
               <div className="space-y-3">
-                {diariasSolicitadasExibidas.slice(0, 10).map((solicitacao) => (
+                {renderListaInfo(diariasSolicitadasExibidas.length)}
+                {diariasSolicitadasPaginadas.map((solicitacao) => (
                   <button
                     key={`${solicitacao.id}-${solicitacao.beneficiarioIndex}`}
                     type="button"
@@ -3774,6 +3903,13 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                     </div>
                   </button>
                 ))}
+                {diariasSolicitadasExibidas.length > diariaPageSize && (
+                  <ListPagination
+                    currentPage={diariasSolicitadasSafePage}
+                    totalPages={diariasSolicitadasTotalPages}
+                    onPageChange={setDiariasSolicitadasPage}
+                  />
+                )}
               </div>
             </section>
           )}
@@ -3869,6 +4005,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                 { value: '2022', label: '2022' },
                 { value: '2021', label: '2021' },
               ]}
+              showSelectedIcon={false}
             />
           </div>
         </div>

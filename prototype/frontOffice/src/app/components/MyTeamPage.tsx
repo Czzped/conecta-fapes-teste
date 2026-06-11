@@ -1,18 +1,11 @@
-import { Users, Plus, ChevronDown, ChevronLeft, ChevronRight, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check } from 'lucide-react';
+import { Users, Plus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import * as echarts from 'echarts';
 import { DatePicker } from '@/app/components/DatePicker';
 import { PaymentsPage } from '@/app/components/PaymentsPage';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationPrevious,
-  PaginationNext,
-} from '@/app/components/ui/pagination';
+import { ListPagination } from '@/app/components/ListPagination';
 
 interface MyTeamPageProps {
   accessType: 'voluntario' | 'bolsista' | 'coordenador';
@@ -128,6 +121,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentMembers = filteredMembers.slice(startIndex, endIndex);
+  const visibleMembersCount = Math.min(itemsPerPage, filteredMembers.length);
 
   const goToPage = (page: number) => {
     setCurrentPage(page);
@@ -1459,6 +1453,11 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
 
         {/* Bolsistas List */}
         <div className="space-y-4 max-w-full">
+          <div className="flex justify-start">
+            <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
+              Mostrando {visibleMembersCount} resultados de {filteredMembers.length}
+            </span>
+          </div>
           {/* Desktop Cards */}
           <div className="hidden md:block space-y-4">
             {currentMembers.map((member) => (
@@ -1943,73 +1942,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-end mt-6">
-              <Pagination className="mx-0 w-auto justify-end">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={() => currentPage > 1 && goToPage(currentPage - 1)}
-                      style={{
-                        padding: '0.5rem 0.75rem',
-                        backgroundColor: 'transparent',
-                        color: currentPage === 1 ? 'var(--muted-foreground)' : 'var(--foreground)',
-                        fontSize: 'var(--text-sm)',
-                        fontWeight: 'var(--font-weight-normal)',
-                        border: 'none',
-                        borderRadius: 'var(--radius)',
-                        cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                        transition: 'color 0.2s',
-                        textDecoration: 'none',
-                        opacity: currentPage === 1 ? 0.5 : 1,
-                      }}
-                    />
-                  </PaginationItem>
-
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <PaginationItem key={page}>
-                      <PaginationLink
-                        isActive={currentPage === page}
-                        onClick={() => goToPage(page)}
-                        style={{
-                          padding: '0.5rem 0.75rem',
-                          backgroundColor: currentPage === page ? 'var(--primary)' : 'transparent',
-                          color: currentPage === page ? 'var(--primary-foreground)' : 'var(--muted-foreground)',
-                          fontSize: 'var(--text-sm)',
-                          fontWeight: currentPage === page ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
-                          border: 'none',
-                          borderRadius: 'var(--radius)',
-                          cursor: 'pointer',
-                          transition: 'color 0.2s',
-                          minWidth: '2.5rem',
-                          textDecoration: 'none',
-                        }}
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={() => currentPage < totalPages && goToPage(currentPage + 1)}
-                      style={{
-                        padding: '0.5rem 0.75rem',
-                        backgroundColor: 'transparent',
-                        color: currentPage === totalPages ? 'var(--muted-foreground)' : 'var(--foreground)',
-                        fontSize: 'var(--text-sm)',
-                        fontWeight: 'var(--font-weight-normal)',
-                        border: 'none',
-                        borderRadius: 'var(--radius)',
-                        cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-                        transition: 'color 0.2s',
-                        textDecoration: 'none',
-                        opacity: currentPage === totalPages ? 0.5 : 1,
-                      }}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
+            <ListPagination currentPage={currentPage} totalPages={totalPages} onPageChange={goToPage} />
           )}
         </div>
         </div>

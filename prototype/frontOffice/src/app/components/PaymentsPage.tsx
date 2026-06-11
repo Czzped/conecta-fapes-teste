@@ -1,5 +1,6 @@
 import { Check, ChevronDown, CreditCard } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { ListPagination } from '@/app/components/ListPagination';
 
 interface MultiSelectOption {
   value: string;
@@ -16,6 +17,14 @@ interface FilterMultiSelectProps {
 interface PaymentsPageProps {
   scope?: 'personal' | 'project';
   embedded?: boolean;
+}
+
+function ListToolbar({ label }: { label: string }) {
+  return (
+    <div className="flex justify-start mb-4">
+      <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>{label}</span>
+    </div>
+  );
 }
 
 function FilterMultiSelect({ selectedValues, onChange, options, summaryLabel = 'itens' }: FilterMultiSelectProps) {
@@ -178,6 +187,7 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
   const [selectedYears, setSelectedYears] = useState<string[]>([]);
   const [selectedModalities, setSelectedModalities] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const personalPayments = [
     {
@@ -268,6 +278,51 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
       scholarship: 'Iniciação Científica',
       value: 'R$ 700,00',
       paymentDate: '05/06/2025',
+      status: 'Pago',
+    },
+    {
+      reference: 'IC-2025-000',
+      project: 'Conecta Fapes',
+      beneficiary: 'Paulo Sérgio Junior',
+      scholarship: 'Iniciação Científica',
+      value: 'R$ 700,00',
+      paymentDate: '05/05/2025',
+      status: 'Pago',
+    },
+    {
+      reference: 'IC-2024-012',
+      project: 'Conecta Fapes',
+      beneficiary: 'Paulo Sérgio Junior',
+      scholarship: 'Iniciação Científica',
+      value: 'R$ 700,00',
+      paymentDate: '05/12/2024',
+      status: 'Pago',
+    },
+    {
+      reference: 'IC-2024-011',
+      project: 'Conecta Fapes',
+      beneficiary: 'Paulo Sérgio Junior',
+      scholarship: 'Iniciação Científica',
+      value: 'R$ 700,00',
+      paymentDate: '05/11/2024',
+      status: 'Pago',
+    },
+    {
+      reference: 'IC-2024-010',
+      project: 'Conecta Fapes',
+      beneficiary: 'Paulo Sérgio Junior',
+      scholarship: 'Iniciação Científica',
+      value: 'R$ 700,00',
+      paymentDate: '05/10/2024',
+      status: 'Pago',
+    },
+    {
+      reference: 'IC-2024-009',
+      project: 'Conecta Fapes',
+      beneficiary: 'Paulo Sérgio Junior',
+      scholarship: 'Iniciação Científica',
+      value: 'R$ 700,00',
+      paymentDate: '05/09/2024',
       status: 'Pago',
     },
   ];
@@ -363,6 +418,51 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
       paymentDate: '05/07/2025',
       status: 'Pago',
     },
+    {
+      reference: 'IC-2025-015',
+      project: 'Conecta Fapes',
+      beneficiary: 'Larissa Monteiro',
+      scholarship: 'Apoio Técnico',
+      value: 'R$ 1.200,00',
+      paymentDate: '05/06/2025',
+      status: 'Pago',
+    },
+    {
+      reference: 'IC-2025-014',
+      project: 'Conecta Fapes',
+      beneficiary: 'Marcos Vinícius',
+      scholarship: 'Mestrado',
+      value: 'R$ 2.100,00',
+      paymentDate: '05/05/2025',
+      status: 'Pago',
+    },
+    {
+      reference: 'IC-2025-013',
+      project: 'Conecta Fapes',
+      beneficiary: 'Natália Campos',
+      scholarship: 'Doutorado',
+      value: 'R$ 3.100,00',
+      paymentDate: '05/04/2025',
+      status: 'Pago',
+    },
+    {
+      reference: 'IC-2025-012',
+      project: 'Conecta Fapes',
+      beneficiary: 'Otávio Pereira',
+      scholarship: 'Iniciação Científica',
+      value: 'R$ 700,00',
+      paymentDate: '05/03/2025',
+      status: 'Pago',
+    },
+    {
+      reference: 'IC-2025-011',
+      project: 'Conecta Fapes',
+      beneficiary: 'Renata Alves',
+      scholarship: 'Apoio Técnico',
+      value: 'R$ 1.200,00',
+      paymentDate: '05/02/2025',
+      status: 'Pago',
+    },
   ];
 
   const payments = scope === 'project' ? projectPayments : personalPayments;
@@ -373,6 +473,7 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
   const shouldShowBeneficiary = scope === 'project';
   const shouldShowProjectColumn = !embedded;
   const shouldShowProjectFilter = scope !== 'project';
+  const shouldShowBankAccount = scope !== 'project';
   const bankAccountsByBeneficiary: Record<string, { agency: string; account: string }> = {
     'Ana Souza': { agency: '0912', account: '12345-6' },
     'Bruno Lima': { agency: '0874', account: '98765-1' },
@@ -435,6 +536,16 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
 
     return projectMatches && beneficiaryMatches && yearMatches && modalityMatches && statusMatches;
   });
+  const pageSize = 10;
+  const totalPages = Math.max(1, Math.ceil(filteredPayments.length / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedPayments = filteredPayments.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const visibleResults = Math.min(pageSize, filteredPayments.length);
+  const resultsLabel = `Mostrando ${visibleResults} resultados de ${filteredPayments.length}`;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedProjects, selectedBeneficiaries, selectedYears, selectedModalities, selectedStatuses, scope]);
 
   return (
     <div className={embedded ? 'w-full' : 'w-full px-4 md:px-8 py-8'}>
@@ -593,11 +704,14 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
 
         {/* Timeline */}
         <div className="relative">
+          <ListToolbar
+            label={resultsLabel}
+          />
           {/* Desktop Cards */}
           <div className="hidden md:grid md:grid-cols-1 gap-4">
-            {filteredPayments.map((payment, index) => {
+            {paginatedPayments.map((payment, index) => {
               const statusColors = getStatusColor(payment.status);
-              const bankAccount = getBankAccount(payment.beneficiary);
+              const bankAccount = shouldShowBankAccount ? getBankAccount(payment.beneficiary) : null;
               
               return (
                 <div 
@@ -614,8 +728,8 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
                     style={{
                       gridTemplateColumns: shouldShowBeneficiary
                         ? shouldShowProjectColumn
-                          ? '1.15fr 1.2fr 1fr 1.15fr 1.35fr 0.8fr 0.8fr'
-                          : '1.2fr 1fr 1.15fr 1.35fr 0.8fr 0.8fr'
+                          ? '1.15fr 1.2fr 1fr 1.15fr 0.8fr 0.8fr'
+                          : '1.2fr 1fr 1.15fr 0.8fr 0.8fr'
                         : '1.25fr 1fr 1.15fr 1.65fr 0.8fr 0.8fr',
                       alignItems: 'start',
                     }}
@@ -664,17 +778,19 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
                     </div>
 
                     {/* Dados bancários */}
-                    <div>
-                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
-                        Dados bancários
+                    {bankAccount && (
+                      <div>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                          Dados bancários
+                        </div>
+                        <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', wordBreak: 'break-word' }}>
+                          Agência {bankAccount.agency}
+                        </div>
+                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.25rem', wordBreak: 'break-word' }}>
+                          Conta {bankAccount.account}
+                        </div>
                       </div>
-                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', wordBreak: 'break-word' }}>
-                        Agência {bankAccount.agency}
-                      </div>
-                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.25rem', wordBreak: 'break-word' }}>
-                        Conta {bankAccount.account}
-                      </div>
-                    </div>
+                    )}
 
                     {/* Valor */}
                     <div>
@@ -713,9 +829,9 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
 
           {/* Mobile Cards - Hidden on desktop */}
           <div className="md:hidden space-y-4">
-            {filteredPayments.map((payment, index) => {
+            {paginatedPayments.map((payment, index) => {
               const statusColors = getStatusColor(payment.status);
-              const bankAccount = getBankAccount(payment.beneficiary);
+              const bankAccount = shouldShowBankAccount ? getBankAccount(payment.beneficiary) : null;
               
               return (
                 <div 
@@ -764,17 +880,19 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
                       </div>
 
                       {/* Dados bancários */}
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
-                          Dados bancários
+                      {bankAccount && (
+                        <div>
+                          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
+                            Dados bancários
+                          </div>
+                          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                            Agência {bankAccount.agency}
+                          </div>
+                          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
+                            Conta {bankAccount.account}
+                          </div>
                         </div>
-                        <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                          Agência {bankAccount.agency}
-                        </div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
-                          Conta {bankAccount.account}
-                        </div>
-                      </div>
+                      )}
                     </div>
 
                     {/* Right Column */}
@@ -838,6 +956,9 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
             >
               Nenhum pagamento encontrado para os filtros selecionados.
             </div>
+          )}
+          {filteredPayments.length > pageSize && (
+            <ListPagination currentPage={safePage} totalPages={totalPages} onPageChange={setCurrentPage} />
           )}
         </div>
       </section>
