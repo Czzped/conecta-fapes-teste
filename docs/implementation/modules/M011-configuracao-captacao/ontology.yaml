@@ -2,25 +2,25 @@ ontology: "Configuracao de Captacao"
 namespace: "pre_award.captacao"
 imports:
   - namespace: shared
-    path: path: "../../../ontology/shared/base.yaml"
+    path: "../../../ontology/shared/base.yaml"
   - namespace: shared.people
-    path: path: "../../../ontology/shared/people.yaml"
+    path: "../../../ontology/shared/people.yaml"
   - namespace: corporativo.instituicoes
-    path: path: "../M008-cadastros-corporativos/instituicoes/ontology.yaml"
+    path: "../M008-cadastros-corporativos/instituicoes/ontology.yaml"
   - namespace: corporativo.modalidade_bolsa
-    path: path: "../M001-modalidade-bolsa/ontology.yaml"
+    path: "../M001-modalidade-bolsa/ontology.yaml"
   - namespace: corporativo.rubricas
-    path: path: "../M008-cadastros-corporativos/rubricas/ontology.yaml"
+    path: "../M008-cadastros-corporativos/rubricas/ontology.yaml"
   - namespace: planejamento.programas
-    path: path: "../M010-planejamento-estrategia/programas/ontology.yaml"
+    path: "../M010-planejamento-estrategia/programas/ontology.yaml"
   - namespace: planejamento.parcerias
-    path: path: "../M010-planejamento-estrategia/parcerias/ontology.yaml"
+    path: "../M010-planejamento-estrategia/parcerias/ontology.yaml"
   - namespace: planejamento.eixos
-    path: path: "../M010-planejamento-estrategia/eixos/ontology.yaml"
+    path: "../M010-planejamento-estrategia/eixos/ontology.yaml"
   - namespace: financeiro.contabilidade
-    path: path: "../M016-contabilidade-financeiro/ontology.yaml"
+    path: "../M016-contabilidade-financeiro/ontology.yaml"
   - namespace: shared.documents
-    path: path: "../../../ontology/shared/documents.yaml"
+    path: "../../../ontology/shared/documents.yaml"
 metadata:
   module: "M011"
   source: "docs/implementation/modules/M011-configuracao-captacao/modelo-estrutural.md"
@@ -365,6 +365,14 @@ entities:
         type: "ref:pre_award.captacao.MatrizConfiguracaoProjeto"
         required: true
         description: "Define quais blocos fixos da proposta sao EXIGIDO ou DISPENSADO."
+      poolRevisores:
+        type: "list:ref:shared.people.PessoaFisica"
+        required: false
+        description: "Pessoas fisicas selecionadas como revisores Ad Hoc para esta captacao. Configurado no EPIC-M011-003 antes da etapa AVALIACAO_AD_HOC."
+      regraDistribuicao:
+        type: "enum:TipoRegraDistribuicaoAdHoc"
+        required: false
+        description: "Regra de distribuicao das propostas entre revisores do pool. Obrigatoria quando poolRevisores nao esta vazio."
 
 # ─────────────────────────────────────────────────────────────
 # ENTIDADES DE SUPORTE — COMPARTILHADAS ENTRE PROCESSOS 2 E 3
@@ -720,7 +728,7 @@ entities:
         description: "Snapshot das respostas do revisor no formulario de avaliacao do M021. Imutavel apos registro."
 
   ResultadoSelecao:
-    description: "Publicacao de resultado de uma etapa do processo de selecao (preliminar, apos revisao ou final) para um ou mais projetos."
+    description: "Publicacao de resultado de uma etapa do processo de selecao (preliminar, apos revisao ou final). Cada publicacao contem N itens, um por projeto classificado."
     extends: "shared.Auditavel"
     fields:
       tipo:
@@ -732,16 +740,29 @@ entities:
         required: true
         generated: true
         description: "Data e hora de publicacao do resultado."
+      itens:
+        type: "list:ref:pre_award.captacao.ItemResultadoSelecao"
+        required: true
+        description: "Um item por projeto classificado nesta publicacao de resultado."
+
+  ItemResultadoSelecao:
+    description: "Classificacao e decisao individual de um projeto em uma publicacao de ResultadoSelecao. Entidade de juncao entre ResultadoSelecao e Projeto."
+    extends: null
+    fields:
+      projeto:
+        type: "ref:corporativo.M008.Projeto"
+        required: true
+        description: "Projeto classificado neste item do resultado."
       classificacao:
         type: "integer"
         required: false
-        description: "Posicao do projeto no resultado. Nulo para projetos reprovados."
+        description: "Posicao do projeto no resultado. Nulo para projetos reprovados ou em lista de espera sem classificacao numerica."
         domain: ">= 1"
       decisao:
         type: "string"
         required: true
         max_length: 200
-        description: "Decisao registrada. Ex: Aprovado, Reprovado, Em lista de espera."
+        description: "Decisao registrada para este projeto. Ex: Aprovado, Reprovado, Em lista de espera."
 
   RevisaoResultado:
     description: "Solicitacao de revisao do resultado preliminar submetida por um proponente dentro do periodo de recursos."
@@ -892,19 +913,14 @@ relationships:
     to: "pre_award.captacao.ProponenteEscolhido"
     cardinality: "1:N"
   - from: "pre_award.captacao.Captacao"
+    relation: "pool de revisores ad hoc"
+    to: "shared.people.PessoaFisica"
+    cardinality: "N:N"
+    description: "Pessoas fisicas selecionadas como revisores Ad Hoc para esta captacao (papel, nao entidade separada)."
+  - from: "pre_award.captacao.Captacao"
     relation: "documentos exigidos"
     to: "pre_award.captacao.DocumentoExigido"
     cardinality: "1:N"
-  - from: "pre_award.captacao.Captacao"
-    relation: "destinatario PJ"
-    to: "corporativo.instituicoes.Instituicao"
-    cardinality: "N:0..1"
-    description: "Instituicao destinataria quando tipoCaptacao=DEMANDA_INDUZIDA e tipoOutorgado=PESSOA_JURIDICA."
-  - from: "pre_award.captacao.Captacao"
-    relation: "contato destinatario PJ"
-    to: "shared.people.PessoaFisica"
-    cardinality: "N:0..1"
-    description: "Pessoa fisica de contato da instituicao destinataria."
   - from: "pre_award.captacao.Captacao"
     relation: "periodos cronograma"
     to: "pre_award.captacao.PeriodoCronograma"
@@ -954,6 +970,15 @@ relationships:
     relation: "publica resultado"
     to: "pre_award.captacao.ResultadoSelecao"
     cardinality: "1:N"
+  - from: "pre_award.captacao.ResultadoSelecao"
+    relation: "itens do resultado"
+    to: "pre_award.captacao.ItemResultadoSelecao"
+    cardinality: "1:N"
+    description: "Um item por projeto classificado — carrega classificacao e decisao individuais."
+  - from: "pre_award.captacao.ItemResultadoSelecao"
+    relation: "classifica projeto"
+    to: "corporativo.M008.Projeto"
+    cardinality: "N:1"
   - from: "corporativo.M008.Projeto"
     relation: "submissao"
     to: "pre_award.captacao.RespostaFormularioSubmissao"
@@ -988,10 +1013,6 @@ relationships:
     relation: "responsavel"
     to: "shared.people.PessoaFisica"
     cardinality: "N:1"
-  - from: "pre_award.captacao.ResultadoSelecao"
-    relation: "classifica projetos"
-    to: "corporativo.M008.Projeto"
-    cardinality: "N:N"
   - from: "pre_award.captacao.RevisaoResultado"
     relation: "anexos"
     to: "pre_award.captacao.AnexoRevisao"
@@ -1043,21 +1064,12 @@ axioms:
   - id: "AX-M011-033"
     natural_language: "A retomada de uma Captacao PAUSADO e bloqueada enquanto existir qualquer PeriodoCronograma futuro (nao concluido) com dataFim anterior a data de retomada. O GestorFAPES deve registrar AdiamentoPeriodoCronograma para cada periodo afetado antes de acionar a retomada. O sistema deve validar esta condicao e rejeitar a retomada se houver periodos expirados nao aditados."
     formal_rule: "retomar(Captacao) → ∀p ∈ Captacao.periodosCronograma where nao_concluido(p): p.dataFim >= dataRetomada"
-  - id: "AX-M011-031"
-    natural_language: "Quando tipoCaptacao = DEMANDA_INDUZIDA, o preenchimento dos campos de destinatario deve ser consistente com tipoOutorgado: PESSOA_FISICA requer destinatarioCpf e destinatarioNome; PESSOA_JURIDICA requer destinatarioPJ e contatoDestinatarioPJ."
-    formal_rule: "tipoCaptacao = DEMANDA_INDUZIDA → (tipoOutorgado = PESSOA_FISICA → destinatarioCpf ≠ null ∧ destinatarioNome ≠ null ∧ destinatarioPJ = null ∧ contatoDestinatarioPJ = null) ∧ (tipoOutorgado = PESSOA_JURIDICA → destinatarioPJ ≠ null ∧ contatoDestinatarioPJ ≠ null ∧ destinatarioCpf = null ∧ destinatarioNome = null)"
   - id: "AX-M011-029"
     natural_language: "Todas as faixas selecionadas em uma Captacao devem pertencer ao Fomento referenciado por essa Captacao."
     formal_rule: "∀f ∈ Captacao.faixasSelecionadas: f ∈ Captacao.fomento.faixas"
   - id: "AX-M011-030"
     natural_language: "Uma Captacao deve selecionar ao menos uma faixa do Fomento."
     formal_rule: "|Captacao.faixasSelecionadas| >= 1"
-  - id: "AX-M011-013"
-    natural_language: "Quando tipoCaptacao=DEMANDA_INDUZIDA e tipoOutorgado=PESSOA_FISICA, destinatarioCpf e destinatarioNome devem ser preenchidos; destinatarioPJ e contatoDestinatarioPJ devem ser nulos."
-    formal_rule: "(tipoCaptacao = DEMANDA_INDUZIDA ∧ tipoOutorgado = PESSOA_FISICA → destinatarioCpf ≠ null ∧ destinatarioNome ≠ null ∧ destinatarioPJ = null ∧ contatoDestinatarioPJ = null)"
-  - id: "AX-M011-014"
-    natural_language: "Quando tipoCaptacao=DEMANDA_INDUZIDA e tipoOutorgado=PESSOA_JURIDICA, destinatarioPJ e contatoDestinatarioPJ devem ser preenchidos; destinatarioCpf e destinatarioNome devem ser nulos."
-    formal_rule: "(tipoCaptacao = DEMANDA_INDUZIDA ∧ tipoOutorgado = PESSOA_JURIDICA → destinatarioPJ ≠ null ∧ contatoDestinatarioPJ ≠ null ∧ destinatarioCpf = null ∧ destinatarioNome = null)"
   - id: "AX-M011-016"
     natural_language: "Cada Fomento deve ter ao menos um tipo de projeto associado."
     formal_rule: "|Fomento.tiposProjeto| >= 1"
@@ -1230,6 +1242,13 @@ enums:
       INSTITUICAO: "Captacao direcionada a uma instituicao especifica."
       TIPO_INSTITUICAO: "Captacao direcionada a um tipo de instituicao especifico."
 
+  TipoRegraDistribuicaoAdHoc:
+    description: "Regra de distribuicao de propostas entre revisores Ad Hoc do pool."
+    values:
+      ROUND_ROBIN: "Distribuicao ciclica entre revisores na ordem de cadastro no pool."
+      MANUAL: "AnalistaTecnico distribui manualmente cada proposta a um revisor do pool."
+      POR_AREA: "Distribuicao automatica por afinidade de area de conhecimento entre revisor e proposta."
+
 value_objects: {}
 
 events:
@@ -1241,6 +1260,17 @@ events:
     description: "Emitido quando a captacao transita para o estado PUBLICADO."
     payload_entity: "pre_award.captacao.Captacao"
     trigger: "Transicao de EM_ANDAMENTO para PUBLICADO com cronograma completo e link do edital preenchido."
+  - name: "ResultadoFinalPublicado"
+    description: "Emitido quando o AnalistaTecnico publica o ResultadoSelecao do tipo FINAL. Notifica M022 que projetos aprovados estao disponiveis para contratacao/outorga."
+    payload_entity: "pre_award.captacao.ResultadoSelecao"
+    payload_extra:
+      captacaoId: "string"
+      projetosAprovados:
+        type: "list"
+        items:
+          projetoId: "string"
+          classificacao: "integer (nullable)"
+    trigger: "Publicacao de ResultadoSelecao com tipo=FINAL pelo AnalistaTecnico."
   - name: "CaptacaoEncerrada"
     description: "Emitido quando a captacao transita para o estado ENCERRADO apos publicacao do resultado final."
     payload_entity: "pre_award.captacao.Captacao"
@@ -1385,6 +1415,11 @@ workflows:
         to: RESULTADO_FINAL
         trigger: "publicacao resultado final"
         actor: "AnalistaTecnico"
+      - from: RESULTADO_PRELIMINAR
+        to: RESULTADO_FINAL
+        trigger: "sem revisoes admissiveis"
+        actor: "AnalistaTecnico"
+        guard: "Nenhuma RevisaoResultado com estado ADMISSIVEL registrada no periodo RECEBIMENTO_REVISAO — AnalistaTecnico pode publicar resultado final diretamente."
 
 policies:
   permissions:
@@ -1401,20 +1436,20 @@ policies:
         - encerrar Fomento APROVADO ou INTERROMPIDO
     GestorFAPES:
       can:
-        - criar Captacao
-        - editar Captacao em EM_ANDAMENTO
-        - publicar Captacao
-        - despublicar Captacao
-        - reabrir Captacao para EM_ANDAMENTO
         - pausar Captacao PUBLICADO (requer justificativa)
         - retomar Captacao PAUSADO
         - cancelar Captacao PUBLICADO (requer justificativa)
         - cancelar Captacao PAUSADO (requer justificativa)
     AnalistaTecnico:
       can:
+        - criar Captacao
+        - editar Captacao em EM_ANDAMENTO
+        - publicar Captacao
+        - despublicar Captacao
+        - reabrir Captacao para EM_ANDAMENTO
+        - encerrar Captacao PUBLICADO apos publicacao do resultado final
         - visualizar Fomento
         - visualizar Captacao
-        - encerrar Captacao PUBLICADO apos publicacao do resultado final
         - configurar PeriodoCronograma
         - configurar RubricaPermitidaFaixa
         - configurar BolsaPermitidaFaixa
