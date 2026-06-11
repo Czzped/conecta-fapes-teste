@@ -12,6 +12,7 @@ interface MyProjectsPageProps {
 export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: MyProjectsPageProps) {
   const { t } = useLanguage();
   const [isWorkPlanExpanded, setIsWorkPlanExpanded] = useState(false);
+  const [budgetTooltip, setBudgetTooltip] = useState<{ name: string; x: number } | null>(null);
   const timelineActiveColor = '#0e7490';
   const timelineCurrentColor = '#06b6d4';
 
@@ -51,7 +52,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
       accentColor: '#60a5fa',
     },
     {
-      name: 'Diárias',
+      name: 'Diária',
       total: 'R$ 60.000,00',
       consumido: 'R$ 22.432,00',
       alocado: 'R$ 12.080,00',
@@ -84,7 +85,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
       accentColor: 'var(--primary)',
     },
     {
-      name: 'Passagens',
+      name: 'Passagem',
       total: 'R$ 85.000,00',
       consumido: 'R$ 28.616,00',
       alocado: null,
@@ -103,6 +104,17 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
       consumidoPercent: 81,
       alocadoPercent: 0,
       Icon: Building2,
+      accentColor: 'var(--primary)',
+    },
+    {
+      name: 'Pessoa Física',
+      total: 'R$ 0,00',
+      consumido: 'R$ 0,00',
+      alocado: null,
+      disponivel: 'R$ 0,00',
+      consumidoPercent: 0,
+      alocadoPercent: 0,
+      Icon: UserCheck,
       accentColor: 'var(--primary)',
     },
   ];
@@ -555,7 +567,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                 }}
               >
                 <div
-                  className="grid grid-cols-1 2xl:grid-cols-[260px_minmax(0,1fr)] gap-5"
+                  className="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-5"
                   style={{ alignItems: 'start' }}
                 >
                   <div className="flex items-center gap-3">
@@ -572,7 +584,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                     </div>
                     <div>
                       <div 
-                        style={{ 
+                        style={{
                           color: 'var(--foreground)',
                           fontSize: 'var(--text-sm)',
                           fontWeight: 'var(--font-weight-normal)',
@@ -580,98 +592,96 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                       >
                         {name}
                       </div>
-                      <span
-                        style={{
-                          color: 'var(--muted-foreground)',
-                          fontSize: 'var(--text-xs)',
-                          fontWeight: 'var(--font-weight-normal)',
-                        }}
-                      >
-                        {alocado ? 'Possui valor alocado' : 'Sem alocação operacional'}
-                      </span>
                     </div>
                   </div>
 
-                  <div
-                    className={`grid grid-cols-1 sm:grid-cols-2 ${alocado ? 'xl:grid-cols-4' : 'xl:grid-cols-3'} gap-3`}
-                    style={{
-                      minWidth: 0,
-                    }}
-                  >
-                    {[
-                      { label: 'Total', value: total, percent: 100, color: 'var(--muted-foreground)' },
-                      { label: 'Consumido', value: consumido, percent: consumidoPercent, color: 'var(--foreground)' },
-                      ...(alocado
-                        ? [{ label: 'Alocado', value: alocado, percent: alocadoPercent, color: '#60a5fa' }]
-                        : []),
-                      { label: 'Disponível', value: disponivel, percent: 100 - consumidoPercent - alocadoPercent, color: 'var(--primary)' },
-                    ].map((metric) => (
-                      <div
-                        key={metric.label}
-                        className="rounded-lg px-3 py-2"
-                        style={{
-                          border: '1px solid var(--border)',
-                          backgroundColor: 'var(--muted)',
-                          minWidth: 0,
-                        }}
-                      >
-                        <div
-                          style={{
-                            color: 'var(--muted-foreground)',
-                            fontSize: 'var(--text-xs)',
-                            fontWeight: 'var(--font-weight-normal)',
-                            marginBottom: '4px',
-                          }}
-                        >
-                          {metric.label}
-                        </div>
-                        <div
-                          style={{
-                            color: 'var(--foreground)',
-                            fontFamily: 'var(--font-family)',
-                            fontSize: 'var(--text-sm)',
-                            fontWeight: 'var(--font-weight-normal)',
-                            lineHeight: 1.35,
-                          }}
-                        >
-                          <span>{metric.value}</span>
-                          <span style={{ color: 'var(--muted-foreground)', margin: '0 6px' }}>·</span>
-                          <span>{metric.percent}%</span>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="flex justify-end" style={{ minWidth: 0 }}>
+                    <span
+                      className="inline-flex items-center"
+                      style={{
+                        padding: '0.25rem 0.625rem',
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        color: '#22c55e',
+                        border: '1px solid rgba(34, 197, 94, 0.2)',
+                        borderRadius: '9999px',
+                        fontSize: 'var(--text-xs)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      Disponível: {disponivel}
+                    </span>
                   </div>
                 </div>
 
                 <div 
+                  onMouseMove={(event) => {
+                    const rect = event.currentTarget.getBoundingClientRect();
+                    setBudgetTooltip({ name, x: event.clientX - rect.left });
+                  }}
+                  onMouseLeave={() => setBudgetTooltip(null)}
                   style={{
+                    position: 'relative',
                     width: '100%',
-                    height: '6px',
-                    backgroundColor: 'var(--muted)',
-                    borderRadius: '999px',
-                    overflow: 'hidden',
-                    display: 'flex',
                     marginTop: '14px',
                   }}
                 >
-                  <div 
-                    style={{
-                      width: `${consumidoPercent}%`,
-                      height: '100%',
-                      backgroundColor: 'var(--primary)',
-                      transition: 'width 0.3s ease',
-                    }}
-                  />
-                  {alocado && (
+                  {budgetTooltip?.name === name && (
                     <div
+                      className="pointer-events-none absolute bottom-full mb-2"
                       style={{
-                        width: `${alocadoPercent}%`,
+                        left: `${Math.min(Math.max(budgetTooltip.x, 120), 9999)}px`,
+                        transform: 'translateX(-50%)',
+                        minWidth: '220px',
+                        padding: '0.75rem',
+                        backgroundColor: 'var(--popover)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        boxShadow: 'var(--elevation-sm)',
+                        zIndex: 10,
+                      }}
+                    >
+                      {[
+                        { label: 'Total', value: total },
+                        { label: 'Consumido', value: consumido },
+                        ...(alocado ? [{ label: 'Alocado', value: alocado }] : []),
+                      ].map((metric) => (
+                        <div key={metric.label} className="flex items-center justify-between gap-4" style={{ marginBottom: metric.label === (alocado ? 'Alocado' : 'Consumido') ? 0 : '0.375rem' }}>
+                          <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>{metric.label}</span>
+                          <span style={{ color: 'var(--foreground)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)' }}>{metric.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '6px',
+                      backgroundColor: 'var(--muted)',
+                      borderRadius: '999px',
+                      overflow: 'hidden',
+                      display: 'flex',
+                    }}
+                  >
+                    <div 
+                      style={{
+                        width: `${consumidoPercent}%`,
                         height: '100%',
-                        backgroundColor: 'color-mix(in srgb, var(--primary) 45%, transparent)',
+                        backgroundColor: 'var(--primary)',
                         transition: 'width 0.3s ease',
                       }}
                     />
-                  )}
+                    {alocado && (
+                      <div
+                        style={{
+                          width: `${alocadoPercent}%`,
+                          height: '100%',
+                          backgroundColor: 'color-mix(in srgb, var(--primary) 45%, transparent)',
+                          transition: 'width 0.3s ease',
+                        }}
+                      />
+                    )}
+                  </div>
                 </div>
               </article>
             ))}

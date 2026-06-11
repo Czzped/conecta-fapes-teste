@@ -894,6 +894,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                             padding: '0.25rem 0.625rem',
                             backgroundColor: `${modalidade.color}20`,
                             color: modalidade.color,
+                            border: `1px solid ${modalidade.color}55`,
                             borderRadius: '9999px',
                             fontSize: 'var(--text-xs)',
                             fontWeight: 'var(--font-weight-semibold)',
