@@ -18,6 +18,7 @@ Especificacao de referencia: [README.md](README.md)
 | EPIC-M009-002 | Avaliacao Documental | UC02 | Must | In Progress | [EPIC-M009-002](epics/EPIC-M009-002.md) |
 | EPIC-M009-003 | Formalizacao e Implementacao de Bolsa | UC03 | Must | To Do | [EPIC-M009-003](epics/EPIC-M009-003.md) |
 | EPIC-M009-004 | Ciclo de Vida da Bolsa | UC04 | Must | To Do | [EPIC-M009-004](epics/EPIC-M009-004.md) |
+| EPIC-M009-005 | Perfil Academico na Aprovacao de Bolsa | UC05 | Must | To Do | [EPIC-M009-005](epics/EPIC-M009-005.md) |
 
 ---
 
@@ -47,6 +48,9 @@ EPIC-M009-004 (Ciclo de Vida da Bolsa)  <- depende de EPIC-M009-003
 ├── US-M009-014 Reativar Bolsa
 ├── US-M009-015 Encerrar Bolsa
 └── US-M009-016 Alertar Vencimento de Bolsa
+
+EPIC-M009-005 (Perfil Academico na Aprovacao de Bolsa)  <- depende de EPIC-M009-002, M024
+└── US-M009-017 Exibir dados academicos do pesquisador na tela de aprovacao de bolsa
 
 ```
 

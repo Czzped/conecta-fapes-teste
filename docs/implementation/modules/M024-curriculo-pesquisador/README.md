@@ -64,7 +64,8 @@ O mapa conceitual completo esta em [modelo-estrutural.md](modelo-estrutural.md);
 | RN-M024-04 | Curriculo valido para uso em fluxos = `dataUltimaSincronizacao` nos ultimos 12 meses. | Must |
 | RN-M024-05 | `Pesquisador` suspenso (PessoaFisica.estado = `SUSPENSA`) bloqueia uso do curriculo em selecao de Ad Hoc e elegibilidade, mas o curriculo permanece consultavel para auditoria. | Must |
 | RN-M024-06 | AreaConhecimento referenciada pelo curriculo deve existir no cadastro canonico CNPq de M008 (§1.3.6) -- areas nao mapeadas sao registradas em log de discrepancia. | Must |
-| RN-M024-07 | Sincronizacao automatica do `Curriculo` acontece **semanalmente** para todos os pesquisadores vinculados (job recorrente). Alem disso, a **primeira sincronizacao** e disparada sincronamente no momento da vinculacao do Lattes em `VincularCurriculo`. Pesquisador e Analista podem disparar `SincronizarCurriculo` sob demanda a qualquer momento. | Must |
+| RN-M024-07 | Sincronizacao automatica do `Curriculo` acontece **mensalmente** para todos os pesquisadores vinculados (job recorrente). Alem disso, a **primeira sincronizacao** e disparada sincronamente no momento da vinculacao do Lattes em `VincularCurriculo`. Pesquisador e Analista podem disparar `SincronizarCurriculo` sob demanda a qualquer momento. | Must |
+| RN-M024-08 | Atualizacao manual do curriculo (acionada por Analista na tela de curriculo) respeita cooldown de **1 hora** por pesquisador para evitar sobrecarga no adapter M023/lattes. Job mensal e primeira vinculacao ignoram o cooldown. Tentativa antes do cooldown retorna 429 ATUALIZACAO_EM_COOLDOWN com timestamp de liberacao. | Must |
 
 ---
 

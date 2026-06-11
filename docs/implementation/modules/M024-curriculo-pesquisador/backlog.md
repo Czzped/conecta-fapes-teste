@@ -33,7 +33,8 @@ Os EPICs foram reorganizados a partir dos submodelos estruturais do M024. O modu
 | US-M024-001 | Vincular `numeroLattes` unico a uma `PessoaFisica` ativa | EPIC-M024-001 | Must | To Do |
 | US-M024-002 | Executar primeira importacao sincrona via M023/lattes | EPIC-M024-001 | Must | To Do |
 | US-M024-003 | Persistir `Curriculo` versionado com validade e areas de atuacao | EPIC-M024-001 | Must | To Do |
-| US-M024-004 | Sincronizar sob demanda e por job semanal preservando snapshot anterior em falha | EPIC-M024-001 | Must | To Do |
+| US-M024-004 | Sincronizar curriculo sob demanda preservando snapshot anterior em falha | EPIC-M024-001 | Must | To Do |
+| US-M024-024 | Executar job mensal de sincronizacao em massa de todos os curriculos vinculados | EPIC-M024-001 | Must | To Do |
 | US-M024-005 | Persistir formacoes academicas importadas do Lattes | EPIC-M024-002 | Must | To Do |
 | US-M024-006 | Calcular titulacao maxima concluida do pesquisador | EPIC-M024-002 | Must | To Do |
 | US-M024-007 | Expor formacoes por curriculo com filtros por nivel, status e area | EPIC-M024-002 | Must | To Do |
@@ -50,15 +51,19 @@ Os EPICs foram reorganizados a partir dos submodelos estruturais do M024. O modu
 | US-M024-018 | Listar colecoes do curriculo com filtros e paginacao | EPIC-M024-006 | Must | To Do |
 | US-M024-019 | Buscar pesquisadores por area, titulacao minima e producao minima | EPIC-M024-006 | Must | To Do |
 | US-M024-020 | Publicar eventos de dominio para consumidores internos | EPIC-M024-006 | Must | To Do |
+| US-M024-021 | Atualizar curriculo manualmente pela tela de curriculo do pesquisador (backoffice FAPES) | EPIC-M024-001 | Must | To Do |
+| US-M024-022 | Calcular compatibilidade pesquisador x edital por interseccao de areas de conhecimento | EPIC-M024-006 | Must | To Do |
+| US-M024-023 | Publicar evento EditaisCompativeisIdentificados apos sincronizacao do curriculo | EPIC-M024-006 | Must | To Do |
 
 ## Consumidores
 
 | Modulo | Uso |
 |--------|-----|
-| M011 | Selecao automatica de consultor Ad Hoc por expertise |
+| M009 | Dados academicos (titulacao, formacao) exibidos na tela de aprovacao de bolsas |
+| M011 | Selecao automatica de consultor Ad Hoc por expertise e score |
 | M018 | Indicadores de producao cientifica, titulacao, orientacoes e projetos |
 | M019 | Vitrine publica do perfil academico |
-| M020 | Notificacoes de vinculacao, sincronizacao e falha |
+| M020 | Notificacoes de vinculacao, sincronizacao, falha e editais compativeis |
 | M008 | `PessoaFisica`, `Instituicao`, `AreaConhecimento` e recalculo de nivel academico |
 
 ## Dependencias e riscos essenciais

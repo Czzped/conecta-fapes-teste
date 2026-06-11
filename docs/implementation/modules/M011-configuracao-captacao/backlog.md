@@ -59,7 +59,8 @@ EPIC-M011-002 (Selecao de Formularios)  <- depende de EPIC-M011-001, M021
 EPIC-M011-003 (Gestao de Pool de Revisores Ad Hoc)  <- depende de EPIC-M011-001
 ├── US-M011-008 Selecionar Pool de Revisores
 ├── US-M011-009 Definir Regras de Distribuicao
-└── US-M011-010 Listar e Consultar Revisores
+├── US-M011-010 Listar e Consultar Revisores
+└── US-M011-057 Sugerir revisores Ad Hoc por score de compatibilidade com M024
 
 EPIC-M011-004 (Recebimento de Propostas)  <- depende de EPIC-M011-001, EPIC-M011-002
 ├── US-M011-017 Submeter Proposta (proponente)

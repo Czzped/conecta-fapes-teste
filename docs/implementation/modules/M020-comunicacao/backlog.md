@@ -25,7 +25,8 @@ Especificacao de referencia: [README.md](README.md)
 EPIC-M020-001 (Servico de Notificacao)
 ├── US-M020-001 Enviar Notificacao por Email
 ├── US-M020-002 Configurar Templates de Notificacao
-└── US-M020-003 Consultar Historico de Notificacoes
+├── US-M020-003 Consultar Historico de Notificacoes
+└── US-M020-006 Notificar pesquisador sobre editais compativeis com seu curriculo
 
 EPIC-M020-002 (Comunicados e Lembretes)  <- depende de EPIC-M020-001
 ├── US-M020-004 Enviar Comunicado em Massa

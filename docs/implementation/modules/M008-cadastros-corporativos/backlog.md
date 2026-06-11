@@ -30,7 +30,8 @@ EPIC-M008-001 (Cadastro de Pessoas Fisicas)
 ├── US-M008-001 Cadastrar Pessoa Fisica
 ├── US-M008-002 Listar e Consultar Pessoas
 ├── US-M008-003 Atualizar Pessoa Fisica
-└── US-M008-004 Suspender Pessoa
+├── US-M008-004 Suspender Pessoa
+└── US-M008-028 Vincular numeroLattes ao cadastrar Pessoa Fisica como Pesquisador
 
 EPIC-M008-002 (Cadastro de Instituicoes e Unidades Organizacionais)  <- depende de EPIC-M008-001  GitHub: #1748
 ├── US-M008-005 Cadastrar Instituicao                   #1749
