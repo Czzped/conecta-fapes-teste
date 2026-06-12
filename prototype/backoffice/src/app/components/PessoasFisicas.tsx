@@ -1,9 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowLeft, Plus, Save, Search, Trash2, UserRound } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Plus, Save, Search, UserRound } from 'lucide-react';
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
 type EstadoPessoa = 'Ativa' | 'Suspensa';
-type ActiveTab = 'listagem' | 'dashboard';
 type PersonDetailTab = 'cadastro' | 'dashboard' | 'vidaAcademica';
 
 interface PessoaFisicaItem {
@@ -156,6 +155,13 @@ const initialPessoas: PessoaFisicaItem[] = [
   { id: 1, cpf: '111.222.333-44', nome: 'Maria Souza', email: 'maria.souza@email.com', telefone: '(27) 99999-1000', dataNascimento: '1985-03-14', lattes: 'http://lattes.cnpq.br/1234567890', estado: 'Ativa' },
   { id: 2, cpf: '222.333.444-55', nome: 'João Silva', email: 'joao.silva@email.com', telefone: '(27) 99999-2000', dataNascimento: '1979-09-21', lattes: 'http://lattes.cnpq.br/2345678901', estado: 'Ativa' },
   { id: 3, cpf: '333.444.555-66', nome: 'Ana Ribeiro', email: 'ana.ribeiro@email.com', telefone: '(27) 99999-3000', dataNascimento: '1991-01-10', lattes: '', estado: 'Suspensa', justificativa: 'Pendência cadastral em validação.' },
+  { id: 4, cpf: '444.555.666-77', nome: 'Carla Mendes', email: 'carla.mendes@email.com', telefone: '(27) 99999-4000', dataNascimento: '1988-07-18', lattes: 'http://lattes.cnpq.br/3456789012', estado: 'Ativa' },
+  { id: 5, cpf: '555.666.777-88', nome: 'Pedro Lima', email: 'pedro.lima@email.com', telefone: '(27) 99999-5000', dataNascimento: '1994-11-05', lattes: '', estado: 'Ativa' },
+  { id: 6, cpf: '666.777.888-99', nome: 'Luciana Costa', email: 'luciana.costa@email.com', telefone: '(27) 99999-6000', dataNascimento: '1982-04-22', lattes: 'http://lattes.cnpq.br/4567890123', estado: 'Ativa' },
+  { id: 7, cpf: '777.888.999-00', nome: 'Rafael Gomes', email: 'rafael.gomes@email.com', telefone: '(27) 99999-7000', dataNascimento: '1990-12-12', lattes: '', estado: 'Suspensa' },
+  { id: 8, cpf: '888.999.000-11', nome: 'Beatriz Rocha', email: 'beatriz.rocha@email.com', telefone: '(27) 99999-8000', dataNascimento: '1996-02-28', lattes: 'http://lattes.cnpq.br/5678901234', estado: 'Ativa' },
+  { id: 9, cpf: '999.000.111-22', nome: 'Henrique Alves', email: 'henrique.alves@email.com', telefone: '(27) 99999-9000', dataNascimento: '1987-06-09', lattes: '', estado: 'Ativa' },
+  { id: 10, cpf: '000.111.222-33', nome: 'Fernanda Martins', email: 'fernanda.martins@email.com', telefone: '(27) 99999-1010', dataNascimento: '1992-10-30', lattes: 'http://lattes.cnpq.br/6789012345', estado: 'Suspensa' },
 ];
 
 const projetosPorPessoa: ProjetoPessoa[] = [
@@ -163,12 +169,18 @@ const projetosPorPessoa: ProjetoPessoa[] = [
   { pessoaId: 1, nome: 'Plataforma de Dados para Políticas Públicas', programa: 'Programa Governo Digital', papel: 'Pesquisadora', status: 'Em execução', inicio: '2024-08-01', fim: '2026-07-31' },
   { pessoaId: 2, nome: 'Rede Capixaba de Inovação Industrial', programa: 'Programa de Inovação', papel: 'Pesquisador', status: 'Em execução', inicio: '2025-01-15', fim: '2026-12-15' },
   { pessoaId: 3, nome: 'Observatório de Indicadores Educacionais', programa: 'Programa de Educação Científica', papel: 'Consultora', status: 'Suspenso', inicio: '2024-03-01', fim: '2025-12-31' },
+  { pessoaId: 4, nome: 'Laboratório de Materiais Sustentáveis', programa: 'Programa de Pesquisa Aplicada', papel: 'Pesquisadora', status: 'Em execução', inicio: '2025-05-01', fim: '2027-04-30' },
+  { pessoaId: 6, nome: 'Monitoramento Ambiental Integrado', programa: 'Programa Clima e Sustentabilidade', papel: 'Coordenadora', status: 'Em execução', inicio: '2025-08-01', fim: '2027-07-31' },
+  { pessoaId: 8, nome: 'Tecnologias Educacionais Inclusivas', programa: 'Programa Educação Científica', papel: 'Bolsista', status: 'Em execução', inicio: '2026-01-01', fim: '2026-12-31' },
 ];
 
 const bolsasPorPessoa: BolsaPessoa[] = [
   { pessoaId: 1, modalidade: 'Mestrado', nivel: 'MS-1', projeto: 'Projeto Pesquisa Aplicada em Saúde', valorMensal: 2100, inicio: '2025-03-01', fim: '2027-02-28', status: 'Recebendo' },
   { pessoaId: 1, modalidade: 'Pesquisa', nivel: 'DTI-B', projeto: 'Plataforma de Dados para Políticas Públicas', valorMensal: 3200, inicio: '2024-09-01', fim: '2025-08-31', status: 'Encerrada' },
   { pessoaId: 2, modalidade: 'Doutorado', nivel: 'DR-1', projeto: 'Rede Capixaba de Inovação Industrial', valorMensal: 3100, inicio: '2025-02-01', fim: '2028-01-31', status: 'Recebendo' },
+  { pessoaId: 4, modalidade: 'Iniciação Científica', nivel: 'IC', projeto: 'Laboratório de Materiais Sustentáveis', valorMensal: 700, inicio: '2025-06-01', fim: '2026-05-31', status: 'Recebendo' },
+  { pessoaId: 6, modalidade: 'Pesquisa', nivel: 'DTI-A', projeto: 'Monitoramento Ambiental Integrado', valorMensal: 4200, inicio: '2025-09-01', fim: '2027-08-31', status: 'Recebendo' },
+  { pessoaId: 8, modalidade: 'Mestrado', nivel: 'MS-1', projeto: 'Tecnologias Educacionais Inclusivas', valorMensal: 2100, inicio: '2026-02-01', fim: '2028-01-31', status: 'Recebendo' },
 ];
 
 const expandArtigos = (base: ArtigoAcademico[], total: number) => Array.from({ length: total }, (_, index) => {
@@ -293,10 +305,11 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
   const { T } = useThemeTokens();
   const S = buildStyles(T);
 
-  const [activeTab, setActiveTab] = useState<ActiveTab>('listagem');
   const [detailTab, setDetailTab] = useState<PersonDetailTab>('cadastro');
   const [academicSearchTerm, setAcademicSearchTerm] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [bolsistaFilter, setBolsistaFilter] = useState('Todos');
+  const [statusFilter, setStatusFilter] = useState('Todos');
   const [pessoas, setPessoas] = useState<PessoaFisicaItem[]>(initialPessoas);
   const [selected, setSelected] = useState<PessoaFisicaItem | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -304,7 +317,11 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
 
   const filtered = pessoas.filter(item => {
     const query = searchTerm.toLowerCase();
-    return item.nome.toLowerCase().includes(query) || item.cpf.toLowerCase().includes(query) || item.email.toLowerCase().includes(query);
+    const matchesSearch = item.nome.toLowerCase().includes(query) || item.cpf.toLowerCase().includes(query) || item.email.toLowerCase().includes(query);
+    const isBolsista = bolsasPorPessoa.some(bolsa => bolsa.pessoaId === item.id);
+    const matchesBolsista = bolsistaFilter === 'Todos' || (bolsistaFilter === 'Sim' ? isBolsista : !isBolsista);
+    const matchesStatus = statusFilter === 'Todos' || item.estado === statusFilter;
+    return matchesSearch && matchesBolsista && matchesStatus;
   });
 
   const metrics = useMemo(() => ({
@@ -342,12 +359,6 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
     setShowForm(false);
   };
 
-  const removeDraft = () => {
-    if (!selected) return;
-    setPessoas(prev => prev.filter(item => item.id !== selected.id));
-    setSelected(null);
-  };
-
   if (showForm || selected) {
     const projetos = selected ? projetosPorPessoa.filter(item => item.pessoaId === selected.id) : [];
     const bolsas = selected ? bolsasPorPessoa.filter(item => item.pessoaId === selected.id) : [];
@@ -361,11 +372,11 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
       : 0;
     const curriculumSections = vidaAcademica ? [
       { id: 'artigos', label: 'Artigos', count: vidaAcademica.artigos.length },
-      { id: 'orientacoes', label: 'Orientacoes', count: vidaAcademica.orientacoes.length },
+      { id: 'orientacoes', label: 'Orientações', count: vidaAcademica.orientacoes.length },
       { id: 'projetos', label: 'Projetos', count: vidaAcademica.projetos.length },
-      { id: 'formacao', label: 'Formacao', count: vidaAcademica.formacoes.length },
+      { id: 'formacao', label: 'Formação', count: vidaAcademica.formacoes.length },
       { id: 'livros', label: 'Livros', count: vidaAcademica.livros.length },
-      { id: 'eventos-premios', label: 'Eventos e premios', count: eventosPremios.length },
+      { id: 'eventos-premios', label: 'Eventos e Prêmios', count: eventosPremios.length },
       { id: 'idiomas', label: 'Idiomas', count: vidaAcademica.idiomas.length },
     ] : [];
     const bolsasAtivas = bolsas.filter(item => item.status === 'Recebendo');
@@ -374,13 +385,18 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
     return (
       <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
         <div className="pt-8 px-8 pb-8">
-          <Header title={showForm ? 'Nova Pessoa Física' : draft.nome} subtitle="Cadastre pessoas físicas com CPF único, dados de contato e situação cadastral." onBack={() => { setShowForm(false); setSelected(null); }} />
+          <Header
+            title={showForm ? 'Criar Pessoa Física' : draft.nome}
+            subtitle="Cadastre pessoas físicas com CPF único, dados de contato e situação cadastral."
+            onBack={() => { setShowForm(false); setSelected(null); }}
+            breadcrumb={showForm ? ['Pessoa Física', 'Criar Pessoa'] : selected ? ['Pessoas Físicas', selected.nome] : undefined}
+          />
 
           {selected && (
             <div style={{ display: 'flex', gap: '4px', borderBottom: `1px solid ${T.borderSubtle}`, marginBottom: '28px' }}>
               {[
                 ['dashboard', 'Dashboard'],
-                ['vidaAcademica', 'Curriculum'],
+                ['vidaAcademica', 'Lattes'],
                 ['cadastro', 'Cadastro'],
               ].map(([id, label]) => (
                 <button key={id} onClick={() => setDetailTab(id as PersonDetailTab)} style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: detailTab === id ? `2px solid ${T.accent}` : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: detailTab === id ? T.accent : T.textSecondary, cursor: 'pointer', marginBottom: '-1px' }}>
@@ -399,7 +415,7 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                 <Metric label="Valor mensal ativo" value={formatCurrency(valorMensalAtivo)} color="#f59e0b" bg="rgba(245,158,11,0.12)" />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 <InfoCard title="Projetos em que a pessoa está presente" subtitle="Vínculos da pessoa com projetos captados.">
                   {projetos.length === 0 ? (
                     <EmptyState text="Nenhum projeto vinculado." />
@@ -409,7 +425,7 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                         <div key={`${item.nome}-${index}`} style={S.rowCard}>
                           <ListCell label="Projeto" value={item.nome} detail={item.programa} strong />
                           <ListCell label="Papel" value={item.papel} detail={`${item.inicio} a ${item.fim}`} />
-                          <ListCell label="Status" value={item.status} />
+                          <StatusBadge label="Status" value={item.status} />
                         </div>
                       ))}
                     </div>
@@ -425,7 +441,7 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                         <div key={`${item.projeto}-${index}`} style={S.rowCard}>
                           <ListCell label="Bolsa" value={`${item.modalidade} · ${item.nivel}`} detail={item.projeto} strong />
                           <ListCell label="Valor mensal" value={formatCurrency(item.valorMensal)} detail={`${item.inicio} a ${item.fim}`} />
-                          <ListCell label="Status" value={item.status} />
+                          <StatusBadge label="Status" value={item.status} />
                         </div>
                       ))}
                     </div>
@@ -440,17 +456,10 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
                 <CurriculumHero pessoa={selected} curriculum={vidaAcademica} totalProducoes={totalProducoes} />
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
-                  <ResearcherStat label="Artigos" value={String(vidaAcademica.artigos.length)} detail="Producoes bibliograficas" />
-                  <ResearcherStat label="Orientacoes" value={String(vidaAcademica.orientacoes.length)} detail="Concluidas e em andamento" />
-                  <ResearcherStat label="Projetos" value={String(vidaAcademica.projetos.length)} detail="Participacoes registradas" />
-                  <ResearcherStat label="Sincronizacao" value={vidaAcademica.curriculoValido ? 'Valido' : 'Revisar'} detail={vidaAcademica.ultimaSincronizacao} />
-                </div>
-
                 <div style={{ ...S.card, padding: '14px 16px', position: 'sticky', top: 0, zIndex: 2 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ position: 'relative', flex: 1 }}>
-                      <input type="text" placeholder="Buscar no curriculum por titulo, ano, participante ou instituicao" value={academicSearchTerm} onChange={event => setAcademicSearchTerm(event.target.value)} style={{ ...S.input, paddingLeft: '38px' }} />
+                      <input type="text" placeholder="Buscar no Lattes por título, ano, participante ou instituição" value={academicSearchTerm} onChange={event => setAcademicSearchTerm(event.target.value)} style={{ ...S.input, paddingLeft: '38px' }} />
                       <Search size={16} style={{ position: 'absolute', left: '13px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
                     </div>
                   </div>
@@ -530,7 +539,7 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                 )} />
               </div>
             ) : (
-              <InfoCard title="Curriculum" subtitle="Dados importados do M024 a partir do curriculo Lattes.">
+              <InfoCard title="Lattes" subtitle="Dados importados do M024 a partir do curriculo Lattes.">
                 <EmptyState text="Nenhum curriculo Lattes sincronizado para esta pessoa." />
               </InfoCard>
             )
@@ -543,35 +552,26 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                   <Field label="CPF" value={draft.cpf} onChange={value => updateDraft('cpf', maskCpf(value))} placeholder="000.000.000-00" />
                   <Field label="Nome completo" value={draft.nome} onChange={value => updateDraft('nome', value)} placeholder="Nome da pessoa" />
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 0.6fr 0.6fr', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 0.6fr 0.6fr 0.5fr', gap: '16px' }}>
                   <Field label="Email" value={draft.email} onChange={value => updateDraft('email', value)} placeholder="email@dominio.com" />
                   <Field label="Telefone" value={draft.telefone} onChange={value => updateDraft('telefone', value)} placeholder="(00) 00000-0000" />
                   <Field label="Data de nascimento" value={draft.dataNascimento} onChange={value => updateDraft('dataNascimento', value)} placeholder="AAAA-MM-DD" />
+                  <Select label="Status" value={draft.estado} onChange={value => updateDraft('estado', value)} options={['Ativa', 'Suspensa']} />
                 </div>
               </FormSection>
 
-              <FormSection number="2" title="Dados Acadêmicos e Situação" subtitle="Informações complementares e controle de suspensão/reativação.">
-                <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 0.6fr', gap: '16px', marginBottom: '16px' }}>
+              <FormSection number="2" title="Dados Acadêmicos" subtitle="Informações complementares">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                   <Field label="Currículo Lattes" value={draft.lattes} onChange={value => updateDraft('lattes', value)} placeholder="URL do currículo Lattes" />
-                  <Select label="Estado" value={draft.estado} onChange={value => updateDraft('estado', value)} options={['Ativa', 'Suspensa']} />
                 </div>
-                <Field label="Justificativa" value={draft.justificativa || ''} onChange={value => updateDraft('justificativa', value)} placeholder="Obrigatória para suspensão e reativação" />
               </FormSection>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                {selected && (
-                  <button type="button" onClick={removeDraft} style={S.dangerButton}>
-                    <Trash2 size={15} />
-                    Remover
-                  </button>
-                )}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', flex: 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
                   <button type="button" onClick={() => { setShowForm(false); setSelected(null); }} style={S.secondaryButton}>Cancelar</button>
                   <button type="button" onClick={saveDraft} style={S.primaryButton}>
                     <Save size={15} />
                     Salvar
                   </button>
-                </div>
               </div>
             </>
           )}
@@ -583,59 +583,70 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
   return (
     <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
-        <PageHeader title="Pessoas Físicas" subtitle="Gerencie cadastros de pessoas, CPF único, situação e dados complementares." onBack={onBack} onAdd={openNew} addLabel="Nova Pessoa" />
+        <PageHeader title="Pessoas Físicas" subtitle="Gerencie cadastros de pessoas, CPF único, situação e dados complementares." onBack={onBack} onAdd={openNew} addLabel="Criar Pessoa" />
 
-        <Tabs activeTab={activeTab} setActiveTab={setActiveTab} labels={[['listagem', 'Pessoas'], ['dashboard', 'Dashboard']]} />
-
-        {activeTab === 'dashboard' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
             <Metric label="Total de pessoas" value={String(metrics.total)} color={T.textPrimary} bg={T.bgChip} />
             <Metric label="Ativas" value={String(metrics.ativas)} color="#22c55e" bg="rgba(34,197,94,0.12)" />
             <Metric label="Suspensas" value={String(metrics.suspensas)} color="#f59e0b" bg="rgba(245,158,11,0.12)" />
             <Metric label="Com Lattes" value={String(metrics.comLattes)} color="#38bdf8" bg="rgba(56,189,248,0.12)" />
-          </div>
-        )}
+        </div>
 
-        {activeTab === 'listagem' && (
-          <>
-            <div style={{ marginBottom: '24px' }}>
-              <label style={S.label}>Pesquisar</label>
+        <>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 1fr) 180px 180px', gap: '16px', marginBottom: '24px', alignItems: 'end' }}>
               <div style={{ position: 'relative' }}>
+                <label style={S.label}>Pesquisar</label>
                 <input type="text" placeholder="Buscar" value={searchTerm} onChange={event => setSearchTerm(event.target.value)} style={{ ...S.input, paddingRight: '36px' }} />
-                <Search size={16} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
+                <Search size={16} style={{ position: 'absolute', right: '12px', bottom: '12px', color: T.iconSubdued }} />
               </div>
+              <Select label="Bolsista" value={bolsistaFilter} onChange={setBolsistaFilter} options={['Todos', 'Sim', 'Não']} />
+              <Select label="Status" value={statusFilter} onChange={setStatusFilter} options={['Todos', 'Ativa', 'Suspensa']} />
             </div>
+
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: '0 0 12px' }}>
+              Exibindo {filtered.length} resultados de {pessoas.length}
+            </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {filtered.map(item => (
                 <button key={item.id} onClick={() => openDetails(item)} style={{ textAlign: 'left', backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '10px', padding: '18px 20px', cursor: 'pointer' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.8fr 1.2fr 0.8fr 0.7fr', gap: '18px', alignItems: 'start' }}>
-                    <ListCell label="Pessoa" value={item.nome} detail={item.email} strong />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.8fr 0.6fr 0.7fr 24px', gap: '18px', alignItems: 'center' }}>
+                    <ListCell label="Pessoa" value={item.nome} strong />
                     <ListCell label="CPF" value={item.cpf} />
-                    <ListCell label="Contato" value={item.telefone || '-'} detail={item.lattes ? 'Lattes informado' : 'Sem Lattes'} />
-                    <ListCell label="Nascimento" value={item.dataNascimento} />
+                    <ListCell label="Bolsista" value={bolsasPorPessoa.some(bolsa => bolsa.pessoaId === item.id) ? 'Sim' : 'Não'} />
                     <StatusPill estado={item.estado} />
+                    <ChevronRight size={18} style={{ color: T.iconSubdued, justifySelf: 'end' }} />
                   </div>
                 </button>
               ))}
             </div>
           </>
-        )}
       </div>
     </div>
   );
 };
 
-const Header: React.FC<{ title: string; subtitle: string; onBack: () => void }> = ({ title, subtitle, onBack }) => {
+const Header: React.FC<{ title: string; subtitle: string; onBack: () => void; breadcrumb?: [string, string] }> = ({ title, subtitle, onBack, breadcrumb }) => {
   const { T } = useThemeTokens();
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '28px' }}>
-      <button onClick={onBack} style={{ width: '36px', height: '36px', border: 'none', borderRadius: 'var(--radius)', backgroundColor: T.accentSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-        <ArrowLeft size={18} style={{ color: T.accent }} />
-      </button>
-      <div>
-        <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 8px' }}>{title}</h1>
-        <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>{subtitle}</p>
+    <div style={{ marginBottom: '28px' }}>
+      {breadcrumb && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: T.textSecondary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', marginBottom: '0.75rem' }}>
+          <button type="button" onClick={onBack} style={{ background: 'none', border: 'none', padding: 0, color: T.textSecondary, cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}>
+            {breadcrumb[0]}
+          </button>
+          <span style={{ color: T.textMuted }}>&gt;</span>
+          <span style={{ color: T.textPrimary }}>{breadcrumb[1]}</span>
+        </div>
+      )}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+        <button onClick={onBack} style={{ width: '36px', height: '36px', border: 'none', borderRadius: 'var(--radius)', backgroundColor: T.accentSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+          <ArrowLeft size={18} style={{ color: T.accent }} />
+        </button>
+        <div>
+          <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 8px' }}>{title}</h1>
+          <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>{subtitle}</p>
+        </div>
       </div>
     </div>
   );
@@ -663,19 +674,6 @@ const PageHeader: React.FC<{ title: string; subtitle: string; onBack: () => void
         </div>
       </div>
     </>
-  );
-};
-
-const Tabs: React.FC<{ activeTab: string; setActiveTab: (tab: ActiveTab) => void; labels: Array<[ActiveTab, string]> }> = ({ activeTab, setActiveTab, labels }) => {
-  const { T } = useThemeTokens();
-  return (
-    <div style={{ display: 'flex', gap: '4px', borderBottom: `1px solid ${T.borderSubtle}`, marginBottom: '28px' }}>
-      {labels.map(([id, label]) => (
-        <button key={id} onClick={() => setActiveTab(id)} style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === id ? `2px solid ${T.accent}` : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: activeTab === id ? T.accent : T.textSecondary, cursor: 'pointer', marginBottom: '-1px' }}>
-          {label}
-        </button>
-      ))}
-    </div>
   );
 };
 
@@ -713,30 +711,23 @@ const CurriculumHero: React.FC<{ pessoa: PessoaFisicaItem; curriculum: VidaAcade
   const S = buildStyles(T);
   return (
     <section style={{ ...S.card, padding: '28px', overflow: 'hidden', position: 'relative' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '28px', alignItems: 'start' }}>
-        <div style={{ display: 'flex', gap: '18px', alignItems: 'flex-start' }}>
-          <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: `linear-gradient(135deg, ${T.accent}, #6366f1)`, color: T.accentText, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xl)', fontWeight: 'var(--font-weight-semibold)', flexShrink: 0 }}>
-            {pessoa.nome.split(' ').slice(0, 2).map(part => part[0]).join('')}
-          </div>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
-              <span style={{ border: `1px solid ${T.borderSubtle}`, borderRadius: '999px', padding: '5px 10px', color: T.textSecondary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>Pesquisador</span>
-              <span style={{ border: `1px solid ${curriculum.curriculoValido ? 'rgba(34,197,94,0.45)' : 'rgba(245,158,11,0.45)'}`, backgroundColor: curriculum.curriculoValido ? 'rgba(34,197,94,0.12)' : 'rgba(245,158,11,0.12)', borderRadius: '999px', padding: '5px 10px', color: curriculum.curriculoValido ? '#16a34a' : '#d97706', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>
-                {curriculum.curriculoValido ? 'Curriculo valido' : 'Curriculo desatualizado'}
-              </span>
-            </div>
-            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: '28px', lineHeight: 1.15, color: T.textPrimary, margin: '0 0 10px', fontWeight: 'var(--font-weight-semibold)' }}>{pessoa.nome}</h2>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, lineHeight: 1.6, margin: 0 }}>
-              {curriculum.titulacaoMaxima} em {curriculum.areaPrincipal}. Curriculum sincronizado pelo M024 a partir do Lattes, com producoes, orientacoes, projetos e demais registros estruturados para consulta administrativa.
-            </p>
-          </div>
+      <div style={{ minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
+          <span style={{ border: `1px solid ${T.borderSubtle}`, backgroundColor: T.bgChip, borderRadius: '999px', padding: '5px 10px', color: T.textSecondary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>Pesquisador</span>
+          <span style={{ border: `1px solid ${curriculum.curriculoValido ? 'rgba(34,197,94,0.45)' : 'rgba(245,158,11,0.45)'}`, backgroundColor: curriculum.curriculoValido ? 'rgba(34,197,94,0.12)' : 'rgba(245,158,11,0.12)', borderRadius: '999px', padding: '5px 10px', color: curriculum.curriculoValido ? '#16a34a' : '#d97706', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>
+            {curriculum.curriculoValido ? 'Currículo válido' : 'Currículo desatualizado'}
+          </span>
         </div>
+        <h2 style={{ fontFamily: 'var(--font-family)', fontSize: '28px', lineHeight: 1.15, color: T.textPrimary, margin: '0 0 10px', fontWeight: 'var(--font-weight-semibold)' }}>{pessoa.nome}</h2>
+        <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, lineHeight: 1.6, margin: '0 0 18px' }}>
+          {curriculum.titulacaoMaxima} em {curriculum.areaPrincipal}. Lattes sincronizado pelo M024, com produções, orientações, projetos e demais registros estruturados para consulta administrativa.
+        </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
-          <HeroFact label="Numero Lattes" value={curriculum.numeroLattes} />
-          <HeroFact label="Ultima sincronizacao" value={curriculum.ultimaSincronizacao} />
-          <HeroFact label="Area principal" value={curriculum.areaPrincipal} />
-          <HeroFact label="Producoes" value={String(totalProducoes)} />
+          <HeroFact label="Link" value={curriculum.numeroLattes} />
+          <HeroFact label="Última Sincronização" value={curriculum.ultimaSincronizacao} />
+          <HeroFact label="Área Principal" value={curriculum.areaPrincipal} />
+          <HeroFact label="Produções" value={String(totalProducoes)} />
         </div>
       </div>
     </section>
@@ -753,23 +744,12 @@ const HeroFact: React.FC<{ label: string; value: string }> = ({ label, value }) 
   );
 };
 
-const ResearcherStat: React.FC<{ label: string; value: string; detail: string }> = ({ label, value, detail }) => {
-  const { T } = useThemeTokens();
-  return (
-    <div style={{ border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgCard, padding: '18px' }}>
-      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '10px' }}>{label}</div>
-      <div style={{ fontFamily: 'var(--font-family)', fontSize: '24px', color: T.textPrimary, fontWeight: 'var(--font-weight-semibold)', marginBottom: '6px' }}>{value}</div>
-      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textSecondary }}>{detail}</div>
-    </div>
-  );
-};
-
 const CurriculumAnchor: React.FC<{ href: string; label: string; count: number }> = ({ href, label, count }) => {
   const { T } = useThemeTokens();
   return (
-    <a href={href} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: `1px solid ${T.borderSubtle}`, borderRadius: '999px', backgroundColor: T.bgSurfaceMuted, color: T.textSecondary, padding: '8px 11px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', textDecoration: 'none' }}>
+    <a href={href} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: `1px solid ${T.accent}`, borderRadius: '999px', backgroundColor: T.accentSoft, color: T.accent, padding: '8px 11px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', textDecoration: 'none' }}>
       <span>{label}</span>
-      <span style={{ minWidth: '28px', borderRadius: '999px', backgroundColor: T.bgChip, color: T.textPrimary, padding: '2px 7px', fontSize: 'var(--text-xs)', textAlign: 'center' }}>{count}</span>
+      <span style={{ minWidth: '28px', borderRadius: '999px', backgroundColor: T.accent, color: T.accentText, padding: '2px 7px', fontSize: 'var(--text-xs)', textAlign: 'center' }}>{count}</span>
     </a>
   );
 };
@@ -912,11 +892,33 @@ const ListCell: React.FC<{ label: string; value: string; detail?: string; strong
   );
 };
 
+const statusBadgeColor = (value: string) => {
+  if (value === 'Recebendo' || value.toLowerCase() === 'em execução') return '#22c55e';
+  if (value === 'Encerrada') return '#64748b';
+  if (value === 'Suspenso') return '#f59e0b';
+  return '#38bdf8';
+};
+
+const statusBadgeLabel = (value: string) => value.toLowerCase() === 'em execução' ? 'Em Execução' : value;
+
+const StatusBadge: React.FC<{ label: string; value: string }> = ({ label, value }) => {
+  const { T } = useThemeTokens();
+  const color = statusBadgeColor(value);
+  return (
+    <div>
+      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>{label}</div>
+      <span style={{ display: 'inline-block', backgroundColor: `${color}20`, border: `1px solid ${color}`, borderRadius: '999px', padding: '3px 12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color }}>
+        {statusBadgeLabel(value)}
+      </span>
+    </div>
+  );
+};
+
 const StatusPill: React.FC<{ estado: EstadoPessoa }> = ({ estado }) => {
   const { T } = useThemeTokens();
   return (
     <div>
-      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>Estado</div>
+      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>Status</div>
       <span style={{ display: 'inline-block', backgroundColor: `${estadoColor(estado)}20`, border: `1px solid ${estadoColor(estado)}`, borderRadius: '999px', padding: '3px 12px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: estadoColor(estado) }}>
         {estado}
       </span>

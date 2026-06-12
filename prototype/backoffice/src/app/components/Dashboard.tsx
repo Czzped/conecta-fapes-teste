@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, FileEdit, Settings, Inbox, Landmark, Building2, UserRound } from 'lucide-react';
+import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, Settings, Inbox, Landmark, Building2, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 import conectaSymbol from 'figma:asset/db135b6708f6cc7f72f27c6a31dd02aa5500d030.png';
 import fapesLogo from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
@@ -10,6 +10,7 @@ import { Parceria } from './Parceria';
 import { PlanejamentoEstrategico } from './PlanejamentoEstrategico';
 import { Instituicoes } from './Instituicoes';
 import { Configuracoes } from './Configuracoes';
+import { CalendarioFolha } from './CalendarioFolha';
 import { PessoasFisicas } from './PessoasFisicas';
 import { Rubricas } from './Rubricas';
 import { ReferenciasCorporativas } from './ReferenciasCorporativas';
@@ -30,8 +31,7 @@ type Contrast = 'normal' | 'high' | 'maximum';
 type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
 type Language = 'pt' | 'en' | 'es';
 type NotificationTab = 'avisos' | 'editais';
-type DashboardTab = 'financeiro' | 'captacao';
-type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'tecnica' | 'remanejamento' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal';
+type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal' | 'calendario-folha';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
 type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outro Projeto Exemplo' | 'Mais um Projeto Exemplo';
@@ -53,7 +53,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [activePage, setActivePage] = useState<ActivePage>('dashboard');
-  const [dashboardTab, setDashboardTab] = useState<DashboardTab>('financeiro');
   const [selectedPagamento, setSelectedPagamento] = useState<PagamentoCard | null>(null);
   
   const [theme, setTheme] = useState<Theme>(() => {
@@ -564,8 +563,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
             {([
               { key: 'financeira' as ActivePage, Icon: DollarSign, label: 'Financeira' },
-              { key: 'tecnica' as ActivePage, Icon: ClipboardCheck, label: 'Técnica' },
-              { key: 'remanejamento' as ActivePage, Icon: FileEdit, label: 'Remanejamento' },
             ]).map(({ key, Icon, label }, index) => {
               const active = activePage === key;
               return (
@@ -1728,9 +1725,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             onOpenDocumentos={() => setActivePage('documentos')}
             onOpenFormularios={() => setActivePage('formulario')}
             onOpenRegrasAcaoTransversal={() => setActivePage('regras-acao-transversal')}
+            onOpenCalendarioFolha={() => setActivePage('calendario-folha')}
           />
         ) : activePage === 'planejamento' ? (
           <PlanejamentoEstrategico />
+        ) : activePage === 'calendario-folha' ? (
+          <CalendarioFolha onBack={() => setActivePage('configuracoes')} />
         ) : activePage === 'pessoas' ? (
           <PessoasFisicas onBack={() => setActivePage('configuracoes')} />
         ) : activePage === 'referencias' ? (
@@ -1791,52 +1791,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 </div>
               </div>
 
-              <div className="mb-6 flex gap-6" style={{ borderBottom: '1px solid var(--dash-divider)' }}>
-                {([
-                  { key: 'financeiro' as DashboardTab, label: 'Financeiro' },
-                  { key: 'captacao' as DashboardTab, label: 'Captação' },
-                ]).map((tab) => {
-                  const active = dashboardTab === tab.key;
-                  return (
-                    <button
-                      key={tab.key}
-                      onClick={() => setDashboardTab(tab.key)}
-                      style={{
-                        position: 'relative',
-                        padding: '0.75rem 0',
-                        background: 'transparent',
-                        border: 'none',
-                        color: active ? '#00c1af' : T.textSecondary,
-                        fontFamily: 'var(--font-family)',
-                        fontSize: 'var(--text-sm)',
-                        fontWeight: 'var(--font-weight-medium)',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {tab.label}
-                      {active && (
-                        <span
-                          style={{
-                            position: 'absolute',
-                            left: 0,
-                            right: 0,
-                            bottom: '-1px',
-                            height: '2px',
-                            backgroundColor: '#00c1af',
-                          }}
-                        />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {dashboardTab === 'captacao' ? (
-                <div style={{ margin: '-32px' }}>
-                  <Editais />
-                </div>
-              ) : (
-                <>
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 {[
                   { label: 'Captações em andamento', value: '18', Icon: FileText, tone: '#4f6fce' },
@@ -1860,7 +1814,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                       >
                         <Icon size={20} style={{ color: tone }} />
                       </div>
-                      <span style={{ color: T.textMuted, fontSize: '12px' }}>Atualizado hoje</span>
                     </div>
                     <p style={{ color: T.textSecondary, fontSize: '14px' }}>{label}</p>
                     <p className="mt-2" style={{ color: T.textPrimary, fontSize: '30px', fontWeight: 600, lineHeight: 1 }}>
@@ -1869,139 +1822,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   </div>
                 ))}
               </div>
-
-              <section
-                className="mt-6 rounded-lg p-5"
-                style={{
-                  backgroundColor: 'var(--dash-card-bg)',
-                  border: '1px solid var(--dash-card-border)',
-                  boxShadow: 'var(--dash-shadow)',
-                }}
-              >
-                <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-                  <div>
-                    <h2 style={{ color: T.textPrimary, fontSize: '20px', fontWeight: 600 }}>Área de controle operacional</h2>
-                    <p className="mt-1" style={{ color: T.textSecondary, fontSize: '14px' }}>
-                      Visão consolidada das pendências de bolsa, captação e avaliações que exigem acompanhamento.
-                    </p>
-                  </div>
-                  <span
-                    className="rounded-lg px-3 py-2"
-                    style={{
-                      backgroundColor: isLight ? '#eef6ff' : 'rgba(79, 111, 206, 0.16)',
-                      color: isLight ? '#264a99' : '#9db2ff',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                    }}
-                  >
-                    SLA crítico: 4 itens
-                  </span>
-                </div>
-
-                <div className="grid gap-4 xl:grid-cols-3">
-                  {[
-                    {
-                      title: 'Análise de bolsas',
-                      subtitle: 'Pendências por prioridade',
-                      Icon: BookOpen,
-                      tone: '#00c1af',
-                      action: 'Abrir bolsas',
-                      page: 'pagamento' as ActivePage,
-                      rows: [
-                        { label: 'Bolsas aguardando enquadramento', value: '9', meta: '3 vencem hoje', status: '#ef4444' },
-                        { label: 'Solicitações com documentação incompleta', value: '14', meta: 'aguardando coordenador', status: '#f59e0b' },
-                        { label: 'Renovações para parecer técnico', value: '6', meta: 'prazo médio 2 dias', status: '#3b82f6' },
-                      ],
-                    },
-                    {
-                      title: 'Processos de captação',
-                      subtitle: 'Captações e propostas em curso',
-                      Icon: FileText,
-                      tone: '#4f6fce',
-                      action: 'Abrir captação',
-                      page: 'editais' as ActivePage,
-                      rows: [
-                        { label: 'Captações em análise jurídica', value: '4', meta: '1 bloqueando publicação', status: '#ef4444' },
-                        { label: 'Propostas recebidas sem triagem', value: '27', meta: 'últimas 24h', status: '#f59e0b' },
-                        { label: 'Chamadas próximas da publicação', value: '3', meta: 'esta semana', status: '#3b82f6' },
-                      ],
-                    },
-                    {
-                      title: 'Avisos de avaliação',
-                      subtitle: 'Bolsas e projetos',
-                      Icon: Bell,
-                      tone: '#f59e0b',
-                      action: 'Ver avisos',
-                      page: 'financeira' as ActivePage,
-                      rows: [
-                        { label: 'Avaliação de bolsa sem parecer', value: '5', meta: 'responsável definido', status: '#ef4444' },
-                        { label: 'Projetos com avaliação parcial pendente', value: '8', meta: 'aguardando área técnica', status: '#f59e0b' },
-                        { label: 'Relatórios finais para homologação', value: '11', meta: 'fila regular', status: '#00c1af' },
-                      ],
-                    },
-                  ].map(({ title, subtitle, Icon, tone, action, page, rows }) => (
-                    <div
-                      key={title}
-                      className="rounded-lg p-3"
-                      style={{
-                        backgroundColor: isLight ? '#ffffff' : 'rgba(255, 255, 255, 0.035)',
-                        border: '1px solid var(--dash-card-border)',
-                      }}
-                    >
-                      <div className="mb-3 flex items-start justify-between gap-3">
-                        <div className="flex items-start gap-3">
-                          <div
-                            className="flex items-center justify-center rounded-lg"
-                            style={{ width: 34, height: 34, backgroundColor: `${tone}22`, color: tone }}
-                          >
-                            <Icon size={18} />
-                          </div>
-                          <div>
-                            <h3 style={{ color: T.textPrimary, fontSize: '14px', fontWeight: 700 }}>{title}</h3>
-                            <p className="mt-1" style={{ color: T.textMuted, fontSize: '13px' }}>{subtitle}</p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => setActivePage(page)}
-                          className={`rounded-lg px-2.5 py-1.5 ${T.hoverClass}`}
-                          style={{ color: tone, fontSize: '12px', fontWeight: 700, whiteSpace: 'nowrap' }}
-                        >
-                          {action}
-                        </button>
-                      </div>
-
-                      <div className="space-y-2">
-                        {rows.map((row) => (
-                          <button
-                            key={row.label}
-                            onClick={() => setActivePage(page)}
-                          className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${T.hoverClass}`}
-                            style={{
-                              backgroundColor: isLight ? '#fafafa' : 'rgba(255,255,255,0.035)',
-                              border: '1px solid var(--dash-card-border)',
-                            }}
-                          >
-                            <span className="flex min-w-0 items-start gap-3">
-                              <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full" style={{ backgroundColor: row.status }} />
-                              <span className="min-w-0">
-                                <span style={{ display: 'block', color: T.textPrimary, fontSize: '12px', fontWeight: 600, lineHeight: 1.35 }}>
-                                  {row.label}
-                                </span>
-                                <span style={{ display: 'block', color: T.textMuted, fontSize: '11px', marginTop: 3 }}>
-                                  {row.meta}
-                                </span>
-                              </span>
-                            </span>
-                            <span style={{ color: T.textPrimary, fontSize: '20px', fontWeight: 700, lineHeight: 1 }}>
-                              {row.value}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
 
               <div className="mt-6">
                 <section
@@ -2054,8 +1874,139 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   </div>
                 </section>
               </div>
-                </>
-              )}
+
+              <section
+                className="mt-6 rounded-lg p-5"
+                style={{
+                  backgroundColor: 'var(--dash-card-bg)',
+                  border: '1px solid var(--dash-card-border)',
+                  boxShadow: 'var(--dash-shadow)',
+                }}
+              >
+                <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                  <div>
+                    <h2 style={{ color: T.textPrimary, fontSize: '20px', fontWeight: 600 }}>Área de controle operacional</h2>
+                    <p className="mt-1" style={{ color: T.textSecondary, fontSize: '14px' }}>
+                      Visão consolidada das pendências de bolsa, captação e avaliações que exigem acompanhamento.
+                    </p>
+                  </div>
+                  <span
+                    className="rounded-lg px-3 py-2"
+                    style={{
+                      backgroundColor: isLight ? '#eef6ff' : 'rgba(79, 111, 206, 0.16)',
+                      color: isLight ? '#264a99' : '#9db2ff',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    SLA crítico: 4 itens
+                  </span>
+                </div>
+
+                <div className="space-y-4">
+                  {[
+                    {
+                      title: 'Análise de bolsas',
+                      subtitle: 'Pendências por prioridade',
+                      Icon: BookOpen,
+                      tone: '#00c1af',
+                      action: 'Abrir bolsas',
+                      page: 'pagamento' as ActivePage,
+                      rows: [
+                        { label: 'Bolsas aguardando enquadramento', value: '9', meta: '3 vencem hoje', status: '#ef4444' },
+                        { label: 'Solicitações com documentação incompleta', value: '14', meta: 'aguardando coordenador', status: '#f59e0b' },
+                        { label: 'Renovações para parecer técnico', value: '6', meta: 'prazo médio 2 dias', status: '#3b82f6' },
+                      ],
+                    },
+                    {
+                      title: 'Avisos de avaliação',
+                      subtitle: 'Bolsas e projetos',
+                      Icon: Bell,
+                      tone: '#f59e0b',
+                      action: 'Ver avisos',
+                      page: 'financeira' as ActivePage,
+                      rows: [
+                        { label: 'Avaliação de bolsa sem parecer', value: '5', meta: 'responsável definido', status: '#ef4444' },
+                        { label: 'Projetos com avaliação parcial pendente', value: '8', meta: 'aguardando área técnica', status: '#f59e0b' },
+                        { label: 'Relatórios finais para homologação', value: '11', meta: 'fila regular', status: '#00c1af' },
+                      ],
+                    },
+                    {
+                      title: 'Processos de captação',
+                      subtitle: 'Captações e propostas em curso',
+                      Icon: FileText,
+                      tone: '#4f6fce',
+                      action: 'Abrir captação',
+                      page: 'editais' as ActivePage,
+                      rows: [
+                        { label: 'Captações em análise jurídica', value: '4', meta: '1 bloqueando publicação', status: '#ef4444' },
+                        { label: 'Propostas recebidas sem triagem', value: '27', meta: 'últimas 24h', status: '#f59e0b' },
+                        { label: 'Chamadas próximas da publicação', value: '3', meta: 'esta semana', status: '#3b82f6' },
+                      ],
+                    },
+                  ].map(({ title, subtitle, Icon, tone, action, page, rows }) => (
+                    <div
+                      key={title}
+                      className="rounded-lg p-3"
+                      style={{
+                        backgroundColor: isLight ? '#ffffff' : 'rgba(255, 255, 255, 0.035)',
+                        border: '1px solid var(--dash-card-border)',
+                      }}
+                    >
+                      <div className="mb-3 flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <div
+                            className="flex items-center justify-center rounded-lg"
+                            style={{ width: 34, height: 34, backgroundColor: `${tone}22`, color: tone }}
+                          >
+                            <Icon size={18} />
+                          </div>
+                          <div>
+                            <h3 style={{ color: T.textPrimary, fontSize: '14px', fontWeight: 700 }}>{title}</h3>
+                            <p className="mt-1" style={{ color: T.textMuted, fontSize: '13px' }}>{subtitle}</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setActivePage(page)}
+                          className={`rounded-lg px-2.5 py-1.5 ${T.hoverClass}`}
+                          style={{ color: tone, fontSize: '12px', fontWeight: 700, whiteSpace: 'nowrap' }}
+                        >
+                          {action}
+                        </button>
+                      </div>
+
+                      <div className="space-y-2">
+                        {rows.map((row) => (
+                          <button
+                            key={row.label}
+                            onClick={() => setActivePage(page)}
+                            className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${T.hoverClass}`}
+                            style={{
+                              backgroundColor: isLight ? '#fafafa' : 'rgba(255,255,255,0.035)',
+                              border: '1px solid var(--dash-card-border)',
+                            }}
+                          >
+                            <span className="flex min-w-0 items-start gap-3">
+                              <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full" style={{ backgroundColor: row.status }} />
+                              <span className="min-w-0">
+                                <span style={{ display: 'block', color: T.textPrimary, fontSize: '12px', fontWeight: 600, lineHeight: 1.35 }}>
+                                  {row.label}
+                                </span>
+                                <span style={{ display: 'block', color: T.textMuted, fontSize: '11px', marginTop: 3 }}>
+                                  {row.meta}
+                                </span>
+                              </span>
+                            </span>
+                            <span style={{ color: T.textPrimary, fontSize: '20px', fontWeight: 700, lineHeight: 1 }}>
+                              {row.value}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
             </div>
           </div>
         )}

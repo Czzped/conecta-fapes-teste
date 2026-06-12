@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, ChevronRight, ClipboardList, Database, FileCheck2, Settings, Tags, Target } from 'lucide-react';
+import { BookOpen, CalendarDays, ChevronRight, ClipboardList, Database, FileCheck2, Settings, Tags, Target } from 'lucide-react';
 import { useThemeTokens } from '../theme/ThemeContext';
 
 interface ConfiguracoesProps {
@@ -10,6 +10,7 @@ interface ConfiguracoesProps {
   onOpenDocumentos: () => void;
   onOpenFormularios: () => void;
   onOpenRegrasAcaoTransversal: () => void;
+  onOpenCalendarioFolha: () => void;
 }
 
 const actions = [
@@ -55,9 +56,16 @@ const actions = [
     color: '#f97316',
     key: 'regras-acao-transversal',
   },
+  {
+    title: 'Calendário da Folha',
+    description: 'Definição anual das datas de solicitação, geração e pagamento da folha de bolsas.',
+    Icon: CalendarDays,
+    color: '#38bdf8',
+    key: 'calendario-folha',
+  },
 ];
 
-export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlanejamento, onOpenReferencias, onOpenRubricas, onOpenDocumentos, onOpenFormularios, onOpenRegrasAcaoTransversal }) => {
+export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlanejamento, onOpenReferencias, onOpenRubricas, onOpenDocumentos, onOpenFormularios, onOpenRegrasAcaoTransversal, onOpenCalendarioFolha }) => {
   const { T } = useThemeTokens();
 
   const cardStyle: React.CSSProperties = {
@@ -86,6 +94,10 @@ export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlan
     }
     if (key === 'regras-acao-transversal') {
       onOpenRegrasAcaoTransversal();
+      return;
+    }
+    if (key === 'calendario-folha') {
+      onOpenCalendarioFolha();
       return;
     }
     onOpenReferencias();

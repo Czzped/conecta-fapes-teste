@@ -260,7 +260,7 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [estruturaSigla, setEstruturaSigla] = useState('');
   const [estruturaResponsavel, setEstruturaResponsavel] = useState('');
   const [instituicoes, setInstituicoes] = useState<InstituicaoItem[]>(initialInstituicoes);
-  const [dashboardInstituicao, setDashboardInstituicao] = useState('Universidade Federal do Espírito Santo');
+  const [dashboardInstituicao, setDashboardInstituicao] = useState('Todos');
   const [projetoSearch, setProjetoSearch] = useState('');
   const [projetoUnidade, setProjetoUnidade] = useState('');
   const [projetoCoordenador, setProjetoCoordenador] = useState('');
@@ -291,9 +291,13 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     { nome: 'Unidades com CNPJ', valor: instituicoes.filter(item => item.cnpj && item.superior).length, color: '#22c55e' },
     { nome: 'Setores sem CNPJ', valor: instituicoes.filter(item => !item.cnpj).length, color: '#f59e0b' },
   ]), [instituicoes]);
-  const instituicaoOptions = Array.from(new Set(instituicoes.map(item => item.nome)));
-  const dashboardInstituicoesSelecionadas = instituicoes.filter(item => item.nome === dashboardInstituicao);
-  const dashboardProjetos = projetosPorInstituicao[dashboardInstituicao] || [];
+  const instituicaoOptions = ['Todos', ...Array.from(new Set(instituicoes.map(item => item.nome)))];
+  const dashboardInstituicoesSelecionadas = dashboardInstituicao === 'Todos'
+    ? instituicoes
+    : instituicoes.filter(item => item.nome === dashboardInstituicao);
+  const dashboardProjetos = dashboardInstituicao === 'Todos'
+    ? Object.values(projetosPorInstituicao).flat()
+    : projetosPorInstituicao[dashboardInstituicao] || [];
   const projetoUnidadeOptions = Array.from(new Set(dashboardProjetos.map(projeto => projeto.unidade)));
   const projetoCoordenadorOptions = Array.from(new Set(dashboardProjetos.map(projeto => projeto.coordenador)));
   const dashboardProjetosFiltrados = dashboardProjetos.filter(projeto => {
@@ -751,10 +755,6 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
         {activeTab === 'dashboard' && (
           <div>
-            <div style={{ marginBottom: '24px', maxWidth: '520px' }}>
-              <Select label="Instituição" value={dashboardInstituicao} onChange={setDashboardInstituicao} options={instituicaoOptions} />
-            </div>
-
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
               <Metric label="Projetos Ativos" value={String(dashboardProjetosAtivos)} color={T.accent} bg={T.accentSoft} />
               <Metric label="Bolsas Ativas" value={String(dashboardBolsasAtivas)} color={T.accent} bg={T.accentSoft} />
@@ -766,7 +766,7 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <p style={{ ...S.sectionSubtitle, marginBottom: '18px' }}>
                 Lista de projetos vinculados à instituição selecionada.
               </p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 0.7fr 0.8fr', gap: '16px', marginBottom: '18px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1fr 0.7fr 0.8fr', gap: '16px', marginBottom: '18px' }}>
                 <div>
                   <label style={S.label}>Pesquisar</label>
                   <div style={{ position: 'relative' }}>
@@ -774,6 +774,7 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <Search size={16} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
                   </div>
                 </div>
+                <Select label="Instituição" value={dashboardInstituicao} onChange={setDashboardInstituicao} options={instituicaoOptions} />
                 <ComboField label="Unidade" value={projetoUnidade} onChange={setProjetoUnidade} options={projetoUnidadeOptions} placeholder="Todos" />
                 <ComboField label="Coordenador" value={projetoCoordenador} onChange={setProjetoCoordenador} options={projetoCoordenadorOptions} placeholder="Todos" />
                 <Field label="Data" value={projetoData} onChange={setProjetoData} placeholder="AAAA" />
