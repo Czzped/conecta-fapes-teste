@@ -291,7 +291,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
 
   if (showDetalhesCaptacao) {
     return (
-      <DetalhesCaptacao captacao={captacaoSelecionada || undefined} onBack={() => setShowDetalhesCaptacao(false)} />
+      <DetalhesCaptacao captacao={captacaoSelecionada || undefined} onBack={() => setShowDetalhesCaptacao(false)} kind={kind} />
     );
   }
 
@@ -1004,7 +1004,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                     >
                       <div>
                         <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
-                          Captação
+                          {moduleLabel}
                         </div>
                         <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)' }}>
                           {captacao.titulo}

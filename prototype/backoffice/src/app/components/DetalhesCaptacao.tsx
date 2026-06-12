@@ -17,6 +17,7 @@ interface CaptacaoDetalhe {
 interface Props {
   onBack: () => void;
   captacao?: CaptacaoDetalhe;
+  kind?: 'captacao' | 'fomento';
 }
 
 const cardStyle: React.CSSProperties = {
@@ -192,7 +193,7 @@ const financeiroPorFaixaCaptacao = Array.from(new Set(iniciativasEnviadas.map(in
   };
 });
 
-export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
+export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'captacao' }) => {
   const [activeTab, setActiveTab] = useState<'informacoes' | 'dashboard' | 'proposta' | 'avaliacao' | 'avaliacaoAdHoc' | 'recurso' | 'recursoParcial' | 'resultadoFinal'>('informacoes');
   const [editingResumo, setEditingResumo] = useState(false);
   const [showFormularioEdicao, setShowFormularioEdicao] = useState(false);
@@ -237,6 +238,8 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
     area: 'Pesquisa',
     status: 'Ativo' as const,
   };
+  const isFomento = kind === 'fomento';
+  const moduleLabel = isFomento ? 'Fomento' : 'Captação';
   const podeEditar = captacaoAtual.status === 'Rascunho' || captacaoAtual.status === 'Finalizado';
   const detalheLinhaStyle: React.CSSProperties = {
     display: 'grid',
@@ -427,7 +430,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
   );
 
   if (showFormularioEdicao && podeEditar) {
-    return <FormularioEdital mode="edit" onBack={() => setShowFormularioEdicao(false)} />;
+    return <FormularioEdital mode="edit" onBack={() => setShowFormularioEdicao(false)} scope={kind} />;
   }
 
   const renderModal = () => {
@@ -1226,7 +1229,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
               padding: 0,
             }}
           >
-            Captação
+            {moduleLabel}
           </button>
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
           <span style={{
@@ -1235,7 +1238,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
             color: '#00c1af',
             fontWeight: 'var(--font-weight-medium)',
           }}>
-            Detalhes da Captação
+            {isFomento ? 'Detalhes' : 'Detalhes da Captação'}
           </span>
         </div>
 
@@ -1279,14 +1282,17 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
                 color: 'rgba(255,255,255,0.55)',
                 margin: 0,
               }}>
-                Verifique as informações dessa Captação.
+                Verifique as informações {isFomento ? 'desse fomento' : 'dessa Captação'}.
               </p>
             </div>
           </div>
         </div>
 
         <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '24px' }}>
-          {[
+          {(isFomento ? [
+            { id: 'informacoes', label: 'Informações Gerais' },
+            { id: 'dashboard', label: 'Dashboard' },
+          ] : [
             { id: 'informacoes', label: 'Informações Gerais' },
             { id: 'dashboard', label: 'Dashboard' },
             { id: 'proposta', label: 'Proposta' },
@@ -1295,7 +1301,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao }) => {
             { id: 'recursoParcial', label: 'Resultado Parcial' },
             { id: 'recurso', label: 'Recurso' },
             { id: 'resultadoFinal', label: 'Resultado Final' },
-          ].map(tab => (
+          ]).map(tab => (
             <button
               key={tab.id}
               type="button"
