@@ -24,7 +24,7 @@ import {
   Upload,
   X,
 } from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Dropdown } from '@/app/components/Dropdown';
 import { ListPagination } from '@/app/components/ListPagination';
 import {
@@ -3092,122 +3092,182 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                     </div>
                   </label>
 
-                  <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_180px_150px] gap-4">
-                    <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                      Origem
-                      <div className="mt-2">
-                        <Dropdown
-                        value={origem}
-                        onChange={setOrigem}
-                        placeholder="Selecione a origem"
-                        disabled={diariaSomenteLeitura}
-                        showSelectedIcon={false}
-                        options={origensDiaria.map((localidade) => ({ value: localidade, label: localidade }))}
+                  <div
+                    style={{
+                      padding: '1rem',
+                    }}
+                  >
+                    <h3 style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)', margin: '0 0 1rem' }}>
+                      Ida
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_180px_150px] gap-4">
+                      <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        Origem
+                        <div className="mt-2">
+                          <Dropdown
+                          value={origem}
+                          onChange={setOrigem}
+                          placeholder="Selecione a origem"
+                          disabled={diariaSomenteLeitura}
+                          showSelectedIcon={false}
+                          options={origensDiaria.map((localidade) => ({ value: localidade, label: localidade }))}
+                          />
+                        </div>
+                      </label>
+                      <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        Destino
+                        <div className="mt-2">
+                          {tipoViagemSelecionado === 'INTERNACIONAL' ? (
+                            <input
+                              value={destino}
+                              onChange={(event) => setDestino(event.target.value)}
+                              disabled={diariaSomenteLeitura}
+                              placeholder="Digite o destino"
+                              className="w-full px-3 py-2"
+                              style={{
+                                backgroundColor: 'transparent',
+                                border: '1px solid var(--border)',
+                                borderRadius: 'var(--radius)',
+                                color: 'var(--foreground)',
+                                fontSize: 'var(--text-sm)',
+                              }}
+                            />
+                          ) : (
+                            <Dropdown
+                            value={destino}
+                            onChange={alterarDestino}
+                            placeholder="Selecione o destino"
+                            disabled={diariaSomenteLeitura}
+                            options={destinosDiaria.map((item) => ({ value: item.value, label: item.label }))}
+                            />
+                          )}
+                        </div>
+                      </label>
+                      <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        Data da Ida
+                        <input
+                          type="date"
+                          value={partidaData}
+                          onChange={(event) => setPartida((current) => combinarDataHora(current, event.target.value, 'data'))}
+                          disabled={diariaSomenteLeitura}
+                          className="mt-2 w-full px-3 py-2"
+                          style={{
+                            backgroundColor: 'transparent',
+                            border: '1px solid var(--border)',
+                            borderRadius: 'var(--radius)',
+                            color: 'var(--foreground)',
+                            fontSize: 'var(--text-sm)',
+                          }}
                         />
-                      </div>
-                    </label>
-                    <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                      Data da Partida
-                      <input
-                        type="date"
-                        value={partidaData}
-                        onChange={(event) => setPartida((current) => combinarDataHora(current, event.target.value, 'data'))}
-                        disabled={diariaSomenteLeitura}
-                        className="mt-2 w-full px-3 py-2"
-                        style={{
-                          backgroundColor: 'transparent',
-                          border: '1px solid var(--border)',
-                          borderRadius: 'var(--radius)',
-                          color: 'var(--foreground)',
-                          fontSize: 'var(--text-sm)',
-                        }}
-                      />
-                    </label>
-                    <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                      Horário
-                      <input
-                        type="time"
-                        step="1"
-                        value={partidaHorario}
-                        onChange={(event) => setPartida((current) => combinarDataHora(current, event.target.value, 'hora'))}
-                        disabled={diariaSomenteLeitura}
-                        className="mt-2 w-full px-3 py-2"
-                        style={{
-                          backgroundColor: 'transparent',
-                          border: '1px solid var(--border)',
-                          borderRadius: 'var(--radius)',
-                          color: 'var(--foreground)',
-                          fontSize: 'var(--text-sm)',
-                        }}
-                      />
-                    </label>
+                      </label>
+                      <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        Horário
+                        <input
+                          type="time"
+                          step="1"
+                          value={partidaHorario}
+                          onChange={(event) => setPartida((current) => combinarDataHora(current, event.target.value, 'hora'))}
+                          disabled={diariaSomenteLeitura}
+                          className="mt-2 w-full px-3 py-2"
+                          style={{
+                            backgroundColor: 'transparent',
+                            border: '1px solid var(--border)',
+                            borderRadius: 'var(--radius)',
+                            color: 'var(--foreground)',
+                            fontSize: 'var(--text-sm)',
+                          }}
+                        />
+                      </label>
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_180px_150px] gap-4">
-                    <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                      Destino
-                      <div className="mt-2">
-                        {tipoViagemSelecionado === 'INTERNACIONAL' ? (
-                          <input
+                  <div
+                    style={{
+                      padding: '1rem',
+                    }}
+                  >
+                    <h3 style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)', margin: '0 0 1rem' }}>
+                      Volta
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_180px_150px] gap-4">
+                      <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        Origem
+                        <div className="mt-2">
+                          {tipoViagemSelecionado === 'INTERNACIONAL' ? (
+                            <input
+                              value={destino}
+                              onChange={(event) => setDestino(event.target.value)}
+                              disabled={diariaSomenteLeitura}
+                              placeholder="Digite a origem da volta"
+                              className="w-full px-3 py-2"
+                              style={{
+                                backgroundColor: 'transparent',
+                                border: '1px solid var(--border)',
+                                borderRadius: 'var(--radius)',
+                                color: 'var(--foreground)',
+                                fontSize: 'var(--text-sm)',
+                              }}
+                            />
+                          ) : (
+                            <Dropdown
                             value={destino}
-                            onChange={(event) => setDestino(event.target.value)}
+                            onChange={alterarDestino}
+                            placeholder="Selecione a origem da volta"
                             disabled={diariaSomenteLeitura}
-                            placeholder="Digite o destino"
-                            className="w-full px-3 py-2"
-                            style={{
-                              backgroundColor: 'transparent',
-                              border: '1px solid var(--border)',
-                              borderRadius: 'var(--radius)',
-                              color: 'var(--foreground)',
-                              fontSize: 'var(--text-sm)',
-                            }}
-                          />
-                        ) : (
+                            options={destinosDiaria.map((item) => ({ value: item.value, label: item.label }))}
+                            />
+                          )}
+                        </div>
+                      </label>
+                      <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        Destino
+                        <div className="mt-2">
                           <Dropdown
-                          value={destino}
-                          onChange={alterarDestino}
-                          placeholder="Selecione o destino"
+                          value={origem}
+                          onChange={setOrigem}
+                          placeholder="Selecione o destino da volta"
                           disabled={diariaSomenteLeitura}
-                          options={destinosDiaria.map((item) => ({ value: item.value, label: item.label }))}
+                          showSelectedIcon={false}
+                          options={origensDiaria.map((localidade) => ({ value: localidade, label: localidade }))}
                           />
-                        )}
-                      </div>
-                    </label>
-                    <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                      Data de Chegada
-                      <input
-                        type="date"
-                        value={chegadaData}
-                        onChange={(event) => setChegada((current) => combinarDataHora(current, event.target.value, 'data'))}
-                        disabled={diariaSomenteLeitura}
-                        className="mt-2 w-full px-3 py-2"
-                        style={{
-                          backgroundColor: 'transparent',
-                          border: '1px solid var(--border)',
-                          borderRadius: 'var(--radius)',
-                          color: 'var(--foreground)',
-                          fontSize: 'var(--text-sm)',
-                        }}
-                      />
-                    </label>
-                    <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                      Horário
-                      <input
-                        type="time"
-                        step="1"
-                        value={chegadaHorario}
-                        onChange={(event) => setChegada((current) => combinarDataHora(current, event.target.value, 'hora'))}
-                        disabled={diariaSomenteLeitura}
-                        className="mt-2 w-full px-3 py-2"
-                        style={{
-                          backgroundColor: 'transparent',
-                          border: '1px solid var(--border)',
-                          borderRadius: 'var(--radius)',
-                          color: 'var(--foreground)',
-                          fontSize: 'var(--text-sm)',
-                        }}
-                      />
-                    </label>
+                        </div>
+                      </label>
+                      <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        Data da Volta
+                        <input
+                          type="date"
+                          value={chegadaData}
+                          onChange={(event) => setChegada((current) => combinarDataHora(current, event.target.value, 'data'))}
+                          disabled={diariaSomenteLeitura}
+                          className="mt-2 w-full px-3 py-2"
+                          style={{
+                            backgroundColor: 'transparent',
+                            border: '1px solid var(--border)',
+                            borderRadius: 'var(--radius)',
+                            color: 'var(--foreground)',
+                            fontSize: 'var(--text-sm)',
+                          }}
+                        />
+                      </label>
+                      <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        Horário
+                        <input
+                          type="time"
+                          step="1"
+                          value={chegadaHorario}
+                          onChange={(event) => setChegada((current) => combinarDataHora(current, event.target.value, 'hora'))}
+                          disabled={diariaSomenteLeitura}
+                          className="mt-2 w-full px-3 py-2"
+                          style={{
+                            backgroundColor: 'transparent',
+                            border: '1px solid var(--border)',
+                            borderRadius: 'var(--radius)',
+                            color: 'var(--foreground)',
+                            fontSize: 'var(--text-sm)',
+                          }}
+                        />
+                      </label>
+                    </div>
                   </div>
 
                   {!solicitacaoDetalheId && (

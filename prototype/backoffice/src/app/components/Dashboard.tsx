@@ -31,7 +31,7 @@ type Contrast = 'normal' | 'high' | 'maximum';
 type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
 type Language = 'pt' | 'en' | 'es';
 type NotificationTab = 'avisos' | 'editais';
-type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal' | 'calendario-folha';
+type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'fomento' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal' | 'calendario-folha';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
 type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outro Projeto Exemplo' | 'Mais um Projeto Exemplo';
@@ -375,6 +375,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             {([
               { key: 'parceria' as ActivePage, Icon: Handshake, label: 'Parceria' },
               { key: 'programa' as ActivePage, Icon: FolderOpen, label: 'Programa' },
+              { key: 'fomento' as ActivePage, Icon: BookOpen, label: 'Fomento' },
               { key: 'editais' as ActivePage, Icon: FileText, label: 'Captação' },
               { key: 'iniciativas' as ActivePage, Icon: FolderOpen, label: 'Projetos' },
             ]).map(({ key, Icon, label }, index) => {
@@ -1712,8 +1713,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <Iniciativas />
         ) : activePage === 'rubricas' ? (
           <Rubricas />
+        ) : activePage === 'fomento' ? (
+          <Editais kind="fomento" />
         ) : activePage === 'editais' ? (
-          <Editais />
+          <Editais kind="captacao" />
         ) : activePage === 'editais-light' ? (
           <EditaisLight />
         ) : activePage === 'configuracoes' ? (

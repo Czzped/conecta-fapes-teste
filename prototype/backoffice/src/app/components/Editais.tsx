@@ -142,10 +142,15 @@ const SelectField: React.FC<{
 interface EditaisProps {
   isFormularioMode?: boolean;
   onBack?: () => void;
+  kind?: 'captacao' | 'fomento';
 }
 
-export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBack }) => {
+export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBack, kind = 'captacao' }) => {
   const { T } = useThemeTokens();
+  const isFomento = kind === 'fomento';
+  const moduleLabel = isFomento ? 'Fomento' : 'Captação';
+  const modulePlural = isFomento ? 'fomentos' : 'captações';
+  const createLabel = isFomento ? 'Criar Fomento' : 'Criar Captação';
   const [searchTerm, setSearchTerm] = useState('');
   const [dataFilter, setDataFilter] = useState('');
   const [areaFilter, setAreaFilter] = useState<AreaFilter>('Todas');
@@ -252,7 +257,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
 
   if (showCriarEdital) {
     return (
-      <FormularioEdital onBack={() => setShowCriarEdital(false)} />
+      <FormularioEdital onBack={() => setShowCriarEdital(false)} scope={kind} />
     );
   }
 
@@ -647,15 +652,15 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               </div>
               <div style={{ flex: 1, marginTop: '6px' }}>
                 <h1 className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: T.textPrimary, lineHeight: '1.5' }}>
-                  Captação
+                  {moduleLabel}
                 </h1>
                 <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0, lineHeight: '1.5' }}>
-                  Acompanhe as configurações e instâncias de captação
+                  Acompanhe as configurações e instâncias de {modulePlural}
                 </p>
               </div>
             </div>
 
-            {/* Botão Nova Captação */}
+            {/* Botão Nova Captação/Fomento */}
             <button
               onClick={() => setShowCriarEdital(true)}
               style={{
@@ -670,7 +675,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#00c1af'; }}
             >
               <Plus size={16} />
-              Criar Captação
+              {createLabel}
             </button>
           </div>
           <div className="mt-6" style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle }} />
@@ -683,7 +688,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               <div style={{ backgroundColor: T.accentSoft, borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <ClipboardList size={18} style={{ color: T.accent }} />
               </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Total de captações</span>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Total de {modulePlural}</span>
             </div>
             <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>10</div>
           </div>
@@ -724,7 +729,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
           <div style={{ display: 'flex', gap: '0' }}>
             {(['captacoes', 'dashboard'] as ActiveTab[]).map((tab) => {
               const isActive = activeTab === tab;
-              const label = tab === 'dashboard' ? 'Dashboard' : 'Captações';
+              const label = tab === 'dashboard' ? 'Dashboard' : isFomento ? 'Fomentos' : 'Captações';
               return (
                 <button
                   key={tab}

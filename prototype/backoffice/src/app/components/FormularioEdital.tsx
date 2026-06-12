@@ -223,6 +223,7 @@ const InnerCard: React.FC<{ title: string; children: React.ReactNode }> = ({ tit
 interface Props {
   onBack: () => void;
   mode?: 'create' | 'edit';
+  scope?: 'captacao' | 'fomento';
 }
 
 interface Bolsa {
@@ -361,9 +362,15 @@ const DocCheckRow: React.FC<{ label: string; checked: boolean; onToggle: () => v
 /* ═══════════════════════════════════════════════════════════
    Main Component
 ═══════════════════════════════════════════════════════════ */
-export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) => {
+export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', scope = 'captacao' }) => {
   const { T } = useThemeTokens();
   const isEditMode = mode === 'edit';
+  const isFomento = scope === 'fomento';
+  const moduleLabel = isFomento ? 'Fomento' : 'Captação';
+  const createTitle = isEditMode ? `Editar ${moduleLabel}` : `Criar ${moduleLabel}`;
+  const [statusFomento, setStatusFomento] = useState(isEditMode ? 'aprovado' : '');
+  const [resultadoEsperado, setResultadoEsperado] = useState('');
+  const [eixoEstrategico, setEixoEstrategico] = useState('');
 
   /* ── Section 1 ── */
   const [tipoCaptacao, setTipoCaptacao] = useState(isEditMode ? 'chamada_publica' : '');
@@ -822,6 +829,321 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  const pageShell = (children: React.ReactNode) => (
+    <div
+      style={{
+        backgroundColor: T.bgPage,
+        minHeight: '100vh',
+        '--form-card-bg': T.bgCard,
+        '--form-inner-card-bg': T.bgSurfaceMuted,
+        '--form-input-bg': T.bgInput,
+        '--form-border': T.borderDefault,
+        '--form-divider': T.borderSubtle,
+        '--form-text-primary': T.textPrimary,
+        '--form-text-secondary': T.textSecondary,
+        '--form-text-muted': T.textMuted,
+      } as React.CSSProperties}
+    >
+      <div style={{ padding: '32px 32px 80px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
+          <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)' }}>
+            {moduleLabel}
+          </button>
+          <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
+          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-primary)', fontWeight: 'var(--font-weight-medium)' }}>
+            {createTitle}
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '8px' }}>
+          <div style={{ width: '36px', height: '36px', borderRadius: 'var(--radius)', backgroundColor: 'rgba(0,193,175,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <BookOpen size={18} style={{ color: '#00c1af' }} />
+          </div>
+          <div>
+            <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--form-text-primary)', margin: '0 0 4px' }}>
+              {createTitle}
+            </h1>
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>
+              Configure as informações principais de {moduleLabel.toLowerCase()}.
+            </p>
+          </div>
+        </div>
+
+        <div style={divider} />
+        {children}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '28px' }}>
+          <button type="button" onClick={onBack} style={{ padding: '11px 20px', backgroundColor: 'transparent', border: '1px solid var(--form-border)', borderRadius: 'var(--radius)', color: 'var(--form-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}>
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!isFomento && !cronogramaCompleto) {
+                toast.error(`Inclua um card para cada etapa obrigatória do cronograma: ${etapasCronogramaFaltantes.map(fase => fase.label).join(', ')}.`);
+                return;
+              }
+              toast.success(`${moduleLabel} salvo com sucesso.`);
+              onBack();
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '11px 20px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}
+          >
+            <Save size={16} />
+            Salvar {moduleLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderFinanceiroFomento = () => (
+    <div style={sectionCard}>
+      <SectionHeader num="2" title="Financeiro" subtitle="Configure aportes financeiros e faixas de financiamento" />
+      <InnerCard title="Aportes Financeiros da Captação">
+        <div style={{ display: 'grid', gap: '16px' }}>
+          {aportesFinanceiros.map((aporte, index) => {
+            const origemOpts = aporte.origemTipo === 'programa' ? programaOpts : parceriasData;
+            return (
+              <div key={aporte.id} style={{ display: 'grid', gridTemplateColumns: '180px 1fr 180px auto', gap: '14px', alignItems: 'end' }}>
+                <SelectField
+                  label={index === 0 ? 'Origem' : undefined}
+                  value={aporte.origemTipo}
+                  onChange={value => updateAporteFinanceiro(aporte.id, 'origemTipo', value as 'programa' | 'parceria')}
+                  options={[{ value: 'programa', label: 'Programa' }, { value: 'parceria', label: 'Parceria' }]}
+                />
+                <SelectField
+                  label={index === 0 ? 'Programa ou parceria' : undefined}
+                  value={aporte.origemId}
+                  onChange={value => updateAporteFinanceiro(aporte.id, 'origemId', value)}
+                  placeholder="Selecione..."
+                  options={origemOpts}
+                />
+                <div>
+                  {index === 0 && <label style={labelStyle}>Valor</label>}
+                  <input type="text" placeholder="R$ 0,00" value={aporte.valor} onChange={e => updateAporteFinanceiro(aporte.id, 'valor', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
+                </div>
+                {aportesFinanceiros.length > 1 && (
+                  <button type="button" onClick={() => removeAporteFinanceiro(aporte.id)} style={{ padding: '10px', backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer' }}>
+                    <Trash2 size={16} style={{ color: '#ef4444' }} />
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px' }}>
+          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af' }}>Total aportado: {formatCurrency(valorTotalAportado)}</span>
+          <button type="button" onClick={addAporteFinanceiro} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', backgroundColor: 'rgba(0,193,175,0.1)', border: '1px solid rgba(0,193,175,0.3)', borderRadius: 'var(--radius)', color: '#00c1af', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}>
+            <Plus size={16} /> Adicionar Aporte
+          </button>
+        </div>
+      </InnerCard>
+
+      <div style={{ height: '18px' }} />
+
+      <InnerCard title="Faixas de Financiamento">
+        <div style={{ display: 'grid', gap: '16px' }}>
+          {faixas.map((faixa, index) => (
+            <div key={faixa.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '14px', alignItems: 'end' }}>
+              <div>
+                {index === 0 && <label style={labelStyle}>Duração máxima</label>}
+                <input type="number" placeholder="Meses" value={faixa.duracao} onChange={e => updateFaixa(faixa.id, 'duracao', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
+              </div>
+              <div>
+                {index === 0 && <label style={labelStyle}>Valor mínimo</label>}
+                <input type="text" placeholder="R$ 0,00" value={faixa.valorMin} onChange={e => updateFaixa(faixa.id, 'valorMin', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
+              </div>
+              <div>
+                {index === 0 && <label style={labelStyle}>Valor máximo</label>}
+                <input type="text" placeholder="R$ 0,00" value={faixa.valorMax} onChange={e => updateFaixa(faixa.id, 'valorMax', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
+              </div>
+              <div>
+                {index === 0 && <label style={labelStyle}>Valor aportado</label>}
+                <input type="text" placeholder="R$ 0,00" value={faixa.valorAportado} onChange={e => updateFaixa(faixa.id, 'valorAportado', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
+              </div>
+              {faixas.length > 1 && (
+                <button type="button" onClick={() => removeFaixa(faixa.id)} style={{ padding: '10px', backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer' }}>
+                  <Trash2 size={16} style={{ color: '#ef4444' }} />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px' }}>
+          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af' }}>Aportado nas faixas: {formatCurrency(valorTotalFaixas)}</span>
+          <button type="button" onClick={addFaixa} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', backgroundColor: 'rgba(0,193,175,0.1)', border: '1px solid rgba(0,193,175,0.3)', borderRadius: 'var(--radius)', color: '#00c1af', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}>
+            <Plus size={16} /> Adicionar Faixa
+          </button>
+        </div>
+      </InnerCard>
+    </div>
+  );
+
+  const renderCronogramaCaptacao = () => (
+    <div style={sectionCard}>
+      <SectionHeader num="1" title="Cronograma da Captação" subtitle="Configure as fases obrigatórias da captação" />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
+        <div>
+          <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 6px' }}>Etapas do Cronograma</p>
+          <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>Adicione um card para cada etapa obrigatória da captação.</p>
+        </div>
+        <button type="button" onClick={addEtapaCronograma} disabled={cronogramaCompleto} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', backgroundColor: cronogramaCompleto ? 'rgba(255,255,255,0.06)' : 'rgba(0,193,175,0.1)', border: `1px solid ${cronogramaCompleto ? 'rgba(255,255,255,0.12)' : 'rgba(0,193,175,0.3)'}`, borderRadius: 'var(--radius)', cursor: cronogramaCompleto ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: cronogramaCompleto ? 'rgba(255,255,255,0.4)' : '#00c1af' }}>
+          <Plus size={16} /> Adicionar Etapa
+        </button>
+      </div>
+
+      {!cronogramaCompleto && (
+        <div style={{ padding: '12px 14px', borderRadius: 'var(--radius)', border: '1px solid rgba(0,193,175,0.24)', backgroundColor: 'rgba(0,193,175,0.08)', marginBottom: '18px' }}>
+          <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', margin: 0 }}>
+            Faltam etapas obrigatórias: {etapasCronogramaFaltantes.map(fase => fase.label).join(', ')}.
+          </p>
+        </div>
+      )}
+
+      <div style={{ display: 'grid', gap: '16px' }}>
+        {cronogramaCaptacao.map((etapa, index) => {
+          const faseSelecionada = fasesCronograma.find(fase => fase.key === etapa.tipo);
+          return (
+            <div key={etapa.id} style={{ ...innerCardStyle, padding: '18px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: 0 }}>Etapa {index + 1}</p>
+                <button type="button" onClick={() => removeEtapaCronograma(etapa.id)} style={{ padding: '8px', backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer', display: 'flex' }}>
+                  <Trash2 size={15} style={{ color: '#ef4444' }} />
+                </button>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: '16px', alignItems: 'end' }}>
+                <SelectField label="Etapa obrigatória" value={etapa.tipo} onChange={value => updateCronograma(etapa.id, 'tipo', value)} placeholder="Selecione a etapa..." options={fasesCronograma.filter(fase => fase.key === etapa.tipo || !cronogramaCaptacao.some(item => item.tipo === fase.key)).map(fase => ({ value: fase.key, label: fase.label }))} />
+                <div>
+                  <label style={labelStyle}>{faseSelecionada?.periodo ? 'Data inicial' : 'Data'}</label>
+                  <input type="date" value={etapa.inicio} onChange={e => updateCronograma(etapa.id, 'inicio', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
+                </div>
+                <div style={{ opacity: faseSelecionada?.periodo ? 1 : 0.35 }}>
+                  <label style={labelStyle}>Data final</label>
+                  <input type="date" value={etapa.fim} onChange={e => updateCronograma(etapa.id, 'fim', e.target.value)} style={inputStyle} disabled={!faseSelecionada?.periodo} onFocus={focusTeal} onBlur={blurGray} />
+                </div>
+              </div>
+              <div style={{ ...divider, margin: '18px 0' }} />
+              <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr auto', gap: '16px', alignItems: 'end' }}>
+                <div>
+                  <label style={labelStyle}>Adiar por dias</label>
+                  <input type="number" min="1" placeholder="Ex: 7" value={diasAdiamentoPorEtapa[etapa.id] || ''} onChange={e => setDiasAdiamentoPorEtapa(p => ({ ...p, [etapa.id]: e.target.value }))} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Justificativa do adiamento</label>
+                  <input type="text" placeholder="Informe o motivo do adiamento..." value={justificativaAdiamentoPorEtapa[etapa.id] || ''} onChange={e => setJustificativaAdiamentoPorEtapa(p => ({ ...p, [etapa.id]: e.target.value }))} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
+                </div>
+                <button type="button" onClick={() => aplicarAdiamentoCronograma(etapa)} style={{ padding: '11px 16px', backgroundColor: 'rgba(0,193,175,0.1)', border: '1px solid rgba(0,193,175,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#00c1af', whiteSpace: 'nowrap' }}>
+                  Aplicar adiamento
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  if (isFomento) {
+    return pageShell(
+      <>
+        <div style={sectionCard}>
+          <SectionHeader num="1" title="Identificação do Fomento" subtitle="Informações básicas do fomento" />
+          <div style={{ display: 'grid', gridTemplateColumns: '0.7fr 1.5fr 1fr', gap: '20px', marginBottom: '20px' }}>
+            <div><label style={labelStyle}>Código</label><input type="text" placeholder="Ex: FOM-2026-001" value={numeroCaptacao} onChange={e => setNumeroCaptacao(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} /></div>
+            <div><label style={labelStyle}>Título</label><input type="text" placeholder="Digite o título do fomento" value={tituloCaptacao} onChange={e => setTituloCaptacao(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} /></div>
+            <SelectField label="Status" value={statusFomento} onChange={setStatusFomento} placeholder="Selecione..." options={[
+              { value: 'em_elaboracao', label: 'Em Elaboração' },
+              { value: 'aprovado', label: 'Aprovado' },
+              { value: 'interrompido', label: 'Interrompido' },
+              { value: 'encerrado', label: 'Encerrado' },
+              { value: 'concluido', label: 'Concluído' },
+            ]} />
+          </div>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={labelStyle}>Descrição</label>
+            <textarea placeholder="Descreva o fomento" value={descricaoCaptacao} onChange={e => setDescricaoCaptacao(e.target.value)} style={{ ...inputStyle, minHeight: '96px', resize: 'vertical' }} onFocus={focusTeal} onBlur={blurGray} />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '20px', marginBottom: '20px' }}>
+            <div><label style={labelStyle}>Data de Início</label><input type="date" value={dataInicio} onChange={e => setDataInicio(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} /></div>
+            <div><label style={labelStyle}>Data de Fim</label><input type="date" value={dataFim} onChange={e => setDataFim(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} /></div>
+          </div>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={labelStyle}>Resultado Esperado</label>
+            <textarea placeholder="Informe o resultado esperado" value={resultadoEsperado} onChange={e => setResultadoEsperado(e.target.value)} style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }} onFocus={focusTeal} onBlur={blurGray} />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '20px' }}>
+            <SelectField label="Área Técnica Responsável" value={setorResponsavel} onChange={setSetorResponsavel} placeholder="Selecione..." options={setorResponsavelOpts} />
+            <div><label style={labelStyle}>Eixo Estratégico</label><input type="text" placeholder="Digite o eixo estratégico" value={eixoEstrategico} onChange={e => setEixoEstrategico(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} /></div>
+          </div>
+        </div>
+
+        {renderFinanceiroFomento()}
+
+        <div style={sectionCard}>
+          <SectionHeader num="3" title="Parametrizações Gerais e Requisitos" subtitle="Defina regras de submissão e critérios de elegibilidade" />
+          {[
+            { key: 'multiplas', label: 'Permitir múltiplas propostas por proponente' },
+            { key: 'coordenadorOutro', label: 'Coordenador pode ter outro projeto ou proposta ativa' },
+            { key: 'coordenadorBolsa', label: 'Coordenador pode acumular bolsa' },
+            { key: 'apenasEscolhidos', label: 'Apenas proponentes escolhidos podem submeter proposta' },
+          ].map(item => (
+            <div key={item.key} style={{ padding: '13px 0' }}>
+              <CheckboxField label={item.label} checked={regrasParticipacao[item.key as keyof typeof regrasParticipacao]} onChange={() => toggleParticipacao(item.key as keyof typeof regrasParticipacao)} />
+            </div>
+          ))}
+          <div style={divider} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '20px' }}>
+            <SelectField label="Direcionamento das propostas" value={direcionamentoProposta} onChange={setDirecionamentoProposta} options={[
+              { value: 'aberta', label: 'Aberta' },
+              { value: 'instituicao', label: 'Instituição específica' },
+              { value: 'tipo_instituicao', label: 'Tipo de instituição' },
+            ]} />
+            <SelectField label="Nível acadêmico mínimo exigido" value={nivelAcademico} onChange={setNivelAcademico} placeholder="Selecione..." options={nivelAcademicoOpts} />
+          </div>
+        </div>
+
+        <div style={sectionCard}>
+          <SectionHeader num="4" title="Rubricas" subtitle="Configure rubricas e sub-rubricas permitidas" />
+          <div style={{ display: 'grid', gap: '10px' }}>
+            {rubricasPermitidasData.map(item => {
+              const checked = Boolean(rubricas[item.key]);
+              return (
+                <div key={item.key} style={{ padding: '14px 16px', border: `1px solid ${checked ? 'rgba(0,193,175,0.35)' : 'rgba(255,255,255,0.12)'}`, borderRadius: 'var(--radius)', backgroundColor: checked ? 'rgba(0,193,175,0.08)' : 'rgba(23,23,23,0.35)' }}>
+                  <CheckboxField label={item.label} checked={checked} onChange={() => toggleRubrica(item.key)} />
+                  {checked && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px', marginTop: '12px', paddingLeft: '28px' }}>
+                      {item.subRubricas.map(sub => <CheckboxField key={sub.key} label={sub.label} checked={Boolean(subRubricas[sub.key])} onChange={() => toggleSubRubrica(sub.key)} />)}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={sectionCard}>
+          <SectionHeader num="5" title="Documentos Exigidos do Proponente" subtitle="Selecione documentos exigidos para submissão" />
+          <div style={{ display: 'grid', gap: '12px' }}>
+            {[
+              { key: 'contratoSocial', label: 'Contrato social ou estatuto' },
+              { key: 'balancoPatrimonial', label: 'Balanço patrimonial' },
+              { key: 'certidaoRegularidadeFiscal', label: 'Certidões de regularidade fiscal' },
+              { key: 'comprovanteRepresentanteLegal', label: 'Comprovante do representante legal' },
+              { key: 'declaracaoCapacidadeTecnica', label: 'Declaração de capacidade técnica' },
+            ].map(item => (
+              <div key={item.key} style={{ padding: '13px 0' }}>
+                <CheckboxField label={item.label} checked={Boolean(docsSubmissao[item.key])} onChange={() => toggleDocSubmissao(item.key)} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (!isFomento) {
+    return pageShell(renderCronogramaCaptacao());
+  }
+
   return (
     <div
       style={{
@@ -842,11 +1164,11 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
         {/* Breadcrumb */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
           <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)' }}>
-            Captação
+            {moduleLabel}
           </button>
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
           <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-primary)', fontWeight: 'var(--font-weight-medium)' }}>
-            {isEditMode ? 'Editar Captação' : 'Criar Captação'}
+            {createTitle}
           </span>
         </div>
 
@@ -857,10 +1179,10 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create' }) =
           </div>
           <div>
             <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 4px' }}>
-              {isEditMode ? 'Editar Captação' : 'Criar Captação'}
+              {createTitle}
             </h1>
             <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>
-              {isEditMode ? 'Edite a configuração da captação usando os mesmos controles do cadastro.' : 'Crie e configure uma nova chamada para projetos.'}
+              {isEditMode ? `Edite a configuração do ${moduleLabel.toLowerCase()} usando os mesmos controles do cadastro.` : isFomento ? 'Crie e configure um novo fomento.' : 'Crie e configure o cronograma da captação.'}
             </p>
           </div>
         </div>
