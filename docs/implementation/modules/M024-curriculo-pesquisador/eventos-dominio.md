@@ -1,6 +1,6 @@
 # Eventos de Dominio — M024 Curriculo do Pesquisador
 
-Referencia de dominio e regras: [README.md](README.md) | [Modelo Estrutural](modelo-estrutural.md) | [Adapter Lattes (M023)](../M023-integracoes/lattes/adapter.md)
+Referencia de dominio e regras: [README.md](README.md) | [Modelo Estrutural](modelo-estrutural.md) | [Adapter Lattes (M023)](../M023-integracoes/lattes/adapter.md) | [Catalogo de Eventos de Notificacao (M020)](../M020-comunicacao/notificacoes/catalogo-eventos.md)
 
 M024 opera de forma **sincrona** com o adapter [M023/lattes](../M023-integracoes/lattes/README.md): a chamada ao adapter retorna um snapshot academico normalizado ou um erro. M024 persiste esse snapshot em transacao propria. **Nao ha eventos assincronos consumidos do adapter** -- erros do adapter sao propagados em-linha como excecao/codigo de erro HTTP `502 ADAPTER_LATTES_FALHOU`.
 

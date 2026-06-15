@@ -5,30 +5,45 @@ imports:
     path: path: "../../../ontology/shared/base.yaml"
 metadata:
   module: "M020"
-  source: "stub — no modelo-estrutural.md available"
-  version: "1.0.0"
-  description: "Comunicacao com usuarios. Gerencia notificacoes, emails e alertas disparados por eventos de outros modulos (M003, M009, M012, M014)."
-  todo: "Complete when modelo-estrutural.md is created"
+  source: "modelo-estrutural.md + contrato.md + notificacoes/catalogo-eventos.md"
+  version: "1.1.0"
+  description: "Comunicacao com usuarios. Servico transversal que consome eventos de negocio dos demais modulos e gera notificacoes, emails, comunicados em massa e lembretes de prazo."
+  todo: "Completar entities/relationships/invariants a partir de modelo-estrutural.md."
 entities:
-  todo: "Define when modelo-estrutural.md is available"
+  todo: "Define from modelo-estrutural.md (Notificacao, TemplateNotificacao, HistoricoEnvio, ComunicadoMassa, LembretePrazo)."
 relationships:
-  todo: "Define when modelo-estrutural.md is available"
+  todo: "Define from modelo-estrutural.md."
 axioms:
-  todo: "Define when modelo-estrutural.md is available"
+  todo: "Define from modelo-estrutural.md."
 invariants:
-  todo: "Define when modelo-estrutural.md is available"
-enums: {}
+  todo: "Define from modelo-estrutural.md."
+enums:
+  TipoNotificacao:
+    values: [MUDANCA_STATUS, LEMBRETE_PRAZO, SOLICITACAO_APROVACAO, PAGAMENTO, COMUNICADO, ALERTA]
+  EstadoNotificacao:
+    values: [PENDENTE, ENVIADA, ENTREGUE, FALHA, REENVIO]
+  EstadoComunicado:
+    values: [AGUARDANDO_APROVACAO, APROVADO, REJEITADO, EM_ENVIO, ENVIADO]
 value_objects: {}
 events:
-  todo: "Define when modelo-estrutural.md is available"
+  emitted:
+    note: "Nenhum evento emitido foi estabilizado como interface publica (ver contrato.md)."
+  consumed:
+    note: >-
+      M020 consome eventos de negocio de outros modulos via
+      ReceberEventoDeNegocioParaNotificacao, identificados por eventoOrigem +
+      moduloOrigem. Catalogo consolidado em notificacoes/catalogo-eventos.md.
+    source_modules: [M003, M004, M009, M012, M014, M015, M016, M017, M019, M024]
+    catalog: "notificacoes/catalogo-eventos.md"
 workflows:
-  todo: "Define when modelo-estrutural.md is available"
+  todo: "Define from modelo-comportamental.md (ciclo de vida da Notificacao)."
 policies:
-  todo: "Define when modelo-estrutural.md is available"
+  todo: "Define from README.md regras RN01-RN09."
 
 agent_instructions:
   rules:
-    - "Este módulo é stub. Não gerar implementações sem modelo-estrutural.md."
+    - "modelo-estrutural.md disponivel. enums e eventos consumidos preenchidos; entities/relationships/invariants pendentes."
+    - "Eventos consumidos: ver notificacoes/catalogo-eventos.md (fonte unica do mapeamento evento->notificacao)."
     - "Consultar arquitetura em docs/architecture/02-modulos-e-integracoes.md."
   notes:
     - "Comunicação com usuários."
