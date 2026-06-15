@@ -104,6 +104,7 @@ const PROJECT_ITEM_GIT_FLOW_CONTEXT_QUERY = `
             title
           }
           ... on Issue {
+            id
             title
             number
             repository {
@@ -383,6 +384,7 @@ interface ProjectItemQueryResult {
 
 interface ProjectItemGitFlowContentNode {
   __typename: "DraftIssue" | "Issue" | "PullRequest";
+  id?: string | null;
   title?: string | null;
   number?: number | null;
   repository?: { name?: string | null } | null;
@@ -729,6 +731,7 @@ export class GitHubProjectRepository {
     return {
       title: content?.title ?? null,
       repositoryName: repositoryFromField ?? repositoryFromIssue,
+      issueId: content?.__typename === "Issue" ? content.id ?? null : null,
       issueNumber: content?.__typename === "Issue" ? content.number ?? null : null,
     };
   }

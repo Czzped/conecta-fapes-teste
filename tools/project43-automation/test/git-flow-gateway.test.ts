@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { GitFlowGateway } from "../src/github/git-flow-gateway.js";
+import { GitHubGraphqlClient } from "../src/github/github-graphql-client.js";
 import { GitHubRestClient } from "../src/github/github-rest-client.js";
 
 const originalFetch = globalThis.fetch;
@@ -42,6 +43,14 @@ function buildGateway(): GitFlowGateway {
   return new GitFlowGateway(new GitHubRestClient("token", "test", { retryDelayMs: 0 }), "leds-conectafapes");
 }
 
+function buildLinkedBranchGateway(): GitFlowGateway {
+  return new GitFlowGateway(
+    new GitHubRestClient("token", "test", { retryDelayMs: 0 }),
+    "leds-conectafapes",
+    new GitHubGraphqlClient("token", "test", { maxRetries: 0, retryDelayMs: 0 })
+  );
+}
+
 test("createBranch reads base sha and posts a new ref", async () => {
   const calls = installFetch((call) => {
     if (call.method === "GET" && call.url.includes("/git/ref/heads/release/v1.2")) {
@@ -66,6 +75,109 @@ test("createBranch reads base sha and posts a new ref", async () => {
   assert.equal(result.status, "created");
   const post = calls.find((call) => call.method === "POST");
   assert.deepEqual(post?.body, { ref: "refs/heads/release/v1.2", sha: "base-sha" });
+});
+
+test("createBranch uses createLinkedBranch when an issue id is available", async () => {
+  const calls = installFetch((call) => {
+    if (call.method === "GET" && call.url.includes("/git/ref/heads/feature/42-cadastro")) {
+      return json({ message: "Not Found" }, 404);
+    }
+    if (call.method === "GET" && call.url.includes("/git/ref/heads/develop")) {
+      return json({ object: { sha: "base-sha" } });
+    }
+    if (call.method === "GET" && call.url.endsWith("/repos/leds-conectafapes/leds-conectafapes-backend-admin")) {
+      return json({ node_id: "REPO_node_id" });
+    }
+    if (call.method === "POST" && call.url.endsWith("/graphql")) {
+      return json({
+        data: {
+          createLinkedBranch: {
+            linkedBranch: {
+              id: "LINKED_BRANCH_node_id",
+              ref: { name: "feature/42-cadastro" },
+            },
+          },
+        },
+      });
+    }
+    throw new Error(`unexpected call ${call.method} ${call.url}`);
+  });
+
+  const result = await buildLinkedBranchGateway().createBranch({
+    type: "create_branch",
+    repo: "leds-conectafapes-backend-admin",
+    branch: "feature/42-cadastro",
+    baseBranch: "develop",
+    issueId: "ISSUE_node_id",
+  });
+
+  assert.equal(result.status, "created");
+  assert.equal(result.detail, "feature/42-cadastro");
+  assert.equal(calls.some((call) => call.method === "POST" && call.url.endsWith("/git/refs")), false);
+  const graphqlPost = calls.find((call) => call.method === "POST" && call.url.endsWith("/graphql"));
+  assert.match(String((graphqlPost?.body as { query?: string } | undefined)?.query), /createLinkedBranch/);
+  assert.deepEqual((graphqlPost?.body as { variables?: unknown } | undefined)?.variables, {
+    issueId: "ISSUE_node_id",
+    repositoryId: "REPO_node_id",
+    oid: "base-sha",
+    name: "feature/42-cadastro",
+  });
+});
+
+test("createBranch keeps the REST ref fallback when there is no issue id", async () => {
+  const calls = installFetch((call) => {
+    if (call.method === "GET" && call.url.includes("/git/ref/heads/feature/no-issue")) {
+      return json({ message: "Not Found" }, 404);
+    }
+    if (call.method === "GET" && call.url.includes("/git/ref/heads/develop")) {
+      return json({ object: { sha: "base-sha" } });
+    }
+    if (call.method === "POST" && call.url.endsWith("/git/refs")) {
+      return json({ ref: "refs/heads/feature/no-issue" }, 201);
+    }
+    throw new Error(`unexpected call ${call.method} ${call.url}`);
+  });
+
+  const result = await buildLinkedBranchGateway().createBranch({
+    type: "create_branch",
+    repo: "leds-conectafapes-backend-admin",
+    branch: "feature/no-issue",
+    baseBranch: "develop",
+    issueId: null,
+  });
+
+  assert.equal(result.status, "created");
+  assert.equal(calls.some((call) => call.method === "POST" && call.url.endsWith("/graphql")), false);
+  assert.equal(calls.some((call) => call.method === "POST" && call.url.endsWith("/git/refs")), true);
+});
+
+test("createBranch treats duplicate linked-branch errors as idempotent", async () => {
+  installFetch((call) => {
+    if (call.method === "GET" && call.url.includes("/git/ref/heads/feature/42-cadastro")) {
+      return json({ message: "Not Found" }, 404);
+    }
+    if (call.method === "GET" && call.url.includes("/git/ref/heads/develop")) {
+      return json({ object: { sha: "base-sha" } });
+    }
+    if (call.method === "GET" && call.url.endsWith("/repos/leds-conectafapes/leds-conectafapes-backend-admin")) {
+      return json({ node_id: "REPO_node_id" });
+    }
+    if (call.method === "POST" && call.url.endsWith("/graphql")) {
+      return json({ errors: [{ message: "Name already exists" }] });
+    }
+    throw new Error(`unexpected call ${call.method} ${call.url}`);
+  });
+
+  const result = await buildLinkedBranchGateway().createBranch({
+    type: "create_branch",
+    repo: "leds-conectafapes-backend-admin",
+    branch: "feature/42-cadastro",
+    baseBranch: "develop",
+    issueId: "ISSUE_node_id",
+  });
+
+  assert.equal(result.status, "already_exists");
+  assert.match(result.detail ?? "", /Name already exists/);
 });
 
 test("createBranch is idempotent when the branch already exists", async () => {

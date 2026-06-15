@@ -10,6 +10,8 @@ export interface BranchPlanInput {
   statusName: string | null;
   /** Nome do repositorio (puro ou `org/repo`), quando identificavel. */
   repositoryName: string | null;
+  /** Issue node ID do card do Project, quando existir. */
+  issueId?: string | null;
   issueNumber?: number | null;
   title?: string | null;
   /** Prefixo do branch de trabalho, default `feature/`. */
@@ -53,8 +55,8 @@ function buildBranchName(
 }
 
 /**
- * Decide se um branch deve ser criado quando uma demanda entra em
- * "Pronto para desenvolvimento".
+ * Decide se um branch deve ser criado quando uma demanda entra no status
+ * configurado como gatilho de desenvolvimento (hoje "In Progress").
  *
  * - status diferente do configurado -> `ignored` (nada a fazer);
  * - repositorio nao reconhecido/ausente -> `needs_review` (nao cria branch as
@@ -86,6 +88,7 @@ export function planBranchCreation(
       repo: repo.name,
       branch,
       baseBranch: repo.developBranch,
+      issueId: input.issueId ?? null,
     },
   };
 }

@@ -19,6 +19,7 @@ test("reads repository, issue number and title from Project item issue content",
             node: {
               content: {
                 __typename: "Issue",
+                id: "ISSUE_node_id",
                 title: "Implementar login do cidadão",
                 number: 2090,
                 repository: { name: "leds-conectafapes-backend-admin" },
@@ -39,6 +40,7 @@ test("reads repository, issue number and title from Project item issue content",
   assert.deepEqual(context, {
     title: "Implementar login do cidadão",
     repositoryName: "leds-conectafapes-backend-admin",
+    issueId: "ISSUE_node_id",
     issueNumber: 2090,
   });
 });
@@ -70,6 +72,7 @@ test("does not create branch context for DraftIssue without repository", async (
   assert.deepEqual(context, {
     title: "Demanda sem repositorio definido",
     repositoryName: null,
+    issueId: null,
     issueNumber: null,
   });
 });
@@ -112,6 +115,7 @@ test("uses Repositório single-select field as repository for draft project item
   assert.deepEqual(context, {
     title: "Demanda com repositorio no campo do Project",
     repositoryName: "leds-conectafapes/leds-conectafapes-frontend-backoffice",
+    issueId: null,
     issueNumber: null,
   });
 });

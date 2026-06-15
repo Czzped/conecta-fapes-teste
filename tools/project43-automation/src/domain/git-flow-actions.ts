@@ -12,6 +12,8 @@ export interface CreateBranchAction {
   branch: string;
   /** Branch base de onde o novo branch deve partir, ex.: `develop`. */
   baseBranch: string;
+  /** Issue node ID do card do Project, quando o branch deve aparecer em Development. */
+  issueId?: string | null;
 }
 
 export interface OpenPullRequestAction {

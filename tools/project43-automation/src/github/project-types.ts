@@ -61,6 +61,7 @@ export interface ProjectItemForSprintRollover {
 export interface ProjectItemGitFlowContext {
   title: string | null;
   repositoryName: string | null;
+  issueId: string | null;
   issueNumber: number | null;
 }
 

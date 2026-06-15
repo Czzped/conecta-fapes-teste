@@ -13,6 +13,7 @@ do GitHub App e atualiza as datas do Project 43 da organizacao
 - move automaticamente para a proxima sprint os cards da sprint encerrada
   que nao estao em `Done`
 - cria branch de tarefa quando uma issue/card entra em `In Progress` com repo resolvido
+  e vincula em **Development** quando o card e uma Issue
 - publica o status `git-flow/pr-policy` nos PRs
 - cria tag automaticamente depois do merge de release/hotfix em producao
 - abre PRs de retorno de hotfix para `develop` e para release aberta
@@ -84,15 +85,19 @@ Valida a politica via JSON (util para testes/integracao manual). Retorna
 
 Cria um branch a partir de `develop` quando uma demanda entra em `In Progress`.
 Na rota manual, aceita `repository` (nome puro ou `org/repo`); sem repositorio
-reconhecido retorna `needs_review`. A mesma regra tambem roda no webhook
-`projects_v2_item`: o worker resolve titulo/numero/repositorio via GraphQL,
-priorizando o campo single-select `Repositório` do Project e usando a Issue
-vinculada como fallback. Com repositorio reconhecido, cria a branch automaticamente.
+reconhecido retorna `needs_review`. Se `issueId` for informado, o worker usa
+`createLinkedBranch`, entao a branch ja aparece na secao **Development** da
+Issue. Sem `issueId`, ele mantem o fallback idempotente de criar apenas a ref.
+A mesma regra tambem roda no webhook `projects_v2_item`: o worker resolve
+titulo/numero/repositorio/Issue ID via GraphQL, priorizando o campo
+single-select `Repositório` do Project e usando o repositorio da Issue como
+fallback. Com repositorio reconhecido, cria a branch automaticamente.
 
 ```json
 {
   "statusName": "In Progress",
   "repository": "leds-conectafapes-backend-admin",
+  "issueId": "I_kwDO...",
   "issueNumber": 42,
   "title": "Cadastro de Diarias",
   "execute": false
@@ -215,10 +220,12 @@ tecnicos (criar branch/PR/tag), o worker pode usar um token de repositorio
 quando o GitHub App nao tiver `Contents: write`: configure
 `GITHUB_GIT_FLOW_TOKEN` (preferido) ou `GITHUB_REPOSITORY_TOKEN`. O secret
 legado `GITHUB_STATUS_TOKEN` tambem e aceito como fallback para manter
-compatibilidade. A chave privada do GitHub App pode estar em PKCS#8 ou no
-formato RSA/PKCS#1 emitido pelo GitHub; o worker normaliza antes de gerar o
-JWT da instalacao. `GITHUB_WEBHOOK_SECRET` valida a assinatura do webhook
-principal do GitHub App/Project.
+compatibilidade. Para branch vinculada em **Development**, esse token precisa
+conseguir ler a Issue do card e criar `createLinkedBranch` no repositorio
+tecnico alem de criar refs/branches. A chave privada do GitHub App pode estar
+em PKCS#8 ou no formato RSA/PKCS#1 emitido pelo GitHub; o worker normaliza
+antes de gerar o JWT da instalacao. `GITHUB_WEBHOOK_SECRET` valida a assinatura
+do webhook principal do GitHub App/Project.
 
 Para webhooks diretos de repositorio que disparam a validacao de PR, use
 `GITHUB_REPO_WEBHOOK_SECRET`. Isso permite configurar `pull_request` nos repos
@@ -242,7 +249,9 @@ secret nao existir, o worker usa o token da instalacao do GitHub App.
 - `GITHUB_APP_PRIVATE_KEY`
 - `GITHUB_WEBHOOK_SECRET`
 - `GITHUB_REPO_WEBHOOK_SECRET` (opcional; webhooks diretos dos repositorios)
-- `GITHUB_STATUS_TOKEN` (opcional; fallback para publicar commit statuses)
+- `GITHUB_GIT_FLOW_TOKEN` (opcional; preferido para branch/PR/tag/linked branch)
+- `GITHUB_REPOSITORY_TOKEN` (opcional; fallback para side-effects nos repositorios)
+- `GITHUB_STATUS_TOKEN` (opcional; fallback para publicar commit statuses e legado de repositorio)
 
 Para o rollover executado pelo GitHub Actions, use um token com permissao de
 Projects em `GITHUB_LEDS`/`PROJECTS_PAT` ou os segredos do GitHub App
