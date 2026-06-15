@@ -12,10 +12,10 @@ interface Props {
 type DetailStatus = ParceriaItem['status'] | 'SUSPENSA';
 
 const statusLabel: Record<DetailStatus, string> = {
-  EM_ELABORACAO: 'Em Elaboração',
-  VIGENTE: 'Vigente',
+  EM_ELABORACAO: 'Rascunho',
+  VIGENTE: 'Ativo',
   ENCERRADA: 'Encerrada',
-  SUSPENSA: 'Suspensa',
+  SUSPENSA: 'Suspenso',
 };
 
 const formatCurrency = (value: number) => (
@@ -421,7 +421,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
           </button>
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
           <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>
-            Detalhes da Parceria
+            Detalhes
           </span>
         </div>
 
@@ -440,6 +440,30 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                 Instituição vinculada: {cadastroData.instituicaoParceira} · Processo {cadastroData.numeroProcesso}
               </p>
             </div>
+            <button
+              type="button"
+              onClick={() => setShowAditivo(true)}
+              disabled={currentStatus === 'SUSPENSA' || currentStatus === 'ENCERRADA'}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 16px',
+                border: '1px solid rgba(0,193,175,0.45)',
+                borderRadius: 'var(--radius)',
+                backgroundColor: 'transparent',
+                color: '#00c1af',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: currentStatus === 'SUSPENSA' || currentStatus === 'ENCERRADA' ? 'not-allowed' : 'pointer',
+                opacity: currentStatus === 'SUSPENSA' || currentStatus === 'ENCERRADA' ? 0.45 : 1,
+                flexShrink: 0,
+              }}
+            >
+              <Plus size={16} />
+              Adicionar Aditivo
+            </button>
             <div style={{ position: 'relative', flexShrink: 0 }}>
               <button
                 type="button"
@@ -452,7 +476,6 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
               {showActionDropdown && (
                 <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 4px)', minWidth: '190px', backgroundColor: T.bgSurface, border: `1px solid ${T.borderDefault}`, borderRadius: 'var(--radius)', overflow: 'hidden', zIndex: 30, boxShadow: T.shadowLg }}>
                   {[
-                    { label: 'Aditivo', onClick: () => setShowAditivo(true), disabled: currentStatus === 'SUSPENSA' || currentStatus === 'ENCERRADA' },
                     { label: currentStatus === 'SUSPENSA' ? 'Reativar' : 'Suspender', onClick: () => currentStatus === 'SUSPENSA' ? reativarParceria() : setShowSuspensao(true), disabled: currentStatus === 'ENCERRADA' },
                     { label: 'Encerrar', onClick: () => setShowEncerramento(true), disabled: currentStatus === 'ENCERRADA' },
                     { label: 'Deletar', onClick: () => setConfirmDelete(true), danger: true },
@@ -673,21 +696,20 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
             {aditivoTipo === 'financeiro' ? (
               <>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', alignItems: 'end' }}>
-                  <CurrencyEditField label="Valor do aditivo financeiro" value={aditivoFinanceiro.valor} onChange={(valor) => setAditivoFinanceiro(prev => ({ ...prev, valor }))} />
-                  <DateMaskEditField label="Data do aporte" value={aditivoFinanceiro.data} onChange={(data) => setAditivoFinanceiro(prev => ({ ...prev, data }))} />
-                  <UploadEditField label="Documento de descentralização" fileName={aditivoFinanceiro.documento} onChange={(documento) => setAditivoFinanceiro(prev => ({ ...prev, documento }))} />
+                  <CurrencyEditField label="Valor do aditivo financeiro" value={aditivoFinanceiro.valor} onChange={(valor) => setAditivoFinanceiro(prev => ({ ...prev, valor }))} labelColor="#ffffff" />
+                  <DateMaskEditField label="Data do aporte" value={aditivoFinanceiro.data} onChange={(data) => setAditivoFinanceiro(prev => ({ ...prev, data }))} labelColor="#ffffff" />
+                  <UploadEditField label="Documento de descentralização" fileName={aditivoFinanceiro.documento} onChange={(documento) => setAditivoFinanceiro(prev => ({ ...prev, documento }))} labelColor="#ffffff" />
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginTop: '16px', padding: '14px', border: '1px solid rgba(245,158,11,0.28)', borderRadius: '8px', backgroundColor: 'rgba(245,158,11,0.08)' }}>
-                  <Info label="Política" value="Res. CCAF 334/2023" />
-                  <Info label="Percentual no aditivo" value={formatPercent(percentualAditivoPreview)} />
-                  <Info label="Reserva do aditivo" value={formatCurrency(reservaAditivoPreview)} />
-                  <Info label="Líquido para programas" value={formatCurrency(Math.max(valorAditivoPreview - reservaAditivoPreview, 0))} />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginTop: '16px', padding: '14px', border: '1px solid rgba(0,193,175,0.28)', borderRadius: '8px', backgroundColor: 'rgba(0,193,175,0.08)' }}>
+                  <Info label="Percentual no aditivo" value={formatPercent(percentualAditivoPreview)} labelColor="#ffffff" />
+                  <Info label="Reserva do aditivo" value={formatCurrency(reservaAditivoPreview)} labelColor="#ffffff" />
+                  <Info label="Líquido para programas" value={formatCurrency(Math.max(valorAditivoPreview - reservaAditivoPreview, 0))} labelColor="#ffffff" />
                 </div>
               </>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignItems: 'end' }}>
-                <DateMaskEditField label="Nova data fim da parceria" value={aditivoTempo.vigenciaFim} onChange={(vigenciaFim) => setAditivoTempo(prev => ({ ...prev, vigenciaFim }))} />
-                <UploadEditField label="Documento do aditivo de tempo" fileName={aditivoTempo.documento} onChange={(documento) => setAditivoTempo(prev => ({ ...prev, documento }))} />
+                <DateMaskEditField label="Nova data fim da parceria" value={aditivoTempo.vigenciaFim} onChange={(vigenciaFim) => setAditivoTempo(prev => ({ ...prev, vigenciaFim }))} labelColor="#ffffff" />
+                <UploadEditField label="Documento do aditivo de tempo" fileName={aditivoTempo.documento} onChange={(documento) => setAditivoTempo(prev => ({ ...prev, documento }))} labelColor="#ffffff" />
               </div>
             )}
 
@@ -701,17 +723,17 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '16px', marginBottom: '24px' }}>
           {[
-            { label: 'Total Investido', value: formatCurrency(cadastroData.aporteTotal), Icon: DollarSign, color: '#a855f7', bg: 'rgba(168,85,247,0.12)' },
-            { label: 'Ação Transversal', value: formatCurrency(valorReservaAcaoTransversal), Icon: Handshake, color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
-            { label: 'Total Aportado', value: formatCurrency(valorAportado), Icon: Handshake, color: '#38bdf8', bg: 'rgba(56,189,248,0.12)' },
-            { label: 'Total Alocado', value: formatCurrency(cadastroData.valorAlocado), Icon: FolderOpen, color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
-            { label: 'Total Consumido', value: formatCurrency(valorConsumido), Icon: DollarSign, color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
-            { label: 'Saldo programas', value: formatCurrency(saldoDisponivel), Icon: DollarSign, color: '#00c1af', bg: 'rgba(0,193,175,0.12)' },
-          ].map(({ label, value, Icon, color, bg }) => (
+            { label: 'Total Investido', value: formatCurrency(cadastroData.aporteTotal), Icon: DollarSign },
+            { label: 'Ação Transversal', value: formatCurrency(valorReservaAcaoTransversal), Icon: Handshake },
+            { label: 'Total Aportado', value: formatCurrency(valorAportado), Icon: Handshake },
+            { label: 'Total Alocado', value: formatCurrency(cadastroData.valorAlocado), Icon: FolderOpen },
+            { label: 'Total Consumido', value: formatCurrency(valorConsumido), Icon: DollarSign },
+            { label: 'Saldo programas', value: formatCurrency(saldoDisponivel), Icon: DollarSign },
+          ].map(({ label, value, Icon }) => (
             <div key={label} style={metricCardStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: bg, borderRadius: 'var(--radius)', flexShrink: 0 }}>
-                  <Icon size={20} style={{ color }} />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: 'rgba(0,193,175,0.12)', borderRadius: 'var(--radius)', flexShrink: 0 }}>
+                  <Icon size={20} style={{ color: '#00c1af' }} />
                 </div>
                 <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', margin: 0 }}>
                   {label}
@@ -864,16 +886,43 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
 
             <SummarySection number="5" title="Documentos" subtitle="Documentos que sustentam a formalização da parceria">
               <div style={{ ...cardStyle, padding: '20px', marginBottom: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
-                  <div>
-                    <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
-                      Anexar documento
-                    </h2>
-                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
-                      Faça upload do arquivo e classifique o documento por tipo.
-                    </p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
+                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+                    Documentos da parceria
+                  </h2>
+                </div>
+
+                {documentos.length === 0 ? (
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                    Nenhum documento cadastrado.
+                  </p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {documentos.map(documento => (
+                      <Row key={documento.id}>
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                          <div style={{ width: '34px', height: '34px', borderRadius: 'var(--radius)', backgroundColor: 'rgba(0,193,175,0.12)', border: '1px solid rgba(0,193,175,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <FileText size={17} style={{ color: '#00c1af' }} />
+                          </div>
+                          <Info label="Tipo" value={documento.tipo} />
+                        </div>
+                        <Info label="Descrição" value={documento.descricao} />
+                        <Info label="Data de emissão" value={documento.dataEmissao} />
+                        <Info label="Arquivo" value={documento.arquivo} />
+                      </Row>
+                    ))}
                   </div>
-                  <SmallButton icon={<Plus size={14} />} label="Anexar" onClick={anexarDocumento} />
+                )}
+              </div>
+
+              <div style={{ ...cardStyle, padding: '20px', marginBottom: 0 }}>
+                <div style={{ marginBottom: '20px' }}>
+                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
+                    Anexar documento
+                  </h2>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                    Faça upload do arquivo e classifique o documento por tipo.
+                  </p>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 1fr 1.2fr', gap: '16px', alignItems: 'end' }}>
@@ -899,35 +948,6 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                     onChange={(arquivo) => setNovoDocumento(prev => ({ ...prev, arquivo }))}
                   />
                 </div>
-              </div>
-
-              <div style={{ ...cardStyle, padding: '20px', marginBottom: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
-                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
-                    Documentos da parceria
-                  </h2>
-                </div>
-
-                {documentos.length === 0 ? (
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
-                    Nenhum documento cadastrado.
-                  </p>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {documentos.map(documento => (
-                      <Row key={documento.id}>
-                        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                          <FileText size={18} style={{ color: '#00c1af', flexShrink: 0, marginTop: '2px' }} />
-                          <Info label="Identificador" value={documento.id} />
-                        </div>
-                        <Info label="Tipo" value={documento.tipo} />
-                        <Info label="Descrição" value={documento.descricao} />
-                        <Info label="Data de emissão" value={documento.dataEmissao} />
-                        <Info label="Arquivo" value={documento.arquivo} />
-                      </Row>
-                    ))}
-                  </div>
-                )}
               </div>
             </SummarySection>
           </div>
@@ -1003,22 +1023,22 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                 </p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '10px' }}>
                   {[
-                    { label: 'Programas', value: String(parceria.programasRelacionados), Icon: FolderOpen, color: '#38bdf8', bg: 'rgba(56,189,248,0.10)' },
-                    { label: 'Demandas induzidas', value: String(Math.max(1, Math.floor(parceria.programasRelacionados / 2))), Icon: Handshake, color: '#fb7185', bg: 'rgba(251,113,133,0.10)' },
-                    { label: 'Projetos', value: String(parceria.iniciativasImpactadas), Icon: Handshake, color: '#fbbf24', bg: 'rgba(251,191,36,0.10)' },
-                  ].map(({ label, value, Icon, color, bg }) => (
-                    <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(23, 23, 23,0.28)' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '30px', height: '30px', backgroundColor: bg, borderRadius: '7px', flexShrink: 0 }}>
-                        <Icon size={16} style={{ color }} />
-                      </div>
-                      <div style={{ minWidth: 0 }}>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.5)', marginBottom: '2px' }}>
+                    { label: 'Programas', value: String(parceria.programasRelacionados), Icon: FolderOpen },
+                    { label: 'Demandas induzidas', value: String(Math.max(1, Math.floor(parceria.programasRelacionados / 2))), Icon: Handshake },
+                    { label: 'Projetos', value: String(parceria.iniciativasImpactadas), Icon: Handshake },
+                  ].map(({ label, value, Icon }) => (
+                    <div key={label} style={{ padding: '16px 18px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', backgroundColor: 'rgba(23, 23, 23,0.28)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', backgroundColor: 'rgba(0,193,175,0.12)', borderRadius: '7px', flexShrink: 0 }}>
+                          <Icon size={17} style={{ color: '#00c1af' }} />
+                        </div>
+                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', margin: 0 }}>
                           {label}
                         </div>
-                        <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
-                          {value}
-                        </p>
                       </div>
+                      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: 0, textAlign: 'center' }}>
+                        {value}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -1230,9 +1250,9 @@ const SelectEditField: React.FC<{ label: string; value: string; options: string[
   </div>
 );
 
-const DateMaskEditField: React.FC<{ label: string; value: string; onChange: (value: string) => void }> = ({ label, value, onChange }) => (
+const DateMaskEditField: React.FC<{ label: string; value: string; onChange: (value: string) => void; labelColor?: string }> = ({ label, value, onChange, labelColor }) => (
   <div>
-    <div style={labelStyle}>{label}</div>
+    <div style={{ ...labelStyle, color: labelColor || labelStyle.color }}>{label}</div>
     <input
       value={value}
       onChange={event => onChange(maskDate(event.target.value))}
@@ -1244,9 +1264,9 @@ const DateMaskEditField: React.FC<{ label: string; value: string; onChange: (val
   </div>
 );
 
-const CurrencyEditField: React.FC<{ label: string; value: string; onChange: (value: string) => void }> = ({ label, value, onChange }) => (
+const CurrencyEditField: React.FC<{ label: string; value: string; onChange: (value: string) => void; labelColor?: string }> = ({ label, value, onChange, labelColor }) => (
   <div>
-    <div style={labelStyle}>{label}</div>
+    <div style={{ ...labelStyle, color: labelColor || labelStyle.color }}>{label}</div>
     <div style={{ position: 'relative' }}>
       <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.45)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}>
         R$
@@ -1287,9 +1307,9 @@ const TextAreaEditField: React.FC<{ label: string; value: string; onChange: (val
   </div>
 );
 
-const UploadEditField: React.FC<{ label: string; fileName: string; onChange: (fileName: string) => void }> = ({ label, fileName, onChange }) => (
+const UploadEditField: React.FC<{ label: string; fileName: string; onChange: (fileName: string) => void; labelColor?: string }> = ({ label, fileName, onChange, labelColor }) => (
   <div>
-    <div style={labelStyle}>{label}</div>
+    <div style={{ ...labelStyle, color: labelColor || labelStyle.color }}>{label}</div>
     <label
       style={{
         ...inputStyle,
@@ -1374,9 +1394,9 @@ const InstitutionEditField: React.FC<{ label: string; value: string; onChange: (
   );
 };
 
-const Info: React.FC<{ label: string; value: string; full?: boolean }> = ({ label, value, full }) => (
+const Info: React.FC<{ label: string; value: string; full?: boolean; labelColor?: string }> = ({ label, value, full, labelColor }) => (
   <div style={{ gridColumn: full ? '1 / -1' : undefined }}>
-    <div style={labelStyle}>{label}</div>
+    <div style={{ ...labelStyle, color: labelColor || labelStyle.color }}>{label}</div>
     <p style={{ ...valueStyle, color: value === 'Pendente' ? '#f59e0b' : valueStyle.color, lineHeight: '1.5' }}>
       {value}
     </p>

@@ -5,7 +5,7 @@ import { DetalhesParceria } from './DetalhesParceria';
 import { DetalhesPrograma } from './DetalhesPrograma';
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
-type StatusFilter = 'EM_ELABORACAO' | 'VIGENTE' | 'ENCERRADA';
+type StatusFilter = 'EM_ELABORACAO' | 'VIGENTE' | 'SUSPENSA' | 'ENCERRADA';
 type ParceriaStatus = StatusFilter;
 type DataFimSort = 'Mais Recente' | 'Mais Antiga';
 
@@ -43,8 +43,9 @@ export interface ParceriaItem {
 }
 
 const statusLabel: Record<ParceriaStatus, string> = {
-  EM_ELABORACAO: 'Em Elaboração',
-  VIGENTE: 'Vigente',
+  EM_ELABORACAO: 'Rascunho',
+  VIGENTE: 'Ativo',
+  SUSPENSA: 'Suspenso',
   ENCERRADA: 'Encerrada',
 };
 
@@ -52,6 +53,7 @@ const statusColor = (status: ParceriaStatus) => {
   switch (status) {
     case 'EM_ELABORACAO': return '#f59e0b';
     case 'VIGENTE': return '#22c55e';
+    case 'SUSPENSA': return '#f97316';
     case 'ENCERRADA': return '#a3a3a3';
     default: return '#a3a3a3';
   }
@@ -142,7 +144,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
   const [selectedParceria, setSelectedParceria] = useState<ParceriaItem | null>(null);
   const [selectedProgramaFromParceria, setSelectedProgramaFromParceria] = useState<{ codigo: string; nome: string } | null>(null);
 
-  const statusOptions: StatusFilter[] = ['EM_ELABORACAO', 'VIGENTE', 'ENCERRADA'];
+  const statusOptions: StatusFilter[] = ['EM_ELABORACAO', 'VIGENTE', 'SUSPENSA', 'ENCERRADA'];
   const dataFimOptions: DataFimSort[] = ['Mais Recente', 'Mais Antiga'];
   const parceriasBase = [
     {
@@ -152,7 +154,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
       dataEnvio: '15/01/2026',
       aditivo: 'Sim',
       area: 'Pesquisa',
-      status: 'VIGENTE',
+      status: 'SUSPENSA',
       investimento: 'R$ 2.500.000,00',
       dataAssinatura: '10/01/2026',
       vigenciaInicio: '01/02/2026',
@@ -717,19 +719,6 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
             </div>
 
             <DropdownFilter
-              label="Data de Fim"
-              value={dataFimSort}
-              options={dataFimOptions}
-              open={showDataFimDropdown}
-              setOpen={setShowDataFimDropdown}
-              onSelect={(value) => setDataFimSort(value as DataFimSort)}
-              onBeforeOpen={() => {
-                setShowInstituicaoDropdown(false);
-                setShowStatusDropdown(false);
-              }}
-            />
-
-            <DropdownFilter
               label="Instituição"
               value={instituicaoFilter}
               options={instituicaoOptions}
@@ -738,6 +727,19 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
               onSelect={setInstituicaoFilter}
               onBeforeOpen={() => {
                 setShowDataFimDropdown(false);
+                setShowStatusDropdown(false);
+              }}
+            />
+
+            <DropdownFilter
+              label="Data de Fim"
+              value={dataFimSort}
+              options={dataFimOptions}
+              open={showDataFimDropdown}
+              setOpen={setShowDataFimDropdown}
+              onSelect={(value) => setDataFimSort(value as DataFimSort)}
+              onBeforeOpen={() => {
+                setShowInstituicaoDropdown(false);
                 setShowStatusDropdown(false);
               }}
             />
@@ -764,6 +766,8 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
             <button
               key={parceria.id}
               onClick={() => setSelectedParceria(parceria)}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = T.bgHover; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = T.bgCard; }}
               style={{
                 display: 'grid',
                 gridTemplateColumns: '2fr 1fr 1.1fr 0.9fr 1fr 0.9fr 40px',

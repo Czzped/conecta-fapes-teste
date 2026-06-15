@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, Plus, Save, Search, Send, Upload } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Search, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { useThemeTokens } from '../theme/ThemeContext';
 
@@ -97,6 +97,7 @@ const SelectField: React.FC<{
   placeholder?: string;
   required?: boolean;
 }> = ({ label, value, onChange, options, placeholder, required = true }) => {
+  const { T } = useThemeTokens();
   const [open, setOpen] = useState(false);
   return (
     <div style={{ position: 'relative' }}>
@@ -114,9 +115,9 @@ const SelectField: React.FC<{
       {open && (
         <div style={{
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%',
-          backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.12)',
+          backgroundColor: T.bgSurface, border: `1px solid ${T.borderDefault}`,
           borderRadius: 'var(--radius)', zIndex: 300, overflow: 'hidden',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.4)', maxHeight: '240px', overflowY: 'auto',
+          boxShadow: T.shadowMd, maxHeight: '240px', overflowY: 'auto',
         }}>
           {options.map(opt => (
             <button
@@ -125,10 +126,12 @@ const SelectField: React.FC<{
               onClick={() => { onChange(opt.value); setOpen(false); }}
               style={{
                 width: '100%', padding: '10px 14px', textAlign: 'left', border: 'none',
-                backgroundColor: value === opt.value ? 'rgba(0,193,175,0.1)' : 'transparent',
-                color: value === opt.value ? '#00c1af' : '#ffffff',
+                backgroundColor: value === opt.value ? T.accentSoft : 'transparent',
+                color: value === opt.value ? T.accent : T.textPrimary,
                 fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer',
               }}
+              onMouseEnter={e => { if (value !== opt.value) e.currentTarget.style.backgroundColor = T.bgHover; }}
+              onMouseLeave={e => { if (value !== opt.value) e.currentTarget.style.backgroundColor = 'transparent'; }}
             >
               {opt.label}
             </button>
@@ -374,8 +377,7 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
             <Field label="Valor do Aporte Original (R$)" value={valorAporteOriginal} onChange={setValorAporteOriginal} placeholder="Ex: 1.000.000,00" />
             <DateField label="Data do Aporte" value={dataAporteOriginal} onChange={setDataAporteOriginal} />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: '12px', marginBottom: '16px', padding: '16px', border: '1px solid rgba(245,158,11,0.28)', borderRadius: '8px', backgroundColor: 'rgba(245,158,11,0.08)' }}>
-            <Metric label="Política" value="Res. CCAF 334/2023" />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '12px', marginBottom: '16px', padding: '16px', border: '1px solid rgba(0,193,175,0.28)', borderRadius: '8px', backgroundColor: 'rgba(0,193,175,0.08)' }}>
             <Metric label="Faixa aplicada" value={faixaAcaoTransversal} />
             <Metric label="Percentual Ação Transversal" value={formatPercent(percentualAcaoTransversal)} />
             <Metric label="Reserva Ação Transversal" value={formatCurrency(valorReservaAcaoTransversal)} highlight />
@@ -391,17 +393,17 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
           {documentos.map((documento, index) => (
             <div key={documento.id} style={{ marginBottom: '12px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignItems: 'end' }}>
-                <UploadField
-                  label={index === 0 ? 'Arquivo' : 'Arquivo'}
-                  fileName={documento.arquivo}
-                  onChange={(fileName) => updateDocumento(documento.id, 'arquivo', fileName)}
-                />
                 <SelectField
-                  label={index === 0 ? 'Classificação do documento' : 'Classificação do documento'}
+                  label="Classificação do Documento"
                   value={documento.tipo}
                   onChange={(v) => updateDocumento(documento.id, 'tipo', v)}
                   options={documentoOptions}
                   placeholder="Classifique o documento"
+                />
+                <UploadField
+                  label="Arquivo"
+                  fileName={documento.arquivo}
+                  onChange={(fileName) => updateDocumento(documento.id, 'arquivo', fileName)}
                 />
               </div>
             </div>
@@ -423,17 +425,15 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
           <button
             onClick={handleSalvarElaboracao}
             disabled={isLoading}
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 'var(--radius)', color: 'var(--form-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.6 : 1 }}
+            style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 'var(--radius)', color: 'var(--form-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.6 : 1 }}
           >
-            <Save size={16} />
             {isLoading ? 'Salvando...' : 'Salvar Rascunho'}
           </button>
           <button
             onClick={handleFormalizarParceria}
             disabled={isLoading}
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.6 : 1 }}
+            style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.6 : 1 }}
           >
-            <Send size={16} />
             Formalizar Parceria
           </button>
         </div>
