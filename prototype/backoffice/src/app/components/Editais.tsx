@@ -678,50 +678,6 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               {createLabel}
             </button>
           </div>
-          <div className="mt-6" style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle }} />
-        </div>
-
-        {/* Cards de Estatísticas */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-          <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ backgroundColor: T.accentSoft, borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <ClipboardList size={18} style={{ color: T.accent }} />
-              </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Total de {modulePlural}</span>
-            </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>10</div>
-          </div>
-
-          <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ backgroundColor: T.accentSoft, borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <FileText size={18} style={{ color: T.accent }} />
-              </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Ativas</span>
-            </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>7</div>
-          </div>
-
-          <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ backgroundColor: T.accentSoft, borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Users size={18} style={{ color: T.accent }} />
-              </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Propostas recebidas</span>
-            </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>158</div>
-          </div>
-
-          <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ backgroundColor: T.accentSoft, borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <CheckCircle size={18} style={{ color: T.accent }} />
-              </div>
-              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>Finalizadas</span>
-            </div>
-            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>1</div>
-          </div>
         </div>
 
         {/* Tab Bar Link */}
@@ -763,6 +719,25 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
 
         {activeTab === 'dashboard' && (
           <div style={{ marginBottom: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+              {[
+                { label: isFomento ? 'Total de Fomentos' : `Total de ${modulePlural}`, value: '10', Icon: ClipboardList },
+                { label: isFomento ? 'Ativos' : 'Ativas', value: '7', Icon: FileText },
+                { label: 'Propostas recebidas', value: '158', Icon: Users },
+                { label: 'Finalizadas', value: '1', Icon: CheckCircle },
+              ].map(({ label, value, Icon }) => (
+                <div key={label} style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', padding: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                    <div style={{ backgroundColor: T.accentSoft, borderRadius: '6px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Icon size={18} style={{ color: T.accent }} />
+                    </div>
+                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 'var(--font-weight-normal)' }}>{label}</span>
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-2xl)', color: T.textPrimary, lineHeight: 1, textAlign: 'center' }}>{value}</div>
+                </div>
+              ))}
+            </div>
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '22px' }}>
               <div style={{
                 border: `1px solid ${T.borderSubtle}`,
@@ -852,7 +827,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
         {/* Filtros */}
         {activeTab !== 'dashboard' && (
         <div style={{ marginBottom: '24px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isFomento ? 'repeat(4, 1fr)' : 'repeat(5, 1fr)', gap: '16px' }}>
             {/* Pesquisar */}
             <div>
               <label htmlFor="search-input" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
@@ -886,7 +861,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               />
             </div>
 
-            {/* Área */}
+            {!isFomento && (
             <div style={{ position: 'relative' }}>
               <label htmlFor="area-filter" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
                 Área
@@ -911,6 +886,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                 </div>
               )}
             </div>
+            )}
 
             {/* Status */}
             <div style={{ position: 'relative' }}>
@@ -974,7 +950,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               .filter((captacao) => {
                 const query = searchTerm.toLowerCase();
                 const matchSearch = !query || `${captacao.titulo} ${captacao.vinculoNome}`.toLowerCase().includes(query);
-                const matchArea = areaFilter === 'Todas' || captacao.area === areaFilter;
+                const matchArea = isFomento || areaFilter === 'Todas' || captacao.area === areaFilter;
                 const matchVinculo = instituicaoFilter === 'Todos' || captacao.vinculoTipo === instituicaoFilter;
                 const matchStatus = setorFilter === 'Todos' || captacao.status === setorFilter;
                 return matchSearch && matchArea && matchVinculo && matchStatus;
@@ -1000,7 +976,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                   <div className="flex items-center gap-6">
                     <div
                       className="flex-1"
-                      style={{ display: 'grid', gridTemplateColumns: '2.1fr 1.2fr 2fr 1.2fr 1fr 1fr', gap: '20px', alignItems: 'center' }}
+                      style={{ display: 'grid', gridTemplateColumns: isFomento ? '2.1fr 1.2fr 1.2fr 1fr 1fr' : '2.1fr 1.2fr 2fr 1.2fr 1fr 1fr', gap: '20px', alignItems: 'center' }}
                     >
                       <div>
                         <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
@@ -1020,6 +996,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                         </div>
                       </div>
 
+                      {!isFomento && (
                       <div>
                         <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
                           {captacao.vinculoTipo}
@@ -1028,6 +1005,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                           {captacao.vinculoNome}
                         </div>
                       </div>
+                      )}
 
                       <div>
                         <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>

@@ -601,17 +601,17 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
         <div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '16px', marginBottom: '24px' }}>
             {[
-              { label: 'Total Investido', value: formatCurrency(totalInvestido), Icon: DollarSign, color: '#a855f7', bg: 'rgba(168,85,247,0.12)' },
-              { label: 'Ação Transversal', value: formatCurrency(totalAcaoTransversal), detail: 'Reserva normativa', Icon: Handshake, color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
-              { label: 'Total Aportado', value: formatCurrency(totalAportado), detail: `${formatPercent(percentualAportadoPortfolio)} do alocado`, Icon: Handshake, color: '#38bdf8', bg: 'rgba(56,189,248,0.12)' },
-              { label: 'Total Alocado', value: formatCurrency(totalAlocado), detail: `${formatPercent(percentualAlocadoPortfolio)} do investido`, Icon: FolderOpen, color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
-              { label: 'Total Consumido', value: formatCurrency(totalConsumidoPortfolio), detail: `${formatPercent(percentualConsumidoPortfolio)} do alocado`, Icon: DollarSign, color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
-              { label: 'Saldo para programas', value: formatCurrency(saldoTotal), detail: `${formatPercent(percentualDisponivelPortfolio)} do investido`, Icon: DollarSign, color: '#00c1af', bg: 'rgba(0,193,175,0.12)' },
-            ].map(({ label, value, detail, Icon, color, bg }) => (
+              { label: 'Total Investido', value: formatCurrency(totalInvestido), Icon: DollarSign },
+              { label: 'Ação Transversal', value: formatCurrency(totalAcaoTransversal), detail: 'Reserva normativa', Icon: Handshake },
+              { label: 'Total Aportado', value: formatCurrency(totalAportado), detail: `${formatPercent(percentualAportadoPortfolio)} do alocado`, Icon: Handshake },
+              { label: 'Total Alocado', value: formatCurrency(totalAlocado), detail: `${formatPercent(percentualAlocadoPortfolio)} do investido`, Icon: FolderOpen },
+              { label: 'Total Consumido', value: formatCurrency(totalConsumidoPortfolio), detail: `${formatPercent(percentualConsumidoPortfolio)} do alocado`, Icon: DollarSign },
+              { label: 'Saldo para programas', value: formatCurrency(saldoTotal), detail: `${formatPercent(percentualDisponivelPortfolio)} do investido`, Icon: DollarSign },
+            ].map(({ label, value, detail, Icon }) => (
               <div key={label} style={cardStyle}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: bg, borderRadius: 'var(--radius)', flexShrink: 0 }}>
-                    <Icon size={20} style={{ color }} />
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: 'rgba(0,193,175,0.12)', borderRadius: 'var(--radius)', flexShrink: 0 }}>
+                    <Icon size={20} style={{ color: '#00c1af' }} />
                   </div>
                   <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
                     {label}

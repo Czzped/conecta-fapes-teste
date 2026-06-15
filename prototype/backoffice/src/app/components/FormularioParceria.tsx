@@ -434,7 +434,7 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
             disabled={isLoading}
             style={{ display: 'flex', alignItems: 'center', padding: '10px 20px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.6 : 1 }}
           >
-            Formalizar Parceria
+            Ativar Parceria
           </button>
         </div>
 
@@ -442,7 +442,7 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
           <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 500 }}>
             <div style={{ backgroundColor: 'var(--form-card-bg)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', padding: '28px', maxWidth: '440px', width: '90%' }}>
               <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 12px' }}>
-                Formalizar Parceria
+                Ativar Parceria
               </h3>
               <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: '0 0 24px', lineHeight: 1.6 }}>
                 Esta ação tornará a parceria <strong style={{ color: '#00c1af' }}>{nomeParceria || 'sem nome'}</strong> ativa e não poderá ser desfeita. Confirmar?
@@ -458,7 +458,7 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
                   onClick={handleConfirmFormalizar}
                   style={{ padding: '8px 18px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}
                 >
-                  Confirmar Formalização
+                  Confirmar Ativação
                 </button>
               </div>
             </div>

@@ -670,7 +670,6 @@ export const Iniciativas: React.FC = () => {
             </p>
           </div>
         </div>
-        <div className="mt-6" style={{ width: '100%', height: '1px', backgroundColor: 'var(--dash-divider)' }} />
       </div>
       )}
 

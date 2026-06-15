@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, Save, Plus, Trash2, CalendarClock, DollarSign, FolderOpen, Handshake } from 'lucide-react';
+import { ChevronRight, Plus, Trash2, DollarSign, FolderOpen, Handshake } from 'lucide-react';
 import { useThemeTokens } from '../theme/ThemeContext';
 
 interface Props {
@@ -146,8 +146,8 @@ const addBtnStyle: React.CSSProperties = {
 };
 
 const dangerIconButtonStyle: React.CSSProperties = {
-  width: '36px',
-  height: '38px',
+  width: '40px',
+  height: '40px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -193,8 +193,8 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
     { id: 2, nome: 'Dra. Fernanda Rocha' },
   ]);
   const [aportes, setAportes] = useState<AportePrograma[]>([
-    { id: 1, parceria: 'Parceria Internacional - Universidade de Lisboa', valor: '2.400.000,00', dataAporte: '2026-02-15', estado: 'EM_EXECUCAO', valorAlocado: 1400000 },
-    { id: 2, parceria: 'Parceria FAPES-CAPES', valor: '1.250.000,00', dataAporte: '2026-03-10', estado: 'EM_EXECUCAO', valorAlocado: 820000 },
+    { id: 1, parceria: 'Parceria Internacional - Universidade de Lisboa', valor: '2.400.000,00', dataAporte: '2026-02-15', estado: 'Em Execução', valorAlocado: 1400000 },
+    { id: 2, parceria: 'Parceria FAPES-CAPES', valor: '1.250.000,00', dataAporte: '2026-03-10', estado: 'Em Execução', valorAlocado: 820000 },
   ]);
   const [showAditivoTempo, setShowAditivoTempo] = useState(false);
   const [novaDataInicio, setNovaDataInicio] = useState(dataInicio);
@@ -298,7 +298,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
     setMembros(prev => prev.map(membro => membro.id === id ? { ...membro, nome: nomePessoa } : membro));
   };
 
-  const addAporte = () => setAportes(prev => [...prev, { id: Date.now(), parceria: '', valor: '', dataAporte: '', estado: 'EM_EXECUCAO', valorAlocado: 0 }]);
+  const addAporte = () => setAportes(prev => [...prev, { id: Date.now(), parceria: '', valor: '', dataAporte: '', estado: 'Em Execução', valorAlocado: 0 }]);
   const removeAporte = (id: number) => setAportes(prev => prev.filter(aporte => aporte.id !== id));
   const updateAporte = (id: number, field: keyof Omit<AportePrograma, 'id'>, value: string) => {
     setAportes(prev => prev.map(aporte => aporte.id === id ? { ...aporte, [field]: value } : aporte));
@@ -460,8 +460,8 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
             Programa
           </button>
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
-          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>
-            Detalhes do Programa
+          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
+            Detalhes
           </span>
         </div>
 
@@ -501,30 +501,6 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
                 Edite as informações do programa e mantenha a rastreabilidade dos aportes e da governança.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={abrirAditivoTempo}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                backgroundColor: 'rgba(0,193,175,0.12)',
-                border: '1px solid rgba(0,193,175,0.35)',
-                borderRadius: 'var(--radius)',
-                padding: '10px 16px',
-                fontFamily: 'var(--font-family)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)',
-                color: '#00c1af',
-                cursor: 'pointer',
-                flexShrink: 0,
-              }}
-              onMouseEnter={event => event.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.18)'}
-              onMouseLeave={event => event.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.12)'}
-            >
-              <CalendarClock size={15} />
-              Aditivo de Tempo
-            </button>
           </div>
         </div>
 
@@ -535,7 +511,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
           marginBottom: '24px',
         }}>
           {[
-            { id: 'cadastro' as ActiveTab, label: 'Dados do Programa' },
+            { id: 'cadastro' as ActiveTab, label: 'Informações Gerais' },
             { id: 'dashboard' as ActiveTab, label: 'Dashboard' },
           ].map(tab => (
             <button
@@ -626,116 +602,6 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
             </div>
           </div>
         </div>
-
-        {showAditivoTempo && (
-          <div style={{ ...cardStyle, borderColor: 'rgba(0,193,175,0.28)' }}>
-            <h2 style={sectionTitleStyle}>Registrar Aditivo de Tempo</h2>
-            <p style={sectionSubtitleStyle}>
-              Solicitação da instituição demandante para alterar a vigência do programa sem extrapolar as parcerias aportantes.
-            </p>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-              <ReadOnlyInfo label="Solicitante" value={instituicaoDemandante} />
-              <ReadOnlyInfo label="Vigência máxima das parcerias aportantes" value="31/12/2028" />
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-              <ReadOnlyInfo label="Vigência atual" value={`${formatDate(dataInicio)} até ${formatDate(dataFim)}`} />
-              <ReadOnlyInfo label="Regra aplicada" value="A nova vigência deve ficar dentro das parcerias aportantes" />
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-              <DateField label="Nova data de início" value={novaDataInicio} onChange={setNovaDataInicio} />
-              <DateField label="Nova data de fim" value={novaDataFim} onChange={setNovaDataFim} />
-            </div>
-
-            <TextArea
-              label="Justificativa"
-              value={justificativaAditivo}
-              onChange={setJustificativaAditivo}
-              rows={4}
-            />
-
-            {erroAditivoTempo && (
-              <div style={{
-                marginTop: '14px',
-                padding: '10px 12px',
-                border: '1px solid rgba(239,68,68,0.35)',
-                borderRadius: 'var(--radius)',
-                backgroundColor: 'rgba(239,68,68,0.08)',
-                fontFamily: 'var(--font-family)',
-                fontSize: 'var(--text-sm)',
-                color: '#fca5a5',
-              }}>
-                {erroAditivoTempo}
-              </div>
-            )}
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '18px' }}>
-              <button
-                type="button"
-                onClick={() => setShowAditivoTempo(false)}
-                style={{
-                  backgroundColor: 'transparent',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  borderRadius: 'var(--radius)',
-                  padding: '10px 16px',
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--text-sm)',
-                  color: 'rgba(255,255,255,0.75)',
-                  cursor: 'pointer',
-                }}
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={registrarAditivoTempo}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  backgroundColor: '#00c1af',
-                  border: 'none',
-                  borderRadius: 'var(--radius)',
-                  padding: '10px 16px',
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  color: '#171717',
-                  cursor: 'pointer',
-                }}
-              >
-                <Save size={15} />
-                Registrar Aditivo
-              </button>
-            </div>
-          </div>
-        )}
-
-        {aditivosTempo.length > 0 && (
-          <div style={cardStyle}>
-            <h2 style={sectionTitleStyle}>Histórico de Aditivos de Tempo</h2>
-            <div style={{ display: 'grid', gap: '12px' }}>
-              {aditivosTempo.map(aditivo => (
-                <div key={aditivo.id} style={{
-                  backgroundColor: 'rgba(23, 23, 23,0.5)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '8px',
-                  padding: '16px',
-                }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '16px', marginBottom: '12px' }}>
-                    <ReadOnlyInfo label="Vigência anterior" value={`${formatDate(aditivo.dataInicioAnterior)} até ${formatDate(aditivo.dataFimAnterior)}`} />
-                    <ReadOnlyInfo label="Nova vigência" value={`${formatDate(aditivo.novaDataInicio)} até ${formatDate(aditivo.novaDataFim)}`} />
-                    <ReadOnlyInfo label="Solicitante" value={aditivo.solicitante} />
-                    <ReadOnlyInfo label="Registrado em" value={aditivo.registradoEm} />
-                  </div>
-                  <ReadOnlyInfo label="Justificativa" value={aditivo.justificativa} />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {aporteParaRetirada && (
           <div style={{ ...cardStyle, borderColor: aporteParaRetirada.valorAlocado > 0 ? 'rgba(239,68,68,0.35)' : 'rgba(0,193,175,0.28)' }}>
@@ -869,7 +735,7 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
             {aportes.map((aporte, idx) => (
               <div key={aporte.id}>
                 {idx > 0 && <div style={dividerStyle} />}
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 1.3fr) minmax(140px, 0.6fr) minmax(130px, 0.55fr) minmax(130px, 0.55fr) minmax(110px, 0.45fr) auto auto', gap: '12px', alignItems: 'end' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 1.3fr) minmax(140px, 0.6fr) minmax(130px, 0.55fr) minmax(130px, 0.55fr) minmax(110px, 0.45fr) auto', gap: '12px', alignItems: 'end' }}>
                   <Select label="Parceria aportante" value={aporte.parceria} onChange={value => updateAporte(aporte.id, 'parceria', value)} options={parceriasOptions} />
                   <Field
                     label="Valor aportado (R$)"
@@ -878,28 +744,8 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
                     placeholder="0,00"
                   />
                   <DateField label="Data do aporte" value={aporte.dataAporte} onChange={value => updateAporte(aporte.id, 'dataAporte', value)} />
-                  <ReadOnlyInfo label="Alocado em projetos" value={formatCurrency(aporte.valorAlocado)} />
-                  <Select label="Estado" value={aporte.estado} onChange={value => updateAporte(aporte.id, 'estado', value)} options={['EM_EXECUCAO', 'SUSPENSO', 'ENCERRADO']} />
-                  <button
-                    type="button"
-                    onClick={() => abrirRetiradaAporte(aporte)}
-                    style={{
-                      height: '38px',
-                      padding: '0 12px',
-                      border: '1px solid rgba(239,68,68,0.35)',
-                      borderRadius: 'var(--radius)',
-                      background: 'transparent',
-                      color: '#fca5a5',
-                      fontFamily: 'var(--font-family)',
-                      fontSize: 'var(--text-sm)',
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.1)'}
-                    onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
-                  >
-                    Retirar
-                  </button>
+                  <ReadOnlyField label="Alocado em Projetos" value={formatCurrency(aporte.valorAlocado)} />
+                  <Select label="Status" value={aporte.estado} onChange={value => updateAporte(aporte.id, 'estado', value)} options={['Em Execução', 'Suspenso', 'Encerrado']} />
                   {aportes.length > 1 ? (
                     <button
                       type="button"
@@ -978,9 +824,6 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
           <button
             type="button"
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
               backgroundColor: '#00c1af',
               border: 'none',
               borderRadius: 'var(--radius)',
@@ -994,7 +837,6 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
             onMouseEnter={e => e.currentTarget.style.backgroundColor = '#00a99a'}
             onMouseLeave={e => e.currentTarget.style.backgroundColor = '#00c1af'}
           >
-            <Save size={15} />
             Salvar Alterações
           </button>
         </div>
@@ -1004,11 +846,11 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
         {activeTab === 'dashboard' && (
           <div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px', marginBottom: '24px' }}>
-              <Metric label="Total Investido" value={formatCurrency(totalInvestidoPrograma)} detail="Recursos das parcerias" Icon={DollarSign} color="#a855f7" bg="rgba(168,85,247,0.12)" />
-              <Metric label="Total Aportado" value={formatCurrency(totalAportadoIniciativas)} detail={`${formatPercent(percentualAportadoPrograma)} do alocado`} Icon={Handshake} color="#38bdf8" bg="rgba(56,189,248,0.12)" />
-              <Metric label="Total Alocado" value={formatCurrency(totalAlocadoIniciativas)} detail={`${formatPercent(percentualAlocadoPrograma)} do investido`} Icon={FolderOpen} color="#3b82f6" bg="rgba(59,130,246,0.12)" />
-              <Metric label="Total Consumido" value={formatCurrency(totalConsumidoIniciativas)} detail={`${formatPercent(percentualConsumidoPrograma)} do aportado`} Icon={DollarSign} color="#22c55e" bg="rgba(34,197,94,0.12)" />
-              <Metric label="Saldo disponível" value={formatCurrency(saldoDisponivelPrograma)} detail={`${formatPercent(totalInvestidoPrograma > 0 ? (saldoDisponivelPrograma / totalInvestidoPrograma) * 100 : 0)} do investido`} Icon={DollarSign} color="#00c1af" bg="rgba(0,193,175,0.12)" />
+              <Metric label="Total Investido" value={formatCurrency(totalInvestidoPrograma)} detail="Recursos das parcerias" Icon={DollarSign} />
+              <Metric label="Total Aportado" value={formatCurrency(totalAportadoIniciativas)} detail={`${formatPercent(percentualAportadoPrograma)} do alocado`} Icon={Handshake} />
+              <Metric label="Total Alocado" value={formatCurrency(totalAlocadoIniciativas)} detail={`${formatPercent(percentualAlocadoPrograma)} do investido`} Icon={FolderOpen} />
+              <Metric label="Total Consumido" value={formatCurrency(totalConsumidoIniciativas)} detail={`${formatPercent(percentualConsumidoPrograma)} do aportado`} Icon={DollarSign} />
+              <Metric label="Saldo disponível" value={formatCurrency(saldoDisponivelPrograma)} detail={`${formatPercent(totalInvestidoPrograma > 0 ? (saldoDisponivelPrograma / totalInvestidoPrograma) * 100 : 0)} do investido`} Icon={DollarSign} />
             </div>
 
             <div style={dashboardCardStyle()}>
@@ -1127,6 +969,24 @@ const Field: React.FC<{ label: string; value: string; onChange: (value: string) 
   </div>
 );
 
+const ReadOnlyField: React.FC<{ label: string; value: string }> = ({ label, value }) => (
+  <div>
+    <label style={labelStyle}>{label}</label>
+    <div
+      style={{
+        ...inputStyle,
+        minHeight: '40px',
+        display: 'flex',
+        alignItems: 'center',
+        lineHeight: '1.5',
+        pointerEvents: 'none',
+      }}
+    >
+      {value || '-'}
+    </div>
+  </div>
+);
+
 const DateField: React.FC<{ label: string; value: string; onChange: (value: string) => void }> = ({ label, value, onChange }) => (
   <div>
     <label style={labelStyle}>{label}</label>
@@ -1141,23 +1001,60 @@ const DateField: React.FC<{ label: string; value: string; onChange: (value: stri
   </div>
 );
 
-const Select: React.FC<{ label: string; value: string; onChange: (value: string) => void; options: string[] }> = ({ label, value, onChange, options }) => (
-  <div style={{ width: '100%' }}>
-    <label style={labelStyle}>{label}</label>
-    <select
-      value={value}
-      onChange={event => onChange(event.target.value)}
-      style={{ ...inputStyle, colorScheme: 'dark' }}
-      onFocus={event => event.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)'}
-      onBlur={event => event.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'}
-    >
-      <option value="">Selecione...</option>
-      {options.map(option => (
-        <option key={option} value={option}>{option}</option>
-      ))}
-    </select>
-  </div>
-);
+const Select: React.FC<{ label: string; value: string; onChange: (value: string) => void; options: string[] }> = ({ label, value, onChange, options }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div style={{ width: '100%', position: 'relative' }}>
+      <label style={labelStyle}>{label}</label>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        onBlur={() => window.setTimeout(() => setOpen(false), 120)}
+        style={{
+          ...inputStyle,
+          minHeight: '40px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          textAlign: 'left',
+        }}
+      >
+        <span>{value || 'Selecione...'}</span>
+        <ChevronRight size={15} style={{ color: 'rgba(255,255,255,0.45)', transform: open ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+      </button>
+      {open && (
+        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', zIndex: 40, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius)', backgroundColor: '#262626', boxShadow: '0 16px 32px rgba(0,0,0,0.36)' }}>
+          {options.map(option => (
+            <button
+              key={option}
+              type="button"
+              onMouseDown={event => event.preventDefault()}
+              onClick={() => {
+                onChange(option);
+                setOpen(false);
+              }}
+              style={{
+                width: '100%',
+                padding: '11px 14px',
+                border: 'none',
+                backgroundColor: value === option ? 'rgba(0,193,175,0.12)' : 'transparent',
+                color: value === option ? '#00c1af' : '#ffffff',
+                textAlign: 'left',
+                fontFamily: 'var(--font-family)',
+                fontSize: 'var(--text-sm)',
+                cursor: 'pointer',
+              }}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const TextArea: React.FC<{ label: string; value: string; onChange: (value: string) => void; rows?: number }> = ({ label, value, onChange, rows = 3 }) => (
   <div>
@@ -1189,12 +1086,12 @@ const Metric: React.FC<{
   Icon?: React.ElementType;
   color?: string;
   bg?: string;
-}> = ({ label, value, detail, Icon, color = '#ffffff', bg = 'rgba(255,255,255,0.08)' }) => (
+}> = ({ label, value, detail, Icon }) => (
   <div style={dashboardCardStyle()}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
       {Icon && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: bg, borderRadius: 'var(--radius)', flexShrink: 0 }}>
-          <Icon size={20} style={{ color }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: 'rgba(0,193,175,0.12)', borderRadius: 'var(--radius)', flexShrink: 0 }}>
+          <Icon size={20} style={{ color: '#00c1af' }} />
         </div>
       )}
       <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', margin: 0 }}>

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronRight, Home, Save, Send, Plus, Trash2, ChevronDown, Search } from 'lucide-react';
+import { ChevronRight, Plus, Trash2, ChevronDown, Search } from 'lucide-react';
 import { useThemeTokens } from '../theme/ThemeContext';
 
 interface Membro { id: number; nome: string; }
@@ -51,7 +51,7 @@ const sectionSubtitleStyle: React.CSSProperties = {
   fontFamily: 'var(--font-family)',
   fontSize: 'var(--text-sm)',
   color: 'var(--form-text-muted)',
-  margin: '0 0 24px',
+  margin: '0 0 24px 32px',
 };
 
 const dividerStyle: React.CSSProperties = {
@@ -82,6 +82,7 @@ const SelectField: React.FC<{
   options: { value: string; label: string }[];
   placeholder?: string;
 }> = ({ label, value, onChange, options, placeholder }) => {
+  const { T } = useThemeTokens();
   const [open, setOpen] = useState(false);
   return (
     <div style={{ position: 'relative' }}>
@@ -99,9 +100,9 @@ const SelectField: React.FC<{
       {open && (
         <div style={{
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%',
-          backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.12)',
+          backgroundColor: T.bgSurface, border: `1px solid ${T.borderDefault}`,
           borderRadius: 'var(--radius)', zIndex: 300, overflow: 'hidden',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+          boxShadow: T.shadowMd,
         }}>
           {options.map(opt => (
             <button
@@ -110,11 +111,11 @@ const SelectField: React.FC<{
               onClick={() => { onChange(opt.value); setOpen(false); }}
               style={{
                 width: '100%', padding: '10px 14px', textAlign: 'left', border: 'none',
-                backgroundColor: value === opt.value ? 'rgba(0,193,175,0.1)' : 'transparent',
-                color: value === opt.value ? '#00c1af' : '#ffffff',
+                backgroundColor: value === opt.value ? T.accentSoft : 'transparent',
+                color: value === opt.value ? T.accent : T.textPrimary,
                 fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer',
               }}
-              onMouseEnter={e => { if (value !== opt.value) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'; }}
+              onMouseEnter={e => { if (value !== opt.value) e.currentTarget.style.backgroundColor = T.bgHover; }}
               onMouseLeave={e => { if (value !== opt.value) e.currentTarget.style.backgroundColor = 'transparent'; }}
             >
               {opt.label}
@@ -334,10 +335,8 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
     >
       <div className="pt-8 px-8 pb-16">
 
-        {/* Breadcrumb — sem "Gestão de Captação" */}
+        {/* Breadcrumb */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
-          <Home size={15} style={{ color: 'var(--form-text-muted)' }} />
-          <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
           <button
             onClick={onBack}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)' }}
@@ -346,7 +345,7 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
           </button>
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
           <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-primary)', fontWeight: 'var(--font-weight-medium)' }}>
-            Novo Programa
+            Criar Programa
           </span>
         </div>
 
@@ -362,7 +361,7 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
             </div>
             <div style={{ flex: 1, marginTop: '6px' }}>
               <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 4px' }}>
-                Novo Programa
+                Criar Programa
               </h1>
               <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>
                 Preencha as informações abaixo para criar um novo programa de fomento.
@@ -428,7 +427,7 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
             />
           </div>
 
-          <div style={{ marginBottom: planejamento ? '20px' : '0' }}>
+          <div style={{ marginBottom: '20px' }}>
             <SelectField
               label="Planejamento Estratégico"
               value={planejamento}
@@ -441,46 +440,41 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
             />
           </div>
 
-          {planejamento && (
-            <>
-              <div style={dividerStyle} />
-              <div>
-                <label style={labelStyle}>Selecione o Eixo Estratégico</label>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {eixosOptions.map(eixo => (
-                    <button key={eixo} type="button" onClick={() => toggleEixo(eixo)}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: '10px',
-                        background: 'transparent', border: 'none', cursor: 'pointer',
-                        padding: '8px 12px', borderRadius: 'var(--radius)',
-                        backgroundColor: eixos.includes(eixo) ? 'rgba(0,193,175,0.08)' : 'rgba(255,255,255,0.03)',
-                        transition: 'background-color 0.15s',
-                      }}
-                      onMouseEnter={e => { if (!eixos.includes(eixo)) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)'; }}
-                      onMouseLeave={e => { if (!eixos.includes(eixo)) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.03)'; }}
-                    >
-                      <div style={{
-                        width: '18px', height: '18px', borderRadius: '4px', flexShrink: 0,
-                        border: eixos.includes(eixo) ? '2px solid #00c1af' : '2px solid rgba(255,255,255,0.25)',
-                        backgroundColor: eixos.includes(eixo) ? '#00c1af' : 'transparent',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        transition: 'all 0.15s',
-                      }}>
-                        {eixos.includes(eixo) && (
-                          <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                            <path d="M1 4L3.5 6.5L9 1" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        )}
-                      </div>
-                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: eixos.includes(eixo) ? '#00c1af' : 'rgba(255,255,255,0.8)' }}>
-                        {eixo}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
+          <div>
+            <label style={labelStyle}>Selecione o Eixo Estratégico</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {eixosOptions.map(eixo => (
+                <button key={eixo} type="button" onClick={() => toggleEixo(eixo)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '10px',
+                    background: 'transparent', border: 'none', cursor: 'pointer',
+                    padding: '8px 12px', borderRadius: 'var(--radius)',
+                    backgroundColor: eixos.includes(eixo) ? 'rgba(0,193,175,0.08)' : 'rgba(255,255,255,0.03)',
+                    transition: 'background-color 0.15s',
+                  }}
+                  onMouseEnter={e => { if (!eixos.includes(eixo)) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)'; }}
+                  onMouseLeave={e => { if (!eixos.includes(eixo)) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.03)'; }}
+                >
+                  <div style={{
+                    width: '18px', height: '18px', borderRadius: '4px', flexShrink: 0,
+                    border: eixos.includes(eixo) ? '2px solid #00c1af' : '2px solid rgba(255,255,255,0.25)',
+                    backgroundColor: eixos.includes(eixo) ? '#00c1af' : 'transparent',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'all 0.15s',
+                  }}>
+                    {eixos.includes(eixo) && (
+                      <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                        <path d="M1 4L3.5 6.5L9 1" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </div>
+                  <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: eixos.includes(eixo) ? '#00c1af' : 'rgba(255,255,255,0.8)' }}>
+                    {eixo}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* ── Seção 2: Aporte financeiro ── */}
@@ -626,7 +620,7 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
                 </div>
               ))}
             </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '18px' }}>
               <button type="button" onClick={addMembro} style={addBtnStyle}
                 onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(0,193,175,0.08)'; e.currentTarget.style.borderColor = '#00c1af'; }}
                 onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.borderColor = 'rgba(0,193,175,0.4)'; }}
@@ -642,7 +636,7 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px' }}>
           <button type="button"
             style={{
-              display: 'flex', alignItems: 'center', gap: '8px',
+              display: 'flex', alignItems: 'center',
               backgroundColor: 'transparent',
               border: '1px solid rgba(255,255,255,0.2)',
               borderRadius: 'var(--radius)', padding: '11px 20px',
@@ -653,13 +647,12 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
             onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.04)'; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.backgroundColor = 'transparent'; }}
           >
-            <Save size={15} />
-            Salvar em Planejamento
+            Salvar Rascunho
           </button>
 
           <button type="button"
             style={{
-              display: 'flex', alignItems: 'center', gap: '8px',
+              display: 'flex', alignItems: 'center',
               backgroundColor: '#00c1af', border: 'none',
               borderRadius: 'var(--radius)', padding: '11px 20px',
               fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
@@ -669,7 +662,6 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
             onMouseEnter={e => e.currentTarget.style.backgroundColor = '#00a99a'}
             onMouseLeave={e => e.currentTarget.style.backgroundColor = '#00c1af'}
           >
-            <Send size={15} />
             Ativar Programa
           </button>
         </div>

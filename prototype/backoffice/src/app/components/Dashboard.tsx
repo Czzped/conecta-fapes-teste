@@ -52,7 +52,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
-  const [activePage, setActivePage] = useState<ActivePage>('dashboard');
+  const [activePage, setActivePage] = useState<ActivePage>('parceria');
   const [selectedPagamento, setSelectedPagamento] = useState<PagamentoCard | null>(null);
   
   const [theme, setTheme] = useState<Theme>(() => {
@@ -1629,7 +1629,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         ) : activePage === 'pagamento' ? (
           <div />
         ) : activePage === 'contabilidade-financeiro' ? (
-          <AcaoTransversalFinanceiro onBack={() => setActivePage('home')} />
+          <AcaoTransversalFinanceiro onBack={() => setActivePage('parceria')} />
         ) : activePage === 'iniciativas' ? (
           <Iniciativas />
         ) : activePage === 'rubricas' ? (
@@ -1664,11 +1664,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         ) : activePage === 'regras-acao-transversal' ? (
           <RegrasAcaoTransversal onBack={() => setActivePage('configuracoes')} />
         ) : activePage === 'programa' ? (
-          <Programa onBack={() => setActivePage('home')} />
+          <Programa onBack={() => setActivePage('parceria')} />
         ) : activePage === 'parceria' ? (
-          <Parceria onBack={() => setActivePage('home')} />
+          <Parceria onBack={() => setActivePage('parceria')} />
         ) : activePage === 'instituicoes' ? (
-          <Instituicoes onBack={() => setActivePage('home')} />
+          <Instituicoes onBack={() => setActivePage('parceria')} />
         ) : activePage === 'formulario' ? (
           <SurveyFormBuilder onBack={() => setActivePage('configuracoes')} />
         ) : (

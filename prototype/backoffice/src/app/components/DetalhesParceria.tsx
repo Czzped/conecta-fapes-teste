@@ -26,6 +26,18 @@ const formatPercent = (value: number) => (
   `${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
 );
 
+const formatContaDestino = (value: string) => value.replace(/^Banestes\s*[\/-–—]?\s*/i, '').replace(/^\s*\/\s*/, '');
+
+const toDateInputValue = (value: string) => {
+  const match = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  return match ? `${match[3]}-${match[2]}-${match[1]}` : value;
+};
+
+const fromDateInputValue = (value: string) => {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return match ? `${match[3]}/${match[2]}/${match[1]}` : value;
+};
+
 const calcularPercentualAcaoTransversal = (valor: number) => {
   if (valor < 50000) return 0;
   if (valor <= 2000000) return 5;
@@ -271,6 +283,22 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
   const valorReservaAcaoTransversal = reservasAcaoTransversal.reduce((total, reserva) => total + reserva.valorReserva, 0);
   const saldoDisponivel = Math.max(cadastroData.aporteTotal - valorReservaAcaoTransversal - cadastroData.valorAlocado, 0);
   const percentualReservaTotal = cadastroData.aporteTotal > 0 ? (valorReservaAcaoTransversal / cadastroData.aporteTotal) * 100 : 0;
+  const aditivosTimeline = [
+    ...aditivosFinanceiros.map((aditivo, index) => ({
+      id: `financeiro-${index}`,
+      tipo: 'Aditivo de Valor',
+      data: aditivo.data || 'Pendente',
+      descricao: `Aporte total acrescido em ${formatCurrency(aditivo.valor)}.`,
+      documento: aditivo.documento || 'Pendente',
+    })),
+    ...aditivosTempo.map((aditivo, index) => ({
+      id: `tempo-${index}`,
+      tipo: 'Aditivo de Tempo',
+      data: aditivo.vigenciaFim,
+      descricao: `Fim da vigência alterado de ${aditivo.vigenciaFimAnterior} para ${aditivo.vigenciaFim}.`,
+      documento: aditivo.documento || 'Pendente',
+    })),
+  ];
   const valorAditivoPreview = parseCurrency(aditivoFinanceiro.valor);
   const percentualAditivoPreview = calcularPercentualAcaoTransversal(valorAditivoPreview);
   const reservaAditivoPreview = calcularReservaAcaoTransversal(valorAditivoPreview);
@@ -721,34 +749,9 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
           </div>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '16px', marginBottom: '24px' }}>
-          {[
-            { label: 'Total Investido', value: formatCurrency(cadastroData.aporteTotal), Icon: DollarSign },
-            { label: 'Ação Transversal', value: formatCurrency(valorReservaAcaoTransversal), Icon: Handshake },
-            { label: 'Total Aportado', value: formatCurrency(valorAportado), Icon: Handshake },
-            { label: 'Total Alocado', value: formatCurrency(cadastroData.valorAlocado), Icon: FolderOpen },
-            { label: 'Total Consumido', value: formatCurrency(valorConsumido), Icon: DollarSign },
-            { label: 'Saldo programas', value: formatCurrency(saldoDisponivel), Icon: DollarSign },
-          ].map(({ label, value, Icon }) => (
-            <div key={label} style={metricCardStyle}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: 'rgba(0,193,175,0.12)', borderRadius: 'var(--radius)', flexShrink: 0 }}>
-                  <Icon size={20} style={{ color: '#00c1af' }} />
-                </div>
-                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', margin: 0 }}>
-                  {label}
-                </p>
-              </div>
-              <p style={{ fontFamily: 'var(--font-family)', fontSize: label.includes('impactados') || label.includes('induzidas') ? 'var(--text-2xl)' : 'var(--text-lg)', color: '#ffffff', textAlign: 'center', margin: 0 }}>
-                {value}
-              </p>
-            </div>
-          ))}
-        </div>
-
         <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '28px' }}>
           {[
-            { id: 'resumo', label: 'Resumo' },
+            { id: 'resumo', label: 'Informações Gerais' },
             { id: 'dashboard', label: 'Dashboard' },
           ].map(tab => (
             <button
@@ -763,111 +766,48 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
 
         {activeTab === 'resumo' && (
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px', marginBottom: '16px' }}>
-              {editingCadastro ? (
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <SmallButton icon={<X size={14} />} label="Cancelar" onClick={() => setEditingCadastro(false)} muted />
-                  <SmallButton icon={<Save size={14} />} label="Salvar" onClick={saveCadastroData} />
-                </div>
-              ) : (
-                podeEditarCadastro && <SmallButton icon={<Edit3 size={14} />} label="Editar" onClick={startEditingCadastro} />
-              )}
-            </div>
-
             <SummarySection number="1" title="Identificação da Parceria" subtitle="Dados básicos do processo e da instituição vinculada">
-              {editingCadastro ? (
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                  <TextEditField label="Nome da parceria" value={draftCadastroData.nome} onChange={(nome) => setDraftCadastroData(prev => ({ ...prev, nome }))} />
-                  <TextEditField label="Número do processo" value={draftCadastroData.numeroProcesso} onChange={(numeroProcesso) => setDraftCadastroData(prev => ({ ...prev, numeroProcesso }))} />
+              <div style={{ display: 'grid', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px' }}>
+                  <ReadOnlyField label="Nome da parceria" value={cadastroData.nome} />
+                  <ReadOnlyField label="Número do processo" value={cadastroData.numeroProcesso} />
                 </div>
-              ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginBottom: '16px' }}>
-                  <Info label="Nome da parceria" value={cadastroData.nome} />
-                  <Info label="Número do processo" value={cadastroData.numeroProcesso} />
-                </div>
-              )}
-              <div style={{ marginBottom: '16px' }}>
-                {editingCadastro ? (
-                  <InstitutionEditField label="Instituição vinculada" value={draftCadastroData.instituicaoParceira} onChange={(instituicaoParceira) => setDraftCadastroData(prev => ({ ...prev, instituicaoParceira }))} />
-                ) : (
-                  <Info label="Instituição vinculada" value={cadastroData.instituicaoParceira} />
-                )}
+                <ReadOnlyField label="Instituição vinculada" value={cadastroData.instituicaoParceira} />
+                <ReadOnlyField label="Objetivo" value={cadastroData.objetivo} multiline />
               </div>
-              {editingCadastro ? (
-                <TextAreaEditField label="Objetivo" value={draftCadastroData.objetivo} onChange={(objetivo) => setDraftCadastroData(prev => ({ ...prev, objetivo }))} />
-              ) : (
-                <Info label="Objetivo" value={cadastroData.objetivo} full />
-              )}
             </SummarySection>
 
             <SummarySection number="2" title="Vigência Original" subtitle="Período inicial de validade da parceria">
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-                {editingCadastro ? (
-                  <>
-                    <TextEditField label="Data de assinatura" value={draftCadastroData.dataAssinatura} onChange={(dataAssinatura) => setDraftCadastroData(prev => ({ ...prev, dataAssinatura }))} />
-                    <TextEditField label="Início da vigência" value={draftCadastroData.vigenciaInicio} onChange={(vigenciaInicio) => setDraftCadastroData(prev => ({ ...prev, vigenciaInicio }))} />
-                    <TextEditField label="Fim da vigência" value={draftCadastroData.vigenciaFim} onChange={(vigenciaFim) => setDraftCadastroData(prev => ({ ...prev, vigenciaFim }))} />
-                  </>
-                ) : (
-                  <>
-                    <Info label="Data de assinatura" value={cadastroData.dataAssinatura || 'Pendente'} />
-                    <Info label="Início da vigência" value={cadastroData.vigenciaInicio} />
-                    <Info label="Fim da vigência" value={cadastroData.vigenciaFim} />
-                  </>
-                )}
+                <ReadOnlyField label="Data de assinatura" value={cadastroData.dataAssinatura || 'Pendente'} />
+                <ReadOnlyField label="Início da vigência" value={cadastroData.vigenciaInicio} />
+                <ReadOnlyField label="Fim da vigência" value={cadastroData.vigenciaFim} />
               </div>
-              {aditivosTempo.length > 0 && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '18px' }}>
-                  {aditivosTempo.map((aditivo, index) => (
-                    <Row key={`${aditivo.vigenciaFim}-${index}`}>
-                      <Info label="Aditivo de tempo" value={`Aditivo ${index + 1}`} />
-                      <Info label="Fim anterior" value={aditivo.vigenciaFimAnterior} />
-                      <Info label="Novo fim" value={aditivo.vigenciaFim} />
-                      <Info label="Documento" value={aditivo.documento || 'Pendente'} />
-                      <RemoveButton label="Remover" onClick={() => removerAditivoTempo(index)} />
-                    </Row>
-                  ))}
-                </div>
-              )}
             </SummarySection>
 
             <SummarySection number="3" title="Aporte Financeiro Original" subtitle="Valor investido pela instituição vinculada e conta de destino">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '16px' }}>
-                {editingCadastro ? (
-                  <>
-                    <NumberEditField label="Total investido" value={draftCadastroData.aporteTotal} onChange={(aporteTotal) => setDraftCadastroData(prev => ({ ...prev, aporteTotal }))} />
-                    <Info label="Estado atual" value={statusLabel[currentStatus]} />
-                  </>
-                ) : (
-                  <>
-                    <Info label="Total investido" value={formatCurrency(cadastroData.aporteTotal)} />
-                    <Info label="Estado atual" value={statusLabel[currentStatus]} />
-                  </>
-                )}
+              <div style={{ display: 'grid', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+                  <ReadOnlyField label="Total investido" value={formatCurrency(cadastroData.aporteTotal)} />
+                  <ReadOnlyField label="Status atual" value={statusLabel[currentStatus]} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+                  <ReadOnlyField label="Conta bancária de destino da parceria" value={cadastroData.contaBancariaDestino} />
+                  <ReadOnlyField label="Conta Ação Transversal" value={cadastroData.contaBancariaAcaoTransversal} />
+                </div>
               </div>
-              {editingCadastro ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
-                  <TextEditField label="Conta bancária de destino da parceria" value={draftCadastroData.contaBancariaDestino} onChange={(contaBancariaDestino) => setDraftCadastroData(prev => ({ ...prev, contaBancariaDestino }))} />
-                  <TextEditField label="Conta Ação Transversal" value={draftCadastroData.contaBancariaAcaoTransversal} onChange={(contaBancariaAcaoTransversal) => setDraftCadastroData(prev => ({ ...prev, contaBancariaAcaoTransversal }))} />
-                </div>
-              ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
-                  <Info label="Conta bancária de destino da parceria" value={cadastroData.contaBancariaDestino} />
-                  <Info label="Conta Ação Transversal" value={cadastroData.contaBancariaAcaoTransversal} />
-                </div>
-              )}
             </SummarySection>
 
             <SummarySection number="4" title="Ação Transversal" subtitle="Reserva normativa bloqueada para gestão contábil e financeira">
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: '16px', marginBottom: '16px' }}>
-                <Info label="Política aplicada" value="Res. CCAF 334/2023" />
-                <Info label="Faixa aplicada" value={definirFaixaAcaoTransversal(cadastroData.aporteTotal)} />
-                <Info label="Percentual médio reservado" value={formatPercent(percentualReservaTotal)} />
-                <Info label="Valor reservado" value={formatCurrency(valorReservaAcaoTransversal)} />
-                <Info label="Conta destino" value={cadastroData.contaBancariaAcaoTransversal} />
+                <ReadOnlyField label="Política aplicada" value="Res. CCAF 334/2023" />
+                <ReadOnlyField label="Faixa aplicada" value={definirFaixaAcaoTransversal(cadastroData.aporteTotal)} />
+                <ReadOnlyField label="Percentual médio reservado" value={formatPercent(percentualReservaTotal)} />
+                <ReadOnlyField label="Valor reservado" value={formatCurrency(valorReservaAcaoTransversal)} />
+                <ReadOnlyField label="Conta destino" value={formatContaDestino(cadastroData.contaBancariaAcaoTransversal)} />
               </div>
               <div style={{ marginBottom: '16px' }}>
-                <Info label="Saldo alocável em programas" value={formatCurrency(saldoDisponivel)} />
+                <ReadOnlyField label="Saldo alocável em programas" value={formatCurrency(saldoDisponivel)} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {reservasAcaoTransversal.map((reserva, index) => (
@@ -877,7 +817,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                     <Info label="Faixa aplicada" value={reserva.faixa} />
                     <Info label="Percentual" value={formatPercent(reserva.percentual)} />
                     <Info label="Reserva financeira" value={formatCurrency(reserva.valorReserva)} />
-                    <Info label="Conta destino" value={reserva.contaAcaoTransversal} />
+                    <Info label="Conta destino" value={formatContaDestino(reserva.contaAcaoTransversal)} />
                     <Info label="Líquido programas" value={formatCurrency(reserva.saldoLiquido)} />
                   </Row>
                 ))}
@@ -885,7 +825,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
             </SummarySection>
 
             <SummarySection number="5" title="Documentos" subtitle="Documentos que sustentam a formalização da parceria">
-              <div style={{ ...cardStyle, padding: '20px', marginBottom: '16px' }}>
+              <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
                   <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
                     Documentos da parceria
@@ -915,41 +855,36 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                 )}
               </div>
 
-              <div style={{ ...cardStyle, padding: '20px', marginBottom: 0 }}>
-                <div style={{ marginBottom: '20px' }}>
-                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>
-                    Anexar documento
-                  </h2>
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
-                    Faça upload do arquivo e classifique o documento por tipo.
-                  </p>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 1fr 1.2fr', gap: '16px', alignItems: 'end' }}>
-                  <SelectEditField
-                    label="Tipo do documento"
-                    value={novoDocumento.tipo}
-                    options={tipoDocumentoOptions}
-                    onChange={(tipo) => setNovoDocumento(prev => ({ ...prev, tipo }))}
-                  />
-                  <TextEditField
-                    label="Descrição"
-                    value={novoDocumento.descricao}
-                    onChange={(descricao) => setNovoDocumento(prev => ({ ...prev, descricao }))}
-                  />
-                  <DateMaskEditField
-                    label="Data de emissão"
-                    value={novoDocumento.dataEmissao}
-                    onChange={(dataEmissao) => setNovoDocumento(prev => ({ ...prev, dataEmissao }))}
-                  />
-                  <UploadEditField
-                    label="Arquivo"
-                    fileName={novoDocumento.arquivo}
-                    onChange={(arquivo) => setNovoDocumento(prev => ({ ...prev, arquivo }))}
-                  />
-                </div>
-              </div>
             </SummarySection>
+
+            {aditivosTimeline.length > 0 && (
+              <SummarySection number="6" title="Aditivo" subtitle="Histórico das alterações registradas na parceria">
+                <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '18px', paddingLeft: '28px' }}>
+                  <div style={{ position: 'absolute', left: '8px', top: '6px', bottom: '6px', width: '2px', backgroundColor: 'rgba(0,193,175,0.35)' }} />
+                  {aditivosTimeline.map((aditivo, index) => (
+                    <div key={aditivo.id} style={{ position: 'relative' }}>
+                      <div style={{ position: 'absolute', left: '-26px', top: '4px', width: '18px', height: '18px', borderRadius: '999px', backgroundColor: '#00c1af', border: '3px solid rgba(0,193,175,0.18)' }} />
+                      <div style={{ ...inputStyle, padding: '14px 16px', minHeight: 'auto', pointerEvents: 'none' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', marginBottom: '8px' }}>
+                          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff' }}>
+                            {index + 1}. {aditivo.tipo}
+                          </span>
+                          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.55)' }}>
+                            {aditivo.data}
+                          </span>
+                        </div>
+                        <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.78)', lineHeight: 1.5, margin: '0 0 8px' }}>
+                          {aditivo.descricao}
+                        </p>
+                        <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                          Documento: {aditivo.documento}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </SummarySection>
+            )}
           </div>
         )}
 
@@ -965,7 +900,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                     <Info label="Tipo" value={aporte.tipo} />
                     <Info label="Data" value={aporte.data} />
                     <Info label="Valor" value={formatCurrency(aporte.valor)} />
-                    <Info label="Conta destino" value={aporte.conta} />
+                    <Info label="Conta destino" value={formatContaDestino(aporte.conta)} />
                     <Info label="Documento" value={aporte.documento} />
                     {index === 0 ? <Info label="Ação" value="-" /> : <RemoveButton label="Remover" onClick={() => removerAditivoFinanceiro(index - 1)} />}
                   </Row>
@@ -985,7 +920,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
                     <Info label="Faixa aplicada" value={reserva.faixa} />
                     <Info label="Percentual" value={formatPercent(reserva.percentual)} />
                     <Info label="Valor reservado" value={formatCurrency(reserva.valorReserva)} />
-                    <Info label="Conta destino" value={reserva.contaAcaoTransversal} />
+                    <Info label="Conta destino" value={formatContaDestino(reserva.contaAcaoTransversal)} />
                   </Row>
                 ))}
               </div>
@@ -1016,6 +951,31 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
 
         {activeTab === 'dashboard' && (
           <>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '16px', marginBottom: '24px' }}>
+              {[
+                { label: 'Total Investido', value: formatCurrency(cadastroData.aporteTotal), Icon: DollarSign },
+                { label: 'Ação Transversal', value: formatCurrency(valorReservaAcaoTransversal), Icon: Handshake },
+                { label: 'Total Aportado', value: formatCurrency(valorAportado), Icon: Handshake },
+                { label: 'Total Alocado', value: formatCurrency(cadastroData.valorAlocado), Icon: FolderOpen },
+                { label: 'Total Consumido', value: formatCurrency(valorConsumido), Icon: DollarSign },
+                { label: 'Saldo programas', value: formatCurrency(saldoDisponivel), Icon: DollarSign },
+              ].map(({ label, value, Icon }) => (
+                <div key={label} style={metricCardStyle}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: 'rgba(0,193,175,0.12)', borderRadius: 'var(--radius)', flexShrink: 0 }}>
+                      <Icon size={20} style={{ color: '#00c1af' }} />
+                    </div>
+                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.7)', margin: 0 }}>
+                      {label}
+                    </p>
+                  </div>
+                  <p style={{ fontFamily: 'var(--font-family)', fontSize: label.includes('impactados') || label.includes('induzidas') ? 'var(--text-2xl)' : 'var(--text-lg)', color: '#ffffff', textAlign: 'center', margin: 0 }}>
+                    {value}
+                  </p>
+                </div>
+              ))}
+            </div>
+
             <div style={{ ...cardStyle, padding: '16px 18px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
@@ -1154,7 +1114,7 @@ const SummarySection: React.FC<{ number: string; title: string; subtitle: string
         {title}
       </p>
     </div>
-    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: '0 0 24px' }}>
+    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: '0 0 16px', border: 'none', borderBottom: 'none', boxShadow: 'none', padding: 0 }}>
       {subtitle}
     </p>
     {children}
@@ -1237,6 +1197,26 @@ const TextEditField: React.FC<{ label: string; value: string; onChange: (value: 
   </div>
 );
 
+const ReadOnlyField: React.FC<{ label: string; value: string; multiline?: boolean }> = ({ label, value, multiline }) => (
+  <div style={{ gridColumn: multiline ? '1 / -1' : undefined }}>
+    <div style={labelStyle}>{label}</div>
+    <div
+      style={{
+        ...inputStyle,
+        minHeight: multiline ? '96px' : '44px',
+        display: 'flex',
+        alignItems: multiline ? 'flex-start' : 'center',
+        lineHeight: '1.5',
+        color: value === 'Pendente' ? '#f59e0b' : '#ffffff',
+        pointerEvents: 'none',
+        whiteSpace: 'pre-wrap',
+      }}
+    >
+      {value || '-'}
+    </div>
+  </div>
+);
+
 const SelectEditField: React.FC<{ label: string; value: string; options: string[]; onChange: (value: string) => void }> = ({ label, value, options, onChange }) => (
   <div>
     <div style={labelStyle}>{label}</div>
@@ -1254,12 +1234,10 @@ const DateMaskEditField: React.FC<{ label: string; value: string; onChange: (val
   <div>
     <div style={{ ...labelStyle, color: labelColor || labelStyle.color }}>{label}</div>
     <input
-      value={value}
-      onChange={event => onChange(maskDate(event.target.value))}
-      placeholder="dd/mm/aaaa"
-      maxLength={10}
-      inputMode="numeric"
-      style={inputStyle}
+      type="date"
+      value={toDateInputValue(value)}
+      onChange={event => onChange(fromDateInputValue(event.target.value))}
+      style={{ ...inputStyle, colorScheme: 'dark' }}
     />
   </div>
 );
