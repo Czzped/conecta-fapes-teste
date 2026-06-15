@@ -420,7 +420,7 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
             Parcerias
           </button>
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
-          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }}>
+          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)' }}>
             Detalhes
           </span>
         </div>

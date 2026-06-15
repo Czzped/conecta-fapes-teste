@@ -62,7 +62,7 @@ const sectionSubtitleStyle: React.CSSProperties = {
   fontFamily: 'var(--font-family)',
   fontSize: 'var(--text-sm)',
   color: 'var(--form-text-muted)',
-  margin: '0 0 24px',
+  margin: '0 0 24px 32px',
 };
 
 const parseCurrencyValue = (value: string) => Number(value.replace(/\./g, '').replace(',', '.')) || 0;
@@ -319,7 +319,7 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
           </button>
           <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
           <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-primary)', fontWeight: 'var(--font-weight-medium)' }}>
-            Nova Parceria
+            Criar Parceira
           </span>
         </div>
 
@@ -330,7 +330,7 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
             </div>
             <div style={{ flex: 1, marginTop: '6px' }}>
               <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 4px' }}>
-                Nova Parceria
+                Criar Parceria
               </h1>
               <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>
                 Registre a solicitação, a instituição única, a vigência original e o aporte financeiro da parceria.
@@ -380,7 +380,7 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '12px', marginBottom: '16px', padding: '16px', border: '1px solid rgba(0,193,175,0.28)', borderRadius: '8px', backgroundColor: 'rgba(0,193,175,0.08)' }}>
             <Metric label="Faixa aplicada" value={faixaAcaoTransversal} />
             <Metric label="Percentual Ação Transversal" value={formatPercent(percentualAcaoTransversal)} />
-            <Metric label="Reserva Ação Transversal" value={formatCurrency(valorReservaAcaoTransversal)} highlight />
+            <Metric label="Reserva Ação Transversal" value={formatCurrency(valorReservaAcaoTransversal)} />
             <Metric label="Saldo alocável em programas" value={formatCurrency(saldoAlocavelEmProgramas)} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
@@ -489,10 +489,10 @@ const Field: React.FC<{ label: string; value: string; onChange: (value: string) 
   </div>
 );
 
-const Metric: React.FC<{ label: string; value: string; highlight?: boolean }> = ({ label, value, highlight }) => (
+const Metric: React.FC<{ label: string; value: string; highlight?: boolean }> = ({ label, value }) => (
   <div>
     <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--form-text-muted)', marginBottom: '5px' }}>{label}</div>
-    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: highlight ? '#f59e0b' : '#ffffff', fontWeight: highlight ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', margin: 0 }}>
+    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-normal)', margin: 0 }}>
       {value}
     </p>
   </div>
