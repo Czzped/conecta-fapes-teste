@@ -20,6 +20,7 @@ import { planRelease } from "../domain/release-planning.js";
 import { createInstallationToken } from "../github/app-auth.js";
 import { GitFlowGateway, type CommitStatusResult } from "../github/git-flow-gateway.js";
 import { resolveGitFlowRepositoryToken } from "../github/git-flow-token.js";
+import { GitHubGraphqlClient } from "../github/github-graphql-client.js";
 import { GitHubRestClient } from "../github/github-rest-client.js";
 import { verifyWebhookSignature } from "../github/webhook-signature.js";
 
@@ -80,7 +81,11 @@ async function defaultGatewayFactory(
     )
   );
 
-  return new GitFlowGateway(new GitHubRestClient(token, USER_AGENT), config.org);
+  return new GitFlowGateway(
+    new GitHubRestClient(token, USER_AGENT),
+    config.org,
+    new GitHubGraphqlClient(token, USER_AGENT)
+  );
 }
 
 function createTokenGateway(
@@ -89,7 +94,11 @@ function createTokenGateway(
   userAgent = USER_AGENT
 ): GitFlowGateway {
   const config = createGitFlowConfig(env);
-  return new GitFlowGateway(new GitHubRestClient(token, userAgent), config.org);
+  return new GitFlowGateway(
+    new GitHubRestClient(token, userAgent),
+    config.org,
+    new GitHubGraphqlClient(token, userAgent)
+  );
 }
 
 function getWebhookSecrets(env: WorkerEnvironment): string[] {
@@ -347,6 +356,7 @@ export class GitFlowWorker {
       statusName: typeof body.statusName === "string" ? body.statusName : null,
       repositoryName:
         typeof body.repository === "string" ? body.repository : null,
+      issueId: typeof body.issueId === "string" ? body.issueId : null,
       issueNumber:
         typeof body.issueNumber === "number" ? body.issueNumber : null,
       title: typeof body.title === "string" ? body.title : null,

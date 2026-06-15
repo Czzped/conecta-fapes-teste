@@ -135,17 +135,17 @@ export class ProjectStatusDateWorker {
     const branchPlan = planBranchCreation(gitFlowConfig, {
       statusName: itemState.statusName,
       repositoryName: itemContext.repositoryName,
+      issueId: itemContext.issueId,
       issueNumber: itemContext.issueNumber,
       title: itemContext.title,
     });
+    const branchRepositoryToken = resolveGitFlowRepositoryToken(env, accessToken);
     const branchResult =
       branchPlan.decision === "create_branch"
         ? await new GitFlowGateway(
-            new GitHubRestClient(
-              resolveGitFlowRepositoryToken(env, accessToken),
-              config.userAgent
-            ),
-            gitFlowConfig.org
+            new GitHubRestClient(branchRepositoryToken, config.userAgent),
+            gitFlowConfig.org,
+            new GitHubGraphqlClient(branchRepositoryToken, config.userAgent)
           ).executeAction(branchPlan.action)
         : null;
 

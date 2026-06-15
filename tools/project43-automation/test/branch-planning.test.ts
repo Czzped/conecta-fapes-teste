@@ -37,6 +37,7 @@ test("creates branch from develop and accepts org/repo form", () => {
   const plan = planBranchCreation(config, {
     statusName: config.readyForDevStatusName,
     repositoryName: "leds-conectafapes/leds-conectafapes-backend-admin",
+    issueId: "ISSUE_node_id",
     issueNumber: 42,
     title: "Cadastro de Diárias",
   });
@@ -53,6 +54,7 @@ test("creates branch from develop and accepts org/repo form", () => {
     repo: "leds-conectafapes-backend-admin",
     branch: "feature/42-cadastro-de-diarias",
     baseBranch: "develop",
+    issueId: "ISSUE_node_id",
   });
 });
 

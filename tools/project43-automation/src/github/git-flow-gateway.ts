@@ -5,6 +5,7 @@ import type {
   GitFlowActionResult,
   OpenPullRequestAction,
 } from "../domain/git-flow-actions.js";
+import { GitHubGraphqlClient } from "./github-graphql-client.js";
 import { GitHubRestClient } from "./github-rest-client.js";
 
 interface GitRefResponse {
@@ -13,6 +14,10 @@ interface GitRefResponse {
 
 interface BranchResponse {
   name?: string;
+}
+
+interface RepositoryResponse {
+  node_id?: string;
 }
 
 interface PullRequestResponse {
@@ -32,6 +37,17 @@ interface CommitStatusResponse {
   state?: string;
 }
 
+interface CreateLinkedBranchResponse {
+  createLinkedBranch?: {
+    linkedBranch?: {
+      id?: string;
+      ref?: {
+        name?: string;
+      } | null;
+    } | null;
+  } | null;
+}
+
 export interface CommitStatusResult {
   status: "created" | "failed";
   detail?: string;
@@ -40,6 +56,31 @@ export interface CommitStatusResult {
 interface ExecuteOptions {
   dryRun?: boolean;
 }
+
+const CREATE_LINKED_BRANCH_MUTATION = `
+  mutation CreateLinkedBranch(
+    $issueId: ID!
+    $repositoryId: ID!
+    $oid: GitObjectID!
+    $name: String!
+  ) {
+    createLinkedBranch(
+      input: {
+        issueId: $issueId
+        repositoryId: $repositoryId
+        oid: $oid
+        name: $name
+      }
+    ) {
+      linkedBranch {
+        id
+        ref {
+          name
+        }
+      }
+    }
+  }
+`;
 
 function encodeRef(value: string): string {
   return value.split("/").map(encodeURIComponent).join("/");
@@ -68,7 +109,8 @@ function describeGitHubFailure<TData>(response: {
 export class GitFlowGateway {
   constructor(
     private readonly client: GitHubRestClient,
-    private readonly org: string
+    private readonly org: string,
+    private readonly graphqlClient?: GitHubGraphqlClient
   ) {}
 
   private repoPath(repo: string): string {
@@ -96,6 +138,105 @@ export class GitFlowGateway {
     }
 
     return response.data?.object?.sha ?? null;
+  }
+
+  private async getRepositoryNodeId(repo: string): Promise<string | null> {
+    const response = await this.client.request<RepositoryResponse>(
+      "GET",
+      this.repoPath(repo)
+    );
+
+    if (!response.ok) {
+      throw new Error(`failed to read repository ${repo}: ${describeGitHubFailure(response)}`);
+    }
+
+    return response.data?.node_id ?? null;
+  }
+
+  private async createRefBranch(
+    action: CreateBranchAction,
+    baseSha: string
+  ): Promise<GitFlowActionResult> {
+    const response = await this.client.request(
+      "POST",
+      `${this.repoPath(action.repo)}/git/refs`,
+      { ref: `refs/heads/${action.branch}`, sha: baseSha }
+    );
+
+    if (response.status === 422) {
+      return { action, status: "already_exists" };
+    }
+
+    if (!response.ok) {
+      return { action, status: "failed", detail: describeGitHubFailure(response) };
+    }
+
+    return { action, status: "created" };
+  }
+
+  private async createLinkedBranch(
+    action: CreateBranchAction,
+    baseSha: string
+  ): Promise<GitFlowActionResult> {
+    if (!this.graphqlClient || !action.issueId) {
+      return this.createRefBranch(action, baseSha);
+    }
+
+    let repositoryId: string | null;
+
+    try {
+      repositoryId = await this.getRepositoryNodeId(action.repo);
+    } catch (error) {
+      return {
+        action,
+        status: "failed",
+        detail: error instanceof Error ? error.message : String(error),
+      };
+    }
+
+    if (!repositoryId) {
+      return {
+        action,
+        status: "failed",
+        detail: `repository node id not found: ${action.repo}`,
+      };
+    }
+
+    try {
+      const data = await this.graphqlClient.request<CreateLinkedBranchResponse>(
+        CREATE_LINKED_BRANCH_MUTATION,
+        {
+          issueId: action.issueId,
+          repositoryId,
+          oid: baseSha,
+          name: action.branch,
+        }
+      );
+
+      const linkedBranchName = data.createLinkedBranch?.linkedBranch?.ref?.name;
+
+      if (linkedBranchName && linkedBranchName !== action.branch) {
+        return {
+          action,
+          status: "failed",
+          detail: `linked branch mismatch: expected ${action.branch}, got ${linkedBranchName}`,
+        };
+      }
+
+      return {
+        action,
+        status: "created",
+        detail: linkedBranchName ?? action.branch,
+      };
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error);
+
+      if (/already exists|reference exists|name already exists/i.test(detail)) {
+        return { action, status: "already_exists", detail };
+      }
+
+      return { action, status: "failed", detail };
+    }
   }
 
   async createBranch(action: CreateBranchAction): Promise<GitFlowActionResult> {
@@ -135,21 +276,7 @@ export class GitFlowGateway {
       };
     }
 
-    const response = await this.client.request(
-      "POST",
-      `${this.repoPath(action.repo)}/git/refs`,
-      { ref: `refs/heads/${action.branch}`, sha: baseSha }
-    );
-
-    if (response.status === 422) {
-      return { action, status: "already_exists" };
-    }
-
-    if (!response.ok) {
-      return { action, status: "failed", detail: describeGitHubFailure(response) };
-    }
-
-    return { action, status: "created" };
+    return this.createLinkedBranch(action, baseSha);
   }
 
   async openPullRequest(action: OpenPullRequestAction): Promise<GitFlowActionResult> {
