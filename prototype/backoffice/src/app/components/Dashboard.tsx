@@ -53,6 +53,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [activePage, setActivePage] = useState<ActivePage>('parceria');
+  const [pageVersion, setPageVersion] = useState(0);
   const [selectedPagamento, setSelectedPagamento] = useState<PagamentoCard | null>(null);
   
   const [theme, setTheme] = useState<Theme>(() => {
@@ -312,7 +313,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     width: sidebarExpanded ? '100%' : '48px',
                     justifyContent: sidebarExpanded ? 'flex-start' : 'center',
                   }}
-                  onClick={() => setActivePage(key)}
+                  onClick={() => {
+                    setActivePage(key);
+                    if (key === 'editais' || key === 'fomento') {
+                      setPageVersion(version => version + 1);
+                    }
+                  }}
                   onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.07)'; }}
                   onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'transparent'; }}
                 >
@@ -1635,9 +1641,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         ) : activePage === 'rubricas' ? (
           <Rubricas />
         ) : activePage === 'fomento' ? (
-          <Editais kind="fomento" />
+          <Editais key={`fomento-${pageVersion}`} kind="fomento" />
         ) : activePage === 'editais' ? (
-          <Editais kind="captacao" />
+          <Editais key={`captacao-${pageVersion}`} kind="captacao" />
         ) : activePage === 'editais-light' ? (
           <EditaisLight />
         ) : activePage === 'configuracoes' ? (

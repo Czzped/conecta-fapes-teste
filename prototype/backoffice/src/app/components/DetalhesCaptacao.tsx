@@ -1412,93 +1412,6 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
               </div>
             </div>
 
-            {!isFomento && (
-            <>
-            <div style={dividerStyle} />
-
-            <div>
-              <h3 style={subSectionTitleStyle}>Aportes Financeiros da Captação</h3>
-              <div style={{ display: 'grid', gap: '12px' }}>
-                {[
-                  { origem: 'Programa de Inovação Tecnológica', tipo: 'Programa', valor: 'R$ 3.000.000,00' },
-                  { origem: 'Parceria FAPES/Findes', tipo: 'Parceria', valor: 'R$ 2.000.000,00' },
-                ].map((aporte, index) => (
-                  <div key={aporte.origem} style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 140px 170px',
-                    gap: '16px',
-                  }}>
-                    <div>
-                      <label style={labelStyle}>Origem {index + 1}</label>
-                      <input type="text" defaultValue={aporte.origem} readOnly={!editingResumo} style={resumoInputStyle} />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Tipo</label>
-                      <input type="text" defaultValue={aporte.tipo} readOnly={!editingResumo} style={resumoInputStyle} />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Valor aportado</label>
-                      <input type="text" defaultValue={aporte.valor} readOnly={!editingResumo} style={resumoInputStyle} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '16px' }}>
-              <div>
-                <label style={labelStyle}>Total Financeiro</label>
-                <input type="text" defaultValue="R$ 5.000.000,00" readOnly={!editingResumo} style={{ ...resumoInputStyle, color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }} />
-              </div>
-              <div>
-                <label style={labelStyle}>Total por Faixas</label>
-                <input type="text" defaultValue="R$ 5.000.000,00" readOnly={!editingResumo} style={resumoInputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Saldo sem faixa</label>
-                <input type="text" defaultValue="R$ 0,00" readOnly={!editingResumo} style={resumoInputStyle} />
-              </div>
-            </div>
-
-            <div>
-              <h3 style={subSectionTitleStyle}>Faixas de Financiamento</h3>
-              <div style={{ display: 'grid', gap: '12px' }}>
-                {[
-                  { nome: 'Faixa 1', duracao: '24 meses', minimo: 'R$ 50.000,00', maximo: 'R$ 200.000,00', aportado: 'R$ 3.000.000,00' },
-                  { nome: 'Faixa 2', duracao: '36 meses', minimo: 'R$ 200.001,00', maximo: 'R$ 500.000,00', aportado: 'R$ 2.000.000,00' },
-                ].map(faixa => (
-                  <div key={faixa.nome} style={{
-                    display: 'grid',
-                    gap: '12px',
-                  }}>
-                    <div>
-                      <label style={labelStyle}>Nome da Faixa</label>
-                      <input type="text" defaultValue={faixa.nome} readOnly={!editingResumo} style={resumoInputStyle} />
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
-                      <div>
-                        <label style={labelStyle}>Duração máxima</label>
-                        <input type="text" defaultValue={faixa.duracao} readOnly={!editingResumo} style={resumoInputStyle} />
-                      </div>
-                      <div>
-                        <label style={labelStyle}>Valor mínimo</label>
-                        <input type="text" defaultValue={faixa.minimo} readOnly={!editingResumo} style={resumoInputStyle} />
-                      </div>
-                      <div>
-                        <label style={labelStyle}>Valor máximo</label>
-                        <input type="text" defaultValue={faixa.maximo} readOnly={!editingResumo} style={resumoInputStyle} />
-                      </div>
-                      <div>
-                        <label style={labelStyle}>Valor aportado</label>
-                        <input type="text" defaultValue={faixa.aportado} readOnly={!editingResumo} style={resumoInputStyle} />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            </>
-            )}
           </div>
         </div>
 
@@ -1689,6 +1602,8 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
         </div>
         )}
 
+        {isFomento && (
+        <>
         {/* SESSÃO 3 — Parametrizações Gerais */}
         <div style={cardStyle}>
           <NumberedSectionTitle number={isFomento ? '3' : '3'} title={isFomento ? 'Parametrizações Gerais e Requisitos' : 'Parametrizações Gerais'} />
@@ -1946,6 +1861,8 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
             ))}
           </div>
         </div>
+        </>
+        )}
 
         {isFomento && (
           <div style={cardStyle}>
