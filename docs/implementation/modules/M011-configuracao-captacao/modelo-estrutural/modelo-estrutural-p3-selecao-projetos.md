@@ -7,173 +7,271 @@ Contexto: [README.md](../README.md) | Modelo consolidado: [modelo-estrutural.md]
 ## P3 - Selecao dos Projetos
 
 Este recorte modela os artefatos conceituais da execucao da selecao. A configuracao base vem da
-`Captacao` publicada no P2; a contratacao/outorga posterior pertence ao M022.
+`Captacao` configurada no P2; a contratacao/outorga posterior pertence ao M022.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
 
     class Captacao {
         +String codigo
-        +EstadoConfiguracaoCaptacao estadoConfiguracao
-    }
-
-    class Projeto {
-        <<externo M008>>
-    }
-
-    class RespostaFormularioSubmissao {
-        +String formularioId
-        +String versaoFormularioId
-        +Json respostas
-        +Date dataSubmissao
-    }
-
-    class DocumentacaoProjeto {
-        +EstadoDocumentacao estado
-        +String justificativa
-        +Date dataInicioAvaliacao
-        +Date dataFimAvaliacao
-    }
-
-    class AssinaturaInstitucional {
-        +EstadoAssinatura estado
-        +Date dataSolicitacao
-        +Date dataDecisao
-        +String justificativaRecusa
-    }
-
-    class DistribuicaoAvaliacao {
-        +Date dataDistribuicao
-        +Date dataLimiteResposta
-        +EstadoDistribuicao estado
-        +String justificativaRecusa
-        +Date dataRecusa
-    }
-
-    class AvaliacaoAdHoc {
-        +Decimal nota
-        +String parecer
-        +String recomendacao
-        +Date dataRegistro
-        +Json respostasFormulario
-    }
-
-    class ResultadoSelecao {
-        +TipoResultadoSelecao tipo
-        +Date dataPublicacao
-        +Integer classificacao
-        +String decisao
-    }
-
-    class RevisaoResultado {
-        +String motivo
-        +String descricao
-        +EstadoRevisao estado
-        +String decisao
-        +String justificativaDecisao
-        +Date dataSolicitacao
-        +Date dataDecisao
-    }
-
-    class AnexoRevisao {
-        +String nomeArquivo
-        +String urlArquivo
-    }
-
-    class EstadoDocumentacao {
-        <<enumeration>>
-        PENDENTE
-        HABILITADA
-        INABILITADA
-    }
-
-    class EstadoAssinatura {
-        <<enumeration>>
-        SOLICITADA
-        ASSINADA
-        RECUSADA
-        EXPIRADA
-    }
-
-    class EstadoDistribuicao {
-        <<enumeration>>
-        DISTRIBUIDA
-        RECUSADA
-        NAO_RESPONDEU
-        AVALIADA
-        CANCELADA
-    }
-
-    class TipoResultadoSelecao {
-        <<enumeration>>
-        PRELIMINAR
-        APOS_REVISAO
-        FINAL
-    }
-
-    class EstadoRevisao {
-        <<enumeration>>
-        SUBMETIDA
-        ADMISSIVEL
-        INADMISSIVEL
-        DEFERIDA
-        INDEFERIDA
-    }
-
-    class Proponente {
-        <<externo shared.people/M008>>
-    }
-
-    class ResponsavelInstitucional {
-        <<externo M008>>
-    }
-
-    class PessoaFisica {
-        <<shared>>
-    }
-
-    class PeriodoCronograma {
-        <<P2>>
-    }
-
-    class FormularioAvaliacaoRef {
-        <<P2/M021>>
-    }
-
-    class FormularioRevisaoRef {
-        <<P2/M021>>
     }
 
     class Faixa {
-        <<P1>>
+        +String nome
     }
 
-    class TipoProjeto {
-        <<externo M008>>
+    class FaseCaptacao {
+        +FaseFomento faseFomento
     }
 
-    Captacao "1" --> "*" Projeto : recebe
-    Captacao "1" --> "*" ResultadoSelecao : publica
-    Captacao "1" --> "*" PeriodoCronograma : rege etapas
+    class Formulario {
+        <<externo>>
+        +String nome
+    }
 
-    Projeto "*" --> "1" Proponente : proponente
-    Projeto "*" --> "1" Faixa : faixa escolhida
-    Projeto "*" --> "1" TipoProjeto : tipo projeto
-    Projeto "1" --> "1" RespostaFormularioSubmissao : submissao
-    Projeto "1" --> "1" DocumentacaoProjeto : documentacao
-    Projeto "1" --> "0..1" AssinaturaInstitucional : assinatura
-    Projeto "1" --> "*" DistribuicaoAvaliacao : distribuicoes
-    Projeto "1" --> "*" RevisaoResultado : revisoes
+    class Proponente {
+        <<Actor>>
+        +String nome
+        +iniciarSubmissaoProjeto()
+        +salvarSubmissaoProjeto()
+        +submeterProjeto()
+        +responderForm()
+        +solicitarRecurso()
+    }
 
-    AssinaturaInstitucional "*" --> "1" ResponsavelInstitucional : responsavel
-    DistribuicaoAvaliacao "*" --> "1" PessoaFisica : revisor ad hoc
-    DistribuicaoAvaliacao "1" --> "0..1" AvaliacaoAdHoc : parecer
-    AvaliacaoAdHoc "*" --> "1" FormularioAvaliacaoRef : formulario
-    RevisaoResultado "*" --> "1" FormularioRevisaoRef : formulario
-    RevisaoResultado "1" --> "*" AnexoRevisao : anexos
-    ResultadoSelecao "*" --> "*" Projeto : classificacao
+    class Projeto {
+        +Proponente proponente
+        +iniciarSubmissao()
+        +salvarSubmissao()
+        +submeter()
+    }
+
+    class DocumentoProjeto {
+        +String nome
+        +String descricao
+        +Date dataUpload
+        +EstadoDocumento estadoDocumento
+    }
+
+    class EstadoDocumento {
+        <<enumeration>>
+        PENDENTE
+        HABILITADO
+        INABILITADO
+    }
+
+
+
+    class ParticipacaoFaseCaptacao {
+        +Date dtInicio
+        +String observacao
+        +Boolean selecionado
+        +Decimal nota
+        +FaseCaptacao fase
+    }
+
+
+    class RecursoSelecao {
+        +Date data
+        +String observacao
+    }
+
+    class Resposta {
+        +Date dtResposta
+        +Formulario formRespondido
+    }
+
+    class Selecionador {
+        <<Actor>>
+        +String nome
+        +TipoSelecionadores tipoSelecionadores
+        +iniciarSelecaoProjeto()
+        +finalizarSelecaoProjeto()
+        +responderFormSelecao()
+    }
+
+    class TipoSelecionadores {
+        <<enumeration>>
+        AVALIADOR_ADHOC
+        RESPONSAVEL_AREA_TECNICA
+    }
+
+    class SelecaoProjeto {
+        +Date data
+        +Projeto projeto
+        +String observacao
+        +StatusSelecao statusSelecao
+        +iniciar()
+        +finalizar()
+        +cancelar()
+    }
+
+    class StatusSelecao {
+        <<enumeration>>
+        PENDENTE
+        INICIADA
+        FINALIZADA
+        CANCELADA
+    }
+
+    %% Relacionamentos dos Projetos e Atores
+    Captacao "1" *-- "0..*" Projeto : selecionados (Participa de)
+    Projeto --> "1" Faixa : concorre a
+    Projeto --> "1" Proponente : submetido por
+
+    %% Novas Composições do Projeto
+    Projeto "1" *-- "0..*" DocumentoProjeto : possui
+    DocumentoProjeto --> "1" EstadoDocumento : possui estado
+
+    Projeto "1" *-- "1..*" ParticipacaoFaseCaptacao : participa de
+    ParticipacaoFaseCaptacao --> "1" FaseCaptacao : em
+    ParticipacaoFaseCaptacao "1" *-- "0..*" Resposta : possui
+    Resposta --> "1" Formulario : responde ao
+
+    Selecionador --> "1" TipoSelecionadores : possui tipo
+    Selecionador "1" -- "0..*" SelecaoProjeto : realiza
+    SelecaoProjeto --> "1" ParticipacaoFaseCaptacao : avalia
+    SelecaoProjeto --> "1" StatusSelecao : possui status
+    SelecaoProjeto "1" *-- "1..*" Resposta : gera
+
+    RecursoSelecao "*" --> "1" Resposta : formalizado por
+    RecursoSelecao "*" --> "1" SelecaoProjeto : referente a
+
+
+    %% Estilização Simplificada
+    style Captacao fill:lightgreen
+    style Faixa fill:lightgreen
+    style FaseCaptacao fill:lightgreen
+    style Proponente fill:lightgreen
+    style Projeto fill:lightgreen
+    style ParticipacaoFaseCaptacao fill:lightgreen
+    style SelecaoProjeto fill:lightgreen
+    style RecursoSelecao fill:lightgreen
 ```
+
+OBS: Classes me verde fazem parte do V1!
+
+
+### Estados da Seleção de Projetos
+
+```mermaid
+
+stateDiagram-v2
+    [*] --> PENDENTE : Analista Técnico Associa Selecionador
+    
+    PENDENTE --> INICIADA : iniciarSelecaoProjeto()
+    PENDENTE --> CANCELADA : cancelar()
+    
+    state INICIADA {
+        [*] --> PreenchendoAvaliacao
+        PreenchendoAvaliacao --> PreenchendoAvaliacao : responderFormSelecao()
+    }
+    
+    INICIADA --> FINALIZADA : finalizarSelecaoProjeto() [Respostas / Notas Salvas]
+    INICIADA --> CANCELADA : cancelar()
+    
+    state FINALIZADA {
+        [*] --> AguardandoPrazoRecurso
+        AguardandoPrazoRecurso --> EmFaseDeRecurso : solicitarRecurso() [Proponente Contesta]
+        EmFaseDeRecurso --> Julgado : Julgamento do Recurso Concluído
+    }
+    
+    FINALIZADA --> [*]
+    CANCELADA --> [*]
+
+
+```
+
+
+
+
+### Fluxo Seleção de Projetos
+
+```mermaid
+stateDiagram-v2
+    %% ---- RAIA DO PROPONENTE ----
+    state "Atividades do Proponente" as BlocoProponente {
+        [*] --> IniciarSubmissao : iniciarSubmissaoProjeto()
+        IniciarSubmissao --> PreencherDadosProjeto : Cadastrar Projeto
+        PreencherDadosProjeto --> EscolherFaixa : Selecionar Faixa do Fomento
+        EscolherFaixa --> EnviarDocumentos : Upload de Documentos
+        EnviarDocumentos --> ResponderFormularios : responderForm()
+        
+        state choice_salvamento <<choice>>
+        ResponderFormularios --> choice_salvamento
+        choice_salvamento --> RascunhoSalvo : salvarSubmissaoProjeto()
+        RascunhoSalvo --> PreencherDadosProjeto : Editar posterior
+        
+        choice_salvamento --> SubmeterProjeto : submeterProjeto()
+        SubmeterProjeto --> GerarParticipacaoFase : Gerar ParticipacaoFaseCaptacao
+    }
+
+    %% ---- RAIA DO SISTEMA / REGRAS DE GUARDA ----
+    state "Regras de Controle da Fase (Sistema)" as SistemaControle {
+        state choice_exige_selecao <<choice>>
+        GerarParticipacaoFase --> choice_exige_selecao : Fase possui critério de seleção?
+        
+        %% Se não exigir
+        choice_exige_selecao --> AvancarSemAvaliacao : [Não] temRecurso/ehEliminatoria = False
+    }
+
+    %% ---- RAIA DO ANALISTA TÉCNICO ----
+    state "Atividades do Analista Técnico" as BlocoAnalista {
+        %% Se a fase exigir seleção, o analista vincula diretamente o selecionador
+        choice_exige_selecao --> VincularSelecionador : [Sim] Fase exige avaliação
+        VincularSelecionador --> AssociarProjeto : Associar Selecionador ao Projeto
+    }
+
+    %% ---- RAIA DO SELECIONADOR ----
+    state "Visualizar Fila (Status: Pendente)" as VisualizarPendentes
+    state "Iniciar Avaliação (Status: Iniciada)" as IniciarAvaliacao
+    state "Finalizar Avaliação (Status: Finalizada)" as FinalizarAvaliacao
+
+    state "Atividades do Selecionador" as BlocoSelecionador {
+        AssociarProjeto --> VisualizarPendentes
+        VisualizarPendentes --> IniciarAvaliacao : iniciarSelecaoProjeto()
+        IniciarAvaliacao --> AvaliarDocumentos : Verificar DocumentoProjeto
+        AvaliarDocumentos --> AnalisarFormularios : Ler respostas do proponente
+        AnalisarFormularios --> PreencherFormSelecao : responderFormSelecao()
+        PreencherFormSelecao --> FinalizarAvaliacao : finalizarSelecaoProjeto()
+    }
+
+    %% ---- RAIA DE RESULTADO E RECURSO ----
+    state "Resultado da Fase" as Resultado {
+        FinalizarAvaliacao --> ComputarNota : Atribuir nota final e observação
+        
+        state choice_aprovacao <<choice>>
+        ComputarNota --> choice_aprovacao : Nota maior ou igual Nota de Corte?
+        
+        choice_aprovacao --> MarcarSelecionado : [Sim] selecionado = True
+        choice_aprovacao --> MarcarEliminado : [Não] selecionado = False
+    }
+
+    state "Fluxo de Contestação" as FluxoRecurso {
+        state choice_recurso <<choice>>
+        MarcarEliminado --> choice_recurso : Proponente deseja contestar resultado?
+        
+        choice_recurso --> EntrarComRecurso : [Sim] solicitarRecurso()
+        choice_recurso --> FimProcesso : [Não] Aceita eliminacao
+        
+        EntrarComRecurso --> JulgarRecurso : Analisar contestação
+        JulgarRecurso --> AlterarResultado : Recurso Deferido?
+        
+        state choice_deferido <<choice>>
+        AlterarResultado --> choice_deferido
+        choice_deferido --> MarcarSelecionado : [Sim] Reverter para Selecionado
+        choice_deferido --> FimProcesso : [Não] Manter Eliminado
+    }
+
+    %% Conclusão do fluxo sem avaliação
+    AvancarSemAvaliacao --> MarcarSelecionado : Projeto avança direto
+
+    MarcarSelecionado --> [*]
+    FimProcesso --> [*]
+
+```
+
 
 ---
 
@@ -181,45 +279,40 @@ classDiagram
 
 | Classe | Atributo | Definicao | Obrig. | Tipo | Dominio | Tamanho | Unico |
 |--------|----------|-----------|--------|------|---------|---------|-------|
-| **RespostaFormularioSubmissao** | formularioId | Identificador do formulario no M021 | Sim | String | | | |
-| | versaoFormularioId | Versao do formulario usada na submissao | Sim | String | | | |
-| | respostas | Conteudo das respostas em formato estruturado | Sim | Json | Snapshot imutavel apos submissao | | |
-| | dataSubmissao | Data em que a proposta foi submetida formalmente | Gerado | Date | Gerada no momento da submissao | | |
-| **DocumentacaoProjeto** | estado | Estado da analise documental | Sim | EstadoDocumentacao | PENDENTE, HABILITADA, INABILITADA | | |
-| | justificativa | Justificativa da inabilitacao | Cond. | String | Obrigatoria quando estado=INABILITADA | 500 | |
-| | dataInicioAvaliacao | Data de inicio da analise documental | Cond. | Date | | | |
-| | dataFimAvaliacao | Data de conclusao da analise documental | Cond. | Date | | | |
-| **AssinaturaInstitucional** | estado | Estado da assinatura | Sim | EstadoAssinatura | SOLICITADA, ASSINADA, RECUSADA, EXPIRADA | | |
-| | dataSolicitacao | Data em que a assinatura foi solicitada ao responsavel | Gerado | Date | | | |
-| | dataDecisao | Data em que o responsavel assinou ou recusou | Cond. | Date | | | |
-| | justificativaRecusa | Motivo da recusa informado pelo responsavel | Cond. | String | Obrigatoria quando estado=RECUSADA | 500 | |
-| | responsavel (relacao) | Responsavel institucional que deve assinar a proposta | Sim | FK → ResponsavelInstitucional | Via M008 | | |
-| **DistribuicaoAvaliacao** | dataDistribuicao | Data em que o AnalistaTecnico distribuiu o projeto ao revisor | Gerado | Date | | | |
-| | dataLimiteResposta | Prazo para o revisor aceitar, recusar ou registrar parecer | Sim | Date | Definido pelo AnalistaTecnico no momento da distribuicao | | |
-| | estado | Estado da distribuicao | Sim | EstadoDistribuicao | DISTRIBUIDA, RECUSADA, NAO_RESPONDEU, AVALIADA, CANCELADA | | |
-| | justificativaRecusa | Motivo informado pelo revisor ao recusar | Cond. | String | Obrigatoria quando estado=RECUSADA | 500 | |
-| | dataRecusa | Data em que o revisor registrou a recusa | Cond. | Date | | | |
-| | revisor (relacao) | Pessoa fisica que atua como revisor ad hoc; selecionada do pool configurado no P2 | Sim | FK → PessoaFisica | Via shared.people | | |
-| **AvaliacaoAdHoc** | nota | Nota atribuida pelo revisor a proposta | Sim | Decimal | >= 0 | | |
-| | parecer | Texto do parecer tecnico do revisor | Sim | String | | 3000 | |
-| | recomendacao | Recomendacao do revisor sobre a proposta | Sim | String | Ex: Aprovada, Reprovada, Aprovada com ressalvas | 200 | |
-| | dataRegistro | Data do registro da avaliacao | Gerado | Date | | | |
-| | respostasFormulario | Snapshot das respostas do revisor no formulario de avaliacao do M021 | Gerado | Json | Imutavel apos registro | | |
-| | distribuicao (relacao) | Distribuicao de avaliacao a qual este parecer pertence | Sim | FK → DistribuicaoAvaliacao | | | |
-| **ResultadoSelecao** | tipo | Tipo do resultado publicado | Sim | TipoResultadoSelecao | PRELIMINAR, APOS_REVISAO, FINAL | | |
-| | dataPublicacao | Data de publicacao do resultado | Gerado | Date | | | |
-| | classificacao | Classificacao da proposta no resultado | Nao | Integer | >= 1; nulo para propostas reprovadas | | |
-| | decisao | Decisao final registrada para a proposta neste resultado | Sim | String | Ex: Aprovada, Reprovada, Em lista de espera | 200 | |
-| | projeto (relacao) | Projeto avaliado neste resultado | Sim | FK → Projeto | | | |
-| **RevisaoResultado** | motivo | Motivo principal da solicitacao de revisao | Sim | String | | 200 | |
-| | descricao | Descricao detalhada da contestacao | Sim | String | | 3000 | |
-| | estado | Estado do processamento da revisao | Sim | EstadoRevisao | SUBMETIDA, ADMISSIVEL, INADMISSIVEL, DEFERIDA, INDEFERIDA | | |
-| | decisao | Decisao final da revisao | Cond. | String | Obrigatoria quando estado=DEFERIDA ou INDEFERIDA | 200 | |
-| | justificativaDecisao | Justificativa da decisao sobre a revisao | Cond. | String | | 1000 | |
-| | dataSolicitacao | Data de submissao da solicitacao de revisao | Gerado | Date | | | |
-| | dataDecisao | Data em que a decisao foi registrada | Cond. | Date | | | |
-| **AnexoRevisao** | nomeArquivo | Nome do arquivo anexado a revisao | Sim | String | | 300 | |
-| | urlArquivo | URL de acesso ao arquivo | Sim | String | | 500 | |
+| **Captacao** | codigo | Codigo da captacao em execucao | Sim | String | Herdado do P2 | | Sim |
+| **Projeto** | proponente (relacao) | Proponente responsavel pela submissao do projeto | Sim | FK → Proponente | Pessoa ou instituicao autorizada conforme regra da Captacao | | |
+| | faixa (relacao) | Faixa do Fomento escolhida para concorrencia | Sim | FK → Faixa | Deve pertencer ao Fomento da Captacao | | |
+| | captacao (relacao) | Captacao na qual o projeto participa | Sim | FK → Captacao | Captacao em periodo de submissao aberto | | |
+| **Proponente** | nome | Nome do proponente que submete o projeto | Sim | String | Via cadastro corporativo/M008 quando aplicavel | 200 | |
+| **Faixa** | nome | Nome da faixa do Fomento | Sim | String | Herdado do P1 Fomento | 200 | |
+| **DocumentoProjeto** | nome | Nome do documento anexado ao projeto | Sim | String | | 200 | |
+| | descricao | Descricao ou finalidade do documento | Nao | String | | 500 | |
+| | dataUpload | Data de envio do documento | Gerado | Date | | | |
+| | estadoDocumento | Estado de habilitacao do documento | Sim | EstadoDocumento | PENDENTE, HABILITADO, INABILITADO | | |
+| **EstadoDocumento** | valor | Estado da analise documental do documento | Sim | Enum | PENDENTE, HABILITADO, INABILITADO | | |
+| **ParticipacaoFaseCaptacao** | dtInicio | Data em que o projeto iniciou participacao na fase | Gerado | Date | Deve estar dentro da vigencia da FaseCaptacao | | |
+| | observacao | Observacao consolidada da participacao do projeto na fase | Nao | String | | 1000 | |
+| | selecionado | Indica se o projeto foi selecionado/aprovado na fase | Cond. | Boolean | true/false; preenchido apos avaliacao ou avanco automatico | | |
+| | nota | Nota final do projeto na fase | Cond. | Decimal | >= 0; obrigatoria quando a fase possuir criterio com nota | | |
+| | fase (relacao) | Fase da captacao em que o projeto participa | Sim | FK → FaseCaptacao | Deve pertencer a Captacao do Projeto | | |
+| **FaseCaptacao** | faseFomento (relacao) | Fase da captacao herdada da configuracao do Fomento | Sim | FK → FaseFomento | Herdado do P2 | | |
+| **Resposta** | dtResposta | Data em que o formulario foi respondido | Gerado | Date | | | |
+| | formRespondido (relacao) | Formulario usado na submissao, avaliacao ou recurso | Sim | FK → Formulario | Formulario externo publicado/ativo | | |
+| **Formulario** | nome | Nome do formulario externo respondido | Sim | String | Modulo proprietario externo | 200 | |
+| **Selecionador** | nome | Nome do selecionador responsavel por avaliar uma participacao | Sim | String | Pessoa fisica ou papel funcional autorizado | 200 | |
+| | tipoSelecionadores | Tipo do selecionador | Sim | TipoSelecionadores | AVALIADOR_ADHOC, RESPONSAVEL_AREA_TECNICA | | |
+| **TipoSelecionadores** | valor | Perfil do selecionador | Sim | Enum | AVALIADOR_ADHOC, RESPONSAVEL_AREA_TECNICA | | |
+| **SelecaoProjeto** | data | Data de criacao ou movimentacao da selecao do projeto | Gerado | Date | | | |
+| | projeto (relacao) | Projeto avaliado | Sim | FK → Projeto | Mesmo projeto da ParticipacaoFaseCaptacao avaliada | | |
+| | observacao | Parecer ou observacao do selecionador | Nao | String | Obrigatoria quando statusSelecao=CANCELADA | 2000 | |
+| | statusSelecao | Estado da selecao do projeto | Sim | StatusSelecao | PENDENTE, INICIADA, FINALIZADA, CANCELADA | | |
+| | participacaoFase (relacao) | Participacao do projeto na fase avaliada | Sim | FK → ParticipacaoFaseCaptacao | | | |
+| | selecionador (relacao) | Selecionador associado a avaliacao | Sim | FK → Selecionador | Deve possuir tipo compatível com a FaseFomento | | |
+| **StatusSelecao** | valor | Estado da avaliacao realizada por selecionador | Sim | Enum | PENDENTE, INICIADA, FINALIZADA, CANCELADA | | |
+| **RecursoSelecao** | data | Data de solicitacao ou julgamento do recurso | Gerado | Date | | | |
+| | observacao | Justificativa, argumento ou decisao do recurso | Sim | String | | 2000 | |
+| | resposta (relacao) | Resposta de formulario que formaliza o recurso ou julgamento | Sim | FK → Resposta | Formulario de recurso/julgamento quando configurado | | |
+| | selecaoProjeto (relacao) | Selecao contestada pelo proponente | Sim | FK → SelecaoProjeto | SelecaoProjeto.statusSelecao = FINALIZADA | | |
 
 ---
 
@@ -229,39 +322,43 @@ classDiagram
 
 | ID | Responsavel | Regra |
 |----|-------------|-------|
-| RN-SP01 | AnalistaTecnico | A captacao somente fica visivel para os proponentes a partir da data de publicacao definida no cronograma. |
-| RN-SP02 | Proponente | Projetos somente podem ser submetidas entre a data inicial e a data final do periodo de recebimento. |
-| RN-SP03 | Proponente | Quando exigeAprovacaoInstitucional=true, a proposta so pode ser submetida apos a assinatura do ResponsavelInstitucional. |
-| RN-SP04 | ResponsavelInstitucional | A assinatura institucional deve ocorrer dentro do periodo de submissao. Recusa deve ter justificativa e devolve a proposta ao proponente. |
-| RN-SP11 | AnalistaTecnico | Quando tipoCaptacao=DEMANDA_INDUZIDA e outorgado for PJ, a proposta e conduzida pelo contato PF indicado na configuracao. |
+| RN-SP01 | Proponente | O Projeto so pode ser iniciado e submetido quando a Captacao permitir submissao conforme o estado operacional definido no P2. |
+| RN-SP02 | Proponente | Todo Projeto submetido deve indicar exatamente um Proponente e uma Faixa do Fomento vinculada a Captacao. |
+| RN-SP03 | Proponente | A Faixa escolhida pelo Projeto deve pertencer ao Fomento que originou a Captacao. |
+| RN-SP04 | Proponente | O Proponente pode salvar rascunho da submissao antes de submeter; somente a submissao formal gera ParticipacaoFaseCaptacao. |
+| RN-SP05 | Sistema | Ao submeter Projeto, o sistema deve gerar ao menos uma ParticipacaoFaseCaptacao para a primeira fase aplicavel da Captacao. |
+| RN-SP06 | Sistema | Documentos exigidos pela Captacao devem ser registrados como DocumentoProjeto e iniciar com estadoDocumento=PENDENTE. |
+| RN-SP07 | Sistema | DocumentoProjeto so pode transitar para HABILITADO ou INABILITADO durante fase de avaliacao documental ou fase equivalente configurada. |
+| RN-SP08 | AnalistaTecnico | DocumentoProjeto INABILITADO deve possuir observacao ou justificativa registrada na ParticipacaoFaseCaptacao ou na SelecaoProjeto correspondente. |
 
 ### Avaliacao e Resultado
 
 | ID | Responsavel | Regra |
 |----|-------------|-------|
-| RN-SP05 | AnalistaTecnico | Somente projetos com documentacao habilitada seguem para analise de merito. Inabilitacao requer justificativa. |
-| RN-SP06 | RevisorAdHoc | Revisores somente podem registrar pareceres dentro do periodo de analise de merito. |
-| RN-SP18 | AnalistaTecnico | O AnalistaTecnico seleciona os revisores ad hoc do pool configurado no P2 e distribui projetos a eles durante o periodo AVALIACAO_AD_HOC. |
-| RN-SP19 | AnalistaTecnico | Um projeto pode ser distribuido a um ou mais revisores ad hoc. Cada distribuicao gera um registro independente de DistribuicaoAvaliacao. |
-| RN-SP20 | RevisorAdHoc | Um revisor ad hoc pode recusar avaliar um projeto informando justificativa obrigatoria. A recusa transiciona a DistribuicaoAvaliacao para RECUSADA. |
-| RN-SP21 | AnalistaTecnico | Quando um revisor recusa, o AnalistaTecnico pode distribuir o projeto a outro revisor do pool. A distribuicao recusada permanece no historico. |
-| RN-SP22 | Sistema | Um revisor ad hoc nao pode avaliar projetos de sua propria instituicao (conflito de interesses). |
-| RN-SP23 | AnalistaTecnico | Quando um revisor nao responde ao chamado ate o dataLimiteResposta, o AnalistaTecnico marca a distribuicao como NAO_RESPONDEU e pode distribuir o projeto a outro revisor do pool. Nao e exigida justificativa — a nao resposta e o proprio motivo. |
-| RN-SP07 | AnalistaTecnico | O resultado preliminar deve ser publicado antes do inicio do periodo de recursos. |
-| RN-SP08 | Proponente | Solicitacoes de revisao somente podem ser enviadas dentro do periodo de recursos. |
-| RN-SP09 | AnalistaTecnico | O resultado final somente pode ser publicado apos o encerramento e analise de todas as revisoes admissiveis. |
-| RN-SP10 | AnalistaTecnico | A publicacao do resultado final encerra o processo de selecao no M011. |
-| RN-SP12 | AnalistaTecnico | Projetos aprovadas ficam disponiveis para consumo pelo M022 apos a publicacao do resultado final. |
+| RN-SP09 | Sistema | Se a FaseCaptacao nao exigir selecao, recurso ou eliminacao, o Projeto pode avancar automaticamente com `selecionado=true`. |
+| RN-SP10 | AnalistaTecnico | Quando a fase exigir avaliacao, o AnalistaTecnico deve associar um Selecionador ao Projeto, gerando SelecaoProjeto com statusSelecao=PENDENTE. |
+| RN-SP11 | Sistema | A SelecaoProjeto deve avaliar exatamente uma ParticipacaoFaseCaptacao. |
+| RN-SP12 | Selecionador | Somente o Selecionador associado pode iniciar, responder formulario de selecao e finalizar a SelecaoProjeto. |
+| RN-SP13 | Sistema | `iniciarSelecaoProjeto()` transiciona SelecaoProjeto de PENDENTE para INICIADA. |
+| RN-SP14 | Sistema | `cancelar()` transiciona SelecaoProjeto de PENDENTE ou INICIADA para CANCELADA e exige observacao quando o cancelamento for manual. |
+| RN-SP15 | Selecionador | SelecaoProjeto INICIADA pode receber uma ou mais Respostas de formulario de selecao. |
+| RN-SP16 | Selecionador | `finalizarSelecaoProjeto()` so pode transicionar SelecaoProjeto de INICIADA para FINALIZADA quando as respostas obrigatorias e a nota aplicavel estiverem salvas. |
+| RN-SP17 | Sistema | Ao finalizar a selecao, a nota e a observacao consolidadas devem atualizar a ParticipacaoFaseCaptacao avaliada. |
+| RN-SP18 | Sistema | Quando a nota final for maior ou igual a nota de corte da fase/criterio, ParticipacaoFaseCaptacao.selecionado deve ser true; quando for menor, deve ser false. |
+| RN-SP19 | Sistema | Projeto eliminado em fase eliminatoria nao deve avancar para a proxima FaseCaptacao, salvo deferimento de RecursoSelecao. |
+| RN-SP20 | Sistema | Um Selecionador do tipo AVALIADOR_ADHOC nao pode avaliar Projeto de sua propria instituicao quando essa informacao estiver disponivel. |
 
-### Pausa, Cancelamento e Expiracao
+### Recurso e Encerramento
 
 | ID | Responsavel | Regra |
 |----|-------------|-------|
-| RN-SP13 | GestorFAPES | O processo de selecao pode ser pausado em qualquer ponto apos a publicacao da captacao. A pausa requer justificativa obrigatoria. |
-| RN-SP14 | Sistema | Durante a pausa, nenhuma operacao e permitida: proponentes nao podem submeter nem solicitar revisao, revisores nao podem registrar pareceres, e o AnalistaTecnico nao pode avancar etapas. |
-| RN-SP15 | Sistema | A retomada e bloqueada enquanto existir periodo futuro nao concluido com dataFim anterior a data de retomada. O GestorFAPES deve registrar AdiamentoPeriodoCronograma para cada periodo expirado antes de acionar a retomada. |
-| RN-SP16 | Sistema | Quando RESULTADO_FINAL.dataFim e atingida sem publicacao manual do resultado final, o Sistema encerra a captacao automaticamente. |
-| RN-SP17 | GestorFAPES | O GestorFAPES pode cancelar a captacao administrativamente a partir dos estados PUBLICADO ou PAUSADO, com justificativa obrigatoria. Projetos aprovadas nao sao consumidas pelo M022 apos cancelamento. |
+| RN-SP21 | Proponente | RecursoSelecao so pode ser solicitado pelo Proponente do Projeto apos SelecaoProjeto FINALIZADA e dentro da janela de recurso da FaseCaptacao. |
+| RN-SP22 | Sistema | RecursoSelecao deve referenciar a SelecaoProjeto contestada e a Resposta que formaliza a contestacao ou decisao. |
+| RN-SP23 | AnalistaTecnico | Todo julgamento de recurso deve registrar observacao com a decisao tomada. |
+| RN-SP24 | Sistema | Recurso deferido pode alterar ParticipacaoFaseCaptacao.selecionado para true e permitir avanco do Projeto. |
+| RN-SP25 | Sistema | Recurso indeferido mantem o resultado anterior da SelecaoProjeto e encerra a participacao do Projeto na fase quando ele estiver eliminado. |
+| RN-SP26 | Sistema | Uma ParticipacaoFaseCaptacao selecionada deve gerar participacao na proxima FaseCaptacao quando houver proxima fase configurada. |
+| RN-SP27 | Sistema | O P3 usa `StatusSelecao` para o estado da avaliacao por selecionador; isso nao substitui o `EstadoCaptacao` operacional do P2 nem os estados consolidados de Captacao ainda documentados em README/modelo-comportamental. |
 
 ---
 
