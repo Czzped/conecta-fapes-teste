@@ -762,7 +762,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
         </div>
 
         <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: '0 0 12px' }}>
-          Exibindo {filtered.length} resultados de {parcerias.length}
+          Exibindo {filtered.length} resultados de {parceriasData.length}
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
