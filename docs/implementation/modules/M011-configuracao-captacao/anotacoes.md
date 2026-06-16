@@ -9,3 +9,4 @@ Reunião 08/06/2026
 - Alterar o processo de fomento para dizer se ele será chamada pública ou demanda induzida.
 - Configurar tipos fixos que podem ou não aparecer no fomrulário de submissão (e.g., Equipe, Objetivos, Resultados, Cronograma, .....)
 - Dividir o recurso do fomento entre faixa e captacao
+- Temos dois tipo de fomento por chamamento público: contínuo e não contínuo. No caso do contínuo cada projeto pode estar em uma fase. Caso contrário todos os projetos avançam as fases juntos. Na V1 vamos focar no não contínuo.

@@ -1,21 +1,47 @@
-# Modelo Comportamental
+# Modelo Comportamental do Ciclo de Vida do Formulario
 
 Dominio e regras de negocio: ver [README.md](README.md)
 
-## Ciclo de Vida da Versao do Formulario
+## Ciclo de Vida do Formulario
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Rascunho
-    Rascunho --> Publicada : Publicar versao
-    Rascunho --> Cancelada : Cancelar rascunho
-    Publicada --> Substituida : Nova versao publicada
-    Publicada --> Cancelada : Cancelamento administrativo
-    Substituida --> [*]
-    Cancelada --> [*]
+    state "Em edição" as EmEdicao
+    state "Publicado" as Publicado
+    state "Utilizado" as Utilizado
+    state "Inativo" as Inativo
+    state "Excluido" as Excluido
 
-    state Rascunho : Pode editar secoes, campos e regras
-    state Publicada : Disponivel para selecao por outros modulos
-    state Substituida : Mantida para historico
-    state Cancelada : Indisponivel para novas configuracoes
+    [*] --> EmEdicao
+    EmEdicao --> EmEdicao : Editar formulario
+    EmEdicao --> Publicado : Publicar formulario
+    EmEdicao --> Excluido : Excluir formulario
+
+    Publicado --> EmEdicao : Reverter publicacao
+    Publicado --> Utilizado : Notificar uso por outro modulo
+    Publicado --> Inativo : Inativar formulario
+
+    Utilizado --> Inativo : Inativar formulario
+    Excluido --> [*]
+
+    state EmEdicao : Pode ser editado e excluido
+    state Publicado : Visivel para uso por outros modulos
+    state Utilizado : Nao pode voltar para edicao e pode receber respostas
+    state Inativo : Indisponivel para novos usos, mas pode receber respostas de usos existentes
+```
+
+## Ciclo de Vida da Resposta do Formulario
+
+```mermaid
+stateDiagram-v2
+    state "Rascunho" as Rascunho
+    state "Enviada" as Enviada
+
+    [*] --> Rascunho : Iniciar resposta
+    Rascunho --> Rascunho : Editar resposta
+    Rascunho --> Enviada : Enviar resposta
+    Enviada --> [*]
+
+    state Rascunho : Pode ser editada pelo respondedor
+    state Enviada : Nao pode mais ser alterada pelo respondedor
 ```

@@ -543,6 +543,10 @@ nav:
           - EPIC-002: implementation/modules/M021-gestao-formularios/epics/EPIC-M021-002.md
           - EPIC-003: implementation/modules/M021-gestao-formularios/epics/EPIC-M021-003.md
           - EPIC-004: implementation/modules/M021-gestao-formularios/epics/EPIC-M021-004.md
+          - EPIC-005: implementation/modules/M021-gestao-formularios/epics/EPIC-M021-005.md
+          - EPIC-006: implementation/modules/M021-gestao-formularios/epics/EPIC-M021-006.md
+          - EPIC-007: implementation/modules/M021-gestao-formularios/epics/EPIC-M021-007.md
+          - EPIC-008: implementation/modules/M021-gestao-formularios/epics/EPIC-M021-008.md
       - M022 Contratacao e Outorga:
           - implementation/modules/M022-contratacao-outorga/README.md
           - Backlog: implementation/modules/M022-contratacao-outorga/backlog.md
