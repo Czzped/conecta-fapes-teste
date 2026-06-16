@@ -18,6 +18,8 @@ classDiagram
         +criarFomento()
         +criarCaptacao()
         +adicionarAporte()
+        +publicarFomento()
+        +cancelarFomento()
     }
 
     class Fomento {
@@ -34,7 +36,7 @@ classDiagram
         +salvar()
         +publicar()
         +cancelar()
-        +encerrar()
+        +concluir()
         +adicionarAporte()
     }
 
@@ -46,10 +48,10 @@ classDiagram
     class EstadoFomento {
         <<enumeration>>
         EM_ELABORACAO
-        APROVADO
-        VIGENTE
-        INTERROMPIDO
-        ENCERRADO
+        PUBLICADO
+        ABERTO
+        FECHADO
+        CANCELADO
         CONCLUIDO
     }
 
@@ -76,6 +78,12 @@ classDiagram
         +Integer quantidadeMinimaCotas
         +Integer minimoBolsistas
         +String observacao
+    }
+
+
+    class TipoDocumento {
+        +String nome
+        +String descricao
     }
 
     %% Classes de Infraestrutura de Fases e Formulários (V1)
@@ -164,6 +172,7 @@ classDiagram
     Fomento "*" --> "1" EixoEstrategico : atinge
     Fomento "*" --> "1" AreaTecnica : gerenciado por
     Fomento "*" --> "1" TipoProjeto : tipos de projeto
+    Fomento "*" --> "*" TipoDocumento : recebe
     
 
     %% Composição de Itens Financeiros e de Escopo do Fomento
@@ -203,9 +212,13 @@ classDiagram
     style AporteFomento fill:lightgreen
     style FaseFomento fill:lightgreen
     style Origem fill:lightgreen
+    style TipoProjeto fill:lightgreen
+    style AreaTecnica fill:lightgreen
+    style EixoEstrategico fill:lightgreen
+    style TipoDocumento fill:lightgreen
 ```
 
-OBS: Classes me verde fazem parte do V1!
+OBS: Classes em verde fazem parte do V1!
 
 ### Estados Fomento
 
@@ -213,27 +226,86 @@ OBS: Classes me verde fazem parte do V1!
 stateDiagram-v2
     [*] --> EM_ELABORACAO : criarFomento()
     
-    EM_ELABORACAO --> APROVADO : salvar() / validar
-    EM_ELABORACAO --> [*] : cancelar()
-    
-    APROVADO --> VIGENTE : publicar() [dataInicio atingida]
-    APROVADO --> INTERROMPIDO : cancelar()
-    
-    state VIGENTE {
-        [*] --> RecebendoAportes
-        RecebendoAportes --> RecebendoAportes : adicionarAporte()
+    state EM_ELABORACAO {
+        [*] --> PermiteAlteracao
+        PermiteAlteracao --> PermiteAlteracao : salvar() / editar dados
+        PermiteAlteracao --> PermiteAlteracao : adicionarAporte()
     }
     
-    VIGENTE --> ENCERRADO : encerrar() [dataFim atingida]
-    VIGENTE --> INTERROMPIDO : cancelar()
+    EM_ELABORACAO --> PUBLICADO : publicar() / publicarFomento()
     
-    ENCERRADO --> CONCLUIDO : finalizarAnalise()
-    INTERROMPIDO --> [*]
+    state PUBLICADO {
+        [*] --> FECHADO : [Nenhuma captação acontecendo]
+        FECHADO --> ABERTO : [Captação iniciada / acontecendo]
+        ABERTO --> FECHADO : [Captação finalizada / encerrada]
+    }
+    
+    %% Transições para Concluído
+    PUBLICADO --> CONCLUIDO : concluir() OU [Data Atual > dataFim]
+    EM_ELABORACAO --> CONCLUIDO : concluir() OU [Data Atual > dataFim]
+
+    %% Cancelamento a qualquer momento
+    EM_ELABORACAO --> CANCELADO : cancelar() / cancelarFomento()
+    PUBLICADO --> CANCELADO : cancelar() / cancelarFomento()
+    
+    CANCELADO --> [*]
     CONCLUIDO --> [*]
 
 
 ```
 
+### Fluxo de Eventos Fomento
+
+```mermaid
+stateDiagram-v2
+    %% ---- FLUXO UNIFICADO E SEQUENCIAL DO FOMENTO ----
+    state "Gestão e Publicação do Fomento (Analista Técnico & Sistema)" as FluxoPrincipal {
+        [*] --> CriarFomento : criarFomento()
+        
+        %% Ponto de retorno caso a edição não seja finalizada
+        PreencherDados : Informar Código, Título, Descrição, Eixo, Área, TipoProjeto, TipoDocumento
+        
+        CriarFomento --> PreencherDados
+        PreencherDados --> ConfigurarFaixas : Cadastrar Faixas de Valores
+        
+        state "Configurar Regras de Faixa" as RegrasFaixa {
+            [*] --> VincularRubricas : Definir RubricaPermitidaFaixa (% Min/Max)
+            VincularRubricas --> VincularBolsas : Definir BolsaPermitidaFaixa (Qtd Cotas)
+        }
+        
+        ConfigurarFaixas --> RegrasFaixa
+        RegrasFaixa --> ConfigurarEstruturaFases : Cadastrar FaseFomento, Formulários e Critérios
+        
+        %% Nó de decisão de fechamento da edição do Fomento
+        state choice_edicao_finalizada <<choice>>
+
+        %% Loop de criação de múltiplas captações
+        ConfigurarEstruturaFases --> choice_edicao_finalizada : Edição do fomento finalizada?
+        
+      
+        
+        
+        choice_edicao_finalizada --> PreencherDados : [Não] Voltar para ajustes
+        choice_edicao_finalizada --> PublicarEdital : [Sim] publicar() / publicarFomento()
+        
+        state "Publicação" as Publicacao {
+
+        PublicarEdital --> FomentoPublicado : Bloquear Fomento para Alterações
+        
+        FomentoPublicado --> ConcluirFomento : concluir() acionado OU [Data Atual > dataFim]
+        ConcluirFomento --> MudarEstadoConcluido : Alterar Estado para CONCLUIDO
+        MudarEstadoConcluido --> [*]
+        }
+    }
+
+    %% ---- FLUXO PARALELO ORÇAMENTÁRIO (Apenas enquanto em Elaboração) ----
+    state "Gestão de Recursos Orçamentários" as Orcamento {
+        [*] --> ReceberAporte : adicionarAporte() [Fomento em Elaboração]
+        ReceberAporte --> IdentificarOrigem : Vincular a Programa, Parceria ou ContaContabil
+        IdentificarOrigem --> [*]
+    }
+
+```
 
 ---
 
@@ -244,7 +316,7 @@ stateDiagram-v2
 | **Fomento** | codigo | Codigo do fomento | Gerado | String | | | Sim |
 | | titulo | Titulo do fomento | Sim | String | | 200 | |
 | | descricao | Descricao do fomento | Nao | String | | 1000 | |
-| | estado | Estado do fomento | Sim | EstadoFomento | EM_ELABORACAO, APROVADO, VIGENTE, INTERROMPIDO, ENCERRADO, CONCLUIDO | | |
+| | estado | Estado do fomento | Sim | EstadoFomento | EM_ELABORACAO, PUBLICADO, ABERTO, FECHADO, CANCELADO, CONCLUIDO | | |
 | | dataInicio | Data de inicio da vigencia do fomento | Sim | Date | | | |
 | | dataFim | Data de fim da vigencia do fomento | Sim | Date | | | |
 | | resultadoEsperado | Descricao livre dos resultados esperados dos projetos financiados | Nao | String | | 1000 | |
@@ -252,11 +324,15 @@ stateDiagram-v2
 | | eixoEstrategico (relacao) | Eixo estrategico ao qual o fomento esta vinculado | Sim | FK → EixoEstrategico | Via M010 | | |
 | | areaTecnica (relacao) | Area tecnica responsavel pelo fomento | Sim | FK → AreaTecnica | Via M008 | | |
 | | tipoProjeto (relacao) | Tipo de projeto aceito pelo fomento | Sim | FK → TipoProjeto | Via M008 | | |
+| | tipoDocumento (relacao) | Tipo de documento que o fomento aceita ou exige dos projetos/captacoes derivados | Nao | FK → TipoDocumento | | | |
+| **EstadoFomento** | valor | Estado ou subestado operacional do fomento | Sim | Enum | EM_ELABORACAO, PUBLICADO, ABERTO, FECHADO, CANCELADO, CONCLUIDO | | |
 | **Edital** | nome | Nome ou identificacao do edital associado ao fomento | Sim | String | | 200 | |
 | | url | Endereco externo do edital publicado ou minuta validada | Sim | String | URL valida | 500 | |
+| **TipoDocumento** | nome | Nome do tipo de documento aceito ou exigido no fomento | Sim | String | | 200 | Sim |
+| | descricao | Descricao do uso esperado do tipo de documento | Nao | String | | 500 | |
 | **AporteFomento** | valorAportado | Valor financeiro aportado | Sim | Double | > 0 | | |
 | | dataAporte | Data do registro do aporte | Sim | Date | | | |
-| | isAditivo | Indica se e aporte adicional ao original da mesma origem | Sim | Boolean | true/false | | |
+| | isAditivo | Indica se o aporte complementa outro aporte ja informado na elaboracao | Sim | Boolean | true/false | | |
 | | justificativa | Motivo do aporte; obrigatorio quando isAditivo=true ou Origem.tipo=RECURSO_INTERNO | Cond. | String | | 500 | |
 | | origem (relacao) | Origem unica do aporte, especializada em Programa, Parceria ou ContaContabil | Sim | FK → Origem | Programa/Parceria via M010; ContaContabil via M016 | | |
 | **Faixa** | nome | Nome da faixa | Sim | String | | 200 | |
@@ -305,8 +381,8 @@ stateDiagram-v2
 |----|-------------|-------|
 | RN-F01 | GestorFomento | Todo Fomento deve possuir ao menos um aporte financeiro originado de Programa, Parceria ou recurso interno. |
 | RN-F02 | GestorFomento | Todo Fomento deve estar vinculado a exatamente um eixo estrategico do M010. |
-| RN-F03 | GestorFomento | Todo Fomento deve possuir ao menos uma faixa antes de ser aprovado. |
-| RN-F04 | GestorFomento | Todo Fomento deve possuir um Edital associado antes de ser aprovado. |
+| RN-F03 | GestorFomento | Todo Fomento deve possuir ao menos uma faixa antes de ser publicado. |
+| RN-F04 | GestorFomento | Todo Fomento deve possuir um Edital associado antes de ser publicado. |
 | RN-F05 | GestorFomento | Cada aporte deve indicar exatamente uma origem, possuir valor > 0, data do aporte e justificativa quando aplicavel. |
 | RN-F06 | GestorFomento | O total financeiro do Fomento e calculado pela soma dos aportes; nao ha total manual. |
 | RN-F07 | GestorFomento | Todo Fomento deve possuir ao menos um tipo de projeto aceito. |
@@ -315,27 +391,30 @@ stateDiagram-v2
 | RN-F10 | AnalistaTecnico | Quando a rubrica Bolsa estiver permitida em uma faixa, devem ser configuradas as modalidades e niveis de bolsa permitidos. |
 | RN-F11 | AnalistaTecnico | BolsaPermitidaFaixa so pode ser configurada em faixa que permite rubrica do tipo Bolsa. |
 | RN-F12 | AnalistaTecnico | RubricaPermitidaFaixa com rubrica DOACI: o percentualMaximo, quando informado, nao pode superar a tabela normativa aplicavel. |
-| RN-F13 | GestorFomento | Somente Fomento com estado APROVADO ou VIGENTE pode ser referenciado por nova Captacao. |
-| RN-F14 | GestorFomento | Fomento APROVADO ou VIGENTE pode ser interrompido com justificativa; Captacoes e projetos vinculados sao suspensos em cascata. |
-| RN-F15 | GestorFomento | Fomento INTERROMPIDO pode ser retomado; Captacoes e projetos retomam o estado anterior. |
-| RN-F16 | GestorFomento | Fomento APROVADO, VIGENTE ou INTERROMPIDO pode ser encerrado com justificativa; Captacoes e projetos vinculados sao cancelados em cascata. |
-| RN-F17 | Sistema | Fomento transita automaticamente para CONCLUIDO quando dataFim e atingida. Nenhuma nova Captacao pode ser criada a partir de Fomento CONCLUIDO. |
+| RN-F13 | GestorFomento | Somente Fomento PUBLICADO pode originar novas Captacoes; ABERTO e FECHADO representam a situacao operacional do Fomento durante a existencia de Captacoes vinculadas. |
+| RN-F14 | Sistema | Fomento em EM_ELABORACAO permite alteracao de dados, faixas, aportes, documentos, formularios e criterios. |
+| RN-F15 | Sistema | Ao publicar o Fomento, o sistema bloqueia alteracoes estruturais em dados, faixas, rubricas, bolsas, fases, criterios, formularios e tipos de documento. |
+| RN-F16 | Sistema | Fomento PUBLICADO fica FECHADO quando nao houver Captacao em andamento e ABERTO enquanto houver Captacao iniciada/acontecendo. |
+| RN-F17 | Sistema | Fomento transita para CONCLUIDO por `concluir()` ou automaticamente quando `dataFim` for ultrapassada. Nenhuma nova Captacao pode ser criada a partir de Fomento CONCLUIDO. |
 | RN-F18 | Sistema | Nenhuma data do cronograma de uma Captacao pode ser anterior a `Fomento.dataInicio` nem posterior a `Fomento.dataFim`. |
-| RN-F19 | Sistema | Fomento APROVADO transita para VIGENTE quando publicado e a `dataInicio` for atingida. |
-| RN-F20 | Sistema | Aportes adicionais so podem ser registrados em Fomento APROVADO ou VIGENTE, preservando historico e recalculando o total financeiro. |
+| RN-F19 | GestorFomento | Fomento EM_ELABORACAO ou PUBLICADO pode ser cancelado por `cancelarFomento()`, transicionando para CANCELADO. |
+| RN-F20 | Sistema | Aportes so podem ser registrados enquanto o Fomento estiver em EM_ELABORACAO, preservando historico e recalculando o total financeiro. |
 | RN-F21 | GestorFomento | Todo Fomento deve possuir ao menos uma FaseFomento marcada como fase inicial por nao possuir pre-requisito. |
 | RN-F22 | GestorFomento | Pre-requisitos entre FaseFomento devem pertencer ao mesmo Fomento e nao podem formar ciclo. |
 | RN-F23 | Sistema | As flags de FaseFomento (`temRecurso`, `ehEliminatoria`, `ehClassificatoria`) devem ser coerentes com o TipoFase selecionado. |
 | RN-F24 | GestorFomento | FaseFomento pode possuir zero ou mais criterios; quando possuir CriterioSelecao, cada criterio deve informar tipo de selecao, perfil de selecionadores, quantidade de selecionadores e formulario de selecao. |
 | RN-F25 | GestorFomento | CriterioSelecao do tipo ELIMINACAO deve possuir `notaCorte` quando a eliminacao depender de pontuacao. |
 | RN-F26 | GestorFomento | CriterioSelecao com `tipoSelecionadores=AVALIADOR_ADHOC` deve exigir `qteSelecionadores >= 1`. |
-| RN-F27 | Sistema | Formularios referenciados por FaseFomento ou CriterioSelecao pertencem ao modulo proprietario externo e devem estar publicados/ativos no momento da aprovacao do Fomento. |
+| RN-F27 | Sistema | Formularios referenciados por FaseFomento ou CriterioSelecao pertencem ao modulo proprietario externo e devem estar publicados/ativos no momento da publicacao do Fomento. |
+| RN-F28 | GestorFomento | Um Fomento pode possuir varios TipoDocumento para orientar os documentos aceitos ou exigidos nos projetos/captacoes derivados. |
+| RN-F29 | Sistema | Captacoes criadas a partir do Fomento devem referenciar somente TipoProjeto, TipoDocumento, Faixa, FaseFomento, rubricas e bolsas configurados no proprio Fomento. |
+| RN-F30 | Sistema | Os estados do diagrama P1 (`PUBLICADO`, `ABERTO`, `FECHADO`, `CANCELADO`) divergem do vocabulário consolidado em README/modelo-comportamental (`APROVADO`, `INTERROMPIDO`, `ENCERRADO`). Antes de atualizar contrato/API, os vocabulários devem ser conciliados ou explicitamente separados como estado de governanca e subestado operacional. |
 
 ### Aportes Adicionais
 
 | ID | Responsavel | Regra |
 |----|-------------|-------|
-| RN-A01 | GestorFomento | Aporte aditivo so pode ser registrado em Fomento com estado APROVADO ou VIGENTE. |
+| RN-A01 | GestorFomento | Aporte aditivo so pode ser registrado em Fomento com estado EM_ELABORACAO. |
 | RN-A02 | GestorFomento | Aporte aditivo deve possuir valor > 0, data do aporte e justificativa. |
 | RN-A03 | GestorFomento | Quando a origem for RECURSO_INTERNO, o aporte deve referenciar uma ContaContabil interna da FAPES. |
 | RN-A04 | Sistema | O total financeiro do Fomento e recalculado pela soma de todos os AporteFomento, incluindo os com isAditivo=true. |
