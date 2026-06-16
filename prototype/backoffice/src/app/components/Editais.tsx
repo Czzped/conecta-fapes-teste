@@ -214,6 +214,12 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
       { nome: 'Diárias e passagens', valor: 640000, quantidade: 12, cor: '#fb7185' },
     ],
   };
+  const captacoesFiltradas = captacoesData.filter((captacao) => {
+    const query = searchTerm.toLowerCase();
+    const matchSearch = !query || `${captacao.titulo} ${captacao.vinculoNome}`.toLowerCase().includes(query);
+    const matchStatus = setorFilter === 'Todos' || captacao.status === setorFilter;
+    return matchSearch && matchStatus;
+  });
   const maiorValorRubricaCaptacao = Math.max(...financeiroCaptacaoDashboard.rubricas.map(item => item.valor), 1);
   const bolsasSolicitadasCaptacao = [
     { nome: 'Iniciação Científica', quantidade: 48, valor: 960000 },
@@ -827,7 +833,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
         {/* Filtros */}
         {activeTab !== 'dashboard' && (
         <div style={{ marginBottom: '24px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: isFomento ? 'repeat(4, 1fr)' : 'repeat(5, 1fr)', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '16px' }}>
             {/* Pesquisar */}
             <div>
               <label htmlFor="search-input" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
@@ -861,33 +867,6 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               />
             </div>
 
-            {!isFomento && (
-            <div style={{ position: 'relative' }}>
-              <label htmlFor="area-filter" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
-                Área
-              </label>
-              <button
-                id="area-filter"
-                onClick={() => { setShowAreaDropdown(!showAreaDropdown); setShowSetorDropdown(false); setShowInstituicaoDropdown(false); }}
-                style={{ width: '100%', backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '6px', padding: '10px 12px', color: T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
-              >
-                <span>{areaFilter}</span>
-                <ChevronDown size={16} style={{ color: T.textSecondary }} />
-              </button>
-              {showAreaDropdown && (
-                <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', marginTop: '4px', backgroundColor: T.bgSurface, border: `1px solid ${T.borderSubtle}`, borderRadius: '6px', overflow: 'hidden', zIndex: 100 }}>
-                  {areaOptions.map((option) => (
-                    <button key={option} onClick={() => { setAreaFilter(option); setShowAreaDropdown(false); }}
-                      style={{ width: '100%', padding: '10px 12px', textAlign: 'left', backgroundColor: areaFilter === option ? T.accentSoft : 'transparent', color: areaFilter === option ? T.accent : T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', border: 'none', cursor: 'pointer' }}
-                      onMouseEnter={(e) => { if (areaFilter !== option) e.currentTarget.style.backgroundColor = T.bgHover; }}
-                      onMouseLeave={(e) => { if (areaFilter !== option) e.currentTarget.style.backgroundColor = 'transparent'; }}
-                    >{option}</button>
-                  ))}
-                </div>
-              )}
-            </div>
-            )}
-
             {/* Status */}
             <div style={{ position: 'relative' }}>
               <label htmlFor="status-filter" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
@@ -914,31 +893,6 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
               )}
             </div>
 
-            {/* Instituição */}
-            <div style={{ position: 'relative' }}>
-              <label htmlFor="category-filter" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, display: 'block', marginBottom: '8px', fontWeight: 'var(--font-weight-normal)' }}>
-                Vínculo
-              </label>
-              <button
-                id="category-filter"
-                onClick={() => { setShowInstituicaoDropdown(!showInstituicaoDropdown); setShowAreaDropdown(false); setShowSetorDropdown(false); }}
-                style={{ width: '100%', backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '6px', padding: '10px 12px', color: T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
-              >
-                <span>{instituicaoFilter}</span>
-                <ChevronDown size={16} style={{ color: T.textSecondary }} />
-              </button>
-              {showInstituicaoDropdown && (
-                <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', marginTop: '4px', backgroundColor: T.bgSurface, border: `1px solid ${T.borderSubtle}`, borderRadius: '6px', overflow: 'hidden', zIndex: 100 }}>
-                  {instituicaoOptions.map((option) => (
-                    <button key={option} onClick={() => { setInstituicaoFilter(option); setShowInstituicaoDropdown(false); }}
-                      style={{ width: '100%', padding: '10px 12px', textAlign: 'left', backgroundColor: instituicaoFilter === option ? T.accentSoft : 'transparent', color: instituicaoFilter === option ? T.accent : T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', border: 'none', cursor: 'pointer' }}
-                      onMouseEnter={(e) => { if (instituicaoFilter !== option) e.currentTarget.style.backgroundColor = T.bgHover; }}
-                      onMouseLeave={(e) => { if (instituicaoFilter !== option) e.currentTarget.style.backgroundColor = 'transparent'; }}
-                    >{option}</button>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         </div>
         )}
@@ -946,16 +900,10 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
         {/* Tab Content */}
         {activeTab === 'dashboard' ? null : activeTab === 'captacoes' ? (
           <div className="space-y-3">
-            {captacoesData
-              .filter((captacao) => {
-                const query = searchTerm.toLowerCase();
-                const matchSearch = !query || `${captacao.titulo} ${captacao.vinculoNome}`.toLowerCase().includes(query);
-                const matchArea = isFomento || areaFilter === 'Todas' || captacao.area === areaFilter;
-                const matchVinculo = instituicaoFilter === 'Todos' || captacao.vinculoTipo === instituicaoFilter;
-                const matchStatus = setorFilter === 'Todos' || captacao.status === setorFilter;
-                return matchSearch && matchArea && matchVinculo && matchStatus;
-              })
-              .map((captacao) => (
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: '0 0 12px' }}>
+              Exibindo {captacoesFiltradas.length} resultados de {captacoesData.length}
+            </p>
+            {captacoesFiltradas.map((captacao) => (
                 <div
                   key={captacao.id}
                   className="rounded-lg"
@@ -976,7 +924,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                   <div className="flex items-center gap-6">
                     <div
                       className="flex-1"
-                      style={{ display: 'grid', gridTemplateColumns: isFomento ? '2.1fr 1.2fr 1.2fr 1fr 1fr' : '2.1fr 1.2fr 2fr 1.2fr 1fr 1fr', gap: '20px', alignItems: 'center' }}
+                      style={{ display: 'grid', gridTemplateColumns: isFomento ? '2.1fr 1.2fr 1.2fr 1fr 1fr' : '2.1fr 1.2fr 1.2fr 1fr 1fr', gap: '20px', alignItems: 'center' }}
                     >
                       <div>
                         <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
@@ -995,17 +943,6 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
                           {captacao.tipo}
                         </div>
                       </div>
-
-                      {!isFomento && (
-                      <div>
-                        <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>
-                          {captacao.vinculoTipo}
-                        </div>
-                        <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>
-                          {captacao.vinculoNome}
-                        </div>
-                      </div>
-                      )}
 
                       <div>
                         <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted }}>

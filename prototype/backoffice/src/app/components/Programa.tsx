@@ -62,7 +62,8 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('listagem');
   const [searchTerm, setSearchTerm] = useState('');
-  const [dataFilter, setDataFilter] = useState('');
+  const [dataFinalSort, setDataFinalSort] = useState<'Mais Recente' | 'Mais Antiga'>('Mais Recente');
+  const [showDataFinalDropdown, setShowDataFinalDropdown] = useState(false);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('Todos');
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [showFormulario, setShowFormulario] = useState(false);
@@ -88,13 +89,21 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
   ];
   const instituicaoOptions = ['Todos', ...Array.from(new Set(programasData.map(programa => programa.instituicaoDemandante)))];
 
+  const toDateFinalTime = (dataVigencia: string) => {
+    const final = dataVigencia.split(' - ')[1] || '';
+    const [day, month, year] = final.split('/').map(Number);
+    return new Date(year || 0, (month || 1) - 1, day || 1).getTime();
+  };
+
   const filtered = programasData.filter(p => {
     const matchSearch = `${p.nome} ${p.instituicaoDemandante}`.toLowerCase().includes(searchTerm.toLowerCase());
     const matchInstituicao = instituicaoFilter === 'Todos' || p.instituicaoDemandante === instituicaoFilter;
     const matchStatus = statusFilter === 'Todos' || p.status === statusFilter;
     const matchEixo = eixoFilter === 'Todos' || p.eixo === eixoFilter;
-    const matchData = !dataFilter || p.dataVigencia.includes(dataFilter);
-    return matchSearch && matchInstituicao && matchStatus && matchEixo && matchData;
+    return matchSearch && matchInstituicao && matchStatus && matchEixo;
+  }).sort((a, b) => {
+    const delta = toDateFinalTime(b.dataVigencia) - toDateFinalTime(a.dataVigencia);
+    return dataFinalSort === 'Mais Recente' ? delta : -delta;
   });
 
   if (showFormulario) {
@@ -424,18 +433,51 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
             )}
           </div>
 
-          {/* Data */}
-          <div>
+          {/* Data Final */}
+          <div style={{ position: 'relative' }}>
             <label style={filterLabelStyle}>
-              Vigência
+              Data Final
             </label>
-            <input
-              type="text"
-              placeholder="dd/mm/aaaa"
-              value={dataFilter}
-              onChange={e => setDataFilter(e.target.value)}
-              style={inputBaseStyle}
-            />
+            <button
+              onClick={() => {
+                setShowDataFinalDropdown(!showDataFinalDropdown);
+                setShowInstituicaoDropdown(false);
+                setShowEixoDropdown(false);
+                setShowStatusDropdown(false);
+              }}
+              style={{
+                ...inputBaseStyle,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer',
+              }}
+            >
+              <span>{dataFinalSort}</span>
+              <ChevronDown size={16} style={{ color: T.iconSubdued, flexShrink: 0, transform: showDataFinalDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+            </button>
+            {showDataFinalDropdown && (
+              <div style={{
+                position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%',
+                backgroundColor: T.bgSurface, border: `1px solid ${T.borderDefault}`,
+                borderRadius: '6px', overflow: 'hidden', zIndex: 100, boxShadow: T.shadowMd,
+              }}>
+                {(['Mais Recente', 'Mais Antiga'] as const).map(opt => (
+                  <button
+                    key={opt}
+                    onClick={() => { setDataFinalSort(opt); setShowDataFinalDropdown(false); }}
+                    style={{
+                      width: '100%', padding: '10px 12px', textAlign: 'left',
+                      backgroundColor: dataFinalSort === opt ? T.accentSoft : 'transparent',
+                      color: dataFinalSort === opt ? T.accent : T.textPrimary,
+                      fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
+                      border: 'none', cursor: 'pointer',
+                    }}
+                    onMouseEnter={e => { if (dataFinalSort !== opt) e.currentTarget.style.backgroundColor = T.bgHover; }}
+                    onMouseLeave={e => { if (dataFinalSort !== opt) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Status */}
@@ -486,6 +528,9 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
         </div>
 
         {/* Lista de Programas */}
+        <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: '0 0 12px' }}>
+          Exibindo {filtered.length} resultados de {programas.length}
+        </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {filtered.length === 0 ? (
             <div style={{

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ChevronDown, ChevronRight, Plus, Search, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { useThemeTokens } from '../theme/ThemeContext';
+import { BackofficeDatePicker } from './BackofficeDatePicker';
 
 interface Props {
   onBack: () => void;
@@ -501,7 +502,7 @@ const Metric: React.FC<{ label: string; value: string; highlight?: boolean }> = 
 const DateField: React.FC<{ label: string; value: string; onChange: (value: string) => void }> = ({ label, value, onChange }) => (
   <div>
     <RequiredLabel label={label} />
-    <input type="date" value={value} onChange={e => onChange(e.target.value)} style={{ ...inputStyle, colorScheme: 'dark' }} />
+    <BackofficeDatePicker value={value} onChange={onChange} style={inputStyle} />
   </div>
 );
 

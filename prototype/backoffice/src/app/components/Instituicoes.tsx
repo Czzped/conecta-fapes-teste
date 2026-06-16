@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowLeft, Building2, ChevronDown, ChevronRight, Plus, Save, Search, Trash2 } from 'lucide-react';
+import { ArrowLeft, Building2, ChevronDown, ChevronRight, Plus, Search, Trash2 } from 'lucide-react';
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
 type NaturezaJuridica = 'Publica' | 'Privada';
@@ -535,16 +535,18 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <div className="pt-8 px-8 pb-8">
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '28px' }}>
             <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
                 <button
                   type="button"
                   onClick={() => { setShowForm(false); setSelected(null); }}
-                  style={{ background: 'none', border: 'none', padding: 0, color: T.textMuted, cursor: 'pointer', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}
+                  style={{ background: 'none', border: 'none', padding: 0, color: T.textMuted, cursor: 'pointer', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)' }}
                 >
-                  {showForm ? 'Instituições' : 'Instituição'}
+                  Instituição
                 </button>
-                <ChevronRight size={14} style={{ color: T.iconSubdued }} />
-                <span style={{ color: T.accent, fontWeight: 'var(--font-weight-medium)' }}>{showForm ? 'Criar Instituição' : 'Detalhes da Instituição'}</span>
+                <ChevronRight size={13} style={{ color: T.iconSubdued }} />
+                <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)' }}>
+                  {showForm ? 'Criar Instituição' : 'Detalhes'}
+                </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
                 <button
@@ -558,10 +560,12 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 </h1>
               </div>
               <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: '0 0 0 48px' }}>
-                {showForm ? 'Preencha as informações abaixo para criar uma nova Instituição' : 'Cadastre instituições, unidades com CNPJ e setores sem CNPJ na mesma estrutura organizacional.'}
+                {showForm ? 'Preencha as informações abaixo para criar uma nova Instituição' : 'Verifique as informações dessa Instituição'}
               </p>
             </div>
           </div>
+
+          <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, margin: '-8px 0 32px' }} />
 
           <FormSection number="1" title="Identificação" subtitle="Dados básicos">
             <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 0.6fr', gap: '16px', marginBottom: '16px' }}>
@@ -704,11 +708,10 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', flex: 1 }}>
               <button type="button" onClick={() => { setShowForm(false); setSelected(null); }} style={{ backgroundColor: 'transparent', border: `1px solid ${T.borderStrong}`, borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, cursor: 'pointer' }}>
-                Cancelar
+                {showForm ? 'Salvar Rascunho' : 'Cancelar'}
               </button>
               <button type="button" onClick={saveDraft} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: T.accent, border: 'none', borderRadius: 'var(--radius)', padding: '10px 16px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: T.accentText, cursor: 'pointer' }}>
-                <Save size={15} />
-                Salvar
+                {showForm ? 'Ativar Instituição' : 'Salvar'}
               </button>
             </div>
           </div>
@@ -762,10 +765,6 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
 
             <div>
-              <h2 style={S.sectionTitle}>Projetos da Instituição</h2>
-              <p style={{ ...S.sectionSubtitle, marginBottom: '18px' }}>
-                Lista de projetos vinculados à instituição selecionada.
-              </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1fr 0.7fr 0.8fr', gap: '16px', marginBottom: '18px' }}>
                 <div>
                   <label style={S.label}>Pesquisar</label>
@@ -816,9 +815,13 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <DropdownFilter label="Status" value={statusFilter} options={['Todos', 'Ativa', 'Inativa', 'Rascunho']} open={showStatusDropdown} setOpen={setShowStatusDropdown} onSelect={value => setStatusFilter(value as typeof statusFilter)} />
             </div>
 
+            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: '0 0 12px' }}>
+              Exibindo {filtered.length} resultados de {instituicoes.length}
+            </p>
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {filtered.map(item => (
-                <button key={item.id} onClick={() => openDetails(item)} style={{ textAlign: 'left', backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '10px', padding: '18px 20px', cursor: 'pointer' }}>
+                <button key={item.id} onClick={() => openDetails(item)} onMouseEnter={event => { event.currentTarget.style.backgroundColor = T.bgHover; }} onMouseLeave={event => { event.currentTarget.style.backgroundColor = T.bgCard; }} style={{ textAlign: 'left', backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '10px', padding: '18px 20px', cursor: 'pointer', transition: 'background-color 0.2s' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.1fr 0.9fr minmax(92px, 0.8fr) 18px', gap: '14px', alignItems: 'start' }}>
                     <ListCell label="Instituição" value={item.nome} strong />
                     <ListCell label="Unidade" value={item.filial} />

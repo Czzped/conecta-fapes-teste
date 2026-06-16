@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Archive, ChevronDown, ChevronRight, DollarSign, Edit3, FileText, FolderOpen, Handshake, PauseCircle, Plus, Save, Search, Upload, X } from 'lucide-react';
 import type { ParceriaItem } from './Parceria';
 import { useThemeTokens } from '../theme/ThemeContext';
+import { BackofficeDatePicker } from './BackofficeDatePicker';
 
 interface Props {
   parceria: ParceriaItem;
@@ -1233,12 +1234,7 @@ const SelectEditField: React.FC<{ label: string; value: string; options: string[
 const DateMaskEditField: React.FC<{ label: string; value: string; onChange: (value: string) => void; labelColor?: string }> = ({ label, value, onChange, labelColor }) => (
   <div>
     <div style={{ ...labelStyle, color: labelColor || labelStyle.color }}>{label}</div>
-    <input
-      type="date"
-      value={toDateInputValue(value)}
-      onChange={event => onChange(fromDateInputValue(event.target.value))}
-      style={{ ...inputStyle, colorScheme: 'dark' }}
-    />
+    <BackofficeDatePicker value={toDateInputValue(value)} onChange={nextValue => onChange(fromDateInputValue(nextValue))} style={inputStyle} />
   </div>
 );
 

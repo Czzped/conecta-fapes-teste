@@ -4,6 +4,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useThemeTokens } from '../theme/ThemeContext';
+import { BackofficeDatePicker } from './BackofficeDatePicker';
 
 /* ─── Shared style tokens ─────────────────────────────────── */
 const inputStyle: React.CSSProperties = {
@@ -410,6 +411,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
     { id: 7, tipo: 'final', inicio: '2026-06-25', fim: '2026-06-25' },
   ]);
   const [captacaoCronogramaSelecionada, setCaptacaoCronogramaSelecionada] = useState('');
+  const [captacaoFomentoSelecionada, setCaptacaoFomentoSelecionada] = useState('');
   const [quantidadeCaptacoesFomento, setQuantidadeCaptacoesFomento] = useState(1);
   const nextEtapaCronogramaId = useRef(8);
   const [adiamentosCronograma, setAdiamentosCronograma] = useState<AdiamentoCronograma[]>([]);
@@ -689,6 +691,11 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
     { value: 'inovacao_tecnologica_2026', label: 'Inovação Tecnológica 2026' },
     { value: 'extensao_universitaria_2026', label: 'Extensão Universitária 2026' },
   ];
+  const captacaoFomentoOptions = [
+    { value: 'fomento_inovacao_2026', label: 'Fomento à Inovação 2026' },
+    { value: 'fomento_pesquisa_2026', label: 'Fomento à Pesquisa 2026' },
+    { value: 'fomento_extensao_2026', label: 'Fomento à Extensão 2026' },
+  ];
   const cronogramasPorCaptacao: Record<string, EtapaCronograma[]> = {
     bolsas_pesquisa_2026: [
       { id: 1, tipo: 'publicacao', inicio: '2026-02-01', fim: '2026-02-01' },
@@ -912,7 +919,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
               {createTitle}
             </h1>
             <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>
-              Configure as informações principais de {moduleLabel.toLowerCase()}.
+              {isFomento ? 'Configure as informações principais de fomento.' : 'A partir do Cronograma criado em Fomento, configure as datas da Captação.'}
             </p>
           </div>
         </div>
@@ -922,7 +929,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
         {children}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '28px' }}>
           <button type="button" onClick={onBack} style={{ padding: '11px 20px', backgroundColor: 'transparent', border: '1px solid var(--form-border)', borderRadius: 'var(--radius)', color: 'var(--form-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}>
-            {isFomento ? 'Salvar Rascunho' : 'Cancelar'}
+            Salvar Rascunho
           </button>
           <button
             type="button"
@@ -936,8 +943,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
             }}
             style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '11px 20px', backgroundColor: '#00c1af', border: 'none', borderRadius: 'var(--radius)', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}
           >
-            {!isFomento && <Save size={16} />}
-            {isFomento ? 'Ativar Fomento' : `Salvar ${moduleLabel}`}
+            {isFomento ? 'Ativar Fomento' : 'Ativar Captação'}
           </button>
         </div>
       </div>
@@ -1036,12 +1042,21 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
   const renderCronogramaCaptacao = (sectionNumber = '1', showNomeCaptacao = false) => (
     <div style={sectionCard}>
       <SectionHeader num={sectionNumber} title="Cronograma da Captação" subtitle="Configure as fases obrigatórias da captação" />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', marginBottom: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: showNomeCaptacao ? '1fr' : '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
         {showNomeCaptacao && (
           <div>
             <label style={labelStyle}>Nome da Captação</label>
             <input type="text" placeholder="Digite o nome da captação" value={tituloCaptacao} onChange={e => setTituloCaptacao(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
           </div>
+        )}
+        {!showNomeCaptacao && (
+          <SelectField
+            label="Fomento"
+            value={captacaoFomentoSelecionada}
+            onChange={setCaptacaoFomentoSelecionada}
+            placeholder="Selecione o fomento..."
+            options={captacaoFomentoOptions}
+          />
         )}
         {!showNomeCaptacao && (
           <SelectField
@@ -1058,9 +1073,11 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
           <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 6px' }}>Etapas do Cronograma</p>
           <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>Adicione um card para cada etapa obrigatória da captação.</p>
         </div>
-        <button type="button" onClick={showNomeCaptacao ? addEtapaCronogramaFomento : addEtapaCronograma} disabled={!showNomeCaptacao && (cronogramaCompleto || Boolean(captacaoCronogramaSelecionada))} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', backgroundColor: (!showNomeCaptacao && (cronogramaCompleto || captacaoCronogramaSelecionada)) ? 'rgba(255,255,255,0.06)' : 'rgba(0,193,175,0.1)', border: `1px solid ${(!showNomeCaptacao && (cronogramaCompleto || captacaoCronogramaSelecionada)) ? 'rgba(255,255,255,0.12)' : 'rgba(0,193,175,0.3)'}`, borderRadius: 'var(--radius)', cursor: (!showNomeCaptacao && (cronogramaCompleto || captacaoCronogramaSelecionada)) ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: (!showNomeCaptacao && (cronogramaCompleto || captacaoCronogramaSelecionada)) ? 'rgba(255,255,255,0.4)' : '#00c1af' }}>
-          <Plus size={16} /> Adicionar Etapa
-        </button>
+        {showNomeCaptacao && (
+          <button type="button" onClick={addEtapaCronogramaFomento} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', backgroundColor: 'rgba(0,193,175,0.1)', border: '1px solid rgba(0,193,175,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#00c1af' }}>
+            <Plus size={16} /> Adicionar Etapa
+          </button>
+        )}
       </div>
 
       {!cronogramaCompleto && (
@@ -1091,7 +1108,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
                     <input type="text" value={faseSelecionada?.label || ''} readOnly style={{ ...inputStyle, color: 'var(--form-text-secondary)' }} />
                   </div>
                 ) : (
-                  <SelectField label={showNomeCaptacao ? `Etapa ${index + 1}` : 'Etapa obrigatória'} value={etapa.tipo} onChange={value => updateCronograma(etapa.id, 'tipo', value)} placeholder="Selecione a etapa..." options={(showNomeCaptacao ? fasesCronograma : fasesCronograma.filter(fase => fase.key === etapa.tipo || !cronogramaCaptacao.some(item => item.tipo === fase.key))).map(fase => ({ value: fase.key, label: fase.label }))} />
+                  <SelectField label={showNomeCaptacao ? `Etapa ${index + 1}` : 'Etapa obrigatória'} value={etapa.tipo} onChange={value => updateCronograma(etapa.id, 'tipo', value)} placeholder="Selecione a etapa..." options={(showNomeCaptacao || !etapa.tipo ? fasesCronograma : fasesCronograma.filter(fase => fase.key === etapa.tipo || !cronogramaCaptacao.some(item => item.tipo === fase.key))).map(fase => ({ value: fase.key, label: fase.label }))} />
                 )}
                 {showNomeCaptacao && (
                   <button type="button" onClick={() => removeEtapaCronograma(etapa.id)} style={{ height: '44px', width: '44px', padding: 0, backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -1101,38 +1118,27 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
                 {!showNomeCaptacao && (
                   <>
                     <div>
-                      <label style={labelStyle}>{faseSelecionada?.periodo ? 'Data inicial' : 'Data'}</label>
-                      <input type="date" value={etapa.inicio} onChange={e => updateCronograma(etapa.id, 'inicio', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
+                      <label style={labelStyle}>Data Inicial</label>
+                      <BackofficeDatePicker value={etapa.inicio} onChange={value => updateCronograma(etapa.id, 'inicio', value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
                     </div>
                     <div style={{ opacity: faseSelecionada?.periodo ? 1 : 0.35 }}>
                       <label style={labelStyle}>Data final</label>
-                      <input type="date" value={etapa.fim} onChange={e => updateCronograma(etapa.id, 'fim', e.target.value)} style={inputStyle} disabled={!faseSelecionada?.periodo} onFocus={focusTeal} onBlur={blurGray} />
+                      <BackofficeDatePicker value={etapa.fim} onChange={value => updateCronograma(etapa.id, 'fim', value)} style={inputStyle} disabled={!faseSelecionada?.periodo} onFocus={focusTeal} onBlur={blurGray} />
                     </div>
                   </>
                 )}
               </div>
-              {!showNomeCaptacao && (
-                <>
-                  <div style={{ ...divider, margin: '18px 0' }} />
-                  <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr auto', gap: '16px', alignItems: 'end' }}>
-                    <div>
-                      <label style={labelStyle}>Adiar por dias</label>
-                      <input type="number" min="1" placeholder="Ex: 7" value={diasAdiamentoPorEtapa[etapa.id] || ''} onChange={e => setDiasAdiamentoPorEtapa(p => ({ ...p, [etapa.id]: e.target.value }))} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Justificativa do adiamento</label>
-                      <input type="text" placeholder="Informe o motivo do adiamento..." value={justificativaAdiamentoPorEtapa[etapa.id] || ''} onChange={e => setJustificativaAdiamentoPorEtapa(p => ({ ...p, [etapa.id]: e.target.value }))} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
-                    </div>
-                    <button type="button" onClick={() => aplicarAdiamentoCronograma(etapa)} style={{ padding: '11px 16px', backgroundColor: 'rgba(0,193,175,0.1)', border: '1px solid rgba(0,193,175,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#00c1af', whiteSpace: 'nowrap' }}>
-                      Aplicar adiamento
-                    </button>
-                  </div>
-                </>
-              )}
             </div>
           );
         })}
       </div>
+      {!showNomeCaptacao && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+          <button type="button" onClick={addEtapaCronogramaFomento} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', backgroundColor: 'rgba(0,193,175,0.1)', border: '1px solid rgba(0,193,175,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#00c1af' }}>
+            <Plus size={16} /> Adicionar Etapa
+          </button>
+        </div>
+      )}
       {showNomeCaptacao && (
         <>
           {Array.from({ length: quantidadeCaptacoesFomento - 1 }).map((_, captacaoIndex) => (
@@ -1202,8 +1208,8 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
             <textarea placeholder="Descreva o fomento" value={descricaoCaptacao} onChange={e => setDescricaoCaptacao(e.target.value)} style={{ ...inputStyle, minHeight: '96px', resize: 'vertical' }} onFocus={focusTeal} onBlur={blurGray} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '20px', marginBottom: '20px' }}>
-            <div><label style={labelStyle}>Data de Início</label><input type="date" value={dataInicio} onChange={e => setDataInicio(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} /></div>
-            <div><label style={labelStyle}>Data de Fim</label><input type="date" value={dataFim} onChange={e => setDataFim(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} /></div>
+            <div><label style={labelStyle}>Data de Início</label><BackofficeDatePicker value={dataInicio} onChange={setDataInicio} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} /></div>
+            <div><label style={labelStyle}>Data de Fim</label><BackofficeDatePicker value={dataFim} onChange={setDataFim} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} /></div>
           </div>
           <div style={{ marginBottom: '20px' }}>
             <label style={labelStyle}>Resultado Esperado</label>
@@ -1911,10 +1917,9 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
                     />
                     <div>
                       <label style={labelStyle}>{faseSelecionada?.periodo ? 'Data inicial' : 'Data'}</label>
-                      <input
-                        type="date"
+                      <BackofficeDatePicker
                         value={etapa.inicio}
-                        onChange={e => updateCronograma(etapa.id, 'inicio', e.target.value)}
+                        onChange={value => updateCronograma(etapa.id, 'inicio', value)}
                         style={inputStyle}
                         onFocus={focusTeal}
                         onBlur={blurGray}
@@ -1922,10 +1927,9 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
                     </div>
                     <div style={{ opacity: faseSelecionada?.periodo ? 1 : 0.35 }}>
                       <label style={labelStyle}>Data final</label>
-                      <input
-                        type="date"
+                      <BackofficeDatePicker
                         value={etapa.fim}
-                        onChange={e => updateCronograma(etapa.id, 'fim', e.target.value)}
+                        onChange={value => updateCronograma(etapa.id, 'fim', value)}
                         style={inputStyle}
                         disabled={!faseSelecionada?.periodo}
                         onFocus={focusTeal}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   Home, ChevronRight, FileText, Plus, Trash2, ChevronDown, Edit, X,
 } from 'lucide-react';
+import { BackofficeDatePicker } from './BackofficeDatePicker';
 
 // ─── Shared styles ───────────────────────────────────────────────────────────
 
@@ -16,6 +17,11 @@ const inputStyle: React.CSSProperties = {
   fontSize: 'var(--text-sm)',
   outline: 'none',
   boxSizing: 'border-box',
+};
+
+const LocalDateInput: React.FC = () => {
+  const [value, setValue] = useState('');
+  return <BackofficeDatePicker value={value} onChange={setValue} style={inputStyle} />;
 };
 
 const textareaStyle: React.CSSProperties = {
@@ -993,7 +999,7 @@ export const FormularioInscricaoGeral: React.FC<Props> = ({ onBack, onBackToEdit
             onLabelChange={() => {}}
             onDelete={() => {}}
           >
-            <input style={inputStyle} type="date" />
+            <LocalDateInput />
           </EditableField>
 
           <EditableField
@@ -1002,7 +1008,7 @@ export const FormularioInscricaoGeral: React.FC<Props> = ({ onBack, onBackToEdit
             onLabelChange={() => {}}
             onDelete={() => {}}
           >
-            <input style={inputStyle} type="date" />
+            <LocalDateInput />
           </EditableField>
 
           <EditableField

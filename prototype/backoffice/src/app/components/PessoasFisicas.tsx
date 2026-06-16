@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowLeft, ChevronRight, Plus, Save, Search, UserRound } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronRight, Plus, Search, UserRound } from 'lucide-react';
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
 type EstadoPessoa = 'Ativa' | 'Suspensa';
@@ -245,7 +245,7 @@ const vidaAcademicaPorPessoa: VidaAcademicaPessoa[] = [
       { nome: 'Congresso Brasileiro de Saude Coletiva', papel: 'Apresentadora', ano: '2025', local: 'Vitoria/ES' },
     ],
     premios: [
-      { nome: 'Premio Inovacao em Saude Digital', entidade: 'FAPES', ano: '2025' },
+      { nome: 'Prêmio Inovação em Saúde Digital', entidade: 'FAPES', ano: '2025' },
     ],
     idiomas: [
       { idioma: 'Ingles', leitura: 'Fluente', fala: 'Bom', escrita: 'Bom' },
@@ -365,7 +365,7 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
     const vidaAcademica = selected ? vidaAcademicaPorPessoa.find(item => item.pessoaId === selected.id) : undefined;
     const eventosPremios = vidaAcademica ? [
       ...vidaAcademica.eventos.map(item => ({ ...item, tipoRegistro: 'Evento' })),
-      ...vidaAcademica.premios.map(item => ({ ...item, tipoRegistro: 'Premio' })),
+      ...vidaAcademica.premios.map(item => ({ ...item, tipoRegistro: 'Prêmio' })),
     ] : [];
     const totalProducoes = vidaAcademica
       ? vidaAcademica.artigos.length + vidaAcademica.livros.length + vidaAcademica.orientacoes.length + vidaAcademica.projetos.length + vidaAcademica.eventos.length + vidaAcademica.premios.length
@@ -387,10 +387,12 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
         <div className="pt-8 px-8 pb-8">
           <Header
             title={showForm ? 'Criar Pessoa Física' : draft.nome}
-            subtitle="Cadastre pessoas físicas com CPF único, dados de contato e situação cadastral."
+            subtitle={showForm ? 'Cadastre pessoas físicas com CPF único, dados de contato e situação cadastral.' : 'Verifique as informações dessa Pessoa Física.'}
             onBack={() => { setShowForm(false); setSelected(null); }}
-            breadcrumb={showForm ? ['Pessoa Física', 'Criar Pessoa'] : selected ? ['Pessoas Físicas', selected.nome] : undefined}
+            breadcrumb={showForm ? ['Pessoa Física', 'Criar Pessoa'] : selected ? ['Pessoas Físicas', 'Detalhes'] : undefined}
           />
+
+          {showForm && <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, margin: '-8px 0 28px' }} />}
 
           {selected && (
             <div style={{ display: 'flex', gap: '4px', borderBottom: `1px solid ${T.borderSubtle}`, marginBottom: '28px' }}>
@@ -409,10 +411,10 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
           {selected && detailTab === 'dashboard' && (
             <>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-                <Metric label="Projetos vinculados" value={String(projetos.length)} color="#38bdf8" bg="rgba(56,189,248,0.12)" />
-                <Metric label="Bolsas recebidas" value={String(bolsas.length)} color="#a855f7" bg="rgba(168,85,247,0.12)" />
-                <Metric label="Bolsas em andamento" value={String(bolsasAtivas.length)} color="#22c55e" bg="rgba(34,197,94,0.12)" />
-                <Metric label="Valor mensal ativo" value={formatCurrency(valorMensalAtivo)} color="#f59e0b" bg="rgba(245,158,11,0.12)" />
+                <Metric label="Projetos vinculados" value={String(projetos.length)} color={T.accent} bg={T.accentSoft} />
+                <Metric label="Bolsas recebidas" value={String(bolsas.length)} color={T.accent} bg={T.accentSoft} />
+                <Metric label="Bolsas em andamento" value={String(bolsasAtivas.length)} color={T.accent} bg={T.accentSoft} />
+                <Metric label="Valor mensal ativo" value={formatCurrency(valorMensalAtivo)} color={T.accent} bg={T.accentSoft} />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -470,7 +472,7 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                   </div>
                 </div>
 
-                <CurriculumDataSection id="artigos" title="Artigos" subtitle="Producoes compartilhadas entre curriculos de autores." items={vidaAcademica.artigos} searchTerm={academicSearchTerm} emptyText="Nenhum artigo encontrado." columns={['Titulo', 'Periodico', 'Ano']} gridTemplateColumns="minmax(320px, 1.5fr) minmax(220px, 1fr) 90px" getSearchText={item => `${item.titulo} ${item.periodico} ${item.ano} ${item.autores}`} renderRow={item => (
+                <CurriculumDataSection id="artigos" title="Artigos" subtitle="Produções compartilhadas entre currículos de autores." items={vidaAcademica.artigos} searchTerm={academicSearchTerm} emptyText="Nenhum artigo encontrado." columns={['Título', 'Periódico', 'Ano']} gridTemplateColumns="minmax(320px, 1.5fr) minmax(220px, 1fr) 90px" getSearchText={item => `${item.titulo} ${item.periodico} ${item.ano} ${item.autores}`} renderRow={item => (
                   <>
                     <AcademicCell value={item.titulo} detail={item.autores} strong />
                     <AcademicCell value={item.periodico} />
@@ -478,7 +480,7 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                   </>
                 )} />
 
-                <CurriculumDataSection id="orientacoes" title="Orientacoes" subtitle="Orientacoes concluidas ou em andamento." items={vidaAcademica.orientacoes} searchTerm={academicSearchTerm} emptyText="Nenhuma orientacao encontrada." columns={['Nivel', 'Orientando', 'Instituicao']} gridTemplateColumns="180px minmax(240px, 1fr) minmax(180px, 0.8fr)" getSearchText={item => `${item.nivel} ${item.orientando} ${item.instituicao} ${item.status}`} renderRow={item => (
+                <CurriculumDataSection id="orientacoes" title="Orientações" subtitle="Orientações concluídas ou em andamento." items={vidaAcademica.orientacoes} searchTerm={academicSearchTerm} emptyText="Nenhuma orientação encontrada." columns={['Nível', 'Orientando', 'Instituição']} gridTemplateColumns="minmax(180px, 1fr) minmax(240px, 1fr) minmax(180px, 1fr)" getSearchText={item => `${item.nivel} ${item.orientando} ${item.instituicao} ${item.status}`} renderRow={item => (
                   <>
                     <AcademicCell value={item.nivel} detail={item.status} strong />
                     <AcademicCell value={item.orientando} />
@@ -486,7 +488,7 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                   </>
                 )} />
 
-                <CurriculumDataSection id="projetos" title="Projetos academicos" subtitle="Participacoes em projetos do curriculo Lattes." items={vidaAcademica.projetos} searchTerm={academicSearchTerm} emptyText="Nenhum projeto academico encontrado." columns={['Projeto', 'Papel', 'Status']} gridTemplateColumns="minmax(320px, 1.5fr) minmax(180px, 0.8fr) 130px" getSearchText={item => `${item.titulo} ${item.tipo} ${item.papel} ${item.periodo} ${item.status}`} renderRow={item => (
+                <CurriculumDataSection id="projetos" title="Projetos Acadêmicos" subtitle="Participações em projetos do currículo Lattes." items={vidaAcademica.projetos} searchTerm={academicSearchTerm} emptyText="Nenhum projeto acadêmico encontrado." columns={['Projeto', 'Papel', 'Status']} gridTemplateColumns="minmax(320px, 1.5fr) minmax(180px, 0.8fr) 130px" getSearchText={item => `${item.titulo} ${item.tipo} ${item.papel} ${item.periodo} ${item.status}`} renderRow={item => (
                   <>
                     <AcademicCell value={item.titulo} detail={item.tipo} strong />
                     <AcademicCell value={item.papel} detail={item.periodo} />
@@ -494,7 +496,7 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                   </>
                 )} />
 
-                <CurriculumDataSection id="formacao" title="Formacao academica" subtitle="Titulos importados do curriculo." items={vidaAcademica.formacoes} searchTerm={academicSearchTerm} emptyText="Nenhuma formacao encontrada." columns={['Nivel', 'Curso', 'Periodo']} gridTemplateColumns="180px minmax(260px, 1fr) 140px" getSearchText={item => `${item.nivel} ${item.curso} ${item.instituicao} ${item.periodo} ${item.status}`} renderRow={item => (
+                <CurriculumDataSection id="formacao" title="Formação Acadêmica" subtitle="Títulos importados do currículo." items={vidaAcademica.formacoes} searchTerm={academicSearchTerm} emptyText="Nenhuma formação encontrada." columns={['Nível', 'Curso', 'Período']} gridTemplateColumns="minmax(180px, 1fr) minmax(260px, 1fr) minmax(140px, 1fr)" getSearchText={item => `${item.nivel} ${item.curso} ${item.instituicao} ${item.periodo} ${item.status}`} renderRow={item => (
                   <>
                     <AcademicCell value={item.nivel} detail={item.status} strong />
                     <AcademicCell value={item.curso} detail={item.instituicao} />
@@ -502,7 +504,7 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                   </>
                 )} />
 
-                <CurriculumDataSection id="livros" title="Livros e capitulos" subtitle="Producoes bibliograficas em livros." items={vidaAcademica.livros} searchTerm={academicSearchTerm} emptyText="Nenhum livro encontrado." columns={['Titulo', 'Papel', 'Ano']} gridTemplateColumns="minmax(320px, 1.5fr) minmax(160px, 0.8fr) 90px" getSearchText={item => `${item.titulo} ${item.tipo} ${item.papel} ${item.ano}`} renderRow={item => (
+                <CurriculumDataSection id="livros" title="Livros e capítulos" subtitle="Produções bibliográficas em livros." items={vidaAcademica.livros} searchTerm={academicSearchTerm} emptyText="Nenhum livro encontrado." columns={['Título', 'Papel', 'Ano']} gridTemplateColumns="minmax(320px, 1.5fr) minmax(160px, 0.8fr) 90px" getSearchText={item => `${item.titulo} ${item.tipo} ${item.papel} ${item.ano}`} renderRow={item => (
                   <>
                     <AcademicCell value={item.titulo} detail={item.tipo} strong />
                     <AcademicCell value={item.papel} />
@@ -510,7 +512,7 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                   </>
                 )} />
 
-                <CurriculumDataSection id="eventos-premios" title="Eventos e premios" subtitle="Participacoes, premios e reconhecimentos." items={eventosPremios} searchTerm={academicSearchTerm} emptyText="Nenhum evento ou premio encontrado." columns={['Registro', 'Detalhe', 'Ano']} gridTemplateColumns="minmax(300px, 1.3fr) minmax(220px, 1fr) 90px" getSearchText={item => `${item.tipoRegistro} ${item.nome} ${'local' in item ? item.local : item.entidade} ${item.ano}`} renderRow={item => {
+                <CurriculumDataSection id="eventos-premios" title="Eventos e Prêmios" subtitle="Participações, prêmios e reconhecimentos." items={eventosPremios} searchTerm={academicSearchTerm} emptyText="Nenhum evento ou prêmio encontrado." columns={['Registro', 'Detalhe', 'Ano']} gridTemplateColumns="minmax(300px, 1.3fr) minmax(220px, 1fr) 90px" getSearchText={item => `${item.tipoRegistro} ${item.nome} ${'local' in item ? item.local : item.entidade} ${item.ano}`} renderRow={item => {
                   if ('local' in item) {
                     return (
                       <>
@@ -522,14 +524,14 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                   }
                   return (
                     <>
-                      <AcademicCell value={item.nome} detail="Premio" strong />
+                        <AcademicCell value={item.nome} detail="Prêmio" strong />
                       <AcademicCell value={item.entidade} />
                       <AcademicCell value={item.ano} />
                     </>
                   );
                 }} />
 
-                <CurriculumDataSection id="idiomas" title="Idiomas" subtitle="Proficiencia declarada no Lattes." items={vidaAcademica.idiomas} searchTerm={academicSearchTerm} emptyText="Nenhum idioma encontrado." columns={['Idioma', 'Leitura', 'Fala', 'Escrita']} gridTemplateColumns="minmax(180px, 1fr) repeat(3, minmax(120px, 0.7fr))" getSearchText={item => `${item.idioma} ${item.leitura} ${item.fala} ${item.escrita}`} renderRow={item => (
+                <CurriculumDataSection id="idiomas" title="Idiomas" subtitle="Proficiência declarada no Lattes." items={vidaAcademica.idiomas} searchTerm={academicSearchTerm} emptyText="Nenhum idioma encontrado." columns={['Idioma', 'Leitura', 'Fala', 'Escrita']} gridTemplateColumns="minmax(180px, 1fr) repeat(3, minmax(120px, 0.7fr))" getSearchText={item => `${item.idioma} ${item.leitura} ${item.fala} ${item.escrita}`} renderRow={item => (
                   <>
                     <AcademicCell value={item.idioma} strong />
                     <AcademicCell value={item.leitura} />
@@ -539,8 +541,8 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                 )} />
               </div>
             ) : (
-              <InfoCard title="Lattes" subtitle="Dados importados do M024 a partir do curriculo Lattes.">
-                <EmptyState text="Nenhum curriculo Lattes sincronizado para esta pessoa." />
+              <InfoCard title="Lattes" subtitle="Dados importados do M024 a partir do currículo Lattes.">
+                <EmptyState text="Nenhum currículo Lattes sincronizado para esta pessoa." />
               </InfoCard>
             )
           )}
@@ -567,10 +569,9 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
               </FormSection>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                  <button type="button" onClick={() => { setShowForm(false); setSelected(null); }} style={S.secondaryButton}>Cancelar</button>
+                  <button type="button" onClick={() => { setShowForm(false); setSelected(null); }} style={S.secondaryButton}>Salvar Rascunho</button>
                   <button type="button" onClick={saveDraft} style={S.primaryButton}>
-                    <Save size={15} />
-                    Salvar
+                    Ativar Pessoa
                   </button>
               </div>
             </>
@@ -586,10 +587,10 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
         <PageHeader title="Pessoas Físicas" subtitle="Gerencie cadastros de pessoas, CPF único, situação e dados complementares." onBack={onBack} onAdd={openNew} addLabel="Criar Pessoa" />
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-            <Metric label="Total de pessoas" value={String(metrics.total)} color={T.textPrimary} bg={T.bgChip} />
-            <Metric label="Ativas" value={String(metrics.ativas)} color="#22c55e" bg="rgba(34,197,94,0.12)" />
-            <Metric label="Suspensas" value={String(metrics.suspensas)} color="#f59e0b" bg="rgba(245,158,11,0.12)" />
-            <Metric label="Com Lattes" value={String(metrics.comLattes)} color="#38bdf8" bg="rgba(56,189,248,0.12)" />
+            <Metric label="Total de pessoas" value={String(metrics.total)} color={T.accent} bg={T.accentSoft} />
+            <Metric label="Ativas" value={String(metrics.ativas)} color={T.accent} bg={T.accentSoft} />
+            <Metric label="Suspensas" value={String(metrics.suspensas)} color={T.accent} bg={T.accentSoft} />
+            <Metric label="Com Lattes" value={String(metrics.comLattes)} color={T.accent} bg={T.accentSoft} />
         </div>
 
         <>
@@ -609,7 +610,7 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {filtered.map(item => (
-                <button key={item.id} onClick={() => openDetails(item)} style={{ textAlign: 'left', backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '10px', padding: '18px 20px', cursor: 'pointer' }}>
+                <button key={item.id} onClick={() => openDetails(item)} onMouseEnter={event => { event.currentTarget.style.backgroundColor = T.bgHover; }} onMouseLeave={event => { event.currentTarget.style.backgroundColor = T.bgCard; }} style={{ textAlign: 'left', backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '10px', padding: '18px 20px', cursor: 'pointer', transition: 'background-color 0.2s' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.8fr 0.6fr 0.7fr 24px', gap: '18px', alignItems: 'center' }}>
                     <ListCell label="Pessoa" value={item.nome} strong />
                     <ListCell label="CPF" value={item.cpf} />
@@ -718,7 +719,7 @@ const CurriculumHero: React.FC<{ pessoa: PessoaFisicaItem; curriculum: VidaAcade
             {curriculum.curriculoValido ? 'Currículo válido' : 'Currículo desatualizado'}
           </span>
         </div>
-        <h2 style={{ fontFamily: 'var(--font-family)', fontSize: '28px', lineHeight: 1.15, color: T.textPrimary, margin: '0 0 10px', fontWeight: 'var(--font-weight-semibold)' }}>{pessoa.nome}</h2>
+        <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', lineHeight: 1.4, color: T.textPrimary, margin: '0 0 10px', fontWeight: 'var(--font-weight-medium)' }}>{pessoa.nome}</h2>
         <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, lineHeight: 1.6, margin: '0 0 18px' }}>
           {curriculum.titulacaoMaxima} em {curriculum.areaPrincipal}. Lattes sincronizado pelo M024, com produções, orientações, projetos e demais registros estruturados para consulta administrativa.
         </p>
@@ -747,9 +748,9 @@ const HeroFact: React.FC<{ label: string; value: string }> = ({ label, value }) 
 const CurriculumAnchor: React.FC<{ href: string; label: string; count: number }> = ({ href, label, count }) => {
   const { T } = useThemeTokens();
   return (
-    <a href={href} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: `1px solid ${T.accent}`, borderRadius: '999px', backgroundColor: T.accentSoft, color: T.accent, padding: '8px 11px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', textDecoration: 'none' }}>
+    <a href={href} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: `1px solid ${T.accent}`, borderRadius: '999px', backgroundColor: T.accent, color: T.accentText, padding: '8px 11px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', textDecoration: 'none' }}>
       <span>{label}</span>
-      <span style={{ minWidth: '28px', borderRadius: '999px', backgroundColor: T.accent, color: T.accentText, padding: '2px 7px', fontSize: 'var(--text-xs)', textAlign: 'center' }}>{count}</span>
+      <span style={{ minWidth: '28px', borderRadius: '999px', backgroundColor: T.accentText, color: T.accent, padding: '2px 7px', fontSize: 'var(--text-xs)', textAlign: 'center' }}>{count}</span>
     </a>
   );
 };
@@ -853,14 +854,47 @@ const Field: React.FC<{ label: string; value: string; onChange: (value: string) 
 };
 
 const Select: React.FC<{ label: string; value: string; onChange: (value: string) => void; options: string[] }> = ({ label, value, onChange, options }) => {
-  const { T, isLight } = useThemeTokens();
+  const { T } = useThemeTokens();
   const S = buildStyles(T);
+  const [open, setOpen] = useState(false);
+
   return (
-    <div>
+    <div style={{ position: 'relative' }}>
       <label style={S.label}>{label}</label>
-      <select value={value} onChange={event => onChange(event.target.value)} style={{ ...S.input, colorScheme: isLight ? 'light' : 'dark' }}>
-        {options.map(option => <option key={option} value={option}>{option}</option>)}
-      </select>
+      <button
+        type="button"
+        onClick={() => setOpen(current => !current)}
+        style={{
+          ...S.input,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          textAlign: 'left',
+          cursor: 'pointer',
+        }}
+      >
+        <span>{value || 'Selecione'}</span>
+        <ChevronDown size={16} style={{ color: T.iconSubdued, transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+      </button>
+      {open && (
+        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: T.bgSurface, border: `1px solid ${T.borderDefault}`, borderRadius: '6px', overflow: 'hidden', zIndex: 100, boxShadow: T.shadowMd }}>
+          {options.map(option => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => {
+                onChange(option);
+                setOpen(false);
+              }}
+              style={{ width: '100%', padding: '10px 12px', textAlign: 'left', backgroundColor: value === option ? T.accentSoft : 'transparent', color: value === option ? T.accent : T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', border: 'none', cursor: 'pointer' }}
+              onMouseEnter={(event) => { if (value !== option) event.currentTarget.style.backgroundColor = T.bgHover; }}
+              onMouseLeave={(event) => { if (value !== option) event.currentTarget.style.backgroundColor = 'transparent'; }}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

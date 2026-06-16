@@ -8,6 +8,7 @@ import {
   ReceiptText,
   Search,
 } from 'lucide-react';
+import { BackofficeDatePicker } from './BackofficeDatePicker';
 
 type StatusSolicitacaoDiaria = 'ALOCADA' | 'APROVADA' | 'CANCELADA' | 'RECUSADA';
 type EstadoAceiteDiaria = 'PENDENTE' | 'ASSINADO' | 'RECUSADO' | 'CANCELADO';
@@ -416,11 +417,10 @@ export const SolicitacoesDiarias: React.FC<SolicitacoesDiariasProps> = ({ embedd
 
           <label style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)' }}>
             Partida de
-            <input
-              type="date"
+            <BackofficeDatePicker
               value={dataInicio}
-              onChange={(event) => {
-                setDataInicio(event.target.value);
+              onChange={(value) => {
+                setDataInicio(value);
                 resetPage();
               }}
               style={{ ...inputStyle, marginTop: '8px', padding: '0 12px' }}
@@ -429,11 +429,10 @@ export const SolicitacoesDiarias: React.FC<SolicitacoesDiariasProps> = ({ embedd
 
           <label style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)' }}>
             Partida até
-            <input
-              type="date"
+            <BackofficeDatePicker
               value={dataFim}
-              onChange={(event) => {
-                setDataFim(event.target.value);
+              onChange={(value) => {
+                setDataFim(value);
                 resetPage();
               }}
               style={{ ...inputStyle, marginTop: '8px', padding: '0 12px' }}

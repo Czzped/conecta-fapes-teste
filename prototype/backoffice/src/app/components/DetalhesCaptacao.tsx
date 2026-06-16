@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { ChevronRight, ArrowLeft, ChevronDown, X, Save, FileText, CheckCircle, ClipboardCheck, ListChecks, RotateCcw, Trophy, ShieldCheck, ClipboardList } from 'lucide-react';
 import { FormularioEdital } from './FormularioEdital';
+import { BackofficeDatePicker } from './BackofficeDatePicker';
+import { useThemeTokens } from '../theme/ThemeContext';
 
 interface CaptacaoDetalhe {
   titulo: string;
@@ -112,6 +114,23 @@ const fasesIniciativas = [
   { fase: 'Reprovados', quantidade: 8, cor: '#ef4444' },
 ];
 
+const initialCronogramaCaptacao = [
+  { etapa: 'Publicação da captação', inicio: '2026-02-01', fim: '2026-02-01' },
+  { etapa: 'Recebimento das propostas', inicio: '2026-02-01', fim: '2026-03-31' },
+  { etapa: 'Avaliação documental', inicio: '2026-04-01', fim: '2026-04-15' },
+  { etapa: 'Avaliação Ad Hoc', inicio: '2026-04-16', fim: '2026-05-31' },
+  { etapa: 'Publicação do resultado preliminar', inicio: '2026-06-05', fim: '2026-06-05' },
+  { etapa: 'Recebimento de revisão do resultado', inicio: '2026-06-06', fim: '2026-06-15' },
+  { etapa: 'Publicação do resultado após revisão', inicio: '2026-06-20', fim: '2026-06-20' },
+  { etapa: 'Publicação do resultado final', inicio: '2026-06-25', fim: '2026-06-25' },
+];
+
+const formatDateLabel = (value: string) => {
+  const [year, month, day] = value.split('-');
+  if (!year || !month || !day) return value;
+  return `${day}/${month}/${year}`;
+};
+
 const iniciativasEnviadas = [
   { codigo: 'INI-2026-001', titulo: 'Plataforma inteligente de monitoramento hídrico', proponente: 'Instituto Federal do Espírito Santo', ortogado: 'Mariana Lopes', fase: 'Avaliação Ad Hoc', data: '12/02/2026', categoria: 'Inovação', faixa: 'Faixa 2', valorSolicitado: 'R$ 420.000,00', valorNumerico: 420000, resumo: 'Solução para monitorar bacias hidrográficas com sensores conectados e painéis de alerta.', rubricas: [{ nome: 'Bolsas', valor: 140000, cor: '#38bdf8' }, { nome: 'Capital', valor: 180000, cor: '#a78bfa' }, { nome: 'Custeio', valor: 100000, cor: '#22c55e' }] },
   { codigo: 'INI-2026-002', titulo: 'Bioinsumos para agricultura de precisão', proponente: 'Universidade Federal do Espírito Santo', ortogado: 'André Carvalho', fase: 'Habilitação', data: '14/02/2026', categoria: 'Pesquisa', faixa: 'Faixa 1', valorSolicitado: 'R$ 180.000,00', valorNumerico: 180000, resumo: 'Pesquisa aplicada para validação de bioinsumos em cadeias produtivas regionais.', rubricas: [{ nome: 'Bolsas', valor: 90000, cor: '#38bdf8' }, { nome: 'Custeio', valor: 70000, cor: '#22c55e' }, { nome: 'Diárias e passagens', valor: 20000, cor: '#fb7185' }] },
@@ -194,6 +213,7 @@ const financeiroPorFaixaCaptacao = Array.from(new Set(iniciativasEnviadas.map(in
 });
 
 export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'captacao' }) => {
+  const { T } = useThemeTokens();
   const [activeTab, setActiveTab] = useState<'informacoes' | 'dashboard' | 'proposta' | 'avaliacao' | 'avaliacaoAdHoc' | 'recurso' | 'recursoParcial' | 'resultadoFinal'>('informacoes');
   const [editingResumo, setEditingResumo] = useState(false);
   const [showFormularioEdicao, setShowFormularioEdicao] = useState(false);
@@ -219,6 +239,18 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
   const [showStatusHabilitacaoDropdown, setShowStatusHabilitacaoDropdown] = useState(false);
   const [statusAvaliacaoAdHocFiltro, setStatusAvaliacaoAdHocFiltro] = useState('Aguardando Avaliador');
   const [showStatusAvaliacaoAdHocDropdown, setShowStatusAvaliacaoAdHocDropdown] = useState(false);
+  const [editandoDatasCronograma, setEditandoDatasCronograma] = useState(false);
+  const [cronogramaCaptacao, setCronogramaCaptacao] = useState(initialCronogramaCaptacao);
+  const [cronogramaSnapshot, setCronogramaSnapshot] = useState(initialCronogramaCaptacao);
+  const [historicoDatasCronograma, setHistoricoDatasCronograma] = useState([
+    {
+      id: 1,
+      titulo: 'Avaliação documental adiada em 5 dia(s)',
+      detalhe: '01/04/2026 → 06/04/2026 · fim: 15/04/2026 → 20/04/2026',
+      observacao: 'Necessidade de tempo adicional para conferência documental.',
+      data: 'Registro mockado',
+    },
+  ]);
   const resumoInputStyle: React.CSSProperties = {
     ...inputStyle,
     backgroundColor: editingResumo ? 'rgba(23, 23, 23,0.95)' : inputStyle.backgroundColor,
@@ -228,6 +260,28 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
   const maiorValorRubricaDetalhe = Math.max(...financeiroCaptacaoDetalhe.rubricas.map(item => item.valor), 1);
   const formatCurrency = (value: number) =>
     value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const updateCronogramaDate = (index: number, field: 'inicio' | 'fim', value: string) =>
+    setCronogramaCaptacao(items => items.map((item, itemIndex) => itemIndex === index ? { ...item, [field]: value } : item));
+  const salvarDatasCronograma = () => {
+    const alteracoes = cronogramaCaptacao.flatMap((item, index) => {
+      const anterior = cronogramaSnapshot[index];
+      if (!anterior || (anterior.inicio === item.inicio && anterior.fim === item.fim)) return [];
+      return [{
+        id: Date.now() + index,
+        titulo: item.etapa,
+        detalhe: `${formatDateLabel(anterior.inicio)} → ${formatDateLabel(item.inicio)} · fim: ${formatDateLabel(anterior.fim)} → ${formatDateLabel(item.fim)}`,
+        observacao: 'Datas alteradas manualmente em Detalhes da Captação.',
+        data: new Date().toLocaleDateString('pt-BR'),
+      }];
+    });
+
+    if (alteracoes.length > 0) {
+      setHistoricoDatasCronograma(items => [...alteracoes, ...items]);
+      setCronogramaSnapshot(cronogramaCaptacao);
+      toast.success('Datas do cronograma atualizadas.');
+    }
+    setEditandoDatasCronograma(false);
+  };
   const captacaoAtual = captacao || {
     titulo: 'Bolsas de Pesquisa 2026',
     tipo: 'Chamada Pública',
@@ -1017,7 +1071,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
     ];
 
     return (
-      <div style={{ backgroundColor: '#171717', minHeight: '100vh' }}>
+      <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
         <div className="pt-8 px-8 pb-8">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
             <button
@@ -1213,7 +1267,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
   }
 
   return (
-    <div style={{ backgroundColor: '#171717', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
         {/* Breadcrumb */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
@@ -1235,10 +1289,10 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
           <span style={{
             fontFamily: 'var(--font-family)',
             fontSize: 'var(--text-sm)',
-            color: isFomento ? '#ffffff' : '#00c1af',
+            color: '#ffffff',
             fontWeight: 'var(--font-weight-medium)',
           }}>
-            {isFomento ? 'Detalhes' : 'Detalhes da Captação'}
+            Detalhes
           </span>
         </div>
 
@@ -1326,7 +1380,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
 
         {activeTab === 'informacoes' && (
           <>
-        {podeEditar && (
+        {isFomento && podeEditar && (
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
             <button
               type="button"
@@ -1351,22 +1405,23 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
           </div>
         )}
 
-        {/* SESSÃO 1 — Identificação da Captação */}
+        {/* SESSÃO 1 — Identificação */}
+        {isFomento && (
         <div style={cardStyle}>
-          <NumberedSectionTitle number="1" title="Identificação da Captação" />
+          <NumberedSectionTitle number="1" title={isFomento ? 'Identificação do Fomento' : 'Identificação da Captação'} />
           
           <div style={{ display: 'grid', gap: '16px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '180px 1.6fr 1fr', gap: '16px' }}>
               <div>
-                <label style={labelStyle}>Código da Captação</label>
+                <label style={labelStyle}>{isFomento ? 'Código do Fomento' : 'Código da Captação'}</label>
                 <input type="text" defaultValue="" readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
               <div>
-                <label style={labelStyle}>Título da Captação</label>
+                <label style={labelStyle}>{isFomento ? 'Título do Fomento' : 'Título da Captação'}</label>
                 <input type="text" defaultValue={captacaoAtual.titulo} readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
               <div>
-                <label style={labelStyle}>Tipo de Captação</label>
+                <label style={labelStyle}>{isFomento ? 'Tipo de Fomento' : 'Tipo de Captação'}</label>
                 <input type="text" defaultValue={captacaoAtual.tipo} readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
             </div>
@@ -1377,7 +1432,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
             </div>
 
             <div>
-              <label style={labelStyle}>Descrição da Captação</label>
+              <label style={labelStyle}>{isFomento ? 'Descrição do Fomento' : 'Descrição da Captação'}</label>
               <textarea
                 defaultValue="Edital voltado para fomentar projetos de inovação tecnológica no Estado do Espírito Santo, com foco em soluções que promovam o desenvolvimento econômico e social sustentável."
                 readOnly={!editingResumo}
@@ -1407,20 +1462,21 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
                 <input type="text" defaultValue="Projeto de inovação, Projeto de pesquisa" readOnly={!editingResumo} style={resumoInputStyle} />
               </div>
               <div>
-                <label style={labelStyle}>Status da Configuração</label>
+                <label style={labelStyle}>Status</label>
                 <input type="text" defaultValue={captacaoAtual.status} readOnly={!editingResumo} style={{ ...resumoInputStyle, color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }} />
               </div>
             </div>
 
           </div>
         </div>
+        )}
 
         {isFomento && (
         <div style={cardStyle}>
           <NumberedSectionTitle number="2" title="Financeiro" />
           <div style={{ display: 'grid', gap: '18px' }}>
             <div>
-              <h3 style={subSectionTitleStyle}>Aportes Financeiros da Captação</h3>
+              <h3 style={subSectionTitleStyle}>{isFomento ? 'Aportes Financeiros do Fomento' : 'Aportes Financeiros da Captação'}</h3>
               <div style={{ display: 'grid', gap: '12px' }}>
                 {[
                   { origem: 'Programa de Inovação Tecnológica', tipo: 'Programa', valor: 'R$ 3.000.000,00' },
@@ -1497,22 +1553,50 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
         </div>
         )}
 
-        {/* SESSÃO 2 — Cronograma da Captação */}
+        {/* SESSÃO 1 — Cronograma da Captação */}
         {!isFomento && (
         <div style={cardStyle}>
-          <NumberedSectionTitle number="2" title="Cronograma da Captação" />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
+            <NumberedSectionTitle number="1" title="Cronograma da Captação" />
+            {!editandoDatasCronograma && (
+              <button
+                type="button"
+                onClick={() => {
+                  setCronogramaSnapshot(cronogramaCaptacao);
+                  setEditandoDatasCronograma(true);
+                }}
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: 'rgba(0,193,175,0.1)',
+                  border: '1px solid rgba(0,193,175,0.3)',
+                  borderRadius: 'var(--radius)',
+                  color: '#00c1af',
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                }}
+              >
+                Editar Datas
+              </button>
+            )}
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+            <div>
+              <label style={labelStyle}>Fomento</label>
+              <input type="text" defaultValue="Fomento à Inovação 2026" readOnly style={resumoInputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Captação</label>
+              <input type="text" defaultValue={captacaoAtual.titulo} readOnly style={resumoInputStyle} />
+            </div>
+          </div>
+
+          <div style={dividerStyle} />
 
           <div style={{ display: 'grid', gap: '16px' }}>
-            {[
-              { etapa: 'Publicação da captação', inicio: '01/02/2026', fim: '01/02/2026' },
-              { etapa: 'Recebimento das propostas', inicio: '01/02/2026', fim: '31/03/2026' },
-              { etapa: 'Avaliação documental', inicio: '01/04/2026', fim: '15/04/2026' },
-              { etapa: 'Avaliação Ad Hoc', inicio: '16/04/2026', fim: '31/05/2026' },
-              { etapa: 'Publicação do resultado preliminar', inicio: '05/06/2026', fim: '05/06/2026' },
-              { etapa: 'Recebimento de revisão do resultado', inicio: '06/06/2026', fim: '15/06/2026' },
-              { etapa: 'Publicação do resultado após revisão', inicio: '20/06/2026', fim: '20/06/2026' },
-              { etapa: 'Publicação do resultado final', inicio: '25/06/2026', fim: '25/06/2026' },
-            ].map((item, index) => (
+            {cronogramaCaptacao.map((item, index) => (
               <div key={item.etapa} style={{
                 display: 'grid',
                 gridTemplateColumns: '42px 1fr 160px 160px',
@@ -1540,62 +1624,72 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
                 </div>
                 <div>
                   <label style={labelStyle}>Data inicial</label>
-                  <input type="text" defaultValue={item.inicio} readOnly={!editingResumo} style={resumoInputStyle} />
+                  {editandoDatasCronograma ? (
+                    <BackofficeDatePicker value={item.inicio} onChange={value => updateCronogramaDate(index, 'inicio', value)} style={resumoInputStyle} />
+                  ) : (
+                    <input type="text" value={formatDateLabel(item.inicio)} readOnly style={resumoInputStyle} />
+                  )}
                 </div>
                 <div>
                   <label style={labelStyle}>Data final</label>
-                  <input type="text" defaultValue={item.fim} readOnly={!editingResumo} style={resumoInputStyle} />
+                  {editandoDatasCronograma ? (
+                    <BackofficeDatePicker value={item.fim} onChange={value => updateCronogramaDate(index, 'fim', value)} style={resumoInputStyle} />
+                  ) : (
+                    <input type="text" value={formatDateLabel(item.fim)} readOnly style={resumoInputStyle} />
+                  )}
                 </div>
               </div>
             ))}
 
-            {!isFomento && (
-              <>
-                <div style={dividerStyle} />
-
-                <div>
-                  <h3 style={subSectionTitleStyle}>Histórico de Adiamentos</h3>
-                  <div style={{
-                    padding: '14px 16px',
+            {editandoDatasCronograma && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={salvarDatasCronograma}
+                  style={{
+                    padding: '11px 18px',
+                    backgroundColor: '#00c1af',
+                    border: 'none',
                     borderRadius: 'var(--radius)',
-                    border: '1px solid rgba(251,191,36,0.22)',
-                    backgroundColor: 'rgba(251,191,36,0.06)',
-                  }}>
-                    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', marginBottom: '4px' }}>
-                      Avaliação documental adiada em 5 dia(s)
-                    </div>
-                    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#fbbf24', marginBottom: '4px' }}>
-                      01/04/2026 → 06/04/2026 · fim: 15/04/2026 → 20/04/2026
-                    </div>
-                    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.55)' }}>
-                      Necessidade de tempo adicional para conferência documental.
-                    </div>
-                  </div>
-                </div>
-              </>
+                    color: '#171717',
+                    fontFamily: 'var(--font-family)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Salvar Alterações
+                </button>
+              </div>
             )}
 
             <div style={dividerStyle} />
 
             <div>
-              <h3 style={subSectionTitleStyle}>Formulários da Captação</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
-                <div>
-                  <label style={labelStyle}>Formulário de Submissão</label>
-                  <input type="text" defaultValue="Formulário de Inovação" readOnly={!editingResumo} style={resumoInputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Formulário de Avaliação</label>
-                  <input type="text" defaultValue="Avaliação de Inovação" readOnly={!editingResumo} style={resumoInputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Formulário do Recurso</label>
-                  <input type="text" defaultValue="Recurso Padrão" readOnly={!editingResumo} style={resumoInputStyle} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Formulário de Anexos</label>
-                  <input type="text" defaultValue="Anexos institucionais" readOnly={!editingResumo} style={resumoInputStyle} />
-                </div>
+              <h3 style={subSectionTitleStyle}>Histórico de Adiamentos</h3>
+              <div style={{ display: 'grid', gap: '14px', position: 'relative', paddingLeft: '22px' }}>
+                <div style={{ position: 'absolute', left: '6px', top: '6px', bottom: '6px', width: '2px', backgroundColor: 'rgba(0,193,175,0.28)' }} />
+                {historicoDatasCronograma.map(item => (
+                  <div key={item.id} style={{ position: 'relative' }}>
+                    <div style={{ position: 'absolute', left: '-21px', top: '5px', width: '12px', height: '12px', borderRadius: '999px', backgroundColor: '#00c1af' }} />
+                    <div style={{
+                      padding: '14px 16px',
+                      borderRadius: 'var(--radius)',
+                      border: '1px solid rgba(0,193,175,0.24)',
+                      backgroundColor: 'rgba(0,193,175,0.06)',
+                    }}>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', marginBottom: '4px' }}>
+                        {item.titulo}
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#00c1af', marginBottom: '4px' }}>
+                        {item.detalhe}
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.55)' }}>
+                        {item.observacao} · {item.data}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -1881,7 +1975,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
               ].map((item, index) => (
                 <div key={item.etapa} style={{
                   display: 'grid',
-                  gridTemplateColumns: '42px 1fr 160px 160px',
+                  gridTemplateColumns: '42px 1fr',
                   gap: '16px',
                   alignItems: 'center',
                 }}>
@@ -1904,40 +1998,8 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
                     <label style={labelStyle}>Etapa obrigatória</label>
                     <input type="text" defaultValue={item.etapa} readOnly={!editingResumo} style={resumoInputStyle} />
                   </div>
-                  <div>
-                    <label style={labelStyle}>Data inicial</label>
-                    <input type="text" defaultValue={item.inicio} readOnly={!editingResumo} style={resumoInputStyle} />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Data final</label>
-                    <input type="text" defaultValue={item.fim} readOnly={!editingResumo} style={resumoInputStyle} />
-                  </div>
                 </div>
               ))}
-
-              <div style={dividerStyle} />
-
-              <div>
-                <h3 style={subSectionTitleStyle}>Formulários da Captação</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
-                  <div>
-                    <label style={labelStyle}>Formulário de Submissão</label>
-                    <input type="text" defaultValue="Formulário de Inovação" readOnly={!editingResumo} style={resumoInputStyle} />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Formulário de Avaliação</label>
-                    <input type="text" defaultValue="Avaliação de Inovação" readOnly={!editingResumo} style={resumoInputStyle} />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Formulário do Recurso</label>
-                    <input type="text" defaultValue="Recurso Padrão" readOnly={!editingResumo} style={resumoInputStyle} />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Formulário de Anexos</label>
-                    <input type="text" defaultValue="Anexos institucionais" readOnly={!editingResumo} style={resumoInputStyle} />
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         )}
@@ -2453,7 +2515,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
                     <div style={detalheValorStyle}>{iniciativa.ortogado}</div>
                   </div>
                   <div>
-                    <div style={detalheRotuloStyle}>Fase</div>
+                    <div style={detalheRotuloStyle}>Recurso</div>
                     <div style={detalheValorStyle}>{index % 2 === 0 ? 'Habilitação' : 'Avaliação Ad Hoc'}</div>
                   </div>
                   <div>
@@ -2500,7 +2562,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
                   }}
                   style={{
                     ...detalheLinhaStyle,
-                    gridTemplateColumns: '1.25fr 1fr 1fr 150px 190px',
+                    gridTemplateColumns: '1.25fr 1fr 1fr 190px',
                   }}
                 >
                   <div>
@@ -2516,10 +2578,6 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
                   <div>
                     <div style={detalheRotuloStyle}>Proponente</div>
                     <div style={detalheValorStyle}>{iniciativa.ortogado}</div>
-                  </div>
-                  <div>
-                    <div style={detalheRotuloStyle}>Fase</div>
-                    <div style={detalheValorStyle}>{index % 2 === 0 ? 'Habilitação' : 'Avaliação Ad Hoc'}</div>
                   </div>
                   <div>
                     <div style={detalheRotuloStyle}>Status</div>

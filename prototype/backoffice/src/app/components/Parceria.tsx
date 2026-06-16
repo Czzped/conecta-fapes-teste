@@ -732,7 +732,7 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
             />
 
             <DropdownFilter
-              label="Data de Fim"
+              label="Data Final"
               value={dataFimSort}
               options={dataFimOptions}
               open={showDataFimDropdown}
@@ -760,6 +760,10 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
             />
           </div>
         </div>
+
+        <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: '0 0 12px' }}>
+          Exibindo {filtered.length} resultados de {parcerias.length}
+        </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {filtered.map((parceria) => (

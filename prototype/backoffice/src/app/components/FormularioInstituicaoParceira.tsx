@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronRight, Home, Save, Plus, Trash2, ChevronDown, Search, UserPlus, History } from 'lucide-react';
+import { BackofficeDatePicker } from './BackofficeDatePicker';
 
 interface Props {
   onBack: () => void;
@@ -803,21 +804,11 @@ export const FormularioInstituicaoParceira: React.FC<Props> = ({ onBack }) => {
                 </div>
                 <div>
                   <label style={labelStyle}>Início do Mandato</label>
-                  <input
-                    type="date"
-                    value={dataInicioMandato}
-                    onChange={(e) => setDataInicioMandato(e.target.value)}
-                    style={{ ...inputStyle, colorScheme: 'dark' }}
-                  />
+                  <BackofficeDatePicker value={dataInicioMandato} onChange={setDataInicioMandato} style={inputStyle} />
                 </div>
                 <div>
                   <label style={labelStyle}>Fim do Mandato</label>
-                  <input
-                    type="date"
-                    value={dataFimMandato}
-                    onChange={(e) => setDataFimMandato(e.target.value)}
-                    style={{ ...inputStyle, colorScheme: 'dark' }}
-                  />
+                  <BackofficeDatePicker value={dataFimMandato} onChange={setDataFimMandato} style={inputStyle} />
                 </div>
               </div>
             </div>

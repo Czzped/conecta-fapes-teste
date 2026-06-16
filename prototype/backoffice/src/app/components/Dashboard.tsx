@@ -11,6 +11,7 @@ import { PlanejamentoEstrategico } from './PlanejamentoEstrategico';
 import { Instituicoes } from './Instituicoes';
 import { Configuracoes } from './Configuracoes';
 import { CalendarioFolha } from './CalendarioFolha';
+import { BackofficeDatePicker } from './BackofficeDatePicker';
 import { PessoasFisicas } from './PessoasFisicas';
 import { Rubricas } from './Rubricas';
 import { ReferenciasCorporativas } from './ReferenciasCorporativas';
@@ -761,7 +762,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       </header>
 
       <div
-        aria-label={isReadyForDevPage ? 'Pronto para Dev' : 'Em Prototipação'}
+        aria-label={isReadyForDevPage ? 'Pronto para Dev' : 'Quase Pronto Para Dev'}
         style={{
           position: 'fixed',
           top: '82px',
@@ -782,7 +783,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           WebkitBackdropFilter: 'blur(10px)',
         }}
       >
-        {isReadyForDevPage ? 'Pronto para Dev' : 'Em Prototipação'}
+        {isReadyForDevPage ? 'Pronto para Dev' : 'Quase Pronto Para Dev'}
       </div>
 
       {/* Modal de Acessibilidade */}
@@ -1174,12 +1175,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     <div key={label} className="relative">
                       <label className="mb-2 block" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>Data</label>
                       <div className="relative">
-                        <input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)}
-                          className="w-full rounded-lg px-4 py-2 pr-10"
-                          style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', colorScheme: isLight ? 'light' : 'dark' as any, outline: 'none' }} />
-                        <Calendar size={18} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--dash-icon-subdued)', pointerEvents: 'none' }} />
+                        <BackofficeDatePicker value={dateFilter} onChange={setDateFilter}
+                          style={{ width: '100%', backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', borderRadius: 'var(--radius)', padding: '8px 14px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
                       </div>
-                      <style>{`input[type="date"]::-webkit-calendar-picker-indicator { position:absolute;right:0;width:100%;height:100%;opacity:0;cursor:pointer; }`}</style>
                     </div>
                   ) : (
                     <div key={label} className="relative">

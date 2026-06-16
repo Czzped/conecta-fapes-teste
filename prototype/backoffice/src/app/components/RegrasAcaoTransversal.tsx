@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { ArrowLeft, ClipboardList, Plus, Save, Search, Trash2 } from 'lucide-react';
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
+import { BackofficeDatePicker } from './BackofficeDatePicker';
 
 type SituacaoRegra = 'Vigente' | 'Programada' | 'Inativa';
 
@@ -362,7 +363,9 @@ const buildStyles = (T: ThemeTokens) => ({
 const Field: React.FC<{ label: string; value: string; onChange: (value: string) => void; S: ReturnType<typeof buildStyles>; placeholder?: string; type?: string }> = ({ label, value, onChange, S, placeholder, type = 'text' }) => (
   <div>
     <label style={S.label}>{label}</label>
-    <input type={type} value={value} onChange={event => onChange(event.target.value)} placeholder={placeholder} style={S.input} />
+    {type === 'date'
+      ? <BackofficeDatePicker value={value} onChange={onChange} placeholder={placeholder} style={S.input} />
+      : <input type={type} value={value} onChange={event => onChange(event.target.value)} placeholder={placeholder} style={S.input} />}
   </div>
 );
 

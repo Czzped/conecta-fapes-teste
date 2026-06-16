@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronRight, Plus, Trash2, ChevronDown, Search } from 'lucide-react';
 import { useThemeTokens } from '../theme/ThemeContext';
+import { BackofficeDatePicker } from './BackofficeDatePicker';
 
 interface Membro { id: number; nome: string; }
 interface AportePrograma { id: number; parceria: string; valor: string; dataAporte: string; }
@@ -403,13 +404,13 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
             <div>
               <label style={labelStyle}>Data de Início</label>
-              <input type="date" value={dataInicio} onChange={e => setDataInicio(e.target.value)} style={{ ...inputStyle, colorScheme: 'dark' }}
+              <BackofficeDatePicker value={dataInicio} onChange={setDataInicio} style={inputStyle}
                 onFocus={e => e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)'}
                 onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'} />
             </div>
             <div>
               <label style={labelStyle}>Data de Fim</label>
-              <input type="date" value={dataFim} onChange={e => setDataFim(e.target.value)} style={{ ...inputStyle, colorScheme: 'dark' }}
+              <BackofficeDatePicker value={dataFim} onChange={setDataFim} style={inputStyle}
                 onFocus={e => e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)'}
                 onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'} />
             </div>
@@ -515,11 +516,10 @@ export const FormularioPrograma: React.FC<Props> = ({ onBack }) => {
                   </div>
                   <div>
                     <label style={labelStyle}>Data do aporte</label>
-                    <input
-                      type="date"
+                    <BackofficeDatePicker
                       value={aporte.dataAporte}
-                      onChange={e => updateAporte(aporte.id, 'dataAporte', e.target.value)}
-                      style={{ ...inputStyle, colorScheme: 'dark' }}
+                      onChange={value => updateAporte(aporte.id, 'dataAporte', value)}
+                      style={inputStyle}
                       onFocus={e => e.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)'}
                       onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'}
                     />

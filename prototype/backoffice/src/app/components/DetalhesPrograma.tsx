@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, Plus, Trash2, DollarSign, FolderOpen, Handshake } from 'lucide-react';
 import { useThemeTokens } from '../theme/ThemeContext';
+import { BackofficeDatePicker } from './BackofficeDatePicker';
 
 interface Props {
   onBack: () => void;
@@ -990,11 +991,10 @@ const ReadOnlyField: React.FC<{ label: string; value: string }> = ({ label, valu
 const DateField: React.FC<{ label: string; value: string; onChange: (value: string) => void }> = ({ label, value, onChange }) => (
   <div>
     <label style={labelStyle}>{label}</label>
-    <input
-      type="date"
+    <BackofficeDatePicker
       value={value}
-      onChange={event => onChange(event.target.value)}
-      style={{ ...inputStyle, colorScheme: 'dark' }}
+      onChange={onChange}
+      style={inputStyle}
       onFocus={event => event.currentTarget.style.borderColor = 'rgba(0,193,175,0.5)'}
       onBlur={event => event.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'}
     />

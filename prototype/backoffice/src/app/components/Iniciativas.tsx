@@ -1001,30 +1001,6 @@ export const Iniciativas: React.FC = () => {
         </section>
       ) : (
         <>
-      <section className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-6">
-        {dashboardCards.map(({ label, value, status }) => {
-          const { Icon } = statusStyle[status];
-
-          return (
-            <button
-              key={label}
-              type="button"
-              onClick={() => setStatusFiltro(status)}
-              className="rounded-lg p-3 text-left"
-              style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)', cursor: 'pointer', minHeight: '118px', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between' }}
-            >
-              <div className="flex items-center justify-start gap-2">
-                <div className="flex items-center justify-center rounded-lg" style={{ width: '32px', height: '32px', backgroundColor: 'rgba(0, 193, 175, 0.12)', flexShrink: 0 }}>
-                  <Icon size={16} style={{ color: '#00c1af' }} />
-                </div>
-                <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-secondary)', lineHeight: 1.3 }}>{label}</span>
-              </div>
-              <strong style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'translateY(8px)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: 'var(--dash-text-primary)', pointerEvents: 'none' }}>{value}</strong>
-            </button>
-          );
-        })}
-      </section>
-
       <div
         role="tablist"
         aria-label="Seções de projetos"
@@ -1060,6 +1036,30 @@ export const Iniciativas: React.FC = () => {
       </div>
 
       {activeTab === 'dashboard' && (
+        <>
+        <section className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-6">
+          {dashboardCards.map(({ label, value, status }) => {
+            const { Icon } = statusStyle[status];
+
+            return (
+              <button
+                key={label}
+                type="button"
+                onClick={() => setStatusFiltro(status)}
+                className="rounded-lg p-3 text-left"
+                style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)', cursor: 'pointer', minHeight: '118px', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between' }}
+              >
+                <div className="flex items-center justify-start gap-2">
+                  <div className="flex items-center justify-center rounded-lg" style={{ width: '32px', height: '32px', backgroundColor: 'rgba(0, 193, 175, 0.12)', flexShrink: 0 }}>
+                    <Icon size={16} style={{ color: '#00c1af' }} />
+                  </div>
+                  <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-secondary)', lineHeight: 1.3 }}>{label}</span>
+                </div>
+                <strong style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'translateY(8px)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: 'var(--dash-text-primary)', pointerEvents: 'none' }}>{value}</strong>
+              </button>
+            );
+          })}
+        </section>
         <section className="rounded-lg mb-6" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)', padding: '20px 2px 14px' }}>
           <h2 style={{ color: 'var(--dash-text-primary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', margin: '0 18px 10px' }}>
             Acompanhamento dos Status
@@ -1100,6 +1100,7 @@ export const Iniciativas: React.FC = () => {
             </svg>
           </div>
         </section>
+        </>
       )}
 
       {activeTab === 'iniciativas' && (
@@ -1156,7 +1157,7 @@ export const Iniciativas: React.FC = () => {
               <ChevronDown size={16} style={{ flexShrink: 0, transform: showIniciativaDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
             </button>
             {showIniciativaDropdown && (
-              <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: '#1e293b', border: '1px solid var(--dash-card-border)', borderRadius: 'var(--radius)', overflow: 'hidden', zIndex: 30, boxShadow: '0 12px 28px rgba(0,0,0,0.28)' }}>
+              <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', borderRadius: 'var(--radius)', overflow: 'hidden', zIndex: 30, boxShadow: '0 12px 28px rgba(0,0,0,0.28)' }}>
                 {iniciativaOptions.map((iniciativa) => (
                   <button
                     key={iniciativa}
@@ -1169,7 +1170,7 @@ export const Iniciativas: React.FC = () => {
                       width: '100%',
                       padding: '10px 12px',
                       border: 'none',
-                      backgroundColor: iniciativaFiltro === iniciativa ? 'rgba(0, 193, 175, 0.16)' : '#1e293b',
+                      backgroundColor: iniciativaFiltro === iniciativa ? 'rgba(0, 193, 175, 0.16)' : 'transparent',
                       color: iniciativaFiltro === iniciativa ? '#00c1af' : 'var(--dash-text-primary)',
                       fontFamily: 'var(--font-family)',
                       fontSize: 'var(--text-sm)',
@@ -1213,7 +1214,7 @@ export const Iniciativas: React.FC = () => {
               <ChevronDown size={16} style={{ flexShrink: 0, transform: showInstituicaoDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
             </button>
             {showInstituicaoDropdown && (
-              <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: '#1e293b', border: '1px solid var(--dash-card-border)', borderRadius: 'var(--radius)', overflow: 'hidden', zIndex: 30, boxShadow: '0 12px 28px rgba(0,0,0,0.28)' }}>
+              <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', borderRadius: 'var(--radius)', overflow: 'hidden', zIndex: 30, boxShadow: '0 12px 28px rgba(0,0,0,0.28)' }}>
                 {instituicaoOptions.map((instituicao) => (
                   <button
                     key={instituicao}
@@ -1226,7 +1227,7 @@ export const Iniciativas: React.FC = () => {
                       width: '100%',
                       padding: '10px 12px',
                       border: 'none',
-                      backgroundColor: instituicaoFiltro === instituicao ? 'rgba(0, 193, 175, 0.16)' : '#1e293b',
+                      backgroundColor: instituicaoFiltro === instituicao ? 'rgba(0, 193, 175, 0.16)' : 'transparent',
                       color: instituicaoFiltro === instituicao ? '#00c1af' : 'var(--dash-text-primary)',
                       fontFamily: 'var(--font-family)',
                       fontSize: 'var(--text-sm)',
@@ -1270,7 +1271,7 @@ export const Iniciativas: React.FC = () => {
               <ChevronDown size={16} style={{ transform: showStatusDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
             </button>
             {showStatusDropdown && (
-              <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: '#1e293b', border: '1px solid var(--dash-card-border)', borderRadius: 'var(--radius)', overflow: 'hidden', zIndex: 30, boxShadow: '0 12px 28px rgba(0,0,0,0.28)' }}>
+              <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', borderRadius: 'var(--radius)', overflow: 'hidden', zIndex: 30, boxShadow: '0 12px 28px rgba(0,0,0,0.28)' }}>
                 {filtros.map((filtro) => (
                   <button
                     key={filtro}
@@ -1283,7 +1284,7 @@ export const Iniciativas: React.FC = () => {
                       width: '100%',
                       padding: '10px 12px',
                       border: 'none',
-                      backgroundColor: statusFiltro === filtro ? 'rgba(0, 193, 175, 0.16)' : '#1e293b',
+                      backgroundColor: statusFiltro === filtro ? 'rgba(0, 193, 175, 0.16)' : 'transparent',
                       color: statusFiltro === filtro ? '#00c1af' : 'var(--dash-text-primary)',
                       fontFamily: 'var(--font-family)',
                       fontSize: 'var(--text-sm)',
@@ -1299,6 +1300,10 @@ export const Iniciativas: React.FC = () => {
           </div>
         </div>
       </section>
+
+      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', margin: '0 0 12px' }}>
+        Exibindo {iniciativasFiltradas.length} resultados de {iniciativas.length}
+      </p>
 
       <section className="space-y-3">
         {iniciativasFiltradas.map((iniciativa) => {
@@ -1319,14 +1324,7 @@ export const Iniciativas: React.FC = () => {
               }}
               style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)', cursor: 'pointer', padding: '18px 20px' }}
             >
-              <div className="grid grid-cols-1 xl:grid-cols-[1.1fr_1.8fr_1.4fr_1.1fr_1fr_1fr_40px] gap-5 items-center">
-                <div>
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', margin: '0 0 5px' }}>Captação</p>
-                  <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', fontWeight: 'var(--font-weight-medium)' }}>
-                    {iniciativa.captacao}
-                  </strong>
-                </div>
-
+              <div className="grid grid-cols-1 xl:grid-cols-[2fr_1.5fr_1.1fr_1fr_1fr_40px] gap-5 items-center">
                 <div>
                   <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)', margin: '0 0 5px' }}>Projeto</p>
                   <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', fontWeight: 'var(--font-weight-medium)' }}>
