@@ -29,3 +29,19 @@ stateDiagram-v2
     state Utilizado : Nao pode voltar para edicao e pode receber respostas
     state Inativo : Indisponivel para novos usos, mas pode receber respostas de usos existentes
 ```
+
+## Ciclo de Vida da Resposta do Formulario
+
+```mermaid
+stateDiagram-v2
+    state "Rascunho" as Rascunho
+    state "Enviada" as Enviada
+
+    [*] --> Rascunho : Iniciar resposta
+    Rascunho --> Rascunho : Editar resposta
+    Rascunho --> Enviada : Enviar resposta
+    Enviada --> [*]
+
+    state Rascunho : Pode ser editada pelo respondedor
+    state Enviada : Nao pode mais ser alterada pelo respondedor
+```

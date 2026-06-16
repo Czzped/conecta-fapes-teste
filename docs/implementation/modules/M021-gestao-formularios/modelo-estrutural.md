@@ -60,8 +60,10 @@ classDiagram
 
     class RespostaFormulario {
         +String codigo
+        +EstadoRespostaFormulario estado
         +Date dataRegistro
         +Date dataUltimaAlteracao
+        +Date dataEnvio
         +ResultadoHabilitacao resultadoHabilitacao
         +Decimal resultadoAvaliacao
     }
@@ -84,6 +86,12 @@ classDiagram
         PUBLICADO
         UTILIZADO
         INATIVO
+    }
+
+    class EstadoRespostaFormulario {
+        <<enumeration>>
+        RASCUNHO
+        ENVIADA
     }
 
     class TipoQuestao {
@@ -168,8 +176,10 @@ classDiagram
 | | parametro | Valor usado pela regra de validacao | Sim | String | Ex: minimo=50, min=0;max=10 |
 | | mensagem | Mensagem exibida quando a validacao falha | Nao | String | |
 | **RespostaFormulario** | codigo | Identificador da resposta | Gerado | String | |
+| | estado | Estado do ciclo de vida da resposta | Gerado | EstadoRespostaFormulario | RASCUNHO, ENVIADA |
 | | dataRegistro | Data de registro da resposta | Gerado | Date | |
 | | dataUltimaAlteracao | Data da ultima alteracao da resposta | Gerado | Date | Atualizada a cada alteracao da resposta |
+| | dataEnvio | Data e hora em que a resposta foi enviada | Cond. | DateTime | Obrigatoria quando estado = ENVIADA |
 | | resultadoHabilitacao | Resultado calculado para formulario de habilitacao | Cond. | ResultadoHabilitacao | HABILITADO, INABILITADO, REVER |
 | | resultadoAvaliacao | Resultado calculado para formulario de avaliacao | Cond. | Decimal | Media ponderada das respostas numericas |
 | **RespostaQuestao** | valor | Valor informado para a questao | Sim | String | |
@@ -186,6 +196,10 @@ classDiagram
 - Formularios so podem ser excluidos enquanto estiverem em estado EM_EDICAO.
 - Formularios de habilitacao devem usar as opcoes Sim, Nao, Nao se aplica e Rever para todas as questoes.
 - Formularios de avaliacao devem definir escala numerica e peso para cada questao usada no calculo do resultado.
+- Uma resposta deve ser criada em estado RASCUNHO.
+- Apenas respostas em estado RASCUNHO podem ser editadas pelo respondedor.
+- Ao ser enviada, a resposta muda para ENVIADA e registra dataEnvio.
+- Respostas em estado ENVIADA nao podem ser alteradas pelo respondedor.
 
 ### Diagrama de Classes Simplificado
 
@@ -215,8 +229,10 @@ classDiagram
 
     class RespostaFormulario {
         +String codigo
+        +EstadoRespostaFormulario estado
         +Date dataRegistro
         +Date dataUltimaAlteracao
+        +Date dataEnvio
         +ResultadoHabilitacao resultadoHabilitacao
         +Decimal resultadoAvaliacao
         +JSON respostas
@@ -251,6 +267,12 @@ classDiagram
         PUBLICADO
         UTILIZADO
         INATIVO
+    }
+
+    class EstadoRespostaFormulario {
+        <<enumeration>>
+        RASCUNHO
+        ENVIADA
     }
 
     class ResultadoHabilitacao {
