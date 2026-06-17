@@ -458,10 +458,10 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
                 <CurriculumHero pessoa={selected} curriculum={vidaAcademica} totalProducoes={totalProducoes} />
 
-                <div style={{ ...S.card, padding: '14px 16px', position: 'sticky', top: 0, zIndex: 2 }}>
+                <div style={{ ...S.card, padding: '14px 16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ position: 'relative', flex: 1 }}>
-                      <input type="text" placeholder="Buscar no Lattes por título, ano, participante ou instituição" value={academicSearchTerm} onChange={event => setAcademicSearchTerm(event.target.value)} style={{ ...S.input, paddingLeft: '38px' }} />
+                      <input type="text" placeholder="Buscar no Latter" value={academicSearchTerm} onChange={event => setAcademicSearchTerm(event.target.value)} style={{ ...S.input, paddingLeft: '38px' }} />
                       <Search size={16} style={{ position: 'absolute', left: '13px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
                     </div>
                   </div>
@@ -748,9 +748,9 @@ const HeroFact: React.FC<{ label: string; value: string }> = ({ label, value }) 
 const CurriculumAnchor: React.FC<{ href: string; label: string; count: number }> = ({ href, label, count }) => {
   const { T } = useThemeTokens();
   return (
-    <a href={href} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: `1px solid ${T.accent}`, borderRadius: '999px', backgroundColor: T.accent, color: T.accentText, padding: '8px 11px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', textDecoration: 'none' }}>
+    <a href={href} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: `1px solid ${T.accent}`, borderRadius: '999px', backgroundColor: `${T.accent}20`, color: T.accent, padding: '8px 11px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', textDecoration: 'none' }}>
       <span>{label}</span>
-      <span style={{ minWidth: '28px', borderRadius: '999px', backgroundColor: T.accentText, color: T.accent, padding: '2px 7px', fontSize: 'var(--text-xs)', textAlign: 'center' }}>{count}</span>
+      <span style={{ minWidth: '28px', border: `1px solid ${T.accent}`, borderRadius: '999px', backgroundColor: `${T.accent}20`, color: T.accent, padding: '2px 7px', fontSize: 'var(--text-xs)', textAlign: 'center' }}>{count}</span>
     </a>
   );
 };
