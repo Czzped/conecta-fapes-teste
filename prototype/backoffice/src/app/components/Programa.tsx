@@ -529,7 +529,7 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
 
         {/* Lista de Programas */}
         <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: '0 0 12px' }}>
-          Exibindo {filtered.length} resultados de {programas.length}
+          Exibindo {filtered.length} resultados de {programasData.length}
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {filtered.length === 0 ? (
