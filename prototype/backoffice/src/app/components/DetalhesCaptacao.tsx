@@ -240,6 +240,8 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
   const [statusAvaliacaoAdHocFiltro, setStatusAvaliacaoAdHocFiltro] = useState('Aguardando Avaliador');
   const [showStatusAvaliacaoAdHocDropdown, setShowStatusAvaliacaoAdHocDropdown] = useState(false);
   const [editandoDatasCronograma, setEditandoDatasCronograma] = useState(false);
+  const [editandoFinanceiroFomento, setEditandoFinanceiroFomento] = useState(false);
+  const [justificativaAlteracaoDatas, setJustificativaAlteracaoDatas] = useState('');
   const [cronogramaCaptacao, setCronogramaCaptacao] = useState(initialCronogramaCaptacao);
   const [cronogramaSnapshot, setCronogramaSnapshot] = useState(initialCronogramaCaptacao);
   const [historicoDatasCronograma, setHistoricoDatasCronograma] = useState([
@@ -248,7 +250,16 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
       titulo: 'Avaliação documental adiada em 5 dia(s)',
       detalhe: '01/04/2026 → 06/04/2026 · fim: 15/04/2026 → 20/04/2026',
       observacao: 'Necessidade de tempo adicional para conferência documental.',
-      data: 'Registro mockado',
+      data: 'Registro mockado · Usuário: Maria Souza',
+    },
+  ]);
+  const [historicoFinanceiroFomento, setHistoricoFinanceiroFomento] = useState([
+    {
+      id: 1,
+      titulo: 'Aporte financeiro revisado',
+      detalhe: 'Faixa 1 ajustada para R$ 3.000.000,00',
+      data: '12/06/2026',
+      usuario: 'Maria Souza',
     },
   ]);
   const resumoInputStyle: React.CSSProperties = {
@@ -263,6 +274,11 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
   const updateCronogramaDate = (index: number, field: 'inicio' | 'fim', value: string) =>
     setCronogramaCaptacao(items => items.map((item, itemIndex) => itemIndex === index ? { ...item, [field]: value } : item));
   const salvarDatasCronograma = () => {
+    const justificativa = justificativaAlteracaoDatas.trim();
+    if (!justificativa) {
+      toast.error('Informe a justificativa da alteração.');
+      return;
+    }
     const alteracoes = cronogramaCaptacao.flatMap((item, index) => {
       const anterior = cronogramaSnapshot[index];
       if (!anterior || (anterior.inicio === item.inicio && anterior.fim === item.fim)) return [];
@@ -270,8 +286,8 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
         id: Date.now() + index,
         titulo: item.etapa,
         detalhe: `${formatDateLabel(anterior.inicio)} → ${formatDateLabel(item.inicio)} · fim: ${formatDateLabel(anterior.fim)} → ${formatDateLabel(item.fim)}`,
-        observacao: 'Datas alteradas manualmente em Detalhes da Captação.',
-        data: new Date().toLocaleDateString('pt-BR'),
+        observacao: justificativa,
+        data: `${new Date().toLocaleDateString('pt-BR')} · Usuário: Maria Souza`,
       }];
     });
 
@@ -280,6 +296,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
       setCronogramaSnapshot(cronogramaCaptacao);
       toast.success('Datas do cronograma atualizadas.');
     }
+    setJustificativaAlteracaoDatas('');
     setEditandoDatasCronograma(false);
   };
   const captacaoAtual = captacao || {
@@ -295,6 +312,26 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
   const isFomento = kind === 'fomento';
   const moduleLabel = isFomento ? 'Fomento' : 'Captação';
   const podeEditar = captacaoAtual.status === 'Rascunho' || captacaoAtual.status === 'Finalizado';
+  const fomentoAtivo = isFomento && captacaoAtual.status === 'Ativo';
+  const financeiroInputStyle: React.CSSProperties = {
+    ...resumoInputStyle,
+    backgroundColor: editandoFinanceiroFomento ? 'rgba(23, 23, 23,0.95)' : inputStyle.backgroundColor,
+    border: editandoFinanceiroFomento ? '1px solid rgba(0,193,175,0.42)' : inputStyle.border,
+  };
+  const salvarFinanceiroFomento = () => {
+    setHistoricoFinanceiroFomento(items => [
+      {
+        id: Date.now(),
+        titulo: 'Financeiro alterado',
+        detalhe: 'Aportes financeiros e faixas de financiamento atualizados.',
+        data: new Date().toLocaleDateString('pt-BR'),
+        usuario: 'Maria Souza',
+      },
+      ...items,
+    ]);
+    setEditandoFinanceiroFomento(false);
+    toast.success('Financeiro do fomento atualizado.');
+  };
   const detalheLinhaStyle: React.CSSProperties = {
     display: 'grid',
     gap: '20px',
@@ -1473,7 +1510,35 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
 
         {isFomento && (
         <div style={cardStyle}>
-          <NumberedSectionTitle number="2" title="Financeiro" />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
+            <NumberedSectionTitle number="2" title="Financeiro" />
+            {!fomentoAtivo && (
+              <button
+                type="button"
+                onClick={() => editandoFinanceiroFomento ? salvarFinanceiroFomento() : setEditandoFinanceiroFomento(true)}
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: editandoFinanceiroFomento ? '#00c1af' : 'rgba(0,193,175,0.1)',
+                  border: editandoFinanceiroFomento ? 'none' : '1px solid rgba(0,193,175,0.3)',
+                  borderRadius: 'var(--radius)',
+                  color: editandoFinanceiroFomento ? '#171717' : '#00c1af',
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                }}
+              >
+                {editandoFinanceiroFomento ? 'Salvar Alterações' : 'Editar'}
+              </button>
+            )}
+          </div>
+          {fomentoAtivo && (
+            <div style={{ padding: '12px 14px', borderRadius: 'var(--radius)', border: '1px solid rgba(0,193,175,0.24)', backgroundColor: 'rgba(0,193,175,0.08)', marginBottom: '18px' }}>
+              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', margin: 0 }}>
+                Fomentos com status Ativo não permitem edição do Financeiro.
+              </p>
+            </div>
+          )}
           <div style={{ display: 'grid', gap: '18px' }}>
             <div>
               <h3 style={subSectionTitleStyle}>{isFomento ? 'Aportes Financeiros do Fomento' : 'Aportes Financeiros da Captação'}</h3>
@@ -1485,15 +1550,15 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
                   <div key={aporte.origem} style={{ display: 'grid', gridTemplateColumns: '1fr 140px 170px', gap: '16px' }}>
                     <div>
                       <label style={labelStyle}>Origem {index + 1}</label>
-                      <input type="text" defaultValue={aporte.origem} readOnly={!editingResumo} style={resumoInputStyle} />
+                      <input type="text" defaultValue={aporte.origem} readOnly={!editandoFinanceiroFomento} style={financeiroInputStyle} />
                     </div>
                     <div>
                       <label style={labelStyle}>Tipo</label>
-                      <input type="text" defaultValue={aporte.tipo} readOnly={!editingResumo} style={resumoInputStyle} />
+                      <input type="text" defaultValue={aporte.tipo} readOnly={!editandoFinanceiroFomento} style={financeiroInputStyle} />
                     </div>
                     <div>
                       <label style={labelStyle}>Valor aportado</label>
-                      <input type="text" defaultValue={aporte.valor} readOnly={!editingResumo} style={resumoInputStyle} />
+                      <input type="text" defaultValue={aporte.valor} readOnly={!editandoFinanceiroFomento} style={financeiroInputStyle} />
                     </div>
                   </div>
                 ))}
@@ -1503,15 +1568,15 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '16px' }}>
               <div>
                 <label style={labelStyle}>Total Financeiro</label>
-                <input type="text" defaultValue="R$ 5.000.000,00" readOnly={!editingResumo} style={{ ...resumoInputStyle, color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }} />
+                <input type="text" defaultValue="R$ 5.000.000,00" readOnly={!editandoFinanceiroFomento} style={{ ...financeiroInputStyle, color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }} />
               </div>
               <div>
                 <label style={labelStyle}>Total por Faixas</label>
-                <input type="text" defaultValue="R$ 5.000.000,00" readOnly={!editingResumo} style={resumoInputStyle} />
+                <input type="text" defaultValue="R$ 5.000.000,00" readOnly={!editandoFinanceiroFomento} style={financeiroInputStyle} />
               </div>
               <div>
                 <label style={labelStyle}>Saldo sem faixa</label>
-                <input type="text" defaultValue="R$ 0,00" readOnly={!editingResumo} style={resumoInputStyle} />
+                <input type="text" defaultValue="R$ 0,00" readOnly={!editandoFinanceiroFomento} style={financeiroInputStyle} />
               </div>
             </div>
 
@@ -1525,24 +1590,49 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
                   <div key={faixa.nome} style={{ display: 'grid', gap: '12px' }}>
                     <div>
                       <label style={labelStyle}>Nome da Faixa</label>
-                      <input type="text" defaultValue={faixa.nome} readOnly={!editingResumo} style={resumoInputStyle} />
+                      <input type="text" defaultValue={faixa.nome} readOnly={!editandoFinanceiroFomento} style={financeiroInputStyle} />
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
                       <div>
                         <label style={labelStyle}>Duração máxima</label>
-                        <input type="text" defaultValue={faixa.duracao} readOnly={!editingResumo} style={resumoInputStyle} />
+                        <input type="text" defaultValue={faixa.duracao} readOnly={!editandoFinanceiroFomento} style={financeiroInputStyle} />
                       </div>
                       <div>
                         <label style={labelStyle}>Valor mínimo</label>
-                        <input type="text" defaultValue={faixa.minimo} readOnly={!editingResumo} style={resumoInputStyle} />
+                        <input type="text" defaultValue={faixa.minimo} readOnly={!editandoFinanceiroFomento} style={financeiroInputStyle} />
                       </div>
                       <div>
                         <label style={labelStyle}>Valor máximo</label>
-                        <input type="text" defaultValue={faixa.maximo} readOnly={!editingResumo} style={resumoInputStyle} />
+                        <input type="text" defaultValue={faixa.maximo} readOnly={!editandoFinanceiroFomento} style={financeiroInputStyle} />
                       </div>
                       <div>
                         <label style={labelStyle}>Valor aportado</label>
-                        <input type="text" defaultValue={faixa.aportado} readOnly={!editingResumo} style={resumoInputStyle} />
+                        <input type="text" defaultValue={faixa.aportado} readOnly={!editandoFinanceiroFomento} style={financeiroInputStyle} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={dividerStyle} />
+
+            <div>
+              <h3 style={subSectionTitleStyle}>Histórico de Alterações</h3>
+              <div style={{ display: 'grid', gap: '14px', position: 'relative', paddingLeft: '22px' }}>
+                <div style={{ position: 'absolute', left: '6px', top: '6px', bottom: '6px', width: '2px', backgroundColor: 'rgba(0,193,175,0.28)' }} />
+                {historicoFinanceiroFomento.map(item => (
+                  <div key={item.id} style={{ position: 'relative' }}>
+                    <div style={{ position: 'absolute', left: '-21px', top: '5px', width: '12px', height: '12px', borderRadius: '999px', backgroundColor: '#00c1af' }} />
+                    <div style={{ padding: '14px 16px', borderRadius: 'var(--radius)', border: '1px solid rgba(0,193,175,0.24)', backgroundColor: 'rgba(0,193,175,0.06)' }}>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', marginBottom: '4px' }}>
+                        {item.titulo}
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: '#00c1af', marginBottom: '4px' }}>
+                        {item.detalhe}
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.55)' }}>
+                        {item.data} · Usuário: {item.usuario}
                       </div>
                     </div>
                   </div>
@@ -1642,24 +1732,35 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
             ))}
 
             {editandoDatasCronograma && (
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={salvarDatasCronograma}
-                  style={{
-                    padding: '11px 18px',
-                    backgroundColor: '#00c1af',
-                    border: 'none',
-                    borderRadius: 'var(--radius)',
-                    color: '#171717',
-                    fontFamily: 'var(--font-family)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-weight-medium)',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Salvar Alterações
-                </button>
+              <div style={{ display: 'grid', gap: '14px' }}>
+                <div>
+                  <label style={labelStyle}>Justificativa</label>
+                  <textarea
+                    value={justificativaAlteracaoDatas}
+                    onChange={event => setJustificativaAlteracaoDatas(event.target.value)}
+                    placeholder="Informe o motivo da alteração das datas"
+                    style={{ ...resumoInputStyle, minHeight: '96px', resize: 'vertical' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <button
+                    type="button"
+                    onClick={salvarDatasCronograma}
+                    style={{
+                      padding: '11px 18px',
+                      backgroundColor: '#00c1af',
+                      border: 'none',
+                      borderRadius: 'var(--radius)',
+                      color: '#171717',
+                      fontFamily: 'var(--font-family)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Salvar Alteração
+                  </button>
+                </div>
               </div>
             )}
 
@@ -1960,7 +2061,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
 
         {isFomento && (
           <div style={cardStyle}>
-            <NumberedSectionTitle number="6" title="Cronograma da Captação" />
+            <NumberedSectionTitle number="6" title="Cronograma" />
 
             <div style={{ display: 'grid', gap: '16px' }}>
               {[

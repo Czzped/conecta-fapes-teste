@@ -412,6 +412,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
   ]);
   const [captacaoCronogramaSelecionada, setCaptacaoCronogramaSelecionada] = useState('');
   const [captacaoFomentoSelecionada, setCaptacaoFomentoSelecionada] = useState('');
+  const [nomeCaptacaoCronograma, setNomeCaptacaoCronograma] = useState('');
   const [quantidadeCaptacoesFomento, setQuantidadeCaptacoesFomento] = useState(1);
   const nextEtapaCronogramaId = useRef(8);
   const [adiamentosCronograma, setAdiamentosCronograma] = useState<AdiamentoCronograma[]>([]);
@@ -1041,14 +1042,8 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
 
   const renderCronogramaCaptacao = (sectionNumber = '1', showNomeCaptacao = false) => (
     <div style={sectionCard}>
-      <SectionHeader num={sectionNumber} title="Cronograma da Captação" subtitle="Configure as fases obrigatórias da captação" />
+      <SectionHeader num={sectionNumber} title={showNomeCaptacao ? 'Cronograma' : 'Cronograma da Captação'} subtitle="Configure as fases obrigatórias da captação" />
       <div style={{ display: 'grid', gridTemplateColumns: showNomeCaptacao ? '1fr' : '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-        {showNomeCaptacao && (
-          <div>
-            <label style={labelStyle}>Nome da Captação</label>
-            <input type="text" placeholder="Digite o nome da captação" value={tituloCaptacao} onChange={e => setTituloCaptacao(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
-          </div>
-        )}
         {!showNomeCaptacao && (
           <SelectField
             label="Fomento"
@@ -1059,13 +1054,10 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
           />
         )}
         {!showNomeCaptacao && (
-          <SelectField
-            label="Captação"
-            value={captacaoCronogramaSelecionada}
-            onChange={selecionarCaptacaoCronograma}
-            placeholder="Selecione a captação..."
-            options={captacaoCronogramaOptions}
-          />
+          <div>
+            <label style={labelStyle}>Nome</label>
+            <input type="text" placeholder="Digite o nome da captação" value={nomeCaptacaoCronograma} onChange={e => setNomeCaptacaoCronograma(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
+          </div>
         )}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
@@ -1132,58 +1124,6 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
           );
         })}
       </div>
-      {!showNomeCaptacao && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-          <button type="button" onClick={addEtapaCronogramaFomento} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', backgroundColor: 'rgba(0,193,175,0.1)', border: '1px solid rgba(0,193,175,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#00c1af' }}>
-            <Plus size={16} /> Adicionar Etapa
-          </button>
-        </div>
-      )}
-      {showNomeCaptacao && (
-        <>
-          {Array.from({ length: quantidadeCaptacoesFomento - 1 }).map((_, captacaoIndex) => (
-            <div key={captacaoIndex}>
-              <div style={{ ...divider, margin: '28px 0' }} />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', marginBottom: '20px' }}>
-                <div>
-                  <label style={labelStyle}>Nome da Captação</label>
-                  <input type="text" placeholder="Digite o nome da captação" style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
-                </div>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
-                <div>
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 6px' }}>Etapas do Cronograma</p>
-                  <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>Adicione um card para cada etapa obrigatória da captação.</p>
-                </div>
-                <button type="button" onClick={addEtapaCronogramaFomento} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', backgroundColor: 'rgba(0,193,175,0.1)', border: '1px solid rgba(0,193,175,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#00c1af' }}>
-                  <Plus size={16} /> Adicionar Etapa
-                </button>
-              </div>
-              <div style={{ display: 'grid', gap: '16px' }}>
-                {cronogramaCaptacao.map((etapa, index) => (
-                    <div key={`${captacaoIndex}-${etapa.id}`} style={{ display: 'grid', gap: '8px' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 46px', gap: '16px', alignItems: 'end' }}>
-                        <SelectField label={`Etapa ${index + 1}`} value={etapa.tipo} onChange={value => updateCronograma(etapa.id, 'tipo', value)} placeholder="Selecione a etapa..." options={fasesCronograma.map(fase => ({ value: fase.key, label: fase.label }))} />
-                        <button type="button" onClick={() => removeEtapaCronograma(etapa.id)} style={{ height: '44px', width: '44px', padding: 0, backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Trash2 size={16} style={{ color: '#ef4444' }} />
-                        </button>
-                      </div>
-                    </div>
-                ))}
-              </div>
-            </div>
-          ))}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-            <button
-              type="button"
-              onClick={() => setQuantidadeCaptacoesFomento(total => total + 1)}
-              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', backgroundColor: 'rgba(0,193,175,0.1)', border: '1px solid rgba(0,193,175,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: '#00c1af' }}
-            >
-              <Plus size={16} /> Adicionar Captação
-            </button>
-          </div>
-        </>
-      )}
     </div>
   );
 
