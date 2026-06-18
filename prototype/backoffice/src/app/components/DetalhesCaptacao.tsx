@@ -1417,31 +1417,6 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
 
         {activeTab === 'informacoes' && (
           <>
-        {isFomento && podeEditar && (
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
-            <button
-              type="button"
-              onClick={() => setShowFormularioEdicao(true)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '10px 18px',
-                backgroundColor: 'rgba(0,193,175,0.1)',
-                border: '1px solid rgba(0,193,175,0.3)',
-                borderRadius: 'var(--radius)',
-                color: '#00c1af',
-                fontFamily: 'var(--font-family)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)',
-                cursor: 'pointer',
-              }}
-            >
-              Editar captação
-            </button>
-          </div>
-        )}
-
         {/* SESSÃO 1 — Identificação */}
         {isFomento && (
         <div style={cardStyle}>
