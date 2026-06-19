@@ -76,31 +76,28 @@ jobs:
         id: repos
         run: |
           REPOS=""
-          ${{ inputs.backend_admin && 'REPOS="$REPOS backend-admin"' }}
-          ${{ inputs.frontend_backoffice && 'REPOS="$REPOS frontend-backoffice"' }}
-          ${{ inputs.frontoffice_backend && 'REPOS="$REPOS frontoffice-backend"' }}
-          ${{ inputs.frontoffice_frontend && 'REPOS="$REPOS frontoffice-frontend"' }}
-          ${{ inputs.prestacao_de_contas && 'REPOS="$REPOS prestacao-de-contas"' }}
+          if ${{ inputs.backend_admin }}; then
+            REPOS="$REPOS leds-conectafapes-backend-admin"
+          fi
+          if ${{ inputs.frontend_backoffice }}; then
+            REPOS="$REPOS leds-conectafapes-frontend-backoffice"
+          fi
+          if ${{ inputs.frontoffice_backend }}; then
+            REPOS="$REPOS leds-conectafapes-frontoffice-backend"
+          fi
+          if ${{ inputs.frontoffice_frontend }}; then
+            REPOS="$REPOS leds-conectafapes-frontoffice-frontend"
+          fi
+          if ${{ inputs.prestacao_de_contas }}; then
+            REPOS="$REPOS leds-conectafapes-prestacao-de-contas"
+          fi
 
-          # Substituir nomes curtos por nomes completos
-          FULL=""
-          for R in $REPOS; do
-            case "$R" in
-              backend-admin)        FULL="$FULL leds-conectafapes-backend-admin" ;;
-              frontend-backoffice)  FULL="$FULL leds-conectafapes-frontend-backoffice" ;;
-              frontoffice-backend)  FULL="$FULL leds-conectafapes-frontoffice-backend" ;;
-              frontoffice-frontend) FULL="$FULL leds-conectafapes-frontoffice-frontend" ;;
-              prestacao-de-contas)  FULL="$FULL leds-conectafapes-prestacao-de-contas" ;;
-            esac
-          done
-
-          if [ -z "$FULL" ]; then
+          if [ -z "$REPOS" ]; then
             echo "Selecione ao menos um repositorio"
             exit 1
           fi
 
-          echo "repos=$FULL" >> "$GITHUB_OUTPUT"
-          echo "Repositorios: $FULL"
+          echo "repos=$REPOS" >> "$GITHUB_OUTPUT"
 
       - name: Mostrar plano
         run: |
@@ -130,9 +127,6 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           echo "Executando release $VERSION..."
           echo ""
-
-          echo "Repo | Branch | PR"
-          echo "-----|--------|----"
 
           for REPO in ${{ steps.repos.outputs.repos }}; do
             FULL="leds-conectafapes/$REPO"
