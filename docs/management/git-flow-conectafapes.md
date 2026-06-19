@@ -133,25 +133,27 @@ Exemplo:
 v1.4
 ```
 
-O fluxo esperado é:
+### Como fazer (passo a passo)
 
-1. Definir a versão da release.
-2. Definir quais repositórios entram nessa release.
-3. Rodar primeiro em modo de conferência, sem aplicar alterações.
-4. Com a conferência aprovada, o app cria a branch `release/vX.Y` a partir de `develop`.
-5. O app abre o PR da release para a branch de produção do repositório:
-   - `main` na maioria dos repositórios;
-   - `master` no `leds-conectafapes-prestacao-de-contas`.
-6. Depois do merge em produção, o app cria automaticamente a tag da versão no commit de merge.
+1. Acesse **Actions → [Release ConectaFapes](https://github.com/leds-conectafapes/conectafapes-project/actions/workflows/release-conectafapes.yml)** no repositório `conectafapes-project`.
+2. Clique **Run workflow**.
+3. Preencha:
+   - **Versão** — deixe vazio para detectar automático, ou digite `vX.Y` manual
+   - **Repositórios** — `all` para todos, ou separe com vírgula (ex: `backend-admin, frontend-backoffice`)
+   - **Executar** — **desmarcado** = dry-run (só mostra o plano); **marcado** = cria branches + PRs
+4. Revise o plano exibido no log.
+5. Se estiver tudo certo, rode novamente com **Executar** marcado.
 
-Exemplo:
+A Action cria `release/vX.Y` a partir de `develop` em cada repositório e abre o PR para produção (`main` ou `master` conforme o repositório).
+
+**Importante:** a tag `vX.Y` ainda é criada automaticamente pelo worker **depois** do merge do PR em produção — você não precisa fazer nada nessa parte.
+
+Exemplo do resultado:
 
 ```text
 release/v1.4 -> main
 release/v1.4 -> master
 ```
-
-O GitHub também bloqueia PR para produção se a origem não for `release/*` ou `hotfix/*`.
 
 ## 7. Hotfix
 
