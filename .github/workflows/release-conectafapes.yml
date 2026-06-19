@@ -39,7 +39,7 @@ on:
         default: false
 
 env:
-  GH_TOKEN: ${{ secrets.PROJECTS_PAT }}
+  GIT_ASKPASS: /bin/echo
 
 jobs:
   release:
@@ -78,6 +78,7 @@ jobs:
         run: |
           set +e
           VERSION="${{ steps.version.outputs.version }}"
+          TOKEN="${{ secrets.PROJECTS_PAT }}"
 
           for REPO in ${{ steps.repos.outputs.repos }}; do
             FULL="leds-conectafapes/$REPO"
@@ -86,29 +87,24 @@ jobs:
 
             echo ">>> $REPO"
 
-            # 1. develop SHA
-            DEVELOP=$(gh api "repos/$FULL/git/refs/heads/develop" --jq '.object.sha' 2>/dev/null)
-            if [ -z "$DEVELOP" ] || [ "$DEVELOP" = "null" ]; then
-              echo "  FAIL: develop nao encontrado"; echo ""; continue
+            # Criar branch via git push (atomico, zero ambiguidade)
+            PUSH_OUT=$(git push --force \
+              "https://x-access-token:$TOKEN@github.com/$FULL.git" \
+              "develop:refs/heads/$BRANCH" 2>&1 || true)
+
+            if echo "$PUSH_OUT" | grep -q 'new branch'; then
+              echo "  Branch $BRANCH criada"
+            elif echo "$PUSH_OUT" | grep -q 'up to date'; then
+              echo "  Branch $BRANCH ja existe (mesmo commit)"
+            elif echo "$PUSH_OUT" | grep -q 'remote rejected'; then
+              echo "  FAIL: $PUSH_OUT"
+              echo ""
+              continue
+            else
+              echo "  git: $(echo "$PUSH_OUT" | tail -1)"
             fi
 
-            # 2. criar branch
-            HTTP=$(gh api -X POST "repos/$FULL/git/refs" \
-              -f ref="refs/heads/$BRANCH" \
-              -f sha="$DEVELOP" \
-              -i --silent 2>&1 | head -1 | grep -oP '\d{3}')
-            case "$HTTP" in
-              201) echo "  Branch $BRANCH criada" ;;
-              422) echo "  Branch $BRANCH ja existe" ;;
-              401|403) echo "  FAIL: sem permissao de escrita"; echo ""; continue ;;
-              *) echo "  FAIL: HTTP $HTTP"; echo ""; continue ;;
-            esac
-
-            # 3. verificar commits ahead
-            AHEAD=$(gh api "repos/$FULL/compare/$PROD...$BRANCH" --jq '.ahead_by' 2>/dev/null)
-            echo "  Commits ahead de $PROD: $AHEAD"
-
-            # 4. abrir PR
+            # Abrir PR via REST
             PR_RESP=$(gh api "repos/$FULL/pulls" \
               -f title="Release $VERSION" \
               -f head="$BRANCH" \
@@ -119,14 +115,10 @@ jobs:
               PR_URL=$(echo "$PR_RESP" | grep -oP '"html_url"\s*:\s*"\K[^"]+')
               echo "  PR: $PR_URL"
             else
-              # Mostrar erros detalhados
-              ERRORS=$(echo "$PR_RESP" | grep -oP '"message"\s*:\s*"[^"]+"' | head -1)
-              DETAILS=$(echo "$PR_RESP" | grep -oP '"message"\s*:\s*"[^"]+"' | tail -n +2 | head -3)
-              echo "  FAIL: $ERRORS"
-              [ -n "$DETAILS" ] && echo "        $DETAILS"
-              echo "        raw: $(echo "$PR_RESP" | tr '\n' ' ' | head -c 300)"
+              echo "  FAIL (PR): $(echo "$PR_RESP" | grep -oP '"message"\s*:\s*"[^"]+"' | head -1)"
             fi
 
             echo ""
           done
+
           echo "Feito."
