@@ -37,7 +37,7 @@ stateDiagram-v2
     state "Rascunho" as Rascunho
     state "Enviada" as Enviada
 
-    [*] --> Rascunho : Iniciar resposta [funcionario da FAPES autenticado]
+    [*] --> Rascunho : Iniciar resposta [usuario autenticado]
     Rascunho --> Rascunho : Editar resposta [usuario = autor]
     Rascunho --> Enviada : Enviar resposta [usuario = autor]
     Enviada --> [*]

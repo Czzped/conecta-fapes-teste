@@ -17,7 +17,7 @@ axioms:
   todo: "Define when modelo-estrutural.md is available"
 invariants:
   - id: RN28
-    description: "Qualquer funcionario da FAPES autenticado pode criar um formulario ou uma resposta a formulario."
+    description: "Qualquer funcionario da FAPES autenticado pode criar um formulario e qualquer usuario logado pode criar uma resposta a formulario."
   - id: RN29
     description: "Um formulario ou uma resposta a formulario so pode ser editado pelo proprio usuario autor do registro, respeitadas as restricoes de estado aplicaveis."
   - id: RN30
@@ -36,7 +36,8 @@ policies:
       - Formulario
       - RespostaFormulario
     rules:
-      - "Criacao exige funcionario da FAPES autenticado."
+      - "Criacao de formulario exige funcionario da FAPES autenticado."
+      - "Criacao de resposta a formulario exige usuario logado."
       - "Edicao exige que o usuario solicitante seja o autor do registro."
       - "Copia de formulario nao exige autoria do formulario original."
   permissionamento_categorias:

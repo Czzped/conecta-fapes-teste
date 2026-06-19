@@ -11,8 +11,8 @@ Contrato funcional: ver [contrato.md](contrato.md)
 - `conteudo` representa a estrutura do formulario em JSON, contendo secoes, questoes, opcoes, validacoes e metadados de avaliacao quando aplicavel.
 - A notificacao de uso altera o formulario para "Utilizado" e registra `dataPrimeiroUso`.
 - Formularios inativos nao aparecem para novos usos, mas continuam aceitando respostas.
-- Operacoes de categorias, criacao de formulario, copia de formulario e registro de resposta exigem funcionario da FAPES autenticado.
-- Operacoes de edicao de formulario e de edicao ou envio de resposta exigem que o funcionario da FAPES autenticado seja o autor do registro, alem das restricoes de estado aplicaveis.
+- Operacoes de categorias, criacao de formulario e copia de formulario exigem funcionario da FAPES autenticado. O registro de resposta exige apenas usuario autenticado.
+- Operacoes de edicao de formulario exigem que o funcionario da FAPES autenticado seja o autor do registro. Operacoes de edicao ou envio de resposta exigem usuario autenticado autor da resposta, alem das restricoes de estado aplicaveis.
 
 ## Endpoints
 
@@ -34,10 +34,10 @@ Contrato funcional: ver [contrato.md](contrato.md)
 | GET | `/formularios` | ListarFormularios | Lista formularios por filtros |
 | GET | `/formularios/publicados` | ListarFormulariosPublicados | Lista formularios disponiveis para novos usos |
 | GET | `/formularios/{formularioId}` | ConsultarFormulario | Consulta dados e conteudo de formulario |
-| POST | `/formularios/{formularioId}/respostas` | RegistrarRespostaFormulario | Inicia resposta em estado RASCUNHO para funcionario da FAPES autenticado, com dataRegistro, data/usuario de criacao e ultima alteracao, e resultado calculado quando aplicavel |
+| POST | `/formularios/{formularioId}/respostas` | RegistrarRespostaFormulario | Inicia resposta em estado RASCUNHO para usuario autenticado, com dataRegistro, data/usuario de criacao e ultima alteracao, e resultado calculado quando aplicavel |
 | GET | `/formularios/{formularioId}/respostas` | ListarRespostasFormulario | Lista respostas de um formulario, permitindo filtro por estado |
-| PUT | `/respostas/{respostaId}` | AtualizarRespostaFormulario | Atualiza resposta em RASCUNHO somente quando o funcionario da FAPES autenticado e o autor, registra data/usuario da ultima alteracao e recalcula resultado quando aplicavel |
-| POST | `/respostas/{respostaId}/enviar` | EnviarRespostaFormulario | Envia resposta em RASCUNHO somente quando o funcionario da FAPES autenticado e o autor, altera estado para ENVIADA, registra dataEnvio e calcula/recalcula resultado quando aplicavel |
+| PUT | `/respostas/{respostaId}` | AtualizarRespostaFormulario | Atualiza resposta em RASCUNHO somente quando o usuario autenticado e o autor, registra data/usuario da ultima alteracao e recalcula resultado quando aplicavel |
+| POST | `/respostas/{respostaId}/enviar` | EnviarRespostaFormulario | Envia resposta em RASCUNHO somente quando o usuario autenticado e o autor, altera estado para ENVIADA, registra dataEnvio e calcula/recalcula resultado quando aplicavel |
 | GET | `/respostas/{respostaId}` | ConsultarRespostaFormulario | Consulta resposta registrada com estado, datas e resultado quando aplicavel |
 
 ## Recursos
@@ -283,7 +283,7 @@ Resposta esperada:
 
 ### Registrar Resposta
 
-Autorizacao: funcionario da FAPES autenticado.
+Autorizacao: usuario autenticado.
 
 ```json
 {
@@ -452,7 +452,7 @@ Resposta esperada:
 | HTTP | Codigo | Situacao |
 |------|--------|----------|
 | 401 | USUARIO_NAO_AUTENTICADO | Operacao exige autenticacao |
-| 403 | USUARIO_NAO_AUTORIZADO | Usuario autenticado nao e funcionario da FAPES ou nao atende a autoria/permissao exigida para alterar categoria, formulario ou resposta |
+| 403 | USUARIO_NAO_AUTORIZADO | Usuario autenticado nao atende a permissao exigida para a operacao ou nao e autor do formulario/resposta que tentou alterar/enviar |
 | 400 | PAYLOAD_INVALIDO | Dados obrigatorios ausentes ou invalidos |
 | 400 | FILTRO_OBRIGATORIO | Consulta de respostas sem `formularioId` |
 | 404 | FORMULARIO_NAO_ENCONTRADO | Formulario inexistente |
