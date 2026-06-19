@@ -48,7 +48,7 @@ jobs:
       - name: Detectar versao
         id: version
         run: |
-          set +e  # nao falhar se gh api der erro em algum repo
+          set +e
 
           if [ -n "${{ inputs.version }}" ]; then
             echo "version=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
@@ -134,6 +134,8 @@ jobs:
       - name: Executar
         if: ${{ inputs.execute }}
         run: |
+          set +e
+
           VERSION="${{ steps.version.outputs.version }}"
           echo "Executando release $VERSION..."
           echo ""
@@ -148,33 +150,44 @@ jobs:
               PROD="main"
             fi
 
-            sha=$(gh api "repos/$FULL/git/refs/heads/develop" --jq '.object.sha' 2>/dev/null)
+            echo "--- $REPO ---"
+
+            # Buscar SHA do develop
+            sha=$(gh api "repos/$FULL/git/refs/heads/develop" --jq '.object.sha' 2>/dev/null || true)
             if [ -z "$sha" ]; then
               echo "ERRO: develop nao encontrado em $REPO"
               continue
             fi
 
-            gh api "repos/$FULL/git/refs" \
+            # Criar branch release
+            OUT=$(gh api "repos/$FULL/git/refs" \
               --field ref="refs/heads/$BRANCH" \
-              --field sha="$sha" \
-              --silent 2>/dev/null && echo "Branch $BRANCH criada" || echo "Branch $BRANCH ja existe"
+              --field sha="$sha" 2>&1)
+            if echo "$OUT" | grep -q "Reference already exists"; then
+              echo "Branch $BRANCH ja existe"
+            elif [ -n "$OUT" ]; then
+              echo "Branch $BRANCH criada"
+            else
+              echo "ERRO ao criar branch $BRANCH: $OUT"
+              continue
+            fi
 
+            # Abrir PR
             PR=$(gh api "repos/$FULL/pulls" \
               --field title="Release $VERSION" \
               --field head="$BRANCH" \
               --field base="$PROD" \
               --field body="Release automatica $VERSION de develop para $PROD." \
-              --jq '.html_url' 2>/dev/null)
+              --jq '.html_url' 2>/dev/null || true)
 
             if [ -n "$PR" ]; then
-              echo "PR: $PR"
+              echo "PR criado: $PR"
             else
               PR=$(gh pr list --repo "$FULL" --head "$BRANCH" --base "$PROD" --state open --json url -q '.[0].url' 2>/dev/null || echo "-")
-              echo "PR (existente): $PR"
+              echo "PR (ja existente): $PR"
             fi
 
-            echo "---"
+            echo ""
           done
 
-          echo ""
-          echo "Pronto! A tag $VERSION sera criada automaticamente apos o merge em producao."
+          echo "Pronto! A tag $VERSION sera criada automaticamente apos o merge."
