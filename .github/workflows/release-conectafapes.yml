@@ -74,6 +74,7 @@ jobs:
         if: ${{ inputs.execute }}
         env:
           REPO_TOKEN: ${{ secrets.PROJECTS_PAT }}
+          GH_TOKEN: ${{ secrets.PROJECTS_PAT }}
         run: |
           set -e
           VERSION="${{ steps.version.outputs.version }}"
@@ -104,7 +105,7 @@ jobs:
               -f title="Release $VERSION" \
               -f head="$BRANCH" \
               -f base="$PROD" \
-              -f body="Release $VERSION: integra develop em $PROD." 2>&1) || true
+              -f body="Release $VERSION: integra develop em $PROD." 2>&1 || true)
 
             PR_URL=$(echo "$PR" | grep -oP '"html_url"\s*:\s*"\K[^"]+' || true)
             if [ -n "$PR_URL" ]; then
