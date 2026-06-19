@@ -7,6 +7,11 @@ on:
         description: "Versao (ex: v1.5). Vazio = detectar automatico"
         required: false
         type: string
+      execute:
+        description: "EXECUTAR (desmarcado = dry-run)"
+        required: false
+        type: boolean
+        default: false
       backend_admin:
         description: "backend-admin"
         required: false
@@ -29,11 +34,6 @@ on:
         default: true
       prestacao_de_contas:
         description: "prestacao-de-contas"
-        required: false
-        type: boolean
-        default: false
-      execute:
-        description: "Executar (desmarcado = dry-run)"
         required: false
         type: boolean
         default: false
