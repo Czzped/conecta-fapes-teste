@@ -82,27 +82,36 @@ jobs:
             FULL="leds-conectafapes/$REPO"
             if [ "$REPO" = "leds-conectafapes-prestacao-de-contas" ]; then PROD="master"; else PROD="main"; fi
             BRANCH="release/$VERSION"
+            URL="https://x-access-token:$REPO_TOKEN@github.com/$FULL.git"
 
             echo ">>> $REPO"
 
-            # Criar branch via git push (unico comando, zero ambiguidade)
-            PUSH_OUT=$(git push \
-              "https://x-access-token:$REPO_TOKEN@github.com/$FULL.git" \
-              "develop:refs/heads/$BRANCH" 2>&1 || true)
+            # Criar branch: fetch develop + push para novo branch
+            TMP=$(mktemp -d)
+            git -C "$TMP" init -q
+            FETCH_OUT=$(git -C "$TMP" fetch --depth=1 "$URL" develop 2>&1 || true)
+            if echo "$FETCH_OUT" | grep -q 'fatal'; then
+              echo "  FAIL (fetch): $(echo "$FETCH_OUT" | tail -1)"
+              rm -rf "$TMP"
+              echo ""
+              continue
+            fi
 
+            PUSH_OUT=$(git -C "$TMP" push "$URL" FETCH_HEAD:refs/heads/$BRANCH 2>&1 || true)
             if echo "$PUSH_OUT" | grep -q 'new branch'; then
               echo "  Branch $BRANCH criada"
             elif echo "$PUSH_OUT" | grep -q ' up to date'; then
               echo "  Branch $BRANCH ja existe"
-            elif echo "$PUSH_OUT" | grep -qE 'remote rejected|fatal|error'; then
-              echo "  FAIL: $(echo "$PUSH_OUT" | tail -1)"
+            else
+              echo "  FAIL (push): $(echo "$PUSH_OUT" | tail -1)"
+              rm -rf "$TMP"
               echo ""
               continue
-            else
-              echo "  git: $PUSH_OUT"
             fi
 
-            # Abrir PR via gh
+            rm -rf "$TMP"
+
+            # Abrir PR via REST
             PR_RESP=$(gh api "repos/$FULL/pulls" \
               -f title="Release $VERSION" \
               -f head="$BRANCH" \
