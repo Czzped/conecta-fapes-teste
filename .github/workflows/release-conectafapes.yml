@@ -38,9 +38,6 @@ on:
         type: boolean
         default: false
 
-env:
-  GIT_ASKPASS: /bin/echo
-
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -75,10 +72,11 @@ jobs:
 
       - name: Executar
         if: ${{ inputs.execute }}
+        env:
+          REPO_TOKEN: ${{ secrets.PROJECTS_PAT }}
         run: |
           set +e
           VERSION="${{ steps.version.outputs.version }}"
-          TOKEN="${{ secrets.PROJECTS_PAT }}"
 
           for REPO in ${{ steps.repos.outputs.repos }}; do
             FULL="leds-conectafapes/$REPO"
@@ -87,24 +85,24 @@ jobs:
 
             echo ">>> $REPO"
 
-            # Criar branch via git push (atomico, zero ambiguidade)
-            PUSH_OUT=$(git push --force \
-              "https://x-access-token:$TOKEN@github.com/$FULL.git" \
+            # Criar branch via git push (unico comando, zero ambiguidade)
+            PUSH_OUT=$(git push \
+              "https://x-access-token:$REPO_TOKEN@github.com/$FULL.git" \
               "develop:refs/heads/$BRANCH" 2>&1 || true)
 
             if echo "$PUSH_OUT" | grep -q 'new branch'; then
               echo "  Branch $BRANCH criada"
-            elif echo "$PUSH_OUT" | grep -q 'up to date'; then
-              echo "  Branch $BRANCH ja existe (mesmo commit)"
-            elif echo "$PUSH_OUT" | grep -q 'remote rejected'; then
-              echo "  FAIL: $PUSH_OUT"
+            elif echo "$PUSH_OUT" | grep -q ' up to date'; then
+              echo "  Branch $BRANCH ja existe"
+            elif echo "$PUSH_OUT" | grep -qE 'remote rejected|fatal|error'; then
+              echo "  FAIL: $(echo "$PUSH_OUT" | tail -1)"
               echo ""
               continue
             else
-              echo "  git: $(echo "$PUSH_OUT" | tail -1)"
+              echo "  git: $PUSH_OUT"
             fi
 
-            # Abrir PR via REST
+            # Abrir PR via gh
             PR_RESP=$(gh api "repos/$FULL/pulls" \
               -f title="Release $VERSION" \
               -f head="$BRANCH" \
