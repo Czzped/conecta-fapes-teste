@@ -39,7 +39,7 @@ on:
         default: false
 
 env:
-  GH_TOKEN: ${{ secrets.GH_PAT }}
+  GH_TOKEN: ${{ secrets.PROJECTS_PAT }}
 
 jobs:
   release:
@@ -53,7 +53,6 @@ jobs:
             V="v1.0"
           fi
           echo "version=$V" >> "$GITHUB_OUTPUT"
-          echo "Versao: $V"
 
       - name: Montar lista de repositorios
         id: repos
@@ -85,11 +84,8 @@ jobs:
       - name: Mostrar plano
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          echo "============================================"
-          echo "  RELEASE $VERSION"
-          echo "============================================"
-          echo ""
-          echo "Modo: ${{ inputs.execute && 'EXECUTAR' || 'DRY-RUN (nada sera alterado)' }}"
+          echo "RELEASE $VERSION"
+          echo "Modo: ${{ inputs.execute && 'EXECUTAR' || 'DRY-RUN' }}"
           echo ""
 
           for REPO in ${{ steps.repos.outputs.repos }}; do
@@ -98,10 +94,7 @@ jobs:
             else
               PROD="main"
             fi
-            echo "  [$REPO]"
-            echo "    Branch: release/$VERSION (de develop)"
-            echo "    PR:     release/$VERSION -> $PROD"
-            echo ""
+            echo "  [$REPO] release/$VERSION -> $PROD"
           done
 
       - name: Executar
@@ -110,43 +103,36 @@ jobs:
           set +e
 
           VERSION="${{ steps.version.outputs.version }}"
-          echo "Lançando release $VERSION..."
-          echo ""
 
           for REPO in ${{ steps.repos.outputs.repos }}; do
             FULL="leds-conectafapes/$REPO"
-
-            if [ "$REPO" = "leds-conectafapes-prestacao-de-contas" ]; then
-              PROD="master"
-            else
-              PROD="main"
-            fi
-
+            if [ "$REPO" = "leds-conectafapes-prestacao-de-contas" ]; then PROD="master"; else PROD="main"; fi
             BRANCH="release/$VERSION"
 
             echo ">>> $REPO"
 
-            # 1. Pegar SHA do develop
+            # Ler develop
             DEVELOP=$(gh api "repos/$FULL/git/refs/heads/develop" --jq '.object.sha' 2>/dev/null)
             if [ -z "$DEVELOP" ] || [ "$DEVELOP" = "null" ]; then
-              echo "  FAIL: develop nao encontrado"
+              echo "  FAIL: develop nao encontrado (PAT sem acesso?)"
               echo ""
               continue
             fi
 
-            # 2. Criar branch (idempotente)
-            HTTP_CODE=$(gh api -X POST "repos/$FULL/git/refs" \
+            # Criar branch
+            HTTP=$(gh api -X POST "repos/$FULL/git/refs" \
               -f ref="refs/heads/$BRANCH" \
               -f sha="$DEVELOP" \
-              -i 2>/dev/null | head -1 | grep -oP '\d{3}')
+              -i --silent 2>&1 | head -1 | grep -oP '\d{3}')
 
-            case "$HTTP_CODE" in
+            case "$HTTP" in
               201) echo "  Branch $BRANCH criada" ;;
               422) echo "  Branch $BRANCH ja existe" ;;
-              *)   echo "  FAIL: HTTP $HTTP_CODE ao criar branch" ;;
+              401|403) echo "  FAIL: sem permissao de escrita nesse repo"; echo ""; continue ;;
+              *) echo "  FAIL: HTTP $HTTP"; echo ""; continue ;;
             esac
 
-            # 3. Abrir PR via REST
+            # Abrir PR via REST
             PR_RESP=$(gh api "repos/$FULL/pulls" \
               -f title="Release $VERSION" \
               -f head="$BRANCH" \
@@ -156,10 +142,8 @@ jobs:
 
             if [ -n "$PR_URL" ]; then
               echo "  PR: $PR_URL"
-            elif echo "$PR_RESP" | grep -qi "already exists"; then
-              echo "  PR ja existe"
             else
-              echo "  FAIL (PR): $(echo "$PR_RESP" | tr '\n' ' ' | head -c 200)"
+              echo "  AVISO: $(echo "$PR_RESP" | grep -oP '"message"\s*:\s*"\K[^"]+')"
             fi
 
             echo ""
