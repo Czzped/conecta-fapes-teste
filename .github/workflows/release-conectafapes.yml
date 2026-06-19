@@ -86,44 +86,12 @@ jobs:
 
             echo ">>> $REPO"
 
-            # Criar branch: fetch develop + push para novo branch
+            # fetch + push
             TMP=$(mktemp -d)
             git -C "$TMP" init -q
-            FETCH_OUT=$(git -C "$TMP" fetch --depth=1 "$URL" develop 2>&1 || true)
-            if echo "$FETCH_OUT" | grep -q 'fatal'; then
-              echo "  FAIL (fetch): $(echo "$FETCH_OUT" | tail -1)"
-              rm -rf "$TMP"
-              echo ""
-              continue
-            fi
-
-            PUSH_OUT=$(git -C "$TMP" push "$URL" FETCH_HEAD:refs/heads/$BRANCH 2>&1 || true)
-            if echo "$PUSH_OUT" | grep -q 'new branch'; then
-              echo "  Branch $BRANCH criada"
-            elif echo "$PUSH_OUT" | grep -q ' up to date'; then
-              echo "  Branch $BRANCH ja existe"
-            else
-              echo "  FAIL (push): $(echo "$PUSH_OUT" | tail -1)"
-              rm -rf "$TMP"
-              echo ""
-              continue
-            fi
-
+            echo "  fetch: $(git -C "$TMP" fetch --depth=1 --no-tags "$URL" develop 2>&1)"
+            echo "  push:  $(git -C "$TMP" push "$URL" FETCH_HEAD:refs/heads/$BRANCH 2>&1)"
             rm -rf "$TMP"
-
-            # Abrir PR via REST
-            PR_RESP=$(gh api "repos/$FULL/pulls" \
-              -f title="Release $VERSION" \
-              -f head="$BRANCH" \
-              -f base="$PROD" \
-              -f body="Release automatica $VERSION de develop para $PROD." 2>&1)
-
-            if echo "$PR_RESP" | grep -q '"html_url"'; then
-              PR_URL=$(echo "$PR_RESP" | grep -oP '"html_url"\s*:\s*"\K[^"]+')
-              echo "  PR: $PR_URL"
-            else
-              echo "  FAIL (PR): $(echo "$PR_RESP" | grep -oP '"message"\s*:\s*"[^"]+"' | head -1)"
-            fi
 
             echo ""
           done
