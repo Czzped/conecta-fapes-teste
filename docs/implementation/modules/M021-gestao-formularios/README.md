@@ -35,6 +35,7 @@ Formulários de caracterização serão utilizados para coletar informações qu
 Formulários de habilitação serão utilizados para julgar a habilitação ou não de um objeto de acordo com um conjunto de critérios. Cada critério será mapeado como uma questão que terá como possibilidades de respostas "Sim", "Não", "Não se aplica" ou "Rever" e ainda deve ter um campo texto no qual o respondedor possa justificar sua resposta. Todas as questões de um questionário de habilitação seguirão este mesmo formato. Com base nas respostas às questões, será computado o resultado da resposta, seguindo a seguinte regra: Caso alguma questão tenha sido respondida como "Rever", o resultado será "Rever". Caso contrário, se alguma resposta for "Não", o resultado será "Inabilitado". Não havendo nenhum "Rever" e nenhum "Não", o resultado será "Habilitado". Formulários deste tipo serão utilizados, por exemplo, para avaliações de habilitação de propostas em fomentos. Neste caso, o formulário será associado ao fomento e cada resposta conterá a avaliação de habilitação de uma proposta submetida ao fomento em questão.
 Formulários de Avaliação serão utilizados para avaliar quantitativamente objetos do sistema. A questões serão utilizadas para mapear critérios de avaliação a serem considerados e terão uma escala numérica para a resposta (por exemplo de 0 a 10) e um peso dentro do formulário. A média ponderada das respostas às questões será o resultado da resposta. Por exemplo suponha que um formulário tenha duas questões, ambas com peso 1 e escala de 0 a 10. Se a resposta a este formulário ao avaliar uma proposta seja de 7 para a primeira questão e 9 para a segunda, o resultado do formulário para esta avaliação será 8. Formulários deste tipo poderão ser utilizados, por exemplo, para avaliação ad hoc de fomentos.
 Uma resposta a formulario pode ser iniciada e salva como rascunho pelo usuario responsavel pelo preenchimento. Enquanto estiver em rascunho, a resposta pode ser editada. Ao enviar a resposta, ela passa a ser considerada submetida e nao pode mais ser alterada pelo respondedor.
+Quanto ao permissionamento, qualquer funcionario da FAPES autenticado podera criar um formulario ou uma resposta a formulario. A edicao de um formulario ou de uma resposta, contudo, sera restrita ao proprio usuario autor do registro, respeitando tambem as restricoes de estado aplicaveis. A criacao de um formulario a partir de outro formulario existente nao depende da autoria do formulario original: qualquer funcionario da FAPES autenticado podera criar sua propria copia a partir de qualquer formulario disponivel.
 ---
 
 ## Regras de Negocio
@@ -68,6 +69,9 @@ Uma resposta a formulario pode ser iniciada e salva como rascunho pelo usuario r
 | RN25 | Uma resposta em rascunho pode ser editada pelo usuario responsavel pelo preenchimento. |
 | RN26 | Uma resposta enviada nao pode mais ser alterada pelo respondedor. |
 | RN27 | Uma categoria so podera ser excluida se nao estiver associada a nenhum formulario. |
+| RN28 | Qualquer funcionario da FAPES autenticado pode criar um formulario ou uma resposta a formulario. |
+| RN29 | Um formulario ou uma resposta a formulario so pode ser editado pelo proprio usuario autor do registro, respeitadas as restricoes de estado aplicaveis. |
+| RN30 | Qualquer funcionario da FAPES autenticado pode criar um formulario a partir de qualquer formulario existente, independentemente da autoria do formulario original. |
 
 ## Integracoes
 

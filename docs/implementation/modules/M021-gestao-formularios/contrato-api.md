@@ -11,6 +11,8 @@ Contrato funcional: ver [contrato.md](contrato.md)
 - `conteudo` representa a estrutura do formulario em JSON, contendo secoes, questoes, opcoes, validacoes e metadados de avaliacao quando aplicavel.
 - A notificacao de uso altera o formulario para "Utilizado" e registra `dataPrimeiroUso`.
 - Formularios inativos nao aparecem para novos usos, mas continuam aceitando respostas.
+- Operacoes de criacao de formulario, copia de formulario e registro de resposta exigem funcionario da FAPES autenticado.
+- Operacoes de edicao de formulario e de edicao ou envio de resposta exigem que o funcionario da FAPES autenticado seja o autor do registro, alem das restricoes de estado aplicaveis.
 
 ## Endpoints
 
@@ -21,9 +23,9 @@ Contrato funcional: ver [contrato.md](contrato.md)
 | PUT | `/categorias/{categoriaId}` | AtualizarCategoriaFormulario | Atualiza nome e descricao da categoria |
 | DELETE | `/categorias/{categoriaId}` | ExcluirCategoriaFormulario | Exclui categoria somente se ela nao estiver associada a nenhum formulario |
 | GET | `/categorias` | ListarCategoriasFormulario | Lista categorias |
-| POST | `/formularios` | CriarFormulario | Cria formulario do zero em estado "Em Edicao" e registra data/usuario de criacao e ultima alteracao |
-| POST | `/formularios/{formularioId}/copiar` | CopiarFormulario | Cria novo formulario em "Em Edicao", registra o formulario de origem e data/usuario de criacao e ultima alteracao |
-| PUT | `/formularios/{formularioId}` | AtualizarFormulario | Atualiza dados, categorias e conteudo de formulario em edicao e registra data/usuario da ultima alteracao |
+| POST | `/formularios` | CriarFormulario | Cria formulario do zero em estado "Em Edicao" para funcionario da FAPES autenticado e registra data/usuario de criacao e ultima alteracao |
+| POST | `/formularios/{formularioId}/copiar` | CopiarFormulario | Cria novo formulario em "Em Edicao" para funcionario da FAPES autenticado, independente da autoria da origem, registrando formulario de origem e data/usuario de criacao e ultima alteracao |
+| PUT | `/formularios/{formularioId}` | AtualizarFormulario | Atualiza dados, categorias e conteudo de formulario em edicao somente quando o funcionario da FAPES autenticado e o autor, registrando data/usuario da ultima alteracao |
 | POST | `/formularios/{formularioId}/publicar` | PublicarFormulario | Altera estado para "Publicado" e registra dataPublicacao e data/usuario da ultima alteracao |
 | POST | `/formularios/{formularioId}/reverter-publicacao` | ReverterPublicacaoFormulario | Altera estado para "Em Edicao", limpa dataPublicacao e registra data/usuario da ultima alteracao |
 | POST | `/formularios/{formularioId}/usos` | NotificarUsoFormulario | Altera estado para "Utilizado" e registra dataPrimeiroUso apenas se ainda estiver vazia |
@@ -32,10 +34,10 @@ Contrato funcional: ver [contrato.md](contrato.md)
 | GET | `/formularios` | ListarFormularios | Lista formularios por filtros |
 | GET | `/formularios/publicados` | ListarFormulariosPublicados | Lista formularios disponiveis para novos usos |
 | GET | `/formularios/{formularioId}` | ConsultarFormulario | Consulta dados e conteudo de formulario |
-| POST | `/formularios/{formularioId}/respostas` | RegistrarRespostaFormulario | Inicia resposta em estado RASCUNHO, com dataRegistro, data/usuario de criacao e ultima alteracao, e resultado calculado quando aplicavel |
+| POST | `/formularios/{formularioId}/respostas` | RegistrarRespostaFormulario | Inicia resposta em estado RASCUNHO para funcionario da FAPES autenticado, com dataRegistro, data/usuario de criacao e ultima alteracao, e resultado calculado quando aplicavel |
 | GET | `/formularios/{formularioId}/respostas` | ListarRespostasFormulario | Lista respostas de um formulario, permitindo filtro por estado |
-| PUT | `/respostas/{respostaId}` | AtualizarRespostaFormulario | Atualiza resposta em RASCUNHO, registra data/usuario da ultima alteracao e recalcula resultado quando aplicavel |
-| POST | `/respostas/{respostaId}/enviar` | EnviarRespostaFormulario | Envia resposta em RASCUNHO, altera estado para ENVIADA, registra dataEnvio e calcula/recalcula resultado quando aplicavel |
+| PUT | `/respostas/{respostaId}` | AtualizarRespostaFormulario | Atualiza resposta em RASCUNHO somente quando o funcionario da FAPES autenticado e o autor, registra data/usuario da ultima alteracao e recalcula resultado quando aplicavel |
+| POST | `/respostas/{respostaId}/enviar` | EnviarRespostaFormulario | Envia resposta em RASCUNHO somente quando o funcionario da FAPES autenticado e o autor, altera estado para ENVIADA, registra dataEnvio e calcula/recalcula resultado quando aplicavel |
 | GET | `/respostas/{respostaId}` | ConsultarRespostaFormulario | Consulta resposta registrada com estado, datas e resultado quando aplicavel |
 
 ## Recursos
@@ -165,6 +167,8 @@ Resposta esperada: `204 No Content`.
 
 ### Criar Formulario
 
+Autorizacao: funcionario da FAPES autenticado.
+
 ```json
 {
   "titulo": "Formulario de submissao de proposta",
@@ -198,6 +202,8 @@ Resposta esperada: `204 No Content`.
 
 ### Criar Formulario de Habilitacao
 
+Autorizacao: funcionario da FAPES autenticado.
+
 ```json
 {
   "titulo": "Habilitacao documental",
@@ -225,6 +231,8 @@ Resposta esperada: `204 No Content`.
 ```
 
 ### Criar Formulario de Avaliacao
+
+Autorizacao: funcionario da FAPES autenticado.
 
 ```json
 {
@@ -269,6 +277,8 @@ Resposta esperada:
 
 ### Registrar Resposta
 
+Autorizacao: funcionario da FAPES autenticado.
+
 ```json
 {
   "respostas": {
@@ -303,6 +313,8 @@ Resposta esperada:
 ```
 
 ### Atualizar Resposta em Rascunho
+
+Autorizacao: autor da resposta.
 
 ```json
 {
@@ -412,6 +424,8 @@ Resposta esperada:
 
 ### Enviar Resposta
 
+Autorizacao: autor da resposta.
+
 Esta operacao nao recebe corpo. Ela altera uma resposta em RASCUNHO para ENVIADA, registra `dataEnvio` e calcula ou recalcula o resultado quando aplicavel.
 
 Resposta esperada:
@@ -431,6 +445,8 @@ Resposta esperada:
 
 | HTTP | Codigo | Situacao |
 |------|--------|----------|
+| 401 | USUARIO_NAO_AUTENTICADO | Operacao exige autenticacao |
+| 403 | USUARIO_NAO_AUTORIZADO | Usuario autenticado nao e funcionario da FAPES ou nao e autor do formulario/resposta que tentou alterar/enviar |
 | 400 | PAYLOAD_INVALIDO | Dados obrigatorios ausentes ou invalidos |
 | 400 | FILTRO_OBRIGATORIO | Consulta de respostas sem `formularioId` |
 | 404 | FORMULARIO_NAO_ENCONTRADO | Formulario inexistente |

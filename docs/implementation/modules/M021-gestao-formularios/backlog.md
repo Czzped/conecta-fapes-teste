@@ -19,9 +19,9 @@ O cadastro de categorias nao e fundamental para viabilizar a Release 1. Se isso 
 | ID | Titulo | Requisito | Prioridade | Status | Documento |
 |----|--------|-----------|------------|--------|-----------|
 | EPIC-M021-001 | Cadastrar Categoria de Formulario | RN14, RN15, RN27 | Should | To Do | [EPIC-M021-001](epics/EPIC-M021-001.md) |
-| EPIC-M021-002 | Cadastrar Formulario de Caracterizacao | RN01-RN06, RN13, RN15-RN17 | Must | To Do | [EPIC-M021-002](epics/EPIC-M021-002.md) |
+| EPIC-M021-002 | Cadastrar Formulario de Caracterizacao | RN01-RN06, RN13, RN15-RN17, RN28-RN30 | Must | To Do | [EPIC-M021-002](epics/EPIC-M021-002.md) |
 | EPIC-M021-003 | Gerenciar Ciclo de Vida de Formulario | RN07-RN12 | Must | To Do | [EPIC-M021-003](epics/EPIC-M021-003.md) |
-| EPIC-M021-004 | Gerenciar Respostas de Formulario de Caracterizacao | RN09, RN12, RN17, RN24-RN26 | Must | To Do | [EPIC-M021-004](epics/EPIC-M021-004.md) |
+| EPIC-M021-004 | Gerenciar Respostas de Formulario de Caracterizacao | RN09, RN12, RN17, RN24-RN26, RN28-RN29 | Must | To Do | [EPIC-M021-004](epics/EPIC-M021-004.md) |
 
 ## Backlog - Release 2
 
@@ -29,8 +29,8 @@ Esta release trata de adequar as funcionalidades de cadastro e respostas para fo
 
 | ID | Titulo | Requisito | Prioridade | Status | Documento |
 |----|--------|-----------|------------|--------|-----------|
-| EPIC-M021-005 | Cadastrar Formulario de Avaliacao | RN01-RN06, RN13, RN15, RN16, RN22 | Should | To Do | [EPIC-M021-005](epics/EPIC-M021-005.md) |
-| EPIC-M021-006 | Gerenciar Respostas de Formulario de Avaliacao | RN09, RN12, RN22-RN26 | Should | To Do | [EPIC-M021-006](epics/EPIC-M021-006.md) |
+| EPIC-M021-005 | Cadastrar Formulario de Avaliacao | RN01-RN06, RN13, RN15, RN16, RN22, RN28-RN30 | Should | To Do | [EPIC-M021-005](epics/EPIC-M021-005.md) |
+| EPIC-M021-006 | Gerenciar Respostas de Formulario de Avaliacao | RN09, RN12, RN22-RN26, RN28-RN29 | Should | To Do | [EPIC-M021-006](epics/EPIC-M021-006.md) |
 
 ## Backlog - Release 3
 
@@ -38,8 +38,8 @@ Esta release trata de adequar as funcionalidades de cadastro e respostas para fo
 
 | ID | Titulo | Requisito | Prioridade | Status | Documento |
 |----|--------|-----------|------------|--------|-----------|
-| EPIC-M021-007 | Cadastrar Formulario de Habilitacao | RN01-RN06, RN13, RN15, RN16, RN18 | Should | To Do | [EPIC-M021-007](epics/EPIC-M021-007.md) |
-| EPIC-M021-008 | Gerenciar Respostas de Formulario de Habilitacao | RN09, RN12, RN18-RN21, RN24-RN26 | Should | To Do | [EPIC-M021-008](epics/EPIC-M021-008.md) |
+| EPIC-M021-007 | Cadastrar Formulario de Habilitacao | RN01-RN06, RN13, RN15, RN16, RN18, RN28-RN30 | Should | To Do | [EPIC-M021-007](epics/EPIC-M021-007.md) |
+| EPIC-M021-008 | Gerenciar Respostas de Formulario de Habilitacao | RN09, RN12, RN18-RN21, RN24-RN26, RN28-RN29 | Should | To Do | [EPIC-M021-008](epics/EPIC-M021-008.md) |
 
 ---
 

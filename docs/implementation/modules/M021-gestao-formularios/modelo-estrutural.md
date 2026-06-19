@@ -194,10 +194,14 @@ classDiagram
 - Formularios utilizados nao podem ser alterados nem voltar para EM_EDICAO.
 - Formularios inativos nao podem ser selecionados para novos usos, mas podem continuar recebendo respostas de usos existentes.
 - Formularios so podem ser excluidos enquanto estiverem em estado EM_EDICAO.
+- Qualquer funcionario da FAPES autenticado pode criar formulario do zero ou a partir da copia de outro formulario.
+- A copia de formulario pode ter como origem formulario criado por qualquer usuario.
+- Apenas o usuario que criou o formulario pode edita-lo, respeitando tambem as restricoes de estado.
 - Formularios de habilitacao devem usar as opcoes Sim, Nao, Nao se aplica e Rever para todas as questoes.
 - Formularios de avaliacao devem definir escala numerica e peso para cada questao usada no calculo do resultado.
 - Uma resposta deve ser criada em estado RASCUNHO.
-- Apenas respostas em estado RASCUNHO podem ser editadas pelo respondedor.
+- Qualquer funcionario da FAPES autenticado pode criar resposta a formulario.
+- Apenas respostas em estado RASCUNHO podem ser editadas pelo usuario que criou a resposta.
 - Ao ser enviada, a resposta muda para ENVIADA e registra dataEnvio.
 - Respostas em estado ENVIADA nao podem ser alteradas pelo respondedor.
 

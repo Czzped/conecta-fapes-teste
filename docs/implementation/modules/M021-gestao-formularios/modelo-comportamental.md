@@ -12,8 +12,8 @@ stateDiagram-v2
     state "Inativo" as Inativo
     state "Excluido" as Excluido
 
-    [*] --> EmEdicao
-    EmEdicao --> EmEdicao : Editar formulario
+    [*] --> EmEdicao : Criar ou copiar formulario [funcionario da FAPES autenticado]
+    EmEdicao --> EmEdicao : Editar formulario [usuario = autor]
     EmEdicao --> Publicado : Publicar formulario
     EmEdicao --> Excluido : Excluir formulario
 
@@ -24,7 +24,7 @@ stateDiagram-v2
     Utilizado --> Inativo : Inativar formulario
     Excluido --> [*]
 
-    state EmEdicao : Pode ser editado e excluido
+    state EmEdicao : Pode ser editado pelo autor e excluido
     state Publicado : Visivel para uso por outros modulos
     state Utilizado : Nao pode voltar para edicao e pode receber respostas
     state Inativo : Indisponivel para novos usos, mas pode receber respostas de usos existentes
@@ -37,11 +37,11 @@ stateDiagram-v2
     state "Rascunho" as Rascunho
     state "Enviada" as Enviada
 
-    [*] --> Rascunho : Iniciar resposta
-    Rascunho --> Rascunho : Editar resposta
-    Rascunho --> Enviada : Enviar resposta
+    [*] --> Rascunho : Iniciar resposta [funcionario da FAPES autenticado]
+    Rascunho --> Rascunho : Editar resposta [usuario = autor]
+    Rascunho --> Enviada : Enviar resposta [usuario = autor]
     Enviada --> [*]
 
-    state Rascunho : Pode ser editada pelo respondedor
+    state Rascunho : Pode ser editada pelo autor
     state Enviada : Nao pode mais ser alterada pelo respondedor
 ```

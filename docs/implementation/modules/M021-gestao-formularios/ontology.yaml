@@ -16,7 +16,12 @@ relationships:
 axioms:
   todo: "Define when modelo-estrutural.md is available"
 invariants:
-  todo: "Define when modelo-estrutural.md is available"
+  - id: RN28
+    description: "Qualquer funcionario da FAPES autenticado pode criar um formulario ou uma resposta a formulario."
+  - id: RN29
+    description: "Um formulario ou uma resposta a formulario so pode ser editado pelo proprio usuario autor do registro, respeitadas as restricoes de estado aplicaveis."
+  - id: RN30
+    description: "Qualquer funcionario da FAPES autenticado pode criar um formulario a partir de qualquer formulario existente, independentemente da autoria do formulario original."
 enums: {}
 value_objects: {}
 events:
@@ -24,7 +29,14 @@ events:
 workflows:
   todo: "Define when modelo-estrutural.md is available"
 policies:
-  todo: "Define when modelo-estrutural.md is available"
+  permissionamento_autoria:
+    applies_to:
+      - Formulario
+      - RespostaFormulario
+    rules:
+      - "Criacao exige funcionario da FAPES autenticado."
+      - "Edicao exige que o usuario solicitante seja o autor do registro."
+      - "Copia de formulario nao exige autoria do formulario original."
 
 agent_instructions:
   rules:
