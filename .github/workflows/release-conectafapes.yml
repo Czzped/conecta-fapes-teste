@@ -113,6 +113,11 @@ jobs:
           echo "Lançando release $VERSION..."
           echo ""
 
+          not_null() {
+            # jq .field em resposta 404 retorna a string literal "null"
+            [ -n "$1" ] && [ "$1" != "null" ]
+          }
+
           for REPO in ${{ steps.repos.outputs.repos }}; do
             FULL="leds-conectafapes/$REPO"
 
@@ -126,46 +131,46 @@ jobs:
 
             echo ">>> $REPO"
 
-            # 1. Verificar se develop existe
+            # 1. develop existe?
             DEVELOP_SHA=$(gh api "repos/$FULL/git/refs/heads/develop" --jq '.object.sha' 2>/dev/null || true)
-            if [ -z "$DEVELOP_SHA" ]; then
+            if ! not_null "$DEVELOP_SHA"; then
               echo "  FAIL: develop nao encontrado"
               echo ""
               continue
             fi
 
-            # 2. Branch ja existe?
+            # 2. branch ja existe?
             EXISTING=$(gh api "repos/$FULL/git/refs/heads/$BRANCH" --jq '.object.sha' 2>/dev/null || true)
-            if [ -n "$EXISTING" ]; then
+            if not_null "$EXISTING"; then
               echo "  Branch $BRANCH ja existe"
             else
-              # 3. Criar branch
+              # 3. criar branch
               gh api "repos/$FULL/git/refs" \
                 --field ref="refs/heads/$BRANCH" \
-                --field sha="$DEVELOP_SHA" --silent 2>/dev/null
-              # 4. Confirmar que foi criada
+                --field sha="$DEVELOP_SHA" --silent 2>/dev/null || true
+              # 4. confirmar
               CONFIRM=$(gh api "repos/$FULL/git/refs/heads/$BRANCH" --jq '.object.sha' 2>/dev/null || true)
-              if [ -n "$CONFIRM" ]; then
+              if not_null "$CONFIRM"; then
                 echo "  Branch $BRANCH criada"
               else
-                echo "  FAIL: nao foi possivel criar branch $BRANCH"
+                echo "  FAIL: nao foi possivel criar branch (PAT sem permissao de escrita?)"
                 echo ""
                 continue
               fi
             fi
 
-            # 5. Abrir PR
-            PR_URL=$(gh pr create \
+            # 5. abrir PR
+            PR_OUT=$(gh pr create \
               --repo "$FULL" \
               --head "$BRANCH" \
               --base "$PROD" \
               --title "Release $VERSION" \
               --body "Release automatica $VERSION de develop para $PROD." 2>&1 || true)
 
-            if echo "$PR_URL" | grep -q '^https://github.com/'; then
-              echo "  PR criado: $PR_URL"
+            if echo "$PR_OUT" | grep -q '^https://github.com/'; then
+              echo "  PR criado: $(echo "$PR_OUT" | grep -oP 'https://github\.com/[^\s]+/pull/\d+')"
             else
-              echo "  AVISO (PR): $(echo "$PR_URL" | tr '\n' ' ' | head -c 200)"
+              echo "  FAIL (PR): $(echo "$PR_OUT" | tr '\n' ' ' | head -c 250)"
             fi
 
             echo ""
