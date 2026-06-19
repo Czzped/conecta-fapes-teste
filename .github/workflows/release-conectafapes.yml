@@ -32,9 +32,14 @@ on:
         required: false
         type: boolean
         default: false
+      execute:
+        description: "Executar (desmarcado = dry-run)"
+        required: false
+        type: boolean
+        default: false
 
 env:
-  GH_TOKEN: ${{ secrets.GITHUB_LEDS }}
+  GH_TOKEN: ${{ secrets.PROJECTS_PAT }}
 
 jobs:
   release:
@@ -48,6 +53,7 @@ jobs:
             exit 0
           fi
 
+          ALL_TAGS=""
           for REPO in \
             leds-conectafapes-backend-admin \
             leds-conectafapes-frontend-backoffice \
@@ -55,18 +61,16 @@ jobs:
             leds-conectafapes-frontoffice-frontend \
             leds-conectafapes-prestacao-de-contas; do
             TAG=$(gh release list --repo "leds-conectafapes/$REPO" --limit 1 --json tagName -q '.[0].tagName' 2>/dev/null)
-            if [[ "$TAG" =~ ^v([0-9]+)\.([0-9]+)$ ]]; then
-              CANDIDATE="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
-              if [ -z "$LATEST" ] || [ "${BASH_REMATCH[1]}" -gt "${LATEST%.*}" ] || { [ "${BASH_REMATCH[1]}" -eq "${LATEST%.*}" ] && [ "${BASH_REMATCH[2]}" -gt "${LATEST##*.}" ]; }; then
-                LATEST="$CANDIDATE"
-              fi
+            if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+$ ]]; then
+              ALL_TAGS="$ALL_TAGS $TAG"
             fi
           done
 
-          if [ -z "$LATEST" ]; then
+          if [ -z "$ALL_TAGS" ]; then
             VERSION="v1.0"
           else
-            VERSION="v${LATEST%.*}.$((LATEST##*. + 1))"
+            LATEST=$(echo "$ALL_TAGS" | tr ' ' '\n' | sort -V | tail -1)
+            VERSION=$(echo "$LATEST" | awk -F. '{print "v" $1+0 "." $2+1}')
           fi
 
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
