@@ -7,13 +7,28 @@ on:
         description: "Versao (ex: v1.5). Vazio = detectar automatico"
         required: false
         type: string
-      repos:
-        description: "Repos (virgula). 'all' = todos"
+      backend_admin:
+        description: "backend-admin"
         required: false
-        default: "all"
-        type: string
-      execute:
-        description: "Executar (desmarcado = dry-run)"
+        type: boolean
+        default: true
+      frontend_backoffice:
+        description: "frontend-backoffice"
+        required: false
+        type: boolean
+        default: true
+      frontoffice_backend:
+        description: "frontoffice-backend"
+        required: false
+        type: boolean
+        default: true
+      frontoffice_frontend:
+        description: "frontoffice-frontend"
+        required: false
+        type: boolean
+        default: true
+      prestacao_de_contas:
+        description: "prestacao-de-contas"
         required: false
         type: boolean
         default: false
@@ -57,38 +72,42 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Versao detectada: $VERSION"
 
-      - name: Resolver repositorios
+      - name: Montar lista de repositorios
         id: repos
         run: |
-          ALL="leds-conectafapes-backend-admin leds-conectafapes-frontend-backoffice leds-conectafapes-frontoffice-backend leds-conectafapes-frontoffice-frontend leds-conectafapes-prestacao-de-contas"
+          REPOS=""
+          ${{ inputs.backend_admin && 'REPOS="$REPOS backend-admin"' }}
+          ${{ inputs.frontend_backoffice && 'REPOS="$REPOS frontend-backoffice"' }}
+          ${{ inputs.frontoffice_backend && 'REPOS="$REPOS frontoffice-backend"' }}
+          ${{ inputs.frontoffice_frontend && 'REPOS="$REPOS frontoffice-frontend"' }}
+          ${{ inputs.prestacao_de_contas && 'REPOS="$REPOS prestacao-de-contas"' }}
 
-          if [ "${{ inputs.repos }}" = "all" ]; then
-            SELECTED="$ALL"
-          else
-            SELECTED=$(echo "${{ inputs.repos }}" | tr ',' ' ')
-          fi
-
-          VALID=""
-          for REPO in $SELECTED; do
-            REPO=$(echo "$REPO" | xargs)
-            if echo "$ALL" | tr ' ' '\n' | grep -qx "$REPO"; then
-              VALID="$VALID $REPO"
-            else
-              echo "Ignorado (nao reconhecido): $REPO"
-            fi
+          # Substituir nomes curtos por nomes completos
+          FULL=""
+          for R in $REPOS; do
+            case "$R" in
+              backend-admin)        FULL="$FULL leds-conectafapes-backend-admin" ;;
+              frontend-backoffice)  FULL="$FULL leds-conectafapes-frontend-backoffice" ;;
+              frontoffice-backend)  FULL="$FULL leds-conectafapes-frontoffice-backend" ;;
+              frontoffice-frontend) FULL="$FULL leds-conectafapes-frontoffice-frontend" ;;
+              prestacao-de-contas)  FULL="$FULL leds-conectafapes-prestacao-de-contas" ;;
+            esac
           done
 
-          if [ -z "$VALID" ]; then
-            echo "Nenhum repositorio valido selecionado"
+          if [ -z "$FULL" ]; then
+            echo "Selecione ao menos um repositorio"
             exit 1
           fi
 
-          echo "repos=$VALID" >> "$GITHUB_OUTPUT"
+          echo "repos=$FULL" >> "$GITHUB_OUTPUT"
+          echo "Repositorios: $FULL"
 
       - name: Mostrar plano
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          echo "========== PLANO DA RELEASE $VERSION =========="
+          echo "============================================"
+          echo "  RELEASE $VERSION"
+          echo "============================================"
           echo ""
           echo "Modo: ${{ inputs.execute && 'EXECUTAR' || 'DRY-RUN (nada sera alterado)' }}"
           echo ""
@@ -125,20 +144,17 @@ jobs:
               PROD="main"
             fi
 
-            # Buscar SHA do develop
-            SHA=$(gh api "repos/$FULL/git/refs/heads/develop" --jq '.object.sha' 2>/dev/null)
-            if [ -z "$SHA" ]; then
-              echo "ERRO: nao foi possivel ler develop em $REPO"
+            sha=$(gh api "repos/$FULL/git/refs/heads/develop" --jq '.object.sha' 2>/dev/null)
+            if [ -z "$sha" ]; then
+              echo "ERRO: develop nao encontrado em $REPO"
               continue
             fi
 
-            # Criar branch release
             gh api "repos/$FULL/git/refs" \
               --field ref="refs/heads/$BRANCH" \
-              --field sha="$SHA" \
-              --silent 2>/dev/null && echo "Branch $BRANCH criada em $REPO" || echo "Branch $BRANCH ja existe em $REPO"
+              --field sha="$sha" \
+              --silent 2>/dev/null && echo "Branch $BRANCH criada" || echo "Branch $BRANCH ja existe"
 
-            # Abrir PR
             PR=$(gh api "repos/$FULL/pulls" \
               --field title="Release $VERSION" \
               --field head="$BRANCH" \
