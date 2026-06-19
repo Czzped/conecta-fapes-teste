@@ -45,43 +45,15 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Detectar versao
+      - name: Definir versao
         id: version
         run: |
-          set +e
-          INPUT="${{ inputs.version }}"
-
-          if [ -n "$INPUT" ]; then
-            echo "version=$INPUT" >> "$GITHUB_OUTPUT"
-            exit 0
+          V="${{ inputs.version }}"
+          if [ -z "$V" ]; then
+            V="v1.0"
           fi
-
-          ALL_VERSIONS=""
-          for REPO in \
-            leds-conectafapes-backend-admin \
-            leds-conectafapes-frontend-backoffice \
-            leds-conectafapes-frontoffice-backend \
-            leds-conectafapes-frontoffice-frontend \
-            leds-conectafapes-prestacao-de-contas; do
-            TAGS=$(gh api "repos/leds-conectafapes/$REPO/git/refs/tags" --jq '.[].ref | sub("refs/tags/"; "")' 2>/dev/null || true)
-            for TAG in $TAGS; do
-              if [[ "$TAG" =~ ^v([0-9]+)\.([0-9]+)(\.[0-9]+)?$ ]]; then
-                ALL_VERSIONS="$ALL_VERSIONS ${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
-              fi
-            done
-          done
-
-          ALL_VERSIONS=$(echo "$ALL_VERSIONS" | xargs -n1 | sort -u)
-
-          if [ -z "$ALL_VERSIONS" ]; then
-            VERSION="v1.0"
-          else
-            LATEST=$(echo "$ALL_VERSIONS" | sort -t. -k1,1n -k2,2n | tail -1)
-            VERSION="v${LATEST%.*}.$((LATEST##*. + 1))"
-          fi
-
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Versao detectada: $VERSION"
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "Versao: $V"
 
       - name: Montar lista de repositorios
         id: repos
@@ -167,17 +139,17 @@ jobs:
               --field ref="refs/heads/$BRANCH" \
               --field sha="$DEVELOP_SHA" 2>&1 || true)
             if echo "$CREATE_OUT" | grep -qi "error\|not found\|bad credentials\|forbidden"; then
-              echo "  FAIL ao criar branch: $CREATE_OUT"
+              echo "  FAIL ao criar branch: $(echo "$CREATE_OUT" | tr '\n' ' ')"
               echo ""
               continue
             fi
             if echo "$CREATE_OUT" | grep -qi "already exists"; then
-              echo "  Branch release/$VERSION ja existe"
+              echo "  Branch $BRANCH ja existe"
             else
-              echo "  Branch release/$VERSION criada"
+              echo "  Branch $BRANCH criada"
             fi
 
-            # Abrir PR via gh pr create (melhor compatibilidade com PAT)
+            # Abrir PR
             PR_OUT=$(gh pr create \
               --repo "$FULL" \
               --head "$BRANCH" \
@@ -188,10 +160,12 @@ jobs:
             PR_URL=$(echo "$PR_OUT" | grep -oP 'https://github\.com/[^\s]+/pull/\d+')
             if [ -n "$PR_URL" ]; then
               echo "  PR criado: $PR_URL"
+            elif [ -z "$PR_OUT" ]; then
+              echo "  FAIL ao criar PR (sem saida)"
             elif echo "$PR_OUT" | grep -qi "already exists\|existing\|já existe\|ya existe"; then
               echo "  PR ja existe"
             else
-              echo "  AVISO (PR): $(echo "$PR_OUT" | head -1)"
+              echo "  AVISO (PR): $(echo "$PR_OUT" | tr '\n' ' ')"
             fi
 
             echo ""
