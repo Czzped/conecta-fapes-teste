@@ -39,7 +39,7 @@ on:
         default: false
 
 env:
-  GH_TOKEN: ${{ secrets.PROJECTS_PAT }}
+  GH_TOKEN: ${{ secrets.GH_PAT }}
 
 jobs:
   release:
@@ -113,11 +113,6 @@ jobs:
           echo "Lançando release $VERSION..."
           echo ""
 
-          not_null() {
-            # jq .field em resposta 404 retorna a string literal "null"
-            [ -n "$1" ] && [ "$1" != "null" ]
-          }
-
           for REPO in ${{ steps.repos.outputs.repos }}; do
             FULL="leds-conectafapes/$REPO"
 
@@ -131,46 +126,40 @@ jobs:
 
             echo ">>> $REPO"
 
-            # 1. develop existe?
-            DEVELOP_SHA=$(gh api "repos/$FULL/git/refs/heads/develop" --jq '.object.sha' 2>/dev/null || true)
-            if ! not_null "$DEVELOP_SHA"; then
+            # 1. Pegar SHA do develop
+            DEVELOP=$(gh api "repos/$FULL/git/refs/heads/develop" --jq '.object.sha' 2>/dev/null)
+            if [ -z "$DEVELOP" ] || [ "$DEVELOP" = "null" ]; then
               echo "  FAIL: develop nao encontrado"
               echo ""
               continue
             fi
 
-            # 2. branch ja existe?
-            EXISTING=$(gh api "repos/$FULL/git/refs/heads/$BRANCH" --jq '.object.sha' 2>/dev/null || true)
-            if not_null "$EXISTING"; then
-              echo "  Branch $BRANCH ja existe"
-            else
-              # 3. criar branch
-              gh api "repos/$FULL/git/refs" \
-                --field ref="refs/heads/$BRANCH" \
-                --field sha="$DEVELOP_SHA" --silent 2>/dev/null || true
-              # 4. confirmar
-              CONFIRM=$(gh api "repos/$FULL/git/refs/heads/$BRANCH" --jq '.object.sha' 2>/dev/null || true)
-              if not_null "$CONFIRM"; then
-                echo "  Branch $BRANCH criada"
-              else
-                echo "  FAIL: nao foi possivel criar branch (PAT sem permissao de escrita?)"
-                echo ""
-                continue
-              fi
-            fi
+            # 2. Criar branch (idempotente)
+            HTTP_CODE=$(gh api -X POST "repos/$FULL/git/refs" \
+              -f ref="refs/heads/$BRANCH" \
+              -f sha="$DEVELOP" \
+              -i 2>/dev/null | head -1 | grep -oP '\d{3}')
 
-            # 5. abrir PR
-            PR_OUT=$(gh pr create \
-              --repo "$FULL" \
-              --head "$BRANCH" \
-              --base "$PROD" \
-              --title "Release $VERSION" \
-              --body "Release automatica $VERSION de develop para $PROD." 2>&1 || true)
+            case "$HTTP_CODE" in
+              201) echo "  Branch $BRANCH criada" ;;
+              422) echo "  Branch $BRANCH ja existe" ;;
+              *)   echo "  FAIL: HTTP $HTTP_CODE ao criar branch" ;;
+            esac
 
-            if echo "$PR_OUT" | grep -q '^https://github.com/'; then
-              echo "  PR criado: $(echo "$PR_OUT" | grep -oP 'https://github\.com/[^\s]+/pull/\d+')"
+            # 3. Abrir PR via REST
+            PR_RESP=$(gh api "repos/$FULL/pulls" \
+              -f title="Release $VERSION" \
+              -f head="$BRANCH" \
+              -f base="$PROD" \
+              -f body="Release automatica $VERSION de develop para $PROD." 2>&1)
+            PR_URL=$(echo "$PR_RESP" | grep -oP '"html_url"\s*:\s*"\K[^"]+')
+
+            if [ -n "$PR_URL" ]; then
+              echo "  PR: $PR_URL"
+            elif echo "$PR_RESP" | grep -qi "already exists"; then
+              echo "  PR ja existe"
             else
-              echo "  FAIL (PR): $(echo "$PR_OUT" | tr '\n' ' ' | head -c 250)"
+              echo "  FAIL (PR): $(echo "$PR_RESP" | tr '\n' ' ' | head -c 200)"
             fi
 
             echo ""
