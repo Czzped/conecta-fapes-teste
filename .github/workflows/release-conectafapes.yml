@@ -64,11 +64,13 @@ jobs:
       - name: Mostrar plano
         run: |
           V="${{ steps.version.outputs.version }}"
-          echo "RELEASE $V  —  ${{ inputs.execute && 'EXECUTAR' || 'DRY-RUN' }}"
+          echo "=== RELEASE $V  —  ${{ inputs.execute && 'EXECUTAR' || 'DRY-RUN' }} ==="
+          echo ""
           for REPO in ${{ steps.repos.outputs.repos }}; do
             if [ "$REPO" = "leds-conectafapes-prestacao-de-contas" ]; then PROD="master"; else PROD="main"; fi
-            echo "  [$REPO] release/$V -> $PROD"
+            echo "  $REPO  →  release/$V -> $PROD"
           done
+          echo ""
 
       - name: Executar
         if: ${{ inputs.execute }}
@@ -86,14 +88,42 @@ jobs:
 
             echo ">>> $REPO"
 
-            # fetch + push
+            # 1. Criar branch via git push
             TMP=$(mktemp -d)
             git -C "$TMP" init -q
-            echo "  fetch: $(git -C "$TMP" fetch --depth=1 --no-tags "$URL" develop 2>&1)"
-            echo "  push:  $(git -C "$TMP" push "$URL" FETCH_HEAD:refs/heads/$BRANCH 2>&1)"
+            FETCH_ERR=$(git -C "$TMP" fetch --depth=1 --no-tags "$URL" develop 2>&1)
+            if echo "$FETCH_ERR" | grep -q 'fatal'; then
+              echo "  FAIL: $(echo "$FETCH_ERR" | tail -1)"; rm -rf "$TMP"; echo ""; continue
+            fi
+
+            PUSH_OUT=$(git -C "$TMP" push "$URL" FETCH_HEAD:refs/heads/$BRANCH 2>&1)
             rm -rf "$TMP"
+
+            if echo "$PUSH_OUT" | grep -q 'new branch'; then
+              echo "  ✓ Branch $BRANCH"
+            elif echo "$PUSH_OUT" | grep -q ' up to date'; then
+              echo "  = Branch $BRANCH (ja existe)"
+            else
+              echo "  ✗ $(echo "$PUSH_OUT" | grep 'remote:' | tail -1)"
+              echo ""; continue
+            fi
+
+            # 2. Abrir PR
+            PR_RESP=$(gh api "repos/$FULL/pulls" \
+              -f title="Release $VERSION" \
+              -f head="$BRANCH" \
+              -f base="$PROD" \
+              -f body="Release $VERSION: integra develop em $PROD." 2>&1)
+
+            if echo "$PR_RESP" | grep -q '"html_url"'; then
+              echo "  ✓ PR: $(echo "$PR_RESP" | grep -oP '"html_url"\s*:\s*"\K[^"]+')"
+            elif echo "$PR_RESP" | grep -qi 'already exists'; then
+              echo "  = PR ja existe"
+            else
+              echo "  ✗ PR: $(echo "$PR_RESP" | grep -oP '"message"\s*:\s*"([^"]+)"' | sed 's/"message":"//;s/"$//')"
+            fi
 
             echo ""
           done
 
-          echo "Feito."
+          echo "Concluido."
