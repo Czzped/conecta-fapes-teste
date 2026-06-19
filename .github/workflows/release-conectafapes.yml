@@ -49,59 +49,34 @@ jobs:
         id: version
         run: |
           V="${{ inputs.version }}"
-          if [ -z "$V" ]; then
-            V="v1.0"
-          fi
+          if [ -z "$V" ]; then V="v1.0"; fi
           echo "version=$V" >> "$GITHUB_OUTPUT"
 
       - name: Montar lista de repositorios
         id: repos
         run: |
           REPOS=""
-          if ${{ inputs.backend_admin }}; then
-            REPOS="$REPOS leds-conectafapes-backend-admin"
-          fi
-          if ${{ inputs.frontend_backoffice }}; then
-            REPOS="$REPOS leds-conectafapes-frontend-backoffice"
-          fi
-          if ${{ inputs.frontoffice_backend }}; then
-            REPOS="$REPOS leds-conectafapes-frontoffice-backend"
-          fi
-          if ${{ inputs.frontoffice_frontend }}; then
-            REPOS="$REPOS leds-conectafapes-frontoffice-frontend"
-          fi
-          if ${{ inputs.prestacao_de_contas }}; then
-            REPOS="$REPOS leds-conectafapes-prestacao-de-contas"
-          fi
-
-          if [ -z "$REPOS" ]; then
-            echo "Selecione ao menos um repositorio"
-            exit 1
-          fi
-
+          if ${{ inputs.backend_admin }}; then REPOS="$REPOS leds-conectafapes-backend-admin"; fi
+          if ${{ inputs.frontend_backoffice }}; then REPOS="$REPOS leds-conectafapes-frontend-backoffice"; fi
+          if ${{ inputs.frontoffice_backend }}; then REPOS="$REPOS leds-conectafapes-frontoffice-backend"; fi
+          if ${{ inputs.frontoffice_frontend }}; then REPOS="$REPOS leds-conectafapes-frontoffice-frontend"; fi
+          if ${{ inputs.prestacao_de_contas }}; then REPOS="$REPOS leds-conectafapes-prestacao-de-contas"; fi
+          if [ -z "$REPOS" ]; then echo "Selecione ao menos um repositorio"; exit 1; fi
           echo "repos=$REPOS" >> "$GITHUB_OUTPUT"
 
       - name: Mostrar plano
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          echo "RELEASE $VERSION"
-          echo "Modo: ${{ inputs.execute && 'EXECUTAR' || 'DRY-RUN' }}"
-          echo ""
-
+          V="${{ steps.version.outputs.version }}"
+          echo "RELEASE $V  —  ${{ inputs.execute && 'EXECUTAR' || 'DRY-RUN' }}"
           for REPO in ${{ steps.repos.outputs.repos }}; do
-            if [ "$REPO" = "leds-conectafapes-prestacao-de-contas" ]; then
-              PROD="master"
-            else
-              PROD="main"
-            fi
-            echo "  [$REPO] release/$VERSION -> $PROD"
+            if [ "$REPO" = "leds-conectafapes-prestacao-de-contas" ]; then PROD="master"; else PROD="main"; fi
+            echo "  [$REPO] release/$V -> $PROD"
           done
 
       - name: Executar
         if: ${{ inputs.execute }}
         run: |
           set +e
-
           VERSION="${{ steps.version.outputs.version }}"
 
           for REPO in ${{ steps.repos.outputs.repos }}; do
@@ -111,42 +86,47 @@ jobs:
 
             echo ">>> $REPO"
 
-            # Ler develop
+            # 1. develop SHA
             DEVELOP=$(gh api "repos/$FULL/git/refs/heads/develop" --jq '.object.sha' 2>/dev/null)
             if [ -z "$DEVELOP" ] || [ "$DEVELOP" = "null" ]; then
-              echo "  FAIL: develop nao encontrado (PAT sem acesso?)"
-              echo ""
-              continue
+              echo "  FAIL: develop nao encontrado"; echo ""; continue
             fi
 
-            # Criar branch
+            # 2. criar branch
             HTTP=$(gh api -X POST "repos/$FULL/git/refs" \
               -f ref="refs/heads/$BRANCH" \
               -f sha="$DEVELOP" \
               -i --silent 2>&1 | head -1 | grep -oP '\d{3}')
-
             case "$HTTP" in
               201) echo "  Branch $BRANCH criada" ;;
               422) echo "  Branch $BRANCH ja existe" ;;
-              401|403) echo "  FAIL: sem permissao de escrita nesse repo"; echo ""; continue ;;
+              401|403) echo "  FAIL: sem permissao de escrita"; echo ""; continue ;;
               *) echo "  FAIL: HTTP $HTTP"; echo ""; continue ;;
             esac
 
-            # Abrir PR via REST
+            # 3. verificar commits ahead
+            AHEAD=$(gh api "repos/$FULL/compare/$PROD...$BRANCH" --jq '.ahead_by' 2>/dev/null)
+            echo "  Commits ahead de $PROD: $AHEAD"
+
+            # 4. abrir PR
             PR_RESP=$(gh api "repos/$FULL/pulls" \
               -f title="Release $VERSION" \
               -f head="$BRANCH" \
               -f base="$PROD" \
               -f body="Release automatica $VERSION de develop para $PROD." 2>&1)
-            PR_URL=$(echo "$PR_RESP" | grep -oP '"html_url"\s*:\s*"\K[^"]+')
 
-            if [ -n "$PR_URL" ]; then
+            if echo "$PR_RESP" | grep -q '"html_url"'; then
+              PR_URL=$(echo "$PR_RESP" | grep -oP '"html_url"\s*:\s*"\K[^"]+')
               echo "  PR: $PR_URL"
             else
-              echo "  AVISO: $(echo "$PR_RESP" | grep -oP '"message"\s*:\s*"\K[^"]+')"
+              # Mostrar erros detalhados
+              ERRORS=$(echo "$PR_RESP" | grep -oP '"message"\s*:\s*"[^"]+"' | head -1)
+              DETAILS=$(echo "$PR_RESP" | grep -oP '"message"\s*:\s*"[^"]+"' | tail -n +2 | head -3)
+              echo "  FAIL: $ERRORS"
+              [ -n "$DETAILS" ] && echo "        $DETAILS"
+              echo "        raw: $(echo "$PR_RESP" | tr '\n' ' ' | head -c 300)"
             fi
 
             echo ""
           done
-
           echo "Feito."
