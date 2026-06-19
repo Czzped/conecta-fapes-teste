@@ -1,0 +1,194 @@
+name: 🚀 Release ConectaFapes
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versão (ex: v1.5). Deixe vazio para detectar automático'
+        required: false
+        type: string
+      repos:
+        description: 'Repositórios (separados por vírgula). "all" = todos'
+        required: false
+        default: 'all'
+        type: string
+      execute:
+        description: 'Executar (desmarcado = dry-run, só mostra o plano)'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_LEDS }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔍 Detectar versão se não informada
+        id: version
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            VERSION="${{ inputs.version }}"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "Usando versão informada: $VERSION"
+            exit 0
+          fi
+
+          ALL_TAGS=$(gh release list \
+            --repo leds-conectafapes/leds-conectafapes-backend-admin \
+            --limit 1 --json tagName -q '.[0].tagName' 2>/dev/null; \
+            gh release list \
+            --repo leds-conectafapes/leds-conectafapes-frontend-backoffice \
+            --limit 1 --json tagName -q '.[0].tagName' 2>/dev/null; \
+            gh release list \
+            --repo leds-conectafapes/leds-conectafapes-frontoffice-backend \
+            --limit 1 --json tagName -q '.[0].tagName' 2>/dev/null; \
+            gh release list \
+            --repo leds-conectafapes/leds-conectafapes-frontoffice-frontend \
+            --limit 1 --json tagName -q '.[0].tagName' 2>/dev/null; \
+            gh release list \
+            --repo leds-conectafapes/leds-conectafapes-prestacao-de-contas \
+            --limit 1 --json tagName -q '.[0].tagName' 2>/dev/null)
+
+          LATEST=""
+          for TAG in $ALL_TAGS; do
+            # Pega a tag mais alta no formato vX.Y
+            if [[ "$TAG" =~ ^v([0-9]+)\.([0-9]+)$ ]]; then
+              MAJOR="${BASH_REMATCH[1]}"
+              MINOR="${BASH_REMATCH[2]}"
+              if [ -z "$LATEST" ] || [ "$MAJOR" -gt "${LATEST%.*}" ] || { [ "$MAJOR" -eq "${LATEST%.*}" ] && [ "$MINOR" -gt "${LATEST##*.}" ]; }; then
+                LATEST="${MAJOR}.${MINOR}"
+              fi
+            fi
+          done
+
+          if [ -z "$LATEST" ]; then
+            VERSION="v1.0"
+            echo "Nenhuma tag encontrada — versão inicial: $VERSION"
+          else
+            VERSION="v${LATEST%.*}.$((LATEST##*. + 1))"
+            echo "Última tag v$LATEST — próxima versão: $VERSION"
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: 📋 Resolver repositórios da release
+        id: repos
+        run: |
+          ALL_REPOS="leds-conectafapes-backend-admin leds-conectafapes-frontend-backoffice leds-conectafapes-frontoffice-backend leds-conectafapes-frontoffice-frontend leds-conectafapes-prestacao-de-contas"
+
+          if [ "${{ inputs.repos }}" = "all" ]; then
+            SELECTED="$ALL_REPOS"
+            echo "Repositórios: todos"
+          else
+            # Substituir vírgulas por espaços
+            SELECTED=$(echo "${{ inputs.repos }}" | tr ',' ' ')
+            echo "Repositórios selecionados: $SELECTED"
+          fi
+
+          # Validar que cada repo existe
+          VALID=""
+          for REPO in $SELECTED; do
+            REPO=$(echo "$REPO" | xargs) # trim
+            if echo "$ALL_REPOS" | tr ' ' '\n' | grep -qx "$REPO"; then
+              VALID="$VALID $REPO"
+            else
+              echo "⚠️  Repositório ignorado (não reconhecido): $REPO"
+            fi
+          done
+
+          if [ -z "$VALID" ]; then
+            echo "❌ Nenhum repositório válido selecionado"
+            exit 1
+          fi
+
+          echo "repos=$VALID" >> "$GITHUB_OUTPUT"
+          echo ""
+          echo "=== PLANO DA RELEASE ==="
+          echo "Versão: ${{ steps.version.outputs.version }}"
+          echo "Modo: ${{ inputs.execute && 'EXECUÇÃO' || 'DRY-RUN' }}"
+          echo ""
+
+      - name: 📄 Mostrar plano (dry-run)
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          EXECUTE=${{ inputs.execute }}
+
+          echo "═══════════════════════════════════════════"
+          echo "  🚀  RELEASE $VERSION"
+          echo "═══════════════════════════════════════════"
+          echo ""
+          echo "  Modo: $([[ $EXECUTE == true ]] && echo '✅ EXECUTAR' || echo '🔍 DRY-RUN (nada será alterado)')"
+          echo ""
+          echo "  Ações para cada repositório:"
+          echo ""
+
+          for REPO in ${{ steps.repos.outputs.repos }}; do
+            # Determinar branch de produção
+            if [ "$REPO" = "leds-conectafapes-prestacao-de-contas" ]; then
+              PROD_BRANCH="master"
+            else
+              PROD_BRANCH="main"
+            fi
+
+            echo "  ┌─ $REPO"
+            echo "  │  📦 Criar branch:  release/$VERSION (de develop)"
+            echo "  │  🔗 Abrir PR:      release/$VERSION → $PROD_BRANCH"
+            echo "  │  🏷️  Tag pós-merge: $VERSION (automática pelo worker)"
+            echo "  └─"
+            echo ""
+          done
+
+      - name: ⚡ Executar release
+        if: inputs.execute
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          echo "Executando release $VERSION..."
+          echo ""
+          echo '```'
+          echo "  Repositório                        | Branch              | PR para produção"
+          echo "  ───────────────────────────────────┼─────────────────────┼────────────────"
+          for REPO in ${{ steps.repos.outputs.repos }}; do
+            FULL_REPO="leds-conectafapes/$REPO"
+            RELEASE_BRANCH="release/$VERSION"
+
+            # Determinar branch de produção
+            if [ "$REPO" = "leds-conectafapes-prestacao-de-contas" ]; then
+              PROD_BRANCH="master"
+            else
+              PROD_BRANCH="main"
+            fi
+
+            # 1. Criar branch release/vX.Y a partir de develop
+            echo "  Criando $RELEASE_BRANCH em $REPO..."
+            gh api repos/$FULL_REPO/git/refs \
+              --field ref="refs/heads/$RELEASE_BRANCH" \
+              --field sha="$(gh api repos/$FULL_REPO/git/refs/heads/develop --jq '.object.sha')" \
+              --silent 2>/dev/null && echo "  ✅ Branch criada" || echo "  ⚠️  Pode já existir"
+
+            # 2. Abrir PR para produção
+            PR_URL=$(gh api repos/$FULL_REPO/pulls \
+              --field title="Release $VERSION" \
+              --field head="$RELEASE_BRANCH" \
+              --field base="$PROD_BRANCH" \
+              --field body="Release automática $VERSION de \`develop\` para \`$PROD_BRANCH\`.
+
+> Gerado pelo workflow [Release ConectaFapes](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" \
+              --jq '.html_url' 2>/dev/null)
+
+            if [ -n "$PR_URL" ]; then
+              echo "  ✅ PR criado: $PR_URL"
+            else
+              echo "  ⚠️  PR pode já existir"
+              PR_URL=$(gh pr list --repo $FULL_REPO --head "$RELEASE_BRANCH" --base "$PROD_BRANCH" --state open --json url -q '.[0].url' 2>/dev/null || echo "(pendente)")
+            fi
+
+            printf "  %-37s │ %-19s │ %s\n" "$REPO" "$RELEASE_BRANCH" "$PR_URL"
+          done
+          echo '```'
+          echo ""
+          echo "✅ Release $VERSION concluída!"
+          echo ""
+          echo "⚠️  Lembrete: a tag $VERSION será criada automaticamente pelo worker"
+          echo "   quando o PR da release for mergeado em produção."
