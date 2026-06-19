@@ -126,46 +126,46 @@ jobs:
 
             echo ">>> $REPO"
 
-            # Ler SHA do develop
+            # 1. Verificar se develop existe
             DEVELOP_SHA=$(gh api "repos/$FULL/git/refs/heads/develop" --jq '.object.sha' 2>/dev/null || true)
             if [ -z "$DEVELOP_SHA" ]; then
-              echo "  FAIL: nao foi possivel ler develop (PAT sem acesso ao repo?)"
+              echo "  FAIL: develop nao encontrado"
               echo ""
               continue
             fi
 
-            # Criar branch release
-            CREATE_OUT=$(gh api "repos/$FULL/git/refs" \
-              --field ref="refs/heads/$BRANCH" \
-              --field sha="$DEVELOP_SHA" 2>&1 || true)
-            if echo "$CREATE_OUT" | grep -qi "error\|not found\|bad credentials\|forbidden"; then
-              echo "  FAIL ao criar branch: $(echo "$CREATE_OUT" | tr '\n' ' ')"
-              echo ""
-              continue
-            fi
-            if echo "$CREATE_OUT" | grep -qi "already exists"; then
+            # 2. Branch ja existe?
+            EXISTING=$(gh api "repos/$FULL/git/refs/heads/$BRANCH" --jq '.object.sha' 2>/dev/null || true)
+            if [ -n "$EXISTING" ]; then
               echo "  Branch $BRANCH ja existe"
             else
-              echo "  Branch $BRANCH criada"
+              # 3. Criar branch
+              gh api "repos/$FULL/git/refs" \
+                --field ref="refs/heads/$BRANCH" \
+                --field sha="$DEVELOP_SHA" --silent 2>/dev/null
+              # 4. Confirmar que foi criada
+              CONFIRM=$(gh api "repos/$FULL/git/refs/heads/$BRANCH" --jq '.object.sha' 2>/dev/null || true)
+              if [ -n "$CONFIRM" ]; then
+                echo "  Branch $BRANCH criada"
+              else
+                echo "  FAIL: nao foi possivel criar branch $BRANCH"
+                echo ""
+                continue
+              fi
             fi
 
-            # Abrir PR
-            PR_OUT=$(gh pr create \
+            # 5. Abrir PR
+            PR_URL=$(gh pr create \
               --repo "$FULL" \
               --head "$BRANCH" \
               --base "$PROD" \
               --title "Release $VERSION" \
               --body "Release automatica $VERSION de develop para $PROD." 2>&1 || true)
 
-            PR_URL=$(echo "$PR_OUT" | grep -oP 'https://github\.com/[^\s]+/pull/\d+')
-            if [ -n "$PR_URL" ]; then
+            if echo "$PR_URL" | grep -q '^https://github.com/'; then
               echo "  PR criado: $PR_URL"
-            elif [ -z "$PR_OUT" ]; then
-              echo "  FAIL ao criar PR (sem saida)"
-            elif echo "$PR_OUT" | grep -qi "already exists\|existing\|já existe\|ya existe"; then
-              echo "  PR ja existe"
             else
-              echo "  AVISO (PR): $(echo "$PR_OUT" | tr '\n' ' ')"
+              echo "  AVISO (PR): $(echo "$PR_URL" | tr '\n' ' ' | head -c 200)"
             fi
 
             echo ""
