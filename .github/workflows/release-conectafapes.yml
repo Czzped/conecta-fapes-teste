@@ -69,14 +69,13 @@ jobs:
             if [ "$REPO" = "leds-conectafapes-prestacao-de-contas" ]; then PROD="master"; else PROD="main"; fi
             echo "  $REPO  →  release/$V -> $PROD"
           done
-          echo ""
 
       - name: Executar
         if: ${{ inputs.execute }}
         env:
           REPO_TOKEN: ${{ secrets.PROJECTS_PAT }}
         run: |
-          set -e  # falhar em erros inesperados
+          set -e
           VERSION="${{ steps.version.outputs.version }}"
 
           for REPO in ${{ steps.repos.outputs.repos }}; do
@@ -87,7 +86,7 @@ jobs:
 
             echo ">>> $REPO"
 
-            # 1. Criar branch (idempotente)
+            # 1. Branch
             TMP=$(mktemp -d)
             git -C "$TMP" init -q
             git -C "$TMP" fetch -q --depth=1 --no-tags "$URL" develop || { echo "  FAIL: fetch develop"; rm -rf "$TMP"; continue; }
@@ -96,24 +95,24 @@ jobs:
 
             if   echo "$PUSH" | grep -q 'new branch';      then echo "  ✓ Branch $BRANCH"
             elif echo "$PUSH" | grep -q 'up-to-date\|up to date'; then echo "  = Branch $BRANCH (existe)"
-            elif echo "$PUSH" | grep -q 'remote rejected';  then echo "  ✗ $PUSH" | tr '\n' ' '; echo; continue
+            elif echo "$PUSH" | grep -q 'remote rejected';  then echo "  ✗ $PUSH"; echo ""; continue
             else  echo "  ? $PUSH"
             fi
 
-            # 2. Abrir PR
+            # 2. PR
             PR=$(gh api "repos/$FULL/pulls" \
               -f title="Release $VERSION" \
               -f head="$BRANCH" \
               -f base="$PROD" \
-              -f body="Release $VERSION: integra develop em $PROD." 2>&1 || true)
+              -f body="Release $VERSION: integra develop em $PROD." 2>&1) || true
 
-            URL=$(echo "$PR" | grep -oP '"html_url"\s*:\s*"\K[^"]+')
-            if [ -n "$URL" ]; then
-              echo "  ✓ PR $URL"
-            elif echo "$PR" | grep -q 'already exists'; then
+            PR_URL=$(echo "$PR" | grep -oP '"html_url"\s*:\s*"\K[^"]+' || true)
+            if [ -n "$PR_URL" ]; then
+              echo "  ✓ PR $PR_URL"
+            elif echo "$PR" | grep -qi 'already exists'; then
               echo "  = PR ja existe"
             else
-              echo "  ✗ $(echo "$PR" | tr '\n' ' ' | head -c 300)"
+              echo "  ✗ $(echo "$PR" | tr '\n' ' ' | head -c 300 || true)"
             fi
 
             echo ""
