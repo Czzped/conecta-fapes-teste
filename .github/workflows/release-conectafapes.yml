@@ -49,12 +49,12 @@ jobs:
         id: version
         run: |
           set +e
+          INPUT="${{ inputs.version }}"
 
-          if [ -n "$VERSION_INPUT" ]; then
-            echo "version=$VERSION_INPUT" >> "$GITHUB_OUTPUT"
+          if [ -n "$INPUT" ]; then
+            echo "version=$INPUT" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          VERSION_INPUT="${{ inputs.version }}"
 
           ALL_VERSIONS=""
           for REPO in \
@@ -157,12 +157,12 @@ jobs:
             # Ler SHA do develop
             DEVELOP_SHA=$(gh api "repos/$FULL/git/refs/heads/develop" --jq '.object.sha' 2>/dev/null || true)
             if [ -z "$DEVELOP_SHA" ]; then
-              echo "  FAIL: nao foi possivel ler develop (PAT pode nao ter acesso a este repo)"
+              echo "  FAIL: nao foi possivel ler develop (PAT sem acesso ao repo?)"
               echo ""
               continue
             fi
 
-            # Criar branch release/vX.Y
+            # Criar branch release
             CREATE_OUT=$(gh api "repos/$FULL/git/refs" \
               --field ref="refs/heads/$BRANCH" \
               --field sha="$DEVELOP_SHA" 2>&1 || true)
@@ -177,21 +177,21 @@ jobs:
               echo "  Branch release/$VERSION criada"
             fi
 
-            # Abrir PR
-            PR_URL=$(gh pr create \
+            # Abrir PR via gh pr create (melhor compatibilidade com PAT)
+            PR_OUT=$(gh pr create \
               --repo "$FULL" \
               --head "$BRANCH" \
               --base "$PROD" \
               --title "Release $VERSION" \
               --body "Release automatica $VERSION de develop para $PROD." 2>&1 || true)
 
-            if echo "$PR_URL" | grep -q "github.com.*/pull/"; then
-              PR_URL=$(echo "$PR_URL" | grep -o 'https://github.com/[^ ]*')
+            PR_URL=$(echo "$PR_OUT" | grep -oP 'https://github\.com/[^\s]+/pull/\d+')
+            if [ -n "$PR_URL" ]; then
               echo "  PR criado: $PR_URL"
-            elif echo "$PR_URL" | grep -qi "already exists\|already has\|já existe\|existing"; then
+            elif echo "$PR_OUT" | grep -qi "already exists\|existing\|já existe\|ya existe"; then
               echo "  PR ja existe"
             else
-              echo "  AVISO (PR): $PR_URL"
+              echo "  AVISO (PR): $(echo "$PR_OUT" | head -1)"
             fi
 
             echo ""
