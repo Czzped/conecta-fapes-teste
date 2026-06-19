@@ -50,10 +50,11 @@ jobs:
         run: |
           set +e
 
-          if [ -n "${{ inputs.version }}" ]; then
-            echo "version=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          if [ -n "$VERSION_INPUT" ]; then
+            echo "version=$VERSION_INPUT" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          VERSION_INPUT="${{ inputs.version }}"
 
           ALL_VERSIONS=""
           for REPO in \
@@ -80,7 +81,7 @@ jobs:
           fi
 
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Versao detectada: $VERSION (ultima: $LATEST)"
+          echo "Versao detectada: $VERSION"
 
       - name: Montar lista de repositorios
         id: repos
@@ -137,12 +138,11 @@ jobs:
           set +e
 
           VERSION="${{ steps.version.outputs.version }}"
-          echo "Executando release $VERSION..."
+          echo "Lançando release $VERSION..."
           echo ""
 
           for REPO in ${{ steps.repos.outputs.repos }}; do
             FULL="leds-conectafapes/$REPO"
-            BRANCH="release/$VERSION"
 
             if [ "$REPO" = "leds-conectafapes-prestacao-de-contas" ]; then
               PROD="master"
@@ -150,44 +150,51 @@ jobs:
               PROD="main"
             fi
 
-            echo "--- $REPO ---"
+            BRANCH="release/$VERSION"
 
-            # Buscar SHA do develop
-            sha=$(gh api "repos/$FULL/git/refs/heads/develop" --jq '.object.sha' 2>/dev/null || true)
-            if [ -z "$sha" ]; then
-              echo "ERRO: develop nao encontrado em $REPO"
+            echo ">>> $REPO"
+
+            # Ler SHA do develop
+            DEVELOP_SHA=$(gh api "repos/$FULL/git/refs/heads/develop" --jq '.object.sha' 2>/dev/null || true)
+            if [ -z "$DEVELOP_SHA" ]; then
+              echo "  FAIL: nao foi possivel ler develop (PAT pode nao ter acesso a este repo)"
+              echo ""
               continue
             fi
 
-            # Criar branch release
-            OUT=$(gh api "repos/$FULL/git/refs" \
+            # Criar branch release/vX.Y
+            CREATE_OUT=$(gh api "repos/$FULL/git/refs" \
               --field ref="refs/heads/$BRANCH" \
-              --field sha="$sha" 2>&1)
-            if echo "$OUT" | grep -q "Reference already exists"; then
-              echo "Branch $BRANCH ja existe"
-            elif [ -n "$OUT" ]; then
-              echo "Branch $BRANCH criada"
-            else
-              echo "ERRO ao criar branch $BRANCH: $OUT"
+              --field sha="$DEVELOP_SHA" 2>&1 || true)
+            if echo "$CREATE_OUT" | grep -qi "error\|not found\|bad credentials\|forbidden"; then
+              echo "  FAIL ao criar branch: $CREATE_OUT"
+              echo ""
               continue
+            fi
+            if echo "$CREATE_OUT" | grep -qi "already exists"; then
+              echo "  Branch release/$VERSION ja existe"
+            else
+              echo "  Branch release/$VERSION criada"
             fi
 
             # Abrir PR
-            PR=$(gh api "repos/$FULL/pulls" \
-              --field title="Release $VERSION" \
-              --field head="$BRANCH" \
-              --field base="$PROD" \
-              --field body="Release automatica $VERSION de develop para $PROD." \
-              --jq '.html_url' 2>/dev/null || true)
+            PR_URL=$(gh pr create \
+              --repo "$FULL" \
+              --head "$BRANCH" \
+              --base "$PROD" \
+              --title "Release $VERSION" \
+              --body "Release automatica $VERSION de develop para $PROD." 2>&1 || true)
 
-            if [ -n "$PR" ]; then
-              echo "PR criado: $PR"
+            if echo "$PR_URL" | grep -q "github.com.*/pull/"; then
+              PR_URL=$(echo "$PR_URL" | grep -o 'https://github.com/[^ ]*')
+              echo "  PR criado: $PR_URL"
+            elif echo "$PR_URL" | grep -qi "already exists\|already has\|já existe\|existing"; then
+              echo "  PR ja existe"
             else
-              PR=$(gh pr list --repo "$FULL" --head "$BRANCH" --base "$PROD" --state open --json url -q '.[0].url' 2>/dev/null || echo "-")
-              echo "PR (ja existente): $PR"
+              echo "  AVISO (PR): $PR_URL"
             fi
 
             echo ""
           done
 
-          echo "Pronto! A tag $VERSION sera criada automaticamente apos o merge."
+          echo "Feito."
