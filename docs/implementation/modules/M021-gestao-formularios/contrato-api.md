@@ -11,18 +11,18 @@ Contrato funcional: ver [contrato.md](contrato.md)
 - `conteudo` representa a estrutura do formulario em JSON, contendo secoes, questoes, opcoes, validacoes e metadados de avaliacao quando aplicavel.
 - A notificacao de uso altera o formulario para "Utilizado" e registra `dataPrimeiroUso`.
 - Formularios inativos nao aparecem para novos usos, mas continuam aceitando respostas.
-- Operacoes de criacao de formulario, copia de formulario e registro de resposta exigem funcionario da FAPES autenticado.
+- Operacoes de categorias, criacao de formulario, copia de formulario e registro de resposta exigem funcionario da FAPES autenticado.
 - Operacoes de edicao de formulario e de edicao ou envio de resposta exigem que o funcionario da FAPES autenticado seja o autor do registro, alem das restricoes de estado aplicaveis.
 
 ## Endpoints
 
 | Metodo | Path | Operacao | Descricao |
 |--------|------|----------|-----------|
-| POST | `/categorias` | CriarCategoriaFormulario | Cria categoria de formulario |
-| GET | `/categorias/{categoriaId}` | ConsultarCategoriaFormulario | Consulta dados de uma categoria |
-| PUT | `/categorias/{categoriaId}` | AtualizarCategoriaFormulario | Atualiza nome e descricao da categoria |
-| DELETE | `/categorias/{categoriaId}` | ExcluirCategoriaFormulario | Exclui categoria somente se ela nao estiver associada a nenhum formulario |
-| GET | `/categorias` | ListarCategoriasFormulario | Lista categorias |
+| POST | `/categorias` | CriarCategoriaFormulario | Cria categoria de formulario para funcionario da FAPES autenticado |
+| GET | `/categorias/{categoriaId}` | ConsultarCategoriaFormulario | Consulta dados de uma categoria para funcionario da FAPES autenticado ou modulo interno autorizado |
+| PUT | `/categorias/{categoriaId}` | AtualizarCategoriaFormulario | Atualiza nome e descricao da categoria para funcionario da FAPES autenticado |
+| DELETE | `/categorias/{categoriaId}` | ExcluirCategoriaFormulario | Exclui categoria para funcionario da FAPES autenticado somente se ela nao estiver associada a nenhum formulario |
+| GET | `/categorias` | ListarCategoriasFormulario | Lista categorias para funcionario da FAPES autenticado ou modulo interno autorizado |
 | POST | `/formularios` | CriarFormulario | Cria formulario do zero em estado "Em Edicao" para funcionario da FAPES autenticado e registra data/usuario de criacao e ultima alteracao |
 | POST | `/formularios/{formularioId}/copiar` | CopiarFormulario | Cria novo formulario em "Em Edicao" para funcionario da FAPES autenticado, independente da autoria da origem, registrando formulario de origem e data/usuario de criacao e ultima alteracao |
 | PUT | `/formularios/{formularioId}` | AtualizarFormulario | Atualiza dados, categorias e conteudo de formulario em edicao somente quando o funcionario da FAPES autenticado e o autor, registrando data/usuario da ultima alteracao |
@@ -140,6 +140,8 @@ Contrato funcional: ver [contrato.md](contrato.md)
 
 ### Criar Categoria
 
+Autorizacao: funcionario da FAPES autenticado.
+
 ```json
 {
   "nome": "Submissao",
@@ -148,6 +150,8 @@ Contrato funcional: ver [contrato.md](contrato.md)
 ```
 
 ### Consultar Categoria
+
+Autorizacao: funcionario da FAPES autenticado ou modulo interno autorizado.
 
 Resposta esperada:
 
@@ -160,6 +164,8 @@ Resposta esperada:
 ```
 
 ### Excluir Categoria
+
+Autorizacao: funcionario da FAPES autenticado.
 
 Esta operacao nao recebe corpo. Ela exclui a categoria somente se ela nao estiver associada a nenhum formulario.
 
@@ -446,7 +452,7 @@ Resposta esperada:
 | HTTP | Codigo | Situacao |
 |------|--------|----------|
 | 401 | USUARIO_NAO_AUTENTICADO | Operacao exige autenticacao |
-| 403 | USUARIO_NAO_AUTORIZADO | Usuario autenticado nao e funcionario da FAPES ou nao e autor do formulario/resposta que tentou alterar/enviar |
+| 403 | USUARIO_NAO_AUTORIZADO | Usuario autenticado nao e funcionario da FAPES ou nao atende a autoria/permissao exigida para alterar categoria, formulario ou resposta |
 | 400 | PAYLOAD_INVALIDO | Dados obrigatorios ausentes ou invalidos |
 | 400 | FILTRO_OBRIGATORIO | Consulta de respostas sem `formularioId` |
 | 404 | FORMULARIO_NAO_ENCONTRADO | Formulario inexistente |

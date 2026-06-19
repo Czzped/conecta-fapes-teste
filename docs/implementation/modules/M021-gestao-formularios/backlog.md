@@ -18,7 +18,7 @@ O cadastro de categorias nao e fundamental para viabilizar a Release 1. Se isso 
 
 | ID | Titulo | Requisito | Prioridade | Status | Documento |
 |----|--------|-----------|------------|--------|-----------|
-| EPIC-M021-001 | Cadastrar Categoria de Formulario | RN14, RN15, RN27 | Should | To Do | [EPIC-M021-001](epics/EPIC-M021-001.md) |
+| EPIC-M021-001 | Cadastrar Categoria de Formulario | RN14, RN15, RN27, RN31 | Should | To Do | [EPIC-M021-001](epics/EPIC-M021-001.md) |
 | EPIC-M021-002 | Cadastrar Formulario de Caracterizacao | RN01-RN06, RN13, RN15-RN17, RN28-RN30 | Must | To Do | [EPIC-M021-002](epics/EPIC-M021-002.md) |
 | EPIC-M021-003 | Gerenciar Ciclo de Vida de Formulario | RN07-RN12 | Must | To Do | [EPIC-M021-003](epics/EPIC-M021-003.md) |
 | EPIC-M021-004 | Gerenciar Respostas de Formulario de Caracterizacao | RN09, RN12, RN17, RN24-RN26, RN28-RN29 | Must | To Do | [EPIC-M021-004](epics/EPIC-M021-004.md) |

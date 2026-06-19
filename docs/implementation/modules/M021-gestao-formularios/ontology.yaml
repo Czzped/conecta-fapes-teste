@@ -22,6 +22,8 @@ invariants:
     description: "Um formulario ou uma resposta a formulario so pode ser editado pelo proprio usuario autor do registro, respeitadas as restricoes de estado aplicaveis."
   - id: RN30
     description: "Qualquer funcionario da FAPES autenticado pode criar um formulario a partir de qualquer formulario existente, independentemente da autoria do formulario original."
+  - id: RN31
+    description: "Qualquer funcionario da FAPES autenticado pode criar, consultar, atualizar, excluir e listar categorias de formulario, respeitadas as demais regras aplicaveis."
 enums: {}
 value_objects: {}
 events:
@@ -37,6 +39,11 @@ policies:
       - "Criacao exige funcionario da FAPES autenticado."
       - "Edicao exige que o usuario solicitante seja o autor do registro."
       - "Copia de formulario nao exige autoria do formulario original."
+  permissionamento_categorias:
+    applies_to:
+      - CategoriaFormulario
+    rules:
+      - "Funcionalidades de categorias exigem funcionario da FAPES autenticado."
 
 agent_instructions:
   rules:
