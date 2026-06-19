@@ -88,14 +88,13 @@ jobs:
 
             echo ">>> $REPO"
 
-            # 1. Criar branch via git push
+            # 1. Criar branch
             TMP=$(mktemp -d)
             git -C "$TMP" init -q
             FETCH_ERR=$(git -C "$TMP" fetch --depth=1 --no-tags "$URL" develop 2>&1)
             if echo "$FETCH_ERR" | grep -q 'fatal'; then
               echo "  FAIL: $(echo "$FETCH_ERR" | tail -1)"; rm -rf "$TMP"; echo ""; continue
             fi
-
             PUSH_OUT=$(git -C "$TMP" push "$URL" FETCH_HEAD:refs/heads/$BRANCH 2>&1)
             rm -rf "$TMP"
 
@@ -117,10 +116,8 @@ jobs:
 
             if echo "$PR_RESP" | grep -q '"html_url"'; then
               echo "  ✓ PR: $(echo "$PR_RESP" | grep -oP '"html_url"\s*:\s*"\K[^"]+')"
-            elif echo "$PR_RESP" | grep -qi 'already exists'; then
-              echo "  = PR ja existe"
             else
-              echo "  ✗ PR: $(echo "$PR_RESP" | grep -oP '"message"\s*:\s*"([^"]+)"' | sed 's/"message":"//;s/"$//')"
+              echo "  ✗ $(echo "$PR_RESP" | tr '\n' ' ')"
             fi
 
             echo ""
