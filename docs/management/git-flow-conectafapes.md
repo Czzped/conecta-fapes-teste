@@ -121,38 +121,45 @@ Se a branch estiver fora do padrão, o status falha e o PR fica bloqueado até a
 
 ## 6. Release
 
-Quando um conjunto de entregas estiver pronto em `develop`, a release deve ser preparada com uma versão no formato:
+A release é preparada via **Action do GitHub** que detecta automaticamente a versão, gera changelog categorizado e cria branches + PRs.
 
-```text
-vX.Y
-```
+### Como funciona a detecção de versão
 
-Exemplo:
+O script analisa os commits desde a última tag em cada repositório usando [Conventional Commits](https://www.conventionalcommits.org/):
 
-```text
-v1.4
-```
+| Tipo de commit | Bump | Exemplo |
+|---|---|---|
+| `fix: ...` | **patch** | `v0.1.49 → v0.1.50` |
+| `feat: ...` | **minor** | `v0.1.49 → v0.2.0` |
+| `BREAKING CHANGE` ou `!:` | **major** | `v0.1.49 → v1.0.0` |
+
+Se houver commits `feat` e `fix` misturados, prevalece o maior (minor > patch).
 
 ### Como fazer (passo a passo)
 
-1. Acesse **Actions → [Release ConectaFapes](https://github.com/leds-conectafapes/conectafapes-project/actions/workflows/release-conectafapes.yml)** no repositório `conectafapes-project`.
+1. Acesse **Actions → [Release ConectaFapes](https://github.com/leds-conectafapes/conectafapes-project/actions/workflows/release-conectafapes.yml)**.
 2. Clique **Run workflow**.
-3. Preencha:
-   - **Versão** — deixe vazio para detectar automático, ou digite `vX.Y` manual
-   - **Repositórios** — `all` para todos, ou separe com vírgula (ex: `backend-admin, frontend-backoffice`)
-   - **Executar** — **desmarcado** = dry-run (só mostra o plano); **marcado** = cria branches + PRs
-4. Revise o plano exibido no log.
-5. Se estiver tudo certo, rode novamente com **Executar** marcado.
+3. Marque os repositórios que entram na release.
+4. **Deixe versão vazia** para detectar automático, ou digite manual.
+5. **Desmarque Executar** = dry-run (só mostra o plano + changelog).
+6. Revise o plano.
+7. Se estiver tudo certo, rode novamente com **Executar** marcado.
 
-A Action cria `release/vX.Y` a partir de `develop` em cada repositório e abre o PR para produção (`main` ou `master` conforme o repositório).
+A Action:
+- Cria `release/vX.Y.Z` a partir de `develop` em cada repositório
+- Abre PR para produção (`main` ou `master`) com **changelog categorizado** (Features, Bug Fixes, Breaking Changes)
+- A tag é criada automaticamente pelo worker **após o merge**
 
-**Importante:** a tag `vX.Y` ainda é criada automaticamente pelo worker **depois** do merge do PR em produção — você não precisa fazer nada nessa parte.
+### Exemplo de changelog gerado
 
-Exemplo do resultado:
+```markdown
+## Release v0.2.0
 
-```text
-release/v1.4 -> main
-release/v1.4 -> master
+### ✨ Features
+  - página de visualização de Pagamentos (dea9a95) (#282)
+
+### 🐛 Bug Fixes
+  - correção nos filtros de prestação de contas (97c7fb7) (#2260, #2261)
 ```
 
 ## 7. Hotfix
