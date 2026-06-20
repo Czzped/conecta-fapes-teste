@@ -38,17 +38,13 @@ on:
         type: boolean
         default: false
 
+env:
+  GH_TOKEN: ${{ secrets.PROJECTS_PAT }}
+
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Definir versao
-        id: version
-        run: |
-          V="${{ inputs.version }}"
-          [ -z "$V" ] && V="v1.0"
-          echo "version=$V" >> "$GITHUB_OUTPUT"
-
       - name: Montar lista de repositorios
         id: repos
         run: |
@@ -61,20 +57,103 @@ jobs:
           [ -z "$REPOS" ] && { echo "Selecione ao menos um repositorio"; exit 1; }
           echo "repos=$REPOS" >> "$GITHUB_OUTPUT"
 
+      - name: Detectar versao automatica
+        id: version
+        run: |
+          MANUAL="${{ inputs.version }}"
+          if [ -n "$MANUAL" ]; then
+            echo "version=$MANUAL" >> "$GITHUB_OUTPUT"
+            echo "Versao manual: $MANUAL"
+            exit 0
+          fi
+
+          # Buscar maior tag vX.Y.Z entre todos os repos selecionados
+          LATEST_MAJOR=0; LATEST_MINOR=0; LATEST_PATCH=0; LATEST_TAG=""
+          for REPO in ${{ steps.repos.outputs.repos }}; do
+            TAGS=$(gh api "repos/leds-conectafapes/$REPO/git/refs/tags" --jq '.[].ref | sub("refs/tags/"; "")' 2>/dev/null || true)
+            for TAG in $TAGS; do
+              if [[ "$TAG" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+                M=${BASH_REMATCH[1]}; m=${BASH_REMATCH[2]}; p=${BASH_REMATCH[3]}
+                if [ "$M" -gt "$LATEST_MAJOR" ] || { [ "$M" -eq "$LATEST_MAJOR" ] && [ "$m" -gt "$LATEST_MINOR" ]; } || { [ "$M" -eq "$LATEST_MAJOR" ] && [ "$m" -eq "$LATEST_MINOR" ] && [ "$p" -gt "$LATEST_PATCH" ]; }; then
+                  LATEST_MAJOR=$M; LATEST_MINOR=$m; LATEST_PATCH=$p; LATEST_TAG="$TAG"
+                fi
+              elif [[ "$TAG" =~ ^v([0-9]+)\.([0-9]+)$ ]]; then
+                M=${BASH_REMATCH[1]}; m=${BASH_REMATCH[2]}
+                if [ "$M" -gt "$LATEST_MAJOR" ] || { [ "$M" -eq "$LATEST_MAJOR" ] && [ "$m" -gt "$LATEST_MINOR" ]; }; then
+                  LATEST_MAJOR=$M; LATEST_MINOR=$m; LATEST_PATCH=0; LATEST_TAG="$TAG"
+                fi
+              fi
+            done
+          done
+
+          echo "Maior tag encontrada: $LATEST_TAG"
+
+          # Determinar tipo de bump analisando commits desde a ultima tag
+          BUMP="patch"
+          for REPO in ${{ steps.repos.outputs.repos }}; do
+            if [ -n "$LATEST_TAG" ]; then
+              COMMITS=$(gh api "repos/leds-conectafapes/$REPO/compare/$LATEST_TAG...develop" --jq '.commits[].commit.message' 2>/dev/null || true)
+            else
+              COMMITS=$(gh api "repos/leds-conectafapes/$REPO/commits?sha=develop&per_page=50" --jq '.[].commit.message' 2>/dev/null || true)
+            fi
+            for MSG in $COMMITS; do
+              MSG=$(echo "$MSG" | head -1)  # primeira linha
+              if echo "$MSG" | grep -qiE '^(feat|feature)'; then
+                [ "$BUMP" != "major" ] && BUMP="minor"
+              elif echo "$MSG" | grep -qi 'BREAKING CHANGE\|^BREAKING\|!:'; then
+                BUMP="major"
+              fi
+            done
+          done
+
+          # Calcular proxima versao
+          case "$BUMP" in
+            major) NEXT="v$((LATEST_MAJOR+1)).0.0" ;;
+            minor) NEXT="v$LATEST_MAJOR.$((LATEST_MINOR+1)).0" ;;
+            *)     NEXT="v$LATEST_MAJOR.$LATEST_MINOR.$((LATEST_PATCH+1))" ;;
+          esac
+
+          echo "Bump: $BUMP | Proxima versao: $NEXT"
+          echo "version=$NEXT" >> "$GITHUB_OUTPUT"
+          echo "type=$BUMP" >> "$GITHUB_OUTPUT"
+          echo "last_tag=$LATEST_TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Gerar changelog
+        id: changelog
+        run: |
+          TAG="${{ steps.version.outputs.last_tag }}"
+          echo "## Commits desde $TAG" > /tmp/changelog.md
+          echo "" >> /tmp/changelog.md
+
+          for REPO in ${{ steps.repos.outputs.repos }}; do
+            echo "### $REPO" >> /tmp/changelog.md
+            if [ -n "$TAG" ] && [ "$TAG" != "v0.0.0" ]; then
+              gh api "repos/leds-conectafapes/$REPO/compare/$TAG...develop" --jq '.commits[] | "- \(.commit.message | split("\n")[0])"' 2>/dev/null >> /tmp/changelog.md || echo "  (sem commits novos)" >> /tmp/changelog.md
+            else
+              gh api "repos/leds-conectafapes/$REPO/commits?sha=develop&per_page=50" --jq '.[].commit.message | split("\n")[0] | "- \(.)"' 2>/dev/null | head -20 >> /tmp/changelog.md || echo "  (sem commits)" >> /tmp/changelog.md
+            fi
+            echo "" >> /tmp/changelog.md
+          done
+          cat /tmp/changelog.md
+
       - name: Mostrar plano
         run: |
           V="${{ steps.version.outputs.version }}"
-          echo "=== RELEASE $V  —  ${{ inputs.execute && 'EXECUTAR' || 'DRY-RUN' }} ==="
+          echo "============================================"
+          echo "  RELEASE $V  (bump: ${{ steps.version.outputs.type }})"
+          echo "  Modo: ${{ inputs.execute && 'EXECUTAR' || 'DRY-RUN' }}"
+          echo "============================================"
+          echo ""
           for REPO in ${{ steps.repos.outputs.repos }}; do
             if [ "$REPO" = "leds-conectafapes-prestacao-de-contas" ]; then PROD="master"; else PROD="main"; fi
-            echo "  $REPO  →  release/$V -> $PROD"
+            echo "  [$REPO]  release/$V -> $PROD"
           done
+          echo ""
 
       - name: Executar
         if: ${{ inputs.execute }}
         env:
           REPO_TOKEN: ${{ secrets.PROJECTS_PAT }}
-          GH_TOKEN: ${{ secrets.PROJECTS_PAT }}
         run: |
           set -e
           VERSION="${{ steps.version.outputs.version }}"
@@ -87,25 +166,26 @@ jobs:
 
             echo ">>> $REPO"
 
-            # 1. Branch
+            # Branch
             TMP=$(mktemp -d)
             git -C "$TMP" init -q
-            git -C "$TMP" fetch -q --depth=1 --no-tags "$URL" develop || { echo "  FAIL: fetch develop"; rm -rf "$TMP"; continue; }
+            git -C "$TMP" fetch -q --depth=1 --no-tags "$URL" develop || { echo "  FAIL: fetch"; rm -rf "$TMP"; continue; }
             PUSH=$(git -C "$TMP" push "$URL" FETCH_HEAD:refs/heads/$BRANCH 2>&1 || true)
             rm -rf "$TMP"
 
             if   echo "$PUSH" | grep -q 'new branch';      then echo "  ✓ Branch $BRANCH"
             elif echo "$PUSH" | grep -q 'up-to-date\|up to date'; then echo "  = Branch $BRANCH (existe)"
-            elif echo "$PUSH" | grep -q 'remote rejected';  then echo "  ✗ $PUSH"; echo ""; continue
+            elif echo "$PUSH" | grep -q 'remote rejected';  then echo "  ✗ $PUSH"; continue
             else  echo "  ? $PUSH"
             fi
 
-            # 2. PR
+            # PR com changelog
+            BODY=$(cat /tmp/changelog.md | head -c 60000)  # limite da API
             PR=$(gh api "repos/$FULL/pulls" \
               -f title="Release $VERSION" \
               -f head="$BRANCH" \
               -f base="$PROD" \
-              -f body="Release $VERSION: integra develop em $PROD." 2>&1 || true)
+              -f body="$BODY" 2>&1 || true)
 
             PR_URL=$(echo "$PR" | grep -oP '"html_url"\s*:\s*"\K[^"]+' || true)
             if [ -n "$PR_URL" ]; then
