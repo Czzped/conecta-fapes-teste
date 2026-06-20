@@ -44,153 +44,37 @@ env:
 jobs:
   release:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/release
     steps:
-      - name: Montar lista de repositorios
-        id: repos
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Montar argumentos do release
+        id: args
         run: |
           REPOS=""
-          ${{ inputs.backend_admin }} && REPOS="$REPOS leds-conectafapes-backend-admin"
-          ${{ inputs.frontend_backoffice }} && REPOS="$REPOS leds-conectafapes-frontend-backoffice"
-          ${{ inputs.frontoffice_backend }} && REPOS="$REPOS leds-conectafapes-frontoffice-backend"
-          ${{ inputs.frontoffice_frontend }} && REPOS="$REPOS leds-conectafapes-frontoffice-frontend"
-          ${{ inputs.prestacao_de_contas }} && REPOS="$REPOS leds-conectafapes-prestacao-de-contas"
-          [ -z "$REPOS" ] && { echo "Selecione ao menos um repositorio"; exit 1; }
-          echo "repos=$REPOS" >> "$GITHUB_OUTPUT"
+          ${{ inputs.backend_admin }} && REPOS="$REPOS,backend-admin"
+          ${{ inputs.frontend_backoffice }} && REPOS="$REPOS,frontend-backoffice"
+          ${{ inputs.frontoffice_backend }} && REPOS="$REPOS,frontoffice-backend"
+          ${{ inputs.frontoffice_frontend }} && REPOS="$REPOS,frontoffice-frontend"
+          ${{ inputs.prestacao_de_contas }} && REPOS="$REPOS,prestacao-de-contas"
+          REPOS="${REPOS#,}"  # remove leading comma
 
-      - name: Detectar versao automatica
-        id: version
+          MODE="${{ inputs.execute && '--execute' || '--dry-run' }}"
+          VER="${{ inputs.version }}"
+          [ -n "$VER" ] && VER="--version $VER"
+
+          echo "args=$MODE --repos $REPOS $VER" >> "$GITHUB_OUTPUT"
+          echo "Repos: $REPOS | $MODE"
+
+      - name: Release
         run: |
-          MANUAL="${{ inputs.version }}"
-          if [ -n "$MANUAL" ]; then
-            echo "version=$MANUAL" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          LATEST_MAJOR=0; LATEST_MINOR=0; LATEST_PATCH=0; LATEST_TAG=""
-          for REPO in ${{ steps.repos.outputs.repos }}; do
-            TAGS=$(gh api "repos/leds-conectafapes/$REPO/git/refs/tags" --jq '.[].ref | sub("refs/tags/"; "")' 2>/dev/null || true)
-            for TAG in $TAGS; do
-              if [[ "$TAG" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
-                M=${BASH_REMATCH[1]}; m=${BASH_REMATCH[2]}; p=${BASH_REMATCH[3]}
-                if [ "$M" -gt "$LATEST_MAJOR" ] || { [ "$M" -eq "$LATEST_MAJOR" ] && [ "$m" -gt "$LATEST_MINOR" ]; } || { [ "$M" -eq "$LATEST_MAJOR" ] && [ "$m" -eq "$LATEST_MINOR" ] && [ "$p" -gt "$LATEST_PATCH" ]; }; then
-                  LATEST_MAJOR=$M; LATEST_MINOR=$m; LATEST_PATCH=$p; LATEST_TAG="$TAG"
-                fi
-              elif [[ "$TAG" =~ ^v([0-9]+)\.([0-9]+)$ ]]; then
-                M=${BASH_REMATCH[1]}; m=${BASH_REMATCH[2]}
-                if [ "$M" -gt "$LATEST_MAJOR" ] || { [ "$M" -eq "$LATEST_MAJOR" ] && [ "$m" -gt "$LATEST_MINOR" ]; }; then
-                  LATEST_MAJOR=$M; LATEST_MINOR=$m; LATEST_PATCH=0; LATEST_TAG="$TAG"
-                fi
-              fi
-            done
-          done
-
-          echo "Maior tag: ${LATEST_TAG:-nenhuma}"
-
-          # Analisar commits para decidir o bump
-          BUMP="patch"
-          for REPO in ${{ steps.repos.outputs.repos }}; do
-            if [ -n "$LATEST_TAG" ]; then
-              gh api "repos/leds-conectafapes/$REPO/compare/$LATEST_TAG...develop" --jq '.commits[].commit.message' 2>/dev/null || true
-            else
-              gh api "repos/leds-conectafapes/$REPO/commits?sha=develop&per_page=100" --jq '.[].commit.message' 2>/dev/null || true
-            fi | while IFS= read -r MSG; do
-              FIRST=$(echo "$MSG" | head -1)
-              if echo "$FIRST" | grep -qiE '^(feat|feature)[(:]'; then
-                [ "$BUMP" != "major" ] && echo "minor" > /tmp/bump_level
-              elif echo "$FIRST" | grep -qiE 'BREAKING CHANGE|!:'; then
-                echo "major" > /tmp/bump_level
-              fi
-            done
-            [ -f /tmp/bump_level ] && BUMP=$(cat /tmp/bump_level)
-          done
-
-          case "$BUMP" in
-            major) NEXT="v$((LATEST_MAJOR+1)).0.0" ;;
-            minor) NEXT="v$LATEST_MAJOR.$((LATEST_MINOR+1)).0" ;;
-            *)     NEXT="v$LATEST_MAJOR.$LATEST_MINOR.$((LATEST_PATCH+1))" ;;
-          esac
-
-          echo "Bump: $BUMP → $NEXT"
-          echo "version=$NEXT" >> "$GITHUB_OUTPUT"
-          echo "type=$BUMP" >> "$GITHUB_OUTPUT"
-          echo "last_tag=${LATEST_TAG:-v0.0.0}" >> "$GITHUB_OUTPUT"
-
-      - name: Gerar changelog
-        id: changelog
-        run: |
-          TAG="${{ steps.version.outputs.last_tag }}"
-          echo "## Release ${{ steps.version.outputs.version }}" > /tmp/changelog.md
-          echo "" >> /tmp/changelog.md
-
-          for REPO in ${{ steps.repos.outputs.repos }}; do
-            echo "### $REPO" >> /tmp/changelog.md
-            if [ "$TAG" != "v0.0.0" ]; then
-              gh api "repos/leds-conectafapes/$REPO/compare/$TAG...develop" --jq '.commits[] | "- \(.commit.message | split("\n")[0])"' 2>/dev/null >> /tmp/changelog.md || echo "  (sem commits novos)" >> /tmp/changelog.md
-            else
-              gh api "repos/leds-conectafapes/$REPO/commits?sha=develop&per_page=50" --jq '.[] | "- \(.commit.message | split("\n")[0])"' 2>/dev/null | head -20 >> /tmp/changelog.md || echo "  (sem commits)" >> /tmp/changelog.md
-            fi
-            echo "" >> /tmp/changelog.md
-          done
-          cat /tmp/changelog.md
-
-      - name: Mostrar plano
-        run: |
-          V="${{ steps.version.outputs.version }}"
-          echo ""
-          echo "============================================"
-          echo "  RELEASE $V  (${{ steps.version.outputs.type }})"
-          echo "  Modo: ${{ inputs.execute && 'EXECUTAR' || 'DRY-RUN' }}"
-          echo "============================================"
-          for REPO in ${{ steps.repos.outputs.repos }}; do
-            if [ "$REPO" = "leds-conectafapes-prestacao-de-contas" ]; then PROD="master"; else PROD="main"; fi
-            echo "  [$REPO]  release/$V -> $PROD"
-          done
-          echo ""
-
-      - name: Executar
-        if: ${{ inputs.execute }}
-        env:
-          REPO_TOKEN: ${{ secrets.PROJECTS_PAT }}
-        run: |
-          set -e
-          VERSION="${{ steps.version.outputs.version }}"
-
-          for REPO in ${{ steps.repos.outputs.repos }}; do
-            FULL="leds-conectafapes/$REPO"
-            if [ "$REPO" = "leds-conectafapes-prestacao-de-contas" ]; then PROD="master"; else PROD="main"; fi
-            BRANCH="release/$VERSION"
-            URL="https://x-access-token:$REPO_TOKEN@github.com/$FULL.git"
-
-            echo ">>> $REPO"
-
-            TMP=$(mktemp -d)
-            git -C "$TMP" init -q
-            git -C "$TMP" fetch -q --depth=1 --no-tags "$URL" develop || { echo "  FAIL: fetch develop"; rm -rf "$TMP"; continue; }
-            PUSH=$(git -C "$TMP" push "$URL" FETCH_HEAD:refs/heads/$BRANCH 2>&1 || true)
-            rm -rf "$TMP"
-
-            if   echo "$PUSH" | grep -q 'new branch';      then echo "  ✓ Branch $BRANCH"
-            elif echo "$PUSH" | grep -q 'up-to-date\|up to date'; then echo "  = Branch $BRANCH (existe)"
-            elif echo "$PUSH" | grep -q 'remote rejected';  then echo "  ✗ $PUSH"; continue
-            else  echo "  ? $PUSH"
-            fi
-
-            BODY=$(cat /tmp/changelog.md | head -c 60000)
-            PR=$(gh api "repos/$FULL/pulls" \
-              -f title="Release $VERSION" \
-              -f head="$BRANCH" \
-              -f base="$PROD" \
-              -f body="$BODY" 2>&1 || true)
-
-            PR_URL=$(echo "$PR" | grep -oP '"html_url"\s*:\s*"\K[^"]+' || true)
-            if [ -n "$PR_URL" ]; then
-              echo "  ✓ PR $PR_URL"
-            elif echo "$PR" | grep -qi 'already exists'; then
-              echo "  = PR ja existe"
-            else
-              echo "  ✗ $(echo "$PR" | tr '\n' ' ' | head -c 300 || true)"
-            fi
-
-            echo ""
-          done
-          echo "OK"
+          echo "Args: ${{ steps.args.outputs.args }}"
+          node release.mjs ${{ steps.args.outputs.args }}
