@@ -3,10 +3,6 @@ name: Release ConectaFapes
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: "Versao (ex: v1.5). Vazio = detectar automatico"
-        required: false
-        type: string
       execute:
         description: "EXECUTAR (desmarcado = dry-run)"
         required: false
@@ -16,22 +12,22 @@ on:
         description: "backend-admin"
         required: false
         type: boolean
-        default: true
+        default: false
       frontend_backoffice:
         description: "frontend-backoffice"
         required: false
         type: boolean
-        default: true
+        default: false
       frontoffice_backend:
         description: "frontoffice-backend"
         required: false
         type: boolean
-        default: true
+        default: false
       frontoffice_frontend:
         description: "frontoffice-frontend"
         required: false
         type: boolean
-        default: true
+        default: false
       prestacao_de_contas:
         description: "prestacao-de-contas"
         required: false
@@ -68,10 +64,8 @@ jobs:
           REPOS="${REPOS#,}"  # remove leading comma
 
           MODE="${{ inputs.execute && '--execute' || '--dry-run' }}"
-          VER="${{ inputs.version }}"
-          [ -n "$VER" ] && VER="--version $VER"
 
-          echo "args=$MODE --repos $REPOS $VER" >> "$GITHUB_OUTPUT"
+          echo "args=$MODE --repos $REPOS" >> "$GITHUB_OUTPUT"
           echo "Repos: $REPOS | $MODE"
 
       - name: Release
