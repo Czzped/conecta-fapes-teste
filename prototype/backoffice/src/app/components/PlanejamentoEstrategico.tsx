@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { Calendar, CheckCircle, ChevronRight, DollarSign, Edit3, Flag, Plus, Save, Search, Target, Trash2, X } from 'lucide-react';
+import { Calendar, CheckCircle, ChevronDown, ChevronRight, DollarSign, Edit3, Flag, Plus, Save, Search, Target, Trash2, X } from 'lucide-react';
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 import { ConfiguracoesPageHeader } from './ConfiguracoesPageHeader';
+import { BackofficeDatePicker } from './BackofficeDatePicker';
 
-type EstadoPlano = 'Ativo' | 'Em elaboração' | 'Encerrado';
+type EstadoPlano = 'Ativo' | 'Finalizado' | 'Rascunho';
 
 interface ProgramaAssociado {
   id: number;
@@ -67,9 +68,17 @@ const buildStyles = (T: ThemeTokens) => ({
 
 const estadoColor = (estado: EstadoPlano) => {
   if (estado === 'Ativo') return '#22c55e';
-  if (estado === 'Em elaboração') return '#f59e0b';
+  if (estado === 'Rascunho') return '#f59e0b';
   return '#a3a3a3';
 };
+
+const statusProgramaAssociado = (estado: string): 'Ativo' | 'Finalizado' => (
+  ['Finalizado', 'Encerrado'].includes(estado) ? 'Finalizado' : 'Ativo'
+);
+
+const statusProgramaColor = (status: 'Ativo' | 'Finalizado') => (
+  status === 'Ativo' ? '#22c55e' : '#a3a3a3'
+);
 
 const formatCurrency = (value: number) => (
   `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -97,10 +106,10 @@ const planosIniciais: PlanoEstrategico[] = [
         programas: 4,
         valorInvestido: 8400000,
         programasAssociados: [
-          { id: 1, nome: 'Programa de Pesquisa Aplicada', estado: 'Vigente', valorInvestido: 2900000 },
-          { id: 2, nome: 'Programa de Inovação Aberta', estado: 'Vigente', valorInvestido: 2100000 },
-          { id: 3, nome: 'Programa de Laboratórios Estratégicos', estado: 'Em elaboração', valorInvestido: 1800000 },
-          { id: 4, nome: 'Programa de Transferência Tecnológica', estado: 'Vigente', valorInvestido: 1600000 },
+          { id: 1, nome: 'Programa de Pesquisa Aplicada', estado: 'Ativo', valorInvestido: 2900000 },
+          { id: 2, nome: 'Programa de Inovação Aberta', estado: 'Ativo', valorInvestido: 2100000 },
+          { id: 3, nome: 'Programa de Laboratórios Estratégicos', estado: 'Ativo', valorInvestido: 1800000 },
+          { id: 4, nome: 'Programa de Transferência Tecnológica', estado: 'Ativo', valorInvestido: 1600000 },
         ],
       },
       {
@@ -110,9 +119,9 @@ const planosIniciais: PlanoEstrategico[] = [
         programas: 3,
         valorInvestido: 5200000,
         programasAssociados: [
-          { id: 5, nome: 'Programa Territórios Sustentáveis', estado: 'Vigente', valorInvestido: 2200000 },
-          { id: 6, nome: 'Programa Economia Verde', estado: 'Vigente', valorInvestido: 1700000 },
-          { id: 7, nome: 'Programa Cidades Resilientes', estado: 'Suspenso', valorInvestido: 1300000 },
+          { id: 5, nome: 'Programa Territórios Sustentáveis', estado: 'Ativo', valorInvestido: 2200000 },
+          { id: 6, nome: 'Programa Economia Verde', estado: 'Ativo', valorInvestido: 1700000 },
+          { id: 7, nome: 'Programa Cidades Resilientes', estado: 'Finalizado', valorInvestido: 1300000 },
         ],
       },
       {
@@ -122,11 +131,11 @@ const planosIniciais: PlanoEstrategico[] = [
         programas: 5,
         valorInvestido: 7300000,
         programasAssociados: [
-          { id: 8, nome: 'Programa de Bolsas de Mestrado', estado: 'Vigente', valorInvestido: 1800000 },
-          { id: 9, nome: 'Programa de Bolsas de Doutorado', estado: 'Vigente', valorInvestido: 2200000 },
-          { id: 10, nome: 'Programa Pesquisador Visitante', estado: 'Vigente', valorInvestido: 950000 },
-          { id: 11, nome: 'Programa Jovens Cientistas', estado: 'Em elaboração', valorInvestido: 1150000 },
-          { id: 12, nome: 'Programa Fixação de Talentos', estado: 'Vigente', valorInvestido: 1200000 },
+          { id: 8, nome: 'Programa de Bolsas de Mestrado', estado: 'Ativo', valorInvestido: 1800000 },
+          { id: 9, nome: 'Programa de Bolsas de Doutorado', estado: 'Ativo', valorInvestido: 2200000 },
+          { id: 10, nome: 'Programa Pesquisador Visitante', estado: 'Ativo', valorInvestido: 950000 },
+          { id: 11, nome: 'Programa Jovens Cientistas', estado: 'Ativo', valorInvestido: 1150000 },
+          { id: 12, nome: 'Programa Fixação de Talentos', estado: 'Ativo', valorInvestido: 1200000 },
         ],
       },
     ],
@@ -137,7 +146,7 @@ const planosIniciais: PlanoEstrategico[] = [
     descricao: 'Ciclo estratégico anterior, usado como referência histórica para continuidade de programas.',
     dataInicio: '01/01/2022',
     dataFim: '31/12/2025',
-    estado: 'Encerrado',
+    estado: 'Finalizado',
     eixos: [
       {
         id: 1,
@@ -146,12 +155,12 @@ const planosIniciais: PlanoEstrategico[] = [
         programas: 6,
         valorInvestido: 6900000,
         programasAssociados: [
-          { id: 13, nome: 'Programa Universal de Pesquisa', estado: 'Encerrado', valorInvestido: 1800000 },
-          { id: 14, nome: 'Programa Primeiros Projetos', estado: 'Encerrado', valorInvestido: 900000 },
-          { id: 15, nome: 'Programa Núcleos Emergentes', estado: 'Encerrado', valorInvestido: 1200000 },
-          { id: 16, nome: 'Programa Infraestrutura de Pesquisa', estado: 'Encerrado', valorInvestido: 1400000 },
-          { id: 17, nome: 'Programa Cooperação Científica', estado: 'Encerrado', valorInvestido: 850000 },
-          { id: 18, nome: 'Programa Redes Temáticas', estado: 'Encerrado', valorInvestido: 750000 },
+          { id: 13, nome: 'Programa Universal de Pesquisa', estado: 'Finalizado', valorInvestido: 1800000 },
+          { id: 14, nome: 'Programa Primeiros Projetos', estado: 'Finalizado', valorInvestido: 900000 },
+          { id: 15, nome: 'Programa Núcleos Emergentes', estado: 'Finalizado', valorInvestido: 1200000 },
+          { id: 16, nome: 'Programa Infraestrutura de Pesquisa', estado: 'Finalizado', valorInvestido: 1400000 },
+          { id: 17, nome: 'Programa Cooperação Científica', estado: 'Finalizado', valorInvestido: 850000 },
+          { id: 18, nome: 'Programa Redes Temáticas', estado: 'Finalizado', valorInvestido: 750000 },
         ],
       },
       {
@@ -161,9 +170,9 @@ const planosIniciais: PlanoEstrategico[] = [
         programas: 3,
         valorInvestido: 3600000,
         programasAssociados: [
-          { id: 19, nome: 'Programa Centelha', estado: 'Encerrado', valorInvestido: 1400000 },
-          { id: 20, nome: 'Programa Tecnova', estado: 'Encerrado', valorInvestido: 1600000 },
-          { id: 21, nome: 'Programa Ambientes de Inovação', estado: 'Encerrado', valorInvestido: 600000 },
+          { id: 19, nome: 'Programa Centelha', estado: 'Finalizado', valorInvestido: 1400000 },
+          { id: 20, nome: 'Programa Tecnova', estado: 'Finalizado', valorInvestido: 1600000 },
+          { id: 21, nome: 'Programa Ambientes de Inovação', estado: 'Finalizado', valorInvestido: 600000 },
         ],
       },
     ],
@@ -174,7 +183,7 @@ const planosIniciais: PlanoEstrategico[] = [
     descricao: 'Rascunho inicial para o próximo ciclo de planejamento institucional.',
     dataInicio: '01/01/2030',
     dataFim: '31/12/2033',
-    estado: 'Em elaboração',
+    estado: 'Rascunho',
     eixos: [
       {
         id: 1,
@@ -202,13 +211,16 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
   const [selectedPlanoId, setSelectedPlanoId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [estadoFilter, setEstadoFilter] = useState<EstadoPlano | 'Todos'>('Todos');
+  const [statusFilterOpen, setStatusFilterOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'cadastro' | 'dashboard'>('cadastro');
   const [editing, setEditing] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [draftPlano, setDraftPlano] = useState<Omit<PlanoEstrategico, 'eixos'> | null>(null);
   const [novoEixo, setNovoEixo] = useState({
     nome: '',
     descricao: '',
   });
+  const [eixosCriacao, setEixosCriacao] = useState(['']);
   const [editingEixoId, setEditingEixoId] = useState<number | null>(null);
   const [selectedEixoDashboardId, setSelectedEixoDashboardId] = useState<number | null>(null);
   const [draftEixo, setDraftEixo] = useState({
@@ -232,10 +244,12 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
     setDraftPlano(planoSemEixos(plano));
     setActiveTab('cadastro');
     setEditing(false);
+    setCreating(false);
     setNovoEixo({ nome: '', descricao: '' });
     setEditingEixoId(null);
     setSelectedEixoDashboardId(null);
     setDraftEixo({ nome: '', descricao: '' });
+    setEixosCriacao(['']);
   };
 
   const criarPlano = () => {
@@ -245,7 +259,7 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
       descricao: 'Descreva as diretrizes estratégicas deste ciclo.',
       dataInicio: '',
       dataFim: '',
-      estado: 'Em elaboração',
+      estado: 'Rascunho',
       eixos: [],
     };
     setPlanos(prev => [...prev, novoPlano]);
@@ -253,6 +267,7 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
     setDraftPlano(planoSemEixos(novoPlano));
     setActiveTab('cadastro');
     setEditing(true);
+    setCreating(true);
     setEditingEixoId(null);
     setSelectedEixoDashboardId(null);
     setDraftEixo({ nome: '', descricao: '' });
@@ -265,6 +280,16 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
       return { ...plano, ...draftPlano };
     }));
     setEditing(false);
+    setCreating(false);
+  };
+
+  const ativarPlano = () => {
+    if (!draftPlano) return;
+    const ativo = { ...draftPlano, estado: 'Ativo' as EstadoPlano };
+    setDraftPlano(ativo);
+    setPlanos(prev => prev.map(plano => plano.id === ativo.id ? { ...plano, ...ativo } : plano));
+    setEditing(false);
+    setCreating(false);
   };
 
   const adicionarEixo = () => {
@@ -320,21 +345,20 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
     return (
       <div style={{ padding: '32px' }}>
         <Header
-          title="Planejamentos Estratégicos"
+          title="Planejamento Estratégico"
           subtitle="Gerencie os ciclos estratégicos e abra um planejamento para cadastrar seus eixos."
           onBack={onBack}
-          action={<SmallButton icon={<Plus size={14} />} label="Novo planejamento" onClick={criarPlano} />}
+          action={<SmallButton icon={<Plus size={14} />} label="Criar Planejamento" onClick={criarPlano} filled />}
         />
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-          <MetricCard icon={<CheckCircle size={20} />} label="Planejamento ativo" value={planoAtivo?.nome || 'Nenhum'} color="#22c55e" />
-          <MetricCard icon={<Target size={20} />} label="Total de planejamentos" value={String(planos.length)} color="#38bdf8" />
-          <MetricCard icon={<Flag size={20} />} label="Eixos cadastrados" value={String(planos.reduce((total, plano) => total + plano.eixos.length, 0))} color="#fbbf24" />
-          <MetricCard icon={<Calendar size={20} />} label="Em elaboração" value={String(planos.filter(plano => plano.estado === 'Em elaboração').length)} color="#a855f7" />
+          <MetricCard icon={<CheckCircle size={20} />} label="Planejamento ativo" value={planoAtivo?.nome || 'Nenhum'} />
+          <MetricCard icon={<Target size={20} />} label="Total de planejamentos" value={String(planos.length)} />
+          <MetricCard icon={<Flag size={20} />} label="Eixos cadastrados" value={String(planos.reduce((total, plano) => total + plano.eixos.length, 0))} />
+          <MetricCard icon={<Calendar size={20} />} label="Rascunho" value={String(planos.filter(plano => plano.estado === 'Rascunho').length)} />
         </div>
 
-        <div style={{ ...S.card, marginBottom: '24px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', marginBottom: '24px' }}>
             <div>
               <label style={S.label}>Pesquisar</label>
               <div style={{ position: 'relative' }}>
@@ -347,15 +371,23 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
                 <Search size={17} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
               </div>
             </div>
-            <Field label="Estado">
-              <select value={estadoFilter} onChange={(event) => setEstadoFilter(event.target.value as EstadoPlano | 'Todos')} style={S.input}>
-                <option>Todos</option>
-                <option>Ativo</option>
-                <option>Em elaboração</option>
-                <option>Encerrado</option>
-              </select>
-            </Field>
-          </div>
+            <SystemDropdown
+              label="Status"
+              value={estadoFilter}
+              options={['Todos', 'Ativo', 'Finalizado', 'Rascunho']}
+              isOpen={statusFilterOpen}
+              onOpen={() => setStatusFilterOpen(open => !open)}
+              onChange={value => {
+                setEstadoFilter(value as EstadoPlano | 'Todos');
+                setStatusFilterOpen(false);
+              }}
+            />
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '12px' }}>
+          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary }}>
+            Exibindo {Math.min(filteredPlanos.length, 10)} resultados de {filteredPlanos.length}
+          </span>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -365,7 +397,7 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
               onClick={() => openPlano(plano)}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '2fr 1fr 1fr 0.8fr 1fr 40px',
+                gridTemplateColumns: '2fr 0.7fr 1.15fr 1fr 1fr 40px',
                 gap: '16px',
                 alignItems: 'center',
                 width: '100%',
@@ -378,13 +410,13 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
               }}
             >
               <ReadCell label="Planejamento" value={plano.nome} strong />
+              <ReadCell label="Eixos" value={String(plano.eixos.length)} />
+              <ReadCell label="Vigência" value={`${plano.dataInicio || 'Pendente'} - ${plano.dataFim || 'Pendente'}`} />
+              <ReadCell label="Programas Vinculados" value={String(plano.eixos.reduce((total, eixo) => total + totalProgramasEixo(eixo), 0))} />
               <div>
-                <div style={S.cellLabel}>Estado</div>
+                <div style={S.cellLabel}>Status</div>
                 <StatusBadge label={plano.estado} color={estadoColor(plano.estado)} />
               </div>
-              <ReadCell label="Vigência" value={`${plano.dataInicio || 'Pendente'} - ${plano.dataFim || 'Pendente'}`} />
-              <ReadCell label="Eixos" value={String(plano.eixos.length)} />
-              <ReadCell label="Programas vinculados" value={String(plano.eixos.reduce((total, eixo) => total + totalProgramasEixo(eixo), 0))} />
               <ChevronRight size={18} style={{ color: T.iconSubdued, justifySelf: 'center' }} />
             </button>
           ))}
@@ -399,35 +431,84 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
   const currentDraft = draftPlano || planoSemEixos(selectedPlano);
   const selectedEixoDashboard = selectedPlano.eixos.find(eixo => eixo.id === selectedEixoDashboardId) || null;
 
+  if (creating) {
+    return (
+      <div style={{ padding: '32px' }}>
+        <Header
+          title="Criar Planejamento Estratégico"
+          subtitle="Preencha as informações abaixo para criar um novo planejamento estratégico."
+          onBack={onBack}
+          breadcrumbParent="Planejamento Estratégico"
+          breadcrumbTitle="Criar Planejamento"
+          onBreadcrumbParentClick={() => setSelectedPlanoId(null)}
+        />
+
+        <div style={{ ...S.card, marginBottom: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '22px' }}>
+            <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: T.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: T.accentText }}>1</span>
+            </div>
+            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+              Identificação do Planejamento
+            </h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+            <Field label="Nome">
+              <input value={currentDraft.nome} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, nome: event.target.value } : prev)} style={S.input} />
+            </Field>
+            <Field label="Data de Início">
+              <BackofficeDatePicker value={currentDraft.dataInicio} onChange={(value) => setDraftPlano(prev => prev ? { ...prev, dataInicio: value } : prev)} style={S.input} />
+            </Field>
+            <Field label="Data de Fim">
+              <BackofficeDatePicker value={currentDraft.dataFim} onChange={(value) => setDraftPlano(prev => prev ? { ...prev, dataFim: value } : prev)} style={S.input} />
+            </Field>
+          </div>
+
+          <Field label="Descrição">
+            <textarea value={currentDraft.descricao} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, descricao: event.target.value } : prev)} rows={4} style={{ ...S.input, resize: 'vertical' }} />
+          </Field>
+
+          <div style={{ display: 'grid', gap: '14px', marginTop: '16px' }}>
+            {eixosCriacao.map((eixo, index) => (
+              <Field key={index} label={index === 0 ? 'Eixo Estratégico' : `Eixo Estratégico ${index + 1}`}>
+                <input
+                  value={eixo}
+                  onChange={(event) => setEixosCriacao(prev => prev.map((item, itemIndex) => itemIndex === index ? event.target.value : item))}
+                  placeholder="Digite o eixo estratégico"
+                  style={S.input}
+                />
+              </Field>
+            ))}
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <SmallButton icon={<Plus size={14} />} label="Adicionar Eixo" onClick={() => setEixosCriacao(prev => [...prev, ''])} />
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+          <SmallButton icon={null} label="Salvar Rascunho" onClick={salvarPlano} muted />
+          <SmallButton icon={null} label="Ativar Planejamento" onClick={ativarPlano} filled />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ padding: '32px' }}>
       <Header
         title={selectedPlano.nome}
         subtitle="Cadastro do planejamento estratégico e gestão dos eixos associados."
         onBack={onBack}
-        action={editing ? (
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <SmallButton icon={<X size={14} />} label="Cancelar" onClick={() => { setDraftPlano(planoSemEixos(selectedPlano)); setEditing(false); }} muted />
-            <SmallButton icon={<Save size={14} />} label="Salvar" onClick={salvarPlano} />
-          </div>
-        ) : (
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <SmallButton icon={<X size={14} />} label="Voltar" onClick={() => setSelectedPlanoId(null)} muted />
-            <SmallButton icon={<Edit3 size={14} />} label="Editar plano" onClick={() => setEditing(true)} />
-          </div>
-        )}
+        breadcrumbParent="Planejamento Estratégico"
+        breadcrumbTitle="Detalhes"
+        onBreadcrumbParentClick={() => setSelectedPlanoId(null)}
+        hideDivider
       />
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-        <MetricCard icon={<CheckCircle size={20} />} label="Estado" value={selectedPlano.estado} color={estadoColor(selectedPlano.estado)} />
-        <MetricCard icon={<Calendar size={20} />} label="Vigência" value={`${selectedPlano.dataInicio || 'Pendente'} - ${selectedPlano.dataFim || 'Pendente'}`} color="#38bdf8" />
-        <MetricCard icon={<Flag size={20} />} label="Eixos" value={String(selectedPlano.eixos.length)} color="#fbbf24" />
-        <MetricCard icon={<DollarSign size={20} />} label="Valor investido" value={formatCurrency(totalInvestido)} color="#a855f7" />
-      </div>
 
       <div style={{ display: 'flex', gap: '4px', borderBottom: `1px solid ${T.borderSubtle}`, marginBottom: '24px' }}>
         {[
-          { id: 'cadastro', label: 'Cadastro' },
+          { id: 'cadastro', label: 'Informações Gerais' },
           { id: 'dashboard', label: 'Dashboard' },
         ].map(tab => (
           <button
@@ -443,122 +524,50 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
       {activeTab === 'cadastro' && (
         <>
           <div style={{ ...S.card, marginBottom: '24px' }}>
-            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 20px' }}>
-              Cadastro do plano
-            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '22px' }}>
+              <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: T.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: T.accentText }}>1</span>
+              </div>
+              <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+                Identificação do Planejamento
+              </h2>
+            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>
               <Field label="Nome">
-                {editing ? (
-                  <input value={currentDraft.nome} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, nome: event.target.value } : prev)} style={S.input} />
-                ) : (
-                  <ReadValue value={selectedPlano.nome} />
-                )}
+                <ReadValue value={selectedPlano.nome} />
               </Field>
-              <Field label="Início">
-                {editing ? (
-                  <input value={currentDraft.dataInicio} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, dataInicio: event.target.value } : prev)} style={S.input} />
-                ) : (
-                  <ReadValue value={selectedPlano.dataInicio || 'Pendente'} />
-                )}
+              <Field label="Data de Início">
+                <ReadValue value={selectedPlano.dataInicio || 'Pendente'} />
               </Field>
-              <Field label="Fim">
-                {editing ? (
-                  <input value={currentDraft.dataFim} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, dataFim: event.target.value } : prev)} style={S.input} />
-                ) : (
-                  <ReadValue value={selectedPlano.dataFim || 'Pendente'} />
-                )}
-              </Field>
-              <Field label="Estado">
-                {editing ? (
-                  <select value={currentDraft.estado} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, estado: event.target.value as EstadoPlano } : prev)} style={S.input}>
-                    <option>Ativo</option>
-                    <option>Em elaboração</option>
-                    <option>Encerrado</option>
-                  </select>
-                ) : (
-                  <ReadValue value={selectedPlano.estado} />
-                )}
+              <Field label="Data de Fim">
+                <ReadValue value={selectedPlano.dataFim || 'Pendente'} />
               </Field>
             </div>
 
             <Field label="Descrição">
-              {editing ? (
-                <textarea value={currentDraft.descricao} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, descricao: event.target.value } : prev)} rows={4} style={{ ...S.input, resize: 'vertical' }} />
-              ) : (
-                <ReadValue value={selectedPlano.descricao} />
-              )}
+              <ReadValue value={selectedPlano.descricao} />
             </Field>
-          </div>
 
-          <div style={{ ...S.card, marginBottom: '24px' }}>
-            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 20px' }}>
-              Novo eixo estratégico
-            </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr auto', gap: '16px', alignItems: 'end' }}>
-              <Field label="Nome do eixo">
-                <input value={novoEixo.nome} onChange={(event) => setNovoEixo(prev => ({ ...prev, nome: event.target.value }))} placeholder="Ex.: Saúde e bem-estar" style={S.input} />
-              </Field>
-              <Field label="Descrição">
-                <input value={novoEixo.descricao} onChange={(event) => setNovoEixo(prev => ({ ...prev, descricao: event.target.value }))} placeholder="Orientação estratégica do eixo" style={S.input} />
-              </Field>
-              <SmallButton icon={<Plus size={14} />} label="Adicionar" onClick={adicionarEixo} />
-            </div>
-          </div>
-
-          <div style={S.card}>
-            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 20px' }}>
-              Eixos estratégicos cadastrados
-            </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {selectedPlano.eixos.map(eixo => {
-                const isEditingEixo = editingEixoId === eixo.id;
-                return (
-                  <div
-                    key={eixo.id}
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1.4fr 0.55fr 0.9fr 1.8fr auto',
-                      gap: '16px',
-                      alignItems: 'center',
-                      padding: '16px',
-                      backgroundColor: T.bgSurfaceMuted,
-                      border: `1px solid ${T.borderSubtle}`,
-                      borderRadius: '8px',
-                    }}
-                  >
-                    <Field label="Eixo">
-                      {isEditingEixo ? (
-                        <input value={draftEixo.nome} onChange={(event) => setDraftEixo(prev => ({ ...prev, nome: event.target.value }))} style={S.input} />
-                      ) : (
-                        <ReadValue value={eixo.nome} />
-                      )}
-                    </Field>
-                    <ReadCell label="Programas" value={String(totalProgramasEixo(eixo))} />
-                    <ReadCell label="Valor investido" value={formatCurrency(eixo.valorInvestido)} />
-                    <Field label="Descrição">
-                      {isEditingEixo ? (
-                        <input value={draftEixo.descricao} onChange={(event) => setDraftEixo(prev => ({ ...prev, descricao: event.target.value }))} style={S.input} />
-                      ) : (
-                        <ReadValue value={eixo.descricao} />
-                      )}
-                    </Field>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
-                      {isEditingEixo ? (
-                        <>
-                          <IconButton icon={<X size={15} />} label="Cancelar edição" onClick={cancelarEdicaoEixo} muted />
-                          <IconButton icon={<Save size={15} />} label="Salvar eixo" onClick={salvarEdicaoEixo} />
-                        </>
-                      ) : (
-                        <>
-                          <IconButton icon={<Edit3 size={15} />} label="Editar eixo" onClick={() => iniciarEdicaoEixo(eixo)} />
-                          <IconButton icon={<Trash2 size={15} />} label="Remover eixo" onClick={() => removerEixo(eixo.id)} danger />
-                        </>
-                      )}
+            <div style={{ marginTop: '20px' }}>
+              <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 16px' }}>
+                Eixos Estratégicos
+              </h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {selectedPlano.eixos.map(eixo => (
+                    <div
+                      key={eixo.id}
+                      style={{
+                        padding: '16px',
+                        backgroundColor: T.bgSurfaceMuted,
+                        border: `1px solid ${T.borderSubtle}`,
+                        borderRadius: '8px',
+                      }}
+                    >
+                      <ReadCell label="Eixo" value={eixo.nome} strong />
                     </div>
-                  </div>
-                );
-              })}
+                ))}
+              </div>
             </div>
           </div>
         </>
@@ -624,23 +633,31 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
               selectedEixoDashboard.programasAssociados && selectedEixoDashboard.programasAssociados.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {selectedEixoDashboard.programasAssociados.map(programa => (
-                    <div
-                      key={programa.id}
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1.7fr 0.8fr 0.9fr',
-                        gap: '16px',
-                        alignItems: 'center',
-                        padding: '14px 16px',
-                        backgroundColor: T.bgSurfaceMuted,
-                        border: `1px solid ${T.borderSubtle}`,
-                        borderRadius: '8px',
-                      }}
-                    >
-                      <ReadCell label="Programa" value={programa.nome} strong />
-                      <ReadCell label="Estado" value={programa.estado} />
-                      <ReadCell label="Valor investido" value={formatCurrency(programa.valorInvestido)} />
-                    </div>
+                    (() => {
+                      const status = statusProgramaAssociado(programa.estado);
+                      return (
+                        <div
+                          key={programa.id}
+                          style={{
+                            display: 'grid',
+                            gridTemplateColumns: '1.7fr 0.9fr 0.8fr',
+                            gap: '16px',
+                            alignItems: 'center',
+                            padding: '14px 16px',
+                            backgroundColor: T.bgSurfaceMuted,
+                            border: `1px solid ${T.borderSubtle}`,
+                            borderRadius: '8px',
+                          }}
+                        >
+                          <ReadCell label="Programa" value={programa.nome.replace(/^Programa de\s+/i, '').replace(/^Programa\s+/i, '')} strong />
+                          <ReadCell label="Valor investido" value={formatCurrency(programa.valorInvestido)} />
+                          <div>
+                            <div style={S.cellLabel}>Status</div>
+                            <StatusBadge label={status} color={statusProgramaColor(status)} />
+                          </div>
+                        </div>
+                      );
+                    })()
                   ))}
                 </div>
               ) : (
@@ -656,9 +673,92 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
   );
 };
 
-const Header: React.FC<{ title: string; subtitle: string; action: React.ReactNode; onBack: () => void }> = ({ title, subtitle, action, onBack }) => (
-  <ConfiguracoesPageHeader title={title} subtitle={subtitle} icon={Target} onBack={onBack} action={action} />
+const Header: React.FC<{ title: string; subtitle: string; action?: React.ReactNode; onBack: () => void; breadcrumbParent?: string; breadcrumbTitle?: string; onBreadcrumbParentClick?: () => void; hideDivider?: boolean }> = ({ title, subtitle, action, onBack, breadcrumbParent, breadcrumbTitle, onBreadcrumbParentClick, hideDivider }) => (
+  <ConfiguracoesPageHeader title={title} subtitle={subtitle} icon={Target} onBack={onBack} action={action} breadcrumbParent={breadcrumbParent} breadcrumbTitle={breadcrumbTitle} onBreadcrumbParentClick={onBreadcrumbParentClick} hideDivider={hideDivider} />
 );
+
+const SystemDropdown: React.FC<{
+  label: string;
+  value: string;
+  options: string[];
+  isOpen: boolean;
+  onOpen: () => void;
+  onChange: (value: string) => void;
+}> = ({ label, value, options, isOpen, onOpen, onChange }) => {
+  const { T } = useThemeTokens();
+  const S = buildStyles(T);
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <label style={S.label}>{label}</label>
+      <button
+        type="button"
+        onClick={onOpen}
+        style={{
+          ...S.input,
+          minHeight: '42px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '12px',
+          cursor: 'pointer',
+          textAlign: 'left',
+          border: `1px solid ${isOpen ? T.accent : T.borderDefault}`,
+        }}
+      >
+        <span>{value}</span>
+        <ChevronDown size={16} style={{ color: T.iconSubdued, flexShrink: 0 }} />
+      </button>
+      {isOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 6px)',
+            left: 0,
+            right: 0,
+            zIndex: 30,
+            backgroundColor: '#171717',
+            border: `1px solid ${T.borderDefault}`,
+            borderRadius: 'var(--radius)',
+            boxShadow: '0 18px 50px rgba(0,0,0,0.45)',
+            overflow: 'hidden',
+          }}
+        >
+          {options.map(option => {
+            const selected = option === value;
+            return (
+              <button
+                key={option}
+                type="button"
+                onClick={() => onChange(option)}
+                style={{
+                  width: '100%',
+                  minHeight: '42px',
+                  padding: '10px 12px',
+                  border: 'none',
+                  backgroundColor: selected ? 'rgba(0,193,175,0.12)' : '#171717',
+                  color: selected ? T.accent : T.textPrimary,
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-sm)',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={event => {
+                  event.currentTarget.style.backgroundColor = selected ? 'rgba(0,193,175,0.16)' : 'rgba(38,38,38,0.95)';
+                }}
+                onMouseLeave={event => {
+                  event.currentTarget.style.backgroundColor = selected ? 'rgba(0,193,175,0.12)' : '#171717';
+                }}
+              >
+                {option}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const Field: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => {
   const { T } = useThemeTokens();
@@ -681,13 +781,14 @@ const ReadValue: React.FC<{ value: string }> = ({ value }) => {
   );
 };
 
-const MetricCard: React.FC<{ icon: React.ReactNode; label: string; value: string; color: string }> = ({ icon, label, value, color }) => {
+const MetricCard: React.FC<{ icon: React.ReactNode; label: string; value: string; color?: string }> = ({ icon, label, value }) => {
   const { T } = useThemeTokens();
   const S = buildStyles(T);
+  const iconColor = T.accent;
   return (
     <div style={S.card}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: `${color}1f`, borderRadius: 'var(--radius)', color }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: T.accentSoft, borderRadius: 'var(--radius)', color: iconColor }}>
           {icon}
         </div>
         <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
@@ -701,7 +802,7 @@ const MetricCard: React.FC<{ icon: React.ReactNode; label: string; value: string
   );
 };
 
-const SmallButton: React.FC<{ icon: React.ReactNode; label: string; onClick: () => void; muted?: boolean }> = ({ icon, label, onClick, muted }) => {
+const SmallButton: React.FC<{ icon: React.ReactNode; label: string; onClick: () => void; muted?: boolean; filled?: boolean }> = ({ icon, label, onClick, muted, filled }) => {
   const { T } = useThemeTokens();
   return (
     <button
@@ -714,9 +815,9 @@ const SmallButton: React.FC<{ icon: React.ReactNode; label: string; onClick: () 
         minHeight: '38px',
         padding: '9px 13px',
         borderRadius: 'var(--radius)',
-        border: muted ? `1px solid ${T.borderDefault}` : `1px solid ${T.accent}`,
-        backgroundColor: muted ? T.bgSurfaceMuted : T.accentSoft,
-        color: muted ? T.textSecondary : T.accent,
+        border: muted ? `1px solid ${T.borderDefault}` : filled ? 'none' : `1px solid ${T.accent}`,
+        backgroundColor: muted ? T.bgSurfaceMuted : filled ? T.accent : T.accentSoft,
+        color: muted ? T.textSecondary : filled ? T.accentText : T.accent,
         fontFamily: 'var(--font-family)',
         fontSize: 'var(--text-sm)',
         fontWeight: 'var(--font-weight-medium)',

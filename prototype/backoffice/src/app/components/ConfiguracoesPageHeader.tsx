@@ -8,9 +8,13 @@ interface ConfiguracoesPageHeaderProps {
   icon: LucideIcon;
   onBack: () => void;
   action?: React.ReactNode;
+  breadcrumbParent?: string;
+  breadcrumbTitle?: string;
+  onBreadcrumbParentClick?: () => void;
+  hideDivider?: boolean;
 }
 
-export const ConfiguracoesPageHeader: React.FC<ConfiguracoesPageHeaderProps> = ({ title, subtitle, icon: Icon, onBack, action }) => {
+export const ConfiguracoesPageHeader: React.FC<ConfiguracoesPageHeaderProps> = ({ title, subtitle, icon: Icon, onBack, action, breadcrumbParent, breadcrumbTitle, onBreadcrumbParentClick, hideDivider = false }) => {
   const { T } = useThemeTokens();
 
   return (
@@ -21,7 +25,19 @@ export const ConfiguracoesPageHeader: React.FC<ConfiguracoesPageHeaderProps> = (
             Configurações
           </button>
           <ChevronRight size={14} />
-          <span style={{ color: T.textPrimary, fontWeight: 'var(--font-weight-medium)' }}>{title}</span>
+          {breadcrumbParent && (
+            <>
+              {onBreadcrumbParentClick ? (
+                <button type="button" onClick={onBreadcrumbParentClick} style={{ background: 'none', border: 'none', padding: 0, color: T.textSecondary, cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}>
+                  {breadcrumbParent}
+                </button>
+              ) : (
+                <span style={{ color: T.textSecondary }}>{breadcrumbParent}</span>
+              )}
+              <ChevronRight size={14} />
+            </>
+          )}
+          <span style={{ color: T.textPrimary, fontWeight: 'var(--font-weight-medium)' }}>{breadcrumbTitle || title}</span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '20px' }}>
@@ -42,7 +58,7 @@ export const ConfiguracoesPageHeader: React.FC<ConfiguracoesPageHeaderProps> = (
         </div>
       </div>
 
-      <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, margin: '20px 0 28px' }} />
+      {!hideDivider && <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, margin: '20px 0 28px' }} />}
     </>
   );
 };
