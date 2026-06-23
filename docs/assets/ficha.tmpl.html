@@ -14,6 +14,23 @@
   .lnk{font-size:12.5px;color:var(--ink-dim);border:1px solid var(--line);border-radius:8px;padding:6px 11px;cursor:pointer}
   .lnk:hover{color:var(--ink);border-color:#3a455a}
   .lnk.pri{background:var(--accent);color:#04121c;border-color:var(--accent);font-weight:600}
+  .search{position:relative;display:flex;align-items:center;margin-left:auto}
+  .search svg{position:absolute;left:9px;width:14px;height:14px;stroke:var(--ink-faint);fill:none}
+  .search input{background:var(--panel-2);border:1px solid var(--line);border-radius:9px;color:var(--ink);font:inherit;font-size:13px;padding:7px 11px 7px 30px;width:230px;outline:none}
+  .search input:focus{border-color:var(--accent)}
+  .search + .nav{margin-left:14px}
+  .results{position:absolute;top:38px;right:0;width:340px;max-height:60vh;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;z-index:40;display:none;box-shadow:0 12px 34px #0009}
+  .results.show{display:block}
+  .rgrp{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);padding:9px 12px 4px}
+  .res{display:flex;gap:9px;align-items:center;padding:7px 12px;cursor:pointer;border-top:1px solid #ffffff06}
+  .res:hover,.res.sel{background:#ffffff0d}
+  .res .rb{font-size:10px;font-weight:700;color:#06080d;border-radius:5px;padding:2px 6px;flex:none}
+  .res .rmain{flex:1;min-width:0}
+  .res .rt{font-size:12.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .res .rs{font-size:11px;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .res .rk{font-size:9.5px;color:var(--ink-faint);border:1px solid var(--line);border-radius:5px;padding:1px 6px;flex:none}
+  .epic.hl{outline:2px solid var(--accent);outline-offset:2px}
+  @media(max-width:640px){.search input{width:150px}.results{width:280px}}
   .wrap{max-width:880px;margin:0 auto;padding:24px 22px 60px}
   /* índice */
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-top:18px}
@@ -66,6 +83,11 @@
 
 <div class="top">
   <h1 id="topttl">Fichas de Módulo</h1>
+  <label class="search">
+    <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+    <input id="q" placeholder="Buscar módulo ou epic…" autocomplete="off">
+    <div class="results" id="results"></div>
+  </label>
   <div class="nav" id="topnav"></div>
 </div>
 <div class="wrap" id="wrap"></div>
@@ -76,6 +98,7 @@ const DOM=DATA.dominios;
 const STATUS={entregue:{c:"#22c55e",l:"Entregue"},andamento:{c:"#f59e0b",l:"Em andamento"},homol:{c:"#14b8a6",l:"Homologação"},validacao:{c:"#06b6d4",l:"Validação"},planejado:{c:"#64748b",l:"Planejado"},especificado:{c:"#3a4354",l:"Especificado"}};
 const IMP={1:"Apoio",2:"Complementar",3:"Relevante",4:"Estruturante",5:"Crítico"};
 const M=DATA.modulos,byId={};M.forEach(m=>byId[m.id]=m);
+let pendingEpic=null;
 const wrap=document.getElementById("wrap"),topnav=document.getElementById("topnav"),topttl=document.getElementById("topttl");
 const esc=s=>(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;");
 const pct=m=>(m.negocio&&m.negocio.percent_desenv!=null)?m.negocio.percent_desenv:null;
@@ -109,7 +132,7 @@ function ficha(m){
     ${(N.kpis&&N.kpis.length)?`<div class="nrow"><div class="nk">KPIs</div><div class="nv">${N.kpis.map(k=>`<span class="kpi">${esc(k)}</span>`).join("")}</div></div>`:''}
   </div>`;
   const epics=m.epics.map(e=>{const v=e.valor||e.objetivo||"";
-    return `<div class="epic"><div class="er"><span class="eid">${e.id.replace('EPIC-','')}</span><span class="et">${esc(e.titulo)}</span>${e.milestone?`<span class="ems">${e.milestone}</span>`:''}</div>
+    return `<div class="epic" id="ep-${e.id}"><div class="er"><span class="eid">${e.id.replace('EPIC-','')}</span><span class="et">${esc(e.titulo)}</span>${e.milestone?`<span class="ems">${e.milestone}</span>`:''}</div>
     ${v?`<div class="ev2">${esc(v)}</div>`:''}
     <div style="display:flex;align-items:center;gap:9px"><div class="prog"><i style="width:${e.us_total?e.us.done/e.us_total*100:0}%;background:var(--enable)"></i><i style="width:${e.us_total?e.us.doing/e.us_total*100:0}%;background:var(--accent)"></i></div><span class="muted">${e.us.done}/${e.us_total} US</span></div>
     ${e.habilita_modulos.length?`<div class="muted" style="margin-top:7px">habilita: ${e.habilita_modulos.map(x=>chip(x)).join(" ")}</div>`:''}</div>`;}).join("")||'<p class="muted">Sem epics documentados.</p>';
@@ -140,7 +163,34 @@ function ficha(m){
   wrap.querySelectorAll("[data-go]").forEach(c=>c.onclick=()=>go(c.dataset.go));
   wrap.querySelectorAll("[data-home]").forEach(a=>a.onclick=e=>{e.preventDefault();go(null);});
   topnav.querySelectorAll("[data-home]").forEach(a=>a.onclick=e=>{e.preventDefault();go(null);});
+  if(pendingEpic){const t=document.getElementById("ep-"+pendingEpic);if(t){t.classList.add("hl");t.scrollIntoView({block:"center"});}pendingEpic=null;}
 }
+
+// busca (módulos + epics)
+const qi=document.getElementById("q"),resBox=document.getElementById("results");
+const SEARCH=[];
+M.forEach(m=>SEARCH.push({type:"mod",id:m.id,mod:m.id,label:m.nome,sub:(m.negocio&&m.negocio.dor)||m.proposito,key:(m.id+" "+m.nome+" "+m.proposito+" "+((m.negocio&&m.negocio.dor)||"")).toLowerCase()}));
+M.forEach(m=>m.epics.forEach(e=>SEARCH.push({type:"epic",id:e.id,mod:m.id,label:e.titulo,sub:m.id+" "+m.nome,key:(e.id+" "+e.titulo+" "+(e.objetivo||"")+" "+(e.valor||"")+" "+m.id+" "+m.nome).toLowerCase()})));
+let query="",selIdx=0,curList=[];
+function runSearch(){
+  if(!query){resBox.classList.remove("show");resBox.innerHTML="";curList=[];return;}
+  const hits=SEARCH.filter(s=>s.key.includes(query));
+  const mods=hits.filter(h=>h.type==="mod").slice(0,6),eps=hits.filter(h=>h.type==="epic").slice(0,12);
+  curList=[...mods,...eps];selIdx=0;
+  if(!curList.length){resBox.innerHTML='<div class="rgrp">sem resultados</div>';resBox.classList.add("show");return;}
+  const rh=(h,i)=>{const col=DOM[byId[h.mod].dominio].cor;return `<div class="res${i===selIdx?' sel':''}" data-i="${i}"><span class="rb" style="background:${col}">${h.type==="mod"?h.id.slice(1):h.id.replace("EPIC-","")}</span><div class="rmain"><div class="rt">${esc(h.label)}</div><div class="rs">${esc(h.sub)}</div></div><span class="rk">${h.type==="mod"?"módulo":"epic"}</span></div>`;};
+  let html="",i=0;
+  if(mods.length){html+='<div class="rgrp">Módulos</div>';mods.forEach(h=>html+=rh(h,i++));}
+  if(eps.length){html+='<div class="rgrp">Epics</div>';eps.forEach(h=>html+=rh(h,i++));}
+  resBox.innerHTML=html;resBox.classList.add("show");
+  resBox.querySelectorAll("[data-i]").forEach(elm=>elm.onclick=()=>pick(curList[+elm.dataset.i]));
+}
+function hl(){resBox.querySelectorAll(".res").forEach((e,i)=>e.classList.toggle("sel",i===selIdx));const s=resBox.querySelector(".res.sel");if(s)s.scrollIntoView({block:"nearest"});}
+function pick(h){if(!h)return;resBox.classList.remove("show");qi.value="";query="";if(h.type==="epic")pendingEpic=h.id;go(h.mod);}
+qi.oninput=()=>{query=qi.value.trim().toLowerCase();runSearch();};
+qi.onkeydown=e=>{if(e.key==="ArrowDown"){e.preventDefault();selIdx=Math.min(selIdx+1,curList.length-1);hl();}else if(e.key==="ArrowUp"){e.preventDefault();selIdx=Math.max(selIdx-1,0);hl();}else if(e.key==="Enter"){e.preventDefault();pick(curList[selIdx]);}else if(e.key==="Escape"){qi.value="";query="";resBox.classList.remove("show");qi.blur();}};
+document.addEventListener("click",e=>{if(!e.target.closest(".search"))resBox.classList.remove("show");});
+document.addEventListener("keydown",e=>{if(e.key==="/"&&e.target!==qi){e.preventDefault();qi.focus();}});
 
 function route(){const id=new URLSearchParams(location.search).get("m");(id&&byId[id])?ficha(byId[id]):index();}
 window.addEventListener("popstate",route);
