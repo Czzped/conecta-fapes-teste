@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { CheckCircle, Edit3, FileText, FolderTree, Plus, Save, Search, Tags, Trash2 } from 'lucide-react';
 import { ThemeTokens, useThemeTokens } from '../theme/ThemeContext';
+import { ConfiguracoesPageHeader } from './ConfiguracoesPageHeader';
 
 type NaturezaDespesa = 'CUSTEIO' | 'CAPITAL';
 
@@ -84,7 +85,11 @@ const buildStyles = (T: ThemeTokens) => ({
   } as React.CSSProperties,
 });
 
-export const Rubricas: React.FC = () => {
+interface RubricasProps {
+  onBack: () => void;
+}
+
+export const Rubricas: React.FC<RubricasProps> = ({ onBack }) => {
   const { T } = useThemeTokens();
   const S = buildStyles(T);
   const catalogGrid = 'minmax(112px, 0.95fr) minmax(150px, 1.25fr) 76px 104px 68px 70px';
@@ -155,33 +160,18 @@ export const Rubricas: React.FC = () => {
   return (
     <div style={S.page}>
       <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-        <div style={{ marginBottom: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: T.textMuted, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', marginBottom: '18px' }}>
-            <span>Cadastros</span>
-            <span>/</span>
-            <strong style={{ color: T.textSecondary, fontWeight: 'var(--font-weight-medium)' }}>Rubricas</strong>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '10px', backgroundColor: T.accentSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Tags size={24} style={{ color: T.accent }} />
-              </div>
-              <div>
-                <h1 style={{ margin: 0, color: T.textPrimary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xl)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 1.2 }}>
-                  Rubricas
-                </h1>
-                <p style={{ margin: '8px 0 0', color: T.textSecondary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', lineHeight: 1.5, maxWidth: '760px' }}>
-                  Cadastre a categoria orçamentária usada por editais, projetos e prestação de contas, informando a natureza da despesa. Rubrica é categoria; movimentação de saldo acontece por transação no orçamento do projeto.
-                </p>
-              </div>
-            </div>
+        <ConfiguracoesPageHeader
+          title="Rubricas"
+          subtitle="Cadastre a categoria orçamentária usada por editais, projetos e prestação de contas, informando a natureza da despesa. Rubrica é categoria; movimentação de saldo acontece por transação no orçamento do projeto."
+          icon={Tags}
+          onBack={onBack}
+          action={(
             <button type="button" onClick={() => { setEditingId(null); setDraft(emptyRubrica); }} style={{ height: '42px', display: 'flex', alignItems: 'center', gap: '8px', padding: '0 16px', border: 'none', borderRadius: '8px', backgroundColor: T.accent, color: T.accentText, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)', cursor: 'pointer', whiteSpace: 'nowrap' }}>
               <Plus size={16} />
               Nova rubrica
             </button>
-          </div>
-        </div>
+          )}
+        />
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: '14px', marginBottom: '22px' }}>
           <Metric T={T} icon={<FileText size={18} />} label="Total" value={metrics.total} />

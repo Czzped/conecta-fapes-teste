@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ArrowLeft, FileCheck2, Plus, Trash2 } from 'lucide-react';
+import { FileCheck2, Plus, Trash2 } from 'lucide-react';
+import { ConfiguracoesPageHeader } from './ConfiguracoesPageHeader';
 
 interface DocumentosExigidosProps {
   onBack: () => void;
@@ -57,25 +58,12 @@ export const DocumentosExigidos: React.FC<DocumentosExigidosProps> = ({ onBack }
   return (
     <div style={{ backgroundColor: '#171717', minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '28px' }}>
-          <button
-            onClick={onBack}
-            style={{ width: '36px', height: '36px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--radius)', backgroundColor: 'rgba(38, 38, 38,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-          >
-            <ArrowLeft size={16} style={{ color: 'rgba(255,255,255,0.7)' }} />
-          </button>
-          <div style={{ width: '36px', height: '36px', borderRadius: 'var(--radius)', backgroundColor: 'rgba(0,193,175,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <FileCheck2 size={18} style={{ color: '#00c1af' }} />
-          </div>
-          <div style={{ flex: 1, marginTop: '4px' }}>
-            <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: '#ffffff', margin: '0 0 8px' }}>
-              Documentos Exigidos
-            </h1>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
-              Cadastre documentos reutilizáveis que podem ser exigidos dos proponentes em uma captação.
-            </p>
-          </div>
-        </div>
+        <ConfiguracoesPageHeader
+          title="Documentos Exigidos"
+          subtitle="Cadastre documentos reutilizáveis que podem ser exigidos dos proponentes em uma captação."
+          icon={FileCheck2}
+          onBack={onBack}
+        />
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '18px' }}>
           <div style={cardStyle}>

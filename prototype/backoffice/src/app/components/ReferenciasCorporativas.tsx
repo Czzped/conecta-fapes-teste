@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowLeft, Database, Plus, Save, Search, Trash2 } from 'lucide-react';
+import { Database, Plus, Save, Search, Trash2 } from 'lucide-react';
+import { ConfiguracoesPageHeader } from './ConfiguracoesPageHeader';
 
 type ReferenceTab = 'areas' | 'rubricas' | 'diarias' | 'tiposViagem' | 'regioes' | 'finalidades';
 
@@ -196,7 +197,12 @@ export const ReferenciasCorporativas: React.FC<{ onBack: () => void }> = ({ onBa
   return (
     <div style={{ backgroundColor: 'var(--dash-page-bg)', minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
-        <PageHeader title="Referências Corporativas" subtitle="Gerencie áreas de conhecimento, rubricas financeiras, diárias por tipo de viagem, cidades/regiões e finalidades." onBack={onBack} />
+        <ConfiguracoesPageHeader
+          title="Referências Corporativas"
+          subtitle="Gerencie áreas de conhecimento, rubricas financeiras, diárias por tipo de viagem, cidades/regiões e finalidades."
+          icon={Database}
+          onBack={onBack}
+        />
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '14px', marginBottom: '24px' }}>
           <Metric label="Áreas" value={String(metrics.areas)} />
@@ -336,26 +342,6 @@ const upsert = <T extends { id: number }>(items: T[], item: T) => {
   const exists = items.some(row => row.id === item.id);
   return exists ? items.map(row => row.id === item.id ? item : row) : [...items, item];
 };
-
-const PageHeader: React.FC<{ title: string; subtitle: string; onBack: () => void }> = ({ title, subtitle, onBack }) => (
-  <>
-    <div className="mb-6">
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-        <button onClick={onBack} style={{ width: '36px', height: '36px', border: '1px solid var(--dash-card-border)', borderRadius: 'var(--radius)', backgroundColor: 'var(--dash-card-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-          <ArrowLeft size={16} style={{ color: 'var(--dash-text-secondary)' }} />
-        </button>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', flexShrink: 0, backgroundColor: 'rgba(0,193,175,0.15)', borderRadius: 'var(--radius)' }}>
-          <Database size={18} style={{ color: '#00c1af' }} />
-        </div>
-        <div style={{ flex: 1, marginTop: '6px' }}>
-          <h1 className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: 'var(--dash-text-primary)', lineHeight: '1.5' }}>{title}</h1>
-          <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', margin: 0, lineHeight: '1.5' }}>{subtitle}</p>
-        </div>
-      </div>
-    </div>
-    <div style={{ width: '100%', height: '1px', backgroundColor: 'var(--dash-divider)', margin: '20px 0 28px' }} />
-  </>
-);
 
 const ReferenceSection: React.FC<{ title: string; subtitle: string; children: React.ReactNode }> = ({ title, subtitle, children }) => (
   <div style={cardStyle()}>

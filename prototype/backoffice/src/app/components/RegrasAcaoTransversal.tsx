@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowLeft, ClipboardList, Plus, Save, Search, Trash2 } from 'lucide-react';
+import { ClipboardList, Plus, Save, Search, Trash2 } from 'lucide-react';
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 import { BackofficeDatePicker } from './BackofficeDatePicker';
+import { ConfiguracoesPageHeader } from './ConfiguracoesPageHeader';
 
 type SituacaoRegra = 'Vigente' | 'Programada' | 'Inativa';
 
@@ -132,28 +133,18 @@ export const RegrasAcaoTransversal: React.FC<{ onBack: () => void }> = ({ onBack
   return (
     <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-16">
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '24px' }}>
-          <button onClick={onBack} title="Voltar" style={S.iconButton}>
-            <ArrowLeft size={16} style={{ color: T.textSecondary }} />
-          </button>
-          <div style={{ width: '36px', height: '36px', borderRadius: 'var(--radius)', backgroundColor: T.accentSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <ClipboardList size={18} style={{ color: T.accent }} />
-          </div>
-          <div style={{ flex: 1, marginTop: '4px' }}>
-            <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: T.textPrimary, margin: '0 0 6px' }}>
-              Regras de Ação Transversal
-            </h1>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
-              Cadastre políticas, vigências, faixas percentuais e rubricas permitidas para cálculo da reserva.
-            </p>
-          </div>
-          <button onClick={openNew} style={S.primaryButton}>
-            <Plus size={15} />
-            Nova regra
-          </button>
-        </div>
-
-        <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, marginBottom: '24px' }} />
+        <ConfiguracoesPageHeader
+          title="Regras de Ação Transversal"
+          subtitle="Cadastre políticas, vigências, faixas percentuais e rubricas permitidas para cálculo da reserva."
+          icon={ClipboardList}
+          onBack={onBack}
+          action={(
+            <button onClick={openNew} style={S.primaryButton}>
+              <Plus size={15} />
+              Nova regra
+            </button>
+          )}
+        />
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '14px', marginBottom: '24px' }}>
           <Metric T={T} label="Regras" value={String(metrics.total)} />

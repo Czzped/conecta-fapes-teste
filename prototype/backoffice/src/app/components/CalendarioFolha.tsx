@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowLeft, CalendarDays, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { useThemeTokens } from '../theme/ThemeContext';
+import { ConfiguracoesPageHeader } from './ConfiguracoesPageHeader';
 
 interface CalendarioFolhaProps {
   onBack: () => void;
@@ -213,45 +214,12 @@ export const CalendarioFolha: React.FC<CalendarioFolhaProps> = ({ onBack }) => {
   return (
     <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
-        <div style={{ marginBottom: '28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: T.textSecondary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', marginBottom: '0.75rem' }}>
-              <button type="button" onClick={onBack} style={{ background: 'none', border: 'none', padding: 0, color: T.textSecondary, cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}>
-                Configurações
-              </button>
-              <ChevronRight size={14} />
-              <span style={{ color: T.textPrimary }}>Calendário da Folha</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-              <button
-                type="button"
-                onClick={onBack}
-                aria-label="Voltar para configurações"
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  border: 'none',
-                  borderRadius: 'var(--radius)',
-                  backgroundColor: T.accentSoft,
-                  color: T.accent,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                }}
-              >
-                <ArrowLeft size={18} />
-              </button>
-              <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: T.textPrimary, margin: 0, lineHeight: '1.5' }}>
-                Calendário da Folha
-              </h1>
-            </div>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: '0 0 0 48px', lineHeight: '1.5' }}>
-              Configure as datas mensais de solicitação, geração e pagamento da folha de bolsas.
-            </p>
-        </div>
-
-        <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, margin: '20px 0 28px' }} />
+        <ConfiguracoesPageHeader
+          title="Calendário da Folha"
+          subtitle="Configure as datas mensais de solicitação, geração e pagamento da folha de bolsas."
+          icon={CalendarDays}
+          onBack={onBack}
+        />
 
         <section style={{ marginBottom: '28px' }}>
             <label style={{ display: 'block', color: T.textSecondary, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', marginBottom: '0.5rem' }}>

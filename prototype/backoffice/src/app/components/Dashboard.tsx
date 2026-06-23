@@ -11,6 +11,7 @@ import { PlanejamentoEstrategico } from './PlanejamentoEstrategico';
 import { Instituicoes } from './Instituicoes';
 import { Configuracoes } from './Configuracoes';
 import { CalendarioFolha } from './CalendarioFolha';
+import { ControleAcessos } from './ControleAcessos';
 import { BackofficeDatePicker } from './BackofficeDatePicker';
 import { PessoasFisicas } from './PessoasFisicas';
 import { Rubricas } from './Rubricas';
@@ -32,7 +33,7 @@ type Contrast = 'normal' | 'high' | 'maximum';
 type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
 type Language = 'pt' | 'en' | 'es';
 type NotificationTab = 'avisos' | 'editais';
-type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'fomento' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal' | 'calendario-folha';
+type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'fomento' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal' | 'calendario-folha' | 'controle-acessos';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
 type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outro Projeto Exemplo' | 'Mais um Projeto Exemplo';
@@ -1637,7 +1638,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         ) : activePage === 'iniciativas' ? (
           <Iniciativas />
         ) : activePage === 'rubricas' ? (
-          <Rubricas />
+          <Rubricas onBack={() => setActivePage('configuracoes')} />
         ) : activePage === 'fomento' ? (
           <Editais key={`fomento-${pageVersion}`} kind="fomento" />
         ) : activePage === 'editais' ? (
@@ -1654,11 +1655,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             onOpenFormularios={() => setActivePage('formulario')}
             onOpenRegrasAcaoTransversal={() => setActivePage('regras-acao-transversal')}
             onOpenCalendarioFolha={() => setActivePage('calendario-folha')}
+            onOpenControleAcessos={() => setActivePage('controle-acessos')}
           />
         ) : activePage === 'planejamento' ? (
-          <PlanejamentoEstrategico />
+          <PlanejamentoEstrategico onBack={() => setActivePage('configuracoes')} />
         ) : activePage === 'calendario-folha' ? (
           <CalendarioFolha onBack={() => setActivePage('configuracoes')} />
+        ) : activePage === 'controle-acessos' ? (
+          <ControleAcessos onBack={() => setActivePage('configuracoes')} />
         ) : activePage === 'pessoas' ? (
           <PessoasFisicas onBack={() => setActivePage('configuracoes')} />
         ) : activePage === 'referencias' ? (

@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Calendar, CheckCircle, ChevronRight, DollarSign, Edit3, Flag, Plus, Save, Search, Target, Trash2, X } from 'lucide-react';
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
+import { ConfiguracoesPageHeader } from './ConfiguracoesPageHeader';
 
 type EstadoPlano = 'Ativo' | 'Em elaboração' | 'Encerrado';
 
@@ -189,7 +190,11 @@ const planosIniciais: PlanoEstrategico[] = [
 
 const planoSemEixos = ({ eixos: _eixos, ...plano }: PlanoEstrategico): Omit<PlanoEstrategico, 'eixos'> => plano;
 
-export const PlanejamentoEstrategico: React.FC = () => {
+interface PlanejamentoEstrategicoProps {
+  onBack: () => void;
+}
+
+export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = ({ onBack }) => {
   const { T } = useThemeTokens();
   const S = buildStyles(T);
 
@@ -317,6 +322,7 @@ export const PlanejamentoEstrategico: React.FC = () => {
         <Header
           title="Planejamentos Estratégicos"
           subtitle="Gerencie os ciclos estratégicos e abra um planejamento para cadastrar seus eixos."
+          onBack={onBack}
           action={<SmallButton icon={<Plus size={14} />} label="Novo planejamento" onClick={criarPlano} />}
         />
 
@@ -398,6 +404,7 @@ export const PlanejamentoEstrategico: React.FC = () => {
       <Header
         title={selectedPlano.nome}
         subtitle="Cadastro do planejamento estratégico e gestão dos eixos associados."
+        onBack={onBack}
         action={editing ? (
           <div style={{ display: 'flex', gap: '8px' }}>
             <SmallButton icon={<X size={14} />} label="Cancelar" onClick={() => { setDraftPlano(planoSemEixos(selectedPlano)); setEditing(false); }} muted />
@@ -649,27 +656,9 @@ export const PlanejamentoEstrategico: React.FC = () => {
   );
 };
 
-const Header: React.FC<{ title: string; subtitle: string; action: React.ReactNode }> = ({ title, subtitle, action }) => {
-  const { T } = useThemeTokens();
-  return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '20px', marginBottom: '28px' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: T.accentSoft, borderRadius: 'var(--radius)' }}>
-          <Target size={22} style={{ color: T.accent }} />
-        </div>
-        <div>
-          <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: T.textPrimary, margin: '0 0 8px' }}>
-            {title}
-          </h1>
-          <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
-            {subtitle}
-          </p>
-        </div>
-      </div>
-      {action}
-    </div>
-  );
-};
+const Header: React.FC<{ title: string; subtitle: string; action: React.ReactNode; onBack: () => void }> = ({ title, subtitle, action, onBack }) => (
+  <ConfiguracoesPageHeader title={title} subtitle={subtitle} icon={Target} onBack={onBack} action={action} />
+);
 
 const Field: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => {
   const { T } = useThemeTokens();

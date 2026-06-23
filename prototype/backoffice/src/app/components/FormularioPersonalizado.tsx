@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  ChevronRight, Home, ChevronDown, Plus, Trash2, Copy,
+  ChevronDown, Plus, Trash2, Copy,
   AlignLeft, AlignJustify, Circle, CheckSquare, List,
   Upload, Star, Grid2x2, LayoutGrid, Calendar, Clock,
-  GripHorizontal, X, Minus, Save, Send, FileText,
+  GripHorizontal, X, Minus, Save, Send, BookOpen,
 } from 'lucide-react';
+import { ConfiguracoesPageHeader } from './ConfiguracoesPageHeader';
 
 /* ─── Types ─────────────────────────────────────────────── */
 type FieldType =
@@ -450,40 +451,12 @@ export const FormularioPersonalizado: React.FC<Props> = ({ onBack }) => {
     <div style={{ backgroundColor: '#171717', minHeight: '100vh' }}>
       <div style={{ padding: '32px 32px 80px' }}>
 
-        {/* Breadcrumb */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
-          <Home size={15} style={{ color: 'rgba(255,255,255,0.5)' }} />
-          <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
-          <button onClick={onBack}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)' }}>
-            Captação
-          </button>
-          <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
-          <button onClick={onBack}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)' }}>
-            Criar Formulário
-          </button>
-          <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.3)' }} />
-          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-medium)' }}>
-            Novo Formulário
-          </span>
-        </div>
-
-        {/* Page header */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '8px' }}>
-          <div style={{ width: '36px', height: '36px', borderRadius: 'var(--radius)', backgroundColor: 'rgba(0,193,175,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <FileText size={18} style={{ color: '#00c1af' }} />
-          </div>
-          <div>
-            <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-medium)', color: '#ffffff', margin: '0 0 4px' }}>
-              Novo Formulário
-            </h1>
-            <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
-              Crie um novo formulário.
-            </p>
-          </div>
-        </div>
-        <div style={{ height: '1px', backgroundColor: 'rgba(255,255,255,0.1)', margin: '20px 0 28px' }} />
+        <ConfiguracoesPageHeader
+          title="Formulários"
+          subtitle="Crie um novo formulário."
+          icon={BookOpen}
+          onBack={onBack}
+        />
 
         {/* Two-column layout: form + sidebar */}
         <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
