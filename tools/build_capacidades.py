@@ -247,6 +247,29 @@ def render(tmpl_name, full):
     (ASSETS / tmpl_name.replace(".tmpl", "")).write_text(tmpl.replace("//__DATA__", js))
 
 
+def gen_impacto_md(full):
+    """Gera docs/discovery/impacto-negocio.md a partir de negocio.casos (fonte única)."""
+    L = ["# Impacto de Negócio por Funcionalidade", "",
+         "Casos concretos de dor e benefício por funcionalidade, na voz de quem usa o sistema. "
+         "Gerado automaticamente de `negocio.casos` no [`capacidades.yaml`](../data/capacidades.yaml) — "
+         "não editar à mão. Visão consolidada por módulo nas [Fichas de Módulo](../fichas.md).", ""]
+    any_ = False
+    for m in full["modulos"]:
+        casos = ((m.get("negocio") or {}).get("casos")) or []
+        if not casos:
+            continue
+        any_ = True
+        L += [f"## {m['nome']} — {m['id']}", ""]
+        for c in casos:
+            L += [f"### {c.get('funcionalidade', '').strip()}", "",
+                  f"**Problema** — {c.get('problema', '').strip()}", "",
+                  f"**Benefício** — {c.get('beneficio', '').strip()}", ""]
+        L += [f"→ [Ficha do módulo {m['id']}](../assets/ficha.html?m={m['id']})", ""]
+    if not any_:
+        L += ["_Nenhum caso cadastrado. Adicione `negocio.casos` em `docs/data/capacidades.yaml`._"]
+    (REPO / "docs/discovery/impacto-negocio.md").write_text("\n".join(L))
+
+
 def main():
     cap = yaml.safe_load(open(DATA / "capacidades.yaml"))
     onto = parse_ontology()
@@ -261,6 +284,7 @@ def main():
     render("mapa-capacidades.tmpl.html", full)
     if (ASSETS / "ficha.tmpl.html").exists():
         render("ficha.tmpl.html", full)
+    gen_impacto_md(full)
     n_ep = sum(len(v) for v in epics.values())
     print(f"[capacidades] {len(full['modulos'])} módulos · {len(onto['edges'])} arestas · "
           f"{n_ep} epics · {len(backlog)} c/ negócio -> docs/assets/{{mapa-capacidades,ficha}}.html")
