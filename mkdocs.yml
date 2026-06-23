@@ -127,6 +127,7 @@ nav:
 
   - Discovery:
       - Visao do Produto: discovery/product-vision.md
+      - Impacto de Negocio: discovery/impacto-negocio.md
       - Personas: discovery/personas.md
       - Glossario: discovery/glossario.md
       - Rubricas e Subrubricas FAPES: discovery/rubricas-subrubricas-fapes.md
