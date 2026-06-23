@@ -127,6 +127,7 @@ nav:
 
   - Discovery:
       - Visao do Produto: discovery/product-vision.md
+      - Impacto de Negocio: discovery/impacto-negocio.md
       - Personas: discovery/personas.md
       - Glossario: discovery/glossario.md
       - Rubricas e Subrubricas FAPES: discovery/rubricas-subrubricas-fapes.md
@@ -206,8 +207,10 @@ nav:
 
   - Design System: design-system.md
 
-  - Mapa de Capacidades: mapa-capacidades.md
-  - Fichas de Módulo: fichas.md
+  - Mapa de Capacidades:
+      - Grafo Interativo: mapa-capacidades.md
+      - Fichas de Módulo: fichas.md
+      - Dados e Build (como funciona): data/README.md
 
   - Modulos:
       - Visao Geral: implementation/modules/README.md

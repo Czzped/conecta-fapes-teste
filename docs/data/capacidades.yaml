@@ -273,6 +273,11 @@ modulos:
     impacto: critico
     proposito: "Fonte canônica de saldos: alocações, execuções e remanejamentos."
     entidades_chave: [RubricaProjeto, SolicitacaoOrcamentaria, Transacao, Remanejamento]
+    negocio:
+      casos:
+        - funcionalidade: "Remanejamento de bolsa"
+          problema: "Processo manual e sem controle; dependia de e-mail e da comunicação com a FAPES."
+          beneficio: "Coordenador remaneja sem intervenção da FAPES; sem erro de planilha nem controle manual — processo simplificado e sob seu controle."
     habilita:
       - { modulo: M003, tipo: dados }   # ciclo M003<->M013 (saldo valida projeto)
       - { modulo: M009, tipo: dados }
@@ -290,6 +295,11 @@ modulos:
     impacto: alto
     proposito: "Ciclo de vida de bolsas de pesquisa, da alocação ao encerramento."
     entidades_chave: [BolsaPesquisa, TermoCompromisso, CotaBolsa]
+    negocio:
+      casos:
+        - funcionalidade: "Solicitação de bolsa e gestão de cotas"
+          problema: "Gestão de cotas feita manualmente via Excel; controle divergente entre a planilha e o SIGFAPES."
+          beneficio: "Gestão de cotas mais refinada e com histórico das operações, sob responsabilidade do coordenador e do analista da FAPES."
     habilita:
       - { modulo: M004, tipo: dados }
       - { modulo: M015, tipo: workflow }
@@ -308,6 +318,11 @@ modulos:
     impacto: alto
     proposito: "Folhas de pagamento, remessas bancárias e integração Banestes/BANDES."
     entidades_chave: [PlanoMensal, Folha, PagamentoBolsista, RemessaPagamento]
+    negocio:
+      casos:
+        - funcionalidade: "Abertura de conta bancária do bolsista"
+          problema: "Demora na abertura e erro no fornecimento dos dados."
+          beneficio: "O processo valida a conta bancária, evita erros e dispensa o bolsista de ir ao banco."
     habilita:
       - { modulo: M015, tipo: dados }
       - { modulo: M016, tipo: evento }
