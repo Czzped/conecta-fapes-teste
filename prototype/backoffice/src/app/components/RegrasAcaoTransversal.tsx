@@ -274,12 +274,20 @@ export const RegrasAcaoTransversal: React.FC<{ onBack: () => void }> = ({ onBack
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {draft.faixas.map(faixa => (
-                  <div key={faixa.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 0.8fr', gap: '10px', alignItems: 'end' }}>
+                  <div key={faixa.id} style={{ display: 'grid', gridTemplateColumns: mode === 'create' ? '1fr 1fr 0.8fr auto' : '1fr 1fr 0.8fr', gap: '10px', alignItems: 'end' }}>
                     {mode === 'create' ? (
                       <>
                         <Field label="Valor mínimo" value={faixa.valorMinimo} onChange={value => updateFaixa(faixa.id, 'valorMinimo', value)} placeholder="0,00" S={S} />
                         <Field label="Valor máximo" value={faixa.valorMaximo} onChange={value => updateFaixa(faixa.id, 'valorMaximo', value)} placeholder="Sem limite" S={S} />
                         <Field label="Percentual" value={faixa.percentual} onChange={value => updateFaixa(faixa.id, 'percentual', value)} placeholder="4,00" S={S} />
+                        <button
+                          type="button"
+                          onClick={() => setDraft(prev => ({ ...prev, faixas: [...prev.faixas, { id: Date.now(), valorMinimo: '', valorMaximo: '', percentual: '' }] }))}
+                          style={{ ...S.secondaryButton, minHeight: '42px', whiteSpace: 'nowrap' }}
+                        >
+                          <Plus size={14} />
+                          Adicionar Faixa
+                        </button>
                       </>
                     ) : (
                       <>
