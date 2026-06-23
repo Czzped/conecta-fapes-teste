@@ -132,6 +132,14 @@ export const Configuracoes: React.FC<ConfiguracoesProps> = ({ onBack, onOpenPlan
               type="button"
               onClick={() => handleOpen(key)}
               style={{ ...cardStyle, minHeight: '150px', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '18px' }}
+              onMouseEnter={event => {
+                event.currentTarget.style.backgroundColor = T.bgSurfaceMuted;
+                event.currentTarget.style.borderColor = T.borderDefault;
+              }}
+              onMouseLeave={event => {
+                event.currentTarget.style.backgroundColor = T.bgCard;
+                event.currentTarget.style.borderColor = T.borderSubtle;
+              }}
             >
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>

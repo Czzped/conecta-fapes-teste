@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { ClipboardList, Plus, Save, Search, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, ClipboardList, Plus, Search } from 'lucide-react';
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
-import { BackofficeDatePicker } from './BackofficeDatePicker';
 import { ConfiguracoesPageHeader } from './ConfiguracoesPageHeader';
+import { BackofficeDatePicker } from './BackofficeDatePicker';
 
-type SituacaoRegra = 'Vigente' | 'Programada' | 'Inativa';
+type SituacaoRegra = 'Ativo' | 'Finalizado' | 'Rascunho';
 
 interface FaixaRegra {
   id: number;
@@ -25,20 +25,13 @@ interface RegraAcaoTransversal {
   faixas: FaixaRegra[];
 }
 
-const emptyFaixa = (): FaixaRegra => ({
-  id: Date.now(),
-  valorMinimo: '',
-  valorMaximo: '',
-  percentual: '',
-});
-
 const emptyRegra: RegraAcaoTransversal = {
   id: 0,
   nome: '',
   baseLegal: '',
   vigenciaInicio: '',
   vigenciaFim: '',
-  situacao: 'Programada',
+  situacao: 'Rascunho',
   rubricasPermitidas: '',
   observacoes: '',
   faixas: [
@@ -53,8 +46,8 @@ const initialRegras: RegraAcaoTransversal[] = [
     baseLegal: 'Resolução CCAF nº 334/2023',
     vigenciaInicio: '2026-01-01',
     vigenciaFim: '',
-    situacao: 'Vigente',
-    rubricasPermitidas: 'Diárias, passagens, publicações, serviços de terceiros e material permanente',
+    situacao: 'Ativo',
+    rubricasPermitidas: 'Diária, Passagem, Material Permanente, Material de Consumo, Pessoa Jurídica',
     observacoes: 'Percentuais aplicados sobre aporte original e aditivos financeiros.',
     faixas: [
       { id: 11, valorMinimo: '0,00', valorMaximo: '2.000.000,00', percentual: '5,00' },
@@ -64,30 +57,45 @@ const initialRegras: RegraAcaoTransversal[] = [
   },
 ];
 
+const formatVigencia = (inicio: string, fim: string) => `${inicio || 'Sem data'} - ${fim || 'Sem data'}`;
+
 export const RegrasAcaoTransversal: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { T } = useThemeTokens();
   const S = buildStyles(T);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [regras, setRegras] = useState<RegraAcaoTransversal[]>(initialRegras);
-  const [selected, setSelected] = useState<RegraAcaoTransversal | null>(initialRegras[0]);
+  const [regras] = useState<RegraAcaoTransversal[]>(initialRegras);
+  const [selected, setSelected] = useState<RegraAcaoTransversal | null>(null);
   const [draft, setDraft] = useState<RegraAcaoTransversal>(initialRegras[0]);
+  const [mode, setMode] = useState<'list' | 'detail' | 'create'>('list');
+  const [statusFilter, setStatusFilter] = useState<SituacaoRegra | 'Todos'>('Todos');
+  const [statusOpen, setStatusOpen] = useState(false);
+
+  const rubricaOptions = ['Material Permanente', 'Material de Consumo', 'Passagem', 'Diária', 'Pessoa Jurídica', 'Pessoa Física'];
 
   const filtered = useMemo(() => {
     const query = searchTerm.toLowerCase();
-    return regras.filter(item =>
-      item.nome.toLowerCase().includes(query) ||
-      item.baseLegal.toLowerCase().includes(query) ||
-      item.rubricasPermitidas.toLowerCase().includes(query)
-    );
-  }, [regras, searchTerm]);
+    return regras.filter(item => {
+      const matchesText = item.nome.toLowerCase().includes(query) ||
+        item.baseLegal.toLowerCase().includes(query) ||
+        item.rubricasPermitidas.toLowerCase().includes(query);
+      const matchesStatus = statusFilter === 'Todos' || item.situacao === statusFilter;
+      return matchesText && matchesStatus;
+    });
+  }, [regras, searchTerm, statusFilter]);
 
-  const metrics = useMemo(() => ({
-    total: regras.length,
-    vigentes: regras.filter(item => item.situacao === 'Vigente').length,
-    programadas: regras.filter(item => item.situacao === 'Programada').length,
-    faixas: regras.reduce((total, item) => total + item.faixas.length, 0),
-  }), [regras]);
+  const openNew = () => {
+    const nova = { ...emptyRegra, id: Date.now(), faixas: [{ ...emptyRegra.faixas[0], id: Date.now() + 1 }] };
+    setDraft(nova);
+    setSelected(null);
+    setMode('create');
+  };
+
+  const openEdit = (regra: RegraAcaoTransversal) => {
+    setDraft({ ...regra, faixas: regra.faixas.map(faixa => ({ ...faixa })) });
+    setSelected(regra);
+    setMode('detail');
+  };
 
   const updateDraft = (field: keyof RegraAcaoTransversal, value: string) => {
     setDraft(prev => ({ ...prev, [field]: value }));
@@ -100,159 +108,199 @@ export const RegrasAcaoTransversal: React.FC<{ onBack: () => void }> = ({ onBack
     }));
   };
 
-  const openNew = () => {
-    const nova = { ...emptyRegra, id: Date.now(), faixas: [{ ...emptyRegra.faixas[0], id: Date.now() + 1 }] };
-    setDraft(nova);
-    setSelected(null);
+  const toggleRubrica = (rubrica: string) => {
+    const selectedRubricas = draft.rubricasPermitidas ? draft.rubricasPermitidas.split(', ').filter(Boolean) : [];
+    const next = selectedRubricas.includes(rubrica)
+      ? selectedRubricas.filter(item => item !== rubrica)
+      : [...selectedRubricas, rubrica];
+    updateDraft('rubricasPermitidas', next.join(', '));
   };
 
-  const openEdit = (regra: RegraAcaoTransversal) => {
-    setDraft({ ...regra, faixas: regra.faixas.map(faixa => ({ ...faixa })) });
-    setSelected(regra);
-  };
-
-  const save = () => {
-    const item = { ...draft, id: draft.id || Date.now(), faixas: draft.faixas.length ? draft.faixas : [emptyFaixa()] };
-    setRegras(prev => {
-      const exists = prev.some(regra => regra.id === item.id);
-      return exists ? prev.map(regra => regra.id === item.id ? item : regra) : [item, ...prev];
-    });
-    setSelected(item);
-    setDraft(item);
-  };
-
-  const removeSelected = () => {
-    if (!selected) return;
-    const next = regras.filter(item => item.id !== selected.id);
-    setRegras(next);
-    const nextSelected = next[0] || null;
-    setSelected(nextSelected);
-    setDraft(nextSelected || emptyRegra);
-  };
+  const detailTitle = mode === 'create' ? 'Criar Regra' : 'Detalhes';
 
   return (
     <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-16">
         <ConfiguracoesPageHeader
-          title="Regras de Ação Transversal"
+          title={mode === 'list' ? 'Regras de Ação Transversal' : mode === 'create' ? 'Criar Regra' : (selected ? selected.nome : 'Detalhes')}
           subtitle="Cadastre políticas, vigências, faixas percentuais e rubricas permitidas para cálculo da reserva."
           icon={ClipboardList}
           onBack={onBack}
-          action={(
+          breadcrumbParent={mode !== 'list' ? 'Regras de Ação Transversal' : undefined}
+          breadcrumbTitle={mode !== 'list' ? detailTitle : undefined}
+          onBreadcrumbParentClick={mode !== 'list' ? () => setMode('list') : undefined}
+          action={mode === 'list' ? (
             <button onClick={openNew} style={S.primaryButton}>
               <Plus size={15} />
-              Nova regra
+              Criar Regra
             </button>
-          )}
+          ) : undefined}
         />
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '14px', marginBottom: '24px' }}>
-          <Metric T={T} label="Regras" value={String(metrics.total)} />
-          <Metric T={T} label="Vigentes" value={String(metrics.vigentes)} />
-          <Metric T={T} label="Programadas" value={String(metrics.programadas)} />
-          <Metric T={T} label="Faixas cadastradas" value={String(metrics.faixas)} />
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(320px, 0.85fr) minmax(0, 1.35fr)', gap: '18px', alignItems: 'start' }}>
-          <div style={S.card}>
-            <div style={{ marginBottom: '16px' }}>
-              <label style={S.label}>Pesquisar</label>
-              <div style={{ position: 'relative' }}>
-                <Search size={15} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
-                <input value={searchTerm} onChange={event => setSearchTerm(event.target.value)} placeholder="Buscar" style={{ ...S.input, paddingRight: '36px' }} />
+        {mode === 'list' ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.7fr', gap: '16px', alignItems: 'end' }}>
+              <div>
+                <label style={S.label}>Pesquisar</label>
+                <div style={{ position: 'relative' }}>
+                  <Search size={15} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
+                  <input value={searchTerm} onChange={event => setSearchTerm(event.target.value)} placeholder="Buscar" style={{ ...S.input, paddingRight: '36px' }} />
+                </div>
               </div>
+              <SystemDropdown
+                label="Status"
+                value={statusFilter}
+                options={['Todos', 'Ativo', 'Finalizado', 'Rascunho']}
+                isOpen={statusOpen}
+                onOpen={() => setStatusOpen(open => !open)}
+                onChange={value => {
+                  setStatusFilter(value as SituacaoRegra | 'Todos');
+                  setStatusOpen(false);
+                }}
+                S={S}
+                T={T}
+              />
+            </div>
+
+            <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary }}>
+              Exibindo {filtered.length} resultado{filtered.length === 1 ? '' : 's'} de {regras.length}
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {filtered.map(regra => {
-                const active = draft.id === regra.id;
                 return (
                   <button
                     key={regra.id}
                     onClick={() => openEdit(regra)}
                     style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1.35fr 1fr 1fr 0.7fr 40px',
+                      gap: '16px',
+                      alignItems: 'center',
                       textAlign: 'left',
-                      border: `1px solid ${active ? T.accent : T.borderSubtle}`,
-                      backgroundColor: active ? T.accentSoft : T.bgSurfaceMuted,
-                      borderRadius: '8px',
-                      padding: '14px',
+                      border: `1px solid ${T.borderSubtle}`,
+                      backgroundColor: T.bgCard,
+                      borderRadius: '10px',
+                      padding: '18px 20px',
                       cursor: 'pointer',
                     }}
+                    onMouseEnter={event => {
+                      event.currentTarget.style.backgroundColor = T.bgSurfaceMuted;
+                      event.currentTarget.style.borderColor = T.borderDefault;
+                    }}
+                    onMouseLeave={event => {
+                      event.currentTarget.style.backgroundColor = T.bgCard;
+                      event.currentTarget.style.borderColor = T.borderSubtle;
+                    }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', marginBottom: '8px' }}>
-                      <strong style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary }}>{regra.nome}</strong>
+                    <ReadCell T={T} label="Política" value={regra.nome} strong />
+                    <ReadCell T={T} label="Base legal" value={regra.baseLegal} />
+                    <ReadCell T={T} label="Vigência" value={formatVigencia(regra.vigenciaInicio, regra.vigenciaFim)} />
+                    <div>
+                      <div style={S.cellLabel}>Status</div>
                       <StatusBadge situacao={regra.situacao} />
                     </div>
-                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: '0 0 6px' }}>{regra.baseLegal}</p>
-                    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, margin: 0 }}>{regra.faixas.length} faixa(s) percentual(is)</p>
+                    <ChevronRight size={18} style={{ color: T.iconSubdued, justifySelf: 'center' }} />
                   </button>
                 );
               })}
             </div>
           </div>
-
+        ) : (
+          <>
           <div style={S.card}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
-              <div>
-                <h2 style={S.sectionTitle}>Cadastro da regra</h2>
-                <p style={S.sectionSubtitle}>As faixas não devem se sobrepor e a política vigente será usada nos cálculos das parcerias.</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '18px' }}>
+              <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: T.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: T.accentText }}>1</span>
               </div>
-              {selected && (
-                <button onClick={removeSelected} style={S.dangerButton}>
-                  <Trash2 size={15} />
-                  Remover
-                </button>
-              )}
+              <h2 style={{ ...S.sectionTitle, margin: 0 }}>Informações da Regra</h2>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '16px' }}>
-              <Field label="Nome" value={draft.nome} onChange={value => updateDraft('nome', value)} placeholder="Política padrão de Ação Transversal" S={S} />
-              <Field label="Base legal" value={draft.baseLegal} onChange={value => updateDraft('baseLegal', value)} placeholder="Resolução CCAF nº 334/2023" S={S} />
-              <Field label="Vigência inicial" type="date" value={draft.vigenciaInicio} onChange={value => updateDraft('vigenciaInicio', value)} S={S} />
-              <Field label="Vigência final" type="date" value={draft.vigenciaFim} onChange={value => updateDraft('vigenciaFim', value)} S={S} />
-              <Select label="Situação" value={draft.situacao} onChange={value => updateDraft('situacao', value)} options={['Vigente', 'Programada', 'Inativa']} S={S} />
-              <Field label="Rubricas permitidas" value={draft.rubricasPermitidas} onChange={value => updateDraft('rubricasPermitidas', value)} placeholder="Diárias, passagens, publicações..." S={S} />
-            </div>
+            {mode === 'create' ? (
+              <>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '16px' }}>
+                  <Field label="Nome" value={draft.nome} onChange={value => updateDraft('nome', value)} placeholder="Política padrão de Ação Transversal" S={S} />
+                  <Field label="Base legal" value={draft.baseLegal} onChange={value => updateDraft('baseLegal', value)} placeholder="Resolução CCAF nº 334/2023" S={S} />
+                  <Field label="Data de Início" type="date" value={draft.vigenciaInicio} onChange={value => updateDraft('vigenciaInicio', value)} S={S} />
+                  <Field label="Data de Fim" type="date" value={draft.vigenciaFim} onChange={value => updateDraft('vigenciaFim', value)} S={S} />
+                </div>
 
-            <div style={{ marginBottom: '18px' }}>
-              <label style={S.label}>Observações</label>
-              <textarea value={draft.observacoes} onChange={event => updateDraft('observacoes', event.target.value)} rows={3} style={{ ...S.input, resize: 'vertical' }} />
-            </div>
+                <div style={{ marginBottom: '18px' }}>
+                  <label style={S.label}>Descrição</label>
+                  <textarea value={draft.observacoes} onChange={event => updateDraft('observacoes', event.target.value)} rows={3} style={{ ...S.input, resize: 'vertical' }} />
+                </div>
 
-            <div style={{ marginBottom: '18px' }}>
+                <div style={{ marginBottom: '18px' }}>
+                  <label style={S.label}>Rubricas Permitidas</label>
+                  <RubricasGrid
+                    options={rubricaOptions}
+                    selectedRubricas={draft.rubricasPermitidas}
+                    T={T}
+                    onToggle={toggleRubrica}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '16px' }}>
+                  <ReadField label="Nome" value={draft.nome} S={S} />
+                  <ReadField label="Base legal" value={draft.baseLegal} S={S} />
+                  <ReadField label="Data de Início" value={draft.vigenciaInicio || 'Sem data'} S={S} />
+                  <ReadField label="Data de Fim" value={draft.vigenciaFim || 'Sem data'} S={S} />
+                </div>
+
+                <div style={{ marginBottom: '18px' }}>
+                  <label style={S.label}>Descrição</label>
+                  <div style={{ ...S.readInput, minHeight: '84px' }}>
+                    {draft.observacoes || 'Sem descrição'}
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '18px' }}>
+                  <label style={S.label}>Rubricas Permitidas</label>
+                  <RubricasGrid
+                    options={rubricaOptions}
+                    selectedRubricas={draft.rubricasPermitidas}
+                    T={T}
+                    readOnly
+                  />
+                </div>
+              </>
+            )}
+
+            <div style={{ margin: '18px 0' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                 <h3 style={S.sectionTitle}>Faixas percentuais</h3>
-                <button onClick={() => setDraft(prev => ({ ...prev, faixas: [...prev.faixas, emptyFaixa()] }))} style={S.secondaryButton}>
-                  <Plus size={14} />
-                  Adicionar faixa
-                </button>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {draft.faixas.map(faixa => (
-                  <div key={faixa.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 0.8fr auto', gap: '10px', alignItems: 'end', padding: '12px', border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', backgroundColor: T.bgSurfaceMuted }}>
-                    <Field label="Valor mínimo" value={faixa.valorMinimo} onChange={value => updateFaixa(faixa.id, 'valorMinimo', value)} placeholder="0,00" S={S} />
-                    <Field label="Valor máximo" value={faixa.valorMaximo} onChange={value => updateFaixa(faixa.id, 'valorMaximo', value)} placeholder="Sem limite" S={S} />
-                    <Field label="Percentual" value={faixa.percentual} onChange={value => updateFaixa(faixa.id, 'percentual', value)} placeholder="4,00" S={S} />
-                    <button
-                      onClick={() => setDraft(prev => ({ ...prev, faixas: prev.faixas.filter(item => item.id !== faixa.id) }))}
-                      title="Remover faixa"
-                      style={{ ...S.iconButton, width: '40px', height: '40px' }}
-                    >
-                      <Trash2 size={15} style={{ color: T.danger }} />
-                    </button>
+                  <div key={faixa.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 0.8fr', gap: '10px', alignItems: 'end' }}>
+                    {mode === 'create' ? (
+                      <>
+                        <Field label="Valor mínimo" value={faixa.valorMinimo} onChange={value => updateFaixa(faixa.id, 'valorMinimo', value)} placeholder="0,00" S={S} />
+                        <Field label="Valor máximo" value={faixa.valorMaximo} onChange={value => updateFaixa(faixa.id, 'valorMaximo', value)} placeholder="Sem limite" S={S} />
+                        <Field label="Percentual" value={faixa.percentual} onChange={value => updateFaixa(faixa.id, 'percentual', value)} placeholder="4,00" S={S} />
+                      </>
+                    ) : (
+                      <>
+                        <ReadField label="Valor mínimo" value={faixa.valorMinimo || '0,00'} S={S} />
+                        <ReadField label="Valor máximo" value={faixa.valorMaximo || 'Sem limite'} S={S} />
+                        <ReadField label="Percentual" value={faixa.percentual || '0,00'} S={S} />
+                      </>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <button onClick={save} style={S.primaryButton}>
-                <Save size={15} />
-                Salvar regra
-              </button>
-            </div>
           </div>
-        </div>
+          {mode === 'create' && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '18px' }}>
+              <button type="button" style={S.secondaryButton}>Salvar Rascunho</button>
+              <button type="button" style={S.primaryButton}>Ativar Regra</button>
+            </div>
+          )}
+          </>
+        )}
       </div>
     </div>
   );
@@ -277,12 +325,30 @@ const buildStyles = (T: ThemeTokens) => ({
     outline: 'none',
     boxSizing: 'border-box',
   } as React.CSSProperties,
+  readInput: {
+    width: '100%',
+    minHeight: '42px',
+    backgroundColor: T.bgSurfaceMuted,
+    border: `1px solid ${T.borderDefault}`,
+    borderRadius: '6px',
+    padding: '10px 12px',
+    color: T.textPrimary,
+    fontFamily: 'var(--font-family)',
+    fontSize: 'var(--text-sm)',
+    boxSizing: 'border-box',
+  } as React.CSSProperties,
   label: {
     display: 'block',
     fontFamily: 'var(--font-family)',
     fontSize: 'var(--text-sm)',
     color: T.textSecondary,
     marginBottom: '8px',
+  } as React.CSSProperties,
+  cellLabel: {
+    fontFamily: 'var(--font-family)',
+    fontSize: 'var(--text-xs)',
+    color: T.textMuted,
+    marginBottom: '4px',
   } as React.CSSProperties,
   sectionTitle: {
     fontFamily: 'var(--font-family)',
@@ -360,26 +426,146 @@ const Field: React.FC<{ label: string; value: string; onChange: (value: string) 
   </div>
 );
 
-const Select: React.FC<{ label: string; value: string; onChange: (value: string) => void; options: string[]; S: ReturnType<typeof buildStyles> }> = ({ label, value, onChange, options, S }) => (
+const ReadField: React.FC<{ label: string; value: string; S: ReturnType<typeof buildStyles> }> = ({ label, value, S }) => (
   <div>
     <label style={S.label}>{label}</label>
-    <select value={value} onChange={event => onChange(event.target.value)} style={S.input}>
-      {options.map(option => <option key={option} value={option}>{option}</option>)}
-    </select>
+    <div style={S.readInput}>
+      {value}
+    </div>
   </div>
 );
 
-const Metric: React.FC<{ T: ThemeTokens; label: string; value: string }> = ({ T, label, value }) => (
-  <div style={{ backgroundColor: T.bgCard, border: `1px solid ${T.borderSubtle}`, borderRadius: '10px', padding: '16px' }}>
-    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, margin: '0 0 8px' }}>{label}</p>
-    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', color: T.textPrimary, margin: 0 }}>{value}</p>
+const SystemDropdown: React.FC<{
+  label: string;
+  value: string;
+  options: string[];
+  isOpen: boolean;
+  onOpen: () => void;
+  onChange: (value: string) => void;
+  S: ReturnType<typeof buildStyles>;
+  T: ThemeTokens;
+}> = ({ label, value, options, isOpen, onOpen, onChange, S, T }) => (
+  <div style={{ position: 'relative' }}>
+    <label style={S.label}>{label}</label>
+    <button
+      type="button"
+      onClick={onOpen}
+      style={{
+        ...S.input,
+        minHeight: '42px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '12px',
+        textAlign: 'left',
+        cursor: 'pointer',
+        border: `1px solid ${isOpen ? T.accent : T.borderDefault}`,
+      }}
+    >
+      <span>{value}</span>
+      <ChevronDown size={16} style={{ color: T.iconSubdued }} />
+    </button>
+    {isOpen && (
+      <div
+        style={{
+          position: 'absolute',
+          top: 'calc(100% + 6px)',
+          left: 0,
+          right: 0,
+          zIndex: 30,
+          backgroundColor: T.bgSurface,
+          border: `1px solid ${T.borderDefault}`,
+          borderRadius: 'var(--radius)',
+          boxShadow: T.shadowMd,
+          overflow: 'hidden',
+        }}
+      >
+        {options.map(option => (
+          <button
+            key={option}
+            type="button"
+            onClick={() => onChange(option)}
+            style={{
+              width: '100%',
+              minHeight: '42px',
+              padding: '10px 12px',
+              border: 'none',
+              backgroundColor: option === value ? T.accentSoft : T.bgSurface,
+              color: option === value ? T.accent : T.textPrimary,
+              fontFamily: 'var(--font-family)',
+              fontSize: 'var(--text-sm)',
+              textAlign: 'left',
+              cursor: 'pointer',
+            }}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+    )}
   </div>
 );
+
+const ReadCell: React.FC<{ T: ThemeTokens; label: string; value: string; strong?: boolean }> = ({ T, label, value, strong }) => (
+  <div style={{ minWidth: 0 }}>
+    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: T.textMuted, marginBottom: '4px' }}>
+      {label}
+    </div>
+    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: strong ? T.textPrimary : T.textSecondary, fontWeight: strong ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      {value}
+    </p>
+  </div>
+);
+
+const RubricasGrid: React.FC<{
+  options: string[];
+  selectedRubricas: string;
+  T: ThemeTokens;
+  onToggle?: (rubrica: string) => void;
+  readOnly?: boolean;
+}> = ({ options, selectedRubricas, T, onToggle, readOnly }) => {
+  const selected = selectedRubricas.split(', ').filter(Boolean);
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '10px' }}>
+      {options.map(rubrica => {
+        const checked = selected.includes(rubrica);
+        return (
+          <label
+            key={rubrica}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '10px 12px',
+              border: `1px solid ${checked ? T.accent : T.borderSubtle}`,
+              borderRadius: '8px',
+              backgroundColor: checked ? T.accentSoft : T.bgSurfaceMuted,
+              color: checked ? T.accent : T.textPrimary,
+              fontFamily: 'var(--font-family)',
+              fontSize: 'var(--text-sm)',
+              cursor: readOnly ? 'default' : 'pointer',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={checked}
+              disabled={readOnly}
+              onChange={() => onToggle?.(rubrica)}
+              style={{ width: '16px', height: '16px', accentColor: T.accent, cursor: readOnly ? 'default' : 'pointer' }}
+            />
+            {rubrica}
+          </label>
+        );
+      })}
+    </div>
+  );
+};
 
 const StatusBadge: React.FC<{ situacao: SituacaoRegra }> = ({ situacao }) => {
-  const color = situacao === 'Vigente' ? '#22c55e' : situacao === 'Programada' ? '#38bdf8' : '#a3a3a3';
+  const color = situacao === 'Ativo' ? '#22c55e' : situacao === 'Rascunho' ? '#f59e0b' : '#a3a3a3';
   return (
-    <span style={{ flexShrink: 0, padding: '4px 8px', borderRadius: '999px', backgroundColor: `${color}22`, color, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>
+    <span style={{ flexShrink: 0, padding: '4px 8px', borderRadius: '999px', backgroundColor: `${color}22`, border: `1px solid ${color}66`, color, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)' }}>
       {situacao}
     </span>
   );
