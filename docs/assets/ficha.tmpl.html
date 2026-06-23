@@ -1,0 +1,148 @@
+<title>Fichas de Módulo — ConectaFAPES</title>
+<style>
+  :root{
+    --bg:#0b0e16;--panel:#121826;--panel-2:#1a2130;--line:#28303f;
+    --ink:#e9eef7;--ink-dim:#8c98ad;--ink-faint:#5b667a;--accent:#38bdf8;
+    --enable:#34d399;--depend:#60a5fa;--danger:#fb5d6b;--gold:#fbbf24;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .top{position:sticky;top:0;z-index:10;background:#0b0e16ee;backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:13px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .top h1{margin:0;font-size:16px;font-weight:650}
+  .top .nav{margin-left:auto;display:flex;gap:8px}
+  .lnk{font-size:12.5px;color:var(--ink-dim);border:1px solid var(--line);border-radius:8px;padding:6px 11px;cursor:pointer}
+  .lnk:hover{color:var(--ink);border-color:#3a455a}
+  .lnk.pri{background:var(--accent);color:#04121c;border-color:var(--accent);font-weight:600}
+  .wrap{max-width:880px;margin:0 auto;padding:24px 22px 60px}
+  /* índice */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-top:18px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:15px 16px;cursor:pointer;transition:.15s;border-left-width:4px}
+  .card:hover{border-color:#3a455a;transform:translateY(-2px)}
+  .card .cid{font-size:11px;font-weight:700;color:var(--ink-faint)}
+  .card .cn{font-size:15px;font-weight:600;margin:3px 0 6px}
+  .card .cd{font-size:12.5px;color:var(--ink-dim);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .card .cf{display:flex;align-items:center;gap:8px;margin-top:10px}
+  .tag{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:99px;color:#06080d}
+  .prog{height:6px;border-radius:3px;background:var(--line);overflow:hidden;flex:1;display:flex}
+  .prog i{height:100%}
+  /* ficha */
+  .head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+  .head .id{font-size:13px;font-weight:700;color:var(--ink-faint)}
+  .head h2{margin:0;font-size:24px;font-weight:680;letter-spacing:-.02em}
+  .prop{color:var(--ink-dim);font-size:14px;margin:6px 0 0}
+  .sec{margin-top:24px}
+  .sec h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin:0 0 12px;font-weight:600}
+  .negocio{background:linear-gradient(180deg,#13233a,#121826);border:1px solid #2a3b57;border-radius:14px;padding:18px 20px;margin-top:18px}
+  .negocio h3{color:#9ec5ff}
+  .nrow{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid #ffffff0a;font-size:14px}
+  .nrow:last-child{border-bottom:0}
+  .nrow .nk{flex:none;width:92px;color:var(--ink-faint);font-size:12px;text-transform:uppercase;letter-spacing:.04em;padding-top:2px}
+  .nrow .nv{flex:1;color:var(--ink)}
+  .kpi{display:inline-block;font-size:12px;color:#06080d;background:var(--gold);border-radius:7px;padding:3px 9px;margin:0 6px 6px 0;font-weight:600}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 14px}
+  .stat .k{font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.05em}
+  .stat .v{font-size:19px;font-weight:680;margin-top:3px}
+  .stat .v.enable{color:var(--enable)}.stat .v.danger{color:var(--danger)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:6px 11px;cursor:pointer;transition:.15s}
+  .chip:hover{border-color:#3a455a;color:#fff}
+  .chip .b{width:9px;height:9px;border-radius:3px;flex:none}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .ent{font-size:13px;color:var(--ink);padding:6px 0;border-bottom:1px solid #ffffff08}
+  .ent b{font-weight:600}.ent span{color:var(--ink-faint);font-size:12px;display:block}
+  .ev{font-size:12.5px;color:var(--ink-dim);padding:5px 0;border-bottom:1px solid #ffffff08}
+  .ev code{color:var(--enable)}
+  .epic{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-bottom:9px}
+  .epic .er{display:flex;align-items:center;gap:9px}
+  .epic .eid{font-size:10.5px;font-weight:700;color:var(--ink-faint)}
+  .epic .et{font-size:13.5px;font-weight:600;flex:1}
+  .epic .ems{font-size:9.5px;color:var(--ink-faint);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+  .epic .ev2{font-size:12.5px;color:var(--ink-dim);margin:5px 0 7px}
+  .muted{color:var(--ink-faint);font-size:13px}
+  @media(max-width:640px){.two{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+
+<div class="top">
+  <h1 id="topttl">Fichas de Módulo</h1>
+  <div class="nav" id="topnav"></div>
+</div>
+<div class="wrap" id="wrap"></div>
+
+<script>
+//__DATA__
+const DOM=DATA.dominios;
+const STATUS={entregue:{c:"#22c55e",l:"Entregue"},andamento:{c:"#f59e0b",l:"Em andamento"},homol:{c:"#14b8a6",l:"Homologação"},validacao:{c:"#06b6d4",l:"Validação"},planejado:{c:"#64748b",l:"Planejado"},especificado:{c:"#3a4354",l:"Especificado"}};
+const IMP={1:"Apoio",2:"Complementar",3:"Relevante",4:"Estruturante",5:"Crítico"};
+const M=DATA.modulos,byId={};M.forEach(m=>byId[m.id]=m);
+const wrap=document.getElementById("wrap"),topnav=document.getElementById("topnav"),topttl=document.getElementById("topttl");
+const esc=s=>(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const pct=m=>(m.negocio&&m.negocio.percent_desenv!=null)?m.negocio.percent_desenv:null;
+function progHtml(p){p=p||0;return `<div class="prog"><i style="width:${p}%;background:var(--enable)"></i></div>`;}
+
+function go(id){history.pushState({},"",id?("?m="+id):location.pathname);route();window.scrollTo(0,0);}
+
+function index(){
+  topttl.textContent="Fichas de Módulo";topnav.innerHTML=`<a class="lnk" href="mapa-capacidades.html">▶ ver no grafo</a>`;
+  const cards=M.map(m=>{const col=DOM[m.dominio].cor,st=STATUS[m.status],p=pct(m),dor=(m.negocio&&m.negocio.dor)||m.proposito;
+    return `<div class="card" data-go="${m.id}" style="border-left-color:${col}">
+      <div class="cid">${m.id} · ${DOM[m.dominio].nome}</div>
+      <div class="cn">${esc(m.nome)}</div>
+      <div class="cd">${esc(dor)}</div>
+      <div class="cf"><span class="tag" style="background:${st.c}">${st.l}</span>${p!=null?progHtml(p)+`<span class="muted">${p}%</span>`:'<span class="muted">—</span>'}</div>
+    </div>`;}).join("");
+  wrap.innerHTML=`<p class="muted">${M.length} módulos · clique para abrir a ficha de negócio.</p><div class="grid">${cards}</div>`;
+  wrap.querySelectorAll("[data-go]").forEach(c=>c.onclick=()=>go(c.dataset.go));
+}
+
+function ficha(m){
+  const col=DOM[m.dominio].cor,st=STATUS[m.status],N=m.negocio||{},R=m.epics_resumo,O=m.ontologia,p=pct(m);
+  topttl.innerHTML=`<a href="${location.pathname}" data-home style="color:var(--ink-faint)">Fichas</a> <span style="color:var(--ink-faint)">›</span> ${m.id}`;
+  topnav.innerHTML=`<a class="lnk" href="${location.pathname}" data-home>todas as fichas</a><a class="lnk pri" href="mapa-capacidades.html#${m.id}">▶ ver no grafo</a>`;
+  const chip=(id)=>{const x=byId[id];if(!x)return"";return `<span class="chip" data-go="${id}"><span class="b" style="background:${DOM[x.dominio].cor}"></span>${id} ${esc(x.nome)}</span>`;};
+  const stars="●".repeat(m.importancia)+"○".repeat(5-m.importancia);
+  const negBlock=`<div class="negocio"><h3>Negócio</h3>
+    <div class="nrow"><div class="nk">Dor</div><div class="nv">${esc(N.dor)||'<span class="muted">— não informado</span>'}</div></div>
+    <div class="nrow"><div class="nk">Benefício</div><div class="nv">${esc(N.beneficio)||'<span class="muted">—</span>'}</div></div>
+    ${N.valor_publico?`<div class="nrow"><div class="nk">Valor público</div><div class="nv">${esc(N.valor_publico)}</div></div>`:''}
+    ${(N.kpis&&N.kpis.length)?`<div class="nrow"><div class="nk">KPIs</div><div class="nv">${N.kpis.map(k=>`<span class="kpi">${esc(k)}</span>`).join("")}</div></div>`:''}
+  </div>`;
+  const epics=m.epics.map(e=>{const v=e.valor||e.objetivo||"";
+    return `<div class="epic"><div class="er"><span class="eid">${e.id.replace('EPIC-','')}</span><span class="et">${esc(e.titulo)}</span>${e.milestone?`<span class="ems">${e.milestone}</span>`:''}</div>
+    ${v?`<div class="ev2">${esc(v)}</div>`:''}
+    <div style="display:flex;align-items:center;gap:9px"><div class="prog"><i style="width:${e.us_total?e.us.done/e.us_total*100:0}%;background:var(--enable)"></i><i style="width:${e.us_total?e.us.doing/e.us_total*100:0}%;background:var(--accent)"></i></div><span class="muted">${e.us.done}/${e.us_total} US</span></div>
+    ${e.habilita_modulos.length?`<div class="muted" style="margin-top:7px">habilita: ${e.habilita_modulos.map(x=>chip(x)).join(" ")}</div>`:''}</div>`;}).join("")||'<p class="muted">Sem epics documentados.</p>';
+  wrap.innerHTML=`
+    <div class="head"><span class="id">${m.id}</span><h2>${esc(m.nome)}</h2>
+      <span class="tag" style="background:${col}">${DOM[m.dominio].nome}</span>
+      <span class="tag" style="background:${st.c}">${st.l}</span>
+      ${m.transversal?'<span class="tag" style="background:#475569;color:#e9eef7">transversal</span>':''}</div>
+    <p class="prop">${esc(m.proposito)}</p>
+    ${negBlock}
+    <div class="sec"><h3>Impacto & dependências</h3>
+      <div class="stats">
+        <div class="stat"><div class="k">Importância</div><div class="v">${IMP[m.importancia]}</div><div class="muted" style="color:var(--gold)">${stars}</div></div>
+        <div class="stat"><div class="k">Impacto técnico</div><div class="v" style="text-transform:capitalize">${m.impacto}</div></div>
+        <div class="stat"><div class="k">Param se cair</div><div class="v danger">${m.alcance}</div></div>
+        <div class="stat"><div class="k">Desenvolvido</div><div class="v ${p!=null?'enable':''}">${p!=null?p+'%':'—'}</div></div>
+      </div>
+      <div class="two" style="margin-top:16px">
+        <div><div class="muted" style="margin-bottom:8px">Habilita →</div><div class="chips">${m.hab.map(h=>chip(h.to)).join("")||'<span class="muted">—</span>'}</div></div>
+        <div><div class="muted" style="margin-bottom:8px">← Depende de</div><div class="chips">${m.dep.map(h=>chip(h.to)).join("")||'<span class="muted">—</span>'}</div></div>
+      </div>
+    </div>
+    <div class="two">
+      <div class="sec"><h3>Modelo · ${O.entidades.length} entidades</h3>${O.entidades.slice(0,12).map(e=>`<div class="ent"><b>${esc(e.nome)}</b>${e.desc?`<span>${esc(e.desc)}</span>`:''}</div>`).join("")||'<p class="muted">Stub / transversal.</p>'}</div>
+      <div class="sec"><h3>Eventos · ${O.eventos.length}</h3>${O.eventos.slice(0,12).map(e=>`<div class="ev"><code>${esc(e.nome)}</code></div>`).join("")||'<p class="muted">—</p>'}</div>
+    </div>
+    <div class="sec"><h3>Entrega · ${R.epics} epics · ${R.done}/${R.us_total} US</h3>${epics}</div>`;
+  wrap.querySelectorAll("[data-go]").forEach(c=>c.onclick=()=>go(c.dataset.go));
+  wrap.querySelectorAll("[data-home]").forEach(a=>a.onclick=e=>{e.preventDefault();go(null);});
+  topnav.querySelectorAll("[data-home]").forEach(a=>a.onclick=e=>{e.preventDefault();go(null);});
+}
+
+function route(){const id=new URLSearchParams(location.search).get("m");(id&&byId[id])?ficha(byId[id]):index();}
+window.addEventListener("popstate",route);
+route();
+</script>

@@ -140,6 +140,11 @@ def parse_epics():
         milestone = ms.group(1) if ms else ""
         obj = re.sub(r"\s+", " ", sect(txt, "Objetivo")).strip()
         if obj: obj = re.split(r"(?<=[.;])\s", obj)[0][:160]
+        val = re.sub(r"\s+", " ", sect(txt, "Valor") or sect(txt, "Valor de Negocio") or sect(txt, "Valor de Negócio")).strip()
+        if not val:
+            vm = re.search(r"\*\*Valor\*\*\s*:?\s*(.+)", txt)
+            val = vm.group(1).strip() if vm else ""
+        val = val[:160]
         dep_sec = sect(txt, "Dependencias") or sect(txt, "Dependências")
 
         def grab(label):
@@ -161,7 +166,7 @@ def parse_epics():
             st_by_id.setdefault(uid, "todo")
         us = collections.Counter(st_by_id.values())
         by_mod[mod].append({
-            "id": eid, "titulo": titulo, "objetivo": obj, "milestone": milestone,
+            "id": eid, "titulo": titulo, "objetivo": obj, "valor": val, "milestone": milestone,
             "depende_epics": dep_e, "depende_modulos": dep_m,
             "habilita_epics": hab_e, "habilita_modulos": hab_m,
             "us_total": len(st_by_id),
@@ -170,9 +175,27 @@ def parse_epics():
     return {m: sorted(by_mod[m], key=lambda e: e["id"]) for m in sorted(by_mod)}
 
 
+# ------------------------------------------------------------------ negócio
+def parse_backlog():
+    """Tabela 'Modulos e Sub-Backlogs' do backlog-product.md -> negócio por módulo."""
+    f = REPO / "docs/management/backlog-product.md"
+    out = {}
+    if not f.exists(): return out
+    for line in f.read_text().splitlines():
+        m = re.match(r"^\|\s*(M0\d\d)\s*\|([^|]*)\|([^|]*)\|([^|]*)\|([^|]*)\|([^|]*)\|", line)
+        if not m: continue
+        mid, _nome, dor, cap, kpi, pct = (g.strip() for g in m.groups())
+        pm = re.search(r"(\d+)\s*%", pct)
+        out[mid] = {"dor": dor, "beneficio": cap,
+                    "kpis": [k.strip() for k in re.split(r"[;\n]", kpi) if k.strip()],
+                    "percent_desenv": int(pm.group(1)) if pm else None}
+    return out
+
+
 # ------------------------------------------------------------------ merge
-def merge(cap, onto, epics):
+def merge(cap, onto, epics, backlog):
     mods = {}
+    aut_neg = {m["id"]: (m.get("negocio") or {}) for m in cap["modulos"]}
     for m in cap["modulos"]:
         mods[m["id"]] = {
             "id": m["id"], "nome": m["nome"], "dominio": m["dominio"], "nivel": m["nivel"],
@@ -204,6 +227,7 @@ def merge(cap, onto, epics):
 
     for mid, Mx in mods.items():
         Mx["alcance"] = len(reach(mid))
+        Mx["negocio"] = {**(backlog.get(mid) or {}), **aut_neg.get(mid, {})}
         o = onto["modules"].get(mid, {})
         Mx["ontologia"] = {"entidades": o.get("entities", [])[:24],
                            "eventos": o.get("events", [])[:20], "workflows": o.get("workflows", [])}
@@ -217,21 +241,29 @@ def merge(cap, onto, epics):
             "escalas": cap["escalas"], "modulos": [mods[k] for k in sorted(mods, key=lambda x: int(x[1:]))]}
 
 
+def render(tmpl_name, full):
+    tmpl = (ASSETS / tmpl_name).read_text()
+    js = "const DATA=" + json.dumps(full, ensure_ascii=False, separators=(",", ":")) + ";"
+    (ASSETS / tmpl_name.replace(".tmpl", "")).write_text(tmpl.replace("//__DATA__", js))
+
+
 def main():
     cap = yaml.safe_load(open(DATA / "capacidades.yaml"))
     onto = parse_ontology()
     epics = parse_epics()
+    backlog = parse_backlog()
     DATA.mkdir(parents=True, exist_ok=True)
     ASSETS.mkdir(parents=True, exist_ok=True)
     yaml.safe_dump({"epics_por_modulo": epics}, open(DATA / "epics.yaml", "w"),
                    allow_unicode=True, sort_keys=False, width=100)
     json.dump(onto, open(DATA / "ontology_data.json", "w"), ensure_ascii=False, indent=1)
-    full = merge(cap, onto, epics)
-    tmpl = (ASSETS / "mapa-capacidades.tmpl.html").read_text()
-    js = "const DATA=" + json.dumps(full, ensure_ascii=False, separators=(",", ":")) + ";"
-    (ASSETS / "mapa-capacidades.html").write_text(tmpl.replace("//__DATA__", js))
+    full = merge(cap, onto, epics, backlog)
+    render("mapa-capacidades.tmpl.html", full)
+    if (ASSETS / "ficha.tmpl.html").exists():
+        render("ficha.tmpl.html", full)
     n_ep = sum(len(v) for v in epics.values())
-    print(f"[capacidades] {len(full['modulos'])} módulos · {len(onto['edges'])} arestas ontology · {n_ep} epics -> docs/assets/mapa-capacidades.html")
+    print(f"[capacidades] {len(full['modulos'])} módulos · {len(onto['edges'])} arestas · "
+          f"{n_ep} epics · {len(backlog)} c/ negócio -> docs/assets/{{mapa-capacidades,ficha}}.html")
 
 
 if __name__ == "__main__":

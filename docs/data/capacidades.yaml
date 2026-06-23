@@ -177,6 +177,12 @@ modulos:
     impacto: medio
     proposito: "Formulários reutilizáveis (caracterização, habilitação, avaliação)."
     entidades_chave: [Formulario, RespostaFormulario, Secao, Questao]
+    negocio:
+      dor: "Formulários de submissão e avaliação são montados ad hoc a cada edital, gerando retrabalho e inconsistência."
+      beneficio: "Formulários reutilizáveis e versionados, prontos para compor captações."
+      impacto_negocio: medio
+      kpis: ["Tempo de montagem de edital", "Reuso de formulários entre captações"]
+      valor_publico: "Editais padronizados e auditáveis."
     habilita:
       - { modulo: M011, tipo: dados }
 
@@ -190,6 +196,12 @@ modulos:
     impacto: medio
     proposito: "Réplica local versionada do Lattes para elegibilidade e indicadores."
     entidades_chave: [Curriculo, FormacaoAcademica, Artigo, Orientacao]
+    negocio:
+      dor: "Dados de currículo (formação, produção) dependem de consulta manual ao Lattes, sem histórico nem padronização."
+      beneficio: "Réplica local versionada do Lattes para elegibilidade, expertise e indicadores."
+      impacto_negocio: medio
+      kpis: ["Cobertura de currículos sincronizados", "Tempo de seleção de revisor ad hoc"]
+      valor_publico: "Seleção de avaliadores mais justa e rastreável."
     habilita:
       - { modulo: M011, tipo: dados }
       - { modulo: M018, tipo: dados }
@@ -221,6 +233,12 @@ modulos:
     impacto: medio
     proposito: "Formaliza proposta aprovada em projeto via termo de outorga."
     entidades_chave: [ContratacaoOutorga, Outorgado, TermoOutorga]
+    negocio:
+      dor: "Contratação/outorga de propostas aprovadas é manual, com conferência de requisitos em papel."
+      beneficio: "Formaliza a outorga e converte proposta aprovada em projeto gerenciável."
+      impacto_negocio: medio
+      kpis: ["Tempo entre aprovação e início do projeto", "% outorgas sem pendência documental"]
+      valor_publico: "Início de projeto mais rápido para o pesquisador."
     habilita:
       - { modulo: M003, tipo: workflow }
 
@@ -421,6 +439,12 @@ modulos:
     impacto: alto
     proposito: "Adaptadores: assinatura digital (E-Docs) e currículos (Lattes, ORCID)."
     entidades_chave: [SolicitacaoAssinatura, Signatario, EventoAssinatura]
+    negocio:
+      dor: "Assinatura de documentos e importação de currículos são manuais e dispersas em sistemas externos."
+      beneficio: "Adaptadores plugáveis de assinatura digital (E-Docs) e currículo (Lattes/ORCID)."
+      impacto_negocio: alto
+      kpis: ["Tempo de assinatura de termos", "% termos assinados digitalmente"]
+      valor_publico: "Menos papel, termos juridicamente válidos, mais rápido."
     habilita:
       - { modulo: M003, tipo: infra }
       - { modulo: M009, tipo: infra }

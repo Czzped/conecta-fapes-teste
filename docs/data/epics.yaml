@@ -4,6 +4,7 @@ epics_por_modulo:
     titulo: Cadastro de Resolucoes
     objetivo: Permitir o cadastro, consulta, alteracao e exclusao das resolucoes que criam ou alteram
       modalidades de bolsas, servindo como base para todos os demais cadastros
+    valor: ''
     milestone: MS-01
     depende_epics: []
     depende_modulos: []
@@ -20,6 +21,7 @@ epics_por_modulo:
     titulo: Controle de Modalidades de Bolsa
     objetivo: Permitir o cadastro, versionamento, ativacao, desativacao e consulta de modalidades de bolsa,
       garantindo que cada versao esteja vinculada a sua resolucao de ori
+    valor: ''
     milestone: MS-01
     depende_epics:
     - EPIC-M001-001
@@ -36,6 +38,7 @@ epics_por_modulo:
     titulo: Cadastro de Niveis de Bolsa
     objetivo: 'Permitir o cadastro, alteracao, consulta e exclusao de niveis de bolsa dentro de uma versao
       de modalidade, incluindo a definicao de valores, moeda e requisitos '
+    valor: ''
     milestone: MS-01
     depende_epics:
     - EPIC-M001-001
@@ -53,6 +56,7 @@ epics_por_modulo:
     titulo: Listar e Selecionar Editais do SIGFAPES
     objetivo: Permitir que um operador autenticado via Supabase Auth visualize a lista de editais disponiveis
       no dump SIGFAPES mais recente, filtre por ID/nome, ordene por da
+    valor: ''
     milestone: MS-01
     depende_epics: []
     depende_modulos: []
@@ -68,6 +72,7 @@ epics_por_modulo:
     titulo: Corrigir Planilha do Edital
     objetivo: 'Entregar o ciclo completo de edicao de uma planilha: aquisicao de lock exclusivo, geracao
       da planilha inicial a partir dos Parquets, edicao em tela com virtual '
+    valor: ''
     milestone: MS-01
     depende_epics:
     - EPIC-M002-001
@@ -84,6 +89,7 @@ epics_por_modulo:
     titulo: Gerar Arquivos de Importacao (JSONL)
     objetivo: Gerar, sob demanda, os arquivos JSONL de importacao (`editais.jsonl`, `projetos.jsonl`,
       `pessoas.jsonl`, `alocacoes.jsonl`, etc.) a partir da planilha ativa, co
+    valor: ''
     milestone: MS-01
     depende_epics:
     - EPIC-M002-002
@@ -100,6 +106,7 @@ epics_por_modulo:
   - id: EPIC-M003-001
     titulo: Registrar Projeto Contratada
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -113,6 +120,7 @@ epics_por_modulo:
   - id: EPIC-M003-002
     titulo: Gerir Plano Versionado da Projeto
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -126,6 +134,7 @@ epics_por_modulo:
   - id: EPIC-M003-003
     titulo: Gerir Orcamento Planejado e Rubricas
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -139,6 +148,7 @@ epics_por_modulo:
   - id: EPIC-M003-004
     titulo: Consolidar Execucao Financeira da Projeto
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -152,6 +162,7 @@ epics_por_modulo:
   - id: EPIC-M003-005
     titulo: Consultar Visao Consolidada da Projeto
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -166,6 +177,7 @@ epics_por_modulo:
     titulo: Gestao de Diarias da Projeto
     objetivo: Permitir a gestao completa do ciclo de solicitacao de diaria — desde a criacao pelo coordenador,
       passando pelo aceite do bolsista, ate o cancelamento ou regular
+    valor: ''
     milestone: MS-04
     depende_epics: []
     depende_modulos:
@@ -185,6 +197,7 @@ epics_por_modulo:
     titulo: Consultar Ciclo de Fomento da Projeto
     objetivo: Permitir consultar a timeline consolidada da projeto, desde a submissao da proposta ate
       conclusao ou cancelamento, com fase, marco, estado, datas e modulo de or
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -199,6 +212,7 @@ epics_por_modulo:
     titulo: Consultar Vigencia e Aditivos da Projeto
     objetivo: 'Permitir consultar e exibir, na tela **Meu Projeto**, os dados de vigencia e aditivos da
       projeto: data inicial, data final original, data final vigente, existen'
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -213,6 +227,7 @@ epics_por_modulo:
     titulo: Solicitacao e Liberacao de Parcelas da Projeto
     objetivo: Permitir que o coordenador solicite a liberacao da proxima parcela, que o sistema valide
       automaticamente as condicoes normativas e, quando aprovado, dispare o p
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -228,6 +243,7 @@ epics_por_modulo:
     titulo: Definir Calendario das Folhas
     objetivo: Permitir que o Gerente GEPOF visualize e defina o calendario anual com os marcos M1, M2
       e M3 para cada mes, respeitando as restricoes de datas e prazos.
+    valor: ''
     milestone: MS-04
     depende_epics: []
     depende_modulos: []
@@ -244,6 +260,7 @@ epics_por_modulo:
     titulo: Liberar Editais da Area para Pagamento
     objetivo: Permitir que o Gerente da Area Tecnica visualize os editais de sua area por competencia,
       tome decisoes de liberacao ou nao liberacao e submeta essas decisoes pa
+    valor: ''
     milestone: MS-04
     depende_epics:
     - EPIC-M004-001
@@ -260,6 +277,7 @@ epics_por_modulo:
     titulo: Gerenciar Folhas de Pagamento
     objetivo: Permitir que o Gerente GEPOF monitore as liberacoes das areas tecnicas, gere folhas de pagamento
       (normais e complementares), visualize previas, acompanhe libera
+    valor: ''
     milestone: MS-04
     depende_epics:
     - EPIC-M004-001
@@ -277,6 +295,7 @@ epics_por_modulo:
     titulo: Autorizar Pagamento da Folha
     objetivo: Permitir que a DIRAF e a GEPOF listem e consultem folhas de pagamento, visualizem detalhes
       por area tecnica, e que o Diretor Administrativo decida sobre a autor
+    valor: ''
     milestone: MS-04
     depende_epics:
     - EPIC-M004-003
@@ -291,6 +310,7 @@ epics_por_modulo:
   - id: EPIC-M004-005
     titulo: Bonus de Pagamento
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -304,6 +324,7 @@ epics_por_modulo:
   - id: EPIC-M004-006
     titulo: Geracao de Remessas Bancarias
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -317,6 +338,7 @@ epics_por_modulo:
   - id: EPIC-M004-007
     titulo: Processamento de Retorno Bancario
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -330,6 +352,7 @@ epics_por_modulo:
   - id: EPIC-M004-008
     titulo: Encaminhamento de Pagamento (Bandes)
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -343,6 +366,7 @@ epics_por_modulo:
   - id: EPIC-M004-009
     titulo: Guia de Liberacao (PDF)
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -356,6 +380,7 @@ epics_por_modulo:
   - id: EPIC-M004-010
     titulo: Relatorios e Relacoes de Pagamento
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -369,6 +394,7 @@ epics_por_modulo:
   - id: EPIC-M004-011
     titulo: Monitoramento de Processos de Remessa
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -382,6 +408,7 @@ epics_por_modulo:
   - id: EPIC-M004-012
     titulo: Visualizacoes e Consultas
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -397,6 +424,7 @@ epics_por_modulo:
     titulo: Cadastro de Pessoas Fisicas
     objetivo: Permitir o cadastro, consulta, atualizacao e suspensao de pessoas fisicas, garantindo unicidade
       por CPF, historico de alteracoes e integracao com o Acesso Cidad
+    valor: ''
     milestone: MS-01
     depende_epics: []
     depende_modulos:
@@ -415,6 +443,7 @@ epics_por_modulo:
     titulo: Cadastro de Instituicoes e Unidades Organizacionais
     objetivo: Permitir o cadastro de `Instituicao` (entidade juridica com CNPJ obrigatorio) e `UnidadeOrganizacional`
       (subdivisao interna sem CNPJ), com composicao hierarquic
+    valor: ''
     milestone: MS-01
     depende_epics:
     - EPIC-M008-001
@@ -432,6 +461,7 @@ epics_por_modulo:
     titulo: Classificacoes Corporativas
     objetivo: Manter referencias corporativas de classificacao, como areas de conhecimento e finalidades
       institucionais, com codigo, nome, hierarquia quando aplicavel e statu
+    valor: ''
     milestone: MS-01
     depende_epics: []
     depende_modulos: []
@@ -446,6 +476,7 @@ epics_por_modulo:
     titulo: Catalogo de Rubricas
     objetivo: Criar e manter o catalogo corporativo de Rubricas, com codigo, nome, descricao, natureza
       da despesa, indicador booleano `ativa` e hierarquia simples por rubrica
+    valor: ''
     milestone: MS-01
     depende_epics: []
     depende_modulos: []
@@ -463,6 +494,7 @@ epics_por_modulo:
     titulo: Gestao Corporativa de Diarias
     objetivo: Permitir que a FAPES cadastre, consulte e mantenha valores vigentes de diaria por abrangencia
       e parametros normativos de calculo vinculados ao tipo de diaria, c
+    valor: ''
     milestone: MS-01
     depende_epics: []
     depende_modulos: []
@@ -477,6 +509,7 @@ epics_por_modulo:
     titulo: Cadastros Geograficos
     objetivo: Manter cidades e regioes de forma canonica, permitindo agrupamento territorial e filtros
       geograficos nos modulos consumidores.
+    valor: ''
     milestone: MS-01
     depende_epics: []
     depende_modulos: []
@@ -491,6 +524,7 @@ epics_por_modulo:
     titulo: Naturalidade de Pessoa Fisica via IBGE
     objetivo: Permitir o registro da naturalidade (municipio de nascimento) de uma pessoa fisica vinculando-a
       ao cadastro oficial de municipios IBGE (`shared.geography.Cidade
+    valor: ''
     milestone: MS-01
     depende_epics:
     - EPIC-M008-001
@@ -508,6 +542,7 @@ epics_por_modulo:
     titulo: Indicacao de Bolsista
     objetivo: Permitir que o Coordenador do Programa indique bolsistas para as cotas disponiveis, registrando
       orientador, tema de pesquisa, periodo da bolsa e periodo do curs
+    valor: ''
     milestone: MS-03
     depende_epics: []
     depende_modulos:
@@ -525,6 +560,7 @@ epics_por_modulo:
     titulo: Avaliacao Documental
     objetivo: Permitir o envio de documentos pelo bolsista, a assinatura do termo de aceite pelo orientador
       e a avaliacao documental pela Area Tecnica, com rastreabilidade de
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M009-001
@@ -541,6 +577,7 @@ epics_por_modulo:
     titulo: Formalizacao e Implementacao de Bolsa
     objetivo: Automatizar a geracao dos termos de compromisso, gerenciar o fluxo de assinaturas e registrar
       a publicacao no Diario Oficial, permitindo a implementacao da bols
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M009-002
@@ -557,6 +594,7 @@ epics_por_modulo:
     titulo: Ciclo de Vida da Bolsa
     objetivo: Permitir a renovacao, suspensao, reativacao e encerramento de bolsas implementadas, com
       alertas de vencimento e liberacao automatica de cotas.
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M009-003
@@ -572,6 +610,7 @@ epics_por_modulo:
     titulo: Perfil Academico na Aprovacao de Bolsa
     objetivo: Exibir titulacao maxima, formacoes academicas e flag `curriculoValido` do pesquisador diretamente
       no painel de aprovacao de bolsa, consumindo a API de M024 de f
+    valor: ''
     milestone: ''
     depende_epics:
     - EPIC-M009-002
@@ -590,6 +629,7 @@ epics_por_modulo:
     titulo: Gestao do Plano Estrategico
     objetivo: 'Permitir o cadastro, listagem e manutencao dos planejamentos estrategicos da agencia e
       seus eixos, servindo como base para a vinculacao de programas de fomento '
+    valor: ''
     milestone: MS-02
     depende_epics: []
     depende_modulos: []
@@ -605,6 +645,7 @@ epics_por_modulo:
     titulo: Gestao de Parcerias
     objetivo: 'Permitir o cadastro, formalizacao, acompanhamento e encerramento de parcerias, incluindo:
       Instituicao vinculada, Vigencia original e aditivos (novas `Vigencia`)'
+    valor: ''
     milestone: MS-02
     depende_epics: []
     depende_modulos:
@@ -620,6 +661,7 @@ epics_por_modulo:
     titulo: Gestao de Programas
     objetivo: Permitir o cadastro e a gestao de programas de fomento vinculados ao planejamento estrategico
       e a eixos estrategicos, incluindo Instituicao demandante, definica
+    valor: ''
     milestone: MS-02
     depende_epics:
     - EPIC-M010-001
@@ -635,6 +677,7 @@ epics_por_modulo:
   - id: EPIC-M010-004
     titulo: Dashboard de Parcerias
     objetivo: 'Prover ao Gestor de Parcerias e a Diretoria dois dashboards financeiros integrados: 1.'
+    valor: ''
     milestone: MS-02
     depende_epics: []
     depende_modulos: []
@@ -650,6 +693,7 @@ epics_por_modulo:
     titulo: Configuracao da Captacao
     objetivo: Permitir a criacao, configuracao de aportes financeiros de programa ou parceria, definicao
       da area tecnica responsavel, categorias e tipos de projeto aceitos, c
+    valor: ''
     milestone: MS-02
     depende_epics: []
     depende_modulos: []
@@ -666,6 +710,7 @@ epics_por_modulo:
     titulo: Selecao de Formularios
     objetivo: Permitir que o M011 referencie formularios publicados no M021, garantindo rastreabilidade
       da versao usada em cada captacao.
+    valor: ''
     milestone: MS-02
     depende_epics:
     - EPIC-M011-001
@@ -681,6 +726,7 @@ epics_por_modulo:
     titulo: Gestao de Pool de Revisores Ad Hoc
     objetivo: Permitir a selecao de pool de revisores ad hoc e a definicao das regras de distribuicao,
       garantindo o controle de conflitos de interesses e a rastreabilidade da
+    valor: ''
     milestone: MS-02
     depende_epics:
     - EPIC-M011-001
@@ -697,6 +743,7 @@ epics_por_modulo:
   - id: EPIC-M011-004
     titulo: Recebimento de Propostas
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -710,6 +757,7 @@ epics_por_modulo:
   - id: EPIC-M011-005
     titulo: Avaliacao Documental e Ad Hoc
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -723,6 +771,7 @@ epics_por_modulo:
   - id: EPIC-M011-006
     titulo: Revisao de Resultado
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -736,6 +785,7 @@ epics_por_modulo:
   - id: EPIC-M011-007
     titulo: Publicacao de Resultado
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -750,6 +800,7 @@ epics_por_modulo:
     titulo: Rubricas Permitidas da Captacao
     objetivo: Permitir que a area tecnica selecione Rubricas e subrubricas do M008 para a captacao, configure
       limites e restricoes, e gere uma `allowlist` que sera usada pela
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -764,6 +815,7 @@ epics_por_modulo:
     titulo: Gestao do Fomento
     objetivo: 'Permitir o gerenciamento completo do ciclo de vida do Fomento, incluindo criacao, configuracao
       financeira por meio de Aportes e faixas, definicao de Resultados '
+    valor: ''
     milestone: MS-02
     depende_epics: []
     depende_modulos:
@@ -781,6 +833,7 @@ epics_por_modulo:
     titulo: Controles Operacionais da Captacao (Pausa, Retomada e Encerramento)
     objetivo: Prover ao GestorFAPES controles formais de pausa, retomada e cancelamento da captacao, e
       garantir que o sistema encerre automaticamente captacoes cujo resultado
+    valor: ''
     milestone: MS-02
     depende_epics:
     - EPIC-M011-001
@@ -797,6 +850,7 @@ epics_por_modulo:
     titulo: Dashboards de Acompanhamento
     objetivo: Prover dashboards de acompanhamento com visoes especificas para coordenador, agencia de
       fomento e SECONT, permitindo o monitoramento consolidado da execucao dos
+    valor: ''
     milestone: MS-03
     depende_epics: []
     depende_modulos:
@@ -814,6 +868,7 @@ epics_por_modulo:
     titulo: Gestao de Relatorios Tecnicos
     objetivo: Permitir a submissao de relatorios tecnicos pelo coordenador, a analise pela Area Tecnica
       com emissao de parecer, a contestacao pelo coordenador em caso de repr
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M012-001
@@ -829,6 +884,7 @@ epics_por_modulo:
     titulo: Solicitacoes de Alteracao
     objetivo: Permitir que coordenadores registrem solicitacoes de alteracao com justificativa, que a
       Area Tecnica analise e registre a decisao de deferimento ou indeferiment
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M012-001
@@ -845,6 +901,7 @@ epics_por_modulo:
     titulo: Adicoes Orcamentarias
     objetivo: Permitir que coordenadores solicitem adicoes orcamentarias, que a Area Tecnica analise as
       solicitacoes e que a aprovacao seja registrada de forma rastreavel, at
+    valor: ''
     milestone: MS-03
     depende_epics: []
     depende_modulos:
@@ -862,6 +919,7 @@ epics_por_modulo:
     titulo: Gestao de Rubricas
     objetivo: 'Permitir a inclusao de novas rubricas em um projeto, o remanejamento de recursos entre
       rubricas e a consulta em tempo real do saldo de cada rubrica, garantindo '
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M013-001
@@ -878,6 +936,7 @@ epics_por_modulo:
     titulo: Realocacao de Bolsas
     objetivo: Permitir que coordenadores solicitem a realocacao de bolsas entre modalidades ou niveis,
       com analise e aprovacao pela Area Tecnica, garantindo que o impacto orc
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M013-002
@@ -894,6 +953,7 @@ epics_por_modulo:
     titulo: Orcamento do Projeto por Rubrica Aprovada
     objetivo: Materializar `RubricaProjeto` a partir do orcamento aprovado, controlar valores aprovados,
       comprometidos, executados e saldo disponivel por meio de `Transacao`,
+    valor: ''
     milestone: MS-03
     depende_epics: []
     depende_modulos: []
@@ -909,6 +969,7 @@ epics_por_modulo:
     titulo: Submissao de Prestacao de Contas
     objetivo: Permitir que coordenadores submetam documentos fiscais e comprovantes organizados por tipo
       de despesa (servicos, produtos, diarias, passagens), vinculados as ru
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M014-010
@@ -926,6 +987,7 @@ epics_por_modulo:
     titulo: Analise de Prestacao de Contas
     objetivo: Permitir que a Area Tecnica analise os documentos fiscais submetidos, verificando conformidade
       e consistencia com os movimentos bancarios, e emita parecer de ap
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M014-001
@@ -942,6 +1004,7 @@ epics_por_modulo:
     titulo: Contestacao e Auditoria
     objetivo: Permitir que coordenadores contestem recusas dentro do prazo legal, que a Area Tecnica reanalise
       as contestacoes e que a SECONT conduza auditorias com acesso di
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M014-002
@@ -957,6 +1020,7 @@ epics_por_modulo:
     titulo: Justificativas de Despesa
     objetivo: Permitir que coordenadores cadastrem, consultem e editem justificativas de despesa dos tipos
       suportados, associando-as a rubricas do orcamento do projeto.
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M014-001
@@ -973,6 +1037,7 @@ epics_por_modulo:
     titulo: Documentos Fiscais e Integracao SERPRO
     objetivo: 'Processar e validar documentos fiscais de forma automatizada, integrando com SERPRO para
       NF-e e suportando upload direto para NFS-e, com deteccao automatica de '
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M014-004
@@ -989,6 +1054,7 @@ epics_por_modulo:
     titulo: Itens de Documento Fiscal e Associacao a Rubricas
     objetivo: Permitir que coordenadores vinculem e desvinculem itens de documentos fiscais a rubricas
       do projeto, com visibilidade do impacto no saldo de cada rubrica.
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M014-005
@@ -1005,6 +1071,7 @@ epics_por_modulo:
     titulo: Orcamentos de Fornecedor
     objetivo: Permitir que coordenadores cadastrem em lote ate tres orcamentos por justificativa, faca
       upload dos PDFs, selecionem o vencedor e consultem ou editem os orcamen
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M014-004
@@ -1021,6 +1088,7 @@ epics_por_modulo:
     titulo: Fluxo de Submissao e Analise (V1)
     objetivo: Implementar o ciclo de vida principal da prestacao de contas — desde a submissao pelo coordenador
       ate a decisao final da Area Tecnica — com as quatro transicoes
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M014-001
@@ -1039,6 +1107,7 @@ epics_por_modulo:
     titulo: Prazos Temporais da Prestacao
     objetivo: Formalizar, no dominio e no backend, os dois prazos temporais da prestacao de contas, com
       notificacao proativa ao Coordenador, bloqueio de transicoes fora do pr
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M014-008
@@ -1055,6 +1124,7 @@ epics_por_modulo:
     titulo: Importacao
     objetivo: Permitir que jobs de integracao importem dados de iniciativa com conta bancaria, executem
       uma carga unica do orcamento planejado da iniciativa e importem movime
+    valor: ''
     milestone: MS-03
     depende_epics: []
     depende_modulos:
@@ -1072,6 +1142,7 @@ epics_por_modulo:
     titulo: Prestacao de Contas de Diarias
     objetivo: Permitir que o Coordenador preste contas de diarias a partir das solicitacoes operacionais
       do M003, garantindo que cada diaria seja comprovada uma unica vez, cl
+    valor: ''
     milestone: MS-03
     depende_epics: []
     depende_modulos: []
@@ -1086,6 +1157,7 @@ epics_por_modulo:
     titulo: Prestacao de Contas de Passagens
     objetivo: Permitir que o Coordenador preste contas de passagens compradas, registrando valor, dados
       da viagem, comprovantes obrigatorios, classificacao na `RubricaProjeto
+    valor: ''
     milestone: MS-03
     depende_epics: []
     depende_modulos: []
@@ -1100,6 +1172,7 @@ epics_por_modulo:
     titulo: Devolucoes do Coordenador
     objetivo: Permitir que o Coordenador classifique um credito bancario como devolucao, associe esse
       credito a uma compra/debito ou a uma prestacao existente, informe se a d
+    valor: ''
     milestone: MS-03
     depende_epics: []
     depende_modulos: []
@@ -1115,6 +1188,7 @@ epics_por_modulo:
     titulo: Suspensao de Iniciativa
     objetivo: 'Permitir a solicitacao de suspensao de iniciativas (pelo ortogado ou pela agencia de fomento),
       a analise pela Area Tecnica, o bloqueio automatico de pagamentos '
+    valor: ''
     milestone: MS-03
     depende_epics: []
     depende_modulos:
@@ -1133,6 +1207,7 @@ epics_por_modulo:
     titulo: Finalizacao de Iniciativa
     objetivo: Permitir a solicitacao de encerramento de iniciativas, a verificacao automatica de pendencias
       e o encerramento definitivo e irreversivel quando tudo estiver res
+    valor: ''
     milestone: MS-03
     depende_epics:
     - EPIC-M015-001
@@ -1152,6 +1227,7 @@ epics_por_modulo:
     titulo: Plano de Contas
     objetivo: Permitir o cadastro de contas contabeis seguindo a estrutura do plano de contas do governo,
       a associacao dessas contas a iniciativas, programas e parcerias, e a
+    valor: ''
     milestone: MS-04
     depende_epics: []
     depende_modulos:
@@ -1169,6 +1245,7 @@ epics_por_modulo:
     titulo: Gestao de Contas Bancarias
     objetivo: Permitir o cadastro de contas bancarias vinculadas a projetos, o registro de movimentacoes
       financeiras (entradas e saidas) e a consulta de saldos por conta, com
+    valor: ''
     milestone: MS-04
     depende_epics:
     - EPIC-M016-001
@@ -1185,6 +1262,7 @@ epics_por_modulo:
     titulo: Fluxo de Caixa e Conciliacao
     objetivo: Permitir a visualizacao do fluxo de caixa consolidado, a realizacao de conciliacao bancaria
       comparando registros do sistema com extratos, e a apresentacao de um
+    valor: ''
     milestone: MS-04
     depende_epics:
     - EPIC-M016-002
@@ -1199,6 +1277,7 @@ epics_por_modulo:
   - id: EPIC-M016-005
     titulo: Superseded
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1212,6 +1291,7 @@ epics_por_modulo:
   - id: EPIC-M016-006
     titulo: Superseded
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1225,6 +1305,7 @@ epics_por_modulo:
   - id: EPIC-M016-007
     titulo: Superseded
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1239,6 +1320,7 @@ epics_por_modulo:
     titulo: Plano de Aplicacao e Execucao de Despesas da Acao Transversal
     objetivo: 'Permitir planejar o uso dos recursos da AcaoTransversal por rubrica e registrar despesas
       institucionais vinculadas ao plano, com rastreabilidade de documento e '
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1253,6 +1335,7 @@ epics_por_modulo:
     titulo: Prestacao Financeira da Acao Transversal
     objetivo: Permitir submeter, analisar, glosar, aprovar e encerrar a prestacao financeira institucional
       da AcaoTransversal.
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1267,6 +1350,7 @@ epics_por_modulo:
     titulo: Dashboard e Relatorios da Acao Transversal
     objetivo: 'Disponibilizar consultas, dashboards e exportacoes gerenciais do ciclo de execucao da AcaoTransversal:
       plano, despesas, glosas, prestacoes e saldos.'
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1281,6 +1365,7 @@ epics_por_modulo:
     titulo: Parametrizacao da Politica, Versoes e Faixas
     objetivo: 'Permitir que o Gestor Financeiro parametrize e versione a `PoliticaTaxaGestaoParcerias`
       com suas faixas e percentuais, respeitando o modelo de versioning: entid'
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1295,6 +1380,7 @@ epics_por_modulo:
     titulo: Recebimento e Classificacao da TaxaGestaoParcerias
     objetivo: Registrar a `TaxaGestaoParcerias` com rastreabilidade de origem e classifica-la em conta
       contabil, fundo financeiro e centro de custo.
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1309,6 +1395,7 @@ epics_por_modulo:
     titulo: Repasse para Conta Bancaria BANESTES
     objetivo: Registrar o repasse da TaxaGestaoParcerias para conta bancaria BANESTES vinculada ao escopo
       da outorga, controlando saldo e rastreabilidade.
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1323,6 +1410,7 @@ epics_por_modulo:
     titulo: Vinculacao com AcaoTransversal
     objetivo: Registrar a vinculacao entre TaxaGestaoParcerias e AcaoTransversal, controlando o saldo
       disponivel e emitindo o sinal de que a taxa esta custodiada e pronta par
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1337,6 +1425,7 @@ epics_por_modulo:
     titulo: Dashboard e Relatorios da Taxa de Gestao de Parcerias
     objetivo: 'Fornecer dashboard e relatorios de acompanhamento do ciclo de vida das TaxaGestaoParcerias:
       calculadas, classificadas, repassadas, vinculadas e encerradas.'
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1352,6 +1441,7 @@ epics_por_modulo:
     titulo: Verificacao Cadastral KYC
     objetivo: Permitir a verificacao dos dados cadastrais dos beneficiarios, a consulta automatica a listas
       restritivas e o registro dos resultados de KYC, garantindo que ape
+    valor: ''
     milestone: MS-04
     depende_epics: []
     depende_modulos:
@@ -1368,6 +1458,7 @@ epics_por_modulo:
     titulo: Monitoramento de Transacoes
     objetivo: Permitir o monitoramento automatico de transacoes financeiras para deteccao de padroes atipicos,
       a geracao de alertas de operacao suspeita e a analise e tratame
+    valor: ''
     milestone: MS-04
     depende_epics:
     - EPIC-M017-001
@@ -1384,6 +1475,7 @@ epics_por_modulo:
     titulo: Bloqueio e Reporte
     objetivo: Permitir o bloqueio preventivo de pagamentos, o desbloqueio mediante autorizacao do diretor,
       a geracao de reportes ao COAF e a analise de conflitos de interesse
+    valor: ''
     milestone: MS-04
     depende_epics:
     - EPIC-M017-002
@@ -1400,6 +1492,7 @@ epics_por_modulo:
     titulo: Auditoria e Dashboard PLD
     objetivo: Permitir a consulta da trilha de auditoria de todas as acoes de PLD e fornecer um dashboard
       consolidado com indicadores de risco, status de alertas e metricas d
+    valor: ''
     milestone: MS-04
     depende_epics:
     - EPIC-M017-001
@@ -1418,6 +1511,7 @@ epics_por_modulo:
     titulo: Paineis de Programas e Projetos
     objetivo: Fornecer dashboards interativos para visualizacao consolidada de programas de fomento e
       projetos por edital, com indicadores de desempenho, filtros por periodo/
+    valor: ''
     milestone: MS-05
     depende_epics: []
     depende_modulos:
@@ -1435,6 +1529,7 @@ epics_por_modulo:
     titulo: Paineis de Bolsas e Resultados
     objetivo: Fornecer dashboards interativos para visualizacao de bolsas por modalidade, auxilios concedidos
       e analise de resultados de pesquisa, permitindo avaliacao do imp
+    valor: ''
     milestone: MS-05
     depende_epics:
     - EPIC-M018-001
@@ -1454,6 +1549,7 @@ epics_por_modulo:
     titulo: Portal de Transparencia
     objetivo: Disponibilizar um portal publico de transparencia com dados abertos sobre projetos, bolsas
       e programas de fomento da agencia de fomento, com anonimizacao de dad
+    valor: ''
     milestone: MS-05
     depende_epics: []
     depende_modulos:
@@ -1472,6 +1568,7 @@ epics_por_modulo:
     titulo: Relatorios e Auditoria
     objetivo: 'Automatizar a geracao de relatorios de execucao financeira para a SECONT, permitir exportacao
       de dados para auditoria com metadados de rastreabilidade e prover '
+    valor: ''
     milestone: MS-05
     depende_epics:
     - EPIC-M019-001
@@ -1489,6 +1586,7 @@ epics_por_modulo:
     titulo: Servico de Notificacao
     objetivo: Prover um servico centralizado de envio de notificacoes por email, com templates configuraveis,
       registro de historico de envio e mecanismo de retry em caso de f
+    valor: ''
     milestone: MS-05
     depende_epics:
     - EPIC-M024-006
@@ -1507,6 +1605,7 @@ epics_por_modulo:
     titulo: Comunicados e Lembretes
     objetivo: Permitir o envio de comunicados em massa com aprovacao do Diretor e a configuracao de lembretes
       automaticos de prazo com antecedencia configuravel.
+    valor: ''
     milestone: MS-05
     depende_epics:
     - EPIC-M020-001
@@ -1522,6 +1621,7 @@ epics_por_modulo:
   - id: EPIC-M021-001
     titulo: Cadastrar Categoria de Formulario
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1535,6 +1635,7 @@ epics_por_modulo:
   - id: EPIC-M021-002
     titulo: Cadastrar Formulario de Caracterizacao
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1548,6 +1649,7 @@ epics_por_modulo:
   - id: EPIC-M021-003
     titulo: Gerenciar Ciclo de Vida de Formulario
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1561,6 +1663,7 @@ epics_por_modulo:
   - id: EPIC-M021-004
     titulo: Gerenciar Respostas de Formulario de Caracterizacao
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1574,6 +1677,7 @@ epics_por_modulo:
   - id: EPIC-M021-005
     titulo: Cadastrar Formulario de Avaliacao
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1587,6 +1691,7 @@ epics_por_modulo:
   - id: EPIC-M021-006
     titulo: Gerenciar Respostas de Formulario de Avaliacao
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1600,6 +1705,7 @@ epics_por_modulo:
   - id: EPIC-M021-007
     titulo: Cadastrar Formulario de Habilitacao
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1613,6 +1719,7 @@ epics_por_modulo:
   - id: EPIC-M021-008
     titulo: Gerenciar Respostas de Formulario de Habilitacao
     objetivo: ''
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1628,6 +1735,7 @@ epics_por_modulo:
     titulo: Convocacao de Propostas Aprovadas
     objetivo: Permitir que a Area Tecnica consulte propostas aprovadas no resultado final da captacao
       e convoque aquelas que seguirao para contratacao/outorga.
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1641,6 +1749,7 @@ epics_por_modulo:
   - id: EPIC-M022-002
     titulo: Formalizacao da Contratacao e Outorga
     objetivo: Controlar a conferencia de requisitos finais e a formalizacao do termo de outorga ou contrato.
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1654,6 +1763,7 @@ epics_por_modulo:
   - id: EPIC-M022-003
     titulo: Integracao com Gestao de Iniciativas
     objetivo: Encaminhar contratacoes/outorgas formalizadas para registro da iniciativa no M003.
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1669,6 +1779,7 @@ epics_por_modulo:
     titulo: Envio de Documento para Assinatura + Captura Inicial
     objetivo: 'Permitir que qualquer modulo consumidor envie um Documento M008 ao provedor de assinatura
       externo com lista de signatarios e receba uma `SolicitacaoAssinatura` '
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos:
@@ -1687,6 +1798,7 @@ epics_por_modulo:
     titulo: Sincronizacao de Status + Arquivamento do PDF Assinado
     objetivo: 'Garantir que toda `SolicitacaoAssinatura` chegue ao estado terminal correto sem intervencao
       manual, com PDF assinado arquivado e eventos publicos emitidos para '
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1701,6 +1813,7 @@ epics_por_modulo:
     titulo: Recusa, Expiracao e Reconciliacao Manual
     objetivo: Cobrir todos os caminhos terminais nao felizes da `SolicitacaoAssinatura` com eventos publicos
       e operacoes administrativas.
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos: []
@@ -1716,6 +1829,7 @@ epics_por_modulo:
     titulo: Nucleo do Curriculo e Sincronizacao Lattes
     objetivo: 'Permitir vincular um curriculo Lattes unico a uma `PessoaFisica` ativa, executar a primeira
       importacao sincrona via M023/lattes e manter um snapshot versionado '
+    valor: ''
     milestone: ''
     depende_epics: []
     depende_modulos:
@@ -1733,6 +1847,7 @@ epics_por_modulo:
     titulo: Formacao Academica e Titulacao
     objetivo: Importar e consultar a trajetoria de formacao do pesquisador, calcular a titulacao maxima
       concluida e acionar atualizacao do nivel academico de `PessoaFisica` q
+    valor: ''
     milestone: ''
     depende_epics:
     - EPIC-M024-001
@@ -1749,6 +1864,7 @@ epics_por_modulo:
     titulo: Producoes Bibliograficas
     objetivo: 'Persistir artigos, periodicos, livros e capitulos importados do Lattes, respeitando autoria
       compartilhada, deduplicacao e filtros de consulta por ano, autoria, '
+    valor: ''
     milestone: ''
     depende_epics:
     - EPIC-M024-001
@@ -1768,6 +1884,7 @@ epics_por_modulo:
     titulo: Orientacoes e Projetos Academicos
     objetivo: Persistir orientacoes e participacoes em projetos academicos, respeitando status, nivel,
       instituicoes, tipo de projeto, participante e papel exercido.
+    valor: ''
     milestone: ''
     depende_epics:
     - EPIC-M024-001
@@ -1784,6 +1901,7 @@ epics_por_modulo:
     titulo: Complementos do Perfil Academico
     objetivo: Persistir participacoes em eventos, premios/homenagens e proficiencia em idiomas, mantendo
       cada colecao consultavel no curriculo estruturado.
+    valor: ''
     milestone: ''
     depende_epics:
     - EPIC-M024-001
@@ -1800,6 +1918,7 @@ epics_por_modulo:
     titulo: Consulta, Busca por Expertise e Eventos
     objetivo: Oferecer consulta do perfil completo, listagem paginada das colecoes, busca por expertise
       e publicacao dos eventos essenciais de dominio.
+    valor: ''
     milestone: ''
     depende_epics:
     - EPIC-M024-001

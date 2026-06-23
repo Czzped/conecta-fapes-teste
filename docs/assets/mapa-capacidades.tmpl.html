@@ -244,7 +244,7 @@ function drawPanel(){
     <span class="ptag" style="background:${col}">${DOMINIOS[m.dominio].nome}</span>
     <span class="ptag" style="background:${st.c};color:#06080d;margin-left:6px">${st.l}</span>
     ${m.transversal?'<span class="ptag" style="background:#475569;color:#e9eef7;margin-left:6px">transversal</span>':''}
-    <div class="pname">${m.nome}</div><div class="pid">${m.id}</div>
+    <div class="pname">${m.nome}</div><div class="pid">${m.id} · <a href="ficha.html?m=${m.id}" target="_blank" rel="noopener" style="color:var(--accent)">ficha de negócio ↗</a></div>
     <p class="pp">${m.proposito}</p>
     <div class="tabs">
       <span class="tab ${tab==='visao'?'on':''}" data-tab="visao">Visão</span>
