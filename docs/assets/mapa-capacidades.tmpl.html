@@ -1,0 +1,360 @@
+<title>Explorador de Capacidades — ConectaFAPES</title>
+<style>
+  :root{
+    --bg:#0b0e16;--panel:#121826;--panel-2:#1a2130;--line:#28303f;
+    --ink:#e9eef7;--ink-dim:#8c98ad;--ink-faint:#5b667a;
+    --accent:#38bdf8;--enable:#34d399;--depend:#60a5fa;--danger:#fb5d6b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  header{padding:16px 26px 11px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  h1{margin:0;font-size:19px;font-weight:650;letter-spacing:-.01em}
+  .sub{color:var(--ink-dim);font-size:13px}
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 26px;border-bottom:1px solid var(--line);background:var(--panel)}
+  .search{position:relative;display:flex;align-items:center}
+  .search input{background:var(--panel-2);border:1px solid var(--line);border-radius:9px;color:var(--ink);font:inherit;font-size:13px;padding:7px 11px 7px 30px;width:220px;outline:none}
+  .search input:focus{border-color:var(--accent)}
+  .search svg{position:absolute;left:9px;width:14px;height:14px;stroke:var(--ink-faint);fill:none}
+  .search kbd{position:absolute;right:8px;color:var(--ink-faint);font-size:10px;border:1px solid var(--line);border-radius:4px;padding:0 5px}
+  .results{position:absolute;top:38px;left:0;width:360px;max-height:380px;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;z-index:30;display:none;box-shadow:0 12px 34px #0009}
+  .results.show{display:block}
+  .rgrp{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);padding:9px 12px 4px}
+  .res{display:flex;gap:9px;align-items:center;padding:7px 12px;cursor:pointer;border-top:1px solid #ffffff06}
+  .res:hover,.res.sel{background:#ffffff0d}
+  .res .rb{font-size:10px;font-weight:700;color:#06080d;border-radius:5px;padding:2px 6px;flex:none}
+  .res .rmain{flex:1;min-width:0}
+  .res .rt{font-size:12.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .res .rs{font-size:11px;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .res .rk{font-size:9.5px;color:var(--ink-faint);border:1px solid var(--line);border-radius:5px;padding:1px 6px;flex:none}
+  .btn{background:var(--panel-2);border:1px solid var(--line);border-radius:9px;color:var(--ink-dim);font:inherit;font-size:12.5px;padding:7px 12px;cursor:pointer;display:inline-flex;gap:7px;align-items:center;transition:.15s}
+  .btn:hover{color:var(--ink);border-color:#3a455a}
+  .btn.on{background:var(--danger);border-color:var(--danger);color:#fff;font-weight:600}
+  .btn.toggle.on{background:var(--accent);border-color:var(--accent);color:#04121c}
+  .sep{margin-left:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;font-size:12px;color:var(--ink-dim)}
+  .chip{display:inline-flex;align-items:center;gap:6px;cursor:pointer;user-select:none;transition:opacity .15s}
+  .chip.off{opacity:.3}
+  .dot{width:11px;height:11px;border-radius:3px;flex:none}
+  .crumb{padding:8px 26px;border-bottom:1px solid var(--line);background:var(--bg);font-size:12.5px;color:var(--ink-faint);display:flex;align-items:center;gap:6px;min-height:34px;flex-wrap:wrap}
+  .crumb a{color:var(--ink-dim);cursor:pointer;text-decoration:none}
+  .crumb a:hover{color:var(--accent)}
+  .crumb .x{margin-left:8px;cursor:pointer;color:var(--ink-faint);border:1px solid var(--line);border-radius:6px;padding:1px 7px}
+  .crumb .x:hover{color:var(--ink)}
+  .wrap{display:flex;min-height:calc(100vh - 170px)}
+  .stage{flex:1;overflow:auto;position:relative}
+  svg{display:block}
+  .colhdr{fill:var(--ink-faint);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+  .collane{fill:#ffffff03}
+  .edge{fill:none;stroke:var(--line);stroke-width:1.4;transition:stroke .18s,opacity .18s,stroke-width .18s}
+  .edge.curada{stroke-dasharray:2 4}
+  .node{cursor:pointer}
+  .node circle.body{stroke-width:2.75;transition:opacity .18s,stroke .18s}
+  .node .id{fill:#06080d;font-weight:700;font-size:10.5px;text-anchor:middle;pointer-events:none}
+  .node .lbl{fill:var(--ink-dim);font-size:11px;text-anchor:middle;pointer-events:none;transition:fill .18s}
+  .node.dim{opacity:.12}
+  .node.hot .lbl{fill:var(--ink)}
+  .node.match circle.body{stroke:var(--accent)!important}
+  .banner{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:#2a1116;border:1px solid var(--danger);color:#ffd9dd;font-size:13px;padding:8px 16px;border-radius:10px;display:none;align-items:center;gap:10px}
+  .banner b{color:#fff}
+  .hint{position:absolute;left:18px;bottom:14px;color:var(--ink-faint);font-size:12px;background:#0b0e16cc;padding:6px 11px;border-radius:8px;border:1px solid var(--line)}
+  .panel{width:360px;flex:none;border-left:1px solid var(--line);background:var(--panel);overflow:auto}
+  .empty{color:var(--ink-faint);font-size:13.5px;padding:38px 22px;text-align:center}
+  .pad{padding:18px 20px}
+  .ptag{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:99px;color:#06080d}
+  .pname{font-size:18px;font-weight:650;margin:10px 0 2px;letter-spacing:-.01em}
+  .pid{color:var(--ink-faint);font-size:12px;font-weight:600}
+  .pp{color:var(--ink-dim);font-size:13.5px;margin:10px 0 14px}
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:0 -20px 14px;padding:0 20px}
+  .tab{padding:8px 12px;font-size:12.5px;color:var(--ink-faint);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .tab:hover{color:var(--ink-dim)}
+  .tab.on{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+  .tab .n{font-size:10px;background:var(--panel-2);border:1px solid var(--line);border-radius:99px;padding:0 6px;margin-left:5px;color:var(--ink-dim)}
+  .metrics{display:flex;gap:10px;margin:0 0 14px}
+  .metric{flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .metric .k{font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.05em}
+  .metric .v{font-size:15px;font-weight:650;margin-top:3px}
+  .metric .v.danger{color:var(--danger)}.metric .v.enable{color:var(--enable)}
+  .bars{display:flex;gap:3px;margin-top:5px}.bars i{height:6px;flex:1;border-radius:2px}
+  .sec{margin-top:16px}
+  .sec h4{margin:0 0 8px;font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em}
+  .rel{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #ffffff08;cursor:pointer;font-size:12.5px}
+  .rel:hover .rn{color:var(--ink)}
+  .rel .rid{font-size:10px;font-weight:700;color:#06080d;border-radius:5px;padding:2px 6px;flex:none}
+  .rel .rn{color:var(--ink-dim);flex:1}
+  .rel .rt{font-size:9.5px;color:var(--ink-faint);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+  .ent{display:block;font-size:12.5px;color:var(--ink);padding:7px 0;border-bottom:1px solid #ffffff08}
+  .ent b{font-weight:600}.ent span{color:var(--ink-faint);font-size:11.5px;display:block;margin-top:1px}
+  .pill{display:inline-block;font-size:11px;color:var(--ink-dim);background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:3px 8px;margin:0 5px 5px 0}
+  .ev{font-size:12px;color:var(--ink-dim);padding:5px 0;border-bottom:1px solid #ffffff08}
+  .ev code{color:var(--enable);font-size:11.5px}
+  .epic{padding:9px 0;border-bottom:1px solid #ffffff08;cursor:pointer}
+  .epic:hover .et{color:var(--ink)}
+  .epic .er{display:flex;align-items:center;gap:8px}
+  .epic .eid{font-size:10px;font-weight:700;color:var(--ink-faint)}
+  .epic .et{font-size:12.5px;color:var(--ink-dim);flex:1}
+  .epic .ems{font-size:9.5px;color:var(--ink-faint);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+  .prog{height:5px;border-radius:3px;background:var(--line);margin-top:6px;overflow:hidden;display:flex}
+  .prog i{height:100%}
+  .back{color:var(--accent);font-size:12px;cursor:pointer;margin-bottom:10px;display:inline-block}
+  .kv{font-size:12.5px;color:var(--ink-dim);margin:7px 0}.kv b{color:var(--ink);font-weight:600}
+</style>
+
+<header>
+  <h1>Explorador de Capacidades</h1>
+  <span class="sub" id="subhead"></span>
+</header>
+
+<div class="toolbar">
+  <label class="search">
+    <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+    <input id="q" placeholder="Buscar módulo ou epic…" autocomplete="off"><kbd>/</kbd>
+    <div class="results" id="results"></div>
+  </label>
+  <button class="btn toggle" id="depthBtn">cadeia completa</button>
+  <button class="btn" id="killBtn">⚠ Simular queda</button>
+  <button class="btn toggle" id="transBtn">+ transversais</button>
+  <button class="btn toggle" id="epicBtn" title="setas epic → módulo">⚡ impacto epics</button>
+  <div class="sep"></div>
+  <div class="legend" id="domLegend"></div>
+</div>
+
+<div class="crumb" id="crumb"></div>
+
+<div class="wrap">
+  <div class="stage"><svg id="svg"></svg>
+    <div class="banner" id="banner"></div>
+    <div class="hint" id="hint"></div>
+  </div>
+  <aside class="panel" id="panel"></aside>
+</div>
+
+<script>
+//__DATA__
+const DOMINIOS=DATA.dominios, ESC=DATA.escalas;
+const NIVEIS=DATA.niveis.slice().sort((a,b)=>a.ordem-b.ordem);
+const STATUS={entregue:{c:"#22c55e",l:"Entregue"},andamento:{c:"#f59e0b",l:"Em andamento"},homol:{c:"#14b8a6",l:"Homologação"},validacao:{c:"#06b6d4",l:"Validação"},planejado:{c:"#64748b",l:"Planejado"},especificado:{c:"#3a4354",l:"Especificado"}};
+const IMP={1:"Apoio",2:"Complementar",3:"Relevante",4:"Estruturante",5:"Crítico"};
+const impColor=v=>v>=5?"#fb7185":v>=4?"#fbbf24":v>=3?"#38bdf8":"#64748b";
+const M=DATA.modulos, byId={}; M.forEach(m=>byId[m.id]=m);
+document.getElementById("subhead").textContent=`ConectaFAPES · ${M.length} módulos · ${M.reduce((s,m)=>s+m.epics.length,0)} epics · tamanho = alcance · borda = status`;
+// arestas epic->módulo (impacto de entrega), agregadas por par
+const epicAgg={};
+M.forEach(m=>m.epics.forEach(e=>(e.habilita_modulos||[]).forEach(t=>{if(byId[t]){const k=m.id+">"+t;(epicAgg[k]||(epicAgg[k]={from:m.id,to:t,epics:[]})).epics.push(e.id);}})));
+const EPICED=Object.values(epicAgg);
+// índice de busca: módulos + epics
+const SEARCH=[];
+M.forEach(m=>SEARCH.push({type:"mod",id:m.id,mod:m.id,label:m.nome,sub:m.proposito,key:(m.id+" "+m.nome+" "+m.proposito).toLowerCase()}));
+M.forEach(m=>m.epics.forEach(e=>{const hab=[...e.habilita_modulos,...e.habilita_epics.map(x=>x.replace("EPIC-",""))];
+  SEARCH.push({type:"epic",id:e.id,mod:m.id,label:e.titulo,
+    sub:m.id+" "+m.nome+(hab.length?" · habilita "+hab.join(", "):" · habilita —"),
+    key:(e.id+" "+e.titulo+" "+(e.objetivo||"")+" "+m.id+" "+m.nome).toLowerCase()});}));
+
+function bfsHab(id){const s=new Set(),st=[id];while(st.length){const c=st.pop();(byId[c].hab||[]).forEach(h=>{if(!s.has(h.to)){s.add(h.to);st.push(h.to);}});}return s;}
+function bfsDep(id){const s=new Set(),st=[id];while(st.length){const c=st.pop();(byId[c].dep||[]).forEach(h=>{if(!s.has(h.to)){s.add(h.to);st.push(h.to);}});}return s;}
+function hopHab(id){return new Set((byId[id].hab||[]).map(h=>h.to));}
+function hopDep(id){return new Set((byId[id].dep||[]).map(h=>h.to));}
+
+let focus=null,trail=[],fullDepth=true,killMode=false,query="",tab="visao",epicSel=null,epicMode=false,epicHi=null;
+const hiddenDom=new Set();let showTrans=false;
+const NS="http://www.w3.org/2000/svg",svg=document.getElementById("svg");
+function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+const COLW=212,PADX=72,TOP=66,ROWH=80,R_MIN=15,R_MAX=34;
+function visible(){return M.filter(m=>!hiddenDom.has(m.dominio)&&(showTrans||!m.transversal));}
+function downSet(id){return fullDepth?bfsHab(id):hopHab(id);}
+function upSet(id){return fullDepth?bfsDep(id):hopDep(id);}
+const maxA=Math.max(...M.map(m=>m.alcance),1);
+
+function layout(){
+  const vis=visible();
+  const cols=NIVEIS.map(n=>({n,items:vis.filter(m=>m.nivel===n.id).sort((a,b)=>b.importancia-a.importancia||b.alcance-a.alcance)}));
+  let maxRows=0;
+  cols.forEach((c,ci)=>{c.x=PADX+ci*COLW;c.items.forEach((m,ri)=>{m._x=c.x;m._y=TOP+ri*ROWH+ROWH/2;m._r=R_MIN+(R_MAX-R_MIN)*Math.sqrt(m.alcance/maxA);});maxRows=Math.max(maxRows,c.items.length);});
+  const W=PADX+cols.length*COLW,H=TOP+maxRows*ROWH+26;
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);svg.setAttribute("width",W);svg.setAttribute("height",H);
+  return {vis,cols,H};
+}
+function pathD(a,b){const x1=a._x+a._r,x2=b._x-b._r,mx=(x1+x2)/2;
+  if(x2<x1){const my=Math.min(a._y,b._y)-46;return `M${x1},${a._y} C${x1+50},${my} ${x2-50},${my} ${x2},${b._y}`;}
+  return `M${x1},${a._y} C${mx},${a._y} ${mx},${b._y} ${x2},${b._y}`;}
+
+function render(){
+  const {vis,cols,H}=layout();svg.innerHTML="";
+  const defs=el("defs");const mk=el("marker",{id:"ah",viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:6,markerHeight:6,orient:"auto"});mk.appendChild(el("path",{d:"M0,0 L10,5 L0,10 z",fill:"#c084fc"}));defs.appendChild(mk);svg.appendChild(defs);
+  const visSet=new Set(vis.map(m=>m.id));
+  const down=focus?downSet(focus):null,up=focus?upSet(focus):null;
+  const matchSet=query?new Set(M.filter(m=>(m.nome+m.id+m.proposito).toLowerCase().includes(query)).map(m=>m.id)):null;
+  cols.forEach((c,ci)=>{if(ci%2)svg.appendChild(el("rect",{x:c.x-COLW/2+18,y:46,width:COLW-12,height:H-54,rx:14,class:"collane"}));
+    const t=el("text",{x:c.x,y:32,class:"colhdr","text-anchor":"middle"});t.textContent=c.n.nome;svg.appendChild(t);});
+  vis.forEach(m=>(m.hab||[]).forEach(h=>{const b=byId[h.to];if(!visSet.has(h.to))return;
+    const curada=!/ontologia/.test(h.fonte);
+    const p=el("path",{d:pathD(m,b),class:"edge"+(curada?" curada":"")});
+    if(focus){const onD=(m.id===focus||down.has(m.id))&&(h.to===focus||down.has(h.to));
+      const onU=(m.id===focus||up.has(m.id))&&(h.to===focus||up.has(h.to));
+      if(killMode&&onD){p.setAttribute("stroke","var(--danger)");p.setAttribute("stroke-width","2.2");}
+      else if(onD){p.setAttribute("stroke","var(--enable)");p.setAttribute("stroke-width","2.2");}
+      else if(onU){p.setAttribute("stroke","var(--depend)");p.setAttribute("stroke-width","2");}
+      else p.style.opacity=.06;}
+    svg.appendChild(p);}));
+  // camada epic->módulo (impacto de entrega)
+  if(epicMode||epicHi){
+    const list=epicHi?EPICED.filter(x=>x.from===epicHi.from&&epicHi.tos.includes(x.to)):EPICED;
+    list.forEach(x=>{if(!visSet.has(x.from)||!visSet.has(x.to))return;const a=byId[x.from],b=byId[x.to];
+      const p=el("path",{d:pathD(a,b),class:"edge","marker-end":"url(#ah)"});
+      p.setAttribute("stroke","#c084fc");p.setAttribute("stroke-dasharray","5 3");
+      p.setAttribute("stroke-width",epicHi?2.6:1.7);p.style.opacity=epicHi?1:.7;
+      svg.appendChild(p);});
+  }
+  vis.forEach(m=>{const g=el("g",{class:"node"});
+    if(epicHi){const inv=m.id===epicHi.from||epicHi.tos.includes(m.id);g.classList.add(inv?"hot":"dim");}
+    else if(focus){const inD=m.id===focus||down.has(m.id),inU=m.id===focus||up.has(m.id);if(!inD&&!inU)g.classList.add("dim");else g.classList.add("hot");}
+    if(matchSet){if(matchSet.has(m.id))g.classList.add("match");else g.classList.add("dim");}
+    let stroke=STATUS[m.status].c;
+    if(focus&&killMode&&down.has(m.id))stroke="var(--danger)";else if(focus&&m.id===focus)stroke="var(--accent)";
+    if(epicHi){if(m.id===epicHi.from)stroke="var(--accent)";else if(epicHi.tos.includes(m.id))stroke="#c084fc";}
+    g.appendChild(el("circle",{class:"body",cx:m._x,cy:m._y,r:m._r,fill:DOMINIOS[m.dominio].cor,stroke}));
+    const idt=el("text",{x:m._x,y:m._y+3.5,class:"id"});idt.textContent=m.id.slice(1);g.appendChild(idt);
+    const lbl=el("text",{x:m._x,y:m._y+m._r+15,class:"lbl"});lbl.textContent=m.nome;g.appendChild(lbl);
+    g.onclick=()=>setFocus(m.id);svg.appendChild(g);});
+  const banner=document.getElementById("banner");
+  if(focus&&killMode){banner.style.display="flex";banner.innerHTML=`⚠ Se <b>${byId[focus].nome}</b> cair, <b>${down.size}</b> módulo(s) param`;}
+  else banner.style.display="none";
+  document.getElementById("hint").innerHTML=(epicMode||epicHi)?`<b style="color:#c084fc">magenta</b> = epic habilita módulo (impacto de entrega)`:focus?`<b style="color:var(--enable)">verde</b> habilita · <b style="color:var(--depend)">azul</b> depende · tracejado = curado (fora da ontologia) · Esc limpa`:`Clique num nó · <b>/</b> busca · <b>setas</b> navegam`;
+}
+
+function setFocus(id,skipPush){if(focus&&focus!==id&&(!trail.length||trail[trail.length-1]!==focus))trail.push(focus);
+  focus=id;epicSel=null;epicHi=null;tab="visao";document.getElementById("q").value="";query="";
+  if(!skipPush&&id)history.replaceState(null,"","#"+id);drawCrumb();render();drawPanel();}
+function clearFocus(){focus=null;trail=[];epicSel=null;epicHi=null;history.replaceState(null,"","#");drawCrumb();render();drawPanel();}
+
+function drawCrumb(){const c=document.getElementById("crumb");
+  if(!focus){c.innerHTML='<span>Nenhum módulo em foco — clique num nó para isolar a cadeia.</span>';return;}
+  const path=[...trail,focus];
+  c.innerHTML=path.map((id,i)=>i<path.length-1?`<a data-go="${id}">${id} ${byId[id].nome}</a> ›`:`<b style="color:var(--ink)">${id} ${byId[id].nome}</b>`).join(" ")+`<span class="x" id="clearF">limpar ✕</span>`;
+  c.querySelectorAll("[data-go]").forEach(a=>a.onclick=()=>{const i=trail.indexOf(a.dataset.go);if(i>=0)trail=trail.slice(0,i);focus=a.dataset.go;epicSel=null;history.replaceState(null,"","#"+focus);drawCrumb();render();drawPanel();});
+  document.getElementById("clearF").onclick=clearFocus;}
+
+const panel=document.getElementById("panel");
+function relRow(id,tipo){const m=byId[id];if(!m)return"";return `<div class="rel" data-go="${id}"><span class="rid" style="background:${DOMINIOS[m.dominio].cor}">${id.slice(1)}</span><span class="rn">${m.nome}</span><span class="rt">${tipo}</span></div>`;}
+function progBar(t,d,dn){const tot=t||1;return `<div class="prog"><i style="width:${dn/tot*100}%;background:var(--enable)"></i><i style="width:${d/tot*100}%;background:var(--accent)"></i><i style="width:${(tot-d-dn)/tot*100}%;background:transparent"></i></div>`;}
+
+function drawPanel(){
+  if(!focus){panel.innerHTML='<div class="empty">Selecione um módulo para ver importância, impacto, modelo e entrega.<br><br>Ative <b>⚠ Simular queda</b> para o efeito-cascata.</div>';return;}
+  const m=byId[focus],col=DOMINIOS[m.dominio].cor,st=STATUS[m.status],O=m.ontologia,R=m.epics_resumo;
+  const head=`<div class="pad">
+    <span class="ptag" style="background:${col}">${DOMINIOS[m.dominio].nome}</span>
+    <span class="ptag" style="background:${st.c};color:#06080d;margin-left:6px">${st.l}</span>
+    ${m.transversal?'<span class="ptag" style="background:#475569;color:#e9eef7;margin-left:6px">transversal</span>':''}
+    <div class="pname">${m.nome}</div><div class="pid">${m.id}</div>
+    <p class="pp">${m.proposito}</p>
+    <div class="tabs">
+      <span class="tab ${tab==='visao'?'on':''}" data-tab="visao">Visão</span>
+      <span class="tab ${tab==='modelo'?'on':''}" data-tab="modelo">Modelo<span class="n">${O.entidades.length+O.eventos.length}</span></span>
+      <span class="tab ${tab==='entrega'?'on':''}" data-tab="entrega">Entrega<span class="n">${R.epics}</span></span>
+    </div><div id="tabbody"></div></div>`;
+  panel.innerHTML=head;
+  panel.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{tab=t.dataset.tab;epicSel=null;drawTab();});
+  drawTab();
+}
+function bindGo(){panel.querySelectorAll("[data-go]").forEach(r=>r.onclick=()=>{setFocus(r.dataset.go);panel.scrollTop=0;});}
+
+function drawTab(){
+  const m=byId[focus],O=m.ontologia,R=m.epics_resumo,body=document.getElementById("tabbody");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===tab));
+  if(tab==="visao"){
+    const bars=Array.from({length:5},(_,i)=>`<i style="background:${i<m.importancia?impColor(m.importancia):'var(--line)'}"></i>`).join("");
+    body.innerHTML=`
+      <div class="metrics"><div class="metric"><div class="k">Importância</div><div class="v">${IMP[m.importancia]}</div><div class="bars">${bars}</div></div>
+      <div class="metric"><div class="k">Impacto</div><div class="v" style="text-transform:capitalize">${m.impacto}</div></div></div>
+      <div class="metrics"><div class="metric"><div class="k">Habilita (direto)</div><div class="v enable">${m.hab.length}</div></div>
+      <div class="metric"><div class="k">Param se cair</div><div class="v danger">${bfsHab(m.id).size}</div></div></div>
+      ${m.hab.length?`<div class="sec"><h4>Habilita →</h4>${m.hab.map(h=>relRow(h.to,h.tipo)).join("")}</div>`:''}
+      ${m.dep.length?`<div class="sec"><h4>← Depende de</h4>${m.dep.map(h=>relRow(h.to,h.tipo)).join("")}</div>`:''}`;
+    bindGo();
+  } else if(tab==="modelo"){
+    body.innerHTML=`
+      ${O.entidades.length?`<div class="sec"><h4>Entidades (${O.entidades.length})</h4>${O.entidades.map(e=>`<div class="ent"><b>${e.nome}</b>${e.desc?`<span>${e.desc}</span>`:''}</div>`).join("")}</div>`:'<div class="sec"><h4>Entidades</h4><p class="pp">Sem entidades modeladas na ontologia (módulo stub/transversal).</p></div>'}
+      ${O.eventos.length?`<div class="sec"><h4>Eventos (${O.eventos.length})</h4>${O.eventos.map(e=>`<div class="ev"><code>${e.nome}</code>${e.desc?` — ${e.desc}`:''}</div>`).join("")}</div>`:''}
+      ${O.workflows.length?`<div class="sec"><h4>Workflows</h4>${O.workflows.map(w=>`<span class="pill">${w}</span>`).join("")}</div>`:''}`;
+  } else {
+    if(epicSel){drawEpic();return;}
+    body.innerHTML=`
+      <div class="metrics"><div class="metric"><div class="k">Epics</div><div class="v">${R.epics}</div></div>
+      <div class="metric"><div class="k">User stories</div><div class="v">${R.us_total}</div></div>
+      <div class="metric"><div class="k">Done</div><div class="v enable">${R.done}</div></div></div>
+      ${progBar(R.us_total,R.doing,R.done)}
+      <div class="sec"><h4>Epics</h4>${m.epics.map(e=>`
+        <div class="epic" data-epic="${e.id}"><div class="er"><span class="eid">${e.id.replace('EPIC-','')}</span><span class="et">${e.titulo}</span>${e.milestone?`<span class="ems">${e.milestone}</span>`:''}</div>
+        ${progBar(e.us_total,e.us.doing,e.us.done)}</div>`).join("")||'<p class="pp">Sem epics documentados.</p>'}</div>`;
+    body.querySelectorAll("[data-epic]").forEach(x=>x.onclick=()=>{epicSel=x.dataset.epic;const e=m.epics.find(z=>z.id===epicSel);epicHi=(e&&e.habilita_modulos.length)?{from:focus,tos:e.habilita_modulos}:null;drawTab();render();panel.scrollTop=0;});
+  }
+}
+function drawEpic(){
+  const m=byId[focus],e=m.epics.find(x=>x.id===epicSel),body=document.getElementById("tabbody");
+  const goMods=ids=>ids.map(id=>relRow(id,"módulo")).join("")||'<span class="pill">—</span>';
+  body.innerHTML=`<span class="back" id="backEpic">← epics de ${m.nome}</span>
+    <div class="pname" style="font-size:16px">${e.titulo}</div><div class="pid">${e.id}${e.milestone?' · '+e.milestone:''}</div>
+    <p class="pp">${e.objetivo||'—'}</p>
+    <div class="metrics"><div class="metric"><div class="k">US total</div><div class="v">${e.us_total}</div></div>
+    <div class="metric"><div class="k">Done</div><div class="v enable">${e.us.done}</div></div>
+    <div class="metric"><div class="k">A fazer</div><div class="v">${e.us.todo}</div></div></div>
+    ${progBar(e.us_total,e.us.doing,e.us.done)}
+    ${e.habilita_epics.length?`<div class="sec"><h4>Habilita epics →</h4>${e.habilita_epics.map(x=>`<span class="pill">${x.replace('EPIC-','')}</span>`).join("")}</div>`:''}
+    ${e.depende_epics.length?`<div class="sec"><h4>← Depende de epics</h4>${e.depende_epics.map(x=>`<span class="pill">${x.replace('EPIC-','')}</span>`).join("")}</div>`:''}
+    ${e.habilita_modulos.length?`<div class="sec"><h4>Habilita módulos → (impacto)</h4>${goMods(e.habilita_modulos)}</div>`:''}
+    ${e.depende_modulos.length?`<div class="sec"><h4>← Depende de módulos</h4>${goMods(e.depende_modulos)}</div>`:''}`;
+  document.getElementById("backEpic").onclick=()=>{epicSel=null;epicHi=null;drawTab();render();};
+  bindGo();
+}
+
+const domLegend=document.getElementById("domLegend");
+function buildLegend(){domLegend.innerHTML="";Object.entries(DOMINIOS).forEach(([k,v])=>{const c=document.createElement("span");c.className="chip"+(hiddenDom.has(k)?" off":"");c.innerHTML=`<span class="dot" style="background:${v.cor}"></span>${v.nome}`;c.onclick=()=>{hiddenDom.has(k)?hiddenDom.delete(k):hiddenDom.add(k);buildLegend();render();};domLegend.appendChild(c);});}
+
+document.getElementById("depthBtn").onclick=function(){fullDepth=!fullDepth;this.classList.toggle("on",!fullDepth);this.textContent=fullDepth?"cadeia completa":"1 salto";render();};
+document.getElementById("killBtn").onclick=function(){killMode=!killMode;this.classList.toggle("on",killMode);render();};
+document.getElementById("transBtn").onclick=function(){showTrans=!showTrans;this.classList.toggle("on",showTrans);render();};
+document.getElementById("epicBtn").onclick=function(){epicMode=!epicMode;this.classList.toggle("on",epicMode);render();};
+const qi=document.getElementById("q"),resBox=document.getElementById("results");
+let selIdx=0,curList=[];
+function runSearch(){
+  if(!query){resBox.classList.remove("show");resBox.innerHTML="";curList=[];return;}
+  const hits=SEARCH.filter(s=>s.key.includes(query));
+  const mods=hits.filter(h=>h.type==="mod").slice(0,6), eps=hits.filter(h=>h.type==="epic").slice(0,12);
+  curList=[...mods,...eps];selIdx=0;
+  if(!curList.length){resBox.innerHTML='<div class="rgrp">sem resultados</div>';resBox.classList.add("show");return;}
+  const resHtml=(h,i)=>{const col=DOMINIOS[byId[h.mod].dominio].cor,badge=h.type==="mod"?h.id.slice(1):h.id.replace("EPIC-M","").replace(/^0+/,"");
+    return `<div class="res${i===selIdx?' sel':''}" data-i="${i}"><span class="rb" style="background:${col}">${h.type==="mod"?h.id.slice(1):h.id.replace("EPIC-","")}</span><div class="rmain"><div class="rt">${h.label}</div><div class="rs">${h.sub}</div></div><span class="rk">${h.type==="mod"?"módulo":"epic"}</span></div>`;};
+  let html="";let i=0;
+  if(mods.length){html+='<div class="rgrp">Módulos</div>';mods.forEach(h=>html+=resHtml(h,i++));}
+  if(eps.length){html+='<div class="rgrp">Epics</div>';eps.forEach(h=>html+=resHtml(h,i++));}
+  resBox.innerHTML=html;resBox.classList.add("show");
+  resBox.querySelectorAll("[data-i]").forEach(elm=>elm.onclick=()=>pick(curList[+elm.dataset.i]));
+}
+function highlightSel(){resBox.querySelectorAll(".res").forEach((e,i)=>e.classList.toggle("sel",i===selIdx));
+  const s=resBox.querySelector(".res.sel");if(s)s.scrollIntoView({block:"nearest"});}
+function pick(h){if(!h)return;resBox.classList.remove("show");qi.value="";query="";
+  if(h.type==="mod"){setFocus(h.mod);}
+  else{focus=h.mod;tab="entrega";epicSel=h.id;const e=byId[h.mod].epics.find(z=>z.id===h.id);
+    epicHi=(e&&e.habilita_modulos.length)?{from:h.mod,tos:e.habilita_modulos}:null;
+    history.replaceState(null,"","#"+h.mod);drawCrumb();render();drawPanel();panel.scrollTop=0;}}
+qi.oninput=()=>{query=qi.value.trim().toLowerCase();runSearch();};
+qi.onkeydown=e=>{
+  if(e.key==="ArrowDown"){e.preventDefault();selIdx=Math.min(selIdx+1,curList.length-1);highlightSel();}
+  else if(e.key==="ArrowUp"){e.preventDefault();selIdx=Math.max(selIdx-1,0);highlightSel();}
+  else if(e.key==="Enter"){e.preventDefault();pick(curList[selIdx]);}
+  else if(e.key==="Escape"){qi.value="";query="";resBox.classList.remove("show");qi.blur();}};
+document.addEventListener("click",e=>{if(!e.target.closest(".search"))resBox.classList.remove("show");});
+document.addEventListener("keydown",e=>{if(e.target===qi)return;
+  if(e.key==="/"){e.preventDefault();qi.focus();return;}
+  if(e.key==="Escape"){clearFocus();return;}
+  if(e.key==="k"){document.getElementById("killBtn").click();return;}
+  if(e.key==="f"){document.getElementById("depthBtn").click();return;}
+  if(focus&&["ArrowRight","ArrowLeft","ArrowDown","ArrowUp"].includes(e.key)){e.preventDefault();
+    if(e.key==="ArrowRight"&&byId[focus].hab[0])setFocus(byId[focus].hab[0].to);
+    if(e.key==="ArrowLeft"&&byId[focus].dep[0])setFocus(byId[focus].dep[0].to);
+    if(e.key==="ArrowDown"||e.key==="ArrowUp"){const ids=M.map(m=>m.id);let i=ids.indexOf(focus);i=(i+(e.key==="ArrowDown"?1:-1)+ids.length)%ids.length;setFocus(ids[i]);}}});
+window.addEventListener("hashchange",()=>{const id=location.hash.slice(1);if(byId[id])setFocus(id,true);});
+
+buildLegend();
+const initial=location.hash.slice(1);
+if(byId[initial])setFocus(initial,true);else{drawCrumb();render();drawPanel();}
+</script>
