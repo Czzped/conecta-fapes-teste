@@ -7,12 +7,13 @@ interface CalendarioFolhaProps {
   onBack: () => void;
 }
 
-type CalendarField = 'solicitacao' | 'geracao' | 'pagamento';
+type CalendarField = 'solicitacao' | 'avaliacaoDocumentos' | 'geracao' | 'pagamento';
 
 interface MonthSchedule {
   monthIndex: number;
   monthName: string;
   solicitacao: string;
+  avaliacaoDocumentos: string;
   geracao: string;
   pagamento: string;
 }
@@ -34,6 +35,7 @@ const monthNames = [
 
 const fieldLabels: Record<CalendarField, string> = {
   solicitacao: 'Solicitação de Bolsas',
+  avaliacaoDocumentos: 'Avaliação dos Documentos',
   geracao: 'Geração das Folhas',
   pagamento: 'Pagamento da Folha',
 };
@@ -56,6 +58,7 @@ const buildSchedule = (year: number): MonthSchedule[] =>
     monthIndex,
     monthName,
     solicitacao: toInputDate(year, monthIndex, 3),
+    avaliacaoDocumentos: toInputDate(year, monthIndex, 10),
     geracao: toInputDate(year, monthIndex, 18),
     pagamento: toInputDate(year, monthIndex, lastDayOfMonth(year, monthIndex)),
   }));
@@ -216,7 +219,7 @@ export const CalendarioFolha: React.FC<CalendarioFolhaProps> = ({ onBack }) => {
       <div className="pt-8 px-8 pb-8">
         <ConfiguracoesPageHeader
           title="Calendário da Folha"
-          subtitle="Configure as datas mensais de solicitação, geração e pagamento da folha de bolsas."
+          subtitle="Configure as datas mensais de solicitação, avaliação, geração e pagamento da folha de bolsas."
           icon={CalendarDays}
           onBack={onBack}
         />
@@ -328,7 +331,7 @@ export const CalendarioFolha: React.FC<CalendarioFolhaProps> = ({ onBack }) => {
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
                     {(Object.keys(fieldLabels) as CalendarField[]).map((field) => (
                       <div key={field} style={{ position: 'relative' }}>
                         <label style={{ display: 'block', color: editable ? T.textPrimary : T.textMuted, fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem' }}>
