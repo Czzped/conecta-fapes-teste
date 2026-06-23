@@ -14,6 +14,7 @@ Agent personas and skills for the Conecta FAPES project.
 |-------|-------------|
 | [DDD](skills/ddd/SKILL.md) | Used by the Product Owner agent to define bounded context, ubiquitous language, invariants, and tactical model consistency when creating or reviewing module documentation |
 | [Nielsen Heuristics](skills/nielsen-heuristics/SKILL.md) | Evaluate or design UI against Nielsen's 10 usability heuristics. Use when reviewing screens before merge, auditing complex forms, inspecting error messages, or evaluating multi-step flows (payment, reporting, scholarship management) |
+| [Observability](skills/observability/SKILL.md) | Used by the Product Owner agent to define each module's observability contract — eventos/variaveis a monitorar em SigNoz/Prometheus/Grafana, metricas, SLIs/SLOs, alertas e tracing no codigo. Produz o artefato padrao `monitoramento.md` |
 
 ## Skills Globais em Uso no Projeto
 

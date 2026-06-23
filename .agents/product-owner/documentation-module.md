@@ -457,7 +457,44 @@ stateDiagram-v2
 
 ---
 
-## Step 8: Atualizar Backlog Central
+## Step 8: Monitoramento (Observabilidade)
+
+Create `/docs/implementation/modules/{M00x-name}/monitoramento.md`
+
+Artefato **padrao** de todo modulo. Aplicar a [observability skill](../skills/observability/SKILL.md). Define o que a equipe de sustentacao deve monitorar em SigNoz/Prometheus/Grafana e o tracing a instrumentar no codigo. Referencia (nao duplica) `eventos-dominio.md` e o catalogo M020.
+
+```markdown
+# Monitoramento e Observabilidade — M00x [Nome]
+
+Dominio e regras: ver [README.md](README.md) | Eventos: ver [eventos-dominio.md](eventos-dominio.md)
+
+## Objetivo de Sustentacao
+[O que garantir em producao]
+
+## Eventos de Negocio Monitorados
+| Evento | Fonte | Sinal | Alerta? | Severidade |
+
+## Metricas (Prometheus)
+| Metrica | Tipo | Labels | Unidade | Descricao |
+
+## Tracing (SigNoz / OpenTelemetry)
+| Span | Quando | Atributos (nao sensiveis) |
+
+## SLIs / SLOs
+| SLI | SLO | Janela |
+
+## Alertas
+| Alerta | Condicao | Severidade | Acao / Runbook |
+
+## Dashboards
+| Painel | Conteudo | Ferramenta |
+```
+
+**Principio**: nem todo evento de dominio vira metrica — monitorar o que tem impacto operacional ou financeiro. Nunca colocar dado pessoal (CPF, nome, email) em label de metrica ou atributo de span.
+
+---
+
+## Step 9: Atualizar Backlog Central
 
 Update `/docs/management/backlog-product.md` — adicionar ou atualizar a linha do modulo na tabela com dor, capacidade, KPI e % de desenvolvimento.
 
@@ -473,6 +510,8 @@ docs/implementation/modules/{M00x-name}/
 ├── backlog.md               # EPICs + Rastreabilidade
 ├── modelo-estrutural.md     # Diagrama de classes + Dicionario de dados
 ├── modelo-comportamental.md # Diagramas de estado
+├── eventos-dominio.md       # Eventos de dominio emitidos/consumidos (notificacao via M020)
+├── monitoramento.md         # Observabilidade: eventos/metricas/tracing para sustentacao
 └── epics/
     ├── EPIC-M00x-001.md     # Contexto + US com Gherkin
     ├── EPIC-M00x-002.md
@@ -490,6 +529,8 @@ Antes de considerar a documentacao do modulo completa:
 - [ ] contrato-api.md cobre operacoes do backlog ainda nao mapeadas no contrato.md
 - [ ] contrato-api.md usa envelope de erro consistente com status HTTP corretos
 - [ ] Nenhum outro documento repete texto do dominio
+- [ ] monitoramento.md define eventos/variaveis a monitorar (SigNoz/Prometheus/Grafana), tracing, SLIs/SLOs e alertas
+- [ ] monitoramento.md referencia eventos-dominio.md sem redefinir eventos; nenhum dado pessoal em label/atributo
 - [ ] Cada EPIC contem suas US com cenarios Gherkin
 - [ ] Regras de negocio nos EPICs sao links para o README
 - [ ] Backlog lista todos os EPICs com rastreabilidade

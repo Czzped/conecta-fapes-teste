@@ -65,6 +65,13 @@ Para skills proprias do projeto (Tipo 1, com frontmatter), veja `.agents/skills/
 - **Quando usar**: ao definir limites de modulo; ao decidir dependencias entre bounded contexts; ao refatorar estrutura de camadas; ao redigir ADR.
 - **Complementa**: skill local [`.agents/skills/ddd/SKILL.md`](skills/ddd/SKILL.md)
 
+### `observability` *(skill local do projeto)*
+
+- **Origem**: [`.agents/skills/observability/SKILL.md`](skills/observability/SKILL.md)
+- **Descricao**: Define o contrato de observabilidade de cada modulo — eventos/variaveis a monitorar em SigNoz, Prometheus e Grafana, metricas, SLIs/SLOs, alertas e tracing/spans a instrumentar no codigo. Produz o artefato padrao `monitoramento.md`.
+- **Quando usar**: ao criar/revisar documentacao de modulo (artefato `monitoramento.md`); ao traduzir eventos de dominio, jobs ou integracoes externas em sinais operacionais; ao definir o que a sustentacao monitora em producao.
+- **Complementa**: skill local [`ddd`](skills/ddd/SKILL.md), `documentation-module.md`, e o catalogo de eventos do M020
+
 ---
 
 ## Testes e QA
@@ -96,6 +103,17 @@ Para skills proprias do projeto (Tipo 1, com frontmatter), veja `.agents/skills/
 - **Descricao**: Escrita de `.feature` Gherkin, Scenario Outline, tags, Background.
 - **Quando usar**: ao converter cenarios Gherkin de EPICs/US em `.feature` executaveis; ao organizar cenarios por tags de dominio (ex.: `@RN13`, `@RI2`); ao reusar setup via `Background`.
 - **Combina com**: `playwright-e2e-testing` (execucao dos cenarios `.feature` em E2E)
+
+---
+
+## Operacao e Observabilidade
+
+### `monitoring-expert`
+
+- **Origem**: [`jeffallan/claude-skills@monitoring-expert`](https://skills.sh/jeffallan/claude-skills/monitoring-expert) (3.2K installs, MIT)
+- **Descricao**: Configuracao de monitoramento — pipelines de logging estruturado, dashboards Prometheus/Grafana, regras de alerta, instrumentacao de tracing distribuido, load testing (k6/Artillery), profiling e capacity planning.
+- **Quando usar**: ao **implementar** a observabilidade definida no `monitoramento.md` de um modulo — montar dashboards Grafana, escrever regras de alerta Prometheus, instrumentar spans/metricas no codigo, debugar producao via logs/metricas/traces.
+- **Complementa**: skill local [`.agents/skills/observability/SKILL.md`](skills/observability/SKILL.md) — o skill local define **o que** monitorar (nivel PO/spec, artefato `monitoramento.md`); o `monitoring-expert` cobre **como** implementar (config concreta de Prometheus/Grafana/OTel).
 
 ---
 

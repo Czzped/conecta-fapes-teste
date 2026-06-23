@@ -41,7 +41,7 @@ classDiagram
     PessoaFisica "1" -- "0..1" Curriculo : titular
     FormaCitacao "0..*" -- "0..1" Artigo : citado em
     FormaCitacao "0..*" -- "1" PessoaFisica : pesquisador
-    Artigo "0..*" -- "0..*" Curriculo : curriculos
+    Artigo "0..*" -- "0..*" Curriculo : artigos
     Artigo "0..*" -- "0..*" PessoaFisica : autores
     Artigo "0..*" -- "1" Periodico : periodico
 ```
