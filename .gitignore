@@ -35,3 +35,6 @@ Thumbs.db
 # AI / Codex
 .codex/
 .vercel
+
+# Impacto de Negócio (gerado de negocio.casos a cada build)
+docs/discovery/impacto-negocio.md
