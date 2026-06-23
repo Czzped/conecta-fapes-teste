@@ -56,6 +56,10 @@ Cada módulo:
     kpis: ["...", "..."]
     valor_publico: "..."
     percent_desenv: 35
+    casos:                   # casos concretos de impacto por funcionalidade (aparecem na ficha)
+      - funcionalidade: "Remanejamento de bolsa"
+        problema: "Processo manual via e-mail, sem controle."
+        beneficio: "Coordenador remaneja sem intervenção da FAPES; sem planilha."
 ```
 
 `depende_de` **não** é mantido à mão — o site deriva invertendo `habilita`.

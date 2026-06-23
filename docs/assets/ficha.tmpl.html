@@ -57,6 +57,11 @@
   .nrow .nk{flex:none;width:92px;color:var(--ink-faint);font-size:12px;text-transform:uppercase;letter-spacing:.04em;padding-top:2px}
   .nrow .nv{flex:1;color:var(--ink)}
   .kpi{display:inline-block;font-size:12px;color:#06080d;background:var(--gold);border-radius:7px;padding:3px 9px;margin:0 6px 6px 0;font-weight:600}
+  .caso{background:#0e1726;border:1px solid #2a3b57;border-radius:10px;padding:11px 13px;margin-top:10px}
+  .caso .cf{font-size:13.5px;font-weight:650;color:#9ec5ff;margin-bottom:5px}
+  .caso .cp,.caso .cb{font-size:13px;color:var(--ink-dim);margin:3px 0}
+  .caso .cp b,.caso .cb b{color:var(--ink);font-weight:600}
+  .caso .cb b{color:var(--enable)}
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
   .stat{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 14px}
   .stat .k{font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.05em}
@@ -130,6 +135,7 @@ function ficha(m){
     <div class="nrow"><div class="nk">Benefício</div><div class="nv">${esc(N.beneficio)||'<span class="muted">—</span>'}</div></div>
     ${N.valor_publico?`<div class="nrow"><div class="nk">Valor público</div><div class="nv">${esc(N.valor_publico)}</div></div>`:''}
     ${(N.kpis&&N.kpis.length)?`<div class="nrow"><div class="nk">KPIs</div><div class="nv">${N.kpis.map(k=>`<span class="kpi">${esc(k)}</span>`).join("")}</div></div>`:''}
+    ${(N.casos&&N.casos.length)?`<div class="nrow"><div class="nk">Casos</div><div class="nv">${N.casos.map(c=>`<div class="caso"><div class="cf">${esc(c.funcionalidade)}</div><div class="cp"><b>Problema:</b> ${esc(c.problema)}</div><div class="cb"><b>Benefício:</b> ${esc(c.beneficio)}</div></div>`).join("")}</div></div>`:''}
   </div>`;
   const epics=m.epics.map(e=>{const v=e.valor||e.objetivo||"";
     return `<div class="epic" id="ep-${e.id}"><div class="er"><span class="eid">${e.id.replace('EPIC-','')}</span><span class="et">${esc(e.titulo)}</span>${e.milestone?`<span class="ems">${e.milestone}</span>`:''}</div>
