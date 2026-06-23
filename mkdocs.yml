@@ -7,6 +7,7 @@ docs_dir: docs
 exclude_docs: |
   deprecated/
   templates/
+  assets/*.tmpl.html
 
 not_in_nav: |
   architecture/adr/template.md
@@ -61,6 +62,9 @@ theme:
     - search.suggest
     - search.highlight
     - content.code.copy
+
+hooks:
+  - tools/mkdocs_hooks.py
 
 plugins:
   - search:
@@ -201,6 +205,9 @@ nav:
           - Backlog: products/authrix/backlog.md
 
   - Design System: design-system.md
+
+  - Mapa de Capacidades: mapa-capacidades.md
+  - Fichas de Módulo: fichas.md
 
   - Modulos:
       - Visao Geral: implementation/modules/README.md

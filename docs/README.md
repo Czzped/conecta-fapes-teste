@@ -2,6 +2,8 @@
 
 Plataforma digital da agencia de fomento para gestao do ciclo completo de fomento a pesquisa, desenvolvimento e inovacao.
 
+> 🗺️ **[Mapa de Capacidades](mapa-capacidades.md)** — grafo interativo dos 24 modulos: importancia, impacto e como cada um habilita os demais. [Abrir em tela cheia](assets/mapa-capacidades.html).
+
 ## Prototipos
 
 | Prototipo | Link |

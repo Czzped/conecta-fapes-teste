@@ -1,0 +1,455 @@
+# =============================================================================
+# capacidades.yaml — Mapa de Capacidades ConectaFAPES
+# Fonte de verdade do grafo de módulos: importância, impacto e habilitação.
+# Gera o site (grafo/árvore). Editar AQUI, não no HTML.
+# =============================================================================
+
+meta:
+  titulo: "Mapa de Capacidades — ConectaFAPES"
+  subtitulo: "Como cada módulo habilita os demais"
+  versao: "1.0.0"
+  atualizado_em: "2026-06-23"
+  fonte: "docs/implementation/modules/*/ontology.yaml + README.md"
+
+# -- Domínios = cor do nó -----------------------------------------------------
+dominios:
+  corporativo: { nome: "IAM / Corporativo", cor: "#3b82f6" }
+  plataforma:  { nome: "Plataforma",         cor: "#64748b" }
+  pre_award:   { nome: "Pré-Award",          cor: "#8b5cf6" }
+  post_award:  { nome: "Post-Award",         cor: "#10b981" }
+  financeiro:  { nome: "Financeiro",         cor: "#f59e0b" }
+  inteligencia: { nome: "Inteligência",      cor: "#ec4899" }
+
+# -- Níveis = coluna no grafo (cadeia de valor, esquerda → direita) -----------
+niveis:
+  - { id: fundacao,     ordem: 0, nome: "Fundação" }
+  - { id: pre_award,    ordem: 1, nome: "Pré-Award" }
+  - { id: contratacao,  ordem: 2, nome: "Contratação" }
+  - { id: post_award,   ordem: 3, nome: "Post-Award" }
+  - { id: execucao,     ordem: 4, nome: "Execução / Financeiro" }
+  - { id: inteligencia, ordem: 5, nome: "Inteligência" }
+
+# -- Legenda das escalas (autorais, 1=apoio .. 5=crítico) ---------------------
+escalas:
+  importancia:
+    1: "Apoio"
+    2: "Complementar"
+    3: "Relevante"
+    4: "Estruturante"
+    5: "Crítico — bloqueia o negócio"
+  impacto:        # blast radius se o módulo cair
+    baixo:   "Degrada uma feature isolada"
+    medio:   "Degrada um fluxo"
+    alto:    "Para um domínio inteiro"
+    critico: "Para a plataforma"
+  tipo_aresta:    # natureza da habilitação (estilo da linha no grafo)
+    dados:    "Fornece dado mestre / referência"
+    evento:   "Emite evento consumido"
+    workflow: "Transição de estado / handoff"
+    infra:    "Serviço transversal (auth, gateway, notificação)"
+
+# -- Módulos ------------------------------------------------------------------
+# Campo `habilita` é a aresta canônica (este módulo VIABILIZA o destino).
+# `depende_de` é derivado pelo site invertendo `habilita` — não precisa manter.
+# `transversal: true` => infra que conecta quase tudo; arestas ocultas por
+# padrão no grafo (toggle), pra não virar emaranhado.
+modulos:
+
+  # --- Fundação --------------------------------------------------------------
+  - id: M005
+    nome: "Autenticação"
+    slug: autenticacao
+    dominio: corporativo
+    nivel: fundacao
+    transversal: true
+    status: entregue
+    importancia: 5
+    impacto: critico
+    proposito: "Autenticação centralizada via Acesso Cidadão (OIDC)."
+    entidades_chave: []
+    habilita:
+      - { modulo: M020, tipo: infra }
+      - { modulo: M023, tipo: infra }
+      - { modulo: M024, tipo: infra }
+      - { modulo: M019, tipo: infra }
+
+  - id: M006
+    nome: "Autorização"
+    slug: autorizacao
+    dominio: corporativo
+    nivel: fundacao
+    transversal: true
+    status: planejado
+    importancia: 5
+    impacto: critico
+    proposito: "Autorização RBAC/ABAC via OpenFGA para todos os módulos."
+    entidades_chave: []
+    habilita: []          # transversal a todos; sem arestas explícitas
+
+  - id: M007
+    nome: "API Gateway"
+    slug: api-gateway
+    dominio: plataforma
+    nivel: fundacao
+    transversal: true
+    status: entregue
+    importancia: 4
+    impacto: critico
+    proposito: "Gateway de roteamento, autenticação e rate limiting das APIs."
+    entidades_chave: [Gateway, BFF]
+    habilita:
+      - { modulo: M008, tipo: infra }
+      - { modulo: M009, tipo: infra }
+      - { modulo: M011, tipo: infra }
+
+  - id: M008
+    nome: "Cadastros Corporativos"
+    slug: cadastros-corporativos
+    dominio: corporativo
+    nivel: fundacao
+    status: especificado
+    importancia: 5
+    impacto: critico
+    proposito: "Centraliza pessoas, organizações, rubricas e dados de referência."
+    entidades_chave: [PessoaFisica, Instituicao, UnidadeOrganizacional, Rubrica]
+    habilita:
+      - { modulo: M002, tipo: dados }
+      - { modulo: M003, tipo: dados }
+      - { modulo: M009, tipo: dados }
+      - { modulo: M010, tipo: dados }
+      - { modulo: M011, tipo: dados }
+      - { modulo: M012, tipo: dados }
+      - { modulo: M013, tipo: dados }
+      - { modulo: M021, tipo: dados }
+      - { modulo: M022, tipo: dados }
+
+  - id: M001
+    nome: "Modalidade de Bolsa"
+    slug: modalidade-bolsa
+    dominio: corporativo
+    nivel: fundacao
+    status: planejado
+    importancia: 4
+    impacto: alto
+    proposito: "Modalidades, níveis e valores versionados de bolsa conforme resoluções."
+    entidades_chave: [ModalidadeBolsa, VersaoModalidade, NivelBolsa, VersaoNivel]
+    habilita:
+      - { modulo: M009, tipo: dados }
+      - { modulo: M011, tipo: dados }
+
+  # --- Pré-Award -------------------------------------------------------------
+  - id: M002
+    nome: "Importação de Editais"
+    slug: importacao-editais
+    dominio: pre_award
+    nivel: pre_award
+    status: entregue
+    importancia: 3
+    impacto: medio
+    proposito: "Importa editais do SIGFAPES e gera JSONLs consumidos a jusante."
+    entidades_chave: [Edital, Projeto, AlocacaoBolsistaSigfapes]
+    habilita:
+      - { modulo: M003, tipo: dados }
+      - { modulo: M004, tipo: dados }
+
+  - id: M010
+    nome: "Planejamento e Estratégia"
+    slug: planejamento-estrategia
+    dominio: pre_award
+    nivel: pre_award
+    status: especificado
+    importancia: 4
+    impacto: alto
+    proposito: "Plano estratégico, parcerias institucionais e programas de fomento."
+    entidades_chave: [PlanoEstrategico, Parceria, Programa, AporteFinanceiro]
+    habilita:
+      - { modulo: M011, tipo: dados }
+      - { modulo: M016, tipo: dados }
+      - { modulo: M018, tipo: dados }
+
+  - id: M021
+    nome: "Gestão de Formulários"
+    slug: gestao-formularios
+    dominio: plataforma
+    nivel: pre_award
+    status: especificado
+    importancia: 3
+    impacto: medio
+    proposito: "Formulários reutilizáveis (caracterização, habilitação, avaliação)."
+    entidades_chave: [Formulario, RespostaFormulario, Secao, Questao]
+    negocio:
+      dor: "Formulários de submissão e avaliação são montados ad hoc a cada edital, gerando retrabalho e inconsistência."
+      beneficio: "Formulários reutilizáveis e versionados, prontos para compor captações."
+      impacto_negocio: medio
+      kpis: ["Tempo de montagem de edital", "Reuso de formulários entre captações"]
+      valor_publico: "Editais padronizados e auditáveis."
+    habilita:
+      - { modulo: M011, tipo: dados }
+
+  - id: M024
+    nome: "Currículo do Pesquisador"
+    slug: curriculo-pesquisador
+    dominio: corporativo
+    nivel: pre_award
+    status: especificado
+    importancia: 3
+    impacto: medio
+    proposito: "Réplica local versionada do Lattes para elegibilidade e indicadores."
+    entidades_chave: [Curriculo, FormacaoAcademica, Artigo, Orientacao]
+    negocio:
+      dor: "Dados de currículo (formação, produção) dependem de consulta manual ao Lattes, sem histórico nem padronização."
+      beneficio: "Réplica local versionada do Lattes para elegibilidade, expertise e indicadores."
+      impacto_negocio: medio
+      kpis: ["Cobertura de currículos sincronizados", "Tempo de seleção de revisor ad hoc"]
+      valor_publico: "Seleção de avaliadores mais justa e rastreável."
+    habilita:
+      - { modulo: M011, tipo: dados }
+      - { modulo: M018, tipo: dados }
+      - { modulo: M019, tipo: dados }
+
+  - id: M011
+    nome: "Configuração de Captação"
+    slug: configuracao-captacao
+    dominio: pre_award
+    nivel: pre_award
+    status: especificado
+    importancia: 4
+    impacto: alto
+    proposito: "Configura captação de projetos, da configuração ao resultado final."
+    entidades_chave: [Fomento, Captacao, Faixa, AporteFomento, Proposta]
+    habilita:
+      - { modulo: M003, tipo: workflow }
+      - { modulo: M022, tipo: workflow }
+      - { modulo: M018, tipo: dados }
+
+  # --- Contratação -----------------------------------------------------------
+  - id: M022
+    nome: "Contratação e Outorga"
+    slug: contratacao-outorga
+    dominio: post_award
+    nivel: contratacao
+    status: especificado
+    importancia: 3
+    impacto: medio
+    proposito: "Formaliza proposta aprovada em projeto via termo de outorga."
+    entidades_chave: [ContratacaoOutorga, Outorgado, TermoOutorga]
+    negocio:
+      dor: "Contratação/outorga de propostas aprovadas é manual, com conferência de requisitos em papel."
+      beneficio: "Formaliza a outorga e converte proposta aprovada em projeto gerenciável."
+      impacto_negocio: medio
+      kpis: ["Tempo entre aprovação e início do projeto", "% outorgas sem pendência documental"]
+      valor_publico: "Início de projeto mais rápido para o pesquisador."
+    habilita:
+      - { modulo: M003, tipo: workflow }
+
+  # --- Post-Award ------------------------------------------------------------
+  - id: M003
+    nome: "Gestão de Projetos Captados"
+    slug: gestao-projetos-captados
+    dominio: post_award
+    nivel: post_award
+    status: andamento
+    importancia: 5
+    impacto: critico
+    proposito: "Gerencia projetos da contratação à conclusão: plano, equipe, orçamento."
+    entidades_chave: [Projeto, VersaoPlanoIniciativa, OrcamentoPlanejado]
+    habilita:
+      - { modulo: M004, tipo: dados }
+      - { modulo: M009, tipo: dados }
+      - { modulo: M012, tipo: dados }
+      - { modulo: M013, tipo: dados }
+      - { modulo: M014, tipo: dados }
+      - { modulo: M015, tipo: workflow }
+      - { modulo: M018, tipo: dados }
+      - { modulo: M019, tipo: dados }
+
+  - id: M013
+    nome: "Gestão Orçamentária"
+    slug: gestao-orcamentaria-projeto
+    dominio: post_award
+    nivel: post_award
+    status: especificado
+    importancia: 5
+    impacto: critico
+    proposito: "Fonte canônica de saldos: alocações, execuções e remanejamentos."
+    entidades_chave: [RubricaProjeto, SolicitacaoOrcamentaria, Transacao, Remanejamento]
+    habilita:
+      - { modulo: M003, tipo: dados }   # ciclo M003<->M013 (saldo valida projeto)
+      - { modulo: M009, tipo: dados }
+      - { modulo: M012, tipo: dados }
+      - { modulo: M014, tipo: dados }
+      - { modulo: M015, tipo: dados }
+
+  - id: M009
+    nome: "Gestão de Bolsista"
+    slug: gestao-bolsista
+    dominio: post_award
+    nivel: post_award
+    status: planejado
+    importancia: 4
+    impacto: alto
+    proposito: "Ciclo de vida de bolsas de pesquisa, da alocação ao encerramento."
+    entidades_chave: [BolsaPesquisa, TermoCompromisso, CotaBolsa]
+    habilita:
+      - { modulo: M004, tipo: dados }
+      - { modulo: M015, tipo: workflow }
+      - { modulo: M017, tipo: dados }
+      - { modulo: M018, tipo: dados }
+      - { modulo: M019, tipo: dados }
+
+  # --- Execução / Financeiro -------------------------------------------------
+  - id: M004
+    nome: "Pagamento de Bolsista"
+    slug: pagamento-bolsista
+    dominio: financeiro
+    nivel: execucao
+    status: andamento
+    importancia: 4
+    impacto: alto
+    proposito: "Folhas de pagamento, remessas bancárias e integração Banestes/BANDES."
+    entidades_chave: [PlanoMensal, Folha, PagamentoBolsista, RemessaPagamento]
+    habilita:
+      - { modulo: M015, tipo: dados }
+      - { modulo: M016, tipo: evento }
+      - { modulo: M017, tipo: dados }
+
+  - id: M016
+    nome: "Contabilidade e Financeiro"
+    slug: contabilidade-financeiro
+    dominio: financeiro
+    nivel: execucao
+    status: especificado
+    importancia: 4
+    impacto: alto
+    proposito: "Plano de contas, contas bancárias, movimentos e conciliação."
+    entidades_chave: [ContaContabil, FundoFinanceiro, ContaBancaria, TransacaoFinanceira]
+    habilita:
+      - { modulo: M011, tipo: dados }
+      - { modulo: M014, tipo: dados }
+      - { modulo: M017, tipo: dados }
+
+  - id: M014
+    nome: "Prestação de Contas"
+    slug: prestacao-contas
+    dominio: post_award
+    nivel: execucao
+    status: especificado
+    importancia: 3
+    impacto: medio
+    proposito: "Justificativas de despesa, movimentos bancários e conciliação."
+    entidades_chave: [Prestacao, JustificativaDespesa, DocumentoFiscal]
+    habilita:
+      - { modulo: M015, tipo: dados }
+      - { modulo: M010, tipo: dados }
+
+  - id: M017
+    nome: "Prevenção à Lavagem (PLD)"
+    slug: prevencao-lavagem-dinheiro
+    dominio: financeiro
+    nivel: execucao
+    status: especificado
+    importancia: 3
+    impacto: medio
+    proposito: "Compliance PLD: KYC, monitoramento, alertas e bloqueio preventivo."
+    entidades_chave: [AlertaPLD, VerificacaoKYC, AnaliseConflito]
+    habilita:
+      - { modulo: M004, tipo: workflow }   # bloqueio de pagamento
+
+  - id: M012
+    nome: "Acompanhamento de Resultados"
+    slug: acompanhamento-resultados
+    dominio: post_award
+    nivel: execucao
+    status: especificado
+    importancia: 2
+    impacto: medio
+    proposito: "Dashboards, relatórios técnicos e solicitações de alteração."
+    entidades_chave: [RelatorioTecnico, SolicitacaoAlteracao, DashboardProjeto]
+    habilita:
+      - { modulo: M013, tipo: evento }     # alteração de orçamento
+
+  - id: M015
+    nome: "Suspensão e Finalização"
+    slug: suspensao-finalizacao
+    dominio: post_award
+    nivel: execucao
+    status: especificado
+    importancia: 2
+    impacto: medio
+    proposito: "Suspensão temporária e encerramento de projetos com checagem de pendências."
+    entidades_chave: [SolicitacaoSuspensao, SolicitacaoFinalizacao, VerificacaoPendencia]
+    habilita: []
+
+  # --- Inteligência ----------------------------------------------------------
+  - id: M018
+    nome: "Business Intelligence"
+    slug: business-intelligence
+    dominio: inteligencia
+    nivel: inteligencia
+    status: especificado
+    importancia: 3
+    impacto: baixo
+    proposito: "Consolida dados de todos os módulos em painéis e relatórios gerenciais."
+    entidades_chave: [Dashboard, Indicador, Relatorio]
+    habilita:
+      - { modulo: M019, tipo: dados }
+
+  - id: M019
+    nome: "Transparência e Auditoria"
+    slug: transparencia-auditoria
+    dominio: inteligencia
+    nivel: inteligencia
+    status: especificado
+    importancia: 2
+    impacto: baixo
+    proposito: "Dados abertos, relatórios SECONT e trilha de auditoria imutável."
+    entidades_chave: [PublicacaoTransparencia, RelatorioSECONT, RegistroAuditoria]
+    habilita: []
+
+  # --- Transversais (infra) --------------------------------------------------
+  - id: M020
+    nome: "Comunicação"
+    slug: comunicacao
+    dominio: plataforma
+    nivel: fundacao
+    transversal: true
+    status: especificado
+    importancia: 3
+    impacto: medio
+    proposito: "Notificações, e-mails e comunicados; consome eventos de todos os módulos."
+    entidades_chave: [Notificacao, TemplateNotificacao, ComunicadoMassa]
+    habilita:
+      - { modulo: M003, tipo: infra }
+      - { modulo: M004, tipo: infra }
+      - { modulo: M009, tipo: infra }
+      - { modulo: M014, tipo: infra }
+      - { modulo: M015, tipo: infra }
+      - { modulo: M017, tipo: infra }
+      - { modulo: M019, tipo: infra }
+      - { modulo: M024, tipo: infra }
+
+  - id: M023
+    nome: "Integrações Externas"
+    slug: integracoes
+    dominio: plataforma
+    nivel: fundacao
+    transversal: true
+    status: especificado
+    importancia: 4
+    impacto: alto
+    proposito: "Adaptadores: assinatura digital (E-Docs) e currículos (Lattes, ORCID)."
+    entidades_chave: [SolicitacaoAssinatura, Signatario, EventoAssinatura]
+    negocio:
+      dor: "Assinatura de documentos e importação de currículos são manuais e dispersas em sistemas externos."
+      beneficio: "Adaptadores plugáveis de assinatura digital (E-Docs) e currículo (Lattes/ORCID)."
+      impacto_negocio: alto
+      kpis: ["Tempo de assinatura de termos", "% termos assinados digitalmente"]
+      valor_publico: "Menos papel, termos juridicamente válidos, mais rápido."
+    habilita:
+      - { modulo: M003, tipo: infra }
+      - { modulo: M009, tipo: infra }
+      - { modulo: M010, tipo: infra }
+      - { modulo: M011, tipo: infra }
+      - { modulo: M018, tipo: infra }
+      - { modulo: M022, tipo: infra }
+      - { modulo: M024, tipo: infra }

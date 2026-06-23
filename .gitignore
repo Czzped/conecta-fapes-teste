@@ -1,6 +1,10 @@
 # MkDocs
 site/
 
+# Mapa de Capacidades (assets gerados pelo hook a cada build)
+docs/assets/mapa-capacidades.html
+docs/assets/ficha.html
+
 # Python
 .venv/
 __pycache__/

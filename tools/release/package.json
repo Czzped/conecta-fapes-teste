@@ -1,0 +1,16 @@
+{
+  "name": "conectafapes-release",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ferramenta de release multi-repo para ConectaFapes — deteccao semver, changelog categorizado e abertura de PRs",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dry-run": "node release.mjs --dry-run",
+    "release": "node release.mjs",
+    "diff": "node release.mjs --diff"
+  },
+  "dependencies": {}
+}

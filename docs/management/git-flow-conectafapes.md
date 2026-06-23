@@ -121,37 +121,46 @@ Se a branch estiver fora do padrão, o status falha e o PR fica bloqueado até a
 
 ## 6. Release
 
-Quando um conjunto de entregas estiver pronto em `develop`, a release deve ser preparada com uma versão no formato:
+A release é preparada via **Action do GitHub** que detecta automaticamente a versão, gera changelog categorizado e cria branches + PRs.
 
-```text
-vX.Y
+### Como funciona a detecção de versão
+
+O script analisa os commits desde a última tag em cada repositório usando [Conventional Commits](https://www.conventionalcommits.org/):
+
+| Tipo de commit | Bump | Exemplo |
+|---|---|---|
+| `fix: ...` | **patch** | `v0.1.49 → v0.1.50` |
+| `feat: ...` | **minor** | `v0.1.49 → v0.2.0` |
+| `BREAKING CHANGE` ou `!:` | **major** | `v0.1.49 → v1.0.0` |
+
+Se houver commits `feat` e `fix` misturados, prevalece o maior (minor > patch).
+
+### Como fazer (passo a passo)
+
+1. Acesse **Actions → [Release ConectaFapes](https://github.com/leds-conectafapes/conectafapes-project/actions/workflows/release-conectafapes.yml)**.
+2. Clique **Run workflow**.
+3. Marque os repositórios que entram na release.
+4. **Deixe versão vazia** para detectar automático, ou digite manual.
+5. **Desmarque Executar** = dry-run (só mostra o plano + changelog).
+6. Revise o plano.
+7. Se estiver tudo certo, rode novamente com **Executar** marcado.
+
+A Action:
+- Cria `release/vX.Y.Z` a partir de `develop` em cada repositório
+- Abre PR para produção (`main` ou `master`) com **changelog categorizado** (Features, Bug Fixes, Breaking Changes)
+- A tag é criada automaticamente pelo worker **após o merge**
+
+### Exemplo de changelog gerado
+
+```markdown
+## Release v0.2.0
+
+### ✨ Features
+  - página de visualização de Pagamentos (dea9a95) (#282)
+
+### 🐛 Bug Fixes
+  - correção nos filtros de prestação de contas (97c7fb7) (#2260, #2261)
 ```
-
-Exemplo:
-
-```text
-v1.4
-```
-
-O fluxo esperado é:
-
-1. Definir a versão da release.
-2. Definir quais repositórios entram nessa release.
-3. Rodar primeiro em modo de conferência, sem aplicar alterações.
-4. Com a conferência aprovada, o app cria a branch `release/vX.Y` a partir de `develop`.
-5. O app abre o PR da release para a branch de produção do repositório:
-   - `main` na maioria dos repositórios;
-   - `master` no `leds-conectafapes-prestacao-de-contas`.
-6. Depois do merge em produção, o app cria automaticamente a tag da versão no commit de merge.
-
-Exemplo:
-
-```text
-release/v1.4 -> main
-release/v1.4 -> master
-```
-
-O GitHub também bloqueia PR para produção se a origem não for `release/*` ou `hotfix/*`.
 
 ## 7. Hotfix
 

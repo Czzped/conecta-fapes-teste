@@ -1,0 +1,1381 @@
+{
+ "modules": {
+  "M001": {
+   "entities": [
+    {
+     "nome": "Resolucao",
+     "desc": "Resolucao legal emitida pela FAPES que cria e fundamenta modalidades de bolsa."
+    },
+    {
+     "nome": "ModalidadeBolsa",
+     "desc": "Categoria de bolsa identificada por sigla e nome, conforme definida em resolucao. Pode acumular versoes ao longo do tempo."
+    },
+    {
+     "nome": "VersaoModalidade",
+     "desc": "Versao versionada de uma ModalidadeBolsa, criada por uma Resolucao. Combina modalidade, ano e resolucao na sigla. Uma VersaoModalidade pode "
+    },
+    {
+     "nome": "NivelBolsa",
+     "desc": "Nivel hierarquico de uma ModalidadeBolsa, identificado por sigla no formato: sigla modalidade + hifen + indice (ex: BPIG-I, DTI-A-1)."
+    },
+    {
+     "nome": "VersaoNivel",
+     "desc": "Versao versionada de um NivelBolsa com valor monetario, definida em uma VersaoModalidade. Uma Bolsa (M009) e associada a uma VersaoNivel."
+    },
+    {
+     "nome": "Moeda",
+     "desc": "Moeda utilizada para cotacao do valor de uma VersaoNivel. Cadastro corporativo pre-definido."
+    },
+    {
+     "nome": "RequisitoBolsa",
+     "desc": "Requisito para implementacao de uma bolsa, podendo estar associado a uma VersaoModalidade ou a uma VersaoNivel."
+    }
+   ],
+   "events": [],
+   "workflows": [],
+   "deps": {}
+  },
+  "M002": {
+   "entities": [
+    {
+     "nome": "Edital",
+     "desc": "Edital ofertado pela agência, originado do dump SIGFAPES via editais.parquet. É o agregado raiz do módulo."
+    },
+    {
+     "nome": "Projeto",
+     "desc": "Projeto vinculado a um edital no SIGFAPES, originado de projetos_por_edital.parquet."
+    },
+    {
+     "nome": "AlocacaoBolsistaSigfapes",
+     "desc": "Alocação de bolsa (bolsista + projeto + período), originada de bolsistas_projeto.parquet. Contém campos derivados calculados vetorizadamente"
+    },
+    {
+     "nome": "RelatorioBeneficiario",
+     "desc": "Dados bancários atualizados do bolsista, oriundos de relatorio_beneficiario.json. Join por CPF sobrepõe conta/agência da AlocacaoBolsistaSig"
+    },
+    {
+     "nome": "PlanilhaVersao",
+     "desc": "Registro de auditoria de cada versão de planilha XLSX no S3, persistido em planilha_version_audit."
+    },
+    {
+     "nome": "ResourceLock",
+     "desc": "Lock exclusivo por recurso (planilha + mês + tipo) com heartbeat para detectar sessões abandonadas. Persiste em resource_locks."
+    },
+    {
+     "nome": "ResourceKindState",
+     "desc": "Fonte de verdade do tipo ativo (editais ou programas) por edital_id + month_year. Persiste em resource_kind_state."
+    },
+    {
+     "nome": "ResourceKindSwitchLog",
+     "desc": "Histórico imutável de cada troca de tipo de planilha, com referência às chaves S3 do clone. Persiste em resource_kind_switch_log."
+    },
+    {
+     "nome": "ProgramaConfig",
+     "desc": "Mapeamento de projeto para área técnica e programa. Persiste em dados-programas.json no S3. Obrigatório antes da geração de JSONLs."
+    },
+    {
+     "nome": "ImportJob",
+     "desc": "Job assíncrono na fila de processamento. Persiste em import_jobs. Gerencia operações pesadas como geração de JSONL fora do ciclo request/res"
+    },
+    {
+     "nome": "ArquivoImportacaoJsonl",
+     "desc": "Artefato JSONL gerado por GenerateJsonlUseCase, pronto para consumo pelo M003 (Gestão de Iniciativas Captadas)."
+    }
+   ],
+   "events": [
+    {
+     "nome": "ImportJobEnqueued",
+     "desc": "Job de importação foi adicionado à fila com status PENDING."
+    },
+    {
+     "nome": "ImportJobStarted",
+     "desc": "Worker assumiu o job e status transicionou para RUNNING."
+    },
+    {
+     "nome": "ImportJobCompleted",
+     "desc": "Job concluído com sucesso; JSONLs disponíveis no S3 para consumo pelo M003."
+    },
+    {
+     "nome": "ImportJobFailed",
+     "desc": "Job falhou; error preenchido com mensagem diagnóstica."
+    },
+    {
+     "nome": "PlanilhaVersaoCreated",
+     "desc": "Nova versão de planilha registrada em planilha_version_audit."
+    },
+    {
+     "nome": "ResourceKindSwitched",
+     "desc": "Tipo ativo de planilha alterado de editais para programas ou vice-versa."
+    },
+    {
+     "nome": "ResourceLockAcquired",
+     "desc": "Lock exclusivo adquirido por um operador para um recurso."
+    },
+    {
+     "nome": "ResourceLockReleased",
+     "desc": "Lock liberado (explícito, expirado, takeover ou shutdown)."
+    }
+   ],
+   "workflows": [
+    "ImportJob",
+    "PlanilhaVersao",
+    "ResourceLock"
+   ],
+   "deps": {}
+  },
+  "M003": {
+   "entities": [
+    {
+     "nome": "VigenciaProjeto",
+     "desc": "Read model consultivo da vigência e dados originais do projeto. Consolida dados de prazo e valor considerando todos os aditivos aprovados. N"
+    },
+    {
+     "nome": "AditivoProjeto",
+     "desc": "Registro de cada termo aditivo vinculado ao projeto, seja de tempo, financeiro ou ambos. Não altera automaticamente os campos originais de P"
+    },
+    {
+     "nome": "SolicitacaoDiaria",
+     "desc": "Pedido operacional de diária criado pelo coordenador para um conjunto de bolsistas do projeto. Congela snapshots de calculo e referências ao"
+    },
+    {
+     "nome": "RelatorioDiariaBolsista",
+     "desc": "Comprovação da realização da viagem pelo bolsista. Composto por descrição textual e arquivo anexo. Um por SolicitacaoDiariaBolsista. Preench"
+    },
+    {
+     "nome": "Localidade",
+     "desc": "Tipo abstrato que representa a origem ou o destino de uma viagem. Pode ser Cidade ou Pais."
+    },
+    {
+     "nome": "Cidade",
+     "desc": "Localidade do tipo cidade. Usada como origem da viagem e como destino quando o destino for uma cidade específica."
+    },
+    {
+     "nome": "Pais",
+     "desc": "Localidade do tipo país. Usada como destino em viagens internacionais sem cidade específica."
+    },
+    {
+     "nome": "SolicitacaoDiariaBolsista",
+     "desc": "Registra a manifestação de um bolsista sobre uma SolicitacaoDiaria. Entidade embarcada — persiste dentro da SolicitacaoDiaria."
+    },
+    {
+     "nome": "ParcelaProjeto",
+     "desc": "Representa cada parcela financeira planejada de um projeto. Registra o numero da parcela, valor previsto, valor liberado e estado. Criada qu"
+    },
+    {
+     "nome": "SolicitacaoLiberacaoParcela",
+     "desc": "Solicitacao formal de liberacao da proxima parcela de um projeto, criada pelo coordenador. Ao ser criada, o sistema executa automaticamente "
+    },
+    {
+     "nome": "ValidacaoLiberacaoParcela",
+     "desc": "Snapshot auditavel das condicoes verificadas no momento da solicitacao de liberacao. Preserva o resultado de cada verificacao individual par"
+    },
+    {
+     "nome": "Projeto",
+     "desc": "Agregado central do módulo. Representa o item apoiado pela agência após a contratação — projeto de pesquisa, inovação, visita técnica ou out"
+    },
+    {
+     "nome": "TipoProjeto",
+     "desc": "Cadastro controlado dos tipos de projeto apoiados pela agência (ex.: Projeto de Pesquisa, Projeto de Inovação, Visita Técnica)."
+    },
+    {
+     "nome": "Ortogado",
+     "desc": "Papel operacional assumido por uma PessoaFisica cadastrada no M008 que recebe a outorga de um projeto. Registra código, data da outorga e si"
+    },
+    {
+     "nome": "VersaoPlanoIniciativa",
+     "desc": "Versão do plano de execução de um projeto. Permite evoluir o plano sem apagar histórico; cada alteração em blocos configuráveis gera nova ve"
+    },
+    {
+     "nome": "Objetivo",
+     "desc": "Objetivo geral ou específico de uma versão do plano do projeto. Condicional: obrigatório apenas quando a captação (M011) exigir objetivos."
+    },
+    {
+     "nome": "Resultado",
+     "desc": "Entrega esperada do projeto. Condicional: obrigatório apenas quando a captação (M011) exigir resultados."
+    },
+    {
+     "nome": "TipoResultado",
+     "desc": "Cadastro controlado dos tipos de resultado (ex.: Serviço, Processo, Produto)."
+    },
+    {
+     "nome": "Risco",
+     "desc": "Risco identificado para a execução do projeto, vinculado a uma versão do plano. Condicional: obrigatório apenas quando a captação (M011) exi"
+    },
+    {
+     "nome": "NivelRisco",
+     "desc": "Cadastro controlado dos níveis de risco usados para impacto e probabilidade (ex.: Pequeno, Médio, Grande). A mesma classe serve impacto e pr"
+    },
+    {
+     "nome": "Beneficio",
+     "desc": "Ganho esperado ou gerado pelo projeto. Condicional: obrigatório apenas quando a captação (M011) exigir benefícios."
+    },
+    {
+     "nome": "IndicadorBeneficio",
+     "desc": "Indicador de medição de um benefício do projeto. Condicional: obrigatório apenas quando a captação (M011) exigir indicadores."
+    },
+    {
+     "nome": "OrcamentoPlanejado",
+     "desc": "Previsão aprovada de recursos necessários para implementar o projeto. Pertence a uma VersaoPlanoIniciativa. Condicional: obrigatório apenas "
+    },
+    {
+     "nome": "ItemOrcamento",
+     "desc": "Item de orçamento planejado em nível inicial dentro de um OrcamentoPlanejado. Deve estar associado a uma RubricaOrcamentaria."
+    },
+    {
+     "nome": "OrcamentoExecutado",
+     "desc": "Visão consolidada da execução financeira do projeto. Calculado a partir dos LancamentoExecucao; o total executado não é sobrescrito manualme"
+    },
+    {
+     "nome": "LancamentoExecucao",
+     "desc": "Lançamento de execução financeira do projeto. Preserva histórico de movimentos. Todo lançamento deve estar associado a uma RubricaOrcamentar"
+    },
+    {
+     "nome": "SolicitacaoAlteracaoRubrica",
+     "desc": "Solicitação do Ortogado para incluir ou retirar uma rubrica orçamentária do projeto. Não altera automaticamente o OrcamentoPlanejado; passa "
+    },
+    {
+     "nome": "PapelEquipe",
+     "desc": "Papel planejado para a equipe de um projeto. Define o papel esperado, a quantidade prevista de pessoas e os resultados pelos quais este pape"
+    },
+    {
+     "nome": "MembroEquipe",
+     "desc": "Associação entre uma PessoaFisica (M008) e um PapelEquipe planejado na versão do plano. Preenche a necessidade definida em PapelEquipe com p"
+    },
+    {
+     "nome": "AtividadeCronograma",
+     "desc": "Atividade planejada no cronograma de uma versão do plano do projeto. Vincula período de execução, resultados a entregar e papéis executores."
+    },
+    {
+     "nome": "EstagioCicloFomento",
+     "desc": "Read model de timeline transversal do projeto, desde a submissão até a conclusão, suspensão ou cancelamento. Cada módulo dono registra seus "
+    }
+   ],
+   "events": [
+    {
+     "nome": "AditivoAprovado",
+     "desc": "Emitido quando um AditivoProjeto passa para situacao APROVADO. Dispara recálculo do VigenciaProjeto."
+    },
+    {
+     "nome": "SolicitacaoDiariaBolsistaCriado",
+     "desc": "Emitido quando um SolicitacaoDiariaBolsista é criado dentro de uma SolicitacaoDiaria. Dispara envio de notificação de di"
+    },
+    {
+     "nome": "SolicitacaoDiariaAprovada",
+     "desc": "Emitido quando todos os bolsistas aceitam e a SolicitacaoDiaria transiciona para APROVADA."
+    },
+    {
+     "nome": "SolicitacaoDiariaRecusada",
+     "desc": "Emitido quando qualquer bolsista recusa e a SolicitacaoDiaria transiciona para RECUSADA."
+    },
+    {
+     "nome": "LiberacaoParcelaSolicitada",
+     "desc": "Emitido quando SolicitacaoLiberacaoParcela transita para APROVADA. Consumido pelo M004 para executar o pagamento da parc"
+    },
+    {
+     "nome": "ParcelaLiberada",
+     "desc": "Emitido pelo M004 de volta ao M003 apos pagamento executado. M003 transita ParcelaProjeto para LIBERADA e registra dataE"
+    },
+    {
+     "nome": "SolicitacaoLiberacaoCancelada",
+     "desc": "Emitido quando SolicitacaoLiberacaoParcela transita para CANCELADA. M003 reverte ParcelaProjeto para AGUARDANDO_LIBERACA"
+    },
+    {
+     "nome": "ProjetoCriado",
+     "desc": "Emitido quando um Projeto é criado a partir de ContratacaoOutorga formalizada no M022."
+    },
+    {
+     "nome": "VersaoPlanoAtivada",
+     "desc": "Emitido quando uma nova VersaoPlanoIniciativa passa para estado VIGENTE, substituindo a anterior."
+    },
+    {
+     "nome": "EstagioCicloAvancado",
+     "desc": "Emitido quando um EstagioCicloFomento passa para estado ATUAL ou CONCLUIDO."
+    },
+    {
+     "nome": "SolicitacaoRubricaAprovada",
+     "desc": "Emitido quando uma SolicitacaoAlteracaoRubrica é aprovada, disparando geração de nova VersaoPlanoIniciativa."
+    }
+   ],
+   "workflows": [
+    "AditivoProjeto",
+    "ParcelaProjeto",
+    "Projeto",
+    "SolicitacaoAlteracaoRubrica",
+    "SolicitacaoDiaria",
+    "SolicitacaoDiariaBolsista",
+    "SolicitacaoLiberacaoParcela",
+    "VersaoPlanoIniciativa"
+   ],
+   "deps": {
+    "M008": 8,
+    "M011": 1,
+    "M022": 1
+   }
+  },
+  "M004": {
+   "entities": [
+    {
+     "nome": "PlanoMensal",
+     "desc": "Plano mensal de pagamento. Define os marcos temporais do ciclo de pagamento de um mes e agrega as competencias de editais a serem pagas."
+    },
+    {
+     "nome": "EditalCompetencia",
+     "desc": "Competencia mensal de um Edital dentro de um PlanoMensal. Registra o status de liberacao e os valores previstos e pagos para o edital no mes"
+    },
+    {
+     "nome": "DecisaoLiberacao",
+     "desc": "Decisao de liberacao ou nao-liberacao de um EditalCompetencia para inclusao em folha. Registro imutavel de auditoria."
+    },
+    {
+     "nome": "Usuario",
+     "desc": "Snapshot dos dados do usuario que realizou uma acao (DecisaoLiberacao ou DecisaoFolha). Denormalizado para preservar auditoria historica."
+    },
+    {
+     "nome": "Folha",
+     "desc": "Folha de pagamento mensal. ordem=0 indica Folha Normal; ordem>0 indica Folha Complementar. Agrega PagamentoBolsista e guias de liberacao."
+    },
+    {
+     "nome": "DecisaoFolha",
+     "desc": "Registro de uma acao realizada sobre uma Folha (gerar, autorizar, cancelar, rejeitar). Imutavel — constitui trilha de auditoria."
+    },
+    {
+     "nome": "PagamentoBolsista",
+     "desc": "Registro individual de pagamento de uma cota de bolsa a um bolsista em uma competencia. Associado a uma AlocacaoBolsista (M009) e pode ser i"
+    },
+    {
+     "nome": "BonusPagamento",
+     "desc": "Bonus aplicado sobre pagamentos de bolsistas em um PlanoMensal. Pode ser valor fixo ou percentual sobre o valor original. Associado a Versao"
+    },
+    {
+     "nome": "GuiaDeLiberacao",
+     "desc": "Guia de liberacao financeira associada a uma Folha, enviada ao BANDES ou orgao competente para liberacao dos recursos. Pode ser Normal ou Al"
+    },
+    {
+     "nome": "Remessa",
+     "desc": "Entidade abstrata base para remessas bancarias. Representa o arquivo enviado ao banco e o retorno recebido. Especializada em RemessaCadastro"
+    },
+    {
+     "nome": "RemessaCadastro",
+     "desc": "Remessa de cadastro de bolsistas no banco. Especializa Remessa. Envia dados cadastrais dos bolsistas para registro no sistema bancario (Bane"
+    },
+    {
+     "nome": "RemessaPagamento",
+     "desc": "Remessa de pagamento de bolsistas. Especializa Remessa. Agenda pagamentos junto ao banco (Banestes) para uma ou mais Folhas."
+    },
+    {
+     "nome": "ErroCadastro",
+     "desc": "Registro de erros retornados pelo banco para uma AlocacaoBolsista em uma RemessaCadastro."
+    },
+    {
+     "nome": "ErroAgendamentoPagamento",
+     "desc": "Registro de erros retornados pelo banco para um PagamentoBolsista em uma RemessaPagamento."
+    },
+    {
+     "nome": "ProcessoRemessa",
+     "desc": "Controle de processamento assincrono de uma Remessa. Rastreia tentativas, status e caminhos de arquivos no MinIO. Suporta retry ate o limite"
+    },
+    {
+     "nome": "Contratante",
+     "desc": "Dados bancarios e identificacao do contratante (FAPES ou orgao delegante) utilizados na geracao dos arquivos de remessa para o banco."
+    }
+   ],
+   "events": [
+    {
+     "nome": "FolhaGerada",
+     "desc": "Emitido quando uma Folha e criada no status GERADA."
+    },
+    {
+     "nome": "FolhaAutorizada",
+     "desc": "Emitido quando uma Folha tem status alterado para AUTORIZADA."
+    },
+    {
+     "nome": "FolhaCancelada",
+     "desc": "Emitido quando uma Folha e cancelada."
+    },
+    {
+     "nome": "RemessaProcessada",
+     "desc": "Emitido quando ProcessoRemessa completa com sucesso."
+    },
+    {
+     "nome": "RemessaProcessadaComErro",
+     "desc": "Emitido quando ProcessoRemessa termina com erro."
+    },
+    {
+     "nome": "PagamentoBolsistaEfetuado",
+     "desc": "Emitido quando um PagamentoBolsista atinge status PAGO."
+    },
+    {
+     "nome": "EditalCompetenciaLiberada",
+     "desc": "Emitido quando uma EditalCompetencia tem decisao de liberacao aprovada."
+    }
+   ],
+   "workflows": [
+    "CicloMensalPagamento",
+    "ProcessoRemessa"
+   ],
+   "deps": {
+    "M009": 7,
+    "M003": 3,
+    "M001": 2
+   }
+  },
+  "M005": {
+   "entities": [],
+   "events": [],
+   "workflows": [
+    "todo"
+   ],
+   "deps": {}
+  },
+  "M006": {
+   "entities": [],
+   "events": [],
+   "workflows": [
+    "todo"
+   ],
+   "deps": {}
+  },
+  "M007": {
+   "entities": [],
+   "events": [],
+   "workflows": [
+    "todo"
+   ],
+   "deps": {}
+  },
+  "M008": {
+   "entities": [
+    {
+     "nome": "Abrangencia",
+     "desc": "Classifica o tipo de deslocamento para fins de diaria (DENTRO_ESTADO, NACIONAL, INTERNACIONAL). Codigo deve ser unico."
+    },
+    {
+     "nome": "TipoDiaria",
+     "desc": "Valor unitario vigente de diaria para uma Abrangencia em um periodo. Quando o valor muda, cria-se novo TipoDiaria com nova vigencia — o ante"
+    },
+    {
+     "nome": "ParametroCalculoDiaria",
+     "desc": "Parametros normativos usados pelo M003 para calcular quantidade, acrescimos, bloqueios e elegibilidade. Vinculado a um TipoDiaria com vigenc"
+    },
+    {
+     "nome": "Instituicao",
+     "desc": "Entidade juridicamente identificavel pela posse de CNPJ proprio: matriz, filial ou campus. Pode conter subInstituicoes (filiais) e UnidadeOr"
+    },
+    {
+     "nome": "UnidadeOrganizacional",
+     "desc": "Subdivisao interna de uma Instituicao, sem CNPJ proprio (ex: centro, departamento, coordenacao, laboratorio, setor). Pode ter multiplos pais"
+    },
+    {
+     "nome": "TipoInstituicao",
+     "desc": "Classifica o tipo de uma Instituicao (ex: Ensino, Empresa, Agencia de Fomento). Nao se aplica a UnidadeOrganizacional."
+    },
+    {
+     "nome": "ContaBancaria",
+     "desc": "Conta bancaria institucional registrada em nome de PessoaFisica ou Instituicao. Cadastro corporativo reutilizavel por M016 (Taxa de Gestao d"
+    },
+    {
+     "nome": "Responsavel",
+     "desc": "Vinculo temporal entre uma PessoaFisica e uma entidade organizacional (Instituicao OU UnidadeOrganizacional). Cada Responsavel aponta para e"
+    },
+    {
+     "nome": "Rubrica",
+     "desc": "Categoria normativa e orcamentaria para classificacao de despesas. Subrubrica e uma Rubrica filha de outra Rubrica (via rubricaPai), nao e e"
+    },
+    {
+     "nome": "NaturezaDespesa",
+     "desc": "Enumeracao que classifica a natureza da despesa associada a uma Rubrica."
+    }
+   ],
+   "events": [],
+   "workflows": [],
+   "deps": {}
+  },
+  "M009": {
+   "entities": [
+    {
+     "nome": "BolsaPesquisa",
+     "desc": "Bolsa de pesquisa concedida a um bolsista, vinculada a um projeto e a um nivel de modalidade de bolsa, passando por ciclo de vida completo d"
+    },
+    {
+     "nome": "CotaBolsa",
+     "desc": "Contador independente de cotas de bolsa disponiveis para um projeto. Nao substitui o saldo monetario governado por M013."
+    },
+    {
+     "nome": "TermoAceite",
+     "desc": "Registro do aceite ou rejeicao do orientador para assumir a orientacao da bolsa."
+    },
+    {
+     "nome": "DocumentoBolsa",
+     "desc": "Documento enviado pelo bolsista para avaliacao no processo de concessao da bolsa."
+    },
+    {
+     "nome": "ParecerAvaliacao",
+     "desc": "Parecer tecnico de avaliacao da documentacao do bolsista."
+    },
+    {
+     "nome": "TermoCompromisso",
+     "desc": "Termo de compromisso gerado apos aprovacao documental, requerendo assinatura de multiplos signatarios (Coordenador, Orientador, Bolsista, DI"
+    },
+    {
+     "nome": "AssinaturaTermo",
+     "desc": "Registro individual de assinatura ou recusa de um signatario no TermoCompromisso."
+    },
+    {
+     "nome": "PublicacaoDiarioOficial",
+     "desc": "Registro da publicacao da bolsa no Diario Oficial, precedendo a implementacao."
+    },
+    {
+     "nome": "HistoricoBolsa",
+     "desc": "Trilha de auditoria dos eventos do ciclo de vida de uma BolsaPesquisa."
+    }
+   ],
+   "events": [
+    {
+     "nome": "BolsaConcedida",
+     "desc": "Disparado quando a bolsa atinge estado IMPLEMENTADA. Aciona COMPROMETIMENTO em M013 para as mensalidades futuras."
+    },
+    {
+     "nome": "BolsaCancelada",
+     "desc": "Disparado quando a bolsa e cancelada antes do pagamento. Aciona CANCELAMENTO_COMPROMETIMENTO em M013."
+    },
+    {
+     "nome": "AceiteOrientadorRegistrado",
+     "desc": "Disparado quando o orientador registra aceite ou rejeicao."
+    },
+    {
+     "nome": "DocumentacaoAprovada",
+     "desc": "Disparado quando avaliador emite parecer favoravel, desbloqueando geracao do termo."
+    },
+    {
+     "nome": "TermoAssinado",
+     "desc": "Disparado quando todos os signatarios assinam o TermoCompromisso."
+    }
+   ],
+   "workflows": [
+    "BolsaPesquisaStateMachine"
+   ],
+   "deps": {
+    "M001": 3,
+    "M003": 9,
+    "M013": 1
+   }
+  },
+  "M010": {
+   "entities": [
+    {
+     "nome": "Parceria",
+     "desc": "Instrumento formal de cooperacao entre a agencia de fomento e uma Instituicao, com vigencia, aportes financeiros e documentos. Vinculada a e"
+    },
+    {
+     "nome": "Vigencia",
+     "desc": "Janela temporal da Parceria, original ou aditivo. A Parceria deve ter exatamente uma Vigencia com isAditivo = false (RN15). Aditivos estende"
+    },
+    {
+     "nome": "AporteFinanceiro",
+     "desc": "Registro de valor recebido pela Parceria oriundo da Instituicao vinculada. Cada aporte sujeito a Taxa de Gestao de Parcerias gera sua propri"
+    },
+    {
+     "nome": "PlanoEstrategico",
+     "desc": "Plano estrategico da agencia de fomento, com vigencia definida, composto por eixos estrategicos que orientam programas."
+    },
+    {
+     "nome": "EixoEstrategico",
+     "desc": "Eixo tematico que agrupa Programas dentro de um Plano Estrategico. Pertence a exatamente um plano (RN08)."
+    },
+    {
+     "nome": "Programa",
+     "desc": "Instrumento de execucao do planejamento estrategico, demandado por exatamente uma Instituicao (RN16), orientado por um ou mais EixoEstrategi"
+    },
+    {
+     "nome": "ComiteGovernanca",
+     "desc": "Orgao colegiado de governanca do Programa, composto por membros com papeis definidos."
+    },
+    {
+     "nome": "MembroComite",
+     "desc": "Membro do ComiteGovernanca, com papel e periodo de participacao definidos."
+    },
+    {
+     "nome": "AporteFinanceiroParceriaPrograma",
+     "desc": "Entidade associativa N:N entre Parceria e Programa, representando a alocacao de recursos de uma Parceria para um Programa. O valor consome o"
+    }
+   ],
+   "events": [
+    {
+     "nome": "ParceiraVigente",
+     "desc": "Emitido quando Parceria transita para Vigente apos satisfazer todos os pre-requisitos (RN19)."
+    },
+    {
+     "nome": "ParceriaSuspensa",
+     "desc": "Emitido quando Parceria transita para Suspensa; dispara suspensao em cascata de Programas e Projetos (RI4)."
+    },
+    {
+     "nome": "ParceriaEncerrada",
+     "desc": "Emitido quando Parceria transita para Encerrada (solicitacao do usuario ou expiracao automatica); dispara encerramento e"
+    },
+    {
+     "nome": "AporteFinanceiroRegistrado",
+     "desc": "Emitido quando um AporteFinanceiro e registrado na Parceria; recalcula valorBrutoRecebido, valorTaxaGestao e saldoAlocav"
+    },
+    {
+     "nome": "VigenciaAditivada",
+     "desc": "Emitido quando uma nova Vigencia aditivo e registrada; recalcula vigenciaInicioCorrente e vigenciaFimCorrente."
+    },
+    {
+     "nome": "PlanoEstrategicoAtivado",
+     "desc": "Emitido quando PlanoEstrategico transita para Ativo."
+    },
+    {
+     "nome": "PlanoEstrategicoEncerrado",
+     "desc": "Emitido quando PlanoEstrategico transita para Encerrado."
+    },
+    {
+     "nome": "ProgramaAtivado",
+     "desc": "Emitido quando Programa transita para ATIVO."
+    },
+    {
+     "nome": "ProgramaSuspenso",
+     "desc": "Emitido quando Programa transita para SUSPENSO (solicitacao direta ou cascata de Parceria suspensa — RI4)."
+    },
+    {
+     "nome": "ProgramaEncerrado",
+     "desc": "Emitido quando Programa transita para ENCERRADO (solicitacao direta ou cascata de Parceria encerrada — RI2)."
+    },
+    {
+     "nome": "AporteParceriaProgramaRegistrado",
+     "desc": "Emitido quando AporteFinanceiroParceriaPrograma e criado; recalcula saldoAlocavelEmProgramas da Parceria."
+    },
+    {
+     "nome": "AporteParceriaProgramaRetirado",
+     "desc": "Emitido quando AporteFinanceiroParceriaPrograma transita para RETIRADO; devolve saldo alocavel a Parceria (RN14)."
+    }
+   ],
+   "workflows": [
+    "AporteFinanceiroParceriaPrograma",
+    "Parceria",
+    "PlanoEstrategico",
+    "Programa"
+   ],
+   "deps": {
+    "M008": 16
+   }
+  },
+  "M011": {
+   "entities": [
+    {
+     "nome": "Fomento",
+     "desc": "Agregado raiz do Processo 1. Representa o aporte financeiro de Programas, Parcerias ou recursos internos para fomentar projetos de um eixo e"
+    },
+    {
+     "nome": "RemanejamentoFaixas",
+     "desc": "Registro imutavel de um remanejamento de valor entre duas faixas de investimento do mesmo Fomento. Ocorre apos a selecao dos projetos, quand"
+    },
+    {
+     "nome": "AporteFomento",
+     "desc": "Aporte financeiro de um Programa, Parceria ou recurso interno para o Fomento. Exatamente uma origem por registro."
+    },
+    {
+     "nome": "Faixa",
+     "desc": "Recorte de configuracao do Fomento usado para organizar rubricas e bolsas permitidas para propostas de projeto."
+    },
+    {
+     "nome": "RubricaPermitidaFaixa",
+     "desc": "Rubrica autorizada para o orcamento de projetos em uma Faixa, com percentuais, restricoes e orientacoes."
+    },
+    {
+     "nome": "BolsaPermitidaFaixa",
+     "desc": "Versao de nivel de bolsa permitida em uma Faixa, com limites operacionais de cotas e bolsistas."
+    },
+    {
+     "nome": "Captacao",
+     "desc": "Agregado raiz dos Processos 2 e 3. Representa a configuracao e a execucao da selecao de projetos sobre um Fomento aprovado. A Area Tecnica c"
+    },
+    {
+     "nome": "MatrizConfiguracaoProjeto",
+     "desc": "Define quais blocos fixos da proposta/projeto sao exigidos, opcionais ou dispensados nesta captacao. Evita que o M003 trate todos os blocos "
+    },
+    {
+     "nome": "PeriodoCronograma",
+     "desc": "Card operacional de uma fase do cronograma da captacao com data de inicio e fim."
+    },
+    {
+     "nome": "AdiamentoPeriodoCronograma",
+     "desc": "Registro imutavel de um adiamento aplicado a um periodo do cronograma com justificativa, datas originais e novas."
+    },
+    {
+     "nome": "RegraSubmissao",
+     "desc": "Regras que governam quem pode submeter propostas e sob quais condicoes de acumulacao."
+    },
+    {
+     "nome": "FormularioRef",
+     "desc": "Referencia a um formulario publicado no M021. Usado para submissao, avaliacao ad hoc, revisao de resultado e anexos."
+    },
+    {
+     "nome": "ProponenteEscolhido",
+     "desc": "Proponente autorizado a submeter quando submissaoRestritaAEscolhidos = true. Aponta para exatamente uma Instituicao ou PessoaFisica."
+    },
+    {
+     "nome": "DocumentoExigido",
+     "desc": "Documento exigido do proponente na submissao, com regras de reaproveitamento do cadastro corporativo."
+    },
+    {
+     "nome": "RespostaFormularioSubmissao",
+     "desc": "Snapshot imutavel das respostas preenchidas pelo proponente no formulario de submissao do M021. Registrado no momento da submissao formal."
+    },
+    {
+     "nome": "DocumentacaoProjeto",
+     "desc": "Registro da analise documental realizada pelo AnalistaTecnico sobre a documentacao entregue pelo proponente."
+    },
+    {
+     "nome": "AssinaturaInstitucional",
+     "desc": "Solicitacao de aprovacao institucional enviada ao ResponsavelInstitucional durante o periodo de submissao. Criada apenas quando exigeAprovac"
+    },
+    {
+     "nome": "DistribuicaoAvaliacao",
+     "desc": "Registro da distribuicao de um projeto a um RevisorAdHoc para analise de merito."
+    },
+    {
+     "nome": "AvaliacaoAdHoc",
+     "desc": "Parecer tecnico registrado por um RevisorAdHoc sobre um projeto durante o periodo de avaliacao de merito."
+    },
+    {
+     "nome": "ResultadoSelecao",
+     "desc": "Publicacao de resultado de uma etapa do processo de selecao (preliminar, apos revisao ou final). Cada publicacao contem N itens, um por proj"
+    },
+    {
+     "nome": "ItemResultadoSelecao",
+     "desc": "Classificacao e decisao individual de um projeto em uma publicacao de ResultadoSelecao. Entidade de juncao entre ResultadoSelecao e Projeto."
+    },
+    {
+     "nome": "RevisaoResultado",
+     "desc": "Solicitacao de revisao do resultado preliminar submetida por um proponente dentro do periodo de recursos."
+    },
+    {
+     "nome": "AnexoRevisao",
+     "desc": "Arquivo anexado a uma RevisaoResultado como evidencia ou suporte da contestacao."
+    }
+   ],
+   "events": [
+    {
+     "nome": "FomentoAprovado",
+     "desc": "Emitido quando o Fomento transita para o estado APROVADO."
+    },
+    {
+     "nome": "CaptacaoPublicada",
+     "desc": "Emitido quando a captacao transita para o estado PUBLICADO."
+    },
+    {
+     "nome": "ResultadoFinalPublicado",
+     "desc": "Emitido quando o AnalistaTecnico publica o ResultadoSelecao do tipo FINAL. Notifica M022 que projetos aprovados estao di"
+    },
+    {
+     "nome": "CaptacaoEncerrada",
+     "desc": "Emitido quando a captacao transita para o estado ENCERRADO apos publicacao do resultado final."
+    },
+    {
+     "nome": "PeriodoCronogramaAdiado",
+     "desc": "Emitido quando um periodo do cronograma e adiado e as etapas posteriores sao deslocadas."
+    }
+   ],
+   "workflows": [
+    "CaptacaoStateMachine",
+    "CronogramaPeriodosSequencia",
+    "FomentoStateMachine"
+   ],
+   "deps": {
+    "M008": 15,
+    "M001": 3,
+    "M010": 9,
+    "M016": 3
+   }
+  },
+  "M012": {
+   "entities": [
+    {
+     "nome": "DashboardProjeto",
+     "desc": "Visao consolidada de metricas de execucao de um projeto: relatorios pendentes e submetidos, solicitacoes pendentes e status geral. Entidade "
+    },
+    {
+     "nome": "RelatorioTecnico",
+     "desc": "Relatorio tecnico periodico submetido pelo coordenador do projeto, sujeito a analise, aprovacao, reprovacao e contestacao."
+    },
+    {
+     "nome": "ParecerRelatorio",
+     "desc": "Parecer tecnico emitido por analista sobre um RelatorioTecnico, podendo ser de analise inicial ou reanalise apos contestacao."
+    },
+    {
+     "nome": "ContestacaoRelatorio",
+     "desc": "Contestacao registrada pelo coordenador em resposta a um RelatorioTecnico reprovado. Prazo limite de 15 dias apos notificacao."
+    },
+    {
+     "nome": "DocumentoContestacao",
+     "desc": "Documento complementar enviado pelo coordenador junto com a ContestacaoRelatorio."
+    },
+    {
+     "nome": "SolicitacaoAlteracao",
+     "desc": "Solicitacao formal do coordenador para alterar escopo, cronograma, equipe ou orcamento do projeto em execucao."
+    },
+    {
+     "nome": "DecisaoSolicitacao",
+     "desc": "Decisao proferida por gestor sobre uma SolicitacaoAlteracao."
+    }
+   ],
+   "events": [
+    {
+     "nome": "RelatorioTecnicoSubmetido",
+     "desc": "Disparado quando coordenador submete um RelatorioTecnico."
+    },
+    {
+     "nome": "RelatorioTecnicoAprovado",
+     "desc": "Disparado quando relatorio e aprovado (analise inicial ou reanalise)."
+    },
+    {
+     "nome": "RelatorioTecnicoReprovado",
+     "desc": "Disparado quando relatorio e reprovado. Abre prazo de 15 dias para contestacao."
+    },
+    {
+     "nome": "ContestacaoRegistrada",
+     "desc": "Disparado quando coordenador registra contestacao dentro do prazo."
+    },
+    {
+     "nome": "SolicitacaoAlteracaoDeferida",
+     "desc": "Disparado quando solicitacao de alteracao e deferida. Para tipo ORCAMENTO, aciona M013."
+    }
+   ],
+   "workflows": [
+    "RelatorioTecnicoStateMachine",
+    "SolicitacaoAlteracaoStateMachine"
+   ],
+   "deps": {
+    "M003": 13
+   }
+  },
+  "M013": {
+   "entities": [
+    {
+     "nome": "SolicitacaoOrcamentaria",
+     "desc": "Solicitacao formal de ajuste orcamentario (adicao, inclusao de rubrica, remanejamento ou realocacao de bolsa) vinculada a um projeto."
+    },
+    {
+     "nome": "RubricaProjeto",
+     "desc": "Rubrica orcamentaria aprovada para o projeto, com snapshot dos metadados canonicos no momento da aprovacao e saldos financeiros derivados da"
+    },
+    {
+     "nome": "Remanejamento",
+     "desc": "Detalhamento de um remanejamento orcamentario entre duas rubricas de projeto. Auto-sinaliza aprovacao do diretor quando percentual de origem"
+    },
+    {
+     "nome": "Transacao",
+     "desc": "Movimento financeiro que afeta os saldos de uma RubricaProjeto: comprometimento, execucao, estorno, remanejamento ou ajuste."
+    },
+    {
+     "nome": "ParecerSolicitacao",
+     "desc": "Parecer tecnico emitido por analista sobre uma SolicitacaoOrcamentaria."
+    },
+    {
+     "nome": "HistoricoOrcamentario",
+     "desc": "Trilha de auditoria orcamentaria de um projeto, registrando cada movimentacao relevante."
+    }
+   ],
+   "events": [
+    {
+     "nome": "SolicitacaoOrcamentariaSubmetida",
+     "desc": "Disparado quando coordenador submete uma SolicitacaoOrcamentaria."
+    },
+    {
+     "nome": "SolicitacaoOrcamentariaAprovada",
+     "desc": "Disparado quando analista aprova a solicitacao. Aciona aplicacao dos efeitos orcamentarios na RubricaProjeto."
+    },
+    {
+     "nome": "SolicitacaoOrcamentariaRejeitada",
+     "desc": "Disparado quando analista rejeita a solicitacao."
+    },
+    {
+     "nome": "TransacaoRegistrada",
+     "desc": "Disparado quando uma nova Transacao e registrada em uma RubricaProjeto, recalculando saldos."
+    }
+   ],
+   "workflows": [
+    "SolicitacaoOrcamentariaStateMachine"
+   ],
+   "deps": {
+    "M008": 3,
+    "M003": 7,
+    "M001": 1
+   }
+  },
+  "M014": {
+   "entities": [
+    {
+     "nome": "Prestacao",
+     "desc": "Agregado raiz da prestacao de contas de um projeto; agrupa justificativas de despesa e transacoes financeiras no ciclo de vida da prestacao."
+    },
+    {
+     "nome": "TransacaoFinanceira",
+     "desc": "Registro de um movimento bancario (debito ou credito) importado via CNAB 240; representa o movimento financeiro — nao e rubrica e nao deve s"
+    },
+    {
+     "nome": "ContaBancaria",
+     "desc": "Conta bancaria de um projeto utilizada para movimentacao dos recursos, reconciliada via CNAB 240."
+    },
+    {
+     "nome": "JustificativaDespesa",
+     "desc": "Classe base das justificativas de despesa; instanciada apenas atraves das subclasses concretas. Agrupa campos comuns e orcamentos de fornece"
+    },
+    {
+     "nome": "JustificativaNF",
+     "desc": "Justificativa via nota fiscal eletronica (NF-e) validada via SERPRO; herda JustificativaDespesa."
+    },
+    {
+     "nome": "JustificativaDiaria",
+     "desc": "Justificativa de diaria de deslocamento referenciando solicitacao aprovada no M003; herda JustificativaDespesa."
+    },
+    {
+     "nome": "JustificativaPassagem",
+     "desc": "Justificativa de passagem comprada para viagem; sem validacao SERPRO; herda JustificativaDespesa."
+    },
+    {
+     "nome": "JustificativaInvoice",
+     "desc": "Justificativa de despesa em moeda estrangeira (invoice); herda JustificativaDespesa."
+    },
+    {
+     "nome": "JustificativaProdutoSemNota",
+     "desc": "Justificativa excepcional de produto sem nota fiscal; exige comprovante alternativo e analise obrigatoria pela Area Tecnica; herda Justifica"
+    },
+    {
+     "nome": "DocumentoFiscal",
+     "desc": "Nota fiscal (NF-e produto ou NFS-e servico) processada via SERPRO, com itens discriminados, dados tributarios e chave de acesso de 44 digito"
+    },
+    {
+     "nome": "ItemDocumentoFiscal",
+     "desc": "Item discriminado em DocumentoFiscal, classificado em uma RubricaOrcamentaria (alias de RubricaProjeto)."
+    },
+    {
+     "nome": "OrcamentoFornecedor",
+     "desc": "Orcamento de fornecedor vinculado a uma justificativa de despesa, podendo ser marcado como vencedor."
+    },
+    {
+     "nome": "Orcamento",
+     "desc": "Orcamento anual do projeto com rubricas orcamentarias (DT-M014-001: pertence conceitualmente a M013)."
+    },
+    {
+     "nome": "RubricaOrcamentaria",
+     "desc": "Estrutura hierarquica de classificacao orcamentaria do projeto. Termo canonico de dominio: RubricaProjeto (M013). Nome de classe/tabela e al"
+    },
+    {
+     "nome": "ProjetoRef",
+     "desc": "View externa somente leitura do sistema de Importacao de Editais (M002); mapeada a view de banco de dados — nao herda BaseEntity."
+    },
+    {
+     "nome": "AlocacaoBolsistaRef",
+     "desc": "View externa somente leitura do sistema de Importacao de Editais (M002); mapeada a view de banco de dados — nao herda BaseEntity."
+    }
+   ],
+   "events": [
+    {
+     "nome": "PrestacaoSubmetida",
+     "desc": "Emitido quando o coordenador submete a prestacao para analise da FAPES."
+    },
+    {
+     "nome": "PrestacaoAprovada",
+     "desc": "Emitido quando a FAPES aprova e finaliza a prestacao."
+    },
+    {
+     "nome": "PrestacaoNegada",
+     "desc": "Emitido quando a FAPES nega a prestacao."
+    },
+    {
+     "nome": "RevisaoSolicitada",
+     "desc": "Emitido quando a FAPES devolve a prestacao para revisao."
+    },
+    {
+     "nome": "EstornoAssociado",
+     "desc": "Emitido quando um credito de estorno e associado a um debito dentro de uma prestacao."
+    }
+   ],
+   "workflows": [
+    "PrestacaoStateMachine"
+   ],
+   "deps": {
+    "M003": 1,
+    "M013": 1
+   }
+  },
+  "M015": {
+   "entities": [],
+   "events": [],
+   "workflows": [
+    "todo"
+   ],
+   "deps": {
+    "M003": 1
+   }
+  },
+  "M016": {
+   "entities": [],
+   "events": [],
+   "workflows": [],
+   "deps": {}
+  },
+  "M017": {
+   "entities": [],
+   "events": [],
+   "workflows": [
+    "todo"
+   ],
+   "deps": {}
+  },
+  "M018": {
+   "entities": [],
+   "events": [],
+   "workflows": [
+    "todo"
+   ],
+   "deps": {}
+  },
+  "M019": {
+   "entities": [],
+   "events": [],
+   "workflows": [
+    "todo"
+   ],
+   "deps": {}
+  },
+  "M020": {
+   "entities": [],
+   "events": [],
+   "workflows": [
+    "todo"
+   ],
+   "deps": {}
+  },
+  "M021": {
+   "entities": [],
+   "events": [],
+   "workflows": [
+    "todo"
+   ],
+   "deps": {}
+  },
+  "M022": {
+   "entities": [
+    {
+     "nome": "PropostaAprovadaRef",
+     "desc": "Referencia imutavel a uma proposta aprovada no M011, identificada por captacao, proposta e resultado final."
+    },
+    {
+     "nome": "ContratacaoOutorga",
+     "desc": "Agregado raiz que gerencia o processo de formalizacao de uma proposta aprovada, do estado de convocacao ate a criacao do projeto no M003."
+    },
+    {
+     "nome": "Outorgado",
+     "desc": "Pessoa fisica outorgada, referenciada a partir do cadastro corporativo M008."
+    },
+    {
+     "nome": "TermoOutorga",
+     "desc": "Documento de termo ou contrato que formaliza a outorga."
+    },
+    {
+     "nome": "IniciativaRef",
+     "desc": "Referencia ao projeto criado no M003 apos a formalizacao da outorga."
+    }
+   ],
+   "events": [
+    {
+     "nome": "ContratacaoConvocada",
+     "desc": "Emitido quando uma proposta aprovada e convocada para formalizacao, criando a ContratacaoOutorga em EM_CONVOCACAO."
+    },
+    {
+     "nome": "ContratacaoFormalizada",
+     "desc": "Emitido quando o TermoOutorga e registrado e a ContratacaoOutorga transita para FORMALIZADA."
+    },
+    {
+     "nome": "IniciativaCriada",
+     "desc": "Emitido quando o projeto e criado no M003 e IniciativaRef e preenchida na ContratacaoOutorga."
+    },
+    {
+     "nome": "ContratacaoCancelada",
+     "desc": "Emitido quando uma ContratacaoOutorga e cancelada antes da formalizacao."
+    }
+   ],
+   "workflows": [
+    "ContratacaoOutorgaStateMachine"
+   ],
+   "deps": {
+    "M011": 1
+   }
+  },
+  "M023": {
+   "entities": [],
+   "events": [],
+   "workflows": [
+    "todo"
+   ],
+   "deps": {}
+  },
+  "M024": {
+   "entities": [
+    {
+     "nome": "Curriculo",
+     "desc": "Raiz do curriculo do pesquisador importado da Plataforma Lattes; controla versionamento do snapshot e validade da sincronizacao."
+    },
+    {
+     "nome": "FormacaoAcademica",
+     "desc": "Titulacao academica do pesquisador registrada no curriculo Lattes; alimenta elegibilidade, titulacao maxima e busca por expertise."
+    },
+    {
+     "nome": "FormaCitacao",
+     "desc": "Juncao entre Curriculo e Artigo; registra o nome como o pesquisador foi citado naquela publicacao. PessoaFisica e alcancada atraves do Curri"
+    },
+    {
+     "nome": "Artigo",
+     "desc": "Artigo publicado em periodico ou anais de conferencia; pode ser compartilhado entre curriculos de coautores, deduplicado por doi ou (titulo,"
+    },
+    {
+     "nome": "Periodico",
+     "desc": "Periodico ou anais de conferencia; cadastro compartilhado deduplicado por issn ou nome normalizado."
+    },
+    {
+     "nome": "Livro",
+     "desc": "Livro completo ou capitulo de livro publicado pelo pesquisador; composicao de Curriculo, apagado e recriado a cada reimportacao."
+    },
+    {
+     "nome": "Orientacao",
+     "desc": "Orientacao academica (IC, mestrado, doutorado, pos-doutorado) realizada pelo pesquisador; composicao de Curriculo."
+    },
+    {
+     "nome": "NivelOrientacao",
+     "desc": "Cadastro local de niveis de orientacao academica; compartilhado entre curriculos, nao apagado por reimportacao."
+    },
+    {
+     "nome": "Projeto",
+     "desc": "Projeto academico registrado no Lattes; entidade compartilhada que pode aparecer em multiplos curriculos via ParticipacaoProjeto, deduplicad"
+    },
+    {
+     "nome": "ParticipacaoProjeto",
+     "desc": "Vinculo entre um Curriculo e um Projeto; carrega o papel exercido pelo pesquisador no projeto, pois pessoas diferentes podem ter papeis dist"
+    },
+    {
+     "nome": "TipoProjeto",
+     "desc": "Cadastro local de tipos de projeto academico; compartilhado entre curriculos, nao apagado por reimportacao."
+    },
+    {
+     "nome": "ParticipacaoEvento",
+     "desc": "Participacao do pesquisador em evento cientifico registrada no curriculo Lattes; composicao de Curriculo."
+    },
+    {
+     "nome": "Premio",
+     "desc": "Premio, titulo honorifico ou homenagem recebido pelo pesquisador; composicao de Curriculo."
+    },
+    {
+     "nome": "Idioma",
+     "desc": "Idioma declarado pelo pesquisador no curriculo Lattes com proficiencia discriminada por habilidade; composicao de Curriculo — cada idioma de"
+    }
+   ],
+   "events": [
+    {
+     "nome": "CurriculoSincronizado",
+     "desc": "Emitido apos sincronizacao bem-sucedida do curriculo com a Plataforma Lattes."
+    },
+    {
+     "nome": "NivelAcademicoAtualizado",
+     "desc": "Emitido apos sincronizacao quando o nivel academico derivado da FormacaoAcademica mais alta concluida difere do nivel at"
+    }
+   ],
+   "workflows": [],
+   "deps": {
+    "M008": 6
+   }
+  }
+ },
+ "edges": [
+  [
+   "M001",
+   "M004",
+   [
+    "ref",
+    "rel"
+   ]
+  ],
+  [
+   "M001",
+   "M009",
+   [
+    "import",
+    "ref",
+    "rel"
+   ]
+  ],
+  [
+   "M001",
+   "M011",
+   [
+    "import",
+    "ref",
+    "rel"
+   ]
+  ],
+  [
+   "M001",
+   "M013",
+   [
+    "ref"
+   ]
+  ],
+  [
+   "M003",
+   "M004",
+   [
+    "import",
+    "ref",
+    "rel"
+   ]
+  ],
+  [
+   "M003",
+   "M009",
+   [
+    "import",
+    "ref",
+    "rel"
+   ]
+  ],
+  [
+   "M003",
+   "M012",
+   [
+    "import",
+    "ref",
+    "rel"
+   ]
+  ],
+  [
+   "M003",
+   "M013",
+   [
+    "import",
+    "ref",
+    "rel"
+   ]
+  ],
+  [
+   "M003",
+   "M014",
+   [
+    "import"
+   ]
+  ],
+  [
+   "M003",
+   "M015",
+   [
+    "import"
+   ]
+  ],
+  [
+   "M008",
+   "M003",
+   [
+    "import",
+    "ref",
+    "rel"
+   ]
+  ],
+  [
+   "M008",
+   "M010",
+   [
+    "import",
+    "ref",
+    "rel"
+   ]
+  ],
+  [
+   "M008",
+   "M011",
+   [
+    "import",
+    "ref",
+    "rel"
+   ]
+  ],
+  [
+   "M008",
+   "M013",
+   [
+    "import",
+    "ref",
+    "rel"
+   ]
+  ],
+  [
+   "M008",
+   "M024",
+   [
+    "import",
+    "rel"
+   ]
+  ],
+  [
+   "M009",
+   "M004",
+   [
+    "import",
+    "ref",
+    "rel"
+   ]
+  ],
+  [
+   "M010",
+   "M011",
+   [
+    "import",
+    "ref",
+    "rel"
+   ]
+  ],
+  [
+   "M011",
+   "M003",
+   [
+    "import"
+   ]
+  ],
+  [
+   "M011",
+   "M022",
+   [
+    "import"
+   ]
+  ],
+  [
+   "M013",
+   "M009",
+   [
+    "import"
+   ]
+  ],
+  [
+   "M013",
+   "M014",
+   [
+    "import"
+   ]
+  ],
+  [
+   "M016",
+   "M011",
+   [
+    "import",
+    "ref",
+    "rel"
+   ]
+  ],
+  [
+   "M022",
+   "M003",
+   [
+    "import"
+   ]
+  ]
+ ]
+}
