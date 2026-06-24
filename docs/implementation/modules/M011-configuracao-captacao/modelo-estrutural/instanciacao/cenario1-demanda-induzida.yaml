@@ -1,0 +1,198 @@
+# ==============================================================================
+# MÓDULO 01: FOMENTO
+# ==============================================================================
+fomento:
+  codigo: "FOM-2026-004"
+  titulo: "Inova-ES Saúde - Apoio a Hospitais Tecnológicos"
+  descricao: "Chamamento focado no desenvolvimento de soluções de IA para saúde pública."
+  estado: "PUBLICADO" # Subestado interno: EM_ANDAMENTO
+  tipoChamamento: "DEMANDA_INDUZIDA"
+  tipoOutorgado: "PESSOA_JURIDICA"
+  dataInicio: "2026-03-01"
+  dataFim: "2026-12-31"
+  resultadoEsperado: "Redução de filas no SUS através de triagem inteligente."
+  eixoEstrategico: "Saúde e Bem-Estar Social (M010)"
+  areaTecnica: "Diretoria de Inovação - FAPES (M008)"
+  tipoProjeto: "Desenvolvimento Tecnológico Especial (M008)"
+
+  edital:
+    nome: "Edital FAPES Nº 04/2026 - Inova Saúde"
+    url: "https://fapes.es.gov.br/editais/inova-saude-2026"
+
+  restricoesFomento:
+    - id: "REST-001"
+      descricao: "Proponentes listados em cadastros de inadimplência técnica ou com pendências na SEFAZ-ES serão sumariamente desclassificados."
+
+  outorgadosDemanda:
+    - id: "OUT-DEM-001"
+      tipo: "PESSOA_JURIDICA"
+      nome: "Hospital Capixaba de Inovação"
+      cnpj: "12.345.678/0001-99"
+      razaoSocial: "HCI Tecnologias em Saude LTDA"
+      contato: "diretoria@hci.org.br"
+
+  aportesFomento:
+    - id: "APOR-001"
+      valorAportado: 1500000.00
+      dataAporte: "2026-02-15"
+      isAditivo: false
+      justificativa: "Orçamento de partida do Tesouro Estadual para atendimento da demanda emergencial."
+      origemAporte: "CONTA_CONTABIL"
+
+  faixas:
+    - id: "FAIXA-A"
+      nome: "Faixa Única - Projetos Hospitalares"
+      descricao: "Subvenção integral para o desenvolvimento e homologação de protótipos."
+      valorAportado: 1500000.00
+
+      rubricasPermitidas:
+        - rubrica: "Material de Consumo e Equipamentos (M008)"
+          percentualMinimo: 0.00
+          percentualMaximo: 40.00
+          obrigatoria: true
+          valorLimite: 600000.00
+          restricoes: "Vedada a compra de mobiliário hospitalar padrão, apenas itens de TI."
+          observacao: "Foco em hardware de processamento de dados."
+
+      bolsasPermitidas:
+        - versaoNivel: "Iniciação Tecnológica Industrial - ITI-A (M001)"
+          quantidadeMinimaCotas: 1
+          minimoBolsistas: 1
+          institucional: true
+          observacao: "Bolsista atuará diretamente no desenvolvimento de software de IA."
+
+  etapasFomento:
+    - id: "ETAPA-FOM-01"
+      nome: "Submissão de Projetos"
+      codigo: "SUB-PROJ"
+      temRecurso: false
+      ehEliminatoria: false
+      ehClassificatoria: false
+      tipoEtapa: "Recebimento e Triagem Inicial"
+
+    - id: "ETAPA-FOM-02"
+      nome: "Habilitação"
+      codigo: "HAB-DOC"
+      temRecurso: true
+      ehEliminatoria: true
+      ehClassificatoria: false
+      tipoEtapa: "Análise Legal e Documental"
+
+    - id: "ETAPA-FOM-03"
+      nome: "Avaliação Adhoc"
+      codigo: "AVAL-ADHOC"
+      temRecurso: true
+      ehEliminatoria: false
+      ehClassificatoria: true
+      tipoEtapa: "Julgamento de Mérito por Pares"
+
+# ==============================================================================
+# MÓDULO 02: CAPTAÇÃO
+# ==============================================================================
+captacao:
+  codigo: "CAP-2026-HEALTH"
+  nome: "Captação Emergencial IA Saúde FAPES 2026"
+  dataInicio: "2026-04-01"
+  dataFim: "2026-06-01"
+  limiteProjetos: 1
+  recursoMaximo: 1500000.00
+  estado: "FECHADA_PARA_SUBMISSAO"
+  etapaAtual: "ETAPA-CAP-02" # Aponta para o estágio atual do cenário (Habilitação)
+
+  etapasCaptacao:
+    - id: "ETAPA-CAP-01"
+      baseadaEmEtapaFomento: "ETAPA-FOM-01"
+      dtInicio: "2026-04-01"
+      dtResultadoParcial: "2026-06-01"
+      dtRecurso: "2026-06-01" # Não aplicável (temRecurso = false)
+      dtResultadoFinal: "2026-06-01"
+      extensoes: []
+      proxima: "ETAPA-CAP-02"
+
+    - id: "ETAPA-CAP-02"
+      baseadaEmEtapaFomento: "ETAPA-FOM-02"
+      dtInicio: "2026-06-02"
+      dtResultadoParcial: "2026-06-15"
+      dtRecurso: "2026-06-18"
+      dtResultadoFinal: "2026-06-25"
+      extensoes: []
+      proxima: "ETAPA-CAP-03"
+
+    - id: "ETAPA-CAP-03"
+      baseadaEmEtapaFomento: "ETAPA-FOM-03"
+      dtInicio: "2026-06-26"
+      dtResultadoParcial: "2026-07-15"
+      dtRecurso: "2026-07-20"
+      dtResultadoFinal: "2026-07-30"
+      extensoes: []
+      proxima: null
+
+# ==============================================================================
+# MÓDULO 03: SELEÇÃO DE PROJETOS
+# ==============================================================================
+proponente:
+  id: "PROP-001"
+  nome: "Dr. Carlos Eduardo Neves"
+  CPF: "111.222.333-44"
+  email: "carlos.neves@hci.org.br"
+  contato: "(27) 99999-8888"
+  endereco: "Av. Marechal Mascarenhas de Moraes, Vitória - ES"
+  genero: "MASCULINO"
+  dataNascimento: "1978-05-20"
+  institucao: "Hospital Capixaba de Inovação (Massa Externa)"
+
+projeto:
+  id: "PROJ-2026-001"
+  statusProjeto: "EM_SELECAO" # Transacionou de SUBMETIDO para a esteira seletiva
+  dataCriacao: "2026-04-10"
+  dataSubmissao: "2026-05-28"
+  dataInicio: "2026-08-01"
+  dataFim: "2027-07-31"
+  titulo: "Telemedicina Avançada com IA para Diagnóstico de Imagens Clínicas"
+  descricao: "Implementação de redes neurais convolucionais para triagem rápida de exames de raio-X."
+  objetivo: "Reduzir o tempo de entrega de laudos críticos de 48 horas para menos de 10 minutos."
+  resultados: "Acurácia de triagem de 94.2% validada em ambiente controlado de testes."
+  demandaInduzida: true
+  estahAprovada: false
+  tipo: "Projeto de Desenvolvimento Tecnológico (M008)"
+  concorreAFaixa: "FAIXA-A"
+  submetidoPor: "PROP-001"
+  nota: 0.0
+
+  documentos:
+    - id: "DOC-001"
+      nome: "Certidao_Negativa_Debitos_Estaduais.pdf"
+      descricao: "Certidão emitida pelo SEFAZ-ES comprovando regularidade fiscal."
+      dataUpload: "2026-05-28"
+      estadoDocumento: "PENDENTE"
+      tipoDocumento: "Certidão Fiscal Obrigatória"
+
+participacaoEtapaCaptacao:
+  id: "PART-ETAPA-001"
+  projeto: "PROJ-2026-001"
+  etapa: "ETAPA-CAP-02" # Processando ativamente na etapa de Habilitação Documental
+  dtInicio: "2026-06-02"
+  selecionado: null
+  nota: null
+  observacao: ""
+  respostasFormulariosProponente:
+    - id: "RESP-PROP-001"
+      dtResposta: "2026-05-28"
+      formRespondido: "Questionário Técnico de Elegibilidade da Demanda Induzida"
+
+selecaoProjeto:
+  id: "SEL-PROJ-001"
+  data: "2026-06-03"
+  projeto: "PROJ-2026-001"
+  avaliaParticipacao: "PART-ETAPA-001"
+  statusSelecao: "PENDENTE" # Analista vinculou o avaliador, aguardando início da rotina
+  observacao: "Aguardando abertura dos documentos fiscais anexados pelo proponente."
+
+  realizadaPorSelecionador:
+    id: "SEL-001"
+    nome: "Dr. Roberto Mendes"
+    tipoSelecionadores: "RESPONSAVEL_AREA_TECNICA"
+
+  respostasFormulariosSelecao: []
+
+recursoSelecao: null # Sem registros. O projeto ainda não foi julgado como ELIMINADO para motivar contestação.
