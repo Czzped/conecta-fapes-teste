@@ -271,7 +271,7 @@ export function MyInfoPage() {
         border: '2px dashed',
         borderColor: dragActive === docId ? 'var(--primary)' : 'var(--border)',
         borderRadius: 'var(--radius)',
-        backgroundColor: dragActive === docId ? 'rgba(8, 145, 178, 0.05)' : 'var(--card)',
+        backgroundColor: dragActive === docId ? 'rgba(34, 211, 238, 0.05)' : 'var(--card)',
         cursor: 'pointer',
         minHeight: '200px',
       }}
@@ -490,7 +490,7 @@ export function MyInfoPage() {
             style={{
               color: 'var(--title-icon-foreground)',
             borderRadius: 'var(--radius)',
-            backgroundColor: 'rgba(8, 145, 178, 0.1)',
+            backgroundColor: 'rgba(34, 211, 238, 0.1)',
           }}
         >
           <User size={20} />
@@ -919,7 +919,7 @@ export function MyInfoPage() {
             style={{
               color: 'var(--title-icon-foreground)',
                   borderRadius: 'var(--radius)',
-                  backgroundColor: 'rgba(8, 145, 178, 0.1)',
+                  backgroundColor: 'rgba(34, 211, 238, 0.1)',
                 }}
               >
                 <FileText size={20} />
@@ -1321,7 +1321,7 @@ export function MyInfoPage() {
                               border: '2px dashed',
                               borderColor: dragActive === doc.id ? 'var(--primary)' : 'var(--border)',
                               borderRadius: 'var(--radius)',
-                              backgroundColor: dragActive === doc.id ? 'rgba(8, 145, 178, 0.05)' : 'var(--card)',
+                              backgroundColor: dragActive === doc.id ? 'rgba(34, 211, 238, 0.05)' : 'var(--card)',
                               cursor: 'pointer',
                               minHeight: '200px',
                             }}
@@ -1485,7 +1485,7 @@ export function MyInfoPage() {
                                 border: '2px dashed',
                                 borderColor: dragActive === doc.id ? 'var(--primary)' : 'var(--border)',
                                 borderRadius: 'var(--radius)',
-                                backgroundColor: dragActive === doc.id ? 'rgba(8, 145, 178, 0.05)' : 'var(--card)',
+                                backgroundColor: dragActive === doc.id ? 'rgba(34, 211, 238, 0.05)' : 'var(--card)',
                                 cursor: 'pointer',
                                 minHeight: '200px',
                               }}
@@ -1701,7 +1701,7 @@ export function MyInfoPage() {
                               border: '2px dashed',
                               borderColor: dragActive === doc.id ? 'var(--primary)' : 'var(--border)',
                               borderRadius: 'var(--radius)',
-                              backgroundColor: dragActive === doc.id ? 'rgba(8, 145, 178, 0.05)' : 'var(--card)',
+                              backgroundColor: dragActive === doc.id ? 'rgba(34, 211, 238, 0.05)' : 'var(--card)',
                               cursor: 'pointer',
                               minHeight: '200px',
                             }}
@@ -1934,7 +1934,7 @@ export function MyInfoPage() {
                                 border: '2px dashed',
                                 borderColor: dragActive === doc.id ? 'var(--primary)' : 'var(--border)',
                                 borderRadius: 'var(--radius)',
-                                backgroundColor: dragActive === doc.id ? 'rgba(8, 145, 178, 0.05)' : 'var(--card)',
+                                backgroundColor: dragActive === doc.id ? 'rgba(34, 211, 238, 0.05)' : 'var(--card)',
                                 cursor: 'pointer',
                                 minHeight: '200px',
                               }}
@@ -2394,7 +2394,7 @@ export function MyInfoPage() {
                               border: '2px dashed',
                               borderColor: dragActive === doc.id ? 'var(--primary)' : 'var(--border)',
                               borderRadius: 'var(--radius)',
-                              backgroundColor: dragActive === doc.id ? 'rgba(8, 145, 178, 0.05)' : 'var(--card)',
+                              backgroundColor: dragActive === doc.id ? 'rgba(34, 211, 238, 0.05)' : 'var(--card)',
                               cursor: 'pointer',
                               minHeight: '200px',
                             }}
@@ -2539,7 +2539,7 @@ export function MyInfoPage() {
                                 border: '2px dashed',
                                 borderColor: dragActive === doc.id ? 'var(--primary)' : 'var(--border)',
                                 borderRadius: 'var(--radius)',
-                                backgroundColor: dragActive === doc.id ? 'rgba(8, 145, 178, 0.05)' : 'var(--card)',
+                                backgroundColor: dragActive === doc.id ? 'rgba(34, 211, 238, 0.05)' : 'var(--card)',
                                 cursor: 'pointer',
                                 minHeight: '200px',
                               }}

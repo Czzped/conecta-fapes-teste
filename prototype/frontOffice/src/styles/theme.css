@@ -20,14 +20,14 @@
   --card-foreground: var(--color-neutral-800);
   --popover: #ffffff;
   --popover-foreground: var(--color-neutral-800);
-  /* Cyan-700 no claro: o cyan-500 vibra demais sobre branco */
-  --primary: #0891b2;
+  /* Cyan-400: cor padrão do frontoffice */
+  --primary: #22d3ee;
   --primary-foreground: #ffffff;
   --secondary: rgba(0, 0, 0, 0);
   --secondary-foreground: var(--color-neutral-700);
   --muted: var(--color-neutral-100);
   --muted-foreground: var(--color-neutral-500);
-  --accent: #0891b2;
+  --accent: #22d3ee;
   --accent-foreground: #ffffff;
   --destructive: rgba(0, 0, 0, 0);
   --destructive-foreground: var(--color-red-500);
@@ -42,15 +42,15 @@
   --font-weight-semibold: 600;
   /* The default font weight for bold text. */
   --font-weight-bold: 700;
-  --ring: #0891b2;
+  --ring: #22d3ee;
   /* Sombra com tinta neutral em vez de preto puro */
   --elevation-sm: 0 1px 2px rgba(23, 23, 23, 0.04), 0 1px 3px rgba(23, 23, 23, 0.06);
   /* The color for chart elements, such as a bar or line in a chart. */
-  --chart-1: #06b6d4;
+  --chart-1: #22d3ee;
   /* The color for another chart element, such as a bar or line in a chart. */
-  --chart-2: #0891b2;
+  --chart-2: #22d3ee;
   /* The color for another chart element, such as a bar or line in a chart. */
-  --chart-3: #0891b2;
+  --chart-3: #22d3ee;
   /* The color for another chart element, such as a bar or line in a chart. */
   --chart-4: #67e8f9;
   /* The color for another chart element, such as a bar or line in a chart. */
@@ -68,12 +68,12 @@
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: var(--color-neutral-200);
   --sidebar-accent-foreground: #00c1af;
-  --sidebar-selected-foreground: #06b6d4;
-  --tab-selected-foreground: #06b6d4;
-  --title-icon-foreground: #06b6d4;
+  --sidebar-selected-foreground: #22d3ee;
+  --tab-selected-foreground: #22d3ee;
+  --title-icon-foreground: #22d3ee;
   --timeline-pending-circle: #e5e5e5;
   --sidebar-border: var(--color-neutral-200);
-  --sidebar-ring: #0891b2;
+  --sidebar-ring: #22d3ee;
   --app-header: var(--background);
   --app-header-border: #e5e5e5;
 }
@@ -94,7 +94,7 @@
   /* The default color for text or elements that appear on top of dropdowns and tooltips. */
   --popover-foreground: rgba(255, 255, 255, 1.00);
   /* The primary color used for buttons, links, and other interactive elements. */
-  --primary: #0891b2;
+  --primary: #22d3ee;
   /* The default color for text or elements that appear on top of primary colored elements. */
   --primary-foreground: rgba(23, 23, 23, 1.00);
   /* The secondary color used for secondary(but NOT-DESTRUCTIVE) buttons and interactive elements. */
@@ -106,7 +106,7 @@
   /* The default color for text or elements that appear on top of muted colored elements. */
   --muted-foreground: rgba(163, 163, 163, 1.00);
   /* The accent color used for highlights, links, and other interactive elements. */
-  --accent: #0891b2;
+  --accent: #22d3ee;
   /* The default color for text or elements that appear on top of accent colored elements. */
   --accent-foreground: rgba(23, 23, 23, 1.00);
   /* The color used for background in destructive actions, such as delete buttons or error messages. */
@@ -120,7 +120,7 @@
   /* The default background color for input fields, text areas, and other input elements. */
   --input-background: rgba(23, 23, 23, 0.82);
   /* The color for focus rings, outlines, and other focus indicators. */
-  --ring: #0891b2;
+  --ring: #22d3ee;
   /* Shadow for small elevations, such as cards or modals. */
   --elevation-sm: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
   /* The background color for sidebars, navigation menus, and other persistent elements. */
@@ -135,14 +135,14 @@
   --sidebar-accent: rgba(255, 255, 255, 0.1);
   /* The default color for text or elements that appear on top of accent colored elements in sidebars and navigation menus. */
   --sidebar-accent-foreground: #00c1af;
-  --sidebar-selected-foreground: #06b6d4;
-  --tab-selected-foreground: #06b6d4;
-  --title-icon-foreground: #06b6d4;
+  --sidebar-selected-foreground: #22d3ee;
+  --tab-selected-foreground: #22d3ee;
+  --title-icon-foreground: #22d3ee;
   --timeline-pending-circle: #262626;
   /* The default border color for elements in sidebars and navigation menus. */
   --sidebar-border: rgba(255, 255, 255, 0.1);
   /* The default color for focus rings, outlines, and other focus indicators in sidebars and navigation menus. */
-  --sidebar-ring: #0891b2;
+  --sidebar-ring: #22d3ee;
   --app-header: #171717;
   --app-header-border: rgba(255, 255, 255, 0.1);
 }
@@ -566,7 +566,7 @@ input[type="date"]:focus {
 }
 
 :root:not(.dark) .custom-datepicker .rdp-day_selected {
-  background-color: #06b6d4 !important;
+  background-color: #22d3ee !important;
   color: #ffffff !important;
 }
 
@@ -579,7 +579,7 @@ input[type="date"]:focus {
 }
 
 :root:not(.dark) .custom-datepicker .rdp-day_today:not(.rdp-day_selected) {
-  background-color: rgba(6, 182, 212, 0.2);
+  background-color: rgba(34, 211, 238, 0.2);
 }
 
 /* Select dropdown styling for NuxtUI pattern */
@@ -601,12 +601,12 @@ select:focus {
 }
 
 .dark select option:hover {
-  background-color: rgba(8, 145, 178, 0.1);
+  background-color: rgba(34, 211, 238, 0.1);
 }
 
 .dark select option:checked {
-  background-color: rgba(8, 145, 178, 0.2);
-  color: #0891b2;
+  background-color: rgba(34, 211, 238, 0.2);
+  color: #22d3ee;
   font-weight: 500;
 }
 
@@ -619,11 +619,11 @@ select:focus {
 }
 
 :root:not(.dark) select option:hover {
-  background-color: rgba(6, 182, 212, 0.1);
+  background-color: rgba(34, 211, 238, 0.1);
 }
 
 :root:not(.dark) select option:checked {
-  background-color: rgba(6, 182, 212, 0.15);
-  color: #06b6d4;
+  background-color: rgba(34, 211, 238, 0.15);
+  color: #22d3ee;
   font-weight: 500;
 }

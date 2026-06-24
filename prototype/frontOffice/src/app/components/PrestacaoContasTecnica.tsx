@@ -21,7 +21,7 @@ export function PrestacaoContasTecnica({ onBack }: PrestacaoContasTecnicaProps) 
             style={{
               color: 'var(--title-icon-foreground)',
             borderRadius: 'var(--radius)',
-            backgroundColor: 'rgba(8, 145, 178, 0.1)',
+            backgroundColor: 'rgba(34, 211, 238, 0.1)',
           }}
         >
           <FileText size={20} />
@@ -867,7 +867,7 @@ export function PrestacaoContasTecnica({ onBack }: PrestacaoContasTecnicaProps) 
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = 'var(--primary)';
-              e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.1)';
+              e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.1)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = 'var(--border)';
@@ -904,7 +904,7 @@ export function PrestacaoContasTecnica({ onBack }: PrestacaoContasTecnicaProps) 
               transition: 'all 0.2s',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.1)';
+              e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.1)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';

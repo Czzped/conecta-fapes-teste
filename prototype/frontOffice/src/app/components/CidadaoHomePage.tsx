@@ -153,9 +153,9 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
               style={{
                 padding: '0.45rem 1.1rem',
                 borderRadius: '9999px',
-                border: '1px solid #0891b2',
+                border: '1px solid #22d3ee',
                 backgroundColor: 'transparent',
-                color: '#0891b2',
+                color: '#22d3ee',
                 fontSize: 'var(--text-sm)',
                 fontWeight: 'var(--font-weight-medium)',
                 cursor: 'pointer',
@@ -221,7 +221,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
               marginBottom: '2rem',
             }}
           >
-            <span style={{ color: '#0891b2', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '0.08em', fontFamily: 'var(--font-family)' }}>
+            <span style={{ color: '#22d3ee', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '0.08em', fontFamily: 'var(--font-family)' }}>
               TRANSPARÊNCIA &amp; CIÊNCIA
             </span>
           </div>
@@ -239,7 +239,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
             }}
           >
             Simplicidade no acesso a{' '}
-            <span style={{ color: '#0891b2' }}>Editais</span>.
+            <span style={{ color: '#22d3ee' }}>Editais</span>.
           </h1>
 
           {/* Subtitle */}
@@ -264,7 +264,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                 padding: '0.75rem 1.75rem',
                 borderRadius: 'var(--radius)',
                 border: 'none',
-                backgroundColor: '#06b6d4',
+                backgroundColor: '#22d3ee',
                 color: '#0a0a0a',
                 fontSize: 'var(--text-sm)',
                 fontWeight: 'var(--font-weight-medium)',
@@ -272,8 +272,8 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                 transition: 'all 0.2s',
                 fontFamily: 'var(--font-family)',
               }}
-              onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#0891b2'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-              onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#06b6d4'; e.currentTarget.style.transform = 'translateY(0)'; }}
+              onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#22d3ee'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#22d3ee'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
               Analisar Oportunidades
             </button>
@@ -346,9 +346,9 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                     padding: '0.5rem 1rem',
                     borderRadius: '9999px',
                     border: '1px solid',
-                    borderColor: selectedArea === area ? '#0891b2' : 'rgba(6,182,212,0.25)',
+                    borderColor: selectedArea === area ? '#22d3ee' : 'rgba(6,182,212,0.25)',
                     backgroundColor: selectedArea === area ? 'rgba(6,182,212,0.25)' : 'rgba(6,182,212,0.08)',
-                    color: selectedArea === area ? '#0891b2' : 'var(--muted-foreground)',
+                    color: selectedArea === area ? '#22d3ee' : 'var(--muted-foreground)',
                     fontSize: 'var(--text-xs)',
                     fontWeight: 'var(--font-weight-medium)',
                     cursor: 'pointer',
@@ -403,7 +403,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                           left: 0,
                           right: 0,
                           height: '2px',
-                          backgroundColor: '#0891b2',
+                          backgroundColor: '#22d3ee',
                           borderRadius: '2px 2px 0 0',
                         }}
                       />
@@ -417,7 +417,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
           {/* Editais Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filtered.map(edital => {
-              const areaColor = areaColors[edital.area] ?? { bg: 'rgba(6,182,212,0.12)', color: '#0891b2' };
+              const areaColor = areaColors[edital.area] ?? { bg: 'rgba(6,182,212,0.12)', color: '#22d3ee' };
               return (
                 <div
                   key={edital.id}
@@ -433,7 +433,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                     cursor: 'pointer',
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = 'rgba(8, 145, 178,0.45)';
+                    e.currentTarget.style.borderColor = 'rgba(34, 211, 238,0.45)';
                     e.currentTarget.style.transform = 'translateY(-2px)';
                     e.currentTarget.style.boxShadow = '0 8px 24px rgba(6,182,212,0.1)';
                     e.currentTarget.style.backgroundColor = 'rgba(6,182,212,0.1)';
@@ -545,7 +545,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital }: CidadaoHomePageProps) 
                       borderRadius: 'var(--radius)',
                       border: '1px solid rgba(6,182,212,0.35)',
                       backgroundColor: 'rgba(6,182,212,0.12)',
-                      color: '#0891b2',
+                      color: '#22d3ee',
                       fontSize: 'var(--text-sm)',
                       fontWeight: 'var(--font-weight-medium)',
                       cursor: 'pointer',

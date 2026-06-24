@@ -34,15 +34,15 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
           <button
             className="p-2 transition-colors"
             style={{
-              backgroundColor: 'rgba(8, 145, 178, 0.1)',
+              backgroundColor: 'rgba(34, 211, 238, 0.1)',
               color: 'var(--title-icon-foreground)',
               borderRadius: 'var(--radius)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.2)';
+              e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.2)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.1)';
+              e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.1)';
             }}
             aria-label="Portal"
           >
@@ -265,7 +265,7 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
             style={{
               color: 'var(--title-icon-foreground)',
               borderRadius: 'var(--radius)',
-              backgroundColor: 'rgba(8, 145, 178, 0.1)',
+              backgroundColor: 'rgba(34, 211, 238, 0.1)',
             }}
           >
             <Bell size={20} />
@@ -352,7 +352,7 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
             style={{
               color: 'var(--title-icon-foreground)',
               borderRadius: 'var(--radius)',
-              backgroundColor: 'rgba(8, 145, 178, 0.1)',
+              backgroundColor: 'rgba(34, 211, 238, 0.1)',
             }}
           >
             <FolderOpen size={20} />
@@ -472,7 +472,7 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
             style={{
               color: 'var(--title-icon-foreground)',
               borderRadius: 'var(--radius)',
-              backgroundColor: 'rgba(8, 145, 178, 0.1)',
+              backgroundColor: 'rgba(34, 211, 238, 0.1)',
             }}
           >
             <FileUser size={20} />

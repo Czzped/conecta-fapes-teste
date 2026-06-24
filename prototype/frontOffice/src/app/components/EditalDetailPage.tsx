@@ -19,18 +19,18 @@ const CONTAINER: React.CSSProperties = {
 };
 
 const areaColors: Record<string, { bg: string; color: string }> = {
-  'Carreira Científica':     { bg: 'rgba(8, 145, 178,0.12)', color: '#0891b2' },
-  'Pesquisa':                { bg: 'rgba(8, 145, 178,0.12)', color: '#0891b2' },
-  'Extensão':                { bg: 'rgba(8, 145, 178,0.12)', color: '#0891b2' },
-  'Internacional':           { bg: 'rgba(8, 145, 178,0.12)', color: '#0891b2' },
-  'Difusão do Conhecimento': { bg: 'rgba(8, 145, 178,0.12)', color: '#0891b2' },
-  'Inovação':                { bg: 'rgba(8, 145, 178,0.12)', color: '#0891b2' },
+  'Carreira Científica':     { bg: 'rgba(34, 211, 238,0.12)', color: '#22d3ee' },
+  'Pesquisa':                { bg: 'rgba(34, 211, 238,0.12)', color: '#22d3ee' },
+  'Extensão':                { bg: 'rgba(34, 211, 238,0.12)', color: '#22d3ee' },
+  'Internacional':           { bg: 'rgba(34, 211, 238,0.12)', color: '#22d3ee' },
+  'Difusão do Conhecimento': { bg: 'rgba(34, 211, 238,0.12)', color: '#22d3ee' },
+  'Inovação':                { bg: 'rgba(34, 211, 238,0.12)', color: '#22d3ee' },
 };
 
 export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: EditalDetailPageProps) {
   const [showAccessibility, setShowAccessibility] = useState(false);
   const edital = editais.find(e => e.id === editalId) ?? editais[0];
-  const areaColor = areaColors[edital.area] ?? { bg: 'rgba(8, 145, 178,0.12)', color: '#0891b2' };
+  const areaColor = areaColors[edital.area] ?? { bg: 'rgba(34, 211, 238,0.12)', color: '#22d3ee' };
 
   return (
     <div
@@ -63,9 +63,9 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
               style={{
                 padding: '0.45rem 1.1rem',
                 borderRadius: '9999px',
-                border: '1px solid #0891b2',
+                border: '1px solid #22d3ee',
                 backgroundColor: 'transparent',
-                color: '#0891b2',
+                color: '#22d3ee',
                 fontSize: 'var(--text-sm)',
                 fontWeight: 'var(--font-weight-medium)',
                 cursor: 'pointer',
@@ -117,7 +117,7 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
             padding: 0,
             transition: 'color 0.2s',
           }}
-          onMouseEnter={e => { e.currentTarget.style.color = '#0891b2'; }}
+          onMouseEnter={e => { e.currentTarget.style.color = '#22d3ee'; }}
           onMouseLeave={e => { e.currentTarget.style.color = 'var(--muted-foreground)'; }}
         >
           <ChevronLeft size={16} />
@@ -279,7 +279,7 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
                 fontFamily: 'var(--font-family)',
                 transition: 'color 0.2s',
               }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#0891b2'; }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#22d3ee'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--muted-foreground)'; }}
             >
               <ExternalLink size={13} />
@@ -343,7 +343,7 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
               padding: '0.75rem 2rem',
               borderRadius: 'var(--radius)',
               border: 'none',
-              backgroundColor: '#06b6d4',
+              backgroundColor: '#22d3ee',
               color: '#0a0a0a',
               fontSize: 'var(--text-sm)',
               fontWeight: 'var(--font-weight-semibold)',
@@ -352,8 +352,8 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
               fontFamily: 'var(--font-family)',
               whiteSpace: 'nowrap',
             }}
-            onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#0891b2'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-            onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#06b6d4'; e.currentTarget.style.transform = 'translateY(0)'; }}
+            onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#22d3ee'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+            onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#22d3ee'; e.currentTarget.style.transform = 'translateY(0)'; }}
           >
             Fazer Inscrição
           </button>

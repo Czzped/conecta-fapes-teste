@@ -37,8 +37,8 @@ const FF = 'var(--font-family)';
 const CLR_FG = 'var(--foreground)';
 const CLR_MUTED = 'var(--muted-foreground)';
 const CLR_LABEL = 'var(--muted-foreground)';
-const CLR_TEAL = '#0891b2';
-const CLR_TEAL_MID = '#06b6d4';
+const CLR_TEAL = '#22d3ee';
+const CLR_TEAL_MID = '#22d3ee';
 
 const inputBase: React.CSSProperties = {
   width: '100%',
@@ -345,7 +345,7 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
           <div style={{ ...CONTAINER, height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <img src={fapesLogo} alt="FAPES" style={{ height: '36px', objectFit: 'contain' }} />
             <div className="flex items-center gap-3">
-              <button onClick={onLogin} style={{ padding: '0.45rem 1.1rem', borderRadius: '9999px', border: '1px solid #0891b2', backgroundColor: 'transparent', color: '#0891b2', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: FF }}>
+              <button onClick={onLogin} style={{ padding: '0.45rem 1.1rem', borderRadius: '9999px', border: '1px solid #22d3ee', backgroundColor: 'transparent', color: '#22d3ee', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: FF }}>
                 Entrar com Acesso Cidadão
               </button>
               <button
@@ -390,7 +390,7 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
           <div className="flex items-center gap-3">
             <button
               onClick={onLogin}
-              style={{ padding: '0.45rem 1.1rem', borderRadius: '9999px', border: '1px solid #0891b2', backgroundColor: 'transparent', color: '#0891b2', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: FF }}
+              style={{ padding: '0.45rem 1.1rem', borderRadius: '9999px', border: '1px solid #22d3ee', backgroundColor: 'transparent', color: '#22d3ee', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: FF }}
             >
               Entrar com Acesso Cidadão
             </button>
@@ -773,7 +773,7 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
               transition: 'all 0.18s',
               opacity: isSubmitting ? 0.7 : 1,
             }}
-            onMouseEnter={e => { if (!isSubmitting) e.currentTarget.style.backgroundColor = '#0891b2'; }}
+            onMouseEnter={e => { if (!isSubmitting) e.currentTarget.style.backgroundColor = '#22d3ee'; }}
             onMouseLeave={e => { if (!isSubmitting) e.currentTarget.style.backgroundColor = CLR_TEAL_MID; }}
           >
             {isSubmitting ? 'Enviando...' : 'Submeter Proposta'}

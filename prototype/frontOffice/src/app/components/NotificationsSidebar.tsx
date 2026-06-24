@@ -187,9 +187,9 @@ export function NotificationsSidebar({ isOpen, onClose, onNavigate }: Notificati
               <span
                 className="inline-flex items-center px-2 py-0.5"
                 style={{
-                  backgroundColor: 'rgba(8, 145, 178, 0.1)',
+                  backgroundColor: 'rgba(34, 211, 238, 0.1)',
                   color: 'var(--primary)',
-                  border: '1px solid rgba(8, 145, 178, 0.3)',
+                  border: '1px solid rgba(34, 211, 238, 0.3)',
                   borderRadius: '9999px',
                   fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
