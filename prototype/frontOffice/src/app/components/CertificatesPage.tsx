@@ -2945,10 +2945,10 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
             <>
               <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
                 {[
-                  { label: 'Valor Total Disponível', value: currency.format(totalDisponivelDashboard), icon: Banknote, tint: 'var(--primary)' },
-                  { label: 'Valor Alocado', value: currency.format(valorAlocadoDashboard), icon: Coins, tint: '#f59e0b' },
-                  { label: 'Valor Utilizado', value: currency.format(valorUtilizadoDashboard), icon: CircleDollarSign, tint: '#22c55e' },
-                  { label: 'Saldo Disponível', value: currency.format(saldoDisponivelDashboard), icon: PiggyBank, tint: '#38bdf8' },
+                  { label: 'Valor Total Disponível', value: currency.format(totalDisponivelDashboard), icon: Banknote, tint: '#06b6d4' },
+                  { label: 'Valor Alocado', value: currency.format(valorAlocadoDashboard), icon: Coins, tint: '#06b6d4' },
+                  { label: 'Valor Utilizado', value: currency.format(valorUtilizadoDashboard), icon: CircleDollarSign, tint: '#06b6d4' },
+                  { label: 'Saldo Disponível', value: currency.format(saldoDisponivelDashboard), icon: PiggyBank, tint: '#06b6d4' },
                 ].map((card) => {
                   const Icon = card.icon;
 
@@ -3092,17 +3092,10 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                     </div>
                   </label>
 
-                  <div
-                    style={{
-                      padding: '1rem',
-                    }}
-                  >
-                    <h3 style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)', margin: '0 0 1rem' }}>
-                      Ida
-                    </h3>
+                  <div>
                     <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_180px_150px] gap-4">
                       <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                        Origem
+                        Ida - Origem
                         <div className="mt-2">
                           <Dropdown
                           value={origem}
@@ -3181,17 +3174,10 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                     </div>
                   </div>
 
-                  <div
-                    style={{
-                      padding: '1rem',
-                    }}
-                  >
-                    <h3 style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)', margin: '0 0 1rem' }}>
-                      Volta
-                    </h3>
+                  <div>
                     <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_180px_150px] gap-4">
                       <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                        Origem
+                        Volta - Origem
                         <div className="mt-2">
                           {tipoViagemSelecionado === 'INTERNACIONAL' ? (
                             <input
