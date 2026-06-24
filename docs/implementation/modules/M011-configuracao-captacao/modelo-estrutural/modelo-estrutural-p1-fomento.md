@@ -244,7 +244,7 @@ classDiagram
 
     %% Estilização Requerida Simplificada
     style Fomento fill:lightgreen
-    style EstadoFomento fill:lightgreen
+    %% style EstadoFomento fill:lightgreen
     style Faixa fill:lightgreen
     style AporteFomento fill:lightgreen
     style EtapaFomento fill:lightgreen
@@ -293,6 +293,18 @@ stateDiagram-v2
 
 
 ```
+
+### Glossario de Estados
+
+| Nome | Definicao |
+|------|-----------|
+| EM_ELABORACAO | Estado inicial do Fomento, usado enquanto dados, aportes, faixas, documentos, etapas, formularios e criterios ainda estao sendo configurados. |
+| PermiteAlteracao | Subestado interno de EM_ELABORACAO que explicita que o Fomento pode receber `salvar()`, `alterar()` e `adicionarAporte()` enquanto esta em configuracao. Nao e valor de `EstadoFomento`. |
+| PUBLICADO | Macroestado que indica que o Fomento foi publicado por `publicar()` ou `publicarFomento()` e entrou no ciclo operacional. |
+| EM_ANDAMENTO | Subestado operacional de PUBLICADO em que o Fomento esta ativo para captacoes, permitindo alteracoes e aportes com auditoria. |
+| INTERROMPIDO | Subestado operacional de PUBLICADO em que o Fomento foi suspenso temporariamente por `suspender()` ou `suspenderFomento()`, podendo voltar a EM_ANDAMENTO por `prosseguir()` ou `prosseguirFomento()`. |
+| CANCELADO | Estado terminal decorrente de `cancelar()` ou `cancelarFomento()`. Bloqueia novas captacoes vinculadas ao Fomento. |
+| CONCLUIDO | Estado terminal decorrente de `concluir()`, `encerrarFomento()` ou ultrapassagem de `dataFim`. Bloqueia novas captacoes vinculadas ao Fomento. |
 
 ### Fluxo de Eventos Fomento
 
@@ -367,6 +379,42 @@ stateDiagram-v2
     }
 
 ```
+
+---
+
+## Glossario de Classes
+
+| Nome | Definicao | Exemplos |
+|------|-----------|----------|
+| AnalistaTecnico | Ator responsavel por criar, alterar, publicar, suspender, prosseguir, concluir e cancelar Fomentos, alem de registrar aportes. | Analista da area de inovacao publicando um fomento; analista registrando aporte aditivo. |
+| Fomento | Agregado principal do P1 que define vigencia, regras financeiras, faixas, rubricas, bolsas, documentos, etapas e criterios que poderao orientar Captacoes. | Fomento Inovacao Capixaba 2026; Fomento Pesquisa Aplicada em Saude. |
+| Edital | Documento ou link associado ao Fomento no modelo atual para registrar a referencia normativa da chamada. | Edital FAPES 01/2026; URL do edital publicado. |
+| EstadoFomento | Enumeracao que representa o ciclo de vida e o subestado operacional do Fomento. | `EM_ELABORACAO`; `PUBLICADO`; `INTERROMPIDO`; `CONCLUIDO`. |
+| TipoChamamento | Enumeracao que indica se o Fomento sera aberto ao publico ou direcionado a destinatario especifico. | `CHAMADA_PUBLICA`; `DEMANDA_INDUZIDA`. |
+| TipoOutorgado | Enumeracao que indica se o outorgado esperado e pessoa fisica ou pessoa juridica. | `PESSOA_FISICA`; `PESSOA_JURIDICA`. |
+| OutorgadoDemanda | Dados do destinatario especifico quando o Fomento for de demanda induzida. | CPF e nome de pesquisador convidado; CNPJ, razao social e contato de uma instituicao. |
+| RestricoesFomento | Restricoes aplicaveis ao Fomento, ao publico habilitado ou ao uso dos recursos. | Restricao a pesquisadores doutores; restricao a instituicoes capixabas. |
+| Faixa | Recorte financeiro do Fomento que organiza valores e regras permitidas para um grupo de projetos. | Faixa A ate R$ 100 mil; Faixa Empresas; Faixa Jovem Pesquisador. |
+| AporteFomento | Registro financeiro que compoe o total do Fomento e identifica valor, data, origem e eventual natureza aditiva. | Aporte de R$ 500 mil de Programa; aporte aditivo de R$ 100 mil de ContaContabil. |
+| TipoOrigemAporte | Enumeracao que classifica a origem orcamentaria do aporte. | `PROGRAMA`; `PARCERIA`; `CONTA_CONTABIL`. |
+| RubricaPermitidaFaixa | Regra de uso de uma Rubrica dentro de uma Faixa, incluindo limites, obrigatoriedade, restricoes e observacoes. | Equipamentos com limite de R$ 30 mil; Diarias com percentual maximo de 10%. |
+| BolsaPermitidaFaixa | Configuracao das bolsas permitidas em uma Faixa quando a rubrica Bolsa estiver habilitada. | 2 cotas de mestrado; bolsa institucional de doutorado. |
+| TipoDocumento | Tipo de documento aceito ou exigido para orientar projetos ou captacoes derivados do Fomento. | Plano de trabalho; comprovante institucional; declaracao de anuencia. |
+| EtapaFomento | Etapa base do ciclo de avaliacao ou selecao definida no Fomento e reutilizada por Captacoes. | Habilitacao documental; avaliacao ad hoc; resultado preliminar. |
+| CriterioSelecao | Criterio aplicado em uma EtapaFomento para classificar ou eliminar propostas. | Nota minima 70; avaliacao por dois revisores; criterio eliminatorio documental. |
+| TipoSelecao | Enumeracao que indica a natureza do criterio de selecao. | `CLASSIFICACAO`; `ELIMINACAO`. |
+| TipoSelecionadores | Enumeracao que indica o perfil responsavel pela avaliacao do criterio. | `AVALIADOR_ADHOC`; `RESPONSAVEL_AREA_TECNICA`. |
+| Formulario | Referencia externa a formulario usado na etapa ou no criterio de selecao. | Formulario de avaliacao ad hoc; formulario de recurso; formulario de habilitacao. |
+| TipoEtapa | Tipo padronizado usado para parametrizar EtapaFomento e seus atributos principais. | Etapa classificatoria com recurso; etapa eliminatoria sem recurso. |
+| Origem | Abstracao da origem financeira concreta de um AporteFomento. | Origem Programa; Origem Parceria; Origem ContaContabil. |
+| Programa | Entidade externa do M010 que pode financiar aportes do Fomento. | Programa de Inovacao; Programa de Pesquisa Aplicada. |
+| Parceria | Entidade externa do M010 que pode financiar aportes do Fomento por meio de acordo institucional. | Parceria FAPES-FINEP; parceria com prefeitura. |
+| ContaContabil | Entidade externa do M016 usada quando o aporte vem de recurso interno da FAPES. | Conta de investimento interno; fundo contabil de pesquisa. |
+| EixoEstrategico | Entidade externa do M010 que indica o eixo de planejamento ao qual o Fomento contribui. | Saude; Economia Verde; Transformacao Digital. |
+| AreaTecnica | Entidade externa do M008 responsavel pela gestao tecnica do Fomento. | Gerencia de Pesquisa; Area de Inovacao. |
+| TipoProjeto | Entidade externa do M008 que classifica os tipos de projeto aceitos pelo Fomento. | Pesquisa cientifica; desenvolvimento tecnologico; inovacao. |
+| Rubrica | Entidade externa do M008 que representa categoria orcamentaria usada nas faixas. | Material permanente; servicos de terceiros; bolsa. |
+| VersaoNivel | Entidade externa do M001 que identifica a versao vigente de um nivel de bolsa. | Mestrado v2026; Doutorado v2026; Iniciacao cientifica v2026. |
 
 ---
 
@@ -503,5 +551,6 @@ stateDiagram-v2
 
 | Commit | Data | Autor | Descricao |
 |--------|------|-------|-----------|
+| `pendente` | 2026-06-24 | Rodrigo Calhau | Adiciona glossarios de classes e de estados ao modelo P1 Fomento |
 | `de606b0` | 2026-05-31 | Paulo Sergio Santos Junior | Adiciona dicionario de dados e regras de negocio ao modelo P1 Fomento |
 | `23d82e4` | 2026-05-31 | Paulo Sergio Santos Junior | Reorganizacao dos modelos estruturais em pasta modelo-estrutural/ |

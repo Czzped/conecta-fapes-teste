@@ -116,6 +116,16 @@ stateDiagram-v2
 
 ```
 
+### Glossario de Estados
+
+| Nome | Definicao |
+|------|-----------|
+| EM_ESPERA | Estado inicial da Captacao criada por `criarCaptacao()`, antes de seu inicio operacional por `iniciar()`. |
+| EM_ANDAMENTO | Estado em que a Captacao foi iniciada e aguarda abertura de submissao ou execucao de etapas internas. |
+| ABERTA_PARA_SUBMISSAO | Estado em que a Captacao permite cadastro ou submissao de projetos ate o limite configurado ou ate o fechamento do periodo. |
+| FECHADA_PARA_SUBMISSAO | Estado em que a submissao foi fechada por prazo, limite ou acionamento manual. Pode voltar para ABERTA_PARA_SUBMISSAO por `extender(numDias)` ou `extenderEtapaCaptacao()`. |
+| FINALIZADA | Estado terminal da Captacao, acionado por `finalizar()`, no qual nao podem ser iniciadas novas submissoes, extensoes ou etapas operacionais. |
+
 ### Fluxo Captação
 
 ```mermaid
@@ -148,6 +158,20 @@ stateDiagram-v2
     ExecutarFasesInternas --> FinalizarCaptacao : finalizar()
     FinalizarCaptacao --> [*]
 ```
+
+---
+
+## Glossario de Classes
+
+| Nome | Definicao | Exemplos |
+|------|-----------|----------|
+| AnalistaTecnico | Ator responsavel por criar e configurar Captacoes, iniciar o fluxo, abrir e fechar submissao e estender etapas. | Analista criando Captacao de um Fomento ativo; analista estendendo a etapa de submissao por 5 dias. |
+| Fomento | Referencia ao Fomento do P1 que origina e governa a Captacao, fornecendo vigencia, etapas base e recursos disponiveis. | Fomento Inovacao Capixaba 2026; Fomento Pesquisa Aplicada em Saude. |
+| Captacao | Agregado principal do P2 que representa a configuracao operacional de uma chamada derivada de um Fomento. | Captacao Edital Inovacao 01/2026; Captacao Demanda Induzida Lab X. |
+| EstadoCaptacao | Enumeracao que representa o ciclo operacional da Captacao. | `EM_ESPERA`; `ABERTA_PARA_SUBMISSAO`; `FECHADA_PARA_SUBMISSAO`; `FINALIZADA`. |
+| EtapaCaptacao | Etapa concreta do cronograma da Captacao, baseada em uma EtapaFomento e com datas proprias. | Submissao de propostas de 01/03 a 31/03; avaliacao documental; resultado final. |
+| ExtensaoEtapaCaptacao | Registro da extensao aplicada a uma EtapaCaptacao, com quantidade de dias e justificativa. | Extensao de 7 dias por baixa adesao; extensao de 3 dias por indisponibilidade do sistema. |
+| EtapaFomento | Etapa base definida no Fomento e usada como modelo para criar EtapaCaptacao. | Habilitacao documental; avaliacao ad hoc; recurso administrativo. |
 
 ---
 
@@ -211,6 +235,7 @@ stateDiagram-v2
 
 | Commit | Data | Autor | Descricao |
 |--------|------|-------|-----------|
+| `pendente` | 2026-06-24 | Rodrigo Calhau | Adiciona glossarios de classes e de estados ao modelo P2 Configuracao da Captacao |
 | `cdc84dd` | 2026-05-31 | Paulo Sergio Santos Junior | Simplificacao e sincronizacao completa do modelo P2 com a ontologia |
 | `db4a22b` | 2026-05-31 | Paulo Sergio Santos Junior | Adiciona dicionario de dados e regras ao modelo P2 |
 | `23d82e4` | 2026-05-31 | Paulo Sergio Santos Junior | Reorganizacao dos modelos estruturais em pasta modelo-estrutural/ |
