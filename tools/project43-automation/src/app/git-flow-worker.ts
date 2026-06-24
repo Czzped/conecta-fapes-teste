@@ -2,6 +2,7 @@ import {
   createGitFlowConfig,
   type GitFlowConfig,
 } from "../config/git-flow-config.js";
+import { createProjectConfig, type ProjectConfig } from "../config/project-config.js";
 import type { WorkerEnvironment } from "../config/worker-config.js";
 import { planBranchCreation } from "../domain/branch-planning.js";
 import type {
@@ -9,6 +10,7 @@ import type {
   GitFlowActionResult,
 } from "../domain/git-flow-actions.js";
 import { planHotfix } from "../domain/hotfix-planning.js";
+import { planCardMovement } from "../domain/pr-card-movement.js";
 import { validatePullRequest } from "../domain/pr-validation.js";
 import { planProductionMerge } from "../domain/production-merge-planning.js";
 import {
@@ -22,6 +24,7 @@ import { GitFlowGateway, type CommitStatusResult } from "../github/git-flow-gate
 import { resolveGitFlowRepositoryToken } from "../github/git-flow-token.js";
 import { GitHubGraphqlClient } from "../github/github-graphql-client.js";
 import { GitHubRestClient } from "../github/github-rest-client.js";
+import { GitHubProjectRepository } from "../github/project-repository.js";
 import { verifyWebhookSignature } from "../github/webhook-signature.js";
 
 const USER_AGENT = "project43-git-flow";
@@ -101,6 +104,151 @@ function createTokenGateway(
   );
 }
 
+interface CardMovementResult {
+  decision: string;
+  cardNumber: number | null;
+  itemId?: string | null;
+  statusSet?: string | null;
+  error?: string;
+}
+
+async function createProjectRepository(
+  env: WorkerEnvironment,
+  installationId?: string | number
+): Promise<GitHubProjectRepository | null> {
+  const appId = env.GITHUB_APP_ID?.trim();
+  const privateKey = env.GITHUB_APP_PRIVATE_KEY?.trim();
+  const resolvedId = installationId ?? env.GITHUB_APP_INSTALLATION_ID?.trim();
+
+  if (!appId || !privateKey || !resolvedId) {
+    return null;
+  }
+
+  try {
+    const token = await createInstallationToken(
+      { appId, privateKey, userAgent: USER_AGENT },
+      resolvedId
+    );
+    return new GitHubProjectRepository(
+      new GitHubGraphqlClient(token, USER_AGENT)
+    );
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Aplica o movimento de card no Project 43 quando uma PR e aberta ou mergeada.
+ * Usa o ProjectRepository para buscar o item e setar o status.
+ */
+async function applyCardMovement(
+  env: WorkerEnvironment,
+  projectConfig: ProjectConfig,
+  gitFlowConfig: GitFlowConfig,
+  prAction: string,
+  merged: boolean,
+  headBranch: string,
+  repoName: string,
+  installationId?: string | number
+): Promise<CardMovementResult> {
+  const plan = planCardMovement({
+    prAction,
+    merged,
+    headBranch,
+    workBranchPrefixes: gitFlowConfig.workBranchPrefixes,
+  });
+
+  if (plan.decision === "ignored" || plan.cardNumber === null) {
+    return {
+      decision: plan.decision,
+      cardNumber: plan.cardNumber,
+    };
+  }
+
+  const projectRepo = await createProjectRepository(env, installationId);
+  if (!projectRepo) {
+    return {
+      decision: plan.decision,
+      cardNumber: plan.cardNumber,
+      error: "project_repository_unavailable",
+    };
+  }
+
+  try {
+    // Busca o item do projeto pelo numero da issue
+    const itemId = await projectRepo.findItemIdByIssue(
+      projectConfig.projectId,
+      projectConfig.githubOrg,
+      repoName,
+      plan.cardNumber
+    );
+
+    if (!itemId) {
+      return {
+        decision: plan.decision,
+        cardNumber: plan.cardNumber,
+        error: "project_item_not_found",
+      };
+    }
+
+    // Obtem os metadados dos campos para resolver os IDs das opcoes de Status
+    const metadata = await projectRepo.getFieldMetadata(
+      projectConfig.projectId,
+      projectConfig.fieldNames
+    );
+
+    const statusField = metadata.statusField;
+    if (!statusField) {
+      return {
+        decision: plan.decision,
+        cardNumber: plan.cardNumber,
+        itemId,
+        error: "status_field_not_found",
+      };
+    }
+
+    // Resolve o ID da opcao pelo nome
+    const targetStatusName =
+      plan.decision === "move_to_validation"
+        ? projectConfig.statusNames.inValidation
+        : projectConfig.statusNames.homologation;
+
+    const options =
+      "options" in statusField ? (statusField as { options: { id: string; name: string }[] }).options : [];
+
+    const targetOption = options.find((opt) => opt.name === targetStatusName);
+
+    if (!targetOption) {
+      return {
+        decision: plan.decision,
+        cardNumber: plan.cardNumber,
+        itemId,
+        error: `status_option_not_found:${targetStatusName}`,
+      };
+    }
+
+    await projectRepo.setSingleSelectValue(
+      projectConfig.projectId,
+      itemId,
+      statusField.id,
+      targetOption.id
+    );
+
+    return {
+      decision: plan.decision,
+      cardNumber: plan.cardNumber,
+      itemId,
+      statusSet: targetStatusName,
+    };
+  } catch (err) {
+    return {
+      decision: plan.decision,
+      cardNumber: plan.cardNumber,
+      error: `movement_failed:${err instanceof Error ? err.message : String(err)}`,
+    };
+  }
+}
+
 function getWebhookSecrets(env: WorkerEnvironment): string[] {
   return [env.GITHUB_WEBHOOK_SECRET, env.GITHUB_REPO_WEBHOOK_SECRET]
     .map((value) => value?.trim())
@@ -129,7 +277,7 @@ async function isWebhookSignatureValid(
  * Worker das automacoes de Git Flow do Projeto 43.
  *
  * Rotas (todas POST):
- * - webhook `pull_request`            -> valida politica de PR (sem side-effect);
+ * - webhook `pull_request`            -> valida politica de PR + move card (Validation/Homologation);
  * - `/git-flow/pull-request`          -> valida politica de PR via JSON;
  * - `/git-flow/branch`                -> plano/execucao de branch automatico;
  * - `/git-flow/release`               -> plano/execucao de release;
@@ -137,6 +285,10 @@ async function isWebhookSignatureValid(
  *
  * Operacoes externas usam `execute: true` para sair do modo `dry-run`
  * (padrao). Sem `execute`, retornam apenas o plano (`planned`).
+ *
+ * Movimentacao automatica de cards:
+ * - PR aberto de branch de trabalho → card vai para `In Validation`
+ * - PR mergeado de branch de trabalho ou hotfix → card vai para `Homologation`
  */
 export class GitFlowWorker {
   private readonly gatewayFactory: GitFlowGatewayFactory;
@@ -263,6 +415,7 @@ export class GitFlowWorker {
       return json({ ignored: true, reason: "missing_refs" }, 202);
     }
 
+    // --- PR validation + card movement on PR opened ---
     if (shouldValidatePullRequest("pull_request", payload)) {
       const validation = validatePullRequest(config, {
         baseBranch: refs.baseBranch,
@@ -283,20 +436,64 @@ export class GitFlowWorker {
         });
       }
 
-      return json({ validation, repository: refs.repository, statusResult });
+      // Card movement: PR aberto de work branch → In Validation
+      const projectConfig = createProjectConfig(env);
+      const cardMovement = refs.repository
+        ? await applyCardMovement(
+            env,
+            projectConfig,
+            config,
+            payload.action ?? "opened",
+            false,
+            refs.headBranch,
+            refs.repository,
+            payload.installation?.id
+          )
+        : null;
+
+      return json({
+        validation,
+        repository: refs.repository,
+        statusResult,
+        cardMovement,
+      });
     }
 
+    // --- PR merged: card movement + release/hotfix tags ---
     if (payload.action === "closed" && payload.pull_request?.merged === true) {
+      const projectConfig = createProjectConfig(env);
+
+      // Card movement: sempre tenta mover para Homologation (work ou hotfix)
+      const cardMovement = refs.repository
+        ? await applyCardMovement(
+            env,
+            projectConfig,
+            config,
+            payload.action,
+            true,
+            refs.headBranch,
+            refs.repository,
+            payload.installation?.id
+          )
+        : null;
+
       const isGitFlowBranch =
         refs.headBranch.startsWith(config.releaseBranchPrefix) ||
         refs.headBranch.startsWith(config.hotfixBranchPrefix);
 
+      // Se nao for release/hotfix, retorna so o card movement
       if (!isGitFlowBranch) {
-        return json({ ignored: true, reason: "not_release_or_hotfix" }, 202);
+        return json({
+          cardMovement,
+          gitFlow: { ignored: true, reason: "not_release_or_hotfix" },
+        });
       }
 
       if (!refs.repository) {
-        return json({ valid: false, reason: "repository_unclear" }, 202);
+        return json({
+          cardMovement,
+          gitFlow: { valid: false, reason: "repository_unclear" },
+        }, 202);
       }
 
       const gateway = await this.gatewayFactory(env, payload.installation?.id);
@@ -313,7 +510,10 @@ export class GitFlowWorker {
       });
 
       if (!plan.valid) {
-        return json({ valid: false, reason: plan.reason, repository: plan.repo }, 202);
+        return json({
+          cardMovement,
+          gitFlow: { valid: false, reason: plan.reason, repository: plan.repo },
+        }, 202);
       }
 
       const results: GitFlowActionResult[] = [];
@@ -322,10 +522,13 @@ export class GitFlowWorker {
       }
 
       return json({
-        valid: true,
-        repository: plan.repo,
-        tag: plan.tag,
-        results,
+        cardMovement,
+        gitFlow: {
+          valid: true,
+          repository: plan.repo,
+          tag: plan.tag,
+          results,
+        },
       });
     }
 
