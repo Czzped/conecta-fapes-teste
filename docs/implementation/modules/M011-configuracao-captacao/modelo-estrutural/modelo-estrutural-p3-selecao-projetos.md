@@ -1,6 +1,6 @@
 # Modelo Estrutural — P3 Selecao dos Projetos
 
-Contexto: [README.md](../README.md) | Modelo consolidado: [modelo-estrutural.md](modelo-estrutural.md) | Por processo: [P1](modelo-estrutural-p1-fomento.md) | [P2](modelo-estrutural-p2-configuracao-selecao.md)
+Contexto: [README.md](../README.md) | Por processo: [P1](modelo-estrutural-p1-fomento.md) | [P2](modelo-estrutural-p2-configuracao-selecao.md)
 
 ---
 
@@ -21,8 +21,8 @@ classDiagram
         +String nome
     }
 
-    class FaseCaptacao {
-        +FaseFomento faseFomento
+    class EtapaCaptacao {
+        +EtapaFomento etapaFomento
     }
 
     class Formulario {
@@ -30,28 +30,76 @@ classDiagram
         +String nome
     }
 
+    class Instituicao {
+        <<externo>>
+    }
+
+    class TipoProjeto {
+        <<externo M008>>
+    }
+
+    class TipoDocumento {
+        +String nome
+        +String descricao
+    }
+
     class Proponente {
         <<Actor>>
         +String nome
+        +String contato
+        +String CPF
+        +String email
+        +String endereco
+        +String genero
+        +Date dataNascimento
         +iniciarSubmissaoProjeto()
         +salvarSubmissaoProjeto()
         +submeterProjeto()
+        +alterarProjeto()
+        +removerProjeto()
         +responderForm()
         +solicitarRecurso()
+        +recorrerSelecao()
     }
 
     class Projeto {
-        +Proponente proponente
+        +StatusProjeto statusProjeto
+        +Date dataCriacao
+        +Date dataSubmissao
+        +Date dataInicio
+        +Date dataFim
+        +String titulo
+        +String descricao
+        +String objetivo
+        +String resultados
+        +List documentos
+        +Boolean demandaInduzida
+        +Boolean estahAprovada
+        +TipoProjeto tipo
+        +Decimal nota
         +iniciarSubmissao()
         +salvarSubmissao()
         +submeter()
     }
 
-    class DocumentoProjeto {
+    class StatusProjeto {
+        <<enumeration>>
+        EM_ELABORACAO
+        SUBMETIDO
+        ESPERANDO
+        EM_SELECAO
+        SELECIONADO
+        ELIMINADO
+    }
+
+    class Documento {
+        <<externo>>
         +String nome
         +String descricao
         +Date dataUpload
         +EstadoDocumento estadoDocumento
+        +habilitar()
+        +inabilitar()
     }
 
     class EstadoDocumento {
@@ -61,16 +109,13 @@ classDiagram
         INABILITADO
     }
 
-
-
-    class ParticipacaoFaseCaptacao {
+    class ParticipacaoEtapaCaptacao {
         +Date dtInicio
         +String observacao
         +Boolean selecionado
         +Decimal nota
-        +FaseCaptacao fase
+        +EtapaCaptacao etapa
     }
-
 
     class RecursoSelecao {
         +Date data
@@ -78,6 +123,7 @@ classDiagram
     }
 
     class Resposta {
+        <<externo>>
         +Date dtResposta
         +Formulario formRespondido
     }
@@ -89,6 +135,10 @@ classDiagram
         +iniciarSelecaoProjeto()
         +finalizarSelecaoProjeto()
         +responderFormSelecao()
+        +responderRecurso()
+        +selecionar(projeto, etapaCaptacao)
+        +classificarProjeto(projeto, etapaCaptacao, nota)
+        +eliminar(projeto, etapaCaptacao)
     }
 
     class TipoSelecionadores {
@@ -119,39 +169,115 @@ classDiagram
     Captacao "1" *-- "0..*" Projeto : selecionados (Participa de)
     Projeto --> "1" Faixa : concorre a
     Projeto --> "1" Proponente : submetido por
+    Projeto --> "1" TipoProjeto : possui tipo
+    Projeto --> "1" StatusProjeto : possui status
+    Proponente --> "1" Instituicao : vinculado a
 
-    %% Novas Composições do Projeto
-    Projeto "1" *-- "0..*" DocumentoProjeto : possui
-    DocumentoProjeto --> "1" EstadoDocumento : possui estado
+    %% Composições do Projeto e Documentação Externa
+    Projeto "1" *-- "0..*" Documento : possui
+    Proponente "1" --> "0..*" Documento : envia
+    Documento --> "1" EstadoDocumento : possui estado
+    Documento --> "1" TipoDocumento : possui tipo
 
-    Projeto "1" *-- "1..*" ParticipacaoFaseCaptacao : participa de
-    ParticipacaoFaseCaptacao --> "1" FaseCaptacao : em
-    ParticipacaoFaseCaptacao "1" *-- "0..*" Resposta : possui
+    %% Alinhamento com o Módulo de Captação (Etapas)
+    Projeto "1" *-- "1..*" ParticipacaoEtapaCaptacao : participa de
+    ParticipacaoEtapaCaptacao --> "1" EtapaCaptacao : em
+    ParticipacaoEtapaCaptacao "1" *-- "0..*" Resposta : possui
     Resposta --> "1" Formulario : responde ao
 
     Selecionador --> "1" TipoSelecionadores : possui tipo
     Selecionador "1" -- "0..*" SelecaoProjeto : realiza
-    SelecaoProjeto --> "1" ParticipacaoFaseCaptacao : avalia
+    SelecaoProjeto --> "1" ParticipacaoEtapaCaptacao : avalia
     SelecaoProjeto --> "1" StatusSelecao : possui status
     SelecaoProjeto "1" *-- "1..*" Resposta : gera
 
     RecursoSelecao "*" --> "1" Resposta : formalizado por
     RecursoSelecao "*" --> "1" SelecaoProjeto : referente a
 
-
     %% Estilização Simplificada
     style Captacao fill:lightgreen
     style Faixa fill:lightgreen
-    style FaseCaptacao fill:lightgreen
+    style EtapaCaptacao fill:lightgreen
     style Proponente fill:lightgreen
     style Projeto fill:lightgreen
-    style ParticipacaoFaseCaptacao fill:lightgreen
+    style ParticipacaoEtapaCaptacao fill:lightgreen
     style SelecaoProjeto fill:lightgreen
     style RecursoSelecao fill:lightgreen
+    style Documento fill:lightgreen
 ```
 
-OBS: Classes me verde fazem parte do V1!
+OBS: Classes em verde fazem parte do V1!
 
+### Glossario de Classes
+
+| Nome | Definicao | Exemplos |
+|------|-----------|----------|
+| Captacao | Instancia configurada no P2 que executa o processo de recebimento, selecao e resultado dos projetos. | Captacao do Edital Universal 2026; chamada de demanda induzida para uma instituicao especifica. |
+| Faixa | Recorte de concorrencia ou financiamento herdado do Fomento, escolhido pelo Projeto na submissao. | Faixa A ate R$ 50.000; Faixa B para projetos multi-institucionais. |
+| EtapaCaptacao | Etapa concreta do cronograma da Captacao, baseada em uma EtapaFomento e usada para controlar submissao, avaliacao, recurso ou resultado. | Periodo de submissao; avaliacao documental; avaliacao de merito; resultado final. |
+| Formulario | Referencia externa ao formulario usado para coletar respostas de submissao, avaliacao ou recurso. | Formulario de submissao do projeto; formulario de avaliacao ad hoc; formulario de recurso. |
+| Instituicao | Organizacao externa vinculada ao Proponente e usada em regras de elegibilidade ou conflito de interesses. | UFES; IFES; startup credenciada. |
+| TipoProjeto | Classificacao externa do M008 que identifica o tipo de projeto aceito pela Captacao. | Pesquisa cientifica; desenvolvimento tecnologico; inovacao. |
+| TipoDocumento | Tipo documental exigido ou aceito para compor a submissao do Projeto. | Plano de trabalho; curriculo; carta de anuencia institucional. |
+| Proponente | Ator responsavel por elaborar, salvar, submeter e eventualmente recorrer da selecao de um Projeto. | Pesquisador responsavel; contato PF de uma PJ em demanda induzida. |
+| Projeto | Proposta submetida a uma Captacao, com dados, documentos, faixa, tipo, participacoes em etapas e resultado de selecao. | Projeto de pesquisa em saude publica; projeto de inovacao para laboratorio compartilhado. |
+| StatusProjeto | Enumeracao que representa o ciclo do Projeto desde a elaboracao ate a selecao ou eliminacao. | EM_ELABORACAO; EM_SELECAO; SELECIONADO. |
+| Documento | Arquivo anexado ao Projeto e analisado conforme o tipo documental exigido. | PDF do plano de trabalho; comprovante de vinculo; declaracao assinada. |
+| EstadoDocumento | Enumeracao que indica a situacao da analise documental de um Documento. | PENDENTE; HABILITADO; INABILITADO. |
+| ParticipacaoEtapaCaptacao | Registro da passagem de um Projeto por uma EtapaCaptacao, com nota, observacao, respostas e resultado da etapa. | Participacao do projeto na avaliacao documental; participacao na avaliacao de merito. |
+| RecursoSelecao | Registro da contestacao apresentada pelo Proponente contra uma SelecaoProjeto finalizada e de sua decisao. | Recurso contra eliminacao documental; recurso contra nota de merito. |
+| Resposta | Preenchimento de um Formulario em uma submissao, avaliacao ou recurso. | Respostas do formulario de avaliacao; respostas do formulario de recurso. |
+| Selecionador | Ator autorizado a avaliar, classificar, selecionar, eliminar ou responder recurso de um Projeto. | Avaliador ad hoc; responsavel da area tecnica. |
+| TipoSelecionadores | Enumeracao que define o perfil do Selecionador no processo de selecao. | AVALIADOR_ADHOC; RESPONSAVEL_AREA_TECNICA. |
+| SelecaoProjeto | Avaliacao de uma ParticipacaoEtapaCaptacao realizada por um Selecionador, com estado proprio e respostas associadas. | Avaliacao de merito feita por avaliador ad hoc; avaliacao tecnica de habilitacao. |
+| StatusSelecao | Enumeracao que representa o ciclo da avaliacao realizada por um Selecionador. | PENDENTE; INICIADA; FINALIZADA; CANCELADA. |
+
+
+### Estados de Projeto
+
+```mermaid
+stateDiagram-v2
+    [*] --> EM_ELABORACAO : iniciarSubmissao()
+
+    state EM_ELABORACAO {
+        [*] --> EdicaoAtiva
+        EdicaoAtiva --> EdicaoAtiva : salvarSubmissao() / alterarProjeto()
+    }
+
+    EM_ELABORACAO --> SUBMETIDO : submeter() / submeterProjeto()
+    EM_ELABORACAO --> [*] : removerProjeto()
+
+    state SUBMETIDO {
+        [*] --> ESPERANDO
+        ESPERANDO --> EM_SELECAO : iniciarSelecaoProjeto()
+
+        state EM_SELECAO {
+            [*] --> SendoAvaliado
+            SendoAvaliado --> SendoAvaliado : classificarProjeto() / atribuir nota
+        }
+
+        EM_SELECAO --> SELECIONADO : selecionar(projeto, etapaCaptacao)
+        EM_SELECAO --> ELIMINADO : eliminar(projeto, etapaCaptacao)
+
+        ELIMINADO --> EM_SELECAO : recorrerSelecao() / responderRecurso() [Recurso Deferido]
+    }
+
+    SELECIONADO --> [*]
+    ELIMINADO --> [*]
+```
+
+#### Glossario de Estados de Projeto
+
+| Nome | Definicao |
+|------|-----------|
+| EM_ELABORACAO | Estado inicial em que o Proponente pode preencher, salvar, alterar ou remover o Projeto antes da submissao formal. |
+| EdicaoAtiva | Subestado interno de EM_ELABORACAO em que os dados e documentos do Projeto permanecem editaveis. |
+| SUBMETIDO | Estado composto iniciado apos a submissao formal do Projeto, quando ele passa a participar da Captacao. |
+| ESPERANDO | Subestado de SUBMETIDO em que o Projeto aguarda inicio de selecao ou avanco para a etapa aplicavel. |
+| EM_SELECAO | Estado em que o Projeto esta sendo avaliado, classificado ou decidido por um Selecionador. |
+| SendoAvaliado | Subestado interno de EM_SELECAO em que notas, classificacao ou respostas de avaliacao podem ser registradas. |
+| SELECIONADO | Estado terminal em que o Projeto foi aprovado/selecionado ao fim da etapa ou do fluxo aplicavel. |
+| ELIMINADO | Estado em que o Projeto foi reprovado ou eliminado; pode retornar a EM_SELECAO quando houver recurso deferido. |
 
 ### Estados da Seleção de Projetos
 
@@ -168,13 +294,13 @@ stateDiagram-v2
         PreenchendoAvaliacao --> PreenchendoAvaliacao : responderFormSelecao()
     }
     
-    INICIADA --> FINALIZADA : finalizarSelecaoProjeto() [Respostas / Notas Salvas]
+    INICIADA --> FINALIZADA : finalizarSelecaoProjeto()
     INICIADA --> CANCELADA : cancelar()
     
     state FINALIZADA {
         [*] --> AguardandoPrazoRecurso
-        AguardandoPrazoRecurso --> EmFaseDeRecurso : solicitarRecurso() [Proponente Contesta]
-        EmFaseDeRecurso --> Julgado : Julgamento do Recurso Concluído
+        AguardandoPrazoRecurso --> EmFaseDeRecurso : recorrerSelecao() / solicitarRecurso()
+        EmFaseDeRecurso --> Julgado : responderRecurso() [Concluído]
     }
     
     FINALIZADA --> [*]
@@ -183,6 +309,19 @@ stateDiagram-v2
 
 ```
 
+#### Glossario de Estados de SelecaoProjeto
+
+| Nome | Definicao |
+|------|-----------|
+| PENDENTE | Estado inicial da SelecaoProjeto apos o AnalistaTecnico associar um Selecionador ao Projeto. |
+| INICIADA | Estado em que o Selecionador iniciou a avaliacao e pode responder formularios ou registrar analise. |
+| PreenchendoAvaliacao | Subestado interno de INICIADA em que o formulario de selecao esta sendo preenchido. |
+| FINALIZADA | Estado em que a avaliacao foi concluida e o resultado fica sujeito ao prazo de recurso, quando aplicavel. |
+| AguardandoPrazoRecurso | Subestado interno de FINALIZADA em que o sistema aguarda eventual recurso do Proponente dentro da janela configurada. |
+| EmFaseDeRecurso | Subestado interno de FINALIZADA em que um recurso foi apresentado e aguarda resposta. |
+| Julgado | Subestado interno de FINALIZADA em que o recurso foi respondido e a decisao ficou registrada. |
+| CANCELADA | Estado terminal da SelecaoProjeto cancelada antes da conclusao da avaliacao. |
+
 
 
 
@@ -190,85 +329,53 @@ stateDiagram-v2
 
 ```mermaid
 stateDiagram-v2
-    %% ---- RAIA DO PROPONENTE ----
-    state "Atividades do Proponente" as BlocoProponente {
-        [*] --> IniciarSubmissao : iniciarSubmissaoProjeto()
-        IniciarSubmissao --> PreencherDadosProjeto : Cadastrar Projeto
-        PreencherDadosProjeto --> EscolherFaixa : Selecionar Faixa do Fomento
-        EscolherFaixa --> EnviarDocumentos : Upload de Documentos
-        EnviarDocumentos --> ResponderFormularios : responderForm()
-        
-        state choice_salvamento <<choice>>
-        ResponderFormularios --> choice_salvamento
-        choice_salvamento --> RascunhoSalvo : salvarSubmissaoProjeto()
-        RascunhoSalvo --> PreencherDadosProjeto : Editar posterior
-        
-        choice_salvamento --> SubmeterProjeto : submeterProjeto()
-        SubmeterProjeto --> GerarParticipacaoFase : Gerar ParticipacaoFaseCaptacao
+    %% 1. SUBMISSÃO DO PROJETO (PROPONENTE)
+    state "1. Submissão do Projeto" as Passo1 {
+        [*] --> Iniciar : iniciarSubmissaoProjeto()
+        Iniciar --> Preencher : Cadastrar dados e Documentos
+        Preencher --> Salvar : salvarSubmissaoProjeto()
+        Salvar --> Preencher : alterarProjeto() (Permite edição)
+        Salvar --> Submeter : submeterProjeto()
     }
 
-    %% ---- RAIA DO SISTEMA / REGRAS DE GUARDA ----
-    state "Regras de Controle da Fase (Sistema)" as SistemaControle {
+    %% 2. ATRIBUIÇÃO (ANALISTA)
+    state "2. Atribuição do Selecionador" as Passo2 {
         state choice_exige_selecao <<choice>>
-        GerarParticipacaoFase --> choice_exige_selecao : Fase possui critério de seleção?
-        
-        %% Se não exigir
-        choice_exige_selecao --> AvancarSemAvaliacao : [Não] temRecurso/ehEliminatoria = False
+        Submeter --> choice_exige_selecao : Etapa possui seleção?
+        choice_exige_selecao --> Vincular : [Sim] Associar Selecionador ao Projeto
+        choice_exige_selecao --> AvancarDireto : [Não] Avança sem avaliação
     }
 
-    %% ---- RAIA DO ANALISTA TÉCNICO ----
-    state "Atividades do Analista Técnico" as BlocoAnalista {
-        %% Se a fase exigir seleção, o analista vincula diretamente o selecionador
-        choice_exige_selecao --> VincularSelecionador : [Sim] Fase exige avaliação
-        VincularSelecionador --> AssociarProjeto : Associar Selecionador ao Projeto
+    %% 3. AVALIAÇÃO (SELECIONADOR)
+    state "3. Seleção do Projeto" as Passo3 {
+        Vincular --> Avaliar : iniciarSelecaoProjeto()
+        Avaliar --> PreencherForm : responderFormSelecao()
+        PreencherForm --> ComputarResultado : finalizarSelecaoProjeto()
     }
 
-    %% ---- RAIA DO SELECIONADOR ----
-    state "Visualizar Fila (Status: Pendente)" as VisualizarPendentes
-    state "Iniciar Avaliação (Status: Iniciada)" as IniciarAvaliacao
-    state "Finalizar Avaliação (Status: Finalizada)" as FinalizarAvaliacao
-
-    state "Atividades do Selecionador" as BlocoSelecionador {
-        AssociarProjeto --> VisualizarPendentes
-        VisualizarPendentes --> IniciarAvaliacao : iniciarSelecaoProjeto()
-        IniciarAvaliacao --> AvaliarDocumentos : Verificar DocumentoProjeto
-        AvaliarDocumentos --> AnalisarFormularios : Ler respostas do proponente
-        AnalisarFormularios --> PreencherFormSelecao : responderFormSelecao()
-        PreencherFormSelecao --> FinalizarAvaliacao : finalizarSelecaoProjeto()
+    %% 4 & 5. PROCESSAMENTO DE RESULTADOS
+    state "Processamento de Resultados" as Julgamento {
+        state choice_passou <<choice>>
+        ComputarResultado --> choice_passou : Projeto Selecionado?
+        AvancarDireto --> choice_passou
+        
+        %% Passo 4: Avança de etapa
+        choice_passou --> ProximaEtapa : [Sim] selecionar(projeto, etapaCaptacao)
+        ProximaEtapa --> choice_exige_selecao : Repete para a nova etapa
+        
+        %% Passo 5: Fluxo de Recurso
+        choice_passou --> CadastrarRecurso : [Não] eliminar(projeto, etapaCaptacao)
+        CadastrarRecurso --> AvaliarRecurso : recorrerSelecao() (Proponente)
+        AvaliarRecurso --> JulgarRecurso : responderRecurso() (Selecionador)
+        
+        state choice_recurso_aceito <<choice>>
+        JulgarRecurso --> choice_recurso_aceito : Recurso Deferido?
+        
+        choice_recurso_aceito --> choice_exige_selecao : [Sim] Retorna para reavaliação
+        choice_recurso_aceito --> FimFluxo : [Não] Mantém Eliminado
     }
 
-    %% ---- RAIA DE RESULTADO E RECURSO ----
-    state "Resultado da Fase" as Resultado {
-        FinalizarAvaliacao --> ComputarNota : Atribuir nota final e observação
-        
-        state choice_aprovacao <<choice>>
-        ComputarNota --> choice_aprovacao : Nota maior ou igual Nota de Corte?
-        
-        choice_aprovacao --> MarcarSelecionado : [Sim] selecionado = True
-        choice_aprovacao --> MarcarEliminado : [Não] selecionado = False
-    }
-
-    state "Fluxo de Contestação" as FluxoRecurso {
-        state choice_recurso <<choice>>
-        MarcarEliminado --> choice_recurso : Proponente deseja contestar resultado?
-        
-        choice_recurso --> EntrarComRecurso : [Sim] solicitarRecurso()
-        choice_recurso --> FimProcesso : [Não] Aceita eliminacao
-        
-        EntrarComRecurso --> JulgarRecurso : Analisar contestação
-        JulgarRecurso --> AlterarResultado : Recurso Deferido?
-        
-        state choice_deferido <<choice>>
-        AlterarResultado --> choice_deferido
-        choice_deferido --> MarcarSelecionado : [Sim] Reverter para Selecionado
-        choice_deferido --> FimProcesso : [Não] Manter Eliminado
-    }
-
-    %% Conclusão do fluxo sem avaliação
-    AvancarSemAvaliacao --> MarcarSelecionado : Projeto avança direto
-
-    MarcarSelecionado --> [*]
-    FimProcesso --> [*]
+    FimFluxo --> [*]
 
 ```
 
@@ -279,40 +386,70 @@ stateDiagram-v2
 
 | Classe | Atributo | Definicao | Obrig. | Tipo | Dominio | Tamanho | Unico |
 |--------|----------|-----------|--------|------|---------|---------|-------|
-| **Captacao** | codigo | Codigo da captacao em execucao | Sim | String | Herdado do P2 | | Sim |
-| **Projeto** | proponente (relacao) | Proponente responsavel pela submissao do projeto | Sim | FK → Proponente | Pessoa ou instituicao autorizada conforme regra da Captacao | | |
-| | faixa (relacao) | Faixa do Fomento escolhida para concorrencia | Sim | FK → Faixa | Deve pertencer ao Fomento da Captacao | | |
-| | captacao (relacao) | Captacao na qual o projeto participa | Sim | FK → Captacao | Captacao em periodo de submissao aberto | | |
-| **Proponente** | nome | Nome do proponente que submete o projeto | Sim | String | Via cadastro corporativo/M008 quando aplicavel | 200 | |
-| **Faixa** | nome | Nome da faixa do Fomento | Sim | String | Herdado do P1 Fomento | 200 | |
-| **DocumentoProjeto** | nome | Nome do documento anexado ao projeto | Sim | String | | 200 | |
+| **Captacao** | codigo | Codigo da captacao que executa a selecao | Sim | String | Herdado do P2 | 80 | Sim |
+| **Captacao** | projetos (relacao) | Projetos vinculados a captacao em execucao | Gerado | List<Projeto> | 0..* projetos selecionados/participantes | | |
+| **Faixa** | nome | Nome da faixa do Fomento escolhida pelo Projeto | Sim | String | Herdado do P1 Fomento | 200 | |
+| **EtapaCaptacao** | etapaFomento (relacao) | Etapa base do Fomento usada para parametrizar a etapa concreta da Captacao | Sim | FK -> EtapaFomento | Deve pertencer ao Fomento da Captacao | | |
+| **Formulario** | nome | Nome do formulario externo respondido na submissao, selecao ou recurso | Sim | String | Modulo proprietario externo | 200 | |
+| **Instituicao** | referenciaExterna | Referencia corporativa da instituicao vinculada ao Proponente | Sim | Referencia externa | Cadastro institucional externo | | |
+| **TipoProjeto** | referenciaExterna | Tipo de projeto mantido pelo modulo proprietario | Sim | Referencia externa | Deve estar permitido no Fomento vinculado a Captacao | | |
+| **TipoDocumento** | nome | Nome do tipo documental solicitado ao Projeto | Sim | String | Configuracao documental do Fomento/Captacao | 200 | |
+| | descricao | Descricao ou finalidade do tipo documental | Nao | String | | 500 | |
+| **Proponente** | nome | Nome do proponente que submete o Projeto | Sim | String | Via cadastro corporativo/M008 quando aplicavel | 200 | |
+| | contato | Telefone ou canal principal de contato do proponente | Nao | String | | 100 | |
+| | CPF | CPF do proponente pessoa fisica | Cond. | String | 11 digitos quando pessoa fisica | 11 | Sim |
+| | email | Email do proponente | Sim | String | Formato de email valido | 254 | |
+| | endereco | Endereco informado no cadastro do proponente | Nao | String | | 500 | |
+| | genero | Genero informado pelo proponente, quando coletado | Nao | String | Dominio cadastral externo | 80 | |
+| | dataNascimento | Data de nascimento do proponente pessoa fisica | Cond. | Date | Obrigatoria quando exigida pelo cadastro/edital | | |
+| | instituicao (relacao) | Instituicao vinculada ao proponente | Sim | FK -> Instituicao | Instituicao habilitada conforme Captacao | | |
+| **Projeto** | statusProjeto | Estado do Projeto no ciclo de submissao e selecao | Sim | StatusProjeto | EM_ELABORACAO, SUBMETIDO, ESPERANDO, EM_SELECAO, SELECIONADO, ELIMINADO | | |
+| | dataCriacao | Data de inicio da submissao do Projeto | Gerado | Date | | | |
+| | dataSubmissao | Data da submissao formal do Projeto | Cond. | Date | Obrigatoria a partir de SUBMETIDO | | |
+| | dataInicio | Data de inicio proposta para execucao do Projeto | Cond. | Date | Deve ser anterior ou igual a dataFim quando ambas existirem | | |
+| | dataFim | Data de fim proposta para execucao do Projeto | Cond. | Date | Deve ser posterior ou igual a dataInicio quando ambas existirem | | |
+| | titulo | Titulo do Projeto submetido | Sim | String | | 250 | |
+| | descricao | Descricao geral do Projeto | Sim | String | | 4000 | |
+| | objetivo | Objetivo principal do Projeto | Sim | String | | 2000 | |
+| | resultados | Resultados esperados ou consolidados do Projeto | Nao | String | | 4000 | |
+| | documentos | Documentos anexados ao Projeto | Cond. | List<Documento> | Deve atender aos TipoDocumento exigidos pela Captacao | | |
+| | demandaInduzida | Indica se o Projeto pertence a uma Captacao de demanda induzida | Sim | Boolean | true/false | | |
+| | estahAprovada | Indica aprovacao final do Projeto no P3 | Gerado | Boolean | true somente apos selecao final sem etapa pendente | | |
+| | tipo (relacao) | Tipo do Projeto | Sim | FK -> TipoProjeto | Deve estar permitido pelo Fomento da Captacao | | |
+| | nota | Nota consolidada do Projeto na etapa corrente ou resultado final | Cond. | Decimal | >= 0 quando houver avaliacao com nota | | |
+| | proponente (relacao) | Proponente responsavel pela submissao | Sim | FK -> Proponente | Pessoa/instituicao autorizada conforme Captacao | | |
+| | faixa (relacao) | Faixa do Fomento escolhida para concorrencia | Sim | FK -> Faixa | Deve pertencer ao Fomento da Captacao | | |
+| | captacao (relacao) | Captacao na qual o Projeto participa | Sim | FK -> Captacao | Captacao aberta para submissao no P2 | | |
+| **StatusProjeto** | valor | Estado de ciclo de vida do Projeto no P3 | Sim | Enum | EM_ELABORACAO, SUBMETIDO, ESPERANDO, EM_SELECAO, SELECIONADO, ELIMINADO | | |
+| **Documento** | nome | Nome do documento anexado ao Projeto | Sim | String | | 200 | |
 | | descricao | Descricao ou finalidade do documento | Nao | String | | 500 | |
 | | dataUpload | Data de envio do documento | Gerado | Date | | | |
 | | estadoDocumento | Estado de habilitacao do documento | Sim | EstadoDocumento | PENDENTE, HABILITADO, INABILITADO | | |
+| | tipoDocumento (relacao) | Tipo documental atendido pelo anexo | Sim | FK -> TipoDocumento | TipoDocumento exigido/aceito pela Captacao | | |
 | **EstadoDocumento** | valor | Estado da analise documental do documento | Sim | Enum | PENDENTE, HABILITADO, INABILITADO | | |
-| **ParticipacaoFaseCaptacao** | dtInicio | Data em que o projeto iniciou participacao na fase | Gerado | Date | Deve estar dentro da vigencia da FaseCaptacao | | |
-| | observacao | Observacao consolidada da participacao do projeto na fase | Nao | String | | 1000 | |
-| | selecionado | Indica se o projeto foi selecionado/aprovado na fase | Cond. | Boolean | true/false; preenchido apos avaliacao ou avanco automatico | | |
-| | nota | Nota final do projeto na fase | Cond. | Decimal | >= 0; obrigatoria quando a fase possuir criterio com nota | | |
-| | fase (relacao) | Fase da captacao em que o projeto participa | Sim | FK → FaseCaptacao | Deve pertencer a Captacao do Projeto | | |
-| **FaseCaptacao** | faseFomento (relacao) | Fase da captacao herdada da configuracao do Fomento | Sim | FK → FaseFomento | Herdado do P2 | | |
+| **ParticipacaoEtapaCaptacao** | dtInicio | Data em que o Projeto iniciou participacao na etapa | Gerado | Date | Deve estar dentro da vigencia da EtapaCaptacao | | |
+| | observacao | Observacao consolidada da participacao do Projeto na etapa | Nao | String | | 1000 | |
+| | selecionado | Indica se o Projeto foi selecionado/aprovado na etapa | Cond. | Boolean | true/false; preenchido apos avaliacao ou avanco automatico | | |
+| | nota | Nota final do Projeto na etapa | Cond. | Decimal | >= 0; obrigatoria quando a etapa possuir criterio com nota | | |
+| | etapa (relacao) | Etapa da Captacao em que o Projeto participa | Sim | FK -> EtapaCaptacao | Deve pertencer a Captacao do Projeto | | |
+| | respostas (relacao) | Respostas coletadas para a participacao na etapa | Nao | List<Resposta> | Formularios configurados para a etapa | | |
 | **Resposta** | dtResposta | Data em que o formulario foi respondido | Gerado | Date | | | |
-| | formRespondido (relacao) | Formulario usado na submissao, avaliacao ou recurso | Sim | FK → Formulario | Formulario externo publicado/ativo | | |
-| **Formulario** | nome | Nome do formulario externo respondido | Sim | String | Modulo proprietario externo | 200 | |
+| | formRespondido (relacao) | Formulario usado na submissao, avaliacao ou recurso | Sim | FK -> Formulario | Formulario externo publicado/ativo | | |
 | **Selecionador** | nome | Nome do selecionador responsavel por avaliar uma participacao | Sim | String | Pessoa fisica ou papel funcional autorizado | 200 | |
 | | tipoSelecionadores | Tipo do selecionador | Sim | TipoSelecionadores | AVALIADOR_ADHOC, RESPONSAVEL_AREA_TECNICA | | |
 | **TipoSelecionadores** | valor | Perfil do selecionador | Sim | Enum | AVALIADOR_ADHOC, RESPONSAVEL_AREA_TECNICA | | |
 | **SelecaoProjeto** | data | Data de criacao ou movimentacao da selecao do projeto | Gerado | Date | | | |
-| | projeto (relacao) | Projeto avaliado | Sim | FK → Projeto | Mesmo projeto da ParticipacaoFaseCaptacao avaliada | | |
+| | projeto (relacao) | Projeto avaliado | Sim | FK -> Projeto | Mesmo Projeto da ParticipacaoEtapaCaptacao avaliada | | |
 | | observacao | Parecer ou observacao do selecionador | Nao | String | Obrigatoria quando statusSelecao=CANCELADA | 2000 | |
 | | statusSelecao | Estado da selecao do projeto | Sim | StatusSelecao | PENDENTE, INICIADA, FINALIZADA, CANCELADA | | |
-| | participacaoFase (relacao) | Participacao do projeto na fase avaliada | Sim | FK → ParticipacaoFaseCaptacao | | | |
-| | selecionador (relacao) | Selecionador associado a avaliacao | Sim | FK → Selecionador | Deve possuir tipo compatível com a FaseFomento | | |
+| | participacaoEtapa (relacao) | Participacao do Projeto na etapa avaliada | Sim | FK -> ParticipacaoEtapaCaptacao | Deve pertencer ao mesmo Projeto avaliado | | |
+| | selecionador (relacao) | Selecionador associado a avaliacao | Sim | FK -> Selecionador | Deve possuir tipo compativel com a EtapaFomento/CriterioSelecao | | |
+| | respostas (relacao) | Respostas de formulario geradas na selecao | Cond. | List<Resposta> | Obrigatorias quando a etapa/criterio exigir formulario | | |
 | **StatusSelecao** | valor | Estado da avaliacao realizada por selecionador | Sim | Enum | PENDENTE, INICIADA, FINALIZADA, CANCELADA | | |
 | **RecursoSelecao** | data | Data de solicitacao ou julgamento do recurso | Gerado | Date | | | |
 | | observacao | Justificativa, argumento ou decisao do recurso | Sim | String | | 2000 | |
-| | resposta (relacao) | Resposta de formulario que formaliza o recurso ou julgamento | Sim | FK → Resposta | Formulario de recurso/julgamento quando configurado | | |
-| | selecaoProjeto (relacao) | Selecao contestada pelo proponente | Sim | FK → SelecaoProjeto | SelecaoProjeto.statusSelecao = FINALIZADA | | |
+| | resposta (relacao) | Resposta de formulario que formaliza o recurso ou julgamento | Sim | FK -> Resposta | Formulario de recurso/julgamento quando configurado | | |
+| | selecaoProjeto (relacao) | Selecao contestada pelo proponente | Sim | FK -> SelecaoProjeto | SelecaoProjeto.statusSelecao = FINALIZADA | | |
 
 ---
 
@@ -322,43 +459,47 @@ stateDiagram-v2
 
 | ID | Responsavel | Regra |
 |----|-------------|-------|
-| RN-SP01 | Proponente | O Projeto so pode ser iniciado e submetido quando a Captacao permitir submissao conforme o estado operacional definido no P2. |
-| RN-SP02 | Proponente | Todo Projeto submetido deve indicar exatamente um Proponente e uma Faixa do Fomento vinculada a Captacao. |
-| RN-SP03 | Proponente | A Faixa escolhida pelo Projeto deve pertencer ao Fomento que originou a Captacao. |
-| RN-SP04 | Proponente | O Proponente pode salvar rascunho da submissao antes de submeter; somente a submissao formal gera ParticipacaoFaseCaptacao. |
-| RN-SP05 | Sistema | Ao submeter Projeto, o sistema deve gerar ao menos uma ParticipacaoFaseCaptacao para a primeira fase aplicavel da Captacao. |
-| RN-SP06 | Sistema | Documentos exigidos pela Captacao devem ser registrados como DocumentoProjeto e iniciar com estadoDocumento=PENDENTE. |
-| RN-SP07 | Sistema | DocumentoProjeto so pode transitar para HABILITADO ou INABILITADO durante fase de avaliacao documental ou fase equivalente configurada. |
-| RN-SP08 | AnalistaTecnico | DocumentoProjeto INABILITADO deve possuir observacao ou justificativa registrada na ParticipacaoFaseCaptacao ou na SelecaoProjeto correspondente. |
+| RN-SP01 | Proponente | O Projeto so pode ser iniciado, salvo ou submetido enquanto a Captacao permitir submissao conforme o estado operacional do P2, especialmente `ABERTA_PARA_SUBMISSAO`, respeitando `limiteProjetos` quando configurado. |
+| RN-SP02 | Proponente | Enquanto estiver em `EM_ELABORACAO`, o Projeto pode ser salvo, alterado ou removido pelo Proponente; a remocao encerra o fluxo sem gerar participacao em etapa. |
+| RN-SP03 | Proponente | Todo Projeto submetido deve informar exatamente uma Captacao, um Proponente, uma Faixa, um TipoProjeto e os dados obrigatorios definidos pela Captacao. |
+| RN-SP04 | Sistema | A Faixa e o TipoProjeto escolhidos pelo Projeto devem pertencer ao Fomento que originou a Captacao. |
+| RN-SP05 | Sistema | Quando `demandaInduzida=true`, o Proponente deve corresponder ao outorgado ou contato autorizado definido para a Captacao de demanda induzida. |
+| RN-SP06 | Sistema | `dataInicio` e `dataFim` do Projeto, quando informadas, devem formar um periodo coerente, com `dataInicio <= dataFim`. |
+| RN-SP07 | Sistema | `submeter()`/`submeterProjeto()` registra `dataSubmissao`, transiciona o Projeto de `EM_ELABORACAO` para `SUBMETIDO` e coloca o Projeto em espera pela primeira etapa aplicavel. |
+| RN-SP08 | Sistema | Ao submeter Projeto, o sistema deve gerar a primeira `ParticipacaoEtapaCaptacao` para a primeira `EtapaCaptacao` aplicavel da Captacao. |
+| RN-SP09 | Sistema | Documentos exigidos pela Captacao devem ser registrados como `Documento`, associados ao respectivo `TipoDocumento` e iniciar com `estadoDocumento=PENDENTE`. |
+| RN-SP10 | Sistema | `Documento` so pode transitar para `HABILITADO` ou `INABILITADO` durante uma etapa de avaliacao documental ou etapa equivalente configurada no Fomento/Captacao. |
+| RN-SP11 | AnalistaTecnico | Documento `INABILITADO` deve possuir observacao ou justificativa registrada na `ParticipacaoEtapaCaptacao` ou na `SelecaoProjeto` correspondente. |
 
 ### Avaliacao e Resultado
 
 | ID | Responsavel | Regra |
 |----|-------------|-------|
-| RN-SP09 | Sistema | Se a FaseCaptacao nao exigir selecao, recurso ou eliminacao, o Projeto pode avancar automaticamente com `selecionado=true`. |
-| RN-SP10 | AnalistaTecnico | Quando a fase exigir avaliacao, o AnalistaTecnico deve associar um Selecionador ao Projeto, gerando SelecaoProjeto com statusSelecao=PENDENTE. |
-| RN-SP11 | Sistema | A SelecaoProjeto deve avaliar exatamente uma ParticipacaoFaseCaptacao. |
-| RN-SP12 | Selecionador | Somente o Selecionador associado pode iniciar, responder formulario de selecao e finalizar a SelecaoProjeto. |
-| RN-SP13 | Sistema | `iniciarSelecaoProjeto()` transiciona SelecaoProjeto de PENDENTE para INICIADA. |
-| RN-SP14 | Sistema | `cancelar()` transiciona SelecaoProjeto de PENDENTE ou INICIADA para CANCELADA e exige observacao quando o cancelamento for manual. |
-| RN-SP15 | Selecionador | SelecaoProjeto INICIADA pode receber uma ou mais Respostas de formulario de selecao. |
-| RN-SP16 | Selecionador | `finalizarSelecaoProjeto()` so pode transicionar SelecaoProjeto de INICIADA para FINALIZADA quando as respostas obrigatorias e a nota aplicavel estiverem salvas. |
-| RN-SP17 | Sistema | Ao finalizar a selecao, a nota e a observacao consolidadas devem atualizar a ParticipacaoFaseCaptacao avaliada. |
-| RN-SP18 | Sistema | Quando a nota final for maior ou igual a nota de corte da fase/criterio, ParticipacaoFaseCaptacao.selecionado deve ser true; quando for menor, deve ser false. |
-| RN-SP19 | Sistema | Projeto eliminado em fase eliminatoria nao deve avancar para a proxima FaseCaptacao, salvo deferimento de RecursoSelecao. |
-| RN-SP20 | Sistema | Um Selecionador do tipo AVALIADOR_ADHOC nao pode avaliar Projeto de sua propria instituicao quando essa informacao estiver disponivel. |
+| RN-SP12 | Sistema | Toda `ParticipacaoEtapaCaptacao` deve referenciar uma `EtapaCaptacao` pertencente a Captacao do Projeto e iniciar com `dtInicio` dentro da vigencia da etapa. |
+| RN-SP13 | Sistema | Se a `EtapaCaptacao` nao exigir selecao, recurso ou eliminacao, o Projeto pode avancar automaticamente com `selecionado=true` na participacao da etapa. |
+| RN-SP14 | AnalistaTecnico | Quando a etapa exigir avaliacao, o AnalistaTecnico deve associar um `Selecionador` ao Projeto, gerando `SelecaoProjeto` com `statusSelecao=PENDENTE`. |
+| RN-SP15 | Sistema | Cada `SelecaoProjeto` deve avaliar exatamente uma `ParticipacaoEtapaCaptacao`, e o Projeto da selecao deve ser o mesmo Projeto da participacao avaliada. |
+| RN-SP16 | Selecionador | Somente o `Selecionador` associado pode iniciar, responder formulario de selecao, classificar, selecionar, eliminar ou finalizar a `SelecaoProjeto`. |
+| RN-SP17 | Sistema | `iniciarSelecaoProjeto()` transiciona `SelecaoProjeto` de `PENDENTE` para `INICIADA` e coloca o Projeto em `EM_SELECAO`. |
+| RN-SP18 | Sistema | `cancelar()` transiciona `SelecaoProjeto` de `PENDENTE` ou `INICIADA` para `CANCELADA` e exige observacao quando o cancelamento for manual. |
+| RN-SP19 | Selecionador | `SelecaoProjeto` `INICIADA` pode receber uma ou mais `Resposta` de formulario de selecao conforme a configuracao da etapa/criterio. |
+| RN-SP20 | Selecionador | `finalizarSelecaoProjeto()` so pode transicionar `SelecaoProjeto` de `INICIADA` para `FINALIZADA` quando as respostas obrigatorias e a nota aplicavel estiverem salvas. |
+| RN-SP21 | Sistema | Ao finalizar a selecao, a nota e a observacao consolidadas devem atualizar a `ParticipacaoEtapaCaptacao` avaliada e, quando aplicavel, a nota consolidada do Projeto. |
+| RN-SP22 | Sistema | Quando a nota final cumprir o criterio de corte da etapa/criterio, `ParticipacaoEtapaCaptacao.selecionado` deve ser `true`; quando nao cumprir, deve ser `false`. |
+| RN-SP23 | Sistema | `selecionar(projeto, etapaCaptacao)` marca a participacao da etapa como selecionada; se houver proxima etapa, cria nova `ParticipacaoEtapaCaptacao`, caso contrario transiciona o Projeto para `SELECIONADO` e define `estahAprovada=true`. |
+| RN-SP24 | Sistema | `eliminar(projeto, etapaCaptacao)` marca a participacao da etapa como nao selecionada e transiciona o Projeto para `ELIMINADO`, salvo posterior deferimento de recurso. |
+| RN-SP25 | Sistema | Um `Selecionador` do tipo `AVALIADOR_ADHOC` nao pode avaliar Projeto vinculado a sua propria instituicao quando essa informacao estiver disponivel. |
 
 ### Recurso e Encerramento
 
 | ID | Responsavel | Regra |
 |----|-------------|-------|
-| RN-SP21 | Proponente | RecursoSelecao so pode ser solicitado pelo Proponente do Projeto apos SelecaoProjeto FINALIZADA e dentro da janela de recurso da FaseCaptacao. |
-| RN-SP22 | Sistema | RecursoSelecao deve referenciar a SelecaoProjeto contestada e a Resposta que formaliza a contestacao ou decisao. |
-| RN-SP23 | AnalistaTecnico | Todo julgamento de recurso deve registrar observacao com a decisao tomada. |
-| RN-SP24 | Sistema | Recurso deferido pode alterar ParticipacaoFaseCaptacao.selecionado para true e permitir avanco do Projeto. |
-| RN-SP25 | Sistema | Recurso indeferido mantem o resultado anterior da SelecaoProjeto e encerra a participacao do Projeto na fase quando ele estiver eliminado. |
-| RN-SP26 | Sistema | Uma ParticipacaoFaseCaptacao selecionada deve gerar participacao na proxima FaseCaptacao quando houver proxima fase configurada. |
-| RN-SP27 | Sistema | O P3 usa `StatusSelecao` para o estado da avaliacao por selecionador; isso nao substitui o `EstadoCaptacao` operacional do P2 nem os estados consolidados de Captacao ainda documentados em README/modelo-comportamental. |
+| RN-SP26 | Proponente | `RecursoSelecao` so pode ser solicitado pelo Proponente do Projeto apos `SelecaoProjeto` `FINALIZADA` e dentro da janela de recurso da `EtapaCaptacao`. |
+| RN-SP27 | Sistema | `RecursoSelecao` deve referenciar a `SelecaoProjeto` contestada e a `Resposta` que formaliza a contestacao ou decisao. |
+| RN-SP28 | Selecionador | Todo julgamento de recurso deve registrar observacao com a decisao tomada por meio de `responderRecurso()`. |
+| RN-SP29 | Sistema | Recurso deferido retorna o Projeto de `ELIMINADO` para `EM_SELECAO`, permite reavaliacao da `SelecaoProjeto` e pode alterar `ParticipacaoEtapaCaptacao.selecionado` para `true`. |
+| RN-SP30 | Sistema | Recurso indeferido mantem o resultado anterior da `SelecaoProjeto` e encerra a participacao do Projeto na etapa quando ele estiver eliminado. |
+| RN-SP31 | Sistema | O P3 usa `StatusProjeto` para o ciclo do Projeto e `StatusSelecao` para a avaliacao por selecionador; esses estados nao substituem o `EstadoCaptacao` operacional definido no P2. |
 
 ---
 
