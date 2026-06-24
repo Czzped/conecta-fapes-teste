@@ -327,6 +327,64 @@ const RENAME_FIELD_MUTATION = `
   }
 `;
 
+const FIND_PROJECT_ITEM_BY_ISSUE_QUERY = `
+  query FindProjectItemByIssue($owner: String!, $repo: String!, $number: Int!) {
+    repository(owner: $owner, name: $repo) {
+      issue(number: $number) {
+        id
+        projectItems(first: 10) {
+          nodes {
+            id
+            project {
+              id
+              number
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const SET_PROJECT_SINGLE_SELECT_MUTATION = `
+  mutation SetProjectSingleSelect(
+    $projectId: ID!
+    $itemId: ID!
+    $fieldId: ID!
+    $optionId: String!
+  ) {
+    updateProjectV2ItemFieldValue(
+      input: {
+        projectId: $projectId
+        itemId: $itemId
+        fieldId: $fieldId
+        value: { singleSelectOptionId: $optionId }
+      }
+    ) {
+      projectV2Item {
+        id
+      }
+    }
+  }
+`;
+
+interface FindProjectItemByIssueQueryResult {
+  repository: {
+    issue: {
+      id: string;
+      projectItems: {
+        nodes: {
+          id: string;
+          project: {
+            id: string;
+            number: number;
+          };
+        }[];
+      };
+    } | null;
+  } | null;
+}
+
 interface ProjectFieldsQueryResult {
   node: {
     fields: {
@@ -808,5 +866,51 @@ export class GitHubProjectRepository {
     );
 
     return data.updateProjectV2Field.projectV2Field;
+  }
+
+  /**
+   * Encontra o ID do item do projeto associado a uma issue pelo numero.
+   * Usa `Issue.projectItems` para buscar diretamente (evita scan do projeto inteiro).
+   *
+   * @returns o item ID ou null se a issue nao estiver no projeto alvo.
+   */
+  async findItemIdByIssue(
+    projectId: string,
+    owner: string,
+    repo: string,
+    issueNumber: number
+  ): Promise<string | null> {
+    const data = await this.client.request<FindProjectItemByIssueQueryResult>(
+      FIND_PROJECT_ITEM_BY_ISSUE_QUERY,
+      { owner, repo, number: issueNumber }
+    );
+
+    const issue = data.repository?.issue;
+    if (!issue) {
+      return null;
+    }
+
+    const match = issue.projectItems.nodes.find(
+      (node) => node.project.id === projectId
+    );
+
+    return match?.id ?? null;
+  }
+
+  /**
+   * Define o valor de um campo single-select (ex.: Status) para um item do projeto.
+   */
+  async setSingleSelectValue(
+    projectId: string,
+    itemId: string,
+    fieldId: string,
+    optionId: string
+  ): Promise<void> {
+    await this.client.request(SET_PROJECT_SINGLE_SELECT_MUTATION, {
+      projectId,
+      itemId,
+      fieldId,
+      optionId,
+    });
   }
 }
