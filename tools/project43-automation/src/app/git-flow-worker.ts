@@ -264,11 +264,10 @@ async function applyCardMovement(
   }
 
   try {
-    // Busca o item do projeto pelo numero da issue
-    const itemId = await projectRepo.findItemIdByIssue(
+    // Busca o item do projeto pelo numero da issue (busca no projeto inteiro,
+    // nao apenas no repo do PR — a issue pode estar em conectafapes-project)
+    const itemId = await projectRepo.findItemByIssueNumber(
       projectConfig.projectId,
-      projectConfig.githubOrg,
-      repoName,
       plan.cardNumber
     );
 
