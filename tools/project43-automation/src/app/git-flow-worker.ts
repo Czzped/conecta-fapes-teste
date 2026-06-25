@@ -1,9 +1,10 @@
 import {
   createGitFlowConfig,
+  resolveRepository,
   type GitFlowConfig,
 } from "../config/git-flow-config.js";
 import { createProjectConfig, type ProjectConfig } from "../config/project-config.js";
-import type { WorkerEnvironment } from "../config/worker-config.js";
+import { loadWorkerConfig, type WorkerEnvironment } from "../config/worker-config.js";
 import { planBranchCreation } from "../domain/branch-planning.js";
 import type {
   GitFlowAction,
@@ -47,6 +48,94 @@ function json(data: unknown, status = 200): Response {
 }
 
 const TAG_DEFERRED_DETAIL = "tag_deferred_until_production_merge";
+
+/**
+ * Extrai o número da issue/PR de um nome de branch.
+ * Ex.: "feature/1234-algum-titulo" → 1234
+ *      "fix/5678-bug" → 5678
+ * Retorna null se não encontrar número no início após o prefixo.
+ */
+function extractIssueNumber(branchName: string, workPrefixes: string[]): number | null {
+  for (const prefix of workPrefixes) {
+    if (branchName.startsWith(prefix)) {
+      const rest = branchName.slice(prefix.length);
+      const match = rest.match(/^(\d+)/);
+      if (match) {
+        return parseInt(match[1], 10);
+      }
+    }
+  }
+  return null;
+}
+
+/** Verifica se o branch corresponde a um prefixo de trabalho (feature/fix/etc). */
+function isWorkBranch(branchName: string, workPrefixes: string[]): boolean {
+  return workPrefixes.some((prefix) => branchName.startsWith(prefix));
+}
+
+async function moveProjectCard(
+  env: WorkerEnvironment,
+  issueNumber: number,
+  targetStatus: string
+): Promise<{ moved: boolean; reason?: string; projectItemId?: string }> {
+  const workerConfig = loadWorkerConfig(env);
+  const projectConfig = workerConfig.project;
+  const installationId = workerConfig.secrets.installationId;
+
+  if (!installationId) {
+    return { moved: false, reason: "missing_installation_id" };
+  }
+
+  const accessToken = await createInstallationToken(
+    {
+      appId: workerConfig.secrets.appId,
+      privateKey: workerConfig.secrets.appPrivateKey,
+      userAgent: USER_AGENT,
+    },
+    installationId
+  );
+  const graphqlClient = new GitHubGraphqlClient(accessToken, USER_AGENT);
+  const repository = new GitHubProjectRepository(graphqlClient);
+
+  const metadata = await repository.getFieldMetadata(
+    projectConfig.projectId,
+    projectConfig.fieldNames
+  );
+
+  if (!metadata.statusField) {
+    return { moved: false, reason: "status_field_not_found" };
+  }
+
+  const itemId = await repository.findItemByIssueNumber(
+    projectConfig.projectId,
+    issueNumber
+  );
+
+  if (!itemId) {
+    return { moved: false, reason: "item_not_found" };
+  }
+
+  const statusOptions =
+    metadata.statusField.__typename === "ProjectV2SingleSelectField"
+      ? metadata.statusField.options
+      : [];
+  const targetOption = statusOptions.find(
+    (opt) => opt.name === targetStatus
+  );
+
+  if (!targetOption) {
+    return { moved: false, reason: `status_option_not_found: ${targetStatus}` };
+  }
+
+  await repository.updateItemStatus(
+    projectConfig.projectId,
+    itemId,
+    metadata.statusField.id,
+    targetOption.id
+  );
+
+  return { moved: true, projectItemId: itemId };
+}
 
 function readAdminToken(request: Request): string | null {
   const header = request.headers.get("authorization");

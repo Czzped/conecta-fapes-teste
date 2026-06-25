@@ -240,6 +240,52 @@ const CLEAR_PROJECT_DATE_MUTATION = `
   }
 `;
 
+const SET_PROJECT_STATUS_MUTATION = `
+  mutation SetProjectStatus(
+    $projectId: ID!
+    $itemId: ID!
+    $fieldId: ID!
+    $singleSelectOptionId: String!
+  ) {
+    updateProjectV2ItemFieldValue(
+      input: {
+        projectId: $projectId
+        itemId: $itemId
+        fieldId: $fieldId
+        value: { singleSelectOptionId: $singleSelectOptionId }
+      }
+    ) {
+      projectV2Item {
+        id
+      }
+    }
+  }
+`;
+
+const FIND_ITEM_BY_ISSUE_QUERY = `
+  query FindItemByIssue($projectId: ID!, $issueNumber: Int!, $first: Int!, $after: String) {
+    node(id: $projectId) {
+      ... on ProjectV2 {
+        items(first: $first, after: $after) {
+          nodes {
+            id
+            content {
+              __typename
+              ... on Issue {
+                number
+              }
+            }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+        }
+      }
+    }
+  }
+`;
+
 const SET_PROJECT_ITERATION_MUTATION = `
   mutation SetProjectIteration(
     $projectId: ID!
@@ -836,6 +882,71 @@ export class GitHubProjectRepository {
       itemId,
       fieldId,
       iterationId,
+    });
+  }
+
+  async findItemByIssueNumber(
+    projectId: string,
+    issueNumber: number
+  ): Promise<string | null> {
+    type FindItemPage = {
+      node: {
+        items: {
+          nodes: {
+            id: string;
+            content: { __typename: string; number?: number } | null;
+          }[];
+          pageInfo: {
+            hasNextPage: boolean;
+            endCursor: string | null;
+          };
+        };
+      } | null;
+    };
+
+    const pageSize = 100;
+    let after: string | null = null;
+
+    do {
+      const result: FindItemPage = await this.client.request(FIND_ITEM_BY_ISSUE_QUERY, {
+        projectId,
+        issueNumber,
+        first: pageSize,
+        after,
+      });
+
+      if (!result.node) {
+        throw new Error(`project not found: ${projectId}`);
+      }
+
+      for (const node of result.node.items.nodes) {
+        if (
+          node.content?.__typename === "Issue" &&
+          node.content.number === issueNumber
+        ) {
+          return node.id;
+        }
+      }
+
+      after = result.node.items.pageInfo.hasNextPage
+        ? result.node.items.pageInfo.endCursor
+        : null;
+    } while (after);
+
+    return null;
+  }
+
+  async updateItemStatus(
+    projectId: string,
+    itemId: string,
+    statusFieldId: string,
+    optionId: string
+  ): Promise<void> {
+    await this.client.request(SET_PROJECT_STATUS_MUTATION, {
+      projectId,
+      itemId,
+      fieldId: statusFieldId,
+      singleSelectOptionId: optionId,
     });
   }
 
