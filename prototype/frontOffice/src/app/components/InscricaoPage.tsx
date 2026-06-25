@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import {
   ChevronLeft, FileText, User, Users, Receipt, CalendarDays, Eye,
-  Plus, CheckCircle2, Moon,
+  Plus, CheckCircle2, Moon, Paperclip,
 } from 'lucide-react';
 import fapesLogo from 'figma:asset/aec6ed8eb7cf2782d52002e0d4c19150c79afd78.png';
 import { editais } from '../data/editais';
@@ -267,12 +267,13 @@ function AddButton({ label, onClick }: { label: string; onClick: () => void }) {
         display: 'inline-flex',
         alignItems: 'center',
         gap: '0.4rem',
-        padding: '0.45rem 1rem',
+        minHeight: '42px',
+        padding: '0.6rem 1rem',
         borderRadius: RADIUS,
         border: `1px solid rgba(6,182,212,${hov ? '0.45' : '0.25'})`,
         backgroundColor: `rgba(6,182,212,${hov ? '0.14' : '0.07'})`,
         color: CLR_TEAL,
-        fontSize: 'var(--text-xs)',
+        fontSize: 'var(--text-sm)',
         fontWeight: 'var(--font-weight-medium)',
         cursor: 'pointer',
         fontFamily: FF,
@@ -597,6 +598,8 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
 
   // Cronograma
   const [atividades, setAtividades] = useState<Atividade[]>([{ descricao: '', inicio: '', conclusao: '' }]);
+  const [documentoProjeto, setDocumentoProjeto] = useState('');
+  const documentoInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -857,6 +860,74 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <AddButton label="Adicionar Atividade" onClick={() => setAtividades(prev => [...prev, { descricao: '', inicio: '', conclusao: '' }])} />
             </div>
+          </div>
+        </MyDataSection>
+
+        <MyDataSection number={5} title="Documento">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'minmax(0, 1fr) auto',
+                gap: '1rem',
+                alignItems: 'end',
+              }}
+            >
+              <Field label="Documento">
+                <ReadOnlyInput value="Projeto em PDF" />
+              </Field>
+              <button
+                type="button"
+                onClick={() => documentoInputRef.current?.click()}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  minHeight: '42px',
+                  padding: '0.6rem 1rem',
+                  borderRadius: RADIUS,
+                  border: '1px solid rgba(6,182,212,0.35)',
+                  backgroundColor: 'rgba(6,182,212,0.12)',
+                  color: CLR_TEAL,
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                  fontFamily: FF,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <Paperclip size={16} />
+                Anexar Arquivo
+              </button>
+              <input
+                ref={documentoInputRef}
+                type="file"
+                accept=".pdf,.png,.jpg,.jpeg"
+                style={{ display: 'none' }}
+                onChange={event => {
+                  const file = event.target.files?.[0];
+                  if (!file) return;
+                  setDocumentoProjeto(file.name);
+                }}
+              />
+            </div>
+
+            {documentoProjeto && (
+              <div
+                className="p-4 flex items-center gap-4"
+                style={{
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                }}
+              >
+                <FileText size={20} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
+                <span style={{ fontSize: 'var(--text-sm)', fontFamily: FF, color: 'var(--foreground)' }}>
+                  {documentoProjeto}
+                </span>
+              </div>
+            )}
           </div>
         </MyDataSection>
 

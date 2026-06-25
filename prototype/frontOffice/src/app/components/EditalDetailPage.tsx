@@ -280,22 +280,41 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
               Documento do Edital
             </span>
           </div>
-          <button
-            style={{
-              padding: '0.55rem 1rem',
-              borderRadius: 'var(--radius)',
-              border: '1px solid rgba(6,182,212,0.35)',
-              backgroundColor: 'rgba(6,182,212,0.12)',
-              color: '#22d3ee',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-medium)',
-              cursor: 'pointer',
-              fontFamily: 'var(--font-family)',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            Baixar Arquivo
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <button
+              style={{
+                padding: '0.55rem 1rem',
+                borderRadius: 'var(--radius)',
+                border: '1px solid rgba(6,182,212,0.35)',
+                backgroundColor: 'rgba(6,182,212,0.12)',
+                color: '#22d3ee',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-family)',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Baixar Arquivo
+            </button>
+            <button
+              onClick={onInscricao}
+              style={{
+                padding: '0.55rem 1rem',
+                borderRadius: 'var(--radius)',
+                border: '1px solid rgba(20,184,166,0.35)',
+                backgroundColor: 'rgba(20,184,166,0.12)',
+                color: '#14b8a6',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-family)',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Fazer Inscrição
+            </button>
+          </div>
         </div>
 
         <article style={{ maxWidth: '860px', marginLeft: '2rem' }}>
