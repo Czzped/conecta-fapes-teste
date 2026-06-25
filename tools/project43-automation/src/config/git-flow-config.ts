@@ -26,6 +26,7 @@ export const DEFAULT_REPOSITORIES: readonly RepoDefinition[] = [
   { name: "leds-conectafapes-frontoffice-backend", productionBranch: "main", developBranch: "develop" },
   { name: "leds-conectafapes-frontoffice-frontend", productionBranch: "main", developBranch: "develop" },
   { name: "leds-conectafapes-prestacao-de-contas", productionBranch: "master", developBranch: "develop" },
+  { name: "conectafapes-project", productionBranch: "main", developBranch: "develop" },
 ];
 
 export interface RepoDefinition {
