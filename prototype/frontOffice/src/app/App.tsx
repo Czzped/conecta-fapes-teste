@@ -164,6 +164,7 @@ export default function App() {
             <CidadaoHomePage
               onLogin={() => { setIsLoggedIn(false); setAccessType('bolsista'); }}
               onVerEdital={(id) => { setSelectedEditalId(id); setCidadaoPage('edital-detail'); window.scrollTo(0, 0); }}
+              onInscricao={(id) => { setSelectedEditalId(id); setCidadaoPage('inscricao'); window.scrollTo(0, 0); }}
             />
           )}
           {cidadaoPage === 'edital-detail' && (

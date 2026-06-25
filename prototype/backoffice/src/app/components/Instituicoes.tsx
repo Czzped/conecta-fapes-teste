@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ArrowLeft, Building2, ChevronDown, ChevronRight, Plus, Search, Trash2 } from 'lucide-react';
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
-type NaturezaJuridica = 'Publica' | 'Privada';
+type NaturezaJuridica = '' | 'Publica' | 'Privada';
 type SituacaoInstituicao = 'Ativa' | 'Inativa' | 'Rascunho';
 type ClassificacaoInstituicao =
   | ''
@@ -10,6 +10,7 @@ type ClassificacaoInstituicao =
   | 'Instituição de Ensino Superior (IES)'
   | 'Organização Sem Fins Lucrativos (OSFL)'
   | 'Empresa';
+type NivelInstituicao = '' | 'Municipal' | 'Estadual' | 'Federal' | 'Internacional';
 type ActiveTab = 'listagem' | 'dashboard';
 
 interface InstituicaoItem {
@@ -26,6 +27,7 @@ interface InstituicaoItem {
   endereco: string;
   bairro: string;
   natureza: NaturezaJuridica;
+  nivel?: NivelInstituicao;
   municipio: string;
   uf: string;
   responsavel: string;
@@ -158,7 +160,8 @@ const emptyInstituicao: InstituicaoItem = {
   cep: '',
   endereco: '',
   bairro: '',
-  natureza: 'Publica',
+  natureza: '',
+  nivel: '',
   municipio: '',
   uf: 'ES',
   responsavel: '',
@@ -569,10 +572,14 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
           <FormSection number="1" title="Identificação" subtitle="Dados básicos">
             <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 0.6fr', gap: '16px', marginBottom: '16px' }}>
-              <Field label="Nome" value={draft.nome} onChange={value => updateDraft('nome', value)} placeholder="Nome da instituição ou unidade" />
+              <Field label="Nome" value={draft.nome} onChange={value => updateDraft('nome', value)} placeholder="Nome da Instituição" />
               <Field label="Sigla" value={draft.sigla} onChange={value => updateDraft('sigla', value)} placeholder="Sigla" />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 0.45fr 1.2fr', gap: '16px', marginBottom: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.6fr', gap: '16px', marginBottom: '16px' }}>
+              <Field label="CNPJ" value={draft.cnpj} onChange={value => updateDraft('cnpj', maskCnpj(value))} placeholder="Deixe vazio para setor sem CNPJ" />
+              <Field label={isSetorSemCnpj ? 'Razão Social' : 'Razão Social obrigatória'} value={draft.razaoSocial} onChange={value => updateDraft('razaoSocial', value)} placeholder={isSetorSemCnpj ? 'Não se aplica a setor interno' : 'Razão Social'} disabled={isSetorSemCnpj} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 0.7fr 0.7fr', gap: '16px', marginBottom: '16px' }}>
               <Select
                 label="Classificação"
                 value={draft.classificacao}
@@ -580,11 +587,16 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 options={classificacaoOptions}
                 placeholder="Selecione"
               />
-              <Select label="Natureza" value={draft.natureza} onChange={value => updateDraft('natureza', value)} options={['Publica', 'Privada']} />
-              <Field label={isSetorSemCnpj ? 'Razão Social' : 'Razão Social obrigatória'} value={draft.razaoSocial} onChange={value => updateDraft('razaoSocial', value)} placeholder={isSetorSemCnpj ? 'Não se aplica a setor interno' : 'Razão social da instituição'} disabled={isSetorSemCnpj} />
+              <Select label="Natureza" value={draft.natureza} onChange={value => updateDraft('natureza', value)} options={['Publica', 'Privada']} placeholder="Selecione" />
+              <Select
+                label="Nível"
+                value={draft.nivel || ''}
+                onChange={value => updateDraft('nivel', value)}
+                options={['Municipal', 'Estadual', 'Federal', 'Internacional']}
+                placeholder="Selecione"
+              />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.2fr 0.7fr', gap: '16px', marginBottom: '16px' }}>
-              <Field label="CNPJ" value={draft.cnpj} onChange={value => updateDraft('cnpj', maskCnpj(value))} placeholder="Deixe vazio para setor sem CNPJ" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.7fr', gap: '16px', marginBottom: '16px' }}>
               <Field label="E-mail Institucional" value={draft.email} onChange={value => updateDraft('email', value)} placeholder="email@instituicao.br" />
               <Field label="Telefone" value={draft.telefone} onChange={value => updateDraft('telefone', value)} placeholder="(00) 0000-0000" />
             </div>

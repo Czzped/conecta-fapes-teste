@@ -421,16 +421,16 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
             <ChevronLeft size={16} /> Voltar para o Edital
           </button>
           <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-weight-semibold)', color: CLR_FG, fontFamily: FF }}>
-            Submissão de Proposta
+            {edital.titulo}
           </div>
           <div style={{ fontSize: 'var(--text-sm)', color: CLR_MUTED, fontFamily: FF, marginTop: '2px' }}>
-            Preencha todos os campos para submeter sua proposta · {edital.titulo} · {edital.numero}
+            Submissão da Proposta · {edital.numero}
           </div>
         </div>
       </div>
 
       {/* ── FORM BODY ── */}
-      <div style={{ ...CONTAINER, paddingTop: '2rem', paddingBottom: '7rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div style={{ ...CONTAINER, paddingTop: '2rem', paddingBottom: '3rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
         {/* ── DADOS GERAIS ── */}
         <SectionCard
@@ -625,117 +625,13 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
           </div>
         </SectionCard>
 
-        {/* ── RESUMO ── */}
-        <SectionCard
-          icon={<Eye size={16} style={{ color: CLR_TEAL }} />}
-          title="Resumo"
-          subtitle="Revise todas as informações inseridas antes de submeter sua proposta."
-        >
-          {/* Dados Gerais */}
-          <ReviewGroup title="Dados Gerais">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3" style={{ marginBottom: '0.5rem' }}>
-              <ReviewRow label="Título do Projeto" value={titulo} />
-              <ReviewRow label="Coordenador" value={coordenador} />
-            </div>
-            <div style={{ marginBottom: '0.5rem' }}>
-              <ReviewRow label="Resumo" value={resumo} />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3" style={{ marginBottom: '0.5rem' }}>
-              <ReviewRow label="Objetivo Geral" value={objGeral} />
-              <ReviewRow label="Objetivo Específico" value={objEspecifico} />
-            </div>
-            <ReviewRow label="Resultados" value={resultados} />
-          </ReviewGroup>
-
-          <Divider />
-
-          {/* Proponente */}
-          <ReviewGroup title="Proponente">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
-              <ReviewRow label="Nome Completo" value={nomeCompleto} />
-              <ReviewRow label="CPF" value={cpf} />
-              <ReviewRow label="Telefone" value={telefone} />
-              <ReviewRow label="E-mail" value={email} />
-              <ReviewRow label="Endereço" value={endereco} />
-              <ReviewRow label="Instituição" value={instituicao} />
-            </div>
-          </ReviewGroup>
-
-          <Divider />
-
-          {/* Equipe */}
-          <ReviewGroup title="Equipe">
-            {membros.map((m, i) => (
-              <div key={i} style={{ marginBottom: i < membros.length - 1 ? '0.75rem' : 0 }}>
-                <div style={{ fontSize: 'var(--text-xs)', color: CLR_MUTED, fontFamily: FF, marginBottom: '0.4rem' }}>Membro {i + 1}</div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-2">
-                  <ReviewRow label="Nome Completo" value={m.nome} />
-                  <ReviewRow label="CPF" value={m.cpf} />
-                  <ReviewRow label="Função" value={m.funcao} />
-                  <ReviewRow label="Bolsa" value={m.bolsa} />
-                </div>
-              </div>
-            ))}
-          </ReviewGroup>
-
-          <Divider />
-
-          {/* Despesas */}
-          <ReviewGroup title="Despesas">
-            {despesas.map((d, i) => (
-              <div key={i} style={{ marginBottom: i < despesas.length - 1 ? '0.75rem' : 0 }}>
-                <div style={{ fontSize: 'var(--text-xs)', color: CLR_MUTED, fontFamily: FF, marginBottom: '0.4rem' }}>Item {i + 1}</div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-2" style={{ marginBottom: '0.4rem' }}>
-                  <ReviewRow label="Nome" value={d.nome} />
-                  <ReviewRow label="Categoria" value={d.categoria} />
-                  <ReviewRow label="Quantidade" value={d.quantidade} />
-                  <ReviewRow label="Custo Total (R$)" value={d.custo} />
-                </div>
-                <ReviewRow label="Justificativa" value={d.justificativa} />
-              </div>
-            ))}
-          </ReviewGroup>
-
-          <Divider />
-
-          {/* Cronograma */}
-          <ReviewGroup title="Cronograma">
-            {atividades.map((a, i) => (
-              <div key={i} style={{ marginBottom: i < atividades.length - 1 ? '0.75rem' : 0 }}>
-                <div style={{ fontSize: 'var(--text-xs)', color: CLR_MUTED, fontFamily: FF, marginBottom: '0.4rem' }}>Atividade {i + 1}</div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-2">
-                  <ReviewRow label="Descrição" value={a.descricao} />
-                  <ReviewRow label="Data de Início" value={a.inicio} />
-                  <ReviewRow label="Data de Conclusão" value={a.conclusao} />
-                </div>
-              </div>
-            ))}
-          </ReviewGroup>
-        </SectionCard>
-      </div>
-
-      {/* ── STICKY BOTTOM BAR ── */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 40,
-          backgroundColor: 'var(--app-header)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          borderTop: '1px solid rgba(6,182,212,0.2)',
-          padding: '0.875rem 0',
-        }}
-      >
         <div
           style={{
-            ...CONTAINER,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-end',
             gap: '0.75rem',
+            marginTop: '0.5rem',
           }}
         >
           <button
@@ -755,7 +651,7 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
             onMouseEnter={e => { e.currentTarget.style.color = CLR_FG; e.currentTarget.style.borderColor = 'rgba(6,182,212,0.45)'; }}
             onMouseLeave={e => { e.currentTarget.style.color = CLR_MUTED; e.currentTarget.style.borderColor = 'rgba(6,182,212,0.25)'; }}
           >
-            Cancelar
+            Salvar Rascunho
           </button>
           <button
             onClick={handleSubmit}
@@ -776,7 +672,7 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
             onMouseEnter={e => { if (!isSubmitting) e.currentTarget.style.backgroundColor = '#22d3ee'; }}
             onMouseLeave={e => { if (!isSubmitting) e.currentTarget.style.backgroundColor = CLR_TEAL_MID; }}
           >
-            {isSubmitting ? 'Enviando...' : 'Submeter Proposta'}
+            {isSubmitting ? 'Enviando...' : 'Enviar Proposta'}
           </button>
           {submitError && (
             <p style={{ color: '#ef4444', fontSize: 'var(--text-xs)', fontFamily: FF, marginTop: '0.5rem', textAlign: 'right' }}>
