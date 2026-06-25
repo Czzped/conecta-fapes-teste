@@ -116,7 +116,7 @@ const fasesIniciativas = [
 
 const initialCronogramaCaptacao = [
   { etapa: 'Publicação da captação', inicio: '2026-02-01', fim: '2026-02-01' },
-  { etapa: 'Recebimento das propostas', inicio: '2026-02-01', fim: '2026-03-31' },
+  { etapa: 'Submissão das Propostas', inicio: '2026-02-01', fim: '2026-03-31' },
   { etapa: 'Avaliação documental', inicio: '2026-04-01', fim: '2026-04-15' },
   { etapa: 'Avaliação Ad Hoc', inicio: '2026-04-16', fim: '2026-05-31' },
   { etapa: 'Publicação do resultado preliminar', inicio: '2026-06-05', fim: '2026-06-05' },
@@ -1468,14 +1468,10 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div>
               <div>
                 <label style={labelStyle}>Tipos de Projetos Aceitos</label>
                 <input type="text" defaultValue="Projeto de inovação, Projeto de pesquisa" readOnly={!editingResumo} style={resumoInputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>Status</label>
-                <input type="text" defaultValue={captacaoAtual.status} readOnly={!editingResumo} style={{ ...resumoInputStyle, color: '#00c1af', fontWeight: 'var(--font-weight-medium)' }} />
               </div>
             </div>
 
@@ -1559,31 +1555,17 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
               <h3 style={subSectionTitleStyle}>Faixas de Financiamento</h3>
               <div style={{ display: 'grid', gap: '12px' }}>
                 {[
-                  { nome: 'Faixa 1', duracao: '24 meses', minimo: 'R$ 50.000,00', maximo: 'R$ 200.000,00', aportado: 'R$ 3.000.000,00' },
-                  { nome: 'Faixa 2', duracao: '36 meses', minimo: 'R$ 200.001,00', maximo: 'R$ 500.000,00', aportado: 'R$ 2.000.000,00' },
+                  { nome: 'Faixa 1', aportado: 'R$ 3.000.000,00' },
+                  { nome: 'Faixa 2', aportado: 'R$ 2.000.000,00' },
                 ].map(faixa => (
-                  <div key={faixa.nome} style={{ display: 'grid', gap: '12px' }}>
+                  <div key={faixa.nome} style={{ display: 'grid', gridTemplateColumns: '1fr 220px', gap: '16px' }}>
                     <div>
                       <label style={labelStyle}>Nome da Faixa</label>
                       <input type="text" defaultValue={faixa.nome} readOnly={!editandoFinanceiroFomento} style={financeiroInputStyle} />
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
-                      <div>
-                        <label style={labelStyle}>Duração máxima</label>
-                        <input type="text" defaultValue={faixa.duracao} readOnly={!editandoFinanceiroFomento} style={financeiroInputStyle} />
-                      </div>
-                      <div>
-                        <label style={labelStyle}>Valor mínimo</label>
-                        <input type="text" defaultValue={faixa.minimo} readOnly={!editandoFinanceiroFomento} style={financeiroInputStyle} />
-                      </div>
-                      <div>
-                        <label style={labelStyle}>Valor máximo</label>
-                        <input type="text" defaultValue={faixa.maximo} readOnly={!editandoFinanceiroFomento} style={financeiroInputStyle} />
-                      </div>
-                      <div>
-                        <label style={labelStyle}>Valor aportado</label>
-                        <input type="text" defaultValue={faixa.aportado} readOnly={!editandoFinanceiroFomento} style={financeiroInputStyle} />
-                      </div>
+                    <div>
+                      <label style={labelStyle}>Valor aportado</label>
+                      <input type="text" defaultValue={faixa.aportado} readOnly={!editandoFinanceiroFomento} style={financeiroInputStyle} />
                     </div>
                   </div>
                 ))}
@@ -1653,7 +1635,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
               <input type="text" defaultValue="Fomento à Inovação 2026" readOnly style={resumoInputStyle} />
             </div>
             <div>
-              <label style={labelStyle}>Captação</label>
+              <label style={labelStyle}>Nome da Captação</label>
               <input type="text" defaultValue={captacaoAtual.titulo} readOnly style={resumoInputStyle} />
             </div>
           </div>
@@ -1944,10 +1926,10 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
               <h3 style={subSectionTitleStyle}>Modalidades e Níveis de Bolsa</h3>
               <div style={{ display: 'grid', gap: '12px' }}>
                 {[
-                  { modalidade: 'Iniciação Científica', nivel: 'Nível A', versao: 'Última versão ativa', maximo: '2', cotas: '50', institucional: 'Não' },
-                  { modalidade: 'Pesquisa', nivel: 'Nível C', versao: 'Última versão ativa', maximo: '1', cotas: '30', institucional: 'Sim' },
+                  { modalidade: 'Iniciação Científica', nivel: 'Nível A', versao: 'Última versão ativa', maximo: '2', cotas: '50' },
+                  { modalidade: 'Pesquisa', nivel: 'Nível C', versao: 'Última versão ativa', maximo: '1', cotas: '30' },
                 ].map((bolsa, index) => (
-                  <div key={`${bolsa.modalidade}-${bolsa.nivel}`} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 110px 110px 120px', gap: '12px' }}>
+                  <div key={`${bolsa.modalidade}-${bolsa.nivel}`} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 110px 110px', gap: '12px' }}>
                     <div>
                       <label style={labelStyle}>Modalidade {index + 1}</label>
                       <input type="text" defaultValue={bolsa.modalidade} readOnly={!editingResumo} style={resumoInputStyle} />
@@ -1967,10 +1949,6 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
                     <div>
                       <label style={labelStyle}>Cotas</label>
                       <input type="text" defaultValue={bolsa.cotas} readOnly={!editingResumo} style={resumoInputStyle} />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Institucional</label>
-                      <input type="text" defaultValue={bolsa.institucional} readOnly={!editingResumo} style={resumoInputStyle} />
                     </div>
                   </div>
                 ))}
@@ -2041,7 +2019,7 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
             <div style={{ display: 'grid', gap: '16px' }}>
               {[
                 { etapa: 'Publicação da captação', inicio: '01/02/2026', fim: '01/02/2026' },
-                { etapa: 'Recebimento das propostas', inicio: '01/02/2026', fim: '31/03/2026' },
+                { etapa: 'Submissão das Propostas', inicio: '01/02/2026', fim: '31/03/2026' },
                 { etapa: 'Avaliação documental', inicio: '01/04/2026', fim: '15/04/2026' },
                 { etapa: 'Avaliação Ad Hoc', inicio: '16/04/2026', fim: '31/05/2026' },
                 { etapa: 'Publicação do resultado preliminar', inicio: '05/06/2026', fim: '05/06/2026' },
