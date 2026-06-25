@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Search, Calendar, ArrowRight, Moon } from 'lucide-react';
 import fapesLogo from 'figma:asset/aec6ed8eb7cf2782d52002e0d4c19150c79afd78.png';
 import { AccessibilityModal } from './AccessibilityModal';
@@ -7,6 +7,8 @@ interface CidadaoHomePageProps {
   onLogin?: () => void;
   onVerEdital?: (editalId: number) => void;
   onInscricao?: (editalId: number) => void;
+  scrollToOportunidades?: boolean;
+  onScrolledToOportunidades?: () => void;
 }
 
 const editais = [
@@ -78,6 +80,20 @@ const editais = [
   },
 ];
 
+const editaisEmAndamento = editais.slice(0, 4).map((edital, index) => ({
+  ...edital,
+  id: 101 + index,
+  status: 'Em Andamento',
+  prazo: ['12/02/2025', '28/02/2025', '15/03/2025', '30/03/2025'][index],
+}));
+
+const editaisFinalizados = editais.slice(2, 6).map((edital, index) => ({
+  ...edital,
+  id: 201 + index,
+  status: 'Finalizado',
+  prazo: ['10/12/2024', '20/12/2024', '15/01/2025', '31/01/2025'][index],
+}));
+
 const areaColors: Record<string, { bg: string; color: string }> = {
   'Carreira Científica':     { bg: 'rgba(20,184,166,0.14)', color: '#14b8a6' },
   'Pesquisa':                { bg: 'rgba(20,184,166,0.14)', color: '#14b8a6' },
@@ -94,7 +110,7 @@ const CONTAINER: React.CSSProperties = {
   padding: '0 1.5rem',
 };
 
-export function CidadaoHomePage({ onLogin, onVerEdital, onInscricao }: CidadaoHomePageProps) {
+export function CidadaoHomePage({ onLogin, onVerEdital, onInscricao, scrollToOportunidades, onScrolledToOportunidades }: CidadaoHomePageProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArea, setSelectedArea] = useState('Todas');
   const [selectedTab, setSelectedTab] = useState('Aberto');
@@ -102,16 +118,29 @@ export function CidadaoHomePage({ onLogin, onVerEdital, onInscricao }: CidadaoHo
 
   const oportunidadesRef = useRef<HTMLElement>(null);
 
-  const scrollToOportunidades = () => {
+  const handleScrollToOportunidades = () => {
     if (!oportunidadesRef.current) return;
     const top = oportunidadesRef.current.getBoundingClientRect().top + window.scrollY - 64;
     window.scrollTo({ top, behavior: 'smooth' });
   };
 
+  useEffect(() => {
+    if (!scrollToOportunidades || !oportunidadesRef.current) return;
+    const top = oportunidadesRef.current.getBoundingClientRect().top + window.scrollY - 64;
+    window.scrollTo({ top, behavior: 'smooth' });
+    onScrolledToOportunidades?.();
+  }, [scrollToOportunidades, onScrolledToOportunidades]);
+
   const areas = ['Todas', 'Carreira Científica', 'Pesquisa', 'Difusão do Conhecimento', 'Extensão', 'Inovação', 'Internacional'];
   const tabs = ['Aberto', 'Em Andamento', 'Finalizado'];
 
-  const filtered = editais.filter(e => {
+  const editaisByTab = selectedTab === 'Em Andamento'
+    ? editaisEmAndamento
+    : selectedTab === 'Finalizado'
+      ? editaisFinalizados
+      : editais;
+
+  const filtered = editaisByTab.filter(e => {
     const matchSearch =
       e.titulo.toLowerCase().includes(searchQuery.toLowerCase()) ||
       e.programa.toLowerCase().includes(searchQuery.toLowerCase());
@@ -260,7 +289,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital, onInscricao }: CidadaoHo
           {/* CTA */}
           <div className="flex flex-wrap items-center gap-4">
             <button
-              onClick={scrollToOportunidades}
+              onClick={handleScrollToOportunidades}
               style={{
                 padding: '0.75rem 1.75rem',
                 borderRadius: 'var(--radius)',
@@ -561,30 +590,59 @@ export function CidadaoHomePage({ onLogin, onVerEdital, onInscricao }: CidadaoHo
                     Ver Edital
                     <ArrowRight size={14} />
                   </button>
-                  <button
-                    onClick={() => onInscricao?.(edital.id)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.5rem',
-                      padding: '0.625rem 1rem',
-                      borderRadius: 'var(--radius)',
-                      border: '1px solid rgba(20,184,166,0.35)',
-                      backgroundColor: 'rgba(20,184,166,0.12)',
-                      color: '#14b8a6',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: 'var(--font-weight-medium)',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                      width: '100%',
-                      fontFamily: 'var(--font-family)',
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(20,184,166,0.22)'; e.currentTarget.style.borderColor = 'rgba(20,184,166,0.55)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(20,184,166,0.12)'; e.currentTarget.style.borderColor = 'rgba(20,184,166,0.35)'; }}
-                  >
-                    Fazer Inscrição
-                  </button>
+                  {selectedTab === 'Em Andamento' && (
+                    <button
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.5rem',
+                        padding: '0.625rem 1rem',
+                        borderRadius: 'var(--radius)',
+                        border: '1px solid rgba(20,184,166,0.35)',
+                        backgroundColor: 'rgba(20,184,166,0.12)',
+                        color: '#14b8a6',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        width: '100%',
+                        fontFamily: 'var(--font-family)',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(20,184,166,0.22)'; e.currentTarget.style.borderColor = 'rgba(20,184,166,0.55)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(20,184,166,0.12)'; e.currentTarget.style.borderColor = 'rgba(20,184,166,0.35)'; }}
+                    >
+                      Ver Andamento
+                    </button>
+                  )}
+                  {selectedTab !== 'Em Andamento' && (
+                    <button
+                      onClick={() => {
+                        if (selectedTab === 'Aberto') onInscricao?.(edital.id);
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.5rem',
+                        padding: '0.625rem 1rem',
+                        borderRadius: 'var(--radius)',
+                        border: '1px solid rgba(20,184,166,0.35)',
+                        backgroundColor: 'rgba(20,184,166,0.12)',
+                        color: '#14b8a6',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        width: '100%',
+                        fontFamily: 'var(--font-family)',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(20,184,166,0.22)'; e.currentTarget.style.borderColor = 'rgba(20,184,166,0.55)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'rgba(20,184,166,0.12)'; e.currentTarget.style.borderColor = 'rgba(20,184,166,0.35)'; }}
+                    >
+                      {selectedTab === 'Finalizado' ? 'Ver Resultado' : 'Fazer Inscrição'}
+                    </button>
+                  )}
                 </div>
               );
             })}

@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { ChevronLeft, Calendar, Users, DollarSign, FileText, ExternalLink, Moon } from 'lucide-react';
+import { ChevronLeft, Calendar, FileText, Moon } from 'lucide-react';
 import fapesLogo from 'figma:asset/aec6ed8eb7cf2782d52002e0d4c19150c79afd78.png';
-import editalImg from 'figma:asset/87cbb34a404391c3629605e4569ee0dab2b3e31f.png';
 import { editais } from '../data/editais';
 import { AccessibilityModal } from './AccessibilityModal';
 
@@ -26,6 +25,39 @@ const areaColors: Record<string, { bg: string; color: string }> = {
   'Difusão do Conhecimento': { bg: 'rgba(34, 211, 238,0.12)', color: '#22d3ee' },
   'Inovação':                { bg: 'rgba(34, 211, 238,0.12)', color: '#22d3ee' },
 };
+
+const editalTextSections = [
+  {
+    title: '1. Apresentação',
+    content:
+      'A Fundação de Amparo à Pesquisa e Inovação do Espírito Santo torna pública a abertura de inscrições para seleção de propostas voltadas ao desenvolvimento científico, tecnológico e de inovação, conforme as diretrizes institucionais da FAPES.',
+  },
+  {
+    title: '2. Objetivo',
+    content:
+      'Apoiar projetos que contribuam para a formação de recursos humanos, fortalecimento da pesquisa aplicada, difusão do conhecimento e geração de soluções para desafios estratégicos do Estado do Espírito Santo.',
+  },
+  {
+    title: '3. Público-alvo',
+    content:
+      'Poderão submeter propostas pesquisadores, estudantes, profissionais vinculados a instituições científicas, tecnológicas, de inovação, ensino superior ou organizações elegíveis conforme as regras deste edital.',
+  },
+  {
+    title: '4. Recursos disponíveis',
+    content:
+      'Os recursos financeiros serão destinados conforme disponibilidade orçamentária, critérios de mérito técnico-científico e atendimento aos requisitos formais estabelecidos no cronograma da chamada.',
+  },
+  {
+    title: '5. Inscrição e envio da proposta',
+    content:
+      'A inscrição deverá ser realizada exclusivamente pelo sistema Conecta FAPES. O proponente deve preencher o formulário eletrônico, anexar os documentos exigidos e enviar a proposta dentro do prazo indicado.',
+  },
+  {
+    title: '6. Análise e resultado',
+    content:
+      'As propostas serão analisadas quanto à habilitação documental, aderência ao edital, mérito técnico e disponibilidade de recursos. O resultado será publicado nos canais oficiais da FAPES.',
+  },
+];
 
 export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: EditalDetailPageProps) {
   const [showAccessibility, setShowAccessibility] = useState(false);
@@ -126,7 +158,7 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
       </div>
 
       {/* ── CONTENT ── */}
-      <div style={{ ...CONTAINER, paddingTop: '1.5rem', paddingBottom: '8rem' }}>
+      <div style={{ ...CONTAINER, paddingTop: '1.5rem', paddingBottom: '3rem' }}>
 
         {/* Header info bar */}
         <div
@@ -141,6 +173,7 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
             gap: '1.5rem',
             alignItems: 'flex-start',
             justifyContent: 'space-between',
+            position: 'relative',
           }}
         >
           {/* Left: title block */}
@@ -206,159 +239,93 @@ export function EditalDetailPage({ editalId, onBack, onInscricao, onLogin }: Edi
             </p>
           </div>
 
-          {/* Right: meta chips */}
           <div
             style={{
               display: 'flex',
-              flexDirection: 'column',
-              gap: '0.75rem',
-              minWidth: '180px',
+              alignItems: 'center',
+              gap: '0.5rem',
+              flex: '0 0 auto',
+              justifyContent: 'flex-start',
+              marginTop: '0.1rem',
             }}
           >
-            {[
-              { icon: <Calendar size={15} />, label: 'Inscrição até', value: edital.prazo },
-              { icon: <Users size={15} />, label: 'Vagas', value: `${edital.vagas} vagas` },
-              { icon: <DollarSign size={15} />, label: 'Valor total', value: edital.valor },
-            ].map(item => (
-              <div key={item.label} className="flex items-center gap-2">
-                <span style={{ color: 'var(--muted-foreground)' }}>{item.icon}</span>
-                <div>
-                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)', fontFamily: 'var(--font-family)', lineHeight: 1 }}>
-                    {item.label}
-                  </div>
-                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--foreground)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
-                    {item.value}
-                  </div>
-                </div>
+            <span style={{ color: 'var(--muted-foreground)', display: 'inline-flex' }}>
+              <Calendar size={15} />
+            </span>
+            <div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)', fontFamily: 'var(--font-family)', lineHeight: 1 }}>
+                Inscrições até
               </div>
-            ))}
+              <div style={{ fontSize: 'var(--text-sm)', color: 'var(--foreground)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
+                {edital.prazo}
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Document viewer label */}
-        <div className="flex items-center gap-2" style={{ marginBottom: '1rem' }}>
-          <FileText size={16} style={{ color: 'var(--muted-foreground)' }} />
-          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', fontFamily: 'var(--font-family)' }}>
-            Documento do Edital
-          </span>
-        </div>
-
-        {/* Document image frame */}
         <div
           style={{
-            border: '1px solid rgba(6,182,212,0.2)',
-            borderRadius: 'var(--radius-lg)',
-            overflow: 'hidden',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
-          }}
-        >
-          {/* Viewer toolbar */}
-          <div
-            style={{
-              backgroundColor: 'rgba(6,182,212,0.08)',
-              borderBottom: '1px solid rgba(6,182,212,0.15)',
-              padding: '0.625rem 1.25rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)', fontFamily: 'var(--font-family)' }}>
-              {edital.numero ?? 'Edital FAPES'} — Página 1 de 53
-            </span>
-            <button
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.375rem',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                color: 'var(--muted-foreground)',
-                fontSize: 'var(--text-xs)',
-                fontFamily: 'var(--font-family)',
-                transition: 'color 0.2s',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#22d3ee'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'var(--muted-foreground)'; }}
-            >
-              <ExternalLink size={13} />
-              Abrir em nova aba
-            </button>
-          </div>
-
-          {/* The document */}
-          <div style={{ backgroundColor: '#e8e8e8', display: 'flex', justifyContent: 'center', padding: '2rem 1rem' }}>
-            <img
-              src={editalImg}
-              alt={`Edital ${edital.titulo}`}
-              style={{
-                width: '100%',
-                maxWidth: '860px',
-                display: 'block',
-                boxShadow: '0 4px 32px rgba(0,0,0,0.25)',
-                borderRadius: '2px',
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* ── STICKY BOTTOM BAR ── */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 40,
-          backgroundColor: 'var(--app-header)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          borderTop: '1px solid rgba(6,182,212,0.2)',
-          padding: '1rem 0',
-        }}
-      >
-        <div
-          style={{
-            ...CONTAINER,
+            marginLeft: '2rem',
+            marginBottom: '1rem',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            flexWrap: 'wrap',
             gap: '1rem',
           }}
         >
-          <div>
-            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--muted-foreground)', fontFamily: 'var(--font-family)', marginBottom: '0.2rem' }}>
-              Edital aberto
-            </div>
-            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--foreground)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
-              {edital.titulo} · Inscrições até {edital.prazo}
-            </div>
+          <div className="flex items-center gap-2">
+            <FileText size={16} style={{ color: 'var(--muted-foreground)' }} />
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', fontFamily: 'var(--font-family)' }}>
+              Documento do Edital
+            </span>
           </div>
           <button
-            onClick={onInscricao}
             style={{
-              padding: '0.75rem 2rem',
+              padding: '0.55rem 1rem',
               borderRadius: 'var(--radius)',
-              border: 'none',
-              backgroundColor: '#22d3ee',
-              color: '#0a0a0a',
+              border: '1px solid rgba(6,182,212,0.35)',
+              backgroundColor: 'rgba(6,182,212,0.12)',
+              color: '#22d3ee',
               fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-semibold)',
+              fontWeight: 'var(--font-weight-medium)',
               cursor: 'pointer',
-              transition: 'all 0.2s',
               fontFamily: 'var(--font-family)',
               whiteSpace: 'nowrap',
             }}
-            onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#22d3ee'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-            onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#22d3ee'; e.currentTarget.style.transform = 'translateY(0)'; }}
           >
-            Fazer Inscrição
+            Baixar Arquivo
           </button>
         </div>
+
+        <article style={{ maxWidth: '860px', marginLeft: '2rem' }}>
+          <div style={{ marginBottom: '2rem' }}>
+            <div style={{ color: '#22d3ee', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)', letterSpacing: '0.06em', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+              {edital.numero ?? 'EDITAL FAPES'}
+            </div>
+            <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-xl)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 1.35, margin: '0 0 0.75rem', fontFamily: 'var(--font-family)' }}>
+              {edital.titulo}
+            </h2>
+            <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', lineHeight: 1.7, margin: 0, fontFamily: 'var(--font-family)' }}>
+              Texto demonstrativo do edital para visualização no protótipo. As informações abaixo são mockadas e representam a estrutura textual que será exibida ao cidadão.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {editalTextSections.map(section => (
+              <section key={section.title}>
+                <h3 style={{ color: 'var(--foreground)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-semibold)', margin: '0 0 0.5rem', fontFamily: 'var(--font-family)' }}>
+                  {section.title}
+                </h3>
+                <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', lineHeight: 1.8, margin: 0, fontFamily: 'var(--font-family)' }}>
+                  {section.content}
+                </p>
+              </section>
+            ))}
+          </div>
+        </article>
       </div>
+
     </div>
   );
 }
