@@ -10,8 +10,8 @@ O processo de Parcerias foi dividido em quatro fluxos principais:
 
 1. **[Criacao da Parceria](#fluxo-1-criacao-da-parceria)** — solicitacao pela Instituicao, envio do documento de solicitacao, cadastro, formalizacao documental, registro do aporte original e transicao para `Vigente`.
 2. **[Aditivo da Parceria](#fluxo-2-aditivo-da-parceria)** — inclusao de nova vigencia ou novo aporte financeiro apos a parceria estar vigente.
-3. **[Suspensao ou Encerramento da Parceria](#fluxo-3-suspensao-ou-encerramento-da-parceria)** — interrupcao temporaria, reativacao ou encerramento definitivo com cascata para Programas aportados.
-4. **[Suspensao em Cascata](#fluxo-4-suspensao-em-cascata-para-programas-e-iniciativas)** — suspensao dos Programas e Iniciativas vinculados quando a Parceria e suspensa.
+3. **[Suspensao, Reativacao e Encerramento da Parceria](#fluxo-3-suspensao-reativacao-e-encerramento-da-parceria)** — interrupcao temporaria, retorno a vigencia ou encerramento definitivo com cascata para Programas aportados.
+4. **[Cascata em Programas](#fluxo-4-cascata-em-programas)** — impacto da suspensao, reativacao e encerramento da Parceria sobre os Programas associados por `AporteFinanceiroPrograma`.
 
 ---
 
@@ -122,130 +122,102 @@ Um `AporteFinanceiro` com `isAditivo = true` pode ser editado ou removido apos c
 
 ---
 
-## Fluxo 3 — Suspensao ou Encerramento da Parceria
+## Fluxo 3 — Suspensao, Reativacao e Encerramento da Parceria
 
-Este fluxo cobre a interrupcao temporaria da Parceria, sua reativacao e o encerramento definitivo. A solicitacao de suspensao ou encerramento pode partir da Instituicao ou da Area de Parcerias. O encerramento exige confirmacao explicita, justificativa e encerramento em cascata dos Programas aportados.
+Este fluxo cobre a interrupcao temporaria da Parceria, sua reativacao e o encerramento definitivo. O recorte atual segue as issues #2147, #2149 e #2153: a origem por Area Tecnica e rastreada a partir do usuario autenticado, a resolucao por Instituicao fica fora de escopo nesta entrega, o frontend nao exibe seletor manual de origem, e a cascata automatica atua sobre Programas associados via `AporteFinanceiroPrograma`.
 
 ```mermaid
 flowchart TB
-    inicio((Parceria Vigente))
+    inicio((Parceria Vigente ou Suspensa))
     fim((Parceria Encerrada))
 
-    subgraph instituicao["Instituicao"]
-        I1["Solicitar suspensao"]
-        I2["Solicitar encerramento"]
-        I3["Enviar justificativa"]
-    end
-
     subgraph area["Area de Parcerias"]
-        A0["Solicitar suspensao ou encerramento"]
-        A00["Receber solicitacao da Instituicao"]
+        A0["Abrir dropdown de Acoes"]
         G1{"Acao solicitada"}
-        A1["Informar motivo da suspensao"]
-        A2["Suspender Parceria"]
-        A8["Acionar suspensao em cascata"]
-        G2{"Reativar ou encerrar?"}
-        A3["Reativar Parceria"]
-        A4["Solicitar encerramento"]
-        A5["Informar justificativa e confirmacao"]
-        A6["Encerrar Parceria"]
+        A1["Consultar Programas afetados (#2186)"]
+        A2["Informar motivo da suspensao"]
+        A3["Suspender Parceria"]
+        A4["Confirmar reativacao"]
+        A5["Reativar Parceria"]
+        A6["Informar justificativa de encerramento"]
+        A7["Encerrar Parceria"]
     end
 
     subgraph programas["Programas / M010"]
-        P1["Identificar Programas aportados"]
-        P2["Encerrar Programas em cascata"]
+        P1["Listar Programas via AporteFinanceiroPrograma"]
+        P2["Vigentes -> SUSPENSO_POR_PARCERIA"]
+        P3["Fechar SuspensaoPrograma e voltar para VIGENTE"]
+        P4["Todos associados -> ENCERRADO_POR_PARCERIA"]
     end
 
     inicio --> A0 --> G1
-    inicio --> I1 --> A00 --> G1
-    inicio --> I2 --> A00 --> G1
-    I3 --> A5
-    G1 -- "Suspender" --> A1 --> A2 --> A8 --> G2
-    G2 -- "Reativar" --> A3 --> inicio
-    G2 -- "Encerrar" --> A4
-
-    G1 -- "Encerrar" --> A4
-    A4 --> A5
-    A5 -- "RI2 invalido" --> A5
-    A5 -- "RI2 valido" --> P1 --> P2 --> A6 --> fim
-
-    inicio -- "Vigencia expirada" --> A4
+    G1 -- "Suspender" --> A1 --> P1 --> A2 --> A3 --> P2
+    G1 -- "Reativar" --> A4 --> A5 --> P3
+    G1 -- "Encerrar" --> A1 --> P1 --> A6 --> A7 --> P4 --> fim
 ```
 
-### Atividades de suspensao e encerramento
+### Atividades de suspensao, reativacao e encerramento
 
 | Atividade | Responsavel | Resultado |
 |-----------|-------------|-----------|
-| Solicitar suspensao | Instituicao ou Area de Parcerias | Pedido de suspensao recebido com motivo inicial. |
-| Solicitar encerramento | Instituicao ou Area de Parcerias | Pedido de encerramento recebido para analise. |
-| Suspender Parceria | Area de Parcerias | Estado alterado para `Suspensa`; novos aportes e aditivos ficam bloqueados. Aciona a suspensao em cascata de Programas e Iniciativas (RI4). |
-| Reativar Parceria | Area de Parcerias | Estado retorna para `Vigente` quando a vigencia corrente ainda e valida. |
-| Verificar vigencia expirada | Area de Parcerias | Identifica vigencia vencida e notifica o responsavel; nao encerra automaticamente. |
-| Iniciar encerramento operacional | Area de Parcerias | Abertura da etapa de encerramento apos solicitacao ou notificacao de expiracao. |
-| Validar RI2 | Area de Parcerias | Exige confirmacao explicita e justificativa antes do encerramento definitivo. |
-| Encerrar Programas em cascata | Programas / M010 | Programas aportados pela Parceria sao encerrados conforme RI2. |
-| Encerrar Parceria | Area de Parcerias | Estado alterado para `Encerrada`; a Parceria torna-se imutavel. |
+| Consultar Programas afetados | Frontend / Backend | `GET /api/captacaoprojetos/parcerias/{id}/programas` retorna os Programas associados; usado nos modais de Suspender e Encerrar. |
+| Suspender Parceria | Area de Parcerias | `POST /api/captacaoprojetos/parcerias/{id}/suspender` recebe `{ isAreaTecnica, motivo }`; apenas Parcerias `VIGENTE` podem ser suspensas. |
+| Registrar SuspensaoParceria | Backend | Cria historico ativo com motivo, data, usuario e origem resolvida do token (`AreaTecnicaId` quando `isAreaTecnica = true`; `InstituicaoId` fica fora de escopo nesta entrega). |
+| Suspender Programas em cascata | Programas / M010 | Programas associados que estiverem `VIGENTE` passam para `SUSPENSO_POR_PARCERIA` e geram `SuspensaoPrograma` ativo. |
+| Reativar Parceria | Area de Parcerias | `POST /api/captacaoprojetos/parcerias/{id}/reativar` recebe `{ isAreaTecnica }`; apenas Parcerias `SUSPENSA` podem ser reativadas. |
+| Reverter cascata de Programas | Programas / M010 | Fecha `SuspensaoPrograma` ativo e retorna Programas `SUSPENSO_POR_PARCERIA` para `VIGENTE`; Programas encerrados nao sao ressuscitados. |
+| Encerrar Parceria | Area de Parcerias | `POST /api/captacaoprojetos/parcerias/{id}/encerrar` recebe `{ justificativa }`; apenas Parcerias `VIGENTE` ou `SUSPENSA` podem ser encerradas. |
+| Encerrar Programas em cascata | Programas / M010 | Programas associados via `AporteFinanceiroPrograma` passam para `ENCERRADO_POR_PARCERIA`; o status `ENCERRADO` permanece para encerramento proprio do Programa. |
 
 ---
 
-## Fluxo 4 — Suspensao em Cascata para Programas e Iniciativas
+## Fluxo 4 — Cascata em Programas
 
-Uma Parceria pode aportar em mais de um Programa e tambem estar relacionada a Iniciativas. Quando a Parceria e suspensa, todos os Programas e Iniciativas dependentes dessa Parceria devem ser suspensos para impedir novas execucoes, novos editais ou novas operacoes vinculadas enquanto a causa da suspensao estiver em analise.
+A cascata de Parceria sobre Programas e executada a partir da associacao `AporteFinanceiroPrograma`. A suspensao cria historico ativo para permitir reativacao idempotente; o encerramento usa status causal para diferenciar encerramento herdado de encerramento proprio do Programa. A propagacao para Iniciativas (M003) permanece como integracao futura.
 
 ```mermaid
 flowchart TB
-    inicio((Parceria Suspensa))
-    fim((Impactos Suspensos))
+    inicio((Acao na Parceria))
+    fim((Programas atualizados))
 
-    subgraph area["Area de Parcerias"]
-        A1["Confirmar suspensao da Parceria"]
-        A2["Identificar causa e vigencia da suspensao"]
-        A3["Notificar areas responsaveis"]
+    subgraph parceria["Parceria"]
+        G0{"Tipo de acao"}
+        S1["SuspensaoParceria ativa"]
+        R1["SuspensaoParceria encerrada"]
+        E1["Parceria ENCERRADA"]
     end
 
-    subgraph programas["Programas / M010"]
-        P1["Listar Programas aportados pela Parceria"]
-        G1{"Existem Programas vinculados?"}
-        P2["Suspender Programa"]
-        P3["Registrar motivo da suspensao herdada"]
-        P4["Bloquear novos aportes e novas ativacoes"]
+    subgraph programas["Programas associados"]
+        P1["Buscar por AporteFinanceiroPrograma"]
+        G1{"Status do Programa"}
+        P2["VIGENTE -> SUSPENSO_POR_PARCERIA"]
+        P3["Criar SuspensaoPrograma ativa"]
+        P4["SUSPENSO_POR_PARCERIA -> VIGENTE"]
+        P5["Fechar SuspensaoPrograma"]
+        P6["Associado -> ENCERRADO_POR_PARCERIA"]
     end
 
-    subgraph iniciativas["Iniciativas / M003"]
-        I1["Listar Iniciativas vinculadas a Parceria"]
-        G2{"Existem Iniciativas vinculadas?"}
-        I2["Suspender Iniciativa"]
-        I3["Registrar motivo da suspensao herdada"]
-        I4["Bloquear novas publicacoes ou execucoes vinculadas"]
-    end
-
-    inicio --> A1 --> A2
-    A2 --> P1 --> G1
-    A2 --> I1 --> G2
-
-    G1 -- "Sim" --> P2 --> P3 --> P4 --> A3
-    G1 -- "Nao" --> A3
-
-    G2 -- "Sim" --> I2 --> I3 --> I4 --> A3
-    G2 -- "Nao" --> A3
-
-    A3 --> fim
+    inicio --> G0
+    G0 -- "Suspender" --> S1 --> P1 --> G1
+    G1 -- "VIGENTE" --> P2 --> P3 --> fim
+    G1 -- "Demais status" --> fim
+    G0 -- "Reativar" --> R1 --> P5 --> P4 --> fim
+    G0 -- "Encerrar" --> E1 --> P1 --> P6 --> fim
 ```
 
-### Atividades da suspensao em cascata
+### Atividades da cascata em Programas
 
 | Atividade | Responsavel | Resultado |
 |-----------|-------------|-----------|
-| Confirmar suspensao da Parceria | Area de Parcerias | Parceria permanece em `Suspensa` e a causa da suspensao e registrada. |
-| Listar Programas aportados | Programas / M010 | Identifica todos os Programas que recebem aporte da Parceria por `AporteFinanceiroParceriaPrograma`. |
-| Suspender Programa | Programas / M010 | Cada Programa vinculado passa para `Suspenso` e recebe motivo de suspensao herdada da Parceria. |
-| Listar Iniciativas vinculadas | Iniciativas / M003 | Identifica Iniciativas relacionadas diretamente a Parceria ou a Programas suspensos. |
-| Suspender Iniciativa | Iniciativas / M003 | Cada Iniciativa impactada passa para estado suspenso ou equivalente, preservando rastreabilidade do motivo. |
-| Notificar areas responsaveis | Area de Parcerias | Areas de Programas e Iniciativas sao notificadas sobre os impactos da suspensao. |
+| Listar Programas associados | Programas / M010 | Identifica Programas por `AporteFinanceiroPrograma.ParceriaId`. |
+| Suspender Programa por Parceria | Programas / M010 | Apenas Programas `VIGENTE` passam para `SUSPENSO_POR_PARCERIA`; demais status sao ignorados na suspensao. |
+| Registrar SuspensaoPrograma | Programas / M010 | Cria historico ativo vinculado a `SuspensaoParceria`, com `ParceriaId`, `ProgramaId`, `DataSuspensao` e `Ativa = true`. |
+| Reativar Programa por Parceria | Programas / M010 | Fecha historicos ativos e retorna Programas `SUSPENSO_POR_PARCERIA` para `VIGENTE`, sem alterar Programas encerrados. |
+| Encerrar Programa por Parceria | Programas / M010 | Todos os Programas associados a Parceria encerrada passam para `ENCERRADO_POR_PARCERIA`, preservando a diferenca para `ENCERRADO` proprio do Programa. |
 
 ### Referencia da cascata
 
-A suspensao em cascata e regida pela `RI4`. A definicao oficial fica em [M010 — Regras de Negocio](../README.md#regras-de-negocio-consolidadas).
+A cascata e regida por `RI2` (encerramento) e `RI4` (suspensao/reativacao). A definicao oficial fica em [M010 — Regras de Negocio](../README.md#regras-de-negocio-consolidadas).
 
 ---
 
@@ -255,6 +227,6 @@ Regras aplicaveis aos fluxos de Parcerias: `RN04`, `RN06`, `RN10`, `RN14`, `RN15
 
 ## Observacoes
 
-- A criacao da Parceria nao distribui recurso para Programa; isso ocorre via `AporteFinanceiroParceriaPrograma`, no subdominio de Programas.
-- O job de expiracao apenas notifica e abre pendencia operacional; a Parceria nao e encerrada sem confirmacao.
+- A criacao da Parceria nao distribui recurso para Programa; isso ocorre via `AporteFinanceiroPrograma`, no subdominio de Programas.
+- O job de expiracao apenas notifica e abre pendencia operacional; a Parceria nao e encerrada sem acao explicita de encerramento.
 - Contas bancarias pertencem conceitualmente ao M016, sendo usadas aqui como destino do deposito do aporte.

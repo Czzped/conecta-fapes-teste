@@ -74,9 +74,9 @@ entities:
       saldoAlocavelEmProgramas:
         type: "decimal"
         required: false
-        description: "valorBrutoRecebido - valorTaxaGestao - SUM(AporteFinanceiroParceriaPrograma.valor em estado ATIVO). Sempre >= 0 (RN14, RN22)."
+        description: "valorBrutoRecebido - valorTaxaGestao - SUM(AporteFinanceiroPrograma.valor em estado ATIVO). Sempre >= 0 (RN14, RN22)."
         derived: true
-        formula: "valorBrutoRecebido - valorTaxaGestao - SUM(AporteFinanceiroParceriaPrograma.valor WHERE parceria = this AND estado = 'ATIVO')"
+        formula: "valorBrutoRecebido - valorTaxaGestao - SUM(AporteFinanceiroPrograma.valor WHERE parceria = this AND estado = 'ATIVO')"
 
   Vigencia:
     description: "Janela temporal da Parceria, original ou aditivo. A Parceria deve ter exatamente uma Vigencia com isAditivo = false (RN15). Aditivos estendem a vigencia com justificativa e documento (RN06)."
@@ -178,9 +178,9 @@ relationships:
     description: "Cada Vigencia e formalizada por um Documento (Termo de Cooperacao ou Termo Aditivo)."
   - from: "planejamento.parcerias.Parceria"
     relation: "origem_de"
-    to: "planejamento.programas.AporteFinanceiroParceriaPrograma"
+    to: "planejamento.programas.AporteFinanceiroPrograma"
     cardinality: "1:N"
-    description: "Uma Parceria pode ser origem de zero ou mais aportes em Programas via AporteFinanceiroParceriaPrograma (entidade vive em programas)."
+    description: "Uma Parceria pode ser origem de zero ou mais aportes em Programas via AporteFinanceiroPrograma (entidade vive em programas)."
 
 axioms:
   # --- Fluxo financeiro ---
@@ -191,8 +191,8 @@ axioms:
     natural_language: "valorTaxaGestao e a soma dos TaxaGestaoParcerias gerados por cada AporteFinanceiro desta Parceria, com snapshot imutavel da politica vigente no momento do aporte."
     formal_rule: "∀p ∈ Parceria: p.valorTaxaGestao = SUM(TaxaGestaoParcerias.valorTaxaGestao WHERE parceria = p)"
   - id: "AX-M010-FIN-03"
-    natural_language: "saldoAlocavelEmProgramas e valorBrutoRecebido menos valorTaxaGestao menos a soma dos valores dos AportesFinanceiroParceriaPrograma em estado ATIVO desta Parceria. Nunca negativo."
-    formal_rule: "∀p ∈ Parceria: p.saldoAlocavelEmProgramas = p.valorBrutoRecebido - p.valorTaxaGestao - SUM(AporteFinanceiroParceriaPrograma.valor WHERE parceria = p AND estado = 'ATIVO') AND p.saldoAlocavelEmProgramas >= 0"
+    natural_language: "saldoAlocavelEmProgramas e valorBrutoRecebido menos valorTaxaGestao menos a soma dos valores dos AportesFinanceiroPrograma em estado ATIVO desta Parceria. Nunca negativo."
+    formal_rule: "∀p ∈ Parceria: p.saldoAlocavelEmProgramas = p.valorBrutoRecebido - p.valorTaxaGestao - SUM(AporteFinanceiroPrograma.valor WHERE parceria = p AND estado = 'ATIVO') AND p.saldoAlocavelEmProgramas >= 0"
   - id: "AX-M010-FIN-04"
     natural_language: >
       valorConsumido (executado) e a consolidacao dos valores efetivamente executados nos Projetos
@@ -201,7 +201,7 @@ axioms:
       Parceria nao armazena valorConsumido diretamente; acessa via consolidacao M003/M014.
     formal_rule: >
       ∀p ∈ Parceria:
-        programas_aportados = {prog | AporteFinanceiroParceriaPrograma.parceria = p AND estado = 'ATIVO'}
+        programas_aportados = {prog | AporteFinanceiroPrograma.parceria = p AND estado = 'ATIVO'}
         projetos_vinculados = {ini | ini.programa ∈ programas_aportados}  # M003
         p.valorConsumido = SUM(ini.valorExecutado WHERE ini ∈ projetos_vinculados)  # alimentado por M014
       p.valorConsumido IS READ-ONLY in M010; ownership = M003+M014
@@ -247,9 +247,9 @@ axioms:
     formal_rule: "TaxaGestaoParcerias.calculada_em = Parceria AND Programa.recalcula_taxa_gestao = false"
   - id: "AX-M010-RN21"
     natural_language: "O valor da Taxa de Gestao de Parcerias nao compoe o saldo alocavel em Programas."
-    formal_rule: "saldoAlocavelEmProgramas = valorBrutoRecebido - valorTaxaGestao - SUM(AporteFinanceiroParceriaPrograma.valor em ATIVO)"
+    formal_rule: "saldoAlocavelEmProgramas = valorBrutoRecebido - valorTaxaGestao - SUM(AporteFinanceiroPrograma.valor em ATIVO)"
   - id: "AX-M010-RN22"
-    natural_language: "O saldo alocavel em Programas e SUM(AporteFinanceiro.valorInvestido) - valorTaxaGestao - SUM(AporteFinanceiroParceriaPrograma.valor em estado ATIVO), sempre >= 0."
+    natural_language: "O saldo alocavel em Programas e SUM(AporteFinanceiro.valorInvestido) - valorTaxaGestao - SUM(AporteFinanceiroPrograma.valor em estado ATIVO), sempre >= 0."
     formal_rule: "saldoAlocavelEmProgramas >= 0"
   - id: "AX-M010-RN23"
     natural_language: "Cada AporteFinanceiro sujeito a Taxa de Gestao de Parcerias gera sua propria TaxaGestaoParcerias com snapshot da politica, faixa, percentual, base de calculo e valor calculado. Nao se recalcula retroativamente."
@@ -296,8 +296,8 @@ enums:
     values:
       EmElaboracao: "Parceria em elaboracao, ainda nao formalizada."
       Vigente: "Parceria formalizada e dentro da vigencia (RN19)."
-      Suspensa: "Parceria temporariamente suspensa; provoca suspensao em cascata de Programas e Projetos (RI4)."
-      Encerrada: "Parceria encerrada; provoca encerramento em cascata de Programas aportados (RI2)."
+      Suspensa: "Parceria temporariamente suspensa; provoca suspensao em cascata dos Programas associados que estavam vigentes, com status SUSPENSO_POR_PARCERIA (RI4)."
+      Encerrada: "Parceria encerrada por chamada explicita com justificativa; provoca encerramento em cascata dos Programas associados com status ENCERRADO_POR_PARCERIA (RI2)."
 
 value_objects: {}
 
@@ -307,11 +307,11 @@ events:
     payload_entity: "planejamento.parcerias.Parceria"
     trigger: "state_transition.Vigente"
   - name: "ParceriaSuspensa"
-    description: "Emitido quando Parceria transita para Suspensa; dispara suspensao em cascata de Programas e Projetos (RI4)."
+    description: "Emitido quando Parceria transita para Suspensa; dispara suspensao em cascata dos Programas associados que estavam vigentes (RI4)."
     payload_entity: "planejamento.parcerias.Parceria"
     trigger: "state_transition.Suspensa"
   - name: "ParceriaEncerrada"
-    description: "Emitido quando Parceria transita para Encerrada (solicitacao do usuario ou expiracao automatica); dispara encerramento em cascata de Programas aportados (RI2)."
+    description: "Emitido quando Parceria transita para Encerrada por chamada explicita com justificativa; dispara encerramento em cascata dos Programas associados como ENCERRADO_POR_PARCERIA (RI2)."
     payload_entity: "planejamento.parcerias.Parceria"
     trigger: "state_transition.Encerrada"
   - name: "AporteFinanceiroRegistrado"
@@ -338,23 +338,19 @@ workflows:
       - from: Vigente
         to: Suspensa
         trigger: "suspender_parceria"
-        guard: "justificativa preenchida"
+        guard: "motivo preenchido AND Parceria em VIGENTE"
       - from: Suspensa
         to: Vigente
         trigger: "reativar_parceria"
-        guard: "justificativa preenchida AND today() <= vigenciaFimCorrente"
+        guard: "SuspensaoParceria ativa existente"
       - from: Vigente
         to: Encerrada
         trigger: "encerrar_parceria"
-        guard: "justificativa obrigatoria AND confirmacao explicita de cascata em Programas"
-      - from: Vigente
-        to: Encerrada
-        trigger: "expiracao_automatica"
-        guard: "vigenciaFimCorrente < today() AND justificativa obrigatoria"
+        guard: "justificativa obrigatoria"
       - from: Suspensa
         to: Encerrada
         trigger: "encerrar_parceria_suspensa"
-        guard: "justificativa obrigatoria AND confirmacao explicita de cascata em Programas"
+        guard: "justificativa obrigatoria"
 
 policies:
   permissions:
@@ -390,12 +386,12 @@ agent_instructions:
     - "Ao registrar AporteFinanceiro aditivo, verificar existencia de original e dataAporte posterior (RN17)."
     - "Garantir saldoAlocavelEmProgramas >= 0 em toda operacao financeira (RN14, RN22)."
     - "valorTaxaGestao nao compoe saldo alocavel — calcular antes de permitir aportes em Programas (RN21)."
-    - "Ao suspender Parceria, disparar evento ParceriaSuspensa para cascata em Programas e Projetos (RI4)."
-    - "Ao encerrar Parceria, exigir confirmacao explicita e disparar encerramento em cascata de Programas aportados (RI2)."
-    - "Parceria so pode ser removida se nao houver AporteFinanceiroParceriaPrograma vinculado (RI3)."
+    - "Ao suspender Parceria, disparar evento ParceriaSuspensa para cascata apenas em Programas associados que estejam vigentes; Projetos/Iniciativas ficam para integracao futura com M003 (RI4)."
+    - "Ao encerrar Parceria, exigir justificativa e disparar encerramento em cascata dos Programas associados como ENCERRADO_POR_PARCERIA (RI2)."
+    - "Parceria so pode ser removida se nao houver AporteFinanceiroPrograma vinculado (RI3)."
     - "A prestacao financeira da AcaoTransversal pertence ao M016; nao modelar aqui (RN24)."
   notes:
     - "ContaBancaria e entidade de M008 (cadastro corporativo); referenciada via FK em AporteFinanceiro.contaBancariaDestino."
     - "TaxaGestaoParcerias e entidade de M016; M010 calcula e bloqueia, M016 custodia, planeja e executa via AcaoTransversal."
-    - "AporteFinanceiroParceriaPrograma e entidade definida em planejamento.programas."
+    - "AporteFinanceiroPrograma e entidade definida em planejamento.programas."
     - "Percentuais e faixas da Taxa de Gestao de Parcerias sao parametrizados em M016 (PoliticaTaxaGestaoParcerias, Resolucao CCAF 334/2023)."

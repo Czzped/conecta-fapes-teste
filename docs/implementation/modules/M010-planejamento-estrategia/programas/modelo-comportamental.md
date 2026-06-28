@@ -11,21 +11,21 @@ stateDiagram-v2
     [*] --> EmPlanejamento : CriarPrograma (RN01, RN16)
 
     EmPlanejamento --> EmPlanejamento : AtualizarPrograma (RN13)
-    EmPlanejamento --> EmPlanejamento : RegistrarAporteFinanceiroParceriaPrograma (RN11, RN13, RN14)
-    EmPlanejamento --> EmPlanejamento : RetirarAporteFinanceiroParceriaPrograma (RN14)
+    EmPlanejamento --> EmPlanejamento : RegistrarAporteFinanceiroPrograma (RN11, RN13, RN14)
+    EmPlanejamento --> EmPlanejamento : RetirarAporteFinanceiroPrograma (RN14)
     EmPlanejamento --> EmPlanejamento : CadastrarComiteGovernanca
     EmPlanejamento --> Ativo : AtivarPrograma
     EmPlanejamento --> [*] : RemoverPrograma (RI1)
 
     Ativo --> Ativo : AtualizarPrograma (RN13)
-    Ativo --> Ativo : RegistrarAporteFinanceiroParceriaPrograma (RN11, RN13, RN14)
-    Ativo --> Ativo : RetirarAporteFinanceiroParceriaPrograma (RN14)
+    Ativo --> Ativo : RegistrarAporteFinanceiroPrograma (RN11, RN13, RN14)
+    Ativo --> Ativo : RetirarAporteFinanceiroPrograma (RN14)
     Ativo --> Suspenso : SuspenderPrograma
     Ativo --> Encerrado : EncerrarPrograma (RI1)
     Ativo --> [*] : RemoverPrograma (RI1)
 
     Suspenso --> Ativo : ReativarPrograma
-    Suspenso --> Suspenso : RetirarAporteFinanceiroParceriaPrograma (RN14)
+    Suspenso --> Suspenso : RetirarAporteFinanceiroPrograma (RN14)
     Suspenso --> Encerrado : EncerrarPrograma (RI1)
     Suspenso --> [*] : RemoverPrograma (RI1)
 
@@ -47,8 +47,8 @@ stateDiagram-v2
 |-----------|----------|---------------|
 | `[*] → EM_PLANEJAMENTO` | `CriarPrograma` | Eixo estrategico vinculado (RN01); Instituicao demandante (RN16) |
 | `EM_PLANEJAMENTO → ATIVO` | `AtivarPrograma` | Eixo vinculado **e** `ComiteGovernanca` definido |
-| `EM_PLANEJAMENTO/ATIVO/SUSPENSO → mesmo estado` | `RegistrarAporteFinanceiroParceriaPrograma` | Parceria vigente, saldo suficiente e periodo do Programa dentro da vigencia da Parceria |
-| `EM_PLANEJAMENTO/ATIVO/SUSPENSO → mesmo estado` | `RetirarAporteFinanceiroParceriaPrograma` | Aporte existe; se houver dinheiro alocado em iniciativa ou execucao vinculada, exige ajuste operacional previo |
+| `EM_PLANEJAMENTO/ATIVO/SUSPENSO → mesmo estado` | `RegistrarAporteFinanceiroPrograma` | Parceria vigente, saldo suficiente e periodo do Programa dentro da vigencia da Parceria |
+| `EM_PLANEJAMENTO/ATIVO/SUSPENSO → mesmo estado` | `RetirarAporteFinanceiroPrograma` | Aporte existe; se houver dinheiro alocado em iniciativa ou execucao vinculada, exige ajuste operacional previo |
 | `ATIVO → SUSPENSO` | `SuspenderPrograma` | motivo informado |
 | `SUSPENSO → ATIVO` | `ReativarPrograma` | causa da suspensao resolvida; bloqueio herdado de Parceria resolvido quando aplicavel |
 | `ATIVO → ENCERRADO` / `SUSPENSO → ENCERRADO` | `EncerrarPrograma` | sem bloqueios operacionais por iniciativas em andamento |

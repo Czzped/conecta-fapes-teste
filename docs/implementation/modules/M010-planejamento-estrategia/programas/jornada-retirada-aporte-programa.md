@@ -33,7 +33,7 @@ journey
 | # | Etapa | Ator principal | Resultado |
 |---|-------|----------------|-----------|
 | 1 | Solicitacao | Instituicao Demandante ou Area Tecnica | Pedido de retirada formalizado com justificativa. |
-| 2 | Identificacao do aporte | Area Tecnica / Area de Parcerias | `AporteFinanceiroParceriaPrograma` localizado. |
+| 2 | Identificacao do aporte | Area Tecnica / Area de Parcerias | `AporteFinanceiroPrograma` localizado. |
 | 3 | Analise de impacto | M003 / M011 | Verifica se o dinheiro ja foi alocado em iniciativa ou execucao vinculada. |
 | 4 | Ajuste operacional | M003 / M011 | Iniciativas afetadas sao canceladas, reduzidas ou realocadas quando necessario. |
 | 5 | Retirada | Area de Parcerias | Aporte retirado do Programa e saldo devolvido a Parceria. |

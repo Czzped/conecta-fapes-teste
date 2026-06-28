@@ -20,7 +20,7 @@ M010-planejamento-estrategia/
 │   ├── modelo-estrutural.md
 │   ├── modelo-comportamental.md
 │   └── epics/EPIC-M010-001.md
-├── programas/                    ← Programa + Recursos + Comite + AporteFinanceiroParceriaPrograma
+├── programas/                    ← Programa + Recursos + Comite + AporteFinanceiroPrograma
 │   ├── README.md
 │   ├── processo.md
 │   ├── jornada-gestao-programa.md
@@ -62,14 +62,14 @@ Referencia normativa: [Resolucao CCAF nº 334/2023 - FAPES](https://fapes.es.gov
 | [Backlog](backlog.md) | EPICs, US e rastreabilidade |
 | [Planejamento — Processo](planejamento/processo.md) / [Jornada](planejamento/jornada-gestao-planejamento.md) / [Estrutural](planejamento/modelo-estrutural.md) / [Comportamental](planejamento/modelo-comportamental.md) | Plano Estrategico + Eixos |
 | [Programas](programas/README.md) | Indice do subdominio, capacidades, jornadas, modelos e epic |
-| [Programas — Processo](programas/processo.md) / [Estrutural](programas/modelo-estrutural.md) / [Comportamental](programas/modelo-comportamental.md) | Programas + Recursos + Comite + AporteFinanceiroParceriaPrograma |
+| [Programas — Processo](programas/processo.md) / [Estrutural](programas/modelo-estrutural.md) / [Comportamental](programas/modelo-comportamental.md) | Programas + Recursos + Comite + AporteFinanceiroPrograma |
 | [Jornadas — Gestao do Programa](programas/jornada-gestao-programa.md) | Mapa das jornadas de Programas |
 | [Parcerias](parcerias/README.md) | Indice do subdominio, dores, capacidades e documentos |
 | [Parcerias — Processo](parcerias/processo.md) / [Estrutural](parcerias/modelo-estrutural.md) / [Comportamental](parcerias/modelo-comportamental.md) | Parcerias + Vigencias + Aportes + Documentos |
 | [Parcerias — Criacao da Parceria](parcerias/processo.md#fluxo-1-criacao-da-parceria) | Solicitacao, cadastro, aporte original e formalizacao |
 | [Parcerias — Aditivo da Parceria](parcerias/processo.md#fluxo-2-aditivo-da-parceria) | Aditivo de vigencia e aditivo de aporte |
-| [Parcerias — Suspensao e Encerramento](parcerias/processo.md#fluxo-3-suspensao-ou-encerramento-da-parceria) | Suspensao, reativacao e encerramento com cascata |
-| [Parcerias — Suspensao em Cascata](parcerias/processo.md#fluxo-4-suspensao-em-cascata-para-programas-e-iniciativas) | Impacto da suspensao sobre Programas e Iniciativas |
+| [Parcerias — Suspensao, Reativacao e Encerramento](parcerias/processo.md#fluxo-3-suspensao-reativacao-e-encerramento-da-parceria) | Suspensao, reativacao e encerramento com cascata em Programas |
+| [Parcerias — Cascata em Programas](parcerias/processo.md#fluxo-4-cascata-em-programas) | Impacto da suspensao, reativacao e encerramento sobre Programas associados |
 
 ## Consumidores
 
@@ -104,7 +104,7 @@ O sistema e estruturado em tres subdominios integrados (cada um com sua propria 
 
 **Planejamento** — A agencia define seus planejamentos estrategicos e eixos que orientam a criacao de programas. Pode haver mais de um planejamento cadastrado para ciclos diferentes, mas so pode haver um plano ativo por vez (RN09). Detalhes em [planejamento](planejamento/processo.md).
 
-**Programas** — Programas sao o instrumento de execucao, demandados por uma Instituicao (RN16), orientados por eixos (RN01), com comite de governanca, e podem receber aportes de uma ou mais Parcerias via `AporteFinanceiroParceriaPrograma` (N:N, RN11). Detalhes em [programas](programas/README.md).
+**Programas** — Programas sao o instrumento de execucao, demandados por uma Instituicao (RN16), orientados por eixos (RN01), com comite de governanca, e podem receber aportes de uma ou mais Parcerias via `AporteFinanceiroPrograma` (N:N, RN11). Detalhes em [programas](programas/README.md).
 
 **Parcerias** — Instrumento formal vinculado a exatamente uma Instituicao, com Vigencia (original + aditivos), aportes financeiros recebidos e Documentos regularizadores. Parcerias destinam aportes aos Programas (outflow). Detalhes em [parcerias](parcerias/README.md).
 
@@ -119,7 +119,7 @@ O sistema e estruturado em tres subdominios integrados (cada um com sua propria 
 | ID | Descricao | Prioridade | Subdominio |
 |----|-----------|------------|------------|
 | RN01 | Um programa deve estar vinculado a pelo menos um eixo estrategico. | Must | programas |
-| RN02 | Parcerias e Programas relacionam-se exclusivamente via `AporteFinanceiroParceriaPrograma` (N:N). Uma Parceria pode aportar em varios Programas; um Programa pode receber aportes de varias Parcerias. Nao existe relacao direta "parceria de referencia". | Must | programas / parcerias |
+| RN02 | Parcerias e Programas relacionam-se exclusivamente via `AporteFinanceiroPrograma` (N:N). Uma Parceria pode aportar em varios Programas; um Programa pode receber aportes de varias Parcerias. Nao existe relacao direta "parceria de referencia". | Must | programas / parcerias |
 | RN03 | O registro de aporte financeiro requer que a parceria tenha data de assinatura preenchida. | Must | parcerias |
 | RN04 | Cada aporte financeiro deve ter origem na Instituicao vinculada a Parceria, cadastrada em M008. | Must | parcerias |
 | RN06 | A primeira Vigencia da Parceria tem `isAditivo = false` e e criada junto ao cadastro (RN15). Toda alteracao posterior ocorre via nova Vigencia com `isAditivo = true`, contendo justificativa e documento (termo aditivo). Uma Vigencia aditivo exige: (a) `dataAssinatura` posterior a da Vigencia original; (b) `dataFim` posterior a `vigenciaFimCorrente` anterior. | Must | parcerias |
@@ -137,10 +137,10 @@ O sistema e estruturado em tres subdominios integrados (cada um com sua propria 
 | RN19 | Transicao `EmElaboracao → Vigente` exige: `dataAssinatura` + >=1 `AporteFinanceiro` original + Vigencia original + >=1 `Documento` anexado + hoje em `[vigenciaInicioCorrente, vigenciaFimCorrente]` (inclusivo). | Must | parcerias |
 | RN20 | A Taxa de Gestao de Parcerias e calculada uma unica vez por AporteFinanceiro, com base na PoliticaTaxaGestaoParcerias vigente parametrizada no M016; Programas nao recalculam Taxa de Gestao sobre aportes recebidos. | Must | parcerias / financeiro |
 | RN21 | O valor da Taxa de Gestao de Parcerias nao compoe o saldo alocavel em Programas (`valorTaxaGestao` e descontado antes de calcular `saldoAlocavelEmProgramas`). | Must | parcerias / programas |
-| RN22 | O saldo alocavel em Programas e `SUM(AporteFinanceiro.valorInvestido) - valorTaxaGestao - SUM(AporteFinanceiroParceriaPrograma.valor em estado ATIVO)`, sempre `>= 0`. | Must | parcerias / programas |
+| RN22 | O saldo alocavel em Programas e `SUM(AporteFinanceiro.valorInvestido) - valorTaxaGestao - SUM(AporteFinanceiroPrograma.valor em estado ATIVO)`, sempre `>= 0`. | Must | parcerias / programas |
 | RN23 | Cada AporteFinanceiro gera sua propria `TaxaGestaoParcerias` com snapshot imutavel da politica, faixa, percentual, base de calculo e valor calculado. Nao se recalcula retroativamente para aportes anteriores. | Must | parcerias / financeiro |
 | RN24 | A prestacao financeira da AcaoTransversal pertence ao M016; a prestacao de contas da Iniciativa/Projeto permanece no M014. | Must | financeiro / prestacao de contas |
 | RI1 | Um Programa pode ser removido sem impacto quando nao possui nenhuma Iniciativa vinculada. Se ja houver Iniciativa vinculada, a remocao e bloqueada e o Programa deve ser encerrado para preservar historico. | Must | programas |
-| RI2 | Uma Parceria transita para `Encerrada` em dois gatilhos: solicitacao do usuario ou expiracao automatica (`vigenciaFimCorrente < hoje`). Em ambos os casos, exige `justificativa` obrigatoria e encerra em cascata todos os Programas aportados, apos confirmacao explicita. | Must | parcerias |
-| RI3 | Uma Parceria so pode ser removida se nao estiver vinculada a nenhum Programa (sem `AporteFinanceiroParceriaPrograma`). | Must | parcerias |
-| RI4 | Ao suspender uma Parceria, todos os Programas aportados e Iniciativas vinculadas devem ser suspensos enquanto a Parceria permanecer suspensa. | Must | parcerias / programas / iniciativas |
+| RI2 | Uma Parceria `VIGENTE` ou `SUSPENSA` transita para `ENCERRADA` mediante solicitacao explicita com `justificativa` obrigatoria. O sistema registra `DataFim`/`JustificativaEncerramento` e encerra em cascata os Programas associados via `AporteFinanceiroPrograma` com status `ENCERRADO_POR_PARCERIA`; `ENCERRADO` permanece para encerramento proprio do Programa. A expiracao de vigencia gera pendencia/notificacao, nao encerramento automatico sem acao explicita. | Must | parcerias |
+| RI3 | Uma Parceria so pode ser removida se nao estiver vinculada a nenhum Programa (sem `AporteFinanceiroPrograma`). | Must | parcerias |
+| RI4 | Ao suspender uma Parceria `VIGENTE`, o sistema cria `SuspensaoParceria` e suspende em cascata os Programas associados via `AporteFinanceiroPrograma` que estejam `VIGENTE`, marcando-os como `SUSPENSO_POR_PARCERIA` e criando `SuspensaoPrograma`. Ao reativar a Parceria, fecha os historicos ativos e retorna esses Programas para `VIGENTE`, sem ressuscitar Programas encerrados. Cascata para Iniciativas fica como integracao futura com M003. | Must | parcerias / programas |

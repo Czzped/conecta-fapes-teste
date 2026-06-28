@@ -1,4 +1,4 @@
-ontology: "Programas — Programa, ComiteGovernanca e AporteFinanceiroParceriaPrograma"
+ontology: "Programas — Programa, ComiteGovernanca e AporteFinanceiroPrograma"
 namespace: "planejamento.programas"
 imports:
   - namespace: shared
@@ -15,7 +15,7 @@ metadata:
   module: "M010"
   source: "docs/implementation/modules/M010-planejamento-estrategia/programas/modelo-estrutural.md"
   version: "1.0.0"
-  description: "Define o Programa de fomento, seu comite de governanca e os aportes recebidos de Parcerias via AporteFinanceiroParceriaPrograma."
+  description: "Define o Programa de fomento, seu comite de governanca e os aportes recebidos de Parcerias via AporteFinanceiroPrograma."
 
 entities:
   Programa:
@@ -62,9 +62,9 @@ entities:
       valorAlocado:
         type: "decimal"
         required: false
-        description: "SUM(AporteFinanceiroParceriaPrograma.valor WHERE programa = this AND estado = 'ATIVO'). Atributo derivado."
+        description: "SUM(AporteFinanceiroPrograma.valor WHERE programa = this AND estado = 'ATIVO'). Atributo derivado."
         derived: true
-        formula: "SUM(AporteFinanceiroParceriaPrograma.valor WHERE programa = this AND estado = 'ATIVO')"
+        formula: "SUM(AporteFinanceiroPrograma.valor WHERE programa = this AND estado = 'ATIVO')"
       valorConsumido:
         type: "decimal"
         required: false
@@ -121,7 +121,7 @@ entities:
         required: true
         description: "ComiteGovernanca ao qual este membro pertence."
 
-  AporteFinanceiroParceriaPrograma:
+  AporteFinanceiroPrograma:
     description: "Entidade associativa N:N entre Parceria e Programa, representando a alocacao de recursos de uma Parceria para um Programa. O valor consome o saldo liquido alocavel da Parceria (RN11, RN22). O Programa nao recalcula Taxa de Gestao de Parcerias sobre aportes recebidos (RN20)."
     extends: "shared.Auditavel"
     fields:
@@ -184,31 +184,31 @@ relationships:
     description: "Cada MembroComite representa uma PessoaFisica."
   - from: "planejamento.parcerias.Parceria"
     relation: "origem_de"
-    to: "planejamento.programas.AporteFinanceiroParceriaPrograma"
+    to: "planejamento.programas.AporteFinanceiroPrograma"
     cardinality: "1:N"
     description: "Uma Parceria pode ser origem de zero ou mais aportes em Programas."
-  - from: "planejamento.programas.AporteFinanceiroParceriaPrograma"
+  - from: "planejamento.programas.AporteFinanceiroPrograma"
     relation: "destinado_a"
     to: "planejamento.programas.Programa"
     cardinality: "N:1"
-    description: "Cada AporteFinanceiroParceriaPrograma e destinado a exatamente um Programa."
+    description: "Cada AporteFinanceiroPrograma e destinado a exatamente um Programa."
 
 axioms:
   - id: "AX-M010-RN01"
     natural_language: "Um programa deve estar vinculado a pelo menos um eixo estrategico."
     formal_rule: "∀p ∈ Programa: COUNT(EixoEstrategico orienta p) >= 1"
   - id: "AX-M010-RN02"
-    natural_language: "Parcerias e Programas relacionam-se exclusivamente via AporteFinanceiroParceriaPrograma (N:N). Uma Parceria pode aportar em varios Programas; um Programa pode receber aportes de varias Parcerias. Nao existe relacao direta 'parceria de referencia'."
-    formal_rule: "Parceria ↔ Programa ONLY VIA AporteFinanceiroParceriaPrograma"
+    natural_language: "Parcerias e Programas relacionam-se exclusivamente via AporteFinanceiroPrograma (N:N). Uma Parceria pode aportar em varios Programas; um Programa pode receber aportes de varias Parcerias. Nao existe relacao direta 'parceria de referencia'."
+    formal_rule: "Parceria ↔ Programa ONLY VIA AporteFinanceiroPrograma"
   - id: "AX-M010-RN11"
     natural_language: "Uma Parceria pode aportar em um ou mais Programas; um Programa pode receber aportes de uma ou mais Parcerias. Cada aporte exige valor nao-negativo (>= 0, admite zero) e Parceria vigente. Aportes com valor negativo sao rejeitados."
-    formal_rule: "∀a ∈ AporteFinanceiroParceriaPrograma: a.valor >= 0 AND a.parceria.estado = 'Vigente'"
+    formal_rule: "∀a ∈ AporteFinanceiroPrograma: a.valor >= 0 AND a.parceria.estado = 'Vigente'"
   - id: "AX-M010-RN13"
     natural_language: "Um Programa nao pode comecar antes da vigenciaInicioCorrente nem terminar depois da vigenciaFimCorrente de nenhuma Parceria que nele aporte. Invariante estrutural validado ao registrar aporte, ao alterar datas do Programa e ao registrar nova Vigencia."
-    formal_rule: "∀a ∈ AporteFinanceiroParceriaPrograma: a.programa.dataInicio >= a.parceria.vigenciaInicioCorrente AND a.programa.dataFim <= a.parceria.vigenciaFimCorrente"
+    formal_rule: "∀a ∈ AporteFinanceiroPrograma: a.programa.dataInicio >= a.parceria.vigenciaInicioCorrente AND a.programa.dataFim <= a.parceria.vigenciaFimCorrente"
   - id: "AX-M010-RN14"
     natural_language: "Aportes retirados do Programa nao compoem o total alocado e devolvem saldo alocavel a Parceria."
-    formal_rule: "AporteFinanceiroParceriaPrograma WHERE estado = 'RETIRADO' NOT COUNTED IN saldoAlocavelEmProgramas"
+    formal_rule: "AporteFinanceiroPrograma WHERE estado = 'RETIRADO' NOT COUNTED IN saldoAlocavelEmProgramas"
   - id: "AX-M010-RN16"
     natural_language: "Todo Programa deve ter exatamente uma Instituicao demandante."
     formal_rule: "∀p ∈ Programa: COUNT(p.instituicaoDemandante) = 1"
@@ -217,14 +217,14 @@ axioms:
     formal_rule: "Programa.recalcula_taxa_gestao = false"
   - id: "AX-M010-RN21"
     natural_language: "O valorTaxaGestao nao compoe o saldo alocavel em Programas. E deduzido na Parceria antes de qualquer alocacao."
-    formal_rule: "saldoAlocavelEmProgramas = valorBrutoRecebido - valorTaxaGestao - SUM(AporteFinanceiroParceriaPrograma.valor em ATIVO)"
+    formal_rule: "saldoAlocavelEmProgramas = valorBrutoRecebido - valorTaxaGestao - SUM(AporteFinanceiroPrograma.valor em ATIVO)"
   - id: "AX-M010-RN22"
-    natural_language: "O saldo alocavel em Programas e SUM(AporteFinanceiro.valorInvestido) - valorTaxaGestao - SUM(AporteFinanceiroParceriaPrograma.valor em estado ATIVO), sempre >= 0."
+    natural_language: "O saldo alocavel em Programas e SUM(AporteFinanceiro.valorInvestido) - valorTaxaGestao - SUM(AporteFinanceiroPrograma.valor em estado ATIVO), sempre >= 0."
     formal_rule: "saldoAlocavelEmProgramas >= 0"
   # --- Fluxo financeiro do Programa ---
   - id: "AX-M010-PROG-FIN-01"
     natural_language: "valorAlocado do Programa e a soma dos AportesFinanceiroParceriaPrograma em estado ATIVO destinados a este Programa."
-    formal_rule: "∀p ∈ Programa: p.valorAlocado = SUM(AporteFinanceiroParceriaPrograma.valor WHERE programa = p AND estado = 'ATIVO')"
+    formal_rule: "∀p ∈ Programa: p.valorAlocado = SUM(AporteFinanceiroPrograma.valor WHERE programa = p AND estado = 'ATIVO')"
   - id: "AX-M010-PROG-FIN-02"
     natural_language: >
       valorConsumido do Programa e a consolidacao dos valores executados nos Projetos
@@ -240,7 +240,7 @@ axioms:
     formal_rule: "∀p ∈ Programa: p.saldoDisponivelPrograma = p.valorAlocado - p.valorConsumido AND p.saldoDisponivelPrograma >= 0"
   - id: "AX-M010-PROG-FIN-04"
     natural_language: "Aporte RETIRADO nao compoe valorAlocado do Programa e devolve saldo alocavel a Parceria de origem."
-    formal_rule: "AporteFinanceiroParceriaPrograma WHERE estado = 'RETIRADO': NOT IN valorAlocado(Programa) AND devolve valor a Parceria.saldoAlocavelEmProgramas"
+    formal_rule: "AporteFinanceiroPrograma WHERE estado = 'RETIRADO': NOT IN valorAlocado(Programa) AND devolve valor a Parceria.saldoAlocavelEmProgramas"
   - id: "AX-M010-PROG-FIN-05"
     natural_language: "Os termos valorAlocado, valorConsumido e saldoDisponivelPrograma sao distintos e nao substituiveis por 'pago', 'executado' ou 'saldo livre' nos contratos e interfaces do Programa."
     formal_rule: "nomenclature_invariant: {valorAlocado, valorConsumido, saldoDisponivelPrograma} DISJOINT"
@@ -253,7 +253,7 @@ invariants:
     rule: "COUNT(Programa.instituicaoDemandante) = 1"
     description: "Todo Programa deve ter exatamente uma Instituicao demandante (RN16)."
   - id: "INV-M010-PROG-03"
-    rule: "AporteFinanceiroParceriaPrograma.valor >= 0"
+    rule: "AporteFinanceiroPrograma.valor >= 0"
     description: "O valor de um aporte em Programa nao pode ser negativo (RN11)."
   - id: "INV-M010-PROG-04"
     rule: "Programa.dataFim > Programa.dataInicio"
@@ -262,13 +262,13 @@ invariants:
     rule: "Programa.estado = 'ENCERRADO' OR COUNT(Projeto WHERE programa = p) = 0 REQUIRED_FOR remove(Programa)"
     description: "Um Programa so pode ser removido se nao possui Projetos vinculados; caso contrario deve ser encerrado para preservar historico (RI1)."
   - id: "INV-M010-PROG-RI2"
-    rule: "Programa.estado = 'ENCERRADO' WHEN parceria.estado = 'Encerrada'"
-    description: "Ao encerrar uma Parceria, todos os Programas aportados devem ser encerrados em cascata, apos confirmacao explicita (RI2)."
+    rule: "Programa.estado = 'ENCERRADO_POR_PARCERIA' WHEN parceria.estado = 'ENCERRADA' AND Programa associado via AporteFinanceiroPrograma"
+    description: "Ao encerrar uma Parceria, os Programas associados devem ser encerrados em cascata com status causal ENCERRADO_POR_PARCERIA (RI2)."
   - id: "INV-M010-PROG-RI4"
-    rule: "Programa.estado = 'SUSPENSO' WHILE parceria.estado = 'Suspensa'"
-    description: "Ao suspender uma Parceria, todos os Programas aportados devem ser suspensos enquanto a Parceria permanecer suspensa (RI4)."
+    rule: "Programa.estado = 'SUSPENSO_POR_PARCERIA' WHILE parceria.estado = 'SUSPENSA' AND Programa.previous_estado = 'VIGENTE'"
+    description: "Ao suspender uma Parceria, apenas Programas associados que estavam vigentes entram em SUSPENSO_POR_PARCERIA; demais estados nao sao alterados (RI4)."
   - id: "INV-M010-PROG-05"
-    rule: "Programa.valorAlocado = SUM(AporteFinanceiroParceriaPrograma.valor WHERE programa = p AND estado = 'ATIVO')"
+    rule: "Programa.valorAlocado = SUM(AporteFinanceiroPrograma.valor WHERE programa = p AND estado = 'ATIVO')"
     description: "valorAlocado e sempre a soma dos aportes ATIVOS destinados ao Programa (AX-M010-PROG-FIN-01)."
   - id: "INV-M010-PROG-06"
     rule: "Programa.saldoDisponivelPrograma >= 0"
@@ -280,8 +280,10 @@ enums:
     values:
       EM_PLANEJAMENTO: "Programa em elaboracao, ainda nao ativo."
       ATIVO: "Programa ativo e em execucao."
-      SUSPENSO: "Programa suspenso temporariamente (pode ser por cascata de Parceria suspensa — RI4)."
-      ENCERRADO: "Programa encerrado; preserva historico de Projetos vinculados."
+      SUSPENSO: "Programa suspenso temporariamente por motivo proprio do Programa."
+      SUSPENSO_POR_PARCERIA: "Programa suspenso automaticamente porque uma Parceria associada foi suspensa (RI4)."
+      ENCERRADO: "Programa encerrado por motivo proprio; preserva historico de Projetos vinculados."
+      ENCERRADO_POR_PARCERIA: "Programa encerrado automaticamente porque uma Parceria associada foi encerrada (RI2)."
 
   EstadoAportePrograma:
     description: "Estado do aporte financeiro de uma Parceria em um Programa."
@@ -304,20 +306,28 @@ events:
     payload_entity: "planejamento.programas.Programa"
     trigger: "state_transition.ATIVO"
   - name: "ProgramaSuspenso"
-    description: "Emitido quando Programa transita para SUSPENSO (solicitacao direta ou cascata de Parceria suspensa — RI4)."
+    description: "Emitido quando Programa transita para SUSPENSO por solicitacao direta."
     payload_entity: "planejamento.programas.Programa"
     trigger: "state_transition.SUSPENSO"
+  - name: "ProgramaSuspensoPorParceria"
+    description: "Emitido quando Programa transita para SUSPENSO_POR_PARCERIA por cascata de Parceria suspensa (RI4)."
+    payload_entity: "planejamento.programas.Programa"
+    trigger: "state_transition.SUSPENSO_POR_PARCERIA"
   - name: "ProgramaEncerrado"
-    description: "Emitido quando Programa transita para ENCERRADO (solicitacao direta ou cascata de Parceria encerrada — RI2)."
+    description: "Emitido quando Programa transita para ENCERRADO por solicitacao direta."
     payload_entity: "planejamento.programas.Programa"
     trigger: "state_transition.ENCERRADO"
+  - name: "ProgramaEncerradoPorParceria"
+    description: "Emitido quando Programa transita para ENCERRADO_POR_PARCERIA por cascata de Parceria encerrada (RI2)."
+    payload_entity: "planejamento.programas.Programa"
+    trigger: "state_transition.ENCERRADO_POR_PARCERIA"
   - name: "AporteParceriaProgramaRegistrado"
-    description: "Emitido quando AporteFinanceiroParceriaPrograma e criado; recalcula saldoAlocavelEmProgramas da Parceria."
-    payload_entity: "planejamento.programas.AporteFinanceiroParceriaPrograma"
+    description: "Emitido quando AporteFinanceiroPrograma e criado; recalcula saldoAlocavelEmProgramas da Parceria."
+    payload_entity: "planejamento.programas.AporteFinanceiroPrograma"
     trigger: "create"
   - name: "AporteParceriaProgramaRetirado"
-    description: "Emitido quando AporteFinanceiroParceriaPrograma transita para RETIRADO; devolve saldo alocavel a Parceria (RN14)."
-    payload_entity: "planejamento.programas.AporteFinanceiroParceriaPrograma"
+    description: "Emitido quando AporteFinanceiroPrograma transita para RETIRADO; devolve saldo alocavel a Parceria (RN14)."
+    payload_entity: "planejamento.programas.AporteFinanceiroPrograma"
     trigger: "state_transition.RETIRADO"
 
 workflows:
@@ -326,7 +336,9 @@ workflows:
       - EM_PLANEJAMENTO
       - ATIVO
       - SUSPENSO
+      - SUSPENSO_POR_PARCERIA
       - ENCERRADO
+      - ENCERRADO_POR_PARCERIA
     transitions:
       - from: EM_PLANEJAMENTO
         to: ATIVO
@@ -336,10 +348,18 @@ workflows:
         to: SUSPENSO
         trigger: "suspender_programa"
         guard: "justificativa preenchida"
+      - from: ATIVO
+        to: SUSPENSO_POR_PARCERIA
+        trigger: "suspender_por_parceria"
+        guard: "Parceria associada em SUSPENSA via AporteFinanceiroPrograma"
       - from: SUSPENSO
         to: ATIVO
         trigger: "reativar_programa"
         guard: "justificativa preenchida AND parceria.estado = 'Vigente' (se suspensao foi por cascata)"
+      - from: SUSPENSO_POR_PARCERIA
+        to: ATIVO
+        trigger: "reativar_por_parceria"
+        guard: "SuspensaoParceria/SuspensaoPrograma ativos fechados; Programa nao encerrado"
       - from: ATIVO
         to: ENCERRADO
         trigger: "encerrar_programa"
@@ -348,11 +368,19 @@ workflows:
         to: ENCERRADO
         trigger: "encerrar_programa_suspenso"
         guard: "dataEncerramento preenchida AND justificativa preenchida"
+      - from: ATIVO
+        to: ENCERRADO_POR_PARCERIA
+        trigger: "encerrar_por_parceria"
+        guard: "Parceria associada encerrada com justificativa"
+      - from: SUSPENSO_POR_PARCERIA
+        to: ENCERRADO_POR_PARCERIA
+        trigger: "encerrar_por_parceria"
+        guard: "Parceria associada encerrada com justificativa"
       - from: EM_PLANEJAMENTO
         to: ENCERRADO
         trigger: "cancelar_programa"
         guard: "COUNT(Projeto) = 0 AND justificativa preenchida"
-  AporteFinanceiroParceriaPrograma:
+  AporteFinanceiroPrograma:
     states:
       - ATIVO
       - RETIRADO
@@ -391,10 +419,10 @@ agent_instructions:
     - "Toda implementacao deve seguir workflows definidos."
     - "Programa deve sempre ter Instituicao demandante (RN16)."
     - "Programa deve estar vinculado a pelo menos um EixoEstrategico ao ser ativado (RN01)."
-    - "AporteFinanceiro flui de Parceria para Programa via AporteFinanceiroParceriaPrograma antes de qualquer Captacao."
+    - "AporteFinanceiro flui de Parceria para Programa via AporteFinanceiroPrograma antes de qualquer Captacao."
     - "Ao registrar aporte, verificar saldoAlocavelEmProgramas da Parceria e estado Vigente (RN11)."
     - "Ao registrar aporte, verificar que datas do Programa estao dentro da vigencia da Parceria (RN13)."
-    - "Parceria e Programa nao possuem relacao direta; usar exclusivamente AporteFinanceiroParceriaPrograma (RN02)."
+    - "Parceria e Programa nao possuem relacao direta; usar exclusivamente AporteFinanceiroPrograma (RN02)."
     - "Aporte RETIRADO nao compoe total alocado; devolve saldo alocavel a Parceria (RN14)."
     - "Programa nao recalcula Taxa de Gestao de Parcerias sobre aportes recebidos — ja foi calculada e deduzida na Parceria antes da alocacao (RN20, RN21)."
     - "valorConsumido do Programa e somente leitura neste modulo; calculado por M003 a partir de M014 (Projetos de demanda induzida e projetos ligados ao Programa)."
@@ -403,6 +431,6 @@ agent_instructions:
     - "dataEncerramento so e preenchida quando estado = ENCERRADO."
   notes:
     - "EixoEstrategico e entidade definida em planejamento.estrategia; a relacao N:N e registrada aqui no lado do Programa."
-    - "Parceria e entidade definida em planejamento.parcerias; AporteFinanceiroParceriaPrograma e a entidade associativa que vive neste namespace."
+    - "Parceria e entidade definida em planejamento.parcerias; AporteFinanceiroPrograma e a entidade associativa que vive neste namespace."
     - "Projeto e entidade externa do M003; nao modelar aqui."
     - "PessoaFisica e entidade externa do M008; referenciada via shared.people."

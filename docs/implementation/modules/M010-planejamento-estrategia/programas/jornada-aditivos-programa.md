@@ -22,7 +22,7 @@ journey
       2.2 Enviar justificativa e valor solicitado: 4: Instituicao Demandante
       2.3 Analisar demanda de reforco financeiro: 3: Area Tecnica
       2.4 Validar Parceria vigente e saldo: 3: Area de Parcerias
-      2.5 Registrar AporteFinanceiroParceriaPrograma: 5: Area de Parcerias
+      2.5 Registrar AporteFinanceiroPrograma: 5: Area de Parcerias
       2.6 Recalcular saldo da Parceria: 5: Area de Parcerias
 ```
 
@@ -34,7 +34,7 @@ journey
 | 2 | Validar periodo | Area Tecnica / Area de Parcerias | Novo periodo aprovado apenas se respeitar vigencias das Parcerias aportantes. |
 | 3 | Solicitar aditivo financeiro | Instituicao Demandante | Pedido de reforco financeiro formalizado. |
 | 4 | Validar Parceria e saldo | Area de Parcerias | Aporte permitido apenas com Parceria vigente e saldo suficiente. |
-| 5 | Registrar aporte | Area de Parcerias | Recurso alocado ao Programa via `AporteFinanceiroParceriaPrograma`. |
+| 5 | Registrar aporte | Area de Parcerias | Recurso alocado ao Programa via `AporteFinanceiroPrograma`. |
 
 ## Referencia de Regras
 
