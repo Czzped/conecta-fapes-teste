@@ -2,11 +2,11 @@ ontology: "Planejamento Estrategico — Plano e Eixos"
 namespace: "planejamento.estrategia"
 imports:
   - namespace: shared
-    path: path: "../../../ontology/shared/base.yaml"
+    path: "../../../ontology/shared/base.yaml"
   - namespace: shared.people
-    path: path: "../../../ontology/shared/people.yaml"
+    path: "../../../ontology/shared/people.yaml"
   - namespace: corporativo.instituicoes
-    path: path: "../../M008-cadastros-corporativos/instituicoes/ontology.yaml"
+    path: "../../M008-cadastros-corporativos/instituicoes/ontology.yaml"
 metadata:
   module: "M010"
   source: "docs/implementation/modules/M010-planejamento-estrategia/planejamento/modelo-estrutural.md"

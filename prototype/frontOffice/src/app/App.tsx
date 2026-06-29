@@ -41,6 +41,7 @@ export default function App() {
   // Cidadão sub-navigation
   const [cidadaoPage, setCidadaoPage] = useState<CidadaoPage>('home');
   const [selectedEditalId, setSelectedEditalId] = useState<number>(1);
+  const [scrollCidadaoOportunidades, setScrollCidadaoOportunidades] = useState(false);
 
   // Define dark mode como padrão do sistema
   useEffect(() => {
@@ -164,6 +165,9 @@ export default function App() {
             <CidadaoHomePage
               onLogin={() => { setIsLoggedIn(false); setAccessType('bolsista'); }}
               onVerEdital={(id) => { setSelectedEditalId(id); setCidadaoPage('edital-detail'); window.scrollTo(0, 0); }}
+              onInscricao={(id) => { setSelectedEditalId(id); setCidadaoPage('inscricao'); window.scrollTo(0, 0); }}
+              scrollToOportunidades={scrollCidadaoOportunidades}
+              onScrolledToOportunidades={() => setScrollCidadaoOportunidades(false)}
             />
           )}
           {cidadaoPage === 'edital-detail' && (
@@ -177,7 +181,7 @@ export default function App() {
           {cidadaoPage === 'inscricao' && (
             <InscricaoPage
               editalId={selectedEditalId}
-              onBack={() => { setCidadaoPage('edital-detail'); window.scrollTo(0, 0); }}
+              onBack={() => { setScrollCidadaoOportunidades(true); setCidadaoPage('home'); }}
               onLogin={() => { setIsLoggedIn(false); setAccessType('bolsista'); }}
             />
           )}

@@ -39,7 +39,7 @@ As jornadas de Programas foram separadas por momento do ciclo de vida para facil
 |---------|---------|
 | Criacao | O Programa deve ter exatamente uma Instituicao demandante. |
 | Aditivo de tempo | O novo periodo deve respeitar a vigencia corrente de todas as Parcerias aportantes. |
-| Aditivo financeiro | O aporte deve ser registrado via `AporteFinanceiroParceriaPrograma`, sem criar relacao direta entre Programa e Parceria. |
+| Aditivo financeiro | O aporte deve ser registrado via `AporteFinanceiroPrograma`, sem criar relacao direta entre Programa e Parceria. |
 | Suspensao por cascata | Quando a suspensao vem de Parceria, a reativacao depende da resolucao do bloqueio herdado. |
 | Encerramento/remocao | A remocao e sem impacto quando nao ha nenhuma Iniciativa vinculada; se houver Iniciativa, o caminho correto e encerramento com preservacao de historico. |
 

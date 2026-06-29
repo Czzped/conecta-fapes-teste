@@ -16,16 +16,16 @@ stateDiagram-v2
     EmElaboracao --> Vigente : FormalizarParceria (RN19)
 
     Vigente --> Vigente : RegistrarAporteFinanceiro (RN03, RN04, RN12, RN17)
-    Vigente --> Vigente : RegistrarAporteFinanceiroParceriaPrograma (RN11, RN13, RN14)
+    Vigente --> Vigente : RegistrarAporteFinanceiroPrograma (RN11, RN13, RN14)
     Vigente --> Vigente : RegistrarVigencia aditivo (RN06, RN15)
     Vigente --> Vigente : AnexarDocumento / DesanexarDocumento
     Vigente --> Vigente : EditarAporteFinanceiroAditivo (RN18)
     Vigente --> Vigente : RemoverAporteFinanceiroAditivo (RN18)
-    Vigente --> Suspensa : SuspenderParceria (RI4)
-    Vigente --> Encerrada : EncerrarParceria (RI2)
+    Vigente --> Suspensa : SuspenderParceria (RI4, cria SuspensaoParceria)
+    Vigente --> Encerrada : EncerrarParceria (RI2, ENCERRADO_POR_PARCERIA)
 
-    Suspensa --> Vigente : ReativarParceria (reativacao em cascata)
-    Suspensa --> Encerrada : EncerrarParceria (RI2)
+    Suspensa --> Vigente : ReativarParceria (fecha SuspensaoParceria/SuspensaoPrograma)
+    Suspensa --> Encerrada : EncerrarParceria (RI2, ENCERRADO_POR_PARCERIA)
 
     Encerrada --> [*]
 ```
@@ -36,8 +36,8 @@ stateDiagram-v2
 |--------|-----------|
 | **EmElaboracao** | Parceria cadastrada com Vigencia original. Permanece aqui ate atender RN19. |
 | **Vigente** | Acordo assinado; aportes e aditivos permitidos. `hoje` em `[vigenciaInicioCorrente, vigenciaFimCorrente]`. |
-| **Suspensa** | Operacoes interrompidas temporariamente. Aportes, aditivos e distribuicoes para Programas bloqueados; Programas aportados e Iniciativas vinculadas ficam suspensos em cascata (RI4). |
-| **Encerrada** | Parceria encerrada formalmente apos cascata de encerramento dos Programas aportados; imutavel. |
+| **Suspensa** | Operacoes interrompidas temporariamente. Nesta entrega, a suspensao cria `SuspensaoParceria` e suspende Programas `VIGENTE` associados via `AporteFinanceiroPrograma` com status `SUSPENSO_POR_PARCERIA`; bloqueios finos e Iniciativas ficam para integracoes futuras. |
+| **Encerrada** | Parceria encerrada formalmente com `DataFim` e `JustificativaEncerramento`; Programas associados recebem `ENCERRADO_POR_PARCERIA`; imutavel. |
 
 ### Guards e regras por transicao
 
@@ -45,14 +45,14 @@ stateDiagram-v2
 |-----------|----------|---------------|
 | `[*] → EmElaboracao` | `CriarParceria` | Instituicao informada (RN10); Vigencia original valida (RN15) |
 | `EmElaboracao → Vigente` | `FormalizarParceria` | Ver `RN19` |
-| `Vigente → Suspensa` | `SuspenderParceria` | motivo informado + suspensao em cascata de Programas aportados e Iniciativas vinculadas (RI4) |
-| `Suspensa → Vigente` | `ReativarParceria` | `hoje` no intervalo `[vigenciaInicioCorrente, vigenciaFimCorrente]` + reativacao coordenada de Programas e Iniciativas impactadas |
-| `Vigente → Encerrada` / `Suspensa → Encerrada` | `EncerrarParceria` | Ver `RI2` |
+| `Vigente → Suspensa` | `SuspenderParceria` | motivo informado; origem derivada do token; cria `SuspensaoParceria`; Programas `VIGENTE` associados passam para `SUSPENSO_POR_PARCERIA` (RI4) |
+| `Suspensa → Vigente` | `ReativarParceria` | existe `SuspensaoParceria` ativa; fecha historicos ativos; Programas `SUSPENSO_POR_PARCERIA` voltam para `VIGENTE`; nao ressuscita encerrados |
+| `Vigente → Encerrada` / `Suspensa → Encerrada` | `EncerrarParceria` | justificativa obrigatoria; registra `DataFim` e `JustificativaEncerramento`; Programas associados passam para `ENCERRADO_POR_PARCERIA` (RI2) |
 
 ### Gatilhos de encerramento
 
-1. **Manual**: usuario solicita `EncerrarParceria` com `origemGatilho = USUARIO`.
-2. **Automatico por expiracao**: job diario `VerificarVigenciaExpirada` detecta `vigenciaFimCorrente` < `hoje`, **notifica** o responsavel e abre pendencia de confirmacao. O sistema nao encerra sem confirmacao explicita.
+1. **Manual**: usuario solicita `EncerrarParceria` com justificativa obrigatoria.
+2. **Automatico por expiracao**: job diario `VerificarVigenciaExpirada` detecta `vigenciaFimCorrente` < `hoje`, **notifica** o responsavel e abre pendencia operacional. O encerramento efetivo continua exigindo chamada explicita ao endpoint de encerramento com justificativa.
 
 ### Referencia de Regras
 
@@ -79,16 +79,16 @@ Regras aplicaveis ao ciclo de vida de Parcerias: `RN13`, `RN14`, `RN19`, `RI2`, 
 2. Recalcula `valorBrutoRecebido`, `valorTaxaGestao` e `saldoAlocavelEmProgramas` com o novo estado.
 3. Rejeita se `saldoAlocavelEmProgramas_resultante < 0` (INV-M010-PAR-01).
 
-### RegistrarAporteFinanceiroParceriaPrograma (alocacao em Programa)
+### RegistrarAporteFinanceiroPrograma (alocacao em Programa)
 
 1. Verifica `saldoAlocavelEmProgramas >= valor_alocado` (RN22).
 2. Verifica Parceria `Vigente` (RN11).
 3. Verifica que datas do Programa cabem na vigencia da Parceria (RN13).
 4. Debita do `saldoAlocavelEmProgramas`; emite evento de alocacao.
 
-### RetirarAporteFinanceiroParceriaPrograma
+### RetirarAporteFinanceiroPrograma
 
-1. Remove o `AporteFinanceiroParceriaPrograma`.
+1. Remove o `AporteFinanceiroPrograma`.
 2. Devolve valor ao `saldoAlocavelEmProgramas` da Parceria (RN14).
 
 ### Impacto no Saldo por Operacao

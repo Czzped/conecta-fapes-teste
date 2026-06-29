@@ -15,6 +15,10 @@ do GitHub App e atualiza as datas do Project 43 da organizacao
 - cria branch de tarefa quando uma issue/card entra em `In Progress` com repo resolvido
   e vincula em **Development** quando o card e uma Issue
 - publica o status `git-flow/pr-policy` nos PRs
+- **move o card para `In Validation` automaticamente quando um PR e aberto**
+  a partir de um branch de trabalho (`feature/`, `fix/`, etc.)
+- **move o card para `Homologation` automaticamente quando o PR e mergeado**
+  (vale para branches de trabalho e hotfix)
 - cria tag automaticamente depois do merge de release/hotfix em producao
 - abre PRs de retorno de hotfix para `develop` e para release aberta
 
@@ -198,6 +202,8 @@ npm run sync:fields
 - `DONE_AT_FIELD_NAME`
 - `REPOSITORY_FIELD_NAME`
 - `IN_PROGRESS_OPTION_NAME`
+- `IN_VALIDATION_OPTION_NAME` (default `In Validation`)
+- `HOMOLOGATION_OPTION_NAME` (default `Homologation`)
 - `READY_FOR_DEV_OPTION_NAME`
 - `DONE_OPTION_NAME`
 - `ITERATION_FIELD_NAME` ou `SPRINT_FIELD_NAME`

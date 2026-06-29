@@ -140,6 +140,7 @@ const inputSt = (disabled?: boolean): React.CSSProperties => ({
 export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDetalhesProps) {
   useLanguage();
   const fileInputRef     = useRef<HTMLInputElement>(null);
+  const contestacaoFileInputRef = useRef<HTMLInputElement>(null);
   const cotacaoInputRef  = useRef<HTMLInputElement>(null);
   const benefSearch      = useRef<HTMLInputElement>(null);
   const passSearch       = useRef<HTMLInputElement>(null);
@@ -150,6 +151,9 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
   const [estornoAssociado, setEstornoAssociado] = useState(false);
   const [devolucaoComprovanteAnexado, setDevolucaoComprovanteAnexado] = useState(false);
   const [devolucaoAssociada, setDevolucaoAssociada] = useState(false);
+  const [justificativaReprovacao, setJustificativaReprovacao] = useState('');
+  const [arquivoContestacao, setArquivoContestacao] = useState('');
+  const [contestacaoArquivoExpandido, setContestacaoArquivoExpandido] = useState(false);
 
   /* ── Step 1 ── */
   const [selectedDocumento, setSelectedDocumento] = useState('');
@@ -298,6 +302,11 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
     setDataSaida(''); setHoraSaida(''); setDataChegada(''); setHoraChegada('');
   };
 
+  const enviarContestacao = () => {
+    toast.success('Contestação enviada com sucesso!');
+    window.setTimeout(onBack, 800);
+  };
+
   const selecionarDiariaPrestacao = (diaria: DiariaPrestacao & { originalIndex: number }) => {
     if (isReadOnly) return;
 
@@ -383,8 +392,8 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
   const getStatusMessage = () => {
     switch (payment.status) {
       case 'Em Validação': return { text: 'Esta Prestação de Contas está Em Validação. Após verificarmos todos os dados enviados, seu status irá ser atualizado na tela inicial. Enquanto isso, você não consegue alterar as informações enviadas.', bg: 'rgba(59,130,246,.1)', border: 'rgba(59,130,246,.3)', color: 'rgb(59,130,246)' };
-      case 'Reprovado':    return { text: 'Esta Prestação de Contas não foi aprovada por X motivo. Você deve repositar o valor para a conta do projeto em até 30 dias corridos.', bg: 'rgba(239,68,68,.1)', border: 'rgba(239,68,68,.3)', color: 'rgb(239,68,68)' };
-      case 'Revisar':      return { text: 'Esta Prestação de Contas ainda não foi aprovada e precisa de revisão.\n\nMensagem enviada pela Fapes: X', bg: 'rgba(234,179,8,.1)', border: 'rgba(234,179,8,.3)', color: 'rgb(234,179,8)' };
+      case 'Reprovado':    return { text: '10/06/2026 - Esta Prestação de Contas não foi aprovada por X motivo. Você deve repositar o valor para a conta do projeto em até 30 dias corridos.', bg: 'rgba(239,68,68,.1)', border: 'rgba(239,68,68,.3)', color: 'rgb(239,68,68)' };
+      case 'Revisar':      return { text: '10/06/2026 - Esta Prestação de Contas ainda não foi aprovada e precisa de revisão. Você tem até 15 dias úteis para contestá-la. Para isso, basta enviar sua a justificativa da solicitação de revisão.\n\nMensagem enviada pela Fapes: A cotação está errada.', bg: 'rgba(234,179,8,.1)', border: 'rgba(234,179,8,.3)', color: 'rgb(234,179,8)' };
       default: return null;
     }
   };
@@ -928,9 +937,190 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
 
       {/* Status alert */}
       {statusMessage && (
-        <div className="p-4 mb-6" style={{ backgroundColor: statusMessage.bg, border: `1px solid ${statusMessage.border}`, borderRadius: 'var(--radius)' }}>
-          <p style={{ color: statusMessage.color, fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: 0, lineHeight: '1.5', whiteSpace: 'pre-line' }}>{statusMessage.text}</p>
-        </div>
+        <>
+          <div className={payment.status === 'Revisar' || payment.status === 'Reprovado' ? 'p-4' : 'p-4 mb-6'} style={{ backgroundColor: statusMessage.bg, border: `1px solid ${statusMessage.border}`, borderRadius: 'var(--radius)' }}>
+            <p style={{ color: statusMessage.color, fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: 0, lineHeight: '1.5', whiteSpace: 'pre-line' }}>{statusMessage.text}</p>
+          </div>
+          {payment.status === 'Reprovado' && (
+            <section
+              className="mt-4 mb-6"
+              style={{
+                backgroundColor: 'var(--card)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
+                padding: '2rem',
+              }}
+            >
+              <div className="flex items-start gap-3 mb-4">
+                <h2 style={stepTitle}>Contestação</h2>
+              </div>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label style={labelSt}>Data de envio</label>
+                  <div className="px-3 py-2" style={{ backgroundColor: 'var(--input-background)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
+                    12/06/2026
+                  </div>
+                </div>
+                <div>
+                  <label style={labelSt}>Justificativa</label>
+                  <div className="px-3 py-2" style={{ minHeight: '96px', backgroundColor: 'var(--input-background)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
+                    A cotação anexada foi substituída por documento fiscal atualizado, com os valores corrigidos conforme solicitado pela FAPES.
+                  </div>
+                </div>
+                <div className="p-4 flex items-center gap-4" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
+                  <div className="flex items-center gap-3 flex-1">
+                    <FileText size={20} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
+                    <span style={{ fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', color: 'var(--foreground)' }}>
+                      Contestacao_Cotacao_Corrigida.pdf
+                    </span>
+                  </div>
+                  <ChevronDown size={18} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
+                </div>
+              </div>
+            </section>
+          )}
+          {payment.status === 'Revisar' && (
+            <>
+              <section
+                className="mt-4"
+                style={{
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                  padding: '2rem',
+                }}
+              >
+                <div className="flex items-start gap-3 mb-4">
+                  <h2 style={stepTitle}>Contestação</h2>
+                </div>
+                <div>
+                  <label style={labelSt}>
+                    Justificativa
+                    <textarea
+                      value={justificativaReprovacao}
+                      onChange={(event) => setJustificativaReprovacao(event.target.value)}
+                      rows={4}
+                      className="mt-2 w-full px-3 py-2"
+                      placeholder="Digite a justificativa da solicitação de revisão"
+                      style={{
+                        backgroundColor: 'var(--input-background)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        color: 'var(--foreground)',
+                        fontSize: 'var(--text-sm)',
+                        fontFamily: 'var(--font-family)',
+                        resize: 'vertical',
+                      }}
+                    />
+                  </label>
+                </div>
+                <input
+                  ref={contestacaoFileInputRef}
+                  type="file"
+                  className="hidden"
+                  onChange={(event) => {
+                    setArquivoContestacao(event.target.files?.[0]?.name ?? '');
+                    setContestacaoArquivoExpandido(false);
+                  }}
+                />
+                {arquivoContestacao && (
+                  <div className="mt-3">
+                    <div className="p-4 flex items-center gap-4" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
+                      <div className="flex items-center gap-3 flex-1">
+                        <FileText size={20} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
+                        <span style={{ fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', color: 'var(--foreground)' }}>
+                          {arquivoContestacao}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setContestacaoArquivoExpandido((current) => !current)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '6px',
+                          color: 'var(--muted-foreground)',
+                          display: 'flex',
+                          borderRadius: 'var(--radius)',
+                          transition: 'all .2s',
+                          transform: contestacaoArquivoExpandido ? 'rotate(180deg)' : 'rotate(0deg)',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--muted)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                      >
+                        <ChevronDown size={18} />
+                      </button>
+                    </div>
+                    {contestacaoArquivoExpandido && (
+                      <div className="mt-2 p-4" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
+                        Pré-visualização indisponível para este arquivo.
+                      </div>
+                    )}
+                  </div>
+                )}
+                <div className="mt-3 flex justify-end">
+                  <button
+                    type="button"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2"
+                    onClick={() => contestacaoFileInputRef.current?.click()}
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: 'var(--primary)',
+                      border: '1px solid var(--primary)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      fontFamily: 'var(--font-family)',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    <Paperclip size={16} />
+                    Anexar Arquivo
+                  </button>
+                </div>
+              </section>
+              <div className="mt-4 mb-6 flex flex-col justify-end gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center px-4 py-2"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: 'var(--foreground)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    fontFamily: 'var(--font-family)',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Salvar Rascunho
+                </button>
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center px-4 py-2"
+                  onClick={enviarContestacao}
+                  style={{
+                    backgroundColor: 'var(--primary)',
+                    color: 'var(--primary-foreground)',
+                    border: '1px solid var(--primary)',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    fontFamily: 'var(--font-family)',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Enviar Contestação
+                </button>
+              </div>
+            </>
+          )}
+        </>
       )}
 
       {/* ══ Steps container ══ */}

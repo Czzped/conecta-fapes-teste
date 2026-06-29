@@ -240,6 +240,52 @@ const CLEAR_PROJECT_DATE_MUTATION = `
   }
 `;
 
+const SET_PROJECT_STATUS_MUTATION = `
+  mutation SetProjectStatus(
+    $projectId: ID!
+    $itemId: ID!
+    $fieldId: ID!
+    $singleSelectOptionId: String!
+  ) {
+    updateProjectV2ItemFieldValue(
+      input: {
+        projectId: $projectId
+        itemId: $itemId
+        fieldId: $fieldId
+        value: { singleSelectOptionId: $singleSelectOptionId }
+      }
+    ) {
+      projectV2Item {
+        id
+      }
+    }
+  }
+`;
+
+const FIND_ITEM_BY_ISSUE_QUERY = `
+  query FindItemByIssue($projectId: ID!, $issueNumber: Int!, $first: Int!, $after: String) {
+    node(id: $projectId) {
+      ... on ProjectV2 {
+        items(first: $first, after: $after) {
+          nodes {
+            id
+            content {
+              __typename
+              ... on Issue {
+                number
+              }
+            }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+        }
+      }
+    }
+  }
+`;
+
 const SET_PROJECT_ITERATION_MUTATION = `
   mutation SetProjectIteration(
     $projectId: ID!
@@ -326,6 +372,64 @@ const RENAME_FIELD_MUTATION = `
     }
   }
 `;
+
+const FIND_PROJECT_ITEM_BY_ISSUE_QUERY = `
+  query FindProjectItemByIssue($owner: String!, $repo: String!, $number: Int!) {
+    repository(owner: $owner, name: $repo) {
+      issue(number: $number) {
+        id
+        projectItems(first: 10) {
+          nodes {
+            id
+            project {
+              id
+              number
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const SET_PROJECT_SINGLE_SELECT_MUTATION = `
+  mutation SetProjectSingleSelect(
+    $projectId: ID!
+    $itemId: ID!
+    $fieldId: ID!
+    $optionId: String!
+  ) {
+    updateProjectV2ItemFieldValue(
+      input: {
+        projectId: $projectId
+        itemId: $itemId
+        fieldId: $fieldId
+        value: { singleSelectOptionId: $optionId }
+      }
+    ) {
+      projectV2Item {
+        id
+      }
+    }
+  }
+`;
+
+interface FindProjectItemByIssueQueryResult {
+  repository: {
+    issue: {
+      id: string;
+      projectItems: {
+        nodes: {
+          id: string;
+          project: {
+            id: string;
+            number: number;
+          };
+        }[];
+      };
+    } | null;
+  } | null;
+}
 
 interface ProjectFieldsQueryResult {
   node: {
@@ -781,6 +885,71 @@ export class GitHubProjectRepository {
     });
   }
 
+  async findItemByIssueNumber(
+    projectId: string,
+    issueNumber: number
+  ): Promise<string | null> {
+    type FindItemPage = {
+      node: {
+        items: {
+          nodes: {
+            id: string;
+            content: { __typename: string; number?: number } | null;
+          }[];
+          pageInfo: {
+            hasNextPage: boolean;
+            endCursor: string | null;
+          };
+        };
+      } | null;
+    };
+
+    const pageSize = 100;
+    let after: string | null = null;
+
+    do {
+      const result: FindItemPage = await this.client.request(FIND_ITEM_BY_ISSUE_QUERY, {
+        projectId,
+        issueNumber,
+        first: pageSize,
+        after,
+      });
+
+      if (!result.node) {
+        throw new Error(`project not found: ${projectId}`);
+      }
+
+      for (const node of result.node.items.nodes) {
+        if (
+          node.content?.__typename === "Issue" &&
+          node.content.number === issueNumber
+        ) {
+          return node.id;
+        }
+      }
+
+      after = result.node.items.pageInfo.hasNextPage
+        ? result.node.items.pageInfo.endCursor
+        : null;
+    } while (after);
+
+    return null;
+  }
+
+  async updateItemStatus(
+    projectId: string,
+    itemId: string,
+    statusFieldId: string,
+    optionId: string
+  ): Promise<void> {
+    await this.client.request(SET_PROJECT_STATUS_MUTATION, {
+      projectId,
+      itemId,
+      fieldId: statusFieldId,
+      singleSelectOptionId: optionId,
+    });
+  }
+
   async createField(
     projectId: string,
     definition: ProjectFieldDefinition
@@ -808,5 +977,51 @@ export class GitHubProjectRepository {
     );
 
     return data.updateProjectV2Field.projectV2Field;
+  }
+
+  /**
+   * Encontra o ID do item do projeto associado a uma issue pelo numero.
+   * Usa `Issue.projectItems` para buscar diretamente (evita scan do projeto inteiro).
+   *
+   * @returns o item ID ou null se a issue nao estiver no projeto alvo.
+   */
+  async findItemIdByIssue(
+    projectId: string,
+    owner: string,
+    repo: string,
+    issueNumber: number
+  ): Promise<string | null> {
+    const data = await this.client.request<FindProjectItemByIssueQueryResult>(
+      FIND_PROJECT_ITEM_BY_ISSUE_QUERY,
+      { owner, repo, number: issueNumber }
+    );
+
+    const issue = data.repository?.issue;
+    if (!issue) {
+      return null;
+    }
+
+    const match = issue.projectItems.nodes.find(
+      (node) => node.project.id === projectId
+    );
+
+    return match?.id ?? null;
+  }
+
+  /**
+   * Define o valor de um campo single-select (ex.: Status) para um item do projeto.
+   */
+  async setSingleSelectValue(
+    projectId: string,
+    itemId: string,
+    fieldId: string,
+    optionId: string
+  ): Promise<void> {
+    await this.client.request(SET_PROJECT_SINGLE_SELECT_MUTATION, {
+      projectId,
+      itemId,
+      fieldId,
+      optionId,
+    });
   }
 }

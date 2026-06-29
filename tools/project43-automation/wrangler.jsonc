@@ -13,6 +13,8 @@
     "REPOSITORY_FIELD_NAME": "Repositório",
     "IN_PROGRESS_OPTION_NAME": "In Progress",
     "READY_FOR_DEV_OPTION_NAME": "In Progress",
+    "IN_VALIDATION_OPTION_NAME": "In Validation",
+    "HOMOLOGATION_OPTION_NAME": "Homologation",
     "DONE_OPTION_NAME": "Done"
   }
 }

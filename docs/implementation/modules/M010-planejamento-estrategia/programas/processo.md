@@ -10,7 +10,7 @@ O processo de Programas foi dividido em fluxos independentes para explicitar as 
 
 1. **Criacao e ativacao do Programa** — cadastro inicial, vinculacao a Instituicao demandante, eixos estrategicos e comite de governanca.
 2. **Aditivo de tempo do Programa** — alteracao de datas do Programa, preservando a compatibilidade com Parcerias aportantes.
-3. **Aditivo financeiro do Programa** — recebimento de aporte de uma ou mais Parcerias por meio de `AporteFinanceiroParceriaPrograma`.
+3. **Aditivo financeiro do Programa** — recebimento de aporte de uma ou mais Parcerias por meio de `AporteFinanceiroPrograma`.
 4. **Retirada de aporte de Parceria do Programa** — remocao ou estorno de uma alocacao financeira quando ainda nao houver execucao vinculada.
 5. **Suspensao do Programa** — interrupcao temporaria por decisao da Area Tecnica ou por cascata de Parceria.
 6. **Reativacao do Programa** — retorno do Programa suspenso para `ATIVO` apos a resolucao da causa de suspensao.
@@ -116,7 +116,7 @@ flowchart TB
 
 ## Fluxo 3 — Aditivo Financeiro do Programa
 
-Este fluxo trata o recebimento de recursos de uma Parceria a partir de uma solicitacao da Instituicao demandante. O Programa nao recebe uma relacao direta com Parceria; o vinculo financeiro e criado por `AporteFinanceiroParceriaPrograma`. Um Programa pode receber aportes de mais de uma Parceria.
+Este fluxo trata o recebimento de recursos de uma Parceria a partir de uma solicitacao da Instituicao demandante. O Programa nao recebe uma relacao direta com Parceria; o vinculo financeiro e criado por `AporteFinanceiroPrograma`. Um Programa pode receber aportes de mais de uma Parceria.
 
 ```mermaid
 flowchart TB
@@ -142,7 +142,7 @@ flowchart TB
         P2["Consultar saldo da Parceria"]
         P3["Validar periodo do Programa"]
         G1{"Parceria apta e saldo suficiente?"}
-        P4["Registrar AporteFinanceiroParceriaPrograma"]
+        P4["Registrar AporteFinanceiroPrograma"]
         P5["Recalcular saldo da Parceria"]
     end
 
@@ -162,14 +162,14 @@ flowchart TB
 | 5 | Selecionar Parceria vigente | Area de Parcerias | Parceria aportante identificada. |
 | 6 | Validar saldo da Parceria | Area de Parcerias | Garante que a alocacao nao deixa saldo negativo. |
 | 7 | Validar periodo do Programa | Area de Parcerias | Garante que o Programa esta dentro da vigencia da Parceria aportante. |
-| 8 | Registrar `AporteFinanceiroParceriaPrograma` | Area de Parcerias | Recurso alocado ao Programa com rastreabilidade da origem. |
+| 8 | Registrar `AporteFinanceiroPrograma` | Area de Parcerias | Recurso alocado ao Programa com rastreabilidade da origem. |
 | 9 | Recalcular saldo da Parceria | Area de Parcerias | Saldo disponivel da Parceria atualizado. |
 
 ---
 
 ## Fluxo 4 — Retirada de Aporte de Parceria do Programa
 
-Este fluxo trata a retirada de um `AporteFinanceiroParceriaPrograma`. A retirada pode ser solicitada pela Instituicao Demandante ou pela Area Tecnica. A retirada direta so e permitida quando o valor ainda nao foi alocado em iniciativas ou outras execucoes vinculadas ao Programa. Quando o dinheiro ja estiver alocado, a retirada deve ser bloqueada ate que as iniciativas afetadas sejam canceladas, reduzidas ou realocadas formalmente.
+Este fluxo trata a retirada de um `AporteFinanceiroPrograma`. A retirada pode ser solicitada pela Instituicao Demandante ou pela Area Tecnica. A retirada direta so e permitida quando o valor ainda nao foi alocado em iniciativas ou outras execucoes vinculadas ao Programa. Quando o dinheiro ja estiver alocado, a retirada deve ser bloqueada ate que as iniciativas afetadas sejam canceladas, reduzidas ou realocadas formalmente.
 
 O principal impacto e financeiro-operacional: a retirada devolve saldo para a Parceria e reduz o total disponivel do Programa. Pode haver impacto de tempo quando a retirada exigir cancelamento ou replanejamento de iniciativas, pois o Programa pode precisar suspender publicacoes ou revisar seu cronograma antes de concluir a retirada.
 
@@ -195,7 +195,7 @@ flowchart TB
     end
 
     subgraph parcerias["Area de Parcerias"]
-        P1["Validar AporteFinanceiroParceriaPrograma"]
+        P1["Validar AporteFinanceiroPrograma"]
         P2["Reverter alocacao do aporte"]
         P3["Recalcular saldo da Parceria"]
     end
@@ -220,7 +220,7 @@ flowchart TB
 | # | Atividade | Responsavel | Resultado |
 |---|-----------|-------------|-----------|
 | 1 | Solicitar retirada do aporte | Instituicao Demandante ou Area Tecnica | Pedido formalizado com justificativa. |
-| 2 | Identificar aporte da Parceria | Area Tecnica / Area de Parcerias | `AporteFinanceiroParceriaPrograma` localizado no Programa. |
+| 2 | Identificar aporte da Parceria | Area Tecnica / Area de Parcerias | `AporteFinanceiroPrograma` localizado no Programa. |
 | 3 | Verificar dinheiro ja alocado | M003-M011 | Confirma se o valor foi comprometido em iniciativa ou execucao vinculada. |
 | 4 | Bloquear retirada quando houver alocacao | Area Tecnica | Retirada direta impedida enquanto houver dinheiro alocado em iniciativas ou execucoes vinculadas. |
 | 5 | Cancelar, reduzir ou realocar iniciativas afetadas | M003-M011 | Ajuste operacional realizado antes da retirada financeira. |

@@ -1,4 +1,4 @@
-import { Users, Plus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check } from 'lucide-react';
+import { Users, Plus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -23,7 +23,7 @@ interface TeamMember {
   startDate: string;
   endDate: string;
   type: 'BPIG-VII' | 'BPIG-VI' | 'BPIG-V' | 'BPIG-IV' | 'BPIG-III' | 'BPIG-II';
-  status: 'Em Andamento' | 'Finalizada' | 'Cancelada' | 'Reprovada' | 'Doc. Pendente';
+  status: 'Em Andamento' | 'Finalizada' | 'Cancelada' | 'Reprovada' | 'Doc. Pendente' | 'Revisar';
   email: string;
   phone: string;
   documents: {
@@ -78,12 +78,18 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
     { id: 13, requisito: 'Não ter vínculo empregatício', documento: 'CNIS', dataEnvio: '20/02/2026', status: 'Reprovado' as const },
   ];
 
+  const revisarDocuments = defaultDocuments.map((document) =>
+    document.requisito === 'Nível Médio'
+      ? { ...document, status: 'Reprovado' as const }
+      : document
+  );
+
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
     { id: 1, name: 'Paulo Sérgio dos Santos Junior', startDate: '01/06/2025', endDate: '01/06/2026', type: 'BPIG-VII', status: 'Doc. Pendente', email: 'paulo.junior@example.com', phone: '(27) 99999-9999', documents: defaultDocuments },
     { id: 2, name: 'Felipe Frechiani de Oliveira', startDate: '01/06/2025', endDate: '01/06/2026', type: 'BPIG-VI', status: 'Doc. Pendente', email: 'felipe.frechiani@example.com', phone: '(27) 99888-8888', documents: defaultDocuments },
     { id: 3, name: 'Fabiano Borges Ruy', startDate: '15/07/2025', endDate: '15/07/2026', type: 'BPIG-V', status: 'Finalizada', email: 'fabiano.ruy@example.com', phone: '(27) 99777-7777', documents: defaultDocuments },
     { id: 4, name: 'Victorio Albani de Carvalho', startDate: '01/06/2025', endDate: '01/06/2026', type: 'BPIG-IV', status: 'Em Andamento', email: 'victorio.albani@example.com', phone: '(27) 99666-6666', documents: defaultDocuments },
-    { id: 5, name: 'Sofia de Alcantara Silva', startDate: '01/08/2025', endDate: '01/08/2026', type: 'BPIG-III', status: 'Em Andamento', email: 'sofia.alcantara@example.com', phone: '(27) 99555-5555', documents: defaultDocuments },
+    { id: 5, name: 'Sofia de Alcantara Silva', startDate: '01/08/2025', endDate: '01/08/2026', type: 'BPIG-III', status: 'Revisar', email: 'sofia.alcantara@example.com', phone: '(27) 99555-5555', documents: revisarDocuments },
     { id: 6, name: 'Rafael Emerick Zape de Oliveira', startDate: '01/06/2025', endDate: '01/06/2026', type: 'BPIG-II', status: 'Cancelada', email: 'rafael.zape@example.com', phone: '(27) 99444-4444', documents: defaultDocuments },
     { id: 7, name: 'Moisés Savedra Omena', startDate: '15/07/2025', endDate: '15/07/2026', type: 'BPIG-VII', status: 'Doc. Pendente', email: 'moises.omena@example.com', phone: '(27) 99333-3333', documents: defaultDocuments },
     { id: 8, name: 'Michele Rudio Constatino', startDate: '01/06/2025', endDate: '01/06/2026', type: 'BPIG-VI', status: 'Em Andamento', email: 'michele.rudio@example.com', phone: '(27) 99222-2222', documents: defaultDocuments },
@@ -155,6 +161,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
           border: '1px solid rgba(239, 68, 68, 0.3)',
         };
       case 'Doc. Pendente':
+      case 'Revisar':
         return {
           backgroundColor: 'rgba(234, 179, 8, 0.1)',
           color: '#eab308',
@@ -1353,7 +1360,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                     overflow: 'hidden',
                   }}
                 >
-                  {['Todos', 'Em Andamento', 'Doc. Pendente', 'Finalizada', 'Cancelada', 'Reprovada'].map((status) => (
+                  {['Todos', 'Em Andamento', 'Revisar', 'Doc. Pendente', 'Finalizada', 'Cancelada', 'Reprovada'].map((status) => (
                     <button
                       key={status}
                       onClick={() => {
@@ -1646,6 +1653,23 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                         </div>
                       </div>
 
+                      {member.status === 'Revisar' && (
+                        <div
+                          className="mb-4 flex items-start gap-3 p-3"
+                          style={{
+                            backgroundColor: 'rgba(234, 179, 8, 0.1)',
+                            border: '1px solid rgba(234, 179, 8, 0.3)',
+                            borderRadius: 'var(--radius)',
+                            color: 'rgb(234, 179, 8)',
+                            fontSize: 'var(--text-sm)',
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: '1px' }} />
+                          <span>Diploma de Nível Médio Recusado. Falta o verso do documento. Reenviar em até X dias.</span>
+                        </div>
+                      )}
+
                       {/* Documents List */}
                       <div className="space-y-3">
                           {member.documents.map((doc) => {
@@ -1815,6 +1839,23 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                           Documentos Solicitados
                         </div>
                       </div>
+
+                      {member.status === 'Revisar' && (
+                        <div
+                          className="mb-4 flex items-start gap-3 p-3"
+                          style={{
+                            backgroundColor: 'rgba(234, 179, 8, 0.1)',
+                            border: '1px solid rgba(234, 179, 8, 0.3)',
+                            borderRadius: 'var(--radius)',
+                            color: 'rgb(234, 179, 8)',
+                            fontSize: 'var(--text-sm)',
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: '1px' }} />
+                          <span>Diploma de Nível Médio Recusado. Falta o verso do documento. Reenviar em até X dias.</span>
+                        </div>
+                      )}
 
                       {/* Documents List */}
                       <div className="space-y-3 mb-4 max-w-full">

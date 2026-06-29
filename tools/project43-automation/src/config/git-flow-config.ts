@@ -26,6 +26,7 @@ export const DEFAULT_REPOSITORIES: readonly RepoDefinition[] = [
   { name: "leds-conectafapes-frontoffice-backend", productionBranch: "main", developBranch: "develop" },
   { name: "leds-conectafapes-frontoffice-frontend", productionBranch: "main", developBranch: "develop" },
   { name: "leds-conectafapes-prestacao-de-contas", productionBranch: "master", developBranch: "develop" },
+  { name: "conectafapes-project", productionBranch: "main", developBranch: "develop" },
 ];
 
 export interface RepoDefinition {
@@ -38,6 +39,8 @@ export interface GitFlowConfig {
   org: string;
   repositories: RepoDefinition[];
   readyForDevStatusName: string;
+  inValidationStatusName: string;
+  homologationStatusName: string;
   developBranch: string;
   workBranchPrefixes: string[];
   releaseBranchPrefix: string;
@@ -88,6 +91,16 @@ export function createGitFlowConfig(source: ConfigSource = {}): GitFlowConfig {
       source,
       "READY_FOR_DEV_OPTION_NAME",
       DEFAULT_READY_FOR_DEV_STATUS
+    ),
+    inValidationStatusName: getOptionalValue(
+      source,
+      "IN_VALIDATION_OPTION_NAME",
+      "In Validation"
+    ),
+    homologationStatusName: getOptionalValue(
+      source,
+      "HOMOLOGATION_OPTION_NAME",
+      "Homologation"
     ),
     developBranch,
     workBranchPrefixes: parseList(

@@ -14,7 +14,7 @@ Este documento especifica o contrato HTTP REST do modulo M010 (Planejamento e Es
 
 > **Nota**: as rotas nao expoem o identificador interno do modulo (`M010`). Os recursos sao expostos diretamente sob `/api/v1/` (ex.: `/parcerias`, `/programas`, `/planos-estrategicos`). A segmentacao por modulo e uma decisao interna de arquitetura e nao deve vazar para clientes externos.
 
-> **Implementacao atual (SPRINT-007)**: os endpoints de Parcerias estao sob `/api/parcerias` (sem prefixo `v1`). O prefixo `/api/v1` sera adicionado em sprint futura de versionamento.
+> **Implementacao atual**: parte dos endpoints de Parcerias legados ainda esta sob `/api/parcerias`, mas as novas acoes do Portal Admin para Programas da Parceria, suspender, reativar e encerrar seguem `/api/captacaoprojetos/parcerias/...` conforme #2186, #2147, #2149 e #2153. O prefixo `/api/v1` sera consolidado em sprint futura de versionamento.
 
 ### Convencoes Gerais
 
@@ -395,7 +395,7 @@ Remove a Parceria em caso de erro de cadastro (RI3).
 - **Operacao de origem:** `RemoverParceria`
 - **Autorizacao:** `ANALISTA_AGENCIA`
 
-**Pre-condicao (RI3)**: a Parceria nao pode ter nenhum `AporteFinanceiroParceriaPrograma` vinculado.
+**Pre-condicao (RI3)**: a Parceria nao pode ter nenhum `AporteFinanceiroPrograma` vinculado.
 
 **Response `204 No Content`** (sucesso).
 
@@ -406,19 +406,93 @@ Remove a Parceria em caso de erro de cadastro (RI3).
 | `404` | `PARCERIA_NAO_ENCONTRADA` | Parceria nao encontrada. |
 | `422` | `PARCERIA_VINCULADA_A_PROGRAMAS` | Parceria vinculada a Programas; impossivel remover (RI3). `details.programasVinculados` lista os Programas. |
 
-### `POST /api/v1/parcerias/{id}/suspender`
+### `GET /api/captacaoprojetos/parcerias/{id}/programas`
 
-Suspende temporariamente uma Parceria `Vigente` (estado → `Suspensa`). **Autorizacao:** `ANALISTA_AGENCIA`.
+Lista os Programas associados a uma Parceria por `AporteFinanceiroPrograma`. Endpoint de apoio para as telas de Suspender e Encerrar Parceria (#2186).
 
-**Request body**: `{ "motivo": "..." }` (obrigatorio).
+**Response `200 OK`**
 
-**Erros**: `404 PARCERIA_NAO_ENCONTRADA`, `422 PARCERIA_NAO_VIGENTE`.
+```json
+{
+  "statusCode": 200,
+  "message": "Requisicao realizada com sucesso!",
+  "body": [
+    { "id": "3f1a9c5e-0000-0000-0000-000000000000", "nome": "Programa de Bolsas de Pesquisa" }
+  ]
+}
+```
 
-### `POST /api/v1/parcerias/{id}/reativar`
+**Erros**: `404 PARCERIA_NAO_ENCONTRADA`.
 
-Reativa Parceria Suspensa (estado → `Vigente`). Exige hoje em `[vigenciaInicioCorrente, vigenciaFimCorrente]`.
+### `POST /api/captacaoprojetos/parcerias/{id}/suspender`
 
-**Erros**: `404`, `422 PARCERIA_NAO_SUSPENSA`, `422 FORA_DA_VIGENCIA`.
+Suspende temporariamente uma Parceria `VIGENTE` (status → `SUSPENSA`) e suspende em cascata os Programas associados que estejam `VIGENTE` (status → `SUSPENSO_POR_PARCERIA`). **Autorizacao:** contexto autenticado do Portal Admin.
+
+**Request body**
+
+```json
+{ "isAreaTecnica": true, "motivo": "Pendencia documental identificada na auditoria." }
+```
+
+- `isAreaTecnica`: indica se a origem da solicitacao e Area Tecnica; nenhum ID de Area Tecnica/Instituicao trafega no body.
+- `motivo`: obrigatorio.
+- `AreaTecnicaId`/`InstituicaoId` sao resolvidos a partir do usuario autenticado; `InstituicaoId` fica fora de escopo nesta entrega.
+
+**Response `200 OK`**
+
+```json
+{
+  "statusCode": 200,
+  "message": "Parceria suspensa com sucesso!",
+  "body": { "id": "uuid", "status": "SUSPENSA" }
+}
+```
+
+**Erros**: `404 PARCERIA_NAO_ENCONTRADA`, `400 PARCERIA_NAO_VIGENTE`, `400 MOTIVO_OBRIGATORIO`.
+
+### `POST /api/captacaoprojetos/parcerias/{id}/reativar`
+
+Reativa uma Parceria `SUSPENSA` (status → `VIGENTE`), fecha a `SuspensaoParceria` ativa e reverte a cascata de Programas (`SUSPENSO_POR_PARCERIA` → `VIGENTE`) sem ressuscitar Programas encerrados.
+
+**Request body**
+
+```json
+{ "isAreaTecnica": true }
+```
+
+**Response `200 OK`**
+
+```json
+{
+  "statusCode": 200,
+  "message": "Parceria reativada com sucesso!",
+  "body": { "id": "uuid", "status": "VIGENTE" }
+}
+```
+
+**Erros**: `404 PARCERIA_NAO_ENCONTRADA`, `400 PARCERIA_NAO_SUSPENSA`.
+
+### `POST /api/captacaoprojetos/parcerias/{id}/encerrar`
+
+Encerra uma Parceria `VIGENTE` ou `SUSPENSA`, registra `DataFim` e `JustificativaEncerramento`, e encerra em cascata todos os Programas associados via `AporteFinanceiroPrograma` (status → `ENCERRADO_POR_PARCERIA`).
+
+**Request body**
+
+```json
+{ "justificativa": "Conclusao das atividades previstas no termo." }
+```
+
+**Response `200 OK`**
+
+```json
+{
+  "statusCode": 200,
+  "message": "Parceria encerrada com sucesso!",
+  "body": { "id": "uuid", "status": "ENCERRADA", "dataFim": "2026-06-09T00:00:00-03:00" }
+}
+```
+
+**Erros**: `404 PARCERIA_NAO_ENCONTRADA`, `400 STATUS_INVALIDO`, `400 JUSTIFICATIVA_OBRIGATORIA`.
 
 ### `POST /api/v1/programas/{id}/ativar`
 
@@ -488,43 +562,6 @@ Transiciona a Parceria de `EmElaboracao` para `Vigente` (RN19).
 | `422` | `FORMALIZACAO_DATA_ASSINATURA_AUSENTE` | `dataAssinatura` ausente no body (RN19). |
 | `422` | `FORMALIZACAO_SEM_APORTE` | Parceria nao possui AporteFinanceiro original registrado (RN19). |
 | `422` | `FORMALIZACAO_FORA_DA_VIGENCIA` | Data atual fora de `[vigenciaInicioCorrente, vigenciaFimCorrente]` (RN19). |
-
-### `PATCH /api/parcerias/{id}/encerrar`
-
-Encerra a Parceria com justificativa obrigatoria (RI2).
-
-- **Autorizacao:** `ANALISTA_AGENCIA`
-- **Operacao de origem:** `EncerrarParceria`
-
-> **Implementacao atual (SPRINT-007)**: encerramento simples com justificativa. O fluxo de confirmacao de cascata (`confirmarCascata`) e encerramento automatico por expiracao serao implementados em sprint futura, junto com `AporteFinanceiroParceriaPrograma`. A prestacao de contas de Iniciativas permanece no M014; a prestacao financeira institucional da Acao Transversal pertence ao M016.
-
-**Request body**
-
-```json
-{
-  "justificativa": "Cumprimento do plano de trabalho e conclusao de entregas."
-}
-```
-
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `justificativa` | string | **Sim** | Justificativa textual do encerramento |
-
-**Response `200 OK`**
-
-```json
-{
-  "id": "PAR-2026-03",
-  "estado": "Encerrada"
-}
-```
-
-**Erros**
-
-| HTTP | Codigo | Mensagem |
-|------|--------|----------|
-| `404` | `PARCERIA_NAO_ENCONTRADA` | Parceria nao encontrada. |
-| `400` | `JUSTIFICATIVA_AUSENTE` | Justificativa de encerramento e obrigatoria (RI2). |
 
 ---
 
@@ -698,7 +735,7 @@ Remove aporte com `isAditivo = true` (RN18). Recalcula Taxa de Gestao de Parceri
 
 Registra aporte da Parceria em Programa (RN11, RN13, RN14).
 
-- **Operacao de origem:** `RegistrarAporteFinanceiroParceriaPrograma`
+- **Operacao de origem:** `RegistrarAporteFinanceiroPrograma`
 - **Autorizacao:** `ANALISTA_AGENCIA`
 
 **Request body**
@@ -852,9 +889,10 @@ Consulta consolidado. Filtros: `planoId`, `estadoPrograma`, `estadoParceria`.
 | `PUT` | `/api/parcerias/{id}` | AtualizarParceria | ANALISTA_AGENCIA |
 | `DELETE` | `/api/parcerias/{id}` | RemoverParceria (RI3) | ANALISTA_AGENCIA |
 | `PATCH` | `/api/parcerias/{id}/formalizar` | FormalizarParceria (RN19) | ANALISTA_AGENCIA |
-| `POST` | `/api/v1/parcerias/{id}/suspender` | SuspenderParceria | ANALISTA_AGENCIA |
-| `POST` | `/api/v1/parcerias/{id}/reativar` | ReativarParceria | ANALISTA_AGENCIA |
-| `PATCH` | `/api/parcerias/{id}/encerrar` | EncerrarParceria (RI2) | ANALISTA_AGENCIA |
+| `GET` | `/api/captacaoprojetos/parcerias/{id}/programas` | ListarProgramasDaParceria (#2186) | ANALISTA_AGENCIA |
+| `POST` | `/api/captacaoprojetos/parcerias/{id}/suspender` | SuspenderParceria (#2147) | ANALISTA_AGENCIA |
+| `POST` | `/api/captacaoprojetos/parcerias/{id}/reativar` | ReativarParceria (#2149) | ANALISTA_AGENCIA |
+| `POST` | `/api/captacaoprojetos/parcerias/{id}/encerrar` | EncerrarParceria (RI2, #2153) | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/programas/{id}/ativar` | AtivarPrograma | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/programas/{id}/suspender` | SuspenderPrograma | ANALISTA_AGENCIA |
 | `POST` | `/api/v1/programas/{id}/reativar` | ReativarPrograma | ANALISTA_AGENCIA |
@@ -865,7 +903,7 @@ Consulta consolidado. Filtros: `planoId`, `estadoPrograma`, `estadoParceria`.
 | `GET` | `/api/v1/parcerias/{id}/aportes` | ListarAportesFinanceiros | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
 | `PUT` | `/api/parcerias/{id}/aportes/{aporteId}` | EditarAporteFinanceiroAditivo (RN18) | ANALISTA_AGENCIA |
 | `DELETE` | `/api/parcerias/{id}/aportes/{aporteId}` | RemoverAporteFinanceiroAditivo (RN18) | ANALISTA_AGENCIA |
-| `POST` | `/api/v1/parcerias/{parceriaId}/aportes-programas` | RegistrarAporteFinanceiroParceriaPrograma | ANALISTA_AGENCIA |
+| `POST` | `/api/v1/parcerias/{parceriaId}/aportes-programas` | RegistrarAporteFinanceiroPrograma | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/parcerias/{parceriaId}/aportes-programas` | ListarAportesEmProgramas | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
 | `POST` | `/api/v1/parcerias/{id}/documentos` | AnexarDocumentoAParceria | ANALISTA_AGENCIA |
 | `GET` | `/api/v1/parcerias/{id}/documentos` | ListarDocumentosDaParceria | DIRETORIA, ANALISTA_AGENCIA, MODULO_INTERNO |
@@ -925,7 +963,7 @@ Consulta consolidado. Filtros: `planoId`, `estadoPrograma`, `estadoParceria`.
 }
 ```
 
-### AporteFinanceiroParceriaPrograma
+### AporteFinanceiroPrograma
 
 ```json
 {

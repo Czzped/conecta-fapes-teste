@@ -8,7 +8,7 @@
 
 O subdominio de Programas organiza o ciclo de vida dos Programas de fomento, desde a criacao e ativacao ate aditivos, aportes recebidos de Parcerias, retirada de aportes, suspensao, reativacao, execucao operacional, acompanhamento e encerramento.
 
-Todo Programa possui exatamente uma Instituicao demandante, deve estar vinculado a pelo menos um eixo estrategico e pode receber aportes de uma ou mais Parcerias por meio de `AporteFinanceiroParceriaPrograma`.
+Todo Programa possui exatamente uma Instituicao demandante, deve estar vinculado a pelo menos um eixo estrategico e pode receber aportes de uma ou mais Parcerias por meio de `AporteFinanceiroPrograma`.
 
 ## Documentos
 
@@ -32,7 +32,7 @@ Todo Programa possui exatamente uma Instituicao demandante, deve estar vinculado
 |------------|--------------------|
 | Criar e ativar Programa | Programa criado em `EM_PLANEJAMENTO` e ativado quando atende Instituicao demandante, eixo e comite. |
 | Registrar aditivo de tempo | Periodo atualizado sem violar vigencia das Parcerias aportantes. |
-| Solicitar aditivo financeiro | Reforco financeiro analisado e, quando aprovado, registrado via `AporteFinanceiroParceriaPrograma`. |
+| Solicitar aditivo financeiro | Reforco financeiro analisado e, quando aprovado, registrado via `AporteFinanceiroPrograma`. |
 | Retirar aporte de Parceria | Aporte retirado quando ainda nao houve alocacao operacional; se houver alocacao, exige ajuste previo. |
 | Suspender e reativar Programa | Publicacoes e execucoes bloqueadas durante impedimento e retomadas apos resolucao. |
 | Encerrar ou remover Programa | Remocao sem impacto quando nao ha Iniciativa vinculada; encerramento preserva historico quando ha execucao. |
@@ -44,19 +44,19 @@ Todo Programa possui exatamente uma Instituicao demandante, deve estar vinculado
 
 O recurso no nivel do Programa percorre tres camadas. Cada camada tem conceito, formula e dono distintos.
 
-### 1. Entrada — AporteFinanceiroParceriaPrograma
+### 1. Entrada — AporteFinanceiroPrograma
 
-Uma ou mais Parcerias alocam recursos no Programa via entidade N:N `AporteFinanceiroParceriaPrograma`. O Programa **nao recalcula** Taxa de Gestao de Parcerias — ela ja foi calculada e deduzida na Parceria antes da alocacao (RN20, RN21).
+Uma ou mais Parcerias alocam recursos no Programa via entidade N:N `AporteFinanceiroPrograma`. O Programa **nao recalcula** Taxa de Gestao de Parcerias — ela ja foi calculada e deduzida na Parceria antes da alocacao (RN20, RN21).
 
 ```
-valorAlocado = SUM(AporteFinanceiroParceriaPrograma.valor WHERE programa = this AND estado = 'ATIVO')
+valorAlocado = SUM(AporteFinanceiroPrograma.valor WHERE programa = this AND estado = 'ATIVO')
 ```
 
 Regras de registro: Parceria deve estar `Vigente` (RN11); valor `>= 0`, negativo rejeitado (RN11); datas do Programa devem caber na vigencia de todas as Parcerias aportantes (RN13).
 
 ### Retirada de Aporte
 
-Um `AporteFinanceiroParceriaPrograma` pode transitar para `RETIRADO` quando ainda nao houve alocacao operacional comprometida. Ao ser retirado:
+Um `AporteFinanceiroPrograma` pode transitar para `RETIRADO` quando ainda nao houve alocacao operacional comprometida. Ao ser retirado:
 - Deixa de compor `valorAlocado` do Programa
 - Devolve o valor ao `saldoAlocavelEmProgramas` da Parceria de origem (RN14)
 - Exige `dataRetirada` e `justificativaRetirada`

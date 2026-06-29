@@ -473,25 +473,6 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
   const shouldShowBeneficiary = scope === 'project';
   const shouldShowProjectColumn = !embedded;
   const shouldShowProjectFilter = scope !== 'project';
-  const shouldShowBankAccount = scope !== 'project';
-  const bankAccountsByBeneficiary: Record<string, { agency: string; account: string }> = {
-    'Ana Souza': { agency: '0912', account: '12345-6' },
-    'Bruno Lima': { agency: '0874', account: '98765-1' },
-    'Carolina Martins': { agency: '1120', account: '45678-9' },
-    'Diego Almeida': { agency: '0715', account: '74125-0' },
-    'Fernanda Rocha': { agency: '1044', account: '85236-7' },
-    'Gabriel Costa': { agency: '0631', account: '96325-4' },
-    'Helena Dias': { agency: '0988', account: '15973-2' },
-    'Igor Nascimento': { agency: '0750', account: '35791-8' },
-    'Juliana Freitas': { agency: '0816', account: '24680-3' },
-    'Paulo Sérgio Junior': { agency: '0921', account: '123456-7' },
-  };
-
-  const getBankAccount = (beneficiary: string) => bankAccountsByBeneficiary[beneficiary] ?? {
-    agency: 'Não informada',
-    account: 'Não informada',
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Pago':
@@ -711,7 +692,6 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
           <div className="hidden md:grid md:grid-cols-1 gap-4">
             {paginatedPayments.map((payment, index) => {
               const statusColors = getStatusColor(payment.status);
-              const bankAccount = shouldShowBankAccount ? getBankAccount(payment.beneficiary) : null;
               
               return (
                 <div 
@@ -730,7 +710,7 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
                         ? shouldShowProjectColumn
                           ? '1.15fr 1.2fr 1fr 1.15fr 0.8fr 0.8fr'
                           : '1.2fr 1fr 1.15fr 0.8fr 0.8fr'
-                        : '1.25fr 1fr 1.15fr 1.65fr 0.8fr 0.8fr',
+                        : '1.25fr 1fr 1.15fr 0.8fr 0.8fr',
                       alignItems: 'start',
                     }}
                   >
@@ -777,21 +757,6 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
                       </div>
                     </div>
 
-                    {/* Dados bancários */}
-                    {bankAccount && (
-                      <div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
-                          Dados bancários
-                        </div>
-                        <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', wordBreak: 'break-word' }}>
-                          Agência {bankAccount.agency}
-                        </div>
-                        <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.25rem', wordBreak: 'break-word' }}>
-                          Conta {bankAccount.account}
-                        </div>
-                      </div>
-                    )}
-
                     {/* Valor */}
                     <div>
                       <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
@@ -831,7 +796,6 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
           <div className="md:hidden space-y-4">
             {paginatedPayments.map((payment, index) => {
               const statusColors = getStatusColor(payment.status);
-              const bankAccount = shouldShowBankAccount ? getBankAccount(payment.beneficiary) : null;
               
               return (
                 <div 
@@ -879,20 +843,6 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
                         </div>
                       </div>
 
-                      {/* Dados bancários */}
-                      {bankAccount && (
-                        <div>
-                          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
-                            Dados bancários
-                          </div>
-                          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                            Agência {bankAccount.agency}
-                          </div>
-                          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
-                            Conta {bankAccount.account}
-                          </div>
-                        </div>
-                      )}
                     </div>
 
                     {/* Right Column */}

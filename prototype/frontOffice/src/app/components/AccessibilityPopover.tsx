@@ -138,8 +138,8 @@ export function AccessibilityPopover({ isOpen, onClose, anchorEl }: Accessibilit
                   onClick={() => handleThemeChange(item.id)}
                   className="flex flex-col items-center gap-2 py-3 px-2 transition-all"
                   style={{
-                    backgroundColor: isActive ? 'rgba(8, 145, 178, 0.1)' : 'transparent',
-                    border: isActive ? '1px solid rgba(8, 145, 178, 0.3)' : '1px solid var(--border)',
+                    backgroundColor: isActive ? 'rgba(34, 211, 238, 0.1)' : 'transparent',
+                    border: isActive ? '1px solid rgba(34, 211, 238, 0.3)' : '1px solid var(--border)',
                     borderRadius: 'var(--radius)',
                     color: isActive ? 'var(--primary)' : 'var(--foreground)',
                   }}
@@ -177,8 +177,8 @@ export function AccessibilityPopover({ isOpen, onClose, anchorEl }: Accessibilit
                   onClick={() => setContrast(item.id)}
                   className="py-2 px-2 transition-all"
                   style={{
-                    backgroundColor: isActive ? 'rgba(8, 145, 178, 0.1)' : 'transparent',
-                    border: isActive ? '1px solid rgba(8, 145, 178, 0.3)' : '1px solid var(--border)',
+                    backgroundColor: isActive ? 'rgba(34, 211, 238, 0.1)' : 'transparent',
+                    border: isActive ? '1px solid rgba(34, 211, 238, 0.3)' : '1px solid var(--border)',
                     borderRadius: 'var(--radius)',
                     color: isActive ? 'var(--primary)' : 'var(--foreground)',
                     fontSize: 'var(--text-sm)',
@@ -217,8 +217,8 @@ export function AccessibilityPopover({ isOpen, onClose, anchorEl }: Accessibilit
                   onClick={() => setFontSize(item.id)}
                   className="py-2 px-2 transition-all"
                   style={{
-                    backgroundColor: isActive ? 'rgba(8, 145, 178, 0.1)' : 'transparent',
-                    border: isActive ? '1px solid rgba(8, 145, 178, 0.3)' : '1px solid var(--border)',
+                    backgroundColor: isActive ? 'rgba(34, 211, 238, 0.1)' : 'transparent',
+                    border: isActive ? '1px solid rgba(34, 211, 238, 0.3)' : '1px solid var(--border)',
                     borderRadius: 'var(--radius)',
                     color: isActive ? 'var(--primary)' : 'var(--foreground)',
                     fontSize: item.size,
@@ -350,13 +350,13 @@ export function AccessibilityPopover({ isOpen, onClose, anchorEl }: Accessibilit
           className="w-full flex items-center justify-center gap-2 py-2 transition-colors"
           style={{
             color: 'var(--primary)',
-            border: '1px solid rgba(8, 145, 178, 0.3)',
+            border: '1px solid rgba(34, 211, 238, 0.3)',
             borderRadius: 'var(--radius)',
             fontSize: 'var(--text-sm)',
             fontWeight: 'var(--font-weight-medium)',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.05)';
+            e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.05)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';

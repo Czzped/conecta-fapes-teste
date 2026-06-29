@@ -14,7 +14,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
   const [isWorkPlanExpanded, setIsWorkPlanExpanded] = useState(false);
   const [budgetTooltip, setBudgetTooltip] = useState<{ name: string; x: number } | null>(null);
   const timelineActiveColor = '#0e7490';
-  const timelineCurrentColor = '#06b6d4';
+  const timelineCurrentColor = '#22d3ee';
 
   const projectStages = [
     { id: 1, label: 'Submissão', date: '15/01/2024', icon: Send, status: 'completed' },

@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import {
   ChevronLeft, FileText, User, Users, Receipt, CalendarDays, Eye,
-  Plus, CheckCircle2, Moon,
+  Plus, CheckCircle2, Moon, Paperclip,
 } from 'lucide-react';
 import fapesLogo from 'figma:asset/aec6ed8eb7cf2782d52002e0d4c19150c79afd78.png';
 import { editais } from '../data/editais';
@@ -27,8 +27,8 @@ const CARD_BG = 'rgba(255,255,255,0.03)';
 const CARD_BORDER = '1px solid rgba(6,182,212,0.14)';
 const SECTION_HEAD_BG = 'rgba(6,182,212,0.06)';
 const SECTION_HEAD_BORDER = '1px solid rgba(6,182,212,0.14)';
-const INPUT_BG = 'rgba(0,0,0,0.25)';
-const INPUT_BORDER = '1px solid rgba(6,182,212,0.2)';
+const INPUT_BG = 'var(--input-background)';
+const INPUT_BORDER = '1px solid var(--border)';
 const INPUT_BORDER_FOCUS = '1px solid rgba(6,182,212,0.55)';
 const INPUT_BG_FOCUS = 'rgba(6,182,212,0.07)';
 const RADIUS = 'var(--radius)';
@@ -37,8 +37,8 @@ const FF = 'var(--font-family)';
 const CLR_FG = 'var(--foreground)';
 const CLR_MUTED = 'var(--muted-foreground)';
 const CLR_LABEL = 'var(--muted-foreground)';
-const CLR_TEAL = '#0891b2';
-const CLR_TEAL_MID = '#06b6d4';
+const CLR_TEAL = '#22d3ee';
+const CLR_TEAL_MID = '#22d3ee';
 
 const inputBase: React.CSSProperties = {
   width: '100%',
@@ -267,12 +267,13 @@ function AddButton({ label, onClick }: { label: string; onClick: () => void }) {
         display: 'inline-flex',
         alignItems: 'center',
         gap: '0.4rem',
-        padding: '0.45rem 1rem',
+        minHeight: '42px',
+        padding: '0.6rem 1rem',
         borderRadius: RADIUS,
         border: `1px solid rgba(6,182,212,${hov ? '0.45' : '0.25'})`,
         backgroundColor: `rgba(6,182,212,${hov ? '0.14' : '0.07'})`,
         color: CLR_TEAL,
-        fontSize: 'var(--text-xs)',
+        fontSize: 'var(--text-sm)',
         fontWeight: 'var(--font-weight-medium)',
         cursor: 'pointer',
         fontFamily: FF,
@@ -289,10 +290,292 @@ function AddButton({ label, onClick }: { label: string; onClick: () => void }) {
 interface Membro { nome: string; cpf: string; funcao: string; bolsa: string; tipo: 'completo' | 'bolsa'; }
 interface Despesa { nome: string; categoria: string; quantidade: string; custo: string; justificativa: string; }
 interface Atividade { descricao: string; inicio: string; conclusao: string; }
+type InscricaoTab = 'formulario' | 'dados';
+
+function TabBar({
+  activeTab,
+  onChange,
+}: {
+  activeTab: InscricaoTab;
+  onChange: (tab: InscricaoTab) => void;
+}) {
+  const tabs: Array<{ id: InscricaoTab; label: string }> = [
+    { id: 'formulario', label: 'Formulário do Projeto' },
+    { id: 'dados', label: 'Meus Dados' },
+  ];
+
+  return (
+    <div style={{ borderBottom: '1px solid rgba(6,182,212,0.14)', display: 'flex', gap: '2rem' }}>
+      {tabs.map(tab => (
+        <button
+          key={tab.id}
+          onClick={() => onChange(tab.id)}
+          style={{
+            border: 'none',
+            borderBottom: activeTab === tab.id ? `2px solid ${CLR_TEAL}` : '2px solid transparent',
+            backgroundColor: 'transparent',
+            color: activeTab === tab.id ? CLR_TEAL : CLR_MUTED,
+            fontFamily: FF,
+            fontSize: 'var(--text-sm)',
+            fontWeight: 'var(--font-weight-medium)',
+            padding: '0 0 0.875rem',
+            cursor: 'pointer',
+            transition: 'all 0.18s',
+          }}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ReadOnlyInput({ value }: { value: string }) {
+  return (
+    <input
+      value={value}
+      readOnly
+      style={{
+        ...inputBase,
+        color: CLR_FG,
+        cursor: 'default',
+      }}
+    />
+  );
+}
+
+function MyDataSection({
+  number,
+  title,
+  children,
+}: {
+  number: number;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      style={{
+        backgroundColor: 'var(--card)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius)',
+        padding: '1.5rem',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+        <span
+          style={{
+            width: '24px',
+            height: '24px',
+            borderRadius: '9999px',
+            backgroundColor: 'var(--primary)',
+            color: 'var(--primary-foreground)',
+            fontSize: 'var(--text-xs)',
+            fontWeight: 'var(--font-weight-semibold)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            fontFamily: FF,
+          }}
+        >
+          {number}
+        </span>
+        <h3
+          style={{
+            color: 'var(--foreground)',
+            fontSize: '16px',
+            fontWeight: 'var(--font-weight-normal)',
+            lineHeight: 1.2,
+            margin: 0,
+            fontFamily: FF,
+          }}
+        >
+          {title}
+        </h3>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function MyDataLabel({ children, required = true }: { children: React.ReactNode; required?: boolean }) {
+  return (
+    <label className="block mb-2" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontFamily: FF }}>
+      {children}
+      {required && <span style={{ color: 'var(--destructive-foreground)', marginLeft: '4px' }}>*</span>}
+    </label>
+  );
+}
+
+function MyDataField({
+  label,
+  value,
+  required = true,
+  link = false,
+}: {
+  label: string;
+  value: string;
+  required?: boolean;
+  link?: boolean;
+}) {
+  return (
+    <div>
+      <MyDataLabel required={required}>{label}</MyDataLabel>
+      <input
+        type="text"
+        value={value}
+        readOnly
+        className="w-full px-4 py-2 border transition-colors"
+        style={{
+          backgroundColor: 'var(--input-background)',
+          color: link ? 'var(--primary)' : 'var(--foreground)',
+          borderColor: 'var(--border)',
+          borderRadius: 'var(--radius)',
+          textDecoration: link ? 'underline' : 'none',
+          fontSize: 'var(--text-sm)',
+          fontFamily: FF,
+          cursor: 'default',
+        }}
+      />
+    </div>
+  );
+}
+
+function DadosPessoaisTab() {
+  return (
+    <div className="space-y-6">
+      <MyDataSection number={1} title="Dados Pessoais">
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <MyDataField label="Nome Completo" value="Paulo Sérgio Junior" />
+            <MyDataField label="Nome Social" value="" required={false} />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <MyDataField label="CPF" value="123.456.789-00" />
+            <MyDataField label="Data de Nascimento" value="15/03/1995" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <MyDataField label="E-mail" value="paulo.souza@example.com" />
+            <MyDataField label="Celular" value="(27) 99999-9999" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <MyDataField label="Gênero" value="Masculino" />
+            <MyDataField label="Etnia" value="Parda" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <MyDataField label="Lattes" value="http://lattes.cnpq.br/1234567890" link />
+            <MyDataField label="Nível Acadêmico" value="Ensino superior" />
+          </div>
+        </div>
+      </MyDataSection>
+
+      <MyDataSection number={2} title="Documento de Identificação">
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <MyDataField label="Tipo de Documento" value="Identidade" />
+            <MyDataField label="Número" value="1234567" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <MyDataField label="Órgão Emissor" value="SSP" />
+            <MyDataField label="UF do Órgão Emissor" value="ES" />
+            <MyDataField label="Data de Emissão" value="10/03/2015" />
+          </div>
+        </div>
+      </MyDataSection>
+
+      <MyDataSection number={3} title="Endereço Residencial">
+        <div className="space-y-8">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <MyDataField label="CEP" value="29000-000" />
+              <MyDataField label="Rua" value="Rua das Flores" />
+              <MyDataField label="Número" value="123" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <MyDataField label="Complemento" value="Apto 101" required={false} />
+              <MyDataField label="Bairro" value="Centro" />
+              <MyDataField label="Municipio" value="Vitória" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <MyDataField label="Estado" value="Espírito Santo" />
+              <MyDataField label="País" value="Brasil" />
+            </div>
+          </div>
+        </div>
+      </MyDataSection>
+    </div>
+  );
+}
+
+function PrimaryActionButton({
+  children,
+  onClick,
+  disabled = false,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        padding: '0.6rem 1.75rem',
+        borderRadius: RADIUS,
+        border: 'none',
+        backgroundColor: disabled ? 'rgba(6,182,212,0.4)' : CLR_TEAL_MID,
+        color: '#0a0a0a',
+        fontSize: 'var(--text-sm)',
+        fontWeight: 'var(--font-weight-semibold)',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        fontFamily: FF,
+        transition: 'all 0.18s',
+        opacity: disabled ? 0.7 : 1,
+      }}
+      onMouseEnter={e => { if (!disabled) e.currentTarget.style.backgroundColor = '#22d3ee'; }}
+      onMouseLeave={e => { if (!disabled) e.currentTarget.style.backgroundColor = CLR_TEAL_MID; }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function SecondaryActionButton({
+  children,
+  onClick,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        padding: '0.6rem 1.5rem',
+        borderRadius: RADIUS,
+        border: '1px solid rgba(6,182,212,0.25)',
+        backgroundColor: 'transparent',
+        color: CLR_MUTED,
+        fontSize: 'var(--text-sm)',
+        fontWeight: 'var(--font-weight-medium)',
+        cursor: 'pointer',
+        fontFamily: FF,
+        transition: 'all 0.18s',
+      }}
+      onMouseEnter={e => { e.currentTarget.style.color = CLR_FG; e.currentTarget.style.borderColor = 'rgba(6,182,212,0.45)'; }}
+      onMouseLeave={e => { e.currentTarget.style.color = CLR_MUTED; e.currentTarget.style.borderColor = 'rgba(6,182,212,0.25)'; }}
+    >
+      {children}
+    </button>
+  );
+}
 
 export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps) {
   const edital = editais.find(e => e.id === editalId) ?? editais[0];
   const [showAccessibility, setShowAccessibility] = useState(false);
+  const [activeTab, setActiveTab] = useState<InscricaoTab>('formulario');
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -305,12 +588,6 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
   const [objEspecifico, setObjEspecifico] = useState('');
   const [resultados, setResultados] = useState('');
 
-  // Proponente
-  const [nomeCompleto, setNomeCompleto] = useState('');
-  const [cpf, setCpf] = useState('');
-  const [telefone, setTelefone] = useState('');
-  const [email, setEmail] = useState('');
-  const [endereco, setEndereco] = useState('');
   const [instituicao, setInstituicao] = useState('');
 
   // Equipe
@@ -321,6 +598,8 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
 
   // Cronograma
   const [atividades, setAtividades] = useState<Atividade[]>([{ descricao: '', inicio: '', conclusao: '' }]);
+  const [documentoProjeto, setDocumentoProjeto] = useState('');
+  const documentoInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -345,7 +624,7 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
           <div style={{ ...CONTAINER, height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <img src={fapesLogo} alt="FAPES" style={{ height: '36px', objectFit: 'contain' }} />
             <div className="flex items-center gap-3">
-              <button onClick={onLogin} style={{ padding: '0.45rem 1.1rem', borderRadius: '9999px', border: '1px solid #0891b2', backgroundColor: 'transparent', color: '#0891b2', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: FF }}>
+              <button onClick={onLogin} style={{ padding: '0.45rem 1.1rem', borderRadius: '9999px', border: '1px solid #22d3ee', backgroundColor: 'transparent', color: '#22d3ee', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: FF }}>
                 Entrar com Acesso Cidadão
               </button>
               <button
@@ -390,7 +669,7 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
           <div className="flex items-center gap-3">
             <button
               onClick={onLogin}
-              style={{ padding: '0.45rem 1.1rem', borderRadius: '9999px', border: '1px solid #0891b2', backgroundColor: 'transparent', color: '#0891b2', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: FF }}
+              style={{ padding: '0.45rem 1.1rem', borderRadius: '9999px', border: '1px solid #22d3ee', backgroundColor: 'transparent', color: '#22d3ee', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: FF }}
             >
               Entrar com Acesso Cidadão
             </button>
@@ -418,99 +697,67 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
             onMouseEnter={e => { e.currentTarget.style.color = CLR_TEAL; }}
             onMouseLeave={e => { e.currentTarget.style.color = CLR_MUTED; }}
           >
-            <ChevronLeft size={16} /> Voltar para o Edital
+            <ChevronLeft size={16} /> Voltar para Oportunidades
           </button>
           <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-weight-semibold)', color: CLR_FG, fontFamily: FF }}>
-            Submissão de Proposta
+            {edital.titulo}
           </div>
           <div style={{ fontSize: 'var(--text-sm)', color: CLR_MUTED, fontFamily: FF, marginTop: '2px' }}>
-            Preencha todos os campos para submeter sua proposta · {edital.titulo} · {edital.numero}
+            Submissão da Proposta · {edital.numero}
+          </div>
+          <div style={{ fontSize: 'var(--text-sm)', color: CLR_MUTED, fontFamily: FF, marginTop: '0.5rem' }}>
+            Preencha os dados a baixo para enviar sua proposta
           </div>
         </div>
       </div>
 
       {/* ── FORM BODY ── */}
-      <div style={{ ...CONTAINER, paddingTop: '2rem', paddingBottom: '7rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div style={{ ...CONTAINER, paddingTop: '2rem', paddingBottom: '3rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <TabBar activeTab={activeTab} onChange={setActiveTab} />
 
-        {/* ── DADOS GERAIS ── */}
-        <SectionCard
-          icon={<FileText size={16} style={{ color: CLR_TEAL }} />}
-          title="Dados Gerais"
-          subtitle="Preencha os dados básicos do projeto."
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
-            {/* Row: Título + Coordenador */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Field label="Título do Projeto">
-                <FocusInput placeholder="Digite o título do projeto" value={titulo} onChange={setTitulo} />
-              </Field>
-              <Field label="Coordenador">
-                <FocusInput placeholder="Nome do coordenador" value={coordenador} onChange={setCoordenador} />
-              </Field>
-            </div>
-            <Field label="Resumo">
-              <FocusTextarea placeholder="Descreva brevemente o projeto" value={resumo} onChange={setResumo} rows={4} />
-            </Field>
-            {/* Row: Objetivo Geral + Objetivo Específico */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Field label="Objetivo Geral">
-                <FocusTextarea placeholder="Descreva o objetivo geral" value={objGeral} onChange={setObjGeral} rows={4} />
-              </Field>
-              <Field label="Objetivo Específico">
-                <FocusTextarea placeholder="Descreva os objetivos específicos" value={objEspecifico} onChange={setObjEspecifico} rows={4} />
-              </Field>
-            </div>
-            <Field label="Resultados">
-              <FocusTextarea placeholder="Quais resultados são esperados?" value={resultados} onChange={setResultados} rows={4} />
-            </Field>
-          </div>
-        </SectionCard>
-
-        {/* ── PROPONENTE ── */}
-        <SectionCard
-          icon={<User size={16} style={{ color: CLR_TEAL }} />}
-          title="Proponente"
-          subtitle="Informe os dados do responsável pelo projeto."
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Field label="Nome Completo">
-                <FocusInput placeholder="Nome completo" value={nomeCompleto} onChange={setNomeCompleto} />
-              </Field>
-              <Field label="CPF">
-                <FocusInput placeholder="000.000.000-00" value={cpf} onChange={setCpf} />
-              </Field>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Field label="Telefone">
-                <FocusInput placeholder="(27) 00000-0000" value={telefone} onChange={setTelefone} />
-              </Field>
-              <Field label="E-mail">
-                <FocusInput placeholder="email@exemplo.com.br" value={email} onChange={setEmail} type="email" />
-              </Field>
-            </div>
-            <Field label="Endereço">
-              <FocusInput placeholder="Rua, número, bairro, cidade – UF" value={endereco} onChange={setEndereco} />
-            </Field>
-            <Field label="Sua Instituição">
-              <FocusSelect value={instituicao} onChange={setInstituicao} placeholder="Selecione...">
-                <option value="UFES">Universidade Federal do Espírito Santo (UFES)</option>
-                <option value="IFES">Instituto Federal do Espírito Santo (IFES)</option>
-                <option value="UVV">Universidade Vila Velha (UVV)</option>
-                <option value="MULTIVIX">Faculdade Multivix</option>
-                <option value="EMESCAM">EMESCAM</option>
-                <option value="outro">Outra</option>
-              </FocusSelect>
-            </Field>
-          </div>
-        </SectionCard>
+        {activeTab === 'formulario' ? (
+          <>
+            <MyDataSection number={1} title="Informações Gerais">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Field label="Título do Projeto">
+                    <FocusInput placeholder="Digite o título do projeto" value={titulo} onChange={setTitulo} />
+                  </Field>
+                  <Field label="Coordenador">
+                    <FocusInput placeholder="Nome do coordenador" value={coordenador} onChange={setCoordenador} />
+                  </Field>
+                </div>
+                <Field label="Instituição">
+                  <FocusSelect value={instituicao} onChange={setInstituicao} placeholder="Selecione...">
+                    <option value="UFES">Universidade Federal do Espírito Santo (UFES)</option>
+                    <option value="IFES">Instituto Federal do Espírito Santo (IFES)</option>
+                    <option value="UVV">Universidade Vila Velha (UVV)</option>
+                    <option value="MULTIVIX">Faculdade Multivix</option>
+                    <option value="EMESCAM">EMESCAM</option>
+                    <option value="outro">Outra</option>
+                  </FocusSelect>
+                </Field>
+                <Field label="Resumo">
+                  <FocusTextarea placeholder="Descreva brevemente o projeto" value={resumo} onChange={setResumo} rows={4} />
+                </Field>
+                <div className="grid grid-cols-1 gap-4">
+                  <Field label="Objetivo Geral">
+                    <FocusTextarea placeholder="Descreva o objetivo geral" value={objGeral} onChange={setObjGeral} rows={4} />
+                  </Field>
+                </div>
+                <div className="grid grid-cols-1 gap-4">
+                  <Field label="Objetivo Específico">
+                    <FocusTextarea placeholder="Descreva os objetivos específicos" value={objEspecifico} onChange={setObjEspecifico} rows={4} />
+                  </Field>
+                </div>
+                <Field label="Resultados">
+                  <FocusTextarea placeholder="Quais resultados são esperados?" value={resultados} onChange={setResultados} rows={4} />
+                </Field>
+              </div>
+            </MyDataSection>
 
         {/* ── EQUIPE ── */}
-        <SectionCard
-          icon={<Users size={16} style={{ color: CLR_TEAL }} />}
-          title="Equipe"
-          subtitle="Adicione os membros da equipe que participarão e liste as bolsas."
-        >
+        <MyDataSection number={2} title="Equipe">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {membros.map((m, i) => (
               <div key={i}>
@@ -542,19 +789,14 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
                 )}
               </div>
             ))}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-              <AddButton label="Adicionar Apenas Bolsa" onClick={() => setMembros(prev => [...prev, { nome: '', cpf: '', funcao: '', bolsa: '', tipo: 'bolsa' }])} />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
               <AddButton label="Adicionar Membro" onClick={() => setMembros(prev => [...prev, { nome: '', cpf: '', funcao: '', bolsa: '', tipo: 'completo' }])} />
             </div>
           </div>
-        </SectionCard>
+        </MyDataSection>
 
         {/* ── DESPESAS ── */}
-        <SectionCard
-          icon={<Receipt size={16} style={{ color: CLR_TEAL }} />}
-          title="Despesas"
-          subtitle="Lista os itens de capital e de custeio. Se o projeto for aprovado, será possível apenas usar o recurso com esses itens."
-        >
+        <MyDataSection number={3} title="Despesas">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {despesas.map((d, i) => (
               <div key={i}>
@@ -591,14 +833,10 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
               <AddButton label="Adicionar Item" onClick={() => setDespesas(prev => [...prev, { nome: '', categoria: '', quantidade: '', custo: '', justificativa: '' }])} />
             </div>
           </div>
-        </SectionCard>
+        </MyDataSection>
 
         {/* ── CRONOGRAMA ── */}
-        <SectionCard
-          icon={<CalendarDays size={16} style={{ color: CLR_TEAL }} />}
-          title="Cronograma"
-          subtitle="Defina o período de execução e entrega concreta para cada objetivo específico. Dê preferência a entregas mensais."
-        >
+        <MyDataSection number={4} title="Cronograma">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {atividades.map((a, i) => (
               <div key={i}>
@@ -623,167 +861,108 @@ export function InscricaoPage({ editalId, onBack, onLogin }: InscricaoPageProps)
               <AddButton label="Adicionar Atividade" onClick={() => setAtividades(prev => [...prev, { descricao: '', inicio: '', conclusao: '' }])} />
             </div>
           </div>
-        </SectionCard>
+        </MyDataSection>
 
-        {/* ── RESUMO ── */}
-        <SectionCard
-          icon={<Eye size={16} style={{ color: CLR_TEAL }} />}
-          title="Resumo"
-          subtitle="Revise todas as informações inseridas antes de submeter sua proposta."
-        >
-          {/* Dados Gerais */}
-          <ReviewGroup title="Dados Gerais">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3" style={{ marginBottom: '0.5rem' }}>
-              <ReviewRow label="Título do Projeto" value={titulo} />
-              <ReviewRow label="Coordenador" value={coordenador} />
+        <MyDataSection number={5} title="Documento">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'minmax(0, 1fr) auto',
+                gap: '1rem',
+                alignItems: 'end',
+              }}
+            >
+              <Field label="Documento">
+                <ReadOnlyInput value="Projeto em PDF" />
+              </Field>
+              <button
+                type="button"
+                onClick={() => documentoInputRef.current?.click()}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  minHeight: '42px',
+                  padding: '0.6rem 1rem',
+                  borderRadius: RADIUS,
+                  border: '1px solid rgba(6,182,212,0.35)',
+                  backgroundColor: 'rgba(6,182,212,0.12)',
+                  color: CLR_TEAL,
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                  fontFamily: FF,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <Paperclip size={16} />
+                Anexar Arquivo
+              </button>
+              <input
+                ref={documentoInputRef}
+                type="file"
+                accept=".pdf,.png,.jpg,.jpeg"
+                style={{ display: 'none' }}
+                onChange={event => {
+                  const file = event.target.files?.[0];
+                  if (!file) return;
+                  setDocumentoProjeto(file.name);
+                }}
+              />
             </div>
-            <div style={{ marginBottom: '0.5rem' }}>
-              <ReviewRow label="Resumo" value={resumo} />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3" style={{ marginBottom: '0.5rem' }}>
-              <ReviewRow label="Objetivo Geral" value={objGeral} />
-              <ReviewRow label="Objetivo Específico" value={objEspecifico} />
-            </div>
-            <ReviewRow label="Resultados" value={resultados} />
-          </ReviewGroup>
 
-          <Divider />
-
-          {/* Proponente */}
-          <ReviewGroup title="Proponente">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
-              <ReviewRow label="Nome Completo" value={nomeCompleto} />
-              <ReviewRow label="CPF" value={cpf} />
-              <ReviewRow label="Telefone" value={telefone} />
-              <ReviewRow label="E-mail" value={email} />
-              <ReviewRow label="Endereço" value={endereco} />
-              <ReviewRow label="Instituição" value={instituicao} />
-            </div>
-          </ReviewGroup>
-
-          <Divider />
-
-          {/* Equipe */}
-          <ReviewGroup title="Equipe">
-            {membros.map((m, i) => (
-              <div key={i} style={{ marginBottom: i < membros.length - 1 ? '0.75rem' : 0 }}>
-                <div style={{ fontSize: 'var(--text-xs)', color: CLR_MUTED, fontFamily: FF, marginBottom: '0.4rem' }}>Membro {i + 1}</div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-2">
-                  <ReviewRow label="Nome Completo" value={m.nome} />
-                  <ReviewRow label="CPF" value={m.cpf} />
-                  <ReviewRow label="Função" value={m.funcao} />
-                  <ReviewRow label="Bolsa" value={m.bolsa} />
-                </div>
+            {documentoProjeto && (
+              <div
+                className="p-4 flex items-center gap-4"
+                style={{
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                }}
+              >
+                <FileText size={20} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
+                <span style={{ fontSize: 'var(--text-sm)', fontFamily: FF, color: 'var(--foreground)' }}>
+                  {documentoProjeto}
+                </span>
               </div>
-            ))}
-          </ReviewGroup>
+            )}
+          </div>
+        </MyDataSection>
 
-          <Divider />
-
-          {/* Despesas */}
-          <ReviewGroup title="Despesas">
-            {despesas.map((d, i) => (
-              <div key={i} style={{ marginBottom: i < despesas.length - 1 ? '0.75rem' : 0 }}>
-                <div style={{ fontSize: 'var(--text-xs)', color: CLR_MUTED, fontFamily: FF, marginBottom: '0.4rem' }}>Item {i + 1}</div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-2" style={{ marginBottom: '0.4rem' }}>
-                  <ReviewRow label="Nome" value={d.nome} />
-                  <ReviewRow label="Categoria" value={d.categoria} />
-                  <ReviewRow label="Quantidade" value={d.quantidade} />
-                  <ReviewRow label="Custo Total (R$)" value={d.custo} />
-                </div>
-                <ReviewRow label="Justificativa" value={d.justificativa} />
-              </div>
-            ))}
-          </ReviewGroup>
-
-          <Divider />
-
-          {/* Cronograma */}
-          <ReviewGroup title="Cronograma">
-            {atividades.map((a, i) => (
-              <div key={i} style={{ marginBottom: i < atividades.length - 1 ? '0.75rem' : 0 }}>
-                <div style={{ fontSize: 'var(--text-xs)', color: CLR_MUTED, fontFamily: FF, marginBottom: '0.4rem' }}>Atividade {i + 1}</div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-2">
-                  <ReviewRow label="Descrição" value={a.descricao} />
-                  <ReviewRow label="Data de Início" value={a.inicio} />
-                  <ReviewRow label="Data de Conclusão" value={a.conclusao} />
-                </div>
-              </div>
-            ))}
-          </ReviewGroup>
-        </SectionCard>
-      </div>
-
-      {/* ── STICKY BOTTOM BAR ── */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 40,
-          backgroundColor: 'var(--app-header)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          borderTop: '1px solid rgba(6,182,212,0.2)',
-          padding: '0.875rem 0',
-        }}
-      >
-        <div
-          style={{
-            ...CONTAINER,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            gap: '0.75rem',
-          }}
-        >
-          <button
-            onClick={onBack}
-            style={{
-              padding: '0.6rem 1.5rem',
-              borderRadius: RADIUS,
-              border: '1px solid rgba(6,182,212,0.25)',
-              backgroundColor: 'transparent',
-              color: CLR_MUTED,
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-medium)',
-              cursor: 'pointer',
-              fontFamily: FF,
-              transition: 'all 0.18s',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.color = CLR_FG; e.currentTarget.style.borderColor = 'rgba(6,182,212,0.45)'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = CLR_MUTED; e.currentTarget.style.borderColor = 'rgba(6,182,212,0.25)'; }}
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            style={{
-              padding: '0.6rem 1.75rem',
-              borderRadius: RADIUS,
-              border: 'none',
-              backgroundColor: isSubmitting ? 'rgba(6,182,212,0.4)' : CLR_TEAL_MID,
-              color: '#0a0a0a',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-semibold)',
-              cursor: isSubmitting ? 'not-allowed' : 'pointer',
-              fontFamily: FF,
-              transition: 'all 0.18s',
-              opacity: isSubmitting ? 0.7 : 1,
-            }}
-            onMouseEnter={e => { if (!isSubmitting) e.currentTarget.style.backgroundColor = '#0891b2'; }}
-            onMouseLeave={e => { if (!isSubmitting) e.currentTarget.style.backgroundColor = CLR_TEAL_MID; }}
-          >
-            {isSubmitting ? 'Enviando...' : 'Submeter Proposta'}
-          </button>
-          {submitError && (
-            <p style={{ color: '#ef4444', fontSize: 'var(--text-xs)', fontFamily: FF, marginTop: '0.5rem', textAlign: 'right' }}>
-              {submitError}
-            </p>
-          )}
-        </div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                gap: '0.75rem',
+                marginTop: '0.5rem',
+              }}
+            >
+              <SecondaryActionButton onClick={onBack}>
+                Salvar Rascunho
+              </SecondaryActionButton>
+              <PrimaryActionButton onClick={handleSubmit} disabled={isSubmitting}>
+                {isSubmitting ? 'Enviando...' : 'Enviar Proposta'}
+              </PrimaryActionButton>
+              {submitError && (
+                <p style={{ color: '#ef4444', fontSize: 'var(--text-xs)', fontFamily: FF, marginTop: '0.5rem', textAlign: 'right' }}>
+                  {submitError}
+                </p>
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            <DadosPessoaisTab />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+              <PrimaryActionButton onClick={() => toast.success('Alterações salvas com sucesso.')}>
+                Salvar Alterações
+              </PrimaryActionButton>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

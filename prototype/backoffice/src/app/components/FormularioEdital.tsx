@@ -232,7 +232,8 @@ interface Bolsa {
   modalidade: string;
   nivel: string;
   versao: string;
-  maxBolsistas: string;
+  minimo: string;
+  maximo: string;
   quantidadeCotas: string;
   institucional: boolean;
 }
@@ -370,7 +371,6 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
   const isFomento = scope === 'fomento';
   const moduleLabel = isFomento ? 'Fomento' : 'Captação';
   const createTitle = isEditMode ? `Editar ${moduleLabel}` : `Criar ${moduleLabel}`;
-  const [statusFomento, setStatusFomento] = useState(isEditMode ? 'aprovado' : '');
   const [resultadoEsperado, setResultadoEsperado] = useState('');
   const [eixoEstrategico, setEixoEstrategico] = useState('');
 
@@ -494,10 +494,10 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
 
   /* ── Section 6 ── */
   const [bolsas, setBolsas] = useState<Bolsa[]>(isEditMode ? [
-    { id: 1, modalidade: 'ic', nivel: 'a', versao: 'Última versão ativa', maxBolsistas: '2', quantidadeCotas: '50', institucional: false },
-    { id: 2, modalidade: 'pesquisa', nivel: 'c', versao: 'Última versão ativa', maxBolsistas: '1', quantidadeCotas: '30', institucional: true },
+    { id: 1, modalidade: 'ic', nivel: 'a', versao: 'Última versão ativa', minimo: '1', maximo: '2', quantidadeCotas: '50', institucional: false },
+    { id: 2, modalidade: 'pesquisa', nivel: 'c', versao: 'Última versão ativa', minimo: '1', maximo: '1', quantidadeCotas: '30', institucional: true },
   ] : [
-    { id: 1, modalidade: '', nivel: '', versao: '', maxBolsistas: '', quantidadeCotas: '', institucional: false },
+    { id: 1, modalidade: '', nivel: '', versao: '', minimo: '', maximo: '', quantidadeCotas: '', institucional: false },
   ]);
   const nextBolsaId = useRef(isEditMode ? 3 : 2);
 
@@ -509,6 +509,9 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
     comprovanteRepresentanteLegal: isEditMode,
     declaracaoCapacidadeTecnica: false,
   });
+  const [documentosExigidos, setDocumentosExigidos] = useState<string[]>(
+    isEditMode ? ['contratoSocial', 'comprovanteRepresentanteLegal'] : ['']
+  );
   const [arquivosPublicos, setArquivosPublicos] = useState<Record<string, boolean>>({
     editalCompleto: false,
     manualSubmissao: false,
@@ -522,6 +525,13 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
     PDF: false, PNG: false, DOCX: false, JPEG: false, XLSX: false, CSV: false, MOV: false, MP4: false, MP3: false, XML: false, ZIP: false
   });
   const [novoArquivoObrigatorio, setNovoArquivoObrigatorio] = useState('sim');
+  const documentosExigidosOptions = [
+    { value: 'contratoSocial', label: 'Contrato social ou estatuto' },
+    { value: 'balancoPatrimonial', label: 'Balanço patrimonial' },
+    { value: 'certidaoRegularidadeFiscal', label: 'Certidões de regularidade fiscal' },
+    { value: 'comprovanteRepresentanteLegal', label: 'Comprovante do representante legal' },
+    { value: 'declaracaoCapacidadeTecnica', label: 'Declaração de capacidade técnica' },
+  ];
 
   /* ── helpers ── */
   const toggleParticipacao = (k: keyof typeof regrasParticipacao) =>
@@ -537,10 +547,15 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
   const removerRevisorAdHoc = (k: string) => setRevisoresAdHocSelecionados(p => ({ ...p, [k]: false }));
 
   const addBolsa = () =>
-    setBolsas(p => [...p, { id: nextBolsaId.current++, modalidade: '', nivel: '', versao: '', maxBolsistas: '', quantidadeCotas: '', institucional: false }]);
+    setBolsas(p => [...p, { id: nextBolsaId.current++, modalidade: '', nivel: '', versao: '', minimo: '', maximo: '', quantidadeCotas: '', institucional: false }]);
   const removeBolsa = (id: number) => setBolsas(p => p.filter(b => b.id !== id));
   const updateBolsa = <K extends keyof Bolsa>(id: number, field: K, value: Bolsa[K]) =>
     setBolsas(p => p.map(b => b.id === id ? { ...b, [field]: value } : b));
+  const addDocumentoExigido = () => setDocumentosExigidos(p => [...p, '']);
+  const updateDocumentoExigido = (index: number, value: string) =>
+    setDocumentosExigidos(p => p.map((documento, itemIndex) => itemIndex === index ? value : documento));
+  const removeDocumentoExigido = (index: number) =>
+    setDocumentosExigidos(p => p.length > 1 ? p.filter((_, itemIndex) => itemIndex !== index) : p);
 
   const addFaixa = () => setFaixas(p => [...p, { id: nextFaixaId.current++, nome: '', duracao: '', valorMin: '', valorMax: '', valorAportado: '' }]);
   const removeFaixa = (id: number) => setFaixas(p => p.filter(f => f.id !== id));
@@ -664,6 +679,12 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
 
   const categoriaIniciativaOpts = tipoFomentoOpts;
   const categoriasSelecionadas = categoriaIniciativaOpts.filter(item => categoriasIniciativa[item.value]);
+  const eixoEstrategicoOptions = [
+    'Ciência e Tecnologia',
+    'Inovação e Desenvolvimento',
+    'Formação de Recursos Humanos',
+    'Infraestrutura de Pesquisa',
+  ];
 
   const tipoInstituicaoOpts = [
     { value: 'ensino', label: 'Instituição de ensino' },
@@ -680,7 +701,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
 
   const fasesCronograma = [
     { key: 'publicacao', label: 'Publicação da Captação', periodo: false },
-    { key: 'recebimento', label: 'Recedimento das Propostas', periodo: true },
+    { key: 'recebimento', label: 'Submissão das Propostas', periodo: true },
     { key: 'documental', label: 'Habilitação de Documentos', periodo: true },
     { key: 'adhoc', label: 'Avaliação Ad Hoc', periodo: true },
     { key: 'preliminar', label: 'Publicação do Resultado Preliminar', periodo: false },
@@ -954,12 +975,12 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
   const renderFinanceiroFomento = () => (
     <div style={sectionCard}>
       <SectionHeader num="2" title="Financeiro" subtitle="Configure aportes financeiros e faixas de financiamento" />
-      <InnerCard title="Aportes Financeiros da Captação">
+      <InnerCard title="Aportes Financeiros do Fomento">
         <div style={{ display: 'grid', gap: '16px' }}>
           {aportesFinanceiros.map((aporte, index) => {
             const origemOpts = aporte.origemTipo === 'programa' ? programaOpts : parceriasData;
             return (
-              <div key={aporte.id} style={{ display: 'grid', gridTemplateColumns: '180px 1fr 180px auto', gap: '14px', alignItems: 'end' }}>
+              <div key={aporte.id} style={{ display: 'grid', gridTemplateColumns: aportesFinanceiros.length > 1 ? '180px 1fr 180px auto' : '180px 1fr 180px', gap: '14px', alignItems: 'end' }}>
                 <SelectField
                   label={index === 0 ? 'Origem' : undefined}
                   value={aporte.origemTipo}
@@ -999,34 +1020,20 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
       <InnerCard title="Faixas de Financiamento">
         <div style={{ display: 'grid', gap: '16px' }}>
           {faixas.map((faixa, index) => (
-            <div key={faixa.id} style={{ display: 'grid', gap: '12px' }}>
+            <div key={faixa.id} style={{ display: 'grid', gridTemplateColumns: faixas.length > 1 ? '1fr 220px auto' : '1fr 220px', gap: '14px', alignItems: 'end' }}>
               <div>
                 <label style={labelStyle}>Nome da Faixa</label>
                 <input type="text" placeholder="Digite o nome da faixa" value={faixa.nome} onChange={e => updateFaixa(faixa.id, 'nome', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '14px', alignItems: 'end' }}>
-                <div>
-                  <label style={labelStyle}>Duração máxima</label>
-                  <input type="number" placeholder="Meses" value={faixa.duracao} onChange={e => updateFaixa(faixa.id, 'duracao', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Valor mínimo</label>
-                  <input type="text" placeholder="R$ 0,00" value={faixa.valorMin} onChange={e => updateFaixa(faixa.id, 'valorMin', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Valor máximo</label>
-                  <input type="text" placeholder="R$ 0,00" value={faixa.valorMax} onChange={e => updateFaixa(faixa.id, 'valorMax', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Valor aportado</label>
-                  <input type="text" placeholder="R$ 0,00" value={faixa.valorAportado} onChange={e => updateFaixa(faixa.id, 'valorAportado', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
-                </div>
-                {faixas.length > 1 ? (
-                  <button type="button" onClick={() => removeFaixa(faixa.id)} style={{ padding: '10px', backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer' }}>
-                    <Trash2 size={16} style={{ color: '#ef4444' }} />
-                  </button>
-                ) : <div />}
+              <div>
+                <label style={labelStyle}>Valor Aportado</label>
+                <input type="text" placeholder="R$ 0,00" value={faixa.valorAportado} onChange={e => updateFaixa(faixa.id, 'valorAportado', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
               </div>
+              {faixas.length > 1 && (
+                <button type="button" onClick={() => removeFaixa(faixa.id)} style={{ padding: '10px', backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer' }}>
+                  <Trash2 size={16} style={{ color: '#ef4444' }} />
+                </button>
+              )}
             </div>
           ))}
         </div>
@@ -1055,7 +1062,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
         )}
         {!showNomeCaptacao && (
           <div>
-            <label style={labelStyle}>Nome</label>
+            <label style={labelStyle}>Nome da Captação</label>
             <input type="text" placeholder="Digite o nome da captação" value={nomeCaptacaoCronograma} onChange={e => setNomeCaptacaoCronograma(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
           </div>
         )}
@@ -1072,25 +1079,14 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
         )}
       </div>
 
-      {!cronogramaCompleto && (
-        <div style={{ padding: '12px 14px', borderRadius: 'var(--radius)', border: '1px solid rgba(0,193,175,0.24)', backgroundColor: 'rgba(0,193,175,0.08)', marginBottom: '18px' }}>
-          <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', margin: 0 }}>
-            Faltam etapas obrigatórias: {etapasCronogramaFaltantes.map(fase => fase.label).join(', ')}.
-          </p>
-        </div>
-      )}
-
       <div style={{ display: 'grid', gap: '16px' }}>
         {cronogramaCaptacao.map((etapa, index) => {
           const faseSelecionada = fasesCronograma.find(fase => fase.key === etapa.tipo);
           return (
-            <div key={etapa.id} style={showNomeCaptacao ? { display: 'grid', gap: '8px' } : { ...innerCardStyle, padding: '18px' }}>
+            <div key={etapa.id} style={showNomeCaptacao ? { display: 'grid', gap: '12px' } : { ...innerCardStyle, padding: '18px' }}>
               {!showNomeCaptacao && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                   <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: 0 }}>Etapa {index + 1}</p>
-                  <button type="button" onClick={() => removeEtapaCronograma(etapa.id)} disabled={Boolean(captacaoCronogramaSelecionada)} style={{ padding: '8px', backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius)', cursor: captacaoCronogramaSelecionada ? 'not-allowed' : 'pointer', display: 'flex', opacity: captacaoCronogramaSelecionada ? 0.35 : 1 }}>
-                    <Trash2 size={15} style={{ color: '#ef4444' }} />
-                  </button>
                 </div>
               )}
               <div style={{ display: 'grid', gridTemplateColumns: showNomeCaptacao ? '1fr 46px' : '1.4fr 1fr 1fr', gap: '16px', alignItems: 'end' }}>
@@ -1132,16 +1128,9 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
       <>
         <div style={sectionCard}>
           <SectionHeader num="1" title="Identificação do Fomento" subtitle="Informações básicas do fomento" />
-          <div style={{ display: 'grid', gridTemplateColumns: '0.7fr 1.5fr 1fr', gap: '20px', marginBottom: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '0.7fr 1.5fr', gap: '20px', marginBottom: '20px' }}>
             <div><label style={labelStyle}>Código</label><input type="text" placeholder="Ex: FOM-2026-001" value={numeroCaptacao} onChange={e => setNumeroCaptacao(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} /></div>
             <div><label style={labelStyle}>Título</label><input type="text" placeholder="Digite o título do fomento" value={tituloCaptacao} onChange={e => setTituloCaptacao(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} /></div>
-            <SelectField label="Status" value={statusFomento} onChange={setStatusFomento} placeholder="Selecione..." options={[
-              { value: 'em_elaboracao', label: 'Em Elaboração' },
-              { value: 'aprovado', label: 'Aprovado' },
-              { value: 'interrompido', label: 'Interrompido' },
-              { value: 'encerrado', label: 'Encerrado' },
-              { value: 'concluido', label: 'Concluído' },
-            ]} />
           </div>
           <div style={{ marginBottom: '20px' }}>
             <label style={labelStyle}>Descrição</label>
@@ -1155,9 +1144,60 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
             <label style={labelStyle}>Resultado Esperado</label>
             <textarea placeholder="Informe o resultado esperado" value={resultadoEsperado} onChange={e => setResultadoEsperado(e.target.value)} style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }} onFocus={focusTeal} onBlur={blurGray} />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '20px' }}>
+          <div style={{ display: 'grid', gap: '20px' }}>
             <SelectField label="Área Técnica Responsável" value={setorResponsavel} onChange={setSetorResponsavel} placeholder="Selecione..." options={setorResponsavelOpts} />
-            <div><label style={labelStyle}>Eixo Estratégico</label><input type="text" placeholder="Digite o eixo estratégico" value={eixoEstrategico} onChange={e => setEixoEstrategico(e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} /></div>
+            <div>
+              <label style={labelStyle}>Selecione o Eixo Estratégico</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {eixoEstrategicoOptions.map(eixo => {
+                  const selected = eixoEstrategico === eixo;
+                  return (
+                    <button
+                      key={eixo}
+                      type="button"
+                      onClick={() => setEixoEstrategico(selected ? '' : eixo)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '8px 12px',
+                        borderRadius: 'var(--radius)',
+                        backgroundColor: selected ? 'rgba(0,193,175,0.08)' : 'rgba(255,255,255,0.03)',
+                        transition: 'background-color 0.15s',
+                        textAlign: 'left',
+                      }}
+                      onMouseEnter={e => { if (!selected) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)'; }}
+                      onMouseLeave={e => { if (!selected) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.03)'; }}
+                    >
+                      <div style={{
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '4px',
+                        flexShrink: 0,
+                        border: selected ? '2px solid #00c1af' : '2px solid rgba(255,255,255,0.25)',
+                        backgroundColor: selected ? '#00c1af' : 'transparent',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.15s',
+                      }}>
+                        {selected && (
+                          <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                            <path d="M1 4L3.5 6.5L9 1" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </div>
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: selected ? '#00c1af' : 'rgba(255,255,255,0.8)' }}>
+                        {eixo}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1194,7 +1234,17 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
               return (
                 <div key={item.key} style={{ padding: '14px 16px', border: `1px solid ${checked ? 'rgba(0,193,175,0.35)' : 'rgba(255,255,255,0.12)'}`, borderRadius: 'var(--radius)', backgroundColor: checked ? 'rgba(0,193,175,0.08)' : 'rgba(23,23,23,0.35)' }}>
                   <CheckboxField label={item.label} checked={checked} onChange={() => toggleRubrica(item.key)} />
-                  {checked && subRubricasFomento.length > 0 && (
+                  {checked && item.key === 'bolsa' && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: '12px', marginTop: '12px', paddingLeft: '28px' }}>
+                      <SelectField label="Modalidade" value={bolsas[0]?.modalidade || ''} onChange={v => updateBolsa(bolsas[0].id, 'modalidade', v)} options={modalidadeOpts} placeholder="Selecione..." />
+                      <SelectField label="Nível" value={bolsas[0]?.nivel || ''} onChange={v => updateBolsa(bolsas[0].id, 'nivel', v)} options={nivelBolsaOpts} placeholder="Selecione..." />
+                      <div><label style={labelStyle}>Versão</label><input type="text" placeholder="Versão" value={bolsas[0]?.versao || ''} onChange={e => updateBolsa(bolsas[0].id, 'versao', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} /></div>
+                      <div><label style={labelStyle}>Cotas</label><input type="number" placeholder="0" value={bolsas[0]?.quantidadeCotas || ''} onChange={e => updateBolsa(bolsas[0].id, 'quantidadeCotas', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} /></div>
+                      <div><label style={labelStyle}>Mínimo</label><input type="number" placeholder="0" value={bolsas[0]?.minimo || ''} onChange={e => updateBolsa(bolsas[0].id, 'minimo', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} /></div>
+                      <div><label style={labelStyle}>Máximo</label><input type="number" placeholder="0" value={bolsas[0]?.maximo || ''} onChange={e => updateBolsa(bolsas[0].id, 'maximo', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} /></div>
+                    </div>
+                  )}
+                  {checked && item.key !== 'bolsa' && subRubricasFomento.length > 0 && (
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px', marginTop: '12px', paddingLeft: '28px' }}>
                       {subRubricasFomento.map(sub => <CheckboxField key={sub.key} label={sub.label} checked={Boolean(subRubricas[sub.key])} onChange={() => toggleSubRubrica(sub.key)} />)}
                     </div>
@@ -1207,18 +1257,30 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
 
         <div style={sectionCard}>
           <SectionHeader num="5" title="Documentos Exigidos do Proponente" subtitle="Selecione documentos exigidos para submissão" />
-          <div>
-            {[
-              { key: 'contratoSocial', label: 'Contrato social ou estatuto' },
-              { key: 'balancoPatrimonial', label: 'Balanço patrimonial' },
-              { key: 'certidaoRegularidadeFiscal', label: 'Certidões de regularidade fiscal' },
-              { key: 'comprovanteRepresentanteLegal', label: 'Comprovante do representante legal' },
-              { key: 'declaracaoCapacidadeTecnica', label: 'Declaração de capacidade técnica' },
-            ].map(item => (
-              <div key={item.key} style={{ padding: '13px 0' }}>
-                <CheckboxField label={item.label} checked={Boolean(docsSubmissao[item.key])} onChange={() => toggleDocSubmissao(item.key)} />
-              </div>
-            ))}
+          <div style={{ display: 'grid', gap: '18px' }}>
+            <div style={{ display: 'grid', gap: '12px' }}>
+              {documentosExigidos.map((documento, index) => (
+                <div key={`documento-${index}`} style={{ display: 'grid', gridTemplateColumns: documentosExigidos.length > 1 ? '1fr auto' : '1fr', gap: '12px', alignItems: 'end' }}>
+                  <SelectField
+                    label={index === 0 ? 'Documento' : undefined}
+                    value={documento}
+                    onChange={value => updateDocumentoExigido(index, value)}
+                    placeholder="Selecione o documento..."
+                    options={documentosExigidosOptions}
+                  />
+                  {documentosExigidos.length > 1 ? (
+                    <button type="button" onClick={() => removeDocumentoExigido(index)} style={{ height: '44px', width: '44px', padding: 0, backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Trash2 size={16} style={{ color: '#ef4444' }} />
+                    </button>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button type="button" onClick={addDocumentoExigido} style={{ height: '44px', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', backgroundColor: 'rgba(0,193,175,0.1)', border: '1px solid rgba(0,193,175,0.3)', borderRadius: 'var(--radius)', color: '#00c1af', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  <Plus size={16} /> Adicionar Documento
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1544,7 +1606,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px' }}>
               <div>
                 <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: '0 0 6px' }}>
-                  Aportes Financeiros da Captação
+                  Aportes Financeiros do Fomento
                 </p>
                 <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>
                   Informe quais programas ou parcerias aportam recursos financeiros para esta captação.
@@ -1628,7 +1690,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
                   Faixas de Financiamento
                 </p>
                 <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--form-text-muted)', margin: 0 }}>
-                  Distribua o valor aportado em faixas com duração máxima e limites financeiros.
+                  Distribua o valor aportado por faixa de financiamento.
                 </p>
               </div>
             </div>
@@ -1637,48 +1699,24 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
               {faixas.map((faixa, index) => (
                 <div key={faixa.id}>
                   {index > 0 && <div style={{ ...divider, margin: '16px 0' }} />}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '20px', alignItems: 'end' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 220px auto', gap: '20px', alignItems: 'end' }}>
                     <div>
-                      <label style={labelStyle}>Duração máxima do projeto (meses)</label>
+                      <label style={labelStyle}>Nome da Faixa</label>
                       <input
-                        type="number"
-                        placeholder="24"
-                        value={faixa.duracao}
-                        onChange={e => updateFaixa(faixa.id, 'duracao', e.target.value)}
+                        type="text"
+                        placeholder="Digite o nome da faixa"
+                        value={faixa.nome}
+                        onChange={e => updateFaixa(faixa.id, 'nome', e.target.value)}
                         style={inputStyle}
                         onFocus={focusTeal}
                         onBlur={blurGray}
                       />
                     </div>
                     <div>
-                      <label style={labelStyle}>Valor financeiro mínimo (R$)</label>
+                      <label style={labelStyle}>Valor Aportado</label>
                       <input
-                        type="number"
-                        placeholder="50000"
-                        value={faixa.valorMin}
-                        onChange={e => updateFaixa(faixa.id, 'valorMin', e.target.value)}
-                        style={inputStyle}
-                        onFocus={focusTeal}
-                        onBlur={blurGray}
-                      />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Valor financeiro máximo (R$)</label>
-                      <input
-                        type="number"
-                        placeholder="200000"
-                        value={faixa.valorMax}
-                        onChange={e => updateFaixa(faixa.id, 'valorMax', e.target.value)}
-                        style={inputStyle}
-                        onFocus={focusTeal}
-                        onBlur={blurGray}
-                      />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Valor aportado na faixa (R$)</label>
-                      <input
-                        type="number"
-                        placeholder="250000"
+                        type="text"
+                        placeholder="R$ 0,00"
                         value={faixa.valorAportado}
                         onChange={e => updateFaixa(faixa.id, 'valorAportado', e.target.value)}
                         style={inputStyle}
@@ -1820,30 +1858,15 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
             })}
           </div>
 
-          {!cronogramaCompleto && (
-            <div style={{ padding: '12px 14px', borderRadius: 'var(--radius)', border: '1px solid rgba(0,193,175,0.24)', backgroundColor: 'rgba(0,193,175,0.08)', marginBottom: '18px' }}>
-              <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#00c1af', margin: 0 }}>
-                Faltam etapas obrigatórias: {etapasCronogramaFaltantes.map(fase => fase.label).join(', ')}.
-              </p>
-            </div>
-          )}
-
           <div style={{ display: 'grid', gap: '16px' }}>
             {cronogramaCaptacao.map((etapa, index) => {
               const faseSelecionada = fasesCronograma.find(fase => fase.key === etapa.tipo);
               return (
                 <div key={etapa.id} style={{ ...innerCardStyle, padding: '18px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                     <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)', margin: 0 }}>
                       Etapa {index + 1}
                     </p>
-                    <button
-                      type="button"
-                      onClick={() => removeEtapaCronograma(etapa.id)}
-                      style={{ padding: '8px', backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                    >
-                      <Trash2 size={15} style={{ color: '#ef4444' }} />
-                    </button>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: '16px', alignItems: 'end' }}>
                     <SelectField
@@ -2487,7 +2510,7 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
               {bolsas.map((bolsa, idx) => (
                 <div key={bolsa.id}>
                   {idx > 0 && <div style={divider} />}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr auto', gap: '16px', alignItems: 'end', marginBottom: '16px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 0.8fr 0.8fr 0.8fr auto', gap: '16px', alignItems: 'end', marginBottom: '16px' }}>
                     <SelectField label="Modalidade" value={bolsa.modalidade} onChange={v => updateBolsa(bolsa.id, 'modalidade', v)} options={modalidadeOpts} placeholder="Selecione..." />
                     <SelectField label="Nível" value={bolsa.nivel} onChange={v => updateBolsa(bolsa.id, 'nivel', v)} options={nivelBolsaOpts} placeholder="Selecione..." />
                     <div>
@@ -2495,12 +2518,16 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
                       <input type="text" placeholder="v1.0" value={bolsa.versao} onChange={e => updateBolsa(bolsa.id, 'versao', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
                     </div>
                     <div>
-                      <label style={labelStyle}>Máximo de Bolsistas</label>
-                      <input type="number" placeholder="10" value={bolsa.maxBolsistas} onChange={e => updateBolsa(bolsa.id, 'maxBolsistas', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
+                      <label style={labelStyle}>Cotas</label>
+                      <input type="number" placeholder="0" value={bolsa.quantidadeCotas} onChange={e => updateBolsa(bolsa.id, 'quantidadeCotas', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
                     </div>
                     <div>
-                      <label style={labelStyle}>Quantidade de Cotas</label>
-                      <input type="number" placeholder="5" value={bolsa.quantidadeCotas} onChange={e => updateBolsa(bolsa.id, 'quantidadeCotas', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
+                      <label style={labelStyle}>Mínimo</label>
+                      <input type="number" placeholder="0" value={bolsa.minimo} onChange={e => updateBolsa(bolsa.id, 'minimo', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Máximo</label>
+                      <input type="number" placeholder="0" value={bolsa.maximo} onChange={e => updateBolsa(bolsa.id, 'maximo', e.target.value)} style={inputStyle} onFocus={focusTeal} onBlur={blurGray} />
                     </div>
                 {bolsas.length > 1 && (
                   <button
@@ -2585,101 +2612,54 @@ export const FormularioEdital: React.FC<Props> = ({ onBack, mode = 'create', sco
             </p>
           </div>
 
-          <div style={{ display: 'grid', gap: '12px', marginBottom: '20px' }}>
-            {[
-              { key: 'contratoSocial', label: 'Contrato social ou estatuto', descricao: 'Documento constitutivo da instituição ou empresa proponente.', formatos: 'PDF', obrigatorio: true },
-              { key: 'balancoPatrimonial', label: 'Balanço patrimonial', descricao: 'Demonstração contábil usada para comprovar capacidade econômico-financeira.', formatos: 'PDF ou XLSX', obrigatorio: false },
-              { key: 'certidaoRegularidadeFiscal', label: 'Certidões de regularidade fiscal', descricao: 'Comprovação de regularidade perante órgãos fiscais e trabalhistas, quando aplicável.', formatos: 'PDF', obrigatorio: false },
-              { key: 'comprovanteRepresentanteLegal', label: 'Comprovante do representante legal', descricao: 'Documento que comprova poderes de representação do responsável pela submissão.', formatos: 'PDF', obrigatorio: true },
-              { key: 'declaracaoCapacidadeTecnica', label: 'Declaração de capacidade técnica', descricao: 'Declaração institucional de que o proponente possui estrutura para executar o projeto.', formatos: 'PDF', obrigatorio: false },
-            ].map(item => {
-              const checked = Boolean(docsSubmissao[item.key]);
-
-              return (
-                <button
-                  key={item.key}
-                  type="button"
-                  onClick={() => toggleDocSubmissao(item.key)}
-                  style={{
-                    width: '100%',
-                    display: 'grid',
-                    gridTemplateColumns: '1fr auto',
-                    gap: '16px',
-                    alignItems: 'center',
-                    padding: '16px',
-                    borderRadius: 'var(--radius)',
-                    border: `1px solid ${checked ? 'rgba(0,193,175,0.35)' : 'rgba(255,255,255,0.12)'}`,
-                    backgroundColor: checked ? 'rgba(0,193,175,0.08)' : 'rgba(23, 23, 23,0.35)',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                >
-                  <span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--form-text-primary)' }}>
-                        {item.label}
-                      </span>
-                      <span style={{
-                        padding: '3px 8px',
-                        borderRadius: '999px',
-                        border: `1px solid ${item.obrigatorio ? 'rgba(0,193,175,0.3)' : 'rgba(255,255,255,0.14)'}`,
-                        color: item.obrigatorio ? '#00c1af' : 'rgba(255,255,255,0.55)',
-                        fontFamily: 'var(--font-family)',
-                        fontSize: 'var(--text-xs)',
-                      }}>
-                        {item.obrigatorio ? 'Obrigatório' : 'Opcional'}
-                      </span>
-                    </span>
-                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--form-text-muted)', lineHeight: 1.45 }}>
-                      {item.descricao}
-                    </span>
-                    <span style={{ display: 'block', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.38)', marginTop: '8px' }}>
-                      Formatos permitidos: {item.formatos}
-                    </span>
-                  </span>
-                  <span style={{
-                    width: '20px',
-                    height: '20px',
-                    borderRadius: '5px',
-                    border: `2px solid ${checked ? '#00c1af' : 'rgba(255,255,255,0.24)'}`,
-                    backgroundColor: checked ? '#00c1af' : 'transparent',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                    {checked && (
-                      <svg width="11" height="9" viewBox="0 0 10 8" fill="none">
-                        <path d="M1 4L3.5 6.5L9 1" stroke="#171717" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    )}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <button
-              type="button"
-              onClick={() => setShowModalNovoArquivo(true)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '10px 16px',
-                backgroundColor: 'rgba(0,193,175,0.1)',
-                border: '1px solid rgba(0,193,175,0.3)',
-                borderRadius: 'var(--radius)',
-                cursor: 'pointer',
-                fontFamily: 'var(--font-family)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)',
-                color: '#00c1af',
-              }}
-            >
-              <Plus size={16} />
-              Novo Documento Exigido
-            </button>
+          <div style={{ display: 'grid', gap: '18px' }}>
+            <div style={{ display: 'grid', gap: '12px' }}>
+              {documentosExigidos.map((documento, index) => (
+                <div key={`documento-exigido-${index}`} style={{ display: 'grid', gridTemplateColumns: documentosExigidos.length > 1 ? '1fr auto' : '1fr', gap: '12px', alignItems: 'end' }}>
+                  <SelectField
+                    label={index === 0 ? 'Documento' : undefined}
+                    value={documento}
+                    onChange={value => updateDocumentoExigido(index, value)}
+                    placeholder="Selecione o documento..."
+                    options={documentosExigidosOptions}
+                  />
+                  {documentosExigidos.length > 1 ? (
+                    <button
+                      type="button"
+                      onClick={() => removeDocumentoExigido(index)}
+                      style={{ height: '44px', width: '44px', padding: 0, backgroundColor: 'transparent', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <Trash2 size={16} style={{ color: '#ef4444' }} />
+                    </button>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={addDocumentoExigido}
+                style={{
+                  height: '44px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 16px',
+                  backgroundColor: 'rgba(0,193,175,0.1)',
+                  border: '1px solid rgba(0,193,175,0.3)',
+                  borderRadius: 'var(--radius)',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  color: '#00c1af',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <Plus size={16} />
+                Adicionar Documento
+              </button>
+            </div>
           </div>
         </div>
 

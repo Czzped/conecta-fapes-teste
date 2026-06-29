@@ -8,14 +8,14 @@
 
 O subdominio de Parcerias organiza o ciclo de vida das cooperacoes institucionais firmadas pela agencia de fomento com uma Instituicao. Ele cobre a solicitacao, formalizacao, vigencia, aditivos, aportes financeiros, alocacao de recursos em Programas ou Iniciativas, suspensao, encerramento e rastreabilidade documental.
 
-Uma Parceria pertence a exatamente uma Instituicao e pode aportar recursos em um ou mais Programas. O Programa tambem pode receber aportes de mais de uma Parceria, sempre por meio de `AporteFinanceiroParceriaPrograma`.
+Uma Parceria pertence a exatamente uma Instituicao e pode aportar recursos em um ou mais Programas. O Programa tambem pode receber aportes de mais de uma Parceria, sempre por meio de `AporteFinanceiroPrograma`.
 
 ## Dores
 
 | Dor | Impacto | Resposta do Subdominio |
 |-----|---------|------------------------|
 | Falta de gestao processual de como criar uma parceria | A criacao da parceria depende de documentos avulsos, troca de informacoes fora do sistema e pouca clareza sobre o que falta para formalizar a cooperacao. | O processo de criacao define inicio pela solicitacao da Instituicao, envio do documento de solicitacao, analise, cadastro, vigencia original, documentos e criterios para transicao para `Vigente`. |
-| Falta de gestao financeira da parceria | Nao ha rastreabilidade clara sobre quanto foi investido, quando o recurso foi implementado e quando foi alocado em Programas ou Iniciativas. | O modelo separa aportes recebidos pela Parceria (`AporteFinanceiro`) dos recursos destinados a Programas (`AporteFinanceiroParceriaPrograma`), permitindo acompanhar saldo, historico de aportes, aditivos e alocacoes. |
+| Falta de gestao financeira da parceria | Nao ha rastreabilidade clara sobre quanto foi investido, quando o recurso foi implementado e quando foi alocado em Programas ou Iniciativas. | O modelo separa aportes recebidos pela Parceria (`AporteFinanceiro`) dos recursos destinados a Programas (`AporteFinanceiroPrograma`), permitindo acompanhar saldo, historico de aportes, aditivos e alocacoes. |
 
 ## Documentos
 
@@ -24,8 +24,8 @@ Uma Parceria pertence a exatamente uma Instituicao e pode aportar recursos em um
 | [Processo](processo.md) | Fluxos operacionais de criacao, aditivo, suspensao, encerramento e suspensao em cascata. |
 | [Processo — Criacao da Parceria](processo.md#fluxo-1-criacao-da-parceria) | Jornada visual da solicitacao ate a formalizacao da Parceria. |
 | [Processo — Aditivo da Parceria](processo.md#fluxo-2-aditivo-da-parceria) | Jornada visual para aditivo de vigencia ou de aporte financeiro. |
-| [Processo — Suspensao e Encerramento](processo.md#fluxo-3-suspensao-ou-encerramento-da-parceria) | Jornada visual para suspender, reativar ou encerrar a Parceria. |
-| [Processo — Suspensao em Cascata](processo.md#fluxo-4-suspensao-em-cascata-para-programas-e-iniciativas) | Jornada visual do impacto da suspensao sobre Programas e Iniciativas. |
+| [Processo — Suspensao, Reativacao e Encerramento](processo.md#fluxo-3-suspensao-reativacao-e-encerramento-da-parceria) | Jornada visual para suspender, reativar ou encerrar a Parceria. |
+| [Processo — Cascata em Programas](processo.md#fluxo-4-cascata-em-programas) | Jornada visual do impacto da suspensao, reativacao e encerramento sobre Programas associados. |
 | [Modelo Estrutural](modelo-estrutural.md) | Classes, atributos e relacionamentos do subdominio. |
 | [Modelo Comportamental](modelo-comportamental.md) | Estados, transicoes e regras de comportamento da Parceria. |
 | [EPIC-M010-002 — Gestao de Parcerias](epics/EPIC-M010-002.md) | Backlog principal de gestao de parcerias. |
@@ -40,7 +40,7 @@ Uma Parceria pertence a exatamente uma Instituicao e pode aportar recursos em um
 | Registrar aditivos | Preservar historico de nova vigencia ou novo aporte sem sobrescrever a Parceria original. |
 | Alocar recursos em Programas | Destinar parte do saldo da Parceria a Programas, mantendo rastreabilidade financeira. |
 | Consultar dashboards e saldo | Responder quanto foi investido, aportado, alocado, consumido e quanto permanece disponivel. |
-| Suspender ou encerrar Parceria | Controlar impacto sobre Programas e Iniciativas vinculadas. |
+| Suspender, reativar ou encerrar Parceria | Controlar impacto sobre Programas associados, com historico de suspensao e status causais (`SUSPENSO_POR_PARCERIA`, `ENCERRADO_POR_PARCERIA`). |
 
 ---
 
@@ -72,7 +72,7 @@ Um `AporteFinanceiro` com `isAditivo = true` representa recurso adicional recebi
 ```
 valorBrutoRecebido  += aditivo.valorInvestido
 valorTaxaGestao     += TaxaGestaoParcerias gerada pelo aditivo (snapshot da politica vigente no M016)
-saldoAlocavelEmProgramas = valorBrutoRecebido - valorTaxaGestao - SUM(AporteFinanceiroParceriaPrograma.valor[ATIVO])
+saldoAlocavelEmProgramas = valorBrutoRecebido - valorTaxaGestao - SUM(AporteFinanceiroPrograma.valor[ATIVO])
 ```
 
 **Edicao e remocao de aditivo (RN18):**
@@ -117,14 +117,14 @@ Os percentuais sao parametrizados em `VersaoPoliticaTaxaGestao` + `VersaoFaixaPe
 ### 3. Saldo Alocavel em Programas
 
 ```
-saldoAlocavelEmProgramas = valorBrutoRecebido - valorTaxaGestao - SUM(AporteFinanceiroParceriaPrograma.valor[ATIVO])
+saldoAlocavelEmProgramas = valorBrutoRecebido - valorTaxaGestao - SUM(AporteFinanceiroPrograma.valor[ATIVO])
 ```
 
 Invariante: sempre `>= 0` (RN14, RN22). Quando a Parceria retira aporte de um Programa, o valor retorna ao saldo.
 
 ### 4. Saida — Alocacao em Programas
 
-A Parceria aloca para Programas via entidade N:N `AporteFinanceiroParceriaPrograma` (definida em `programas/`). Valor `>= 0`; negativo rejeitado (RN11). Parceria deve estar vigente. Datas do Programa devem caber na vigencia da Parceria (RN13).
+A Parceria aloca para Programas via entidade N:N `AporteFinanceiroPrograma` (definida em `programas/`). Valor `>= 0`; negativo rejeitado (RN11). Parceria deve estar vigente. Datas do Programa devem caber na vigencia da Parceria (RN13).
 
 ### 5. Execucao — Consumido pelas Iniciativas
 
@@ -149,7 +149,7 @@ A prestacao financeira da `AcaoTransversal` (Taxa de Gestao) pertence ao M016, n
 | `valorBrutoRecebido` | SUM de todos os `valorInvestido` da Parceria | "total recebido" |
 | `valorTaxaGestao` | Taxa retida sobre cada aporte, calculada por M010, custodiada por M016 | "reserva", "retencao" |
 | `saldoAlocavelEmProgramas` | Saldo disponivel para destinar a Programas | "saldo livre", "saldo nao alocado" |
-| `valorAlocado` | Parcela destinada a um Programa via AporteFinanceiroParceriaPrograma | "reservado", "comprometido" |
+| `valorAlocado` | Parcela destinada a um Programa via AporteFinanceiroPrograma | "reservado", "comprometido" |
 | `valorConsumido` | Consolidacao do que foi executado nas Iniciativas (projetos de demanda induzida e projetos ligados a Programas aportados); calculado por M003 via M014 | "pago", "executado" |
 
 ---

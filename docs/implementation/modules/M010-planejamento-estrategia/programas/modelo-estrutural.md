@@ -28,7 +28,9 @@ classDiagram
         EM_PLANEJAMENTO
         ATIVO
         SUSPENSO
+        SUSPENSO_POR_PARCERIA
         ENCERRADO
+        ENCERRADO_POR_PARCERIA
     }
 
     class ComiteGovernanca {
@@ -50,7 +52,7 @@ classDiagram
         SUPLENTE
     }
 
-    class AporteFinanceiroParceriaPrograma {
+    class AporteFinanceiroPrograma {
         <<M010-programas>>
         +Decimal valor
         +Date dataAporte
@@ -90,8 +92,8 @@ classDiagram
     MembroComite "*" --> "1" PessoaFisica : representa
 
     %% Aporte Parceria -> Programa (entidade pertence a programas)
-    Parceria "1" --> "0..*" AporteFinanceiroParceriaPrograma : origem
-    AporteFinanceiroParceriaPrograma "*" --> "1" Programa : destinadoA
+    Parceria "1" --> "0..*" AporteFinanceiroPrograma : origem
+    AporteFinanceiroPrograma "*" --> "1" Programa : destinadoA
 ```
 
 Leitura da relacao `demandadoPor`: uma Instituicao pode demandar zero ou muitos Programas; cada Programa deve ter exatamente uma Instituicao demandante.
@@ -105,14 +107,14 @@ Leitura da relacao `demandadoPor`: uma Instituicao pode demandar zero ou muitos 
 | | resumo | Resumo, justificativa e objetivo | Sim | String | | 2000 | |
 | | dataInicio | Data de inicio | Sim | Date | | | |
 | | dataFim | Data de fim | Sim | Date | | | |
-| | dataEncerramento | Data efetiva do encerramento (preenchida quando estado = `ENCERRADO`) | Condicional | Date | | | |
-| | estado | Estado atual | Gerado | EstadoPrograma | `EM_PLANEJAMENTO`/`ATIVO`/`SUSPENSO`/`ENCERRADO` | | |
+| | dataEncerramento | Data efetiva do encerramento (preenchida quando estado = `ENCERRADO` ou `ENCERRADO_POR_PARCERIA`) | Condicional | Date | | | |
+| | estado | Estado atual | Gerado | EstadoPrograma | `EM_PLANEJAMENTO`/`ATIVO`/`SUSPENSO`/`SUSPENSO_POR_PARCERIA`/`ENCERRADO`/`ENCERRADO_POR_PARCERIA` | | |
 | | instituicaoDemandante (relacao) | Exatamente uma Instituicao (M008) que demanda o Programa (RN16) | Sim | FK → Instituicao (M008) | Via `demandadoPor`; nao admite vazio nem multiplas Instituicoes | | |
 | **ComiteGovernanca** | nome | Nome do comite (ex: "Comite Gestor PRG-2026-001") | Sim | String | | 200 | |
 | **MembroComite** | papel | Papel do membro | Sim | PapelComite | `PRESIDENTE`/`MEMBRO`/`SUPLENTE` | | |
 | | dataInicio | Inicio da participacao | Sim | Date | | | |
 | | dataFim | Fim da participacao (aberto = ativo) | Nao | Date | | | |
-| **AporteFinanceiroParceriaPrograma** | valor | Valor aportado pela parceria no programa | Sim | Decimal | Ex: 150000.00; `>= 0` (admite zero; valores negativos rejeitados) | | |
+| **AporteFinanceiroPrograma** | valor | Valor aportado pela parceria no programa | Sim | Decimal | Ex: 150000.00; `>= 0` (admite zero; valores negativos rejeitados) | | |
 | | dataAporte | Data de efetivacao do aporte no programa | Sim | Date | | | |
 | | estado | Situacao do aporte no Programa | Gerado | EstadoAportePrograma | `ATIVO`/`RETIRADO` | | |
 | | dataRetirada | Data em que o aporte foi retirado do Programa | Condicional | Date | Obrigatorio quando `estado = RETIRADO` | | |
@@ -122,7 +124,7 @@ Leitura da relacao `demandadoPor`: uma Instituicao pode demandar zero ou muitos 
 
 | Conceito | Definicao | Fonte |
 |----------|-----------|-------|
-| Valor alocado | SUM dos AportesFinanceiroParceriaPrograma em estado ATIVO destinados a este Programa. Taxa de Gestao de Parcerias ja foi deduzida na Parceria antes desta alocacao — Programa nao recalcula (RN20). | `AporteFinanceiroParceriaPrograma.valor[ATIVO]` |
+| Valor alocado | SUM dos AportesFinanceiroPrograma em estado ATIVO destinados a este Programa. Taxa de Gestao de Parcerias ja foi deduzida na Parceria antes desta alocacao — Programa nao recalcula (RN20). | `AporteFinanceiroPrograma.valor[ATIVO]` |
 | Valor consumido | Consolidacao dos valores executados nas Iniciativas (projetos) vinculadas a este Programa — inclui projetos de demanda induzida. Calculado por M003 a partir de pagamentos e compromissos registrados em M014. Programa nao armazena diretamente. | M003 + M014 |
 | Saldo disponivel do Programa | `valorAlocado - valorConsumido`. Sempre `>= 0`. | Derivado |
 
@@ -130,7 +132,7 @@ Leitura da relacao `demandadoPor`: uma Instituicao pode demandar zero ou muitos 
 
 ## Referencia de Regras
 
-`AporteFinanceiroParceriaPrograma.valor` consome `saldoAlocavelEmProgramas` da Parceria. O Programa nao recalcula Taxa de Gestao de Parcerias — ela ja foi calculada e deduzida na Parceria antes da alocacao (RN20, RN21). Aporte retirado nao compoe `valorAlocado` e devolve saldo alocavel a Parceria (RN14).
+`AporteFinanceiroPrograma.valor` consome `saldoAlocavelEmProgramas` da Parceria. O Programa nao recalcula Taxa de Gestao de Parcerias — ela ja foi calculada e deduzida na Parceria antes da alocacao (RN20, RN21). Aporte retirado nao compoe `valorAlocado` e devolve saldo alocavel a Parceria (RN14).
 
 Regras aplicaveis ao modelo de Programas: `RN01`, `RN02`, `RN11`, `RN13`, `RN14`, `RN16`, `RN20`, `RN21`, `RN22`, `RI1`, `RI2`, `RI4`. As definicoes oficiais ficam em [M010 — Regras de Negocio](../README.md#regras-de-negocio-consolidadas).
 
@@ -139,6 +141,6 @@ Regras aplicaveis ao modelo de Programas: `RN01`, `RN02`, `RN11`, `RN13`, `RN14`
 | Destino | Relacao | Observacao |
 |---------|---------|------------|
 | `planejamento/EixoEstrategico` | Orienta (N:N) | Diretriz estrategica |
-| `parcerias/Parceria` | Parceria origina AporteFinanceiroParceriaPrograma | Entidade vive aqui, fonte vem de parcerias |
+| `parcerias/Parceria` | Parceria origina AporteFinanceiroPrograma | Entidade vive aqui, fonte vem de parcerias |
 | `M008/Instituicao` | `demandadoPor` (N:1) | Instituicao solicita o programa |
 | `M008/PessoaFisica` | `representa` (N:1) via MembroComite | Pessoas do comite |

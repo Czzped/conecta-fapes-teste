@@ -121,16 +121,16 @@ export function ProjectsListPage({ onNavigate }: { onNavigate?: (page: string, p
           <button
             className="p-2 transition-colors"
             style={{
-              backgroundColor: 'rgba(8, 145, 178, 0.1)',
+              backgroundColor: 'rgba(34, 211, 238, 0.1)',
               color: 'var(--title-icon-foreground)',
               borderRadius: 'var(--radius)',
               flexShrink: 0,
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.2)';
+              e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.2)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.1)';
+              e.currentTarget.style.backgroundColor = 'rgba(34, 211, 238, 0.1)';
             }}
             aria-label="Projetos"
           >
@@ -508,7 +508,7 @@ export function ProjectsListPage({ onNavigate }: { onNavigate?: (page: string, p
                   fontSize: 'var(--text-xs)',
                   fontWeight: 'var(--font-weight-medium)',
                   color: 'var(--primary)',
-                  backgroundColor: 'rgba(8, 145, 178, 0.1)',
+                  backgroundColor: 'rgba(34, 211, 238, 0.1)',
                   padding: '0.25rem 0.75rem',
                   borderRadius: 'var(--radius)',
                   border: '1px solid var(--primary)',

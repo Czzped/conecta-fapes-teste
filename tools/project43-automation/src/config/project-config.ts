@@ -6,6 +6,8 @@ const DEFAULT_STARTED_AT_FIELD_NAME = "Iniciado em";
 const DEFAULT_DONE_AT_FIELD_NAME = "Data de Conclusao";
 const DEFAULT_REPOSITORY_FIELD_NAME = "Repositório";
 const DEFAULT_IN_PROGRESS_STATUS_NAME = "In Progress";
+const DEFAULT_IN_VALIDATION_STATUS_NAME = "In Validation";
+const DEFAULT_HOMOLOGATION_STATUS_NAME = "Homologation";
 const DEFAULT_DONE_STATUS_NAME = "Done";
 
 const LEGACY_DONE_AT_FIELD_ALIASES = [
@@ -27,6 +29,8 @@ export interface ProjectFieldNames {
 
 export interface ProjectStatusNames {
   inProgress: string;
+  inValidation: string;
+  homologation: string;
   done: string;
 }
 
@@ -128,6 +132,16 @@ export function createProjectConfig(
         source,
         "IN_PROGRESS_OPTION_NAME",
         DEFAULT_IN_PROGRESS_STATUS_NAME
+      ),
+      inValidation: getOptionalValue(
+        source,
+        "IN_VALIDATION_OPTION_NAME",
+        DEFAULT_IN_VALIDATION_STATUS_NAME
+      ),
+      homologation: getOptionalValue(
+        source,
+        "HOMOLOGATION_OPTION_NAME",
+        DEFAULT_HOMOLOGATION_STATUS_NAME
       ),
       done: getOptionalValue(source, "DONE_OPTION_NAME", DEFAULT_DONE_STATUS_NAME),
     },
