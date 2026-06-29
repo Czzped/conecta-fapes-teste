@@ -1274,48 +1274,6 @@ epics_por_modulo:
       todo: 3
       doing: 0
       done: 0
-  - id: EPIC-M016-005
-    titulo: Superseded
-    objetivo: ''
-    valor: ''
-    milestone: ''
-    depende_epics: []
-    depende_modulos: []
-    habilita_epics: []
-    habilita_modulos: []
-    us_total: 0
-    us:
-      todo: 0
-      doing: 0
-      done: 0
-  - id: EPIC-M016-006
-    titulo: Superseded
-    objetivo: ''
-    valor: ''
-    milestone: ''
-    depende_epics: []
-    depende_modulos: []
-    habilita_epics: []
-    habilita_modulos: []
-    us_total: 0
-    us:
-      todo: 0
-      doing: 0
-      done: 0
-  - id: EPIC-M016-007
-    titulo: Superseded
-    objetivo: ''
-    valor: ''
-    milestone: ''
-    depende_epics: []
-    depende_modulos: []
-    habilita_epics: []
-    habilita_modulos: []
-    us_total: 0
-    us:
-      todo: 0
-      doing: 0
-      done: 0
   - id: EPIC-M016-008
     titulo: Plano de Aplicacao e Execucao de Despesas da Acao Transversal
     objetivo: 'Permitir planejar o uso dos recursos da AcaoTransversal por rubrica e registrar despesas

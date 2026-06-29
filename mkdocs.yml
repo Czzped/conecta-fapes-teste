@@ -23,14 +23,6 @@ not_in_nav: |
   implementation/modules/M008-cadastros-corporativos/implementacao-backend-admin-instituicao.md
   implementation/modules/M014-prestacao-contas/epics/EPIC-M014-012.md
   implementation/modules/M014-prestacao-contas/epics/EPIC-M014-013.md
-  implementation/modules/M016-contabilidade-financeiro/taxa-gestao/README.md
-  implementation/modules/M016-contabilidade-financeiro/taxa-gestao/processo.md
-  implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/README.md
-  implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/EPIC-M016-011.md
-  implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/EPIC-M016-012.md
-  implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/EPIC-M016-013.md
-  implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/EPIC-M016-014.md
-  implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/EPIC-M016-015.md
   implementation/modules/M023-integracoes/epics/EPIC-M023-001.md
   implementation/modules/M023-integracoes/epics/EPIC-M023-002.md
   implementation/modules/M023-integracoes/epics/EPIC-M023-003.md
@@ -125,7 +117,7 @@ nav:
           - ADR-010 MinIO Storage: architecture/adr/ADR-010-minio-armazenamento-objetos.md
           - ADR-011 Arquitetura do Importador SIGFAPES: architecture/adr/ADR-011-arquitetura-importador-sigfapes.md
 
-  - Discovery:
+  - Understanding:
       - Visao do Produto: discovery/product-vision.md
       - Impacto de Negocio: discovery/impacto-negocio.md
       - Personas: discovery/personas.md
@@ -139,7 +131,17 @@ nav:
       - Financeiro: discovery/domains/05-financeiro.md
       - Suporte e Inteligencia: discovery/domains/06-suporte-inteligencia.md
       - Importacao SIGFAPES: discovery/domains/07-importacao-sigfapes.md
-      - Acao Transversal: discovery/domains/08-acao-transversal.md
+      - Acao Transversal:
+          - Dominio: discovery/domains/08-acao-transversal.md
+          - Visao Geral: implementation/modules/M016-contabilidade-financeiro/acao-transversal/README.md
+          - Modelo: implementation/modules/M016-contabilidade-financeiro/acao-transversal/modelo/README.md
+          - Processo: implementation/modules/M016-contabilidade-financeiro/acao-transversal/processo.md
+          - Proposta de Tela e Impacto no Codigo: implementation/modules/M016-contabilidade-financeiro/acao-transversal/proposta-tela-e-impacto-codigo.md
+          - Epicos:
+              - implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/README.md
+              - EPIC-008 Plano e Execucao: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-008.md
+              - EPIC-009 Prestacao Financeira: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-009.md
+              - EPIC-010 Dashboard: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-010.md
       - Integracao Lattes: discovery/integracoes/lattes.md
       - Integracao ORCID: discovery/integracoes/orcid.md
 
@@ -216,6 +218,7 @@ nav:
       - Visao Geral: implementation/modules/README.md
       - M001 Modalidade de Bolsa:
           - implementation/modules/M001-modalidade-bolsa/README.md
+          - Monitoramento: implementation/modules/M001-modalidade-bolsa/monitoramento.md
           - Backlog: implementation/modules/M001-modalidade-bolsa/backlog.md
           - Contrato: implementation/modules/M001-modalidade-bolsa/contrato.md
           - Contrato API: implementation/modules/M001-modalidade-bolsa/contrato-api.md
@@ -226,6 +229,7 @@ nav:
           - EPIC-003: implementation/modules/M001-modalidade-bolsa/epics/EPIC-M001-003.md
       - M002 Importacao de Editais:
           - implementation/modules/M002-importacao-editais/README.md
+          - Monitoramento: implementation/modules/M002-importacao-editais/monitoramento.md
           - Backlog: implementation/modules/M002-importacao-editais/backlog.md
           - Contrato: implementation/modules/M002-importacao-editais/contrato.md
           - Contrato API: implementation/modules/M002-importacao-editais/contrato-api.md
@@ -236,6 +240,7 @@ nav:
           - EPIC-003: implementation/modules/M002-importacao-editais/epics/EPIC-M002-003.md
       - M003 Gestao de Projetos Captados:
           - implementation/modules/M003-gestao-projetos-captados/README.md
+          - Monitoramento: implementation/modules/M003-gestao-projetos-captados/monitoramento.md
           - Eventos de Dominio: implementation/modules/M003-gestao-projetos-captados/eventos-dominio.md
           - Backlog: implementation/modules/M003-gestao-projetos-captados/backlog.md
           - Contrato: implementation/modules/M003-gestao-projetos-captados/contrato.md
@@ -273,6 +278,7 @@ nav:
               - Proposta Ciclo de Fomento: implementation/modules/M003-gestao-projetos-captados/specifications/proposta-ciclo-fomento-projeto.md
       - M004 Pagamento de Bolsistas:
           - implementation/modules/M004-pagamento-bolsista/README.md
+          - Monitoramento: implementation/modules/M004-pagamento-bolsista/monitoramento.md
           - Eventos de Dominio: implementation/modules/M004-pagamento-bolsista/eventos-dominio.md
           - Backlog: implementation/modules/M004-pagamento-bolsista/backlog.md
           - Contrato: implementation/modules/M004-pagamento-bolsista/contrato.md
@@ -297,12 +303,16 @@ nav:
               - Processo: implementation/modules/M004-pagamento-bolsista/diarias/processo.md
       - M005 Autenticacao:
           - implementation/modules/M005-autenticacao/README.md
+          - Monitoramento: implementation/modules/M005-autenticacao/monitoramento.md
       - M006 Autorizacao:
           - implementation/modules/M006-autorizacao/README.md
+          - Monitoramento: implementation/modules/M006-autorizacao/monitoramento.md
       - M007 API Gateway:
           - implementation/modules/M007-api-gateway/README.md
+          - Monitoramento: implementation/modules/M007-api-gateway/monitoramento.md
       - M008 Cadastros Corporativos:
           - implementation/modules/M008-cadastros-corporativos/README.md
+          - Monitoramento: implementation/modules/M008-cadastros-corporativos/monitoramento.md
           - Backlog: implementation/modules/M008-cadastros-corporativos/backlog.md
           - Contrato: implementation/modules/M008-cadastros-corporativos/contrato.md
           - Contrato API: implementation/modules/M008-cadastros-corporativos/contrato-api.md
@@ -350,6 +360,7 @@ nav:
           - Modelo Comportamental: implementation/modules/M008-cadastros-corporativos/modelo-comportamental.md
       - M009 Gestao Bolsa Pesquisa:
           - implementation/modules/M009-gestao-bolsista/README.md
+          - Monitoramento: implementation/modules/M009-gestao-bolsista/monitoramento.md
           - Eventos de Dominio: implementation/modules/M009-gestao-bolsista/eventos-dominio.md
           - Backlog: implementation/modules/M009-gestao-bolsista/backlog.md
           - Contrato: implementation/modules/M009-gestao-bolsista/contrato.md
@@ -363,6 +374,7 @@ nav:
           - EPIC-005 Perfil Academico: implementation/modules/M009-gestao-bolsista/epics/EPIC-M009-005.md
       - M010 Planejamento e Estrategia:
           - implementation/modules/M010-planejamento-estrategia/README.md
+          - Monitoramento: implementation/modules/M010-planejamento-estrategia/monitoramento.md
           - Backlog: implementation/modules/M010-planejamento-estrategia/backlog.md
           - Contrato: implementation/modules/M010-planejamento-estrategia/contrato.md
           - Contrato API: implementation/modules/M010-planejamento-estrategia/contrato-api.md
@@ -395,6 +407,7 @@ nav:
               - EPIC-M010-004 Painel Financeiro: implementation/modules/M010-planejamento-estrategia/parcerias/epics/EPIC-M010-004.md
       - M011 Configuracao de Captacao:
           - implementation/modules/M011-configuracao-captacao/README.md
+          - Monitoramento: implementation/modules/M011-configuracao-captacao/monitoramento.md
           - Processos:
               - Index: implementation/modules/M011-configuracao-captacao/process/process.md
               - P1 Fomento: implementation/modules/M011-configuracao-captacao/process/process-fomento.md
@@ -422,6 +435,7 @@ nav:
               - EPIC-010: implementation/modules/M011-configuracao-captacao/epics/EPIC-M011-010.md
       - M012 Acompanhamento e Resultados:
           - implementation/modules/M012-acompanhamento-resultados/README.md
+          - Monitoramento: implementation/modules/M012-acompanhamento-resultados/monitoramento.md
           - Eventos de Dominio: implementation/modules/M012-acompanhamento-resultados/eventos-dominio.md
           - Backlog: implementation/modules/M012-acompanhamento-resultados/backlog.md
           - Contrato: implementation/modules/M012-acompanhamento-resultados/contrato.md
@@ -433,6 +447,7 @@ nav:
           - EPIC-003: implementation/modules/M012-acompanhamento-resultados/epics/EPIC-M012-003.md
       - M013 Gestao Orcamentaria:
           - implementation/modules/M013-gestao-orcamentaria-projeto/README.md
+          - Monitoramento: implementation/modules/M013-gestao-orcamentaria-projeto/monitoramento.md
           - Backlog: implementation/modules/M013-gestao-orcamentaria-projeto/backlog.md
           - Contrato: implementation/modules/M013-gestao-orcamentaria-projeto/contrato.md
           - Contrato API: implementation/modules/M013-gestao-orcamentaria-projeto/contrato-api.md
@@ -444,6 +459,7 @@ nav:
           - EPIC-004 Rubrica Aprovada: implementation/modules/M013-gestao-orcamentaria-projeto/epics/EPIC-M013-004.md
       - M014 Prestacao de Contas:
           - implementation/modules/M014-prestacao-contas/README.md
+          - Monitoramento: implementation/modules/M014-prestacao-contas/monitoramento.md
           - Eventos de Dominio: implementation/modules/M014-prestacao-contas/eventos-dominio.md
           - Backlog: implementation/modules/M014-prestacao-contas/backlog.md
           - Contrato: implementation/modules/M014-prestacao-contas/contrato.md
@@ -466,6 +482,7 @@ nav:
           - EPIC-011 Rubrica do Projeto: implementation/modules/M014-prestacao-contas/epics/EPIC-M014-011.md
       - M015 Suspensao e Finalizacao:
           - implementation/modules/M015-suspensao-finalizacao/README.md
+          - Monitoramento: implementation/modules/M015-suspensao-finalizacao/monitoramento.md
           - Eventos de Dominio: implementation/modules/M015-suspensao-finalizacao/eventos-dominio.md
           - Backlog: implementation/modules/M015-suspensao-finalizacao/backlog.md
           - Contrato: implementation/modules/M015-suspensao-finalizacao/contrato.md
@@ -476,30 +493,31 @@ nav:
           - EPIC-002: implementation/modules/M015-suspensao-finalizacao/epics/EPIC-M015-002.md
       - M016 Contabilidade e Financeiro:
           - implementation/modules/M016-contabilidade-financeiro/README.md
+          - Monitoramento: implementation/modules/M016-contabilidade-financeiro/monitoramento.md
           - Eventos de Dominio: implementation/modules/M016-contabilidade-financeiro/eventos-dominio.md
           - Backlog: implementation/modules/M016-contabilidade-financeiro/backlog.md
           - Contrato: implementation/modules/M016-contabilidade-financeiro/contrato.md
           - Contrato API: implementation/modules/M016-contabilidade-financeiro/contrato-api.md
           - Modelo Estrutural: implementation/modules/M016-contabilidade-financeiro/modelo-estrutural.md
           - Modelo Comportamental: implementation/modules/M016-contabilidade-financeiro/modelo-comportamental.md
-          - Acao Transversal:
-              - Visao Geral: implementation/modules/M016-contabilidade-financeiro/acao-transversal/README.md
-              - Modelo: implementation/modules/M016-contabilidade-financeiro/acao-transversal/modelo/README.md
-              - Processo: implementation/modules/M016-contabilidade-financeiro/acao-transversal/processo.md
-              - Proposta de Tela e Impacto no Codigo: implementation/modules/M016-contabilidade-financeiro/acao-transversal/proposta-tela-e-impacto-codigo.md
+          - Taxa de Gestao de Parcerias:
+              - Visao Geral: implementation/modules/M016-contabilidade-financeiro/taxa-gestao/README.md
+              - Modelo Estrutural: implementation/modules/M016-contabilidade-financeiro/taxa-gestao/modelo-estrutural.md
+              - Modelo Comportamental: implementation/modules/M016-contabilidade-financeiro/taxa-gestao/modelo-comportamental.md
+              - Processo: implementation/modules/M016-contabilidade-financeiro/taxa-gestao/processo.md
               - Epicos:
-                  - implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/README.md
-                  - EPIC-005 Politicas e Faixas: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-005.md
-                  - EPIC-006 Reserva: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-006.md
-                  - EPIC-007 Outorga e Repasse: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-007.md
-                  - EPIC-008 Plano e Execucao: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-008.md
-                  - EPIC-009 Prestacao Financeira: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-009.md
-                  - EPIC-010 Dashboard: implementation/modules/M016-contabilidade-financeiro/acao-transversal/epics/EPIC-M016-010.md
+                  - implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/README.md
+                  - EPIC-011 Politica e Faixas: implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/EPIC-M016-011.md
+                  - EPIC-012 Recebimento e Classificacao: implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/EPIC-M016-012.md
+                  - EPIC-013 Repasse BANESTES: implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/EPIC-M016-013.md
+                  - EPIC-014 Vinculacao Acao Transversal: implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/EPIC-M016-014.md
+                  - EPIC-015 Dashboard: implementation/modules/M016-contabilidade-financeiro/taxa-gestao/epics/EPIC-M016-015.md
           - EPIC-001: implementation/modules/M016-contabilidade-financeiro/epics/EPIC-M016-001.md
           - EPIC-002: implementation/modules/M016-contabilidade-financeiro/epics/EPIC-M016-002.md
           - EPIC-003: implementation/modules/M016-contabilidade-financeiro/epics/EPIC-M016-003.md
       - M017 Prevencao Lavagem Dinheiro:
           - implementation/modules/M017-prevencao-lavagem-dinheiro/README.md
+          - Monitoramento: implementation/modules/M017-prevencao-lavagem-dinheiro/monitoramento.md
           - Eventos de Dominio: implementation/modules/M017-prevencao-lavagem-dinheiro/eventos-dominio.md
           - Backlog: implementation/modules/M017-prevencao-lavagem-dinheiro/backlog.md
           - Contrato: implementation/modules/M017-prevencao-lavagem-dinheiro/contrato.md
@@ -512,6 +530,7 @@ nav:
           - EPIC-004: implementation/modules/M017-prevencao-lavagem-dinheiro/epics/EPIC-M017-004.md
       - M018 Business Intelligence:
           - implementation/modules/M018-business-intelligence/README.md
+          - Monitoramento: implementation/modules/M018-business-intelligence/monitoramento.md
           - Backlog: implementation/modules/M018-business-intelligence/backlog.md
           - Contrato: implementation/modules/M018-business-intelligence/contrato.md
           - Contrato API: implementation/modules/M018-business-intelligence/contrato-api.md
@@ -521,6 +540,7 @@ nav:
           - EPIC-002: implementation/modules/M018-business-intelligence/epics/EPIC-M018-002.md
       - M019 Transparencia e Auditoria:
           - implementation/modules/M019-transparencia-auditoria/README.md
+          - Monitoramento: implementation/modules/M019-transparencia-auditoria/monitoramento.md
           - Eventos de Dominio: implementation/modules/M019-transparencia-auditoria/eventos-dominio.md
           - Backlog: implementation/modules/M019-transparencia-auditoria/backlog.md
           - Contrato: implementation/modules/M019-transparencia-auditoria/contrato.md
@@ -531,6 +551,7 @@ nav:
           - EPIC-002: implementation/modules/M019-transparencia-auditoria/epics/EPIC-M019-002.md
       - M020 Comunicacao:
           - implementation/modules/M020-comunicacao/README.md
+          - Monitoramento: implementation/modules/M020-comunicacao/monitoramento.md
           - Backlog: implementation/modules/M020-comunicacao/backlog.md
           - Contrato: implementation/modules/M020-comunicacao/contrato.md
           - Contrato API: implementation/modules/M020-comunicacao/contrato-api.md
@@ -544,6 +565,7 @@ nav:
               - Template de Email: implementation/modules/M020-comunicacao/notificacoes/emails/email-notificacao-evento.md
       - M021 Gestao de Formularios:
           - implementation/modules/M021-gestao-formularios/README.md
+          - Monitoramento: implementation/modules/M021-gestao-formularios/monitoramento.md
           - Backlog: implementation/modules/M021-gestao-formularios/backlog.md
           - Contrato: implementation/modules/M021-gestao-formularios/contrato.md
           - Contrato API: implementation/modules/M021-gestao-formularios/contrato-api.md
@@ -559,6 +581,7 @@ nav:
           - EPIC-008: implementation/modules/M021-gestao-formularios/epics/EPIC-M021-008.md
       - M022 Contratacao e Outorga:
           - implementation/modules/M022-contratacao-outorga/README.md
+          - Monitoramento: implementation/modules/M022-contratacao-outorga/monitoramento.md
           - Backlog: implementation/modules/M022-contratacao-outorga/backlog.md
           - Contrato: implementation/modules/M022-contratacao-outorga/contrato.md
           - Contrato API: implementation/modules/M022-contratacao-outorga/contrato-api.md
@@ -569,6 +592,7 @@ nav:
           - EPIC-003: implementation/modules/M022-contratacao-outorga/epics/EPIC-M022-003.md
       - M023 Integracoes:
           - implementation/modules/M023-integracoes/README.md
+          - Monitoramento: implementation/modules/M023-integracoes/monitoramento.md
           - Backlog: implementation/modules/M023-integracoes/backlog.md
           - Contrato: implementation/modules/M023-integracoes/contrato.md
           - Contrato API: implementation/modules/M023-integracoes/contrato-api.md
@@ -587,6 +611,7 @@ nav:
               - Adapter: implementation/modules/M023-integracoes/orcid/adapter.md
       - M024 Curriculo do Pesquisador:
           - implementation/modules/M024-curriculo-pesquisador/README.md
+          - Monitoramento: implementation/modules/M024-curriculo-pesquisador/monitoramento.md
           - Backlog: implementation/modules/M024-curriculo-pesquisador/backlog.md
           - Contrato: implementation/modules/M024-curriculo-pesquisador/contrato.md
           - Contrato API: implementation/modules/M024-curriculo-pesquisador/contrato-api.md

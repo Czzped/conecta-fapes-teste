@@ -147,7 +147,7 @@ agent_instructions:
     - "So pode haver um PlanoEstrategico ativo por vez (RN09); validar antes de ativar."
   notes:
     - "Este arquivo e apenas o indice do modulo. Consultar os subdominios para detalhes: planejamento.yaml, parcerias.yaml, programas.yaml."
-    - "Subdominio de Acao Transversal: M010 calcula e bloqueia a reserva; M016 planeja, executa e presta financeiramente."
+    - "Taxa de Gestao de Parcerias: M010 calcula e bloqueia a taxa sobre o aporte; M016/taxa-gestao custodia, classifica e gere; M016/acao-transversal executa e presta financeiramente."
     - "Editais sao configurados em M011. Projetos resultantes de contratos/outorgas pertencem ao M003."
-    - "Dependencias externas: M008 (Instituicao, Documento, PessoaFisica), M016 (ContaBancaria, politica Acao Transversal), M003 (Projeto), M014 (prestacao de contas)."
+    - "Dependencias externas: M008 (Instituicao, Documento, PessoaFisica), M016 (ContaBancaria, PoliticaTaxaGestaoParcerias), M003 (Projeto), M014 (prestacao de contas)."
     - "Referencia normativa Acao Transversal: Resolucao CCAF 334/2023 — FAPES."

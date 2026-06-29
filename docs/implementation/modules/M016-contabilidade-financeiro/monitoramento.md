@@ -4,7 +4,9 @@ Dominio e regras: ver [README.md](README.md) | Eventos: ver [eventos-dominio.md]
 
 ## Objetivo de Sustentacao
 
-A equipe de sustentacao deve garantir que o M016 mantenha a integridade contabil e financeira da agencia de fomento: lancamentos sem perda de trilha de auditoria (RN06), saldos consistentes sem ficar negativos fora de autorizacao (RN05), conciliacao bancaria executada e fechada com divergencias tratadas (RN04, RN08, RN09) e gestao financeira da Acao Transversal rastreavel (RN11-RN15). O foco operacional e: detectar rapidamente movimentacoes recusadas (saldo negativo, associacao ausente), conciliacoes que nao iniciam/concluem, transacoes pendentes de analise acumulando e indisponibilidade do extrato bancario externo. As operacoes `CriarFundoFinanceiro` e o vinculo de fundo em `CadastrarContaBancaria` estao deferidas (ver Nota de Deferimento no contrato.md); suas metricas/spans abaixo ficam como TODO ate a implementacao.
+A equipe de sustentacao deve garantir que o M016 mantenha a integridade contabil e financeira da agencia de fomento: lancamentos sem perda de trilha de auditoria (RN06), saldos consistentes sem ficar negativos fora de autorizacao (RN05), conciliacao bancaria executada e fechada com divergencias tratadas (RN04, RN08, RN09) e execucao financeira da Acao Transversal rastreavel (RN11-RN15). O foco operacional e: detectar rapidamente movimentacoes recusadas (saldo negativo, associacao ausente), conciliacoes que nao iniciam/concluem, transacoes pendentes de analise acumulando e indisponibilidade do extrato bancario externo. As operacoes `CriarFundoFinanceiro` e o vinculo de fundo em `CadastrarContaBancaria` estao deferidas (ver Nota de Deferimento no contrato.md); suas metricas/spans abaixo ficam como TODO ate a implementacao.
+
+> Recebimento, saldo e custodia da Taxa de Gestao de Parcerias (antiga "reserva" de Acao Transversal) nao sao mais observados aqui: passaram ao subdominio [taxa-gestao](taxa-gestao/README.md). Este documento cobre apenas o nucleo contabil/financeiro do M016 e a **execucao** da Acao Transversal (outorga, plano, despesa, prestacao).
 
 ## Eventos de Negocio Monitorados
 
@@ -34,16 +36,12 @@ RED por operacao publica do contrato.md (`status` em `{success, error}`; `motivo
 | m016_registrar_movimentacao_financeira_duration_seconds | histogram | - | s | latencia de RegistrarMovimentacaoFinanceira |
 | m016_consultar_fluxo_caixa_saldos_total | counter | status, motivo | - | chamadas a ConsultarFluxoCaixaESaldos |
 | m016_consultar_fluxo_caixa_saldos_duration_seconds | histogram | - | s | latencia de ConsultarFluxoCaixaESaldos |
-| m016_parametrizar_politica_acao_transversal_total | counter | status, motivo | - | chamadas a ParametrizarPoliticaAcaoTransversal |
-| m016_parametrizar_politica_acao_transversal_duration_seconds | histogram | - | s | latencia de ParametrizarPoliticaAcaoTransversal |
-| m016_receber_reserva_acao_transversal_total | counter | status, motivo, tipo_origem | - | chamadas a ReceberReservaAcaoTransversal (origem M010) |
-| m016_receber_reserva_acao_transversal_duration_seconds | histogram | - | s | latencia de ReceberReservaAcaoTransversal |
 | m016_cadastrar_plano_aplicacao_acao_transversal_total | counter | status, motivo | - | chamadas a CadastrarPlanoAplicacaoAcaoTransversal |
 | m016_cadastrar_plano_aplicacao_acao_transversal_duration_seconds | histogram | - | s | latencia de CadastrarPlanoAplicacaoAcaoTransversal |
 | m016_registrar_despesa_acao_transversal_total | counter | status, motivo | - | chamadas a RegistrarDespesaAcaoTransversal |
 | m016_registrar_despesa_acao_transversal_duration_seconds | histogram | - | s | latencia de RegistrarDespesaAcaoTransversal |
-| m016_analisar_prestacao_financeira_acao_transversal_total | counter | status, motivo, decisao | - | chamadas a AnalisarPrestacaoFinanceiraAcaoTransversal |
-| m016_analisar_prestacao_financeira_acao_transversal_duration_seconds | histogram | - | s | latencia de AnalisarPrestacaoFinanceiraAcaoTransversal |
+| m016_analisar_prestacao_contas_acao_transversal_total | counter | status, motivo, decisao | - | chamadas a AnalisarPrestacaoContasAcaoTransversal |
+| m016_analisar_prestacao_contas_acao_transversal_duration_seconds | histogram | - | s | latencia de AnalisarPrestacaoContasAcaoTransversal |
 | m016_consultar_dashboard_acao_transversal_total | counter | status, motivo | - | chamadas a ConsultarDashboardAcaoTransversal |
 | m016_consultar_dashboard_acao_transversal_duration_seconds | histogram | - | s | latencia de ConsultarDashboardAcaoTransversal |
 | m016_criar_fundo_financeiro_total | counter | status, motivo | - | chamadas a CriarFundoFinanceiro (TODO: deferida, ver contrato.md) |
@@ -72,9 +70,9 @@ Gauges de negocio (dominio M016):
 | m016_conciliacao_divergencias_abertas | gauge | - | - | divergencias de conciliacao registradas e ainda nao tratadas (RN09) |
 | m016_conciliacao_divergencias_total | counter | - | - | divergencias de conciliacao registradas acumuladas (RN04, RN09) |
 | m016_transacao_pendente_analise_total | counter | - | - | transacoes que entraram em estado pendente de analise (acumulado) |
-| m016_reserva_acao_transversal_saldo_brl | gauge | tipo_origem | brl | saldo disponivel das reservas de Acao Transversal (RN15) |
+| m016_acao_transversal_prestacoes_pendentes_analise | gauge | - | - | prestacoes de contas de Acao Transversal aguardando analise (RN14, RN15) |
 
-> Convencao: prefixo `m016_`, snake_case, unidade no sufixo, labels de baixa cardinalidade. NUNCA colocar CPF, nome, email, id de conta/parceria/iniciativa, codigo de conta contabil ou numero de conta bancaria em label de metrica — esses ids entram apenas em atributos de span/log correlacionados por `trace_id`. O label `motivo` deve usar apenas os codigos de recusa fixos do contrato.md (ex.: `saldo_negativo`, `associacao_ausente`, `conta_duplicada`).
+> Convencao: prefixo `m016_`, snake_case, unidade no sufixo, labels de baixa cardinalidade. NUNCA colocar CPF, nome, email, id de conta/parceria/iniciativa/outorga, codigo de conta contabil ou numero de conta bancaria em label de metrica — esses ids entram apenas em atributos de span/log correlacionados por `trace_id`. O label `motivo` deve usar apenas os codigos de recusa fixos do contrato.md (ex.: `saldo_negativo`, `associacao_ausente`, `conta_duplicada`).
 
 ## Tracing (SigNoz / OpenTelemetry)
 
@@ -85,17 +83,15 @@ Gauges de negocio (dominio M016):
 | m016.CadastrarContaBancaria | por operacao CadastrarContaBancaria | tipo_associacao, banco, resultado |
 | m016.RegistrarMovimentacaoFinanceira | por operacao RegistrarMovimentacaoFinanceira | tipo_movimentacao, resultado, motivo_recusa |
 | m016.ConsultarFluxoCaixaESaldos | por operacao ConsultarFluxoCaixaESaldos | tipo_filtro, periodo, resultado |
-| m016.ParametrizarPoliticaAcaoTransversal | por operacao ParametrizarPoliticaAcaoTransversal | vigencia, resultado |
-| m016.ReceberReservaAcaoTransversal | por operacao ReceberReservaAcaoTransversal | tipo_origem, modulo.origem=M010, resultado |
 | m016.CadastrarPlanoAplicacaoAcaoTransversal | por operacao CadastrarPlanoAplicacaoAcaoTransversal | qtd_itens, resultado |
 | m016.RegistrarDespesaAcaoTransversal | por operacao RegistrarDespesaAcaoTransversal | resultado, motivo_recusa |
-| m016.AnalisarPrestacaoFinanceiraAcaoTransversal | por operacao AnalisarPrestacaoFinanceiraAcaoTransversal | decisao, resultado |
+| m016.AnalisarPrestacaoContasAcaoTransversal | por operacao AnalisarPrestacaoContasAcaoTransversal | decisao, resultado |
 | m016.ConsultarDashboardAcaoTransversal | por operacao ConsultarDashboardAcaoTransversal | tipo_filtro, resultado |
 | m016.CriarFundoFinanceiro | por operacao CriarFundoFinanceiro (TODO: deferida, ver contrato.md) | resultado |
 | m016.ext.extrato_bancario | por chamada ao sistema de extrato bancario | peer.service, http.status_code, resultado |
 | m016.job.ConciliacaoBancaria | por execucao do job de conciliacao | resultado, periodo, divergencias_encontradas, itens_processados |
 
-> Propagar contexto de trace BFF -> Gateway -> M016 -> integracao de extrato bancario. Atributos de span carregam apenas dados nao sensiveis: nunca CPF, nome, email, numero de conta bancaria. Ids de negocio (conta, parceria, reserva) podem ir em atributo de span (correlacao operacional), nunca em label de metrica.
+> Propagar contexto de trace BFF -> Gateway -> M016 -> integracao de extrato bancario. Atributos de span carregam apenas dados nao sensiveis: nunca CPF, nome, email, numero de conta bancaria. Ids de negocio (conta, parceria, outorga) podem ir em atributo de span (correlacao operacional), nunca em label de metrica.
 
 ## SLIs / SLOs
 
@@ -107,7 +103,7 @@ Gauges de negocio (dominio M016):
 | latencia p95 de ConsultarFluxoCaixaESaldos | < 2s | 30d |
 | taxa de sucesso do job ExecutarConciliacaoBancaria (resultado="sucesso" / total executado) | 99% | 30d |
 | taxa de sucesso das chamadas ao extrato bancario (m016.ext.extrato_bancario) | 98% | 30d |
-| taxa de sucesso de ReceberReservaAcaoTransversal | 99,5% | 30d |
+| taxa de sucesso de RegistrarDespesaAcaoTransversal | 99% | 30d |
 
 ## Alertas
 
@@ -120,15 +116,16 @@ Gauges de negocio (dominio M016):
 | Divergencias de conciliacao acumulando | `m016_conciliacao_divergencias_abertas > 50` | warning | Acionar gestor financeiro para tratar divergencias antes do fechamento (RN09). TODO: link runbook |
 | Transacoes pendentes de analise acumulando | `m016_transacoes_pendentes_analise > 100` | warning | Acionar Analista Financeiro (evento TRANSACAO_PENDENTE_ANALISE). TODO: link runbook |
 | SLO de movimentacao em risco | `sum(rate(m016_registrar_movimentacao_financeira_total{status="error"}[1h])) / sum(rate(m016_registrar_movimentacao_financeira_total[1h])) > 0.005` | warning | Investigar erros recorrentes de lancamento (associacao ausente, conta invalida). TODO: link runbook |
-| Falha ao receber reserva de Acao Transversal | `increase(m016_receber_reserva_acao_transversal_total{status="error"}[30m]) > 0` | warning | Verificar integracao com M010 e classificacao contabil obrigatoria (RN11, RN12). TODO: link runbook |
+| Falha ao registrar despesa de Acao Transversal | `increase(m016_registrar_despesa_acao_transversal_total{status="error"}[30m]) > 0` | warning | Verificar rubrica do plano de aplicacao e documento comprobatorio da despesa (RN11, RN12). TODO: link runbook |
+| Prestacoes de Acao Transversal acumulando para analise | `m016_acao_transversal_prestacoes_pendentes_analise > 20` | warning | Acionar analista para concluir analise das prestacoes de contas (RN14, RN15). TODO: link runbook |
 
 ## Dashboards
 
 | Painel | Conteudo | Ferramenta |
 |--------|----------|------------|
 | RED M016 - Operacoes | rate/errors/duration por operacao do contrato (commands e queries) | Grafana |
-| RED M016 - Acao Transversal | rate/errors/duration das operacoes de reserva, plano, despesa e prestacao | Grafana |
+| RED M016 - Acao Transversal | rate/errors/duration das operacoes de execucao: plano de aplicacao, despesa e prestacao de contas | Grafana |
 | Saude da Conciliacao | execucoes, duracao, ultima execucao com sucesso e divergencias abertas do job | Grafana |
 | Integracao Extrato Bancario | latencia e taxa de erro de m016.ext.extrato_bancario | Grafana |
-| Gauges de Negocio | transacoes pendentes de analise, divergencias abertas, saldo de reservas (brl) | Grafana |
+| Gauges de Negocio | transacoes pendentes de analise, divergencias abertas, prestacoes de Acao Transversal pendentes de analise | Grafana |
 | Trace explorer M016 | spans m016.* fim-a-fim, filtro por operacao e integracao | SigNoz |

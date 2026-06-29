@@ -53,9 +53,12 @@ O M016 e dono do plano de contas e das contas contabeis. O M008 e dono do catalo
 
 Esse mapeamento apoia classificacao, relatorios e integracoes, mas o lancamento contabil final continua pertencendo ao M016. Ja o orcamento do projeto por Rubrica pertence ao M013, e a prestacao de contas da iniciativa pertence ao M014.
 
-### Acao Transversal
+### Taxa de Gestao de Parcerias e Acao Transversal
 
-A Acao Transversal e tratada neste modulo como gestao financeira institucional da agencia de fomento. O M010 calcula e reserva o percentual na Parceria, bloqueando esse valor para aportes em Programas. A partir dessa reserva, o M016 controla o plano de aplicacao, a execucao financeira, documentos comprobatórios, glosas, estornos, saldos e a prestacao financeira institucional.
+O M016 tem dois subdominios proprios em torno da retencao sobre aportes de Parcerias:
+
+- **[Taxa de Gestao de Parcerias](taxa-gestao/README.md)** — o M010 calcula a `TaxaGestaoParcerias` sobre cada `AporteFinanceiro` (politica vigente parametrizada no M016) e bloqueia esse valor do saldo alocavel em Programas. O subdominio taxa-gestao recebe (evento `TaxaGestaoParceriasCalculada`), classifica contabilmente, repassa (conta BANESTES) e custodia a taxa, versionando a `PoliticaTaxaGestaoParcerias` por Resolucao.
+- **[Acao Transversal](acao-transversal/README.md)** — gestao financeira institucional que **gasta** os recursos custodiados. Quando a taxa fica VINCULADA, cria-se uma `OutorgaAcaoTransversal` para uma `AcaoTransversal`, que entao planeja (plano de aplicacao por rubrica), executa despesas e presta contas institucionalmente.
 
 Essa prestacao financeira institucional **nao** substitui nem pertence ao M014. O M014 continua sendo o contexto dono da prestacao de contas da Iniciativa/Projeto, feita pelo coordenador ou outorgado sobre os recursos executados na iniciativa. A Acao Transversal pertence a gestao financeira interna da agencia, pois cobre despesas operacionais e administrativas da propria FAPES/agencia.
 
@@ -75,10 +78,10 @@ Essa prestacao financeira institucional **nao** substitui nem pertence ao M014. 
 | RN08 | Uma conciliacao so pode ser iniciada se nao houver outra em andamento para a mesma conta bancaria. | Should |
 | RN09 | Divergencias identificadas na conciliacao devem ser registradas e tratadas antes do fechamento. | Must |
 | RN10 | O fluxo de caixa deve consolidar movimentacoes realizadas e projetadas. | Should |
-| RN11 | Toda reserva de Acao Transversal recebida do M010 deve manter rastreabilidade com a Parceria de origem, aporte financeiro de origem, politica aplicada, percentual, valor base e valor reservado. | Must |
-| RN12 | Toda reserva de Acao Transversal deve ser classificada em conta contabil, fundo financeiro e centro de custo institucional antes do plano de aplicacao por rubricas. | Must |
-| RN13 | Despesas de Acao Transversal devem estar vinculadas a reserva, rubrica, documento comprobatório e unidade/centro financeiro responsavel. | Must |
-| RN14 | A prestacao financeira institucional da Acao Transversal consolida despesas internas da agencia e nao pode ser usada para prestar contas de Iniciativas ou Projetos, que pertencem ao M014. | Must |
-| RN15 | O plano de aplicacao da Acao Transversal deve distribuir o valor reservado em rubricas permitidas e nao pode ultrapassar o saldo da reserva. | Must |
+| RN11 | Toda `TaxaGestaoParcerias` recebida do M010 deve manter rastreabilidade com a Parceria de origem, o AporteFinanceiro de origem, a versao da politica, a faixa, o percentual, o valor base e o valor da taxa (subdominio taxa-gestao). | Must |
+| RN12 | Toda `TaxaGestaoParcerias` deve ser classificada em conta contabil, fundo financeiro e centro de custo institucional (`ClassificacaoContabilTGP`, subdominio taxa-gestao) antes da vinculacao a uma Acao Transversal. | Must |
+| RN13 | Despesas de Acao Transversal devem estar vinculadas a uma `OutorgaAcaoTransversal`, rubrica permitida, documento comprobatório e unidade/centro financeiro responsavel. | Must |
+| RN14 | A prestacao de contas institucional da Acao Transversal consolida despesas internas da agencia e nao pode ser usada para prestar contas de Iniciativas ou Projetos, que pertencem ao M014. | Must |
+| RN15 | O plano de aplicacao da Acao Transversal deve distribuir o valor vinculado (`OutorgaAcaoTransversal.valorVinculado`) em rubricas permitidas e nao pode ultrapassar o saldo da outorga. | Must |
 | RI1 | Uma conta contabil nao pode ser excluida se possuir lancamentos associados. | Must |
 | RI2 | Uma conta bancaria nao pode ser excluida se possuir movimentacoes registradas. | Must |
