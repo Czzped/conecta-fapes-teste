@@ -4,7 +4,7 @@ Dominio e regras: ver [README.md](README.md) | Contrato: ver [contrato.md](contr
 
 ## Objetivo de Sustentacao
 
-Garantir que o nucleo financeiro de Parcerias do M010 permaneca consistente em producao: aportes recebidos das Instituicoes, calculo da reserva de Acao Transversal, derivacao do `saldoAlocavelEmProgramas` e os aportes Parceria->Programa nao podem produzir saldo negativo (RN14/RN22) nem aporte fora de vigencia (RN13). A sustentacao precisa enxergar, em tempo quase real: volume e latencia das operacoes de comando/consulta do contrato, falhas de registro de aporte (impacto financeiro direto), inventario de negocio (parcerias vigentes, programas ativos, aportes financeiros recebidos, saldo alocavel agregado), saude do job diario de vigencia expirada e a latencia/erro das dependencias internas (M008, M016/Acao Transversal, M003, M014). Como Parcerias possuem entradas financeiras (aportes/saldo), os eventos de aporte e a evolucao do saldo sao cidadaos de primeira classe deste monitoramento.
+Garantir que o nucleo financeiro de Parcerias do M010 permaneca consistente em producao: aportes recebidos das Instituicoes, calculo da Taxa de Gestao de Parcerias, derivacao do `saldoAlocavelEmProgramas` e os aportes Parceria->Programa nao podem produzir saldo negativo (RN14/RN22) nem aporte fora de vigencia (RN13). A sustentacao precisa enxergar, em tempo quase real: volume e latencia das operacoes de comando/consulta do contrato, falhas de registro de aporte (impacto financeiro direto), inventario de negocio (parcerias vigentes, programas ativos, aportes financeiros recebidos, saldo alocavel agregado), saude do job diario de vigencia expirada e a latencia/erro das dependencias internas (M008, M016/Acao Transversal, M003, M014). Como Parcerias possuem entradas financeiras (aportes/saldo), os eventos de aporte e a evolucao do saldo sao cidadaos de primeira classe deste monitoramento.
 
 ## Eventos de Negocio Monitorados
 
@@ -12,8 +12,8 @@ Garantir que o nucleo financeiro de Parcerias do M010 permaneca consistente em p
 |--------|-------|-------|---------|------------|
 | AporteFinanceiroRegistrado | RegistrarAporteFinanceiro (contrato.md) | counter `m010_aporte_recebido_total{status}` + gauge `m010_aporte_recebido_valor_brl` | Nao | - |
 | FalhaRegistroAporteFinanceiro | RegistrarAporteFinanceiro (status="error") | counter `m010_registrar_aporte_financeiro_total{status="error"}` | Sim | critical |
-| ReservaAcaoTransversalCalculada | RegistrarAporteFinanceiro (efeito M016) | counter `m010_acao_transversal_reserva_total{status}` | Sim (em erro) | warning |
-| FalhaPoliticaAcaoTransversal | RegistrarAporteFinanceiro (politica nao encontrada quando obrigatoria) | counter `m010_acao_transversal_reserva_total{status="error"}` | Sim | critical |
+| TaxaGestaoParceriasCalculada | RegistrarAporteFinanceiro (efeito M016) | counter `m010_taxa_gestao_total{status}` | Sim (em erro) | warning |
+| FalhaPoliticaTaxaGestao | RegistrarAporteFinanceiro (politica nao encontrada quando obrigatoria) | counter `m010_taxa_gestao_total{status="error"}` | Sim | critical |
 | AporteParceriaProgramaRegistrado | RegistrarAporteFinanceiroParceriaPrograma | counter `m010_aporte_programa_total{status}` | Nao | - |
 | SaldoAlocavelInsuficiente | RegistrarAporteFinanceiroParceriaPrograma (SALDO_INSUFICIENTE) | counter `m010_aporte_programa_total{status="rejected_saldo"}` | Sim | warning |
 | AporteForaDaVigencia | RegistrarAporteFinanceiroParceriaPrograma (PROGRAMA_FORA_DA_VIGENCIA) | counter `m010_aporte_programa_total{status="rejected_vigencia"}` | Sim | warning |
@@ -40,7 +40,7 @@ RED por operacao publica do contrato (counter de rate/erros + histogram de durac
 | m010_registrar_aporte_financeiro_total | counter | status | - | registros de AporteFinanceiro (entrada financeira) |
 | m010_registrar_aporte_financeiro_duration_seconds | histogram | - | s | latencia do registro de aporte |
 | m010_aporte_programa_total | counter | status | - | aportes Parceria->Programa (status inclui rejected_saldo, rejected_vigencia) |
-| m010_acao_transversal_reserva_total | counter | status | - | calculos de reserva de Acao Transversal disponibilizados ao M016 |
+| m010_taxa_gestao_total | counter | status | - | calculos de Taxa de Gestao de Parcerias disponibilizados ao M016 |
 | m010_criar_parceria_total | counter | status | - | criacoes de Parceria |
 | m010_formalizar_parceria_total | counter | status | - | transicoes EmElaboracao->Vigente |
 | m010_encerrar_parceria_total | counter | status, origem_gatilho | - | encerramentos de Parceria (origem_gatilho: usuario, expiracao_vigencia) |
@@ -48,7 +48,7 @@ RED por operacao publica do contrato (counter de rate/erros + histogram de durac
 | m010_dependencia_erro_total | counter | dependencia | - | erros por dependencia interna (m008, m016, m003, m014) |
 | m010_aporte_recebido_valor_brl | gauge | - | brl | valor bruto agregado recebido em aportes (somatorio corrente) |
 | m010_saldo_alocavel_programas_brl | gauge | - | brl | saldo alocavel agregado das Parcerias vigentes (derivado RN22) |
-| m010_acao_transversal_reservado_valor_brl | gauge | - | brl | valor agregado reservado para Acao Transversal (destino M016) |
+| m010_taxa_gestao_valor_brl | gauge | - | brl | valor agregado da Taxa de Gestao de Parcerias (destino M016) |
 | m010_parcerias_total | gauge | estado | - | inventario de Parcerias por estado (EmElaboracao, Vigente, Suspensa, Encerrada) |
 | m010_parcerias_ativas_total | gauge | - | - | Parcerias no estado Vigente (atalho de negocio) |
 | m010_programas_total | gauge | estado | - | inventario de Programas por estado (EM_PLANEJAMENTO, ATIVO, SUSPENSO, ENCERRADO) |
@@ -109,7 +109,7 @@ Propagar contexto de trace BFF -> Gateway -> M010 -> dependencia interna para tr
 |-----|-----|--------|
 | taxa de sucesso de RegistrarAporteFinanceiro (status != error) | 99,5% | 30d |
 | taxa de sucesso de RegistrarAporteFinanceiroParceriaPrograma (excluindo rejeicoes de regra de negocio) | 99% | 30d |
-| taxa de sucesso do calculo de reserva de Acao Transversal | 99,9% | 30d |
+| taxa de sucesso do calculo de Taxa de Gestao de Parcerias | 99,9% | 30d |
 | latencia p95 das consultas de dashboard de parceria (Local e Global) | < 2 s | 30d |
 | latencia p95 dos comandos transacionais do contrato | < 1,5 s | 30d |
 | execucao diaria bem-sucedida do job VerificarVigenciaExpirada | 100% (1x/dia) | 30d |
@@ -120,7 +120,7 @@ Propagar contexto de trace BFF -> Gateway -> M010 -> dependencia interna para tr
 | Alerta | Condicao | Severidade | Acao / Runbook |
 |--------|----------|------------|----------------|
 | Falha em registro de aporte financeiro | `increase(m010_registrar_aporte_financeiro_total{status="error"}[15m]) > 0` | critical | TODO: runbook registrar-aporte — verificar M008/M016, integridade do Documento (RN12) e politica de Acao Transversal |
-| Politica de Acao Transversal indisponivel | `increase(m010_acao_transversal_reserva_total{status="error"}[10m]) > 0` | critical | TODO: runbook acao-transversal — checar parametrizacao de faixas no M016 (Resolucao CCAF 334/2023) |
+| Politica de Acao Transversal indisponivel | `increase(m010_taxa_gestao_total{status="error"}[10m]) > 0` | critical | TODO: runbook acao-transversal — checar parametrizacao de faixas no M016 (Resolucao CCAF 334/2023) |
 | SLO de aporte financeiro em risco | `sum(rate(m010_registrar_aporte_financeiro_total{status="error"}[1h])) / sum(rate(m010_registrar_aporte_financeiro_total[1h])) > 0.005` | warning | TODO: runbook slo-aporte — abrir investigacao de erro recorrente |
 | Rejeicoes recorrentes por saldo insuficiente | `increase(m010_aporte_programa_total{status="rejected_saldo"}[30m]) > 5` | warning | TODO: runbook saldo-parceria — validar saldo alocavel (RN22) e possivel inconsistencia de derivacao |
 | Job de vigencia expirada nao executado | `time() - m010_job_verificar_vigencia_expirada_last_success_timestamp_seconds > 93600` (>26h) | critical | TODO: runbook job-vigencia — checar agendador Hangfire e reexecutar manualmente |
@@ -136,7 +136,7 @@ Propagar contexto de trace BFF -> Gateway -> M010 -> dependencia interna para tr
 | Painel | Conteudo | Ferramenta |
 |--------|----------|------------|
 | RED M010 — Operacoes | rate/errors/duration por operacao (`m010_operacao_total`, `m010_operacao_duration_seconds`) | Grafana |
-| Financeiro de Parcerias | gauges `m010_aporte_recebido_valor_brl`, `m010_saldo_alocavel_programas_brl`, `m010_acao_transversal_reservado_valor_brl`; rate de aportes recebidos e Parceria->Programa | Grafana |
+| Financeiro de Parcerias | gauges `m010_aporte_recebido_valor_brl`, `m010_saldo_alocavel_programas_brl`, `m010_taxa_gestao_valor_brl`; rate de aportes recebidos e Parceria->Programa | Grafana |
 | Inventario de Negocio | `m010_parcerias_total{estado}`, `m010_parcerias_ativas_total`, `m010_programas_total{estado}`, `m010_programas_ativos_total`, `m010_planos_estrategicos_ativos_total` | Grafana |
 | Saude de Jobs | duracao e last_success do job VerificarVigenciaExpirada; `m010_vigencias_expiradas_pendentes_total` | Grafana |
 | Integracoes Internas | latencia e erro por dependencia (`m010_dependencia_duration_seconds`, `m010_dependencia_erro_total` por m008/m016/m003/m014) | Grafana |

@@ -2,6 +2,8 @@
 
 Dominio e regras de negocio: ver [README.md](README.md)
 
+> **Subdominios proprios.** A Taxa de Gestao de Parcerias (politica, versoes, faixas, recebimento, classificacao, repasse e custodia) vive em [taxa-gestao/](taxa-gestao/modelo-estrutural.md). A execucao dos recursos custodiados (Acao Transversal: outorga, plano de aplicacao, despesa, prestacao) vive em [acao-transversal/](acao-transversal/modelo/README.md). Este modelo cobre apenas o **nucleo contabil e financeiro** do M016, consumido por ambos.
+
 ### Diagrama de Classes
 
 ```mermaid
@@ -128,107 +130,6 @@ classDiagram
         +boolean ativo
     }
 
-    class PoliticaAcaoTransversal {
-        +String nome
-        +String baseLegal
-        +Date dataInicioVigencia
-        +Date dataFimVigencia
-        +boolean ativa
-    }
-
-    class FaixaAcaoTransversal {
-        +double valorMinimo
-        +double valorMaximo
-        +double percentual
-    }
-
-    class ReservaAcaoTransversal {
-        +String aporteFinanceiroOrigemId
-        +TipoOrigemReservaAcaoTransversal tipoOrigem
-        +double valorBaseCalculo
-        +double percentualAplicado
-        +double valorReservado
-        +double valorExecutado
-        +double saldo
-        +Date dataCalculo
-    }
-
-    class OutorgaAcaoTransversal {
-        +String numeroTermo
-        +String atoAutorizacao
-        +Date dataAssinatura
-        +Date vigenciaInicio
-        +Date vigenciaFim
-        +EstadoOutorgaAcaoTransversal estado
-        +String escopoGestao
-    }
-
-    class EstadoOutorgaAcaoTransversal {
-        <<enumeration>>
-        EM_ELABORACAO
-        VIGENTE
-        SUSPENSA
-        ENCERRADA
-        CANCELADA
-    }
-
-    class RepasseAcaoTransversal {
-        +double valor
-        +Date dataPrevista
-        +Date dataRepasse
-        +EstadoRepasseAcaoTransversal estado
-        +String observacao
-    }
-
-    class EstadoRepasseAcaoTransversal {
-        <<enumeration>>
-        PREVISTO
-        REPASSADO
-        CANCELADO
-    }
-
-    class ContaBancariaAcaoTransversal {
-        +String banco
-        +String agencia
-        +String numeroConta
-        +String titular
-        +String finalidade
-        +boolean abertaPelaFapes
-        +boolean ativa
-    }
-
-    class TipoOrigemReservaAcaoTransversal {
-        <<enumeration>>
-        APORTE_ORIGINAL
-        APORTE_ADITIVO
-        AJUSTE
-    }
-
-    class PlanoAplicacaoAcaoTransversal {
-        +Date dataCadastro
-        +EstadoPlanoAplicacao estado
-    }
-
-    class ItemPlanoAplicacaoAcaoTransversal {
-        +double valorPrevisto
-        +String justificativa
-    }
-
-    class DespesaAcaoTransversal {
-        +double valor
-        +Date dataDespesa
-        +String justificativa
-        +EstadoDespesaAcaoTransversal estado
-    }
-
-    class PrestacaoFinanceiraAcaoTransversal {
-        +Date dataSubmissao
-        +Date dataEncerramento
-        +EstadoPrestacaoFinanceira estado
-        +double valorAprovado
-        +double valorGlosado
-    }
-
     class Iniciativa {
         <<fora do escopo - M003>>
     }
@@ -241,16 +142,12 @@ classDiagram
         <<fora do escopo - M010>>
     }
 
-    class Rubrica {
-        <<fora do escopo - M008>>
+    class TaxaGestaoParcerias {
+        <<fora do escopo - taxa-gestao>>
     }
 
-    class Documento {
-        <<fora do escopo - M008>>
-    }
-
-    class PessoaFisica {
-        <<fora do escopo - M008>>
+    class AcaoTransversal {
+        <<fora do escopo - acao-transversal>>
     }
 
     ContaContabil "1" --> "*" AssociacaoConta : associacoes
@@ -269,26 +166,13 @@ classDiagram
     ItemConciliacao "*" --> "0..1" MovimentacaoFinanceira : registro sistema
     MovimentacaoFinanceira "*" --> "1" ContaContabil : classificacao contabil
     FluxoCaixa "*" --> "1" ContaBancaria : conta
-    PoliticaAcaoTransversal "1" --> "*" FaixaAcaoTransversal : faixas
-    ReservaAcaoTransversal "*" --> "1" PoliticaAcaoTransversal : regra aplicada
-    ReservaAcaoTransversal "*" --> "1" Parceria : origem
-    ReservaAcaoTransversal "*" --> "1" ContaContabil : classificadaEm
-    ReservaAcaoTransversal "*" --> "1" FundoFinanceiro : vinculadaAoFundo
-    ReservaAcaoTransversal "*" --> "1" CentroCusto : vinculadaAoCentro
-    ReservaAcaoTransversal "1" --> "0..*" OutorgaAcaoTransversal : outorgas
-    OutorgaAcaoTransversal "*" --> "1" PessoaFisica : coordenador outorgado
-    OutorgaAcaoTransversal "*" --> "1" Documento : termo de outorga
-    OutorgaAcaoTransversal "1" --> "1" ContaBancariaAcaoTransversal : conta especifica
-    OutorgaAcaoTransversal "1" --> "*" RepasseAcaoTransversal : repasses
-    RepasseAcaoTransversal "*" --> "1" ReservaAcaoTransversal : consome reserva
-    ReservaAcaoTransversal "1" --> "0..1" PlanoAplicacaoAcaoTransversal : planejada por
-    PlanoAplicacaoAcaoTransversal "1" --> "*" ItemPlanoAplicacaoAcaoTransversal : itens
-    ItemPlanoAplicacaoAcaoTransversal "*" --> "1" Rubrica : rubrica
-    ReservaAcaoTransversal "1" --> "*" DespesaAcaoTransversal : despesas
-    DespesaAcaoTransversal "*" --> "0..1" ItemPlanoAplicacaoAcaoTransversal : executaItem
-    DespesaAcaoTransversal "*" --> "1" Rubrica : rubrica
-    DespesaAcaoTransversal "*" --> "1" Documento : comprovante
-    PrestacaoFinanceiraAcaoTransversal "1" --> "*" DespesaAcaoTransversal : analisa
+
+    %% Consumo pelos subdominios (modelados em taxa-gestao/ e acao-transversal/)
+    TaxaGestaoParcerias "*" --> "1" ContaContabil : classificadaEm
+    TaxaGestaoParcerias "*" --> "1" FundoFinanceiro : vinculadaAoFundo
+    TaxaGestaoParcerias "*" --> "1" CentroCusto : vinculadaAoCentro
+    TaxaGestaoParcerias "*" --> "1" ContaBancaria : custodiadaEm (BANESTES)
+    AcaoTransversal "*" --> "1" CentroCusto : centro de gestao
 ```
 
 ## Dicionario de Dados
@@ -343,73 +227,29 @@ classDiagram
 | | nome | Nome do centro de custo | Sim | String | Ex: Gestao Institucional de Parcerias | 200 | |
 | | descricao | Finalidade do centro de custo | Nao | String | | 500 | |
 | | ativo | Indica se o centro de custo esta ativo | Sim | Boolean | | | |
-| **PoliticaAcaoTransversal** | nome | Nome da politica normativa | Sim | String | Ex: Resolucao CCAF 334/2023 | 200 | |
-| | baseLegal | Referencia normativa | Sim | String | | 300 | |
-| | dataInicioVigencia | Inicio da vigencia da politica | Sim | Date | | | |
-| | dataFimVigencia | Fim da vigencia da politica | Nao | Date | | | |
-| | ativa | Indica se a politica pode ser usada pelo M010 | Sim | Boolean | | | |
-| **FaixaAcaoTransversal** | valorMinimo | Limite inferior da faixa | Sim | Double | ≥ 0 | | |
-| | valorMaximo | Limite superior da faixa; vazio para faixa aberta | Nao | Double | ≥ valorMinimo | | |
-| | percentual | Percentual aplicado na faixa | Sim | Double | > 0 | | |
-| **ReservaAcaoTransversal** | valorBaseCalculo | Valor bruto usado pelo M010 para calculo | Sim | Double | ≥ 0 | | |
-| | aporteFinanceiroOrigemId | Identificador do AporteFinanceiro do M010 que originou a reserva | Sim | String | Aporte original ou aditivo | | |
-| | tipoOrigem | Origem da reserva | Sim | TipoOrigemReservaAcaoTransversal | `APORTE_ORIGINAL`, `APORTE_ADITIVO`, `AJUSTE` | | |
-| | percentualAplicado | Percentual selecionado pela politica | Sim | Double | > 0 | | |
-| | valorReservado | Valor reservado para gestao financeira institucional | Sim | Double | ≥ 0 | | |
-| | valorExecutado | Total de despesas registradas contra a reserva | Gerado | Double | ≥ 0 | | |
-| | saldo | `valorReservado - valorExecutado` | Gerado | Double | ≥ 0 | | |
-| | dataCalculo | Data em que o M010 calculou/enviou a reserva | Sim | Date | | | |
-| | contaContabil (relacao) | Conta contabil institucional onde a reserva e reconhecida | Sim | FK → ContaContabil | Ex: Recursos de Acao Transversal | | |
-| | fundoFinanceiro (relacao) | Fundo/carteira financeira que concentra a reserva | Sim | FK → FundoFinanceiro | | | |
-| | centroCusto (relacao) | Centro de custo responsavel pela gestao institucional da reserva | Sim | FK → CentroCusto | | | |
-| **OutorgaAcaoTransversal** | numeroTermo | Numero ou identificador do Termo de Outorga que autoriza a gestao do recurso | Sim | String | | 80 | Sim |
-| | atoAutorizacao | Ato/decisao da Diretoria Executiva que autorizou a outorga | Sim | String | | 300 | |
-| | dataAssinatura | Data de assinatura do Termo de Outorga | Sim | Date | | | |
-| | vigenciaInicio | Inicio da autorizacao de gestao | Sim | Date | | | |
-| | vigenciaFim | Fim da autorizacao de gestao | Sim | Date | >= vigenciaInicio | | |
-| | estado | Estado da outorga | Gerado | EstadoOutorgaAcaoTransversal | EmElaboracao, Vigente, Suspensa, Encerrada, Cancelada | | |
-| | escopoGestao | Texto que delimita o recurso, reserva, parceria ou finalidade abrangida pelo TO | Sim | String | | 1000 | |
-| | coordenadorOutorgado (relacao) | Servidor publico vinculado a FAPES autorizado a gerir o recurso | Sim | FK → PessoaFisica (M008) | Deve possuir vinculo ativo com FAPES | | |
-| | termoOutorga (relacao) | Documento formal do Termo de Outorga | Sim | FK → Documento (M008) | TipoDocumento = Termo de Outorga | | |
-| **ContaBancariaAcaoTransversal** | banco | Banco da conta especifica | Sim | String | BANESTES | 100 | |
-| | agencia | Agencia bancaria | Sim | String | | 10 | |
-| | numeroConta | Numero da conta especifica | Sim | String | | 20 | Sim |
-| | titular | Titular da conta, em nome do Coordenador Outorgado | Sim | String | | 200 | |
-| | finalidade | Finalidade da conta especifica de Acao Transversal | Sim | String | | 300 | |
-| | abertaPelaFapes | Indica que a conta foi aberta pela FAPES conforme Resolucao CCAF nº 334/2023 | Sim | Boolean | true | | |
-| | ativa | Indica se a conta esta ativa para movimentacao | Sim | Boolean | | | |
-| **RepasseAcaoTransversal** | valor | Valor repassado ao Coordenador Outorgado | Sim | Double | > 0 e <= saldo disponivel da reserva | | |
-| | dataPrevista | Data prevista no cronograma de desembolso | Nao | Date | | | |
-| | dataRepasse | Data efetiva do credito em conta especifica | Cond. | Date | Obrigatoria quando estado = Repassado | | |
-| | estado | Estado do repasse | Gerado | EstadoRepasseAcaoTransversal | Previsto, Repassado, Cancelado | | |
-| | observacao | Observacoes do repasse | Nao | String | | 1000 | |
-| **PlanoAplicacaoAcaoTransversal** | dataCadastro | Data do plano | Gerado | Date | | | |
-| | estado | Estado do plano | Gerado | EstadoPlanoAplicacao | EmElaboracao, Aprovado, Substituido | | |
-| **ItemPlanoAplicacaoAcaoTransversal** | valorPrevisto | Valor previsto para a rubrica | Sim | Double | ≥ 0 | | |
-| | justificativa | Justificativa da previsao de uso | Sim | String | | 1000 | |
-| **DespesaAcaoTransversal** | valor | Valor da despesa institucional | Sim | Double | ≥ 0 | | |
-| | dataDespesa | Data da despesa | Sim | Date | | | |
-| | justificativa | Justificativa da despesa | Sim | String | | 1000 | |
-| | estado | Estado da despesa | Gerado | EstadoDespesaAcaoTransversal | EmAnalise, Aprovada, Glosada, Reprovada | | |
-| | itemPlanoAplicacao (relacao) | Item planejado que a despesa executa | Cond. | FK → ItemPlanoAplicacaoAcaoTransversal | Obrigatorio quando houver plano aprovado | | |
-| **PrestacaoFinanceiraAcaoTransversal** | dataSubmissao | Data de envio para analise | Cond. | Date | | | |
-| | dataEncerramento | Data de encerramento da analise | Cond. | Date | | | |
-| | estado | Estado da prestacao financeira institucional | Gerado | EstadoPrestacaoFinanceira | Rascunho, EmAnalise, Aprovada, AprovadaComGlosa, Reprovada, Encerrada | | |
-| | valorAprovado | Total aprovado | Gerado | Double | ≥ 0 | | |
-| | valorGlosado | Total glosado | Gerado | Double | ≥ 0 | | |
+
+## Modelo dos Subdominios
+
+O modelo da Taxa de Gestao de Parcerias e da Acao Transversal nao vive aqui — cada subdominio tem o seu, com snapshot, estados e invariantes proprios:
+
+| Subdominio | Modelo | Entidades principais |
+|------------|--------|----------------------|
+| Taxa de Gestao de Parcerias | [taxa-gestao/modelo-estrutural.md](taxa-gestao/modelo-estrutural.md) | `PoliticaTaxaGestaoParcerias`, `VersaoPoliticaTaxaGestao`, `FaixaPercentualTaxaGestao`, `VersaoFaixaPercentual`, `TaxaGestaoParcerias`, `ClassificacaoContabilTGP` |
+| Acao Transversal | [acao-transversal/modelo/README.md](acao-transversal/modelo/README.md) | `AcaoTransversal`, `OutorgaAcaoTransversal`, `PlanoAplicacaoAcaoTransversal`, `DespesaAcaoTransversal`, `PrestacaoContasAcaoTransversal` |
+
+Ambos consomem o nucleo contabil deste modelo: `ContaContabil`, `FundoFinanceiro`, `CentroCusto` e `ContaBancaria` (BANESTES para repasse da taxa — INV-TGP03).
 
 ## Notas de Implementacao
 
 **Entidades externas:**
 - Iniciativa: gerenciada por M003 (Gestao de Iniciativas Captadas) como abstracao estrutural de iniciativas apoiadas.
 - Programa e Parceria: gerenciados por M010 (Planejamento e Estrategia).
-- PessoaFisica, Rubrica e Documento: gerenciados por M008 (Cadastros Corporativos).
+- PessoaFisica, Rubrica e Documento: gerenciados por M008 (Cadastros Corporativos); usados pelos subdominios taxa-gestao e acao-transversal.
 
 **Rubrica x movimentacao financeira:**
 - `Rubrica` e referencia externa de classificacao orcamentaria/despesa.
 - `MovimentacaoFinanceira` e fato financeiro de entrada ou saida em conta bancaria.
 - Uma movimentacao pode ser classificada contabilmente por `ContaContabil` e conciliada com despesas classificadas por rubrica, mas a movimentacao nao deve ser modelada como rubrica.
-- Na Acao Transversal, `ItemPlanoAplicacaoAcaoTransversal` e `DespesaAcaoTransversal` referenciam `Rubrica` para planejamento/classificacao; a movimentacao bancária continua sendo registrada separadamente.
 
 **Navegabilidade:**
 - Cardinalidade 1: atributo do tipo da classe destino (ex: MovimentacaoFinanceira.contaContabil: ContaContabil)

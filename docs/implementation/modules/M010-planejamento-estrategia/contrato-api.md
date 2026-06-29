@@ -331,7 +331,7 @@ Registra parceria com Vigencia original e uma Instituicao vinculada (RN10, RN15)
     "vigenciaInicioCorrente": "2026-03-01",
     "vigenciaFimCorrente": "2028-12-31",
     "valorBrutoRecebido": 0.0,
-    "valorReservadoAcaoTransversal": 0.0,
+    "valorTaxaGestao": 0.0,
     "saldoAlocavelEmProgramas": 0.0,
     "instituicaoId": "INST-2026-010"
   }
@@ -354,7 +354,7 @@ Filtros: `nome`, `estado` (`EmElaboracao`/`Vigente`/`Suspensa`/`Encerrada`), `in
 
 ### `GET /api/v1/parcerias/{id}`
 
-Detalhe com Vigencias, aportes recebidos, reserva de Acao Transversal, aportes destinados a programas, documentos e saldo alocavel em Programas.
+Detalhe com Vigencias, aportes recebidos, Taxa de Gestao de Parcerias, aportes destinados a programas, documentos e saldo alocavel em Programas.
 
 **Response `200 OK`**
 
@@ -366,7 +366,7 @@ Detalhe com Vigencias, aportes recebidos, reserva de Acao Transversal, aportes d
     "vigenciaInicioCorrente": "2026-03-01",
     "vigenciaFimCorrente": "2029-12-31",
     "valorBrutoRecebido": 500000.0,
-    "valorReservadoAcaoTransversal": 25000.0,
+    "valorTaxaGestao": 25000.0,
     "saldoAlocavelEmProgramas": 325000.0,
     "vigencias": [
       { "id": "VIG-2026-001", "isAditivo": false, "dataInicio": "2026-03-01", "dataFim": "2028-12-31" },
@@ -386,7 +386,7 @@ Detalhe com Vigencias, aportes recebidos, reserva de Acao Transversal, aportes d
 
 ### `PUT /api/v1/parcerias/{id}`
 
-Atualiza dados cadastrais (nome, objetivo, processo). **Nao altera Vigencia, reserva de Acao Transversal nem saldo alocavel.**
+Atualiza dados cadastrais (nome, objetivo, processo). **Nao altera Vigencia, Taxa de Gestao de Parcerias nem saldo alocavel.**
 
 ### `DELETE /api/v1/parcerias/{id}`
 
@@ -617,7 +617,7 @@ Registra aporte recebido de Instituicao, formalizado por Documento tipo "Termo d
   "acaoTransversal": {
     "valorBaseCalculo": 500000.0,
     "percentualAplicado": 5.0,
-    "valorReservado": 25000.0,
+    "valorTaxaGestao": 25000.0,
     "moduloDestino": "M016"
   },
   "saldoAlocavelEmProgramas": 475000.0
@@ -642,7 +642,7 @@ Lista aportes recebidos. Filtros: `isAditivo`, `instituicaoId`, `page`, `pageSiz
 
 ### `PUT /api/v1/parcerias/{id}/aportes/{aporteId}`
 
-Edita aporte com `isAditivo = true` (RN18). Recalcula reserva de Acao Transversal quando aplicavel e saldo alocavel em Programas.
+Edita aporte com `isAditivo = true` (RN18). Recalcula Taxa de Gestao de Parcerias quando aplicavel e saldo alocavel em Programas.
 
 - **Operacao de origem:** `EditarAporteFinanceiroAditivo`
 - **Autorizacao:** `ANALISTA_AGENCIA`
@@ -677,7 +677,7 @@ Edita aporte com `isAditivo = true` (RN18). Recalcula reserva de Acao Transversa
 
 ### `DELETE /api/v1/parcerias/{id}/aportes/{aporteId}`
 
-Remove aporte com `isAditivo = true` (RN18). Recalcula reserva de Acao Transversal quando aplicavel e saldo alocavel em Programas.
+Remove aporte com `isAditivo = true` (RN18). Recalcula Taxa de Gestao de Parcerias quando aplicavel e saldo alocavel em Programas.
 
 - **Operacao de origem:** `RemoverAporteFinanceiroAditivo`
 - **Autorizacao:** `ANALISTA_AGENCIA`
@@ -784,7 +784,7 @@ Desvincula Documento da parceria (nao remove o Documento de M008).
 
 ### `GET /api/v1/parcerias/{id}/saldo`
 
-Consulta saldo corrente e composicao, separando valor bruto, reserva de Acao Transversal e saldo alocavel em Programas (RN14, RN15, RN20, RN21, RN22).
+Consulta saldo corrente e composicao, separando valor bruto, Taxa de Gestao de Parcerias e saldo alocavel em Programas (RN14, RN15, RN20, RN21, RN22).
 
 - **Operacao de origem:** `ConsultarSaldoParceria`
 - **Autorizacao:** `DIRETORIA`, `ANALISTA_AGENCIA`, `MODULO_INTERNO`
@@ -795,7 +795,7 @@ Consulta saldo corrente e composicao, separando valor bruto, reserva de Acao Tra
 {
   "parceriaId": "PAR-2026-03",
   "valorBrutoRecebido": 500000.0,
-  "valorReservadoAcaoTransversal": 25000.0,
+  "valorTaxaGestao": 25000.0,
   "saldoAlocavelEmProgramas": 325000.0,
   "totalAportadoEmProgramas": 150000.0,
   "vigenciaInicioCorrente": "2026-03-01",
@@ -890,7 +890,7 @@ Consulta consolidado. Filtros: `planoId`, `estadoPrograma`, `estadoParceria`.
   "vigenciaInicioCorrente": "YYYY-MM-DD",
   "vigenciaFimCorrente": "YYYY-MM-DD",
   "valorBrutoRecebido": "number",
-  "valorReservadoAcaoTransversal": "number",
+  "valorTaxaGestao": "number",
   "saldoAlocavelEmProgramas": "number",
   "instituicaoId": "string"
 }

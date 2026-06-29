@@ -2,7 +2,7 @@
 
 Dominio e regras: ver [README.md](README.md) | Eventos: ver eventos-dominio.md (TODO — pendente)
 
-> **Modulo em stub.** O [README.md](README.md) ainda nao define contrato (politicas, delegacao, consultas de permissao) nem eventos de dominio. Este artefato cobre os **sinais padrao de autorizacao** (well-known) que um Policy Decision Point (PDP) sobre OpenFGA deve expor (RBAC/ABAC, [ADR-007](../../../architecture/decisions/ADR-007.md)). Sinais especificos do modulo (operacoes, eventos, delegacao) estao marcados **TODO** e devem ser confirmados quando `contrato.md` e `eventos-dominio.md` existirem.
+> **Modulo em stub.** O [README.md](README.md) ainda nao define contrato (politicas, delegacao, consultas de permissao) nem eventos de dominio. Este artefato cobre os **sinais padrao de autorizacao** (well-known) que um Policy Decision Point (PDP) sobre OpenFGA deve expor (RBAC/ABAC, [ADR-007](../../../architecture/adr/ADR-007-autorizacao-openfga.md)). Sinais especificos do modulo (operacoes, eventos, delegacao) estao marcados **TODO** e devem ser confirmados quando `contrato.md` e `eventos-dominio.md` existirem.
 
 ## Objetivo de Sustentacao
 

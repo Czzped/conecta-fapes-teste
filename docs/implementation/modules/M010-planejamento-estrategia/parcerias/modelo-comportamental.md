@@ -71,6 +71,7 @@ Regras aplicaveis ao ciclo de vida de Parcerias: `RN13`, `RN14`, `RN19`, `RI2`, 
 3. Calcula `TaxaGestaoParcerias` com snapshot da `PoliticaTaxaGestaoParcerias` vigente no M016 (RN20, RN23).
 4. Recalcula derivados: `valorBrutoRecebido`, `valorTaxaGestao`, `saldoAlocavelEmProgramas`.
 5. Emite evento `AporteFinanceiroRegistrado`.
+6. Quando o aporte gera `TaxaGestaoParcerias`, emite `TaxaGestaoParceriasCalculada` com o snapshot (`aporteFinanceiroId`, `versaoFaixaId`, `valorBase`, `percentualAplicado`, `valorTaxaGestao`) — consumido pelo M016/taxa-gestao (estado CALCULADA). A Parceria e a versao da politica derivam, respectivamente, do aporte e da `versaoFaixaId`.
 
 ### EditarAporteFinanceiroAditivo / RemoverAporteFinanceiroAditivo (RN18)
 

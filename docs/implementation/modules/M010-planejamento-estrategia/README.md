@@ -45,13 +45,13 @@ M010-planejamento-estrategia/
     └── epics/EPIC-M010-002.md
 ```
 
-## Fronteira com Acao Transversal
+## Fronteira com Taxa de Gestao de Parcerias
 
-A Acao Transversal e calculada uma unica vez na Parceria, antes da distribuicao de recursos para Programas. O M010 e dono do calculo aplicado sobre a Parceria, da reserva e do bloqueio desse valor para aportes em Programas. A gestao financeira institucional da reserva, incluindo plano de aplicacao, despesas, documentos, glosas e prestacao financeira da agencia, pertence ao [M016 - Contabilidade e Financeiro](../M016-contabilidade-financeiro/acao-transversal/README.md).
+A Taxa de Gestao de Parcerias e calculada uma unica vez na Parceria, antes da distribuicao de recursos para Programas. O M010 e dono do calculo aplicado sobre a Parceria e do bloqueio desse valor para aportes em Programas. A custodia, classificacao contabil e gestao da taxa pertencem ao [M016 - Taxa de Gestao de Parcerias](../M016-contabilidade-financeiro/taxa-gestao/README.md); a execucao dos recursos custodiados pertence ao subdominio [Acao Transversal](../M016-contabilidade-financeiro/acao-transversal/README.md).
 
 O M014 permanece como contexto de prestacao de contas da Iniciativa/Projeto. Portanto, a prestacao financeira da Acao Transversal nao deve ser modelada no M014.
 
-Referencia normativa: [Resolucao CCAF nº 334/2023 - FAPES](https://fapes.es.gov.br/Media/fapes/Resolu%C3%A7%C3%B5es/Resolu%C3%A7%C3%A3o_CCAF_n%C2%BA_334.2023_-_utiliza%C3%A7%C3%A3o_recursos_financeiros_de_projetos_e-ou_programas_em_parcerias_destinados_a_A%C3%A7%C3%A3o_Transversal_para_a_FAPES..pdf). Os percentuais e faixas dessa resolucao devem ser parametrizados no M016 e apenas consumidos pelo M010 no momento de calcular a reserva da Parceria.
+Referencia normativa: [Resolucao CCAF nº 334/2023 - FAPES](https://fapes.es.gov.br/Media/fapes/Resolu%C3%A7%C3%B5es/Resolu%C3%A7%C3%A3o_CCAF_n%C2%BA_334.2023_-_utiliza%C3%A7%C3%A3o_recursos_financeiros_de_projetos_e-ou_programas_em_parcerias_destinados_a_A%C3%A7%C3%A3o_Transversal_para_a_FAPES..pdf). Os percentuais e faixas dessa resolucao devem ser parametrizados no M016 e apenas consumidos pelo M010 no momento de calcular a Taxa de Gestao de Parcerias.
 
 ## Indice de Documentos
 
@@ -88,7 +88,7 @@ Referencia normativa: [Resolucao CCAF nº 334/2023 - FAPES](https://fapes.es.gov
 | M016 | Modulo interno | Fornece `ContaBancaria` como destino do deposito em `RegistrarAporteFinanceiro` — deferido para pos-M014 |
 | M003 | Modulo interno | Fornece `ConsultarIniciativasPorPrograma` e consumo consolidado por iniciativa |
 | M014 | Modulo interno | Fornece movimentacoes e prestacoes de contas que alimentam consolidacoes de consumo |
-| M016 / Acao Transversal | Modulo interno | Fornece politica/faixas de Acao Transversal e recebe a reserva financeira institucional calculada na Parceria |
+| M016 / Acao Transversal | Modulo interno | Fornece politica/faixas de Acao Transversal e recebe a Taxa de Gestao de Parcerias calculada na Parceria |
 
 ---
 
@@ -129,7 +129,7 @@ O sistema e estruturado em tres subdominios integrados (cada um com sua propria 
 | RN11 | Uma Parceria pode aportar em um ou mais Programas; um Programa pode receber aportes de uma ou mais Parcerias. Cada aporte exige valor nao-negativo (`>= 0`, admite zero) e Parceria vigente. Aportes com valor negativo sao rejeitados. | Must | programas |
 | RN12 | Todo AporteFinanceiro deve estar formalizado por um `Documento`. No ato do registro do aporte, o sistema sempre classifica esse Documento com `TipoDocumento = "Termo de Descentralizacao"`. | Must | parcerias |
 | RN13 | Um Programa nao pode comecar antes da `vigenciaInicioCorrente` (RN15) de nenhuma Parceria que nele aporte, nem terminar depois da `vigenciaFimCorrente`. Invariante estrutural: validar ao registrar aporte, ao alterar datas do Programa e ao registrar nova Vigencia. | Must | programas / parcerias |
-| RN14 | A Parceria deve manter saldos financeiros nao negativos. Quando houver Acao Transversal, o saldo operacional para Programas deve considerar a reserva transversal antes de permitir novos aportes. Aportes retirados do Programa nao compoem o total alocado e devolvem saldo alocavel a Parceria. | Must | parcerias / programas |
+| RN14 | A Parceria deve manter saldos financeiros nao negativos. Quando houver Acao Transversal, o saldo operacional para Programas deve considerar a Taxa de Gestao de Parcerias antes de permitir novos aportes. Aportes retirados do Programa nao compoem o total alocado e devolvem saldo alocavel a Parceria. | Must | parcerias / programas |
 | RN15 | A vigencia efetiva da Parceria e derivada das instancias de `Vigencia`: `vigenciaInicioCorrente = MIN(Vigencia.dataInicio)` e `vigenciaFimCorrente = MAX(Vigencia.dataFim)`. Toda Parceria deve ter exatamente uma Vigencia com `isAditivo = false`. | Must | parcerias |
 | RN16 | Todo Programa deve ter exatamente uma `Instituicao` demandante (relacao `demandadoPor`). | Must | programas |
 | RN17 | O primeiro `AporteFinanceiro` de uma Parceria tem `isAditivo = false` (original). Um aditivo so pode ser registrado apos existir pelo menos um original, com `dataAporte` posterior. | Must | parcerias |

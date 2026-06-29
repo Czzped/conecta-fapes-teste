@@ -10,6 +10,20 @@ A Taxa de Gestao de Parcerias e o percentual retido sobre cada `AporteFinanceiro
 
 Nao e rubrica do projeto nem recurso do coordenador da iniciativa. Nao compoe o saldo alocavel em Programas.
 
+Este subdominio e **auto-contido**: politica, taxa, classificacao e custodia vivem aqui. A execucao dos recursos pertence ao subdominio Acao Transversal (referenciado apenas como fronteira).
+
+---
+
+## Documentos
+
+| Documento | Finalidade |
+|-----------|------------|
+| [Modelo Estrutural](modelo-estrutural.md) | Classes, atributos, relacionamentos, calculo e invariantes. |
+| [Modelo Comportamental](modelo-comportamental.md) | Estados e transicoes de `TaxaGestaoParcerias` e `VersaoPoliticaTaxaGestao`. |
+| [Processo](processo.md) | Fluxos: recebimento, classificacao, repasse, vinculacao, encerramento. |
+| [Epicos](epics/README.md) | Backlog EPIC-M016-011 a 015. |
+| [Ontologia](ontology.yaml) | Fonte canonica de entidades, axiomas, invariantes e workflows. |
+
 ---
 
 ## Referencia Normativa
@@ -71,20 +85,17 @@ Ao registrar um `AporteFinanceiro` no M010, o sistema:
 
 ```
 TaxaGestaoParcerias {
-  aporteFinanceiroId
-  parceiraId
+  aporteFinanceiroId     ← origem (deriva Parceria e isAditivo)
   valorBase
-  versaoPoliticaId       ← snapshot: ID da versao usada
-  versaoPoliticaSigla    ← "TGP-2023" (desnormalizado para auditoria)
-  versaoFaixaId          ← snapshot: ID da faixa usada
-  faixaSigla             ← "FAIXA-2" (desnormalizado para auditoria)
+  versaoFaixaId          ← snapshot: VersaoFaixaPercentual imutavel
+                            (deriva versao da politica, faixa e siglas)
   percentualAplicado     ← 0.04 (congelado)
-  valorTaxaGestao        ← valorBase * percentualAplicado
-  estado: CALCULADA
+  valorTaxaGestao        ← valorBase * percentualAplicado (congelado)
 }
+(sem campo estado — progresso derivado de fatos)
 ```
 
-Nenhum campo do snapshot pode ser alterado apos criacao (INV-TGP05, INV-TGP06).
+Nenhum campo do snapshot pode ser alterado apos criacao (INV-TGP05, INV-TGP06). A versao da politica, a faixa e as siglas (`versaoPoliticaSigla`, `faixaSigla`) sao **derivadas** de `versaoFaixaId` — nao armazenadas.
 
 ---
 
@@ -102,29 +113,29 @@ VersaoPoliticaTaxaGestao TGP-2024 (Res. CCAF 335/2024) vigente 2024-07..
   FAIXA-3: >5M         → 2%  ← alterou
 
 AporteFinanceiro em 2024-03 (R$ 3M)
-  → TaxaGestaoParcerias { versaoPoliticaSigla: "TGP-2023", faixaSigla: "FAIXA-2", percentual: 4% }
+  → TaxaGestaoParcerias { versaoFaixaId → TGP-2023/FAIXA-2, percentualAplicado: 4% }
   → valorTaxaGestao = R$ 120.000  ← congelado para sempre
 
 AporteFinanceiro em 2024-09 (R$ 3M)
-  → TaxaGestaoParcerias { versaoPoliticaSigla: "TGP-2024", faixaSigla: "FAIXA-2", percentual: 3% }
+  → TaxaGestaoParcerias { versaoFaixaId → TGP-2024/FAIXA-2, percentualAplicado: 3% }
   → valorTaxaGestao = R$ 90.000
+
+(versaoPoliticaSigla "TGP-2023"/"TGP-2024" e faixaSigla "FAIXA-2" sao derivadas de versaoFaixaId)
 ```
 
 ---
 
-## Ciclo de Vida da TaxaGestaoParcerias
+## Progresso da TaxaGestaoParcerias (derivado de fatos)
 
-```
-CALCULADA → CLASSIFICADA → REPASSADA → VINCULADA → ENCERRADA
-```
+A taxa **nao tem campo de estado** nem maquina de estados. Cada marco e derivado de um fato registrado:
 
-| Estado | Descricao |
-|--------|-----------|
-| CALCULADA | Emitida pelo M010 no registro do aporte; aguarda classificacao contabil. |
-| CLASSIFICADA | Classificada em conta contabil, fundo financeiro e centro de custo (ClassificacaoContabilTGP). |
-| REPASSADA | Valor repassado para conta bancaria BANESTES (M008/ContaBancaria — INV-TGP03). |
-| VINCULADA | Vinculada a uma ou mais AcoesTransversais via OutorgaAcaoTransversal. |
-| ENCERRADA | PrestacaoContasAcaoTransversal correspondente aprovada. |
+| Marco | Condicao derivada |
+|-------|-------------------|
+| Recebida | `TaxaGestaoParcerias` existe (emitida pelo M010 no registro do aporte). |
+| Classificada | existe `ClassificacaoContabilTGP` (conta contabil, fundo, centro de custo). |
+| Repassada | `contaBancariaId` BANESTES preenchido (INV-TGP03) — opcional. |
+| Vinculada | existe `OutorgaAcaoTransversal` (INV-TGP01). |
+| Encerrada | `PrestacaoContasAcaoTransversal` da AcaoTransversal vinculada aprovada. |
 
 ---
 
@@ -132,7 +143,7 @@ CALCULADA → CLASSIFICADA → REPASSADA → VINCULADA → ENCERRADA
 
 | Contexto | Responsabilidade |
 |----------|------------------|
-| M010 — Parcerias | Calcula `TaxaGestaoParcerias`, emite evento `TaxaGestaoParcelasCalculada`, bloqueia `valorTaxaGestao` do `saldoAlocavelEmProgramas`. |
+| M010 — Parcerias | Calcula `TaxaGestaoParcerias`, emite evento `TaxaGestaoParceriasCalculada`, bloqueia `valorTaxaGestao` do `saldoAlocavelEmProgramas`. |
 | M016 — Taxa de Gestao (este subdominio) | Parametriza `PoliticaTaxaGestaoParcerias` e versoes; recebe taxa; classifica contabilmente; vincula a `AcaoTransversal`. |
 | M016 — Acao Transversal | Gasta os recursos custodiados pela taxa via plano de aplicacao, despesas e prestacao de contas. |
 | M008 — Cadastros Corporativos | Fornece `ContaBancaria` (conta BANESTES para repasse — INV-TGP03). |
@@ -146,7 +157,7 @@ CALCULADA → CLASSIFICADA → REPASSADA → VINCULADA → ENCERRADA
 |----|-------|
 | INV-TGP03 | Conta bancaria para repasse deve ser BANESTES (Resolucao CCAF 334/2023). |
 | INV-TGP04 | Somente uma `VersaoPoliticaTaxaGestao` vigente ao mesmo tempo. |
-| INV-TGP05 | `TaxaGestaoParcerias.versaoPoliticaId` imutavel apos criacao. |
+| INV-TGP05 | `percentualAplicado`, `valorBase` e `valorTaxaGestao` imutaveis apos criacao (versao da faixa via INV-TGP06). |
 | INV-TGP06 | `TaxaGestaoParcerias.versaoFaixaId` imutavel apos criacao. |
 
 ---

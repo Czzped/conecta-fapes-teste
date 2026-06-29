@@ -163,53 +163,35 @@ entities:
       aporteFinanceiroId:
         type: uuid
         required: true
-        description: "ID do AporteFinanceiro (M010/parcerias) que originou esta taxa."
-      parceiraId:
-        type: uuid
-        required: true
-        description: "ID da Parceria (M010) para consultas agregadas."
+        description: >
+          ID do AporteFinanceiro (M010/parcerias) que originou esta taxa.
+          Chave natural de idempotencia. A Parceria e isAditivo sao derivados deste aporte.
       valorBase:
         type: decimal
         required: true
-        description: "Valor do AporteFinanceiro usado como base de calculo."
-      versaoPoliticaId:
-        type: uuid
-        required: true
-        description: "ID da VersaoPoliticaTaxaGestao vigente no calculo. Snapshot imutavel (INV-TGP05)."
-      versaoPoliticaSigla:
-        type: string
-        required: true
-        description: "Sigla da versao da politica (ex: TGP-2023). Desnormalizado para auditoria."
-        max_length: 50
+        description: "Valor do AporteFinanceiro usado como base de calculo. Congelado (aporte aditivo e editavel — RN18)."
       versaoFaixaId:
         type: uuid
         required: true
-        description: "ID da VersaoFaixaPercentual aplicada. Snapshot imutavel (INV-TGP06)."
-      faixaSigla:
-        type: string
-        required: true
-        description: "Sigla da faixa aplicada (ex: FAIXA-2). Desnormalizado para auditoria."
-        max_length: 20
+        description: >
+          ID da VersaoFaixaPercentual aplicada. Snapshot imutavel (INV-TGP06).
+          A VersaoPoliticaTaxaGestao, a faixa e suas siglas sao derivadas desta referencia imutavel.
       percentualAplicado:
         type: decimal
         required: true
-        description: "Percentual da VersaoFaixaPercentual vigente no calculo. Imutavel apos emissao."
+        description: "Percentual da VersaoFaixaPercentual vigente no calculo. Congelado e imutavel apos emissao (INV-TGP05)."
       valorTaxaGestao:
         type: decimal
         required: true
-        derived: true
-        formula: "valorBase * percentualAplicado"
-      estado:
-        type: "enum:EstadoTaxaGestao"
-        required: true
-      isAditivo:
-        type: boolean
-        required: true
-        description: "true quando gerada por aporte aditivo."
+        description: "Valor retido, congelado na emissao = valorBase * percentualAplicado (AX-TGP01)."
       contaBancariaId:
         type: uuid
         required: false
-        description: "ref:corporativo.instituicoes.ContaBancaria — conta BANESTES quando houver repasse."
+        description: >
+          ref:corporativo.instituicoes.ContaBancaria — conta BANESTES quando houver repasse.
+          O progresso da taxa nao e um campo de estado: deriva de fatos —
+          classificada (existe ClassificacaoContabilTGP), repassada (contaBancariaId preenchido),
+          vinculada (existe OutorgaAcaoTransversal), encerrada (prestacao da AcaoTransversal aprovada).
 
   ClassificacaoContabilTGP:
     description: >
@@ -303,7 +285,8 @@ axioms:
   - id: "AX-TGP04"
     natural_language: >
       Ao registrar AporteFinanceiro, o sistema identifica VersaoPoliticaTaxaGestao com estado VIGENTE
-      e VersaoFaixaPercentual correspondente. Esses IDs e valores sao gravados como snapshot imutavel.
+      e a VersaoFaixaPercentual correspondente. A referencia a faixa e os valores congelados sao gravados
+      como snapshot imutavel. A versao da politica e derivada de versaoFaixaId.
     formal_rule: >
       versaoVigente = VersaoPoliticaTaxaGestao WHERE estado = 'VIGENTE'
         AND dataInicioVigencia <= aporte.dataAporte
@@ -311,25 +294,26 @@ axioms:
       faixa = versaoVigente.faixas.firstWhere(f =>
         aporte.valorInvestido >= f.valorMinimo
         AND (f.valorMaximo IS NULL OR aporte.valorInvestido <= f.valorMaximo))
-      TaxaGestaoParcerias.versaoPoliticaId = versaoVigente.id
       TaxaGestaoParcerias.versaoFaixaId = faixa.id
       TaxaGestaoParcerias.percentualAplicado = faixa.percentual
+      TaxaGestaoParcerias.valorTaxaGestao = aporte.valorInvestido * faixa.percentual
 
   - id: "AX-TGP05"
     natural_language: >
       TaxaGestaoParcerias calculada com versao v1 nao e afetada pela criacao de v1a.
-      Snapshot soberano: versaoPoliticaId, versaoFaixaId, percentualAplicado sao imutaveis.
+      Snapshot soberano: versaoFaixaId, percentualAplicado, valorBase e valorTaxaGestao sao imutaveis.
     formal_rule: >
-      ∀t ∈ TaxaGestaoParcerias: t.versaoPoliticaId, t.versaoFaixaId, t.percentualAplicado ARE IMMUTABLE after create
+      ∀t ∈ TaxaGestaoParcerias: t.versaoFaixaId, t.percentualAplicado, t.valorBase, t.valorTaxaGestao ARE IMMUTABLE after create
       CREATE(VersaoPoliticaTaxaGestao) DOES NOT affect TaxaGestaoParcerias WHERE createdAt < novaVersao.dataInicioVigencia
 
   - id: "AX-TGP06"
     natural_language: >
       Encerrar VersaoPoliticaTaxaGestao nao requer recalculo de taxas ja emitidas.
-      Versao encerrada permanece consultavel via versaoPoliticaSigla e faixaSigla desnormalizados.
+      A taxa permanece consultavel via versaoFaixaId, que aponta para uma VersaoFaixaPercentual imutavel
+      (de onde derivam faixa, sigla e versao da politica).
     formal_rule: >
       VersaoPoliticaTaxaGestao.estado = 'ENCERRADA' DOES NOT trigger recalc on TaxaGestaoParcerias
-      TaxaGestaoParcerias.versaoPoliticaSigla + faixaSigla enable audit without JOIN to live policy tables
+      TaxaGestaoParcerias.versaoFaixaId -> VersaoFaixaPercentual (IMMUTABLE) enables historical audit
 
 invariants:
 
@@ -346,12 +330,12 @@ invariants:
     description: "Somente uma VersaoPoliticaTaxaGestao pode estar vigente simultaneamente."
 
   - id: "INV-TGP05"
-    rule: "TaxaGestaoParcerias.versaoPoliticaId IS IMMUTABLE after create"
-    description: "Snapshot da versao da politica nao pode ser alterado apos emissao (AX-TGP05)."
+    rule: "TaxaGestaoParcerias.percentualAplicado, valorBase, valorTaxaGestao ARE IMMUTABLE after create"
+    description: "Valores congelados do snapshot nao podem ser alterados apos emissao (AX-TGP05)."
 
   - id: "INV-TGP06"
     rule: "TaxaGestaoParcerias.versaoFaixaId IS IMMUTABLE after create"
-    description: "Snapshot da faixa de percentual nao pode ser alterado apos emissao (AX-TGP05)."
+    description: "Snapshot da faixa de percentual nao pode ser alterado apos emissao (AX-TGP05). Versao da politica, faixa e siglas derivam desta referencia."
 
   - id: "INV-TGP07"
     rule: "VersaoFaixaPercentual.valorMinimo < VersaoFaixaPercentual.valorMaximo OR valorMaximo IS NULL"
@@ -385,52 +369,29 @@ enums:
       ENCERRADA: "Versao substituida por versao posterior; permanece consultavel para auditoria."
       REVOGADA: "Versao cancelada antes de entrar em vigor ou por decisao administrativa."
 
-  EstadoTaxaGestao:
-    description: "Ciclo de vida da Taxa de Gestao de Parcerias dentro do M016."
-    values:
-      CALCULADA: "Taxa emitida pelo M010, aguardando classificacao contabil no M016."
-      CLASSIFICADA: "Classificada em conta contabil, fundo e centro de custo."
-      REPASSADA: "Valor repassado para conta bancaria BANESTES do Coordenador Outorgado."
-      VINCULADA: "Vinculada a uma ou mais AcoesTransversais via OutorgaAcaoTransversal."
-      ENCERRADA: "Prestacao da AcaoTransversal correspondente aprovada."
-
 events:
 
-  - name: "TaxaGestaoParcelasCalculada"
-    description: "Emitido quando M010 registra novo AporteFinanceiro e calcula TaxaGestaoParcerias. M016 recebe para classificacao."
+  - name: "TaxaGestaoParceriasCalculada"
+    description: "Emitido quando M010 registra novo AporteFinanceiro e calcula TaxaGestaoParcerias. M016 cria o registro para classificacao."
     payload_entity: "financeiro.taxa_gestao.TaxaGestaoParcerias"
-    trigger: "state_transition.CALCULADA"
+    trigger: "create"
 
-workflows:
-
-  TaxaGestaoParcelasLifecycle:
-    description: "Ciclo de vida da Taxa de Gestao de Parcerias no M016."
-    states:
-      - CALCULADA
-      - CLASSIFICADA
-      - REPASSADA
-      - VINCULADA
-      - ENCERRADA
-    transitions:
-      - from: CALCULADA
-        to: CLASSIFICADA
-        trigger: "classificar_taxa"
-        guard: "ClassificacaoContabilTGP criada com conta contabil, fundo e centro de custo"
-      - from: CLASSIFICADA
-        to: REPASSADA
-        trigger: "registrar_repasse"
-        guard: "ContaBancaria BANESTES informada (INV-TGP03)"
-      - from: CLASSIFICADA
-        to: VINCULADA
-        trigger: "vincular_a_acao_transversal"
-        guard: "AcaoTransversal valida com saldo suficiente (INV-TGP01)"
-      - from: REPASSADA
-        to: VINCULADA
-        trigger: "vincular_a_acao_transversal"
-      - from: VINCULADA
-        to: ENCERRADA
-        trigger: "encerrar_taxa"
-        guard: "PrestacaoContasAcaoTransversal APROVADA"
+# A TaxaGestaoParcerias NAO tem maquina de estados (sem campo estado / enum EstadoTaxaGestao).
+# O progresso e DERIVADO de fatos:
+milestones:
+  TaxaGestaoParceriasProgresso:
+    description: "Marcos derivados da TaxaGestaoParcerias — calculados a partir de registros relacionados, nao de um campo estado."
+    derived:
+      - marco: "Recebida"
+        fato: "TaxaGestaoParcerias existe (criada pelo evento TaxaGestaoParceriasCalculada)"
+      - marco: "Classificada"
+        fato: "existe ClassificacaoContabilTGP (conta contabil, fundo, centro de custo)"
+      - marco: "Repassada"
+        fato: "contaBancariaId preenchido com conta BANESTES (INV-TGP03)"
+      - marco: "Vinculada"
+        fato: "existe OutorgaAcaoTransversal (INV-TGP01)"
+      - marco: "Encerrada"
+        fato: "PrestacaoContasAcaoTransversal da AcaoTransversal vinculada APROVADA"
 
 policies:
   permissions:
@@ -452,7 +413,7 @@ agent_instructions:
     - "ContaBancaria para repasse DEVE ser BANESTES — INV-TGP03. Entidade ContaBancaria vive em M008."
     - "Percentuais vem da VersaoPoliticaTaxaGestao com estado VIGENTE — nunca hardcode 5/4/3 porcento."
     - "Ao registrar TaxaGestaoParcerias, usar VersaoPoliticaTaxaGestao VIGENTE no dataAporte — nunca politica master."
-    - "Snapshot (versaoPoliticaId, versaoFaixaId, percentualAplicado) e imutavel — nunca atualizar retroativamente (AX-TGP05)."
+    - "Snapshot (versaoFaixaId, percentualAplicado, valorBase, valorTaxaGestao) e imutavel — nunca atualizar retroativamente (AX-TGP05). Versao da politica, faixa e siglas derivam de versaoFaixaId."
     - "Ao criar nova VersaoPoliticaTaxaGestao, encerrar a versao anterior antes de ativar a nova (INV-TGP04)."
     - "TaxaGestaoParcerias e a retencao; AcaoTransversal (acao-transversal/ontology.yaml) e o projeto que gasta."
   notes:

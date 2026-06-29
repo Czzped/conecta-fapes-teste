@@ -4,7 +4,7 @@
 
 ## Visao Geral
 
-Os epicos da Taxa de Gestao de Parcerias cobrem o ciclo completo de parametrizacao normativa, recebimento da taxa calculada pelo M010 e repasse para conta bancaria BANESTES. A execucao dos recursos custodiados pertence ao subdominio Acao Transversal (EPIC-M016-007 a 010).
+Os epicos da Taxa de Gestao de Parcerias cobrem o ciclo completo de parametrizacao normativa, recebimento da taxa calculada pelo M010 e repasse para conta bancaria BANESTES. A execucao dos recursos custodiados pertence ao subdominio Acao Transversal (EPIC-M016-008 a 010).
 
 | ID | Titulo | Prioridade | Status | Documento |
 |----|--------|------------|--------|-----------|
@@ -24,7 +24,7 @@ EPIC-M016-011 Parametrizacao da Politica
 └── VersaoFaixaPercentual (percentual por faixa por versao)
 
 EPIC-M016-012 Recebimento e Classificacao
-└── TaxaGestaoParcerias (snapshot imutavel: versaoPoliticaId, versaoFaixaId, percentualAplicado)
+└── TaxaGestaoParcerias (snapshot imutavel: versaoFaixaId, percentualAplicado, valorBase, valorTaxaGestao)
 └── ClassificacaoContabilTGP (conta contabil / fundo financeiro / centro de custo)
 
 EPIC-M016-013 Repasse para Conta BANESTES
@@ -34,10 +34,10 @@ EPIC-M016-014 Vinculacao com AcaoTransversal
 └── TaxaGestaoParcerias → AcaoTransversal (N:N via OutorgaAcaoTransversal)
 
 EPIC-M016-015 Dashboard e Relatorios
-└── Consultas consolidadas por parceria, versao da politica, faixa, periodo e estado
-└── Auditoria historica via snapshots desnormalizados (versaoPoliticaSigla, faixaSigla)
+└── Consultas consolidadas por parceria, versao da politica, faixa, periodo e marco derivado
+└── Auditoria historica via referencia imutavel versaoFaixaId (VersaoFaixaPercentual)
 ```
 
 ## Fronteira com Acao Transversal
 
-Os EPICs 011-014 cuidam da **retencao e custodia** do recurso. A partir de VINCULADA (EPIC-M016-014), a execucao do recurso pertence ao subdominio Acao Transversal (EPIC-M016-007 a 010): plano de aplicacao, despesas, prestacao de contas.
+Os EPICs 011-014 cuidam da **retencao e custodia** do recurso. A partir de VINCULADA (EPIC-M016-014), a execucao do recurso pertence ao subdominio Acao Transversal (EPIC-M016-008 a 010): plano de aplicacao, despesas, prestacao de contas.

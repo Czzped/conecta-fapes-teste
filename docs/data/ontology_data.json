@@ -617,6 +617,10 @@
      "desc": "Emitido quando um AporteFinanceiro e registrado na Parceria; recalcula valorBrutoRecebido, valorTaxaGestao e saldoAlocav"
     },
     {
+     "nome": "TaxaGestaoParceriasCalculada",
+     "desc": "Emitido quando o aporte gera Taxa de Gestao de Parcerias; carrega snapshot imutavel (aporteFinanceiroId, versaoFaixaId, "
+    },
+    {
      "nome": "VigenciaAditivada",
      "desc": "Emitido quando uma nova Vigencia aditivo e registrada; recalcula vigenciaInicioCorrente e vigenciaFimCorrente."
     },

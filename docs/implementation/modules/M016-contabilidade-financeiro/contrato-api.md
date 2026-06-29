@@ -65,63 +65,20 @@ Todas as respostas de erro seguem o envelope abaixo:
 
 Referencia normativa inicial: [Resolucao CCAF nº 334/2023 - FAPES](https://fapes.es.gov.br/Media/fapes/Resolu%C3%A7%C3%B5es/Resolu%C3%A7%C3%A3o_CCAF_n%C2%BA_334.2023_-_utiliza%C3%A7%C3%A3o_recursos_financeiros_de_projetos_e-ou_programas_em_parcerias_destinados_a_A%C3%A7%C3%A3o_Transversal_para_a_FAPES..pdf).
 
-### `POST /api/v1/m016/acao-transversal/politicas`
+> **Recebimento, classificacao e repasse da Taxa de Gestao de Parcerias nao sao expostos aqui.** A parametrizacao da politica/faixas e o recebimento do calculo do M010 (evento `TaxaGestaoParceriasCalculada`) pertencem ao subdominio [taxa-gestao](taxa-gestao/README.md). Os endpoints abaixo cobrem **somente a execucao** dos recursos custodiados e operam por `outorgaId` / `acaoTransversalId`, referenciando a entidade `TaxaGestaoParcerias` (taxa-gestao) via `OutorgaAcaoTransversal`.
 
-Cadastra politica e faixas percentuais de Acao Transversal.
+### `POST /api/v1/m016/acao-transversal/outorgas/{outorgaId}/plano-aplicacao`
+
+Cadastra plano de aplicacao por rubrica para a execucao vinculada a uma `OutorgaAcaoTransversal`.
 
 - **Autorizacao:** `GESTOR_FINANCEIRO`
-- **Operacao de origem:** `ParametrizarPoliticaAcaoTransversal`
+- **Operacao de origem:** `CadastrarPlanoAplicacaoAcaoTransversal`
 
 **Request body**
 
 ```json
 {
-  "nome": "Resolucao CCAF 334/2023",
-  "baseLegal": "Resolucao CCAF nº 334/2023",
-  "dataInicioVigencia": "2023-01-01",
-  "faixas": [
-    { "valorMinimo": 50000.0, "valorMaximo": 2000000.0, "percentual": 5.0 },
-    { "valorMinimo": 2000000.01, "valorMaximo": 5000000.0, "percentual": 4.0 },
-    { "valorMinimo": 5000000.01, "valorMaximo": null, "percentual": 3.0 }
-  ]
-}
-```
-
-### `POST /api/v1/m016/acao-transversal/reservas`
-
-Recebe do M010 a reserva calculada na Parceria.
-
-- **Autorizacao:** `MODULO_INTERNO` (`M010`)
-- **Operacao de origem:** `ReceberReservaAcaoTransversal`
-
-**Request body**
-
-```json
-{
-  "parceriaId": "PAR-2026-03",
-  "aporteFinanceiroOrigemId": "APO-2026-001",
-  "tipoOrigem": "APORTE_ORIGINAL",
-  "politicaId": "PAT-2023-334",
-  "valorBaseCalculo": 500000.0,
-  "percentualAplicado": 5.0,
-  "valorReservado": 25000.0,
-  "contaContabilId": "CTB-ACAO-TRANSVERSAL",
-  "fundoFinanceiroId": "FF-ACAO-TRANSVERSAL",
-  "centroCustoId": "CC-GESTAO-PARCERIAS",
-  "documentoReferenciaId": "DOC-TD-2026-001"
-}
-```
-
-Para aditivos financeiros, `tipoOrigem` deve ser `APORTE_ADITIVO` e `valorBaseCalculo` deve conter o valor do proprio aditivo, sem recalculo retroativo das reservas anteriores.
-
-### `POST /api/v1/m016/acao-transversal/reservas/{reservaId}/plano-aplicacao`
-
-Cadastra plano de aplicacao por rubrica.
-
-**Request body**
-
-```json
-{
+  "acaoTransversalId": "AT-2026-007",
   "itens": [
     { "rubricaId": "RUB-DIARIAS", "valorPrevisto": 10000.0, "justificativa": "Acompanhamento tecnico" },
     { "rubricaId": "RUB-PASSAGENS", "valorPrevisto": 12000.0, "justificativa": "Deslocamentos institucionais" }
@@ -129,14 +86,18 @@ Cadastra plano de aplicacao por rubrica.
 }
 ```
 
-### `POST /api/v1/m016/acao-transversal/reservas/{reservaId}/despesas`
+### `POST /api/v1/m016/acao-transversal/outorgas/{outorgaId}/despesas`
 
-Registra despesa institucional da Acao Transversal.
+Registra despesa institucional da Acao Transversal vinculada a outorga.
+
+- **Autorizacao:** `GESTOR_FINANCEIRO`
+- **Operacao de origem:** `RegistrarDespesaAcaoTransversal`
 
 **Request body**
 
 ```json
 {
+  "acaoTransversalId": "AT-2026-007",
   "itemPlanoAplicacaoId": "IPA-2026-001",
   "rubricaId": "RUB-DIARIAS",
   "valor": 3000.0,
@@ -148,9 +109,9 @@ Registra despesa institucional da Acao Transversal.
 
 ### `GET /api/v1/m016/acao-transversal/dashboard`
 
-Consulta consolidado por parceria, rubrica e periodo.
+Consulta consolidado por outorga, acao transversal, rubrica e periodo.
 
-**Query parameters:** `parceriaId`, `rubricaId`, `dataInicio`, `dataFim`, `estadoPrestacao`.
+**Query parameters:** `outorgaId`, `acaoTransversalId`, `rubricaId`, `dataInicio`, `dataFim`, `estadoPrestacao`.
 
 ---
 

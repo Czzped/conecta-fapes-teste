@@ -2,6 +2,8 @@
 
 Dominio e regras de negocio: ver [README.md](README.md)
 
+> **Subdominios proprios.** O ciclo de vida da `TaxaGestaoParcerias` (CALCULADA -> CLASSIFICADA -> REPASSADA -> VINCULADA -> ENCERRADA) e da `VersaoPoliticaTaxaGestao` esta em [taxa-gestao/modelo-comportamental.md](taxa-gestao/modelo-comportamental.md). O ciclo da `AcaoTransversal`, `PlanoAplicacaoAcaoTransversal`, `DespesaAcaoTransversal` e `PrestacaoContasAcaoTransversal` esta em [acao-transversal/](acao-transversal/modelo/README.md). Este modelo cobre apenas o **nucleo contabil/financeiro** do M016.
+
 ### Ciclo de Vida: ConciliacaoBancaria
 
 ```mermaid
@@ -48,50 +50,4 @@ stateDiagram-v2
     state Inativa : Conta desativada, sem novas movimentacoes
 ```
 
-### Ciclo de Vida: ReservaAcaoTransversal
-
-```mermaid
-stateDiagram-v2
-    [*] --> Recebida : ReceberReservaAcaoTransversal
-
-    Recebida --> Classificada : Vincular conta contabil, fundo e centro de custo
-    Classificada --> Planejada : Cadastrar plano de aplicacao por rubrica
-    Planejada --> EmExecucao : Registrar primeira despesa
-    EmExecucao --> EmExecucao : Registrar nova despesa
-    EmExecucao --> EmPrestacaoFinanceira : Submeter prestacao financeira institucional
-    EmPrestacaoFinanceira --> Encerrada : Aprovar sem pendencias
-    EmPrestacaoFinanceira --> EncerradaComGlosa : Aprovar com glosa
-    EmPrestacaoFinanceira --> Planejada : Solicitar ajuste
-    EmPrestacaoFinanceira --> Reprovada : Reprovar prestacao
-
-    Encerrada --> [*]
-    EncerradaComGlosa --> [*]
-    Reprovada --> [*]
-
-    state Recebida : Reserva recebida do M010, ainda sem classificacao completa
-    state Classificada : Reserva vinculada a ContaContabil, FundoFinanceiro e CentroCusto
-    state Planejada : Plano de aplicacao por rubricas criado
-    state EmExecucao : Despesas institucionais registradas
-    state EmPrestacaoFinanceira : Despesas em analise financeira institucional
-    state Encerrada : Prestacao financeira aprovada
-    state EncerradaComGlosa : Prestacao aprovada com valores glosados
-    state Reprovada : Prestacao financeira reprovada
-```
-
-### Ciclo de Vida: PlanoAplicacaoAcaoTransversal
-
-```mermaid
-stateDiagram-v2
-    [*] --> EmElaboracao : Criar plano
-    EmElaboracao --> Aprovado : Aprovar plano [total <= saldo da reserva]
-    EmElaboracao --> Cancelado : Cancelar plano
-    Aprovado --> Substituido : Criar novo plano substitutivo
-    Aprovado --> [*]
-    Cancelado --> [*]
-    Substituido --> [*]
-
-    state EmElaboracao : Itens por rubrica em edicao
-    state Aprovado : Plano apto a orientar despesas
-    state Cancelado : Plano descartado antes da execucao
-    state Substituido : Plano preservado historicamente, mas nao vigente
-```
+> Os ciclos de vida da Taxa de Gestao de Parcerias e da Acao Transversal (incluindo `PlanoAplicacaoAcaoTransversal`) foram movidos para os respectivos subdominios — ver [taxa-gestao/modelo-comportamental.md](taxa-gestao/modelo-comportamental.md) e [acao-transversal/modelo/README.md](acao-transversal/modelo/README.md).
