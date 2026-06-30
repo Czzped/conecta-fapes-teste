@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowLeft, ChevronDown, ChevronRight, Plus, Search, UserRound } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronRight, Search, UserRound } from 'lucide-react';
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 
 type EstadoPessoa = 'Ativa' | 'Suspensa';
@@ -12,7 +12,10 @@ interface PessoaFisicaItem {
   email: string;
   telefone: string;
   dataNascimento: string;
+  genero: string;
+  etnia: string;
   lattes: string;
+  nivelAcademico: string;
   estado: EstadoPessoa;
   justificativa?: string;
 }
@@ -146,22 +149,25 @@ const emptyPessoa: PessoaFisicaItem = {
   email: '',
   telefone: '',
   dataNascimento: '',
+  genero: '',
+  etnia: '',
   lattes: '',
+  nivelAcademico: '',
   estado: 'Ativa',
   justificativa: '',
 };
 
 const initialPessoas: PessoaFisicaItem[] = [
-  { id: 1, cpf: '111.222.333-44', nome: 'Maria Souza', email: 'maria.souza@email.com', telefone: '(27) 99999-1000', dataNascimento: '1985-03-14', lattes: 'http://lattes.cnpq.br/1234567890', estado: 'Ativa' },
-  { id: 2, cpf: '222.333.444-55', nome: 'João Silva', email: 'joao.silva@email.com', telefone: '(27) 99999-2000', dataNascimento: '1979-09-21', lattes: 'http://lattes.cnpq.br/2345678901', estado: 'Ativa' },
-  { id: 3, cpf: '333.444.555-66', nome: 'Ana Ribeiro', email: 'ana.ribeiro@email.com', telefone: '(27) 99999-3000', dataNascimento: '1991-01-10', lattes: '', estado: 'Suspensa', justificativa: 'Pendência cadastral em validação.' },
-  { id: 4, cpf: '444.555.666-77', nome: 'Carla Mendes', email: 'carla.mendes@email.com', telefone: '(27) 99999-4000', dataNascimento: '1988-07-18', lattes: 'http://lattes.cnpq.br/3456789012', estado: 'Ativa' },
-  { id: 5, cpf: '555.666.777-88', nome: 'Pedro Lima', email: 'pedro.lima@email.com', telefone: '(27) 99999-5000', dataNascimento: '1994-11-05', lattes: '', estado: 'Ativa' },
-  { id: 6, cpf: '666.777.888-99', nome: 'Luciana Costa', email: 'luciana.costa@email.com', telefone: '(27) 99999-6000', dataNascimento: '1982-04-22', lattes: 'http://lattes.cnpq.br/4567890123', estado: 'Ativa' },
-  { id: 7, cpf: '777.888.999-00', nome: 'Rafael Gomes', email: 'rafael.gomes@email.com', telefone: '(27) 99999-7000', dataNascimento: '1990-12-12', lattes: '', estado: 'Suspensa' },
-  { id: 8, cpf: '888.999.000-11', nome: 'Beatriz Rocha', email: 'beatriz.rocha@email.com', telefone: '(27) 99999-8000', dataNascimento: '1996-02-28', lattes: 'http://lattes.cnpq.br/5678901234', estado: 'Ativa' },
-  { id: 9, cpf: '999.000.111-22', nome: 'Henrique Alves', email: 'henrique.alves@email.com', telefone: '(27) 99999-9000', dataNascimento: '1987-06-09', lattes: '', estado: 'Ativa' },
-  { id: 10, cpf: '000.111.222-33', nome: 'Fernanda Martins', email: 'fernanda.martins@email.com', telefone: '(27) 99999-1010', dataNascimento: '1992-10-30', lattes: 'http://lattes.cnpq.br/6789012345', estado: 'Suspensa' },
+  { id: 1, cpf: '111.222.333-44', nome: 'Maria Souza', email: 'maria.souza@email.com', telefone: '(27) 99999-1000', dataNascimento: '1985-03-14', genero: 'Feminino', etnia: 'Parda', lattes: 'http://lattes.cnpq.br/1234567890', nivelAcademico: 'Doutorado', estado: 'Ativa' },
+  { id: 2, cpf: '222.333.444-55', nome: 'João Silva', email: 'joao.silva@email.com', telefone: '(27) 99999-2000', dataNascimento: '1979-09-21', genero: 'Masculino', etnia: 'Branca', lattes: 'http://lattes.cnpq.br/2345678901', nivelAcademico: 'Pós-doutorado', estado: 'Ativa' },
+  { id: 3, cpf: '333.444.555-66', nome: 'Ana Ribeiro', email: 'ana.ribeiro@email.com', telefone: '(27) 99999-3000', dataNascimento: '1991-01-10', genero: 'Feminino', etnia: 'Preta', lattes: '', nivelAcademico: 'Mestrado', estado: 'Suspensa', justificativa: 'Pendência cadastral em validação.' },
+  { id: 4, cpf: '444.555.666-77', nome: 'Carla Mendes', email: 'carla.mendes@email.com', telefone: '(27) 99999-4000', dataNascimento: '1988-07-18', genero: 'Feminino', etnia: 'Parda', lattes: 'http://lattes.cnpq.br/3456789012', nivelAcademico: 'Doutorado', estado: 'Ativa' },
+  { id: 5, cpf: '555.666.777-88', nome: 'Pedro Lima', email: 'pedro.lima@email.com', telefone: '(27) 99999-5000', dataNascimento: '1994-11-05', genero: 'Masculino', etnia: 'Branca', lattes: '', nivelAcademico: 'Ensino superior', estado: 'Ativa' },
+  { id: 6, cpf: '666.777.888-99', nome: 'Luciana Costa', email: 'luciana.costa@email.com', telefone: '(27) 99999-6000', dataNascimento: '1982-04-22', genero: 'Feminino', etnia: 'Parda', lattes: 'http://lattes.cnpq.br/4567890123', nivelAcademico: 'Doutorado', estado: 'Ativa' },
+  { id: 7, cpf: '777.888.999-00', nome: 'Rafael Gomes', email: 'rafael.gomes@email.com', telefone: '(27) 99999-7000', dataNascimento: '1990-12-12', genero: 'Masculino', etnia: 'Preta', lattes: '', nivelAcademico: 'Mestrado', estado: 'Suspensa' },
+  { id: 8, cpf: '888.999.000-11', nome: 'Beatriz Rocha', email: 'beatriz.rocha@email.com', telefone: '(27) 99999-8000', dataNascimento: '1996-02-28', genero: 'Feminino', etnia: 'Parda', lattes: 'http://lattes.cnpq.br/5678901234', nivelAcademico: 'Mestrado', estado: 'Ativa' },
+  { id: 9, cpf: '999.000.111-22', nome: 'Henrique Alves', email: 'henrique.alves@email.com', telefone: '(27) 99999-9000', dataNascimento: '1987-06-09', genero: 'Masculino', etnia: 'Branca', lattes: '', nivelAcademico: 'Especialização', estado: 'Ativa' },
+  { id: 10, cpf: '000.111.222-33', nome: 'Fernanda Martins', email: 'fernanda.martins@email.com', telefone: '(27) 99999-1010', dataNascimento: '1992-10-30', genero: 'Feminino', etnia: 'Indígena', lattes: 'http://lattes.cnpq.br/6789012345', nivelAcademico: 'Doutorado', estado: 'Suspensa' },
 ];
 
 const projetosPorPessoa: ProjetoPessoa[] = [
@@ -461,8 +467,8 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                 <div style={{ ...S.card, padding: '14px 16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ position: 'relative', flex: 1 }}>
-                      <input type="text" placeholder="Buscar no Latter" value={academicSearchTerm} onChange={event => setAcademicSearchTerm(event.target.value)} style={{ ...S.input, paddingLeft: '38px' }} />
-                      <Search size={16} style={{ position: 'absolute', left: '13px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
+                      <input type="text" placeholder="Buscar no Lattes" value={academicSearchTerm} onChange={event => setAcademicSearchTerm(event.target.value)} style={{ ...S.input, paddingRight: '38px' }} />
+                      <Search size={16} style={{ position: 'absolute', right: '13px', top: '50%', transform: 'translateY(-50%)', color: T.iconSubdued }} />
                     </div>
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '14px' }}>
@@ -550,30 +556,34 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
           {(!selected || detailTab === 'cadastro') && (
             <>
               <FormSection number="1" title="Identificação" subtitle="Dados obrigatórios para identificar unicamente a pessoa.">
-                <div style={{ display: 'grid', gridTemplateColumns: '0.7fr 1.3fr', gap: '16px', marginBottom: '16px' }}>
-                  <Field label="CPF" value={draft.cpf} onChange={value => updateDraft('cpf', maskCpf(value))} placeholder="000.000.000-00" />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
                   <Field label="Nome completo" value={draft.nome} onChange={value => updateDraft('nome', value)} placeholder="Nome da pessoa" />
+                  <Field label="Nome Social" value="" onChange={() => undefined} placeholder="" />
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 0.6fr 0.6fr 0.5fr', gap: '16px' }}>
-                  <Field label="Email" value={draft.email} onChange={value => updateDraft('email', value)} placeholder="email@dominio.com" />
-                  <Field label="Telefone" value={draft.telefone} onChange={value => updateDraft('telefone', value)} placeholder="(00) 00000-0000" />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                  <Field label="CPF" value={draft.cpf} onChange={value => updateDraft('cpf', maskCpf(value))} placeholder="000.000.000-00" />
                   <Field label="Data de nascimento" value={draft.dataNascimento} onChange={value => updateDraft('dataNascimento', value)} placeholder="AAAA-MM-DD" />
-                  <Select label="Status" value={draft.estado} onChange={value => updateDraft('estado', value)} options={['Ativa', 'Suspensa']} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                  <Field label="E-mail" value={draft.email} onChange={value => updateDraft('email', value)} placeholder="email@dominio.com" />
+                  <Field label="Celular" value={draft.telefone} onChange={value => updateDraft('telefone', value)} placeholder="(00) 00000-0000" />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                  <Field label="Gênero" value={draft.genero} onChange={value => updateDraft('genero', value)} placeholder="Gênero" />
+                  <Field label="Etnia" value={draft.etnia} onChange={value => updateDraft('etnia', value)} placeholder="Etnia" />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                  <Field label="Lattes" value={draft.lattes} onChange={value => updateDraft('lattes', value)} placeholder="URL do currículo Lattes" />
+                  <Field label="Nível Acadêmico" value={draft.nivelAcademico} onChange={value => updateDraft('nivelAcademico', value)} placeholder="Nível acadêmico" />
                 </div>
               </FormSection>
 
-              <FormSection number="2" title="Dados Acadêmicos" subtitle="Informações complementares">
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
-                  <Field label="Currículo Lattes" value={draft.lattes} onChange={value => updateDraft('lattes', value)} placeholder="URL do currículo Lattes" />
-                </div>
-              </FormSection>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              {showForm && <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
                   <button type="button" onClick={() => { setShowForm(false); setSelected(null); }} style={S.secondaryButton}>Salvar Rascunho</button>
                   <button type="button" onClick={saveDraft} style={S.primaryButton}>
                     Ativar Pessoa
                   </button>
-              </div>
+              </div>}
             </>
           )}
         </div>
@@ -584,7 +594,7 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
   return (
     <div style={{ backgroundColor: T.bgPage, minHeight: '100vh' }}>
       <div className="pt-8 px-8 pb-8">
-        <PageHeader title="Pessoas Físicas" subtitle="Gerencie cadastros de pessoas, CPF único, situação e dados complementares." onBack={onBack} onAdd={openNew} addLabel="Criar Pessoa" />
+        <PageHeader title="Pessoas Físicas" subtitle="Gerencie cadastros de pessoas, CPF único, situação e dados complementares." onBack={onBack} />
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
             <Metric label="Total de pessoas" value={String(metrics.total)} color={T.accent} bg={T.accentSoft} />
@@ -653,7 +663,7 @@ const Header: React.FC<{ title: string; subtitle: string; onBack: () => void; br
   );
 };
 
-const PageHeader: React.FC<{ title: string; subtitle: string; onBack: () => void; onAdd: () => void; addLabel: string }> = ({ title, subtitle, onBack, onAdd, addLabel }) => {
+const PageHeader: React.FC<{ title: string; subtitle: string; onBack: () => void; onAdd?: () => void; addLabel?: string }> = ({ title, subtitle, onBack, onAdd, addLabel }) => {
   const { T } = useThemeTokens();
   return (
     <>
@@ -668,10 +678,11 @@ const PageHeader: React.FC<{ title: string; subtitle: string; onBack: () => void
               <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0, lineHeight: '1.5' }}>{subtitle}</p>
             </div>
           </div>
-          <button onClick={onAdd} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: T.accent, border: 'none', borderRadius: 'var(--radius)', padding: '10px 18px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: T.accentText, cursor: 'pointer', flexShrink: 0 }}>
-            <Plus size={16} />
-            {addLabel}
-          </button>
+          {onAdd && addLabel && (
+            <button onClick={onAdd} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: T.accent, border: 'none', borderRadius: 'var(--radius)', padding: '10px 18px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: T.accentText, cursor: 'pointer', flexShrink: 0 }}>
+              {addLabel}
+            </button>
+          )}
         </div>
       </div>
     </>
@@ -725,10 +736,9 @@ const CurriculumHero: React.FC<{ pessoa: PessoaFisicaItem; curriculum: VidaAcade
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
-          <HeroFact label="Link" value={curriculum.numeroLattes} />
-          <HeroFact label="Última Sincronização" value={curriculum.ultimaSincronizacao} />
+          <HeroFact label="Link" value="https://lattes.cnpq.br/123456789" />
+          <HeroFact label="Última Sincronização" value="11/05/2026 14:32" />
           <HeroFact label="Área Principal" value={curriculum.areaPrincipal} />
-          <HeroFact label="Produções" value={String(totalProducoes)} />
         </div>
       </div>
     </section>
@@ -807,7 +817,7 @@ const AcademicDataPanel = <TItem,>({
         <div style={{ border: `1px solid ${T.borderSubtle}`, borderRadius: '8px', overflow: 'hidden', backgroundColor: T.bgSurfaceMuted }}>
           <div style={{ display: 'grid', gridTemplateColumns, gap: '12px', padding: '10px 14px', borderBottom: `1px solid ${T.borderSubtle}`, backgroundColor: T.bgCard, position: 'sticky', top: 0, zIndex: 1 }}>
             {columns.map(column => (
-              <div key={column} style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{column}</div>
+              <div key={column} style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: T.textMuted }}>{column}</div>
             ))}
           </div>
           <div style={{ maxHeight: '540px', overflowY: 'auto' }}>
