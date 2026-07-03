@@ -16,6 +16,7 @@ export type PrValidationReason =
   | "develop_pr_from_unknown_branch"
   | "ok_production_release_or_hotfix"
   | "ok_develop_work_branch"
+  | "ok_develop_backmerge"
   | "no_rule";
 
 export interface PrValidationResult {
@@ -66,16 +67,24 @@ export function validatePullRequest(
   }
 
   if (base === config.developBranch) {
-    if (config.protectedBranches.includes(head)) {
+    // Bloqueia apenas PR de develop para develop (nao faz sentido).
+    if (head === config.developBranch) {
       return result(false, "develop_pr_from_protected_branch");
     }
 
     const isWorkBranch =
       startsWithAny(head, config.workBranchPrefixes) || isReleaseOrHotfix;
 
-    return isWorkBranch
-      ? result(true, "ok_develop_work_branch")
-      : result(false, "develop_pr_from_unknown_branch");
+    if (isWorkBranch) {
+      return result(true, "ok_develop_work_branch");
+    }
+
+    // Permite back-merge de producao (main/master) para develop.
+    if (productionBranches.includes(head)) {
+      return result(true, "ok_develop_backmerge");
+    }
+
+    return result(false, "develop_pr_from_unknown_branch");
   }
 
   return result(true, "no_rule");
