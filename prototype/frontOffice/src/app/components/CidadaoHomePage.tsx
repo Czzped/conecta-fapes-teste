@@ -235,11 +235,18 @@ export function CidadaoHomePage({ onLogin, onVerEdital, onInscricao, scrollToOpo
       >
         {/* Background glow blobs */}
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, color-mix(in srgb, var(--card) 92%, transparent) 0%, color-mix(in srgb, var(--background) 98%, transparent) 68%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 44% 56% at 88% 24%, rgba(6,182,212,0.16) 0%, transparent 68%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 54% 78% at 86% 34%, rgba(6,182,212,0.26) 0%, rgba(6,182,212,0.14) 44%, transparent 76%)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 36% 42% at 6% 78%, rgba(6,182,212,0.08) 0%, transparent 72%)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '120px', background: 'linear-gradient(to bottom, transparent, var(--background))', pointerEvents: 'none', zIndex: 5 }} />
 
-        <div style={{ ...CONTAINER, width: '100%', position: 'relative', zIndex: 10 }}>
+        <div
+          style={{
+            ...CONTAINER,
+            width: '100%',
+            position: 'relative',
+            zIndex: 10,
+          }}
+        >
           {/* Badge */}
           <div
             className="inline-flex items-center gap-2"
@@ -269,7 +276,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital, onInscricao, scrollToOpo
             }}
           >
             Simplicidade no acesso a{' '}
-            <span style={{ color: '#06b6d4' }}>Editais</span>.
+            <span style={{ color: '#06b6d4' }}>Projetos</span>.
           </h1>
 
           {/* Subtitle */}
@@ -329,7 +336,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital, onInscricao, scrollToOpo
               Oportunidades
             </h2>
             <p style={{ fontSize: 'var(--text-sm)', color: 'var(--muted-foreground)', fontFamily: 'var(--font-family)' }}>
-              Explore os editais disponíveis.
+              Explore os fomentos disponíveis.
             </p>
           </div>
 
@@ -350,7 +357,7 @@ export function CidadaoHomePage({ onLogin, onVerEdital, onInscricao, scrollToOpo
               <Search size={18} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
               <input
                 type="text"
-                placeholder="Buscar por edital ou palavra-chave"
+                placeholder="Buscar por palavra-chave"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 style={{
