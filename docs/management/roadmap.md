@@ -22,6 +22,9 @@ As entregas operacionais de 2026 mapeiam para os seguintes milestones estrategic
 | Q2 | PORTAL FAPES - ADMIN | 5 — Financeiro | [MS-04 Financeiro](milestones/MS-04.md) |
 | Q2 | PORTAL FAPES - COORDENADOR | 4 — Fomento Post-Award | [MS-03 Ciclo de Fomento Post-Award](milestones/MS-03.md) |
 | Q2 | CONECTA FAPES | 2 — Planejamento e Estrategia | [MS-02 Ciclo de Fomento Pre-Award](milestones/MS-02.md) |
+| Q2 | CONECTA FAPES | 3 — Fomento Pre-Award | [MS-02 Ciclo de Fomento Pre-Award](milestones/MS-02.md) |
+| Q2 | CONECTA FAPES | 4 — Fomento Post-Award | [MS-03 Ciclo de Fomento Post-Award](milestones/MS-03.md) |
+| Q2 | CONECTA FAPES | 5 — Financeiro | [MS-04 Financeiro](milestones/MS-04.md) |
 | Q3 | PORTAL FAPES - ADMIN | 3 — Fomento Pre-Award | [MS-02 Ciclo de Fomento Pre-Award](milestones/MS-02.md) |
 | Q3 | PORTAL FAPES - ADMIN | 5 — Financeiro | [MS-04 Financeiro](milestones/MS-04.md) |
 | Q4 | CONECTA FAPES | 6 — Suporte e Inteligencia | [MS-05 Inteligencia e Transparencia](milestones/MS-05.md) |
@@ -127,6 +130,31 @@ As entregas operacionais de 2026 mapeiam para os seguintes milestones estrategic
 | Registrar Aporte Financeiro do Parceiro | Maio | — | Funcionalidade | Planejado |
 | Acompanhar Execucao da Parceria | Maio | — | Funcionalidade | Planejado |
 
+#### Foco do 2º Trimestre — Submissao, Prestacao de Contas e Configuracao
+
+Detalhamento do [Plano de Gestao do 2o Trimestre](management_2_trimestre.md). Linhas em **ordem de prioridade de execucao** (respeitando dependencias). ⚠️ = item de risco. Previsao/Responsavel em `—` porque o plano-fonte nao definiu datas nem donos.
+
+| Feature | Previsao | Responsavel | Categoria | Status |
+|---------|----------|-------------|-----------|--------|
+| Configuracao — CRUD de Taxa de Gestao (versionada, sem exclusao fisica) | — | — | Funcionalidade | Planejado |
+| Configuracao — CRUD de Rubricas (habilitador dos dashboards do Admin) | — | — | Funcionalidade | Planejado |
+| Submissao V1 (Demanda Induzida) — Tela de Fomento | — | — | Funcionalidade | Planejado |
+| Submissao V1 (Demanda Induzida) — Tela de Captacao | — | — | Funcionalidade | Planejado |
+| Submissao V1 (Demanda Induzida) — Submeter Proposta | — | — | Funcionalidade | Planejado |
+| ⚠️ Formulario Dinamico — definir campos fixos vs. moveis (trava V1 e V2) | — | — | Funcionalidade | Planejado |
+| Prestacao de Contas V2 — Invoice | — | — | Funcionalidade | Planejado |
+| Prestacao de Contas V2 — Passagem | — | — | Funcionalidade | Planejado |
+| Admin / Parceria — Calcular Taxa de Gestao + melhorar Dashboard | — | — | Funcionalidade | Planejado |
+| Admin / Parceria — Dashboard com rubricas dos Programas | — | — | Funcionalidade | Planejado |
+| Admin / Programa — Associar Projetos a Programas | — | — | Funcionalidade | Planejado |
+| Admin / Programa — Dashboard com rubricas dos Projetos | — | — | Funcionalidade | Planejado |
+| Admin — Polir UI | — | — | Melhoria | Planejado |
+| Diarias e Passagens — Solicitacao de Passagens / Cadastro (habilitador V3) | — | — | Funcionalidade | Planejado |
+| Prestacao de Contas V3 — Diarias (depende do Cadastro) | — | — | Funcionalidade | Planejado |
+| ⚠️ Prestacao de Contas V4 — NF ↔ transacao (N:N) | — | — | Funcionalidade | Planejado |
+| Submissao V2 (Edital) — mesma estrutura da V1 (depende V1 validada) | — | — | Funcionalidade | Planejado |
+| Notificacao — Mapear novas (Submissao/Pagamento de Bolsa, Diarias/Passagens) | — | — | Oportunidade | Planejado |
+
 ### PORTAL FAPES - COORDENADOR
 
 | Feature | Previsao | Responsavel | Categoria | Status |
@@ -167,8 +195,8 @@ As entregas operacionais de 2026 mapeiam para os seguintes milestones estrategic
 
 | Produto | Q1 | Q2 | Q3 | Q4 | Total |
 |---------|----|----|----|----|-------|
-| CONECTA FAPES | 6 | 14 | — | 1 | 21 |
+| CONECTA FAPES | 6 | 32 | — | 1 | 39 |
 | PORTAL FAPES - ADMIN | 10 | 9 | 2 | — | 21 |
 | PORTAL FAPES - COORDENADOR | 3 | 8 | — | — | 11 |
 | IMPORTADOR | 1 | — | — | — | 1 |
-| **Total** | **20** | **31** | **2** | **1** | **54** |
+| **Total** | **20** | **49** | **2** | **1** | **72** |
