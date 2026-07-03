@@ -25,6 +25,14 @@ test("plans tag creation when a release PR is merged into production", () => {
       ref: "main",
       targetSha: "abc123",
     },
+    {
+      type: "open_pull_request",
+      repo: "leds-conectafapes-backend-admin",
+      head: "main",
+      base: "develop",
+      title: "Back-merge main -> develop (v1.6.0)",
+      body: "Back-merge automatico de `main` para `develop` apos release v1.6.0.",
+    },
   ]);
 });
 

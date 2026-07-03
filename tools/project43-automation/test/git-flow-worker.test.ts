@@ -291,6 +291,14 @@ test("merged release PR creates the production tag automatically", async () => {
       ref: "main",
       targetSha: "merge-sha",
     },
+    {
+      type: "open_pull_request",
+      repo: "leds-conectafapes-backend-admin",
+      head: "main",
+      base: "develop",
+      title: "Back-merge main -> develop (v1.6.0)",
+      body: "Back-merge automatico de `main` para `develop` apos release v1.6.0.",
+    },
   ]);
 });
 

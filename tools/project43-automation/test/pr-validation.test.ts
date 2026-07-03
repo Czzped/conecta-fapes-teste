@@ -31,14 +31,30 @@ test("accepts production PR from release/ and hotfix/ (incl. master repos)", () 
   assert.equal(hotfixToMaster.valid, true);
 });
 
-test("rejects develop PR coming from a protected branch", () => {
+test("rejects develop PR coming from develop itself", () => {
   const result = validatePullRequest(config, {
     baseBranch: "develop",
-    headBranch: "main",
+    headBranch: "develop",
   });
 
   assert.equal(result.valid, false);
   assert.equal(result.reason, "develop_pr_from_protected_branch");
+});
+
+test("accepts develop PR from production branch (back-merge after release/hotfix)", () => {
+  const mainToDevelop = validatePullRequest(config, {
+    baseBranch: "develop",
+    headBranch: "main",
+  });
+  const masterToDevelop = validatePullRequest(config, {
+    baseBranch: "develop",
+    headBranch: "master",
+  });
+
+  assert.equal(mainToDevelop.valid, true);
+  assert.equal(mainToDevelop.reason, "ok_develop_backmerge");
+  assert.equal(masterToDevelop.valid, true);
+  assert.equal(masterToDevelop.reason, "ok_develop_backmerge");
 });
 
 test("rejects develop PR from an unknown branch prefix", () => {

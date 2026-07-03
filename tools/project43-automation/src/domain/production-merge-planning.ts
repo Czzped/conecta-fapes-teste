@@ -122,6 +122,18 @@ export function planProductionMerge(
     }
   }
 
+  // Back-merge de producao para develop apos release
+  if (releaseTag) {
+    actions.push({
+      type: "open_pull_request",
+      repo: repo.name,
+      head: repo.productionBranch,
+      base: repo.developBranch,
+      title: `Back-merge ${repo.productionBranch} -> ${repo.developBranch} (${releaseTag})`,
+      body: `Back-merge automatico de \`${repo.productionBranch}\` para \`${repo.developBranch}\` apos release ${releaseTag}.`,
+    });
+  }
+
   return {
     valid: true,
     repo: repo.name,
