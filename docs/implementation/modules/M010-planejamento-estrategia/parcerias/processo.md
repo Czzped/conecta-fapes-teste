@@ -4,6 +4,37 @@
 
 ---
 
+## Contexto
+
+No contexto da Fundacao de Amparo a Pesquisa e Inovacao do Espirito Santo (FAPES), uma Parceria e uma relacao formal de cooperacao entre a FAPES e outras instituicoes (publicas, privadas, nacionais ou internacionais) para desenvolver acoes de inovacao ou atividades de interesse comum. Essas parcerias geralmente sao formalizadas por instrumentos como acordos de cooperacao. A equipe responsavel pela gestao da Parceria na Fapes e o Nucleo de Parcerias Interinstitucionais - NUPAR.
+
+A partir da Parceria, e possivel criar o Programa. O valor de investimento da Parceria e consumido pelos Programas.
+
+Para criar uma nova Parceria, o funcionario da Fapes deve informar:
+
+- Nome da Parceria
+- Numero do Processo (funciona como identificador administrativo)
+- Ano
+- Instituicao Parceira
+- Objetivo
+- Periodo de vigencia (data de inicio e fim)
+- Valor do Aporte
+- Data do Aporte
+- Termo de Cooperacao
+- Termo de Descentralizacao
+
+**Termo de Cooperacao:** instrumento juridico utilizado para formalizar uma cooperacao entre a FAPES e outra instituicao, quando ambas possuem interesse comum na realizacao de atividades relacionadas a pesquisa, inovacao, desenvolvimento cientifico, formacao de recursos humanos ou outras acoes institucionais. Neste documento ha as regras, recursos e datas. E necessario avisar ao usuario quando a data da vigencia do Termo de Cooperacao esta proxima de finalizar.
+
+**Termo de Descentralizacao:** utilizado quando um orgao publico transfere para outro orgao ou entidade publica a execucao de determinada acao, projeto ou atividade, juntamente com a descentralizacao dos creditos orcamentarios necessarios para sua realizacao.
+
+Apos criar uma Parceria e ela estar Ativa nao e possivel Editar. Para isso, o usuario deve incluir um Aditivo, normalmente se o projeto precisar de mais tempo ou um valor maior para terminar a execucao. O Aditivo pode ser de valor, prazo e valor + prazo.
+
+O valor entra pela Parceria, que descentraliza para o Programa e o Projeto consome. Quando nao tem Programa, o valor vai direito para o Projeto.
+
+O valor entra na Parceria pelo Termo de Cooperacao. Se um novo orgao quiser entrar na Parceria abrem um novo Termo de Cooperacao.
+
+---
+
 ## Visao Geral
 
 O processo de Parcerias foi dividido em quatro fluxos principais:
