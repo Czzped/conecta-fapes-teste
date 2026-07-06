@@ -1674,6 +1674,19 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                             </div>
                           </div>
                         )}
+
+                        {selectedCategoriasItem[itemIdx] !== 'Pessoa Jurídica' && (
+                          <>
+                            <div>
+                              <label style={labelSt}>Quantidade</label>
+                              <input type="text" defaultValue={nfItem.quantidade} disabled={isReadOnly} style={inputSt(isReadOnly)} />
+                            </div>
+                            <div>
+                              <label style={labelSt}>Valor</label>
+                              <input type="text" defaultValue={nfItem.valorTotal} disabled={isReadOnly} style={inputSt(isReadOnly)} />
+                            </div>
+                          </>
+                        )}
                       </div>
 
                       {/* Card do item da NF - mesmo formato do Passo 2 */}
@@ -1794,7 +1807,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                     return (
                       <div key={itemIdx} className="flex items-end gap-4">
                         {/* Categoria e Item lado a lado */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 flex-1">
                           {/* Selecione a Categoria do item */}
                           <div>
                             <label style={labelSt}>Selecione a Categoria do item</label>
@@ -1874,6 +1887,15 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                               </div>
                             </div>
                           )}
+
+                          <div>
+                            <label style={labelSt}>Quantidade</label>
+                            <input type="text" placeholder="Informe a quantidade" disabled={isReadOnly} style={inputSt(isReadOnly)} />
+                          </div>
+                          <div>
+                            <label style={labelSt}>Valor</label>
+                            <input type="text" placeholder="R$ 0,00" disabled={isReadOnly} style={inputSt(isReadOnly)} />
+                          </div>
                         </div>
 
                         {/* Botão + (última linha) ou Lixeira (linhas anteriores) */}
