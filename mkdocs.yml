@@ -413,6 +413,7 @@ nav:
               - P1 Fomento: implementation/modules/M011-configuracao-captacao/process/process-fomento.md
               - P2 Configuracao da Captacao: implementation/modules/M011-configuracao-captacao/process/process-configuracao-captacao.md
               - P3 Selecao dos Projetos: implementation/modules/M011-configuracao-captacao/process/process-selecao-projetos.md
+          - Jornada de Inscricao em Edital: implementation/modules/M011-configuracao-captacao/jornada-inscricao-edital.md
           - Backlog: implementation/modules/M011-configuracao-captacao/backlog.md
           - Contrato: implementation/modules/M011-configuracao-captacao/contrato.md
           - Contrato API: implementation/modules/M011-configuracao-captacao/contrato-api.md
