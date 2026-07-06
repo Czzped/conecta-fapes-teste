@@ -555,7 +555,7 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
 
           {(!selected || detailTab === 'cadastro') && (
             <>
-              <FormSection number="1" title="Identificação" subtitle="Dados obrigatórios para identificar unicamente a pessoa.">
+              <FormSection number="1" title="Dados Pessoais">
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
                   <Field label="Nome completo" value={draft.nome} onChange={value => updateDraft('nome', value)} placeholder="Nome da pessoa" />
                   <Field label="Nome Social" value="" onChange={() => undefined} placeholder="" />
@@ -575,6 +575,43 @@ export const PessoasFisicas: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
                   <Field label="Lattes" value={draft.lattes} onChange={value => updateDraft('lattes', value)} placeholder="URL do currículo Lattes" />
                   <Field label="Nível Acadêmico" value={draft.nivelAcademico} onChange={value => updateDraft('nivelAcademico', value)} placeholder="Nível acadêmico" />
+                </div>
+              </FormSection>
+
+              <FormSection number="2" title="Documento de Identificação">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                  <Select label="Tipo de Documento" value="Identidade" onChange={() => undefined} options={['Identidade', 'Carteira de Trabalho', 'Habilitação']} />
+                  <Field label="Número" value="1234567" onChange={() => undefined} placeholder="Número do documento" />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+                  <Field label="Órgão Emissor" value="SSP" onChange={() => undefined} placeholder="Órgão emissor" />
+                  <Field label="UF do Órgão Emissor" value="ES" onChange={() => undefined} placeholder="UF" />
+                  <Field label="Data de Emissão" value="10/03/2015" onChange={() => undefined} placeholder="DD/MM/AAAA" />
+                </div>
+              </FormSection>
+
+              <FormSection number="3" title="Endereço Residencial">
+                <div style={{ display: 'grid', gridTemplateColumns: '0.7fr 1.6fr 0.7fr', gap: '24px', marginBottom: '24px' }}>
+                  <Field label="CEP" value="29000-000" onChange={() => undefined} placeholder="00000-000" />
+                  <Field label="Rua" value="Rua das Flores" onChange={() => undefined} placeholder="Rua" />
+                  <Field label="Número" value="123" onChange={() => undefined} placeholder="Número" />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                  <Field label="Complemento" value="Apto 101" onChange={() => undefined} placeholder="Complemento" />
+                  <Field label="Bairro" value="Centro" onChange={() => undefined} placeholder="Bairro" />
+                  <Field label="Município" value="Vitória" onChange={() => undefined} placeholder="Município" />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                  <Field label="Estado" value="Espírito Santo" onChange={() => undefined} placeholder="Estado" />
+                  <Field label="País" value="Brasil" onChange={() => undefined} placeholder="País" />
+                </div>
+              </FormSection>
+
+              <FormSection number="4" title="Dados Bancários">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+                  <Field label="Banco" value="Banestes" onChange={() => undefined} placeholder="Banco" />
+                  <Field label="Agência" value="0001" onChange={() => undefined} placeholder="Agência" />
+                  <Field label="Conta" value="12345678-9" onChange={() => undefined} placeholder="Conta" />
                 </div>
               </FormSection>
 
@@ -689,16 +726,16 @@ const PageHeader: React.FC<{ title: string; subtitle: string; onBack: () => void
   );
 };
 
-const FormSection: React.FC<{ number: string; title: string; subtitle: string; children: React.ReactNode }> = ({ number, title, subtitle, children }) => {
+const FormSection: React.FC<{ number: string; title: string; subtitle?: string; children: React.ReactNode }> = ({ number, title, subtitle, children }) => {
   const { T } = useThemeTokens();
   const S = buildStyles(T);
   return (
     <div style={{ ...S.card, marginBottom: '24px' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', alignItems: subtitle ? 'flex-start' : 'center', gap: '14px', marginBottom: '20px' }}>
         <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: T.accentSoft, color: T.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>{number}</div>
         <div>
-          <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 6px' }}>{title}</h2>
-          <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>{subtitle}</p>
+          <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: subtitle ? '0 0 6px' : 0 }}>{title}</h2>
+          {subtitle && <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>{subtitle}</p>}
         </div>
       </div>
       {children}
