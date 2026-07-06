@@ -1,3 +1,5 @@
+🚨 **Entregas são feitas via PR** 🚨
+
 # M011 - Configuracao de Captacao
 
 [<- Voltar ao Backlog Central](../../../management/backlog-product.md) | [Domain 03 -- Fomento Pre-Award](../../../discovery/domains/03-fomento-pre-award.md)
@@ -12,6 +14,7 @@
 | [Modelo Estrutural P1 - Fomento](modelo-estrutural/modelo-estrutural-p1-fomento.md) | Diagrama de classes, estados, dicionario e regras de Fomento |
 | [Modelo Estrutural P2 - Configuracao da Captacao](modelo-estrutural/modelo-estrutural-p2-configuracao-selecao.md) | Diagrama de classes, estados, dicionario e regras de Captacao |
 | [Modelo Estrutural P3 - Selecao de Projetos](modelo-estrutural/modelo-estrutural-p3-selecao-projetos.md) | Diagrama de classes da selecao dos projetos |
+| [Jornada - Inscricao em Edital Aberto](jornada-inscricao-edital.md) | Fluxo do proponente ao se inscrever em um edital |
 
 ---
 
