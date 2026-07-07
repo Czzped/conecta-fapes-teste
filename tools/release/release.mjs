@@ -38,7 +38,14 @@ const ALL_REPOS = Object.keys(REPO_DEFS);
 
 function gh(...args) {
   const cmd = args.map(a => `'${a.replace(/'/g, "'\\''")}'`).join(' ');
-  return execSync(`gh ${cmd}`, { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'ignore'] }).trim();
+  try {
+    return execSync(`gh ${cmd}`, { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+  } catch (e) {
+    const stderr = e.stderr?.toString().trim() || '';
+    const stdout = e.stdout?.toString().trim() || '';
+    const msg = [stderr, stdout].filter(Boolean).join('\n') || e.message;
+    throw new Error(`gh ${cmd.split(' ')[0]} failed: ${msg}`);
+  }
 }
 
 function ghJson(endpoint, ...flags) {
