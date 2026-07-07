@@ -259,15 +259,15 @@ function createTagViaApi(repoFull, version, changelog) {
     if (!sha) return 'Falha ao obter SHA do develop';
 
     // Cria tag anotada via git/tags + refs/tags
-    const tagObj = gh('api', `repos/${ORG}/${repoFull}/git/tags`, \
-      '-f', `tag=${version}`, \
-      '-f', `message=Release ${version}`, \
-      '-f', `object=${sha}`, \
+    const tagObj = gh('api', `repos/${ORG}/${repoFull}/git/tags`,
+      '-f', `tag=${version}`,
+      '-f', `message=Release ${version}`,
+      '-f', `object=${sha}`,
       '-f', 'type=commit');
     const tagSha = JSON.parse(tagObj).sha;
 
-    gh('api', `repos/${ORG}/${repoFull}/git/refs`, \
-      '-f', `ref=refs/tags/${version}`, \
+    gh('api', `repos/${ORG}/${repoFull}/git/refs`,
+      '-f', `ref=refs/tags/${version}`,
       '-f', `sha=${tagSha}`);
     return 'created';
   } catch (e) {
