@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, Settings, Inbox, Landmark, Building2, UserRound, Trash2, Pencil } from 'lucide-react';
+import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, Settings, Inbox, Landmark, Building2, UserRound, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import conectaSymbol from 'figma:asset/db135b6708f6cc7f72f27c6a31dd02aa5500d030.png';
 import fapesLogo from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
@@ -1470,7 +1470,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <div className="flex items-center justify-center rounded-full" style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}>2</div>
-                      <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Anexos da Passagem <span style={{ color: '#ef4444' }}>*</span></h2>
+                      <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Anexos da Passagem</h2>
                     </div>
                     <div style={{ marginLeft: '32px' }}>
                       {[
@@ -1479,12 +1479,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                       ].map(({ label, file }) => (
                         <div key={file} className="mb-4">
                           <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>{label}</label>
-                          <div className="rounded-lg p-4 flex items-center justify-between cursor-pointer" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
+                          <div className="rounded-lg p-4 flex items-center justify-between" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
                             <div className="flex items-center gap-3">
                               <FileText className="w-5 h-5" style={{ color: 'var(--dash-text-secondary)' }} />
                               <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{file}</span>
                             </div>
-                            <ChevronDown className="w-5 h-5" style={{ color: 'var(--dash-icon-subdued)' }} />
+                            <button onClick={() => toast.info('Visualizar anexo')} title="Visualizar" style={{ background: 'transparent', border: 'none', color: 'var(--dash-icon-subdued)', cursor: 'pointer', display: 'flex', padding: '4px' }}>
+                              <Eye className="w-5 h-5" />
+                            </button>
                           </div>
                         </div>
                       ))}
@@ -1501,21 +1503,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     <div className="space-y-4" style={{ marginLeft: '32px' }}>
                       {passageiros.map((p, idx) => (
                         <div key={p.id} className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
-                          <div className="flex items-center justify-between mb-3">
+                          <div className="mb-3">
                             <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Passageiro {idx + 1}</span>
-                            <button onClick={() => toast.info('Remover passageiro')} title="Remover" style={{ background: 'transparent', border: 'none', color: 'var(--dash-icon-subdued)', cursor: 'pointer', display: 'flex', padding: '4px' }}>
-                              <Trash2 className="w-4 h-4" />
-                            </button>
                           </div>
                           <div className="grid grid-cols-4 gap-3">
-                            {([
-                              { label: 'Nome do Passageiro', value: p.nome, req: true },
-                              { label: 'Valor', value: p.valor, req: true },
-                              { label: 'Localizador', value: p.localizador, req: false },
-                              { label: 'Data de Emissão', value: p.emissao, req: false },
-                            ] as { label: string; value: string; req: boolean }[]).map(({ label, value, req }) => (
+                            {[
+                              { label: 'Nome do Passageiro', value: p.nome },
+                              { label: 'Valor', value: p.valor },
+                              { label: 'Localizador', value: p.localizador },
+                              { label: 'Data de Emissão', value: p.emissao },
+                            ].map(({ label, value }) => (
                               <div key={label}>
-                                <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>{label}{req && <span style={{ color: '#ef4444' }}> *</span>}</label>
+                                <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>{label}</label>
                                 <input readOnly value={value} className="w-full rounded-lg px-3 py-2" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
                               </div>
                             ))}
@@ -1541,7 +1540,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   </div>
 
                   {/* Passo 4: Cotação */}
-                  {renderCotacao(4, 'Envie 3 cotações de passagens e selecione a de menor valor. A cotação de menor valor deve ser a que foi adquirida.', [
+                  {renderCotacao(4, 'Orçamentos de passagens enviados na prestação. O orçamento selecionado é o de menor valor e corresponde à passagem adquirida.', [
                     { file: 'Cotacao_Loja_A.pdf', fornecedor: 'Passagens Aéreas Alfa', valor: 'R$ 1.280,00', data: '05/02/2026' },
                     { file: 'Cotacao_Loja_B.pdf', fornecedor: 'Passagens Aéreas Beta', valor: 'R$ 1.340,00', data: '04/02/2026' },
                     { file: 'Cotacao_Loja_C.pdf', fornecedor: 'Passagens Aéreas Gama', valor: 'R$ 1.390,00', data: '03/02/2026' },
