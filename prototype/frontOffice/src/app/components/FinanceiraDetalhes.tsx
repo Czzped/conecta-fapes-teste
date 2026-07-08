@@ -145,7 +145,11 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
   const benefSearch      = useRef<HTMLInputElement>(null);
   const passSearch       = useRef<HTMLInputElement>(null);
 
-  const isReadOnly = payment.status !== 'Pendente' && payment.status !== 'Revisar';
+  const [statusAtual, setStatusAtual] = useState<string>(payment.status);
+  const statusColorAtual = statusAtual === 'Contestada'
+    ? { bg: 'rgba(168,85,247,0.1)', color: 'rgb(168,85,247)', border: 'rgba(168,85,247,0.3)' }
+    : payment.statusColor;
+  const isReadOnly = statusAtual !== 'Pendente' && statusAtual !== 'Revisar';
   const isCreditoEstorno = payment.operacao === 'CREDITO' && payment.classificacao === 'ESTORNO';
   const isCreditoDevolucao = payment.operacao === 'CREDITO' && payment.classificacao === 'DEVOLUCAO';
   const [estornoAssociado, setEstornoAssociado] = useState(false);
@@ -305,8 +309,8 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
   };
 
   const enviarContestacao = () => {
+    setStatusAtual('Contestada');
     toast.success('Contestação enviada com sucesso!');
-    window.setTimeout(onBack, 800);
   };
 
   const selecionarDiariaPrestacao = (diaria: DiariaPrestacao & { originalIndex: number }) => {
@@ -392,10 +396,11 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
 
   /* ── status message ─────────────────────────── */
   const getStatusMessage = () => {
-    switch (payment.status) {
+    switch (statusAtual) {
       case 'Em Validação': return { text: 'Esta Prestação de Contas está Em Validação. Após verificarmos todos os dados enviados, seu status irá ser atualizado na tela inicial. Enquanto isso, você não consegue alterar as informações enviadas.', bg: 'rgba(59,130,246,.1)', border: 'rgba(59,130,246,.3)', color: 'rgb(59,130,246)' };
       case 'Reprovado':    return { text: '10/06/2026 - Esta Prestação de Contas não foi aprovada por X motivo. Você deve repositar o valor para a conta do projeto em até 30 dias corridos ou envie uma contestação e justifique.', bg: 'rgba(239,68,68,.1)', border: 'rgba(239,68,68,.3)', color: 'rgb(239,68,68)' };
       case 'Revisar':      return { text: 'Informamos que esta Prestação de Contas ainda não foi aprovada e necessita de revisão. O prazo para realizar as adequações necessárias é de até 15 dias úteis.', bg: 'rgba(234,179,8,.1)', border: 'rgba(234,179,8,.3)', color: 'rgb(234,179,8)' };
+      case 'Contestada':   return { text: 'Sua contestação foi enviada e está em análise pela FAPES.', bg: 'rgba(168,85,247,.1)', border: 'rgba(168,85,247,.3)', color: 'rgb(168,85,247)' };
       default: return null;
     }
   };
@@ -709,7 +714,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
           ))}
           <div>
             <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>Status</div>
-            <span className="inline-flex items-center px-2.5 py-1" style={{ backgroundColor: payment.statusColor.bg, color: payment.statusColor.color, border: `1px solid ${payment.statusColor.border}`, borderRadius: '9999px', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>{payment.status}</span>
+            <span className="inline-flex items-center px-2.5 py-1" style={{ backgroundColor: statusColorAtual.bg, color: statusColorAtual.color, border: `1px solid ${statusColorAtual.border}`, borderRadius: '9999px', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>{statusAtual}</span>
           </div>
         </div>
         <div className="md:hidden space-y-4">
@@ -721,7 +726,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
           ))}
           <div>
             <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', marginBottom: '0.25rem', fontFamily: 'var(--font-family)' }}>Status</div>
-            <span className="inline-flex items-center px-2.5 py-1" style={{ backgroundColor: payment.statusColor.bg, color: payment.statusColor.color, border: `1px solid ${payment.statusColor.border}`, borderRadius: '9999px', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>{payment.status}</span>
+            <span className="inline-flex items-center px-2.5 py-1" style={{ backgroundColor: statusColorAtual.bg, color: statusColorAtual.color, border: `1px solid ${statusColorAtual.border}`, borderRadius: '9999px', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>{statusAtual}</span>
           </div>
         </div>
       </div>
@@ -940,10 +945,10 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
       {/* Status alert */}
       {statusMessage && (
         <>
-          <div className={payment.status === 'Revisar' || payment.status === 'Reprovado' ? 'p-4' : 'p-4 mb-6'} style={{ backgroundColor: statusMessage.bg, border: `1px solid ${statusMessage.border}`, borderRadius: 'var(--radius)' }}>
+          <div className={statusAtual === 'Revisar' || statusAtual === 'Reprovado' || statusAtual === 'Contestada' ? 'p-4' : 'p-4 mb-6'} style={{ backgroundColor: statusMessage.bg, border: `1px solid ${statusMessage.border}`, borderRadius: 'var(--radius)' }}>
             <p style={{ color: statusMessage.color, fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: 0, lineHeight: '1.5', whiteSpace: 'pre-line' }}>{statusMessage.text}</p>
           </div>
-          {payment.status === 'Reprovado' && (
+          {statusAtual === 'Reprovado' && (
             <>
               <section
                 className="mt-4"
@@ -1075,7 +1080,33 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
               </div>
             </>
           )}
-          {payment.status === 'Revisar' && (
+          {statusAtual === 'Contestada' && (
+            <section
+              className="mt-4 mb-6"
+              style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '2rem' }}
+            >
+              <div className="flex items-start gap-3 mb-4">
+                <h2 style={stepTitle}>Contestação enviada</h2>
+              </div>
+              <div>
+                <label style={labelSt}>Justificativa</label>
+                <div className="px-3 py-2" style={{ minHeight: '80px', backgroundColor: 'var(--input-background)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
+                  {justificativaReprovacao || '—'}
+                </div>
+              </div>
+              {arquivosContestacao.length > 0 && (
+                <div className="mt-3 flex flex-col gap-2">
+                  {arquivosContestacao.map((nome, idx) => (
+                    <div key={nome + idx} className="p-4 flex items-center gap-4" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
+                      <FileText size={20} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
+                      <span style={{ fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', color: 'var(--foreground)' }}>{nome}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
+          {statusAtual === 'Revisar' && (
             <section
               className="mt-4 mb-6"
               style={{
