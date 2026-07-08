@@ -34,7 +34,7 @@ type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
 type Language = 'pt' | 'en' | 'es';
 type NotificationTab = 'avisos' | 'editais';
 type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'fomento' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal' | 'calendario-folha' | 'controle-acessos';
-type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado';
+type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado' | 'Contestada';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
 type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outro Projeto Exemplo' | 'Mais um Projeto Exemplo';
 
@@ -50,7 +50,6 @@ interface PagamentoCard {
   variante: PagamentoVariante;
   projeto: string;
   status: StatusFilter;
-  contestada?: boolean;
 }
 
 interface Passageiro {
@@ -189,24 +188,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     hoverClass:       isLight ? 'hover:bg-black/5'        : 'hover:bg-white/10',
   } as const;
 
-  const statusOptions: StatusFilter[] = ['Todos', 'Pendente', 'Em Validação', 'Validado', 'Revisar', 'Reprovado'];
+  const statusOptions: StatusFilter[] = ['Todos', 'Pendente', 'Em Validação', 'Validado', 'Revisar', 'Reprovado', 'Contestada'];
   const categoriaOptions: CategoriaFilter[] = ['Todos', 'Material Permanente', 'Material de Consumo', 'Passagem', 'Diária', 'Pessoa Física', 'Pessoa Jurídica'];
   const projetoOptions: ProjetoFilter[] = ['Todos', 'Conecta Fapes', 'Outro Projeto Exemplo', 'Mais um Projeto Exemplo'];
   const isReadyForDevPage = activePage === 'parceria' || activePage === 'programa';
 
   // Mock data para os cards de pagamento
-  const pagamentosData: PagamentoCard[] = [
+  const [pagamentosData, setPagamentosData] = useState<PagamentoCard[]>([
     { id: 1, tipo: 'Boleto', valor: 'R$ 3.456,70', data: '27/02/2026 - 09:35', categoria: 'Material Permanente', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Em Validação' },
     { id: 2, tipo: 'Pix', valor: 'R$ 4.567,90', data: '25/02/2026 - 10:05', categoria: 'Material de Consumo', variante: 'invoice', projeto: 'Outro Projeto', status: 'Em Validação' },
     { id: 3, tipo: 'Pix', valor: 'R$ 789,00', data: '23/02/2026 - 12:50', categoria: 'Passagem', variante: 'passagem', projeto: 'Mais um Projeto', status: 'Em Validação' },
     { id: 4, tipo: 'Boleto', valor: 'R$ 2.100,00', data: '22/02/2026 - 11:20', categoria: 'Material de Consumo', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Revisar' },
     { id: 5, tipo: 'Boleto', valor: 'R$ 1.890,50', data: '20/02/2026 - 11:45', categoria: 'Passagem', variante: 'passagem', projeto: 'Outro Projeto', status: 'Em Validação' },
-    { id: 6, tipo: 'Boleto', valor: 'R$ 2.345,60', data: '19/02/2026 - 17:25', categoria: 'Pessoa Jurídica', variante: 'nota-fiscal', projeto: 'Mais um Projeto', status: 'Reprovado', contestada: false },
+    { id: 6, tipo: 'Boleto', valor: 'R$ 2.345,60', data: '19/02/2026 - 17:25', categoria: 'Pessoa Jurídica', variante: 'nota-fiscal', projeto: 'Mais um Projeto', status: 'Reprovado' },
     { id: 7, tipo: 'Pix', valor: 'R$ 567,80', data: '18/02/2026 - 16:45', categoria: 'Diária', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Em Validação' },
-    { id: 8, tipo: 'Pix', valor: 'R$ 2.567,30', data: '15/02/2026 - 16:00', categoria: 'Material Permanente', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Reprovado', contestada: true },
+    { id: 8, tipo: 'Pix', valor: 'R$ 2.567,30', data: '15/02/2026 - 16:00', categoria: 'Material Permanente', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Contestada' },
     { id: 9, tipo: 'Pix', valor: 'R$ 5.234,20', data: '14/02/2026 - 08:40', categoria: 'Material de Consumo', variante: 'invoice', projeto: 'Outro Projeto', status: 'Em Validação' },
     { id: 10, tipo: 'Boleto', valor: 'R$ 3.690,00', data: '12/02/2026 - 08:15', categoria: 'Passagem', variante: 'passagem', projeto: 'Mais um Projeto', status: 'Em Validação' },
-  ];
+  ]);
 
   const getStatusColor = (status: StatusFilter): string => {
     switch (status) {
@@ -220,6 +219,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         return '#f59e0b'; // amber/yellow
       case 'Reprovado':
         return '#ef4444'; // red
+      case 'Contestada':
+        return '#a855f7'; // purple
       default:
         return '#ffffff';
     }
@@ -1458,8 +1459,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               </div>
             </div>
 
-            {/* Contestação (Reprovado já contestado pelo coordenador) */}
-            {selectedPagamento.status === 'Reprovado' && selectedPagamento.contestada && (
+            {/* Contestação (status Contestada) */}
+            {selectedPagamento.status === 'Contestada' && (
               <div className="mt-8 rounded-lg p-6" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
                 <h2 className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Contestação</h2>
                 <p className="mb-4" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }}>Contestação enviada pelo coordenador em resposta à reprovação. Analise e decida se mantém a reprovação ou valida a prestação.</p>
@@ -1486,8 +1487,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   </div>
                 </div>
                 <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid var(--dash-divider)', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                  <button onClick={() => { toast.success('Reprovação mantida.'); setTimeout(() => { setActivePage('financeira'); setSelectedPagamento(null); }, 1000); }} className="px-6 py-2 rounded-lg transition-all" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
-                    Manter Reprovado
+                  <button onClick={() => { setPagamentosData(prev => prev.map(p => p.id === selectedPagamento?.id ? { ...p, status: 'Reprovado' as StatusFilter } : p)); toast.success('Prestação reprovada.'); setTimeout(() => { setActivePage('financeira'); setSelectedPagamento(null); }, 1000); }} className="px-6 py-2 rounded-lg transition-all" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
+                    Reprovado
                   </button>
                   <button onClick={() => setShowConfirmacaoModal(true)} className="px-6 py-2 rounded-lg transition-all" style={{ backgroundColor: '#00c1af', border: '1px solid #00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)', cursor: 'pointer' }}>
                     Validar
@@ -1774,8 +1775,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             </div>
             )}
 
-            {/* Divider + Avaliação Fapes (oculta quando Reprovado já contestado) */}
-            {!(selectedPagamento.status === 'Reprovado' && selectedPagamento.contestada) && (
+            {/* Divider + Avaliação Fapes (oculta quando Contestada) */}
+            {selectedPagamento.status !== 'Contestada' && (
             <>
             {/* Divider antes da Avaliação Fapes */}
             <div style={{ marginTop: '32px', marginBottom: '32px', marginLeft: '32px', marginRight: '32px' }}>
@@ -2287,7 +2288,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 style={{ backgroundColor: 'transparent', border: '1px solid var(--dash-card-border)', color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
                 Cancelar
               </button>
-              <button onClick={() => { setStatusAvaliacao('validado'); setShowConfirmacaoModal(false); toast.success('Pagamento validado com sucesso!'); setTimeout(() => { setActivePage('financeira'); setSelectedPagamento(null); }, 1000); }}
+              <button onClick={() => { setPagamentosData(prev => prev.map(p => p.id === selectedPagamento?.id ? { ...p, status: 'Validado' as StatusFilter } : p)); setStatusAvaliacao('validado'); setShowConfirmacaoModal(false); toast.success('Pagamento validado com sucesso!'); setTimeout(() => { setActivePage('financeira'); setSelectedPagamento(null); }, 1000); }}
                 className="px-6 py-2 rounded-lg transition-all"
                 style={{ backgroundColor: '#00c1af', border: '1px solid #00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)',
                   fontWeight: 'var(--font-weight-medium)',
