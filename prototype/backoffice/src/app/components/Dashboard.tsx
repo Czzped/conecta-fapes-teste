@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, Settings, Inbox, Landmark, Building2, UserRound, Pencil } from 'lucide-react';
+import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, Settings, Inbox, Landmark, Building2, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 import conectaSymbol from 'figma:asset/db135b6708f6cc7f72f27c6a31dd02aa5500d030.png';
 import fapesLogo from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
@@ -58,6 +58,9 @@ interface Passageiro {
   valor: string;
   localizador: string;
   emissao: string;
+}
+
+interface Viagem {
   origem: string;
   saida: string;
   horaSaida: string;
@@ -136,9 +139,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [cotacaoSelecionada, setCotacaoSelecionada] = useState('Cotacao_Loja_A.pdf');
   const [cotacaoExpandida, setCotacaoExpandida] = useState<string | null>('Cotacao_Loja_A.pdf');
   const [passageiros] = useState<Passageiro[]>([
-    { id: 1, nome: 'Ana Beatriz Costa', valor: 'R$ 1.280,00', localizador: 'ABX9F2', emissao: '10/02/2026', origem: 'Vitória – ES', saida: '18/02/2026', horaSaida: '08:15', destino: 'São Paulo – SP', chegada: '18/02/2026', horaChegada: '09:55' },
-    { id: 2, nome: 'Carlos Henrique Dias', valor: 'R$ 1.280,00', localizador: 'ABX9F3', emissao: '10/02/2026', origem: 'Vitória – ES', saida: '18/02/2026', horaSaida: '08:15', destino: 'São Paulo – SP', chegada: '18/02/2026', horaChegada: '09:55' },
+    { id: 1, nome: 'Ana Beatriz Costa', valor: 'R$ 1.280,00', localizador: 'ABX9F2', emissao: '10/02/2026' },
+    { id: 2, nome: 'Carlos Henrique Dias', valor: 'R$ 1.280,00', localizador: 'ABX9F3', emissao: '10/02/2026' },
   ]);
+  const viagem: Viagem = { origem: 'Vitória – ES', saida: '18/02/2026', horaSaida: '08:15', destino: 'São Paulo – SP', chegada: '18/02/2026', horaChegada: '09:55' };
 
   const languageNames = {
     pt: 'Português',
@@ -246,18 +250,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                         <input readOnly value={item.valor} className="w-full rounded-lg px-4 py-2" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 mt-4 items-end">
+                    <div className="grid grid-cols-2 gap-4 mt-4">
                       <div>
                         <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>Data <span style={{ color: '#ef4444' }}>*</span></label>
                         <div className="relative">
                           <input readOnly value={item.data} className="w-full rounded-lg px-4 py-2 pr-10" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
                           <Calendar size={18} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--dash-icon-subdued)' }} />
                         </div>
-                      </div>
-                      <div className="flex justify-end">
-                        <button onClick={() => toast.info('Editar cotação')} className="flex items-center gap-2 px-6 py-2 rounded-lg transition-all" style={{ backgroundColor: 'rgba(20, 184, 166, 0.1)', border: '1px solid rgba(20, 184, 166, 0.3)', color: '#14b8a6', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
-                          <Pencil className="w-4 h-4" /> Editar
-                        </button>
                       </div>
                     </div>
                   </div>
@@ -1519,23 +1518,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                               </div>
                             ))}
                           </div>
-                          <div className="grid grid-cols-3 gap-3 mt-3">
-                            {[
-                              { label: 'Local de Origem', value: p.origem },
-                              { label: 'Data de Saída', value: p.saida },
-                              { label: 'Horário', value: p.horaSaida },
-                              { label: 'Local de Destino', value: p.destino },
-                              { label: 'Data de Chegada', value: p.chegada },
-                              { label: 'Horário', value: p.horaChegada },
-                            ].map(({ label, value }, i) => (
-                              <div key={label + i}>
-                                <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>{label}</label>
-                                <input readOnly value={value} className="w-full rounded-lg px-3 py-2" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
-                              </div>
-                            ))}
-                          </div>
                         </div>
                       ))}
+                      <div className="grid grid-cols-3 gap-3">
+                        {[
+                          { label: 'Local de Origem', value: viagem.origem },
+                          { label: 'Data de Saída', value: viagem.saida },
+                          { label: 'Horário', value: viagem.horaSaida },
+                          { label: 'Local de Destino', value: viagem.destino },
+                          { label: 'Data de Chegada', value: viagem.chegada },
+                          { label: 'Horário', value: viagem.horaChegada },
+                        ].map(({ label, value }, i) => (
+                          <div key={label + i}>
+                            <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>{label}</label>
+                            <input readOnly value={value} className="w-full rounded-lg px-3 py-2" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
