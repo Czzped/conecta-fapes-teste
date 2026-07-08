@@ -2205,7 +2205,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       {/* Modal de Confirmação de Aprovação */}
       {showConfirmacaoModal && (
         <div className="fixed inset-0 flex items-start justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)', paddingTop: '20vh', zIndex: 9999 }} onClick={() => setShowConfirmacaoModal(false)}>
-          <div className="rounded-lg p-6 max-w-md w-full mx-4" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+          <div className="rounded-lg p-6 max-w-md w-full mx-4" style={{ backgroundColor: isLight ? '#ffffff' : '#262626', border: '1px solid var(--dash-card-border)', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
             <button onClick={() => setShowConfirmacaoModal(false)} className="absolute top-4 right-4 p-1 rounded-lg transition-all" style={{ backgroundColor: 'transparent', border: 'none', color: 'var(--dash-text-muted)', cursor: 'pointer' }}>
               <X size={20} />
             </button>
@@ -2255,7 +2255,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             setNovoMotivo('');
           }}
         >
-          <div className="rounded-lg p-6 max-w-md w-full mx-4" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+          <div className="rounded-lg p-6 max-w-md w-full mx-4" style={{ backgroundColor: isLight ? '#ffffff' : '#262626', border: '1px solid var(--dash-card-border)', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
             <button onClick={() => { setShowCadastrarMotivoModal(false); setNovoMotivo(''); }}
               className="absolute top-4 right-4 p-1 rounded-lg transition-all"
               style={{ backgroundColor: 'transparent', border: 'none', color: 'var(--dash-text-muted)', cursor: 'pointer' }}>
@@ -2289,7 +2289,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       {/* Modal de Validação em Lote */}
       {showValidarLoteModal && (
         <div className="fixed inset-0 flex items-start justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)', paddingTop: '20vh', zIndex: 9999 }} onClick={() => setShowValidarLoteModal(false)}>
-          <div className="rounded-lg p-6 max-w-md w-full mx-4" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+          <div className="rounded-lg p-6 max-w-md w-full mx-4" style={{ backgroundColor: isLight ? '#ffffff' : '#262626', border: '1px solid var(--dash-card-border)', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
             <button onClick={() => setShowValidarLoteModal(false)} className="absolute top-4 right-4 p-1 rounded-lg transition-all" style={{ backgroundColor: 'transparent', border: 'none', color: 'var(--dash-text-muted)', cursor: 'pointer' }}>
               <X size={20} />
             </button>
