@@ -1619,69 +1619,76 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 </>
               ) : (
                 <>
-              {/* Passo 1: Anexar Nota Fiscal */}
+              {/* Passo 1: Nota Fiscal */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <div 
+                  <div
                     className="flex items-center justify-center rounded-full"
                     style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}
                   >
                     1
                   </div>
                   <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>
-                    Anexar Nota Fiscal <span style={{ color: '#ef4444' }}>*</span>
+                    Nota Fiscal
                   </h2>
                 </div>
                 <p className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginLeft: '32px' }}>
-                  Inclua a Nota Fiscal que justifique esse pagamento
+                  Nota Fiscal enviada para justificar este pagamento.
                 </p>
-                <div className="rounded-lg p-4 flex items-center justify-between cursor-pointer" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)', marginLeft: '32px' }}>
+                <div className="rounded-lg p-4 flex items-center justify-between" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)', marginLeft: '32px' }}>
                   <div className="flex items-center gap-3">
                     <FileText className="w-5 h-5" style={{ color: 'var(--dash-text-secondary)' }} />
                     <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>
                       Nota_Fiscal_Monitor_2024.pdf
                     </span>
                   </div>
-                  <ChevronDown className="w-5 h-5" style={{ color: 'var(--dash-icon-subdued)' }} />
+                  <button onClick={() => toast.info('Visualizar Nota Fiscal')} title="Visualizar" style={{ background: 'transparent', border: 'none', color: 'var(--dash-icon-subdued)', cursor: 'pointer', display: 'flex', padding: '4px' }}>
+                    <Eye className="w-5 h-5" />
+                  </button>
                 </div>
               </div>
 
-              {/* Passo 2: Associar Compra */}
+              {/* Passo 2: Compra Associada */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <div 
+                  <div
                     className="flex items-center justify-center rounded-full"
                     style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}
                   >
                     2
                   </div>
                   <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>
-                    Associar Compra <span style={{ color: '#ef4444' }}>*</span>
+                    Compra Associada
                   </h2>
                 </div>
+                <p className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginLeft: '32px' }}>
+                  Itens comprados associados aos itens aprovados no Edital.
+                </p>
                 <div className="space-y-3" style={{ marginLeft: '32px' }}>
-                  <div className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
-                    <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>Monitor de Video LCD 22"</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      { label: 'Selecione a categoria do item:', value: 'Material Permanente' },
-                      { label: 'Selecione o item do edital que foi adquirido:', value: 'Monitor' },
-                    ].map(({ label, value }) => (
-                      <div key={label}>
-                        <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{label}</label>
-                        <div className="rounded-lg p-4 flex items-center justify-between cursor-pointer" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
-                          <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }}>{value}</span>
-                          <ChevronDown className="w-5 h-5" style={{ color: 'var(--dash-icon-subdued)' }} />
-                        </div>
+                  {[
+                    { categoria: 'Material Permanente', item: 'Monitor de Vídeo LCD 22"', qtd: '1', valor: 'R$ 3.456,70' },
+                  ].map((compra, i) => (
+                    <div key={i} className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
+                      <div className="grid grid-cols-4 gap-4">
+                        {[
+                          { label: 'Categoria do item', value: compra.categoria },
+                          { label: 'Item', value: compra.item },
+                          { label: 'Quantidade', value: compra.qtd },
+                          { label: 'Valor', value: compra.valor },
+                        ].map(({ label, value }) => (
+                          <div key={label}>
+                            <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>{label}</label>
+                            <input readOnly value={value} className="w-full rounded-lg px-3 py-2" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
               {/* Passo 3: Cotação */}
-              {renderCotacao(3, 'Se você comprou um item de valor superior a R$ 1.400, envie 3 orçamentos e selecione o de menor valor. O de menor valor deve ser o que você comprou. Se há mais de um item na Nota Fiscal com valor acima de R$ 1.400, você deve enviar 3 orçamentos para cada item.', [
+              {renderCotacao(3, 'Orçamentos enviados na prestação. O orçamento selecionado é o de menor valor e corresponde ao item adquirido. Para itens acima de R$ 1.400, são exigidos 3 orçamentos por item.', [
                 { file: 'Cotacao_Loja_A.pdf', fornecedor: 'Loja A Informática', valor: 'R$ 1.280,00', data: '05/02/2026' },
                 { file: 'Cotacao_Loja_B.pdf', fornecedor: 'Loja B Suprimentos', valor: 'R$ 1.420,00', data: '04/02/2026' },
                 { file: 'Cotacao_Loja_C.pdf', fornecedor: 'Loja C Tecnologia', valor: 'R$ 1.510,00', data: '03/02/2026' },
