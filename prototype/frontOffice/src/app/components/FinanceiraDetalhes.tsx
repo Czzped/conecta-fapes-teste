@@ -945,44 +945,6 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
             <p style={{ color: statusMessage.color, fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: 0, lineHeight: '1.5', whiteSpace: 'pre-line' }}>{statusMessage.text}</p>
           </div>
           {payment.status === 'Reprovado' && (
-            <section
-              className="mt-4 mb-6"
-              style={{
-                backgroundColor: 'var(--card)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius)',
-                padding: '2rem',
-              }}
-            >
-              <div className="flex items-start gap-3 mb-4">
-                <h2 style={stepTitle}>Contestação</h2>
-              </div>
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <label style={labelSt}>Data de envio</label>
-                  <div className="px-3 py-2" style={{ backgroundColor: 'var(--input-background)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
-                    12/06/2026
-                  </div>
-                </div>
-                <div>
-                  <label style={labelSt}>Justificativa</label>
-                  <div className="px-3 py-2" style={{ minHeight: '96px', backgroundColor: 'var(--input-background)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
-                    A cotação anexada foi substituída por documento fiscal atualizado, com os valores corrigidos conforme solicitado pela FAPES.
-                  </div>
-                </div>
-                <div className="p-4 flex items-center gap-4" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
-                  <div className="flex items-center gap-3 flex-1">
-                    <FileText size={20} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
-                    <span style={{ fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', color: 'var(--foreground)' }}>
-                      Contestacao_Cotacao_Corrigida.pdf
-                    </span>
-                  </div>
-                  <ChevronDown size={18} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
-                </div>
-              </div>
-            </section>
-          )}
-          {payment.status === 'Revisar' && (
             <>
               <section
                 className="mt-4"
@@ -993,9 +955,12 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                   padding: '2rem',
                 }}
               >
-                <div className="flex items-start gap-3 mb-4">
+                <div className="flex items-start gap-3 mb-1">
                   <h2 style={stepTitle}>Contestação</h2>
                 </div>
+                <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: '0 0 1rem' }}>
+                  Conteste a reprovação: descreva a justificativa e anexe os comprovantes que a sustentam.
+                </p>
                 <div>
                   <label style={labelSt}>
                     Justificativa
@@ -1004,7 +969,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                       onChange={(event) => setJustificativaReprovacao(event.target.value)}
                       rows={4}
                       className="mt-2 w-full px-3 py-2"
-                      placeholder="Digite a justificativa da solicitação de revisão"
+                      placeholder="Digite a justificativa da contestação"
                       style={{
                         backgroundColor: 'var(--input-background)',
                         border: '1px solid var(--border)',
@@ -1122,6 +1087,35 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                 </button>
               </div>
             </>
+          )}
+          {payment.status === 'Revisar' && (
+            <section
+              className="mt-4 mb-6"
+              style={{
+                backgroundColor: 'var(--card)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
+                padding: '2rem',
+              }}
+            >
+              <div className="flex items-start gap-3 mb-4">
+                <h2 style={stepTitle}>Justificativa da Revisão</h2>
+              </div>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label style={labelSt}>Data</label>
+                  <div className="px-3 py-2" style={{ backgroundColor: 'var(--input-background)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
+                    10/06/2026
+                  </div>
+                </div>
+                <div>
+                  <label style={labelSt}>Justificativa</label>
+                  <div className="px-3 py-2" style={{ minHeight: '96px', backgroundColor: 'var(--input-background)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
+                    Reenvie a prestação incluindo o comprovante de pagamento correspondente à cotação selecionada e corrija os valores conforme o documento fiscal atualizado.
+                  </div>
+                </div>
+              </div>
+            </section>
           )}
         </>
       )}
