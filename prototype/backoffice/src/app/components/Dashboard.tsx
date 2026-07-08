@@ -1696,7 +1696,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               </div>
             </div>
 
-            {/* Seção de Observação */}
+            {/* Seção de Observação (apenas Nota Fiscal) */}
+            {selectedPagamento.variante === 'nota-fiscal' && (
             <div className="mt-8">
               <div className="flex items-center gap-2 mb-3" style={{ marginLeft: '32px' }}>
                 <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Observação</h3>
@@ -1716,6 +1717,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 {observacao.length}/{maxObservacaoLength} caracteres
               </p>
             </div>
+            )}
 
             {/* Divider antes da Avaliação Fapes */}
             <div style={{ marginTop: '32px', marginBottom: '32px', marginLeft: '32px', marginRight: '32px' }}>
