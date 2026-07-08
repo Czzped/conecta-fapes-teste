@@ -125,6 +125,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [statusAvaliacao, setStatusAvaliacao] = useState<'validado' | 'revisar' | 'reprovado' | null>(null);
   const [motivoRevisao, setMotivoRevisao] = useState('');
   const [justificativa, setJustificativa] = useState('');
+  // Pré-preenche a Avaliação Fapes quando a prestação já está em Revisar
+  React.useEffect(() => {
+    if (selectedPagamento?.status === 'Revisar') {
+      setStatusAvaliacao('revisar');
+      setMotivoRevisao('Está faltando um comprovante');
+      setJustificativa('teste de avaliação');
+    } else {
+      setStatusAvaliacao(null);
+      setMotivoRevisao('');
+      setJustificativa('');
+    }
+  }, [selectedPagamento]);
   const [showMotivoDropdown, setShowMotivoDropdown] = useState(false);
   const [showConfirmacaoModal, setShowConfirmacaoModal] = useState(false);
   const [showCadastrarMotivoModal, setShowCadastrarMotivoModal] = useState(false);
@@ -1734,8 +1746,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               </div>
             </div>
 
-            {/* Seção de Observação (apenas Nota Fiscal) */}
-            {selectedPagamento.variante === 'nota-fiscal' && (
+            {/* Seção de Observação (apenas Nota Fiscal, oculta em Revisar) */}
+            {selectedPagamento.variante === 'nota-fiscal' && selectedPagamento.status !== 'Revisar' && (
             <div className="mt-8">
               <div className="flex items-center gap-2 mb-3" style={{ marginLeft: '32px' }}>
                 <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Observação</h3>
