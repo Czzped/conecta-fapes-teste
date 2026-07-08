@@ -111,7 +111,7 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
         <button
           type="button"
           onClick={() => setOpenMultiSelect(isOpen ? null : key)}
-          className="w-full px-3 py-2 pr-10 text-left transition-colors"
+          className="w-full px-3 pr-10 text-left transition-colors"
           style={{
             backgroundColor: 'var(--input-background)',
             color: selected.length ? 'var(--foreground)' : 'var(--muted-foreground)',
@@ -119,6 +119,8 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
             borderRadius: 'var(--radius)',
             fontSize: 'var(--text-sm)',
             fontWeight: 'var(--font-weight-normal)',
+            paddingTop: '0.625rem',
+            paddingBottom: '0.625rem',
             cursor: 'pointer',
             fontFamily: 'inherit',
           }}
