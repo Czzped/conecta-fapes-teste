@@ -395,7 +395,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
     switch (payment.status) {
       case 'Em Validação': return { text: 'Esta Prestação de Contas está Em Validação. Após verificarmos todos os dados enviados, seu status irá ser atualizado na tela inicial. Enquanto isso, você não consegue alterar as informações enviadas.', bg: 'rgba(59,130,246,.1)', border: 'rgba(59,130,246,.3)', color: 'rgb(59,130,246)' };
       case 'Reprovado':    return { text: '10/06/2026 - Esta Prestação de Contas não foi aprovada por X motivo. Você deve repositar o valor para a conta do projeto em até 30 dias corridos ou envie uma contestação e justifique.', bg: 'rgba(239,68,68,.1)', border: 'rgba(239,68,68,.3)', color: 'rgb(239,68,68)' };
-      case 'Revisar':      return { text: 'Para 10/06/2026: Informamos que esta Prestação de Contas ainda não foi aprovada e necessita de revisão. O prazo para realizar as adequações necessárias é de até 15 dias úteis.', bg: 'rgba(234,179,8,.1)', border: 'rgba(234,179,8,.3)', color: 'rgb(234,179,8)' };
+      case 'Revisar':      return { text: 'Informamos que esta Prestação de Contas ainda não foi aprovada e necessita de revisão. O prazo para realizar as adequações necessárias é de até 15 dias úteis.', bg: 'rgba(234,179,8,.1)', border: 'rgba(234,179,8,.3)', color: 'rgb(234,179,8)' };
       default: return null;
     }
   };
