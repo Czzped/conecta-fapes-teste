@@ -1441,11 +1441,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               </div>
             </div>
 
-            {/* Contestação (apenas Revisar / Reprovado) */}
-            {(selectedPagamento.status === 'Revisar' || selectedPagamento.status === 'Reprovado') && (
+            {/* Contestação (apenas Reprovado) */}
+            {selectedPagamento.status === 'Reprovado' && (
               <div className="mt-8 rounded-lg p-6" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
                 <h2 className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Contestação</h2>
-                <p className="mb-4" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }}>Contestação enviada pelo coordenador em resposta à avaliação.</p>
+                <p className="mb-4" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }}>Contestação enviada pelo coordenador em resposta à reprovação. Analise e decida se mantém a reprovação ou valida a prestação.</p>
                 <div className="space-y-4">
                   <div>
                     <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>Data de envio</label>
@@ -1467,6 +1467,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                       </button>
                     </div>
                   </div>
+                </div>
+                <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid var(--dash-divider)', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                  <button onClick={() => { toast.success('Reprovação mantida.'); setTimeout(() => { setActivePage('financeira'); setSelectedPagamento(null); }, 1000); }} className="px-6 py-2 rounded-lg transition-all" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
+                    Manter Reprovado
+                  </button>
+                  <button onClick={() => setShowConfirmacaoModal(true)} className="px-6 py-2 rounded-lg transition-all" style={{ backgroundColor: '#00c1af', border: '1px solid #00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)', cursor: 'pointer' }}>
+                    Validar
+                  </button>
                 </div>
               </div>
             )}
