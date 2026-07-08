@@ -229,16 +229,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   </div>
                   <FileText className="w-5 h-5" style={{ color: 'var(--dash-text-secondary)' }} />
                   <span className="flex-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{item.file}</span>
-                  {expanded && (
-                    <>
-                      <button onClick={(e) => { e.stopPropagation(); toast.info('Visualizar comprovante'); }} title="Visualizar" style={{ background: 'transparent', border: 'none', color: 'var(--dash-icon-subdued)', cursor: 'pointer', display: 'flex', padding: '4px' }}>
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button onClick={(e) => { e.stopPropagation(); toast.info('Remover cotação'); }} title="Excluir" style={{ background: 'transparent', border: 'none', color: 'var(--dash-icon-subdued)', cursor: 'pointer', display: 'flex', padding: '4px' }}>
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </>
-                  )}
+                  <button onClick={(e) => { e.stopPropagation(); toast.info('Visualizar comprovante'); }} title="Visualizar" style={{ background: 'transparent', border: 'none', color: 'var(--dash-icon-subdued)', cursor: 'pointer', display: 'flex', padding: '4px' }}>
+                    <Eye className="w-4 h-4" />
+                  </button>
                   <ChevronDown className="w-5 h-5" style={{ color: 'var(--dash-icon-subdued)', transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
                 </div>
                 {expanded && (
@@ -1556,54 +1549,72 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 </>
               ) : selectedPagamento.variante === 'invoice' ? (
                 <>
-                  {/* Passo 1: Anexar Invoice */}
+                  {/* Passo 1: Descrição */}
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <div className="flex items-center justify-center rounded-full" style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}>1</div>
-                      <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Anexar Invoice (Pagamento Internacional) <span style={{ color: '#ef4444' }}>*</span></h2>
+                      <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Descrição</h2>
                     </div>
-                    <p className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginLeft: '32px' }}>Inclua o Invoice (Pagamento Internacional) que justifique esse pagamento</p>
-                    <div className="rounded-lg p-4 flex items-center justify-between cursor-pointer" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)', marginLeft: '32px' }}>
+                    <p className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginLeft: '32px' }}>Descrição do Invoice (Pagamento Internacional) informada na prestação.</p>
+                    <div className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)', marginLeft: '32px' }}>
+                      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', lineHeight: '1.6' }}>Compra internacional de insumos de laboratório importados, referentes aos itens aprovados no edital. Pagamento realizado via invoice em moeda estrangeira.</p>
+                    </div>
+                  </div>
+
+                  {/* Passo 2: Invoice (Pagamento Internacional) */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center justify-center rounded-full" style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}>2</div>
+                      <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Invoice (Pagamento Internacional)</h2>
+                    </div>
+                    <p className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginLeft: '32px' }}>Invoice (Pagamento Internacional) enviado para justificar este pagamento.</p>
+                    <div className="rounded-lg p-4 flex items-center justify-between" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)', marginLeft: '32px' }}>
                       <div className="flex items-center gap-3">
                         <FileText className="w-5 h-5" style={{ color: 'var(--dash-text-secondary)' }} />
                         <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>Invoice_Internacional_2026.pdf</span>
                       </div>
-                      <ChevronDown className="w-5 h-5" style={{ color: 'var(--dash-icon-subdued)' }} />
+                      <button onClick={() => toast.info('Visualizar Invoice')} title="Visualizar" style={{ background: 'transparent', border: 'none', color: 'var(--dash-icon-subdued)', cursor: 'pointer', display: 'flex', padding: '4px' }}>
+                        <Eye className="w-5 h-5" />
+                      </button>
                     </div>
                   </div>
 
-                  {/* Passo 2: Associar Compra */}
+                  {/* Passo 3: Compra Associada */}
                   <div>
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="flex items-center justify-center rounded-full" style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}>2</div>
-                      <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Associar Compra <span style={{ color: '#ef4444' }}>*</span></h2>
+                      <div className="flex items-center justify-center rounded-full" style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}>3</div>
+                      <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Compra Associada</h2>
                     </div>
+                    <p className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginLeft: '32px' }}>Itens comprados associados aos itens aprovados no Edital.</p>
                     <div className="space-y-3" style={{ marginLeft: '32px' }}>
-                      <div className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
-                        <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>Notebook Dell Inspiron 15</span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        {[
-                          { label: 'Selecione a categoria do item:', value: 'Material de Consumo' },
-                          { label: 'Selecione o item do edital que foi adquirido:', value: 'Notebook' },
-                        ].map(({ label, value }) => (
-                          <div key={label}>
-                            <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{label}</label>
-                            <div className="rounded-lg p-4 flex items-center justify-between cursor-pointer" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
-                              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }}>{value}</span>
-                              <ChevronDown className="w-5 h-5" style={{ color: 'var(--dash-icon-subdued)' }} />
-                            </div>
+                      {[
+                        { categoria: 'Material de Consumo', item: 'Reagente para cromatografia', qtd: '10', valor: 'R$ 2.283,95' },
+                        { categoria: 'Material de Consumo', item: 'Kit de vidraria laboratorial', qtd: '2', valor: 'R$ 2.283,95' },
+                      ].map((compra, i) => (
+                        <div key={i} className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
+                          <div className="grid grid-cols-4 gap-4">
+                            {[
+                              { label: 'Categoria do item', value: compra.categoria },
+                              { label: 'Item', value: compra.item },
+                              { label: 'Quantidade', value: compra.qtd },
+                              { label: 'Valor', value: compra.valor },
+                            ].map(({ label, value }) => (
+                              <div key={label}>
+                                <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>{label}</label>
+                                <input readOnly value={value} className="w-full rounded-lg px-3 py-2" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Passo 3: Cotação */}
-                  {renderCotacao(3, 'Se você comprou um item de valor superior a R$ 1.400, envie 3 orçamentos e selecione o de menor valor. O de menor valor deve ser o que você comprou.', [
-                    { file: 'Cotacao_Loja_A.pdf', fornecedor: 'Global Tech Ltd.', valor: 'US$ 240,00', data: '05/02/2026' },
-                    { file: 'Cotacao_Loja_B.pdf', fornecedor: 'Overseas Supply Co.', valor: 'US$ 268,00', data: '04/02/2026' },
-                    { file: 'Cotacao_Loja_C.pdf', fornecedor: 'Import Partners Inc.', valor: 'US$ 279,00', data: '03/02/2026' },
+                  {/* Passo 4: Cotação */}
+                  {renderCotacao(4, 'Orçamentos enviados na prestação. O orçamento selecionado é o de menor valor e corresponde ao item adquirido. Para itens acima de R$ 1.400, são exigidos 3 orçamentos por item.', [
+                    { file: 'Cotacao_Loja_A.pdf', fornecedor: 'Global Tech Ltd.', valor: 'R$ 2.283,95', data: '05/02/2026' },
+                    { file: 'Cotacao_Loja_B.pdf', fornecedor: 'Overseas Supply Co.', valor: 'R$ 2.560,00', data: '04/02/2026' },
+                    { file: 'Cotacao_Loja_C.pdf', fornecedor: 'Import Partners Inc.', valor: 'R$ 2.780,00', data: '03/02/2026' },
                   ])}
                 </>
               ) : (
