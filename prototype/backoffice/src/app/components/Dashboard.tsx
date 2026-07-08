@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, Settings, Inbox, Landmark, Building2, UserRound } from 'lucide-react';
+import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, Settings, Inbox, Landmark, Building2, UserRound, Trash2, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import conectaSymbol from 'figma:asset/db135b6708f6cc7f72f27c6a31dd02aa5500d030.png';
 import fapesLogo from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
@@ -38,14 +38,39 @@ type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revi
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
 type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outro Projeto Exemplo' | 'Mais um Projeto Exemplo';
 
+type PagamentoCategoria = Exclude<CategoriaFilter, 'Todos'>;
+type PagamentoVariante = 'passagem' | 'nota-fiscal' | 'invoice';
+
 interface PagamentoCard {
   id: number;
   tipo: 'Boleto' | 'Pix';
   valor: string;
   data: string;
-  cnpj: string;
+  categoria: PagamentoCategoria;
+  variante: PagamentoVariante;
   projeto: string;
   status: StatusFilter;
+}
+
+interface Passageiro {
+  id: number;
+  nome: string;
+  valor: string;
+  localizador: string;
+  emissao: string;
+  origem: string;
+  saida: string;
+  horaSaida: string;
+  destino: string;
+  chegada: string;
+  horaChegada: string;
+}
+
+interface CotacaoItem {
+  file: string;
+  fornecedor: string;
+  valor: string;
+  data: string;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
@@ -107,6 +132,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [selectedPagamentos, setSelectedPagamentos] = useState<number[]>([]);
   const [showValidarLoteModal, setShowValidarLoteModal] = useState(false);
 
+  // Estados do detalhe da prestação (cotação e passageiros)
+  const [cotacaoSelecionada, setCotacaoSelecionada] = useState('Cotacao_Loja_A.pdf');
+  const [cotacaoExpandida, setCotacaoExpandida] = useState<string | null>('Cotacao_Loja_A.pdf');
+  const [passageiros] = useState<Passageiro[]>([
+    { id: 1, nome: 'Ana Beatriz Costa', valor: 'R$ 1.280,00', localizador: 'ABX9F2', emissao: '10/02/2026', origem: 'Vitória – ES', saida: '18/02/2026', horaSaida: '08:15', destino: 'São Paulo – SP', chegada: '18/02/2026', horaChegada: '09:55' },
+    { id: 2, nome: 'Carlos Henrique Dias', valor: 'R$ 1.280,00', localizador: 'ABX9F3', emissao: '10/02/2026', origem: 'Vitória – ES', saida: '18/02/2026', horaSaida: '08:15', destino: 'São Paulo – SP', chegada: '18/02/2026', horaChegada: '09:55' },
+  ]);
+
   const languageNames = {
     pt: 'Português',
     en: 'Inglês',
@@ -142,16 +175,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
   // Mock data para os cards de pagamento
   const pagamentosData: PagamentoCard[] = [
-    { id: 1, tipo: 'Boleto', valor: 'R$ 3.456,70', data: '27/02/2026 - 09:35', cnpj: 'Magazine Luiza', projeto: 'Conecta Fapes', status: 'Em Validação' },
-    { id: 2, tipo: 'Pix', valor: 'R$ 4.567,90', data: '25/02/2026 - 10:05', cnpj: 'Magazine Luiza', projeto: 'Outro Projeto', status: 'Em Validação' },
-    { id: 3, tipo: 'Pix', valor: 'R$ 789,00', data: '23/02/2026 - 12:50', cnpj: 'Kalunga', projeto: 'Mais um Projeto', status: 'Em Validação' },
-    { id: 4, tipo: 'Boleto', valor: 'R$ 2.100,00', data: '22/02/2026 - 11:20', cnpj: 'Kalunga', projeto: 'Conecta Fapes', status: 'Em Validação' },
-    { id: 5, tipo: 'Boleto', valor: 'R$ 1.890,50', data: '20/02/2026 - 11:45', cnpj: 'Americanas', projeto: 'Outro Projeto', status: 'Em Validação' },
-    { id: 6, tipo: 'Boleto', valor: 'R$ 2.345,60', data: '19/02/2026 - 17:25', cnpj: 'Americanas', projeto: 'Mais um Projeto', status: 'Em Validação' },
-    { id: 7, tipo: 'Pix', valor: 'R$ 567,80', data: '18/02/2026 - 16:45', cnpj: 'Americanas', projeto: 'Conecta Fapes', status: 'Em Validação' },
-    { id: 8, tipo: 'Pix', valor: 'R$ 2.567,30', data: '15/02/2026 - 16:00', cnpj: 'Amazon', projeto: 'Conecta Fapes', status: 'Em Validação' },
-    { id: 9, tipo: 'Pix', valor: 'R$ 5.234,20', data: '14/02/2026 - 08:40', cnpj: 'Amazon', projeto: 'Outro Projeto', status: 'Em Validação' },
-    { id: 10, tipo: 'Boleto', valor: 'R$ 3.690,00', data: '12/02/2026 - 08:15', cnpj: 'Amazon', projeto: 'Mais um Projeto', status: 'Em Validação' },
+    { id: 1, tipo: 'Boleto', valor: 'R$ 3.456,70', data: '27/02/2026 - 09:35', categoria: 'Material Permanente', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Em Validação' },
+    { id: 2, tipo: 'Pix', valor: 'R$ 4.567,90', data: '25/02/2026 - 10:05', categoria: 'Material de Consumo', variante: 'invoice', projeto: 'Outro Projeto', status: 'Em Validação' },
+    { id: 3, tipo: 'Pix', valor: 'R$ 789,00', data: '23/02/2026 - 12:50', categoria: 'Passagem', variante: 'passagem', projeto: 'Mais um Projeto', status: 'Em Validação' },
+    { id: 4, tipo: 'Boleto', valor: 'R$ 2.100,00', data: '22/02/2026 - 11:20', categoria: 'Material de Consumo', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Em Validação' },
+    { id: 5, tipo: 'Boleto', valor: 'R$ 1.890,50', data: '20/02/2026 - 11:45', categoria: 'Passagem', variante: 'passagem', projeto: 'Outro Projeto', status: 'Em Validação' },
+    { id: 6, tipo: 'Boleto', valor: 'R$ 2.345,60', data: '19/02/2026 - 17:25', categoria: 'Pessoa Jurídica', variante: 'nota-fiscal', projeto: 'Mais um Projeto', status: 'Em Validação' },
+    { id: 7, tipo: 'Pix', valor: 'R$ 567,80', data: '18/02/2026 - 16:45', categoria: 'Diária', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Em Validação' },
+    { id: 8, tipo: 'Pix', valor: 'R$ 2.567,30', data: '15/02/2026 - 16:00', categoria: 'Material Permanente', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Em Validação' },
+    { id: 9, tipo: 'Pix', valor: 'R$ 5.234,20', data: '14/02/2026 - 08:40', categoria: 'Material de Consumo', variante: 'invoice', projeto: 'Outro Projeto', status: 'Em Validação' },
+    { id: 10, tipo: 'Boleto', valor: 'R$ 3.690,00', data: '12/02/2026 - 08:15', categoria: 'Passagem', variante: 'passagem', projeto: 'Mais um Projeto', status: 'Em Validação' },
   ];
 
   const getStatusColor = (status: StatusFilter): string => {
@@ -170,6 +203,79 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         return '#ffffff';
     }
   };
+
+  // Passo "Cotação" reutilizado pelas 3 variantes do detalhe (Passagem, Nota Fiscal, Invoice)
+  const renderCotacao = (stepNumber: number, intro: string, itens: CotacaoItem[]) => (
+    <div>
+      <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center justify-center rounded-full" style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}>{stepNumber}</div>
+        <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Cotação</h2>
+      </div>
+      <div style={{ marginLeft: '32px' }}>
+        <p className="mb-4" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', lineHeight: '1.6' }}>{intro}</p>
+        <div className="space-y-3">
+          {itens.map((item) => {
+            const selected = cotacaoSelecionada === item.file;
+            const expanded = cotacaoExpandida === item.file;
+            return (
+              <div key={item.file} className="rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--dash-input-bg)', border: `1px solid ${expanded ? '#00c1af' : 'var(--dash-card-border)'}`, transition: 'border-color .2s' }}>
+                <div className="p-4 flex items-center gap-3 cursor-pointer" onClick={() => setCotacaoExpandida(expanded ? null : item.file)}>
+                  <div
+                    onClick={(e) => { e.stopPropagation(); setCotacaoSelecionada(item.file); }}
+                    className="flex items-center justify-center rounded-full"
+                    style={{ width: '20px', height: '20px', border: `2px solid ${selected ? '#00c1af' : 'var(--dash-card-border)'}`, backgroundColor: selected ? '#00c1af' : 'transparent', flexShrink: 0, cursor: 'pointer' }}
+                  >
+                    {selected && <div className="rounded-full" style={{ width: '8px', height: '8px', backgroundColor: '#ffffff' }} />}
+                  </div>
+                  <FileText className="w-5 h-5" style={{ color: 'var(--dash-text-secondary)' }} />
+                  <span className="flex-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{item.file}</span>
+                  {expanded && (
+                    <>
+                      <button onClick={(e) => { e.stopPropagation(); toast.info('Visualizar comprovante'); }} title="Visualizar" style={{ background: 'transparent', border: 'none', color: 'var(--dash-icon-subdued)', cursor: 'pointer', display: 'flex', padding: '4px' }}>
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button onClick={(e) => { e.stopPropagation(); toast.info('Remover cotação'); }} title="Excluir" style={{ background: 'transparent', border: 'none', color: 'var(--dash-icon-subdued)', cursor: 'pointer', display: 'flex', padding: '4px' }}>
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
+                  <ChevronDown className="w-5 h-5" style={{ color: 'var(--dash-icon-subdued)', transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
+                </div>
+                {expanded && (
+                  <div className="px-4 pb-4" style={{ borderTop: '1px solid var(--dash-card-border)' }}>
+                    <div className="grid grid-cols-2 gap-4 pt-4">
+                      <div>
+                        <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>Fornecedor <span style={{ color: '#ef4444' }}>*</span></label>
+                        <input readOnly value={item.fornecedor} className="w-full rounded-lg px-4 py-2" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
+                      </div>
+                      <div>
+                        <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>Valor <span style={{ color: '#ef4444' }}>*</span></label>
+                        <input readOnly value={item.valor} className="w-full rounded-lg px-4 py-2" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mt-4 items-end">
+                      <div>
+                        <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>Data <span style={{ color: '#ef4444' }}>*</span></label>
+                        <div className="relative">
+                          <input readOnly value={item.data} className="w-full rounded-lg px-4 py-2 pr-10" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
+                          <Calendar size={18} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--dash-icon-subdued)' }} />
+                        </div>
+                      </div>
+                      <div className="flex justify-end">
+                        <button onClick={() => toast.info('Editar cotação')} className="flex items-center gap-2 px-6 py-2 rounded-lg transition-all" style={{ backgroundColor: 'rgba(20, 184, 166, 0.1)', border: '1px solid rgba(20, 184, 166, 0.3)', color: '#14b8a6', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
+                          <Pencil className="w-4 h-4" /> Editar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <ThemeProvider isLight={isLight}>
@@ -1247,11 +1353,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     >
                       <div className="grid grid-cols-6 gap-6 flex-1">
                         {[
-                          { label: 'Projeto',       value: pagamento.projeto, cls: '' },
-                          { label: 'Pagamento',     value: pagamento.tipo,    cls: '' },
-                          { label: 'Valor',         value: pagamento.valor,   cls: '' },
-                          { label: 'Data de Envio', value: pagamento.data,    cls: '' },
-                          { label: 'CNPJ',          value: pagamento.cnpj,    cls: 'pl-6' },
+                          { label: 'Projeto',       value: pagamento.projeto,   cls: '' },
+                          { label: 'Categoria',     value: pagamento.categoria, cls: '' },
+                          { label: 'Pagamento',     value: pagamento.tipo,      cls: '' },
+                          { label: 'Valor',         value: pagamento.valor,     cls: '' },
+                          { label: 'Data de Envio', value: pagamento.data,      cls: '' },
                         ].map(({ label, value, cls }) => (
                           <div key={label} className={cls}>
                             <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)' }}>{label}</div>
@@ -1317,24 +1423,29 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             {/* Card do Pagamento */}
             <div className="rounded-lg p-5" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
               <div className="grid grid-cols-6 gap-6">
-                {[
-                  { label: 'Projeto',       value: selectedPagamento.projeto, cls: '' },
-                  { label: 'Pagamento',     value: selectedPagamento.tipo,    cls: '' },
-                  { label: 'Valor',         value: selectedPagamento.valor,   cls: '' },
-                  { label: 'Data de Envio', value: selectedPagamento.data,    cls: '' },
-                  { label: 'CNPJ',          value: selectedPagamento.cnpj,    cls: 'pl-6' },
-                ].map(({ label, value, cls }) => (
-                  <div key={label} className={cls}>
+                {([
+                  { label: 'Projeto',       value: selectedPagamento.projeto,   kind: 'text' },
+                  { label: 'Categoria',     value: selectedPagamento.categoria, kind: 'categoria' },
+                  { label: 'Pagamento',     value: selectedPagamento.tipo,      kind: 'text' },
+                  { label: 'Valor',         value: selectedPagamento.valor,     kind: 'text' },
+                  { label: 'Data de Envio', value: selectedPagamento.data,      kind: 'text' },
+                  { label: 'Status',        value: selectedPagamento.status,    kind: 'status' },
+                ] as { label: string; value: string; kind: 'text' | 'categoria' | 'status' }[]).map(({ label, value, kind }) => (
+                  <div key={label}>
                     <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)' }}>{label}</div>
-                    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{value}</div>
+                    {kind === 'categoria' ? (
+                      <div className="inline-block rounded-full px-3 py-1" style={{ backgroundColor: 'rgba(0,193,175,0.1)', border: '1px solid rgba(0,193,175,0.4)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: '#00c1af' }}>
+                        {value}
+                      </div>
+                    ) : kind === 'status' ? (
+                      <div className="inline-block rounded-full px-3 py-1" style={{ backgroundColor: `${getStatusColor(value as StatusFilter)}20`, border: `1px solid ${getStatusColor(value as StatusFilter)}`, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: getStatusColor(value as StatusFilter) }}>
+                        {value}
+                      </div>
+                    ) : (
+                      <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{value}</div>
+                    )}
                   </div>
                 ))}
-                <div className="pl-6">
-                  <div className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--dash-text-muted)' }}>Status</div>
-                  <div className="inline-block rounded-full px-3 py-1" style={{ backgroundColor: `${getStatusColor(selectedPagamento.status)}20`, border: `1px solid ${getStatusColor(selectedPagamento.status)}`, fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: getStatusColor(selectedPagamento.status) }}>
-                    {selectedPagamento.status}
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -1348,6 +1459,155 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               }}
             >
               <div className="space-y-6">
+              {selectedPagamento.variante === 'passagem' ? (
+                <>
+                  {/* Passo 1: Descrição */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center justify-center rounded-full" style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}>1</div>
+                      <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Descrição</h2>
+                    </div>
+                    <p className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginLeft: '32px' }}>Motivo e detalhes da viagem informados na prestação.</p>
+                    <div className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)', marginLeft: '32px' }}>
+                      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', lineHeight: '1.6' }}>Viagem para participação no workshop de acompanhamento de projetos em São Paulo, conforme cronograma aprovado no edital. Deslocamento ida e volta no mesmo dia.</p>
+                    </div>
+                  </div>
+
+                  {/* Passo 2: Anexos da Passagem */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center justify-center rounded-full" style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}>2</div>
+                      <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Anexos da Passagem <span style={{ color: '#ef4444' }}>*</span></h2>
+                    </div>
+                    <div style={{ marginLeft: '32px' }}>
+                      {[
+                        { label: 'Comprovante de Pagamento', file: 'Comprovante_Pagamento_Passagem.pdf' },
+                        { label: 'Comprovante de Realização da Viagem', file: 'Cartao_Embarque_Ida_Volta.pdf' },
+                      ].map(({ label, file }) => (
+                        <div key={file} className="mb-4">
+                          <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>{label}</label>
+                          <div className="rounded-lg p-4 flex items-center justify-between cursor-pointer" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
+                            <div className="flex items-center gap-3">
+                              <FileText className="w-5 h-5" style={{ color: 'var(--dash-text-secondary)' }} />
+                              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{file}</span>
+                            </div>
+                            <ChevronDown className="w-5 h-5" style={{ color: 'var(--dash-icon-subdued)' }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Passo 3: Informações da Passagem */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center justify-center rounded-full" style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}>3</div>
+                      <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Informações da Passagem</h2>
+                    </div>
+                    <p className="mb-4" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginLeft: '32px' }}>Dados da passagem realizada. O valor informado é associado à rubrica de passagem.</p>
+                    <div className="space-y-4" style={{ marginLeft: '32px' }}>
+                      {passageiros.map((p, idx) => (
+                        <div key={p.id} className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
+                          <div className="flex items-center justify-between mb-3">
+                            <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Passageiro {idx + 1}</span>
+                            <button onClick={() => toast.info('Remover passageiro')} title="Remover" style={{ background: 'transparent', border: 'none', color: 'var(--dash-icon-subdued)', cursor: 'pointer', display: 'flex', padding: '4px' }}>
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <div className="grid grid-cols-4 gap-3">
+                            {([
+                              { label: 'Nome do Passageiro', value: p.nome, req: true },
+                              { label: 'Valor', value: p.valor, req: true },
+                              { label: 'Localizador', value: p.localizador, req: false },
+                              { label: 'Data de Emissão', value: p.emissao, req: false },
+                            ] as { label: string; value: string; req: boolean }[]).map(({ label, value, req }) => (
+                              <div key={label}>
+                                <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>{label}{req && <span style={{ color: '#ef4444' }}> *</span>}</label>
+                                <input readOnly value={value} className="w-full rounded-lg px-3 py-2" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
+                              </div>
+                            ))}
+                          </div>
+                          <div className="grid grid-cols-3 gap-3 mt-3">
+                            {[
+                              { label: 'Local de Origem', value: p.origem },
+                              { label: 'Data de Saída', value: p.saida },
+                              { label: 'Horário', value: p.horaSaida },
+                              { label: 'Local de Destino', value: p.destino },
+                              { label: 'Data de Chegada', value: p.chegada },
+                              { label: 'Horário', value: p.horaChegada },
+                            ].map(({ label, value }, i) => (
+                              <div key={label + i}>
+                                <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>{label}</label>
+                                <input readOnly value={value} className="w-full rounded-lg px-3 py-2" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Passo 4: Cotação */}
+                  {renderCotacao(4, 'Envie 3 cotações de passagens e selecione a de menor valor. A cotação de menor valor deve ser a que foi adquirida.', [
+                    { file: 'Cotacao_Loja_A.pdf', fornecedor: 'Passagens Aéreas Alfa', valor: 'R$ 1.280,00', data: '05/02/2026' },
+                    { file: 'Cotacao_Loja_B.pdf', fornecedor: 'Passagens Aéreas Beta', valor: 'R$ 1.340,00', data: '04/02/2026' },
+                    { file: 'Cotacao_Loja_C.pdf', fornecedor: 'Passagens Aéreas Gama', valor: 'R$ 1.390,00', data: '03/02/2026' },
+                  ])}
+                </>
+              ) : selectedPagamento.variante === 'invoice' ? (
+                <>
+                  {/* Passo 1: Anexar Invoice */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center justify-center rounded-full" style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}>1</div>
+                      <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Anexar Invoice (Pagamento Internacional) <span style={{ color: '#ef4444' }}>*</span></h2>
+                    </div>
+                    <p className="mb-3" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginLeft: '32px' }}>Inclua o Invoice (Pagamento Internacional) que justifique esse pagamento</p>
+                    <div className="rounded-lg p-4 flex items-center justify-between cursor-pointer" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)', marginLeft: '32px' }}>
+                      <div className="flex items-center gap-3">
+                        <FileText className="w-5 h-5" style={{ color: 'var(--dash-text-secondary)' }} />
+                        <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>Invoice_Internacional_2026.pdf</span>
+                      </div>
+                      <ChevronDown className="w-5 h-5" style={{ color: 'var(--dash-icon-subdued)' }} />
+                    </div>
+                  </div>
+
+                  {/* Passo 2: Associar Compra */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center justify-center rounded-full" style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}>2</div>
+                      <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Associar Compra <span style={{ color: '#ef4444' }}>*</span></h2>
+                    </div>
+                    <div className="space-y-3" style={{ marginLeft: '32px' }}>
+                      <div className="rounded-lg p-4" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
+                        <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>Notebook Dell Inspiron 15</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        {[
+                          { label: 'Selecione a categoria do item:', value: 'Material de Consumo' },
+                          { label: 'Selecione o item do edital que foi adquirido:', value: 'Notebook' },
+                        ].map(({ label, value }) => (
+                          <div key={label}>
+                            <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{label}</label>
+                            <div className="rounded-lg p-4 flex items-center justify-between cursor-pointer" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
+                              <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }}>{value}</span>
+                              <ChevronDown className="w-5 h-5" style={{ color: 'var(--dash-icon-subdued)' }} />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Passo 3: Cotação */}
+                  {renderCotacao(3, 'Se você comprou um item de valor superior a R$ 1.400, envie 3 orçamentos e selecione o de menor valor. O de menor valor deve ser o que você comprou.', [
+                    { file: 'Cotacao_Loja_A.pdf', fornecedor: 'Global Tech Ltd.', valor: 'US$ 240,00', data: '05/02/2026' },
+                    { file: 'Cotacao_Loja_B.pdf', fornecedor: 'Overseas Supply Co.', valor: 'US$ 268,00', data: '04/02/2026' },
+                    { file: 'Cotacao_Loja_C.pdf', fornecedor: 'Import Partners Inc.', valor: 'US$ 279,00', data: '03/02/2026' },
+                  ])}
+                </>
+              ) : (
+                <>
               {/* Passo 1: Anexar Nota Fiscal */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
@@ -1410,33 +1670,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               </div>
 
               {/* Passo 3: Cotação */}
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="flex items-center justify-center rounded-full" style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}>3</div>
-                  <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Cotação</h2>
-                </div>
-                <div style={{ marginLeft: '32px' }}>
-                  <p className="mb-4" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', lineHeight: '1.6' }}>
-                    Se você comprou um item de valor superior a R$ 1.400, envie 3 orçamentos e selecione o de menor valor. O de menor valor deve ser o que você comprou. Se há mais de um item na Nota Fiscal com valor a cima de R$ 1.400, você deve enviar 3 orçamentos para cada item.
-                  </p>
-                  <div className="space-y-3">
-                    {[
-                      { file: 'Cotacao_Loja_A.pdf', selected: true },
-                      { file: 'Cotacao_Loja_B.pdf', selected: false },
-                      { file: 'Cotacao_Loja_C.pdf', selected: false },
-                    ].map(({ file, selected }) => (
-                      <div key={file} className="rounded-lg p-4 flex items-center gap-3 cursor-pointer" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
-                        <div className="flex items-center justify-center rounded-full" style={{ width: '20px', height: '20px', border: `2px solid ${selected ? '#00c1af' : 'var(--dash-card-border)'}`, backgroundColor: selected ? '#00c1af' : 'transparent', flexShrink: 0 }}>
-                          {selected && <div className="rounded-full" style={{ width: '8px', height: '8px', backgroundColor: '#ffffff' }} />}
-                        </div>
-                        <FileText className="w-5 h-5" style={{ color: 'var(--dash-text-secondary)' }} />
-                        <span className="flex-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{file}</span>
-                        <ChevronDown className="w-5 h-5" style={{ color: 'var(--dash-icon-subdued)' }} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              {renderCotacao(3, 'Se você comprou um item de valor superior a R$ 1.400, envie 3 orçamentos e selecione o de menor valor. O de menor valor deve ser o que você comprou. Se há mais de um item na Nota Fiscal com valor acima de R$ 1.400, você deve enviar 3 orçamentos para cada item.', [
+                { file: 'Cotacao_Loja_A.pdf', fornecedor: 'Loja A Informática', valor: 'R$ 1.280,00', data: '05/02/2026' },
+                { file: 'Cotacao_Loja_B.pdf', fornecedor: 'Loja B Suprimentos', valor: 'R$ 1.420,00', data: '04/02/2026' },
+                { file: 'Cotacao_Loja_C.pdf', fornecedor: 'Loja C Tecnologia', valor: 'R$ 1.510,00', data: '03/02/2026' },
+              ])}
+                </>
+              )}
               </div>
             </div>
 
@@ -1951,9 +2191,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             <button onClick={() => setShowConfirmacaoModal(false)} className="absolute top-4 right-4 p-1 rounded-lg transition-all" style={{ backgroundColor: 'transparent', border: 'none', color: 'var(--dash-text-muted)', cursor: 'pointer' }}>
               <X size={20} />
             </button>
-            <h3 className="mb-4 pr-8" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', color: 'var(--dash-text-primary)' }}>
-              Tem certeza que deseja aprovar essa Prestação de Contas Financeira?
-            </h3>
+            <div className="flex items-start gap-3 mb-6 pr-8">
+              <div className="flex items-center justify-center flex-shrink-0 rounded-full" style={{ width: '44px', height: '44px', backgroundColor: 'rgba(0,193,175,0.12)' }}>
+                <CheckCircle size={24} style={{ color: '#00c1af' }} />
+              </div>
+              <div>
+                <h3 className="mb-1" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>
+                  Validar prestação?
+                </h3>
+                <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', lineHeight: '1.6' }}>
+                  Tem certeza que deseja validar esta Prestação de Contas Financeira? Após confirmar, <strong style={{ color: 'var(--dash-text-primary)', fontWeight: 'var(--font-weight-semibold)' }}>não é possível desfazer</strong> esta ação.
+                </p>
+              </div>
+            </div>
             <div className="flex gap-3 justify-end">
               <button onClick={() => setShowConfirmacaoModal(false)} className="px-6 py-2 rounded-lg transition-all"
                 style={{ backgroundColor: 'transparent', border: '1px solid var(--dash-card-border)', color: 'var(--dash-text-secondary)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
@@ -1966,7 +2216,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   cursor: 'pointer'
                 }}
               >
-                Aprovar
+                Validar
               </button>
             </div>
           </div>
@@ -2026,7 +2276,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               <X size={20} />
             </button>
             <h3 className="mb-6" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', color: 'var(--dash-text-primary)' }}>
-              Tem certeza que deseja aprovar essa Prestação de Contas Financeira?
+              Tem certeza que deseja validar {selectedPagamentos.length} Prestação{selectedPagamentos.length > 1 ? 'ões' : ''} de Contas Financeira{selectedPagamentos.length > 1 ? 's' : ''} selecionada{selectedPagamentos.length > 1 ? 's' : ''}? Após confirmar, <strong style={{ color: 'var(--dash-text-primary)', fontWeight: 'var(--font-weight-semibold)' }}>não é possível desfazer</strong> esta ação.
             </h3>
             <div className="flex gap-3 justify-end">
               <button onClick={() => setShowValidarLoteModal(false)} className="px-6 py-2 rounded-lg transition-all"
@@ -2036,7 +2286,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               <button onClick={() => { setShowValidarLoteModal(false); const count = selectedPagamentos.length; toast.success(`${count} pagamento${count > 1 ? 's validados' : ' validado'} com sucesso!`); setSelectedPagamentos([]); }}
                 className="px-6 py-2 rounded-lg transition-all"
                 style={{ backgroundColor: '#00c1af', border: '1px solid #00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}>
-                Aprovar
+                Validar
               </button>
             </div>
           </div>
