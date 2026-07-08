@@ -178,12 +178,16 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
   const [novaDiariaMotivo, setNovaDiariaMotivo] = useState('');
 
   // Passagem
-  const [passQuery,    setPassQuery]    = useState('');
-  const [passageiro,   setPassageiro]   = useState('');
-  const [isPassOpen,   setIsPassOpen]   = useState(false);
-  const [localizador,  setLocalizador]  = useState('');
-  const [valorPassagemComprada, setValorPassagemComprada] = useState('');
-  const [dataEmissao,  setDataEmissao]  = useState('');
+  type PassageiroForm = { id: number; query: string; nome: string; isOpen: boolean; valor: string; localizador: string; dataEmissao: string };
+  const [passageiros, setPassageiros] = useState<PassageiroForm[]>([
+    { id: 1, query: '', nome: '', isOpen: false, valor: '', localizador: '', dataEmissao: '' },
+  ]);
+  const updatePassageiro = (id: number, patch: Partial<PassageiroForm>) =>
+    setPassageiros(prev => prev.map(p => (p.id === id ? { ...p, ...patch } : p)));
+  const addPassageiro = () =>
+    setPassageiros(prev => [...prev, { id: prev.reduce((m, p) => Math.max(m, p.id), 0) + 1, query: '', nome: '', isOpen: false, valor: '', localizador: '', dataEmissao: '' }]);
+  const removePassageiro = (id: number) =>
+    setPassageiros(prev => (prev.length > 1 ? prev.filter(p => p.id !== id) : prev));
   const [passOrigem,   setPassOrigem]   = useState('');
   const [passDestino,  setPassDestino]  = useState('');
   const [dataSaida,    setDataSaida]    = useState('');
@@ -245,7 +249,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
     'Scanner Fujitsu ScanSnap', 'Tablet Apple iPad Pro 11"', 'HD Externo Seagate 4TB',
     'Webcam Logitech Brio 4K',
   ];
-  const passagFiltrado = PESSOAS_FICTICIAS.filter(n => n.toLowerCase().includes(passQuery.toLowerCase()));
+  const filtrarPassageiros = (q: string) => PESSOAS_FICTICIAS.filter(n => n.toLowerCase().includes(q.toLowerCase()));
   const diariasElegiveisPrestacao = diariasPrestacao
     .map((diaria, originalIndex) => ({ ...diaria, originalIndex }))
     .filter(diaria => diaria.status === 'Aprovada');
@@ -296,8 +300,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
     setOpenCategoriaIdx(null);
     setOpenItemIdx(null);
     setSelectedDiariaIdx(null);
-    setPassQuery(''); setPassageiro(''); setLocalizador(''); setDataEmissao('');
-    setValorPassagemComprada('');
+    setPassageiros([{ id: 1, query: '', nome: '', isOpen: false, valor: '', localizador: '', dataEmissao: '' }]);
     setPassOrigem(''); setPassDestino('');
     setDataSaida(''); setHoraSaida(''); setDataChegada(''); setHoraChegada('');
   };
@@ -2456,45 +2459,75 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                 <p style={stepSubtitle}>Preencha os dados da passagem realizada. O valor informado será associado à rubrica de passagem.</p>
 
                 <div style={{ marginLeft: '36px' }}>
-                  {/* Linha 1: Passageiro + Valor + Localizador + Data de Emissão */}
-                  <div className="mb-4">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <PersonSelect
-                        label="Nome do Passageiro"
-                        query={passQuery} setQuery={setPassQuery}
-                        selected={passageiro} setSelected={setPassageiro}
-                        isOpen={isPassOpen} setIsOpen={setIsPassOpen}
-                        filtered={passagFiltrado} inputRef={passSearch}
-                        disabled={isReadOnly}
-                      />
-                      <div>
-                        <label style={labelSt}>Valor</label>
-                        <input
-                          type="text"
-                          value={valorPassagemComprada}
-                          onChange={e => setValorPassagemComprada(e.target.value)}
-                          placeholder="R$ 0,00"
-                          disabled={isReadOnly}
-                          style={inputSt(isReadOnly)}
-                          onFocus={e => { if (!isReadOnly) { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; } }}
-                          onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
-                        />
+                  {/* Passageiros (múltiplos) */}
+                  <div className="mb-4 space-y-4">
+                    {passageiros.map((p, idx) => (
+                      <div key={p.id} style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '1rem' }}>
+                        <div className="flex items-center justify-between mb-3">
+                          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--foreground)', fontFamily: 'var(--font-family)' }}>Passageiro {idx + 1}</span>
+                          {!isReadOnly && passageiros.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removePassageiro(p.id)}
+                              title="Remover passageiro"
+                              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', color: 'var(--muted-foreground)', display: 'flex', borderRadius: 'var(--radius)', transition: 'all .2s' }}
+                              onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'; e.currentTarget.style.color = 'rgb(239, 68, 68)'; }}
+                              onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--muted-foreground)'; }}
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                          <PersonSelect
+                            label="Nome do Passageiro"
+                            query={p.query} setQuery={v => updatePassageiro(p.id, { query: v })}
+                            selected={p.nome} setSelected={v => updatePassageiro(p.id, { nome: v })}
+                            isOpen={p.isOpen} setIsOpen={v => updatePassageiro(p.id, { isOpen: v })}
+                            filtered={filtrarPassageiros(p.query)} inputRef={passSearch}
+                            disabled={isReadOnly}
+                          />
+                          <div>
+                            <label style={labelSt}>Valor</label>
+                            <input
+                              type="text"
+                              value={p.valor}
+                              onChange={e => updatePassageiro(p.id, { valor: e.target.value })}
+                              placeholder="R$ 0,00"
+                              disabled={isReadOnly}
+                              style={inputSt(isReadOnly)}
+                              onFocus={e => { if (!isReadOnly) { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; } }}
+                              onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
+                            />
+                          </div>
+                          <div>
+                            <label style={labelSt}>Localizador</label>
+                            <input type="text" value={p.localizador} onChange={e => updatePassageiro(p.id, { localizador: e.target.value })} placeholder="Ex.: ABC123" disabled={isReadOnly} style={inputSt(isReadOnly)}
+                              onFocus={e => { if (!isReadOnly) { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; } }}
+                              onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
+                            />
+                          </div>
+                          <div>
+                            <label style={labelSt}>Data de Emissão</label>
+                            <input type="text" value={p.dataEmissao} onChange={e => updatePassageiro(p.id, { dataEmissao: e.target.value })} placeholder="dd/mm/aaaa" disabled={isReadOnly} style={inputSt(isReadOnly)}
+                              onFocus={e => { if (!isReadOnly) { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; } }}
+                              onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
+                            />
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <label style={labelSt}>Localizador</label>
-                        <input type="text" value={localizador} onChange={e => setLocalizador(e.target.value)} placeholder="Ex.: ABC123" disabled={isReadOnly} style={inputSt(isReadOnly)}
-                          onFocus={e => { if (!isReadOnly) { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; } }}
-                          onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
-                        />
-                      </div>
-                      <div>
-                        <label style={labelSt}>Data de Emissão</label>
-                        <input type="text" value={dataEmissao} onChange={e => setDataEmissao(e.target.value)} placeholder="dd/mm/aaaa" disabled={isReadOnly} style={inputSt(isReadOnly)}
-                          onFocus={e => { if (!isReadOnly) { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; } }}
-                          onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
-                        />
-                      </div>
-                    </div>
+                    ))}
+                    {!isReadOnly && (
+                      <button
+                        type="button"
+                        onClick={addPassageiro}
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'transparent', color: 'var(--foreground)', border: '1px dashed var(--border)', borderRadius: 'var(--radius)', padding: '0.625rem 1rem', cursor: 'pointer', transition: 'all .2s', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}
+                        onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--muted)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                      >
+                        <Plus size={16} /> Adicionar passageiro
+                      </button>
+                    )}
                   </div>
 
                   {/* Linha 2: Local de Origem + Data de Saída + Hora */}
