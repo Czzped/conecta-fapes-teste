@@ -1,4 +1,4 @@
-import { Users, Plus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle } from 'lucide-react';
+import { Users, Plus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle, HeartHandshake, Info } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -8,7 +8,7 @@ import { PaymentsPage } from '@/app/components/PaymentsPage';
 import { ListPagination } from '@/app/components/ListPagination';
 
 interface MyTeamPageProps {
-  accessType: 'voluntario' | 'bolsista' | 'coordenador';
+  accessType: 'voluntario' | 'bolsista' | 'proponente' | 'coordenador';
   onNavigate?: (page: string) => void;
   hideHeader?: boolean;
   defaultTab?: 'bolsistas' | 'informacoes' | 'pagamentos';
@@ -58,6 +58,8 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   const [selectedMemberForCancelRequest, setSelectedMemberForCancelRequest] = useState<TeamMember | null>(null);
   const [selectedYear, setSelectedYear] = useState('2026');
   const [isYearOpen, setIsYearOpen] = useState(false);
+  const [isVolunteerModalOpen, setIsVolunteerModalOpen] = useState(false);
+  const [volunteerStartDate, setVolunteerStartDate] = useState('');
   const itemsPerPage = 10;
   
   const periodChartRef = useRef<HTMLDivElement>(null);
@@ -387,18 +389,61 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               </h1>
             </div>
 
-            {/* Subtitle */}
-            <p 
-              className="mb-6"
-              style={{ 
-                color: 'var(--muted-foreground)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-normal)',
+            {/* Subtitle and actions */}
+            <div
+              className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between"
+              style={{
                 marginLeft: 'calc(32px + 0.75rem)', // Aligns with title (icon size + gap)
               }}
             >
-              Acompanhe as informações dos bolsistas do seu projeto.
-            </p>
+              <p
+                style={{
+                  color: 'var(--muted-foreground)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-normal)',
+                  margin: 0,
+                }}
+              >
+                Acompanhe as informações dos bolsistas do seu projeto.
+              </p>
+
+              {activeTab === 'bolsistas' && !hideAddButton && (
+                <div className="flex flex-col gap-3 sm:flex-row md:-mt-2">
+                  <button
+                    className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: 'var(--primary)',
+                      border: '1px solid var(--primary)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      whiteSpace: 'nowrap',
+                    }}
+                    onClick={() => setIsVolunteerModalOpen(true)}
+                  >
+                    <Plus size={18} />
+                    Adicionar Voluntário
+                  </button>
+                  <button
+                    className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: 'var(--primary)',
+                      border: '1px solid var(--primary)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      whiteSpace: 'nowrap',
+                    }}
+                    onClick={() => onNavigate?.('cadastrar-bolsista')}
+                  >
+                    <Plus size={18} />
+                    Solicitar Bolsa
+                  </button>
+                </div>
+              )}
+            </div>
           </>
         )}
 
@@ -1415,49 +1460,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             </div>
           </div>
 
-          {/* Cadastrar Bolsista Button - Desktop only */}
-          {!hideAddButton && (
-            <button
-              className="hidden md:flex items-center justify-center gap-2 px-4 py-2 transition-colors"
-              style={{
-                backgroundColor: 'transparent',
-                color: 'var(--primary)',
-                border: '1px solid var(--primary)',
-                borderRadius: 'var(--radius)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)',
-                whiteSpace: 'nowrap',
-                marginTop: '1.625rem', // Aligns with inputs (label height + margin)
-              }}
-              onClick={() => onNavigate?.('cadastrar-bolsista')}
-            >
-              <Plus size={18} />
-              Solicitar Bolsa
-            </button>
-          )}
         </div>
-
-        {/* Cadastrar Bolsista Button - Mobile only */}
-        {!hideAddButton && (
-          <div className="flex justify-end mb-6 md:hidden">
-            <button
-              className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
-              style={{
-                backgroundColor: 'transparent',
-                color: 'var(--primary)',
-                border: '1px solid var(--primary)',
-                borderRadius: 'var(--radius)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)',
-                whiteSpace: 'nowrap',
-              }}
-              onClick={() => onNavigate?.('cadastrar-bolsista')}
-            >
-              <Plus size={18} />
-              Solicitar Bolsa
-            </button>
-          </div>
-        )}
 
         {/* Bolsistas List */}
         <div className="space-y-4 max-w-full">
@@ -2696,6 +2699,185 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             </div>
           </div>
         </>
+      )}
+
+      {isVolunteerModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.65)',
+          }}
+          onClick={() => setIsVolunteerModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-xl"
+            style={{
+              backgroundColor: 'var(--popover)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-lg)',
+              boxShadow: 'var(--shadow-lg)',
+              padding: '1.5rem',
+            }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: 'var(--radius)',
+                    backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
+                    color: 'var(--primary)',
+                    flexShrink: 0,
+                  }}
+                >
+                  <HeartHandshake size={22} />
+                </div>
+                <div>
+                  <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
+                    Adicionar Voluntário
+                  </h1>
+                  <p
+                    style={{
+                      color: 'var(--muted-foreground)',
+                      fontSize: 'var(--text-sm)',
+                      margin: '0.375rem 0 0',
+                    }}
+                  >
+                    Sem vínculo de bolsa
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsVolunteerModalOpen(false)}
+                className="flex items-center justify-center transition-colors"
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  color: 'var(--muted-foreground)',
+                  cursor: 'pointer',
+                  padding: 0,
+                }}
+                aria-label="Fechar modal"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="space-y-5">
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    color: 'var(--foreground)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    marginBottom: '0.625rem',
+                  }}
+                >
+                  CPF do Voluntário <span style={{ color: 'rgb(239,68,68)' }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="000.000.000-00"
+                  style={{
+                    width: '100%',
+                    padding: '0.875rem 1rem',
+                    backgroundColor: 'var(--input-background)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                    color: 'var(--foreground)',
+                    fontSize: 'var(--text-sm)',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    color: 'var(--foreground)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    marginBottom: '0.625rem',
+                  }}
+                >
+                  Data de início da participação <span style={{ color: 'rgb(239,68,68)' }}>*</span>
+                </label>
+                <DatePicker
+                  value={volunteerStartDate}
+                  onChange={setVolunteerStartDate}
+                  placeholder="Selecione o mês de início"
+                />
+              </div>
+
+              <div
+                className="flex gap-3"
+                style={{
+                  padding: '1rem',
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--primary)',
+                  backgroundColor: 'color-mix(in srgb, var(--primary) 8%, transparent)',
+                  color: 'var(--primary)',
+                  fontSize: 'var(--text-sm)',
+                  lineHeight: 1.5,
+                }}
+              >
+                <Info size={18} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '0.125rem' }} />
+                <span>
+                  O membro voluntário não possui vínculo financeiro com o projeto e não exige documentação de bolsa. O Voluntário deve entrar em sua conta e aceitar o convite.
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setIsVolunteerModalOpen(false)}
+                className="px-6 py-3 transition-colors"
+                style={{
+                  backgroundColor: 'transparent',
+                  color: 'var(--foreground)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsVolunteerModalOpen(false);
+                  setVolunteerStartDate('');
+                  toast.success('Voluntário adicionado com sucesso.');
+                }}
+                className="px-6 py-3 transition-colors"
+                style={{
+                  backgroundColor: 'var(--primary)',
+                  color: 'var(--background)',
+                  border: '1px solid var(--primary)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                }}
+              >
+                Adicionar voluntário
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

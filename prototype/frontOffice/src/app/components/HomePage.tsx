@@ -2,7 +2,7 @@ import { Info, Briefcase, Bell, FileUser, FolderOpen, Check, GraduationCap, Buil
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-type AccessType = 'voluntario' | 'bolsista' | 'coordenador';
+type AccessType = 'voluntario' | 'bolsista' | 'proponente' | 'coordenador';
 
 interface HomePageProps {
   accessType?: AccessType;
@@ -29,7 +29,7 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
   return (
     <div className="w-full px-4 md:px-8 py-8">
       {/* Header with icon button */}
-      <div className="flex items-center gap-3 mb-8">
+      <div className="flex items-center justify-between gap-3 mb-8">
         <div className="flex items-center gap-3">
           <button
             className="p-2 transition-colors"
@@ -56,6 +56,26 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
             {t('home.portalTitle')}
           </h1>
         </div>
+        {accessType === 'coordenador' && (
+          <button
+            type="button"
+            onClick={() => onNavigate?.('demanda-induzida')}
+            style={{
+              padding: '0.75rem 1.1rem',
+              borderRadius: 'var(--radius)',
+              border: '1px solid rgba(34, 211, 238, 0.35)',
+              backgroundColor: 'rgba(34, 211, 238, 0.12)',
+              color: 'var(--primary)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              fontFamily: 'var(--font-family)',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Demanda Induzida Aberta
+          </button>
+        )}
       </div>
 
       {/* Project Card - Only for Coordenador */}

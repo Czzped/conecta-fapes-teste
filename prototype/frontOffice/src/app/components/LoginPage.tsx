@@ -8,7 +8,7 @@ interface LoginPageProps {
   onLogin: (accessType: AccessType) => void;
 }
 
-type AccessType = 'cidadao' | 'voluntario' | 'bolsista' | 'coordenador' | 'avaliador' | 'diretor' | 'reitor';
+type AccessType = 'cidadao' | 'voluntario' | 'bolsista' | 'proponente' | 'coordenador' | 'avaliador' | 'diretor' | 'reitor';
 
 export function LoginPage({ onLogin }: LoginPageProps) {
   const { t } = useLanguage();
@@ -238,6 +238,40 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               >
                 <GraduationCap size={16} />
                 <span>{t('login.scholar')}</span>
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedAccessType('proponente');
+                  handleLogin('proponente');
+                }}
+                className="flex items-center justify-center gap-2 transition-all duration-200"
+                style={{
+                  backgroundColor: getLoginOptionBackground('proponente'),
+                  color: getLoginOptionColor('proponente'),
+                  padding: '0.75rem 1rem',
+                  borderRadius: 'var(--radius)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  boxShadow: 'none',
+                  width: '100%',
+                }}
+                onMouseEnter={(e) => {
+                  setLoginOptionHover(e.currentTarget, 'proponente');
+                }}
+                onMouseLeave={(e) => {
+                  resetLoginOption(e.currentTarget, 'proponente');
+                }}
+                onMouseDown={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+                onMouseUp={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <Briefcase size={16} />
+                <span>Proponente</span>
               </button>
               <button
                 onClick={() => {

@@ -22,7 +22,12 @@ import termoPg2Image from 'figma:asset/963c600cd797ac50aeadf77e4cd0d47a2df288d6.
 
 type TabType = 'dados' | 'documentos';
 
-export function MyInfoPage() {
+interface MyInfoPageProps {
+  initialTab?: TabType;
+  hideDocumentsTab?: boolean;
+}
+
+export function MyInfoPage({ initialTab = 'documentos', hideDocumentsTab = false }: MyInfoPageProps = {}) {
   usePageScenarios([
     'doc-upload-ok',
     'doc-upload-formato-invalido',
@@ -30,7 +35,7 @@ export function MyInfoPage() {
     'doc-upload-sistema-indisponivel',
   ]);
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<TabType>('documentos');
+  const [activeTab, setActiveTab] = useState<TabType>(hideDocumentsTab ? 'dados' : initialTab);
   const [uploadingDocId, setUploadingDocId] = useState<number | null>(null);
   const [uploadErros, setUploadErros] = useState<Record<number, string>>({});
   const [expandedDocId, setExpandedDocId] = useState<number | null>(null);
@@ -507,22 +512,24 @@ export function MyInfoPage() {
           borderBottom: '1px solid var(--border)',
         }}
       >
-        <button
-          onClick={() => setActiveTab('documentos')}
-          className="pb-3 transition-all"
-          style={{
-            color: activeTab === 'documentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
-            fontWeight: 'var(--font-weight-medium)',
-            fontSize: 'var(--text-sm)',
-            marginBottom: '-1px',
-            background: 'none',
-            border: 'none',
-            borderBottom: activeTab === 'documentos' ? '2px solid var(--primary)' : '2px solid transparent',
-            cursor: 'pointer',
-          }}
-        >
-          Meus Documentos
-        </button>
+        {!hideDocumentsTab && (
+          <button
+            onClick={() => setActiveTab('documentos')}
+            className="pb-3 transition-all"
+            style={{
+              color: activeTab === 'documentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+              fontWeight: 'var(--font-weight-medium)',
+              fontSize: 'var(--text-sm)',
+              marginBottom: '-1px',
+              background: 'none',
+              border: 'none',
+              borderBottom: activeTab === 'documentos' ? '2px solid var(--primary)' : '2px solid transparent',
+              cursor: 'pointer',
+            }}
+          >
+            Meus Documentos
+          </button>
+        )}
         <button
           onClick={() => setActiveTab('dados')}
           className="pb-3 transition-all"
@@ -548,22 +555,24 @@ export function MyInfoPage() {
           borderLeft: '2px solid var(--border)',
         }}
       >
-        <button
-          onClick={() => setActiveTab('documentos')}
-          className="py-3 pl-4 transition-all text-left"
-          style={{
-            color: activeTab === 'documentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
-            fontWeight: 'var(--font-weight-medium)',
-            fontSize: 'var(--text-sm)',
-            background: 'none',
-            border: 'none',
-            borderLeft: activeTab === 'documentos' ? '2px solid var(--primary)' : '2px solid transparent',
-            marginLeft: '-2px',
-            cursor: 'pointer',
-          }}
-        >
-          Meus Documentos
-        </button>
+        {!hideDocumentsTab && (
+          <button
+            onClick={() => setActiveTab('documentos')}
+            className="py-3 pl-4 transition-all text-left"
+            style={{
+              color: activeTab === 'documentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+              fontWeight: 'var(--font-weight-medium)',
+              fontSize: 'var(--text-sm)',
+              background: 'none',
+              border: 'none',
+              borderLeft: activeTab === 'documentos' ? '2px solid var(--primary)' : '2px solid transparent',
+              marginLeft: '-2px',
+              cursor: 'pointer',
+            }}
+          >
+            Meus Documentos
+          </button>
+        )}
         <button
           onClick={() => setActiveTab('dados')}
           className="py-3 pl-4 transition-all text-left"

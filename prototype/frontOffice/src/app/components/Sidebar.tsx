@@ -5,7 +5,7 @@ import fapesLogo from 'figma:asset/0d7b9f0810d49a6ee72945d010952cb0ccbd0c9d.png'
 import fapesLogoExpanded from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-type AccessType = 'voluntario' | 'bolsista' | 'coordenador' | 'diretor' | 'reitor';
+type AccessType = 'voluntario' | 'bolsista' | 'proponente' | 'coordenador' | 'diretor' | 'reitor';
 
 interface SidebarProps {
   currentPage: string;
@@ -428,13 +428,17 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
     );
   }
 
-  // Filter out 'pagamentos' for voluntario access type
-  const filteredProfileMenuItems = accessType === 'voluntario'
+  // Filter profile items by access type
+  const filteredProfileMenuItems = accessType === 'proponente'
+    ? profileMenuItems.filter(item => item.id === 'informacoes')
+    : accessType === 'voluntario'
     ? profileMenuItems.filter(item => item.id !== 'pagamentos')
     : profileMenuItems;
 
   // Insert "Minha Equipe" after "Meu Projeto" for Coordenador
-  const finalManagementMenuItems = accessType === 'coordenador'
+  const finalManagementMenuItems = accessType === 'proponente'
+    ? []
+    : accessType === 'coordenador'
     ? managementMenuItems.reduce((acc, item) => {
         acc.push(item);
         if (item.id === 'projetos') {

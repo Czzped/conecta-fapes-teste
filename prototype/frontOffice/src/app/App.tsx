@@ -3,6 +3,9 @@ import { ScenarioProvider } from '@/mocks/ScenarioContext';
 import { LoginPage } from './components/LoginPage';
 import { CidadaoHomePage } from './components/CidadaoHomePage';
 import { EditalDetailPage } from './components/EditalDetailPage';
+import { AcessoCidadaoLoginPage } from './components/AcessoCidadaoLoginPage';
+import { InscricaoOptionsPage } from './components/InscricaoOptionsPage';
+import { CidadaoMeusDadosPage } from './components/CidadaoMeusDadosPage';
 import { InscricaoPage } from './components/InscricaoPage';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
@@ -24,8 +27,8 @@ import { ProjectDetailsPage } from './components/ProjectDetailsPage';
 import { Toaster } from 'sonner';
 
 // Main App Component - LanguageProvider is in main.tsx
-type AccessType = 'cidadao' | 'voluntario' | 'bolsista' | 'coordenador' | 'diretor' | 'reitor';
-type CidadaoPage = 'home' | 'edital-detail' | 'inscricao';
+type AccessType = 'cidadao' | 'voluntario' | 'bolsista' | 'proponente' | 'coordenador' | 'diretor' | 'reitor';
+type CidadaoPage = 'home' | 'edital-detail' | 'acesso-cidadao' | 'opcoes-inscricao' | 'cidadao-meus-dados' | 'inscricao';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -42,6 +45,7 @@ export default function App() {
   const [cidadaoPage, setCidadaoPage] = useState<CidadaoPage>('home');
   const [selectedEditalId, setSelectedEditalId] = useState<number>(1);
   const [scrollCidadaoOportunidades, setScrollCidadaoOportunidades] = useState(false);
+  const [hideDadosTabInInscricao, setHideDadosTabInInscricao] = useState(false);
 
   // Define dark mode como padrão do sistema
   useEffect(() => {
@@ -51,6 +55,10 @@ export default function App() {
   const handleLogin = (type: AccessType) => {
     setAccessType(type);
     setIsLoggedIn(true);
+    if (type === 'proponente') {
+      setCurrentPage('informacoes');
+      return;
+    }
     // Se for reitor/diretor, navega direto para dashboard
     if (type === 'reitor' || type === 'diretor') {
       setCurrentPage('dashboard');
@@ -102,7 +110,24 @@ export default function App() {
       case 'inicio':
         return <HomePage accessType={accessType} onNavigate={handleNavigate} />;
       case 'informacoes':
-        return <MyInfoPage />;
+        return <MyInfoPage initialTab="dados" hideDocumentsTab={accessType === 'proponente'} />;
+      case 'demanda-induzida':
+        return (
+          <InscricaoPage
+            editalId={selectedEditalId}
+            onBack={() => handleNavigate('inicio')}
+            hideHeader
+            hideTabs
+            hideBackButton
+            pageTitle="Demanda Induzida"
+            pageSubtitle="Você possui uma proposta da Fapes para participar de um projeto. Atualize seus dados e preencha o formulário do projeto"
+            pageDescription=""
+            formHeading="Formulário de Submissão"
+            breadcrumb={['Início', 'Demanda Induzida']}
+            showProjectTitleIcon
+            showDocumentoEditalTab
+          />
+        );
       case 'projetos':
         return <MyProjectsPage accessType={accessType} />;
       case 'minha-equipe':
@@ -165,7 +190,7 @@ export default function App() {
             <CidadaoHomePage
               onLogin={() => { setIsLoggedIn(false); setAccessType('bolsista'); }}
               onVerEdital={(id) => { setSelectedEditalId(id); setCidadaoPage('edital-detail'); window.scrollTo(0, 0); }}
-              onInscricao={(id) => { setSelectedEditalId(id); setCidadaoPage('inscricao'); window.scrollTo(0, 0); }}
+              onInscricao={(id) => { setSelectedEditalId(id); setHideDadosTabInInscricao(false); setCidadaoPage('acesso-cidadao'); window.scrollTo(0, 0); }}
               scrollToOportunidades={scrollCidadaoOportunidades}
               onScrolledToOportunidades={() => setScrollCidadaoOportunidades(false)}
             />
@@ -174,8 +199,27 @@ export default function App() {
             <EditalDetailPage
               editalId={selectedEditalId}
               onBack={() => { setCidadaoPage('home'); window.scrollTo(0, 0); }}
-              onInscricao={() => { setCidadaoPage('inscricao'); window.scrollTo(0, 0); }}
+              onInscricao={() => { setHideDadosTabInInscricao(false); setCidadaoPage('acesso-cidadao'); window.scrollTo(0, 0); }}
               onLogin={() => { setIsLoggedIn(false); setAccessType('bolsista'); }}
+            />
+          )}
+          {cidadaoPage === 'acesso-cidadao' && (
+            <AcessoCidadaoLoginPage
+              onLogin={() => { setCidadaoPage('opcoes-inscricao'); window.scrollTo(0, 0); }}
+            />
+          )}
+          {cidadaoPage === 'opcoes-inscricao' && (
+            <InscricaoOptionsPage
+              onBack={() => { setCidadaoPage('acesso-cidadao'); window.scrollTo(0, 0); }}
+              onOption1={() => { setHideDadosTabInInscricao(false); setCidadaoPage('inscricao'); window.scrollTo(0, 0); }}
+              onOption2Complete={() => { setHideDadosTabInInscricao(true); setCidadaoPage('inscricao'); window.scrollTo(0, 0); }}
+              onOption3={() => { setCidadaoPage('cidadao-meus-dados'); window.scrollTo(0, 0); }}
+            />
+          )}
+          {cidadaoPage === 'cidadao-meus-dados' && (
+            <CidadaoMeusDadosPage
+              onBackToOpportunities={() => { setScrollCidadaoOportunidades(true); setCidadaoPage('home'); }}
+              onLogout={handleLogout}
             />
           )}
           {cidadaoPage === 'inscricao' && (
@@ -183,6 +227,7 @@ export default function App() {
               editalId={selectedEditalId}
               onBack={() => { setScrollCidadaoOportunidades(true); setCidadaoPage('home'); }}
               onLogin={() => { setIsLoggedIn(false); setAccessType('bolsista'); }}
+              hideDadosTab={hideDadosTabInInscricao}
             />
           )}
         </>

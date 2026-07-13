@@ -2,7 +2,7 @@ import { FolderKanban, ChevronDown, Tag, ListChecks, Target, Zap, Clock, Send, F
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-type AccessType = 'voluntario' | 'bolsista' | 'coordenador';
+type AccessType = 'voluntario' | 'bolsista' | 'proponente' | 'coordenador';
 
 interface MyProjectsPageProps {
   accessType?: AccessType;
