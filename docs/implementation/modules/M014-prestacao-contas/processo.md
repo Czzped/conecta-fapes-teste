@@ -463,8 +463,6 @@ Se o Coordenador deseja comprar algo de uma categoria ou item que nao esta dispo
 
 Se o Coordenador deseja comprar uma categoria e item que esta disponivel em seu projeto, mas o valor ja acabou para a categoria, ele pode solicitar o Remanejamento de Recursos manualmente de uma categoria para outra em sua conta Conecta FAPES.
 
-Apos fazer o upload da imagem ou arquivo comprobatorio, o usuario deve conseguir ver qual arquivo enviou sem precisar baixa-lo, alterar o nome do arquivo e excluir.
-
 ### Cotacao
 
 Se o produto ou servico que o Coordenador comprou possui valor acima de 300 VRTE, ele deve enviar a cotacao com tres orcamentos, comprovando que pesquisou o melhor valor.
@@ -474,6 +472,8 @@ O valor de 300 VRTE (Valor de Referencia do Tesouro Estadual) no Espirito Santo 
 Se uma nota fiscal possui dois produtos de valor acima de 300 VRTE, o Coordenador deve enviar duas cotacoes (6 orcamentos). E assim por diante.
 
 Se a compra for menor que 300 VRTE, a sessao de Cotacao nao deve aparecer para o usuario.
+
+Apos fazer o upload da imagem ou arquivo comprobatorio, o usuario deve conseguir ver qual arquivo enviou sem precisar baixa-lo, alterar o nome do arquivo e excluir.
 
 ```mermaid
 sequenceDiagram
