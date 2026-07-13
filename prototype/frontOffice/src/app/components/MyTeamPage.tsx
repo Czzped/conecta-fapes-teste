@@ -1,4 +1,4 @@
-import { Users, Plus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle, HeartHandshake, Info } from 'lucide-react';
+import { Users, Plus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -6,6 +6,7 @@ import * as echarts from 'echarts';
 import { DatePicker } from '@/app/components/DatePicker';
 import { PaymentsPage } from '@/app/components/PaymentsPage';
 import { ListPagination } from '@/app/components/ListPagination';
+import { AdicionarVoluntario } from '@/app/components/AdicionarVoluntario';
 
 interface MyTeamPageProps {
   accessType: 'voluntario' | 'bolsista' | 'proponente' | 'coordenador';
@@ -22,8 +23,9 @@ interface TeamMember {
   name: string;
   startDate: string;
   endDate: string;
-  type: 'BPIG-VII' | 'BPIG-VI' | 'BPIG-V' | 'BPIG-IV' | 'BPIG-III' | 'BPIG-II';
-  status: 'Em Andamento' | 'Finalizada' | 'Cancelada' | 'Reprovada' | 'Doc. Pendente' | 'Revisar';
+  type: 'BPIG-VII' | 'BPIG-VI' | 'BPIG-V' | 'BPIG-IV' | 'BPIG-III' | 'BPIG-II' | 'Voluntário';
+  status: 'Em Andamento' | 'Finalizada' | 'Cancelada' | 'Reprovada' | 'Doc. Pendente' | 'Revisar' | 'Em Avaliação' | 'Reprovado';
+  isVoluntario?: boolean;
   email: string;
   phone: string;
   documents: {
@@ -58,8 +60,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   const [selectedMemberForCancelRequest, setSelectedMemberForCancelRequest] = useState<TeamMember | null>(null);
   const [selectedYear, setSelectedYear] = useState('2026');
   const [isYearOpen, setIsYearOpen] = useState(false);
-  const [isVolunteerModalOpen, setIsVolunteerModalOpen] = useState(false);
-  const [volunteerStartDate, setVolunteerStartDate] = useState('');
+  const [isAddVoluntarioOpen, setIsAddVoluntarioOpen] = useState(false);
   const itemsPerPage = 10;
   
   const periodChartRef = useRef<HTMLDivElement>(null);
@@ -87,6 +88,8 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   );
 
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
+    { id: 101, name: 'Ana Clara Ribeiro Monteiro', startDate: '01/03/2026', endDate: '01/03/2027', type: 'Voluntário', status: 'Em Avaliação', isVoluntario: true, email: 'ana.monteiro@example.com', phone: '(27) 99123-4567', documents: [] },
+    { id: 102, name: 'Bruno Tavares Almeida', startDate: '01/02/2026', endDate: '01/02/2027', type: 'Voluntário', status: 'Em Andamento', isVoluntario: true, email: 'bruno.almeida@example.com', phone: '(27) 99234-5678', documents: [] },
     { id: 1, name: 'Paulo Sérgio dos Santos Junior', startDate: '01/06/2025', endDate: '01/06/2026', type: 'BPIG-VII', status: 'Doc. Pendente', email: 'paulo.junior@example.com', phone: '(27) 99999-9999', documents: defaultDocuments },
     { id: 2, name: 'Felipe Frechiani de Oliveira', startDate: '01/06/2025', endDate: '01/06/2026', type: 'BPIG-VI', status: 'Doc. Pendente', email: 'felipe.frechiani@example.com', phone: '(27) 99888-8888', documents: defaultDocuments },
     { id: 3, name: 'Fabiano Borges Ruy', startDate: '15/07/2025', endDate: '15/07/2026', type: 'BPIG-V', status: 'Finalizada', email: 'fabiano.ruy@example.com', phone: '(27) 99777-7777', documents: defaultDocuments },
@@ -136,6 +139,28 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
     setExpandedBolsistaId(null); // Close any expanded item when changing page
   };
 
+  const handleAddVoluntario = (voluntario: { name: string; cpf: string; email: string; dataInicio: string }) => {
+    const [year, month] = voluntario.dataInicio.split('-');
+    const startDate = `01/${month}/${year}`;
+    const endDate = `01/${month}/${Number(year) + 1}`;
+    setTeamMembers((prev) => [
+      {
+        id: Date.now(),
+        name: voluntario.name,
+        startDate,
+        endDate,
+        type: 'Voluntário',
+        status: 'Em Avaliação',
+        isVoluntario: true,
+        email: voluntario.email,
+        phone: '',
+        documents: [],
+      },
+      ...prev,
+    ]);
+    setCurrentPage(1);
+  };
+
   const getStatusStyles = (status: TeamMember['status']) => {
     switch (status) {
       case 'Em Andamento':
@@ -164,10 +189,23 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
         };
       case 'Doc. Pendente':
       case 'Revisar':
+      case 'Em Avaliação':
         return {
           backgroundColor: 'rgba(234, 179, 8, 0.1)',
           color: '#eab308',
           border: '1px solid rgba(234, 179, 8, 0.3)',
+        };
+      case 'Reprovado':
+        return {
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          color: '#ef4444',
+          border: '1px solid rgba(239, 68, 68, 0.3)',
+        };
+      default:
+        return {
+          backgroundColor: 'var(--muted)',
+          color: 'var(--muted-foreground)',
+          border: '1px solid var(--border)',
         };
     }
   };
@@ -420,7 +458,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                       fontWeight: 'var(--font-weight-medium)',
                       whiteSpace: 'nowrap',
                     }}
-                    onClick={() => setIsVolunteerModalOpen(true)}
+                    onClick={() => setIsAddVoluntarioOpen(true)}
                   >
                     <Plus size={18} />
                     Adicionar Voluntário
@@ -1461,7 +1499,6 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
           </div>
 
         </div>
-
         {/* Bolsistas List */}
         <div className="space-y-4 max-w-full">
           <div className="flex justify-start">
@@ -1505,8 +1542,26 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                       <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                         Nome
                       </div>
-                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', gap: '0.375rem', flexWrap: 'wrap' }}>
                         {member.name}
+                        {member.isVoluntario && (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              padding: '0.05rem 0.4rem',
+                              borderRadius: '9999px',
+                              fontSize: 'var(--text-xs)',
+                              fontWeight: 'var(--font-weight-medium)',
+                              backgroundColor: 'color-mix(in srgb, var(--primary) 15%, transparent)',
+                              color: 'var(--primary)',
+                              border: '1px solid color-mix(in srgb, var(--primary) 30%, transparent)',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            Voluntário
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -1786,6 +1841,26 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                         </div>
                         <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', wordBreak: 'break-word' }}>
                           {member.name}
+                          {member.isVoluntario && (
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                padding: '0.05rem 0.4rem',
+                                marginLeft: '0.375rem',
+                                borderRadius: '9999px',
+                                fontSize: 'var(--text-xs)',
+                                fontWeight: 'var(--font-weight-medium)',
+                                backgroundColor: 'color-mix(in srgb, var(--primary) 15%, transparent)',
+                                color: 'var(--primary)',
+                                border: '1px solid color-mix(in srgb, var(--primary) 30%, transparent)',
+                                whiteSpace: 'nowrap',
+                                verticalAlign: 'middle',
+                              }}
+                            >
+                              Voluntário
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -2701,183 +2776,11 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
         </>
       )}
 
-      {isVolunteerModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.65)',
-          }}
-          onClick={() => setIsVolunteerModalOpen(false)}
-        >
-          <div
-            className="w-full max-w-xl"
-            style={{
-              backgroundColor: 'var(--popover)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-lg)',
-              boxShadow: 'var(--shadow-lg)',
-              padding: '1.5rem',
-            }}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="mb-6 flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div
-                  className="flex items-center justify-center"
-                  style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: 'var(--radius)',
-                    backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
-                    color: 'var(--primary)',
-                    flexShrink: 0,
-                  }}
-                >
-                  <HeartHandshake size={22} />
-                </div>
-                <div>
-                  <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
-                    Adicionar Voluntário
-                  </h1>
-                  <p
-                    style={{
-                      color: 'var(--muted-foreground)',
-                      fontSize: 'var(--text-sm)',
-                      margin: '0.375rem 0 0',
-                    }}
-                  >
-                    Sem vínculo de bolsa
-                  </p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setIsVolunteerModalOpen(false)}
-                className="flex items-center justify-center transition-colors"
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  backgroundColor: 'transparent',
-                  border: 'none',
-                  color: 'var(--muted-foreground)',
-                  cursor: 'pointer',
-                  padding: 0,
-                }}
-                aria-label="Fechar modal"
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            <div className="space-y-5">
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    color: 'var(--foreground)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-weight-semibold)',
-                    marginBottom: '0.625rem',
-                  }}
-                >
-                  CPF do Voluntário <span style={{ color: 'rgb(239,68,68)' }}>*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="000.000.000-00"
-                  style={{
-                    width: '100%',
-                    padding: '0.875rem 1rem',
-                    backgroundColor: 'var(--input-background)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius)',
-                    color: 'var(--foreground)',
-                    fontSize: 'var(--text-sm)',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              </div>
-
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    color: 'var(--foreground)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-weight-semibold)',
-                    marginBottom: '0.625rem',
-                  }}
-                >
-                  Data de início da participação <span style={{ color: 'rgb(239,68,68)' }}>*</span>
-                </label>
-                <DatePicker
-                  value={volunteerStartDate}
-                  onChange={setVolunteerStartDate}
-                  placeholder="Selecione o mês de início"
-                />
-              </div>
-
-              <div
-                className="flex gap-3"
-                style={{
-                  padding: '1rem',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--primary)',
-                  backgroundColor: 'color-mix(in srgb, var(--primary) 8%, transparent)',
-                  color: 'var(--primary)',
-                  fontSize: 'var(--text-sm)',
-                  lineHeight: 1.5,
-                }}
-              >
-                <Info size={18} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '0.125rem' }} />
-                <span>
-                  O membro voluntário não possui vínculo financeiro com o projeto e não exige documentação de bolsa. O Voluntário deve entrar em sua conta e aceitar o convite.
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-              <button
-                type="button"
-                onClick={() => setIsVolunteerModalOpen(false)}
-                className="px-6 py-3 transition-colors"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: 'var(--foreground)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  cursor: 'pointer',
-                }}
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsVolunteerModalOpen(false);
-                  setVolunteerStartDate('');
-                  toast.success('Voluntário adicionado com sucesso.');
-                }}
-                className="px-6 py-3 transition-colors"
-                style={{
-                  backgroundColor: 'var(--primary)',
-                  color: 'var(--background)',
-                  border: '1px solid var(--primary)',
-                  borderRadius: 'var(--radius)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  cursor: 'pointer',
-                }}
-              >
-                Adicionar voluntário
-              </button>
-            </div>
-          </div>
-        </div>
+      {isAddVoluntarioOpen && (
+        <AdicionarVoluntario
+          onClose={() => setIsAddVoluntarioOpen(false)}
+          onAdd={handleAddVoluntario}
+        />
       )}
     </div>
   );
