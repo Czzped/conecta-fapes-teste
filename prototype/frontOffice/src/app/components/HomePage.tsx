@@ -357,7 +357,7 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
 
           {accessType === 'voluntario' && conviteVoluntario === 'pendente' && (
             <div
-              className="flex flex-col gap-4 p-4"
+              className="flex flex-col gap-4 p-4 md:flex-row md:items-start md:justify-between"
               style={{
                 backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
                 border: '1px solid color-mix(in srgb, var(--primary) 24%, transparent)',
@@ -376,7 +376,7 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 md:justify-end">
+              <div className="flex items-center gap-3 md:shrink-0">
                 <button
                   type="button"
                   onClick={() => { setConviteVoluntario('recusado'); toast('Você recusou o convite para ser voluntário.'); }}
