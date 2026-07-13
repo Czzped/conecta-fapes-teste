@@ -4,6 +4,18 @@
 
 ---
 
+## Contexto
+
+Prestacao de Contas e uma funcionalidade para os perfis de usuario Coordenador e o setor de Prestacao de Contas da FAPES.
+
+Na tela ira aparecer as saidas financeiras da conta bancaria do projeto e o Coordenador deve justifica-las.
+
+O Coordenador pode realizar compras de produtos ou servicos, sempre com nota fiscal. Antes de realizar uma compra ele deve confirmar se o fornecedor emite nota fiscal. A FAPES nao aceita Prestacao de Contas sem nota fiscal.
+
+Apos o Coordenador realizar a compra e fazer sua comprovacao, um funcionario da FAPES aprova ou nao manualmente.
+
+---
+
 ## Visao Geral
 
 O processo de Prestacao de Contas cobre o ciclo operacional do modulo: importacoes financeiras e orcamentarias, preparacao da prestacao pelo Coordenador, submissao para analise e decisao do Responsavel FAPES. A prestacao nasce em `RASCUNHO`, pode ir para `EM_ANALISE`, retornar para `REVISAO`, ou terminar como `FINALIZADO` ou `NEGADO`.
@@ -11,8 +23,9 @@ O processo de Prestacao de Contas cobre o ciclo operacional do modulo: importaco
 1. **Carga unica do orcamento original** - primeira integracao entre Conecta FAPES e SIGFAPES para importar o orcamento original aprovado da iniciativa.
 2. **Importacao diaria de movimentos bancarios** - processo diario que captura o CNAB 240 gerado pelo EDI Banestes em uma pasta de servidor, envia o arquivo para a API/Base M014, que salva no MinIO e publica a referencia em uma fila para workers processarem em paralelo.
 3. **Elaboracao da prestacao** - criacao da `Prestacao`, vinculacao de transacoes, registro de justificativas e classificacao de documentos fiscais.
-4. **Submissao e analise** - validacao de conciliacao, bloqueio de edicoes e parecer do Responsavel FAPES.
-5. **Revisao pelo Coordenador** - ajustes solicitados pela FAPES e nova submissao para analise.
+4. **Associar compra e cotacao** - vinculacao da compra as categorias, itens e rubricas aprovadas do projeto, com exigencia de cotacao quando aplicavel.
+5. **Submissao e analise** - validacao de conciliacao, bloqueio de edicoes e parecer do Responsavel FAPES.
+6. **Revisao pelo Coordenador** - ajustes solicitados pela FAPES e nova submissao para analise.
 
 ---
 
@@ -438,7 +451,79 @@ sequenceDiagram
 
 ---
 
-## Fluxo 4 - Submissao e Analise da Prestacao
+## Fluxo 4 - Associar Compra e Cotacao
+
+Este fluxo organiza a associacao da compra realizada pelo Coordenador ao planejamento aprovado do projeto e define quando a cotacao deve ser exigida. A associacao deve separar a categoria/rubrica, o item comprado, a nota fiscal e os arquivos comprobatorios enviados.
+
+### Associar Compra
+
+Quando o Coordenador tem seu projeto aprovado, possui a lista de compras que pode realizar no projeto. Em Prestacao de Contas ele deve apenas comprar o que esta mapeado em seu projeto, tanto a categoria/rubrica (Material Permanente, Material de Consumo, Passagem, Diaria, Pessoa Fisica e Pessoa Juridica) quanto o item.
+
+Se o Coordenador deseja comprar algo de uma categoria ou item que nao esta disponivel no seu edital, deve solicitar o Remanejamento de Recursos para a FAPES, que pode aprovar ou nao.
+
+Se o Coordenador deseja comprar uma categoria e item que esta disponivel em seu projeto, mas o valor ja acabou para a categoria, ele pode solicitar o Remanejamento de Recursos manualmente de uma categoria para outra em sua conta Conecta FAPES.
+
+Apos fazer o upload da imagem ou arquivo comprobatorio, o usuario deve conseguir ver qual arquivo enviou sem precisar baixa-lo, alterar o nome do arquivo e excluir.
+
+### Cotacao
+
+Se o produto ou servico que o Coordenador comprou possui valor acima de 300 VRTE, ele deve enviar a cotacao com tres orcamentos, comprovando que pesquisou o melhor valor.
+
+O valor de 300 VRTE (Valor de Referencia do Tesouro Estadual) no Espirito Santo e de R$ 1.481,49. Esse valor deve ser parametrizavel, pois e atualizado periodicamente pelo governo.
+
+Se uma nota fiscal possui dois produtos de valor acima de 300 VRTE, o Coordenador deve enviar duas cotacoes (6 orcamentos). E assim por diante.
+
+Se a compra for menor que 300 VRTE, a sessao de Cotacao nao deve aparecer para o usuario.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Coord as Coordenador / Outorgado
+    participant API as API Prestacao de Contas
+    participant DB as Base M014
+    participant MinIO as MinIO
+
+    Coord->>API: Seleciona categoria/rubrica e item aprovado do projeto
+    API->>DB: Consulta rubricas, itens e saldos disponiveis
+    DB-->>API: Retorna categorias, itens e limites aprovados
+
+    alt Categoria ou item nao aprovado
+        API-->>Coord: Informa necessidade de Remanejamento de Recursos
+    else Categoria e item aprovados
+        Coord->>API: Associa compra, nota fiscal e transacao financeira
+        Coord->>API: Envia arquivo comprobatorio da compra
+        API->>MinIO: Armazena arquivo enviado
+        MinIO-->>API: Retorna referencia do arquivo
+        API->>DB: Persiste associacao da compra e arquivo
+        API->>API: Verifica se valor ultrapassa 300 VRTE
+
+        alt Valor acima de 300 VRTE
+            API-->>Coord: Exibe sessao de Cotacao
+            Coord->>API: Envia tres orcamentos para a cotacao
+            API->>MinIO: Armazena orcamentos enviados
+            API->>DB: Registra cotacao vinculada ao item
+        else Valor menor que 300 VRTE
+            API-->>Coord: Oculta sessao de Cotacao
+        end
+    end
+```
+
+### Atividades de associacao e cotacao
+
+| # | Atividade | Responsavel | Resultado |
+|---|-----------|-------------|-----------|
+| 1 | Selecionar categoria/rubrica | Coordenador / Outorgado | Categoria da compra escolhida entre as rubricas aprovadas do projeto. |
+| 2 | Selecionar item | Coordenador / Outorgado | Item comprado associado a lista aprovada no projeto. |
+| 3 | Validar elegibilidade | Modulo M014 | Sistema verifica se categoria, item e saldo estao disponiveis para prestacao. |
+| 4 | Orientar remanejamento | Modulo M014 / Coordenador | Quando categoria, item ou saldo nao estao disponiveis, Coordenador deve solicitar Remanejamento de Recursos. |
+| 5 | Enviar arquivo comprobatorio | Coordenador / Outorgado / MinIO | Arquivo enviado, visualizavel sem download, renomeavel e removivel enquanto permitido. |
+| 6 | Verificar limite de VRTE | Modulo M014 | Sistema compara o valor da compra com o parametro de 300 VRTE. |
+| 7 | Exigir cotacao quando aplicavel | Coordenador / Outorgado | Para compra acima de 300 VRTE, Coordenador envia tres orcamentos por item aplicavel. |
+| 8 | Ocultar cotacao quando nao aplicavel | Modulo M014 | Para compra menor que 300 VRTE, sessao de Cotacao nao e exibida. |
+
+---
+
+## Fluxo 5 - Submissao e Analise da Prestacao
 
 A submissao so pode ocorrer quando a prestacao esta em `RASCUNHO` ou `REVISAO` e possui conciliacao suficiente entre transacoes e justificativas. Ao entrar em `EM_ANALISE`, edicoes e exclusoes no agregado ficam bloqueadas ate a decisao da FAPES.
 
@@ -498,7 +583,7 @@ sequenceDiagram
 
 ---
 
-## Fluxo 5 - Revisao pelo Coordenador
+## Fluxo 6 - Revisao pelo Coordenador
 
 Quando a FAPES solicita revisao, a prestacao retorna para `REVISAO`. O Coordenador pode ajustar justificativas, documentos, orcamentos, classificacoes e transacoes vinculadas antes de submeter novamente. `FINALIZADO` e `NEGADO` sao estados terminais.
 
