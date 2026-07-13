@@ -1,4 +1,4 @@
-import { Users, Plus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle } from 'lucide-react';
+import { Users, Plus, UserPlus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle, Info } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -24,7 +24,7 @@ interface TeamMember {
   startDate: string;
   endDate: string;
   type: 'BPIG-VII' | 'BPIG-VI' | 'BPIG-V' | 'BPIG-IV' | 'BPIG-III' | 'BPIG-II' | 'Voluntário';
-  status: 'Em Andamento' | 'Finalizada' | 'Cancelada' | 'Reprovada' | 'Doc. Pendente' | 'Revisar' | 'Em Avaliação' | 'Reprovado';
+  status: 'Em Andamento' | 'Finalizada' | 'Cancelada' | 'Reprovada' | 'Doc. Pendente' | 'Revisar' | 'Em Avaliação' | 'Aguardando Aceite' | 'Reprovado';
   isVoluntario?: boolean;
   email: string;
   phone: string;
@@ -61,6 +61,8 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   const [selectedYear, setSelectedYear] = useState('2026');
   const [isYearOpen, setIsYearOpen] = useState(false);
   const [isAddVoluntarioOpen, setIsAddVoluntarioOpen] = useState(false);
+  const [selectedVolunteerToFinish, setSelectedVolunteerToFinish] = useState<TeamMember | null>(null);
+  const [volunteerEndDate, setVolunteerEndDate] = useState('');
   const itemsPerPage = 10;
   
   const periodChartRef = useRef<HTMLDivElement>(null);
@@ -88,7 +90,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   );
 
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
-    { id: 101, name: 'Ana Clara Ribeiro Monteiro', startDate: '01/03/2026', endDate: '01/03/2027', type: 'Voluntário', status: 'Em Avaliação', isVoluntario: true, email: 'ana.monteiro@example.com', phone: '(27) 99123-4567', documents: [] },
+    { id: 101, name: 'Ana Clara Ribeiro Monteiro', startDate: '01/03/2026', endDate: '01/03/2027', type: 'Voluntário', status: 'Aguardando Aceite', isVoluntario: true, email: 'ana.monteiro@example.com', phone: '(27) 99123-4567', documents: [] },
     { id: 102, name: 'Bruno Tavares Almeida', startDate: '01/02/2026', endDate: '01/02/2027', type: 'Voluntário', status: 'Em Andamento', isVoluntario: true, email: 'bruno.almeida@example.com', phone: '(27) 99234-5678', documents: [] },
     { id: 1, name: 'Paulo Sérgio dos Santos Junior', startDate: '01/06/2025', endDate: '01/06/2026', type: 'BPIG-VII', status: 'Doc. Pendente', email: 'paulo.junior@example.com', phone: '(27) 99999-9999', documents: defaultDocuments },
     { id: 2, name: 'Felipe Frechiani de Oliveira', startDate: '01/06/2025', endDate: '01/06/2026', type: 'BPIG-VI', status: 'Doc. Pendente', email: 'felipe.frechiani@example.com', phone: '(27) 99888-8888', documents: defaultDocuments },
@@ -161,6 +163,42 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
     setCurrentPage(1);
   };
 
+  const isActiveVolunteer = (member: TeamMember) => member.type === 'Voluntário' && member.status === 'Em Andamento';
+
+  const handleMemberRowClick = (member: TeamMember) => {
+    if (hideExpandable) return;
+    if (isActiveVolunteer(member)) {
+      setSelectedVolunteerToFinish(member);
+      setVolunteerEndDate('');
+      return;
+    }
+    setExpandedBolsistaId(expandedBolsistaId === member.id ? null : member.id);
+  };
+
+  const formatDateForDisplay = (value: string) => {
+    if (!value) return '';
+    const [year, month, day] = value.split('-');
+    return `${day}/${month}/${year}`;
+  };
+
+  const handleFinishVolunteering = () => {
+    if (!selectedVolunteerToFinish) return;
+    setTeamMembers((prev) =>
+      prev.map((member) =>
+        member.id === selectedVolunteerToFinish.id
+          ? {
+              ...member,
+              status: 'Finalizada',
+              endDate: formatDateForDisplay(volunteerEndDate) || member.endDate,
+            }
+          : member
+      )
+    );
+    setSelectedVolunteerToFinish(null);
+    setVolunteerEndDate('');
+    toast.success('Voluntariado finalizado com sucesso.');
+  };
+
   const getStatusStyles = (status: TeamMember['status']) => {
     switch (status) {
       case 'Em Andamento':
@@ -190,6 +228,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
       case 'Doc. Pendente':
       case 'Revisar':
       case 'Em Avaliação':
+      case 'Aguardando Aceite':
         return {
           backgroundColor: 'rgba(234, 179, 8, 0.1)',
           color: '#eab308',
@@ -460,7 +499,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                     }}
                     onClick={() => setIsAddVoluntarioOpen(true)}
                   >
-                    <Plus size={18} />
+                    <UserPlus size={18} />
                     Adicionar Voluntário
                   </button>
                   <button
@@ -1520,9 +1559,9 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                 {/* Card Header - Clicável */}
                 <div 
                   className={hideExpandable ? 'p-5' : 'p-5 cursor-pointer'}
-                  onClick={hideExpandable ? undefined : () => setExpandedBolsistaId(expandedBolsistaId === member.id ? null : member.id)}
+                  onClick={hideExpandable ? undefined : () => handleMemberRowClick(member)}
                 >
-                  <div className="grid grid-cols-12 gap-x-24 items-center">
+                  <div className="grid grid-cols-12 gap-x-12 items-center">
                     {/* Ícone */}
                     {!hideExpandable && (
                       <div className="col-span-1 flex items-center">
@@ -1544,24 +1583,6 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                       </div>
                       <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', gap: '0.375rem', flexWrap: 'wrap' }}>
                         {member.name}
-                        {member.isVoluntario && (
-                          <span
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              padding: '0.05rem 0.4rem',
-                              borderRadius: '9999px',
-                              fontSize: 'var(--text-xs)',
-                              fontWeight: 'var(--font-weight-medium)',
-                              backgroundColor: 'color-mix(in srgb, var(--primary) 15%, transparent)',
-                              color: 'var(--primary)',
-                              border: '1px solid color-mix(in srgb, var(--primary) 30%, transparent)',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            Voluntário
-                          </span>
-                        )}
                       </div>
                     </div>
 
@@ -1608,7 +1629,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                         </button>
                       </div>
                       <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                        {member.endDate}
+                        {member.type === 'Voluntário' ? '-' : member.endDate}
                       </div>
                     </div>
 
@@ -1817,7 +1838,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               >
                 <div 
                   className={hideExpandable ? 'p-4 max-w-full' : 'p-4 cursor-pointer max-w-full'}
-                  onClick={hideExpandable ? undefined : () => setExpandedBolsistaId(expandedBolsistaId === member.id ? null : member.id)}
+                  onClick={hideExpandable ? undefined : () => handleMemberRowClick(member)}
                   style={{ boxSizing: 'border-box' }}
                 >
                   {/* Header: Nome and Status */}
@@ -1841,26 +1862,6 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                         </div>
                         <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', wordBreak: 'break-word' }}>
                           {member.name}
-                          {member.isVoluntario && (
-                            <span
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                padding: '0.05rem 0.4rem',
-                                marginLeft: '0.375rem',
-                                borderRadius: '9999px',
-                                fontSize: 'var(--text-xs)',
-                                fontWeight: 'var(--font-weight-medium)',
-                                backgroundColor: 'color-mix(in srgb, var(--primary) 15%, transparent)',
-                                color: 'var(--primary)',
-                                border: '1px solid color-mix(in srgb, var(--primary) 30%, transparent)',
-                                whiteSpace: 'nowrap',
-                                verticalAlign: 'middle',
-                              }}
-                            >
-                              Voluntário
-                            </span>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -1884,7 +1885,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                       Período de Vigência
                     </div>
                     <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                      {member.startDate} - {member.endDate}
+                      {member.startDate} - {member.type === 'Voluntário' ? '-' : member.endDate}
                     </div>
                   </div>
 
@@ -2769,6 +2770,129 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                   }}
                 >
                   Sim, excluir
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {selectedVolunteerToFinish && (
+        <>
+          <div
+            style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 999 }}
+            onClick={() => {
+              setSelectedVolunteerToFinish(null);
+              setVolunteerEndDate('');
+            }}
+          />
+          <div
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              backgroundColor: 'var(--popover)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-lg)',
+              width: '90%',
+              maxWidth: '520px',
+              zIndex: 1000,
+              boxShadow: 'var(--elevation-sm)',
+              fontFamily: 'var(--font-family)',
+            }}
+          >
+            <div style={{ padding: '1.5rem' }}>
+              <div className="flex items-start justify-between" style={{ marginBottom: '1.25rem' }}>
+                <div className="flex items-center gap-3">
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: 'var(--radius)',
+                      backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
+                      color: 'var(--primary)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <UserPlus size={22} />
+                  </div>
+                  <div>
+                    <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
+                      Finalizar Voluntariado
+                    </h1>
+                    <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', margin: '0.15rem 0 0 0', fontFamily: 'var(--font-family)' }}>
+                      {selectedVolunteerToFinish.name}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setSelectedVolunteerToFinish(null);
+                    setVolunteerEndDate('');
+                  }}
+                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem', color: 'var(--muted-foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--radius-sm)', flexShrink: 0, transition: 'all 0.15s' }}
+                  aria-label="Fechar"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="mb-5">
+                <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+                  CPF do Voluntário <span style={{ color: 'var(--destructive-foreground)' }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  value="000.000.000-00"
+                  readOnly
+                  style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: 'var(--input-background)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
+                />
+              </div>
+
+              <div className="mb-5">
+                <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+                  Data de Fim <span style={{ color: 'var(--destructive-foreground)' }}>*</span>
+                </label>
+                <DatePicker
+                  value={volunteerEndDate}
+                  onChange={setVolunteerEndDate}
+                  placeholder="Selecione a data de fim"
+                />
+              </div>
+
+              <div
+                className="flex items-start gap-2 px-3 py-2"
+                style={{
+                  backgroundColor: 'color-mix(in srgb, var(--primary) 5%, transparent)',
+                  border: '1px solid var(--primary)',
+                  borderRadius: 'var(--radius)',
+                }}
+              >
+                <Info size={15} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: 1 }} />
+                <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
+                  Após finalizar o voluntariado, o membro do projeto não irá mais aparecer na lista para solicitar Diária e Passagem.
+                </span>
+              </div>
+
+              <div className="flex justify-end gap-3" style={{ marginTop: '1.5rem' }}>
+                <button
+                  onClick={() => {
+                    setSelectedVolunteerToFinish(null);
+                    setVolunteerEndDate('');
+                  }}
+                  style={{ padding: '0.625rem 1.25rem', backgroundColor: 'transparent', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'var(--font-family)' }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleFinishVolunteering}
+                  style={{ padding: '0.625rem 1.25rem', backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'var(--font-family)' }}
+                >
+                  Finalizar Voluntariado
                 </button>
               </div>
             </div>

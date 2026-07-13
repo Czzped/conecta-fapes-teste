@@ -1,4 +1,4 @@
-import { HeartHandshake, X, AlertCircle, Calendar, ChevronLeft, ChevronRight, Info } from 'lucide-react';
+import { UserPlus, X, AlertCircle, Calendar, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { usePageScenarios } from '@/mocks/ScenarioContext';
@@ -63,7 +63,7 @@ export function AdicionarVoluntario({ onClose, onAdd }: AdicionarVoluntarioProps
       return;
     }
     onAdd({ name: voluntarioName || 'Voluntário convidado', cpf, email: voluntarioInfo?.email ?? '', dataInicio });
-    toast.success('Voluntário adicionado com sucesso!');
+    toast.success('Voluntário adicionado com sucesso! O Status está Pendete, aguardando o Aceite do Voluntário.');
     onClose();
   };
 
@@ -248,7 +248,7 @@ export function AdicionarVoluntario({ onClose, onAdd }: AdicionarVoluntarioProps
                   flexShrink: 0,
                 }}
               >
-                <HeartHandshake size={22} />
+                <UserPlus size={22} />
               </div>
               <div>
                 <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
@@ -338,7 +338,7 @@ export function AdicionarVoluntario({ onClose, onAdd }: AdicionarVoluntarioProps
           </div>
 
           {/* Data de início da participação */}
-          <div className="mb-5" style={{ maxWidth: '320px' }}>
+          <div className="mb-5">
             <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
               Data de início da participação <Required />
             </label>
@@ -355,7 +355,7 @@ export function AdicionarVoluntario({ onClose, onAdd }: AdicionarVoluntarioProps
             }}
           >
             <Info size={15} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: 1 }} />
-            <span style={{ color: 'var(--primary)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
+            <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
               O membro voluntário não possui vínculo financeiro com o projeto e não exige documentação de bolsa. O Voluntário deve entrar em sua conta e aceitar o convite.
             </span>
           </div>
@@ -376,7 +376,7 @@ export function AdicionarVoluntario({ onClose, onAdd }: AdicionarVoluntarioProps
               onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
               onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
             >
-              Adicionar voluntário
+              Adicionar Voluntário
             </button>
           </div>
         </div>
