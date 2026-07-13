@@ -1,5 +1,6 @@
-import { Info, Briefcase, Bell, FileUser, FolderOpen, Check, GraduationCap, Building2, Users, ChevronRight, Hotel } from 'lucide-react';
+import { Info, Briefcase, Bell, FileUser, FolderOpen, Check, GraduationCap, Building2, Users, ChevronRight, Hotel, HeartHandshake } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 type AccessType = 'voluntario' | 'bolsista' | 'coordenador';
@@ -25,6 +26,7 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
     { label: t('home.scholarshipStatus'), value: t('home.active'), isBadge: true },
   ];
   const hasDiariaPendenteAceite = accessType === 'bolsista' || accessType === 'coordenador';
+  const [conviteVoluntario, setConviteVoluntario] = useState<'pendente' | 'aceito' | 'recusado'>('pendente');
 
   return (
     <div className="w-full px-4 md:px-8 py-8">
@@ -331,6 +333,70 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
                 <ChevronRight size={16} />
               </span>
             </button>
+          )}
+
+          {accessType === 'voluntario' && conviteVoluntario === 'pendente' && (
+            <div
+              className="flex flex-col gap-4 p-4"
+              style={{
+                backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
+                border: '1px solid color-mix(in srgb, var(--primary) 24%, transparent)',
+                borderRadius: 'var(--radius)',
+              }}
+            >
+              <div className="flex items-start gap-3">
+                <HeartHandshake size={20} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
+                <div>
+                  <p style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-sm)', margin: '0 0 0.25rem 0' }}>
+                    Convite para participar como voluntário
+                  </p>
+                  <p style={{ color: 'var(--muted-foreground)', fontWeight: 'var(--font-weight-normal)', fontSize: 'var(--text-sm)', lineHeight: '1.5', margin: 0 }}>
+                    Você foi indicado para ser voluntário do projeto{' '}
+                    <strong style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-medium)' }}>Conecta Fapes</strong>. Deseja aceitar?
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 md:justify-end">
+                <button
+                  type="button"
+                  onClick={() => { setConviteVoluntario('recusado'); toast('Você recusou o convite para ser voluntário.'); }}
+                  className="px-4 py-2 transition-colors"
+                  style={{ backgroundColor: 'transparent', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--muted)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                >
+                  Recusar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setConviteVoluntario('aceito'); toast.success('Você aceitou participar do projeto como voluntário.'); }}
+                  className="px-4 py-2 transition-colors"
+                  style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+                >
+                  Aceitar
+                </button>
+              </div>
+            </div>
+          )}
+
+          {accessType === 'voluntario' && conviteVoluntario !== 'pendente' && (
+            <div
+              className="flex items-start gap-3 p-4"
+              style={{
+                backgroundColor: 'var(--muted)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
+              }}
+            >
+              <Check size={20} style={{ color: conviteVoluntario === 'aceito' ? '#22c55e' : 'var(--muted-foreground)', flexShrink: 0, marginTop: '2px' }} />
+              <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', lineHeight: '1.5', margin: 0 }}>
+                {conviteVoluntario === 'aceito'
+                  ? 'Você aceitou o convite para ser voluntário do projeto Conecta Fapes.'
+                  : 'Você recusou o convite para ser voluntário do projeto Conecta Fapes.'}
+              </p>
+            </div>
           )}
         </div>
       </section>
