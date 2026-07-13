@@ -1,4 +1,4 @@
-import { Users, Plus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle } from 'lucide-react';
+import { Users, Plus, UserPlus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -6,6 +6,7 @@ import * as echarts from 'echarts';
 import { DatePicker } from '@/app/components/DatePicker';
 import { PaymentsPage } from '@/app/components/PaymentsPage';
 import { ListPagination } from '@/app/components/ListPagination';
+import { AdicionarVoluntario } from '@/app/components/AdicionarVoluntario';
 
 interface MyTeamPageProps {
   accessType: 'voluntario' | 'bolsista' | 'coordenador';
@@ -22,8 +23,9 @@ interface TeamMember {
   name: string;
   startDate: string;
   endDate: string;
-  type: 'BPIG-VII' | 'BPIG-VI' | 'BPIG-V' | 'BPIG-IV' | 'BPIG-III' | 'BPIG-II';
-  status: 'Em Andamento' | 'Finalizada' | 'Cancelada' | 'Reprovada' | 'Doc. Pendente' | 'Revisar';
+  type: 'BPIG-VII' | 'BPIG-VI' | 'BPIG-V' | 'BPIG-IV' | 'BPIG-III' | 'BPIG-II' | 'Voluntário';
+  status: 'Em Andamento' | 'Finalizada' | 'Cancelada' | 'Reprovada' | 'Doc. Pendente' | 'Revisar' | 'Em Avaliação' | 'Reprovado';
+  isVoluntario?: boolean;
   email: string;
   phone: string;
   documents: {
@@ -58,6 +60,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   const [selectedMemberForCancelRequest, setSelectedMemberForCancelRequest] = useState<TeamMember | null>(null);
   const [selectedYear, setSelectedYear] = useState('2026');
   const [isYearOpen, setIsYearOpen] = useState(false);
+  const [isAddVoluntarioOpen, setIsAddVoluntarioOpen] = useState(false);
   const itemsPerPage = 10;
   
   const periodChartRef = useRef<HTMLDivElement>(null);
@@ -85,6 +88,8 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   );
 
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
+    { id: 101, name: 'Ana Clara Ribeiro Monteiro', startDate: '01/03/2026', endDate: '01/03/2027', type: 'Voluntário', status: 'Em Avaliação', isVoluntario: true, email: 'ana.monteiro@example.com', phone: '(27) 99123-4567', documents: [] },
+    { id: 102, name: 'Bruno Tavares Almeida', startDate: '01/02/2026', endDate: '01/02/2027', type: 'Voluntário', status: 'Em Andamento', isVoluntario: true, email: 'bruno.almeida@example.com', phone: '(27) 99234-5678', documents: [] },
     { id: 1, name: 'Paulo Sérgio dos Santos Junior', startDate: '01/06/2025', endDate: '01/06/2026', type: 'BPIG-VII', status: 'Doc. Pendente', email: 'paulo.junior@example.com', phone: '(27) 99999-9999', documents: defaultDocuments },
     { id: 2, name: 'Felipe Frechiani de Oliveira', startDate: '01/06/2025', endDate: '01/06/2026', type: 'BPIG-VI', status: 'Doc. Pendente', email: 'felipe.frechiani@example.com', phone: '(27) 99888-8888', documents: defaultDocuments },
     { id: 3, name: 'Fabiano Borges Ruy', startDate: '15/07/2025', endDate: '15/07/2026', type: 'BPIG-V', status: 'Finalizada', email: 'fabiano.ruy@example.com', phone: '(27) 99777-7777', documents: defaultDocuments },
@@ -134,6 +139,28 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
     setExpandedBolsistaId(null); // Close any expanded item when changing page
   };
 
+  const handleAddVoluntario = (voluntario: { name: string; cpf: string; email: string; dataInicio: string }) => {
+    const [year, month] = voluntario.dataInicio.split('-');
+    const startDate = `01/${month}/${year}`;
+    const endDate = `01/${month}/${Number(year) + 1}`;
+    setTeamMembers((prev) => [
+      {
+        id: Date.now(),
+        name: voluntario.name,
+        startDate,
+        endDate,
+        type: 'Voluntário',
+        status: 'Em Avaliação',
+        isVoluntario: true,
+        email: voluntario.email,
+        phone: '',
+        documents: [],
+      },
+      ...prev,
+    ]);
+    setCurrentPage(1);
+  };
+
   const getStatusStyles = (status: TeamMember['status']) => {
     switch (status) {
       case 'Em Andamento':
@@ -162,10 +189,23 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
         };
       case 'Doc. Pendente':
       case 'Revisar':
+      case 'Em Avaliação':
         return {
           backgroundColor: 'rgba(234, 179, 8, 0.1)',
           color: '#eab308',
           border: '1px solid rgba(234, 179, 8, 0.3)',
+        };
+      case 'Reprovado':
+        return {
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          color: '#ef4444',
+          border: '1px solid rgba(239, 68, 68, 0.3)',
+        };
+      default:
+        return {
+          backgroundColor: 'var(--muted)',
+          color: 'var(--muted-foreground)',
+          border: '1px solid var(--border)',
         };
     }
   };
@@ -1415,6 +1455,27 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             </div>
           </div>
 
+          {/* Adicionar Voluntário Button - Desktop only */}
+          {!hideAddButton && (
+            <button
+              className="hidden md:flex items-center justify-center gap-2 px-4 py-2 transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                color: 'var(--primary)',
+                border: '1px solid var(--primary)',
+                borderRadius: 'var(--radius)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                whiteSpace: 'nowrap',
+                marginTop: '1.625rem', // Aligns with inputs (label height + margin)
+              }}
+              onClick={() => setIsAddVoluntarioOpen(true)}
+            >
+              <UserPlus size={18} />
+              Adicionar Voluntário
+            </button>
+          )}
+
           {/* Cadastrar Bolsista Button - Desktop only */}
           {!hideAddButton && (
             <button
@@ -1437,9 +1498,25 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
           )}
         </div>
 
-        {/* Cadastrar Bolsista Button - Mobile only */}
+        {/* Add Buttons - Mobile only */}
         {!hideAddButton && (
-          <div className="flex justify-end mb-6 md:hidden">
+          <div className="flex flex-wrap justify-end gap-2 mb-6 md:hidden">
+            <button
+              className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
+              style={{
+                backgroundColor: 'transparent',
+                color: 'var(--primary)',
+                border: '1px solid var(--primary)',
+                borderRadius: 'var(--radius)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                whiteSpace: 'nowrap',
+              }}
+              onClick={() => setIsAddVoluntarioOpen(true)}
+            >
+              <UserPlus size={18} />
+              Adicionar Voluntário
+            </button>
             <button
               className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
               style={{
@@ -1502,8 +1579,26 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                       <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                         Nome
                       </div>
-                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', gap: '0.375rem', flexWrap: 'wrap' }}>
                         {member.name}
+                        {member.isVoluntario && (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              padding: '0.05rem 0.4rem',
+                              borderRadius: '9999px',
+                              fontSize: 'var(--text-xs)',
+                              fontWeight: 'var(--font-weight-medium)',
+                              backgroundColor: 'color-mix(in srgb, var(--primary) 15%, transparent)',
+                              color: 'var(--primary)',
+                              border: '1px solid color-mix(in srgb, var(--primary) 30%, transparent)',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            Voluntário
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -1783,6 +1878,26 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                         </div>
                         <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', wordBreak: 'break-word' }}>
                           {member.name}
+                          {member.isVoluntario && (
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                padding: '0.05rem 0.4rem',
+                                marginLeft: '0.375rem',
+                                borderRadius: '9999px',
+                                fontSize: 'var(--text-xs)',
+                                fontWeight: 'var(--font-weight-medium)',
+                                backgroundColor: 'color-mix(in srgb, var(--primary) 15%, transparent)',
+                                color: 'var(--primary)',
+                                border: '1px solid color-mix(in srgb, var(--primary) 30%, transparent)',
+                                whiteSpace: 'nowrap',
+                                verticalAlign: 'middle',
+                              }}
+                            >
+                              Voluntário
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -2696,6 +2811,13 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             </div>
           </div>
         </>
+      )}
+
+      {isAddVoluntarioOpen && (
+        <AdicionarVoluntario
+          onClose={() => setIsAddVoluntarioOpen(false)}
+          onAdd={handleAddVoluntario}
+        />
       )}
     </div>
   );
