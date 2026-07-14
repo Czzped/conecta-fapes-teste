@@ -368,9 +368,10 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             smooth: true,
             lineStyle: {
               width: 3,
+              color: '#22d3ee',
             },
             itemStyle: {
-              color: '#3b82f6',
+              color: '#22d3ee',
             },
             symbol: 'circle',
             symbolSize: 8,
@@ -964,16 +965,16 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             {/* Modalidades List */}
             <div className="space-y-4">
               {[
-                { name: 'BPIG-I', used: 2, total: 4, color: '#60a5fa' },
-                { name: 'BPIG-II', used: 2, total: 3, color: '#60a5fa' },
-                { name: 'BPIG-III', used: 1, total: 2, color: '#60a5fa' },
-                { name: 'BPIG-IV', used: 0, total: 1, color: '#60a5fa' },
-                { name: 'BPIG-V', used: 1, total: 2, color: '#60a5fa' },
-                { name: 'BPIG-VI', used: 0, total: 0, color: '#60a5fa' },
-                { name: 'BPIG-VII', used: 0, total: 0, color: '#60a5fa' },
-                { name: 'BPIG-VIII', used: 0, total: 0, color: '#60a5fa' },
-                { name: 'BPIG-IX', used: 0, total: 0, color: '#60a5fa' },
-                { name: 'BPIG-X', used: 0, total: 0, color: '#60a5fa' },
+                { name: 'BPIG-I', used: 2, total: 4, color: '#22d3ee' },
+                { name: 'BPIG-II', used: 2, total: 3, color: '#22d3ee' },
+                { name: 'BPIG-III', used: 1, total: 2, color: '#22d3ee' },
+                { name: 'BPIG-IV', used: 0, total: 1, color: '#22d3ee' },
+                { name: 'BPIG-V', used: 1, total: 2, color: '#22d3ee' },
+                { name: 'BPIG-VI', used: 0, total: 0, color: '#22d3ee' },
+                { name: 'BPIG-VII', used: 0, total: 0, color: '#22d3ee' },
+                { name: 'BPIG-VIII', used: 0, total: 0, color: '#22d3ee' },
+                { name: 'BPIG-IX', used: 0, total: 0, color: '#22d3ee' },
+                { name: 'BPIG-X', used: 0, total: 0, color: '#22d3ee' },
               ].filter((modalidade) => !(modalidade.used === 0 && modalidade.total === 0)).map((modalidade, index) => {
                 const available = modalidade.total - modalidade.used;
                 const percentage = modalidade.total > 0 ? Math.round((modalidade.used / modalidade.total) * 100) : 0;
