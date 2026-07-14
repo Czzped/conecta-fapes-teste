@@ -282,19 +282,6 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                         {stage.label}
                       </p>
 
-                      {/* Date */}
-                      {stage.date && (
-                        <p 
-                          className="mt-1"
-                          style={{ 
-                            color: 'var(--muted-foreground)',
-                            fontSize: 'var(--text-xs)',
-                            fontWeight: 'var(--font-weight-normal)',
-                          }}
-                        >
-                          {stage.date}
-                        </p>
-                      )}
                     </div>
                   );
                 })}
@@ -367,17 +354,6 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                         >
                           {stage.label}
                         </p>
-                        {stage.date && (
-                          <p 
-                            style={{ 
-                              color: 'var(--muted-foreground)',
-                              fontSize: 'var(--text-xs)',
-                              fontWeight: 'var(--font-weight-normal)',
-                            }}
-                          >
-                            {stage.date}
-                          </p>
-                        )}
                       </div>
                     </div>
                   );
