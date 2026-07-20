@@ -1,4 +1,4 @@
-import { Check, DollarSign, Search, Calendar, ChevronDown, ChevronRight } from 'lucide-react';
+import { Check, DollarSign, Search, Calendar, ChevronDown, ChevronRight, Download } from 'lucide-react';
 import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -246,7 +246,7 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
       />
 
       {/* Controle de Gastos Section */}
-      <section className="mb-8">
+      <section className="mb-2">
         {/* Title */}
         <h1 
           style={{ 
@@ -555,7 +555,7 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
       </section>
 
       {/* Pagamentos Realizados Section */}
-      <section className="mb-8">
+      <section className="mb-4">
         {/* Title */}
         <h1
           style={{
@@ -581,7 +581,7 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
 
         {/* Filters */}
         <div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
         >
           {/* Search Field */}
           <div style={{ position: 'relative' }}>
@@ -688,10 +688,28 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
 
       {/* Payments List */}
       <div className="space-y-4 mb-8">
-        <div className="flex justify-start">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
             Mostrando {Math.min(pageSize, payments.length)} resultados de {payments.length}
           </span>
+          <button
+            type="button"
+            className="inline-flex items-center gap-2 px-4 py-2"
+            style={{
+              backgroundColor: 'transparent',
+              color: 'var(--foreground)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              fontFamily: 'var(--font-family)',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <Download size={16} />
+            Exportar CSV
+          </button>
         </div>
         {paginatedPayments.map((payment, index) => {
           const canOpenPaymentDetails =

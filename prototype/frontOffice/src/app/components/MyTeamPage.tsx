@@ -1,4 +1,4 @@
-import { Users, Plus, UserPlus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle, Info } from 'lucide-react';
+import { Users, Plus, UserPlus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle, Info, Download } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -1215,7 +1215,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
         {activeTab === 'bolsistas' && (
           <div className="w-full max-w-full" style={{ overflowX: 'hidden' }}>
         {/* Filters and Actions Bar */}
-        <div className="flex flex-col md:flex-row gap-3 mb-6 w-full max-w-full">
+        <div className="flex flex-col md:flex-row gap-3 mb-4 w-full max-w-full">
           {/* Search Input */}
           <div className="flex-1 min-w-0">
             <label
@@ -1541,10 +1541,28 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
         </div>
         {/* Bolsistas List */}
         <div className="space-y-4 max-w-full">
-          <div className="flex justify-start">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
               Mostrando {visibleMembersCount} resultados de {filteredMembers.length}
             </span>
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 px-4 py-2"
+              style={{
+                backgroundColor: 'transparent',
+                color: 'var(--foreground)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                fontFamily: 'var(--font-family)',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <Download size={16} />
+              Exportar CSV
+            </button>
           </div>
           {/* Desktop Cards */}
           <div className="hidden md:block space-y-4">
