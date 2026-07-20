@@ -306,37 +306,9 @@ sequenceDiagram
 
 ### Fluxo 3.4 - Produto sem Nota Fiscal
 
-Compra de produto sem nota fiscal e um fluxo excepcional. Nao passa pelo SERPRO e exige justificativa formal para ausencia da nota, comprovante alternativo da despesa, rubrica orcamentaria e vinculacao a transacao bancaria. A despesa fica marcada para analise obrigatoria pela Area Tecnica.
+A Fapes nao aceita compras sem Nota Fiscal. O sistema deve apresentar e reforcar essa informacao.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Coord as Coordenador / Outorgado
-    participant API as API Prestacao de Contas
-    participant DB as Base M014
-    participant MinIO as MinIO
-
-    Coord->>API: Registra produto sem nota fiscal e envia comprovantes
-    API->>DB: Registra metadados dos arquivos
-    API->>MinIO: Salva comprovante alternativo
-    MinIO-->>API: Retorna URLs dos arquivos
-    API->>DB: Atualiza URLs dos arquivos
-    Coord->>API: Informa fornecedor, data, valor e descricao dos produtos, quando houver
-    Coord->>API: Informa justificativa para ausencia da nota fiscal
-    Coord->>API: Vincula transacao bancaria correspondente
-    API->>DB: Verifica transacao vinculada a Prestacao
-
-    alt Sem justificativa ou comprovante alternativo
-        API-->>Coord: Impede registro da despesa
-    else Dados minimos informados
-        Coord->>API: Define rubrica da compra
-        API->>DB: Valida rubrica e limite orcamentario
-        API->>DB: Persiste JustificativaProdutoSemNota
-        API->>DB: Marca analise obrigatoria pela Area Tecnica
-        API->>DB: Calcula saldo da prestacao
-        API-->>Coord: Confirma produto sem nota registrado
-    end
-```
+Se o coordenador fez uma compra sem Nota Fiscal deve selecionar essa opcao em Documentos. Ele devera entrar em contato com o fornecedor onde realizou a compra e fazer a devolucao, que podera entrar como Estorno. Se nao conseguir, o coordenador deve devolver o valor para a conta do projeto. Quando o valor entrar como Devolucao, podera no campo de Descricao, justificar o que aconteceu.
 
 ### Fluxo 3.5 - Invoice
 
@@ -439,7 +411,7 @@ sequenceDiagram
 | 2 | Vincular transacoes | Coordenador / Outorgado | Movimentos bancarios associados a prestacao, respeitando RN04. |
 | 3 | Registrar nota fiscal de produto | Coordenador / Outorgado / SERPRO | SERPRO retorna dados e itens da nota; o sistema encaixa os itens nas rubricas, e nota falsa, invalida ou ja usada e impedida. |
 | 4 | Registrar nota fiscal de servico | Coordenador / Outorgado | Despesa segue por biblioteca interna no fluxo atual; validacao via SERPRO fica prevista como evolucao futura. |
-| 5 | Registrar produto sem nota fiscal | Coordenador / Outorgado | Despesa excepcional registrada com justificativa, comprovante alternativo, rubrica e analise obrigatoria pela Area Tecnica. |
+| 5 | Registrar produto sem nota fiscal | Coordenador / Outorgado | Valor devera ser devolvido. |
 | 6 | Registrar invoice | Coordenador / Outorgado | Despesa internacional registrada com moeda, valor e cambio, sem chamada ao SERPRO. |
 | 7 | Registrar diaria | Coordenador / Outorgado | Diaria registrada a partir da solicitacao de diaria aprovada do M003, com beneficiario, quantidade, valor calculado e comprovante de pagamento da diaria, sem chamada ao SERPRO. |
 | 8 | Registrar passagem | Coordenador / Outorgado | Passagem registrada com dados da viagem, valor da passagem comprada, comprovante de pagamento da passagem e comprovante de realizacao da viagem, sem chamada ao SERPRO. |
