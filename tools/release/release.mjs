@@ -30,6 +30,7 @@ const REPO_DEFS = {
   'frontoffice-backend':  { repo: `${ORG}-frontoffice-backend`,  production: 'main' },
   'frontoffice-frontend': { repo: `${ORG}-frontoffice-frontend`, production: 'main' },
   'prestacao-de-contas':  { repo: `${ORG}-prestacao-de-contas`,  production: 'master' },
+  'backend-pagamento-bolsistas': { repo: `${ORG}-backend-pagamento-bolsistas`, production: 'main' },
 };
 
 const ALL_REPOS = Object.keys(REPO_DEFS);

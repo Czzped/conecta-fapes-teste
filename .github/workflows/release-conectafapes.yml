@@ -33,6 +33,11 @@ on:
         required: false
         type: boolean
         default: false
+      backend_pagamento_bolsistas:
+        description: "backend-pagamento-bolsistas"
+        required: false
+        type: boolean
+        default: false
 
 env:
   GH_TOKEN: ${{ secrets.PROJECTS_PAT }}
@@ -61,6 +66,7 @@ jobs:
           ${{ inputs.frontoffice_backend }} && REPOS="$REPOS,frontoffice-backend"
           ${{ inputs.frontoffice_frontend }} && REPOS="$REPOS,frontoffice-frontend"
           ${{ inputs.prestacao_de_contas }} && REPOS="$REPOS,prestacao-de-contas"
+          ${{ inputs.backend_pagamento_bolsistas }} && REPOS="$REPOS,backend-pagamento-bolsistas"
           REPOS="${REPOS#,}"  # remove leading comma
 
           MODE="${{ inputs.execute && '--execute' || '--dry-run' }}"
