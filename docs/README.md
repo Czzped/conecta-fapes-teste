@@ -8,8 +8,8 @@ Plataforma digital da agencia de fomento para gestao do ciclo completo de foment
 
 | Prototipo | Link |
 |-----------|------|
-| Front-office | [https://rate-snort-02856207.figma.site/](https://rate-snort-02856207.figma.site/) |
-| Back-office | [https://bucket-lake-78647159.figma.site/](https://bucket-lake-78647159.figma.site/) |
+| Front-office | [https://frontoffice-conecta.vercel.app/](https://frontoffice-conecta.vercel.app/) |
+| Back-office | [https://backoffice-conecta.vercel.app/](https://backoffice-conecta.vercel.app/) |
 
 ## GitHub Project Board
 
