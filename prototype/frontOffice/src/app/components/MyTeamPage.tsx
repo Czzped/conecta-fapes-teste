@@ -1,4 +1,4 @@
-import { Users, Plus, UserPlus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle, Info, Download } from 'lucide-react';
+import { Users, Plus, UserPlus, ChevronDown, ChevronRight, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle, Info, Download } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -9,7 +9,7 @@ import { ListPagination } from '@/app/components/ListPagination';
 import { AdicionarVoluntario } from '@/app/components/AdicionarVoluntario';
 
 interface MyTeamPageProps {
-  accessType: 'voluntario' | 'bolsista' | 'bolsistaSolicitarBolsa' | 'proponente' | 'coordenador';
+  accessType: 'voluntario' | 'bolsista' | 'bolsistaSolicitarBolsa' | 'minhaEquipeExemplo' | 'proponente' | 'coordenador';
   onNavigate?: (page: string) => void;
   hideHeader?: boolean;
   defaultTab?: 'bolsistas' | 'informacoes' | 'pagamentos';
@@ -54,6 +54,8 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedMemberForDetails, setSelectedMemberForDetails] = useState<TeamMember | null>(null);
   const [detailsTab, setDetailsTab] = useState<'informacoes' | 'aprovacao' | 'historico'>('informacoes');
+  const [selectedMemberPage, setSelectedMemberPage] = useState<TeamMember | null>(null);
+  const [memberPageTab, setMemberPageTab] = useState<'documentos' | 'informacoes' | 'historico'>('documentos');
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [selectedMemberForCancel, setSelectedMemberForCancel] = useState<TeamMember | null>(null);
   const [cancelJustification, setCancelJustification] = useState('');
@@ -70,6 +72,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   const [volunteerEndDate, setVolunteerEndDate] = useState('');
   const [volunteerDetailsTab, setVolunteerDetailsTab] = useState<'informacoes' | 'historico'>('informacoes');
   const itemsPerPage = 10;
+  const isExampleFlow = accessType === 'minhaEquipeExemplo';
   
   const periodChartRef = useRef<HTMLDivElement>(null);
 
@@ -177,6 +180,12 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
       setSelectedVolunteerToFinish(member);
       setVolunteerEndDate('');
       setVolunteerDetailsTab('informacoes');
+      return;
+    }
+    if (isExampleFlow) {
+      setSelectedMemberPage(member);
+      setMemberPageTab('documentos');
+      setExpandedBolsistaId(null);
       return;
     }
     setExpandedBolsistaId(expandedBolsistaId === member.id ? null : member.id);
@@ -453,17 +462,286 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
     };
   }, [selectedYear]);
 
+  const renderDocumentsList = (member: TeamMember, compact = false) => (
+    <div className="space-y-3">
+      {member.status === 'Revisar' && (
+        <div
+          className="flex items-start gap-3 p-3"
+          style={{
+            backgroundColor: 'rgba(234, 179, 8, 0.1)',
+            border: '1px solid rgba(234, 179, 8, 0.3)',
+            borderRadius: 'var(--radius)',
+            color: 'rgb(234, 179, 8)',
+            fontSize: 'var(--text-sm)',
+            lineHeight: 1.5,
+          }}
+        >
+          <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: '1px' }} />
+          <span>Diploma de Nível Médio Recusado. Falta o verso do documento. Reenviar em até X dias.</span>
+        </div>
+      )}
+
+      {member.documents.map((doc) => {
+        const statusColors = getDocumentStatusColor(doc.status);
+        return (
+          <div
+            key={doc.id}
+            style={{
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              padding: compact ? '0.75rem' : '1rem',
+            }}
+          >
+            <div className={compact ? 'space-y-3' : 'grid grid-cols-12 gap-4'}>
+              <div className={compact ? '' : 'col-span-3'}>
+                <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                  Requisito
+                </div>
+                <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', wordBreak: 'break-word' }}>
+                  {doc.requisito}
+                </div>
+              </div>
+
+              <div className={compact ? '' : 'col-span-4'}>
+                <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                  Documento
+                </div>
+                <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', wordBreak: 'break-word' }}>
+                  {doc.documento}
+                </div>
+              </div>
+
+              <div className={compact ? '' : 'col-span-3'}>
+                <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                  Data de Envio
+                </div>
+                <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', wordBreak: 'break-word' }}>
+                  {doc.dataEnvio}
+                </div>
+              </div>
+
+              <div className={compact ? '' : 'col-span-2'}>
+                <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                  Status
+                </div>
+                <span
+                  className="inline-flex items-center px-2.5 py-1"
+                  style={{
+                    backgroundColor: statusColors.bg,
+                    color: statusColors.color,
+                    border: `1px solid ${statusColors.border}`,
+                    borderRadius: '9999px',
+                    fontSize: 'var(--text-xs)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {doc.status}
+                </span>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  const renderScholarshipInfo = (member: TeamMember) => (
+    <div
+      style={{
+        backgroundColor: 'var(--card)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius)',
+        padding: '1.5rem',
+      }}
+    >
+      <div className="grid gap-4 md:grid-cols-4">
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Nome</div>
+          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>{member.name}</div>
+        </div>
+
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>E-mail</div>
+          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{member.email}</div>
+        </div>
+
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Telefone</div>
+          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{member.phone}</div>
+        </div>
+
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Vigência</div>
+          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{member.startDate} até {member.endDate}</div>
+        </div>
+
+        {[
+          ['Valor da Bolsa', 'R$ 2.500,00'],
+        ].map(([label, value]) => (
+          <div key={label} className="md:col-span-2">
+            <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>{label}</div>
+            <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>{value}</div>
+          </div>
+        ))}
+
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Modalidade</div>
+          <span
+            className="inline-flex items-center px-3 py-1"
+            style={{
+              backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
+              color: 'var(--primary)',
+              border: '1px solid var(--primary)',
+              borderRadius: '9999px',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+            }}
+          >
+            {member.type}
+          </span>
+        </div>
+
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Status</div>
+          <span
+            className="inline-flex items-center px-3 py-1"
+            style={{
+              ...getStatusStyles(member.status),
+              borderRadius: '9999px',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+            }}
+          >
+            {member.status}
+          </span>
+        </div>
+
+        <div className="md:col-span-4">
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Objetivos</div>
+          <div
+            style={{
+              color: 'var(--foreground)',
+              fontSize: 'var(--text-sm)',
+              lineHeight: 1.6,
+              minHeight: '6rem',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              padding: '1rem',
+              backgroundColor: 'var(--input-background)',
+            }}
+          >
+            Apoiar as atividades técnicas e científicas previstas no projeto, com participação em entregas, registros e acompanhamento das metas pactuadas.
+          </div>
+        </div>
+
+        <div className="md:col-span-4">
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Plano de Trabalho</div>
+          <div
+            style={{
+              color: 'var(--foreground)',
+              fontSize: 'var(--text-sm)',
+              lineHeight: 1.6,
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              padding: '1rem',
+              backgroundColor: 'var(--input-background)',
+            }}
+          >
+            A.1 - Levantamento de dados do projeto, organização das entregas previstas e apoio na execução das atividades técnicas da equipe.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderScholarshipHistory = () => (
+    <div
+      style={{
+        backgroundColor: 'var(--card)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius)',
+        padding: '1.25rem',
+      }}
+    >
+      <div className="flex items-center gap-2 mb-6" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
+        <ClipboardList size={16} />
+        Registro
+      </div>
+      <div className="space-y-5">
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+            Usuário que Solicitou a Bolsa
+          </div>
+          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+            Dra. Maria Silva
+          </div>
+        </div>
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+            Data da Solicitação da Bolsa
+          </div>
+          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+            09/02/2026 às 14:35
+          </div>
+        </div>
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+            Data do Aceite do Bolsista
+          </div>
+          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+            12/02/2026 às 09:18
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className={`max-w-full overflow-x-hidden ${!hideHeader ? 'p-4 md:p-8' : ''}`}>
       <section>
+        {isExampleFlow && selectedMemberPage && !hideHeader && (
+          <nav
+            className="mb-4 flex items-center gap-2"
+            style={{
+              color: 'var(--muted-foreground)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+            }}
+          >
+            <span>Minha Equipe</span>
+            <ChevronRight size={16} />
+            <button
+              type="button"
+              style={{
+                backgroundColor: 'transparent',
+                color: 'var(--muted-foreground)',
+                border: 'none',
+                padding: 0,
+                font: 'inherit',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setSelectedMemberPage(null);
+                setMemberPageTab('documentos');
+              }}
+            >
+              Bolsistas do Projeto
+            </button>
+            <ChevronRight size={16} />
+            <span style={{ color: 'var(--foreground)' }}>Detalhes</span>
+          </nav>
+        )}
+
         {/* Header with icon */}
         {!hideHeader && (
           <>
-            <div className="flex items-center gap-3 mb-2">
-              <div
-            className="p-2 transition-colors"
-            style={{
-              color: 'var(--title-icon-foreground)',
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-2">
+              <div className="flex items-center gap-3">
+                <div
+                  className="p-2 transition-colors"
+                  style={{
+                    color: 'var(--title-icon-foreground)',
                   borderRadius: 'var(--radius)',
                   backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
                 }}
@@ -471,12 +749,54 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                 <Users size={20} />
               </div>
               <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
-                Minha Equipe
+                {isExampleFlow && selectedMemberPage ? selectedMemberPage.name : 'Minha Equipe'}
               </h1>
+              </div>
+
+              {isExampleFlow && selectedMemberPage && (
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <button
+                    type="button"
+                    className="px-4 py-2 transition-colors"
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: 'var(--foreground)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                      setSelectedMemberForCancel(selectedMemberPage);
+                      setIsCancelModalOpen(true);
+                    }}
+                  >
+                    Cancelar Bolsa
+                  </button>
+                  <button
+                    type="button"
+                    className="px-4 py-2 transition-colors"
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: 'var(--primary)',
+                      border: '1px solid var(--primary)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => setIsPermitScholarModalOpen(true)}
+                  >
+                    Delegar - Solicitar Bolsa
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Subtitle and actions */}
-            <div
+            {!(isExampleFlow && selectedMemberPage) && (
+              <div
               className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between"
               style={{
                 marginLeft: 'calc(32px + 0.75rem)', // Aligns with title (icon size + gap)
@@ -493,7 +813,48 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                 Acompanhe as informações dos bolsistas do seu projeto.
               </p>
 
-              {activeTab === 'bolsistas' && !hideAddButton && (
+              {activeTab === 'bolsistas' && !hideAddButton && isExampleFlow && (
+                <div className="flex flex-col gap-2 md:flex-row md:-mt-2">
+                  <button
+                    type="button"
+                    className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: 'var(--primary)',
+                      border: '1px solid var(--primary)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      whiteSpace: 'nowrap',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => setIsAddVoluntarioOpen(true)}
+                  >
+                    <UserPlus size={16} />
+                    Adicionar Voluntário
+                  </button>
+                  <button
+                    type="button"
+                    className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
+                    style={{
+                      backgroundColor: 'var(--primary)',
+                      color: 'var(--primary-foreground)',
+                      border: '1px solid var(--primary)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      whiteSpace: 'nowrap',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => onNavigate?.('cadastrar-bolsista')}
+                  >
+                    <Plus size={16} />
+                    Solicitar Bolsa
+                  </button>
+                </div>
+              )}
+
+              {activeTab === 'bolsistas' && !hideAddButton && !isExampleFlow && (
                 <div className="relative md:-mt-2">
                   <button
                     type="button"
@@ -572,12 +933,13 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                 </div>
               )}
             </div>
+            )}
           </>
         )}
 
         {/* Tab Bar Link - Horizontal for Desktop, Vertical for Mobile */}
         
-        {!hideTabs && (
+        {!(isExampleFlow && selectedMemberPage) && !hideTabs && (
           <>
         {/* Desktop Tab Bar - Horizontal */}
         <div 
@@ -720,8 +1082,78 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
           </>
         )}
 
+        {isExampleFlow && selectedMemberPage && (
+          <div className="space-y-6">
+            <div
+              className="flex gap-1"
+              style={{
+                borderBottom: '1px solid var(--border)',
+              }}
+            >
+              <button
+                onClick={() => setMemberPageTab('documentos')}
+                style={{
+                  padding: '0.625rem 1rem',
+                  backgroundColor: 'transparent',
+                  borderTop: 'none',
+                  borderLeft: 'none',
+                  borderRight: 'none',
+                  borderBottom: memberPageTab === 'documentos' ? '2px solid var(--primary)' : '2px solid transparent',
+                  color: memberPageTab === 'documentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                  marginBottom: '-1px',
+                }}
+              >
+                Documentos
+              </button>
+              <button
+                onClick={() => setMemberPageTab('informacoes')}
+                style={{
+                  padding: '0.625rem 1rem',
+                  backgroundColor: 'transparent',
+                  borderTop: 'none',
+                  borderLeft: 'none',
+                  borderRight: 'none',
+                  borderBottom: memberPageTab === 'informacoes' ? '2px solid var(--primary)' : '2px solid transparent',
+                  color: memberPageTab === 'informacoes' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                  marginBottom: '-1px',
+                }}
+              >
+                Informações
+              </button>
+              <button
+                onClick={() => setMemberPageTab('historico')}
+                style={{
+                  padding: '0.625rem 1rem',
+                  backgroundColor: 'transparent',
+                  borderTop: 'none',
+                  borderLeft: 'none',
+                  borderRight: 'none',
+                  borderBottom: memberPageTab === 'historico' ? '2px solid var(--primary)' : '2px solid transparent',
+                  color: memberPageTab === 'historico' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                  marginBottom: '-1px',
+                }}
+              >
+                Histórico
+              </button>
+            </div>
+
+            {memberPageTab === 'documentos' && renderDocumentsList(selectedMemberPage)}
+            {memberPageTab === 'informacoes' && renderScholarshipInfo(selectedMemberPage)}
+            {memberPageTab === 'historico' && renderScholarshipHistory()}
+          </div>
+        )}
+
         {/* Tab Content: Informações das Bolsas */}
-        {activeTab === 'informacoes' && (
+        {!(isExampleFlow && selectedMemberPage) && activeTab === 'informacoes' && (
           <>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
             {/* Orçamento */}
@@ -1266,7 +1698,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
         )}
 
         {/* Tab Content: Bolsistas do Projeto */}
-        {activeTab === 'bolsistas' && (
+        {!(isExampleFlow && selectedMemberPage) && activeTab === 'bolsistas' && (
           <div className="w-full max-w-full" style={{ overflowX: 'hidden' }}>
         {/* Filters and Actions Bar */}
         <div className="flex flex-col md:flex-row gap-3 mb-4 w-full max-w-full">
@@ -1635,22 +2067,21 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                   onClick={hideExpandable ? undefined : () => handleMemberRowClick(member)}
                 >
                   <div className="grid grid-cols-12 gap-x-12 items-center">
-                    {/* Ícone */}
-                    {!hideExpandable && (
+                    {!hideExpandable && !isExampleFlow && (
                       <div className="col-span-1 flex items-center">
-                        <ChevronDown 
-                          size={16} 
-                          style={{ 
+                        <ChevronDown
+                          size={16}
+                          style={{
                             color: 'var(--muted-foreground)',
                             transform: expandedBolsistaId === member.id ? 'rotate(180deg)' : 'rotate(0deg)',
                             transition: 'transform 0.2s ease',
-                          }} 
+                          }}
                         />
                       </div>
                     )}
 
                     {/* Nome */}
-                    <div className={hideExpandable ? 'col-span-3' : 'col-span-3'} style={hideExpandable ? {} : { marginLeft: '-2.5rem' }}>
+                    <div className="col-span-3" style={!hideExpandable && !isExampleFlow ? { marginLeft: '-2.5rem' } : undefined}>
                       <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                         Nome
                       </div>
@@ -1734,6 +2165,17 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                         {member.status}
                       </span>
                     </div>
+
+                    {!hideExpandable && isExampleFlow && (
+                      <div className="col-span-1 flex justify-end">
+                        <ChevronRight
+                          size={18}
+                          style={{
+                            color: 'var(--muted-foreground)',
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -1917,15 +2359,15 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                   {/* Header: Nome and Status */}
                   <div className="flex justify-between items-start mb-3 gap-2 max-w-full">
                     <div className="flex items-start gap-2 flex-1 min-w-0">
-                      {!hideExpandable && (
+                      {!hideExpandable && !isExampleFlow && (
                         <div className="mt-1 flex-shrink-0">
-                          <ChevronDown 
-                            size={16} 
-                            style={{ 
+                          <ChevronDown
+                            size={16}
+                            style={{
                               color: 'var(--muted-foreground)',
                               transform: expandedBolsistaId === member.id ? 'rotate(180deg)' : 'rotate(0deg)',
                               transition: 'transform 0.2s ease',
-                            }} 
+                            }}
                           />
                         </div>
                       )}
@@ -1950,10 +2392,20 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                     >
                       {member.status}
                     </span>
+                    {!hideExpandable && isExampleFlow && (
+                      <ChevronRight
+                        size={18}
+                        style={{
+                          color: 'var(--muted-foreground)',
+                          flexShrink: 0,
+                          marginTop: '0.125rem',
+                        }}
+                      />
+                    )}
                   </div>
 
                   {/* Período de Vigência */}
-                  <div className="mb-3 ml-6">
+                  <div className={!hideExpandable && !isExampleFlow ? 'mb-3 ml-6' : 'mb-3'}>
                     <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
                       Período de Vigência
                     </div>
@@ -1963,7 +2415,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                   </div>
 
                   {/* Modalidade */}
-                  <div className="ml-6">
+                  <div className={!hideExpandable && !isExampleFlow ? 'ml-6' : undefined}>
                     <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
                       Modalidade
                     </div>
@@ -2142,7 +2594,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
         </div>
         )}
 
-        {activeTab === 'pagamentos' && (
+        {!(isExampleFlow && selectedMemberPage) && activeTab === 'pagamentos' && (
           <PaymentsPage scope="project" embedded />
         )}
       </section>

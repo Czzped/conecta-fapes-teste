@@ -6,9 +6,10 @@ import { usePageScenarios } from '@/mocks/ScenarioContext';
 
 interface CadastrarBolsistaProps {
   onBack: (tab?: 'bolsistas' | 'informacoes' | 'pagamentos') => void;
+  showBolsistasBreadcrumb?: boolean;
 }
 
-export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
+export function CadastrarBolsista({ onBack, showBolsistasBreadcrumb = false }: CadastrarBolsistaProps) {
   usePageScenarios([
     'bolsista-encontrado',
     'bolsista-nao-cadastrado',
@@ -359,6 +360,28 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
           Minha Equipe
         </button>
         <ChevronRight size={16} style={{ color: 'var(--muted-foreground)' }} />
+        {showBolsistasBreadcrumb && (
+          <>
+            <button
+              onClick={() => onBack('bolsistas')}
+              style={{
+                color: 'var(--muted-foreground)',
+                fontSize: 'var(--text-sm)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+                transition: 'color 0.2s',
+                fontFamily: 'var(--font-family)',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--foreground)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--muted-foreground)'; }}
+            >
+              Bolsistas do Projeto
+            </button>
+            <ChevronRight size={16} style={{ color: 'var(--muted-foreground)' }} />
+          </>
+        )}
         <span
           style={{
             color: 'var(--foreground)',

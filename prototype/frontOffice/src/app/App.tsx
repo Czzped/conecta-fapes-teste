@@ -27,7 +27,7 @@ import { ProjectDetailsPage } from './components/ProjectDetailsPage';
 import { Toaster } from 'sonner';
 
 // Main App Component - LanguageProvider is in main.tsx
-type AccessType = 'cidadao' | 'voluntario' | 'bolsista' | 'bolsistaSolicitarBolsa' | 'proponente' | 'coordenador' | 'diretor' | 'reitor';
+type AccessType = 'cidadao' | 'voluntario' | 'bolsista' | 'bolsistaSolicitarBolsa' | 'minhaEquipeExemplo' | 'proponente' | 'coordenador' | 'diretor' | 'reitor';
 type CidadaoPage = 'home' | 'edital-detail' | 'acesso-cidadao' | 'opcoes-inscricao' | 'cidadao-meus-dados' | 'inscricao';
 
 export default function App() {
@@ -57,6 +57,11 @@ export default function App() {
     setIsLoggedIn(true);
     if (type === 'proponente') {
       setCurrentPage('informacoes');
+      return;
+    }
+    if (type === 'minhaEquipeExemplo') {
+      setCurrentPage('minha-equipe');
+      setMyTeamInitialTab('informacoes');
       return;
     }
     // Se for reitor/diretor, navega direto para dashboard
@@ -171,7 +176,7 @@ export default function App() {
         return <CadastrarBolsista onBack={(tab = 'informacoes') => {
           setMyTeamInitialTab(tab);
           handleNavigate('minha-equipe');
-        }} />;
+        }} showBolsistasBreadcrumb={accessType === 'minhaEquipeExemplo'} />;
       case 'editais':
         return <EditaisPage />;
       case 'projects-list':

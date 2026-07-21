@@ -5,7 +5,7 @@ import fapesLogo from 'figma:asset/0d7b9f0810d49a6ee72945d010952cb0ccbd0c9d.png'
 import fapesLogoExpanded from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-type AccessType = 'voluntario' | 'bolsista' | 'bolsistaSolicitarBolsa' | 'proponente' | 'coordenador' | 'diretor' | 'reitor';
+type AccessType = 'voluntario' | 'bolsista' | 'bolsistaSolicitarBolsa' | 'minhaEquipeExemplo' | 'proponente' | 'coordenador' | 'diretor' | 'reitor';
 
 interface SidebarProps {
   currentPage: string;
@@ -66,6 +66,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
 
   const activeMenuPage = parentPageByRoute[currentPage] ?? currentPage;
   const isMenuItemActive = (itemId: string) => activeMenuPage === itemId;
+  const showHomeItem = accessType !== 'minhaEquipeExemplo';
 
   // Translated menu items
   const homeMenuItem = { id: 'inicio', labelKey: 'sidebar.home', icon: Home };
@@ -431,6 +432,8 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
   // Filter profile items by access type
   const filteredProfileMenuItems = accessType === 'proponente'
     ? profileMenuItems.filter(item => item.id === 'informacoes')
+    : accessType === 'minhaEquipeExemplo'
+    ? []
     : accessType === 'voluntario'
     ? profileMenuItems.filter(item => item.id !== 'pagamentos')
     : profileMenuItems;
@@ -438,6 +441,8 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
   // Insert "Minha Equipe" after "Meu Projeto" for Coordenador and scholarship request flow
   const finalManagementMenuItems = accessType === 'proponente'
     ? []
+    : accessType === 'minhaEquipeExemplo'
+    ? [minhaEquipeItem]
     : accessType === 'coordenador' || accessType === 'bolsistaSolicitarBolsa'
     ? managementMenuItems.reduce((acc, item) => {
         acc.push(item);
@@ -570,62 +575,64 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
 
       <div className={isCollapsed ? 'px-2 flex-1' : 'px-4 flex-1'} style={{ overflowY: 'auto', minHeight: 0 }}>
         <nav className="mt-2">
-          <ul className="space-y-2">
-            {(() => {
-              const Icon = homeMenuItem.icon;
-              const isActive = isMenuItemActive(homeMenuItem.id);
+          {showHomeItem && (
+            <ul className="space-y-2">
+              {(() => {
+                const Icon = homeMenuItem.icon;
+                const isActive = isMenuItemActive(homeMenuItem.id);
 
-              return (
-                <li key={homeMenuItem.id}>
-                  <button
-                    onClick={() => onNavigate(homeMenuItem.id)}
-                    className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
-                    style={{
-                      backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
-                      color: isActive ? 'var(--sidebar-selected-foreground)' : 'var(--sidebar-foreground)',
-                      borderRadius: 'var(--radius)',
-                      fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
-                      fontSize: 'var(--text-sm)',
-                      paddingLeft: isCollapsed ? '0' : '0.75rem',
-                      paddingRight: isCollapsed ? '0' : '0.75rem',
-                      justifyContent: isCollapsed ? 'center' : 'flex-start',
-                        minHeight: isCollapsed ? '56px' : undefined,
-                        width: isCollapsed ? '56px' : '100%',
-                        margin: isCollapsed ? '0 auto' : undefined,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.backgroundColor = 'var(--sidebar-accent)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }
-                    }}
-                    title={isCollapsed ? t(homeMenuItem.labelKey) : undefined}
-                  >
-                    <Icon size={20} style={{ flexShrink: 0 }} />
-                    {!isCollapsed && <span style={{ textAlign: 'left' }}>{t(homeMenuItem.labelKey)}</span>}
+                return (
+                  <li key={homeMenuItem.id}>
+                    <button
+                      onClick={() => onNavigate(homeMenuItem.id)}
+                      className="w-full flex items-center gap-3 py-3 transition-colors text-left relative group"
+                      style={{
+                        backgroundColor: isActive ? 'var(--sidebar-accent)' : 'transparent',
+                        color: isActive ? 'var(--sidebar-selected-foreground)' : 'var(--sidebar-foreground)',
+                        borderRadius: 'var(--radius)',
+                        fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
+                        fontSize: 'var(--text-sm)',
+                        paddingLeft: isCollapsed ? '0' : '0.75rem',
+                        paddingRight: isCollapsed ? '0' : '0.75rem',
+                        justifyContent: isCollapsed ? 'center' : 'flex-start',
+                          minHeight: isCollapsed ? '56px' : undefined,
+                          width: isCollapsed ? '56px' : '100%',
+                          margin: isCollapsed ? '0 auto' : undefined,
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'var(--sidebar-accent)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                      title={isCollapsed ? t(homeMenuItem.labelKey) : undefined}
+                    >
+                      <Icon size={20} style={{ flexShrink: 0 }} />
+                      {!isCollapsed && <span style={{ textAlign: 'left' }}>{t(homeMenuItem.labelKey)}</span>}
 
-                    {isCollapsed && (
-                      <div
-                        className="absolute left-full ml-2 px-3 py-2 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50"
-                        style={{
-                          backgroundColor: 'var(--popover)',
-                          color: 'var(--popover-foreground)',
-                          fontSize: 'var(--text-sm)',
-                          boxShadow: 'var(--shadow-lg)',
-                        }}
-                      >
-                        {t(homeMenuItem.labelKey)}
-                      </div>
-                    )}
-                  </button>
-                </li>
-              );
-            })()}
-          </ul>
+                      {isCollapsed && (
+                        <div
+                          className="absolute left-full ml-2 px-3 py-2 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50"
+                          style={{
+                            backgroundColor: 'var(--popover)',
+                            color: 'var(--popover-foreground)',
+                            fontSize: 'var(--text-sm)',
+                            boxShadow: 'var(--shadow-lg)',
+                          }}
+                        >
+                          {t(homeMenuItem.labelKey)}
+                        </div>
+                      )}
+                    </button>
+                  </li>
+                );
+              })()}
+            </ul>
+          )}
 
           {filteredProfileMenuItems.length > 0 && (
             <>
@@ -708,7 +715,7 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
           )}
 
           {/* Section: Gerenciamento */}
-          {(accessType === 'coordenador' || accessType === 'bolsistaSolicitarBolsa') && !isCollapsed && (
+          {(accessType === 'coordenador' || accessType === 'bolsistaSolicitarBolsa' || accessType === 'minhaEquipeExemplo') && !isCollapsed && (
             <div 
               style={{
                 fontSize: 'var(--text-xs)',

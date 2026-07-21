@@ -8,7 +8,7 @@ interface LoginPageProps {
   onLogin: (accessType: AccessType) => void;
 }
 
-type AccessType = 'cidadao' | 'voluntario' | 'bolsista' | 'bolsistaSolicitarBolsa' | 'proponente' | 'coordenador' | 'avaliador' | 'diretor' | 'reitor';
+type AccessType = 'cidadao' | 'voluntario' | 'bolsista' | 'bolsistaSolicitarBolsa' | 'minhaEquipeExemplo' | 'proponente' | 'coordenador' | 'avaliador' | 'diretor' | 'reitor';
 type LoginOptionKey = AccessType;
 
 export function LoginPage({ onLogin }: LoginPageProps) {
@@ -407,6 +407,40 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               >
                 <Building size={16} />
                 <span>Reitor e Diretor</span>
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedAccessType('minhaEquipeExemplo');
+                  handleLogin('minhaEquipeExemplo');
+                }}
+                className="flex items-center justify-center gap-2 transition-all duration-200"
+                style={{
+                  backgroundColor: getLoginOptionBackground('minhaEquipeExemplo'),
+                  color: getLoginOptionColor('minhaEquipeExemplo'),
+                  padding: '0.75rem 1rem',
+                  borderRadius: 'var(--radius)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  boxShadow: 'none',
+                  width: '100%',
+                }}
+                onMouseEnter={(e) => {
+                  setLoginOptionHover(e.currentTarget, 'minhaEquipeExemplo');
+                }}
+                onMouseLeave={(e) => {
+                  resetLoginOption(e.currentTarget, 'minhaEquipeExemplo');
+                }}
+                onMouseDown={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+                onMouseUp={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <Users size={16} />
+                <span style={{ whiteSpace: 'nowrap' }}>Minha Equipe - Exemplo Marcela</span>
               </button>
             </div>
 
