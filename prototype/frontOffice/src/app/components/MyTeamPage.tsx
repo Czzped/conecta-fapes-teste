@@ -9,11 +9,12 @@ import { ListPagination } from '@/app/components/ListPagination';
 import { AdicionarVoluntario } from '@/app/components/AdicionarVoluntario';
 
 interface MyTeamPageProps {
-  accessType: 'voluntario' | 'bolsista' | 'proponente' | 'coordenador';
+  accessType: 'voluntario' | 'bolsista' | 'bolsistaSolicitarBolsa' | 'proponente' | 'coordenador';
   onNavigate?: (page: string) => void;
   hideHeader?: boolean;
   defaultTab?: 'bolsistas' | 'informacoes' | 'pagamentos';
   hideTabs?: boolean;
+  hidePaymentsTab?: boolean;
   hideAddButton?: boolean;
   hideExpandable?: boolean;
 }
@@ -37,9 +38,10 @@ interface TeamMember {
   }[];
 }
 
-export function MyTeamPage({ accessType, onNavigate, hideHeader = false, defaultTab = 'informacoes', hideTabs = false, hideAddButton = false, hideExpandable = false }: MyTeamPageProps) {
+export function MyTeamPage({ accessType, onNavigate, hideHeader = false, defaultTab = 'informacoes', hideTabs = false, hidePaymentsTab = false, hideAddButton = false, hideExpandable = false }: MyTeamPageProps) {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'bolsistas' | 'informacoes' | 'pagamentos'>(defaultTab);
+  const showPaymentsTab = !hidePaymentsTab;
   const [expandedBolsistaId, setExpandedBolsistaId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,7 +53,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedMemberForDetails, setSelectedMemberForDetails] = useState<TeamMember | null>(null);
-  const [detailsTab, setDetailsTab] = useState<'informacoes' | 'aprovacao'>('informacoes');
+  const [detailsTab, setDetailsTab] = useState<'informacoes' | 'aprovacao' | 'historico'>('informacoes');
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [selectedMemberForCancel, setSelectedMemberForCancel] = useState<TeamMember | null>(null);
   const [cancelJustification, setCancelJustification] = useState('');
@@ -61,8 +63,12 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   const [selectedYear, setSelectedYear] = useState('2026');
   const [isYearOpen, setIsYearOpen] = useState(false);
   const [isAddVoluntarioOpen, setIsAddVoluntarioOpen] = useState(false);
+  const [isActionsMenuOpen, setIsActionsMenuOpen] = useState(false);
+  const [isPermitScholarModalOpen, setIsPermitScholarModalOpen] = useState(false);
+  const [selectedScholarCpf, setSelectedScholarCpf] = useState('');
   const [selectedVolunteerToFinish, setSelectedVolunteerToFinish] = useState<TeamMember | null>(null);
   const [volunteerEndDate, setVolunteerEndDate] = useState('');
+  const [volunteerDetailsTab, setVolunteerDetailsTab] = useState<'informacoes' | 'historico'>('informacoes');
   const itemsPerPage = 10;
   
   const periodChartRef = useRef<HTMLDivElement>(null);
@@ -163,13 +169,14 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
     setCurrentPage(1);
   };
 
-  const isActiveVolunteer = (member: TeamMember) => member.type === 'Voluntário' && member.status === 'Em Andamento';
+  const isVolunteer = (member: TeamMember) => member.type === 'Voluntário';
 
   const handleMemberRowClick = (member: TeamMember) => {
     if (hideExpandable) return;
-    if (isActiveVolunteer(member)) {
+    if (isVolunteer(member)) {
       setSelectedVolunteerToFinish(member);
       setVolunteerEndDate('');
+      setVolunteerDetailsTab('informacoes');
       return;
     }
     setExpandedBolsistaId(expandedBolsistaId === member.id ? null : member.id);
@@ -196,6 +203,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
     );
     setSelectedVolunteerToFinish(null);
     setVolunteerEndDate('');
+    setVolunteerDetailsTab('informacoes');
     toast.success('Voluntariado finalizado com sucesso.');
   };
 
@@ -486,8 +494,9 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               </p>
 
               {activeTab === 'bolsistas' && !hideAddButton && (
-                <div className="flex flex-col gap-3 sm:flex-row md:-mt-2">
+                <div className="relative md:-mt-2">
                   <button
+                    type="button"
                     className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
                     style={{
                       backgroundColor: 'transparent',
@@ -498,27 +507,68 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                       fontWeight: 'var(--font-weight-medium)',
                       whiteSpace: 'nowrap',
                     }}
-                    onClick={() => setIsAddVoluntarioOpen(true)}
+                    onClick={() => setIsActionsMenuOpen((current) => !current)}
                   >
-                    <UserPlus size={18} />
-                    Adicionar Voluntário
+                    Ações
+                    <ChevronDown size={18} />
                   </button>
-                  <button
-                    className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
-                    style={{
-                      backgroundColor: 'transparent',
-                      color: 'var(--primary)',
-                      border: '1px solid var(--primary)',
-                      borderRadius: 'var(--radius)',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: 'var(--font-weight-medium)',
-                      whiteSpace: 'nowrap',
-                    }}
-                    onClick={() => onNavigate?.('cadastrar-bolsista')}
-                  >
-                    <Plus size={18} />
-                    Solicitar Bolsa
-                  </button>
+
+                  {isActionsMenuOpen && (
+                    <div
+                      className="absolute right-0 top-full mt-2 overflow-hidden"
+                      style={{
+                        minWidth: '320px',
+                        backgroundColor: 'var(--popover)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        boxShadow: 'var(--shadow-lg)',
+                        zIndex: 30,
+                      }}
+                    >
+                      <button
+                        type="button"
+                        className="flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors"
+                        style={{ backgroundColor: 'transparent', color: 'var(--foreground)', border: 'none', cursor: 'pointer', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', fontFamily: 'var(--font-family)', whiteSpace: 'nowrap' }}
+                        onClick={() => {
+                          setIsActionsMenuOpen(false);
+                          setIsAddVoluntarioOpen(true);
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--primary) 8%, var(--popover))'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                      >
+                        <UserPlus size={16} />
+                        Adicionar Voluntário
+                      </button>
+                      <button
+                        type="button"
+                        className="flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors"
+                        style={{ backgroundColor: 'transparent', color: 'var(--foreground)', border: 'none', cursor: 'pointer', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', fontFamily: 'var(--font-family)', whiteSpace: 'nowrap' }}
+                        onClick={() => {
+                          setIsActionsMenuOpen(false);
+                          onNavigate?.('cadastrar-bolsista');
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--primary) 8%, var(--popover))'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                      >
+                        <Plus size={16} />
+                        Solicitar Bolsa
+                      </button>
+                      <button
+                        type="button"
+                        className="flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors"
+                        style={{ backgroundColor: 'transparent', color: 'var(--foreground)', border: 'none', cursor: 'pointer', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', fontFamily: 'var(--font-family)', whiteSpace: 'nowrap' }}
+                        onClick={() => {
+                          setIsActionsMenuOpen(false);
+                          setIsPermitScholarModalOpen(true);
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--primary) 8%, var(--popover))'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                      >
+                        <Users size={16} />
+                        Permitir Bolsista - Solicitar Bolsa
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -576,26 +626,28 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
           >
             Bolsistas do Projeto
           </button>
-          <button
-            onClick={() => setActiveTab('pagamentos')}
-            style={{
-              padding: '0.625rem 1rem',
-              backgroundColor: 'transparent',
-              borderTop: 'none',
-              borderLeft: 'none',
-              borderRight: 'none',
-              borderBottom: activeTab === 'pagamentos' ? '2px solid var(--primary)' : '2px solid transparent',
-              color: activeTab === 'pagamentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-medium)',
-              cursor: 'pointer',
-              position: 'relative',
-              transition: 'color 0.2s',
-              marginBottom: '-1px',
-            }}
-          >
-            Pagamentos
-          </button>
+          {showPaymentsTab && (
+            <button
+              onClick={() => setActiveTab('pagamentos')}
+              style={{
+                padding: '0.625rem 1rem',
+                backgroundColor: 'transparent',
+                borderTop: 'none',
+                borderLeft: 'none',
+                borderRight: 'none',
+                borderBottom: activeTab === 'pagamentos' ? '2px solid var(--primary)' : '2px solid transparent',
+                color: activeTab === 'pagamentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+                position: 'relative',
+                transition: 'color 0.2s',
+                marginBottom: '-1px',
+              }}
+            >
+              Pagamentos
+            </button>
+          )}
         </div>
 
         {/* Mobile Tab Bar - Vertical */}
@@ -643,25 +695,27 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
           >
             Bolsistas do Projeto
           </button>
-          <button
-            onClick={() => setActiveTab('pagamentos')}
-            className="py-3 pl-4 text-left"
-            style={{
-              backgroundColor: 'transparent',
-              borderTop: 'none',
-              borderRight: 'none',
-              borderBottom: 'none',
-              borderLeft: activeTab === 'pagamentos' ? '2px solid var(--primary)' : '2px solid transparent',
-              color: activeTab === 'pagamentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-medium)',
-              cursor: 'pointer',
-              transition: 'color 0.2s',
-              marginLeft: '-2px',
-            }}
-          >
-            Pagamentos
-          </button>
+          {showPaymentsTab && (
+            <button
+              onClick={() => setActiveTab('pagamentos')}
+              className="py-3 pl-4 text-left"
+              style={{
+                backgroundColor: 'transparent',
+                borderTop: 'none',
+                borderRight: 'none',
+                borderBottom: 'none',
+                borderLeft: activeTab === 'pagamentos' ? '2px solid var(--primary)' : '2px solid transparent',
+                color: activeTab === 'pagamentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+                transition: 'color 0.2s',
+                marginLeft: '-2px',
+              }}
+            >
+              Pagamentos
+            </button>
+          )}
         </div>
           </>
         )}
@@ -2114,7 +2168,8 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              backgroundColor: 'var(--card)',
+              backgroundColor: 'var(--popover)',
+              border: '1px solid var(--border)',
               borderRadius: 'var(--radius)',
               width: '90%',
               maxWidth: '700px',
@@ -2195,6 +2250,21 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               >
                 Aprovação FAPES
               </button>
+              <button
+                onClick={() => setDetailsTab('historico')}
+                className="px-4 py-2 transition-colors"
+                style={{
+                  backgroundColor: 'transparent',
+                  color: detailsTab === 'historico' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                  border: 'none',
+                  borderBottom: detailsTab === 'historico' ? '2px solid var(--primary)' : '2px solid transparent',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                }}
+              >
+                Histórico
+              </button>
             </div>
 
             {/* Modal Content */}
@@ -2224,6 +2294,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                         style={{
                           backgroundColor: 'var(--muted)',
                           color: 'var(--foreground)',
+                          border: '1px solid var(--border)',
                           borderRadius: '9999px',
                           fontSize: 'var(--text-xs)',
                           fontWeight: 'var(--font-weight-medium)',
@@ -2315,6 +2386,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                     border: '1px solid var(--border)',
                     borderRadius: 'var(--radius)',
                     padding: '1.25rem',
+                    minHeight: '9rem',
                   }}
                 >
                   <div className="flex items-center gap-2 mb-3" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
@@ -2348,6 +2420,50 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               </div>
             )}
 
+            {detailsTab === 'historico' && (
+              <div className="p-6">
+                <div
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                    padding: '1.25rem',
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-4" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
+                    <ClipboardList size={16} />
+                    Registro
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                        Usuário que solicitou a bolsa
+                      </div>
+                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        Dra. Maria Silva
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                        Data da Solicitação da Bolsa
+                      </div>
+                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        09/02/2026 às 14:35
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                        Data do Aceite do Bolsista
+                      </div>
+                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        12/02/2026 às 09:18
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {detailsTab === 'aprovacao' && (
               <div className="p-6 space-y-6">
                 {/* Status FAPES Header */}
@@ -2360,7 +2476,8 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                     style={{
                       backgroundColor: 'rgba(34, 197, 94, 0.1)',
                       color: '#22c55e',
-                      borderRadius: 'var(--radius)',
+                      border: '1px solid rgba(34, 197, 94, 0.3)',
+                      borderRadius: '9999px',
                       fontSize: 'var(--text-sm)',
                       fontWeight: 'var(--font-weight-medium)',
                     }}
@@ -2500,7 +2617,8 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              backgroundColor: 'var(--card)',
+              backgroundColor: 'var(--popover)',
+              border: '1px solid var(--border)',
               borderRadius: 'var(--radius)',
               width: '90%',
               maxWidth: '600px',
@@ -2803,6 +2921,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             onClick={() => {
               setSelectedVolunteerToFinish(null);
               setVolunteerEndDate('');
+              setVolunteerDetailsTab('informacoes');
             }}
           />
           <div
@@ -2852,6 +2971,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                   onClick={() => {
                     setSelectedVolunteerToFinish(null);
                     setVolunteerEndDate('');
+                    setVolunteerDetailsTab('informacoes');
                   }}
                   style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem', color: 'var(--muted-foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--radius-sm)', flexShrink: 0, transition: 'all 0.15s' }}
                   aria-label="Fechar"
@@ -2860,27 +2980,244 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                 </button>
               </div>
 
-              <div className="mb-5">
-                <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
-                  CPF do Voluntário <span style={{ color: 'var(--destructive-foreground)' }}>*</span>
-                </label>
-                <input
-                  type="text"
-                  value="000.000.000-00"
-                  readOnly
-                  style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: 'var(--input-background)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
-                />
+              <div className="flex gap-2" style={{ borderBottom: '1px solid var(--border)', marginBottom: '1.25rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setVolunteerDetailsTab('informacoes')}
+                  className="px-4 py-2 transition-colors"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: volunteerDetailsTab === 'informacoes' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                    border: 'none',
+                    borderBottom: volunteerDetailsTab === 'informacoes' ? '2px solid var(--primary)' : '2px solid transparent',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: 'pointer',
+                    marginBottom: '-1px',
+                  }}
+                >
+                  Informações
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVolunteerDetailsTab('historico')}
+                  className="px-4 py-2 transition-colors"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: volunteerDetailsTab === 'historico' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                    border: 'none',
+                    borderBottom: volunteerDetailsTab === 'historico' ? '2px solid var(--primary)' : '2px solid transparent',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: 'pointer',
+                    marginBottom: '-1px',
+                  }}
+                >
+                  Histórico
+                </button>
               </div>
 
-              <div className="mb-5">
+              {volunteerDetailsTab === 'informacoes' && (
+                <>
+                  <div className="mb-5">
+                    <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+                      CPF do Voluntário <span style={{ color: 'var(--destructive-foreground)' }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value="000.000.000-00"
+                      readOnly
+                      style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: 'var(--input-background)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
+                    />
+                  </div>
+
+                  <div className="mb-5">
+                    <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+                      Data de Fim <span style={{ color: 'var(--destructive-foreground)' }}>*</span>
+                    </label>
+                    <DatePicker
+                      value={volunteerEndDate}
+                      onChange={setVolunteerEndDate}
+                      placeholder="Selecione a data de fim"
+                    />
+                  </div>
+
+                  <div
+                    className="flex items-start gap-2 px-3 py-2"
+                    style={{
+                      backgroundColor: 'color-mix(in srgb, var(--primary) 5%, transparent)',
+                      border: '1px solid var(--primary)',
+                      borderRadius: 'var(--radius)',
+                    }}
+                  >
+                    <Info size={15} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: 1 }} />
+                    <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
+                      Após finalizar o voluntariado, o membro do projeto não irá mais aparecer na lista para solicitar Diária e Passagem.
+                    </span>
+                  </div>
+
+                  <div className="flex justify-end gap-3" style={{ marginTop: '1.5rem' }}>
+                    <button
+                      onClick={() => {
+                        setSelectedVolunteerToFinish(null);
+                        setVolunteerEndDate('');
+                        setVolunteerDetailsTab('informacoes');
+                      }}
+                      style={{ padding: '0.625rem 1.25rem', backgroundColor: 'transparent', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'var(--font-family)' }}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={handleFinishVolunteering}
+                      style={{ padding: '0.625rem 1.25rem', backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'var(--font-family)' }}
+                    >
+                      Finalizar Voluntariado
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {volunteerDetailsTab === 'historico' && (
+                <div
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                    padding: '1.25rem',
+                  }}
+                >
+                  <div className="space-y-4">
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                        Usuário que Solicitou a Bolsa
+                      </div>
+                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        Dra. Maria Silva
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                        Data da Solicitação da Bolsa
+                      </div>
+                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        09/02/2026 às 14:35
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                        Data do Aceite do Bolsista
+                      </div>
+                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        12/02/2026 às 09:18
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {isPermitScholarModalOpen && (
+        <>
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              zIndex: 999,
+            }}
+            onClick={() => {
+              setIsPermitScholarModalOpen(false);
+              setSelectedScholarCpf('');
+            }}
+          />
+          <div
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              backgroundColor: 'var(--popover)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-lg)',
+              width: '90%',
+              maxWidth: '560px',
+              zIndex: 1000,
+              boxShadow: 'var(--shadow-lg)',
+              fontFamily: 'var(--font-family)',
+            }}
+          >
+            <div style={{ padding: '1.5rem' }}>
+              <div className="flex items-start justify-between" style={{ marginBottom: '1.25rem' }}>
+                <div className="flex items-center gap-3">
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: 'var(--radius)',
+                      backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
+                      color: 'var(--primary)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Users size={22} />
+                  </div>
+                  <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
+                    Permitir Bolsista - Solicitar Bolsa
+                  </h1>
+                </div>
+                <button
+                  onClick={() => {
+                    setIsPermitScholarModalOpen(false);
+                    setSelectedScholarCpf('');
+                  }}
+                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem', color: 'var(--muted-foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--radius-sm)', flexShrink: 0 }}
+                  aria-label="Fechar"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <p
+                style={{
+                  color: 'var(--muted-foreground)',
+                  fontSize: 'var(--text-sm)',
+                  lineHeight: 1.6,
+                  margin: '0 0 1.25rem',
+                }}
+              >
+                O coordenador do projeto pode permitir que um bolsista da sua equipe tenha acesso as funcionalidade de Minha Equipe e possa Adicionar Voluntário e Solicitar Bolsa. Selecione o bolsista que deseja oferecer esse acesso.
+              </p>
+
+              <div style={{ marginBottom: '1.25rem' }}>
                 <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
-                  Data de Fim <span style={{ color: 'var(--destructive-foreground)' }}>*</span>
+                  CPF do Bolsista
                 </label>
-                <DatePicker
-                  value={volunteerEndDate}
-                  onChange={setVolunteerEndDate}
-                  placeholder="Selecione a data de fim"
-                />
+                <select
+                  value={selectedScholarCpf}
+                  onChange={(event) => setSelectedScholarCpf(event.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.625rem 0.75rem',
+                    backgroundColor: 'var(--input-background)',
+                    color: 'var(--foreground)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-sm)',
+                    outline: 'none',
+                    fontFamily: 'var(--font-family)',
+                  }}
+                >
+                  <option value="">Selecione o CPF do bolsista</option>
+                  <option value="123.456.789-00">123.456.789-00 - Sofia de Alcantara Silva</option>
+                  <option value="234.567.890-11">234.567.890-11 - Vinícius de Jesus Estevam</option>
+                  <option value="345.678.901-22">345.678.901-22 - Camila Rocha</option>
+                </select>
               </div>
 
               <div
@@ -2889,29 +3226,34 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                   backgroundColor: 'color-mix(in srgb, var(--primary) 5%, transparent)',
                   border: '1px solid var(--primary)',
                   borderRadius: 'var(--radius)',
+                  marginBottom: '1.5rem',
                 }}
               >
                 <Info size={15} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: 1 }} />
                 <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
-                  Após finalizar o voluntariado, o membro do projeto não irá mais aparecer na lista para solicitar Diária e Passagem.
+                  O bolsita deve entrar em sua conta e aceitar o convite.
                 </span>
               </div>
 
-              <div className="flex justify-end gap-3" style={{ marginTop: '1.5rem' }}>
+              <div className="flex justify-end gap-3">
                 <button
                   onClick={() => {
-                    setSelectedVolunteerToFinish(null);
-                    setVolunteerEndDate('');
+                    setIsPermitScholarModalOpen(false);
+                    setSelectedScholarCpf('');
                   }}
-                  style={{ padding: '0.625rem 1.25rem', backgroundColor: 'transparent', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'var(--font-family)' }}
+                  style={{ padding: '0.625rem 1.25rem', backgroundColor: 'transparent', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: 'var(--font-family)' }}
                 >
                   Cancelar
                 </button>
                 <button
-                  onClick={handleFinishVolunteering}
-                  style={{ padding: '0.625rem 1.25rem', backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'var(--font-family)' }}
+                  onClick={() => {
+                    setIsPermitScholarModalOpen(false);
+                    setSelectedScholarCpf('');
+                    toast.success('Convite enviado ao bolsista.');
+                  }}
+                  style={{ padding: '0.625rem 1.25rem', backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: 'var(--font-family)' }}
                 >
-                  Finalizar Voluntariado
+                  Salvar
                 </button>
               </div>
             </div>

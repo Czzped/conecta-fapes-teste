@@ -5,7 +5,7 @@ import fapesLogo from 'figma:asset/0d7b9f0810d49a6ee72945d010952cb0ccbd0c9d.png'
 import fapesLogoExpanded from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-type AccessType = 'voluntario' | 'bolsista' | 'proponente' | 'coordenador' | 'diretor' | 'reitor';
+type AccessType = 'voluntario' | 'bolsista' | 'bolsistaSolicitarBolsa' | 'proponente' | 'coordenador' | 'diretor' | 'reitor';
 
 interface SidebarProps {
   currentPage: string;
@@ -435,10 +435,10 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
     ? profileMenuItems.filter(item => item.id !== 'pagamentos')
     : profileMenuItems;
 
-  // Insert "Minha Equipe" after "Meu Projeto" for Coordenador
+  // Insert "Minha Equipe" after "Meu Projeto" for Coordenador and scholarship request flow
   const finalManagementMenuItems = accessType === 'proponente'
     ? []
-    : accessType === 'coordenador'
+    : accessType === 'coordenador' || accessType === 'bolsistaSolicitarBolsa'
     ? managementMenuItems.reduce((acc, item) => {
         acc.push(item);
         if (item.id === 'projetos') {
@@ -707,8 +707,8 @@ export function Sidebar({ currentPage, onNavigate, isCollapsed, onToggle, isMobi
             </>
           )}
 
-          {/* Section: Gerenciamento - Only for Coordenador */}
-          {accessType === 'coordenador' && !isCollapsed && (
+          {/* Section: Gerenciamento */}
+          {(accessType === 'coordenador' || accessType === 'bolsistaSolicitarBolsa') && !isCollapsed && (
             <div 
               style={{
                 fontSize: 'var(--text-xs)',

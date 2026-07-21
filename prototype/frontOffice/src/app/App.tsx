@@ -27,7 +27,7 @@ import { ProjectDetailsPage } from './components/ProjectDetailsPage';
 import { Toaster } from 'sonner';
 
 // Main App Component - LanguageProvider is in main.tsx
-type AccessType = 'cidadao' | 'voluntario' | 'bolsista' | 'proponente' | 'coordenador' | 'diretor' | 'reitor';
+type AccessType = 'cidadao' | 'voluntario' | 'bolsista' | 'bolsistaSolicitarBolsa' | 'proponente' | 'coordenador' | 'diretor' | 'reitor';
 type CidadaoPage = 'home' | 'edital-detail' | 'acesso-cidadao' | 'opcoes-inscricao' | 'cidadao-meus-dados' | 'inscricao';
 
 export default function App() {
@@ -131,7 +131,13 @@ export default function App() {
       case 'projetos':
         return <MyProjectsPage accessType={accessType} />;
       case 'minha-equipe':
-        return <MyTeamPage accessType={accessType} onNavigate={handleNavigate} defaultTab={myTeamInitialTab} />;
+        return (
+          <MyTeamPage
+            accessType={accessType}
+            onNavigate={handleNavigate}
+            defaultTab={myTeamInitialTab}
+          />
+        );
       case 'pagamentos-projeto':
         return <PaymentsPage scope="project" />;
       case 'pagamentos':

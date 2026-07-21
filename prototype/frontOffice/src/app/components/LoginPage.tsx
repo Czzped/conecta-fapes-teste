@@ -8,11 +8,12 @@ interface LoginPageProps {
   onLogin: (accessType: AccessType) => void;
 }
 
-type AccessType = 'cidadao' | 'voluntario' | 'bolsista' | 'proponente' | 'coordenador' | 'avaliador' | 'diretor' | 'reitor';
+type AccessType = 'cidadao' | 'voluntario' | 'bolsista' | 'bolsistaSolicitarBolsa' | 'proponente' | 'coordenador' | 'avaliador' | 'diretor' | 'reitor';
+type LoginOptionKey = AccessType;
 
 export function LoginPage({ onLogin }: LoginPageProps) {
   const { t } = useLanguage();
-  const [selectedAccessType, setSelectedAccessType] = useState<AccessType | null>(null);
+  const [selectedAccessType, setSelectedAccessType] = useState<LoginOptionKey | null>(null);
 
   // Força dark mode na tela de login
   useEffect(() => {
@@ -30,17 +31,17 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     onLogin(accessType);
   };
 
-  const getLoginOptionBackground = (accessType: AccessType) =>
+  const getLoginOptionBackground = (accessType: LoginOptionKey) =>
     selectedAccessType === accessType ? 'var(--sidebar-accent)' : 'transparent';
-  const getLoginOptionColor = (accessType: AccessType) =>
+  const getLoginOptionColor = (accessType: LoginOptionKey) =>
     selectedAccessType === accessType ? 'var(--primary)' : 'var(--card-foreground)';
-  const setLoginOptionHover = (element: HTMLButtonElement, accessType: AccessType) => {
+  const setLoginOptionHover = (element: HTMLButtonElement, accessType: LoginOptionKey) => {
     element.style.backgroundColor = 'var(--sidebar-accent)';
     element.style.color = getLoginOptionColor(accessType);
     element.style.transform = 'translateY(0)';
     element.style.boxShadow = 'none';
   };
-  const resetLoginOption = (element: HTMLButtonElement, accessType: AccessType) => {
+  const resetLoginOption = (element: HTMLButtonElement, accessType: LoginOptionKey) => {
     element.style.backgroundColor = getLoginOptionBackground(accessType);
     element.style.color = getLoginOptionColor(accessType);
     element.style.transform = 'translateY(0)';
@@ -57,7 +58,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
       }}
     >
       <div 
-        className="w-full max-w-md"
+        className="w-full max-w-xl"
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -128,14 +129,10 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
             {/* Access Type Selection */}
             <div 
+              className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full mb-4"
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.75rem',
                 width: '100%',
-                marginBottom: '1rem',
               }}
-              className="md:flex-row md:gap-4 md:w-auto"
             >
               <button
                 onClick={() => {
@@ -238,6 +235,40 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               >
                 <GraduationCap size={16} />
                 <span>{t('login.scholar')}</span>
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedAccessType('bolsistaSolicitarBolsa');
+                  handleLogin('bolsistaSolicitarBolsa');
+                }}
+                className="flex items-center justify-center gap-2 transition-all duration-200"
+                style={{
+                  backgroundColor: getLoginOptionBackground('bolsistaSolicitarBolsa'),
+                  color: getLoginOptionColor('bolsistaSolicitarBolsa'),
+                  padding: '0.75rem 1rem',
+                  borderRadius: 'var(--radius)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  boxShadow: 'none',
+                  width: '100%',
+                }}
+                onMouseEnter={(e) => {
+                  setLoginOptionHover(e.currentTarget, 'bolsistaSolicitarBolsa');
+                }}
+                onMouseLeave={(e) => {
+                  resetLoginOption(e.currentTarget, 'bolsistaSolicitarBolsa');
+                }}
+                onMouseDown={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+                onMouseUp={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <GraduationCap size={16} />
+                <span style={{ whiteSpace: 'nowrap' }}>Bolsista - Solicitar Bolsa</span>
               </button>
               <button
                 onClick={() => {

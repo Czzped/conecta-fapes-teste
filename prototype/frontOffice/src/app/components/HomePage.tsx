@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-type AccessType = 'voluntario' | 'bolsista' | 'proponente' | 'coordenador';
+type AccessType = 'voluntario' | 'bolsista' | 'bolsistaSolicitarBolsa' | 'proponente' | 'coordenador';
 
 interface HomePageProps {
   accessType?: AccessType;
@@ -20,13 +20,14 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
   const scholarData = [
     { label: t('home.scholarName'), value: 'Paulo Sérgio Junior' },
     { label: t('home.project'), value: 'Conecta Fapes' },
-    { label: t('home.scholarshipType'), value: accessType === 'voluntario' || accessType === 'bolsista' ? 'BPIG-VIII' : 'Iniciação Científica' },
+    { label: t('home.scholarshipType'), value: accessType === 'voluntario' || accessType === 'bolsista' || accessType === 'bolsistaSolicitarBolsa' ? 'BPIG-VIII' : 'Iniciação Científica' },
     { label: t('home.amount'), value: 'R$ 700,00' },
     { label: t('home.validityPeriod'), value: '01/06/2025 - 01/06/2026' },
     { label: t('home.scholarshipStatus'), value: t('home.active'), isBadge: true },
   ];
   const hasDiariaPendenteAceite = accessType === 'bolsista' || accessType === 'coordenador';
   const [conviteVoluntario, setConviteVoluntario] = useState<'pendente' | 'aceito' | 'recusado'>('pendente');
+  const [conviteSolicitarBolsa, setConviteSolicitarBolsa] = useState<'pendente' | 'aceito' | 'recusado'>('pendente');
 
   return (
     <div className="w-full px-4 md:px-8 py-8">
@@ -353,6 +354,52 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
                 <ChevronRight size={16} />
               </span>
             </button>
+          )}
+
+          {accessType === 'bolsistaSolicitarBolsa' && conviteSolicitarBolsa === 'pendente' && (
+            <div
+              className="flex flex-col gap-4 p-4 md:flex-row md:items-start md:justify-between"
+              style={{
+                backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
+                border: '1px solid color-mix(in srgb, var(--primary) 24%, transparent)',
+                borderRadius: 'var(--radius)',
+              }}
+            >
+              <div className="flex items-start gap-3">
+                <Users size={20} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
+                <div>
+                  <p style={{ color: 'var(--foreground)', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-sm)', margin: '0 0 0.25rem 0' }}>
+                    Convite para acessar Solicitar Bolsa
+                  </p>
+                  <p style={{ color: 'var(--muted-foreground)', fontWeight: 'var(--font-weight-normal)', fontSize: 'var(--text-sm)', lineHeight: '1.5', margin: 0 }}>
+                    O Coordenador Paulo Sergio Junior, do Projeto Conecta Fapes, convidou você para ter acesso a<br />
+                    funcionalidade de Solicitar Bolsa. Deseja aceitar?
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 md:shrink-0">
+                <button
+                  type="button"
+                  onClick={() => { setConviteSolicitarBolsa('recusado'); toast('Você recusou o convite para acessar Solicitar Bolsa.'); }}
+                  className="px-4 py-2 transition-colors"
+                  style={{ backgroundColor: 'transparent', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--muted)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                >
+                  Recusar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setConviteSolicitarBolsa('aceito'); toast.success('Você aceitou o convite para acessar Solicitar Bolsa.'); }}
+                  className="px-4 py-2 transition-colors"
+                  style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+                >
+                  Aceitar
+                </button>
+              </div>
+            </div>
           )}
 
           {accessType === 'voluntario' && conviteVoluntario === 'pendente' && (
