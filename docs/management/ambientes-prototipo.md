@@ -51,29 +51,34 @@ Ao mergear, automaticamente:
 Mapeamento de destino: front-office → `leds-conectafapes-frontoffice-frontend`;
 backoffice → `leds-conectafapes-frontend-backoffice`.
 
-## 4. Como o deploy funciona (e por que não usa GitHub Actions)
+## 4. Como o deploy funciona
 
-Os deploys são feitos pela **integração nativa do Vercel com o Git**, não por workflow.
-Motivo: o build dos protótipos consumia minutos de GitHub Actions, e a cota da
-organização (plano Team, 3.000 min/mês) já estava no limite. Com deploy nativo, o custo
-de Actions do fluxo cai praticamente a zero — só resta o job que cria a issue (~30s).
+Cada ambiente publica de um jeito diferente, por uma razão de custo:
 
-Configuração de cada projeto no Vercel:
+| Ambiente | Como publica | Por quê |
+|---|---|---|
+| **Protótipo** | Integração **nativa** do Vercel com o Git (push na `prototipagem`) | Publica dezenas de vezes por dia; fazer isso no GitHub Actions consumiria a cota da org (plano Team, 3.000 min/mês, já estourada em jul/2026) |
+| **Estável** | **CLI do Vercel** no workflow [`deploy-estavel`](../../.github/workflows/deploy-estavel.yml) | Publica só em promoções aprovadas (raras), então o custo de Actions é pequeno. A CLI dispensa conectar o repositório, o que permite manter o estável numa conta Vercel separada em plano Hobby (a integração nativa exigiria plano Pro para repo privado de organização) |
 
-| Projeto | Conta Vercel | Production Branch | Root Directory |
+Configuração dos projetos no Vercel:
+
+| Projeto | Conta Vercel | Como publica | Root Directory |
 |---|---|---|---|
-| `frontoffice-conecta` | conta principal | `prototipagem` | `prototype/frontOffice` |
-| `backoffice-conecta` | conta principal | `prototipagem` | `prototype/backoffice` |
-| `frontoffice-conecta-estavel` | `fatasys-projects` | `main` | `prototype/frontOffice` |
-| `backoffice-conecta-estavel` | `fatasys-projects` | `main` | `prototype/backoffice` |
+| `frontoffice-conecta` | conta principal (paga) | nativo, Production Branch `prototipagem` | `prototype/frontOffice` |
+| `backoffice-conecta` | conta principal (paga) | nativo, Production Branch `prototipagem` | `prototype/backoffice` |
+| `frontoffice-conecta-estavel` | `fatasys-projects` (Hobby) | CLI, no merge para `main` | `prototype/frontOffice` |
+| `backoffice-conecta-estavel` | `fatasys-projects` (Hobby) | CLI, no merge para `main` | `prototype/backoffice` |
 
 Detalhes que fazem isso funcionar:
-- O **Root Directory** garante que cada projeto só reconstrói quando a pasta dele muda
-  (equivalente ao filtro de `paths`), evitando builds desnecessários no monorepo.
+- No protótipo, o **Root Directory** garante que cada projeto só reconstrói quando a
+  pasta dele muda, evitando builds desnecessários no monorepo. No estável, o mesmo
+  papel é feito pelo filtro de `paths` do workflow.
 - Os `vercel.json` de cada app têm o **rewrite de SPA** (`/(.*) → /index.html`), sem o
   qual dar refresh ou abrir um link direto numa rota retorna 404.
 - Os ambientes ficam em **contas Vercel separadas**, então quem mexe no protótipo não
   alcança o estável.
+- ⚠️ O Production Branch dos projetos de protótipo **precisa** ser `prototipagem`. Se
+  ficar em `main`, o protótipo passa a publicar da `main` e os dois ambientes viram um só.
 
 ## 5. Regras da `main`
 
