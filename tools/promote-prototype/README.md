@@ -48,8 +48,9 @@ VERCEL_TOKEN_ESTAVEL=*** node tools/promote-prototype/setup-vercel-estavel.mjs -
 
 Flags: `--team <slug>` (se a conta tiver vários times), `--personal` (conta pessoal).
 
-Secrets consumidos pelo [`deploy-estavel.yml`](../../.github/workflows/deploy-estavel.yml):
-`VERCEL_TOKEN_ESTAVEL`, `VERCEL_ORG_ID_ESTAVEL`,
-`VERCEL_PROJECT_ID_FRONTOFFICE_ESTAVEL`, `VERCEL_PROJECT_ID_BACKOFFICE_ESTAVEL`.
-A conta do estável **não** precisa de acesso ao repositório — o deploy é feito pela
-CLI no Actions, sem conexão Git no Vercel.
+> **Nota:** este script serve para **criar/inspecionar** os projetos do estável.
+> O **deploy não usa mais GitHub Actions** — é feito pela integração nativa do Vercel
+> com o Git (`main` → estável), para não consumir minutos de Actions. Por isso a conta
+> do estável **precisa** ter o repositório conectado (app do Vercel no GitHub), e cada
+> projeto precisa de **Production Branch** e **Root Directory** configurados.
+> Ver [docs/management/ambientes-prototipo.md](../../docs/management/ambientes-prototipo.md).

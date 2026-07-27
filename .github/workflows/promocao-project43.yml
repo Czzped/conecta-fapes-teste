@@ -4,6 +4,13 @@ name: Promoção → Project 43
 # MERGEADO, cria uma issue "Pronto para Desenvolvimento" no Project 43,
 # já com Repositório (repo de produto alvo) e Area=Frontend, e a auditoria
 # (corpo do PR) no corpo da issue. Usa PROJECTS_PAT (mesmo secret do release).
+#
+# Os DEPLOYS não passam por aqui: são feitos nativamente pelo Vercel a partir
+# das branches (`prototipagem` -> protótipo, `main` -> estável), para não
+# consumir minutos de GitHub Actions. Ver docs/management/ambientes-prototipo.md
+#
+# Este job é de propósito enxuto (sem build, sem setup-node, checkout parcial):
+# roda em ~30s para pesar o mínimo possível na cota de Actions.
 
 on:
   pull_request:
@@ -21,13 +28,11 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout (apenas a ferramenta)
         uses: actions/checkout@v5
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          sparse-checkout: tools/promote-prototype
+          sparse-checkout-cone-mode: true
 
       - name: Criar issue "Pronto para Desenvolvimento" no Project 43
         env:
