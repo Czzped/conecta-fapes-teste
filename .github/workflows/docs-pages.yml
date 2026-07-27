@@ -4,6 +4,28 @@ on:
   push:
     branches:
       - main
+    # Só reconstrói o site quando alguma ENTRADA da documentação muda. Antes rodava
+    # em todo push na `main`: em jul/2026 foram 36 execuções (81 min) para apenas ~13
+    # commits que mexeram em docs — o resto era build descartável, num recurso que
+    # estourou a cota da organização.
+    #
+    # A lista abaixo é o conjunto real de entradas do `mkdocs build`:
+    #   docs/            -> docs_dir
+    #   overrides/       -> theme.custom_dir
+    #   mkdocs.yml       -> configuração e nav
+    #   requirements.txt -> versões do mkdocs e plugins
+    #   tools/mkdocs_hooks.py + tools/build_capacidades.py -> hook on_pre_build que
+    #                       regenera o Mapa de Capacidades a cada build
+    # Ao criar uma nova entrada (plugin, hook, pasta de tema), acrescente aqui.
+    paths:
+      - "docs/**"
+      - "overrides/**"
+      - "mkdocs.yml"
+      - "requirements.txt"
+      - "tools/mkdocs_hooks.py"
+      - "tools/build_capacidades.py"
+      - ".github/workflows/docs-pages.yml"
+  # Continua disponível para forçar uma republicação a qualquer momento.
   workflow_dispatch:
 
 permissions:
