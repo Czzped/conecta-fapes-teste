@@ -1,0 +1,33 @@
+name: Protótipo · front-office
+
+# Ambiente de PROTÓTIPO: publica a cada push na branch `prototipagem`, sem
+# aprovação. É onde a prototipagem trabalha livremente.
+# O filtro de `paths` garante que só roda quando este app muda.
+
+on:
+  push:
+    branches:
+      - prototipagem
+    paths:
+      - "prototype/frontOffice/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Em sequência de pushes rápidos, cancela os builds já superados.
+concurrency:
+  group: prototipo-frontoffice
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/_deploy-vercel.yml
+    secrets: inherit
+    with:
+      app_name: front-office (protótipo)
+      working_directory: prototype/frontOffice
+      environment: prototipo
+      vercel_org_id: team_wjS2wgLaerYwDfEVz71nvMul
+      vercel_project_id: prj_5QLBPJAlmemx41YwFeWZkWCqLBsC
+      token_secret: VERCEL_TOKEN

@@ -1,0 +1,95 @@
+name: (reutilizável) Deploy Vercel
+
+# Lógica de deploy compartilhada pelos 4 workflows de publicação dos protótipos
+# (2 apps × 2 ambientes). Mantida em um só lugar: corrigir aqui vale para todos.
+#
+# Publica pela CLI do Vercel. Motivo de não usar a integração nativa do Vercel:
+# ela exige plano Pro para repositório privado de organização, e as contas usadas
+# estão no plano Hobby. A CLI não tem essa restrição.
+#
+# Cada workflow chamador tem seu próprio filtro de `paths`, então o GitHub só
+# inicia o job do app que realmente mudou — o app intocado não consome minutos.
+# Ver docs/management/ambientes-prototipo.md
+
+on:
+  workflow_call:
+    inputs:
+      app_name:
+        description: "Nome do app, para exibição"
+        required: true
+        type: string
+      working_directory:
+        description: "Pasta do app no repositório"
+        required: true
+        type: string
+      environment:
+        description: "GitHub Environment (restringe a branch e escopa segredos)"
+        required: true
+        type: string
+      vercel_org_id:
+        description: "Identificador da conta/time no Vercel (não é segredo)"
+        required: true
+        type: string
+      vercel_project_id:
+        description: "Identificador do projeto no Vercel (não é segredo)"
+        required: true
+        type: string
+      token_secret:
+        description: "NOME do secret que guarda o token do Vercel"
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    name: Deploy ${{ inputs.app_name }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
+
+    env:
+      VERCEL_ORG_ID: ${{ inputs.vercel_org_id }}
+      VERCEL_PROJECT_ID: ${{ inputs.vercel_project_id }}
+      VERCEL_TOKEN: ${{ secrets[inputs.token_secret] }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Conferir token
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::Secret '${{ inputs.token_secret }}' está vazio ou não existe. Cadastre em Settings > Environments > ${{ inputs.environment }}."
+            exit 1
+          fi
+          echo "Token presente."
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      # Reaproveita o cache do npm entre execuções para encurtar o install que o
+      # `vercel build` faz internamente. Chaveado por package.json porque o
+      # backoffice não versiona package-lock.json.
+      - name: Cache do npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ inputs.app_name }}-${{ hashFiles(format('{0}/package.json', inputs.working_directory)) }}
+          restore-keys: |
+            npm-${{ inputs.app_name }}-
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel production environment
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      - name: Build production bundle
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+
+      - name: Deploy to Vercel production
+        run: vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"

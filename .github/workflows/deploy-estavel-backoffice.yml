@@ -1,0 +1,36 @@
+name: Estável · backoffice
+
+# Ambiente ESTÁVEL ("pronto para desenvolvimento"): publica quando uma alteração
+# é promovida para a `main` via Pull Request aprovado.
+#
+# GATE DE APROVAÇÃO = branch protection da `main` (PR + 2 aprovações). Ele não
+# fica aqui: em repositório privado, "required reviewers" de Environment exige
+# GitHub Enterprise (o plano da org é Team). Ao mergear, este workflow publica.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "prototype/backoffice/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Publicação no estável não é cancelada no meio: cada promoção deve concluir.
+concurrency:
+  group: estavel-backoffice
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/_deploy-vercel.yml
+    secrets: inherit
+    with:
+      app_name: backoffice (estável)
+      working_directory: prototype/backoffice
+      environment: estavel
+      vercel_org_id: team_pmJ76UeUWi1GzgY4VnYAyeaQ
+      vercel_project_id: prj_OET1E2lEEz4xWv1mwWAWIUF3usvL
+      token_secret: VERCEL_TOKEN_ESTAVEL

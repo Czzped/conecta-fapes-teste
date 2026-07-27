@@ -33,7 +33,8 @@ _(cole aqui o relatório de auditoria)_
 > ⚠️ A aprovação acontece **neste Pull Request** (a `main` exige 2 reviews).
 > Ao mergear, a publicação é automática — não há segunda confirmação depois.
 >
-> O merge dispara: o workflow **Deploy Estável** publica em
+> O merge dispara os workflows **Estável · front-office** / **Estável · backoffice**
+> (só o do app que mudou), publicando em
 > `frontoffice-conecta-estavel.vercel.app` / `backoffice-conecta-estavel.vercel.app`;
 > e **Promoção → Project 43** cria a issue "Pronto para Desenvolvimento" no board #43.
 >

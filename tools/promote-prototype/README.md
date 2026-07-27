@@ -48,13 +48,14 @@ VERCEL_TOKEN_ESTAVEL=*** node tools/promote-prototype/setup-vercel-estavel.mjs -
 
 Flags: `--team <slug>` (se a conta tiver vários times), `--personal` (conta pessoal).
 
-Secrets consumidos pelo [`deploy-estavel.yml`](../../.github/workflows/deploy-estavel.yml):
-`VERCEL_TOKEN_ESTAVEL`, `VERCEL_ORG_ID_ESTAVEL`,
-`VERCEL_PROJECT_ID_FRONTOFFICE_ESTAVEL`, `VERCEL_PROJECT_ID_BACKOFFICE_ESTAVEL`.
+Os deploys usam apenas o secret do token — `VERCEL_TOKEN_ESTAVEL` (estável, Environment
+`estavel`) e `VERCEL_TOKEN` (protótipo, Environment `prototipo`). Os identificadores de
+conta e projeto ficam explícitos nos workflows, por não serem segredos.
 
-> **Nota:** o estável publica pela **CLI do Vercel** dentro do workflow, então a conta
-> dele **não precisa** ter o repositório conectado — o que permite mantê-la no plano
-> Hobby (a integração nativa exigiria Pro para repo privado de organização).
-> Já o **protótipo** usa o deploy **nativo** do Vercel, na conta principal, para não
-> consumir a cota de Actions a cada push.
+> **Nota:** os dois ambientes publicam pela **CLI do Vercel** dentro do Actions — a
+> integração nativa exigiria plano Pro para repositório privado de organização, e as
+> contas estão no Hobby. Por isso as contas **não precisam** ter o repositório conectado.
 > Ver [docs/management/ambientes-prototipo.md](../../docs/management/ambientes-prototipo.md).
+
+> Os secrets `VERCEL_ORG_ID_ESTAVEL` e `VERCEL_PROJECT_ID_*_ESTAVEL` deixaram de ser
+> usados (os valores passaram para os workflows) e podem ser removidos numa limpeza.

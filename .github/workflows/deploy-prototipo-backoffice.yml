@@ -1,0 +1,33 @@
+name: Protótipo · backoffice
+
+# Ambiente de PROTÓTIPO: publica a cada push na branch `prototipagem`, sem
+# aprovação. É onde a prototipagem trabalha livremente.
+# O filtro de `paths` garante que só roda quando este app muda.
+
+on:
+  push:
+    branches:
+      - prototipagem
+    paths:
+      - "prototype/backoffice/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Em sequência de pushes rápidos, cancela os builds já superados.
+concurrency:
+  group: prototipo-backoffice
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/_deploy-vercel.yml
+    secrets: inherit
+    with:
+      app_name: backoffice (protótipo)
+      working_directory: prototype/backoffice
+      environment: prototipo
+      vercel_org_id: team_wjS2wgLaerYwDfEVz71nvMul
+      vercel_project_id: prj_ZjDnZCVAx8GIiCa3L6fsnDUI2A8M
+      token_secret: VERCEL_TOKEN

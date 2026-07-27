@@ -55,30 +55,47 @@ backoffice → `leds-conectafapes-frontend-backoffice`.
 
 Cada ambiente publica de um jeito diferente, por uma razão de custo:
 
-| Ambiente | Como publica | Por quê |
+Os dois ambientes publicam pela **CLI do Vercel**, dentro do GitHub Actions. A
+integração nativa do Vercel com o Git **não é usada** porque exige plano **Pro** para
+repositório privado de organização, e as contas do projeto estão no plano **Hobby** — a
+CLI não tem essa restrição.
+
+São 4 workflows (um por app, por ambiente), todos chamando o mesmo workflow
+reutilizável [`_deploy-vercel.yml`](../../.github/workflows/_deploy-vercel.yml), que
+concentra a lógica de deploy:
+
+| Workflow | Dispara em | Publica em |
 |---|---|---|
-| **Protótipo** | Integração **nativa** do Vercel com o Git (push na `prototipagem`) | Publica dezenas de vezes por dia; fazer isso no GitHub Actions consumiria a cota da org (plano Team, 3.000 min/mês, já estourada em jul/2026) |
-| **Estável** | **CLI do Vercel** no workflow [`deploy-estavel`](../../.github/workflows/deploy-estavel.yml) | Publica só em promoções aprovadas (raras), então o custo de Actions é pequeno. A CLI dispensa conectar o repositório, o que permite manter o estável numa conta Vercel separada em plano Hobby (a integração nativa exigiria plano Pro para repo privado de organização) |
+| [`deploy-prototipo-frontoffice`](../../.github/workflows/deploy-prototipo-frontoffice.yml) | push na `prototipagem` alterando `prototype/frontOffice/**` | `frontoffice-conecta` |
+| [`deploy-prototipo-backoffice`](../../.github/workflows/deploy-prototipo-backoffice.yml) | push na `prototipagem` alterando `prototype/backoffice/**` | `backoffice-conecta` |
+| [`deploy-estavel-frontoffice`](../../.github/workflows/deploy-estavel-frontoffice.yml) | push na `main` alterando `prototype/frontOffice/**` | `frontoffice-conecta-estavel` |
+| [`deploy-estavel-backoffice`](../../.github/workflows/deploy-estavel-backoffice.yml) | push na `main` alterando `prototype/backoffice/**` | `backoffice-conecta-estavel` |
 
-Configuração dos projetos no Vercel:
+### Como o custo de Actions é controlado
 
-| Projeto | Conta Vercel | Como publica | Root Directory |
-|---|---|---|---|
-| `frontoffice-conecta` | conta principal (paga) | nativo, Production Branch `prototipagem` | `prototype/frontOffice` |
-| `backoffice-conecta` | conta principal (paga) | nativo, Production Branch `prototipagem` | `prototype/backoffice` |
-| `frontoffice-conecta-estavel` | `fatasys-projects` (Hobby) | CLI, no merge para `main` | `prototype/frontOffice` |
-| `backoffice-conecta-estavel` | `fatasys-projects` (Hobby) | CLI, no merge para `main` | `prototype/backoffice` |
+A cota da organização (plano Team, **3.000 min/mês**) foi atingida em jul/2026, então o
+consumo é parte do desenho:
 
-Detalhes que fazem isso funcionar:
-- No protótipo, o **Root Directory** garante que cada projeto só reconstrói quando a
-  pasta dele muda, evitando builds desnecessários no monorepo. No estável, o mesmo
-  papel é feito pelo filtro de `paths` do workflow.
+- **Um workflow por app, com filtro de `paths` próprio.** O GitHub avalia o filtro antes
+  de alocar runner: se você mexeu só no front-office, o job do backoffice **não roda** e
+  não custa nada. O workflow anterior buildava sempre os dois apps.
+- **`concurrency` com `cancel-in-progress`** no protótipo: numa sequência de pushes
+  rápidos, os builds já superados são cancelados em vez de rodarem até o fim. No estável
+  é o oposto (`false`), porque cada promoção deve concluir.
+- **Cache do npm** entre execuções, encurtando o install que o `vercel build` faz.
+
+### Outros detalhes
+
 - Os `vercel.json` de cada app têm o **rewrite de SPA** (`/(.*) → /index.html`), sem o
   qual dar refresh ou abrir um link direto numa rota retorna 404.
 - Os ambientes ficam em **contas Vercel separadas**, então quem mexe no protótipo não
   alcança o estável.
-- ⚠️ O Production Branch dos projetos de protótipo **precisa** ser `prototipagem`. Se
-  ficar em `main`, o protótipo passa a publicar da `main` e os dois ambientes viram um só.
+- Cada ambiente tem um **GitHub Environment** (`prototipo` e `estavel`) que restringe de
+  qual branch o deploy pode sair e escopa os segredos: o token do estável não é visível
+  para o workflow do protótipo.
+- Os identificadores do Vercel (`vercel_org_id`, `vercel_project_id`) ficam explícitos nos
+  workflows — não são segredos. Só os **tokens** são secrets (`VERCEL_TOKEN` e
+  `VERCEL_TOKEN_ESTAVEL`).
 
 ## 5. Regras da `main`
 
