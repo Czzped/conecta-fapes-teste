@@ -2,7 +2,7 @@ import { FolderKanban, ChevronDown, Tag, ListChecks, Target, Zap, Clock, Send, F
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-type AccessType = 'voluntario' | 'bolsista' | 'coordenador';
+type AccessType = 'voluntario' | 'bolsista' | 'bolsistaSolicitarBolsa' | 'proponente' | 'coordenador';
 
 interface MyProjectsPageProps {
   accessType?: AccessType;
@@ -28,7 +28,7 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
   ];
 
   const projectData = [
-    { label: accessType === 'voluntario' || accessType === 'bolsista' ? 'Modalidade da Bolsa' : 'Nível', value: accessType === 'voluntario' || accessType === 'bolsista' ? 'BPIG-VIII' : 'V - Atualizada' },
+    { label: accessType === 'voluntario' || accessType === 'bolsista' || accessType === 'bolsistaSolicitarBolsa' ? 'Modalidade da Bolsa' : 'Nível', value: accessType === 'voluntario' || accessType === 'bolsista' || accessType === 'bolsistaSolicitarBolsa' ? 'BPIG-VIII' : 'V - Atualizada' },
     { label: 'Valor', value: 'R$ 700,00' },
     { label: 'Período de Vigência', value: '01/06/2025 - 01/06/2026' },
     { label: 'Status da Bolsa', value: 'Ativa', badge: true },
@@ -282,19 +282,6 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                         {stage.label}
                       </p>
 
-                      {/* Date */}
-                      {stage.date && (
-                        <p 
-                          className="mt-1"
-                          style={{ 
-                            color: 'var(--muted-foreground)',
-                            fontSize: 'var(--text-xs)',
-                            fontWeight: 'var(--font-weight-normal)',
-                          }}
-                        >
-                          {stage.date}
-                        </p>
-                      )}
                     </div>
                   );
                 })}
@@ -367,17 +354,6 @@ export function MyProjectsPage({ accessType = 'bolsista', hideHeader = false }: 
                         >
                           {stage.label}
                         </p>
-                        {stage.date && (
-                          <p 
-                            style={{ 
-                              color: 'var(--muted-foreground)',
-                              fontSize: 'var(--text-xs)',
-                              fontWeight: 'var(--font-weight-normal)',
-                            }}
-                          >
-                            {stage.date}
-                          </p>
-                        )}
                       </div>
                     </div>
                   );

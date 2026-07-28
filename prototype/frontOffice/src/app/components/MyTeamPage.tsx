@@ -9,11 +9,12 @@ import { ListPagination } from '@/app/components/ListPagination';
 import { AdicionarVoluntario } from '@/app/components/AdicionarVoluntario';
 
 interface MyTeamPageProps {
-  accessType: 'voluntario' | 'bolsista' | 'coordenador';
+  accessType: 'voluntario' | 'bolsista' | 'bolsistaSolicitarBolsa' | 'minhaEquipeExemplo' | 'proponente' | 'coordenador';
   onNavigate?: (page: string) => void;
   hideHeader?: boolean;
   defaultTab?: 'bolsistas' | 'informacoes' | 'pagamentos';
   hideTabs?: boolean;
+  hidePaymentsTab?: boolean;
   hideAddButton?: boolean;
   hideExpandable?: boolean;
 }
@@ -37,9 +38,10 @@ interface TeamMember {
   }[];
 }
 
-export function MyTeamPage({ accessType, onNavigate, hideHeader = false, defaultTab = 'informacoes', hideTabs = false, hideAddButton = false, hideExpandable = false }: MyTeamPageProps) {
+export function MyTeamPage({ accessType, onNavigate, hideHeader = false, defaultTab = 'informacoes', hideTabs = false, hidePaymentsTab = false, hideAddButton = false, hideExpandable = false }: MyTeamPageProps) {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'bolsistas' | 'informacoes' | 'pagamentos'>(defaultTab);
+  const showPaymentsTab = !hidePaymentsTab;
   const [expandedBolsistaId, setExpandedBolsistaId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,7 +53,9 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedMemberForDetails, setSelectedMemberForDetails] = useState<TeamMember | null>(null);
-  const [detailsTab, setDetailsTab] = useState<'informacoes' | 'aprovacao'>('informacoes');
+  const [detailsTab, setDetailsTab] = useState<'informacoes' | 'aprovacao' | 'historico'>('informacoes');
+  const [selectedMemberPage, setSelectedMemberPage] = useState<TeamMember | null>(null);
+  const [memberPageTab, setMemberPageTab] = useState<'documentos' | 'informacoes' | 'historico'>('documentos');
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [selectedMemberForCancel, setSelectedMemberForCancel] = useState<TeamMember | null>(null);
   const [cancelJustification, setCancelJustification] = useState('');
@@ -61,9 +65,15 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   const [selectedYear, setSelectedYear] = useState('2026');
   const [isYearOpen, setIsYearOpen] = useState(false);
   const [isAddVoluntarioOpen, setIsAddVoluntarioOpen] = useState(false);
-  const [isAcoesOpen, setIsAcoesOpen] = useState(false);
+  const [isActionsMenuOpen, setIsActionsMenuOpen] = useState(false);
+  const [isPermitScholarModalOpen, setIsPermitScholarModalOpen] = useState(false);
+  const [selectedScholarCpf, setSelectedScholarCpf] = useState('');
+  const [selectedVolunteerToFinish, setSelectedVolunteerToFinish] = useState<TeamMember | null>(null);
+  const [volunteerEndDate, setVolunteerEndDate] = useState('');
+  const [volunteerDetailsTab, setVolunteerDetailsTab] = useState<'informacoes' | 'historico'>('informacoes');
   const itemsPerPage = 10;
-
+  const isExampleFlow = accessType === 'minhaEquipeExemplo';
+  
   const periodChartRef = useRef<HTMLDivElement>(null);
   const acoesDesktopRef = useRef<HTMLDivElement>(null);
   const acoesMobileRef = useRef<HTMLDivElement>(null);
@@ -168,7 +178,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   );
 
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
-    { id: 101, name: 'Ana Clara Ribeiro Monteiro', startDate: '01/03/2026', endDate: '01/03/2027', type: 'Voluntário', status: 'Em Avaliação', isVoluntario: true, email: 'ana.monteiro@example.com', phone: '(27) 99123-4567', documents: [] },
+    { id: 101, name: 'Ana Clara Ribeiro Monteiro', startDate: '01/03/2026', endDate: '01/03/2027', type: 'Voluntário', status: 'Aguardando Aceite', isVoluntario: true, email: 'ana.monteiro@example.com', phone: '(27) 99123-4567', documents: [] },
     { id: 102, name: 'Bruno Tavares Almeida', startDate: '01/02/2026', endDate: '01/02/2027', type: 'Voluntário', status: 'Em Andamento', isVoluntario: true, email: 'bruno.almeida@example.com', phone: '(27) 99234-5678', documents: [] },
     { id: 103, name: 'Carla Menezes Fontoura', startDate: '01/03/2026', endDate: '01/08/2026', type: 'AUX-MOR', status: 'Em Andamento', email: 'carla.fontoura@example.com', phone: '(27) 99345-6789', documents: [] },
     { id: 1, name: 'Paulo Sérgio dos Santos Junior', startDate: '01/06/2025', endDate: '01/06/2026', type: 'BPIG-VII', status: 'Doc. Pendente', email: 'paulo.junior@example.com', phone: '(27) 99999-9999', documents: defaultDocuments },
@@ -242,6 +252,50 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
     setCurrentPage(1);
   };
 
+  const isVolunteer = (member: TeamMember) => member.type === 'Voluntário';
+
+  const handleMemberRowClick = (member: TeamMember) => {
+    if (hideExpandable) return;
+    if (isVolunteer(member)) {
+      setSelectedVolunteerToFinish(member);
+      setVolunteerEndDate('');
+      setVolunteerDetailsTab('informacoes');
+      return;
+    }
+    if (isExampleFlow) {
+      setSelectedMemberPage(member);
+      setMemberPageTab('documentos');
+      setExpandedBolsistaId(null);
+      return;
+    }
+    setExpandedBolsistaId(expandedBolsistaId === member.id ? null : member.id);
+  };
+
+  const formatDateForDisplay = (value: string) => {
+    if (!value) return '';
+    const [year, month, day] = value.split('-');
+    return `${day}/${month}/${year}`;
+  };
+
+  const handleFinishVolunteering = () => {
+    if (!selectedVolunteerToFinish) return;
+    setTeamMembers((prev) =>
+      prev.map((member) =>
+        member.id === selectedVolunteerToFinish.id
+          ? {
+              ...member,
+              status: 'Finalizada',
+              endDate: formatDateForDisplay(volunteerEndDate) || member.endDate,
+            }
+          : member
+      )
+    );
+    setSelectedVolunteerToFinish(null);
+    setVolunteerEndDate('');
+    setVolunteerDetailsTab('informacoes');
+    toast.success('Voluntariado finalizado com sucesso.');
+  };
+
   const getStatusStyles = (status: TeamMember['status']) => {
     switch (status) {
       case 'Em Andamento':
@@ -271,6 +325,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
       case 'Doc. Pendente':
       case 'Revisar':
       case 'Em Avaliação':
+      case 'Aguardando Aceite':
         return {
           backgroundColor: 'rgba(234, 179, 8, 0.1)',
           color: '#eab308',
@@ -410,9 +465,10 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             smooth: true,
             lineStyle: {
               width: 3,
+              color: '#22d3ee',
             },
             itemStyle: {
-              color: '#3b82f6',
+              color: '#22d3ee',
             },
             symbol: 'circle',
             symbolSize: 8,
@@ -486,17 +542,286 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
     };
   }, [selectedYear]);
 
+  const renderDocumentsList = (member: TeamMember, compact = false) => (
+    <div className="space-y-3">
+      {member.status === 'Revisar' && (
+        <div
+          className="flex items-start gap-3 p-3"
+          style={{
+            backgroundColor: 'rgba(234, 179, 8, 0.1)',
+            border: '1px solid rgba(234, 179, 8, 0.3)',
+            borderRadius: 'var(--radius)',
+            color: 'rgb(234, 179, 8)',
+            fontSize: 'var(--text-sm)',
+            lineHeight: 1.5,
+          }}
+        >
+          <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: '1px' }} />
+          <span>Diploma de Nível Médio Recusado. Falta o verso do documento. Reenviar em até X dias.</span>
+        </div>
+      )}
+
+      {member.documents.map((doc) => {
+        const statusColors = getDocumentStatusColor(doc.status);
+        return (
+          <div
+            key={doc.id}
+            style={{
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              padding: compact ? '0.75rem' : '1rem',
+            }}
+          >
+            <div className={compact ? 'space-y-3' : 'grid grid-cols-12 gap-4'}>
+              <div className={compact ? '' : 'col-span-3'}>
+                <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                  Requisito
+                </div>
+                <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', wordBreak: 'break-word' }}>
+                  {doc.requisito}
+                </div>
+              </div>
+
+              <div className={compact ? '' : 'col-span-4'}>
+                <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                  Documento
+                </div>
+                <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', wordBreak: 'break-word' }}>
+                  {doc.documento}
+                </div>
+              </div>
+
+              <div className={compact ? '' : 'col-span-3'}>
+                <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                  Data de Envio
+                </div>
+                <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', wordBreak: 'break-word' }}>
+                  {doc.dataEnvio}
+                </div>
+              </div>
+
+              <div className={compact ? '' : 'col-span-2'}>
+                <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                  Status
+                </div>
+                <span
+                  className="inline-flex items-center px-2.5 py-1"
+                  style={{
+                    backgroundColor: statusColors.bg,
+                    color: statusColors.color,
+                    border: `1px solid ${statusColors.border}`,
+                    borderRadius: '9999px',
+                    fontSize: 'var(--text-xs)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {doc.status}
+                </span>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  const renderScholarshipInfo = (member: TeamMember) => (
+    <div
+      style={{
+        backgroundColor: 'var(--card)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius)',
+        padding: '1.5rem',
+      }}
+    >
+      <div className="grid gap-4 md:grid-cols-4">
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Nome</div>
+          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>{member.name}</div>
+        </div>
+
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>E-mail</div>
+          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{member.email}</div>
+        </div>
+
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Telefone</div>
+          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{member.phone}</div>
+        </div>
+
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Vigência</div>
+          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>{member.startDate} até {member.endDate}</div>
+        </div>
+
+        {[
+          ['Valor da Bolsa', 'R$ 2.500,00'],
+        ].map(([label, value]) => (
+          <div key={label} className="md:col-span-2">
+            <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>{label}</div>
+            <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>{value}</div>
+          </div>
+        ))}
+
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Modalidade</div>
+          <span
+            className="inline-flex items-center px-3 py-1"
+            style={{
+              backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
+              color: 'var(--primary)',
+              border: '1px solid var(--primary)',
+              borderRadius: '9999px',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+            }}
+          >
+            {member.type}
+          </span>
+        </div>
+
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Status</div>
+          <span
+            className="inline-flex items-center px-3 py-1"
+            style={{
+              ...getStatusStyles(member.status),
+              borderRadius: '9999px',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+            }}
+          >
+            {member.status}
+          </span>
+        </div>
+
+        <div className="md:col-span-4">
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Objetivos</div>
+          <div
+            style={{
+              color: 'var(--foreground)',
+              fontSize: 'var(--text-sm)',
+              lineHeight: 1.6,
+              minHeight: '6rem',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              padding: '1rem',
+              backgroundColor: 'var(--input-background)',
+            }}
+          >
+            Apoiar as atividades técnicas e científicas previstas no projeto, com participação em entregas, registros e acompanhamento das metas pactuadas.
+          </div>
+        </div>
+
+        <div className="md:col-span-4">
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>Plano de Trabalho</div>
+          <div
+            style={{
+              color: 'var(--foreground)',
+              fontSize: 'var(--text-sm)',
+              lineHeight: 1.6,
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              padding: '1rem',
+              backgroundColor: 'var(--input-background)',
+            }}
+          >
+            A.1 - Levantamento de dados do projeto, organização das entregas previstas e apoio na execução das atividades técnicas da equipe.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderScholarshipHistory = () => (
+    <div
+      style={{
+        backgroundColor: 'var(--card)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius)',
+        padding: '1.25rem',
+      }}
+    >
+      <div className="flex items-center gap-2 mb-6" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
+        <ClipboardList size={16} />
+        Registro
+      </div>
+      <div className="space-y-5">
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+            Usuário que Solicitou a Bolsa
+          </div>
+          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+            Dra. Maria Silva
+          </div>
+        </div>
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+            Data da Solicitação da Bolsa
+          </div>
+          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+            09/02/2026 às 14:35
+          </div>
+        </div>
+        <div>
+          <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+            Data do Aceite do Bolsista
+          </div>
+          <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+            12/02/2026 às 09:18
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className={`max-w-full overflow-x-hidden ${!hideHeader ? 'p-4 md:p-8' : ''}`}>
       <section>
+        {isExampleFlow && selectedMemberPage && !hideHeader && (
+          <nav
+            className="mb-4 flex items-center gap-2"
+            style={{
+              color: 'var(--muted-foreground)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+            }}
+          >
+            <span>Minha Equipe</span>
+            <ChevronRight size={16} />
+            <button
+              type="button"
+              style={{
+                backgroundColor: 'transparent',
+                color: 'var(--muted-foreground)',
+                border: 'none',
+                padding: 0,
+                font: 'inherit',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setSelectedMemberPage(null);
+                setMemberPageTab('documentos');
+              }}
+            >
+              Bolsistas do Projeto
+            </button>
+            <ChevronRight size={16} />
+            <span style={{ color: 'var(--foreground)' }}>Detalhes</span>
+          </nav>
+        )}
+
         {/* Header with icon */}
         {!hideHeader && (
           <>
-            <div className="flex items-center gap-3 mb-2">
-              <div
-            className="p-2 transition-colors"
-            style={{
-              color: 'var(--title-icon-foreground)',
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-2">
+              <div className="flex items-center gap-3">
+                <div
+                  className="p-2 transition-colors"
+                  style={{
+                    color: 'var(--title-icon-foreground)',
                   borderRadius: 'var(--radius)',
                   backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
                 }}
@@ -504,28 +829,197 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                 <Users size={20} />
               </div>
               <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
-                Minha Equipe
+                {isExampleFlow && selectedMemberPage ? selectedMemberPage.name : 'Minha Equipe'}
               </h1>
+              </div>
+
+              {isExampleFlow && selectedMemberPage && (
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <button
+                    type="button"
+                    className="px-4 py-2 transition-colors"
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: 'var(--foreground)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                      setSelectedMemberForCancel(selectedMemberPage);
+                      setIsCancelModalOpen(true);
+                    }}
+                  >
+                    Cancelar Bolsa
+                  </button>
+                  <button
+                    type="button"
+                    className="px-4 py-2 transition-colors"
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: 'var(--primary)',
+                      border: '1px solid var(--primary)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => setIsPermitScholarModalOpen(true)}
+                  >
+                    Delegar - Solicitar Bolsa
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* Subtitle */}
-            <p 
-              className="mb-6"
-              style={{ 
-                color: 'var(--muted-foreground)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-normal)',
+            {/* Subtitle and actions */}
+            {!(isExampleFlow && selectedMemberPage) && (
+              <div
+              className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between"
+              style={{
                 marginLeft: 'calc(32px + 0.75rem)', // Aligns with title (icon size + gap)
               }}
             >
-              Acompanhe as informações dos bolsistas do seu projeto.
-            </p>
+              <p
+                style={{
+                  color: 'var(--muted-foreground)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-normal)',
+                  margin: 0,
+                }}
+              >
+                Acompanhe as informações dos bolsistas do seu projeto.
+              </p>
+
+              {activeTab === 'bolsistas' && !hideAddButton && isExampleFlow && (
+                <div className="flex flex-col gap-2 md:flex-row md:-mt-2">
+                  <button
+                    type="button"
+                    className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: 'var(--primary)',
+                      border: '1px solid var(--primary)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      whiteSpace: 'nowrap',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => setIsAddVoluntarioOpen(true)}
+                  >
+                    <UserPlus size={16} />
+                    Adicionar Voluntário
+                  </button>
+                  <button
+                    type="button"
+                    className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
+                    style={{
+                      backgroundColor: 'var(--primary)',
+                      color: 'var(--primary-foreground)',
+                      border: '1px solid var(--primary)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      whiteSpace: 'nowrap',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => onNavigate?.('cadastrar-bolsista')}
+                  >
+                    <Plus size={16} />
+                    Solicitar Bolsa
+                  </button>
+                </div>
+              )}
+
+              {activeTab === 'bolsistas' && !hideAddButton && !isExampleFlow && (
+                <div className="relative md:-mt-2">
+                  <button
+                    type="button"
+                    className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: 'var(--primary)',
+                      border: '1px solid var(--primary)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      whiteSpace: 'nowrap',
+                    }}
+                    onClick={() => setIsActionsMenuOpen((current) => !current)}
+                  >
+                    Ações
+                    <ChevronDown size={18} />
+                  </button>
+
+                  {isActionsMenuOpen && (
+                    <div
+                      className="absolute right-0 top-full mt-2 overflow-hidden"
+                      style={{
+                        minWidth: '320px',
+                        backgroundColor: 'var(--popover)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        boxShadow: 'var(--shadow-lg)',
+                        zIndex: 30,
+                      }}
+                    >
+                      <button
+                        type="button"
+                        className="flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors"
+                        style={{ backgroundColor: 'transparent', color: 'var(--foreground)', border: 'none', cursor: 'pointer', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', fontFamily: 'var(--font-family)', whiteSpace: 'nowrap' }}
+                        onClick={() => {
+                          setIsActionsMenuOpen(false);
+                          setIsAddVoluntarioOpen(true);
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--primary) 8%, var(--popover))'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                      >
+                        <UserPlus size={16} />
+                        Adicionar Voluntário
+                      </button>
+                      <button
+                        type="button"
+                        className="flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors"
+                        style={{ backgroundColor: 'transparent', color: 'var(--foreground)', border: 'none', cursor: 'pointer', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', fontFamily: 'var(--font-family)', whiteSpace: 'nowrap' }}
+                        onClick={() => {
+                          setIsActionsMenuOpen(false);
+                          onNavigate?.('cadastrar-bolsista');
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--primary) 8%, var(--popover))'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                      >
+                        <Plus size={16} />
+                        Solicitar Bolsa
+                      </button>
+                      <button
+                        type="button"
+                        className="flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors"
+                        style={{ backgroundColor: 'transparent', color: 'var(--foreground)', border: 'none', cursor: 'pointer', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', fontFamily: 'var(--font-family)', whiteSpace: 'nowrap' }}
+                        onClick={() => {
+                          setIsActionsMenuOpen(false);
+                          setIsPermitScholarModalOpen(true);
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--primary) 8%, var(--popover))'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                      >
+                        <Users size={16} />
+                        Permitir Bolsista - Solicitar Bolsa
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            )}
           </>
         )}
 
         {/* Tab Bar Link - Horizontal for Desktop, Vertical for Mobile */}
         
-        {!hideTabs && (
+        {!(isExampleFlow && selectedMemberPage) && !hideTabs && (
           <>
         {/* Desktop Tab Bar - Horizontal */}
         <div 
@@ -574,26 +1068,28 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
           >
             Bolsistas do Projeto
           </button>
-          <button
-            onClick={() => setActiveTab('pagamentos')}
-            style={{
-              padding: '0.625rem 1rem',
-              backgroundColor: 'transparent',
-              borderTop: 'none',
-              borderLeft: 'none',
-              borderRight: 'none',
-              borderBottom: activeTab === 'pagamentos' ? '2px solid var(--primary)' : '2px solid transparent',
-              color: activeTab === 'pagamentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-medium)',
-              cursor: 'pointer',
-              position: 'relative',
-              transition: 'color 0.2s',
-              marginBottom: '-1px',
-            }}
-          >
-            Pagamentos
-          </button>
+          {showPaymentsTab && (
+            <button
+              onClick={() => setActiveTab('pagamentos')}
+              style={{
+                padding: '0.625rem 1rem',
+                backgroundColor: 'transparent',
+                borderTop: 'none',
+                borderLeft: 'none',
+                borderRight: 'none',
+                borderBottom: activeTab === 'pagamentos' ? '2px solid var(--primary)' : '2px solid transparent',
+                color: activeTab === 'pagamentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+                position: 'relative',
+                transition: 'color 0.2s',
+                marginBottom: '-1px',
+              }}
+            >
+              Pagamentos
+            </button>
+          )}
         </div>
 
         {/* Mobile Tab Bar - Vertical */}
@@ -641,31 +1137,103 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
           >
             Bolsistas do Projeto
           </button>
-          <button
-            onClick={() => setActiveTab('pagamentos')}
-            className="py-3 pl-4 text-left"
-            style={{
-              backgroundColor: 'transparent',
-              borderTop: 'none',
-              borderRight: 'none',
-              borderBottom: 'none',
-              borderLeft: activeTab === 'pagamentos' ? '2px solid var(--primary)' : '2px solid transparent',
-              color: activeTab === 'pagamentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-medium)',
-              cursor: 'pointer',
-              transition: 'color 0.2s',
-              marginLeft: '-2px',
-            }}
-          >
-            Pagamentos
-          </button>
+          {showPaymentsTab && (
+            <button
+              onClick={() => setActiveTab('pagamentos')}
+              className="py-3 pl-4 text-left"
+              style={{
+                backgroundColor: 'transparent',
+                borderTop: 'none',
+                borderRight: 'none',
+                borderBottom: 'none',
+                borderLeft: activeTab === 'pagamentos' ? '2px solid var(--primary)' : '2px solid transparent',
+                color: activeTab === 'pagamentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                cursor: 'pointer',
+                transition: 'color 0.2s',
+                marginLeft: '-2px',
+              }}
+            >
+              Pagamentos
+            </button>
+          )}
         </div>
           </>
         )}
 
+        {isExampleFlow && selectedMemberPage && (
+          <div className="space-y-6">
+            <div
+              className="flex gap-1"
+              style={{
+                borderBottom: '1px solid var(--border)',
+              }}
+            >
+              <button
+                onClick={() => setMemberPageTab('documentos')}
+                style={{
+                  padding: '0.625rem 1rem',
+                  backgroundColor: 'transparent',
+                  borderTop: 'none',
+                  borderLeft: 'none',
+                  borderRight: 'none',
+                  borderBottom: memberPageTab === 'documentos' ? '2px solid var(--primary)' : '2px solid transparent',
+                  color: memberPageTab === 'documentos' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                  marginBottom: '-1px',
+                }}
+              >
+                Documentos
+              </button>
+              <button
+                onClick={() => setMemberPageTab('informacoes')}
+                style={{
+                  padding: '0.625rem 1rem',
+                  backgroundColor: 'transparent',
+                  borderTop: 'none',
+                  borderLeft: 'none',
+                  borderRight: 'none',
+                  borderBottom: memberPageTab === 'informacoes' ? '2px solid var(--primary)' : '2px solid transparent',
+                  color: memberPageTab === 'informacoes' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                  marginBottom: '-1px',
+                }}
+              >
+                Informações
+              </button>
+              <button
+                onClick={() => setMemberPageTab('historico')}
+                style={{
+                  padding: '0.625rem 1rem',
+                  backgroundColor: 'transparent',
+                  borderTop: 'none',
+                  borderLeft: 'none',
+                  borderRight: 'none',
+                  borderBottom: memberPageTab === 'historico' ? '2px solid var(--primary)' : '2px solid transparent',
+                  color: memberPageTab === 'historico' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                  marginBottom: '-1px',
+                }}
+              >
+                Histórico
+              </button>
+            </div>
+
+            {memberPageTab === 'documentos' && renderDocumentsList(selectedMemberPage)}
+            {memberPageTab === 'informacoes' && renderScholarshipInfo(selectedMemberPage)}
+            {memberPageTab === 'historico' && renderScholarshipHistory()}
+          </div>
+        )}
+
         {/* Tab Content: Informações das Bolsas */}
-        {activeTab === 'informacoes' && (
+        {!(isExampleFlow && selectedMemberPage) && activeTab === 'informacoes' && (
           <>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
             {/* Orçamento */}
@@ -963,16 +1531,16 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             {/* Modalidades List */}
             <div className="space-y-4">
               {[
-                { name: 'BPIG-I', used: 2, total: 4, color: '#60a5fa' },
-                { name: 'BPIG-II', used: 2, total: 3, color: '#60a5fa' },
-                { name: 'BPIG-III', used: 1, total: 2, color: '#60a5fa' },
-                { name: 'BPIG-IV', used: 0, total: 1, color: '#60a5fa' },
-                { name: 'BPIG-V', used: 1, total: 2, color: '#60a5fa' },
-                { name: 'BPIG-VI', used: 0, total: 0, color: '#60a5fa' },
-                { name: 'BPIG-VII', used: 0, total: 0, color: '#60a5fa' },
-                { name: 'BPIG-VIII', used: 0, total: 0, color: '#60a5fa' },
-                { name: 'BPIG-IX', used: 0, total: 0, color: '#60a5fa' },
-                { name: 'BPIG-X', used: 0, total: 0, color: '#60a5fa' },
+                { name: 'BPIG-I', used: 2, total: 4, color: '#22d3ee' },
+                { name: 'BPIG-II', used: 2, total: 3, color: '#22d3ee' },
+                { name: 'BPIG-III', used: 1, total: 2, color: '#22d3ee' },
+                { name: 'BPIG-IV', used: 0, total: 1, color: '#22d3ee' },
+                { name: 'BPIG-V', used: 1, total: 2, color: '#22d3ee' },
+                { name: 'BPIG-VI', used: 0, total: 0, color: '#22d3ee' },
+                { name: 'BPIG-VII', used: 0, total: 0, color: '#22d3ee' },
+                { name: 'BPIG-VIII', used: 0, total: 0, color: '#22d3ee' },
+                { name: 'BPIG-IX', used: 0, total: 0, color: '#22d3ee' },
+                { name: 'BPIG-X', used: 0, total: 0, color: '#22d3ee' },
               ].filter((modalidade) => !(modalidade.used === 0 && modalidade.total === 0)).map((modalidade, index) => {
                 const available = modalidade.total - modalidade.used;
                 const percentage = modalidade.total > 0 ? Math.round((modalidade.used / modalidade.total) * 100) : 0;
@@ -1210,10 +1778,10 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
         )}
 
         {/* Tab Content: Bolsistas do Projeto */}
-        {activeTab === 'bolsistas' && (
+        {!(isExampleFlow && selectedMemberPage) && activeTab === 'bolsistas' && (
           <div className="w-full max-w-full" style={{ overflowX: 'hidden' }}>
         {/* Filters and Actions Bar */}
-        <div className="flex flex-col md:flex-row gap-3 mb-6 w-full max-w-full">
+        <div className="flex flex-col md:flex-row gap-3 mb-4 w-full max-w-full">
           {/* Search Input */}
           <div className="flex-1 min-w-0">
             <label
@@ -1536,73 +2104,31 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             </div>
           </div>
 
-          {/* Ações Dropdown - Desktop only */}
-          {!hideAddButton && (
-            <div
-              className="hidden md:block relative"
-              ref={acoesDesktopRef}
-              style={{ marginTop: '1.625rem' /* Aligns with inputs (label height + margin) */ }}
-            >
-              <button
-                className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: 'var(--primary)',
-                  border: '1px solid var(--primary)',
-                  borderRadius: 'var(--radius)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  whiteSpace: 'nowrap',
-                  cursor: 'pointer',
-                }}
-                onClick={() => setIsAcoesOpen((open) => !open)}
-              >
-                Ações
-                <ChevronDown
-                  size={16}
-                  style={{ transform: isAcoesOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}
-                />
-              </button>
-              {isAcoesOpen && renderAcoesMenu()}
-            </div>
-          )}
         </div>
-
-        {/* Ações Dropdown - Mobile only */}
-        {!hideAddButton && (
-          <div className="flex justify-end mb-6 md:hidden">
-            <div className="relative" ref={acoesMobileRef}>
-              <button
-                className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: 'var(--primary)',
-                  border: '1px solid var(--primary)',
-                  borderRadius: 'var(--radius)',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  whiteSpace: 'nowrap',
-                  cursor: 'pointer',
-                }}
-                onClick={() => setIsAcoesOpen((open) => !open)}
-              >
-                Ações
-                <ChevronDown
-                  size={16}
-                  style={{ transform: isAcoesOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}
-                />
-              </button>
-              {isAcoesOpen && renderAcoesMenu()}
-            </div>
-          </div>
-        )}
-
         {/* Bolsistas List */}
         <div className="space-y-4 max-w-full">
-          <div className="flex justify-start">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
               Mostrando {visibleMembersCount} resultados de {filteredMembers.length}
             </span>
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 px-4 py-2"
+              style={{
+                backgroundColor: 'transparent',
+                color: 'var(--foreground)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                fontFamily: 'var(--font-family)',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <Download size={16} />
+              Exportar CSV
+            </button>
           </div>
           {/* Desktop Cards */}
           <div className="hidden md:block space-y-4">
@@ -1618,48 +2144,29 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                 {/* Card Header - Clicável */}
                 <div 
                   className={hideExpandable ? 'p-5' : 'p-5 cursor-pointer'}
-                  onClick={hideExpandable ? undefined : () => setExpandedBolsistaId(expandedBolsistaId === member.id ? null : member.id)}
+                  onClick={hideExpandable ? undefined : () => handleMemberRowClick(member)}
                 >
-                  <div className="grid grid-cols-12 gap-x-24 items-center">
-                    {/* Ícone */}
-                    {!hideExpandable && (
+                  <div className="grid grid-cols-12 gap-x-12 items-center">
+                    {!hideExpandable && !isExampleFlow && (
                       <div className="col-span-1 flex items-center">
-                        <ChevronDown 
-                          size={16} 
-                          style={{ 
+                        <ChevronDown
+                          size={16}
+                          style={{
                             color: 'var(--muted-foreground)',
                             transform: expandedBolsistaId === member.id ? 'rotate(180deg)' : 'rotate(0deg)',
                             transition: 'transform 0.2s ease',
-                          }} 
+                          }}
                         />
                       </div>
                     )}
 
                     {/* Nome */}
-                    <div className={hideExpandable ? 'col-span-3' : 'col-span-3'} style={hideExpandable ? {} : { marginLeft: '-2.5rem' }}>
+                    <div className="col-span-3" style={!hideExpandable && !isExampleFlow ? { marginLeft: '-2.5rem' } : undefined}>
                       <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
                         Nome
                       </div>
                       <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', gap: '0.375rem', flexWrap: 'wrap' }}>
                         {member.name}
-                        {member.isVoluntario && (
-                          <span
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              padding: '0.05rem 0.4rem',
-                              borderRadius: '9999px',
-                              fontSize: 'var(--text-xs)',
-                              fontWeight: 'var(--font-weight-medium)',
-                              backgroundColor: 'color-mix(in srgb, var(--primary) 15%, transparent)',
-                              color: 'var(--primary)',
-                              border: '1px solid color-mix(in srgb, var(--primary) 30%, transparent)',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            Voluntário
-                          </span>
-                        )}
                       </div>
                     </div>
 
@@ -1706,7 +2213,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                         </button>
                       </div>
                       <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                        {member.endDate}
+                        {member.type === 'Voluntário' ? '-' : member.endDate}
                       </div>
                     </div>
 
@@ -1738,6 +2245,17 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                         {member.status}
                       </span>
                     </div>
+
+                    {!hideExpandable && isExampleFlow && (
+                      <div className="col-span-1 flex justify-end">
+                        <ChevronRight
+                          size={18}
+                          style={{
+                            color: 'var(--muted-foreground)',
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -1915,21 +2433,21 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               >
                 <div 
                   className={hideExpandable ? 'p-4 max-w-full' : 'p-4 cursor-pointer max-w-full'}
-                  onClick={hideExpandable ? undefined : () => setExpandedBolsistaId(expandedBolsistaId === member.id ? null : member.id)}
+                  onClick={hideExpandable ? undefined : () => handleMemberRowClick(member)}
                   style={{ boxSizing: 'border-box' }}
                 >
                   {/* Header: Nome and Status */}
                   <div className="flex justify-between items-start mb-3 gap-2 max-w-full">
                     <div className="flex items-start gap-2 flex-1 min-w-0">
-                      {!hideExpandable && (
+                      {!hideExpandable && !isExampleFlow && (
                         <div className="mt-1 flex-shrink-0">
-                          <ChevronDown 
-                            size={16} 
-                            style={{ 
+                          <ChevronDown
+                            size={16}
+                            style={{
                               color: 'var(--muted-foreground)',
                               transform: expandedBolsistaId === member.id ? 'rotate(180deg)' : 'rotate(0deg)',
                               transition: 'transform 0.2s ease',
-                            }} 
+                            }}
                           />
                         </div>
                       )}
@@ -1939,26 +2457,6 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                         </div>
                         <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', wordBreak: 'break-word' }}>
                           {member.name}
-                          {member.isVoluntario && (
-                            <span
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                padding: '0.05rem 0.4rem',
-                                marginLeft: '0.375rem',
-                                borderRadius: '9999px',
-                                fontSize: 'var(--text-xs)',
-                                fontWeight: 'var(--font-weight-medium)',
-                                backgroundColor: 'color-mix(in srgb, var(--primary) 15%, transparent)',
-                                color: 'var(--primary)',
-                                border: '1px solid color-mix(in srgb, var(--primary) 30%, transparent)',
-                                whiteSpace: 'nowrap',
-                                verticalAlign: 'middle',
-                              }}
-                            >
-                              Voluntário
-                            </span>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -1974,20 +2472,30 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                     >
                       {member.status}
                     </span>
+                    {!hideExpandable && isExampleFlow && (
+                      <ChevronRight
+                        size={18}
+                        style={{
+                          color: 'var(--muted-foreground)',
+                          flexShrink: 0,
+                          marginTop: '0.125rem',
+                        }}
+                      />
+                    )}
                   </div>
 
                   {/* Período de Vigência */}
-                  <div className="mb-3 ml-6">
+                  <div className={!hideExpandable && !isExampleFlow ? 'mb-3 ml-6' : 'mb-3'}>
                     <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
                       Período de Vigência
                     </div>
                     <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-                      {member.startDate} - {member.endDate}
+                      {member.startDate} - {member.type === 'Voluntário' ? '-' : member.endDate}
                     </div>
                   </div>
 
                   {/* Modalidade */}
-                  <div className="ml-6">
+                  <div className={!hideExpandable && !isExampleFlow ? 'ml-6' : undefined}>
                     <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
                       Modalidade
                     </div>
@@ -2166,7 +2674,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
         </div>
         )}
 
-        {activeTab === 'pagamentos' && (
+        {!(isExampleFlow && selectedMemberPage) && activeTab === 'pagamentos' && (
           <PaymentsPage scope="project" embedded />
         )}
       </section>
@@ -2192,7 +2700,8 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              backgroundColor: 'var(--card)',
+              backgroundColor: 'var(--popover)',
+              border: '1px solid var(--border)',
               borderRadius: 'var(--radius)',
               width: '90%',
               maxWidth: '700px',
@@ -2273,6 +2782,21 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               >
                 Aprovação FAPES
               </button>
+              <button
+                onClick={() => setDetailsTab('historico')}
+                className="px-4 py-2 transition-colors"
+                style={{
+                  backgroundColor: 'transparent',
+                  color: detailsTab === 'historico' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                  border: 'none',
+                  borderBottom: detailsTab === 'historico' ? '2px solid var(--primary)' : '2px solid transparent',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  cursor: 'pointer',
+                }}
+              >
+                Histórico
+              </button>
             </div>
 
             {/* Modal Content */}
@@ -2302,6 +2826,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                         style={{
                           backgroundColor: 'var(--muted)',
                           color: 'var(--foreground)',
+                          border: '1px solid var(--border)',
                           borderRadius: '9999px',
                           fontSize: 'var(--text-xs)',
                           fontWeight: 'var(--font-weight-medium)',
@@ -2393,6 +2918,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                     border: '1px solid var(--border)',
                     borderRadius: 'var(--radius)',
                     padding: '1.25rem',
+                    minHeight: '9rem',
                   }}
                 >
                   <div className="flex items-center gap-2 mb-3" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
@@ -2426,6 +2952,50 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               </div>
             )}
 
+            {detailsTab === 'historico' && (
+              <div className="p-6">
+                <div
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                    padding: '1.25rem',
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-4" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
+                    <ClipboardList size={16} />
+                    Registro
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                        Usuário que solicitou a bolsa
+                      </div>
+                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        Dra. Maria Silva
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                        Data da Solicitação da Bolsa
+                      </div>
+                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        09/02/2026 às 14:35
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                        Data do Aceite do Bolsista
+                      </div>
+                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        12/02/2026 às 09:18
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {detailsTab === 'aprovacao' && (
               <div className="p-6 space-y-6">
                 {/* Status FAPES Header */}
@@ -2438,7 +3008,8 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                     style={{
                       backgroundColor: 'rgba(34, 197, 94, 0.1)',
                       color: '#22c55e',
-                      borderRadius: 'var(--radius)',
+                      border: '1px solid rgba(34, 197, 94, 0.3)',
+                      borderRadius: '9999px',
                       fontSize: 'var(--text-sm)',
                       fontWeight: 'var(--font-weight-medium)',
                     }}
@@ -2578,7 +3149,8 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              backgroundColor: 'var(--card)',
+              backgroundColor: 'var(--popover)',
+              border: '1px solid var(--border)',
               borderRadius: 'var(--radius)',
               width: '90%',
               maxWidth: '600px',
@@ -2867,6 +3439,353 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                   }}
                 >
                   Sim, excluir
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {selectedVolunteerToFinish && (
+        <>
+          <div
+            style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 999 }}
+            onClick={() => {
+              setSelectedVolunteerToFinish(null);
+              setVolunteerEndDate('');
+              setVolunteerDetailsTab('informacoes');
+            }}
+          />
+          <div
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              backgroundColor: 'var(--popover)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-lg)',
+              width: '90%',
+              maxWidth: '520px',
+              zIndex: 1000,
+              boxShadow: 'var(--elevation-sm)',
+              fontFamily: 'var(--font-family)',
+            }}
+          >
+            <div style={{ padding: '1.5rem' }}>
+              <div className="flex items-start justify-between" style={{ marginBottom: '1.25rem' }}>
+                <div className="flex items-center gap-3">
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: 'var(--radius)',
+                      backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
+                      color: 'var(--primary)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <UserPlus size={22} />
+                  </div>
+                  <div>
+                    <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
+                      Finalizar Voluntariado
+                    </h1>
+                    <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', margin: '0.15rem 0 0 0', fontFamily: 'var(--font-family)' }}>
+                      {selectedVolunteerToFinish.name}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setSelectedVolunteerToFinish(null);
+                    setVolunteerEndDate('');
+                    setVolunteerDetailsTab('informacoes');
+                  }}
+                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem', color: 'var(--muted-foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--radius-sm)', flexShrink: 0, transition: 'all 0.15s' }}
+                  aria-label="Fechar"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="flex gap-2" style={{ borderBottom: '1px solid var(--border)', marginBottom: '1.25rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setVolunteerDetailsTab('informacoes')}
+                  className="px-4 py-2 transition-colors"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: volunteerDetailsTab === 'informacoes' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                    border: 'none',
+                    borderBottom: volunteerDetailsTab === 'informacoes' ? '2px solid var(--primary)' : '2px solid transparent',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: 'pointer',
+                    marginBottom: '-1px',
+                  }}
+                >
+                  Informações
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVolunteerDetailsTab('historico')}
+                  className="px-4 py-2 transition-colors"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: volunteerDetailsTab === 'historico' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                    border: 'none',
+                    borderBottom: volunteerDetailsTab === 'historico' ? '2px solid var(--primary)' : '2px solid transparent',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: 'pointer',
+                    marginBottom: '-1px',
+                  }}
+                >
+                  Histórico
+                </button>
+              </div>
+
+              {volunteerDetailsTab === 'informacoes' && (
+                <>
+                  <div className="mb-5">
+                    <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+                      CPF do Voluntário <span style={{ color: 'var(--destructive-foreground)' }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value="000.000.000-00"
+                      readOnly
+                      style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: 'var(--input-background)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
+                    />
+                  </div>
+
+                  <div className="mb-5">
+                    <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+                      Data de Fim <span style={{ color: 'var(--destructive-foreground)' }}>*</span>
+                    </label>
+                    <DatePicker
+                      value={volunteerEndDate}
+                      onChange={setVolunteerEndDate}
+                      placeholder="Selecione a data de fim"
+                    />
+                  </div>
+
+                  <div
+                    className="flex items-start gap-2 px-3 py-2"
+                    style={{
+                      backgroundColor: 'color-mix(in srgb, var(--primary) 5%, transparent)',
+                      border: '1px solid var(--primary)',
+                      borderRadius: 'var(--radius)',
+                    }}
+                  >
+                    <Info size={15} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: 1 }} />
+                    <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
+                      Após finalizar o voluntariado, o membro do projeto não irá mais aparecer na lista para solicitar Diária e Passagem.
+                    </span>
+                  </div>
+
+                  <div className="flex justify-end gap-3" style={{ marginTop: '1.5rem' }}>
+                    <button
+                      onClick={() => {
+                        setSelectedVolunteerToFinish(null);
+                        setVolunteerEndDate('');
+                        setVolunteerDetailsTab('informacoes');
+                      }}
+                      style={{ padding: '0.625rem 1.25rem', backgroundColor: 'transparent', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'var(--font-family)' }}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={handleFinishVolunteering}
+                      style={{ padding: '0.625rem 1.25rem', backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'var(--font-family)' }}
+                    >
+                      Finalizar Voluntariado
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {volunteerDetailsTab === 'historico' && (
+                <div
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                    padding: '1.25rem',
+                  }}
+                >
+                  <div className="space-y-4">
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                        Usuário que Solicitou a Bolsa
+                      </div>
+                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        Dra. Maria Silva
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                        Data da Solicitação da Bolsa
+                      </div>
+                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        09/02/2026 às 14:35
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                        Data do Aceite do Bolsista
+                      </div>
+                      <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                        12/02/2026 às 09:18
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {isPermitScholarModalOpen && (
+        <>
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              zIndex: 999,
+            }}
+            onClick={() => {
+              setIsPermitScholarModalOpen(false);
+              setSelectedScholarCpf('');
+            }}
+          />
+          <div
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              backgroundColor: 'var(--popover)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-lg)',
+              width: '90%',
+              maxWidth: '560px',
+              zIndex: 1000,
+              boxShadow: 'var(--shadow-lg)',
+              fontFamily: 'var(--font-family)',
+            }}
+          >
+            <div style={{ padding: '1.5rem' }}>
+              <div className="flex items-start justify-between" style={{ marginBottom: '1.25rem' }}>
+                <div className="flex items-center gap-3">
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: 'var(--radius)',
+                      backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
+                      color: 'var(--primary)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Users size={22} />
+                  </div>
+                  <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
+                    Permitir Bolsista - Solicitar Bolsa
+                  </h1>
+                </div>
+                <button
+                  onClick={() => {
+                    setIsPermitScholarModalOpen(false);
+                    setSelectedScholarCpf('');
+                  }}
+                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem', color: 'var(--muted-foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--radius-sm)', flexShrink: 0 }}
+                  aria-label="Fechar"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <p
+                style={{
+                  color: 'var(--muted-foreground)',
+                  fontSize: 'var(--text-sm)',
+                  lineHeight: 1.6,
+                  margin: '0 0 1.25rem',
+                }}
+              >
+                O coordenador do projeto pode permitir que um bolsista da sua equipe tenha acesso as funcionalidade de Minha Equipe e possa Adicionar Voluntário e Solicitar Bolsa. Selecione o bolsista que deseja oferecer esse acesso.
+              </p>
+
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+                  CPF do Bolsista
+                </label>
+                <select
+                  value={selectedScholarCpf}
+                  onChange={(event) => setSelectedScholarCpf(event.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.625rem 0.75rem',
+                    backgroundColor: 'var(--input-background)',
+                    color: 'var(--foreground)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                    fontSize: 'var(--text-sm)',
+                    outline: 'none',
+                    fontFamily: 'var(--font-family)',
+                  }}
+                >
+                  <option value="">Selecione o CPF do bolsista</option>
+                  <option value="123.456.789-00">123.456.789-00 - Sofia de Alcantara Silva</option>
+                  <option value="234.567.890-11">234.567.890-11 - Vinícius de Jesus Estevam</option>
+                  <option value="345.678.901-22">345.678.901-22 - Camila Rocha</option>
+                </select>
+              </div>
+
+              <div
+                className="flex items-start gap-2 px-3 py-2"
+                style={{
+                  backgroundColor: 'color-mix(in srgb, var(--primary) 5%, transparent)',
+                  border: '1px solid var(--primary)',
+                  borderRadius: 'var(--radius)',
+                  marginBottom: '1.5rem',
+                }}
+              >
+                <Info size={15} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: 1 }} />
+                <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
+                  O bolsita deve entrar em sua conta e aceitar o convite.
+                </span>
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setIsPermitScholarModalOpen(false);
+                    setSelectedScholarCpf('');
+                  }}
+                  style={{ padding: '0.625rem 1.25rem', backgroundColor: 'transparent', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: 'var(--font-family)' }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => {
+                    setIsPermitScholarModalOpen(false);
+                    setSelectedScholarCpf('');
+                    toast.success('Convite enviado ao bolsista.');
+                  }}
+                  style={{ padding: '0.625rem 1.25rem', backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: 'var(--font-family)' }}
+                >
+                  Salvar
                 </button>
               </div>
             </div>

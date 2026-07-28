@@ -148,7 +148,9 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
   const [statusAtual, setStatusAtual] = useState<string>(payment.status);
   const statusColorAtual = statusAtual === 'Contestada'
     ? { bg: 'rgba(168,85,247,0.1)', color: 'rgb(168,85,247)', border: 'rgba(168,85,247,0.3)' }
-    : payment.statusColor;
+    : statusAtual === 'Reprovado'
+      ? { bg: 'rgba(239,68,68,0.1)', color: 'rgb(239,68,68)', border: 'rgba(239,68,68,0.3)' }
+      : payment.statusColor;
   const isReadOnly = statusAtual !== 'Pendente' && statusAtual !== 'Revisar';
   const isCreditoEstorno = payment.operacao === 'CREDITO' && payment.classificacao === 'ESTORNO';
   const isCreditoDevolucao = payment.operacao === 'CREDITO' && payment.classificacao === 'DEVOLUCAO';
@@ -157,6 +159,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
   const [devolucaoAssociada, setDevolucaoAssociada] = useState(false);
   const [justificativaReprovacao, setJustificativaReprovacao] = useState('');
   const [arquivosContestacao, setArquivosContestacao] = useState<string[]>([]);
+  const [isConfirmarEnvioSemNotaOpen, setIsConfirmarEnvioSemNotaOpen] = useState(false);
 
   /* ── Step 1 ── */
   const [selectedDocumento, setSelectedDocumento] = useState('');
@@ -243,6 +246,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
     'Diária',
     'Passagem',
     'Invoice (Pagamento Internacional)',
+    'Pagamento sem Nota Fiscal',
   ];
   const categoriasItem = ['Material Permanente', 'Material de Consumo'];
   const categoriasInvoice = ['Material Permanente', 'Material de Consumo', 'Pessoa Jurídica'];
@@ -271,6 +275,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
   /* ── derived flags ──────────────────────────── */
   const isStep1Complete = selectedDocumento !== '';
   const isStep2Complete = uploadedFiles.length > 0;
+  const isPagamentoSemNotaFiscal = selectedDocumento === 'Pagamento sem Nota Fiscal';
   const showStep3 = selectedDocumento === 'Diária' ? selectedDiariaIdx !== null : isStep2Complete;
   const allowMultipleFiles = ['Diária', 'Passagem', 'Invoice (Pagamento Internacional)'].includes(selectedDocumento);
   const showCotacao = ['Nota Fiscal (Produto ou Serviço)', 'Invoice (Pagamento Internacional)', 'Passagem'].includes(selectedDocumento);
@@ -398,7 +403,9 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
   const getStatusMessage = () => {
     switch (statusAtual) {
       case 'Em Validação': return { text: 'Esta Prestação de Contas está Em Validação. Após verificarmos todos os dados enviados, seu status irá ser atualizado na tela inicial. Enquanto isso, você não consegue alterar as informações enviadas.', bg: 'rgba(59,130,246,.1)', border: 'rgba(59,130,246,.3)', color: 'rgb(59,130,246)' };
-      case 'Reprovado':    return { text: '10/06/2026 - Esta Prestação de Contas não foi aprovada por X motivo. Você deve repositar o valor para a conta do projeto em até 30 dias corridos ou envie uma contestação e justifique.', bg: 'rgba(239,68,68,.1)', border: 'rgba(239,68,68,.3)', color: 'rgb(239,68,68)' };
+      case 'Reprovado':
+        if (isPagamentoSemNotaFiscal) return null;
+        return { text: '10/06/2026 - Esta Prestação de Contas não foi aprovada por X motivo. Você deve repositar o valor para a conta do projeto em até 30 dias corridos ou envie uma contestação e justifique.', bg: 'rgba(239,68,68,.1)', border: 'rgba(239,68,68,.3)', color: 'rgb(239,68,68)' };
       case 'Revisar':      return { text: 'Informamos que esta Prestação de Contas ainda não foi aprovada e necessita de revisão. O prazo para realizar as adequações necessárias é de até 15 dias úteis.', bg: 'rgba(234,179,8,.1)', border: 'rgba(234,179,8,.3)', color: 'rgb(234,179,8)' };
       case 'Contestada':   return { text: 'Sua contestação foi enviada e está em análise pela FAPES.', bg: 'rgba(168,85,247,.1)', border: 'rgba(168,85,247,.3)', color: 'rgb(168,85,247)' };
       default: return null;
@@ -948,7 +955,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
           <div className={statusAtual === 'Revisar' || statusAtual === 'Reprovado' || statusAtual === 'Contestada' ? 'p-4' : 'p-4 mb-6'} style={{ backgroundColor: statusMessage.bg, border: `1px solid ${statusMessage.border}`, borderRadius: 'var(--radius)' }}>
             <p style={{ color: statusMessage.color, fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: 0, lineHeight: '1.5', whiteSpace: 'pre-line' }}>{statusMessage.text}</p>
           </div>
-          {statusAtual === 'Reprovado' && (
+          {statusAtual === 'Reprovado' && !isPagamentoSemNotaFiscal && (
             <>
               <section
                 className="mt-4"
@@ -1338,16 +1345,33 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
               </div>
             )}
 
-            {/* Descrição — opcional na prestação de contas */}
+            {/* PAGAMENTO SEM NOTA FISCAL */}
+            {isPagamentoSemNotaFiscal && (
+              <div
+                className="mb-4 flex items-start gap-3 p-4"
+                style={{
+                  backgroundColor: 'rgba(239,68,68,0.1)',
+                  border: '1px solid rgba(239,68,68,0.3)',
+                  borderRadius: 'var(--radius)',
+                }}
+              >
+                <Info size={16} style={{ color: 'rgb(239,68,68)', flexShrink: 0, marginTop: '2px' }} />
+                <p style={{ color: 'rgb(239,68,68)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', margin: 0, lineHeight: '1.6' }}>
+                  A Fapes apenas aceita pagamentos com Nota Fiscal. Se você realizou uma compra com um fornecedor que não emite Nota Fiscal, sugerimos que realize a devolução e solicite o estorno. Se o estorno não for realizado, você deve devolver o valor para a conta do projeto. Apenas clique em Enviar se você irá fazer a devolução.
+                </p>
+              </div>
+            )}
+
+            {/* Observação — opcional na prestação de contas */}
             {selectedDocumento !== '' && selectedDocumento !== 'Diária' && (
               <div>
                 <label style={labelSt}>
-                  Descrição
+                  Observação
                 </label>
                 <textarea
                   value={descricao}
                   onChange={e => { if (e.target.value.length <= maxDesc) setDescricao(e.target.value); }}
-                  placeholder="Descreva o contexto da compra ou pagamento..."
+                  placeholder="Incluir observação ou anotação pessoal sobre esse acontecimento."
                   rows={3}
                   disabled={isReadOnly}
                   style={{ width: '100%', padding: '0.75rem', backgroundColor: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', resize: 'vertical', outline: 'none', opacity: isReadOnly ? 0.7 : 1, cursor: isReadOnly ? 'not-allowed' : 'text', boxSizing: 'border-box' }}
@@ -1363,7 +1387,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
         </section>
 
         {/* ─── Step 2: Anexar Documento Fiscal ─── */}
-        {isStep1Complete && selectedDocumento !== 'Diária' && (
+        {isStep1Complete && selectedDocumento !== 'Diária' && !isPagamentoSemNotaFiscal && (
           <section className="mb-8">
             <div className="flex items-start gap-3 mb-1">
               <div style={stepCircle}>2</div>
@@ -2686,6 +2710,177 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
           </>
         )}
       </div>
+
+      {isPagamentoSemNotaFiscal && !isReadOnly && (
+        <div className="mb-8 flex justify-end gap-3">
+          <button
+            type="button"
+            className="px-5 py-3"
+            onClick={() => toast.success('Rascunho salvo com sucesso.')}
+            style={{
+              backgroundColor: 'transparent',
+              color: 'var(--foreground)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              fontFamily: 'var(--font-family)',
+              cursor: 'pointer',
+            }}
+          >
+            Salvar Rascunho
+          </button>
+          <button
+            type="button"
+            className="px-5 py-3"
+            onClick={() => setIsConfirmarEnvioSemNotaOpen(true)}
+            style={{
+              backgroundColor: 'var(--primary)',
+              color: 'var(--primary-foreground)',
+              border: '1px solid var(--primary)',
+              borderRadius: 'var(--radius)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              fontFamily: 'var(--font-family)',
+              cursor: 'pointer',
+            }}
+          >
+            Enviar
+          </button>
+        </div>
+      )}
+
+      {isConfirmarEnvioSemNotaOpen && (
+        <>
+          <div
+            style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 90 }}
+            onClick={() => setIsConfirmarEnvioSemNotaOpen(false)}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirmar-envio-sem-nota-title"
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 100,
+              width: 'min(92vw, 520px)',
+              backgroundColor: 'var(--popover)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.35)',
+              padding: '1.5rem',
+            }}
+          >
+            <div className="flex items-start justify-between gap-4 mb-5">
+              <div className="flex items-center gap-3">
+                <div
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: 'var(--radius)',
+                    backgroundColor: 'rgba(234, 179, 8, 0.12)',
+                    color: 'rgb(234, 179, 8)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <AlertTriangle size={20} />
+                </div>
+                <h1
+                  id="confirmar-envio-sem-nota-title"
+                  style={{
+                    color: 'var(--foreground)',
+                    margin: 0,
+                    fontFamily: 'var(--font-family)',
+                    lineHeight: 1.45,
+                  }}
+                >
+                  Tem certeza que deseja enviar essa
+                  <br />
+                  Prestação de Contas?
+                </h1>
+              </div>
+              <button
+                type="button"
+                aria-label="Fechar"
+                onClick={() => setIsConfirmarEnvioSemNotaOpen(false)}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: 'var(--radius)',
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                  color: 'var(--muted-foreground)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <p
+              style={{
+                color: 'var(--muted-foreground)',
+                fontSize: 'var(--text-sm)',
+                fontFamily: 'var(--font-family)',
+                lineHeight: 1.6,
+                margin: '0 0 1.5rem',
+              }}
+            >
+              Essa ação irá marcar a prestação de contas como reprovada.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                className="px-4 py-2"
+                onClick={() => setIsConfirmarEnvioSemNotaOpen(false)}
+                style={{
+                  backgroundColor: 'transparent',
+                  color: 'var(--foreground)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontFamily: 'var(--font-family)',
+                  cursor: 'pointer',
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2"
+                onClick={() => {
+                  setStatusAtual('Reprovado');
+                  setIsConfirmarEnvioSemNotaOpen(false);
+                  toast.success('Status alterado para Reprovado.');
+                  onBack();
+                }}
+                style={{
+                  backgroundColor: 'var(--primary)',
+                  color: 'var(--primary-foreground)',
+                  border: '1px solid var(--primary)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontFamily: 'var(--font-family)',
+                  cursor: 'pointer',
+                }}
+              >
+                Enviar
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {selectedDocumento === 'Diária' && isCriarDiariaModalOpen && (
         <>

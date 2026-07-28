@@ -11,7 +11,7 @@ interface HeaderProps {
   isMobileMenuOpen: boolean;
   onLogout?: () => void;
   onNavigate?: (page: string) => void;
-  accessType?: 'cidadao' | 'voluntario' | 'bolsista' | 'coordenador' | 'diretor' | 'reitor';
+  accessType?: 'cidadao' | 'voluntario' | 'bolsista' | 'bolsistaSolicitarBolsa' | 'minhaEquipeExemplo' | 'proponente' | 'coordenador' | 'diretor' | 'reitor';
 }
 
 export function Header({ onToggleSidebar, onToggleMobileMenu, isMobileMenuOpen, onLogout, onNavigate, accessType }: HeaderProps) {

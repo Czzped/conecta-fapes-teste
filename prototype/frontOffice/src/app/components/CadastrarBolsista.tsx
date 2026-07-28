@@ -377,6 +377,28 @@ export function CadastrarBolsista({ onBack, tipo = 'bolsa' }: CadastrarBolsistaP
           Minha Equipe
         </button>
         <ChevronRight size={16} style={{ color: 'var(--muted-foreground)' }} />
+        {showBolsistasBreadcrumb && (
+          <>
+            <button
+              onClick={() => onBack('bolsistas')}
+              style={{
+                color: 'var(--muted-foreground)',
+                fontSize: 'var(--text-sm)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+                transition: 'color 0.2s',
+                fontFamily: 'var(--font-family)',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--foreground)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--muted-foreground)'; }}
+            >
+              Bolsistas do Projeto
+            </button>
+            <ChevronRight size={16} style={{ color: 'var(--muted-foreground)' }} />
+          </>
+        )}
         <span
           style={{
             color: 'var(--foreground)',

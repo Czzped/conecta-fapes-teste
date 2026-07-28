@@ -1,4 +1,4 @@
-import { HeartHandshake, Search, X, AlertCircle, Calendar, ChevronLeft, ChevronRight, Loader2, Info } from 'lucide-react';
+import { UserPlus, X, AlertCircle, Calendar, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { usePageScenarios } from '@/mocks/ScenarioContext';
@@ -58,16 +58,12 @@ export function AdicionarVoluntario({ onClose, onAdd }: AdicionarVoluntarioProps
       toast.error('CPF inválido. Verifique os dígitos informados.');
       return;
     }
-    if (!voluntarioName) {
-      toast.error('Busque a pessoa pelo CPF antes de adicionar.');
-      return;
-    }
     if (!dataInicio) {
       toast.error('Informe a data de início da participação.');
       return;
     }
-    onAdd({ name: voluntarioName, cpf, email: voluntarioInfo?.email ?? '', dataInicio });
-    toast.success('Voluntário adicionado com sucesso!');
+    onAdd({ name: voluntarioName || 'Voluntário convidado', cpf, email: voluntarioInfo?.email ?? '', dataInicio });
+    toast.success('Voluntário adicionado com sucesso! O Status está Pendete, aguardando o Aceite do Voluntário.');
     onClose();
   };
 
@@ -237,7 +233,6 @@ export function AdicionarVoluntario({ onClose, onAdd }: AdicionarVoluntarioProps
         }}
       >
         <div style={{ padding: '1.5rem' }}>
-          {/* Header row */}
           <div className="flex items-start justify-between" style={{ marginBottom: '0.75rem' }}>
             <div className="flex items-center gap-3">
               <div
@@ -245,20 +240,20 @@ export function AdicionarVoluntario({ onClose, onAdd }: AdicionarVoluntarioProps
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '50%',
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: 'var(--radius)',
                   backgroundColor: 'color-mix(in srgb, var(--primary) 12%, transparent)',
                   color: 'var(--primary)',
                   flexShrink: 0,
                 }}
               >
-                <HeartHandshake size={18} />
+                <UserPlus size={22} />
               </div>
               <div>
-                <h2 style={{ color: 'var(--foreground)', fontSize: '18px', fontWeight: 'var(--font-weight-normal)', margin: 0, fontFamily: 'var(--font-family)' }}>
+                <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
                   Adicionar Voluntário
-                </h2>
+                </h1>
                 <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', margin: '0.15rem 0 0 0', fontFamily: 'var(--font-family)' }}>
                   Sem vínculo de bolsa
                 </p>
@@ -275,36 +270,21 @@ export function AdicionarVoluntario({ onClose, onAdd }: AdicionarVoluntarioProps
             </button>
           </div>
 
-          {/* Divider */}
-          <div style={{ height: '1px', backgroundColor: 'var(--border)', marginBottom: '1.25rem' }} />
-
           {/* CPF do Voluntário */}
           <div className="mb-5">
             <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
               CPF do Voluntário <Required />
             </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={cpf}
-                onChange={handleCPFChange}
-                placeholder="000.000.000-00"
-                maxLength={14}
-                style={{ flex: 1, minWidth: 0, padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
-                onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
-              />
-              <button
-                onClick={handleBuscarCPF}
-                disabled={cpfBuscando}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.625rem 1rem', backgroundColor: 'var(--muted)', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: cpfBuscando ? 'not-allowed' : 'pointer', opacity: cpfBuscando ? 0.6 : 1, transition: 'all 0.2s', whiteSpace: 'nowrap', fontFamily: 'var(--font-family)' }}
-                onMouseEnter={(e) => { if (!cpfBuscando) { e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--primary) 10%, transparent)'; e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.color = 'var(--primary)'; } }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--muted)'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--foreground)'; }}
-              >
-                {cpfBuscando ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
-                {cpfBuscando ? 'Buscando...' : 'Buscar'}
-              </button>
-            </div>
+            <input
+              type="text"
+              value={cpf}
+              onChange={handleCPFChange}
+              placeholder="000.000.000-00"
+              maxLength={14}
+              style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
+            />
 
             {/* Mensagem de erro */}
             {cpfErro && (
@@ -358,7 +338,7 @@ export function AdicionarVoluntario({ onClose, onAdd }: AdicionarVoluntarioProps
           </div>
 
           {/* Data de início da participação */}
-          <div className="mb-5" style={{ maxWidth: '320px' }}>
+          <div className="mb-5">
             <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
               Data de início da participação <Required />
             </label>
@@ -370,13 +350,13 @@ export function AdicionarVoluntario({ onClose, onAdd }: AdicionarVoluntarioProps
             className="flex items-start gap-2 px-3 py-2"
             style={{
               backgroundColor: 'color-mix(in srgb, var(--primary) 5%, transparent)',
-              border: '1px solid color-mix(in srgb, var(--primary) 15%, transparent)',
+              border: '1px solid var(--primary)',
               borderRadius: 'var(--radius)',
             }}
           >
             <Info size={15} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: 1 }} />
-            <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
-              O membro voluntário não possui vínculo financeiro com o projeto e não exige documentação de bolsa.
+            <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
+              O membro voluntário não possui vínculo financeiro com o projeto e não exige documentação de bolsa. O Voluntário deve entrar em sua conta e aceitar o convite.
             </span>
           </div>
 
@@ -396,7 +376,7 @@ export function AdicionarVoluntario({ onClose, onAdd }: AdicionarVoluntarioProps
               onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
               onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
             >
-              Adicionar voluntário
+              Adicionar Voluntário
             </button>
           </div>
         </div>

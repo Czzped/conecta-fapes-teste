@@ -1,4 +1,4 @@
-import { Check, ChevronDown, CreditCard } from 'lucide-react';
+import { Check, ChevronDown, CreditCard, Download } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ListPagination } from '@/app/components/ListPagination';
 
@@ -21,8 +21,26 @@ interface PaymentsPageProps {
 
 function ListToolbar({ label }: { label: string }) {
   return (
-    <div className="flex justify-start mb-4">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
       <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>{label}</span>
+      <button
+        type="button"
+        className="inline-flex items-center gap-2 px-4 py-2"
+        style={{
+          backgroundColor: 'transparent',
+          color: 'var(--foreground)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius)',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 'var(--font-weight-medium)',
+          fontFamily: 'var(--font-family)',
+          cursor: 'pointer',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        <Download size={16} />
+        Exportar CSV
+      </button>
     </div>
   );
 }
@@ -572,7 +590,7 @@ export function PaymentsPage({ scope = 'personal', embedded = false }: PaymentsP
       {/* Section */}
       <section className="mb-8 mt-6">
         {/* Filters Section */}
-        <div className="mb-6">
+        <div className="mb-4">
           <div className={`grid grid-cols-1 ${shouldShowProjectFilter ? 'md:grid-cols-4' : 'md:grid-cols-4'} gap-4`}>
             {shouldShowProjectFilter && (
               <div>
