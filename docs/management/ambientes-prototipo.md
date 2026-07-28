@@ -53,8 +53,6 @@ backoffice → `leds-conectafapes-frontend-backoffice`.
 
 ## 4. Como o deploy funciona
 
-Cada ambiente publica de um jeito diferente, por uma razão de custo:
-
 Os dois ambientes publicam pela **CLI do Vercel**, dentro do GitHub Actions. A
 integração nativa do Vercel com o Git **não é usada** porque exige plano **Pro** para
 repositório privado de organização, e as contas do projeto estão no plano **Hobby** — a

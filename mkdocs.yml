@@ -654,6 +654,7 @@ nav:
       - GitHub Project Board: management/github-project.md
       - Git Flow: management/git-flow-conectafapes.md
       - Ambientes do Prototipo: management/ambientes-prototipo.md
+      - Consumo de GitHub Actions: management/consumo-actions.md
       - SPRINT-001: management/sprints/SPRINT-001.md
       - SPRINT-002: management/sprints/SPRINT-002.md
       - SPRINT-003: management/sprints/SPRINT-003.md
