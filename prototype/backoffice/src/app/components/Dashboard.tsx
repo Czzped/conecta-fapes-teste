@@ -191,7 +191,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const statusOptions: StatusFilter[] = ['Todos', 'Pendente', 'Em Validação', 'Validado', 'Revisar', 'Reprovado', 'Contestada'];
   const categoriaOptions: CategoriaFilter[] = ['Todos', 'Material Permanente', 'Material de Consumo', 'Passagem', 'Diária', 'Pessoa Física', 'Pessoa Jurídica'];
   const projetoOptions: ProjetoFilter[] = ['Todos', 'Conecta Fapes', 'Outro Projeto Exemplo', 'Mais um Projeto Exemplo'];
-  const isReadyForDevPage = activePage === 'parceria' || activePage === 'programa';
 
   // Mock data para os cards de pagamento
   const [pagamentosData, setPagamentosData] = useState<PagamentoCard[]>([
@@ -877,31 +876,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           </div>
         </div>
       </header>
-
-      <div
-        aria-label={isReadyForDevPage ? 'Pronto para Dev' : 'Quase Pronto Para Dev'}
-        style={{
-          position: 'fixed',
-          top: '82px',
-          right: '32px',
-          zIndex: 45,
-          pointerEvents: 'none',
-          padding: '7px 12px',
-          borderRadius: '999px',
-          border: isReadyForDevPage ? '1px solid rgba(34,197,94,0.45)' : '1px solid rgba(251,191,36,0.45)',
-          backgroundColor: isReadyForDevPage ? 'rgba(34,197,94,0.16)' : 'rgba(251,191,36,0.16)',
-          color: isReadyForDevPage ? '#22c55e' : '#fbbf24',
-          fontFamily: 'var(--font-family)',
-          fontSize: 'var(--text-xs)',
-          fontWeight: 'var(--font-weight-medium)',
-          lineHeight: 1,
-          boxShadow: isLight ? '0 8px 20px rgba(0,0,0,0.08)' : '0 8px 20px rgba(0,0,0,0.25)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
-        }}
-      >
-        {isReadyForDevPage ? 'Pronto para Dev' : 'Quase Pronto Para Dev'}
-      </div>
 
       {/* Modal de Acessibilidade */}
       {showAccessibilityModal && (
