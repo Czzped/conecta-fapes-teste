@@ -41,6 +41,13 @@ jobs:
           sparse-checkout: tools/promote-prototype
           sparse-checkout-cone-mode: true
 
+      # Necessario: o runner self-hosted NAO traz Node instalado (o hospedado traz).
+      # Sem este passo o job falha com `node: command not found`.
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
       - name: Sincronizar o card do Project 43
         env:
           # PROJECTS_PAT: o GITHUB_TOKEN padrao nao alcanca projects da organizacao.
