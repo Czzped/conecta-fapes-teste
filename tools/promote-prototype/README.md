@@ -3,16 +3,29 @@
 Automação do **handoff** quando uma tela do protótipo é promovida de `prototipagem`
 para `main` (ambiente estável).
 
-## `create-ready-for-dev.mjs`
+## `sync-card-promocao.mjs`
 
 Chamado pelo workflow [`promocao-project43.yml`](../../.github/workflows/promocao-project43.yml)
-quando um PR que altera `prototype/**` é mergeado na `main`. Ele:
+nos eventos do PR de promoção (`prototipagem` → `main`) que altera `prototype/**`.
 
-1. Detecta quais apps mudaram no PR (front-office / backoffice).
-2. Cria uma issue **"[Pronto para Dev] …"** no repositório de planejamento.
-3. Adiciona a issue ao **Project 43** e preenche `Repositório` (repo de produto alvo)
-   e `Area=Frontend` — IDs resolvidos por nome em tempo de execução.
-4. Usa a auditoria do corpo do PR (gerada localmente com o Claude via `/auditar-promocao`).
+O **card é a peça central** do fluxo: é nele que a equipe vê a alteração proposta e de
+onde vai ao PR aprovar. Por isso ele nasce na **abertura** do PR, não no merge:
+
+| Evento do PR | O que o script faz |
+|---|---|
+| `opened` / `reopened` | Cria a issue **"[Promoção] …"**, adiciona ao **Project 43** em `Status = In Validation`, preenche `Area=Frontend` e `Repositório` (repo de produto alvo), e comenta no PR o link do card |
+| `closed` + mergeado | Move o card para **Pronto para desenvolvimento** e registra o link do ambiente **estável** |
+| `closed` sem merge | Move o card para **Desaprovado** |
+
+O corpo do card traz o link do **protótipo** (para ver a alteração) e a **auditoria**
+gerada com `/auditar-promocao`.
+
+### Como o card é reencontrado
+
+A ligação card ↔ PR fica num **comentário-marcador no próprio PR**
+(`<!-- card-promocao: N -->`). Comentários de PR são consistentes imediatamente,
+diferente da API de busca, que tem atraso de indexação. Isso também torna o script
+idempotente: se o PR for reaberto, ele encontra o card em vez de criar outro.
 
 ### Validar antes (dry-run)
 
@@ -20,17 +33,27 @@ quando um PR que altera `prototype/**` é mergeado na `main`. Ele:
 GH_TOKEN=<PROJECTS_PAT> \
 GH_REPO=leds-conectafapes/conectafapes-project \
 PR_NUMBER=<num> PR_TITLE="[FEAT] Tela X" PR_BODY="..." PR_URL="..." \
+PR_ACTION=opened \
 DRY_RUN=true \
-node tools/promote-prototype/create-ready-for-dev.mjs
+node tools/promote-prototype/sync-card-promocao.mjs
 ```
 
-O dry-run imprime os campos/opções resolvidos do Project 43 sem criar nada — use-o
-para conferir o mapeamento antes de ativar (ou ajuste as constantes no topo do script:
-`ISSUE_REPO`, `APP_MAP`, `AREA_VALUE`). Para rodar em dry-run no CI, defina a
-*repository variable* `PROMOCAO_DRY_RUN=true`.
+O dry-run imprime as colunas e opções resolvidas sem alterar o board. Para dry-run no
+CI, defina a *variable* `PROMOCAO_DRY_RUN=true`.
+
+As constantes no topo do script definem as colunas usadas (`In Validation`,
+`Pronto para desenvolvimento`, `Desaprovado`), a `Area` e o mapa de apps → repo de
+produto e URLs dos dois ambientes.
 
 ### Pré-requisitos
-- Secret `PROJECTS_PAT` com acesso ao Project 43 e permissão de criar issues no repo de planejamento.
+- Secret `PROJECTS_PAT` com acesso ao Project 43 e permissão de criar issues.
+  O `GITHUB_TOKEN` padrão **não** alcança projects da organização.
+
+### Relação com a automação existente
+O worker em [`tools/project43-automation`](../project43-automation) já move cards a
+partir de eventos de PR (`pr-card-movement`), localizando o card pelo número na branch
+(`feature/123-…`). A branch de promoção é sempre `prototipagem`, sem número — por isso
+a movimentação da promoção vive aqui, e não lá. Não há conflito entre os dois.
 
 ## `setup-vercel-estavel.mjs`
 
