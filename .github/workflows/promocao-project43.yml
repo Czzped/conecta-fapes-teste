@@ -1,20 +1,26 @@
-name: Promoção → Project 43
+name: Card de promoção → Project 43
 
-# Quando um PR de promoção (prototipagem -> main) que altera o protótipo é
-# MERGEADO, cria uma issue "Pronto para Desenvolvimento" no Project 43,
-# já com Repositório (repo de produto alvo) e Area=Frontend, e a auditoria
-# (corpo do PR) no corpo da issue. Usa PROJECTS_PAT (mesmo secret do release).
+# Mantém o card do Project 43 em sincronia com o Pull Request de promoção
+# (`prototipagem` -> `main`), para que o CARD seja a peça central do fluxo: é nele
+# que a equipe vê a alteração proposta e de onde vai ao PR aprovar.
 #
-# Os DEPLOYS não passam por aqui: são feitos nativamente pelo Vercel a partir
-# das branches (`prototipagem` -> protótipo, `main` -> estável), para não
-# consumir minutos de GitHub Actions. Ver docs/management/ambientes-prototipo.md
+#   PR aberto/reaberto   -> cria o card em "In Validation"
+#   PR mergeado          -> move para "Pronto para desenvolvimento" (+ link do estável)
+#   PR fechado sem merge -> move para "Desaprovado"
 #
-# Este job é de propósito enxuto (sem build, sem setup-node, checkout parcial):
-# roda em ~30s para pesar o mínimo possível na cota de Actions.
+# Segue a convencao que a organizacao ja usa em `tools/project43-automation`
+# (`pr-card-movement`), onde eventos de PR movem o card. Aquele worker localiza o
+# card pelo numero na branch (`feature/123-...`); aqui a branch de promocao e
+# sempre `prototipagem`, sem numero, entao a ligacao card <-> PR fica num
+# comentario-marcador no proprio PR.
+#
+# Roda em runner self-hosted (nao consome a cota de Actions, esgotada em jul/2026).
+# CHAVE DE TROCA: criar a variavel RUNNER_LABELS com `["ubuntu-latest"]` (JSON)
+# devolve o job ao runner hospedado, sem alterar codigo.
 
 on:
   pull_request:
-    types: [closed]
+    types: [opened, reopened, closed]
     branches:
       - main
     paths:
@@ -22,18 +28,12 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
-  pronto-para-dev:
-    if: github.event.pull_request.merged == true
-    # Runner self-hosted da organizacao: nao consome a cota de Actions (esgotada
-    # em jul/2026). Dependencias validadas em execucao real neste runner:
-    # checkout+sparse-checkout (git 2.54), setup-node, `npm install -g` e egress
-    # para api.github.com, registry.npmjs.org e gitlab.com.
-    #
-    # CHAVE DE TROCA: criar a variavel RUNNER_LABELS com `["ubuntu-latest"]` (JSON)
-    # devolve todos estes workflows ao runner hospedado, sem alterar codigo.
+  sincronizar-card:
     runs-on: ${{ fromJSON(vars.RUNNER_LABELS || '["self-hosted","linux","x64"]') }}
+    timeout-minutes: 10
     steps:
       - name: Checkout (apenas a ferramenta)
         uses: actions/checkout@v5
@@ -41,14 +41,17 @@ jobs:
           sparse-checkout: tools/promote-prototype
           sparse-checkout-cone-mode: true
 
-      - name: Criar issue "Pronto para Desenvolvimento" no Project 43
+      - name: Sincronizar o card do Project 43
         env:
+          # PROJECTS_PAT: o GITHUB_TOKEN padrao nao alcanca projects da organizacao.
           GH_TOKEN: ${{ secrets.PROJECTS_PAT }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body }}
           PR_URL: ${{ github.event.pull_request.html_url }}
-          # Deixe DRY_RUN=true para validar a resolução de campos antes de criar de verdade.
+          PR_ACTION: ${{ github.event.action }}
+          PR_MERGED: ${{ github.event.pull_request.merged }}
+          # Defina a variavel PROMOCAO_DRY_RUN=true para ensaiar sem alterar o board.
           DRY_RUN: ${{ vars.PROMOCAO_DRY_RUN || 'false' }}
-        run: node tools/promote-prototype/create-ready-for-dev.mjs
+        run: node tools/promote-prototype/sync-card-promocao.mjs

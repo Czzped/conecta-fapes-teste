@@ -30,12 +30,17 @@ _(cole aqui o relatório de auditoria)_
 - [ ] Issue de planejamento vinculada.
 - [ ] **2 aprovações** neste PR (o gate de aprovação da promoção é aqui).
 
-> ⚠️ A aprovação acontece **neste Pull Request** (a `main` exige 2 reviews).
+> 📋 **Ao abrir este PR**, um card **"[Promoção]"** é criado no
+> [Project 43](https://github.com/orgs/leds-conectafapes/projects/43) em
+> **In Validation**, com o link do protótipo e a auditoria. Ele é a peça que a equipe
+> usa para avaliar a tela — o link aparece num comentário aqui.
+>
+> ⚠️ A **aprovação acontece neste Pull Request** (a `main` exige 2 reviews).
 > Ao mergear, a publicação é automática — não há segunda confirmação depois.
 >
-> O merge dispara os workflows **Estável · front-office** / **Estável · backoffice**
-> (só o do app que mudou), publicando em
-> `frontoffice-conecta-estavel.vercel.app` / `backoffice-conecta-estavel.vercel.app`;
-> e **Promoção → Project 43** cria a issue "Pronto para Desenvolvimento" no board #43.
+> O merge dispara **Estável · front-office** / **Estável · backoffice** (só o do app que
+> mudou), publicando em `frontoffice-conecta-estavel.vercel.app` /
+> `backoffice-conecta-estavel.vercel.app`, e move o card para
+> **Pronto para desenvolvimento**. Fechar sem merge move o card para **Desaprovado**.
 >
 > Fluxo completo: [docs/management/ambientes-prototipo.md](../../docs/management/ambientes-prototipo.md)

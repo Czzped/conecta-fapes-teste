@@ -20,14 +20,24 @@ aprovação. Agora há dois ambientes com propósitos distintos.
 ## 2. O fluxo
 
 ```
-feature/*  ──PR──▶  prototipagem  ──(deploy automático)──▶  PROTÓTIPO
-                          │
-                          │  PR de promoção: "tela pronta para desenvolvimento"
-                          │  (auditoria no corpo + 2 aprovações)
-                          ▼
-                        main  ──(deploy automático)──▶  ESTÁVEL
-                                                        + issue no Project 43
+prototipagem  ──(deploy automático)──▶  PROTÓTIPO
+      │
+      │  abre PR de promoção  ──▶  CARD no Project 43 (In Validation)
+      │                             · link do protótipo, para ver a alteração
+      │                             · auditoria das mudanças
+      │                             · aponta para o PR, onde se aprova
+      │
+      │  2 aprovações no PR  ──▶  merge
+      ▼
+    main  ──(deploy automático)──▶  ESTÁVEL
+                                    + CARD → "Pronto para desenvolvimento"
+
+PR fechado sem merge  ──▶  CARD → "Desaprovado"
 ```
+
+O **card é a peça central**: nasce quando a promoção é proposta, e é dele que a equipe
+parte para avaliar a tela e aprovar. Só chega em *Pronto para desenvolvimento* depois de
+aprovado e mergeado.
 
 ## 3. Como promover uma tela
 
@@ -39,14 +49,24 @@ feature/*  ──PR──▶  prototipagem  ──(deploy automático)──▶ 
    no Claude Code, que lê o diff e descreve telas adicionadas/alteradas/removidas e
    fluxos afetados.
 4. Vincule a issue de planejamento.
-5. **2 aprovações** são obrigatórias (branch protection da `main`). Este é o gate:
-   a aprovação acontece no PR, não no deploy.
 
-Ao mergear, automaticamente:
-- o **Vercel publica** o estável (só os apps cuja pasta mudou);
-- o workflow [`promocao-project43`](../../.github/workflows/promocao-project43.yml)
-  cria a issue **"[Pronto para Dev]"** no [Project 43](https://github.com/orgs/leds-conectafapes/projects/43),
-  com `Repositório` (repo de produto alvo), `Area=Frontend` e a auditoria no corpo.
+Ao **abrir** o PR, o workflow [`promocao-project43`](../../.github/workflows/promocao-project43.yml)
+cria o card **"[Promoção] …"** no [Project 43](https://github.com/orgs/leds-conectafapes/projects/43)
+em `Status = In Validation`, com `Area=Frontend`, `Repositório` (repo de produto alvo), o
+link do **protótipo** e a auditoria. O card é comentado no PR, para navegar entre os dois.
+
+5. A equipe avalia pelo card e **aprova no Pull Request** — **2 aprovações** são
+   obrigatórias (branch protection da `main`). Este é o gate: a aprovação acontece no PR,
+   não no deploy.
+
+Ao **mergear**: o estável é publicado (só os apps cuja pasta mudou) e o card vai para
+**Pronto para desenvolvimento**, com o link do ambiente estável. Se o PR for fechado
+**sem** merge, o card vai para **Desaprovado**.
+
+> Como o gate é o PR, **mergear equivale a liberar** — não há uma segunda confirmação
+> depois. Em repositório privado no plano Team, o GitHub não permite exigir revisor em
+> Environment (isso exige Enterprise), então o PR é o único ponto onde "2 pessoas" é
+> imposto de fato.
 
 Mapeamento de destino: front-office → `leds-conectafapes-frontoffice-frontend`;
 backoffice → `leds-conectafapes-frontend-backoffice`.
