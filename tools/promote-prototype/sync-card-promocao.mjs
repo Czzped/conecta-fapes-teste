@@ -31,6 +31,7 @@ const COLUNA_EM_REVISAO = "In Validation";
 const COLUNA_APROVADO = "Pronto para desenvolvimento";
 const COLUNA_REPROVADO = "Desaprovado";
 const AREA = "Frontend";
+const SQUAD = "Design";
 
 // Pasta do protótipo -> repositório de produto alvo e URLs dos dois ambientes.
 const APPS = {
@@ -117,6 +118,10 @@ async function projeto() {
          fields(first:50){ nodes{
            ... on ProjectV2FieldCommon { id name }
            ... on ProjectV2SingleSelectField { id name options { id name } }
+           ... on ProjectV2IterationField {
+             id name
+             configuration { iterations { id title startDate duration } }
+           }
          }}
        }}
      }`,
@@ -158,6 +163,38 @@ async function itemDoProjeto(numeroIssue, projetoId) {
   if (!issue) return null;
   const item = issue.projectItems.nodes.find((i) => i.project.id === projetoId);
   return item ? item.id : null;
+}
+
+/**
+ * Sprint em andamento hoje, calculada pelas datas — nada fixo no código, para
+ * que os próximos cards caiam sempre na sprint corrente.
+ * Se hoje estiver fora de todas (janela entre sprints), devolve a próxima.
+ */
+function iteracaoAtual(campoSprint) {
+  const iteracoes = campoSprint?.configuration?.iterations || [];
+  if (!iteracoes.length) return null;
+  const hoje = new Date().toISOString().slice(0, 10);
+
+  const emAndamento = iteracoes.find((it) => {
+    const fim = new Date(it.startDate);
+    fim.setDate(fim.getDate() + it.duration);
+    return it.startDate <= hoje && hoje < fim.toISOString().slice(0, 10);
+  });
+  if (emAndamento) return emAndamento;
+
+  const futuras = iteracoes.filter((it) => it.startDate > hoje);
+  return futuras.length ? futuras[0] : null;
+}
+
+async function definirIteracao(projetoId, itemId, campoId, iteracaoId) {
+  await gql(
+    `mutation($p:ID!,$i:ID!,$f:ID!,$it:String!){
+       updateProjectV2ItemFieldValue(input:{
+         projectId:$p, itemId:$i, fieldId:$f, value:{ iterationId:$it }
+       }){ projectV2Item { id } }
+     }`,
+    { p: projetoId, i: itemId, f: campoId, it: iteracaoId },
+  );
 }
 
 async function definirSelecao(projetoId, itemId, campoId, opcaoId) {
@@ -217,6 +254,9 @@ async function criarCard() {
   const campoStatus = campo(p, "Status");
   const campoArea = campo(p, "Area") || campo(p, "Área");
   const campoRepo = campo(p, "Repositório") || campo(p, "Repositorio");
+  const campoSquad = campo(p, "Squad");
+  const campoSprint = campo(p, "Sprint");
+  const sprint = iteracaoAtual(campoSprint);
   const colunaInicial = opcao(campoStatus, (o) => o.name.toLowerCase() === COLUNA_EM_REVISAO.toLowerCase());
   if (!colunaInicial) throw new Error(`Coluna "${COLUNA_EM_REVISAO}" não existe no Status`);
 
@@ -243,7 +283,9 @@ async function criarCard() {
   console.log(`Criaria a issue "${titulo}" em ${repo}, na coluna "${colunaInicial.name}"`);
 
   if (DRY_RUN) {
-    console.log(`[DRY_RUN] Area -> ${campoArea ? AREA : "campo ausente"}`);
+    console.log(`[DRY_RUN] Area   -> ${campoArea ? AREA : "campo ausente"}`);
+    console.log(`[DRY_RUN] Squad  -> ${campoSquad ? SQUAD : "campo ausente"}`);
+    console.log(`[DRY_RUN] Sprint -> ${sprint ? sprint.title : "nenhuma sprint corrente"}`);
     for (const a of apps) {
       const o = opcao(campoRepo, (x) => x.name.includes(a.repoKey));
       console.log(`[DRY_RUN] Repositório (${a.label}) -> ${o ? o.name : "OPÇÃO NÃO ENCONTRADA"}`);
@@ -267,6 +309,19 @@ async function criarCard() {
   if (campoArea) {
     const o = opcao(campoArea, (x) => x.name.toLowerCase() === AREA.toLowerCase());
     if (o) await definirSelecao(p.id, itemId, campoArea.id, o.id);
+  }
+  if (campoSquad) {
+    const o = opcao(campoSquad, (x) => x.name.toLowerCase() === SQUAD.toLowerCase());
+    if (o) await definirSelecao(p.id, itemId, campoSquad.id, o.id);
+    else console.log(`Atenção: squad "${SQUAD}" não existe no board.`);
+  }
+  if (campoSprint) {
+    if (sprint) {
+      await definirIteracao(p.id, itemId, campoSprint.id, sprint.id);
+      console.log(`Sprint: ${sprint.title}`);
+    } else {
+      console.log("Atenção: nenhuma sprint corrente ou futura no board; card ficou sem sprint.");
+    }
   }
   if (campoRepo) {
     const principal = apps[0];
