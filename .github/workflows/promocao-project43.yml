@@ -26,7 +26,14 @@ permissions:
 jobs:
   pronto-para-dev:
     if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
+    # Runner self-hosted da organizacao: nao consome a cota de Actions (esgotada
+    # em jul/2026). Dependencias validadas em execucao real neste runner:
+    # checkout+sparse-checkout (git 2.54), setup-node, `npm install -g` e egress
+    # para api.github.com, registry.npmjs.org e gitlab.com.
+    #
+    # CHAVE DE TROCA: criar a variavel RUNNER_LABELS com `["ubuntu-latest"]` (JSON)
+    # devolve todos estes workflows ao runner hospedado, sem alterar codigo.
+    runs-on: ${{ fromJSON(vars.RUNNER_LABELS || '["self-hosted","linux","x64"]') }}
     steps:
       - name: Checkout (apenas a ferramenta)
         uses: actions/checkout@v5
