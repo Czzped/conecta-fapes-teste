@@ -141,6 +141,11 @@ export default function App() {
           setMyTeamInitialTab(tab);
           handleNavigate('minha-equipe');
         }} />;
+      case 'solicitar-auxilio':
+        return <CadastrarBolsista tipo="auxilio" onBack={(tab = 'informacoes') => {
+          setMyTeamInitialTab(tab);
+          handleNavigate('minha-equipe');
+        }} />;
       case 'editais':
         return <EditaisPage />;
       case 'projects-list':

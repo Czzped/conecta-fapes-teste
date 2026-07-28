@@ -1,4 +1,4 @@
-import { Users, Plus, UserPlus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle } from 'lucide-react';
+import { Users, Plus, UserPlus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle, HandCoins } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -23,7 +23,7 @@ interface TeamMember {
   name: string;
   startDate: string;
   endDate: string;
-  type: 'BPIG-VII' | 'BPIG-VI' | 'BPIG-V' | 'BPIG-IV' | 'BPIG-III' | 'BPIG-II' | 'Voluntário';
+  type: 'BPIG-VII' | 'BPIG-VI' | 'BPIG-V' | 'BPIG-IV' | 'BPIG-III' | 'BPIG-II' | 'Voluntário' | 'AUX-MOR';
   status: 'Em Andamento' | 'Finalizada' | 'Cancelada' | 'Reprovada' | 'Doc. Pendente' | 'Revisar' | 'Em Avaliação' | 'Reprovado';
   isVoluntario?: boolean;
   email: string;
@@ -61,9 +61,89 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   const [selectedYear, setSelectedYear] = useState('2026');
   const [isYearOpen, setIsYearOpen] = useState(false);
   const [isAddVoluntarioOpen, setIsAddVoluntarioOpen] = useState(false);
+  const [isAcoesOpen, setIsAcoesOpen] = useState(false);
   const itemsPerPage = 10;
-  
+
   const periodChartRef = useRef<HTMLDivElement>(null);
+  const acoesDesktopRef = useRef<HTMLDivElement>(null);
+  const acoesMobileRef = useRef<HTMLDivElement>(null);
+
+  // Fecha o dropdown de Ações ao clicar fora
+  useEffect(() => {
+    if (!isAcoesOpen) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      const insideDesktop = acoesDesktopRef.current?.contains(target);
+      const insideMobile = acoesMobileRef.current?.contains(target);
+      if (!insideDesktop && !insideMobile) {
+        setIsAcoesOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isAcoesOpen]);
+
+  // Um membro é de auxílio quando a modalidade começa com "AUX"
+  const isAuxilio = (m: TeamMember) => m.type.startsWith('AUX');
+
+  const acoesItems = [
+    { icon: UserPlus, label: 'Adicionar Voluntário', onClick: () => setIsAddVoluntarioOpen(true) },
+    { icon: Plus, label: 'Solicitar Bolsa', onClick: () => onNavigate?.('cadastrar-bolsista') },
+    { icon: HandCoins, label: 'Solicitar Auxílio', onClick: () => onNavigate?.('solicitar-auxilio') },
+  ];
+
+  const renderAcoesMenu = () => (
+    <div
+      style={{
+        position: 'absolute',
+        top: 'calc(100% + 4px)',
+        right: 0,
+        minWidth: '260px',
+        backgroundColor: 'var(--popover)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius)',
+        boxShadow: 'var(--shadow-lg)',
+        zIndex: 50,
+        overflow: 'hidden',
+        padding: '0.25rem',
+      }}
+    >
+      {acoesItems.map(({ icon: Icon, label, onClick }) => (
+        <button
+          key={label}
+          onClick={() => {
+            onClick();
+            setIsAcoesOpen(false);
+          }}
+          style={{
+            width: '100%',
+            padding: '0.625rem 0.75rem',
+            backgroundColor: 'transparent',
+            color: 'var(--foreground)',
+            border: 'none',
+            borderRadius: 'calc(var(--radius) - 2px)',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 'var(--font-weight-normal)',
+            textAlign: 'left',
+            cursor: 'pointer',
+            transition: 'background-color 0.15s',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--primary) 10%, var(--popover))';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }}
+        >
+          <Icon size={18} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+          {label}
+        </button>
+      ))}
+    </div>
+  );
 
   const defaultDocuments = [
     { id: 1, requisito: 'Nível Médio', documento: 'Imagem Frente e Verso do Diploma', dataEnvio: '20/02/2026', status: 'Pendente' as const },
@@ -90,6 +170,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
     { id: 101, name: 'Ana Clara Ribeiro Monteiro', startDate: '01/03/2026', endDate: '01/03/2027', type: 'Voluntário', status: 'Em Avaliação', isVoluntario: true, email: 'ana.monteiro@example.com', phone: '(27) 99123-4567', documents: [] },
     { id: 102, name: 'Bruno Tavares Almeida', startDate: '01/02/2026', endDate: '01/02/2027', type: 'Voluntário', status: 'Em Andamento', isVoluntario: true, email: 'bruno.almeida@example.com', phone: '(27) 99234-5678', documents: [] },
+    { id: 103, name: 'Carla Menezes Fontoura', startDate: '01/03/2026', endDate: '01/08/2026', type: 'AUX-MOR', status: 'Em Andamento', email: 'carla.fontoura@example.com', phone: '(27) 99345-6789', documents: [] },
     { id: 1, name: 'Paulo Sérgio dos Santos Junior', startDate: '01/06/2025', endDate: '01/06/2026', type: 'BPIG-VII', status: 'Doc. Pendente', email: 'paulo.junior@example.com', phone: '(27) 99999-9999', documents: defaultDocuments },
     { id: 2, name: 'Felipe Frechiani de Oliveira', startDate: '01/06/2025', endDate: '01/06/2026', type: 'BPIG-VI', status: 'Doc. Pendente', email: 'felipe.frechiani@example.com', phone: '(27) 99888-8888', documents: defaultDocuments },
     { id: 3, name: 'Fabiano Borges Ruy', startDate: '15/07/2025', endDate: '15/07/2026', type: 'BPIG-V', status: 'Finalizada', email: 'fabiano.ruy@example.com', phone: '(27) 99777-7777', documents: defaultDocuments },
@@ -1277,7 +1358,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                     overflow: 'hidden',
                   }}
                 >
-                  {['Todos', 'BPIG-VII', 'BPIG-VI', 'BPIG-V', 'BPIG-IV', 'BPIG-III', 'BPIG-II'].map((modalidade) => (
+                  {['Todos', 'BPIG-VII', 'BPIG-VI', 'BPIG-V', 'BPIG-IV', 'BPIG-III', 'BPIG-II', 'AUX-MOR'].map((modalidade) => (
                     <button
                       key={modalidade}
                       onClick={() => {
@@ -1455,84 +1536,64 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             </div>
           </div>
 
-          {/* Adicionar Voluntário Button - Desktop only */}
+          {/* Ações Dropdown - Desktop only */}
           {!hideAddButton && (
-            <button
-              className="hidden md:flex items-center justify-center gap-2 px-4 py-2 transition-colors"
-              style={{
-                backgroundColor: 'transparent',
-                color: 'var(--primary)',
-                border: '1px solid var(--primary)',
-                borderRadius: 'var(--radius)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)',
-                whiteSpace: 'nowrap',
-                marginTop: '1.625rem', // Aligns with inputs (label height + margin)
-              }}
-              onClick={() => setIsAddVoluntarioOpen(true)}
+            <div
+              className="hidden md:block relative"
+              ref={acoesDesktopRef}
+              style={{ marginTop: '1.625rem' /* Aligns with inputs (label height + margin) */ }}
             >
-              <UserPlus size={18} />
-              Adicionar Voluntário
-            </button>
-          )}
-
-          {/* Cadastrar Bolsista Button - Desktop only */}
-          {!hideAddButton && (
-            <button
-              className="hidden md:flex items-center justify-center gap-2 px-4 py-2 transition-colors"
-              style={{
-                backgroundColor: 'transparent',
-                color: 'var(--primary)',
-                border: '1px solid var(--primary)',
-                borderRadius: 'var(--radius)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)',
-                whiteSpace: 'nowrap',
-                marginTop: '1.625rem', // Aligns with inputs (label height + margin)
-              }}
-              onClick={() => onNavigate?.('cadastrar-bolsista')}
-            >
-              <Plus size={18} />
-              Solicitar Bolsa
-            </button>
+              <button
+                className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
+                style={{
+                  backgroundColor: 'transparent',
+                  color: 'var(--primary)',
+                  border: '1px solid var(--primary)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                }}
+                onClick={() => setIsAcoesOpen((open) => !open)}
+              >
+                Ações
+                <ChevronDown
+                  size={16}
+                  style={{ transform: isAcoesOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}
+                />
+              </button>
+              {isAcoesOpen && renderAcoesMenu()}
+            </div>
           )}
         </div>
 
-        {/* Add Buttons - Mobile only */}
+        {/* Ações Dropdown - Mobile only */}
         {!hideAddButton && (
-          <div className="flex flex-wrap justify-end gap-2 mb-6 md:hidden">
-            <button
-              className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
-              style={{
-                backgroundColor: 'transparent',
-                color: 'var(--primary)',
-                border: '1px solid var(--primary)',
-                borderRadius: 'var(--radius)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)',
-                whiteSpace: 'nowrap',
-              }}
-              onClick={() => setIsAddVoluntarioOpen(true)}
-            >
-              <UserPlus size={18} />
-              Adicionar Voluntário
-            </button>
-            <button
-              className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
-              style={{
-                backgroundColor: 'transparent',
-                color: 'var(--primary)',
-                border: '1px solid var(--primary)',
-                borderRadius: 'var(--radius)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)',
-                whiteSpace: 'nowrap',
-              }}
-              onClick={() => onNavigate?.('cadastrar-bolsista')}
-            >
-              <Plus size={18} />
-              Solicitar Bolsa
-            </button>
+          <div className="flex justify-end mb-6 md:hidden">
+            <div className="relative" ref={acoesMobileRef}>
+              <button
+                className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
+                style={{
+                  backgroundColor: 'transparent',
+                  color: 'var(--primary)',
+                  border: '1px solid var(--primary)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                }}
+                onClick={() => setIsAcoesOpen((open) => !open)}
+              >
+                Ações
+                <ChevronDown
+                  size={16}
+                  style={{ transform: isAcoesOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}
+                />
+              </button>
+              {isAcoesOpen && renderAcoesMenu()}
+            </div>
           </div>
         )}
 
@@ -1715,7 +1776,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                               setDetailsTab('informacoes');
                             }}
                           >
-                            {expandedBolsistaId === member.id ? 'Detalhes da Bolsa' : 'Ver Detalhes'}
+                            {expandedBolsistaId === member.id ? (isAuxilio(member) ? 'Detalhes do Auxílio' : 'Detalhes da Bolsa') : 'Ver Detalhes'}
                           </button>
                           <button
                             className="px-3 py-1.5 transition-colors"
@@ -1741,9 +1802,9 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                               }
                             }}
                           >
-                            {expandedBolsistaId === member.id 
-                              ? (member.status === 'Doc. Pendente' ? 'Excluir Solicitação' : 'Cancelar Bolsa')
-                              : 'Editar Bolsa'}
+                            {expandedBolsistaId === member.id
+                              ? (member.status === 'Doc. Pendente' ? 'Excluir Solicitação' : (isAuxilio(member) ? 'Cancelar Auxílio' : 'Cancelar Bolsa'))
+                              : (isAuxilio(member) ? 'Editar Auxílio' : 'Editar Bolsa')}
                           </button>
                         </div>
                       </div>
@@ -2063,7 +2124,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                             setDetailsTab('informacoes');
                           }}
                         >
-                          Detalhes da Bolsa
+                          {isAuxilio(member) ? 'Detalhes do Auxílio' : 'Detalhes da Bolsa'}
                         </button>
                         <button
                           className="w-full px-3 py-2 transition-colors"
@@ -2087,7 +2148,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                             }
                           }}
                         >
-                          {member.status === 'Doc. Pendente' ? 'Excluir Solicitação' : 'Cancelar Bolsa'}
+                          {member.status === 'Doc. Pendente' ? 'Excluir Solicitação' : (isAuxilio(member) ? 'Cancelar Auxílio' : 'Cancelar Bolsa')}
                         </button>
                       </div>
                     </div>
@@ -2154,7 +2215,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                   <GraduationCap size={24} />
                 </div>
                 <h2 style={{ color: 'var(--foreground)', margin: 0 }}>
-                  Detalhes da Bolsa
+                  {selectedMemberForDetails && isAuxilio(selectedMemberForDetails) ? 'Detalhes do Auxílio' : 'Detalhes da Bolsa'}
                 </h2>
               </div>
               <button

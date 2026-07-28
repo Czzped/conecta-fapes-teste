@@ -6,9 +6,15 @@ import { usePageScenarios } from '@/mocks/ScenarioContext';
 
 interface CadastrarBolsistaProps {
   onBack: (tab?: 'bolsistas' | 'informacoes' | 'pagamentos') => void;
+  tipo?: 'bolsa' | 'auxilio';
 }
 
-export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
+export function CadastrarBolsista({ onBack, tipo = 'bolsa' }: CadastrarBolsistaProps) {
+  const isAux = tipo === 'auxilio';
+  // Rótulos que trocam entre Bolsa e Auxílio
+  const rotulo = isAux ? 'Auxílio' : 'Bolsa'; // "Solicitar {rotulo}"
+  const rotuloArtigo = isAux ? 'o auxílio' : 'a bolsa'; // "solicitar {rotuloArtigo} de..."
+  const rotuloDaEntidade = isAux ? 'do Auxílio' : 'da Bolsa'; // "Informações {rotuloDaEntidade}"
   usePageScenarios([
     'bolsista-encontrado',
     'bolsista-nao-cadastrado',
@@ -23,12 +29,15 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
   const [cpfErro, setCpfErro] = useState<string | null>(null);
   const [orientador, setOrientador] = useState('');
   const [orientadorIsCoordinator, setOrientadorIsCoordinator] = useState(false);
-  const [modalidade, setModalidade] = useState('BPIG-X');
+  const [modalidade, setModalidade] = useState(isAux ? 'AUX-MOR' : 'BPIG-X');
   const [isModalidadeOpen, setIsModalidadeOpen] = useState(false);
-  const [tipoBolsa, setTipoBolsa] = useState('Iniciação Científica');
+  const [tipoBolsa, setTipoBolsa] = useState(isAux ? 'Nível I' : 'Iniciação Científica');
   const [quantidadeCotas, setQuantidadeCotas] = useState('1');
   const [dataInicio, setDataInicio] = useState('');
   const [dataTermino, setDataTermino] = useState('');
+  // Auxílio: a pessoa escolhe os meses de pagamento; as cotas saem dos meses.
+  const [mesesPagamento, setMesesPagamento] = useState<string[]>([]);
+  const [mesesPagamentoAno, setMesesPagamentoAno] = useState(2026);
   const [nomeAtividade, setNomeAtividade] = useState('');
   const [planoTrabalhoAtividades, setPlanoTrabalhoAtividades] = useState(['']);
   const [objetivos, setObjetivos] = useState('');
@@ -42,17 +51,16 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
   const [isTipoBolsaOpen, setIsTipoBolsaOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
-  const modalidades = [
-    'BPIG-I', 'BPIG-II', 'BPIG-III', 'BPIG-IV', 'BPIG-V',
-    'BPIG-VI', 'BPIG-VII', 'BPIG-VIII', 'BPIG-IX', 'BPIG-X',
-  ];
+  const modalidades = isAux
+    ? ['AUX-MOR', 'AUX-DID', 'AUX-EVT', 'AUX-INST']
+    : [
+        'BPIG-I', 'BPIG-II', 'BPIG-III', 'BPIG-IV', 'BPIG-V',
+        'BPIG-VI', 'BPIG-VII', 'BPIG-VIII', 'BPIG-IX', 'BPIG-X',
+      ];
 
-  const tiposBolsa = [
-    'Iniciação Científica',
-    'Mestrado',
-    'Doutorado',
-    'Pós-Doutorado',
-  ];
+  const tiposBolsa = isAux
+    ? ['Nível I', 'Nível II', 'Nível III']
+    : ['Iniciação Científica', 'Mestrado', 'Doutorado', 'Pós-Doutorado'];
 
   const coordenadorProjeto = 'Paulo Sergio dos Santos Junior';
   const meses = [
@@ -108,7 +116,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
   const handleConfirmSalvar = () => {
     setIsConfirmModalOpen(false);
     onBack('bolsistas');
-    toast.success('Solicitação de bolsa enviada com sucesso!');
+    toast.success(isAux ? 'Solicitação de auxílio enviada com sucesso!' : 'Solicitação de bolsa enviada com sucesso!');
   };
 
   const handleCancel = () => {
@@ -187,26 +195,36 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
     updateFimAtividades(value, quantidadeCotas);
   };
 
+  const toggleMesPagamento = (monthValue: string) => {
+    setMesesPagamento((prev) =>
+      prev.includes(monthValue)
+        ? prev.filter((mes) => mes !== monthValue)
+        : [...prev, monthValue].sort(),
+    );
+  };
+
   const Required = () => <span style={{ color: 'var(--destructive-foreground)' }}>*</span>;
 
-  const SectionHeader = ({ number, title }: { number: number; title: string }) => (
+  const SectionHeader = ({ number, title }: { number?: number; title: string }) => (
     <div className="flex items-center gap-3 mb-6">
-      <span
-        className="flex items-center justify-center"
-        style={{
-          width: '24px',
-          height: '24px',
-          borderRadius: '9999px',
-          backgroundColor: 'var(--primary)',
-          color: 'var(--primary-foreground)',
-          fontSize: 'var(--text-xs)',
-          fontWeight: 'var(--font-weight-semibold)',
-          flexShrink: 0,
-          fontFamily: 'var(--font-family)',
-        }}
-      >
-        {number}
-      </span>
+      {number != null && (
+        <span
+          className="flex items-center justify-center"
+          style={{
+            width: '24px',
+            height: '24px',
+            borderRadius: '9999px',
+            backgroundColor: 'var(--primary)',
+            color: 'var(--primary-foreground)',
+            fontSize: 'var(--text-xs)',
+            fontWeight: 'var(--font-weight-semibold)',
+            flexShrink: 0,
+            fontFamily: 'var(--font-family)',
+          }}
+        >
+          {number}
+        </span>
+      )}
       <h2
         style={{
           color: 'var(--foreground)',
@@ -367,7 +385,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
             fontFamily: 'var(--font-family)',
           }}
         >
-          Solicitar Bolsa
+          Solicitar {rotulo}
         </span>
       </div>
 
@@ -384,7 +402,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
           <UserPlus size={20} />
         </div>
         <h1 style={{ color: 'var(--foreground)', margin: 0, fontFamily: 'var(--font-family)' }}>
-          Solicitar Bolsa
+          Solicitar {rotulo}
         </h1>
       </div>
 
@@ -399,7 +417,9 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
           fontFamily: 'var(--font-family)',
         }}
       >
-        Incluir nova pessoa para atuar no projeto ou atualizar bolsa de pessoa que já atua no projeto
+        {isAux
+          ? 'Solicitar auxílio para pessoa que atua no projeto, escolhendo os meses de pagamento'
+          : 'Incluir nova pessoa para atuar no projeto ou atualizar bolsa de pessoa que já atua no projeto'}
       </p>
 
       {/* Divider */}
@@ -408,7 +428,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
       {/* Form */}
       <div className="space-y-6">
         <section style={formSectionStyle}>
-          <SectionHeader number={1} title="Informações da Bolsa" />
+          <SectionHeader number={isAux ? undefined : 1} title={`Informações ${rotuloDaEntidade}`} />
 
         {/* Projeto Vinculado */}
         <div className="mb-6">
@@ -592,7 +612,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
           {/* Tipo de Bolsa */}
           <div>
             <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
-              Tipo de Bolsa <Required />
+              {isAux ? 'Nível do Auxílio' : 'Tipo de Bolsa'} <Required />
             </label>
             <div className="relative">
               <button
@@ -626,37 +646,138 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
           </div>
         </div>
 
-        {/* Quantidade de Cotas, Início das Atividades, and Fim das Atividades */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-0">
-          <div>
-            <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
-              Quantidade de Cotas <Required />
+        {isAux ? (
+          /* Auxílio: escolha dos meses de pagamento — cada mês gera uma cota */
+          <div className="mb-0">
+            <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.375rem', fontFamily: 'var(--font-family)' }}>
+              Meses de Pagamento <Required />
             </label>
-            <input
-              type="number"
-              min="1"
-              value={quantidadeCotas}
-              onChange={(e) => handleQuantidadeCotasChange(e.target.value)}
-              style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
+            <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.75rem', fontFamily: 'var(--font-family)' }}>
+              Selecione os meses em que o auxílio será pago. Cada mês selecionado gera uma cota de pagamento.
+            </p>
+            <div style={{ padding: '1rem', backgroundColor: formFieldBackground, border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
+              {/* Navegação de ano */}
+              <div className="flex items-center justify-between mb-3">
+                <button
+                  type="button"
+                  onClick={() => setMesesPagamentoAno((ano) => ano - 1)}
+                  className="flex items-center justify-center"
+                  style={{ width: '28px', height: '28px', backgroundColor: 'transparent', color: 'var(--foreground)', border: 'none', cursor: 'pointer' }}
+                  aria-label="Ano anterior"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <span style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
+                  {mesesPagamentoAno}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setMesesPagamentoAno((ano) => ano + 1)}
+                  className="flex items-center justify-center"
+                  style={{ width: '28px', height: '28px', backgroundColor: 'transparent', color: 'var(--foreground)', border: 'none', cursor: 'pointer' }}
+                  aria-label="Próximo ano"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+              {/* Grid de 12 meses (toggle) */}
+              <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+                {mesesCurtos.map((mes, index) => {
+                  const monthValue = `${mesesPagamentoAno}-${String(index + 1).padStart(2, '0')}`;
+                  const isSelected = mesesPagamento.includes(monthValue);
+
+                  return (
+                    <button
+                      key={mes}
+                      type="button"
+                      onClick={() => toggleMesPagamento(monthValue)}
+                      className="flex items-center justify-center gap-1"
+                      style={{
+                        minWidth: 0,
+                        height: '36px',
+                        padding: '0 0.375rem',
+                        backgroundColor: isSelected ? 'var(--primary)' : 'transparent',
+                        color: isSelected ? 'var(--primary-foreground)' : 'var(--foreground)',
+                        border: `1px solid ${isSelected ? 'var(--primary)' : 'var(--border)'}`,
+                        borderRadius: 'var(--radius)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        cursor: 'pointer',
+                        fontFamily: 'var(--font-family)',
+                      }}
+                    >
+                      {isSelected && <Check size={12} />}
+                      {mes}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            {/* Resumo das cotas geradas */}
+            {mesesPagamento.length > 0 && (
+              <div
+                className="flex items-center justify-between mt-3"
+                style={{ padding: '0.625rem 0.875rem', backgroundColor: 'color-mix(in srgb, var(--primary) 6%, transparent)', border: '1px solid color-mix(in srgb, var(--primary) 18%, transparent)', borderRadius: 'var(--radius)' }}
+              >
+                <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
+                  {mesesPagamento.length} {mesesPagamento.length === 1 ? 'mês selecionado' : 'meses selecionados'}
+                </span>
+                <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
+                  {mesesPagamento.length} {mesesPagamento.length === 1 ? 'cota' : 'cotas'} de pagamento
+                </span>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Bolsa: quantidade de cotas + início/fim das atividades */
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-0">
+            <div>
+              <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+                Quantidade de Cotas <Required />
+              </label>
+              <input
+                type="number"
+                min="1"
+                value={quantidadeCotas}
+                onChange={(e) => handleQuantidadeCotasChange(e.target.value)}
+                style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', fontFamily: 'var(--font-family)' }}
+                onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; }}
+                onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+                Início das Atividades <Required />
+              </label>
+              <MonthPicker value={dataInicio} onChange={handleInicioAtividadesChange} placeholder="Selecione o mês de início" />
+            </div>
+            <div>
+              <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+                Fim das Atividades <Required />
+              </label>
+              <MonthPicker value={dataTermino} onChange={setDataTermino} placeholder="Selecione o mês de fim" />
+            </div>
+          </div>
+        )}
+        {isAux && (
+          <div className="mt-6">
+            <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+              Objetivos <Required />
+            </label>
+            <textarea
+              value={objetivos}
+              onChange={(e) => setObjetivos(e.target.value)}
+              placeholder="Descreva os objetivos do bolsista com o auxílio"
+              rows={4}
+              style={{ width: '100%', padding: '0.625rem 0.75rem', backgroundColor: formFieldBackground, color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', outline: 'none', resize: 'vertical', fontFamily: 'var(--font-family)' }}
               onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; }}
               onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
             />
           </div>
-          <div>
-            <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
-              Início das Atividades <Required />
-            </label>
-            <MonthPicker value={dataInicio} onChange={handleInicioAtividadesChange} placeholder="Selecione o mês de início" />
-          </div>
-          <div>
-            <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
-              Fim das Atividades <Required />
-            </label>
-            <MonthPicker value={dataTermino} onChange={setDataTermino} placeholder="Selecione o mês de fim" />
-          </div>
-        </div>
+        )}
         </section>
 
+        {!isAux && (
         <section style={formSectionStyle}>
           <SectionHeader number={2} title="Informações Gerais" />
 
@@ -820,6 +941,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
           </div>
         </div>
         </section>
+        )}
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-3">
@@ -837,7 +959,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
             onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
             onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
           >
-            Solicitar Bolsa
+            Solicitar {rotulo}
           </button>
         </div>
       </div>
@@ -896,7 +1018,7 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
                       fontFamily: 'var(--font-family)',
                     }}
                   >
-                    Solicitar Bolsa
+                    Solicitar {rotulo}
                   </h2>
                 </div>
                 <button
@@ -919,9 +1041,9 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
                   fontFamily: 'var(--font-family)',
                 }}
               >
-                Tem certeza que deseja solicitar a bolsa de{' '}
+                Tem certeza que deseja solicitar {rotuloArtigo} de{' '}
                 <strong style={{ fontWeight: 'var(--font-weight-semibold)' }}>
-                  {bolsistaName || 'bolsista'}
+                  {bolsistaName || (isAux ? 'beneficiário' : 'bolsista')}
                 </strong>{' '}
                 na modalidade{' '}
                 <strong style={{ color: 'var(--primary)', fontWeight: 'var(--font-weight-semibold)' }}>
@@ -943,12 +1065,20 @@ export function CadastrarBolsista({ onBack }: CadastrarBolsistaProps) {
                   gap: '0.625rem',
                 }}
               >
-                {[
-                  { label: 'Bolsista', value: bolsistaName || '—', highlight: false },
-                  { label: 'Modalidade', value: modalidade, highlight: true },
-                  { label: 'Tipo de Bolsa', value: tipoBolsa, highlight: false },
-                  { label: 'Data de vigência', value: `${dataInicio ? formatMonthYear(dataInicio) : '—'} até ${dataTermino ? formatMonthYear(dataTermino) : '—'}`, highlight: false },
-                ].map((row, idx, arr) => (
+                {(isAux
+                  ? [
+                      { label: 'Beneficiário', value: bolsistaName || '—', highlight: false },
+                      { label: 'Modalidade', value: modalidade, highlight: true },
+                      { label: 'Nível do Auxílio', value: tipoBolsa, highlight: false },
+                      { label: 'Meses de pagamento', value: mesesPagamento.length > 0 ? `${mesesPagamento.length} ${mesesPagamento.length === 1 ? 'mês' : 'meses'}` : '—', highlight: false },
+                    ]
+                  : [
+                      { label: 'Bolsista', value: bolsistaName || '—', highlight: false },
+                      { label: 'Modalidade', value: modalidade, highlight: true },
+                      { label: 'Tipo de Bolsa', value: tipoBolsa, highlight: false },
+                      { label: 'Data de vigência', value: `${dataInicio ? formatMonthYear(dataInicio) : '—'} até ${dataTermino ? formatMonthYear(dataTermino) : '—'}`, highlight: false },
+                    ]
+                ).map((row, idx, arr) => (
                   <div key={row.label}>
                     <div className="flex items-center justify-between">
                       <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)' }}>
