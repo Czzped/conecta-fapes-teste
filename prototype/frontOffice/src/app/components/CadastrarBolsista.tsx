@@ -35,9 +35,6 @@ export function CadastrarBolsista({ onBack, tipo = 'bolsa' }: CadastrarBolsistaP
   const [quantidadeCotas, setQuantidadeCotas] = useState('1');
   const [dataInicio, setDataInicio] = useState('');
   const [dataTermino, setDataTermino] = useState('');
-  // Auxílio: a pessoa escolhe os meses de pagamento; as cotas saem dos meses.
-  const [mesesPagamento, setMesesPagamento] = useState<string[]>([]);
-  const [mesesPagamentoAno, setMesesPagamentoAno] = useState(2026);
   const [nomeAtividade, setNomeAtividade] = useState('');
   const [planoTrabalhoAtividades, setPlanoTrabalhoAtividades] = useState(['']);
   const [objetivos, setObjetivos] = useState('');
@@ -63,6 +60,15 @@ export function CadastrarBolsista({ onBack, tipo = 'bolsa' }: CadastrarBolsistaP
     : ['Iniciação Científica', 'Mestrado', 'Doutorado', 'Pós-Doutorado'];
 
   const coordenadorProjeto = 'Paulo Sergio dos Santos Junior';
+  // Auxílios de cota única (definido no cadastro do backoffice): pagos uma única vez,
+  // por isso o coordenador não informa período ao solicitar.
+  const auxiliosCotaUnica = ['AUX-EVT', 'AUX-INST'];
+  const isCotaUnica = isAux && auxiliosCotaUnica.includes(modalidade);
+  // Fim da vigência do projeto — o período do auxílio não pode ultrapassar.
+  const dataFimProjeto = '2026-12';
+  const periodoExcedeProjeto =
+    isAux && !isCotaUnica &&
+    ((!!dataInicio && dataInicio > dataFimProjeto) || (!!dataTermino && dataTermino > dataFimProjeto));
   const meses = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
@@ -108,6 +114,10 @@ export function CadastrarBolsista({ onBack, tipo = 'bolsa' }: CadastrarBolsistaP
   const handleCadastrar = () => {
     if (cpf && !isValidCPF(cpf)) {
       toast.error('CPF inválido. Verifique os dígitos informados.');
+      return;
+    }
+    if (periodoExcedeProjeto) {
+      toast.error('O período do auxílio não pode ultrapassar o fim do projeto.');
       return;
     }
     setIsConfirmModalOpen(true);
@@ -193,14 +203,6 @@ export function CadastrarBolsista({ onBack, tipo = 'bolsa' }: CadastrarBolsistaP
   const handleInicioAtividadesChange = (value: string) => {
     setDataInicio(value);
     updateFimAtividades(value, quantidadeCotas);
-  };
-
-  const toggleMesPagamento = (monthValue: string) => {
-    setMesesPagamento((prev) =>
-      prev.includes(monthValue)
-        ? prev.filter((mes) => mes !== monthValue)
-        : [...prev, monthValue].sort(),
-    );
   };
 
   const Required = () => <span style={{ color: 'var(--destructive-foreground)' }}>*</span>;
@@ -440,7 +442,7 @@ export function CadastrarBolsista({ onBack, tipo = 'bolsa' }: CadastrarBolsistaP
         }}
       >
         {isAux
-          ? 'Solicitar auxílio para pessoa que atua no projeto, escolhendo os meses de pagamento'
+          ? 'Solicitar auxílio para pessoa que atua no projeto, informando o período de pagamento'
           : 'Incluir nova pessoa para atuar no projeto ou atualizar bolsa de pessoa que já atua no projeto'}
       </p>
 
@@ -545,7 +547,8 @@ export function CadastrarBolsista({ onBack, tipo = 'bolsa' }: CadastrarBolsistaP
           )}
         </div>
 
-        {/* Orientador */}
+        {/* Orientador — não se aplica a Auxílio (não precisa do campo de coordenador) */}
+        {!isAux && (
         <div className="mb-6">
           <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
             Orientador <Required />
@@ -592,6 +595,7 @@ export function CadastrarBolsista({ onBack, tipo = 'bolsa' }: CadastrarBolsistaP
             Orientador é o coordenador do projeto
           </label>
         </div>
+        )}
 
         {/* Modalidade and Tipo de Bolsa */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -669,87 +673,44 @@ export function CadastrarBolsista({ onBack, tipo = 'bolsa' }: CadastrarBolsistaP
         </div>
 
         {isAux ? (
-          /* Auxílio: escolha dos meses de pagamento — cada mês gera uma cota */
+          isCotaUnica ? (
+            /* Auxílio de cota única: pagamento único, sem seleção de período */
+            <div className="mb-0" style={{ display: 'flex', alignItems: 'flex-start', gap: '0.625rem', padding: '0.875rem 1rem', backgroundColor: 'color-mix(in srgb, var(--primary) 6%, transparent)', border: '1px solid color-mix(in srgb, var(--primary) 20%, transparent)', borderRadius: 'var(--radius)' }}>
+              <Check size={16} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: 2 }} />
+              <span style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', lineHeight: 1.5, fontFamily: 'var(--font-family)' }}>
+                Auxílio de <strong style={{ fontWeight: 'var(--font-weight-semibold)' }}>cota única</strong> — pago uma única vez. Não é necessário informar o período de pagamento.
+              </span>
+            </div>
+          ) : (
+          /* Auxílio: período de pagamento (início e fim) — gera uma cota por mês do período */
           <div className="mb-0">
-            <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.375rem', fontFamily: 'var(--font-family)' }}>
-              Meses de Pagamento <Required />
-            </label>
             <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.75rem', fontFamily: 'var(--font-family)' }}>
-              Selecione os meses em que o auxílio será pago. Cada mês selecionado gera uma cota de pagamento.
+              Informe o período em que o auxílio será pago. É gerada uma cota de pagamento por mês do período. O período não pode ultrapassar o fim do projeto ({formatMonthYear(dataFimProjeto)}).
             </p>
-            <div style={{ padding: '1rem', backgroundColor: formFieldBackground, border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
-              {/* Navegação de ano */}
-              <div className="flex items-center justify-between mb-3">
-                <button
-                  type="button"
-                  onClick={() => setMesesPagamentoAno((ano) => ano - 1)}
-                  className="flex items-center justify-center"
-                  style={{ width: '28px', height: '28px', backgroundColor: 'transparent', color: 'var(--foreground)', border: 'none', cursor: 'pointer' }}
-                  aria-label="Ano anterior"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <span style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
-                  {mesesPagamentoAno}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setMesesPagamentoAno((ano) => ano + 1)}
-                  className="flex items-center justify-center"
-                  style={{ width: '28px', height: '28px', backgroundColor: 'transparent', color: 'var(--foreground)', border: 'none', cursor: 'pointer' }}
-                  aria-label="Próximo ano"
-                >
-                  <ChevronRight size={16} />
-                </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+                  Data de Início <Required />
+                </label>
+                <MonthPicker value={dataInicio} onChange={setDataInicio} placeholder="Selecione o mês de início" />
               </div>
-              {/* Grid de 12 meses (toggle) */}
-              <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
-                {mesesCurtos.map((mes, index) => {
-                  const monthValue = `${mesesPagamentoAno}-${String(index + 1).padStart(2, '0')}`;
-                  const isSelected = mesesPagamento.includes(monthValue);
-
-                  return (
-                    <button
-                      key={mes}
-                      type="button"
-                      onClick={() => toggleMesPagamento(monthValue)}
-                      className="flex items-center justify-center gap-1"
-                      style={{
-                        minWidth: 0,
-                        height: '36px',
-                        padding: '0 0.375rem',
-                        backgroundColor: isSelected ? 'var(--primary)' : 'transparent',
-                        color: isSelected ? 'var(--primary-foreground)' : 'var(--foreground)',
-                        border: `1px solid ${isSelected ? 'var(--primary)' : 'var(--border)'}`,
-                        borderRadius: 'var(--radius)',
-                        fontSize: 'var(--text-sm)',
-                        fontWeight: 'var(--font-weight-medium)',
-                        cursor: 'pointer',
-                        fontFamily: 'var(--font-family)',
-                      }}
-                    >
-                      {isSelected && <Check size={12} />}
-                      {mes}
-                    </button>
-                  );
-                })}
+              <div>
+                <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+                  Data de Fim <Required />
+                </label>
+                <MonthPicker value={dataTermino} onChange={setDataTermino} placeholder="Selecione o mês de fim" />
               </div>
             </div>
-            {/* Resumo das cotas geradas */}
-            {mesesPagamento.length > 0 && (
-              <div
-                className="flex items-center justify-between mt-3"
-                style={{ padding: '0.625rem 0.875rem', backgroundColor: 'color-mix(in srgb, var(--primary) 6%, transparent)', border: '1px solid color-mix(in srgb, var(--primary) 18%, transparent)', borderRadius: 'var(--radius)' }}
-              >
-                <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
-                  {mesesPagamento.length} {mesesPagamento.length === 1 ? 'mês selecionado' : 'meses selecionados'}
-                </span>
-                <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>
-                  {mesesPagamento.length} {mesesPagamento.length === 1 ? 'cota' : 'cotas'} de pagamento
+            {periodoExcedeProjeto && (
+              <div className="flex items-start gap-2 mt-3 px-3 py-2" style={{ backgroundColor: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius)' }}>
+                <AlertCircle size={15} style={{ color: '#ef4444', flexShrink: 0, marginTop: 1 }} />
+                <span style={{ color: '#ef4444', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
+                  O período informado ultrapassa o fim do projeto ({formatMonthYear(dataFimProjeto)}). Ajuste as datas.
                 </span>
               </div>
             )}
           </div>
+          )
         ) : (
           /* Bolsa: quantidade de cotas + início/fim das atividades */
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-0">
@@ -1092,7 +1053,9 @@ export function CadastrarBolsista({ onBack, tipo = 'bolsa' }: CadastrarBolsistaP
                       { label: 'Beneficiário', value: bolsistaName || '—', highlight: false },
                       { label: 'Modalidade', value: modalidade, highlight: true },
                       { label: 'Nível do Auxílio', value: tipoBolsa, highlight: false },
-                      { label: 'Meses de pagamento', value: mesesPagamento.length > 0 ? `${mesesPagamento.length} ${mesesPagamento.length === 1 ? 'mês' : 'meses'}` : '—', highlight: false },
+                      isCotaUnica
+                        ? { label: 'Pagamento', value: 'Cota única (pagamento único)', highlight: false }
+                        : { label: 'Período', value: `${dataInicio ? formatMonthYear(dataInicio) : '—'} até ${dataTermino ? formatMonthYear(dataTermino) : '—'}`, highlight: false },
                     ]
                   : [
                       { label: 'Bolsista', value: bolsistaName || '—', highlight: false },
