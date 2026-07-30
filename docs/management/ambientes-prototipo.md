@@ -54,9 +54,10 @@ mergeado.
    (acrescente `?template=promocao-estavel.md` na URL do PR).
 2. **Coloque a `[FLAG]` no título** (`[FEAT]`, `[FIX]`, `[REFACTOR]`…), como em qualquer PR
    do projeto.
-3. **Gere a auditoria e cole no corpo do PR.** Rode `/auditar-promocao` no Claude Code:
-   ele lê o diff e descreve telas adicionadas, alteradas e removidas, além dos fluxos
-   afetados. É o que permite revisar sem precisar ler código.
+3. **Gere a auditoria e cole no corpo do PR.** Rode `/promover-para-estavel` no Claude
+   Code: ele confere as pré-condições, pergunta o que mudou em linguagem de produto,
+   monta os **links diretos das telas alteradas** e escreve o corpo do PR. Os links são o
+   que permite aprovar sem abrir o código.
 4. **Vincule a issue de planejamento**, se houver.
 5. **Consiga 2 aprovações.** Este é o gate.
 

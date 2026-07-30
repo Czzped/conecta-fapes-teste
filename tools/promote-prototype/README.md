@@ -18,7 +18,7 @@ onde vai ao PR aprovar. Por isso ele nasce na **abertura** do PR, não no merge:
 | `closed` sem merge | Move o card para **Desaprovado** |
 
 O corpo do card traz o link do **protótipo** (para ver a alteração) e a **auditoria**
-gerada com `/auditar-promocao`.
+gerada com `/promover-para-estavel`.
 
 ### Como o card é reencontrado
 
