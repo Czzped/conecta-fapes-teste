@@ -124,8 +124,8 @@ obrigatório). Isso não é possível aqui: em repositório **privado**, "requir
 de Environment exige **GitHub Enterprise**, e o plano da organização é **Team**. O que o
 Team oferece em Environment são segredos e política de branch — não aprovação.
 
-Por isso o único ponto onde "2 pessoas" é tecnicamente imposto é o Pull Request. Em
-emergência não há bypass: seria preciso desligar a proteção temporariamente.
+Por isso o único ponto onde "2 pessoas" é tecnicamente imposto é o Pull Request — e, para
+administradores, esse ponto é contornável (ver acima).
 
 ## 7. Como o deploy funciona
 

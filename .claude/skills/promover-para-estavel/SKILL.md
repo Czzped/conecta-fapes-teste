@@ -174,8 +174,9 @@ Depois de abrir, confirme e informe:
 
 1. O **card** foi criado no Project 43 em `In Validation`, na sprint corrente e no squad
    Design — o link aparece num comentário do PR.
-2. São necessárias **2 aprovações** de outras pessoas. Você não pode aprovar o próprio PR,
-   e nem quem tem admin passa por cima.
+2. São necessárias **2 aprovações** de outras pessoas — você não pode aprovar o próprio PR.
+   Quem tem admin no repositório consegue burlar, mas isso é válvula de emergência: usar
+   como atalho anula o motivo de o estável ser confiável.
 3. Ao ser aprovado e mergeado: o **estável publica** e o card vai para
    **Pronto para desenvolvimento**.
 4. Se for recusado (PR fechado sem merge), o card vai para **Desaprovado** e o protótipo
