@@ -105,9 +105,15 @@ automação em [`tools/project43-automation`](../../tools/project43-automation) 
 - **Sem push direto.** Entrada apenas por Pull Request.
 - **2 aprovações obrigatórias.** O autor não pode aprovar o próprio PR, então são sempre
   duas outras pessoas com acesso de escrita.
-- **Vale para administradores.** `enforce_admins` está ligado: ninguém burla, nem quem
-  tem admin. Uma tentativa de merge sem as aprovações é recusada com
+- **Administradores podem burlar.** `enforce_admins` está **desligado**: quem tem admin
+  consegue mergear sem as duas aprovações, pela opção de *bypass* do GitHub. É a válvula
+  de escape para emergências — sem ela, destravar exigiria desligar a proteção inteira.
+  Para quem não é admin a regra é absoluta: o merge é recusado com
   `405: At least 2 approving reviews are required by reviewers with write access`.
+
+    > O bypass é exceção, não atalho: cada uso dele é uma promoção que ninguém revisou —
+    > exatamente o que a separação de ambientes existe para evitar.
+
 - Sem force-push e sem deleção da branch.
 - **Quem faz prototipagem trabalha na `prototipagem`**, não na `main`.
 
