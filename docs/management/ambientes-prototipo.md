@@ -23,7 +23,7 @@ Agora são dois, com propósitos distintos:
 |---|---|
 | **Prototipagem** | Trabalha na branch `prototipagem`. Quando uma tela fica pronta, abre o PR de promoção com a auditoria |
 | **Quem aprova** (2 pessoas) | Avalia pelo card, confere no ambiente de protótipo e aprova no Pull Request |
-| **Desenvolvimento** | Consome o card em *Pronto para desenvolvimento* e implementa olhando o **estável** |
+| **Desenvolvimento** | Implementa olhando o **estável**, abrindo a própria demanda no repositório de produto |
 
 ## 3. O fluxo
 
@@ -38,14 +38,13 @@ prototipagem  ──(publica automático)──▶  PROTÓTIPO
       │  2 aprovações no PR  ──▶  merge
       ▼
     main  ──(publica automático)──▶  ESTÁVEL
-                                    + CARD → "Pronto para desenvolvimento"
+                                    + CARD → "Done" (issue fechada)
 
 PR fechado sem merge  ──▶  CARD → "Desaprovado"
 ```
 
 O **card é a peça central**: nasce quando a promoção é proposta e é dele que a equipe
-parte para avaliar. Só chega em *Pronto para desenvolvimento* depois de aprovado e
-mergeado.
+parte para avaliar. Só é concluído depois de aprovado e mergeado.
 
 ## 4. Como promover uma tela
 
@@ -54,9 +53,10 @@ mergeado.
    (acrescente `?template=promocao-estavel.md` na URL do PR).
 2. **Coloque a `[FLAG]` no título** (`[FEAT]`, `[FIX]`, `[REFACTOR]`…), como em qualquer PR
    do projeto.
-3. **Gere a auditoria e cole no corpo do PR.** Rode `/auditar-promocao` no Claude Code:
-   ele lê o diff e descreve telas adicionadas, alteradas e removidas, além dos fluxos
-   afetados. É o que permite revisar sem precisar ler código.
+3. **Gere a auditoria e cole no corpo do PR.** Rode `/promover-para-estavel` no Claude
+   Code: ele confere as pré-condições, pergunta o que mudou em linguagem de produto,
+   monta os **links diretos das telas alteradas** e escreve o corpo do PR. Os links são o
+   que permite aprovar sem abrir o código.
 4. **Vincule a issue de planejamento**, se houver.
 5. **Consiga 2 aprovações.** Este é o gate.
 
@@ -88,16 +88,18 @@ Um comentário no PR aponta para o card, e vice-versa.
 | Evento no PR | Card |
 |---|---|
 | aberto / reaberto | criado em **In Validation** |
-| aprovado e mergeado | **Pronto para desenvolvimento** + link do estável |
+| aprovado e mergeado | **Done**, com o link do estável, e a **issue é fechada** |
 | fechado sem merge | **Desaprovado** |
 
-Depois de *Pronto para desenvolvimento*, o card entra no fluxo normal do time: quem pega
-move para *In Progress* — o que dispara a criação da branch no repositório de produto pela
-automação em [`tools/project43-automation`](../../tools/project43-automation) — e segue até
-*Done* conforme a implementação avança.
+O card registra a **promoção**, não a implementação: quando a tela chega ao estável, o
+trabalho que ele acompanhava terminou. Por isso vai para *Done* e a issue é fechada.
 
-> O card representa "esta tela está pronta **para ser desenvolvida**". Ele não é *Done*
-> quando a promoção é aprovada; é *Done* quando a tela existe no produto.
+> Implementar a tela no produto é uma demanda própria, aberta no repositório indicado no
+> campo `Repositório` do card. Isso mantém o board honesto: um card de promoção parado em
+> "pronto para desenvolvimento" por semanas diria que a promoção está pendente, quando na
+> verdade o pendente é outro trabalho, de outro time.
+
+Fechar a issue **não remove** o card do Project 43 — ele permanece como histórico.
 
 ## 6. As regras da `main`
 
@@ -123,8 +125,8 @@ obrigatório). Isso não é possível aqui: em repositório **privado**, "requir
 de Environment exige **GitHub Enterprise**, e o plano da organização é **Team**. O que o
 Team oferece em Environment são segredos e política de branch — não aprovação.
 
-Por isso o único ponto onde "2 pessoas" é tecnicamente imposto é o Pull Request. Em
-emergência não há bypass: seria preciso desligar a proteção temporariamente.
+Por isso o único ponto onde "2 pessoas" é tecnicamente imposto é o Pull Request — e, para
+administradores, esse ponto é contornável (ver acima).
 
 ## 7. Como o deploy funciona
 

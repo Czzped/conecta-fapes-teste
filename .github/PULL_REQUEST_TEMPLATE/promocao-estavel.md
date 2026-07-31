@@ -17,16 +17,16 @@ App(s) promovido(s):
 
 ## Auditoria das mudanças (gerada com o Claude)
 <!--
-  Rode `/auditar-promocao` no Claude Code para gerar este relatório a partir do
-  diff (origin/main..HEAD) e cole o resultado abaixo. Inclua telas adicionadas,
-  alteradas e removidas, fluxos afetados e screenshots.
+  Rode `/promover-para-estavel` no Claude Code: ele confere se está tudo publicado,
+  pergunta o que mudou, monta os LINKS DIRETOS das telas alteradas e preenche isto.
+  Os links são o que permite aprovar sem abrir o código.
 -->
 
 _(cole aqui o relatório de auditoria)_
 
 ## Checklist de promoção
 - [ ] A tela está finalizada e validada (não é mais "em prototipagem").
-- [ ] Auditoria acima preenchida (telas/fluxos alterados + screenshots).
+- [ ] Auditoria acima preenchida, **com os links diretos das telas alteradas**.
 - [ ] Issue de planejamento vinculada.
 - [ ] **2 aprovações** neste PR (o gate de aprovação da promoção é aqui).
 
@@ -41,6 +41,6 @@ _(cole aqui o relatório de auditoria)_
 > O merge dispara **Estável · front-office** / **Estável · backoffice** (só o do app que
 > mudou), publicando em `frontoffice-conecta-estavel.vercel.app` /
 > `backoffice-conecta-estavel.vercel.app`, e move o card para
-> **Pronto para desenvolvimento**. Fechar sem merge move o card para **Desaprovado**.
+> **Done** e fecha a issue. Fechar sem merge move o card para **Desaprovado**.
 >
 > Fluxo completo: [docs/management/ambientes-prototipo.md](../../docs/management/ambientes-prototipo.md)

@@ -7,8 +7,8 @@
 //
 //   PR aberto/reaberto  -> cria a issue, põe no Project 43 e deixa em
 //                          "In Validation"; comenta no PR o link do card.
-//   PR mergeado         -> move para "Pronto para desenvolvimento" e registra
-//                          o link do ambiente estável.
+//   PR mergeado         -> move para "Done", registra o link do ambiente estável
+//                          e fecha a issue.
 //   PR fechado sem merge-> move para "Desaprovado".
 //
 // A ligação card <-> PR é guardada num comentário-marcador no próprio PR
@@ -28,7 +28,10 @@ const PROJECT_NUMBER = 43;
 
 // Colunas usadas no ciclo de vida (resolvidas por nome em tempo de execução).
 const COLUNA_EM_REVISAO = "In Validation";
-const COLUNA_APROVADO = "Pronto para desenvolvimento";
+// Promoção aprovada e mergeada = trabalho concluído: o card vai para Done e a issue é
+// fechada. O card registra a PROMOÇÃO, não um pedido de implementação — quem for
+// implementar no repositório de produto abre a própria demanda.
+const COLUNA_APROVADO = "Done";
 const COLUNA_REPROVADO = "Desaprovado";
 const AREA = "Frontend";
 const SQUAD = "Design";
@@ -208,7 +211,7 @@ async function definirSelecao(projetoId, itemId, campoId, opcaoId) {
   );
 }
 
-async function moverColuna(nomeColuna, complemento) {
+async function moverColuna(nomeColuna, complemento, fechar = false) {
   const numeroIssue = await cardExistente();
   if (!numeroIssue) {
     console.log("Nenhum card vinculado a este PR (marcador ausente). Nada a mover.");
@@ -234,6 +237,17 @@ async function moverColuna(nomeColuna, complemento) {
   if (complemento) {
     await rest("POST", `/repos/${owner}/${nome}/issues/${numeroIssue}/comments`, { body: complemento });
   }
+
+  // Promoção concluída: fecha a issue, para não ficar aberta indefinidamente. O card
+  // segue no board como histórico — fechar a issue não o remove do Project.
+  if (fechar) {
+    await rest("PATCH", `/repos/${owner}/${nome}/issues/${numeroIssue}`, {
+      state: "closed",
+      state_reason: "completed",
+    });
+    console.log(`Issue #${numeroIssue} fechada.`);
+  }
+
   console.log(`Card #${numeroIssue} atualizado.`);
 }
 
@@ -271,7 +285,7 @@ async function criarCard() {
     `2. Confira a auditoria abaixo e o diff no ${prUrl || "Pull Request"}.`,
     "3. **A aprovação acontece no Pull Request** — são necessárias 2 aprovações.",
     "",
-    "Ao ser aprovado e mergeado, este card vai para **Pronto para desenvolvimento** e o",
+    "Ao ser aprovado e mergeado, este card é concluído (**Done**, issue fechada) e o",
     "ambiente estável é publicado. Se for recusado, o card vai para **Desaprovado**.",
     "",
     "## Auditoria das mudanças",
@@ -359,6 +373,7 @@ async function main() {
     await moverColuna(
       COLUNA_APROVADO,
       ["✅ Promoção **aprovada e publicada**.", "", "## Ambiente estável (referência para implementar)", links].join("\n"),
+      true, // fecha a issue: a promoção terminou
     );
     return;
   }
