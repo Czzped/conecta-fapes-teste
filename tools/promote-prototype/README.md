@@ -14,7 +14,7 @@ onde vai ao PR aprovar. Por isso ele nasce na **abertura** do PR, não no merge:
 | Evento do PR | O que o script faz |
 |---|---|
 | `opened` / `reopened` | Cria a issue **"[Promoção] …"**, adiciona ao **Project 43** em `Status = In Validation`, preenche `Area=Frontend` e `Repositório` (repo de produto alvo), e comenta no PR o link do card |
-| `closed` + mergeado | Move o card para **Pronto para desenvolvimento** e registra o link do ambiente **estável** |
+| `closed` + mergeado | Move o card para **Done**, registra o link do ambiente **estável** e **fecha a issue** |
 | `closed` sem merge | Move o card para **Desaprovado** |
 
 O corpo do card traz o link do **protótipo** (para ver a alteração) e a **auditoria**
@@ -42,7 +42,7 @@ O dry-run imprime as colunas e opções resolvidas sem alterar o board. Para dry
 CI, defina a *variable* `PROMOCAO_DRY_RUN=true`.
 
 As constantes no topo do script definem as colunas usadas (`In Validation`,
-`Pronto para desenvolvimento`, `Desaprovado`), a `Area` e o mapa de apps → repo de
+`Done`, `Desaprovado`), a `Area` e o mapa de apps → repo de
 produto e URLs dos dois ambientes.
 
 ### Pré-requisitos

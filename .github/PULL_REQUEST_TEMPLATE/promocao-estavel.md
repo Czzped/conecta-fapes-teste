@@ -41,6 +41,6 @@ _(cole aqui o relatório de auditoria)_
 > O merge dispara **Estável · front-office** / **Estável · backoffice** (só o do app que
 > mudou), publicando em `frontoffice-conecta-estavel.vercel.app` /
 > `backoffice-conecta-estavel.vercel.app`, e move o card para
-> **Pronto para desenvolvimento**. Fechar sem merge move o card para **Desaprovado**.
+> **Done** e fecha a issue. Fechar sem merge move o card para **Desaprovado**.
 >
 > Fluxo completo: [docs/management/ambientes-prototipo.md](../../docs/management/ambientes-prototipo.md)

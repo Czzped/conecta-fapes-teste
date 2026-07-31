@@ -177,8 +177,8 @@ Depois de abrir, confirme e informe:
 2. São necessárias **2 aprovações** de outras pessoas — você não pode aprovar o próprio PR.
    Quem tem admin no repositório consegue burlar, mas isso é válvula de emergência: usar
    como atalho anula o motivo de o estável ser confiável.
-3. Ao ser aprovado e mergeado: o **estável publica** e o card vai para
-   **Pronto para desenvolvimento**.
+3. Ao ser aprovado e mergeado: o **estável publica**, o card vai para **Done** e a
+   issue é fechada — a promoção terminou.
 4. Se for recusado (PR fechado sem merge), o card vai para **Desaprovado** e o protótipo
    segue como está — nada se perde.
 
