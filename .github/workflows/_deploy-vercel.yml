@@ -98,5 +98,22 @@ jobs:
       - name: Build production bundle
         run: vercel build --prod --token="$VERCEL_TOKEN"
 
+      # Publica de FORA do repositorio, de proposito.
+      #
+      # A Vercel identifica o autor do commit e recusa o deployment se essa pessoa nao
+      # tiver assento no time, deixando-o em BLOCKED (`TEAM_ACCESS_REQUIRED`) - a CLI
+      # entao fica esperando indefinidamente. Aconteceu em 04/08/2026 com um commit da
+      # equipe de design, travando os dois ambientes.
+      #
+      # Adicionar todo mundo aos times exigiria plano Pro nas duas contas. Como o build
+      # ja esta pronto em `.vercel/output`, o deploy nao precisa do contexto Git:
+      # copiando para um diretorio sem `.git`, a Vercel atribui o deployment ao dono do
+      # token, que e membro. Assim qualquer pessoa pode commitar sem travar a publicacao.
       - name: Deploy to Vercel production
-        run: vercel deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN"
+        run: |
+          area="$RUNNER_TEMP/deploy-vercel"
+          rm -rf "$area" && mkdir -p "$area"
+          cp -r .vercel "$area/"
+          cd "$area"
+          # `--yes` evita qualquer pergunta interativa, ja que o diretorio e novo.
+          vercel deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN"
