@@ -1,0 +1,64 @@
+name: Card de promoção → Project 43
+
+# Mantém o card do Project 43 em sincronia com o Pull Request de promoção
+# (`prototipagem` -> `main`), para que o CARD seja a peça central do fluxo: é nele
+# que a equipe vê a alteração proposta e de onde vai ao PR aprovar.
+#
+#   PR aberto/reaberto   -> cria o card em "In Validation"
+#   PR mergeado          -> move para "Pronto para desenvolvimento" (+ link do estável)
+#   PR fechado sem merge -> move para "Desaprovado"
+#
+# Segue a convencao que a organizacao ja usa em `tools/project43-automation`
+# (`pr-card-movement`), onde eventos de PR movem o card. Aquele worker localiza o
+# card pelo numero na branch (`feature/123-...`); aqui a branch de promocao e
+# sempre `prototipagem`, sem numero, entao a ligacao card <-> PR fica num
+# comentario-marcador no proprio PR.
+#
+# Roda em runner self-hosted (nao consome a cota de Actions, esgotada em jul/2026).
+# CHAVE DE TROCA: criar a variavel RUNNER_LABELS com `["ubuntu-latest"]` (JSON)
+# devolve o job ao runner hospedado, sem alterar codigo.
+
+on:
+  pull_request:
+    types: [opened, reopened, closed]
+    branches:
+      - main
+    paths:
+      - "prototype/**"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  sincronizar-card:
+    runs-on: ${{ fromJSON(vars.RUNNER_LABELS || '["self-hosted","linux","x64"]') }}
+    timeout-minutes: 10
+    steps:
+      - name: Checkout (apenas a ferramenta)
+        uses: actions/checkout@v5
+        with:
+          sparse-checkout: tools/promote-prototype
+          sparse-checkout-cone-mode: true
+
+      # Necessario: o runner self-hosted NAO traz Node instalado (o hospedado traz).
+      # Sem este passo o job falha com `node: command not found`.
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      - name: Sincronizar o card do Project 43
+        env:
+          # PROJECTS_PAT: o GITHUB_TOKEN padrao nao alcanca projects da organizacao.
+          GH_TOKEN: ${{ secrets.PROJECTS_PAT }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_ACTION: ${{ github.event.action }}
+          PR_MERGED: ${{ github.event.pull_request.merged }}
+          # Defina a variavel PROMOCAO_DRY_RUN=true para ensaiar sem alterar o board.
+          DRY_RUN: ${{ vars.PROMOCAO_DRY_RUN || 'false' }}
+        run: node tools/promote-prototype/sync-card-promocao.mjs

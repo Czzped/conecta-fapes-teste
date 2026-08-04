@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, Settings, Inbox, Landmark, Building2, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 import conectaSymbol from 'figma:asset/db135b6708f6cc7f72f27c6a31dd02aa5500d030.png';
@@ -23,6 +24,7 @@ import { AcaoTransversalFinanceiro } from './AcaoTransversalFinanceiro';
 import { RegrasAcaoTransversal } from './RegrasAcaoTransversal';
 import { Iniciativas } from './Iniciativas';
 import { ThemeProvider } from '../theme/ThemeContext';
+import { PAGE_TO_PATH, DEFAULT_PAGE, pathToPage, detalhesIdFromPath } from '../routing/paths';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -82,9 +84,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
-  const [activePage, setActivePage] = useState<ActivePage>('parceria');
+  // Roteamento por URL: `activePage` deriva do caminho e `setActivePage` navega.
+  // Assim os ~40 pontos de navegação existentes seguem inalterados.
+  const location = useLocation();
+  const navigate = useNavigate();
+  const detalhesId = detalhesIdFromPath(location.pathname);
+  const activePage = (detalhesId ? 'detalhes' : pathToPage(location.pathname) ?? DEFAULT_PAGE) as ActivePage;
+  const setActivePage = (page: ActivePage) => {
+    // 'detalhes' depende do id do pagamento: quem navega é setSelectedPagamento.
+    if (page === 'detalhes') return;
+    navigate(PAGE_TO_PATH[page] ?? '/');
+  };
   const [pageVersion, setPageVersion] = useState(0);
-  const [selectedPagamento, setSelectedPagamento] = useState<PagamentoCard | null>(null);
   
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window === 'undefined') return 'dark';
@@ -125,6 +136,37 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [statusAvaliacao, setStatusAvaliacao] = useState<'validado' | 'revisar' | 'reprovado' | null>(null);
   const [motivoRevisao, setMotivoRevisao] = useState('');
   const [justificativa, setJustificativa] = useState('');
+  // Mock data para os cards de pagamento
+  const [pagamentosData, setPagamentosData] = useState<PagamentoCard[]>([
+    { id: 1, tipo: 'Boleto', valor: 'R$ 3.456,70', data: '27/02/2026 - 09:35', categoria: 'Material Permanente', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Em Validação' },
+    { id: 2, tipo: 'Pix', valor: 'R$ 4.567,90', data: '25/02/2026 - 10:05', categoria: 'Material de Consumo', variante: 'invoice', projeto: 'Outro Projeto', status: 'Em Validação' },
+    { id: 3, tipo: 'Pix', valor: 'R$ 789,00', data: '23/02/2026 - 12:50', categoria: 'Passagem', variante: 'passagem', projeto: 'Mais um Projeto', status: 'Em Validação' },
+    { id: 4, tipo: 'Boleto', valor: 'R$ 2.100,00', data: '22/02/2026 - 11:20', categoria: 'Material de Consumo', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Revisar' },
+    { id: 5, tipo: 'Boleto', valor: 'R$ 1.890,50', data: '20/02/2026 - 11:45', categoria: 'Passagem', variante: 'passagem', projeto: 'Outro Projeto', status: 'Em Validação' },
+    { id: 6, tipo: 'Boleto', valor: 'R$ 2.345,60', data: '19/02/2026 - 17:25', categoria: 'Pessoa Jurídica', variante: 'nota-fiscal', projeto: 'Mais um Projeto', status: 'Reprovado' },
+    { id: 7, tipo: 'Pix', valor: 'R$ 567,80', data: '18/02/2026 - 16:45', categoria: 'Diária', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Em Validação' },
+    { id: 8, tipo: 'Pix', valor: 'R$ 2.567,30', data: '15/02/2026 - 16:00', categoria: 'Material Permanente', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Contestada' },
+    { id: 9, tipo: 'Pix', valor: 'R$ 5.234,20', data: '14/02/2026 - 08:40', categoria: 'Material de Consumo', variante: 'invoice', projeto: 'Outro Projeto', status: 'Em Validação' },
+    { id: 10, tipo: 'Boleto', valor: 'R$ 3.690,00', data: '12/02/2026 - 08:15', categoria: 'Passagem', variante: 'passagem', projeto: 'Mais um Projeto', status: 'Em Validação' },
+  ]);
+
+  // Pagamento da tela de detalhes: derivado do id na URL (/financeira/:id), o que
+  // faz deep-link e refresh funcionarem. `setSelectedPagamento` passa a navegar.
+  // Declarado aqui (antes dos efeitos que o consomem) para evitar uso antes da
+  // inicialização.
+  const selectedPagamento = detalhesId
+    ? pagamentosData.find((p) => String(p.id) === detalhesId) ?? null
+    : null;
+  const setSelectedPagamento = (pagamento: PagamentoCard | null) => {
+    if (pagamento) navigate(`/financeira/${pagamento.id}`);
+    // null: a saída da tela já é feita por setActivePage('financeira')
+  };
+
+  // Id inexistente na URL volta para a lista.
+  useEffect(() => {
+    if (detalhesId && !selectedPagamento) navigate('/financeira', { replace: true });
+  }, [detalhesId, selectedPagamento, navigate]);
+
   // Pré-preenche a Avaliação Fapes quando a prestação já está em Revisar
   React.useEffect(() => {
     if (selectedPagamento?.status === 'Revisar') {
@@ -191,21 +233,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const statusOptions: StatusFilter[] = ['Todos', 'Pendente', 'Em Validação', 'Validado', 'Revisar', 'Reprovado', 'Contestada'];
   const categoriaOptions: CategoriaFilter[] = ['Todos', 'Material Permanente', 'Material de Consumo', 'Passagem', 'Diária', 'Pessoa Física', 'Pessoa Jurídica'];
   const projetoOptions: ProjetoFilter[] = ['Todos', 'Conecta Fapes', 'Outro Projeto Exemplo', 'Mais um Projeto Exemplo'];
-  const isReadyForDevPage = activePage === 'parceria' || activePage === 'programa';
-
-  // Mock data para os cards de pagamento
-  const [pagamentosData, setPagamentosData] = useState<PagamentoCard[]>([
-    { id: 1, tipo: 'Boleto', valor: 'R$ 3.456,70', data: '27/02/2026 - 09:35', categoria: 'Material Permanente', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Em Validação' },
-    { id: 2, tipo: 'Pix', valor: 'R$ 4.567,90', data: '25/02/2026 - 10:05', categoria: 'Material de Consumo', variante: 'invoice', projeto: 'Outro Projeto', status: 'Em Validação' },
-    { id: 3, tipo: 'Pix', valor: 'R$ 789,00', data: '23/02/2026 - 12:50', categoria: 'Passagem', variante: 'passagem', projeto: 'Mais um Projeto', status: 'Em Validação' },
-    { id: 4, tipo: 'Boleto', valor: 'R$ 2.100,00', data: '22/02/2026 - 11:20', categoria: 'Material de Consumo', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Revisar' },
-    { id: 5, tipo: 'Boleto', valor: 'R$ 1.890,50', data: '20/02/2026 - 11:45', categoria: 'Passagem', variante: 'passagem', projeto: 'Outro Projeto', status: 'Em Validação' },
-    { id: 6, tipo: 'Boleto', valor: 'R$ 2.345,60', data: '19/02/2026 - 17:25', categoria: 'Pessoa Jurídica', variante: 'nota-fiscal', projeto: 'Mais um Projeto', status: 'Reprovado' },
-    { id: 7, tipo: 'Pix', valor: 'R$ 567,80', data: '18/02/2026 - 16:45', categoria: 'Diária', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Em Validação' },
-    { id: 8, tipo: 'Pix', valor: 'R$ 2.567,30', data: '15/02/2026 - 16:00', categoria: 'Material Permanente', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Contestada' },
-    { id: 9, tipo: 'Pix', valor: 'R$ 5.234,20', data: '14/02/2026 - 08:40', categoria: 'Material de Consumo', variante: 'invoice', projeto: 'Outro Projeto', status: 'Em Validação' },
-    { id: 10, tipo: 'Boleto', valor: 'R$ 3.690,00', data: '12/02/2026 - 08:15', categoria: 'Passagem', variante: 'passagem', projeto: 'Mais um Projeto', status: 'Em Validação' },
-  ]);
 
   const getStatusColor = (status: StatusFilter): string => {
     switch (status) {
@@ -877,31 +904,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           </div>
         </div>
       </header>
-
-      <div
-        aria-label={isReadyForDevPage ? 'Pronto para Dev' : 'Quase Pronto Para Dev'}
-        style={{
-          position: 'fixed',
-          top: '82px',
-          right: '32px',
-          zIndex: 45,
-          pointerEvents: 'none',
-          padding: '7px 12px',
-          borderRadius: '999px',
-          border: isReadyForDevPage ? '1px solid rgba(34,197,94,0.45)' : '1px solid rgba(251,191,36,0.45)',
-          backgroundColor: isReadyForDevPage ? 'rgba(34,197,94,0.16)' : 'rgba(251,191,36,0.16)',
-          color: isReadyForDevPage ? '#22c55e' : '#fbbf24',
-          fontFamily: 'var(--font-family)',
-          fontSize: 'var(--text-xs)',
-          fontWeight: 'var(--font-weight-medium)',
-          lineHeight: 1,
-          boxShadow: isLight ? '0 8px 20px rgba(0,0,0,0.08)' : '0 8px 20px rgba(0,0,0,0.25)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
-        }}
-      >
-        {isReadyForDevPage ? 'Pronto para Dev' : 'Quase Pronto Para Dev'}
-      </div>
 
       {/* Modal de Acessibilidade */}
       {showAccessibilityModal && (

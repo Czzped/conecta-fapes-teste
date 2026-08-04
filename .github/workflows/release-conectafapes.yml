@@ -44,7 +44,14 @@ env:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    # Runner self-hosted da organizacao: nao consome a cota de Actions (esgotada
+    # em jul/2026). Dependencias validadas em execucao real neste runner:
+    # checkout+sparse-checkout (git 2.54), setup-node, `npm install -g` e egress
+    # para api.github.com, registry.npmjs.org e gitlab.com.
+    #
+    # CHAVE DE TROCA: criar a variavel RUNNER_LABELS com `["ubuntu-latest"]` (JSON)
+    # devolve todos estes workflows ao runner hospedado, sem alterar codigo.
+    runs-on: ${{ fromJSON(vars.RUNNER_LABELS || '["self-hosted","linux","x64"]') }}
     defaults:
       run:
         working-directory: tools/release
@@ -56,6 +63,23 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      - name: Garantir o gh CLI
+        # O runner self-hosted nao traz o `gh`, e o release.mjs depende dele.
+        # Instala sem sudo, no diretorio temporario do job, e so quando ausente
+        # (no runner hospedado o `gh` ja vem instalado).
+        run: |
+          if command -v gh >/dev/null 2>&1; then
+            echo "gh ja presente: $(gh --version | head -1)"
+            exit 0
+          fi
+          versao=2.96.0
+          url="https://github.com/cli/cli/releases/download/v${versao}/gh_${versao}_linux_amd64.tar.gz"
+          curl -fsSL "$url" -o "$RUNNER_TEMP/gh.tar.gz"
+          mkdir -p "$RUNNER_TEMP/gh"
+          tar -xzf "$RUNNER_TEMP/gh.tar.gz" -C "$RUNNER_TEMP/gh" --strip-components=1
+          echo "$RUNNER_TEMP/gh/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/gh/bin/gh" --version | head -1
 
       - name: Montar argumentos do release
         id: args
