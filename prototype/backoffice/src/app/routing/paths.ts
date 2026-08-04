@@ -45,3 +45,4 @@ export function detalhesIdFromPath(pathname: string): string | null {
   const m = pathname.match(/^\/financeira\/([^/]+)\/?$/);
   return m ? m[1] : null;
 }
+
