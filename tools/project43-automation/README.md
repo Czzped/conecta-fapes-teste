@@ -45,13 +45,20 @@ aplicadas de forma **idempotente** — branch/PR/tag ja existentes retornam
 
 ### Repositorios suportados
 
-| Repositorio | Producao | Integracao |
-| --- | --- | --- |
-| `leds-conectafapes-backend-admin` | `main` | `develop` |
-| `leds-conectafapes-frontend-backoffice` | `main` | `develop` |
-| `leds-conectafapes-frontoffice-backend` | `main` | `develop` |
-| `leds-conectafapes-frontoffice-frontend` | `main` | `develop` |
-| `leds-conectafapes-prestacao-de-contas` | `master` | `develop` |
+| Repositorio | Producao | Homologacao | Integracao |
+| --- | --- | --- | --- |
+| `leds-conectafapes-backend-admin` | `main` | `homol` | `develop` |
+| `leds-conectafapes-frontend-backoffice` | `main` | `homol` | `develop` |
+| `leds-conectafapes-frontoffice-backend` | `main` | `homol` | `develop` |
+| `leds-conectafapes-frontoffice-frontend` | `main` | `homol` | `develop` |
+| `leds-conectafapes-prestacao-de-contas` | `master` | `homol` | `develop` |
+| `leds-conectafapes-authentication` | `main` | `homol` | `develop` |
+| `leds-conectafapes-backend-pagamento-bolsistas` | `main` | `homol` | `develop` |
+| `conectafapes-project` | `main` | — | `develop` |
+
+`conectafapes-project` nao tem branch de homologacao: hospeda documentacao e
+automacoes, e nao e publicado no cluster da Prodest. Repos sem homologacao
+mantem o fluxo `develop` -> producao.
 
 ### Rotas (todas `POST`)
 
@@ -63,9 +70,12 @@ assinatura `x-hub-signature-256` e verificada.
 
 Regras validadas:
 
-- PR para producao (`main`/`master`) so pode vir de `release/*` ou `hotfix/*`;
-- PR para `develop` deve vir de um branch de trabalho permitido e nunca de um
-  branch protegido (`main`/`master`/`develop`).
+- PR para producao (`main`/`master`) so pode vir de `release/*` ou `hotfix/*` —
+  inclusive `homol` e recusada, porque e a branch de release que carrega a versao;
+- PR para homologacao (`homol`) so pode vir de `release/*`, `hotfix/*` ou de
+  producao (back-merge);
+- PR para `develop` deve vir de um branch de trabalho permitido, ou ser
+  back-merge de producao/`homol`. Nunca de `develop` para `develop`.
 
 Resposta: `{ "validation": { "valid": true|false, "reason": "...",
 "checkName": "git-flow/pr-policy" }, "repository": "..." }`. Quando o PR tem
@@ -74,7 +84,13 @@ Resposta: `{ "validation": { "valid": true|false, "reason": "...",
 
 Quando um PR de `release/*` ou `hotfix/*` e mergeado em producao, o mesmo
 webhook executa a etapa pos-merge: cria a tag no commit de merge. Para hotfix,
-tambem abre os PRs de retorno para `develop` e para qualquer `release/*` aberta.
+tambem abre os PRs de retorno para `homol`, `develop` e para qualquer
+`release/*` aberta. Para release, abre o back-merge de producao para `homol` e
+`develop`.
+
+O retorno para `homol` e o que impede o hotfix de se perder: sem ele a
+correcao fica so em producao, e a proxima release — cortada de `develop` e
+validada em `homol` — a desfaz.
 
 #### `POST /git-flow/pull-request`
 

@@ -31,6 +31,76 @@ test("accepts production PR from release/ and hotfix/ (incl. master repos)", () 
   assert.equal(hotfixToMaster.valid, true);
 });
 
+test("accepts homologation PR from release/ and hotfix/", () => {
+  const release = validatePullRequest(config, {
+    baseBranch: "homol",
+    headBranch: "release/v1.2.0",
+  });
+  const hotfix = validatePullRequest(config, {
+    baseBranch: "homol",
+    headBranch: "hotfix/v1.2.1",
+  });
+
+  assert.equal(release.valid, true);
+  assert.equal(release.reason, "ok_homologation_release_or_hotfix");
+  assert.equal(hotfix.valid, true);
+  assert.equal(hotfix.reason, "ok_homologation_release_or_hotfix");
+});
+
+test("accepts homologation PR from production (back-merge after hotfix)", () => {
+  const mainToHomol = validatePullRequest(config, {
+    baseBranch: "homol",
+    headBranch: "main",
+  });
+  const masterToHomol = validatePullRequest(config, {
+    baseBranch: "homol",
+    headBranch: "master",
+  });
+
+  assert.equal(mainToHomol.valid, true);
+  assert.equal(mainToHomol.reason, "ok_homologation_backmerge");
+  assert.equal(masterToHomol.valid, true);
+  assert.equal(masterToHomol.reason, "ok_homologation_backmerge");
+});
+
+test("rejects homologation PR from a work branch or from develop", () => {
+  const fromWork = validatePullRequest(config, {
+    baseBranch: "homol",
+    headBranch: "feature/cadastro",
+  });
+  const fromDevelop = validatePullRequest(config, {
+    baseBranch: "homol",
+    headBranch: "develop",
+  });
+
+  assert.equal(fromWork.valid, false);
+  assert.equal(fromWork.reason, "homologation_pr_must_come_from_release_or_hotfix");
+  assert.equal(fromDevelop.valid, false);
+  assert.equal(fromDevelop.reason, "homologation_pr_must_come_from_release_or_hotfix");
+});
+
+test("accepts develop PR from homologation (back-merge)", () => {
+  const result = validatePullRequest(config, {
+    baseBranch: "develop",
+    headBranch: "homol",
+  });
+
+  assert.equal(result.valid, true);
+  assert.equal(result.reason, "ok_develop_backmerge");
+});
+
+test("still rejects production PR coming straight from homologation", () => {
+  // A `main` recebe apenas `release/*` e `hotfix/*`: a branch de release e o
+  // veiculo ate producao, e e dela que sai a versao/tag.
+  const result = validatePullRequest(config, {
+    baseBranch: "main",
+    headBranch: "homol",
+  });
+
+  assert.equal(result.valid, false);
+  assert.equal(result.reason, "production_pr_must_come_from_release_or_hotfix");
+});
+
 test("rejects develop PR coming from develop itself", () => {
   const result = validatePullRequest(config, {
     baseBranch: "develop",

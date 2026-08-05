@@ -295,6 +295,14 @@ test("merged release PR creates the production tag automatically", async () => {
       type: "open_pull_request",
       repo: "leds-conectafapes-backend-admin",
       head: "main",
+      base: "homol",
+      title: "Back-merge main -> homol (v1.6.0)",
+      body: "Back-merge automatico de `main` para `homol` apos release v1.6.0.",
+    },
+    {
+      type: "open_pull_request",
+      repo: "leds-conectafapes-backend-admin",
+      head: "main",
       base: "develop",
       title: "Back-merge main -> develop (v1.6.0)",
       body: "Back-merge automatico de `main` para `develop` apos release v1.6.0.",
@@ -328,9 +336,17 @@ test("merged hotfix PR creates tag and opens return PRs", async () => {
   assert.equal(response.status, 200);
   assert.deepEqual(
     state.executed.map((action) => action.type),
-    ["create_tag", "open_pull_request", "open_pull_request"]
+    ["create_tag", "open_pull_request", "open_pull_request", "open_pull_request"]
   );
   assert.deepEqual(state.executed[1], {
+    type: "open_pull_request",
+    repo: "leds-conectafapes-backend-admin",
+    head: "hotfix/v1.6.1-2090",
+    base: "homol",
+    title: "Hotfix v1.6.1 -> homol",
+    body: "Retorno automatico do hotfix v1.6.1 para `homol`.",
+  });
+  assert.deepEqual(state.executed[2], {
     type: "open_pull_request",
     repo: "leds-conectafapes-backend-admin",
     head: "hotfix/v1.6.1-2090",
@@ -338,7 +354,7 @@ test("merged hotfix PR creates tag and opens return PRs", async () => {
     title: "Hotfix v1.6.1 -> develop",
     body: "Retorno automatico do hotfix v1.6.1 para `develop`.",
   });
-  assert.equal((state.executed[2] as { base: string }).base, "release/v1.7.0");
+  assert.equal((state.executed[3] as { base: string }).base, "release/v1.7.0");
 });
 
 test("execute without admin token configured returns 403 and never builds gateway", async () => {

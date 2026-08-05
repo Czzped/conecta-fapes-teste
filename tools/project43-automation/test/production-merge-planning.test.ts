@@ -29,6 +29,14 @@ test("plans tag creation when a release PR is merged into production", () => {
       type: "open_pull_request",
       repo: "leds-conectafapes-backend-admin",
       head: "main",
+      base: "homol",
+      title: "Back-merge main -> homol (v1.6.0)",
+      body: "Back-merge automatico de `main` para `homol` apos release v1.6.0.",
+    },
+    {
+      type: "open_pull_request",
+      repo: "leds-conectafapes-backend-admin",
+      head: "main",
       base: "develop",
       title: "Back-merge main -> develop (v1.6.0)",
       body: "Back-merge automatico de `main` para `develop` apos release v1.6.0.",
@@ -59,6 +67,14 @@ test("plans tag and return PRs when a hotfix PR is merged into production", () =
       type: "open_pull_request",
       repo: "leds-conectafapes-backend-admin",
       head: "hotfix/v1.6.1-2090",
+      base: "homol",
+      title: "Hotfix v1.6.1 -> homol",
+      body: "Retorno automatico do hotfix v1.6.1 para `homol`.",
+    },
+    {
+      type: "open_pull_request",
+      repo: "leds-conectafapes-backend-admin",
+      head: "hotfix/v1.6.1-2090",
       base: "develop",
       title: "Hotfix v1.6.1 -> develop",
       body: "Retorno automatico do hotfix v1.6.1 para `develop`.",
@@ -72,6 +88,24 @@ test("plans tag and return PRs when a hotfix PR is merged into production", () =
       body: "Retorno automatico do hotfix v1.6.1 para a release aberta `release/v1.7.0`.",
     },
   ]);
+});
+
+test("skips the homologation PR for repos without a homologation branch", () => {
+  // `conectafapes-project` hospeda docs e automacoes: nao tem branch `homol`,
+  // e abrir PR para uma branch inexistente falharia com 404.
+  const plan = planProductionMerge(config, {
+    repositoryName: "conectafapes-project",
+    baseBranch: "main",
+    headBranch: "release/v1.6.0",
+    mergeCommitSha: "abc123",
+    openReleaseBranches: [],
+  });
+
+  assert.equal(plan.valid, true);
+  assert.deepEqual(
+    plan.actions.map((action) => ("base" in action ? action.base : action.type)),
+    ["create_tag", "develop"]
+  );
 });
 
 test("ignores merged PRs that are not release/hotfix into production", () => {
