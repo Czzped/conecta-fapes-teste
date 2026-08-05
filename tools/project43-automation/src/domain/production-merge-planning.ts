@@ -101,6 +101,19 @@ export function planProductionMerge(
   ];
 
   if (hotfixTag) {
+    // Retorno para homologacao antes de develop: sem isso o hotfix fica so em
+    // producao e a proxima release, cortada de develop, o desfaz.
+    if (repo.homologationBranch) {
+      actions.push({
+        type: "open_pull_request",
+        repo: repo.name,
+        head: input.headBranch,
+        base: repo.homologationBranch,
+        title: `Hotfix ${hotfixTag} -> ${repo.homologationBranch}`,
+        body: `Retorno automatico do hotfix ${hotfixTag} para \`${repo.homologationBranch}\`.`,
+      });
+    }
+
     actions.push({
       type: "open_pull_request",
       repo: repo.name,
@@ -122,8 +135,22 @@ export function planProductionMerge(
     }
   }
 
-  // Back-merge de producao para develop apos release
+  // Back-merge de producao para homologacao e develop apos release. O PR para
+  // homologacao costuma ser no-op (a release passou por homol antes de ir para
+  // producao), mas garante convergencia quando o merge em producao trouxe algo
+  // a mais — um hotfix mergeado na propria release, por exemplo.
   if (releaseTag) {
+    if (repo.homologationBranch) {
+      actions.push({
+        type: "open_pull_request",
+        repo: repo.name,
+        head: repo.productionBranch,
+        base: repo.homologationBranch,
+        title: `Back-merge ${repo.productionBranch} -> ${repo.homologationBranch} (${releaseTag})`,
+        body: `Back-merge automatico de \`${repo.productionBranch}\` para \`${repo.homologationBranch}\` apos release ${releaseTag}.`,
+      });
+    }
+
     actions.push({
       type: "open_pull_request",
       repo: repo.name,
