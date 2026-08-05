@@ -22,6 +22,12 @@ const actions = [
     key: 'planejamento',
   },
   {
+    title: 'Formulários',
+    description: 'Biblioteca de formulários de inscrição, avaliação, recurso e anexos usados nas captações.',
+    Icon: BookOpen,
+    key: 'formularios',
+  },
+  {
     title: 'Referências Corporativas',
     description: 'Áreas de conhecimento, rubricas financeiras, diárias, cidades, regiões e finalidades.',
     Icon: Database,
@@ -38,12 +44,6 @@ const actions = [
     description: 'Base de documentos que podem ser exigidos dos proponentes em captações.',
     Icon: FileCheck2,
     key: 'documentos',
-  },
-  {
-    title: 'Formulários',
-    description: 'Biblioteca de formulários de inscrição, avaliação, recurso e anexos usados nas captações.',
-    Icon: BookOpen,
-    key: 'formularios',
   },
   {
     title: 'Regras de Ação Transversal',
