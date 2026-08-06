@@ -384,25 +384,44 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
     setNovaDiariaBeneficiarioSearch('');
   };
 
+  const estornoPreviewSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="920" height="520" viewBox="0 0 920 520">
+      <rect width="920" height="520" rx="18" fill="#ffffff"/>
+      <rect x="48" y="48" width="824" height="424" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text x="78" y="104" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#0f172a">E-mail do Estorno da Compra</text>
+      <text x="78" y="150" font-family="Arial, sans-serif" font-size="16" fill="#475569">De: atendimento@magazineluiza.com.br</text>
+      <text x="78" y="182" font-family="Arial, sans-serif" font-size="16" fill="#475569">Para: projeto.conectafapes@fapes.es.gov.br</text>
+      <line x1="78" y1="212" x2="842" y2="212" stroke="#cbd5e1"/>
+      <text x="78" y="258" font-family="Arial, sans-serif" font-size="18" fill="#0f172a">Informamos que o valor referente ao pedido ML-2026-0921 foi estornado.</text>
+      <text x="78" y="296" font-family="Arial, sans-serif" font-size="18" fill="#0f172a">Valor estornado: R$ 4.567,90</text>
+      <text x="78" y="334" font-family="Arial, sans-serif" font-size="18" fill="#0f172a">Data do estorno: 25/02/2026</text>
+      <text x="78" y="372" font-family="Arial, sans-serif" font-size="18" fill="#0f172a">Forma de devolução: crédito na conta do projeto</text>
+      <rect x="78" y="404" width="260" height="42" rx="8" fill="#dcfce7" stroke="#86efac"/>
+      <text x="100" y="431" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#166534">Estorno confirmado</text>
+    </svg>
+  `)}`;
+
   /* ── prefill for read-only ─────────────────── */
   useEffect(() => {
     if (payment.status === 'Pendente') return;
-    setSelectedDocumento('Nota Fiscal (Produto ou Serviço)');
+    setSelectedDocumento(isCredito ? '' : 'Nota Fiscal (Produto ou Serviço)');
     // Para Nota Fiscal mostramos 2 itens, para Invoice seria apenas 1
     setSelectedCategoriasItem(['Material Permanente', 'Material de Consumo']);
     setSelectedItensEdital(['Monitor LCD 27"', 'Teclado Mecânico RGB']);
-    setDescricao('Compra de equipamentos para o laboratório de pesquisa do projeto FAPES 2024.');
-    const f = new File([''], 'Nota_Fiscal_Monitor_2024.pdf', { type: 'application/pdf' });
+    setDescricao(isCredito ? 'Valor creditado referente ao estorno de uma compra realizada no projeto.' : 'Compra de equipamentos para o laboratório de pesquisa do projeto FAPES 2024.');
+    const f = isCredito
+      ? new File([''], 'Print do E-mail do Estorno.png', { type: 'image/png' })
+      : new File([''], 'Nota_Fiscal_Monitor_2024.pdf', { type: 'application/pdf' });
     setUploadedFiles([f]);
     setFileNames([f.name]);
-    setFilePreviewUrls([null]);
+    setFilePreviewUrls([isCredito ? estornoPreviewSvg : null]);
     const c1 = new File([''], 'Cotacao_Loja_A.pdf', { type: 'application/pdf' });
     const c2 = new File([''], 'Cotacao_Loja_B.pdf', { type: 'application/pdf' });
     const c3 = new File([''], 'Cotacao_Loja_C.pdf', { type: 'application/pdf' });
     setCotacaoFiles([c1, c2, c3]);
     setCotacaoFileNames([c1.name, c2.name, c3.name]);
     setCotacaoPreviewUrls([null, null, null]);
-  }, [payment.status]);
+  }, [estornoPreviewSvg, isCredito, payment.status]);
 
   /* ── status message ─────────────────────────── */
   const getStatusMessage = () => {
@@ -623,11 +642,20 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
   );
 
   /* ── File rows (nota fiscal / comprovante) ─────── */
-  const FileRows = () => (
-    <div style={{ marginLeft: '36px' }} className="space-y-2">
+  const FileRows = ({ offset = true, expandOnRowClick = false }: { offset?: boolean; expandOnRowClick?: boolean }) => (
+    <div style={{ marginLeft: offset ? '36px' : 0 }} className="space-y-2">
       {uploadedFiles.map((file, idx) => (
         <div key={idx}>
-          <div className="p-4 flex items-center gap-4" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
+          <div
+            className="p-4 flex items-center gap-4"
+            onClick={expandOnRowClick ? () => toggleFilePreview(idx) : undefined}
+            style={{
+              backgroundColor: 'var(--card)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              cursor: expandOnRowClick ? 'pointer' : 'default',
+            }}
+          >
             <div className="flex items-center gap-3 flex-1">
               <FileText size={20} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
               {editingFileIdx === idx ? (
@@ -669,11 +697,11 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                 <>
                   {!isReadOnly && (
                     <>
-                      <button type="button" onClick={() => { setEditingFileIdx(idx); setTempFileName(fileNames[idx]); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', color: 'var(--muted-foreground)', display: 'flex', borderRadius: 'var(--radius)', transition: 'background-color .2s' }} onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--muted)'; }} onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}><Edit2 size={18} /></button>
-                      <button type="button" onClick={() => handleDeleteFile(idx)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', color: 'var(--muted-foreground)', display: 'flex', borderRadius: 'var(--radius)', transition: 'background-color .2s' }} onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--muted)'; }} onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}><Trash2 size={18} /></button>
+                      <button type="button" onClick={(event) => { event.stopPropagation(); setEditingFileIdx(idx); setTempFileName(fileNames[idx]); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', color: 'var(--muted-foreground)', display: 'flex', borderRadius: 'var(--radius)', transition: 'background-color .2s' }} onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--muted)'; }} onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}><Edit2 size={18} /></button>
+                      <button type="button" onClick={(event) => { event.stopPropagation(); handleDeleteFile(idx); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', color: 'var(--muted-foreground)', display: 'flex', borderRadius: 'var(--radius)', transition: 'background-color .2s' }} onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--muted)'; }} onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}><Trash2 size={18} /></button>
                     </>
                   )}
-                  <button type="button" onClick={() => toggleFilePreview(idx)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', color: 'var(--muted-foreground)', display: 'flex', borderRadius: 'var(--radius)', transition: 'all .2s', transform: expandedFileIdx === idx ? 'rotate(180deg)' : 'rotate(0deg)' }} onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--muted)'; }} onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}><ChevronDown size={18} /></button>
+                  <button type="button" onClick={(event) => { event.stopPropagation(); toggleFilePreview(idx); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', color: 'var(--muted-foreground)', display: 'flex', borderRadius: 'var(--radius)', transition: 'all .2s', transform: expandedFileIdx === idx ? 'rotate(180deg)' : 'rotate(0deg)' }} onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--muted)'; }} onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}><ChevronDown size={18} /></button>
                 </>
               )}
             </div>
@@ -1068,7 +1096,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                 )}
               </div>
               <input type="file" ref={fileInputRef} className="hidden" accept=".pdf,.png,.jpg,.jpeg" onChange={handleFileChange} />
-              {uploadedFiles.length > 0 && <FileRows />}
+              {uploadedFiles.length > 0 && <FileRows offset={false} expandOnRowClick />}
 
               <div>
                 <label style={labelSt}>Associe esse Crédito (entrada) a um Débito (saída).</label>
