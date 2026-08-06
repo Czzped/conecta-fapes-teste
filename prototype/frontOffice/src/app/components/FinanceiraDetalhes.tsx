@@ -2,11 +2,12 @@ import {
   AlertTriangle,
   CheckCircle,
   Upload, Paperclip, FileText, Edit2, Trash2,
-  ChevronDown, Check, Info, Search, X, Send, Plus, Save, Trash, RotateCcw, DollarSign,
+  ChevronDown, Check, Info, Search, X, Send, Plus, Save, Trash, DollarSign,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRef, useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { payments as allPayments } from '@/app/data/pagamentos';
 
 interface Payment {
   tipo: string;
@@ -152,11 +153,15 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
       ? { bg: 'rgba(239,68,68,0.1)', color: 'rgb(239,68,68)', border: 'rgba(239,68,68,0.3)' }
       : payment.statusColor;
   const isReadOnly = statusAtual !== 'Pendente' && statusAtual !== 'Revisar';
-  const isCreditoEstorno = payment.operacao === 'CREDITO' && payment.classificacao === 'ESTORNO';
-  const isCreditoDevolucao = payment.operacao === 'CREDITO' && payment.classificacao === 'DEVOLUCAO';
-  const [estornoAssociado, setEstornoAssociado] = useState(false);
-  const [devolucaoComprovanteAnexado, setDevolucaoComprovanteAnexado] = useState(false);
-  const [devolucaoAssociada, setDevolucaoAssociada] = useState(false);
+  const isCredito = payment.operacao === 'CREDITO';
+  const pagamentoResumo = isCredito ? 'Crédito' : 'Débito';
+  const [classificacaoCredito, setClassificacaoCredito] = useState(
+    payment.classificacao === 'DEVOLUCAO' ? 'Devolução' : 'Estorno',
+  );
+  const [isClassificacaoCreditoOpen, setIsClassificacaoCreditoOpen] = useState(false);
+  const [isClassificacaoTooltipOpen, setIsClassificacaoTooltipOpen] = useState(false);
+  const [saidaAssociada, setSaidaAssociada] = useState('');
+  const [isSaidaAssociadaOpen, setIsSaidaAssociadaOpen] = useState(false);
   const [justificativaReprovacao, setJustificativaReprovacao] = useState('');
   const [arquivosContestacao, setArquivosContestacao] = useState<string[]>([]);
   const [isConfirmarEnvioSemNotaOpen, setIsConfirmarEnvioSemNotaOpen] = useState(false);
@@ -276,7 +281,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
   const isStep1Complete = selectedDocumento !== '';
   const isStep2Complete = uploadedFiles.length > 0;
   const isPagamentoSemNotaFiscal = selectedDocumento === 'Pagamento sem Nota Fiscal';
-  const showStep3 = selectedDocumento === 'Diária' ? selectedDiariaIdx !== null : isStep2Complete;
+  const showStep3 = !isCredito && (selectedDocumento === 'Diária' ? selectedDiariaIdx !== null : isStep2Complete);
   const allowMultipleFiles = ['Diária', 'Passagem', 'Invoice (Pagamento Internacional)'].includes(selectedDocumento);
   const showCotacao = ['Nota Fiscal (Produto ou Serviço)', 'Invoice (Pagamento Internacional)', 'Passagem'].includes(selectedDocumento);
 
@@ -713,7 +718,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
       {/* Payment card */}
       <div className="p-6 mb-6" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
         <div className="hidden md:grid grid-cols-5 gap-20">
-          {[['Pagamento', payment.tipo], ['Valor', payment.valor], ['Data', payment.data], ['CNPJ', payment.cnpj]].map(([l, v]) => (
+          {[['Pagamento', pagamentoResumo], ['Valor', payment.valor], ['Data', payment.data], ['CNPJ', payment.cnpj]].map(([l, v]) => (
             <div key={l}>
               <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>{l}</div>
               <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)' }}>{v}</div>
@@ -725,7 +730,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
           </div>
         </div>
         <div className="md:hidden space-y-4">
-          {[['Pagamento', payment.tipo], ['Valor', payment.valor], ['Data', payment.data], ['CNPJ', payment.cnpj]].map(([l, v]) => (
+          {[['Pagamento', pagamentoResumo], ['Valor', payment.valor], ['Data', payment.data], ['CNPJ', payment.cnpj]].map(([l, v]) => (
             <div key={l}>
               <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', marginBottom: '0.25rem', fontFamily: 'var(--font-family)' }}>{l}</div>
               <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>{v}</div>
@@ -737,217 +742,6 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
           </div>
         </div>
       </div>
-
-      {isCreditoEstorno && (
-        <section className="mb-6">
-          <div
-            className="p-5"
-            style={{
-              backgroundColor: 'color-mix(in srgb, rgb(34, 197, 94) 8%, transparent)',
-              border: '1px solid color-mix(in srgb, rgb(34, 197, 94) 24%, transparent)',
-              borderRadius: 'var(--radius)',
-            }}
-          >
-            <div className="flex items-start gap-3 mb-4">
-              <div>
-                <h1 style={{ color: 'var(--foreground)', margin: 0, fontFamily: 'var(--font-family)' }}>
-                  Estorno identificado
-                </h1>
-                <p style={{ color: 'var(--muted-foreground)', margin: '0.75rem 0 0', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
-                  Crédito de terceiro que anula um débito anterior e pode ser associado como ajuste conciliatório.
-                </p>
-              </div>
-            </div>
-
-            <div style={{ fontFamily: 'var(--font-family)' }}>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[
-                  { label: 'Terceiro', value: payment.origemTerceiro ?? payment.cnpj },
-                  { label: 'Crédito', value: payment.valor, color: 'rgb(34, 197, 94)' },
-                  { label: 'Classificação', value: payment.classificacao ?? '-' },
-                  { label: 'Situação do débito', value: payment.situacaoDebito ?? '-' },
-                  { label: 'Efeito líquido', value: payment.efeitoLiquido ?? '-', color: 'var(--primary)' },
-                  { label: 'Modo', value: payment.modoAssociacao ?? '-' },
-                ].map((item) => (
-                  <div key={item.label}>
-                    <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
-                      {item.label}
-                    </div>
-                    <div style={{ color: item.color ?? 'var(--foreground)', fontWeight: 'var(--font-weight-normal)', fontSize: 'var(--text-sm)' }}>
-                      {item.value}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {estornoAssociado && (
-                <div
-                  className="mt-4 p-3"
-                  style={{
-                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                    border: '1px solid rgba(34, 197, 94, 0.3)',
-                    borderRadius: 'var(--radius)',
-                    color: 'rgb(34, 197, 94)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-weight-normal)',
-                  }}
-                >
-                  Estorno associado à {payment.prestacaoAssociada ?? 'prestação existente'} como {payment.modoAssociacao ?? 'ajuste conciliatório'}.
-                </div>
-              )}
-
-              <div className="mt-4 flex justify-end">
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2"
-                  aria-pressed={estornoAssociado}
-                  onClick={() => setEstornoAssociado(true)}
-                  style={{
-                    backgroundColor: estornoAssociado ? 'rgba(34, 197, 94, 0.14)' : 'var(--primary)',
-                    color: estornoAssociado ? 'rgb(34, 197, 94)' : 'var(--primary-foreground)',
-                    border: `1px solid ${estornoAssociado ? 'rgba(34, 197, 94, 0.35)' : 'var(--primary)'}`,
-                    borderRadius: 'var(--radius)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-weight-medium)',
-                    cursor: estornoAssociado ? 'default' : 'pointer',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {estornoAssociado ? <CheckCircle size={16} /> : <RotateCcw size={16} />}
-                  {estornoAssociado ? 'Associado à prestação existente' : 'Associar à prestação existente'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {isCreditoDevolucao && (
-        <section className="mb-6">
-          <div
-            className="p-5"
-            style={{
-              backgroundColor: 'color-mix(in srgb, rgb(234, 179, 8) 8%, transparent)',
-              border: '1px solid color-mix(in srgb, rgb(234, 179, 8) 24%, transparent)',
-              borderRadius: 'var(--radius)',
-            }}
-          >
-            <div className="flex items-start gap-3 mb-4">
-              <div
-                className="p-2"
-                style={{
-                  color: 'rgb(234, 179, 8)',
-                  backgroundColor: 'rgba(234, 179, 8, 0.12)',
-                  borderRadius: 'var(--radius)',
-                }}
-              >
-                <Upload size={18} />
-              </div>
-              <div>
-                <h1 style={{ color: 'var(--foreground)', margin: 0, fontFamily: 'var(--font-family)' }}>
-                  Devolução do coordenador
-                </h1>
-                <p style={{ color: 'var(--muted-foreground)', margin: '0.25rem 0 0', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)' }}>
-                  Crédito feito pelo coordenador para devolver valor integral ou parcial. Exige comprovante, como Pix, TED ou boleto.
-                </p>
-              </div>
-            </div>
-
-            <div style={{ fontFamily: 'var(--font-family)' }}>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[
-                  { label: 'Origem do crédito', value: payment.cnpj },
-                  { label: 'Valor devolvido', value: payment.valorDevolvido ?? payment.valor, color: 'rgb(34, 197, 94)' },
-                  { label: 'Valor original', value: payment.valorOriginal ?? '-' },
-                  {
-                    label: 'Comprovante',
-                    value: devolucaoComprovanteAnexado ? 'Anexado' : payment.comprovanteObrigatorio ?? '-',
-                    color: devolucaoComprovanteAnexado ? 'rgb(34, 197, 94)' : 'rgb(234, 179, 8)',
-                  },
-                  { label: 'Modo', value: payment.modoAssociacao ?? '-' },
-                  { label: 'Classificação', value: payment.classificacao ?? '-' },
-                ].map((item) => (
-                  <div key={item.label}>
-                    <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.35rem' }}>
-                      {item.label}
-                    </div>
-                    <div style={{ color: item.color ?? 'var(--foreground)', fontWeight: 'var(--font-weight-normal)', fontSize: 'var(--text-sm)' }}>
-                      {item.value}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {devolucaoAssociada && (
-                <div
-                  className="mt-4 p-3"
-                  style={{
-                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                    border: '1px solid rgba(34, 197, 94, 0.3)',
-                    borderRadius: 'var(--radius)',
-                    color: 'rgb(34, 197, 94)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-weight-normal)',
-                  }}
-                >
-                  Devolução associada à {payment.prestacaoAssociada ?? 'prestação existente'}. Saldo residual: {payment.valorResidual ?? '-'}.
-                </div>
-              )}
-
-              <div className="mt-4 flex flex-col sm:flex-row justify-end gap-2">
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2"
-                  aria-pressed={devolucaoComprovanteAnexado}
-                  onClick={() => setDevolucaoComprovanteAnexado(true)}
-                  style={{
-                    backgroundColor: devolucaoComprovanteAnexado ? 'rgba(34, 197, 94, 0.14)' : 'transparent',
-                    color: devolucaoComprovanteAnexado ? 'rgb(34, 197, 94)' : 'var(--foreground)',
-                    border: `1px solid ${devolucaoComprovanteAnexado ? 'rgba(34, 197, 94, 0.35)' : 'var(--border)'}`,
-                    borderRadius: 'var(--radius)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-weight-medium)',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {devolucaoComprovanteAnexado ? <CheckCircle size={16} /> : <Upload size={16} />}
-                  {devolucaoComprovanteAnexado ? 'Comprovante anexado' : 'Anexar comprovante'}
-                </button>
-
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2"
-                  aria-pressed={devolucaoAssociada}
-                  disabled={!devolucaoComprovanteAnexado || devolucaoAssociada}
-                  onClick={() => setDevolucaoAssociada(true)}
-                  style={{
-                    backgroundColor: devolucaoAssociada
-                      ? 'rgba(34, 197, 94, 0.14)'
-                      : devolucaoComprovanteAnexado
-                        ? 'var(--primary)'
-                        : 'transparent',
-                    color: devolucaoAssociada
-                      ? 'rgb(34, 197, 94)'
-                      : devolucaoComprovanteAnexado
-                        ? 'var(--primary-foreground)'
-                        : 'var(--muted-foreground)',
-                    border: `1px solid ${devolucaoAssociada ? 'rgba(34, 197, 94, 0.35)' : devolucaoComprovanteAnexado ? 'var(--primary)' : 'var(--border)'}`,
-                    borderRadius: 'var(--radius)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-weight-medium)',
-                    whiteSpace: 'nowrap',
-                    cursor: !devolucaoComprovanteAnexado || devolucaoAssociada ? 'not-allowed' : 'pointer',
-                    opacity: !devolucaoComprovanteAnexado && !devolucaoAssociada ? 0.7 : 1,
-                  }}
-                >
-                  {devolucaoAssociada ? <CheckCircle size={16} /> : <RotateCcw size={16} />}
-                  {devolucaoAssociada ? 'Devolução associada' : 'Associar prestação'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Status alert */}
       {statusMessage && (
@@ -1154,8 +948,172 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
             <div style={stepCircle}>1</div>
             <h2 style={stepTitle}>Informações Gerais <span style={{ color: 'rgb(239,68,68)' }}>*</span></h2>
           </div>
-          <p style={{ ...stepSubtitle, maxWidth: '800px' }}>Selecione o tipo de Documento e descreva o contexto da compra.</p>
+          <p style={{ ...stepSubtitle, maxWidth: '800px' }}>
+            {isCredito
+              ? 'Este valor entrou na conta do projeto. Justifique o que aconteceu e anexe o comprovante.'
+              : 'Selecione o tipo de Documento e descreva o contexto da compra.'}
+          </p>
 
+          {isCredito ? (
+            <div style={{ marginLeft: '36px' }} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label style={{ ...labelSt, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    Classificação
+                    <span
+                      className="relative inline-flex items-center"
+                      style={{ color: 'var(--primary)' }}
+                      onMouseEnter={() => setIsClassificacaoTooltipOpen(true)}
+                      onMouseLeave={() => setIsClassificacaoTooltipOpen(false)}
+                      onFocus={() => setIsClassificacaoTooltipOpen(true)}
+                      onBlur={() => setIsClassificacaoTooltipOpen(false)}
+                      tabIndex={0}
+                    >
+                      <Info size={14} />
+                      <span
+                        style={{
+                          position: 'absolute',
+                          left: 'calc(100% + 0.5rem)',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          width: '320px',
+                          padding: '0.75rem',
+                          backgroundColor: 'var(--popover)',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius)',
+                          color: 'var(--foreground)',
+                          fontSize: 'var(--text-xs)',
+                          fontWeight: 'var(--font-weight-normal)',
+                          lineHeight: 1.5,
+                          boxShadow: 'var(--elevation-sm)',
+                          opacity: isClassificacaoTooltipOpen ? 1 : 0,
+                          pointerEvents: 'none',
+                          transition: 'opacity .15s',
+                          zIndex: 60,
+                        }}
+                      >
+                        <span style={{ display: 'block' }}>Estorno: valor enviado pela loja.</span>
+                        <span style={{ display: 'block' }}>Devolução: valor que o coordenador deve retornar após a Contestação ter sido recusada.</span>
+                      </span>
+                    </span>
+                  </label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      style={triggerSt(isReadOnly, !!classificacaoCredito)}
+                      onClick={!isReadOnly ? () => setIsClassificacaoCreditoOpen(!isClassificacaoCreditoOpen) : undefined}
+                      disabled={isReadOnly}
+                    >
+                      <span style={{ fontFamily: 'var(--font-family)' }}>{classificacaoCredito || 'Selecione'}</span>
+                      <ChevronDown size={16} style={{ color: 'var(--muted-foreground)', flexShrink: 0, transform: isClassificacaoCreditoOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform .2s' }} />
+                    </button>
+                    {isClassificacaoCreditoOpen && (
+                      <>
+                        <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setIsClassificacaoCreditoOpen(false)} />
+                        <div style={dropdownMenu}>
+                          {['Estorno', 'Devolução'].map((option) => (
+                            <button
+                              key={option}
+                              type="button"
+                              style={dropItemSt(classificacaoCredito === option)}
+                              onClick={() => {
+                                setClassificacaoCredito(option);
+                                setIsClassificacaoCreditoOpen(false);
+                              }}
+                              onMouseEnter={e => { if (classificacaoCredito !== option) e.currentTarget.style.backgroundColor = 'var(--muted)'; }}
+                              onMouseLeave={e => { if (classificacaoCredito !== option) e.currentTarget.style.backgroundColor = 'var(--popover)'; }}
+                            >
+                              {classificacaoCredito === option && <Check size={14} style={{ flexShrink: 0, color: 'var(--primary)' }} />}
+                              <span style={{ marginLeft: classificacaoCredito === option ? 0 : '21px', fontFamily: 'var(--font-family)' }}>{option}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label style={labelSt}>
+                  Descrição
+                </label>
+                <textarea
+                  value={descricao}
+                  onChange={e => { if (e.target.value.length <= maxDesc) setDescricao(e.target.value); }}
+                  placeholder="Descreva o motivo da entrada de valor na conta do projeto."
+                  rows={4}
+                  disabled={isReadOnly}
+                  style={{ width: '100%', padding: '0.75rem', backgroundColor: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius)', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', resize: 'vertical', outline: 'none', opacity: isReadOnly ? 0.7 : 1, cursor: isReadOnly ? 'not-allowed' : 'text', boxSizing: 'border-box' }}
+                  onFocus={e => { if (!isReadOnly) { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary)'; } }}
+                  onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
+                />
+                <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-family)', marginTop: '0.25rem', display: 'block' }}>
+                  {descricao.length}/{maxDesc} caracteres
+                </span>
+              </div>
+
+              <div className="flex justify-end" style={{ marginTop: '-1.25rem' }}>
+                {!isReadOnly && uploadedFiles.length === 0 && (
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-2 px-4 py-2"
+                    onClick={() => fileInputRef.current?.click()}
+                    style={{ backgroundColor: 'transparent', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', fontFamily: 'var(--font-family)', cursor: 'pointer', transition: 'all .2s' }}
+                    onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--muted)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  >
+                    <Paperclip size={16} />Anexar Arquivo
+                  </button>
+                )}
+              </div>
+              <input type="file" ref={fileInputRef} className="hidden" accept=".pdf,.png,.jpg,.jpeg" onChange={handleFileChange} />
+              {uploadedFiles.length > 0 && <FileRows />}
+
+              <div>
+                <label style={labelSt}>Associe esse Crédito (entrada) a um Débito (saída).</label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    style={triggerSt(isReadOnly, !!saidaAssociada)}
+                    onClick={!isReadOnly ? () => setIsSaidaAssociadaOpen(!isSaidaAssociadaOpen) : undefined}
+                    disabled={isReadOnly}
+                  >
+                    <span style={{ fontFamily: 'var(--font-family)' }}>{saidaAssociada || 'Selecione um pagamento'}</span>
+                    <ChevronDown size={16} style={{ color: 'var(--muted-foreground)', flexShrink: 0, transform: isSaidaAssociadaOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform .2s' }} />
+                  </button>
+                  {isSaidaAssociadaOpen && (
+                    <>
+                      <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setIsSaidaAssociadaOpen(false)} />
+                      <div style={dropdownMenu}>
+                        {allPayments.filter((item) => item.operacao === 'DEBITO').map((item) => {
+                          const pagamentoLabel = item.operacao === 'CREDITO' ? 'Crédito' : 'Débito';
+                          const optionLabel = `${pagamentoLabel} · ${item.valor} · ${item.data}`;
+
+                          return (
+                            <button
+                              key={item.id}
+                              type="button"
+                              style={dropItemSt(saidaAssociada === optionLabel)}
+                              onClick={() => {
+                                setSaidaAssociada(optionLabel);
+                                setIsSaidaAssociadaOpen(false);
+                              }}
+                              onMouseEnter={e => { if (saidaAssociada !== optionLabel) e.currentTarget.style.backgroundColor = 'var(--muted)'; }}
+                              onMouseLeave={e => { if (saidaAssociada !== optionLabel) e.currentTarget.style.backgroundColor = 'var(--popover)'; }}
+                            >
+                              {saidaAssociada === optionLabel && <Check size={14} style={{ flexShrink: 0, color: 'var(--primary)' }} />}
+                              <span style={{ marginLeft: saidaAssociada === optionLabel ? 0 : '21px', fontFamily: 'var(--font-family)' }}>{optionLabel}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
           <div style={{ marginLeft: '36px' }}>
 
             {/* Documento select */}
@@ -1384,10 +1342,11 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
               </div>
             )}
           </div>
+          )}
         </section>
 
         {/* ─── Step 2: Anexar Documento Fiscal ─── */}
-        {isStep1Complete && selectedDocumento !== 'Diária' && !isPagamentoSemNotaFiscal && (
+        {!isCredito && isStep1Complete && selectedDocumento !== 'Diária' && !isPagamentoSemNotaFiscal && (
           <section className="mb-8">
             <div className="flex items-start gap-3 mb-1">
               <div style={stepCircle}>2</div>
@@ -2734,6 +2693,45 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
             type="button"
             className="px-5 py-3"
             onClick={() => setIsConfirmarEnvioSemNotaOpen(true)}
+            style={{
+              backgroundColor: 'var(--primary)',
+              color: 'var(--primary-foreground)',
+              border: '1px solid var(--primary)',
+              borderRadius: 'var(--radius)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              fontFamily: 'var(--font-family)',
+              cursor: 'pointer',
+            }}
+          >
+            Enviar
+          </button>
+        </div>
+      )}
+
+      {isCredito && !isReadOnly && (
+        <div className="mb-8 flex justify-end gap-3">
+          <button
+            type="button"
+            className="px-5 py-3"
+            onClick={() => toast.success('Rascunho salvo com sucesso.')}
+            style={{
+              backgroundColor: 'transparent',
+              color: 'var(--foreground)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 'var(--font-weight-medium)',
+              fontFamily: 'var(--font-family)',
+              cursor: 'pointer',
+            }}
+          >
+            Salvar Rascunho
+          </button>
+          <button
+            type="button"
+            className="px-5 py-3"
+            onClick={() => toast.success('Prestação de contas enviada com sucesso.')}
             style={{
               backgroundColor: 'var(--primary)',
               color: 'var(--primary-foreground)',
