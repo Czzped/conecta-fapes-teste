@@ -503,6 +503,19 @@ export class GitFlowWorker {
       return json({ ignored: true, reason: "missing_refs" }, 202);
     }
 
+    // Filtro de repositorio. Com webhook por repositorio isso era desnecessario:
+    // so chegava evento de quem tinha o webhook. Com webhook de ORGANIZACAO
+    // chegam eventos de todos os repos da org, e sem este filtro o worker
+    // publicaria o status `git-flow/pr-policy` — reprovando PRs de repos que
+    // seguem outras convencoes — e moveria cards do Project 43 a partir do
+    // numero no nome de qualquer branch.
+    if (!resolveRepository(config, refs.repository)) {
+      return json(
+        { ignored: true, reason: "repository_not_managed", repository: refs.repository },
+        202
+      );
+    }
+
     // --- PR validation + card movement on PR opened ---
     if (shouldValidatePullRequest("pull_request", payload)) {
       const validation = validatePullRequest(config, {
