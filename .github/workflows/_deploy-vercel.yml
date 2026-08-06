@@ -49,7 +49,7 @@ jobs:
     #
     # CHAVE DE TROCA: criar a variavel RUNNER_LABELS com `["ubuntu-latest"]` (JSON)
     # devolve todos estes workflows ao runner hospedado, sem alterar codigo.
-    runs-on: ${{ fromJSON(vars.RUNNER_LABELS || '["ubuntu-latest"]') }}
+    runs-on: ${{ fromJSON(vars.RUNNER_LABELS || '["self-hosted","k8s-runners"]') }}
     environment: ${{ inputs.environment }}
 
     defaults:
