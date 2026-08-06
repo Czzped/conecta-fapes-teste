@@ -154,6 +154,46 @@ test("signed ping webhook returns ok for repo webhook health checks", async () =
   assert.equal(state.built, 0);
 });
 
+test("accepts the org webhook secret without touching the per-repo secrets", async () => {
+  // O webhook de organizacao entra com secret proprio: trocar um dos dois
+  // secrets em uso derrubaria os webhooks por repositorio que estao ativos.
+  const state = recordingWorker();
+  const response = await state.worker.fetch(
+    signedPullRequestWebhook(
+      { zen: "Keep it logically awesome." },
+      "org-secret",
+      "ping"
+    ),
+    {
+      GITHUB_WEBHOOK_SECRET: "app-secret",
+      GITHUB_REPO_WEBHOOK_SECRET: "repo-secret",
+      GITHUB_ORG_WEBHOOK_SECRET: "org-secret",
+    }
+  );
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { ok: true, event: "ping" });
+});
+
+test("rejects a webhook signed with an unknown secret", async () => {
+  const state = recordingWorker();
+  const response = await state.worker.fetch(
+    signedPullRequestWebhook(
+      { zen: "Keep it logically awesome." },
+      "secret-errado",
+      "ping"
+    ),
+    {
+      GITHUB_WEBHOOK_SECRET: "app-secret",
+      GITHUB_REPO_WEBHOOK_SECRET: "repo-secret",
+      GITHUB_ORG_WEBHOOK_SECRET: "org-secret",
+    }
+  );
+
+  assert.equal(response.status, 401);
+  assert.equal(state.built, 0);
+});
+
 test("pull_request webhook returns the validation decision", async () => {
   const response = await worker.fetch(
     new Request("https://worker.example/", {
