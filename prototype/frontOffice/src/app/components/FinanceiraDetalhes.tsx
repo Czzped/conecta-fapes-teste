@@ -165,6 +165,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
   const [justificativaReprovacao, setJustificativaReprovacao] = useState('');
   const [arquivosContestacao, setArquivosContestacao] = useState<string[]>([]);
   const [isConfirmarEnvioSemNotaOpen, setIsConfirmarEnvioSemNotaOpen] = useState(false);
+  const [isConfirmarEnvioCreditoOpen, setIsConfirmarEnvioCreditoOpen] = useState(false);
 
   /* ── Step 1 ── */
   const [selectedDocumento, setSelectedDocumento] = useState('');
@@ -968,10 +969,10 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
       )}
 
       {/* ══ Steps container ══ */}
-      <div style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '2rem', marginBottom: '2rem' }}>
+      <div style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: isCredito ? '2rem 2rem 1.25rem' : '2rem', marginBottom: '2rem' }}>
 
         {/* ─── Step 1: Informações Gerais ─── */}
-        <section className="mb-8">
+        <section className={isCredito ? 'mb-0' : 'mb-8'}>
           <div className="flex items-start gap-3 mb-1">
             <div style={stepCircle}>1</div>
             <h2 style={stepTitle}>Informações Gerais <span style={{ color: 'rgb(239,68,68)' }}>*</span></h2>
@@ -1004,7 +1005,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                           left: 'calc(100% + 0.5rem)',
                           top: '50%',
                           transform: 'translateY(-50%)',
-                          width: '320px',
+                          width: '420px',
                           padding: '0.75rem',
                           backgroundColor: 'var(--popover)',
                           border: '1px solid var(--border)',
@@ -1021,7 +1022,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                         }}
                       >
                         <span style={{ display: 'block' }}>Estorno: valor enviado pela loja.</span>
-                        <span style={{ display: 'block' }}>Devolução: valor que o coordenador deve retornar após a Contestação ter sido recusada.</span>
+                        <span style={{ display: 'block', whiteSpace: 'nowrap' }}>Devolução: valor que o coordenador retornou para o projeto.</span>
                       </span>
                     </span>
                   </label>
@@ -1055,6 +1056,48 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
                               <span style={{ marginLeft: classificacaoCredito === option ? 0 : '21px', fontFamily: 'var(--font-family)' }}>{option}</span>
                             </button>
                           ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <label style={labelSt}>Associe esse Crédito (entrada) a um Débito (saída).</label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      style={triggerSt(isReadOnly, !!saidaAssociada)}
+                      onClick={!isReadOnly ? () => setIsSaidaAssociadaOpen(!isSaidaAssociadaOpen) : undefined}
+                      disabled={isReadOnly}
+                    >
+                      <span style={{ fontFamily: 'var(--font-family)' }}>{saidaAssociada || 'Selecione um pagamento'}</span>
+                      <ChevronDown size={16} style={{ color: 'var(--muted-foreground)', flexShrink: 0, transform: isSaidaAssociadaOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform .2s' }} />
+                    </button>
+                    {isSaidaAssociadaOpen && (
+                      <>
+                        <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setIsSaidaAssociadaOpen(false)} />
+                        <div style={dropdownMenu}>
+                          {allPayments.filter((item) => item.operacao === 'DEBITO').map((item) => {
+                            const pagamentoLabel = item.operacao === 'CREDITO' ? 'Crédito' : 'Débito';
+                            const optionLabel = `${pagamentoLabel} · ${item.valor} · ${item.data}`;
+
+                            return (
+                              <button
+                                key={item.id}
+                                type="button"
+                                style={dropItemSt(saidaAssociada === optionLabel)}
+                                onClick={() => {
+                                  setSaidaAssociada(optionLabel);
+                                  setIsSaidaAssociadaOpen(false);
+                                }}
+                                onMouseEnter={e => { if (saidaAssociada !== optionLabel) e.currentTarget.style.backgroundColor = 'var(--muted)'; }}
+                                onMouseLeave={e => { if (saidaAssociada !== optionLabel) e.currentTarget.style.backgroundColor = 'var(--popover)'; }}
+                              >
+                                {saidaAssociada === optionLabel && <Check size={14} style={{ flexShrink: 0, color: 'var(--primary)' }} />}
+                                <span style={{ marginLeft: saidaAssociada === optionLabel ? 0 : '21px', fontFamily: 'var(--font-family)' }}>{optionLabel}</span>
+                              </button>
+                            );
+                          })}
                         </div>
                       </>
                     )}
@@ -1098,48 +1141,6 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
               <input type="file" ref={fileInputRef} className="hidden" accept=".pdf,.png,.jpg,.jpeg" onChange={handleFileChange} />
               {uploadedFiles.length > 0 && <FileRows offset={false} expandOnRowClick />}
 
-              <div>
-                <label style={labelSt}>Associe esse Crédito (entrada) a um Débito (saída).</label>
-                <div className="relative">
-                  <button
-                    type="button"
-                    style={triggerSt(isReadOnly, !!saidaAssociada)}
-                    onClick={!isReadOnly ? () => setIsSaidaAssociadaOpen(!isSaidaAssociadaOpen) : undefined}
-                    disabled={isReadOnly}
-                  >
-                    <span style={{ fontFamily: 'var(--font-family)' }}>{saidaAssociada || 'Selecione um pagamento'}</span>
-                    <ChevronDown size={16} style={{ color: 'var(--muted-foreground)', flexShrink: 0, transform: isSaidaAssociadaOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform .2s' }} />
-                  </button>
-                  {isSaidaAssociadaOpen && (
-                    <>
-                      <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setIsSaidaAssociadaOpen(false)} />
-                      <div style={dropdownMenu}>
-                        {allPayments.filter((item) => item.operacao === 'DEBITO').map((item) => {
-                          const pagamentoLabel = item.operacao === 'CREDITO' ? 'Crédito' : 'Débito';
-                          const optionLabel = `${pagamentoLabel} · ${item.valor} · ${item.data}`;
-
-                          return (
-                            <button
-                              key={item.id}
-                              type="button"
-                              style={dropItemSt(saidaAssociada === optionLabel)}
-                              onClick={() => {
-                                setSaidaAssociada(optionLabel);
-                                setIsSaidaAssociadaOpen(false);
-                              }}
-                              onMouseEnter={e => { if (saidaAssociada !== optionLabel) e.currentTarget.style.backgroundColor = 'var(--muted)'; }}
-                              onMouseLeave={e => { if (saidaAssociada !== optionLabel) e.currentTarget.style.backgroundColor = 'var(--popover)'; }}
-                            >
-                              {saidaAssociada === optionLabel && <Check size={14} style={{ flexShrink: 0, color: 'var(--primary)' }} />}
-                              <span style={{ marginLeft: saidaAssociada === optionLabel ? 0 : '21px', fontFamily: 'var(--font-family)' }}>{optionLabel}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
             </div>
           ) : (
           <div style={{ marginLeft: '36px' }}>
@@ -2759,7 +2760,7 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
           <button
             type="button"
             className="px-5 py-3"
-            onClick={() => toast.success('Prestação de contas enviada com sucesso.')}
+            onClick={() => setIsConfirmarEnvioCreditoOpen(true)}
             style={{
               backgroundColor: 'var(--primary)',
               color: 'var(--primary-foreground)',
@@ -2774,6 +2775,138 @@ export function FinanceiraDetalhes({ payment, onBack, onNavigate }: FinanceiraDe
             Enviar
           </button>
         </div>
+      )}
+
+      {isConfirmarEnvioCreditoOpen && (
+        <>
+          <div
+            style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 90 }}
+            onClick={() => setIsConfirmarEnvioCreditoOpen(false)}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirmar-envio-credito-title"
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 100,
+              width: 'min(92vw, 600px)',
+              backgroundColor: 'var(--popover)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.35)',
+              padding: '1.5rem',
+            }}
+          >
+            <div className="flex items-start justify-between gap-4 mb-5">
+              <div className="flex items-center gap-3">
+                <div
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: 'var(--radius)',
+                    backgroundColor: 'rgba(234, 179, 8, 0.12)',
+                    color: 'rgb(234, 179, 8)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <AlertTriangle size={20} />
+                </div>
+                <h1
+                  id="confirmar-envio-credito-title"
+                  style={{
+                    color: 'var(--foreground)',
+                    margin: 0,
+                    fontFamily: 'var(--font-family)',
+                    fontSize: 'var(--text-md)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    lineHeight: 1.45,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Tem certeza que deseja enviar as informações?
+                </h1>
+              </div>
+              <button
+                type="button"
+                aria-label="Fechar"
+                onClick={() => setIsConfirmarEnvioCreditoOpen(false)}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: 'var(--radius)',
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                  color: 'var(--muted-foreground)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <p
+              style={{
+                color: 'var(--muted-foreground)',
+                fontSize: 'var(--text-sm)',
+                fontFamily: 'var(--font-family)',
+                lineHeight: 1.6,
+                margin: '0 0 1.5rem',
+              }}
+            >
+              Confira a classificação, o débito associado e o comprovante antes de enviar. Após enviar, a Fapes irá analisar e enquanto isso não será possível editar.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                className="px-4 py-2"
+                onClick={() => setIsConfirmarEnvioCreditoOpen(false)}
+                style={{
+                  backgroundColor: 'transparent',
+                  color: 'var(--foreground)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontFamily: 'var(--font-family)',
+                  cursor: 'pointer',
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2"
+                onClick={() => {
+                  setIsConfirmarEnvioCreditoOpen(false);
+                  toast.success('Informações enviadas com sucesso.');
+                  onBack();
+                }}
+                style={{
+                  backgroundColor: 'var(--primary)',
+                  color: 'var(--primary-foreground)',
+                  border: '1px solid var(--primary)',
+                  borderRadius: 'var(--radius)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontFamily: 'var(--font-family)',
+                  cursor: 'pointer',
+                }}
+              >
+                Enviar
+              </button>
+            </div>
+          </div>
+        </>
       )}
 
       {isConfirmarEnvioSemNotaOpen && (

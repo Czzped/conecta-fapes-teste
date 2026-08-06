@@ -140,7 +140,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   // Mock data para os cards de pagamento
   const [pagamentosData, setPagamentosData] = useState<PagamentoCard[]>([
     { id: 1, tipo: 'Boleto', operacao: 'Débito', valor: 'R$ 3.456,70', data: '27/02/2026 - 09:35', categoria: 'Material Permanente', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Em Validação' },
-    { id: 2, tipo: 'Pix', operacao: 'Crédito', valor: 'R$ 4.567,90', data: '25/02/2026 - 10:05', categoria: 'Material de Consumo', variante: 'invoice', projeto: 'Outro Projeto', status: 'Em Validação' },
+    { id: 2, tipo: 'Pix', operacao: 'Débito', valor: 'R$ 4.567,90', data: '25/02/2026 - 10:05', categoria: 'Material de Consumo', variante: 'invoice', projeto: 'Outro Projeto', status: 'Em Validação' },
     { id: 3, tipo: 'Pix', operacao: 'Crédito', valor: 'R$ 789,00', data: '23/02/2026 - 12:50', categoria: 'Passagem', variante: 'passagem', projeto: 'Mais um Projeto', status: 'Em Validação' },
     { id: 4, tipo: 'Boleto', operacao: 'Débito', valor: 'R$ 2.100,00', data: '22/02/2026 - 11:20', categoria: 'Material de Consumo', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Revisar' },
     { id: 5, tipo: 'Boleto', operacao: 'Débito', valor: 'R$ 1.890,50', data: '20/02/2026 - 11:45', categoria: 'Passagem', variante: 'passagem', projeto: 'Outro Projeto', status: 'Em Validação' },
@@ -1464,6 +1464,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             </div>
 
             {/* Informações Gerais */}
+            {selectedPagamento.operacao === 'Crédito' && (
             <div
               className="mt-8 rounded-lg p-6"
               style={{
@@ -1493,7 +1494,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>
                       Classificação
                     </label>
-                    <input readOnly value="Estorno" className="w-full rounded-lg px-3 py-2" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
+                    <input readOnly value={selectedPagamento.id === 3 ? 'Devolução' : 'Estorno'} className="w-full rounded-lg px-3 py-2" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
                   </div>
                   <div>
                     <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>
@@ -1510,7 +1511,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   <textarea
                     readOnly
                     rows={4}
-                    value="Valor creditado referente ao estorno de uma compra realizada no projeto."
+                    value={selectedPagamento.id === 3 ? 'Valor creditado referente à devolução realizada para a conta do projeto.' : 'Valor creditado referente ao estorno de uma compra realizada no projeto.'}
                     className="w-full rounded-lg px-3 py-3 resize-none"
                     style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none', lineHeight: '1.5' }}
                   />
@@ -1523,7 +1524,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   <div className="rounded-lg p-4 flex items-center justify-between" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
                     <div className="flex items-center gap-3">
                       <FileText className="w-5 h-5" style={{ color: 'var(--dash-text-secondary)' }} />
-                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>Print do E-mail do Estorno.png</span>
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{selectedPagamento.id === 3 ? 'Comprovante_de_Devolucao.png' : 'Print do E-mail do Estorno.png'}</span>
                     </div>
                     <button onClick={() => toast.info('Visualizar comprovante')} title="Expandir" style={{ background: 'transparent', border: 'none', color: 'var(--dash-icon-subdued)', cursor: 'pointer', display: 'flex', padding: '4px' }}>
                       <ChevronDown className="w-5 h-5" />
@@ -1532,6 +1533,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 </div>
               </div>
             </div>
+            )}
 
             {/* Contestação (status Contestada) */}
             {selectedPagamento.status === 'Contestada' && (
