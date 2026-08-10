@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router';
-import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, Settings, Inbox, Landmark, Building2, UserRound } from 'lucide-react';
+import React, { useState } from 'react';
+import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, Settings, Inbox, Landmark, Building2, UserRound, Layers } from 'lucide-react';
 import { toast } from 'sonner';
 import conectaSymbol from 'figma:asset/db135b6708f6cc7f72f27c6a31dd02aa5500d030.png';
 import fapesLogo from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
@@ -23,6 +22,7 @@ import { CaixaEntrada } from './CaixaEntrada';
 import { AcaoTransversalFinanceiro } from './AcaoTransversalFinanceiro';
 import { RegrasAcaoTransversal } from './RegrasAcaoTransversal';
 import { Iniciativas } from './Iniciativas';
+import { CadastroModalidade } from './CadastroModalidade';
 import { ThemeProvider } from '../theme/ThemeContext';
 import { PAGE_TO_PATH, DEFAULT_PAGE, pathToPage, detalhesIdFromPath } from '../routing/paths';
 
@@ -35,7 +35,7 @@ type Contrast = 'normal' | 'high' | 'maximum';
 type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
 type Language = 'pt' | 'en' | 'es';
 type NotificationTab = 'avisos' | 'editais';
-type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'fomento' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal' | 'calendario-folha' | 'controle-acessos';
+type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'fomento' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal' | 'calendario-folha' | 'controle-acessos' | 'modalidades';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado' | 'Contestada';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
 type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outro Projeto Exemplo' | 'Mais um Projeto Exemplo';
@@ -702,6 +702,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             {([
               { key: 'instituicoes' as ActivePage, Icon: Building2, label: 'Instituições' },
               { key: 'pessoas' as ActivePage, Icon: UserRound, label: 'Pessoas' },
+              { key: 'modalidades' as ActivePage, Icon: Layers, label: 'Modalidades' },
             ]).map(({ key, Icon, label }, index) => {
               const active = activePage === key;
               return (
@@ -2074,6 +2075,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <Instituicoes onBack={() => setActivePage('parceria')} />
         ) : activePage === 'formulario' ? (
           <SurveyFormBuilder onBack={() => setActivePage('configuracoes')} />
+        ) : activePage === 'modalidades' ? (
+          <CadastroModalidade onBack={() => setActivePage('home')} />
         ) : (
           <div className="p-8">
             <div>
