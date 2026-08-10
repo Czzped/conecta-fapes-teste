@@ -7,9 +7,10 @@ import { usePageScenarios } from '@/mocks/ScenarioContext';
 interface CadastrarBolsistaProps {
   onBack: (tab?: 'bolsistas' | 'informacoes' | 'pagamentos') => void;
   tipo?: 'bolsa' | 'auxilio';
+  showBolsistasBreadcrumb?: boolean;
 }
 
-export function CadastrarBolsista({ onBack, tipo = 'bolsa' }: CadastrarBolsistaProps) {
+export function CadastrarBolsista({ onBack, tipo = 'bolsa', showBolsistasBreadcrumb = false }: CadastrarBolsistaProps) {
   const isAux = tipo === 'auxilio';
   // Rótulos que trocam entre Bolsa e Auxílio
   const rotulo = isAux ? 'Auxílio' : 'Bolsa'; // "Solicitar {rotulo}"
