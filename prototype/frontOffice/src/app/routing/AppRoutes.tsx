@@ -208,6 +208,18 @@ function CadastrarBolsistaRoute() {
   );
 }
 
+function SolicitarAuxilioRoute() {
+  const navigate = useNavigate();
+  const { accessType } = useAuth();
+  return (
+    <CadastrarBolsista
+      tipo="auxilio"
+      onBack={(tab: string = 'informacoes') => navigate(`/minha-equipe?tab=${tab}`)}
+      showBolsistasBreadcrumb={accessType === 'minhaEquipeExemplo'}
+    />
+  );
+}
+
 function CertificatesRoute() {
   const { accessType } = useAuth();
   const navigate = useAppNavigate();
@@ -289,6 +301,7 @@ export function AppRoutes() {
           <Route path="projetos" element={<MyProjectsRoute />} />
           <Route path="minha-equipe" element={<MyTeamRoute />} />
           <Route path="cadastrar-bolsista" element={<CadastrarBolsistaRoute />} />
+          <Route path="solicitar-auxilio" element={<SolicitarAuxilioRoute />} />
           <Route path="pagamentos" element={<PaymentsPage scope="personal" />} />
           <Route path="pagamentos-projeto" element={<PaymentsPage scope="project" />} />
           <Route path="certificados" element={<CertificatesRoute />} />

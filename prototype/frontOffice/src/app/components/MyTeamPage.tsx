@@ -1,4 +1,4 @@
-import { Users, Plus, UserPlus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle, HandCoins } from 'lucide-react';
+import { Users, Plus, UserPlus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle, HandCoins, Download } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -75,85 +75,23 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   const isExampleFlow = accessType === 'minhaEquipeExemplo';
   
   const periodChartRef = useRef<HTMLDivElement>(null);
-  const acoesDesktopRef = useRef<HTMLDivElement>(null);
-  const acoesMobileRef = useRef<HTMLDivElement>(null);
+  const acoesMenuRef = useRef<HTMLDivElement>(null);
 
   // Fecha o dropdown de Ações ao clicar fora
   useEffect(() => {
-    if (!isAcoesOpen) return;
+    if (!isActionsMenuOpen) return;
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      const insideDesktop = acoesDesktopRef.current?.contains(target);
-      const insideMobile = acoesMobileRef.current?.contains(target);
-      if (!insideDesktop && !insideMobile) {
-        setIsAcoesOpen(false);
+      if (!acoesMenuRef.current?.contains(target)) {
+        setIsActionsMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isAcoesOpen]);
+  }, [isActionsMenuOpen]);
 
   // Um membro é de auxílio quando a modalidade começa com "AUX"
   const isAuxilio = (m: TeamMember) => m.type.startsWith('AUX');
-
-  const acoesItems = [
-    { icon: UserPlus, label: 'Adicionar Voluntário', onClick: () => setIsAddVoluntarioOpen(true) },
-    { icon: Plus, label: 'Solicitar Bolsa', onClick: () => onNavigate?.('cadastrar-bolsista') },
-    { icon: HandCoins, label: 'Solicitar Auxílio', onClick: () => onNavigate?.('solicitar-auxilio') },
-  ];
-
-  const renderAcoesMenu = () => (
-    <div
-      style={{
-        position: 'absolute',
-        top: 'calc(100% + 4px)',
-        right: 0,
-        minWidth: '260px',
-        backgroundColor: 'var(--popover)',
-        border: '1px solid var(--border)',
-        borderRadius: 'var(--radius)',
-        boxShadow: 'var(--shadow-lg)',
-        zIndex: 50,
-        overflow: 'hidden',
-        padding: '0.25rem',
-      }}
-    >
-      {acoesItems.map(({ icon: Icon, label, onClick }) => (
-        <button
-          key={label}
-          onClick={() => {
-            onClick();
-            setIsAcoesOpen(false);
-          }}
-          style={{
-            width: '100%',
-            padding: '0.625rem 0.75rem',
-            backgroundColor: 'transparent',
-            color: 'var(--foreground)',
-            border: 'none',
-            borderRadius: 'calc(var(--radius) - 2px)',
-            fontSize: 'var(--text-sm)',
-            fontWeight: 'var(--font-weight-normal)',
-            textAlign: 'left',
-            cursor: 'pointer',
-            transition: 'background-color 0.15s',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--primary) 10%, var(--popover))';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-          }}
-        >
-          <Icon size={18} style={{ color: 'var(--primary)', flexShrink: 0 }} />
-          {label}
-        </button>
-      ))}
-    </div>
-  );
 
   const defaultDocuments = [
     { id: 1, requisito: 'Nível Médio', documento: 'Imagem Frente e Verso do Diploma', dataEnvio: '20/02/2026', status: 'Pendente' as const },
@@ -935,7 +873,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
               )}
 
               {activeTab === 'bolsistas' && !hideAddButton && !isExampleFlow && (
-                <div className="relative md:-mt-2">
+                <div ref={acoesMenuRef} className="relative md:-mt-2">
                   <button
                     type="button"
                     className="flex items-center justify-center gap-2 px-4 py-2 transition-colors"
@@ -993,6 +931,20 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                       >
                         <Plus size={16} />
                         Solicitar Bolsa
+                      </button>
+                      <button
+                        type="button"
+                        className="flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors"
+                        style={{ backgroundColor: 'transparent', color: 'var(--foreground)', border: 'none', cursor: 'pointer', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', fontFamily: 'var(--font-family)', whiteSpace: 'nowrap' }}
+                        onClick={() => {
+                          setIsActionsMenuOpen(false);
+                          onNavigate?.('solicitar-auxilio');
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--primary) 8%, var(--popover))'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                      >
+                        <HandCoins size={16} />
+                        Solicitar Auxílio
                       </button>
                       <button
                         type="button"

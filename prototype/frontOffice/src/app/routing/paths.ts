@@ -40,6 +40,7 @@ export const PAGE_TO_PATH: Record<string, string> = {
   projetos: 'projetos',
   'minha-equipe': 'minha-equipe',
   'cadastrar-bolsista': 'cadastrar-bolsista',
+  'solicitar-auxilio': 'solicitar-auxilio',
   pagamentos: 'pagamentos',
   'pagamentos-projeto': 'pagamentos-projeto',
   certificados: 'certificados',
