@@ -1009,7 +1009,6 @@ export const Iniciativas: React.FC = () => {
       >
         {[
           { key: 'iniciativas' as IniciativasTab, label: 'Projetos' },
-          { key: 'dashboard' as IniciativasTab, label: 'Dashboard' },
         ].map(({ key, label }) => (
           <button
             key={key}

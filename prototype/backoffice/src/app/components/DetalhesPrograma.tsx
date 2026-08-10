@@ -513,7 +513,6 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
         }}>
           {[
             { id: 'cadastro' as ActiveTab, label: 'Informações Gerais' },
-            { id: 'dashboard' as ActiveTab, label: 'Dashboard' },
           ].map(tab => (
             <button
               key={tab.id}

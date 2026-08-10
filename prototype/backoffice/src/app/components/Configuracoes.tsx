@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, CalendarDays, ChevronRight, ClipboardList, Database, FileCheck2, Settings, ShieldCheck, Tags, Target } from 'lucide-react';
+import { BookOpen, CalendarDays, ChevronRight, Settings, Target } from 'lucide-react';
 import { useThemeTokens } from '../theme/ThemeContext';
 
 interface ConfiguracoesProps {
@@ -22,46 +22,16 @@ const actions = [
     key: 'planejamento',
   },
   {
-    title: 'Referências Corporativas',
-    description: 'Áreas de conhecimento, rubricas financeiras, diárias, cidades, regiões e finalidades.',
-    Icon: Database,
-    key: 'referencias',
-  },
-  {
-    title: 'Rubricas',
-    description: 'Cadastro de rubricas e subrubricas por natureza da despesa, com situação e relação pai/filha.',
-    Icon: Tags,
-    key: 'rubricas',
-  },
-  {
-    title: 'Documentos Exigidos',
-    description: 'Base de documentos que podem ser exigidos dos proponentes em captações.',
-    Icon: FileCheck2,
-    key: 'documentos',
-  },
-  {
     title: 'Formulários',
     description: 'Biblioteca de formulários de inscrição, avaliação, recurso e anexos usados nas captações.',
     Icon: BookOpen,
     key: 'formularios',
   },
   {
-    title: 'Regras de Ação Transversal',
-    description: 'Políticas, vigências, faixas percentuais e rubricas permitidas para a reserva normativa.',
-    Icon: ClipboardList,
-    key: 'regras-acao-transversal',
-  },
-  {
     title: 'Calendário da Folha',
     description: 'Definição anual das datas de solicitação, geração e pagamento da folha de bolsas.',
     Icon: CalendarDays,
     key: 'calendario-folha',
-  },
-  {
-    title: 'Controle de Acessos',
-    description: 'Gerencie o permissionamento dos funcionários.',
-    Icon: ShieldCheck,
-    key: 'controle-acessos',
   },
 ];
 

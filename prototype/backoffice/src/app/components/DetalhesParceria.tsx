@@ -753,7 +753,6 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
         <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '28px' }}>
           {[
             { id: 'resumo', label: 'Informações Gerais' },
-            { id: 'dashboard', label: 'Dashboard' },
           ].map(tab => (
             <button
               key={tab.id}

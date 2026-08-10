@@ -215,7 +215,6 @@ export const Programa: React.FC<Props> = ({ onBack }) => {
         <div style={{ display: 'flex', gap: '4px', borderBottom: `1px solid ${T.borderSubtle}`, marginBottom: '28px' }}>
           {[
             { id: 'listagem' as ActiveTab, label: 'Programas' },
-            { id: 'dashboard' as ActiveTab, label: 'Dashboard' },
           ].map(tab => (
             <button
               key={tab.id}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, Settings, Inbox, Landmark, Building2, UserRound } from 'lucide-react';
+import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, Settings, Inbox, Building2, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 import conectaSymbol from 'figma:asset/db135b6708f6cc7f72f27c6a31dd02aa5500d030.png';
 import fapesLogo from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
@@ -20,7 +20,6 @@ import { ReferenciasCorporativas } from './ReferenciasCorporativas';
 import { DocumentosExigidos } from './DocumentosExigidos';
 import { SurveyFormBuilder } from './SurveyFormBuilder';
 import { CaixaEntrada } from './CaixaEntrada';
-import { AcaoTransversalFinanceiro } from './AcaoTransversalFinanceiro';
 import { RegrasAcaoTransversal } from './RegrasAcaoTransversal';
 import { Iniciativas } from './Iniciativas';
 import { ThemeProvider } from '../theme/ThemeContext';
@@ -35,7 +34,7 @@ type Contrast = 'normal' | 'high' | 'maximum';
 type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
 type Language = 'pt' | 'en' | 'es';
 type NotificationTab = 'avisos' | 'editais';
-type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'fomento' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal' | 'calendario-folha' | 'controle-acessos';
+type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'pagamento' | 'detalhes' | 'fomento' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal' | 'calendario-folha' | 'controle-acessos';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado' | 'Contestada';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
 type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outro Projeto Exemplo' | 'Mais um Projeto Exemplo';
@@ -421,6 +420,74 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             className={`backoffice-sidebar-menu mt-6 transition-all duration-300 ${sidebarExpanded ? 'expanded w-full px-4' : 'collapsed w-auto'}`}
             style={{ overflowY: 'auto', overflowX: 'hidden', minHeight: 0, flex: '1 1 auto', paddingBottom: '24px' }}
           >
+            {/* Seção BOLSAS */}
+            {sidebarExpanded && (
+              <h3 
+                className="mb-3 px-2"
+                style={{
+                  fontFamily: 'var(--font-family)',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  color: T.textMuted,
+                  letterSpacing: '0.05em',
+                  transition: 'color 0.3s',
+                }}
+              >
+                BOLSAS
+              </h3>
+            )}
+            
+            {/* Itens do menu BOLSAS */}
+            {([
+              { key: 'pagamento' as ActivePage, Icon: CreditCard, label: 'Pagamento' },
+              { key: 'documentos' as ActivePage, Icon: FileText, label: 'Documentos' },
+            ]).map(({ key, Icon, label }, index) => {
+              const active = activePage === key;
+              return (
+                <button
+                  key={key}
+                  className={`flex items-center gap-3 rounded-lg transition-all duration-200 ${index > 0 ? 'mt-2' : ''}`}
+                  aria-label={label}
+                  style={{
+                    backgroundColor: active ? T.menuActiveBg : 'transparent',
+                    padding: sidebarExpanded ? '12px 16px' : '12px',
+                    width: sidebarExpanded ? '100%' : '48px',
+                    justifyContent: sidebarExpanded ? 'flex-start' : 'center',
+                  }}
+                  onClick={() => {
+                    setActivePage(key);
+                  }}
+                  onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.07)'; }}
+                  onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                >
+                  <Icon
+                    size={20}
+                    style={{
+                      color: active ? T.menuActiveText : T.menuInactiveText,
+                      flexShrink: 0,
+                      transition: 'color 0.3s',
+                    }}
+                  />
+                  {sidebarExpanded && (
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        color: active ? T.menuActiveText : T.menuInactiveText,
+                        transition: 'color 0.3s',
+                      }}
+                    >
+                      {label}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+
+            {/* Espaçamento entre seções */}
+            <div style={{ height: '24px' }} />
+
             {/* Seção FOMENTO */}
             {sidebarExpanded && (
               <h3 
@@ -491,128 +558,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 </button>
               );
             })}
-
-            {/* Espaçamento entre seções */}
-            <div style={{ height: '24px' }} />
-
-            {/* Seção FINANCEIRO */}
-            {sidebarExpanded && (
-              <h3
-                className="mb-3 px-2"
-                style={{
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--text-xs)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  color: T.textMuted,
-                  letterSpacing: '0.05em',
-                  transition: 'color 0.3s',
-                }}
-              >
-                FINANCEIRO
-              </h3>
-            )}
-
-            {/* Itens do menu FINANCEIRO */}
-            {([
-              { key: 'contabilidade-financeiro' as ActivePage, Icon: Landmark, label: 'Ação Transversal' },
-            ]).map(({ key, Icon, label }, index) => {
-              const active = activePage === key;
-              return (
-                <button
-                  key={key}
-                  className={`flex items-center gap-3 rounded-lg transition-all duration-200 ${index > 0 ? 'mt-2' : ''}`}
-                  aria-label={label}
-                  style={{
-                    backgroundColor: active ? T.menuActiveBg : 'transparent',
-                    padding: sidebarExpanded ? '12px 16px' : '12px',
-                    width: sidebarExpanded ? '100%' : '48px',
-                    justifyContent: sidebarExpanded ? 'flex-start' : 'center',
-                  }}
-                  onClick={() => setActivePage(key)}
-                  onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.07)'; }}
-                  onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'transparent'; }}
-                >
-                  <Icon
-                    size={20}
-                    style={{
-                      color: active ? T.menuActiveText : T.menuInactiveText,
-                      flexShrink: 0,
-                      transition: 'color 0.3s',
-                    }}
-                  />
-                  {sidebarExpanded && (
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-family)',
-                        fontSize: 'var(--text-sm)',
-                        fontWeight: 'var(--font-weight-medium)',
-                        color: active ? T.menuActiveText : T.menuInactiveText,
-                        transition: 'color 0.3s',
-                      }}
-                    >
-                      {label}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-            
-            {/* Espaçamento entre seções */}
-            <div style={{ height: '24px' }} />
-            
-            {/* Seção BOLSAS */}
-            {sidebarExpanded && (
-              <h3 
-                className="mb-3 px-2"
-                style={{
-                  fontFamily: 'var(--font-family)',
-                  fontSize: 'var(--text-xs)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  color: T.textMuted,
-                  letterSpacing: '0.05em',
-                  transition: 'color 0.3s',
-                }}
-              >
-                BOLSAS
-              </h3>
-            )}
-            
-            {/* Pagamento */}
-            <button
-              className="flex items-center gap-3 rounded-lg transition-all duration-200"
-              aria-label="Pagamento"
-              style={{
-                backgroundColor: activePage === 'pagamento' ? T.menuActiveBg : 'transparent',
-                padding: sidebarExpanded ? '12px 16px' : '12px',
-                width: sidebarExpanded ? '100%' : '48px',
-                justifyContent: sidebarExpanded ? 'flex-start' : 'center',
-              }}
-              onClick={() => setActivePage('pagamento')}
-              onMouseEnter={(e) => { if (activePage !== 'pagamento') e.currentTarget.style.backgroundColor = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.07)'; }}
-              onMouseLeave={(e) => { if (activePage !== 'pagamento') e.currentTarget.style.backgroundColor = 'transparent'; }}
-            >
-              <CreditCard 
-                size={20} 
-                style={{ 
-                  color: activePage === 'pagamento' ? T.menuActiveText : T.menuInactiveText,
-                  flexShrink: 0,
-                  transition: 'color 0.3s',
-                }} 
-              />
-              {sidebarExpanded && (
-                <span
-                  style={{
-                    fontFamily: 'var(--font-family)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 'var(--font-weight-medium)',
-                    color: activePage === 'pagamento' ? T.menuActiveText : T.menuInactiveText,
-                    transition: 'color 0.3s',
-                  }}
-                >
-                  Pagamento
-                </span>
-              )}
-            </button>
 
             {/* Espaçamento entre seções */}
             <div style={{ height: '24px' }} />
@@ -1954,8 +1899,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           />
         ) : activePage === 'pagamento' ? (
           <div />
-        ) : activePage === 'contabilidade-financeiro' ? (
-          <AcaoTransversalFinanceiro onBack={() => setActivePage('parceria')} />
         ) : activePage === 'iniciativas' ? (
           <Iniciativas />
         ) : activePage === 'rubricas' ? (

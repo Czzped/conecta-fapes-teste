@@ -585,7 +585,6 @@ export const Parceria: React.FC<Props> = ({ onBack }) => {
         <div style={{ display: 'flex', gap: '4px', borderBottom: `1px solid ${T.borderSubtle}`, marginBottom: '28px' }}>
           {[
             { id: 'listagem', label: 'Parcerias' },
-            { id: 'dashboard', label: 'Dashboard' },
           ].map(tab => (
             <button
               key={tab.id}

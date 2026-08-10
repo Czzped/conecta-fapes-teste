@@ -689,7 +689,7 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
         {/* Tab Bar Link */}
         <div style={{ marginBottom: '24px' }}>
           <div style={{ display: 'flex', gap: '0' }}>
-            {(['captacoes', 'dashboard'] as ActiveTab[]).map((tab) => {
+            {(['captacoes'] as ActiveTab[]).map((tab) => {
               const isActive = activeTab === tab;
               const label = tab === 'dashboard' ? 'Dashboard' : isFomento ? 'Fomentos' : 'Captações';
               return (

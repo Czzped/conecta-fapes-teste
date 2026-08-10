@@ -1382,10 +1382,8 @@ export const DetalhesCaptacao: React.FC<Props> = ({ onBack, captacao, kind = 'ca
         <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '24px' }}>
           {(isFomento ? [
             { id: 'informacoes', label: 'Informações Gerais' },
-            { id: 'dashboard', label: 'Dashboard' },
           ] : [
             { id: 'informacoes', label: 'Informações Gerais' },
-            { id: 'dashboard', label: 'Dashboard' },
             { id: 'proposta', label: 'Proposta' },
             { id: 'avaliacao', label: 'Habilitação' },
             { id: 'avaliacaoAdHoc', label: 'Avaliação Ad Hoc' },
