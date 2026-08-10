@@ -154,6 +154,46 @@ test("signed ping webhook returns ok for repo webhook health checks", async () =
   assert.equal(state.built, 0);
 });
 
+test("accepts the org webhook secret without touching the per-repo secrets", async () => {
+  // O webhook de organizacao entra com secret proprio: trocar um dos dois
+  // secrets em uso derrubaria os webhooks por repositorio que estao ativos.
+  const state = recordingWorker();
+  const response = await state.worker.fetch(
+    signedPullRequestWebhook(
+      { zen: "Keep it logically awesome." },
+      "org-secret",
+      "ping"
+    ),
+    {
+      GITHUB_WEBHOOK_SECRET: "app-secret",
+      GITHUB_REPO_WEBHOOK_SECRET: "repo-secret",
+      GITHUB_ORG_WEBHOOK_SECRET: "org-secret",
+    }
+  );
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { ok: true, event: "ping" });
+});
+
+test("rejects a webhook signed with an unknown secret", async () => {
+  const state = recordingWorker();
+  const response = await state.worker.fetch(
+    signedPullRequestWebhook(
+      { zen: "Keep it logically awesome." },
+      "secret-errado",
+      "ping"
+    ),
+    {
+      GITHUB_WEBHOOK_SECRET: "app-secret",
+      GITHUB_REPO_WEBHOOK_SECRET: "repo-secret",
+      GITHUB_ORG_WEBHOOK_SECRET: "org-secret",
+    }
+  );
+
+  assert.equal(response.status, 401);
+  assert.equal(state.built, 0);
+});
+
 test("pull_request webhook returns the validation decision", async () => {
   const response = await worker.fetch(
     new Request("https://worker.example/", {
@@ -176,6 +216,60 @@ test("pull_request webhook returns the validation decision", async () => {
   assert.equal(payload.validation.valid, true);
   assert.equal(payload.validation.reason, "ok_develop_work_branch");
   assert.equal(payload.repository, "leds-conectafapes-backend-admin");
+});
+
+test("pull_request webhook ignores repositories outside the git flow", async () => {
+  // Com webhook de organizacao chega evento de todos os repos da org. Um repo
+  // fora da lista nao deve receber status nem mover card do Project 43.
+  const state = recordingWorker();
+  const response = await state.worker.fetch(
+    new Request("https://worker.example/", {
+      method: "POST",
+      headers: { "x-github-event": "pull_request" },
+      body: JSON.stringify({
+        action: "opened",
+        pull_request: { base: { ref: "main" }, head: { ref: "feature/123-qualquer" } },
+        repository: { name: "n8n-na-pratica" },
+      }),
+    }),
+    {}
+  );
+
+  assert.equal(response.status, 202);
+  assert.deepEqual(await response.json(), {
+    ignored: true,
+    reason: "repository_not_managed",
+    repository: "n8n-na-pratica",
+  });
+  // Nenhum gateway construido => nenhum status publicado, nenhuma acao executada.
+  assert.equal(state.built, 0);
+  assert.deepEqual(state.executed, []);
+});
+
+test("merged PR from an unmanaged repository does not create tags or PRs", async () => {
+  const state = recordingWorker();
+  const response = await state.worker.fetch(
+    new Request("https://worker.example/", {
+      method: "POST",
+      headers: { "x-github-event": "pull_request" },
+      body: JSON.stringify({
+        action: "closed",
+        installation: { id: 123 },
+        pull_request: {
+          merged: true,
+          merge_commit_sha: "merge-sha",
+          base: { ref: "main" },
+          head: { ref: "release/v9.9.9" },
+        },
+        repository: { name: "reportfy" },
+      }),
+    }),
+    {}
+  );
+
+  assert.equal(response.status, 202);
+  assert.equal(state.built, 0);
+  assert.deepEqual(state.executed, []);
 });
 
 test("pull_request webhook publishes git-flow policy as commit status", async () => {

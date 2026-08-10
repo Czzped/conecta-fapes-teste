@@ -253,6 +253,13 @@ Para webhooks diretos de repositorio que disparam a validacao de PR, use
 `GITHUB_REPO_WEBHOOK_SECRET`. Isso permite configurar `pull_request` nos repos
 tecnicos sem rotacionar o secret ja usado pelo webhook do Project.
 
+Para o webhook de **organizacao**, use `GITHUB_ORG_WEBHOOK_SECRET`. A assinatura
+e aceita se qualquer um dos tres secrets conferir, entao o webhook de org pode
+entrar em paralelo aos por-repositorio: nenhum secret em uso precisa ser
+rotacionado, e remover os webhooks por repositorio fica sendo um passo separado
+e reversivel. Rotacionar `GITHUB_REPO_WEBHOOK_SECRET` para reaproveitar num
+webhook de org derrubaria os webhooks por repositorio ativos.
+
 A publicacao do status `git-flow/pr-policy` pode usar `GITHUB_STATUS_TOKEN`
 quando o GitHub App ainda nao tiver permissao `Commit statuses: write`; se esse
 secret nao existir, o worker usa o token da instalacao do GitHub App.
@@ -271,6 +278,7 @@ secret nao existir, o worker usa o token da instalacao do GitHub App.
 - `GITHUB_APP_PRIVATE_KEY`
 - `GITHUB_WEBHOOK_SECRET`
 - `GITHUB_REPO_WEBHOOK_SECRET` (opcional; webhooks diretos dos repositorios)
+- `GITHUB_ORG_WEBHOOK_SECRET` (opcional; webhook de organizacao)
 - `GITHUB_GIT_FLOW_TOKEN` (opcional; preferido para branch/PR/tag/linked branch)
 - `GITHUB_REPOSITORY_TOKEN` (opcional; fallback para side-effects nos repositorios)
 - `GITHUB_STATUS_TOKEN` (opcional; fallback para publicar commit statuses e legado de repositorio)

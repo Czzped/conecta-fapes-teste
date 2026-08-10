@@ -260,6 +260,66 @@ No `prestacao-de-contas` ele aponta para `main`, que não existe: workflow morto
    bloqueia o rebuild-na-main, mas é o pré-requisito de qualquer promoção por
    artefato no futuro. Padronizar em `:<branch>-<sha>`, como já fazem
    `frontend-backoffice` e `frontoffice-frontend`.
+5. **Dois repos fora do git-flow.** O status `git-flow/pr-policy` nunca chega em
+   `authentication` nem em `backend-pagamento-bolsistas` — verificado: 0 de 5 PRs
+   recentes têm o status, contra 5 de 5 nos outros cinco. Não é GitHub App: a
+   ligação com o worker é um **webhook por repositório**
+   (`https://project43-status-dates.leds-conectafapes.workers.dev/`, evento
+   `pull_request`). Os cinco que funcionam têm ids sequenciais
+   (638322619…638322655), criados no mesmo lote; estes dois ficaram de fora.
+
+   Esses são exatamente os mesmos dois repos que tinham a `main` desprotegida e
+   os que faltavam em `git-flow-config.ts`. Não são três problemas: nunca foram
+   integrados ao setup.
+
+   **Decisão: trocar por um webhook de organização**, que cobre repos atuais e
+   futuros e elimina a classe de erro. Pré-requisito **já implementado**: o
+   worker agora ignora eventos de repos fora de `DEFAULT_REPOSITORIES`
+   (`repository_not_managed`). Sem esse filtro, um webhook de org faria o worker
+   publicar `git-flow/pr-policy` nos ~30 repos da organização — reprovando PRs de
+   repos com outras convenções — e mover cards do Project 43 a partir do número
+   no nome de qualquer branch.
+
+   Sequência: (a) deploy do worker com o filtro; (b) criar o webhook na org
+   (Settings → Webhooks), evento `pull_request` apenas, com o mesmo secret dos
+   atuais; (c) validar; (d) remover os 5 webhooks por repositório. Coexistir é
+   seguro — o `GitFlowGateway` é idempotente (`already_exists` para branch, PR e
+   tag), então entrega duplicada não gera PR nem tag duplicados.
+
+### 4.7 Proteção de branch: convenções divergentes
+
+Dois mecanismos convivem na org, e isso muda como aplicar a proteção da `homol`:
+
+- `backend-admin`, `frontoffice-frontend` e outros usam **branch protection
+  clássica** (1 aprovação + `git-flow/pr-policy` obrigatório);
+- `authentication` usa **ruleset** (`[BRANCH] Basic Protection Rules`, 2
+  aprovações, sem status check). Aplicar proteção lá é incluir a branch no
+  `conditions.ref_name.include` do ruleset, não criar branch protection.
+
+Cuidado ao replicar: **não tornar `git-flow/pr-policy` obrigatório em repo que
+não recebe o status** — o check nunca chega e todo PR trava para sempre. Vale
+para os dois repos do item 4.6.5 até o webhook de organização estar no ar.
+
+### 4.8 Ruleset de push bloqueia alterar workflow
+
+`[PUSH] Keep It Secrect` restringe caminhos em 3 dos 7 repos:
+
+| Repo | Caminho restrito |
+|---|---|
+| `authentication` | `.github/workflows/**/*` |
+| `backend-admin` | `.github/workflows/**/*` |
+| `frontoffice-frontend` | `.github/*` |
+
+O único `bypass_actors` é `OrganizationAdmin` com `bypass_mode: always`, e **não
+há fluxo de exemption configurado** — a API `bypass-requests/push-rules`
+responde 404, então a URL `exemptions/new` que o GitHub imprime no erro gera uma
+solicitação que ninguém pode aprovar.
+
+Consequência prática: nesses 3 repos a alteração de workflow tem de ser feita
+por uma identidade que seja **admin da organização**. Um `git push` por SSH com
+chave de outra conta é recusado, mesmo que a conta tenha admin no repositório.
+A proteção existe por um motivo — esses repos guardam `HELM_PRODEST_TOKEN`,
+`GHCR_TOKEN` e `INFRA_PUSH_TOKEN` — então não afrouxar o ruleset.
 
 ## 5. Ordem de execução
 
@@ -283,6 +343,24 @@ Sem isso, todo PR do fluxo novo é reprovado pelo `git-flow/pr-policy`.
 > `project43-automation.yml` **só roda os testes — não faz deploy**. A mudança
 > só passa a valer depois de um `wrangler deploy` manual. Enquanto o worker
 > antigo estiver no ar, os PRs para `homol` seguem sendo reprovados.
+
+**Estado do deploy do worker** (verificado em 05/08/2026):
+
+- worker `project43-status-dates`, conta Cloudflare
+  `33aa5d799e068d672eab1b7a2737f816`
+- o token em `CLOUDFLARE_LEDS_TOKEN` **tem permissão de escrita em Workers**
+  (confirmado por sondagem no endpoint de upload, sem criar nada)
+- `wrangler deploy --dry-run` passa; os 7 secrets do worker estão configurados
+  e são preservados pelo deploy (não estão declarados no `wrangler.jsonc`)
+- **decisão: deployar somente depois do merge do PR da Fase 0**, para o que está
+  no ar não divergir da `main`
+
+Dois pontos a resolver quando der:
+
+- o worker roda numa **conta pessoal** da Cloudflare — risco de propriedade
+  para uma automação da organização;
+- vale adicionar um step de deploy no `project43-automation.yml` (com um secret
+  `CLOUDFLARE_API_TOKEN`), senão esse passo manual continua sendo esquecido.
 
 **Fase 1 — piloto em um repo**
 `leds-conectafapes-authentication`: é o único sem job de helm legado, então o

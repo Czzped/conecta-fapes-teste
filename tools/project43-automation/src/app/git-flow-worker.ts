@@ -337,8 +337,22 @@ async function applyCardMovement(
   }
 }
 
+/**
+ * Secrets aceitos para validar a assinatura `x-hub-signature-256`. A assinatura
+ * e valida se QUALQUER um deles conferir.
+ *
+ * `GITHUB_ORG_WEBHOOK_SECRET` existe para o webhook de organizacao poder ser
+ * criado com um secret proprio, sem tocar nos dois secrets ja em uso — trocar
+ * um deles derrubaria os webhooks por repositorio que estao ativos. Com um
+ * terceiro slot, o webhook de org entra em paralelo e a remocao dos por-repo
+ * fica sendo um passo separado e reversivel.
+ */
 function getWebhookSecrets(env: WorkerEnvironment): string[] {
-  return [env.GITHUB_WEBHOOK_SECRET, env.GITHUB_REPO_WEBHOOK_SECRET]
+  return [
+    env.GITHUB_WEBHOOK_SECRET,
+    env.GITHUB_REPO_WEBHOOK_SECRET,
+    env.GITHUB_ORG_WEBHOOK_SECRET,
+  ]
     .map((value) => value?.trim())
     .filter((value): value is string => Boolean(value));
 }
@@ -501,6 +515,19 @@ export class GitFlowWorker {
 
     if (!refs) {
       return json({ ignored: true, reason: "missing_refs" }, 202);
+    }
+
+    // Filtro de repositorio. Com webhook por repositorio isso era desnecessario:
+    // so chegava evento de quem tinha o webhook. Com webhook de ORGANIZACAO
+    // chegam eventos de todos os repos da org, e sem este filtro o worker
+    // publicaria o status `git-flow/pr-policy` — reprovando PRs de repos que
+    // seguem outras convencoes — e moveria cards do Project 43 a partir do
+    // numero no nome de qualquer branch.
+    if (!resolveRepository(config, refs.repository)) {
+      return json(
+        { ignored: true, reason: "repository_not_managed", repository: refs.repository },
+        202
+      );
     }
 
     // --- PR validation + card movement on PR opened ---
