@@ -34,7 +34,7 @@ type Contrast = 'normal' | 'high' | 'maximum';
 type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
 type Language = 'pt' | 'en' | 'es';
 type NotificationTab = 'avisos' | 'editais';
-type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'pagamento' | 'detalhes' | 'fomento' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal' | 'calendario-folha' | 'controle-acessos';
+type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'pagamento' | 'detalhes' | 'fomento' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'bolsas-documentos' | 'regras-acao-transversal' | 'calendario-folha' | 'controle-acessos';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado' | 'Contestada';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
 type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outro Projeto Exemplo' | 'Mais um Projeto Exemplo';
@@ -440,7 +440,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             {/* Itens do menu BOLSAS */}
             {([
               { key: 'pagamento' as ActivePage, Icon: CreditCard, label: 'Pagamento' },
-              { key: 'documentos' as ActivePage, Icon: FileText, label: 'Documentos' },
+              { key: 'bolsas-documentos' as ActivePage, Icon: FileText, label: 'Documentos' },
             ]).map(({ key, Icon, label }, index) => {
               const active = activePage === key;
               return (
@@ -1933,6 +1933,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <ReferenciasCorporativas onBack={() => setActivePage('configuracoes')} />
         ) : activePage === 'documentos' ? (
           <DocumentosExigidos onBack={() => setActivePage('configuracoes')} />
+        ) : activePage === 'bolsas-documentos' ? (
+          <div style={{ minHeight: 'calc(100vh - 96px)' }} />
         ) : activePage === 'regras-acao-transversal' ? (
           <RegrasAcaoTransversal onBack={() => setActivePage('configuracoes')} />
         ) : activePage === 'programa' ? (

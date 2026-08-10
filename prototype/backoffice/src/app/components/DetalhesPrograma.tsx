@@ -505,36 +505,6 @@ export const DetalhesPrograma: React.FC<Props> = ({ onBack, programaNome }) => {
           </div>
         </div>
 
-        <div style={{
-          display: 'flex',
-          gap: '8px',
-          borderBottom: '1px solid rgba(255,255,255,0.1)',
-          marginBottom: '24px',
-        }}>
-          {[
-            { id: 'cadastro' as ActiveTab, label: 'Informações Gerais' },
-          ].map(tab => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                backgroundColor: 'transparent',
-                border: 'none',
-                borderBottom: activeTab === tab.id ? '2px solid #00c1af' : '2px solid transparent',
-                color: activeTab === tab.id ? '#00c1af' : 'rgba(255,255,255,0.6)',
-                fontFamily: 'var(--font-family)',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 'var(--font-weight-medium)',
-                padding: '0 4px 12px',
-                cursor: 'pointer',
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
         {activeTab === 'cadastro' && (
           <>
         <div style={cardStyle}>

@@ -757,16 +757,6 @@ export const Instituicoes: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '4px', borderBottom: `1px solid ${T.borderSubtle}`, marginBottom: '28px' }}>
-          {[
-            { id: 'listagem' as ActiveTab, label: 'Instituições' },
-          ].map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === tab.id ? `2px solid ${T.accent}` : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: activeTab === tab.id ? T.accent : T.textSecondary, cursor: 'pointer', marginBottom: '-1px' }}>
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
         {activeTab === 'dashboard' && (
           <div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>

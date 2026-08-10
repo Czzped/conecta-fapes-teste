@@ -13,6 +13,7 @@ export const PAGE_TO_PATH: Record<string, string> = {
   // 'detalhes' não entra aqui: o caminho carrega o id (/financeira/:id) e é
   // construído a partir do pagamento selecionado.
   pagamento: '/pagamento',
+  'bolsas-documentos': '/bolsas/documentos',
   fomento: '/fomento',
   editais: '/editais',
   'editais-light': '/editais-light',

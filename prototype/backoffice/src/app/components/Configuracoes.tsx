@@ -16,10 +16,10 @@ interface ConfiguracoesProps {
 
 const actions = [
   {
-    title: 'Planejamento Estratégico',
-    description: 'Cadastro e manutenção dos planejamentos estratégicos, eixos e visão de programas por eixo.',
-    Icon: Target,
-    key: 'planejamento',
+    title: 'Calendário da Folha',
+    description: 'Definição anual das datas de solicitação, geração e pagamento da folha de bolsas.',
+    Icon: CalendarDays,
+    key: 'calendario-folha',
   },
   {
     title: 'Formulários',
@@ -28,10 +28,10 @@ const actions = [
     key: 'formularios',
   },
   {
-    title: 'Calendário da Folha',
-    description: 'Definição anual das datas de solicitação, geração e pagamento da folha de bolsas.',
-    Icon: CalendarDays,
-    key: 'calendario-folha',
+    title: 'Planejamento Estratégico',
+    description: 'Cadastro e manutenção dos planejamentos estratégicos, eixos e visão de programas por eixo.',
+    Icon: Target,
+    key: 'planejamento',
   },
 ];
 
