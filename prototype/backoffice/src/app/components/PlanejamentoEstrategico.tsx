@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Calendar, CheckCircle, ChevronDown, ChevronRight, DollarSign, Edit3, Flag, Plus, Save, Search, Target, Trash2, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, DollarSign, Edit3, Plus, Save, Search, Target, Trash2, X } from 'lucide-react';
 import { useThemeTokens, ThemeTokens } from '../theme/ThemeContext';
 import { ConfiguracoesPageHeader } from './ConfiguracoesPageHeader';
 import { BackofficeDatePicker } from './BackofficeDatePicker';
@@ -220,7 +220,7 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
     nome: '',
     descricao: '',
   });
-  const [eixosCriacao, setEixosCriacao] = useState(['']);
+  const [eixosCriacao, setEixosCriacao] = useState([{ nome: '', descricao: '' }]);
   const [editingEixoId, setEditingEixoId] = useState<number | null>(null);
   const [selectedEixoDashboardId, setSelectedEixoDashboardId] = useState<number | null>(null);
   const [draftEixo, setDraftEixo] = useState({
@@ -229,8 +229,6 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
   });
 
   const selectedPlano = planos.find(plano => plano.id === selectedPlanoId) || null;
-  const planoAtivo = planos.find(plano => plano.estado === 'Ativo');
-
   const filteredPlanos = useMemo(() => {
     return planos.filter(plano => {
       const matchesText = `${plano.nome} ${plano.descricao}`.toLowerCase().includes(searchTerm.toLowerCase());
@@ -249,7 +247,7 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
     setEditingEixoId(null);
     setSelectedEixoDashboardId(null);
     setDraftEixo({ nome: '', descricao: '' });
-    setEixosCriacao(['']);
+    setEixosCriacao([{ nome: '', descricao: '' }]);
   };
 
   const criarPlano = () => {
@@ -277,7 +275,19 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
     if (!draftPlano) return;
     setPlanos(prev => prev.map(plano => {
       if (plano.id !== draftPlano.id) return plano;
-      return { ...plano, ...draftPlano };
+      const eixos = creating
+        ? eixosCriacao
+          .filter(eixo => eixo.nome.trim())
+          .map((eixo, index) => ({
+            id: index + 1,
+            nome: eixo.nome,
+            descricao: eixo.descricao || 'Descrição pendente.',
+            programas: 0,
+            valorInvestido: 0,
+            programasAssociados: [],
+          }))
+        : plano.eixos;
+      return { ...plano, ...draftPlano, eixos };
     }));
     setEditing(false);
     setCreating(false);
@@ -286,8 +296,20 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
   const ativarPlano = () => {
     if (!draftPlano) return;
     const ativo = { ...draftPlano, estado: 'Ativo' as EstadoPlano };
+    const eixos = creating
+      ? eixosCriacao
+        .filter(eixo => eixo.nome.trim())
+        .map((eixo, index) => ({
+          id: index + 1,
+          nome: eixo.nome,
+          descricao: eixo.descricao || 'Descrição pendente.',
+          programas: 0,
+          valorInvestido: 0,
+          programasAssociados: [],
+        }))
+      : undefined;
     setDraftPlano(ativo);
-    setPlanos(prev => prev.map(plano => plano.id === ativo.id ? { ...plano, ...ativo } : plano));
+    setPlanos(prev => prev.map(plano => plano.id === ativo.id ? { ...plano, ...ativo, ...(eixos ? { eixos } : {}) } : plano));
     setEditing(false);
     setCreating(false);
   };
@@ -350,13 +372,6 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
           onBack={onBack}
           action={<SmallButton icon={<Plus size={14} />} label="Criar Planejamento" onClick={criarPlano} filled />}
         />
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-          <MetricCard icon={<CheckCircle size={20} />} label="Planejamento ativo" value={planoAtivo?.nome || 'Nenhum'} />
-          <MetricCard icon={<Target size={20} />} label="Total de planejamentos" value={String(planos.length)} />
-          <MetricCard icon={<Flag size={20} />} label="Eixos cadastrados" value={String(planos.reduce((total, plano) => total + plano.eixos.length, 0))} />
-          <MetricCard icon={<Calendar size={20} />} label="Rascunho" value={String(planos.filter(plano => plano.estado === 'Rascunho').length)} />
-        </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', marginBottom: '24px' }}>
             <div>
@@ -469,19 +484,41 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
             <textarea value={currentDraft.descricao} onChange={(event) => setDraftPlano(prev => prev ? { ...prev, descricao: event.target.value } : prev)} rows={4} style={{ ...S.input, resize: 'vertical' }} />
           </Field>
 
-          <div style={{ display: 'grid', gap: '14px', marginTop: '16px' }}>
+        </div>
+
+        <div style={{ ...S.card, marginBottom: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '22px' }}>
+            <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: T.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: T.accentText }}>2</span>
+            </div>
+            <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+              Eixo Estratégico
+            </h2>
+          </div>
+
+          <div style={{ display: 'grid', gap: '16px' }}>
             {eixosCriacao.map((eixo, index) => (
-              <Field key={index} label={index === 0 ? 'Eixo Estratégico' : `Eixo Estratégico ${index + 1}`}>
-                <input
-                  value={eixo}
-                  onChange={(event) => setEixosCriacao(prev => prev.map((item, itemIndex) => itemIndex === index ? event.target.value : item))}
-                  placeholder="Digite o eixo estratégico"
-                  style={S.input}
-                />
-              </Field>
+              <div key={index} style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '16px' }}>
+                <Field label="Nome">
+                  <input
+                    value={eixo.nome}
+                    onChange={(event) => setEixosCriacao(prev => prev.map((item, itemIndex) => itemIndex === index ? { ...item, nome: event.target.value } : item))}
+                    placeholder="Nome do eixo estratégico"
+                    style={S.input}
+                  />
+                </Field>
+                <Field label="Descrição">
+                  <input
+                    value={eixo.descricao}
+                    onChange={(event) => setEixosCriacao(prev => prev.map((item, itemIndex) => itemIndex === index ? { ...item, descricao: event.target.value } : item))}
+                    placeholder="Descrição do eixo estratégico"
+                    style={S.input}
+                  />
+                </Field>
+              </div>
             ))}
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <SmallButton icon={<Plus size={14} />} label="Adicionar Eixo" onClick={() => setEixosCriacao(prev => [...prev, ''])} />
+              <SmallButton icon={<Plus size={14} />} label="Adicionar Eixo" onClick={() => setEixosCriacao(prev => [...prev, { nome: '', descricao: '' }])} />
             </div>
           </div>
         </div>
@@ -548,26 +585,29 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
             <Field label="Descrição">
               <ReadValue value={selectedPlano.descricao} />
             </Field>
+          </div>
 
-            <div style={{ marginTop: '20px' }}>
-              <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: '0 0 16px' }}>
-                Eixos Estratégicos
-              </h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {selectedPlano.eixos.map(eixo => (
-                    <div
-                      key={eixo.id}
-                      style={{
-                        padding: '16px',
-                        backgroundColor: T.bgSurfaceMuted,
-                        border: `1px solid ${T.borderSubtle}`,
-                        borderRadius: '8px',
-                      }}
-                    >
-                      <ReadCell label="Eixo" value={eixo.nome} strong />
-                    </div>
-                ))}
+          <div style={{ ...S.card, marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '22px' }}>
+              <div style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: T.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ fontFamily: 'var(--font-family)', fontSize: '11px', fontWeight: 'var(--font-weight-medium)', color: T.accentText }}>2</span>
               </div>
+              <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textPrimary, fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+                Eixo Estratégico
+              </h2>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {selectedPlano.eixos.map(eixo => (
+                <div key={eixo.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '16px' }}>
+                  <Field label="Nome">
+                    <ReadValue value={eixo.nome} />
+                  </Field>
+                  <Field label="Descrição">
+                    <ReadValue value={eixo.descricao} />
+                  </Field>
+                </div>
+              ))}
             </div>
           </div>
         </>
@@ -777,27 +817,6 @@ const ReadValue: React.FC<{ value: string }> = ({ value }) => {
   return (
     <div style={{ ...S.input, minHeight: '42px', backgroundColor: T.bgSurfaceMuted, color: T.textPrimary }}>
       {value}
-    </div>
-  );
-};
-
-const MetricCard: React.FC<{ icon: React.ReactNode; label: string; value: string; color?: string }> = ({ icon, label, value }) => {
-  const { T } = useThemeTokens();
-  const S = buildStyles(T);
-  const iconColor = T.accent;
-  return (
-    <div style={S.card}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', backgroundColor: T.accentSoft, borderRadius: 'var(--radius)', color: iconColor }}>
-          {icon}
-        </div>
-        <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textSecondary, margin: 0 }}>
-          {label}
-        </p>
-      </div>
-      <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-lg)', color: T.textPrimary, margin: 0, textAlign: 'center', lineHeight: 1.35 }}>
-        {value}
-      </p>
     </div>
   );
 };

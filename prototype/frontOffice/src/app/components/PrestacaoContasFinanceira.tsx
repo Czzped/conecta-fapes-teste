@@ -18,7 +18,8 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
-  const [openMultiSelect, setOpenMultiSelect] = useState<'status' | 'categoria' | null>(null);
+  const [selectedPayment, setSelectedPayment] = useState<string[]>([]);
+  const [openMultiSelect, setOpenMultiSelect] = useState<'status' | 'categoria' | 'pagamento' | null>(null);
   const [paymentsPage, setPaymentsPage] = useState(1);
 
   const categoriesConsumed = [
@@ -56,6 +57,10 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
     { value: 'diaria', label: 'Diária' },
     { value: 'pessoal', label: 'Pessoal' },
   ];
+  const paymentOptions = [
+    { value: 'debito', label: 'Débito' },
+    { value: 'credito', label: 'Crédito' },
+  ];
   const pageSize = 10;
   const totalPaymentPages = Math.max(1, Math.ceil(payments.length / pageSize));
   const safePaymentsPage = Math.min(paymentsPage, totalPaymentPages);
@@ -79,7 +84,7 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
   };
 
   const renderMultiSelect = (
-    key: 'status' | 'categoria',
+    key: 'status' | 'categoria' | 'pagamento',
     selected: string[],
     setSelected: Dispatch<SetStateAction<string[]>>,
     options: Array<{ value: string; label: string }>,
@@ -565,7 +570,7 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
 
         {/* Filters */}
         <div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
         >
           {/* Search Field */}
           <div style={{ position: 'relative' }}>
@@ -663,9 +668,25 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
                 marginBottom: '0.5rem',
               }}
             >
-              Categoria
+              Rúbrica
             </label>
             {renderMultiSelect('categoria', selectedCategory, setSelectedCategory, categoryOptions)}
+          </div>
+
+          {/* Payment Dropdown */}
+          <div>
+            <label 
+              style={{
+                display: 'block',
+                color: 'var(--foreground)',
+                fontSize: 'var(--text-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                marginBottom: '0.5rem',
+              }}
+            >
+              Pagamento
+            </label>
+            {renderMultiSelect('pagamento', selectedPayment, setSelectedPayment, paymentOptions)}
           </div>
         </div>
       </section>
@@ -737,13 +758,10 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
                 {/* Pagamento */}
                 <div className="col-span-2">
                   <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
-                    Movimento
+                    Pagamento
                   </div>
                   <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', whiteSpace: 'nowrap' }}>
-                    {payment.tipo}
-                  </div>
-                  <div style={{ color: payment.operacao === 'CREDITO' ? 'rgb(34, 197, 94)' : 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.35rem', whiteSpace: 'nowrap' }}>
-                    {payment.operacao} · {payment.classificacao}
+                    {payment.operacao === 'CREDITO' ? 'Crédito' : 'Débito'}
                   </div>
                 </div>
 
@@ -813,13 +831,10 @@ export function PrestacaoContasFinanceira({ onBack, onNavigateToDetails }: Prest
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
-                    Movimento
+                    Pagamento
                   </div>
                   <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>
-                    {payment.tipo}
-                  </div>
-                  <div style={{ color: payment.operacao === 'CREDITO' ? 'rgb(34, 197, 94)' : 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginTop: '0.35rem' }}>
-                    {payment.operacao} · {payment.classificacao}
+                    {payment.operacao === 'CREDITO' ? 'Crédito' : 'Débito'}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
