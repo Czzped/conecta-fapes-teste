@@ -543,21 +543,6 @@ export const PlanejamentoEstrategico: React.FC<PlanejamentoEstrategicoProps> = (
         hideDivider
       />
 
-      <div style={{ display: 'flex', gap: '4px', borderBottom: `1px solid ${T.borderSubtle}`, marginBottom: '24px' }}>
-        {[
-          { id: 'cadastro', label: 'Informações Gerais' },
-          { id: 'dashboard', label: 'Dashboard' },
-        ].map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as typeof activeTab)}
-            style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === tab.id ? `2px solid ${T.accent}` : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: activeTab === tab.id ? T.accent : T.textSecondary, cursor: 'pointer', marginBottom: '-1px' }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
       {activeTab === 'cadastro' && (
         <>
           <div style={{ ...S.card, marginBottom: '24px' }}>

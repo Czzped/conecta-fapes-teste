@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, CalendarDays, ChevronRight, ClipboardList, Database, FileCheck2, Settings, ShieldCheck, Tags, Target } from 'lucide-react';
+import { BookOpen, CalendarDays, ChevronRight, Settings, Target } from 'lucide-react';
 import { useThemeTokens } from '../theme/ThemeContext';
 
 interface ConfiguracoesProps {
@@ -16,6 +16,22 @@ interface ConfiguracoesProps {
 
 const actions = [
   {
+    title: 'Calendário da Folha',
+    description: 'Definição anual das datas de solicitação, geração e pagamento da folha de bolsas.',
+    Icon: CalendarDays,
+    key: 'calendario-folha',
+  },
+  {
+    title: 'Formulários',
+    description: 'Biblioteca de formulários de inscrição, avaliação, recurso e anexos usados nas captações.',
+    Icon: BookOpen,
+    key: 'formularios',
+  },
+  {
+    title: 'Planejamento Estratégico',
+    description: 'Cadastro e manutenção dos planejamentos estratégicos, eixos e visão de programas por eixo.',
+    Icon: Target,
+    key: 'planejamento',
     title: 'Planejamento Estratégico',
     description: 'Cadastro e manutenção dos planejamentos estratégicos, eixos e visão de programas por eixo.',
     Icon: Target,

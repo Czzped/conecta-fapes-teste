@@ -1001,40 +1001,6 @@ export const Iniciativas: React.FC = () => {
         </section>
       ) : (
         <>
-      <div
-        role="tablist"
-        aria-label="Seções de projetos"
-        className="flex flex-wrap items-center mb-6"
-        style={{ borderBottom: '1px solid var(--dash-divider)', gap: '4px' }}
-      >
-        {[
-          { key: 'iniciativas' as IniciativasTab, label: 'Projetos' },
-          { key: 'dashboard' as IniciativasTab, label: 'Dashboard' },
-        ].map(({ key, label }) => (
-          <button
-            key={key}
-            type="button"
-            role="tab"
-            aria-selected={activeTab === key}
-            onClick={() => setActiveTab(key)}
-            style={{
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === key ? '2px solid #00c1af' : '2px solid transparent',
-              color: activeTab === key ? '#00c1af' : 'var(--dash-text-secondary)',
-              fontFamily: 'var(--font-family)',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 'var(--font-weight-medium)',
-              cursor: 'pointer',
-              marginBottom: '-1px',
-              padding: '12px 24px',
-            }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
       {activeTab === 'dashboard' && (
         <>
         <section className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-6">

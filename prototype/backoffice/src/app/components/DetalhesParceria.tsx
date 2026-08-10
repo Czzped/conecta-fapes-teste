@@ -750,21 +750,6 @@ export const DetalhesParceria: React.FC<Props> = ({ parceria, onBack, onOpenProg
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '28px' }}>
-          {[
-            { id: 'resumo', label: 'Informações Gerais' },
-            { id: 'dashboard', label: 'Dashboard' },
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === tab.id ? '2px solid #00c1af' : '2px solid transparent', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: activeTab === tab.id ? '#00c1af' : 'rgba(255,255,255,0.6)', cursor: 'pointer', marginBottom: '-1px' }}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
         {activeTab === 'resumo' && (
           <div>
             <SummarySection number="1" title="Identificação da Parceria" subtitle="Dados básicos do processo e da instituição vinculada">

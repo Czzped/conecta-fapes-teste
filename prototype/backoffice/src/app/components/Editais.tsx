@@ -686,43 +686,6 @@ export const Editais: React.FC<EditaisProps> = ({ isFormularioMode = false, onBa
           </div>
         </div>
 
-        {/* Tab Bar Link */}
-        <div style={{ marginBottom: '24px' }}>
-          <div style={{ display: 'flex', gap: '0' }}>
-            {(['captacoes', 'dashboard'] as ActiveTab[]).map((tab) => {
-              const isActive = activeTab === tab;
-              const label = tab === 'dashboard' ? 'Dashboard' : isFomento ? 'Fomentos' : 'Captações';
-              return (
-                <button
-                  key={tab}
-                  onClick={() => {
-                    setActiveTab(tab);
-                    setSetorFilter('Todos');
-                  }}
-                  style={{
-                    padding: '0 0 12px 0',
-                    marginRight: '28px',
-                    border: 'none',
-                    borderBottom: isActive ? '2px solid #00c1af' : '2px solid transparent',
-                    background: 'transparent',
-                    cursor: 'pointer',
-                    fontFamily: 'var(--font-family)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
-                    color: isActive ? '#00c1af' : T.textMuted,
-                    transition: 'color 0.2s, border-color 0.2s',
-                  }}
-                  onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = T.textPrimary; }}
-                  onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = T.textMuted; }}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
-          <div style={{ width: '100%', height: '1px', backgroundColor: T.borderSubtle, marginTop: '-1px' }} />
-        </div>
-
         {activeTab === 'dashboard' && (
           <div style={{ marginBottom: '24px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
