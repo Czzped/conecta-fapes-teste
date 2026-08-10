@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, Settings, Inbox, Building2, UserRound } from 'lucide-react';
+import React, { useState } from 'react';
+import { Moon, Bell, Globe, User, Sun, Monitor, X, Search, CheckCircle, AlertTriangle, AlertCircle, RotateCcw, ChevronRight, ChevronLeft, DollarSign, Calendar, ChevronDown, Home, FileText, Info, Plus, FolderOpen, Clock, Eye, Handshake, BookOpen, LayoutDashboard, CreditCard, ClipboardCheck, Settings, Inbox, Landmark, Building2, UserRound, Layers } from 'lucide-react';
 import { toast } from 'sonner';
 import conectaSymbol from 'figma:asset/db135b6708f6cc7f72f27c6a31dd02aa5500d030.png';
 import fapesLogo from 'figma:asset/affecf58de5f5168c562fa312b9d450b8432233b.png';
@@ -22,6 +24,7 @@ import { SurveyFormBuilder } from './SurveyFormBuilder';
 import { CaixaEntrada } from './CaixaEntrada';
 import { RegrasAcaoTransversal } from './RegrasAcaoTransversal';
 import { Iniciativas } from './Iniciativas';
+import { CadastroModalidade } from './CadastroModalidade';
 import { ThemeProvider } from '../theme/ThemeContext';
 import { PAGE_TO_PATH, DEFAULT_PAGE, pathToPage, detalhesIdFromPath } from '../routing/paths';
 
@@ -35,6 +38,7 @@ type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
 type Language = 'pt' | 'en' | 'es';
 type NotificationTab = 'avisos' | 'editais';
 type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'pagamento' | 'detalhes' | 'fomento' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'bolsas-documentos' | 'regras-acao-transversal' | 'calendario-folha' | 'controle-acessos';
+type ActivePage = 'home' | 'dashboard' | 'caixa-entrada' | 'financeira' | 'pagamento' | 'contabilidade-financeiro' | 'detalhes' | 'fomento' | 'editais' | 'editais-light' | 'planejamento' | 'programa' | 'parceria' | 'formulario' | 'instituicoes' | 'iniciativas' | 'rubricas' | 'configuracoes' | 'pessoas' | 'referencias' | 'documentos' | 'regras-acao-transversal' | 'calendario-folha' | 'controle-acessos' | 'modalidades';
 type StatusFilter = 'Todos' | 'Pendente' | 'Em Validação' | 'Validado' | 'Revisar' | 'Reprovado' | 'Contestada';
 type CategoriaFilter = 'Todos' | 'Material Permanente' | 'Material de Consumo' | 'Passagem' | 'Diária' | 'Pessoa Física' | 'Pessoa Jurídica';
 type ProjetoFilter = 'Todos' | 'Conecta Fapes' | 'Outro Projeto Exemplo' | 'Mais um Projeto Exemplo';
@@ -45,6 +49,7 @@ type PagamentoVariante = 'passagem' | 'nota-fiscal' | 'invoice';
 interface PagamentoCard {
   id: number;
   tipo: 'Boleto' | 'Pix';
+  operacao: 'Débito' | 'Crédito';
   valor: string;
   data: string;
   categoria: PagamentoCategoria;
@@ -137,16 +142,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [justificativa, setJustificativa] = useState('');
   // Mock data para os cards de pagamento
   const [pagamentosData, setPagamentosData] = useState<PagamentoCard[]>([
-    { id: 1, tipo: 'Boleto', valor: 'R$ 3.456,70', data: '27/02/2026 - 09:35', categoria: 'Material Permanente', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Em Validação' },
-    { id: 2, tipo: 'Pix', valor: 'R$ 4.567,90', data: '25/02/2026 - 10:05', categoria: 'Material de Consumo', variante: 'invoice', projeto: 'Outro Projeto', status: 'Em Validação' },
-    { id: 3, tipo: 'Pix', valor: 'R$ 789,00', data: '23/02/2026 - 12:50', categoria: 'Passagem', variante: 'passagem', projeto: 'Mais um Projeto', status: 'Em Validação' },
-    { id: 4, tipo: 'Boleto', valor: 'R$ 2.100,00', data: '22/02/2026 - 11:20', categoria: 'Material de Consumo', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Revisar' },
-    { id: 5, tipo: 'Boleto', valor: 'R$ 1.890,50', data: '20/02/2026 - 11:45', categoria: 'Passagem', variante: 'passagem', projeto: 'Outro Projeto', status: 'Em Validação' },
-    { id: 6, tipo: 'Boleto', valor: 'R$ 2.345,60', data: '19/02/2026 - 17:25', categoria: 'Pessoa Jurídica', variante: 'nota-fiscal', projeto: 'Mais um Projeto', status: 'Reprovado' },
-    { id: 7, tipo: 'Pix', valor: 'R$ 567,80', data: '18/02/2026 - 16:45', categoria: 'Diária', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Em Validação' },
-    { id: 8, tipo: 'Pix', valor: 'R$ 2.567,30', data: '15/02/2026 - 16:00', categoria: 'Material Permanente', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Contestada' },
-    { id: 9, tipo: 'Pix', valor: 'R$ 5.234,20', data: '14/02/2026 - 08:40', categoria: 'Material de Consumo', variante: 'invoice', projeto: 'Outro Projeto', status: 'Em Validação' },
-    { id: 10, tipo: 'Boleto', valor: 'R$ 3.690,00', data: '12/02/2026 - 08:15', categoria: 'Passagem', variante: 'passagem', projeto: 'Mais um Projeto', status: 'Em Validação' },
+    { id: 1, tipo: 'Boleto', operacao: 'Débito', valor: 'R$ 3.456,70', data: '27/02/2026 - 09:35', categoria: 'Material Permanente', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Em Validação' },
+    { id: 2, tipo: 'Pix', operacao: 'Débito', valor: 'R$ 4.567,90', data: '25/02/2026 - 10:05', categoria: 'Material de Consumo', variante: 'invoice', projeto: 'Outro Projeto', status: 'Em Validação' },
+    { id: 3, tipo: 'Pix', operacao: 'Crédito', valor: 'R$ 789,00', data: '23/02/2026 - 12:50', categoria: 'Passagem', variante: 'passagem', projeto: 'Mais um Projeto', status: 'Em Validação' },
+    { id: 4, tipo: 'Boleto', operacao: 'Débito', valor: 'R$ 2.100,00', data: '22/02/2026 - 11:20', categoria: 'Material de Consumo', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Revisar' },
+    { id: 5, tipo: 'Boleto', operacao: 'Débito', valor: 'R$ 1.890,50', data: '20/02/2026 - 11:45', categoria: 'Passagem', variante: 'passagem', projeto: 'Outro Projeto', status: 'Em Validação' },
+    { id: 6, tipo: 'Boleto', operacao: 'Débito', valor: 'R$ 2.345,60', data: '19/02/2026 - 17:25', categoria: 'Pessoa Jurídica', variante: 'nota-fiscal', projeto: 'Mais um Projeto', status: 'Reprovado' },
+    { id: 7, tipo: 'Pix', operacao: 'Débito', valor: 'R$ 567,80', data: '18/02/2026 - 16:45', categoria: 'Diária', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Em Validação' },
+    { id: 8, tipo: 'Pix', operacao: 'Crédito', valor: 'R$ 2.567,30', data: '15/02/2026 - 16:00', categoria: 'Material Permanente', variante: 'nota-fiscal', projeto: 'Conecta Fapes', status: 'Contestada' },
+    { id: 9, tipo: 'Pix', operacao: 'Débito', valor: 'R$ 5.234,20', data: '14/02/2026 - 08:40', categoria: 'Material de Consumo', variante: 'invoice', projeto: 'Outro Projeto', status: 'Em Validação' },
+    { id: 10, tipo: 'Boleto', operacao: 'Débito', valor: 'R$ 3.690,00', data: '12/02/2026 - 08:15', categoria: 'Passagem', variante: 'passagem', projeto: 'Mais um Projeto', status: 'Em Validação' },
   ]);
 
   // Pagamento da tela de detalhes: derivado do id na URL (/financeira/:id), o que
@@ -646,6 +651,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             {([
               { key: 'instituicoes' as ActivePage, Icon: Building2, label: 'Instituições' },
               { key: 'pessoas' as ActivePage, Icon: UserRound, label: 'Pessoas' },
+              { key: 'modalidades' as ActivePage, Icon: Layers, label: 'Modalidades' },
             ]).map(({ key, Icon, label }, index) => {
               const active = activePage === key;
               return (
@@ -1152,9 +1158,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             <div className="grid grid-cols-4 gap-4 mb-6">
               {[
                 { label: 'Projetos ativos', value: '12', Icon: FolderOpen, iconColor: '#14b8a6', iconBg: 'rgba(20,184,166,0.12)' },
-                { label: 'Pendente',         value: '8',  Icon: Clock,       iconColor: '#fbbf24', iconBg: 'rgba(251,191,36,0.12)' },
-                { label: 'Em Validação',     value: '5',  Icon: Eye,         iconColor: '#3b82f6', iconBg: 'rgba(59,130,246,0.12)'  },
-                { label: 'Revisão',          value: '3',  Icon: AlertTriangle,iconColor: '#ef4444', iconBg: 'rgba(239,68,68,0.12)'  },
+                { label: 'Pendente',         value: '8',  Icon: Clock,       iconColor: '#14b8a6', iconBg: 'rgba(20,184,166,0.12)' },
+                { label: 'Em Validação',     value: '5',  Icon: Eye,         iconColor: '#14b8a6', iconBg: 'rgba(20,184,166,0.12)'  },
+                { label: 'Revisão',          value: '3',  Icon: AlertTriangle,iconColor: '#14b8a6', iconBg: 'rgba(20,184,166,0.12)'  },
               ].map(({ label, value, Icon, iconColor, iconBg }) => (
                 <div
                   key={label}
@@ -1233,7 +1239,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   { label: 'Projeto',    value: projetoFilter,   options: projetoOptions,   show: showProjetoDropdown,   setShow: setShowProjetoDropdown,   setValue: setProjetoFilter,   others: [setShowDateDropdown, setShowStatusDropdown, setShowCategoriaDropdown] },
                   { label: 'Data',       value: dateFilter,      options: [] as string[],   show: false,                 setShow: () => {},                 setValue: setDateFilter,      others: [] },
                   { label: 'Status',     value: statusFilter,    options: statusOptions,    show: showStatusDropdown,    setShow: setShowStatusDropdown,    setValue: setStatusFilter,    others: [setShowDateDropdown, setShowCategoriaDropdown, setShowProjetoDropdown] },
-                  { label: 'Categoria',  value: categoriaFilter, options: categoriaOptions, show: showCategoriaDropdown, setShow: setShowCategoriaDropdown, setValue: setCategoriaFilter, others: [setShowDateDropdown, setShowStatusDropdown, setShowProjetoDropdown] },
+                  { label: 'Rubrica',    value: categoriaFilter, options: categoriaOptions, show: showCategoriaDropdown, setShow: setShowCategoriaDropdown, setValue: setCategoriaFilter, others: [setShowDateDropdown, setShowStatusDropdown, setShowProjetoDropdown] },
                 ] as { label: string; value: string; options: string[]; show: boolean; setShow: (v: boolean) => void; setValue: (v: any) => void; others: ((v: boolean) => void)[] }[]).map(({ label, value, options, show, setShow, setValue, others }) =>
                   label === 'Data' ? (
                     <div key={label} className="relative">
@@ -1308,11 +1314,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                       onMouseEnter={(e) => { (e.currentTarget.parentElement!.parentElement as HTMLElement).style.backgroundColor = isLight ? '#fafafa' : 'rgba(38, 38, 38,0.8)'; }}
                       onMouseLeave={(e) => { (e.currentTarget.parentElement!.parentElement as HTMLElement).style.backgroundColor = 'var(--dash-card-bg)'; }}
                     >
-                      <div className="grid grid-cols-6 gap-6 flex-1">
+                      <div className="grid grid-cols-5 gap-6 flex-1">
                         {[
                           { label: 'Projeto',       value: pagamento.projeto,   cls: '' },
-                          { label: 'Categoria',     value: pagamento.categoria, cls: '' },
-                          { label: 'Pagamento',     value: pagamento.tipo,      cls: '' },
+                          { label: 'Pagamento',     value: pagamento.operacao,  cls: '' },
                           { label: 'Valor',         value: pagamento.valor,     cls: '' },
                           { label: 'Data de Envio', value: pagamento.data,      cls: '' },
                         ].map(({ label, value, cls }) => (
@@ -1363,9 +1368,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <div className="pt-8 px-8 pb-1">
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 mb-6">
-              <Home className="w-5 h-5 cursor-pointer" style={{ color: 'var(--dash-text-secondary)' }} onClick={() => setActivePage('home')} />
-              <ChevronRight className="w-4 h-4" style={{ color: 'var(--dash-text-muted)' }} />
-              <span className="cursor-pointer" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }} onClick={() => setActivePage('home')}>Prestação de Contas</span>
+              <span className="cursor-pointer" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }} onClick={() => setActivePage('financeira')}>Prestação de Contas</span>
               <ChevronRight className="w-4 h-4" style={{ color: 'var(--dash-text-muted)' }} />
               <span className="cursor-pointer" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)' }} onClick={() => setActivePage('financeira')}>Financeira</span>
               <ChevronRight className="w-4 h-4" style={{ color: 'var(--dash-text-muted)' }} />
@@ -1373,17 +1376,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             </div>
 
             {/* Título */}
-            <h1 className="mb-6" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: 'var(--dash-text-primary)', lineHeight: '1.5' }}>
-              Detalhes do Pagamento
-            </h1>
+            <div className="mb-6 flex items-center gap-3">
+              <div className="flex items-center justify-center flex-shrink-0" style={{ width: '36px', height: '36px', backgroundColor: 'rgba(20, 184, 166, 0.1)', borderRadius: 'var(--radius)' }}>
+                <DollarSign size={20} className="text-teal-500" />
+              </div>
+              <h1 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-md)', fontWeight: 'var(--font-weight-normal)', color: 'var(--dash-text-primary)', lineHeight: '1.5' }}>
+                Detalhes do Pagamento
+              </h1>
+            </div>
 
             {/* Card do Pagamento */}
             <div className="rounded-lg p-5" style={{ backgroundColor: 'var(--dash-card-bg)', border: '1px solid var(--dash-card-border)', boxShadow: 'var(--dash-shadow)' }}>
-              <div className="grid grid-cols-6 gap-6">
+              <div className="grid grid-cols-5 gap-6">
                 {([
                   { label: 'Projeto',       value: selectedPagamento.projeto,   kind: 'text' },
-                  { label: 'Categoria',     value: selectedPagamento.categoria, kind: 'categoria' },
-                  { label: 'Pagamento',     value: selectedPagamento.tipo,      kind: 'text' },
+                  { label: 'Pagamento',     value: selectedPagamento.operacao,  kind: 'text' },
                   { label: 'Valor',         value: selectedPagamento.valor,     kind: 'text' },
                   { label: 'Data de Envio', value: selectedPagamento.data,      kind: 'text' },
                   { label: 'Status',        value: selectedPagamento.status,    kind: 'status' },
@@ -1405,6 +1412,78 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 ))}
               </div>
             </div>
+
+            {/* Informações Gerais */}
+            {selectedPagamento.operacao === 'Crédito' && (
+            <div
+              className="mt-8 rounded-lg p-6"
+              style={{
+                backgroundColor: 'var(--dash-card-bg)',
+                border: '1px solid var(--dash-card-border)',
+                boxShadow: 'var(--dash-shadow)',
+              }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <div
+                  className="flex items-center justify-center rounded-full"
+                  style={{ width: '24px', height: '24px', backgroundColor: '#00c1af', color: '#171717', fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-semibold)' }}
+                >
+                  1
+                </div>
+                <h2 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>
+                  Informações Gerais
+                </h2>
+              </div>
+              <p className="mb-5" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-secondary)', marginLeft: '32px' }}>
+                Este valor entrou na conta do projeto. Justifique o que aconteceu e anexe o comprovante.
+              </p>
+
+              <div className="space-y-5" style={{ marginLeft: '32px' }}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>
+                      Classificação
+                    </label>
+                    <input readOnly value={selectedPagamento.id === 3 ? 'Devolução' : 'Estorno'} className="w-full rounded-lg px-3 py-2" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
+                  </div>
+                  <div>
+                    <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>
+                      Associe esse Crédito (entrada) a um Débito (saída).
+                    </label>
+                    <input readOnly value="Débito · R$ 3.456,70 · 27/02/2026" className="w-full rounded-lg px-3 py-2" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none' }} />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>
+                    Descrição
+                  </label>
+                  <textarea
+                    readOnly
+                    rows={4}
+                    value={selectedPagamento.id === 3 ? 'Valor creditado referente à devolução realizada para a conta do projeto.' : 'Valor creditado referente ao estorno de uma compra realizada no projeto.'}
+                    className="w-full rounded-lg px-3 py-3 resize-none"
+                    style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-input-border)', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)', outline: 'none', lineHeight: '1.5' }}
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-2" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--dash-text-primary)' }}>
+                    Arquivo anexado
+                  </label>
+                  <div className="rounded-lg p-4 flex items-center justify-between" style={{ backgroundColor: 'var(--dash-input-bg)', border: '1px solid var(--dash-card-border)' }}>
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-5 h-5" style={{ color: 'var(--dash-text-secondary)' }} />
+                      <span style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'var(--dash-text-primary)' }}>{selectedPagamento.id === 3 ? 'Comprovante_de_Devolucao.png' : 'Print do E-mail do Estorno.png'}</span>
+                    </div>
+                    <button onClick={() => toast.info('Visualizar comprovante')} title="Expandir" style={{ background: 'transparent', border: 'none', color: 'var(--dash-icon-subdued)', cursor: 'pointer', display: 'flex', padding: '4px' }}>
+                      <ChevronDown className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            )}
 
             {/* Contestação (status Contestada) */}
             {selectedPagamento.status === 'Contestada' && (
@@ -1446,7 +1525,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
             {/* Passo a Passo */}
             <div 
-              className="mt-8 rounded-lg p-6"
+              className="hidden"
               style={{
                 backgroundColor: 'var(--dash-card-bg)',
                 border: '1px solid var(--dash-card-border)',
@@ -1701,7 +1780,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
             {/* Seção de Observação (apenas Nota Fiscal, oculta em Revisar) */}
             {selectedPagamento.variante === 'nota-fiscal' && selectedPagamento.status !== 'Revisar' && (
-            <div className="mt-8">
+            <div className="hidden">
               <div className="flex items-center gap-2 mb-3" style={{ marginLeft: '32px' }}>
                 <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Observação</h3>
               </div>
@@ -1736,7 +1815,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 <h3 style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--dash-text-primary)' }}>Avaliação Fapes</h3>
               </div>
               
-              <div className="flex gap-4" style={{ marginLeft: '32px', marginBottom: '24px' }}>
+              <div className="flex gap-4" style={{ marginLeft: '32px', marginBottom: '40px' }}>
                 <button
                   onClick={() => {
                     setShowConfirmacaoModal(true);
@@ -1945,6 +2024,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <Instituicoes onBack={() => setActivePage('parceria')} />
         ) : activePage === 'formulario' ? (
           <SurveyFormBuilder onBack={() => setActivePage('configuracoes')} />
+        ) : activePage === 'modalidades' ? (
+          <CadastroModalidade onBack={() => setActivePage('home')} />
         ) : (
           <div className="p-8">
             <div>
