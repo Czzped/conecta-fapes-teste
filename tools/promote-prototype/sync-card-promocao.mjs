@@ -7,8 +7,8 @@
 //
 //   PR aberto/reaberto  -> cria a issue, põe no Project 43 e deixa em
 //                          "In Validation"; comenta no PR o link do card.
-//   PR mergeado         -> move para "Pronto para desenvolvimento" e registra
-//                          o link do ambiente estável.
+//   PR mergeado         -> move para "Done", registra o link do ambiente estável
+//                          e fecha a issue.
 //   PR fechado sem merge-> move para "Desaprovado".
 //
 // A ligação card <-> PR é guardada num comentário-marcador no próprio PR
@@ -28,9 +28,13 @@ const PROJECT_NUMBER = 43;
 
 // Colunas usadas no ciclo de vida (resolvidas por nome em tempo de execução).
 const COLUNA_EM_REVISAO = "In Validation";
-const COLUNA_APROVADO = "Pronto para desenvolvimento";
+// Promoção aprovada e mergeada = trabalho concluído: o card vai para Done e a issue é
+// fechada. O card registra a PROMOÇÃO, não um pedido de implementação — quem for
+// implementar no repositório de produto abre a própria demanda.
+const COLUNA_APROVADO = "Done";
 const COLUNA_REPROVADO = "Desaprovado";
 const AREA = "Frontend";
+const SQUAD = "Design";
 
 // Pasta do protótipo -> repositório de produto alvo e URLs dos dois ambientes.
 const APPS = {
@@ -117,6 +121,10 @@ async function projeto() {
          fields(first:50){ nodes{
            ... on ProjectV2FieldCommon { id name }
            ... on ProjectV2SingleSelectField { id name options { id name } }
+           ... on ProjectV2IterationField {
+             id name
+             configuration { iterations { id title startDate duration } }
+           }
          }}
        }}
      }`,
@@ -160,6 +168,38 @@ async function itemDoProjeto(numeroIssue, projetoId) {
   return item ? item.id : null;
 }
 
+/**
+ * Sprint em andamento hoje, calculada pelas datas — nada fixo no código, para
+ * que os próximos cards caiam sempre na sprint corrente.
+ * Se hoje estiver fora de todas (janela entre sprints), devolve a próxima.
+ */
+function iteracaoAtual(campoSprint) {
+  const iteracoes = campoSprint?.configuration?.iterations || [];
+  if (!iteracoes.length) return null;
+  const hoje = new Date().toISOString().slice(0, 10);
+
+  const emAndamento = iteracoes.find((it) => {
+    const fim = new Date(it.startDate);
+    fim.setDate(fim.getDate() + it.duration);
+    return it.startDate <= hoje && hoje < fim.toISOString().slice(0, 10);
+  });
+  if (emAndamento) return emAndamento;
+
+  const futuras = iteracoes.filter((it) => it.startDate > hoje);
+  return futuras.length ? futuras[0] : null;
+}
+
+async function definirIteracao(projetoId, itemId, campoId, iteracaoId) {
+  await gql(
+    `mutation($p:ID!,$i:ID!,$f:ID!,$it:String!){
+       updateProjectV2ItemFieldValue(input:{
+         projectId:$p, itemId:$i, fieldId:$f, value:{ iterationId:$it }
+       }){ projectV2Item { id } }
+     }`,
+    { p: projetoId, i: itemId, f: campoId, it: iteracaoId },
+  );
+}
+
 async function definirSelecao(projetoId, itemId, campoId, opcaoId) {
   await gql(
     `mutation($p:ID!,$i:ID!,$f:ID!,$o:String!){
@@ -171,7 +211,7 @@ async function definirSelecao(projetoId, itemId, campoId, opcaoId) {
   );
 }
 
-async function moverColuna(nomeColuna, complemento) {
+async function moverColuna(nomeColuna, complemento, fechar = false) {
   const numeroIssue = await cardExistente();
   if (!numeroIssue) {
     console.log("Nenhum card vinculado a este PR (marcador ausente). Nada a mover.");
@@ -197,6 +237,17 @@ async function moverColuna(nomeColuna, complemento) {
   if (complemento) {
     await rest("POST", `/repos/${owner}/${nome}/issues/${numeroIssue}/comments`, { body: complemento });
   }
+
+  // Promoção concluída: fecha a issue, para não ficar aberta indefinidamente. O card
+  // segue no board como histórico — fechar a issue não o remove do Project.
+  if (fechar) {
+    await rest("PATCH", `/repos/${owner}/${nome}/issues/${numeroIssue}`, {
+      state: "closed",
+      state_reason: "completed",
+    });
+    console.log(`Issue #${numeroIssue} fechada.`);
+  }
+
   console.log(`Card #${numeroIssue} atualizado.`);
 }
 
@@ -217,6 +268,9 @@ async function criarCard() {
   const campoStatus = campo(p, "Status");
   const campoArea = campo(p, "Area") || campo(p, "Área");
   const campoRepo = campo(p, "Repositório") || campo(p, "Repositorio");
+  const campoSquad = campo(p, "Squad");
+  const campoSprint = campo(p, "Sprint");
+  const sprint = iteracaoAtual(campoSprint);
   const colunaInicial = opcao(campoStatus, (o) => o.name.toLowerCase() === COLUNA_EM_REVISAO.toLowerCase());
   if (!colunaInicial) throw new Error(`Coluna "${COLUNA_EM_REVISAO}" não existe no Status`);
 
@@ -231,7 +285,7 @@ async function criarCard() {
     `2. Confira a auditoria abaixo e o diff no ${prUrl || "Pull Request"}.`,
     "3. **A aprovação acontece no Pull Request** — são necessárias 2 aprovações.",
     "",
-    "Ao ser aprovado e mergeado, este card vai para **Pronto para desenvolvimento** e o",
+    "Ao ser aprovado e mergeado, este card é concluído (**Done**, issue fechada) e o",
     "ambiente estável é publicado. Se for recusado, o card vai para **Desaprovado**.",
     "",
     "## Auditoria das mudanças",
@@ -243,7 +297,9 @@ async function criarCard() {
   console.log(`Criaria a issue "${titulo}" em ${repo}, na coluna "${colunaInicial.name}"`);
 
   if (DRY_RUN) {
-    console.log(`[DRY_RUN] Area -> ${campoArea ? AREA : "campo ausente"}`);
+    console.log(`[DRY_RUN] Area   -> ${campoArea ? AREA : "campo ausente"}`);
+    console.log(`[DRY_RUN] Squad  -> ${campoSquad ? SQUAD : "campo ausente"}`);
+    console.log(`[DRY_RUN] Sprint -> ${sprint ? sprint.title : "nenhuma sprint corrente"}`);
     for (const a of apps) {
       const o = opcao(campoRepo, (x) => x.name.includes(a.repoKey));
       console.log(`[DRY_RUN] Repositório (${a.label}) -> ${o ? o.name : "OPÇÃO NÃO ENCONTRADA"}`);
@@ -267,6 +323,19 @@ async function criarCard() {
   if (campoArea) {
     const o = opcao(campoArea, (x) => x.name.toLowerCase() === AREA.toLowerCase());
     if (o) await definirSelecao(p.id, itemId, campoArea.id, o.id);
+  }
+  if (campoSquad) {
+    const o = opcao(campoSquad, (x) => x.name.toLowerCase() === SQUAD.toLowerCase());
+    if (o) await definirSelecao(p.id, itemId, campoSquad.id, o.id);
+    else console.log(`Atenção: squad "${SQUAD}" não existe no board.`);
+  }
+  if (campoSprint) {
+    if (sprint) {
+      await definirIteracao(p.id, itemId, campoSprint.id, sprint.id);
+      console.log(`Sprint: ${sprint.title}`);
+    } else {
+      console.log("Atenção: nenhuma sprint corrente ou futura no board; card ficou sem sprint.");
+    }
   }
   if (campoRepo) {
     const principal = apps[0];
@@ -304,6 +373,7 @@ async function main() {
     await moverColuna(
       COLUNA_APROVADO,
       ["✅ Promoção **aprovada e publicada**.", "", "## Ambiente estável (referência para implementar)", links].join("\n"),
+      true, // fecha a issue: a promoção terminou
     );
     return;
   }

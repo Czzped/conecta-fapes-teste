@@ -12,6 +12,7 @@ import {
 import { useAuth, type AccessType } from '@/app/auth/AuthContext';
 import { useAppNavigate } from '@/app/routing/useAppNavigate';
 import { RequireInternal, RequireCidadao, RequireRole } from '@/app/routing/guards';
+import { telaInicial } from '@/app/routing/paths';
 import { AppLayout } from '@/app/layouts/AppLayout';
 import { CidadaoLayout } from '@/app/layouts/CidadaoLayout';
 import { payments } from '@/app/data/pagamentos';
@@ -39,24 +40,17 @@ import { ProjectsListPage } from '@/app/components/ProjectsListPage';
 import { DashboardPage } from '@/app/components/DashboardPage';
 import { ProjectDetailsPage } from '@/app/components/ProjectDetailsPage';
 
-// Rota de destino após login, conforme o perfil.
-function landingPath(type: AccessType): string {
-  if (type === 'cidadao') return '/cidadao';
-  if (type === 'proponente') return '/informacoes';
-  if (type === 'minhaEquipeExemplo') return '/minha-equipe';
-  if (type === 'reitor' || type === 'diretor') return '/dashboard';
-  return '/inicio';
-}
-
 function LoginRoute() {
   const { isLoggedIn, accessType, login } = useAuth();
   const navigate = useNavigate();
-  if (isLoggedIn) return <Navigate to={landingPath(accessType)} replace />;
+  if (isLoggedIn) return <Navigate to={telaInicial(accessType)} replace />;
   return (
     <LoginPage
       onLogin={(type: AccessType) => {
         login(type);
-        navigate(landingPath(type), { replace: true });
+        // Cada perfil abre no seu próprio espaço de URL: /coordenador/inicio,
+        // /reitor/dashboard, /proponente/informacoes, ...
+        navigate(telaInicial(type), { replace: true });
       }}
     />
   );
@@ -285,10 +279,10 @@ export function AppRoutes() {
         </Route>
       </Route>
 
-      {/* Área interna */}
-      <Route element={<RequireInternal />}>
-        <Route path="/" element={<AppLayout />}>
-          <Route index element={<Navigate to="/inicio" replace />} />
+      {/* Área interna, com o PERFIL no caminho: /coordenador/inicio, /bolsista/... */}
+      <Route path="/:perfil" element={<RequireInternal />}>
+        <Route element={<AppLayout />}>
+          <Route index element={<Navigate to="inicio" replace />} />
           <Route path="inicio" element={<HomeRoute />} />
           <Route path="informacoes" element={<MyInfoRoute />} />
           <Route path="demanda-induzida" element={<DemandaInduzidaRoute />} />
@@ -313,7 +307,9 @@ export function AppRoutes() {
         </Route>
       </Route>
 
-      <Route path="*" element={<Navigate to="/inicio" replace />} />
+      {/* Sem perfil na URL não há como saber qual aplicação abrir: volta ao login. */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }

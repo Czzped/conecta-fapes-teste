@@ -1,32 +1,25 @@
 import { useNavigate } from 'react-router';
-import { PAGE_TO_PATH } from './paths';
+import { useAuth } from '@/app/auth/AuthContext';
+import { caminho } from './paths';
 
-// Shim de navegação: mantém a assinatura antiga onNavigate(page, arg?) usada
-// pelos componentes, traduzindo as chaves de página (e os casos especiais de
-// deep-link) para navegação por URL do react-router.
+// Shim de navegação: mantém a assinatura antiga `onNavigate(page, arg?)` usada
+// pelos componentes, agora resolvendo o caminho DENTRO do perfil atual — o
+// perfil faz parte da URL (`/coordenador/inicio`).
 export function useAppNavigate() {
   const navigate = useNavigate();
+  const { accessType } = useAuth();
 
   return (page: string, arg?: string | number) => {
     // Pseudo-rotas de certificados (deep-link para aba de diárias)
     if (page === 'certificados-diarias') {
-      navigate('/certificados?flow=diarias&diariaTab=solicitadas');
+      navigate(`${caminho(accessType, 'certificados')}?flow=diarias&diariaTab=solicitadas`);
       return;
     }
     if (page === 'certificados-diarias-criar') {
-      navigate('/certificados?flow=diarias&diariaTab=nova');
-      return;
-    }
-    // Rotas de detalhe com id na URL
-    if (page === 'financeira-detalhes' && arg != null) {
-      navigate(`/financeira/${arg}`);
-      return;
-    }
-    if (page === 'project-details' && arg != null) {
-      navigate(`/projects-list/${arg}`);
+      navigate(`${caminho(accessType, 'certificados')}?flow=diarias&diariaTab=nova`);
       return;
     }
 
-    navigate(PAGE_TO_PATH[page] ?? '/inicio');
+    navigate(caminho(accessType, page, arg));
   };
 }

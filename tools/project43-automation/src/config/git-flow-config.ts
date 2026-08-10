@@ -15,23 +15,34 @@ const DEFAULT_WORK_BRANCH_PREFIXES = [
 
 const DEFAULT_RELEASE_BRANCH_PREFIX = "release/";
 const DEFAULT_HOTFIX_BRANCH_PREFIX = "hotfix/";
+const DEFAULT_HOMOLOGATION_BRANCH = "homol";
 
 /**
  * Repositorios tecnicos do ConectaFapes. Cada repo declara o branch de
- * producao (`main` ou `master`) e o branch de integracao (`develop`).
+ * producao (`main` ou `master`), o de homologacao (`homol`) e o de integracao
+ * (`develop`).
+ *
+ * `homologationBranch: null` significa que o repo nao tem ambiente de
+ * homologacao proprio — e o caso do `conectafapes-project`, que hospeda a
+ * documentacao e as automacoes, e nao e publicado no cluster da Prodest.
+ * Repos com `null` mantem o fluxo antigo (`develop` -> producao).
  */
 export const DEFAULT_REPOSITORIES: readonly RepoDefinition[] = [
-  { name: "leds-conectafapes-backend-admin", productionBranch: "main", developBranch: "develop" },
-  { name: "leds-conectafapes-frontend-backoffice", productionBranch: "main", developBranch: "develop" },
-  { name: "leds-conectafapes-frontoffice-backend", productionBranch: "main", developBranch: "develop" },
-  { name: "leds-conectafapes-frontoffice-frontend", productionBranch: "main", developBranch: "develop" },
-  { name: "leds-conectafapes-prestacao-de-contas", productionBranch: "master", developBranch: "develop" },
-  { name: "conectafapes-project", productionBranch: "main", developBranch: "develop" },
+  { name: "leds-conectafapes-backend-admin", productionBranch: "main", homologationBranch: DEFAULT_HOMOLOGATION_BRANCH, developBranch: "develop" },
+  { name: "leds-conectafapes-frontend-backoffice", productionBranch: "main", homologationBranch: DEFAULT_HOMOLOGATION_BRANCH, developBranch: "develop" },
+  { name: "leds-conectafapes-frontoffice-backend", productionBranch: "main", homologationBranch: DEFAULT_HOMOLOGATION_BRANCH, developBranch: "develop" },
+  { name: "leds-conectafapes-frontoffice-frontend", productionBranch: "main", homologationBranch: DEFAULT_HOMOLOGATION_BRANCH, developBranch: "develop" },
+  { name: "leds-conectafapes-prestacao-de-contas", productionBranch: "master", homologationBranch: DEFAULT_HOMOLOGATION_BRANCH, developBranch: "develop" },
+  { name: "leds-conectafapes-authentication", productionBranch: "main", homologationBranch: DEFAULT_HOMOLOGATION_BRANCH, developBranch: "develop" },
+  { name: "leds-conectafapes-backend-pagamento-bolsistas", productionBranch: "main", homologationBranch: DEFAULT_HOMOLOGATION_BRANCH, developBranch: "develop" },
+  { name: "conectafapes-project", productionBranch: "main", homologationBranch: null, developBranch: "develop" },
 ];
 
 export interface RepoDefinition {
   name: string;
   productionBranch: string;
+  /** Branch de homologacao, ou `null` quando o repo nao tem esse ambiente. */
+  homologationBranch: string | null;
   developBranch: string;
 }
 
@@ -83,6 +94,11 @@ export function createGitFlowConfig(source: ConfigSource = {}): GitFlowConfig {
     DEFAULT_DEVELOP_BRANCH
   );
   const productionBranches = new Set(DEFAULT_REPOSITORIES.map((repo) => repo.productionBranch));
+  const homologationBranches = new Set(
+    DEFAULT_REPOSITORIES.map((repo) => repo.homologationBranch).filter(
+      (branch): branch is string => Boolean(branch)
+    )
+  );
 
   return {
     org,
@@ -117,7 +133,7 @@ export function createGitFlowConfig(source: ConfigSource = {}): GitFlowConfig {
       "GIT_FLOW_HOTFIX_PREFIX",
       DEFAULT_HOTFIX_BRANCH_PREFIX
     ),
-    protectedBranches: [developBranch, ...productionBranches],
+    protectedBranches: [developBranch, ...productionBranches, ...homologationBranches],
   };
 }
 
@@ -143,4 +159,18 @@ export function resolveRepository(
 
 export function listProductionBranches(config: GitFlowConfig): string[] {
   return [...new Set(config.repositories.map((repo) => repo.productionBranch))];
+}
+
+/**
+ * Branches de homologacao conhecidas, ignorando os repos que nao tem esse
+ * ambiente (`homologationBranch: null`).
+ */
+export function listHomologationBranches(config: GitFlowConfig): string[] {
+  return [
+    ...new Set(
+      config.repositories
+        .map((repo) => repo.homologationBranch)
+        .filter((branch): branch is string => Boolean(branch))
+    ),
+  ];
 }

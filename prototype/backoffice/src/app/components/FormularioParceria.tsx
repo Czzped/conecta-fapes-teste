@@ -66,30 +66,6 @@ const sectionSubtitleStyle: React.CSSProperties = {
   margin: '0 0 24px 32px',
 };
 
-const parseCurrencyValue = (value: string) => Number(value.replace(/\./g, '').replace(',', '.')) || 0;
-
-const formatCurrency = (value: number) => (
-  `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-);
-
-const formatPercent = (value: number) => (
-  `${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
-);
-
-const calcularPercentualAcaoTransversal = (valor: number) => {
-  if (valor < 50000) return 0;
-  if (valor <= 2000000) return 5;
-  if (valor <= 5000000) return 4;
-  return 3;
-};
-
-const definirFaixaAcaoTransversal = (valor: number) => {
-  if (valor < 50000) return 'Sem retenção';
-  if (valor <= 2000000) return 'Faixa 1';
-  if (valor <= 5000000) return 'Faixa 2';
-  return 'Faixa 3';
-};
-
 const SelectField: React.FC<{
   label?: string;
   value: string;
@@ -151,6 +127,7 @@ const SearchableInstitutionField: React.FC<{
   placeholder?: string;
   required?: boolean;
 }> = ({ label, value, onChange, options, placeholder, required = true }) => {
+  const { T } = useThemeTokens();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const selected = options.find(o => o.value === value);
@@ -177,9 +154,9 @@ const SearchableInstitutionField: React.FC<{
       {open && (
         <div style={{
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%',
-          backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.12)',
+          backgroundColor: T.bgSurface, border: `1px solid ${T.borderDefault}`,
           borderRadius: 'var(--radius)', zIndex: 350, overflow: 'hidden',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+          boxShadow: T.shadowMd,
         }}>
           <div style={{ position: 'relative', padding: '10px' }}>
             <input
@@ -204,19 +181,21 @@ const SearchableInstitutionField: React.FC<{
                 }}
                 style={{
                   width: '100%', padding: '10px 14px', textAlign: 'left', border: 'none',
-                  backgroundColor: value === opt.value ? 'rgba(0,193,175,0.1)' : 'transparent',
-                  color: value === opt.value ? '#00c1af' : '#ffffff',
+                  backgroundColor: value === opt.value ? T.accentSoft : 'transparent',
+                  color: value === opt.value ? T.accent : T.textPrimary,
                   fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', cursor: 'pointer',
                 }}
+                onMouseEnter={e => { if (value !== opt.value) e.currentTarget.style.backgroundColor = T.bgHover; }}
+                onMouseLeave={e => { if (value !== opt.value) e.currentTarget.style.backgroundColor = 'transparent'; }}
               >
                 <span style={{ display: 'block' }}>{opt.label}</span>
-                <span style={{ display: 'block', marginTop: '3px', color: 'rgba(255,255,255,0.45)', fontSize: 'var(--text-xs)' }}>
+                <span style={{ display: 'block', marginTop: '3px', color: T.textMuted, fontSize: 'var(--text-xs)' }}>
                   CNPJ {opt.cnpj}
                 </span>
               </button>
             ))}
             {filtered.length === 0 && (
-              <div style={{ padding: '12px 14px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,0.55)' }}>
+              <div style={{ padding: '12px 14px', fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: T.textMuted }}>
                 Nenhuma instituição encontrada.
               </div>
             )}
@@ -239,16 +218,12 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
   const [objetivo, setObjetivo] = useState('');
   const [valorAporteOriginal, setValorAporteOriginal] = useState('');
   const [dataAporteOriginal, setDataAporteOriginal] = useState('');
-  const [contaBancariaDestino, setContaBancariaDestino] = useState('');
-  const [contaBancariaAcaoTransversal, setContaBancariaAcaoTransversal] = useState('');
+  const [banco, setBanco] = useState('');
+  const [agencia, setAgencia] = useState('');
+  const [conta, setConta] = useState('');
   const [documentos, setDocumentos] = useState<Documento[]>([{ id: 1, tipo: '', arquivo: '' }]);
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirmingFormalizar, setIsConfirmingFormalizar] = useState(false);
-  const valorAporteOriginalNumerico = parseCurrencyValue(valorAporteOriginal);
-  const percentualAcaoTransversal = calcularPercentualAcaoTransversal(valorAporteOriginalNumerico);
-  const faixaAcaoTransversal = definirFaixaAcaoTransversal(valorAporteOriginalNumerico);
-  const valorReservaAcaoTransversal = valorAporteOriginalNumerico * percentualAcaoTransversal / 100;
-  const saldoAlocavelEmProgramas = Math.max(valorAporteOriginalNumerico - valorReservaAcaoTransversal, 0);
 
   const instituicoesOptions = [
     { value: 'ufes', label: 'Universidade Federal do Espírito Santo (Ufes)', cnpj: '32.479.123/0001-43' },
@@ -378,15 +353,10 @@ export const FormularioParceria: React.FC<Props> = ({ onBack }) => {
             <Field label="Valor do Aporte Original (R$)" value={valorAporteOriginal} onChange={setValorAporteOriginal} placeholder="Ex: 1.000.000,00" />
             <DateField label="Data do Aporte" value={dataAporteOriginal} onChange={setDataAporteOriginal} />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '12px', marginBottom: '16px', padding: '16px', border: '1px solid rgba(0,193,175,0.28)', borderRadius: '8px', backgroundColor: 'rgba(0,193,175,0.08)' }}>
-            <Metric label="Faixa aplicada" value={faixaAcaoTransversal} />
-            <Metric label="Percentual Ação Transversal" value={formatPercent(percentualAcaoTransversal)} />
-            <Metric label="Reserva Ação Transversal" value={formatCurrency(valorReservaAcaoTransversal)} />
-            <Metric label="Saldo alocável em programas" value={formatCurrency(saldoAlocavelEmProgramas)} />
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <Field label="Conta Bancária de Destino da Parceria" value={contaBancariaDestino} onChange={setContaBancariaDestino} placeholder="Banco / agência / conta" required={false} />
-            <Field label="Conta Ação Transversal" value={contaBancariaAcaoTransversal} onChange={setContaBancariaAcaoTransversal} placeholder="BANESTES / agência / conta específica" required={false} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+            <Field label="Banco" value={banco} onChange={setBanco} placeholder="Banco" required={false} />
+            <Field label="Agência" value={agencia} onChange={setAgencia} placeholder="Agência" required={false} />
+            <Field label="Conta" value={conta} onChange={setConta} placeholder="Conta" required={false} />
           </div>
         </Section>
 
@@ -487,15 +457,6 @@ const Field: React.FC<{ label: string; value: string; onChange: (value: string) 
   <div>
     <RequiredLabel label={label} required={required} />
     <input type="text" placeholder={placeholder} value={value} onChange={e => onChange(e.target.value)} style={inputStyle} />
-  </div>
-);
-
-const Metric: React.FC<{ label: string; value: string; highlight?: boolean }> = ({ label, value }) => (
-  <div>
-    <div style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-xs)', color: 'var(--form-text-muted)', marginBottom: '5px' }}>{label}</div>
-    <p style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--text-sm)', color: '#ffffff', fontWeight: 'var(--font-weight-normal)', margin: 0 }}>
-      {value}
-    </p>
   </div>
 );
 
