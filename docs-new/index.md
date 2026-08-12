@@ -52,7 +52,7 @@ Dois perfis usam o sistema:
 
 ## Banco de dados
 
-O sistema tem **110 tabelas**. Veja o modelo completo, com colunas e ligações entre todas elas, em **[[_banco-de-dados]]**.
+O sistema tem **110 tabelas**. Veja os **[[_diagramas|diagramas do domínio]]** (panorama geral + um por subdomínio) ou o modelo completo, com colunas e ligações entre todas elas, em **[[_banco-de-dados]]**.
 
 As mais centrais: [[Pessoa]] · [[Projeto]] · [[Edital]] · [[AlocacaoBolsista]] (a bolsa) · [[ModalidadeBolsa]] · [[VersaoNivel]] · [[PagamentoBolsista]] · [[DocumentoMetadado]]
 
