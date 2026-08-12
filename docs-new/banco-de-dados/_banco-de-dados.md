@@ -4,7 +4,7 @@ title: Banco de Dados
 
 # Banco de Dados
 
-Todas as 110 tabelas do sistema. Abra o **Graph View** para ver o diagrama completo de ligações.
+Todas as 110 tabelas do sistema. Para uma leitura por área, veja os **[[_diagramas|diagramas do domínio]]**. Abra o **Graph View** para ver o diagrama completo de ligações.
 
 ## Tabelas
 
