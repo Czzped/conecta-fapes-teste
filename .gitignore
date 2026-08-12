@@ -1,6 +1,9 @@
 # MkDocs
 site/
 
+# Obsidian (config local do app, nao faz parte do conteudo do vault)
+docs-new/.obsidian/
+
 # Mapa de Capacidades (assets gerados pelo hook a cada build)
 docs/assets/mapa-capacidades.html
 docs/assets/ficha.html
