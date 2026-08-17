@@ -55,7 +55,7 @@ export function NotificationsSidebar({ isOpen, onClose, onNavigate }: Notificati
     {
       id: '6',
       type: 'diaria',
-      title: 'Diária aguardando assinatura',
+      title: 'Diária aguardando aceite',
       description: 'Você possui uma Diária aguardando o seu aceite.',
       isRead: false,
       link: 'certificados-diarias',

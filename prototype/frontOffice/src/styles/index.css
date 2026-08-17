@@ -1,3 +1,11 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  color: var(--foreground);
+  opacity: 1;
+  -webkit-text-fill-color: var(--foreground);
+}
