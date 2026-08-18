@@ -1,4 +1,4 @@
-import { Users, Plus, UserPlus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle, HandCoins, Download } from 'lucide-react';
+import { Users, Plus, UserPlus, ChevronDown, ChevronRight, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle, HandCoins, Download } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -25,7 +25,7 @@ interface TeamMember {
   startDate: string;
   endDate: string;
   type: 'BPIG-VII' | 'BPIG-VI' | 'BPIG-V' | 'BPIG-IV' | 'BPIG-III' | 'BPIG-II' | 'Voluntário' | 'AUX-MOR';
-  status: 'Em Andamento' | 'Finalizada' | 'Cancelada' | 'Reprovada' | 'Doc. Pendente' | 'Revisar' | 'Em Avaliação' | 'Reprovado';
+  status: 'Em Andamento' | 'Finalizada' | 'Cancelada' | 'Reprovada' | 'Doc. Pendente' | 'Revisar' | 'Em Avaliação' | 'Reprovado' | 'Aguardando Aceite';
   isVoluntario?: boolean;
   email: string;
   phone: string;
@@ -76,6 +76,12 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   
   const periodChartRef = useRef<HTMLDivElement>(null);
   const acoesMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setActiveTab(defaultTab);
+    setSelectedMemberPage(null);
+    setMemberPageTab('documentos');
+  }, [defaultTab]);
 
   // Fecha o dropdown de Ações ao clicar fora
   useEffect(() => {
@@ -191,6 +197,13 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   };
 
   const isVolunteer = (member: TeamMember) => member.type === 'Voluntário';
+
+  const openProjectScholarsTab = () => {
+    setActiveTab('bolsistas');
+    setSelectedMemberPage(null);
+    setMemberPageTab('documentos');
+    setExpandedBolsistaId(null);
+  };
 
   const handleMemberRowClick = (member: TeamMember) => {
     if (hideExpandable) return;
@@ -740,8 +753,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setSelectedMemberPage(null);
-                setMemberPageTab('documentos');
+                openProjectScholarsTab();
               }}
             >
               Bolsistas do Projeto
@@ -1001,7 +1013,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             Informações das Bolsas
           </button>
           <button
-            onClick={() => setActiveTab('bolsistas')}
+            onClick={openProjectScholarsTab}
             style={{
               padding: '0.625rem 1rem',
               backgroundColor: 'transparent',
@@ -1071,7 +1083,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             Informações das Bolsas
           </button>
           <button
-            onClick={() => setActiveTab('bolsistas')}
+            onClick={openProjectScholarsTab}
             className="py-3 pl-4 text-left"
             style={{
               backgroundColor: 'transparent',
