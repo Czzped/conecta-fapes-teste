@@ -17,9 +17,7 @@ import {
   Plus,
   ReceiptText,
   RotateCcw,
-  Save,
   Search,
-  Send,
   Trash2,
   Upload,
   X,
@@ -35,6 +33,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/app/components/ui/breadcrumb';
+import { toast } from 'sonner';
 
 type DocumentoSolicitacao = 'declaracao' | 'informe' | 'termo' | null;
 type StatusDiaria = 'RASCUNHO' | 'ALOCADA' | 'APROVADA' | 'CANCELADA' | 'RECUSADA';
@@ -315,6 +314,46 @@ function statusLabel(status: StatusDiaria) {
   };
 
   return labels[status];
+}
+
+function statusBadgeStyle(status: StatusDiaria): React.CSSProperties {
+  return {
+    backgroundColor:
+      status === 'APROVADA'
+        ? 'rgba(34, 197, 94, 0.12)'
+        : status === 'ALOCADA'
+        ? 'rgba(59, 130, 246, 0.12)'
+        : status === 'RECUSADA'
+        ? 'rgba(249, 115, 22, 0.14)'
+        : status === 'CANCELADA'
+        ? 'rgba(239, 68, 68, 0.12)'
+        : 'color-mix(in srgb, var(--primary) 12%, transparent)',
+    color:
+      status === 'APROVADA'
+        ? '#22c55e'
+        : status === 'ALOCADA'
+        ? 'rgb(59, 130, 246)'
+        : status === 'RECUSADA'
+        ? '#f97316'
+        : status === 'CANCELADA'
+        ? '#dc2626'
+        : 'var(--primary)',
+    border: `1px solid ${
+      status === 'APROVADA'
+        ? 'rgba(34, 197, 94, 0.3)'
+        : status === 'ALOCADA'
+        ? 'rgba(59, 130, 246, 0.3)'
+        : status === 'RECUSADA'
+        ? 'rgba(249, 115, 22, 0.35)'
+        : status === 'CANCELADA'
+        ? 'rgba(239, 68, 68, 0.3)'
+        : 'color-mix(in srgb, var(--primary) 28%, transparent)'
+    }`,
+    borderRadius: '9999px',
+    fontSize: 'var(--text-xs)',
+    fontWeight: 'var(--font-weight-medium)',
+    whiteSpace: 'nowrap',
+  };
 }
 
 function statusPendenteAceite(solicitacao: Pick<DiariaRequest, 'status' | 'estadoAceite'>) {
@@ -1359,6 +1398,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
     setSolicitacaoDetalheId(null);
     setMostrarJustificativaRecusa(false);
     setJustificativaRecusa('');
+    toast.success('Você recusou a Solicitação de Diária que recebeu.');
   };
 
   const alterarTipoViagem = (tipoViagem: TipoViagemCodigo | '') => {
@@ -1485,6 +1525,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
       setActiveDiariaTab('minhas');
       setSolicitacaoDetalheId(null);
     }
+    toast.success('A Solicitação da Diária foi aceita com sucesso.');
   };
 
   const recusarDiaria = (id: string) => {
@@ -1743,6 +1784,20 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
   const solicitacaoDetalhe = solicitacaoDetalheId
     ? solicitacoesDiaria.find((solicitacao) => solicitacao.id === solicitacaoDetalheId)
     : null;
+  useEffect(() => {
+    if (
+      accessType !== 'bolsista' ||
+      activeFlow !== 'diarias' ||
+      activeDiariaTab !== 'nova' ||
+      solicitacaoDetalheId ||
+      minhasDiariasFiltradas.length === 0
+    ) {
+      return;
+    }
+
+    setSolicitacaoDetalheId(minhasDiariasFiltradas[0].id);
+    setSolicitacaoDetalheOrigem('minhas');
+  }, [accessType, activeDiariaTab, activeFlow, minhasDiariasFiltradas, solicitacaoDetalheId]);
   const diariaSomenteLeitura = Boolean(solicitacaoDetalheId);
   const mostrarExcluirDiariaDetalheCoordenador =
     accessType === 'coordenador' &&
@@ -1752,8 +1807,16 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
     solicitacaoDetalhe?.status === 'ALOCADA' &&
     !mostrarMotivoCancelamento;
   const temDiariaPendenteBolsista = solicitacoesDiaria.some((solicitacao) => solicitacao.bolsistaNome === bolsistaAtual && statusPendenteAceite(solicitacao));
+  const diariaDetalheHeader = activeFlow === 'diarias' && activeDiariaTab === 'nova'
+    ? solicitacaoDetalhe ?? (accessType === 'bolsista' ? minhasDiariasFiltradas[0] ?? null : null)
+    : null;
+  const mostrarAcoesAceiteDiariaDetalhe =
+    Boolean(solicitacaoDetalheId) &&
+    solicitacaoDetalhe?.status === 'ALOCADA' &&
+    dataInicioAindaNaoPassou(solicitacaoDetalhe.partida) &&
+    (solicitacaoDetalheOrigem === 'minhas' || accessType === 'bolsistaSolicitarBolsa');
 
-  const renderComprovacaoAtividadeCard = (comprovacaoEditavel: boolean, mostrarNumeroEtapa = false, somenteVisualizacao = false) => (
+  const renderComprovacaoAtividadeCard = (comprovacaoEditavel: boolean, mostrarNumeroEtapa = false, somenteVisualizacao = false, ocultarAcoes = false) => (
     <>
     <div
       className="mt-6 p-5"
@@ -1784,7 +1847,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                 2
               </span>
             )}
-            <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+            <h2 style={{ color: 'var(--foreground)', fontSize: 'inherit', fontWeight: 'var(--font-weight-normal)', margin: 0 }}>
               Relatório da Diária
             </h2>
             {!comprovacaoEditavel && !mostrarNumeroEtapa && (
@@ -2027,7 +2090,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
         )}
       </div>
     </div>
-    {!somenteVisualizacao && (
+    {!somenteVisualizacao && !ocultarAcoes && (
     <div className="mt-4 flex flex-col sm:flex-row justify-end gap-3">
       <button
         type="button"
@@ -2043,7 +2106,6 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
           cursor: comprovacaoEditavel ? 'pointer' : 'not-allowed',
         }}
       >
-        <Save size={16} />
         Salvar Rascunho
       </button>
       <button
@@ -2060,7 +2122,6 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
           cursor: comprovacaoEditavel ? 'pointer' : 'not-allowed',
         }}
       >
-        <Send size={16} />
         Enviar Comprovação
       </button>
     </div>
@@ -2069,58 +2130,189 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
   );
 
   const renderDetalhesBolsistaDiaria = () => {
-    if (!solicitacaoDetalhe) return null;
+    const diariaDetalhe = solicitacaoDetalhe ?? minhasDiariasFiltradas[0] ?? null;
 
-    const comprovacaoEditavel = !dataInicioAindaNaoPassou(solicitacaoDetalhe.partida);
+    if (!diariaDetalhe) return renderMinhasDiarias();
+
+    const comprovacaoEditavel = !dataInicioAindaNaoPassou(diariaDetalhe.partida);
+    const diariaRecusada = diariaDetalhe.status === 'RECUSADA';
+    const justificativaRecusaDetalhe =
+      diariaDetalhe.justificativaRecusa ??
+      'Solicitação recusada pelo bolsista por indisponibilidade para participar da atividade no período informado.';
+    const partidaDetalhe = new Date(diariaDetalhe.partida);
+    const chegadaDetalhe = new Date(diariaDetalhe.chegada);
+    const partidaDataDetalhe = partidaDetalhe.toLocaleDateString('pt-BR');
+    const partidaHoraDetalhe = partidaDetalhe.toLocaleTimeString('pt-BR');
+    const chegadaDataDetalhe = chegadaDetalhe.toLocaleDateString('pt-BR');
+    const chegadaHoraDetalhe = chegadaDetalhe.toLocaleTimeString('pt-BR');
+    const tipoViagemDetalhe = tiposViagem.find((tipo) => tipo.codigo === diariaDetalhe.tipoViagem)?.nome ?? '-';
+    const fieldBoxStyle = {
+      alignItems: 'center',
+      backgroundColor: 'transparent',
+      border: '1px solid var(--border)',
+      borderRadius: 'var(--radius)',
+      color: 'var(--foreground)',
+      display: 'flex',
+      minHeight: '46px',
+      padding: '0.75rem 0.9rem',
+      fontSize: 'var(--text-sm)',
+      fontWeight: 'var(--font-weight-normal)',
+    } as const;
 
     return (
       <section className="mb-8">
         <div
-          className="p-5"
+          className="p-6"
           style={{
             backgroundColor: 'var(--card)',
             border: '1px solid var(--border)',
             borderRadius: 'var(--radius)',
           }}
         >
-          <div className="mb-5">
-            <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+          <div className="mb-6 flex items-center gap-3">
+            <span
+              className="flex items-center justify-center"
+              style={{
+                width: '22px',
+                height: '22px',
+                borderRadius: '999px',
+                backgroundColor: 'var(--primary)',
+                color: 'var(--primary-foreground)',
+                fontSize: 'var(--text-xs)',
+                fontWeight: 'var(--font-weight-normal)',
+                flexShrink: 0,
+              }}
+            >
+              1
+            </span>
+            <h2 style={{ color: 'var(--foreground)', fontSize: 'inherit', fontWeight: 'var(--font-weight-normal)', margin: 0 }}>
               Informações Gerais
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
-            {[
-              { label: 'Bolsista', value: solicitacaoDetalhe.bolsistaNome },
-              { label: 'Tipo de Viagem', value: tiposViagem.find((tipo) => tipo.codigo === solicitacaoDetalhe.tipoViagem)?.nome ?? '-' },
-              { label: 'Diária', value: solicitacaoDetalhe.quantidade.toLocaleString('pt-BR') },
-              { label: 'Valor', value: currency.format(solicitacaoDetalhe.valorTotal) },
-              { label: 'Origem', value: solicitacaoDetalhe.origem },
-              { label: 'Destino', value: solicitacaoDetalhe.destino },
-              { label: 'Partida', value: new Date(solicitacaoDetalhe.partida).toLocaleString('pt-BR') },
-              { label: 'Chegada', value: new Date(solicitacaoDetalhe.chegada).toLocaleString('pt-BR') },
-              { label: 'Status', value: statusLabel(solicitacaoDetalhe.status) },
-            ].map((item) => (
-              <div key={item.label} className="min-w-0">
-                <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
-                  {item.label}
-                </span>
-                <strong style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', overflowWrap: 'anywhere' }}>
-                  {item.value}
-                </strong>
+
+          <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', lineHeight: 1.6, margin: '-0.75rem 0 1.5rem 2.25rem' }}>
+            O valor da diária deve ser transferido da conta do projeto para a conta bancária Banestes do bolsista individualmente.
+          </p>
+
+          <div className="space-y-5">
+            <div>
+              <label className="mb-2 block" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>
+                Tipo de Viagem
+              </label>
+              <div style={{ ...fieldBoxStyle, color: 'var(--foreground)', justifyContent: 'space-between' }}>
+                <span>{tipoViagemDetalhe} - {currency.format(diariaDetalhe.valorUnitario)} - {diariaDetalhe.tipoDiaria === 'INTERNACIONAL' ? '24h' : '12h'}</span>
+                <ChevronDown size={18} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
               </div>
-            ))}
-            <div className="min-w-0 lg:col-span-3">
-              <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,0.6fr)_minmax(0,0.6fr)]">
+              {[
+                { label: 'Ida - Origem', value: diariaDetalhe.origem, selectLike: true },
+                { label: 'Destino', value: diariaDetalhe.destino },
+                { label: 'Data da Ida', value: partidaDataDetalhe },
+                { label: 'Horário', value: partidaHoraDetalhe },
+                { label: 'Volta - Origem', value: diariaDetalhe.destino },
+                { label: 'Destino', value: diariaDetalhe.origem, selectLike: true },
+                { label: 'Data da Volta', value: chegadaDataDetalhe },
+                { label: 'Horário', value: chegadaHoraDetalhe },
+              ].map((item) => (
+                <div key={`${item.label}-${item.value}`}>
+                  <label className="mb-2 block" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>
+                    {item.label}
+                  </label>
+                  <div
+                    style={{
+                      ...fieldBoxStyle,
+                      color: 'var(--foreground)',
+                      justifyContent: item.selectLike ? 'space-between' : undefined,
+                    }}
+                  >
+                    <span>{item.value}</span>
+                    {item.selectLike ? <ChevronDown size={18} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} /> : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div>
+              <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                Equipe
+              </label>
+              <div style={{ marginTop: '0.5rem' }}>
+                <span
+                  className="inline-flex items-center gap-2 px-3 py-2"
+                  style={{
+                    border: '1px solid var(--primary)',
+                    borderRadius: '999px',
+                    backgroundColor: 'color-mix(in srgb, var(--primary) 10%, transparent)',
+                    color: 'var(--foreground)',
+                    fontSize: 'var(--text-sm)',
+                  }}
+                >
+                  {diariaDetalhe.bolsistaNome}
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-2 block" style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)' }}>
                 Motivo
-              </span>
-              <strong style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-normal)', overflowWrap: 'anywhere', lineHeight: 1.6 }}>
-                {solicitacaoDetalhe.motivo}
-              </strong>
+              </label>
+              <div
+                style={{
+                  ...fieldBoxStyle,
+                  alignItems: 'flex-start',
+                  minHeight: '128px',
+                  lineHeight: 1.6,
+                }}
+              >
+                {diariaDetalhe.motivo}
+              </div>
             </div>
           </div>
         </div>
 
-        {renderComprovacaoAtividadeCard(comprovacaoEditavel)}
+        {diariaRecusada ? (
+          <div
+            className="mt-6 p-5"
+            style={{
+              backgroundColor: 'var(--card)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+            }}
+          >
+            <div className="mb-4 flex items-center gap-2">
+              <span
+                className="flex items-center justify-center"
+                style={{
+                  width: '22px',
+                  height: '22px',
+                  borderRadius: '999px',
+                  backgroundColor: 'var(--primary)',
+                  color: 'var(--primary-foreground)',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 'var(--font-weight-normal)',
+                  flexShrink: 0,
+                }}
+              >
+                2
+              </span>
+              <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+                Recusa
+              </h2>
+            </div>
+            <div>
+              <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                Justificativa
+              </span>
+              <p style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', lineHeight: 1.6, margin: 0 }}>
+                {justificativaRecusaDetalhe}
+              </p>
+            </div>
+          </div>
+        ) : (
+          renderComprovacaoAtividadeCard(comprovacaoEditavel, true, false, diariaDetalhe.status === 'ALOCADA')
+        )}
 
         <div
           className="hidden mt-6 p-5"
@@ -2137,7 +2329,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                 <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
                   Relatório da Diária
                 </h2>
-                {!comprovacaoEditavel && !mostrarNumeroEtapa && (
+                {!comprovacaoEditavel && (
                   <span style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)' }}>
                     Disponível para edição após a data de partida.
                   </span>
@@ -2386,7 +2578,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
           </div>
         </div>
 
-        {mostrarJustificativaRecusa && (
+        {!diariaRecusada && mostrarJustificativaRecusa && (
           <div
             className="mt-6 p-5"
             style={{
@@ -2415,7 +2607,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
           </div>
         )}
 
-        {solicitacaoDetalhe.status === 'ALOCADA' && dataInicioAindaNaoPassou(solicitacaoDetalhe.partida) && (
+        {!diariaRecusada && diariaDetalhe.status === 'ALOCADA' && dataInicioAindaNaoPassou(diariaDetalhe.partida) && (
           <div className="mt-6 flex flex-col sm:flex-row justify-end gap-3">
             {mostrarJustificativaRecusa ? (
               <>
@@ -2474,7 +2666,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                 </button>
                 <button
                   type="button"
-                  onClick={() => solicitarAceiteDiaria(solicitacaoDetalhe.id)}
+                  onClick={() => solicitarAceiteDiaria(diariaDetalhe.id)}
                   className="px-4 py-2"
                   style={{
                     backgroundColor: 'var(--primary)',
@@ -2535,11 +2727,30 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.58)' }}>
           <div
             className="w-full max-w-md p-6"
-            style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-lg)' }}
+            style={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-lg)' }}
           >
-            <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', margin: '0 0 0.75rem 0' }}>
-              Confirmar aceite
-            </h2>
+            <div className="mb-3 flex items-start justify-between gap-4">
+              <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-semibold)', margin: 0 }}>
+                Confirmar aceite
+              </h2>
+              <button
+                type="button"
+                aria-label="Fechar modal"
+                onClick={() => setConfirmarAceiteDiariaId(null)}
+                className="flex h-8 w-8 shrink-0 items-center justify-center transition-colors"
+                style={{ backgroundColor: 'transparent', color: 'var(--muted-foreground)', border: 'none', borderRadius: 'var(--radius)', cursor: 'pointer' }}
+                onMouseEnter={(event) => {
+                  event.currentTarget.style.backgroundColor = 'var(--muted)';
+                  event.currentTarget.style.color = 'var(--foreground)';
+                }}
+                onMouseLeave={(event) => {
+                  event.currentTarget.style.backgroundColor = 'transparent';
+                  event.currentTarget.style.color = 'var(--muted-foreground)';
+                }}
+              >
+                <X size={16} />
+              </button>
+            </div>
             <p style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)', lineHeight: 1.6, margin: '0 0 1.5rem 0' }}>
               Confirme que você aceita a diária e está ciente das informações registradas na solicitação.
             </p>
@@ -2622,6 +2833,14 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                     <BreadcrumbPage>Diária</BreadcrumbPage>
                   )}
                 </BreadcrumbItem>
+                {activeDiariaTab === 'nova' && (
+                  <>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>Detalhes</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </>
+                )}
               </>
             )}
           </BreadcrumbList>
@@ -2641,15 +2860,19 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
           <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
             {activeFlow === 'diarias' ? (activeDiariaTab === 'nova' ? 'Detalhes da Diária' : 'Diárias') : 'Solicitações'}
           </h1>
+          {diariaDetalheHeader && (
+            <span className="inline-flex items-center px-2.5 py-1" style={statusBadgeStyle(diariaDetalheHeader.status)}>
+              {statusLabel(diariaDetalheHeader.status)}
+            </span>
+          )}
         </div>
 
         <p
-          className="mb-8"
           style={{
             color: 'var(--muted-foreground)',
             fontSize: 'var(--text-sm)',
             fontWeight: 'var(--font-weight-normal)',
-            marginLeft: 'calc(32px + 0.75rem)',
+            margin: '0 0 1.5rem calc(32px + 0.75rem)',
           }}
         >
           {activeFlow === 'diarias'
@@ -2658,7 +2881,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
               : 'Visualize suas viagens e aceite ou recuse o termo de diária quando houver solicitação pendente.'
             : 'Acesse documentos, informes e suas solicitações vinculadas ao projeto.'}
         </p>
-        <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '1.5rem' }} />
+        <div style={{ borderBottom: '1px solid var(--border)', marginBottom: activeFlow === 'diarias' && activeDiariaTab === 'nova' ? '1rem' : '1.5rem' }} />
 
         {activeFlow === 'diarias' ? (
           <>
@@ -2873,6 +3096,11 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
           <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
             {isNovaSolicitacaoDiaria ? (solicitacaoDetalheId ? 'Detalhes da Diária' : 'Criar Diária') : activeFlow === 'diarias' ? 'Diária' : 'Solicitações'}
           </h1>
+          {diariaDetalheHeader && (
+            <span className="inline-flex items-center px-2.5 py-1" style={statusBadgeStyle(diariaDetalheHeader.status)}>
+              {statusLabel(diariaDetalheHeader.status)}
+            </span>
+          )}
         </div>
       </div>
 
@@ -3300,73 +3528,74 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
 
                   <label style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
                     Equipe
-                    <div className="mt-2">
-                      <div className="relative">
-                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--muted-foreground)' }} />
-                        <input
-                          value={bolsistaSearch}
-                          onFocus={() => setIsBolsistaDropdownOpen(true)}
-                          onBlur={() => window.setTimeout(() => setIsBolsistaDropdownOpen(false), 120)}
-                          onChange={(event) => {
-                            setBolsistaSearch(event.target.value);
-                            setIsBolsistaDropdownOpen(true);
-                          }}
-                          disabled={diariaSomenteLeitura}
-                          placeholder="Digite ou selecione uma ou mais pessoas da equipe"
-                          className="w-full pl-10 pr-3 py-2"
-                          style={{
-                            backgroundColor: 'transparent',
-                            border: '1px solid var(--border)',
-                            borderRadius: 'var(--radius)',
-                            color: 'var(--foreground)',
-                            fontSize: 'var(--text-sm)',
-                          }}
-                        />
-                        {isBolsistaDropdownOpen && bolsistasEncontrados.length > 0 && (
-                          <div
-                            className="absolute z-50 w-full mt-1 overflow-hidden"
+                    {!solicitacaoDetalheId && (
+                      <div className="mt-2">
+                        <div className="relative">
+                          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--muted-foreground)' }} />
+                          <input
+                            value={bolsistaSearch}
+                            onFocus={() => setIsBolsistaDropdownOpen(true)}
+                            onBlur={() => window.setTimeout(() => setIsBolsistaDropdownOpen(false), 120)}
+                            onChange={(event) => {
+                              setBolsistaSearch(event.target.value);
+                              setIsBolsistaDropdownOpen(true);
+                            }}
+                            placeholder="Digite ou selecione uma ou mais pessoas da equipe"
+                            className="w-full pl-10 pr-3 py-2"
                             style={{
-                              backgroundColor: 'var(--popover)',
+                              backgroundColor: 'transparent',
                               border: '1px solid var(--border)',
                               borderRadius: 'var(--radius)',
-                              boxShadow: 'var(--elevation-sm)',
+                              color: 'var(--foreground)',
+                              fontSize: 'var(--text-sm)',
                             }}
-                          >
-                            {bolsistasEncontrados.map((nome) => (
-                              <button
-                                key={nome}
-                                type="button"
-                                onMouseDown={(event) => event.preventDefault()}
-                                onClick={() => {
-                                  adicionarBolsista(nome);
-                                  setIsBolsistaDropdownOpen(false);
-                                }}
-                                className="w-full px-3 py-2.5 text-left transition-colors"
-                                style={{
-                                  backgroundColor: 'transparent',
-                                  color: 'var(--foreground)',
-                                  border: 'none',
-                                  fontSize: 'var(--text-sm)',
-                                  fontFamily: 'inherit',
-                                  cursor: 'pointer',
-                                }}
-                                onMouseEnter={(event) => {
-                                  event.currentTarget.style.backgroundColor = 'var(--muted)';
-                                }}
-                                onMouseLeave={(event) => {
-                                  event.currentTarget.style.backgroundColor = 'transparent';
-                                }}
-                              >
-                                {nome}
-                              </button>
-                            ))}
-                          </div>
-                        )}
+                          />
+                          {isBolsistaDropdownOpen && bolsistasEncontrados.length > 0 && (
+                            <div
+                              className="absolute z-50 w-full mt-1 overflow-hidden"
+                              style={{
+                                backgroundColor: 'var(--popover)',
+                                border: '1px solid var(--border)',
+                                borderRadius: 'var(--radius)',
+                                boxShadow: 'var(--elevation-sm)',
+                              }}
+                            >
+                              {bolsistasEncontrados.map((nome) => (
+                                <button
+                                  key={nome}
+                                  type="button"
+                                  onMouseDown={(event) => event.preventDefault()}
+                                  onClick={() => {
+                                    adicionarBolsista(nome);
+                                    setIsBolsistaDropdownOpen(false);
+                                  }}
+                                  className="w-full px-3 py-2.5 text-left transition-colors"
+                                  style={{
+                                    backgroundColor: 'transparent',
+                                    color: 'var(--foreground)',
+                                    border: 'none',
+                                    fontSize: 'var(--text-sm)',
+                                    fontFamily: 'inherit',
+                                    cursor: 'pointer',
+                                  }}
+                                  onMouseEnter={(event) => {
+                                    event.currentTarget.style.backgroundColor = 'var(--muted)';
+                                  }}
+                                  onMouseLeave={(event) => {
+                                    event.currentTarget.style.backgroundColor = 'transparent';
+                                  }}
+                                >
+                                  {nome}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </label>
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2" style={solicitacaoDetalheId ? { marginTop: '-0.5rem' } : undefined}>
                     {selectedBolsistas.map((nome) => (
                       <span
                         key={nome}
@@ -3380,23 +3609,24 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                         }}
                       >
                         {nome}
-                        <button
-                          type="button"
-                          disabled={diariaSomenteLeitura}
-                          onClick={() => removerBolsista(nome)}
-                          aria-label={`Remover ${nome}`}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            backgroundColor: 'transparent',
-                            border: 'none',
-                            color: 'var(--muted-foreground)',
-                            padding: 0,
-                          }}
-                        >
-                          <X size={14} />
-                        </button>
+                        {!solicitacaoDetalheId && (
+                          <button
+                            type="button"
+                            onClick={() => removerBolsista(nome)}
+                            aria-label={`Remover ${nome}`}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backgroundColor: 'transparent',
+                              border: 'none',
+                              color: 'var(--muted-foreground)',
+                              padding: 0,
+                            }}
+                          >
+                            <X size={14} />
+                          </button>
+                        )}
                       </span>
                     ))}
                   </div>
@@ -3577,10 +3807,52 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
                 </div>
               </div>
 
-              {solicitacaoDetalheId && solicitacaoDetalhe && (
+              {solicitacaoDetalheId && solicitacaoDetalhe?.status === 'RECUSADA' && (
+                <div
+                  className="mt-6 p-5"
+                  style={{
+                    backgroundColor: 'var(--card)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                  }}
+                >
+                  <div className="mb-4 flex items-center gap-2">
+                    <span
+                      className="flex items-center justify-center"
+                      style={{
+                        width: '22px',
+                        height: '22px',
+                        borderRadius: '999px',
+                        backgroundColor: 'var(--primary)',
+                        color: 'var(--primary-foreground)',
+                        fontSize: 'var(--text-xs)',
+                        fontWeight: 'var(--font-weight-normal)',
+                        flexShrink: 0,
+                      }}
+                    >
+                      2
+                    </span>
+                    <h2 style={{ color: 'var(--foreground)', fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>
+                      Recusa
+                    </h2>
+                  </div>
+                  <div>
+                    <span style={{ display: 'block', color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                      Motivo
+                    </span>
+                    <p style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)', lineHeight: 1.6, margin: 0 }}>
+                      {solicitacaoDetalhe.justificativaRecusa ?? 'Solicitação recusada pelo beneficiário por conflito de agenda no período informado.'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {solicitacaoDetalheId && solicitacaoDetalhe && solicitacaoDetalhe.status !== 'RECUSADA' && (
                 renderComprovacaoAtividadeCard(
                   !dataInicioAindaNaoPassou(solicitacaoDetalhe.partida),
                   true,
+                  false,
+                  solicitacaoDetalhe.status === 'ALOCADA',
                 )
               )}
 
@@ -3645,7 +3917,7 @@ export function CertificatesPage({ accessType = 'bolsista', initialFlow = null, 
               <div className="mt-6 flex flex-col sm:flex-row justify-end gap-3">
                 {solicitacaoDetalheId ? (
                   <>
-                    {solicitacaoDetalheOrigem === 'minhas' && solicitacaoDetalhe?.status === 'ALOCADA' && dataInicioAindaNaoPassou(solicitacaoDetalhe.partida) ? (
+                    {mostrarAcoesAceiteDiariaDetalhe ? (
                       mostrarJustificativaRecusa ? (
                         <>
                           <button

@@ -319,7 +319,7 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
                     fontSize: 'var(--text-sm)',
                     margin: '0 0 0.25rem 0',
                   }}>
-                    Diária aguardando assinatura
+                    Diária aguardando aceite
                   </p>
                   <p style={{
                     color: 'var(--muted-foreground)',
@@ -350,7 +350,7 @@ export function HomePage({ accessType, onNavigate }: HomePageProps) {
                   whiteSpace: 'nowrap',
                 }}
               >
-                Assinar diária
+                Verificar Diária
                 <ChevronRight size={16} />
               </span>
             </button>

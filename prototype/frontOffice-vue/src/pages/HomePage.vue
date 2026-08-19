@@ -296,7 +296,7 @@ function goToEditais() {
                   margin: '0 0 0.25rem 0',
                 }"
               >
-                Diária aguardando assinatura
+                Diária aguardando aceite
               </p>
               <p
                 :style="{
@@ -331,7 +331,7 @@ function goToEditais() {
               whiteSpace: 'nowrap',
             }"
           >
-            Assinar diária
+            Verificar Diária
             <UIcon name="i-lucide-chevron-right" class="w-4 h-4" />
           </span>
         </button>

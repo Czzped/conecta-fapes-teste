@@ -1,4 +1,4 @@
-import { Users, Plus, UserPlus, ChevronDown, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle, HandCoins, Download } from 'lucide-react';
+import { Users, Plus, UserPlus, ChevronDown, ChevronRight, Search, FileText, X, GraduationCap, User, Calendar, Target, ClipboardList, Send, CheckCircle, ArrowUpDown, ArrowDown, ArrowUp, Check, AlertTriangle, HandCoins, Download, Info } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -25,7 +25,7 @@ interface TeamMember {
   startDate: string;
   endDate: string;
   type: 'BPIG-VII' | 'BPIG-VI' | 'BPIG-V' | 'BPIG-IV' | 'BPIG-III' | 'BPIG-II' | 'Voluntário' | 'AUX-MOR';
-  status: 'Em Andamento' | 'Finalizada' | 'Cancelada' | 'Reprovada' | 'Doc. Pendente' | 'Revisar' | 'Em Avaliação' | 'Reprovado';
+  status: 'Em Andamento' | 'Finalizada' | 'Cancelada' | 'Reprovada' | 'Doc. Pendente' | 'Revisar' | 'Em Avaliação' | 'Reprovado' | 'Aguardando Aceite';
   isVoluntario?: boolean;
   email: string;
   phone: string;
@@ -68,14 +68,28 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
   const [isActionsMenuOpen, setIsActionsMenuOpen] = useState(false);
   const [isPermitScholarModalOpen, setIsPermitScholarModalOpen] = useState(false);
   const [selectedScholarCpf, setSelectedScholarCpf] = useState('');
+  const [delegationTab, setDelegationTab] = useState<'delegar' | 'retirar'>('delegar');
+  const [isScholarDelegationOpen, setIsScholarDelegationOpen] = useState(false);
   const [selectedVolunteerToFinish, setSelectedVolunteerToFinish] = useState<TeamMember | null>(null);
   const [volunteerEndDate, setVolunteerEndDate] = useState('');
   const [volunteerDetailsTab, setVolunteerDetailsTab] = useState<'informacoes' | 'historico'>('informacoes');
   const itemsPerPage = 10;
   const isExampleFlow = accessType === 'minhaEquipeExemplo';
+  const delegationScholarOptions = [
+    { cpf: '123.456.789-00', name: 'Sofia de Alcantara Silva' },
+    { cpf: '234.567.890-11', name: 'Vinícius de Jesus Estevam' },
+    { cpf: '345.678.901-22', name: 'Camila Rocha' },
+  ];
+  const selectedDelegationScholar = delegationScholarOptions.find((option) => option.cpf === selectedScholarCpf);
   
   const periodChartRef = useRef<HTMLDivElement>(null);
   const acoesMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setActiveTab(defaultTab);
+    setSelectedMemberPage(null);
+    setMemberPageTab('documentos');
+  }, [defaultTab]);
 
   // Fecha o dropdown de Ações ao clicar fora
   useEffect(() => {
@@ -192,18 +206,23 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
 
   const isVolunteer = (member: TeamMember) => member.type === 'Voluntário';
 
+  const openProjectScholarsTab = () => {
+    setActiveTab('bolsistas');
+    setSelectedMemberPage(null);
+    setMemberPageTab('documentos');
+    setExpandedBolsistaId(null);
+  };
+
   const handleMemberRowClick = (member: TeamMember) => {
     if (hideExpandable) return;
-    if (isVolunteer(member)) {
-      setSelectedVolunteerToFinish(member);
-      setVolunteerEndDate('');
-      setVolunteerDetailsTab('informacoes');
-      return;
-    }
     if (isExampleFlow) {
       setSelectedMemberPage(member);
-      setMemberPageTab('documentos');
+      setMemberPageTab(member.documents.length > 0 ? 'documentos' : 'informacoes');
       setExpandedBolsistaId(null);
+      return;
+    }
+    if (isVolunteer(member)) {
+      setExpandedBolsistaId(expandedBolsistaId === member.id ? null : member.id);
       return;
     }
     setExpandedBolsistaId(expandedBolsistaId === member.id ? null : member.id);
@@ -499,6 +518,57 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
         </div>
       )}
 
+      {member.documents.length === 0 && (
+        <div
+          style={{
+            backgroundColor: 'var(--card)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius)',
+            padding: compact ? '0.75rem' : '1.25rem',
+          }}
+        >
+          <div className="flex items-center gap-2 mb-3" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-sm)' }}>
+            <FileText size={16} />
+            Documentos Solicitados
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div>
+              <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                Requisito
+              </div>
+              <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                Termo de aceite
+              </div>
+            </div>
+            <div>
+              <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                Documento
+              </div>
+              <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                Aceite do bolsista no projeto
+              </div>
+            </div>
+            <div>
+              <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                Status
+              </div>
+              <span
+                className="inline-flex items-center px-2.5 py-1"
+                style={{
+                  ...getStatusStyles(member.status),
+                  borderRadius: '9999px',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {member.status}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {member.documents.map((doc) => {
         const statusColors = getDocumentStatusColor(doc.status);
         return (
@@ -740,8 +810,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setSelectedMemberPage(null);
-                setMemberPageTab('documentos');
+                openProjectScholarsTab();
               }}
             >
               Bolsistas do Projeto
@@ -958,7 +1027,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                         onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                       >
                         <Users size={16} />
-                        Permitir Bolsista - Solicitar Bolsa
+                        Delegar
                       </button>
                     </div>
                   )}
@@ -1001,7 +1070,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             Informações das Bolsas
           </button>
           <button
-            onClick={() => setActiveTab('bolsistas')}
+            onClick={openProjectScholarsTab}
             style={{
               padding: '0.625rem 1rem',
               backgroundColor: 'transparent',
@@ -1071,7 +1140,7 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             Informações das Bolsas
           </button>
           <button
-            onClick={() => setActiveTab('bolsistas')}
+            onClick={openProjectScholarsTab}
             className="py-3 pl-4 text-left"
             style={{
               backgroundColor: 'transparent',
@@ -2298,6 +2367,58 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
 
                       {/* Documents List */}
                       <div className="space-y-3">
+                          {member.documents.length === 0 && (
+                            <div
+                              style={{
+                                border: '1px solid var(--border)',
+                                borderRadius: 'var(--radius)',
+                                padding: '1rem',
+                              }}
+                            >
+                              <div className="grid grid-cols-12 gap-4">
+                                <div className="col-span-3">
+                                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                                    Requisito
+                                  </div>
+                                  <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                                    Termo de aceite
+                                  </div>
+                                </div>
+                                <div className="col-span-4">
+                                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                                    Documento
+                                  </div>
+                                  <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                                    Aceite do bolsista no projeto
+                                  </div>
+                                </div>
+                                <div className="col-span-3" style={{ marginLeft: '4rem' }}>
+                                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                                    Data de Envio
+                                  </div>
+                                  <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                                    -
+                                  </div>
+                                </div>
+                                <div className="col-span-2">
+                                  <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.5rem' }}>
+                                    Status
+                                  </div>
+                                  <span
+                                    className="inline-flex items-center px-2.5 py-1"
+                                    style={{
+                                      ...getStatusStyles(member.status),
+                                      borderRadius: '9999px',
+                                      fontSize: 'var(--text-xs)',
+                                      fontWeight: 'var(--font-weight-medium)',
+                                    }}
+                                  >
+                                    {member.status}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                           {member.documents.map((doc) => {
                             const statusColors = getDocumentStatusColor(doc.status);
                             return (
@@ -2495,6 +2616,60 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
 
                       {/* Documents List */}
                       <div className="space-y-3 mb-4 max-w-full">
+                        {member.documents.length === 0 && (
+                          <div
+                            style={{
+                              backgroundColor: 'transparent',
+                              border: '1px solid var(--border)',
+                              borderRadius: 'var(--radius)',
+                              padding: '0.75rem',
+                            }}
+                          >
+                            <div className="space-y-3">
+                              <div>
+                                <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
+                                  Requisito
+                                </div>
+                                <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                                  Termo de aceite
+                                </div>
+                              </div>
+                              <div>
+                                <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
+                                  Documento
+                                </div>
+                                <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                                  Aceite do bolsista no projeto
+                                </div>
+                              </div>
+                              <div>
+                                <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
+                                  Data de Envio
+                                </div>
+                                <div style={{ color: 'var(--foreground)', fontSize: 'var(--text-sm)' }}>
+                                  -
+                                </div>
+                              </div>
+                              <div>
+                                <div style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-xs)', marginBottom: '0.25rem' }}>
+                                  Status
+                                </div>
+                                <span
+                                  className="inline-flex items-center px-2.5 py-1"
+                                  style={{
+                                    ...getStatusStyles(member.status),
+                                    borderRadius: '9999px',
+                                    fontSize: 'var(--text-xs)',
+                                    fontWeight: 'var(--font-weight-medium)',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                >
+                                  {member.status}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                         {member.documents.map((doc) => {
                           const statusColors = getDocumentStatusColor(doc.status);
                           return (
@@ -3615,6 +3790,8 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
             onClick={() => {
               setIsPermitScholarModalOpen(false);
               setSelectedScholarCpf('');
+              setDelegationTab('delegar');
+              setIsScholarDelegationOpen(false);
             }}
           />
           <div
@@ -3652,13 +3829,15 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                     <Users size={22} />
                   </div>
                   <h1 style={{ color: 'var(--foreground)', margin: 0 }}>
-                    Permitir Bolsista - Solicitar Bolsa
+                    Delegar
                   </h1>
                 </div>
                 <button
                   onClick={() => {
                     setIsPermitScholarModalOpen(false);
                     setSelectedScholarCpf('');
+                    setDelegationTab('delegar');
+                    setIsScholarDelegationOpen(false);
                   }}
                   style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem', color: 'var(--muted-foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--radius-sm)', flexShrink: 0 }}
                   aria-label="Fechar"
@@ -3678,45 +3857,168 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                 O coordenador do projeto pode permitir que um bolsista da sua equipe tenha acesso as funcionalidade de Minha Equipe e possa Adicionar Voluntário e Solicitar Bolsa. Selecione o bolsista que deseja oferecer esse acesso.
               </p>
 
-              <div style={{ marginBottom: '1.25rem' }}>
-                <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
-                  CPF do Bolsista
-                </label>
-                <select
-                  value={selectedScholarCpf}
-                  onChange={(event) => setSelectedScholarCpf(event.target.value)}
+              <div className="flex gap-1" style={{ borderBottom: '1px solid var(--border)', marginBottom: '1.25rem' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDelegationTab('delegar');
+                    setSelectedScholarCpf('');
+                    setIsScholarDelegationOpen(false);
+                  }}
                   style={{
-                    width: '100%',
-                    padding: '0.625rem 0.75rem',
-                    backgroundColor: 'var(--input-background)',
-                    color: 'var(--foreground)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius)',
+                    padding: '0.625rem 1rem',
+                    backgroundColor: 'transparent',
+                    color: delegationTab === 'delegar' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                    border: 'none',
+                    borderBottom: delegationTab === 'delegar' ? '2px solid var(--primary)' : '2px solid transparent',
                     fontSize: 'var(--text-sm)',
-                    outline: 'none',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: 'pointer',
+                    marginBottom: '-1px',
                     fontFamily: 'var(--font-family)',
                   }}
                 >
-                  <option value="">Selecione o CPF do bolsista</option>
-                  <option value="123.456.789-00">123.456.789-00 - Sofia de Alcantara Silva</option>
-                  <option value="234.567.890-11">234.567.890-11 - Vinícius de Jesus Estevam</option>
-                  <option value="345.678.901-22">345.678.901-22 - Camila Rocha</option>
-                </select>
+                  Delegar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDelegationTab('retirar');
+                    setSelectedScholarCpf('');
+                    setIsScholarDelegationOpen(false);
+                  }}
+                  style={{
+                    padding: '0.625rem 1rem',
+                    backgroundColor: 'transparent',
+                    color: delegationTab === 'retirar' ? 'var(--tab-selected-foreground)' : 'var(--muted-foreground)',
+                    border: 'none',
+                    borderBottom: delegationTab === 'retirar' ? '2px solid var(--primary)' : '2px solid transparent',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-weight-medium)',
+                    cursor: 'pointer',
+                    marginBottom: '-1px',
+                    fontFamily: 'var(--font-family)',
+                  }}
+                >
+                  Retirar Delegação
+                </button>
               </div>
 
-              <div
-                className="flex items-start gap-2 px-3 py-2"
-                style={{
-                  backgroundColor: 'color-mix(in srgb, var(--primary) 5%, transparent)',
-                  border: '1px solid var(--primary)',
-                  borderRadius: 'var(--radius)',
-                  marginBottom: '1.5rem',
-                }}
-              >
-                <Info size={15} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: 1 }} />
-                <span style={{ color: 'var(--primary)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-family)', lineHeight: 1.5 }}>
-                  O bolsita deve entrar em sua conta e aceitar o convite.
-                </span>
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label style={{ display: 'block', color: 'var(--foreground)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: '0.5rem', fontFamily: 'var(--font-family)' }}>
+                  Bolsista
+                </label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setIsScholarDelegationOpen((current) => !current)}
+                    style={{
+                      width: '100%',
+                      padding: '0.625rem 0.75rem',
+                      backgroundColor: 'var(--input-background)',
+                      color: selectedDelegationScholar ? 'var(--foreground)' : 'var(--muted-foreground)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius)',
+                      fontSize: 'var(--text-sm)',
+                      outline: 'none',
+                      fontFamily: 'var(--font-family)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '0.75rem',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <span>
+                      {selectedDelegationScholar
+                        ? `${selectedDelegationScholar.name} - ${selectedDelegationScholar.cpf}`
+                        : 'Selecione o bolsista'}
+                    </span>
+                    <ChevronDown
+                      size={16}
+                      style={{
+                        color: 'var(--muted-foreground)',
+                        flexShrink: 0,
+                        transform: isScholarDelegationOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.2s',
+                      }}
+                    />
+                  </button>
+
+                  {isScholarDelegationOpen && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 4px)',
+                        left: 0,
+                        right: 0,
+                        backgroundColor: 'var(--popover)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        boxShadow: 'var(--shadow-lg)',
+                        zIndex: 50,
+                        overflow: 'hidden',
+                      }}
+                    >
+                      {delegationScholarOptions.map((option) => {
+                        const isSelected = selectedScholarCpf === option.cpf;
+                        return (
+                          <button
+                            key={option.cpf}
+                            type="button"
+                            onClick={() => {
+                              setSelectedScholarCpf(option.cpf);
+                              setIsScholarDelegationOpen(false);
+                            }}
+                            style={{
+                              width: '100%',
+                              padding: '0.625rem 0.75rem',
+                              backgroundColor: isSelected ? 'color-mix(in srgb, var(--primary) 16%, var(--popover))' : 'transparent',
+                              color: isSelected ? 'var(--primary)' : 'var(--foreground)',
+                              border: 'none',
+                              fontSize: 'var(--text-sm)',
+                              fontWeight: 'var(--font-weight-normal)',
+                              textAlign: 'left',
+                              cursor: 'pointer',
+                              transition: 'background-color 0.15s, color 0.15s',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.75rem',
+                              fontFamily: 'var(--font-family)',
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!isSelected) {
+                                e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--primary) 8%, var(--popover))';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!isSelected) {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }
+                            }}
+                          >
+                            <span
+                              aria-hidden="true"
+                              className="flex items-center justify-center"
+                              style={{
+                                width: '24px',
+                                height: '24px',
+                                borderRadius: '6px',
+                                backgroundColor: isSelected ? 'var(--primary)' : 'transparent',
+                                color: 'var(--primary-foreground)',
+                                flexShrink: 0,
+                              }}
+                            >
+                              {isSelected && <Check size={16} />}
+                            </span>
+                            <span>{option.name} - {option.cpf}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="flex justify-end gap-3">
@@ -3724,6 +4026,8 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                   onClick={() => {
                     setIsPermitScholarModalOpen(false);
                     setSelectedScholarCpf('');
+                    setDelegationTab('delegar');
+                    setIsScholarDelegationOpen(false);
                   }}
                   style={{ padding: '0.625rem 1.25rem', backgroundColor: 'transparent', color: 'var(--foreground)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: 'var(--font-family)' }}
                 >
@@ -3733,11 +4037,13 @@ export function MyTeamPage({ accessType, onNavigate, hideHeader = false, default
                   onClick={() => {
                     setIsPermitScholarModalOpen(false);
                     setSelectedScholarCpf('');
-                    toast.success('Convite enviado ao bolsista.');
+                    setDelegationTab('delegar');
+                    setIsScholarDelegationOpen(false);
+                    toast.success(delegationTab === 'delegar' ? 'Delegação realizada com sucesso.' : 'Delegação retirada com sucesso.');
                   }}
                   style={{ padding: '0.625rem 1.25rem', backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)', border: 'none', borderRadius: 'var(--radius)', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-weight-medium)', cursor: 'pointer', fontFamily: 'var(--font-family)' }}
                 >
-                  Salvar
+                  {delegationTab === 'delegar' ? 'Delegar' : 'Retirar Delegação'}
                 </button>
               </div>
             </div>
