@@ -2,6 +2,8 @@
 
 Repositório de casos de teste funcionais e de integração da plataforma.
 
+> 🤖 **Atenção Agentes de IA:** Para otimização de tokens e conformidade nas entregas, leiam o manual de diretrizes em [instrucoes-ia-casos-de-teste.md](referencias/instrucoes-ia-casos-de-teste.md) antes de criar novos casos.
+
 ## Organização
 
 Os casos de teste devem ser agrupados pelo módulo proprietário da regra de negócio:
