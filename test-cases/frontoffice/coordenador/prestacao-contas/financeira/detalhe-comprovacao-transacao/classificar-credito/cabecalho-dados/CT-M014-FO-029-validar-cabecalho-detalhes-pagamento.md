@@ -5,7 +5,7 @@
 Validar exibição do cabeçalho e dados do pagamento de Crédito
 
 ## Requisito/História Relacionada
-- Requisito/Issue: EP-11 — Tela Classificar Crédito (`/coordenador/prestacao-financeira/:paymentId`)
+- Requisito/Issue: EP-11 — Tela Classificar Crédito (`/coordenador/prestacao-financeira/classificar-credito/:paymentId`)
 - Regra Canônica: M014: `RN08` / `RN09` (Identificação de lançamentos de Crédito)
 - Contrato/API: `M014: ConsultarTransacaoFinanceira`
 
@@ -14,7 +14,7 @@ Validar exibição do cabeçalho e dados do pagamento de Crédito
 - Transação do tipo Crédito pendente de classificação selecionada no extrato.
 
 ## Passo a Passo
-1. Acessar a rota de detalhe de uma transação de Crédito (`/coordenador/prestacao-financeira/:paymentId`).
+1. Acessar a rota de detalhe de uma transação de Crédito (`/coordenador/prestacao-financeira/classificar-credito/:paymentId`).
 2. Verificar o Breadcrumb no topo da página.
 3. Verificar a seção `Detalhes do Pagamento` e a barra de informações.
 
