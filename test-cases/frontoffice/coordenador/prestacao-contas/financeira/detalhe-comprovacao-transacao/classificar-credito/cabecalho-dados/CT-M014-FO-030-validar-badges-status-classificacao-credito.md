@@ -14,7 +14,7 @@ Validar exibição dos badges de Status da transação de crédito (Pendente, Em
 - Transações de crédito cadastradas no sistema em diferentes estágios do ciclo de vida da prestação de contas.
 
 ## Passo a Passo
-1. Acessar `/coordenador/prestacao-financeira/:paymentId` para transações em diferentes estados.
+1. Acessar `/coordenador/prestacao-financeira/classificar-credito/:paymentId` para transações em diferentes estados.
 2. Observar o badge de `Status` no canto direito da barra `Detalhes do Pagamento`.
 3. Verificar a habilitação/desabilitação dos campos e botões conforme o estado atual.
 
