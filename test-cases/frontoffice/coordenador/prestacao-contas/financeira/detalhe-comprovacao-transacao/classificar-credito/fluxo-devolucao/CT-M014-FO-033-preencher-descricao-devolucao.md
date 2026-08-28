@@ -5,13 +5,13 @@
 Preencher campo Descrição no fluxo de Devolução
 
 ## Requisito/História Relacionada
-- Requisito/Issue: EP-11 — Tela Classificar Crédito
+- Requisito/Issue: EP-11 — Tela Classificar Crédito (`/coordenador/prestacao-financeira/classificar-credito/:paymentId`)
 - Regra Canônica: M014: `RN09` (Justificativa de devolução voluntária de saldo)
 - Contrato/API: `M014: ClassificarDevolucaoRecurso`
 
 ## Pré-condições
 - Usuário autenticado com o perfil `coordenador`.
-- Transação de crédito aberta na tela.
+- Transação de crédito aberta na rota `/coordenador/prestacao-financeira/classificar-credito/:paymentId`.
 
 ## Passo a Passo
 1. No campo `Classificação`, selecionar a opção `Devolução`.
@@ -20,6 +20,7 @@ Preencher campo Descrição no fluxo de Devolução
 4. Digitar o motivo da devolução no campo `Descrição`.
 
 ## Dados de Entrada
+- Rota: `/coordenador/prestacao-financeira/classificar-credito/paymentId_credito_01`
 - Classificação: `Devolução`
 - Descrição: `Devolução referente ao saldo remanescente de diárias não utilizadas no evento de pesquisa.`
 

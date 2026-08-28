@@ -15,7 +15,7 @@ Rotas do perfil de coordenador verificadas na aplicação publicada em
 | `minha-equipe/pagamentos-projeto` | `/coordenador/pagamentos-projeto` | pagamentos do projeto |
 | `certificados` | `/coordenador/certificados` | solicitações e diárias |
 | `prestacao-contas/financeira` | `/coordenador/financeira` | prestação financeira |
-| `prestacao-contas/financeira/[paymentId]` | `/coordenador/financeira/:paymentId` | detalhe de lançamento |
+| `prestacao-contas/financeira/detalhe-comprovacao-transacao/classificar-credito` | `/coordenador/prestacao-financeira/classificar-credito/:paymentId` | classificar crédito |
 | `prestacao-contas/tecnica` | `/coordenador/prestacao-contas-tecnica` | prestação técnica |
 | `prestacao-contas/remanejamento` | `/coordenador/remanejamento` | remanejamento orçamentário |
 

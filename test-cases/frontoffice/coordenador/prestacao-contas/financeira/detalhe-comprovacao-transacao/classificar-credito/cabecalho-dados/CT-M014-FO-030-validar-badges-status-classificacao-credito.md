@@ -5,7 +5,7 @@
 Validar exibição dos badges de Status da transação de crédito (Pendente, Em Rascunho, Em Análise, Validado, Rejeitada)
 
 ## Requisito/História Relacionada
-- Requisito/Issue: EP-11 — Tela Classificar Crédito
+- Requisito/Issue: EP-11 — Tela Classificar Crédito (`/coordenador/prestacao-financeira/classificar-credito/:paymentId`)
 - Regra Canônica: M014: `RN08` / `RN10` (Ciclo de vida e máquina de estados da prestação de contas)
 - Contrato/API: `M014: ConsultarTransacaoFinanceira`
 
@@ -19,7 +19,7 @@ Validar exibição dos badges de Status da transação de crédito (Pendente, Em
 3. Verificar a habilitação/desabilitação dos campos e botões conforme o estado atual.
 
 ## Dados de Entrada
-- Rota: `/coordenador/prestacao-financeira/:paymentId`
+- Rota: `/coordenador/prestacao-financeira/classificar-credito/:paymentId`
 - Lista de Estados e Comportamentos Esperados:
   1. **`Pendente`**: Transação de crédito recém-importada, aguardando classificação inicial.
   2. **`Em Rascunho`**: Classificação salva como rascunho pelo coordenador (edição liberada).

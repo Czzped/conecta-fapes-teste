@@ -19,7 +19,7 @@ Validar exibição do cabeçalho e dados do pagamento de Crédito
 3. Verificar a seção `Detalhes do Pagamento` e a barra de informações.
 
 ## Dados de Entrada
-- Rota: `/coordenador/prestacao-financeira/paymentId_credito_01`
+- Rota: `/coordenador/prestacao-financeira/classificar-credito/paymentId_credito_01`
 - Perfil: `coordenador`
 
 ## Resultado Esperado

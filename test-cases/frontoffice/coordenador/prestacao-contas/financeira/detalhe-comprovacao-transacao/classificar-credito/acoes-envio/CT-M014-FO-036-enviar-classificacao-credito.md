@@ -5,12 +5,13 @@
 Enviar classificação de crédito com sucesso
 
 ## Requisito/História Relacionada
-- Requisito/Issue: EP-11 — Tela Classificar Crédito
+- Requisito/Issue: EP-11 — Tela Classificar Crédito (`/coordenador/prestacao-financeira/classificar-credito/:paymentId`)
 - Regra Canônica: M014: `RN10` (Submissão final da comprovação e transição de estado)
 - Contrato/API: `M014: SubmeterComprovacaoCredito`
 
 ## Pré-condições
 - Usuário autenticado com o perfil `coordenador`.
+- Rota acessada: `/coordenador/prestacao-financeira/classificar-credito/:paymentId`.
 - Formulário de classificação (`1. Informações Gerais *`) totalmente preenchido conforme a modalidade escolhida (Estorno com Débito associado OU Devolução com Descrição válida).
 
 ## Passo a Passo
@@ -19,11 +20,12 @@ Enviar classificação de crédito com sucesso
 3. Confirmar o envio se houver modal de confirmação.
 
 ## Dados de Entrada
+- Rota: `/coordenador/prestacao-financeira/classificar-credito/paymentId_credito_01`
 - Classificação: `Estorno` (com débito associado) OU `Devolução` (com descrição válida)
 
 ## Resultado Esperado
 - O sistema processa o envio com sucesso.
-- O status da comprovação transiciona de `Pendente` para `Em Análise`.
+- O status da comprovação transiciona de `Pendente` / `Em Rascunho` para `Em Análise`.
 - O formulário fica bloqueado para novas edições pelo coordenador.
 - O usuário é redirecionado ou recebe feedback claro de conclusão.
 

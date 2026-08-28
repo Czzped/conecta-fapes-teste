@@ -5,13 +5,13 @@
 Associar transação de Crédito a um Débito de saída no fluxo de Estorno
 
 ## Requisito/História Relacionada
-- Requisito/Issue: EP-11 — Tela Classificar Crédito
+- Requisito/Issue: EP-11 — Tela Classificar Crédito (`/coordenador/prestacao-financeira/classificar-credito/:paymentId`)
 - Regra Canônica: M014: `RN08` / `RI-EST02` (Pareamento de crédito de estorno com débito original)
 - Contrato/API: `M014: ParearTransacaoEstorno`
 
 ## Pré-condições
 - Usuário autenticado com o perfil `coordenador`.
-- Transação de crédito em estado `Pendente` aberta na tela.
+- Transação de crédito em estado `Pendente` aberta na rota `/coordenador/prestacao-financeira/classificar-credito/:paymentId`.
 
 ## Passo a Passo
 1. No campo `Classificação`, selecionar a opção `Estorno`.
@@ -20,6 +20,7 @@ Associar transação de Crédito a um Débito de saída no fluxo de Estorno
 4. Selecionar o lançamento de débito correspondente à compra estornada.
 
 ## Dados de Entrada
+- Rota: `/coordenador/prestacao-financeira/classificar-credito/paymentId_credito_01`
 - Classificação: `Estorno`
 - Campo de Associação: `Associe esse Crédito (entrada) a um Débito (saída).`
 - Débito Selecionado: `Débito #1042 - R$ 2.599,60`
