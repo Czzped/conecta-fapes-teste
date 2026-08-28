@@ -14,14 +14,20 @@ Validar atualização dinâmica das opções do dropdown Selecione o Item ao alt
 - Edital do projeto associado com diferentes categorias de despesa cadastradas (ex: *Material de Consumo*, *Equipamento e Material Permanente*, *Serviços de Terceiros*).
 
 ## Passo a Passo
-1. No campo `Selecione a Categoria do Item*`, escolher a opção `Material de Consumo`.
-2. Clicar no dropdown `Selecione o Item*` e observar a lista de itens exibida.
-3. Voltar ao campo `Selecione a Categoria do Item*` e alterar a seleção para `Equipamento e Material Permanente`.
-4. Clicar novamente no dropdown `Selecione o Item*` e inspecionar a nova lista de opções.
+1. No campo `Selecione a Categoria do Item*`, inspecionar as opções disponíveis na lista.
+2. Selecionar a categoria `Material de Consumo`.
+3. Clicar no dropdown `Selecione o Item*` e observar a lista de itens de consumo aprovados.
+4. Alterar o campo `Selecione a Categoria do Item*` para `Material Permanente`.
+5. Verificar se a seleção anterior do item é resetada e o dropdown exibe os itens de equipamentos/permanentes.
+6. Repetir alternando para as categorias `Diária` e `Passagens`.
 
 ## Dados de Entrada
-- Categoria 1: `Material de Consumo` → Espera itens como: *Reagente Químico*, *Vidrarias*, *Material de Escritório*.
-- Categoria 2: `Equipamento e Material Permanente` → Espera itens como: *Microcomputador*, *Nobreak*, *Impressora 3D*.
+- Categorias Válidas do Edital: `Diária`, `Material de Consumo`, `Material Permanente`, `Passagens`
+- Teste de Troca:
+  - Seleção 1: `Material de Consumo` → Exibe itens de consumo
+  - Seleção 2: `Material Permanente` → Exibe itens permanentes (reseta seleção anterior)
+  - Seleção 3: `Diária` → Exibe modalidades de diárias aprovadas
+  - Seleção 4: `Passagens` → Exibe opções de passagens aprovadas
 
 ## Resultado Esperado
 - Ao selecionar `Material de Consumo`, o dropdown `Selecione o Item*` é populado exclusivamente com os itens da rubrica de consumo.
