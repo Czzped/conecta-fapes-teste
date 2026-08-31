@@ -2,7 +2,7 @@
 
 Repositório de casos de teste funcionais e de integração da plataforma.
 
-> 🤖 **Atenção Agentes de IA:** Para otimização de tokens e conformidade nas entregas, leiam o manual de diretrizes em [instrucoes-ia-casos-de-teste.md](referencias/instrucoes-ia-casos-de-teste.md) antes de criar novos casos.
+> 🤖 **Atenção Agentes de IA:** Para otimização de tokens e conformidade nas entregas, leiam os manuais de diretrizes em [instrucoes-ia-casos-de-teste.md](referencias/instrucoes-ia-casos-de-teste.md) (para cenários de teste) e [instrucoes-ia-relato-de-bug.md](referencias/instrucoes-ia-relato-de-bug.md) (para registro de bugs) antes de iniciar tarefas.
 
 ## Organização
 
