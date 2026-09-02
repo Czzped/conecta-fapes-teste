@@ -1,11 +1,11 @@
 ## Título
-Falha intermitente na busca de dados de débito ao navegar a partir de extrato com filtro aplicado (requisição não disparada)
+Falha intermitente na exibição dos dados de débito ao navegar a partir de extrato filtrado (campos vazios apesar de requisições 200 OK)
 
 ## ID
 BUG-M014-FO-006
 
 ## Requisito/Regra Violada
-- Regra Canônica: M014: `RN05` / Ciclo de vida de Navegação Client-Side (Vue Router / Store de Estado do Extrato)
+- Regra Canônica: M014: `RN05` / Reatividade de Estado Client-Side (Vue Router / Mapeamento de Estado da Prestação)
 - Rota/Componente: `/coordenador/prestacao-financeira/detalhes/:paymentId` (`ComprovarDebito.vue`)
 
 ## Ambiente
@@ -23,7 +23,7 @@ BUG-M014-FO-006
 3. Na listagem filtrada, clicar em uma transação de débito (na primeira vez, a tela pode carregar normalmente).
 4. Voltar para o extrato em `/coordenador/financeira` mantendo o filtro ativo.
 5. Clicar em uma segunda transação de débito (ou na mesma transação novamente).
-6. Observar os campos exibidos na barra `Detalhes do Pagamento` e inspecionar a aba `Network` (`F12`).
+6. Observar os campos exibidos na barra `Detalhes do Pagamento` e inspecionar as requisições na aba `Network` (`F12`).
 7. Pressionar `F5` para recarregar a página.
 
 ## Dados de Entrada
@@ -31,18 +31,18 @@ BUG-M014-FO-006
 - Ação: Re-navegação (clique a partir da 2ª vez em diante em itens da listagem filtrada)
 
 ## Comportamento Esperado
-- Em qualquer navegação para a rota `/coordenador/prestacao-financeira/detalhes/:paymentId`, a aplicação deve buscar os dados atualizados da transação/prestação (`Fetch/XHR`) e renderizar o cabeçalho e formulários normalmente.
+- Em qualquer navegação para a rota `/coordenador/prestacao-financeira/detalhes/:paymentId`, a aplicação deve processar a resposta do servidor e renderizar o cabeçalho e formulários com as informações da transação selecionada.
 
 ## Comportamento Atual
 - Na primeira abertura após o carregamento inicial, os dados podem carregar; porém, da **segunda navegação em diante** a partir da listagem filtrada, a tela abre com o cabeçalho completamente zerado/vazio (`Pagamento: -`, `Valor: R$ 0,00`, `Data: -`, `Status: -`).
-- A aba `Network` confirma que nenhuma requisição HTTP de busca (`Fetch/XHR`) foi disparada na transição de rota.
-- Ao pressionar `F5` (recarregamento total), os dados são buscados do servidor e a tela carrega corretamente.
+- A aba `Network` registra a conclusão de chamadas HTTP (ex: `completa`, `conta-contabil`) com status `200 OK`, porém o frontend falha em atribuir ou re-vincular os dados recebidos aos campos da interface.
+- Ao pressionar `F5` (recarregamento total), a página é remontada e exibe os dados corretamente.
 
 ## Evidências
 - 📷 **Tela de Débito com Cabeçalho Zerado:**
   ![Cabeçalho Zerado](file:///C:/Users/phcos/.gemini/antigravity/brain/e9551114-8ca4-4c72-bf40-c8f0aa579ac7/.user_uploaded/media_1788308965728.png)
-- 🧾 **Aba Network Sem Requisições Disparadas:**
-  ![Network Vazia Sem HTTP Request](file:///C:/Users/phcos/.gemini/antigravity/brain/e9551114-8ca4-4c72-bf40-c8f0aa579ac7/.user_uploaded/media_1788308994262.png)
+- 🧾 **Aba Network com Chamadas 200 OK Não Mapeadas na Tela:**
+  ![Network Com Calls 200 OK](file:///C:/Users/phcos/.gemini/antigravity/brain/e9551114-8ca4-4c72-bf40-c8f0aa579ac7/.user_uploaded/media_1788310259019.png)
 
 ## Sugestão de Investigação (Opcional)
-- Verificar a reatividade do Vue Router/watchers na mudança dos parâmetros de rota (`:paymentId`) quando a visualização reutiliza a mesma instância de componente em navegações sucessivas a partir de tabelas filtradas.
+- Verificar se o mapeamento/atribuição do payload retornado nas chamadas `completa` / `conta-contabil` deixa de atualizar o estado reativo do componente em navegações sucessivas.
