@@ -19,23 +19,24 @@ BUG-M014-FO-006
 
 ## Passo a Passo
 1. Acessar o extrato de prestação financeira em `/coordenador/financeira`.
-2. Aplicar um ou mais filtros na barra/painel de pesquisa (ex: filtrar por Categoria `Débito` ou pesquisar por texto/valor).
-3. Na listagem filtrada, clicar em uma transação de débito (ex: transação em status `Em Rascunho`).
-4. Observar os dados exibidos na barra de cabeçalho `Detalhes do Pagamento` e inspecionar a aba `Network` do navegador (`F12`).
-5. Dar um recarregamento manual na página (`F5`).
+2. Aplicar um filtro no painel/barra de pesquisa (ex: Categoria = `Débito` ou buscar por palavra-chave).
+3. Na listagem filtrada, clicar em uma transação de débito (na primeira vez, a tela pode carregar normalmente).
+4. Voltar para o extrato em `/coordenador/financeira` mantendo o filtro ativo.
+5. Clicar em uma segunda transação de débito (ou na mesma transação novamente).
+6. Observar os campos exibidos na barra `Detalhes do Pagamento` e inspecionar a aba `Network` (`F12`).
+7. Pressionar `F5` para recarregar a página.
 
 ## Dados de Entrada
 - Rota Origem: `/coordenador/financeira` com filtro ativo (ex: Categoria = `Débito`)
-- Transação Selecionada: Débito em status `Em Rascunho`
+- Ação: Re-navegação (clique a partir da 2ª vez em diante em itens da listagem filtrada)
 
 ## Comportamento Esperado
-- Ao clicar em uma transação na listagem filtrada, a aplicação deve disparar a requisição de busca dos dados da transação/prestação (`Fetch/XHR`) e carregar normalmente o cabeçalho e formulários na rota `/coordenador/prestacao-financeira/detalhes/:paymentId`.
+- Em qualquer navegação para a rota `/coordenador/prestacao-financeira/detalhes/:paymentId`, a aplicação deve buscar os dados atualizados da transação/prestação (`Fetch/XHR`) e renderizar o cabeçalho e formulários normalmente.
 
 ## Comportamento Atual
-- A aplicação transiciona para a rota de detalhes de débito, porém a tela renderiza o cabeçalho com todos os campos zerados/vazios (`Pagamento: -`, `Valor: R$ 0,00`, `Data: -`, `Status: -`).
-- Na aba `Network` do navegador (`Fetch/XHR`), nenhuma requisição HTTP de busca de dados é disparada durante a transição de rota.
-- Ao pressionar `F5` (recarregamento total da página), os dados são buscados do servidor e a tela carrega corretamente.
-- *Nota:* O problema é intermitente e ocorre com maior frequência quando a navegação é iniciada a partir de uma listagem que possui filtros aplicados no extrato.
+- Na primeira abertura após o carregamento inicial, os dados podem carregar; porém, da **segunda navegação em diante** a partir da listagem filtrada, a tela abre com o cabeçalho completamente zerado/vazio (`Pagamento: -`, `Valor: R$ 0,00`, `Data: -`, `Status: -`).
+- A aba `Network` confirma que nenhuma requisição HTTP de busca (`Fetch/XHR`) foi disparada na transição de rota.
+- Ao pressionar `F5` (recarregamento total), os dados são buscados do servidor e a tela carrega corretamente.
 
 ## Evidências
 - 📷 **Tela de Débito com Cabeçalho Zerado:**
@@ -44,4 +45,4 @@ BUG-M014-FO-006
   ![Network Vazia Sem HTTP Request](file:///C:/Users/phcos/.gemini/antigravity/brain/e9551114-8ca4-4c72-bf40-c8f0aa579ac7/.user_uploaded/media_1788308994262.png)
 
 ## Sugestão de Investigação (Opcional)
-- Investigar se a transição de rota originada de uma tabela filtrada está impedindo o disparo da chamada de busca (`fetch`) no hook de montagem da tela de detalhes de débito.
+- Verificar a reatividade do Vue Router/watchers na mudança dos parâmetros de rota (`:paymentId`) quando a visualização reutiliza a mesma instância de componente em navegações sucessivas a partir de tabelas filtradas.
