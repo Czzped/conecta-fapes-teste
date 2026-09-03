@@ -6,7 +6,7 @@ BUG-M014-FO-002
 
 ## Requisito/Regra Violada
 - Regra Canônica: M014: `RN11` / `RN13` (Classificação de crédito — pareamento de débito aplicável apenas a Estorno)
-- Rota/Componente: `/coordenador/prestacao-financeira/classificar-credito/:paymentId` (`ClassificarCredito.vue`)
+- Rota/Componente: https://conectafapes.hom.es.gov.br/prestacao-financeira/classificar-credito/d5c0a100-0000-4000-8000-000000000048
 
 ## Ambiente
 [ ] Produção  [ ] Staging  [x] Homologação
@@ -35,12 +35,12 @@ BUG-M014-FO-002
 - A validação de obrigatoriedade do campo *"Associe esse Crédito (entrada) a um Débito (saída)"* não deve ser aplicada quando a classificação for `Devolução`.
 
 ## Comportamento Atual
-- Ao confirmar o envio na modal, a submissão falha e nada acontece (o modal é fechado ou a ação é interrompida silenciosamente).
-- O campo de associação de débito exibe a mensagem de validação de erro em vermelho: `"Selecione um débito"`, mesmo quando a classificação selecionada é `Devolução`.
+- Ao confirmar o envio na modal, nada acontece (o modal não é fechado e nem aparece toast de erro na tela).
+- Ao selecionar "Estorno" no campo de classificação, o campo de associação de débito exibe a mensagem de validação de erro em vermelho: `"Selecione um débito"`, mesmo não tendo tido interação anterior com essa opção.
 
 ## Evidências
 - 📷 **Validação Indevida de Débito em Vermelho:**
   ![Mensagem Selecione um débito em vermelho](file:///C:/Users/phcos/.gemini/antigravity/brain/e9551114-8ca4-4c72-bf40-c8f0aa579ac7/.user_uploaded/media_1788211518033.png)
 
-## Sugestão de Investigação (Opcional)
+## Sugestão de Investigação
 - Verificar a condicional do schema de validação do formulário para tornar a seleção do débito obrigatória apenas quando a opção de classificação for `Estorno`.

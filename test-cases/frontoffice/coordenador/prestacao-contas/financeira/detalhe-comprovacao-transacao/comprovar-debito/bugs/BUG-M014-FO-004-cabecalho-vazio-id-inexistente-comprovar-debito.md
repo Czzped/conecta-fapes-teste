@@ -19,7 +19,7 @@ BUG-M014-FO-004
 
 ## Passo a Passo
 1. Fazer login no portal com o perfil `coordenador`.
-2. Inserir diretamente na barra de endereço a URL de comprovação de débito contendo um ID inexistente ou inválido (ex: `/coordenador/prestacao-financeira/detalhes/teste_erro`).
+2. Inserir diretamente na barra de endereço a URL de comprovação de débito contendo um ID inexistente ou inválido (ex: `conectafapes.hom.es.gov.br/prestacao-financeira/teste_erro`).
 3. Pressionar `Enter` para carregar a página.
 4. Observar os campos do cabeçalho `Detalhes do Pagamento` e o console do navegador (`F12`).
 
@@ -45,6 +45,8 @@ BUG-M014-FO-004
 ## Evidências
 - 📷 **Cabeçalho Renderizado com Dados Vazios/Zerados:**
   ![Cabeçalho de Débito Vazio](file:///C:/Users/phcos/.gemini/antigravity/brain/e9551114-8ca4-4c72-bf40-c8f0aa579ac7/.user_uploaded/media_1788307019951.png)
+- 🧾 **Stacktrace no Console do Navegador:**
+
 
 ## Sugestão de Investigação (Opcional)
 - Tratar o retorno de erro da requisição HTTP no composable `usePrestacao` para evitar o acesso a propriedades de objetos não definidos (`justificativas`) e redirecionar o fluxo antes da montagem dos campos de cabeçalho.

@@ -1,4 +1,4 @@
-## Título
+# Título
 Falha intermitente na exibição dos dados de débito ao navegar a partir de extrato filtrado (campos vazios apesar de requisições 200 OK)
 
 ## ID
@@ -22,7 +22,7 @@ BUG-M014-FO-006
 2. Aplicar um filtro no painel/barra de pesquisa (ex: Categoria = `Débito` ou buscar por palavra-chave).
 3. Na listagem filtrada, clicar em uma transação de débito (na primeira vez, a tela pode carregar normalmente).
 4. Voltar para o extrato em `/coordenador/financeira` mantendo o filtro ativo.
-5. Clicar em uma segunda transação de débito (ou na mesma transação novamente).
+5. Clicar na mesma transação novamente.
 6. Observar os campos exibidos na barra `Detalhes do Pagamento` e inspecionar as requisições na aba `Network` (`F12`).
 7. Pressionar `F5` para recarregar a página.
 
@@ -40,9 +40,22 @@ BUG-M014-FO-006
 
 ## Evidências
 - 📷 **Tela de Débito com Cabeçalho Zerado:**
-  ![Cabeçalho Zerado](file:///C:/Users/phcos/.gemini/antigravity/brain/e9551114-8ca4-4c72-bf40-c8f0aa579ac7/.user_uploaded/media_1788308965728.png)
-- 🧾 **Aba Network com Chamadas 200 OK Não Mapeadas na Tela:**
-  ![Network Com Calls 200 OK](file:///C:/Users/phcos/.gemini/antigravity/brain/e9551114-8ca4-4c72-bf40-c8f0aa579ac7/.user_uploaded/media_1788310259019.png)
+  
+<img width="2559" height="1300" alt="Image" src="https://github.com/user-attachments/assets/97f7f3e9-4511-469e-96f3-cc8ee82d1a85" />
+
+- 📷 **Tela de Débito após o F5 na página**
+
+<img width="2545" height="1286" alt="Image" src="https://github.com/user-attachments/assets/0397c391-eaa8-4e50-9b79-b2b9fd7777f2" />
+
+- 🧾 **Stacktrace no Console do Navegador:**
+
+<img width="2254" height="1205" alt="Image" src="https://github.com/user-attachments/assets/056f4983-1d6a-42f4-8075-3f5f3afcbe44" />
+
+- 📷 **Video reproduzindo o caso.**
+
+https://github.com/user-attachments/assets/6ece7a4b-9034-4cde-bdf8-45ff3bbb943f
+
 
 ## Sugestão de Investigação (Opcional)
 - Verificar se o mapeamento/atribuição do payload retornado nas chamadas `completa` / `conta-contabil` deixa de atualizar o estado reativo do componente em navegações sucessivas.
+
