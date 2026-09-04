@@ -1,4 +1,4 @@
-# 🐞 Estrutura de Criação de Bug
+﻿# 🐞 Estrutura de Criação de Bug
 
 Este documento define o padrão utilizado para o registro de bugs neste projeto, garantindo que toda a equipe (QA, Dev e Produto) tenha as informações necessárias para entender, reproduzir e corrigir o defeito com agilidade.
 

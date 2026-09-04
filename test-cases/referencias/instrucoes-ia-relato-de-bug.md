@@ -1,4 +1,4 @@
-# 🤖 Instruções para IA — Relato de Bugs e Otimização de Tokens
+﻿# 🤖 Instruções para IA — Relato de Bugs e Otimização de Tokens
 
 Este documento é um guia de comportamento, padrão e eficiência para agentes de Inteligência Artificial (LLMs) que atuam na identificação, registro ou documentação de **bugs (defeitos de software)** neste projeto.
 
