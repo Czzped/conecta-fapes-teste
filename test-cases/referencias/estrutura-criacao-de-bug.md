@@ -16,6 +16,7 @@ flowchart TD
     F --> G[✅ Comportamento Esperado]
     G --> H[❌ Comportamento Atual]
     H --> I[📎 Evidências]
+    I --> J[💡 Sugestão de Investigação]
 
     style A fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e
     style B fill:#f3f4f6,stroke:#374151,color:#111827
@@ -26,6 +27,7 @@ flowchart TD
     style G fill:#dcfce7,stroke:#15803d,color:#14532d
     style H fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
     style I fill:#ede9fe,stroke:#6d28d9,color:#3b0764
+    style J fill:#fef3c7,stroke:#d97706,color:#78350f
 ```
 
 ---
@@ -82,6 +84,10 @@ Prints de tela, gravações de vídeo ou logs de console que comprovem o erro.
 - 🎥 Vídeo de reprodução
 - 🧾 Logs de console/servidor
 
+### 10. Sugestão de Investigação
+Ponto de atenção técnico, hipótese de causa raiz ou sugestão de validação no código para guiar o desenvolvedor. O título desta seção deve ser estritamente `## Sugestão de Investigação` (sem o termo `(Opcional)`).
+> Exemplo: *"Adicionar validação no datepicker para rejeitar datas superiores à data atual."*
+
 ---
 
 ## 📝 Template Pronto para Uso
@@ -115,6 +121,9 @@ Prints de tela, gravações de vídeo ou logs de console que comprovem o erro.
 
 ## Evidências
 [Anexar prints, vídeos ou logs]
+
+## Sugestão de Investigação
+- [Hipótese técnica ou ponto de atenção no código]
 ```
 
 ---

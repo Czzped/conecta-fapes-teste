@@ -11,7 +11,7 @@ Este documento é um guia de comportamento, padrão e eficiência para agentes d
 Para relatar um bug com máxima eficiência, sem desperdício de tokens de contexto e sem adivinhações, siga estritamente estas diretrizes:
 
 ### ❌ O que NÃO fazer:
-* **Não adivinhe a solução técnica ou causa raiz**: O papel do relato de bug é documentar o comportamento observado com evidências e fatos. Não parta do princípio de que você sabe a resolução do código nem imponha correções técnicas; no máximo, inclua uma seção opcional de sugestão.
+* **Não adivinhe a solução técnica ou causa raiz**: O papel do relato de bug é documentar o comportamento observado com evidências e fatos. Não parta do princípio de que você sabe a resolução do código nem imponha correções técnicas; no máximo, inclua a seção `## Sugestão de Investigação` (sem o sufixo `(Opcional)`).
 * **Não adivinhe regras de negócio**: Não declare que um comportamento é bug baseado apenas em impressão visual. Valide sempre contra as regras de negócio (`RNxx`) ou invariantes (`RIxx`) do módulo.
 * **Não leia arquivos gigantes por inteiro**: Se precisa saber o comportamento esperado de um módulo, leia apenas o arquivo `README.md` do módulo correspondente em `docs/implementation/modules/M0xx-name/README.md` usando leitura por intervalo de linhas (`StartLine` / `EndLine`).
 * **Não prolixize a descrição**: Evite textos longos ou narrativos. Seja direto, técnico e estruture o problema em passos acionáveis.
@@ -65,6 +65,9 @@ Todo relatório de bug gerado por uma IA deve seguir o template markdown abaixo,
 ## Evidências
 - 📷 Screenshots / Vídeos: [Caminho do arquivo ou link do anexo]
 - 🧾 Logs / Retorno da API: `[StatusCode / Mensagem de Erro]`
+
+## Sugestão de Investigação
+- [Hipótese técnica ou ponto de atenção no código]
 ```
 
 ---
