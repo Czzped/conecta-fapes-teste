@@ -1,4 +1,4 @@
-﻿## Título
+## Título
 [Bug] Ausência de botão de exclusão nos cards de anexo do Invoice e do comprovante de fatura na Seção 2
 
 ## ID
@@ -29,7 +29,7 @@ Windows 11 / Chrome v120 / Frontoffice Vue-Nuxt UI em `https://conectafapes.hom.
 4. Marcar o checkbox *"Deseja enviar o comprovante da fatura do cartão?"*.
 5. Clicar em `Anexar fatura do cartão` e selecionar o arquivo de fatura correspondente.
 6. Inspecionar os cards dos dois arquivos anexados renderizados logo abaixo de suas respectivas áreas de upload.
-7. Tentar remover ou substituir qualquer um dos arquivos enviados.
+7. Tentar excluir/remover qualquer um dos anexos enviados (sem enviar outro arquivo por cima).
 8. Observar que apenas o ícone de visualização (olho) é exibido no canto direito dos cards, sem qualquer botão ou ícone de exclusão (lixeira ou 'X').
 
 ## Dados de Entrada
@@ -39,11 +39,11 @@ Windows 11 / Chrome v120 / Frontoffice Vue-Nuxt UI em `https://conectafapes.hom.
 - Arquivo Fatura anexado: `github-leds-conectafapes-receipt-2025-08-05 (1).pdf` (50 KB)
 
 ## Comportamento Esperado
-- Cada card de arquivo anexado deve conter, além do ícone de visualização, uma ação clara de exclusão (ícone de lixeira ou botão de fechar 'X'), permitindo remover o anexo enviado e reabrir o slot para envio de um novo arquivo, mantendo a consistência com os fluxos de Passagem e Nota Fiscal.
+- Cada card de arquivo anexado deve conter, além do ícone de visualização, uma ação explícita de exclusão (ícone de lixeira ou botão de fechar 'X'), permitindo ao usuário desanexar o arquivo e retornar o campo ao estado inicial limpo (sem anexo), mantendo a consistência com os fluxos de Passagem e Nota Fiscal.
 
 ## Comportamento Atual
 - Não existe botão ou ação de exclusão em nenhum dos cards de anexo da Seção 2 de Invoice.
-- O usuário fica impedido de retirar ou substituir um arquivo anexado por engano, ficando o documento incorreto preso ao formulário da prestação de contas.
+- Embora o usuário consiga substituir o documento enviando outro arquivo por cima, ele fica totalmente impossibilitado de simplesmente excluir ou limpar um anexo enviado indevidamente (por exemplo, ao desmarcar a intenção de envio da fatura do cartão ou ao remover um arquivo sobressalente).
 
 ## Evidências
 - 📷 **Cards de anexo do Invoice e da Fatura sem botão de exclusão (apenas ícone de olho):**
