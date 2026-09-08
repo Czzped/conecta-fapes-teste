@@ -25,6 +25,7 @@ Agent personas and skills for the Conecta FAPES project.
 
 - **[`/docs/management/backlog-product.md`](/docs/management/backlog-product.md)** — dashboard central do produto
 - **`/docs/implementation/modules/{M00x}/`** — documentacao por modulo
+- **[`/test-cases/MAPA-QA-GLOBAL.md`](/test-cases/MAPA-QA-GLOBAL.md)** — matriz global de QA, rotas, regras de negócio e relatos de bugs (Frontoffice e Backoffice)
 
 ```
 docs/

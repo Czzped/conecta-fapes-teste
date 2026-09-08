@@ -1,4 +1,4 @@
-﻿# 🐞 Estrutura de Criação de Bug
+# 🐞 Estrutura de Criação de Bug
 
 Este documento define o padrão utilizado para o registro de bugs neste projeto, garantindo que toda a equipe (QA, Dev e Produto) tenha as informações necessárias para entender, reproduzir e corrigir o defeito com agilidade.
 
@@ -33,8 +33,8 @@ flowchart TD
 ## 🔎 Campos do Bug
 
 ### 1. Título
-Resumo curto e claro do problema, combinando **o que acontece** + **onde acontece**.
-> Exemplo: *"Botão de finalizar compra não responde na tela de checkout"*
+Resumo curto e claro do problema, obrigatoriamente iniciado com a tag `[Bug]`, combinando **o que acontece** + **onde acontece**.
+> Exemplo: `[Bug] Botão de finalizar compra não responde na tela de checkout`
 
 ### 2. Identificador/ID
 Código gerado automaticamente pela ferramenta de gestão utilizada (Jira, Trello, Azure DevOps, etc.), usado para rastrear o bug em todo o ciclo de vida.
@@ -88,7 +88,7 @@ Prints de tela, gravações de vídeo ou logs de console que comprovem o erro.
 
 ```markdown
 ## Título
-[Resumo curto: o que acontece + onde acontece]
+[Bug] Resumo curto: o que acontece + onde acontece
 
 ## ID
 [Gerado automaticamente pela ferramenta]

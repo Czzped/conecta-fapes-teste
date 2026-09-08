@@ -1,4 +1,4 @@
-﻿# 🤖 Instruções para IA — Relato de Bugs e Otimização de Tokens
+# 🤖 Instruções para IA — Relato de Bugs e Otimização de Tokens
 
 Este documento é um guia de comportamento, padrão e eficiência para agentes de Inteligência Artificial (LLMs) que atuam na identificação, registro ou documentação de **bugs (defeitos de software)** neste projeto.
 
@@ -16,10 +16,10 @@ Para relatar um bug com máxima eficiência, sem desperdício de tokens de conte
 * **Não leia arquivos gigantes por inteiro**: Se precisa saber o comportamento esperado de um módulo, leia apenas o arquivo `README.md` do módulo correspondente em `docs/implementation/modules/M0xx-name/README.md` usando leitura por intervalo de linhas (`StartLine` / `EndLine`).
 * **Não prolixize a descrição**: Evite textos longos ou narrativos. Seja direto, técnico e estruture o problema em passos acionáveis.
 
-### ✅ O que FAZER (Investigação Cirúrgica):
-1. **Confira o Template Padrão**: Consulte [`test-cases/referencias/estrutura-criacao-de-bug.md`](estrutura-criacao-de-bug.md) para absorver o padrão visual e campos obrigatórios.
-2. **Localize o Módulo e Regra Relacionada**: Verifique qual módulo (`M001` a `M016`) gerencia a funcionalidade afetada para referenciar a `RN` ou `RI` exata que foi violada.
-3. **Extraia Evidências Precisas**: Inclua mensagens de erro reais, payloads HTTP de falha, status codes REST (ex: 400, 403, 404, 500) ou caminhos de arquivos anexos.
+### ✅ O que FAZER (Investigação Cirúrgica em 3 Passos):
+1. **Consulte o Mapa Central Primeiro**: Leia PRIMEIRO o arquivo [`test-cases/MAPA-QA-GLOBAL.md`](../MAPA-QA-GLOBAL.md). Ele mapeia a tela, rota, módulo proprietário, regras canônicas e pasta exata onde o bug deve ser salvo. Em 95% dos casos, você NÃO precisa ler nenhum outro arquivo de documentação.
+2. **Leitura Delimitada (Apenas se estritamente necessário)**: Se o bug envolver uma regra aprofundada não resumida no mapa, leia apenas o intervalo de linhas (`StartLine` / `EndLine`) da seção `## Regras de Negocio` do módulo indicado (`docs/implementation/modules/M0xx/README.md`).
+3. **Escreva Diretamente no Caminho Padronizado**: Use o ID padronizado (`BUG-M0XX-[CANAL]-[TAG]-[NUM]`), adicione a tag obrigatória `[Bug]` no início do título e salve na subpasta `bugs/` correspondente.
 
 ---
 
@@ -29,7 +29,7 @@ Todo relatório de bug gerado por uma IA deve seguir o template markdown abaixo,
 
 ```markdown
 ## Título
-[Resumo direto: O que acontece + Onde acontece]
+[Bug] Resumo direto: O que acontece + Onde acontece
 
 ## ID
 [BUG-M0XX-YYY ou ID da ferramenta de gestão]

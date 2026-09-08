@@ -2,19 +2,25 @@
 
 Repositório de casos de teste funcionais e de integração da plataforma.
 
-> 🤖 **Atenção Agentes de IA:** Para otimização de tokens e conformidade nas entregas, leiam os manuais de diretrizes em [instrucoes-ia-casos-de-teste.md](referencias/instrucoes-ia-casos-de-teste.md) (para cenários de teste) e [instrucoes-ia-relato-de-bug.md](referencias/instrucoes-ia-relato-de-bug.md) (para registro de bugs) antes de iniciar tarefas.
+> 🤖 **Atenção Agentes de IA (Token-Saving):** Para localizar qualquer tela, módulo, regra canônica e diretório de salvamento com consumo mínimo de tokens, consulte o [**MAPA-QA-GLOBAL.md**](MAPA-QA-GLOBAL.md).
+> Antes de criar testes ou relatar bugs, consulte os manuais em [instrucoes-ia-casos-de-teste.md](referencias/instrucoes-ia-casos-de-teste.md) e [instrucoes-ia-relato-de-bug.md](referencias/instrucoes-ia-relato-de-bug.md).
 
-## Organização
+## Organização do Repositório de Testes
 
-Os casos de teste devem ser agrupados pelo módulo proprietário da regra de negócio:
+Os casos de teste e relatos de defeitos estão organizados por canais de produto, perfis e fluxos:
 
 ```text
 test-cases/
-  M0XX-nome-do-modulo/
-    CT-M0XX-001-nome-do-caso.md
+├── MAPA-QA-GLOBAL.md          # Matriz unificada de consulta rápida para IAs e humanos
+├── referencias/               # Templates e manuais de token-saving para IAs
+├── frontoffice/               # Testes e bugs do Portal Coordenador e Bolsista
+│   ├── coordenador/           # Rotas /coordenador/* (início, perfil, pagamentos, prestação)
+│   └── bolsista/              # Rotas do bolsista
+└── backoffice/                # Testes e bugs do Portal Admin (FAPES)
+    └── admin/                 # Rotas /admin/* (modalidades, importação, folhas, análise)
 ```
 
-Cada caso deve referenciar a regra de negócio no `README.md` do módulo e, quando aplicável, o EPIC e o cenário Gherkin correspondentes. Regras e invariantes continuam pertencendo à documentação do módulo; esta pasta apenas registra sua verificação.
+Cada diretório de tela contém seus casos de teste (`CT-*.md`) e uma subpasta dedicada `bugs/` para os defeitos encontrados (`BUG-*.md`) e suas evidências de imagem/vídeo.
 
 ## Conteúdo mínimo de um caso
 

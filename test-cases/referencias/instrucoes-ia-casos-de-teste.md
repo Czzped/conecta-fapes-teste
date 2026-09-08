@@ -15,10 +15,10 @@ Para evitar consumo desnecessário de tokens (o que atrasa a execução e aument
 * **Não leia arquivos de documentação inteiros** (como `README.md` do módulo com centenas de linhas) se você precisa de apenas uma regra específica.
 * **Não invente regras de negócio** baseando-se apenas no comportamento visual do frontend.
 
-###  O que FAZER (Leitura Cirúrgica):
-1. **Identifique a Rota e o Módulo**: Consulte a tabela em [`test-cases/frontoffice/coordenador/README.md`](../frontoffice/coordenador/README.md) para saber qual módulo (`M0xx`) é dono da regra.
-2. **Leitura Focada por Linhas**: Abra o arquivo `README.md` do módulo (ex: `docs/implementation/modules/M014-prestacao-contas/README.md`) e utilize leitura de linhas delimitadas (`StartLine` e `EndLine`) apenas no trecho que descreve as regras de negócio (`RNxx`) ou invariantes (`RIxx`) relacionadas à sua tarefa.
-3. **Leitura do Template**: Leia o arquivo [`test-cases/referencias/criacao-dos-cenarios-de-teste.md`](criacao-dos-cenarios-de-teste.md) para absorver o formato estruturado do cenário.
+### ✅ O que FAZER (Leitura Cirúrgica em 3 Passos):
+1. **Consulte o Mapa Central Primeiro**: Leia PRIMEIRO o arquivo [`test-cases/MAPA-QA-GLOBAL.md`](../MAPA-QA-GLOBAL.md). Ele consolida a rota, tela, módulo proprietário, regras e pasta exata para criação do caso de teste (Frontoffice e Backoffice).
+2. **Leitura Focada por Linhas (Apenas se necessário)**: Se precisar de detalhes de exceções não cobertos no mapa, acesse apenas as linhas de regras de negócio (`RNxx`) no `README.md` do módulo indicado (`docs/implementation/modules/M0xx/README.md`) usando `StartLine` e `EndLine`.
+3. **Template Estruturado**: Siga rigorosamente o padrão canônico do template na Seção 2 abaixo e grave o arquivo `.md` no diretório correspondente à tela mapeada.
 
 ---
 
