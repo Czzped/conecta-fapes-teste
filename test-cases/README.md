@@ -2,8 +2,10 @@
 
 Repositório de casos de teste funcionais e de integração da plataforma.
 
-> 🤖 **Atenção Agentes de IA (Token-Saving):** Para localizar qualquer tela, módulo, regra canônica e diretório de salvamento com consumo mínimo de tokens, consulte o [**MAPA-QA-GLOBAL.md**](MAPA-QA-GLOBAL.md).
-> Antes de criar testes ou relatar bugs, consulte os manuais em [instrucoes-ia-casos-de-teste.md](referencias/instrucoes-ia-casos-de-teste.md) e [instrucoes-ia-relato-de-bug.md](referencias/instrucoes-ia-relato-de-bug.md).
+> 🤖 **Atenção Agentes de IA (Diretrizes Obrigatórias):**
+> 1. **Código em Produção é ESTRITAMENTE READ-ONLY:** Pastas como `leds-conectafapes-frontoffice-frontend-develop/` são exclusivas para leitura e inspeção. **NUNCA modifique arquivos de código-fonte.** Qualquer arquivo gerado deve ser salvo exclusivamente em `test-cases/`.
+> 2. **Token-Saving & Mapeamento:** Consulte PRIMEIRO o [**MAPA-QA-GLOBAL.md**](MAPA-QA-GLOBAL.md) para localizar a tela, módulo, regra canônica e diretório de salvamento.
+> 3. **Manuais Obrigatórios:** Leia as instruções completas em [instrucoes-ia-casos-de-teste.md](referencias/instrucoes-ia-casos-de-teste.md) e [instrucoes-ia-relato-de-bug.md](referencias/instrucoes-ia-relato-de-bug.md).
 
 ## Organização do Repositório de Testes
 

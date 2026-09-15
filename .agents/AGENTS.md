@@ -27,6 +27,18 @@ Agent personas and skills for the Conecta FAPES project.
 - **`/docs/implementation/modules/{M00x}/`** — documentacao por modulo
 - **[`/test-cases/MAPA-QA-GLOBAL.md`](/test-cases/MAPA-QA-GLOBAL.md)** — matriz global de QA, rotas, regras de negócio e relatos de bugs (Frontoffice e Backoffice)
 
+## 🛡️ Diretrizes Críticas para Agentes de QA / Testes
+
+1. **Repositórios de Código são ESTRITAMENTE READ-ONLY:**
+   - Diretórios de código real como `leds-conectafapes-frontoffice-frontend-develop/` são **apenas para consulta e inspeção**.
+   - **NUNCA modifique, crie, renomeie ou delete arquivos nesses diretórios.**
+2. **Fontes de Verdade Cruzadas para Testes e Bugs:**
+   - **Código Real:** inspecionar formulários, componentes Vue, validações Zod, rotas, payloads de API, máscaras e tratamento de erros reais.
+   - **Regras Canônicas de Negócio:** consultar `docs/implementation/modules/M0xx/` e [`test-cases/MAPA-QA-GLOBAL.md`](test-cases/MAPA-QA-GLOBAL.md).
+3. **Escrita Exclusiva em `/test-cases/`:**
+   - Todo e qualquer caso de teste (`CT-*.md`) ou bug report (`BUG-*.md`) gerado deve ser salvo exclusivamente na pasta `/test-cases/` seguindo os templates em [`test-cases/referencias/`](test-cases/referencias/).
+
+
 ```
 docs/
 ├── architecture/

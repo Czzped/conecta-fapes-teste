@@ -6,11 +6,21 @@ Este documento é um guia de comportamento, padrão e eficiência para agentes d
 
 ---
 
-## 🎯 1. Fluxo de Trabalho com Token-Saving (Economia de Contexto)
+## 🛡️ 1. REGRA DE OURO: Repositório de Produção é ESTRITAMENTE READ-ONLY
+
+* Os repositórios de código real presentes no workspace (ex: `leds-conectafapes-frontoffice-frontend-develop/`) são **EXCLUSIVAMENTE PARA LEITURA (READ-ONLY)**.
+* **NUNCA modifique, crie, renomeie ou delete nenhum arquivo nesses diretórios de código.**
+* **NUNCA tente aplicar fixes ou correções diretamente no código de produção.** O papel de QA/IA é **relatar o bug com evidências e passos reproduzíveis**, salvando o relatório exclusivamente em `test-cases/`.
+* A IA pode inspecionar o código-fonte (em modo leitura) para citar com precisão o componente, arquivo, linha ou schema Zod com falha na seção `## Sugestão de Investigação` ou `## Requisito/Regra Violada`.
+
+---
+
+## 🎯 2. Fluxo de Trabalho com Token-Saving (Economia de Contexto)
 
 Para relatar um bug com máxima eficiência, sem desperdício de tokens de contexto e sem adivinhações, siga estritamente estas diretrizes:
 
 ### ❌ O que NÃO fazer:
+* **Não tente alterar o código para consertar o bug.**
 * **Não adivinhe a solução técnica ou causa raiz**: O papel do relato de bug é documentar o comportamento observado com evidências e fatos. Não parta do princípio de que você sabe a resolução do código nem imponha correções técnicas; no máximo, inclua a seção `## Sugestão de Investigação` (sem o sufixo `(Opcional)`).
 * **Não adivinhe regras de negócio**: Não declare que um comportamento é bug baseado apenas em impressão visual. Valide sempre contra as regras de negócio (`RNxx`) ou invariantes (`RIxx`) do módulo.
 * **Não leia arquivos gigantes por inteiro**: Se precisa saber o comportamento esperado de um módulo, leia apenas o arquivo `README.md` do módulo correspondente em `docs/implementation/modules/M0xx-name/README.md` usando leitura por intervalo de linhas (`StartLine` / `EndLine`).
@@ -18,12 +28,12 @@ Para relatar um bug com máxima eficiência, sem desperdício de tokens de conte
 
 ### ✅ O que FAZER (Investigação Cirúrgica em 3 Passos):
 1. **Consulte o Mapa Central Primeiro**: Leia PRIMEIRO o arquivo [`test-cases/MAPA-QA-GLOBAL.md`](../MAPA-QA-GLOBAL.md). Ele mapeia a tela, rota, módulo proprietário, regras canônicas e pasta exata onde o bug deve ser salvo. Em 95% dos casos, você NÃO precisa ler nenhum outro arquivo de documentação.
-2. **Leitura Delimitada (Apenas se estritamente necessário)**: Se o bug envolver uma regra aprofundada não resumida no mapa, leia apenas o intervalo de linhas (`StartLine` / `EndLine`) da seção `## Regras de Negocio` do módulo indicado (`docs/implementation/modules/M0xx/README.md`).
+2. **Leitura Delimitada (Apenas se estritamente necessário)**: Se o bug envolver uma regra aprofundada não resumida no mapa, leia apenas o intervalo de linhas (`StartLine` / `EndLine`) da seção `## Regras de Negocio` do módulo indicado (`docs/implementation/modules/M0xx/README.md`). Se for inspecionar o componente do frontend real, leia de forma cirúrgica o arquivo Vue/TS correspondente em `leds-conectafapes-frontoffice-frontend-develop/`.
 3. **Escreva Diretamente no Caminho Padronizado**: Use o ID padronizado (`BUG-M0XX-[CANAL]-[TAG]-[NUM]`), adicione a tag obrigatória `[Bug]` no início do título e salve na subpasta `bugs/` correspondente.
 
 ---
 
-## 📑 2. Estrutura Canônica de um Relatório de Bug (`.md`)
+## 📑 3. Estrutura Canônica de um Relatório de Bug (`.md`)
 
 Todo relatório de bug gerado por uma IA deve seguir o template markdown abaixo, sem introduções textuais descartáveis no arquivo final:
 
