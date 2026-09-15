@@ -43,7 +43,7 @@ Para criar casos de teste precisos com consumo mínimo de tokens, a IA deve cruz
 
 ---
 
-## 📑 2. Estrutura Canônica de um Caso de Teste (CT)
+## 📑 3. Estrutura Canônica de um Caso de Teste (CT)
 
 Todo arquivo `.md` de caso de teste deve ser criado na pasta correspondente à funcionalidade e seguir rigorosamente o template abaixo, sem adicionar conversas ou introduções textuais no arquivo final:
 
@@ -81,7 +81,7 @@ Todo arquivo `.md` de caso de teste deve ser criado na pasta correspondente à f
 
 ---
 
-## 🗣️ 3. Dicionário de Termos do Domínio (Evite Sinônimos)
+## 🗣️ 4. Dicionário de Termos do Domínio (Evite Sinônimos)
 Para manter o alinhamento com a arquitetura DDD do projeto, utilize **apenas** a nomenclatura oficial abaixo, sem termos alternativos:
 
 * **`Prestacao`**: O agregado/processo de prestação de contas.
@@ -92,7 +92,7 @@ Para manter o alinhamento com a arquitetura DDD do projeto, utilize **apenas** a
 
 ---
 
-## 🚀 4. Instruções de Geração (Output Tokens)
+## 🚀 5. Instruções de Geração (Output Tokens)
 Quando o usuário solicitar a criação de um arquivo de teste:
 1. Gere o conteúdo markdown estritamente limpo dentro do bloco de código.
 2. Evite explicações preliminares ou resumos amigáveis do tipo *"Aqui está o seu arquivo..."*. Vá direto ao ponto ou execute a ferramenta de escrita imediatamente.
