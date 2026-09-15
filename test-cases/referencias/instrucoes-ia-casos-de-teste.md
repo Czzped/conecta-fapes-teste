@@ -20,7 +20,7 @@ Este documento é um guia de comportamento e eficiência para agentes de Intelig
 Para criar casos de teste precisos com consumo mínimo de tokens, a IA deve cruzar **3 Fontes de Verdade**:
 1. **Regras de Negócio Canônicas:** Módulo correspondente em `docs/implementation/modules/M0xx/` e [`test-cases/MAPA-QA-GLOBAL.md`](../MAPA-QA-GLOBAL.md).
 2. **Código em Produção (Inspeção Cirúrgica Read-Only):** Inspecionar o código real em `leds-conectafapes-frontoffice-frontend-develop/` para extrair detalhes técnicos reais da implementação.
-3. **Padrão de QA:** O template canônico definido na Seção 4 deste documento.
+3. **Padrão de QA:** O template canônico definido na Seção 3 deste documento.
 
 ### 🔍 Como Inspecionar o Código Real sem Desperdício de Tokens:
 * **Rotas e Acesso:** Leia `src/modules/{Modulo}/router.ts` e `src/common/router/index.ts` para verificar rotas exatas e guards de permissão (`requiresCapabilities`, `requiresProjetoCoordenador`, `requiresAuth`).
