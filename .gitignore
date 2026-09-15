@@ -41,3 +41,6 @@ Thumbs.db
 
 # Impacto de Negócio (gerado de negocio.casos a cada build)
 docs/discovery/impacto-negocio.md
+
+# Repositórios de código clonados localmente para consulta de QA
+leds-conectafapes-*/
