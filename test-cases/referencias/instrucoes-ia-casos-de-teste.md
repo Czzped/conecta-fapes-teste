@@ -6,19 +6,40 @@ Este documento é um guia de comportamento e eficiência para agentes de Intelig
 
 ---
 
-## 🎯 1. Fluxo de Trabalho com Token-Saving (Economia de Contexto)
+## 🛡️ 1. REGRA DE OURO: Repositório de Produção é ESTRITAMENTE READ-ONLY
 
-Para evitar consumo desnecessário de tokens (o que atrasa a execução e aumenta custos), siga estritamente estas diretrizes de leitura:
+* Os repositórios de código real puxados para o workspace (como `leds-conectafapes-frontoffice-frontend-develop/` e outros futuros) são **EXCLUSIVAMENTE PARA LEITURA (READ-ONLY)**.
+* **NUNCA modifique, crie, renomeie ou delete nenhum arquivo nesses diretórios de código.**
+* **NUNCA execute comandos que alterem arquivos ou o estado desses repositórios.**
+* Qualquer arquivo gerado pela IA (casos de teste, relatórios de bug, notas de QA) deve ser salvo **exclusivamente dentro da pasta `test-cases/`**.
+
+---
+
+## 🎯 2. Fluxo de Trabalho com Token-Saving e Inspeção do Código Real
+
+Para criar casos de teste precisos com consumo mínimo de tokens, a IA deve cruzar **3 Fontes de Verdade**:
+1. **Regras de Negócio Canônicas:** Módulo correspondente em `docs/implementation/modules/M0xx/` e [`test-cases/MAPA-QA-GLOBAL.md`](../MAPA-QA-GLOBAL.md).
+2. **Código em Produção (Inspeção Cirúrgica Read-Only):** Inspecionar o código real em `leds-conectafapes-frontoffice-frontend-develop/` para extrair detalhes técnicos reais da implementação.
+3. **Padrão de QA:** O template canônico definido na Seção 4 deste documento.
+
+### 🔍 Como Inspecionar o Código Real sem Desperdício de Tokens:
+* **Rotas e Acesso:** Leia `src/modules/{Modulo}/router.ts` e `src/common/router/index.ts` para verificar rotas exatas e guards de permissão (`requiresCapabilities`, `requiresProjetoCoordenador`, `requiresAuth`).
+* **Formulários e Componentes:** Leia a view correspondente em `src/modules/{Modulo}/view/` ou `components/` para identificar campos reais, labels, seletores, botões, estados desabilitados e máscaras.
+* **Validações e Schemas Zod:** Inspecione `entities/` ou schemas Zod do módulo para checar limites de caracteres, obrigatoriedade, formatos (CPF, CNPJ, e-mail) e mensagens de erro exibidas.
+* **Integração e Feedback:** Inspecione `api/` ou composables do módulo para checar endpoints consumidos, payloads esperados e toasts/mensagens de sucesso ou erro reais.
+* **Detecção de Discrepâncias:** Se o código real divergir da regra de negócio (`RNxx`), a IA deve documentar o teste com base na regra canônica esperada e sinalizar a divergência (ou relatar como potencial bug).
 
 ### ❌ O que NÃO fazer:
+* **Não altere nenhum arquivo de código-fonte.**
 * **Não liste diretórios recursivamente** buscando arquivos de regras.
-* **Não leia arquivos de documentação inteiros** (como `README.md` do módulo com centenas de linhas) se você precisa de apenas uma regra específica.
-* **Não invente regras de negócio** baseando-se apenas no comportamento visual do frontend.
+* **Não leia arquivos de documentação inteiros** quando precisar apenas de uma regra específica (use leitura por linhas).
+* **Não invente regras de negócio** baseando-se apenas em suposições visuais.
 
-### ✅ O que FAZER (Leitura Cirúrgica em 3 Passos):
-1. **Consulte o Mapa Central Primeiro**: Leia PRIMEIRO o arquivo [`test-cases/MAPA-QA-GLOBAL.md`](../MAPA-QA-GLOBAL.md). Ele consolida a rota, tela, módulo proprietário, regras e pasta exata para criação do caso de teste (Frontoffice e Backoffice).
-2. **Leitura Focada por Linhas (Apenas se necessário)**: Se precisar de detalhes de exceções não cobertos no mapa, acesse apenas as linhas de regras de negócio (`RNxx`) no `README.md` do módulo indicado (`docs/implementation/modules/M0xx/README.md`) usando `StartLine` e `EndLine`.
-3. **Template Estruturado**: Siga rigorosamente o padrão canônico do template na Seção 2 abaixo e grave o arquivo `.md` no diretório correspondente à tela mapeada.
+### ✅ O que FAZER (Processo em 4 Passos):
+1. **Localize no Mapa:** Consulte [`test-cases/MAPA-QA-GLOBAL.md`](../MAPA-QA-GLOBAL.md) para achar o módulo proprietário, a regra e o caminho de destino do arquivo.
+2. **Inspecione o Código Real (Cirúrgico):** Consulte o componente, rota ou schema Zod no repositório de código para validar dados de entrada, botões e mensagens reais de tela.
+3. **Consulte a Regra Canônica:** Se necessário detalhar a regra além do mapa, leia o trecho de `RNxx` no `README.md` do módulo (`docs/implementation/modules/M0xx/README.md`).
+4. **Grave o Caso de Teste:** Crie o arquivo `.md` no diretório mapeado em `test-cases/` usando o template da Seção 3.
 
 ---
 
