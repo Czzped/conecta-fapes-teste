@@ -50,19 +50,23 @@ Windows 11 / Chrome v120 / Frontoffice Vue-Nuxt UI em `https://conectafapes.hom.
 
 ## Evidências
 - 📷 **Ação de clicar no ícone de lixeira ("Remover nota fiscal") na lista da despesa:**
-  ![Clique Lixeira Remover Nota](file:///c:/Users/phcos/Documents/leds/conectafapes-project/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/nota%20fiscal/evidencias-BUG-NF-016-icone-lixeira-remover-nota-fiscal.png)
+ 
+<img width="1582" height="296" alt="Image" src="https://github.com/user-attachments/assets/c4d2623d-bf0a-452e-8666-edd29ad0f127" />
 
 - 📷 **Modal de confirmação "Remover esta nota fiscal?":**
-  ![Modal Confirmação Remover Nota](file:///c:/Users/phcos/Documents/leds/conectafapes-project/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/nota%20fiscal/evidencias-BUG-NF-016-modal-confirmacao-remover-nota-fiscal.png)
+ 
+<img width="615" height="403" alt="Image" src="https://github.com/user-attachments/assets/1350a568-1931-4dbd-be40-c723176c3f00" />
 
 - 📷 **Toasts simultâneos de erro (incluindo "Erro ao remover a nota fiscal - Request failed with status code 403"):**
-  ![Toasts de Erro 403](file:///c:/Users/phcos/Documents/leds/conectafapes-project/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/nota%20fiscal/evidencias-BUG-NF-016-toasts-erro-403-remover-nota-fiscal.png)
+  
+<img width="1144" height="597" alt="Image" src="https://github.com/user-attachments/assets/02b2e6ed-07ed-4edc-a454-22c4f0b4a248" />
 
 - 📷 **Console do navegador registrando erro 403 Forbidden no recurso:**
-  ![Console Erro 403 Forbidden](file:///c:/Users/phcos/Documents/leds/conectafapes-project/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/nota%20fiscal/evidencias-BUG-NF-016-console-erro-403-forbidden.png)
+ 
+<img width="1087" height="263" alt="Image" src="https://github.com/user-attachments/assets/695f4227-40bf-4aac-a145-eb712435ade6" />
 
 - 📷 **Aba Rede (Network) confirmando a resposta HTTP 403 Access Denied:**
-  ![Network Response 403 Access Denied](file:///c:/Users/phcos/Documents/leds/conectafapes-project/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/nota%20fiscal/evidencias-BUG-NF-016-network-response-403-access-denied.png)
+  <img width="1728" height="701" alt="Network Response 403 Access Denied" src="https://github.com/user-attachments/assets/a7e025fc-fe5e-49b4-9ce5-b7cd03f83526" />
 
 ## Sugestão de Investigação
 - Inspecionar a política de autorização (`Authorization Policy` / `Role Claims`) no controller do backend responsável pela remoção de `DocumentoFiscal`:
