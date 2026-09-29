@@ -43,9 +43,13 @@ Windows 11 / Chrome v120 / Frontoffice Vue-Nuxt UI em `https://conectafapes.hom.
 - O arquivo `documento.pdf` de **12 MB** é aceito e exibido como anexado no card da despesa, violando a regra informada ao usuário no próprio rótulo do campo.
 
 ## Evidências
-- 📷 **Arquivo documento.pdf de 12 MB aceito no campo com limite informado de 10 MB:**
+- 📷 **Comprovante de Passagem aceitando arquivo de 12 MB sem validação:**
  
-<img width="973" height="389" alt="Arquivo de 12 MB anexado com sucesso" src="https://github.com/user-attachments/assets/b6d61688-dfdb-4fc2-a270-3d750c18c7e9" />
+<img width="973" height="389" alt="Arquivo de 12 MB anexado na Passagem" src="https://github.com/user-attachments/assets/b6d61688-dfdb-4fc2-a270-3d750c18c7e9" />
+
+- 📷 **Invoice bloqueando o mesmo arquivo de 12 MB com o toast de erro da restrição de 10 MB:**
+ 
+<img width="975" height="389" alt="Invoice bloqueia arquivo de 12 MB com toast" src="https://github.com/user-attachments/assets/cdfe9586-beae-4eb8-b98a-212ca87dfca6" />
 
 ## Sugestão de Investigação
 - Inspecionar a propriedade `maxFileSize` ou o método `@change`/`onFileSelect` do componente de upload de arquivos no Frontoffice (`FileUpload.vue` / `BaseDropzone.vue`):
