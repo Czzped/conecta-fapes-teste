@@ -1,15 +1,15 @@
 ## Título
-[Bug] Desaparecimento do anexo do Comprovante da Fatura do Cartão de Crédito (campo fica vazio) após confirmar a edição e recarregar a página
+[Bug] Substituição do anexo de Comprovante da Fatura do Cartão faz com que o nome do novo arquivo desapareça ao recarregar a página (deixando o campo como se estivesse vazio)
 
 ## ID
 BUG-M014-FO-INV-007
 
 ## Requisito/Regra Violada
 - Fluxo/Contexto: Comprovação de Débito de Invoice — **Seção 2 (Anexar Comprovante da Fatura do Cartão)**
-- Regra Canônica: M014: `RN05` / `RI-INV01` (Gerenciamento e persistência de documentos secundários de Invoice - Fatura do Cartão)
+- Regra Canônica: M014: `RN05` / `RI-INV01` (Gerenciamento e persistência da substituição de documentos secundários de Invoice - Fatura do Cartão)
 - Heurísticas de Usabilidade de Nielsen:
-  - **Heurística #1 (Visibilidade do Status do Sistema)**: Exibição do toast verde de sucesso (*"Invoice atualizado com sucesso!"*), porém ao recarregar a página (`F5`), o comprovante de fatura do cartão é desvinculado e o campo fica completamente vazio como se o arquivo tivesse sido deletado.
-  - **Heurística #5 (Prevenção de Erros)**: Perda não intencional de dados de formulário. O usuário realiza a edição/substituição da fatura esperando atualizar a imagem, mas a operação corrompe o vínculo do arquivo, forçando a digitação/upload do zero.
+  - **Heurística #1 (Visibilidade do Status do Sistema)**: Exibição da notificação verde de confirmação (*"Invoice atualizado com sucesso!"*) indicando que a substituição da fatura foi realizada, porém ao recarregar a página (`F5`), o nome do novo arquivo de fatura desaparece e a caixa de upload fica parecendo um campo vazio sem anexo.
+  - **Heurística #5 (Prevenção de Erros)**: Perda de estado de exibição do arquivo substituído. O usuário substitui um comprovante de fatura antigo por um novo, mas a aplicação falha em manter a renderização do novo nome do arquivo após o refresh da página.
 - Caso de Teste Relacionado: `CT-M014-FO-089` / `CT-M014-FO-074` (Validação de substituição e persistência da fatura do cartão no Invoice)
 - Rota/Componente: `/coordenador/prestacao-financeira/detalhes/:paymentId` (`ComprovarDebito.vue` / Campo `Comprovante da fatura do cartão`)
 
@@ -24,25 +24,25 @@ Windows 11 / Chrome v120 / Frontoffice Vue-Nuxt UI em `https://conectafapes.hom.
 
 ## Passo a Passo
 1. Acessar o extrato financeiro em `/coordenador/financeira` com o perfil de Coordenador.
-2. Abrir uma prestação de débito de **Invoice** em rascunho.
-3. Na Seção `2. Anexar Arquivos do Invoice *`, marcar a opção *"Deseja enviar o comprovante da fatura do cartão?"*.
-4. Anexar um arquivo de comprovante da fatura do cartão (ex.: `NF-Notebooks.pdf`).
-5. Clicar no botão `Confirmar edição` e verificar a exibição da notificação verde (*"Invoice atualizado com sucesso!"*).
-6. Recarregar a página no navegador (`F5` / `Ctrl+R`) ou navegar de volta para o extrato e reabrir a transação.
-7. Inspecionar a Seção 2 e a caixa do campo `Comprovante da fatura do cartão`.
+2. Abrir uma prestação de débito de **Invoice** em rascunho que **já possua um comprovante da fatura do cartão de crédito anexado**.
+3. Na Seção `2. Anexar Arquivos do Invoice *`, clicar em `Editar` (ou habilitar o modo de edição no campo `Comprovante da fatura do cartão`).
+4. Remover a fatura antiga (`X`) e anexar um **novo arquivo de comprovante da fatura** (ex.: `NF-Notebooks.pdf`).
+5. Clicar no botão `Confirmar edição` e verificar a exibição da notificação verde de sucesso (*"Invoice atualizado com sucesso!"*).
+6. Recarregar a página no navegador (`F5` / `Ctrl+R`) ou reabrir a transação.
+7. Inspecionar a caixa de upload do campo `Comprovante da fatura do cartão`.
 
 ## Dados de Entrada
 - Rota: `/coordenador/prestacao-financeira/detalhes/:paymentId`
-- Checkbox: `Deseja enviar o comprovante da fatura do cartão?` (Marcada)
-- Arquivo Anexado: `NF-Notebooks.pdf` (13 KB)
-- Ação: Clique em `Confirmar edição` + Recarregar página (`F5`)
+- Fatura Preexistente: `8b06ec69...Cópia de cotacao_avell.pdf` (ou fatura original)
+- Novo Arquivo Substituto: `NF-Notebooks.pdf` (13 KB)
+- Ação: Substituição da fatura + Clique em `Confirmar edição` + Recarregar página (`F5`)
 
 ## Comportamento Esperado
-- O arquivo de comprovante da fatura do cartão (`NF-Notebooks.pdf`) deve permanecer anexado e visível na caixa de upload da Seção 2 após recarregar a página.
+- Ao substituir a fatura do cartão por um novo arquivo, confirmar a edição e atualizar a página (`F5`), o nome e detalhes do novo arquivo substituído (`NF-Notebooks.pdf`) devem continuar exibidos na caixa de anexo abaixo do campo.
 
 ## Comportamento Atual
-- Embora a mensagem verde de confirmação (*"Invoice atualizado com sucesso!"*) seja disparada no momento do clique, o vínculo com a fatura do cartão é perdido ao atualizar a página.
-- O campo `Comprovante da fatura do cartão` reaparece completamente vazio (sem o card do arquivo anexado), exigindo que o usuário envie o arquivo novamente.
+- O sistema exibe o toast de sucesso (*"Invoice atualizado com sucesso!"*) e demonstra temporariamente que a substituição foi feita na tela.
+- No entanto, ao recarregar a página (`F5`), o nome do novo arquivo que deveria ser exibido abaixo do campo de anexo da fatura do cartão desaparece, deixando o componente parecendo um campo vazio sem nenhum comprovante anexado.
 
 ## Evidências
 - 📷 **Arquivo NF-Notebooks.pdf anexado no campo de Comprovante da Fatura do Cartão:**
