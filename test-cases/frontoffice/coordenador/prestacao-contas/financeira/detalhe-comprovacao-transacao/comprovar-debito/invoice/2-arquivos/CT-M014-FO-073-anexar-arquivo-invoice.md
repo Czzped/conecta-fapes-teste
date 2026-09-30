@@ -2,33 +2,39 @@
 [CT-M014-FO-073]
 
 ## Título
-Anexar arquivo do Invoice (PDF ou imagem) com sucesso
+Anexar e substituir arquivo de Invoice com sucesso na comprovação de débito
 
 ## Requisito/História Relacionada
 - Requisito/Issue: EP-11 — Comprovação de Débito (Invoice)
-- Regra Canônica: M014: `RN05` (Comprovante do Invoice com nome do coordenador, itens, valores e fornecedor)
-- Contrato/API: `M014: AnexarDocumentoInvoice`
+- Regra Canônica: M014: `RN05` / `RI-INV01` (Gerenciamento, anexação e substituição de comprovantes do Invoice)
+- Contrato/API: `M014: AnexarDocumentoInvoice` / `M014: AtualizarDocumentoInvoice`
 
 ## Pré-condições
-- Tipo de documento selecionado como `Invoice (Pagamento Internacional)`.
+- Usuário autenticado com perfil de `coordenador`.
+- Estar na tela de comprovação de débito sob a modalidade `Invoice (Pagamento Internacional)`.
 - Seção `2. Anexar Arquivos do Invoice *` visível.
-- Arquivo PDF ou imagem do Invoice disponível (tamanho <= 10MB).
+- Arquivos em PDF ou imagem com tamanho inferior a 10MB disponíveis.
 
 ## Passo a Passo
-1. Na seção `2. Anexar Arquivos do Invoice *`, clicar no botão `Anexar arquivos` ou arrastar o arquivo para a área de upload.
-2. Selecionar o arquivo PDF/imagem do Invoice.
-3. Aguardar o upload completar.
+1. Na Seção `2. Anexar Arquivos do Invoice *`, clicar em `Anexar arquivos` e selecionar o arquivo PDF/imagem inicial do Invoice (`invoice_inicial.pdf`).
+2. Verificar se o arquivo é carregado e exibido no card da Seção 2.
+3. Clicar no botão `X` (Remover) no card do arquivo anexado.
+4. Clicar novamente em `Anexar arquivos` e selecionar o novo arquivo substituto (`invoice_substituto.pdf`).
+5. Clicar no botão `Confirmar edição`.
+6. Recarregar a página no navegador (`F5`).
 
 ## Dados de Entrada
-- Arquivo: `invoice_fornecedor_internacional.pdf` (Tamanho: `234 KB`)
-- Formatos aceitos: `PDF` ou `imagem`
+- Rota: `/coordenador/prestacao-financeira/detalhes/:paymentId`
+- Arquivo Inicial: `invoice_inicial.pdf` (234 KB)
+- Arquivo Substituto: `invoice_substituto.pdf` (180 KB)
+- Formatos Aceitos: `PDF` ou `XML/Imagem` (até 10MB)
 
 ## Resultado Esperado
-- O arquivo é enviado e exibido abaixo da área de upload em um pill com nome, tamanho e ícone de visualização (olho).
-- A pergunta *"Deseja enviar o comprovante da fatura do cartão?"* é exibida abaixo do arquivo anexado.
+- O novo arquivo substituto (`invoice_substituto.pdf`) é carregado com sucesso.
+- Ao confirmar a edição e atualizar a página (`F5`), o novo arquivo deve ser mantido e persistido como o anexo oficial do Invoice da despesa.
 
 ## Tipo de Teste
-[x] Positivo  [ ] Negativo  [ ] Limite  [ ] Regressão
+[x] Positivo  [ ] Negativo  [ ] Limite  [x] Regressão
 
 ## Prioridade
 [x] Alta  [ ] Média  [ ] Baixa
