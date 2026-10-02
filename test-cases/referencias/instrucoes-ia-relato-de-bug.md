@@ -107,8 +107,18 @@ Para manter a integridade com o DDD e documentação do Conecta FAPES, a IA deve
 
 ---
 
-## 🚀 5. Instruções de Execução Direct-to-File (Output Tokens)
+## 🚀 5. Automação de Versão (Git Push) e Publicação no GitHub FAPES
 
-Ao ser solicitada para registrar um bug:
-1. **Escreva o arquivo `.md` diretamente** na pasta adequada utilizando as ferramentas de arquivo (`write_to_file`).
-2. **Não faça introduções longas** no chat. Apresente um resumo sucinto com o link para o arquivo criado no formato markdown `[nome-do-arquivo.md](file:///caminho/completo)`.
+Ao ser solicitada para registrar um bug ou caso de teste:
+1. **Escreva o arquivo `.md` diretamente** na pasta adequada em `/test-cases/` utilizando `write_to_file`.
+2. **Execute o Git Commit e Push** no repositório de testes local para manter o versionamento em dia.
+3. **Crie a Issue automaticamente** no repositório da FAPES via GitHub CLI (`gh`):
+   ```bash
+   gh issue create --repo leds-conectafapes/leds-conectafapes-prestacao-de-contas --title "[Bug] <Titulo>" --body "<Conteudo Markdown do Bug>"
+   ```
+4. **Vincule a Issue ao Projeto do GitHub** (`Conecta Fapes - Teste` / `Project 46`):
+   ```bash
+   gh project item-add 46 --owner leds-conectafapes --url <URL_DA_ISSUE_CRIADA>
+   ```
+5. **Forneça o link direto** da Issue gerada no GitHub ao usuário ao final do processo e liste o ID/Nome dos Casos de Teste (`CT-*`) relacionados.
+

@@ -37,6 +37,13 @@ Agent personas and skills for the Conecta FAPES project.
    - **Regras Canônicas de Negócio:** consultar `docs/implementation/modules/M0xx/` e [`test-cases/MAPA-QA-GLOBAL.md`](test-cases/MAPA-QA-GLOBAL.md).
 3. **Escrita Exclusiva em `/test-cases/`:**
    - Todo e qualquer caso de teste (`CT-*.md`) ou bug report (`BUG-*.md`) gerado deve ser salvo exclusivamente na pasta `/test-cases/` seguindo os templates em [`test-cases/referencias/`](test-cases/referencias/).
+4. **Automação Git e GitHub Issues no Projeto da FAPES:**
+   - Após criar/atualizar qualquer bug (`BUG-*.md`) ou caso de teste (`CT-*.md`), o agente deve realizar o `git commit` e `git push` no repositório local.
+   - Em seguida, o agente deve **criar automaticamente a Issue no repositório da FAPES** via GitHub CLI:
+     `gh issue create --repo leds-conectafapes/leds-conectafapes-prestacao-de-contas --title "<Titulo>" --body "<Conteudo Markdown>"`
+   - Após a criação da Issue, o agente deve **vinculá-la automaticamente ao projeto da FAPES** (`Conecta Fapes - Teste` / `Project 46`):
+     `gh project item-add 46 --owner leds-conectafapes --url <URL_DA_ISSUE_CRIADA>`
+   - O agente deve fornecer o link direto da Issue do GitHub ao usuário ao final do processo.
 
 
 ```
