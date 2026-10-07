@@ -13,10 +13,10 @@ BUG-M014-FO-NF-020
 - Rota/Componente: `/coordenador/prestacao-financeira/detalhes/:paymentId` (`ComprovarDebito.vue` / `NotaFiscalCard.vue` / Botão `Visualizar arquivo`)
 
 ## Ambiente
-[ ] Produção  [ ] Staging  [x] Homologação
+[ ] Produção  [x] Staging  [ ] Homologação
 
 ## Dispositivo/SO
-Windows 11 / Chrome v120 / Frontoffice Vue-Nuxt UI em `https://conectafapes.hom.es.gov.br`
+Windows 11 / Chrome v120 / Frontoffice Vue-Nuxt UI em `https://stage.conectafapes.leds.dev.br`
 
 ## Gravidade/Prioridade
 [ ] 🔴 Bloqueante  [x] 🟠 Alta  [ ] 🟡 Média  [ ] 🟢 Baixa
