@@ -68,6 +68,23 @@ Windows 11 / Chrome v120 / Frontoffice Vue-Nuxt UI em `https://conectafapes.hom.
 - 📷 **Aba Rede (Network) confirmando a resposta HTTP 403 Access Denied:**
   <img width="1728" height="701" alt="Network Response 403 Access Denied" src="https://github.com/user-attachments/assets/a7e025fc-fe5e-49b4-9ce5-b7cd03f83526" />
 
+### Evidências Adicionais de Reteste (Ambiente Stage — 08/10/2026)
+- 📷 **Nova nota fiscal anexada e enviada com sucesso (WEBCONTINENTAL LTDA - Nota 2 de 2):**  
+  ![Nova nota fiscal anexada e enviada com sucesso](evidencias-BUG-NF-016-reteste-stage-01-nova-nota-enviada-webcontinental.png)
+
+- 📷 **Modal de confirmação para remoção da nota fiscal adicional:**  
+  ![Modal confirmacao remocao nota fiscal](evidencias-BUG-NF-016-reteste-stage-02-modal-confirmacao-remover-nota.png)
+
+- 📷 **Toasts de erro 403 disparados após acionar "Remover nota":**  
+  ![Toasts de erro 403 ao remover nota](evidencias-BUG-NF-016-reteste-stage-03-toasts-erro-403-ao-remover.png)
+
+- 📷 **Console DevTools registrando DELETE 403 (Forbidden) no endpoint de documento-fiscal:**  
+  ![Console DELETE documento fiscal 403](evidencias-BUG-NF-016-reteste-stage-04-console-delete-documento-fiscal-403.png)
+
+- 📷 **Aba Rede (Network) com payload `{ status: 403, message: "Access Denied" }`:**  
+  ![Network resposta 403 Access Denied](evidencias-BUG-NF-016-reteste-stage-05-network-resposta-403-access-denied.png)
+
+
 ## Sugestão de Investigação
 - Inspecionar a política de autorização (`Authorization Policy` / `Role Claims`) no controller do backend responsável pela remoção de `DocumentoFiscal`:
   - O endpoint `DELETE /api/prestacao-de-contas/documento-fiscal/{id}` (ou rota equivalente) está retornando `403 Forbidden` informando que o perfil do usuário não possui permissão para acessar o endpoint.
