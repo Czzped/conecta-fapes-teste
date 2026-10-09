@@ -61,7 +61,7 @@ Mobile Viewport (< 320px, ex.: 280px–319px) / Chrome DevTools Mobile Emulation
 
 ## Evidências
 - 📷 **Quebra de layout e sobreposição dos ícones sobre o Emitente nos cards da Seção 2 abaixo de 320px:**
-  ![Quebra de Responsividade Mobile 320px](evidencias-BUG-NF-024-01-quebra-responsividade-mobile-320px.png)
+  ![Quebra de Responsividade Mobile 320px](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/main/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/nota%20fiscal/evidencias-BUG-NF-024-01-quebra-responsividade-mobile-320px.png)
 
 ## Sugestão de Investigação
 - Inspecionar a estrutura CSS/Tailwind do cabeçalho do card em `NotaFiscalCard.vue` (ou componente equivalente de resumo do documento fiscal):

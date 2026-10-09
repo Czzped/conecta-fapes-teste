@@ -61,10 +61,10 @@ Mobile Viewport (Responsive 425px × 949px e 320px × 949px) / Chrome DevTools M
 
 ## Evidências
 - 📷 **Card de Cotação em resolução Mobile 425px (campos espremidos e truncados):**
-  ![Cotação Responsividade 425px](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/main/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/Nota%20Fiscal/evidencias-BUG-NF-023-01-cotacao-responsividade-425px.png)
+  ![Cotação Responsividade 425px](evidencias-BUG-NF-023-01-cotacao-responsividade-425px.png)
 
 - 📷 **Colapso severo de layout em resolução Mobile 320px (rótulos sobrepostos, inputs comprimidos e quebra vertical monocaractere):**
-  ![Cotação Quebra Layout 320px](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/main/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/Nota%20Fiscal/evidencias-BUG-NF-023-02-cotacao-responsividade-quebra-320px.png)
+  ![Cotação Quebra Layout 320px](evidencias-BUG-NF-023-02-cotacao-responsividade-quebra-320px.png)
 
 ## Sugestão de Investigação
 - Inspecionar o componente que renderiza os cards de cotação na Seção 4 (ex.: `CotacaoCard.vue` ou seção de cotação em `ComprovarDebito.vue`):
