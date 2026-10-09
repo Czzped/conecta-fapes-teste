@@ -110,15 +110,17 @@ Para manter a integridade com o DDD e documentação do Conecta FAPES, a IA deve
 ## 🚀 5. Automação de Versão (Git Push) e Publicação no GitHub FAPES
 
 Ao ser solicitada para registrar um bug ou caso de teste:
-1. **Escreva o arquivo `.md` diretamente** na pasta adequada em `/test-cases/` utilizando `write_to_file`.
-2. **Execute o Git Commit e Push** no repositório de testes local para manter o versionamento em dia.
-3. **Crie a Issue automaticamente** no repositório da FAPES via GitHub CLI (`gh`):
+1. **Salvar e Embutir Evidências (Prints):** Caso o usuário forneça imagens/prints na conversa, extraia os arquivos imediatamente para a pasta de bugs correspondente seguindo o padrão `evidencias-BUG-[TAG]-[NUM]-[seq]-[descricao].png` e incorpore as imagens na seção `## Evidências` do relatório.
+2. **Escreva o arquivo `.md` diretamente** na pasta adequada em `/test-cases/` utilizando `write_to_file`.
+3. **Execute o Git Commit e Push** no repositório de testes local para manter o versionamento em dia (incluindo imagens e arquivos markdown).
+4. **Crie a Issue automaticamente** no repositório da FAPES via GitHub CLI (`gh`):
    ```bash
-   gh issue create --repo leds-conectafapes/leds-conectafapes-prestacao-de-contas --title "[Bug] <Titulo>" --body "<Conteudo Markdown do Bug>"
+   gh issue create --repo leds-conectafapes/leds-conectafapes-prestacao-de-contas --title "[Bug] <Titulo>" --body-file "<Caminho_Do_Arquivo.md>"
    ```
-4. **Vincule a Issue ao Projeto do GitHub** (`Conecta Fapes - Teste` / `Project 46`):
+5. **Vincule a Issue ao Projeto do GitHub** (`Conecta Fapes - Teste` / `Project 46`):
    ```bash
    gh project item-add 46 --owner leds-conectafapes --url <URL_DA_ISSUE_CRIADA>
    ```
-5. **Forneça o link direto** da Issue gerada no GitHub ao usuário ao final do processo e liste o ID/Nome dos Casos de Teste (`CT-*`) relacionados.
+6. **Forneça o link direto** da Issue gerada no GitHub ao usuário ao final do processo e liste o ID/Nome dos Casos de Teste (`CT-*`) relacionados.
+
 
