@@ -58,13 +58,13 @@ Desktop (1920×1080 / 1440×900) / Chrome v120+ / Frontoffice Vue-Nuxt UI em Hom
 
 ## Evidências
 - 📷 **Seção 3 atual na tela de Comprovação de Débito (exibição apenas da listagem do item da NF sem campos de associação inline):**
-  ![Seção 3 Atual](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/main/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/Nota%20Fiscal/evidencias-BUG-NF-026-01-secao-3-associar-compra-atual.png)
+  ![Seção 3 Atual](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/main/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/nota%20fiscal/evidencias-BUG-NF-026-01-secao-3-associar-compra-atual.png)
 
 - 📷 **Modal intermediário 'Associar Compra' exigido na implementação atual para associar categoria/subcategoria:**
-  ![Modal Associar Compra Atual](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/main/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/Nota%20Fiscal/evidencias-BUG-NF-026-02-modal-associar-compra-aberto.png)
+  ![Modal Associar Compra Atual](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/main/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/nota%20fiscal/evidencias-BUG-NF-026-02-modal-associar-compra-aberto.png)
 
 - 📷 **Protótipo oficial de referência com formulário de associação direto na tela (inline, campos Categoria, Item, Quantidade, Valor e dados do item abaixo):**
-  ![Protótipo Associação Inline](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/main/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/Nota%20Fiscal/evidencias-BUG-NF-026-03-prototipo-associacao-direta-inline.png)
+  ![Protótipo Associação Inline](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/main/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/nota%20fiscal/evidencias-BUG-NF-026-03-prototipo-associacao-direta-inline.png)
 
 ## Sugestão de Investigação
 - Inspecionar a Seção 3 em `ComprovarDebito.vue` (ou componente filho responsável por `Associar Compra`):
