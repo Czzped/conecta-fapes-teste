@@ -20,7 +20,10 @@ No Conecta FAPES, transações de débito que entraram em processo de devoluçã
   - **Heurística #5 (Prevenção de Erros)**: O seletor de débitos disponibiliza opções incompatíveis com a operação de estorno simples (débitos em prestação já bloqueada/em devolução), induzindo o usuário a uma falha inevitável no submit.
   - **Heurística #4 (Consistência e Padrões)**: O título do toast exibe *"Não foi possível salvar a passagem. Tente novamente."*, exibindo termo de um módulo alheio (Passagem) em uma operação financeira de Crédito/Estorno.
   - **Heurística #9 (Ajudar usuários a reconhecer, diagnosticar e recuperar-se de erros)**: A interface não orienta o usuário sobre como sanear o débito em devolução (que deve ser feito na tela do próprio débito) e apresenta mensagens conflitantes.
-- Casos de Teste Relacionados: `CT-M014-FO-031` (Associar crédito a débito no fluxo de estorno) e `CT-M014-FO-036` (Enviar classificação de crédito)
+- Casos de Teste Relacionados:
+  - `CT-M014-FO-133` (Validar bloqueio e filtro de associação de estorno para débitos com prestação em devolução)
+  - `CT-M014-FO-031` (Associar transação de Crédito a um Débito de saída no fluxo de Estorno)
+  - `CT-M014-FO-036` (Enviar classificação de crédito com sucesso)
 - Rota/Componente: `/coordenador/prestacao-financeira/classificar-credito/:id` (`ClassificarCredito.vue`)
 - Endpoint API: `PUT https://conectafapes.hom.es.gov.br/api/prestacao-de-contas/projeto/{projetoId}/transacao-financeira/{transacaoId}/classificar`
 
