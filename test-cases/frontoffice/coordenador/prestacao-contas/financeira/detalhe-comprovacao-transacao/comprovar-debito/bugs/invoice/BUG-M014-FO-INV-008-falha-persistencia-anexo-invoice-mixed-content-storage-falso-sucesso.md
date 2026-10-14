@@ -56,13 +56,13 @@ Windows 11 / Chrome v120+ / Frontoffice Vue-Nuxt UI em `https://stage.conectafap
 
 ## Evidências
 - 📷 **Toast de confirmação ("Invoice atualizado com sucesso!") com arquivo anexado:**
-  ![Toast de sucesso com arquivo](evidencias-BUG-INV-008-01-toast-sucesso-anexo-invoice.png)
+  ![Toast de sucesso com arquivo](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/skill-test/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/invoice/evidencias-BUG-INV-008-01-toast-sucesso-anexo-invoice.png)
 
 - 📷 **Console DevTools exibindo Mixed Content, ERR_CONNECTION_TIMED_OUT e falha de fetch:**
-  ![Console com erros de Mixed Content e timeout](evidencias-BUG-INV-008-02-console-mixed-content-failed-to-fetch.png)
+  ![Console com erros de Mixed Content e timeout](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/skill-test/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/invoice/evidencias-BUG-INV-008-02-console-mixed-content-failed-to-fetch.png)
 
 - 📷 **Página recarregada (F5) exibindo a Seção 2 sem o arquivo anexado (campo vazio):**
-  ![Anexo desaparece após recarregar](evidencias-BUG-INV-008-03-anexo-desaparece-pos-recarregar-pagina.png)
+  ![Anexo desaparece após recarregar](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/skill-test/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/invoice/evidencias-BUG-INV-008-03-anexo-desaparece-pos-recarregar-pagina.png)
 
 ## Sugestão de Investigação
 - **Configuração de Endpoint do Storage / MinIO em Staging:**
