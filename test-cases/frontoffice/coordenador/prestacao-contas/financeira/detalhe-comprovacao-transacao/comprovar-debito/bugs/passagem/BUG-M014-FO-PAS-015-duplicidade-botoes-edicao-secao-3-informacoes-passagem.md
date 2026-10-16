@@ -53,7 +53,7 @@ Desktop / Google Chrome / Frontoffice Vue-Nuxt UI em `https://conectafapes.hom.e
 
 ## Evidências
 - 📷 **Seção 3 exibindo simultaneamente dois botões de edição ('Editar passageiros' e 'Editar Informações Gerais'):**
-  ![Dois botões de edição na Seção 3 de Passagem](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/main/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/Passagem/evidencias-BUG-PAS-015-01-dois-botoes-edicao-secao-3.png)
+  ![Dois botões de edição na Seção 3 de Passagem](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/main/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/passagem/evidencias-BUG-PAS-015-01-dois-botoes-edicao-secao-3.png)
 
 ## Sugestão de Investigação
 - Alinhar com a designer Letícia (referência do design no Figma) qual o padrão oficial aprovado para os botões de edição da Seção 3 de Passagem.
