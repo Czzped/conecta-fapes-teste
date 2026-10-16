@@ -58,7 +58,7 @@ Desktop / Chrome v120+ / Frontoffice Vue-Nuxt UI em `https://conectafapes.hom.es
 
 ## Evidências
 - 📷 **Card de cotação expandido com campos divididos em duas linhas e espaço ocioso:**
-  ![Card Cotação com Campos em Duas Linhas](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/main/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/Nota%20Fiscal/evidencias-BUG-NF-027-01-card-cotacao-campos-duas-linhas.png)
+  ![Card Cotação com Campos em Duas Linhas](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/main/test-cases/frontoffice/coordenador/prestacao-contas/financeira/detalhe-comprovacao-transacao/comprovar-debito/bugs/nota%20fiscal/evidencias-BUG-NF-027-01-card-cotacao-campos-duas-linhas.png)
 
 ## Sugestão de Investigação
 - Ajustar o layout do componente de preenchimento de cotação (ex.: `CotacaoCard.vue` ou bloco da Seção 4 em `ComprovarDebito.vue`):
