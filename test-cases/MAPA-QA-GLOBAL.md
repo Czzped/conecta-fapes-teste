@@ -1,4 +1,4 @@
-﻿# 🗺️ Mapa Global de QA, Regras e Rotas — Conecta FAPES
+# 🗺️ Mapa Global de QA, Regras e Rotas — Conecta FAPES
 
 > 🤖 **GUIA DE LEITURA OBRIGATÓRIO PARA AGENTES DE IA (TOKEN-SAVING):**
 > **LEIA APENAS ESTE ARQUIVO** antes de criar ou relatar Casos de Teste (CTs) ou Bugs.
@@ -36,6 +36,7 @@
 | **Meus Pagamentos** | `/coordenador/pagamentos` | M004 | Extrato de bolsas recebidas pelo próprio usuário, mês de referência, situação | `frontoffice/coordenador/pagamentos/` | `.../pagamentos/bugs/` | `BUG-M004-FO-PAG-xxx` |
 | **Meu Projeto** | `/coordenador/projetos` | M003, M009 | Dados gerais da iniciativa, vigência, edital vinculado, instituição executora | `frontoffice/coordenador/projetos/` | `.../projetos/bugs/` | `BUG-M003-FO-PROJ-xxx` |
 | **Minha Equipe** | `/coordenador/minha-equipe` | M003, M009 | Lista de membros, bolsistas ativos, plano de trabalho e período de vigência de bolsa | `frontoffice/coordenador/minha-equipe/` | `.../minha-equipe/bugs/` | `BUG-M009-FO-EQUIP-xxx` |
+| **Alterar Nível da Bolsa** | `/coordenador/minha-equipe` (Detalhes) | M009, M003 | Solicitação de novo nível (mesma modalidade), acúmulo pareado (RI1), dupla contagem (FR-005), congelamento da origem (FR-013) | `frontoffice/coordenador/minha-equipe/alterar-nivel-bolsa/` | `.../alterar-nivel-bolsa/bugs/` | `BUG-M009-FO-NIV-xxx` |
 | **Cadastrar Bolsista** | `/coordenador/cadastrar-bolsista` | M009, M008 | Validação de CPF, dados bancários, modalidade de bolsa compatível, não acumulação | `frontoffice/coordenador/minha-equipe/cadastrar-bolsista/` | `.../cadastrar-bolsista/bugs/` | `BUG-M009-FO-CADB-xxx` |
 | **Solicitar Auxílio** | `/coordenador/solicitar-auxilio` | M003, M009 | Solicitação de benefícios, limites de auxílio por edital | `frontoffice/coordenador/minha-equipe/solicitar-auxilio/` | `.../solicitar-auxilio/bugs/` | `BUG-M003-FO-AUXI-xxx` |
 | **Pagamentos do Projeto** | `/coordenador/pagamentos-projeto` | M004 | Visão consolidada da folha do projeto, histórico de remessas e depósitos | `frontoffice/coordenador/minha-equipe/pagamentos-projeto/` | `.../pagamentos-projeto/bugs/` | `BUG-M004-FO-FOLHA-xxx` |
@@ -63,6 +64,7 @@
 | **Folhas e Remessas Bancárias** | `/admin/pagamentos` | M004 | Fechamento de folha mensal, geração de remessa CNAB Banestes, processamento de retorno | `backoffice/admin/pagamentos-folhas/` | `.../pagamentos-folhas/bugs/` | `BUG-M004-BO-FOLHA-xxx` |
 | **Cadastros Corporativos** | `/admin/cadastros` | M008 | Gestão de Pessoas, Instituições executoras/parceiras, Áreas Técnicas FAPES | `backoffice/admin/cadastros/` | `.../cadastros/bugs/` | `BUG-M008-BO-CAD-xxx` |
 | **Gestão Geral de Bolsistas** | `/admin/bolsistas` | M009 | Homologação de bolsistas, verificação de pendências impeditivas, histórico | `backoffice/admin/bolsistas/` | `.../bolsistas/bugs/` | `BUG-M009-BO-BOLS-xxx` |
+| **Avaliação de Alteração de Nível** | `/admin/bolsistas` / `/gestao-bolsa/documentos-bolsista/:id` | M009 | Swap atômico (aprovação), desfechos de reprovação/expiração, supressão de eventos Autherix | `backoffice/admin/bolsistas/alterar-nivel-bolsa/` | `.../alterar-nivel-bolsa/bugs/` | `BUG-M009-BO-NIV-xxx` |
 | **Análise de Prestação de Contas** | `/admin/prestacao-contas` | M014 | `RN03` (Bloqueio em análise), `RN08` (Terminal), `RN10` (Aprovar, Negar ou Diligência/Revisão) | `backoffice/admin/prestacao-contas-analise/` | `.../prestacao-contas-analise/bugs/` | `BUG-M014-BO-PREST-xxx` |
 | **Suspensões e Cancelamentos** | `/admin/suspensoes` | M015 | Bloqueio temporário de pagamentos por inadimplência, cancelamento com cancelamento de saldos | `backoffice/admin/suspensoes/` | `.../suspensoes/bugs/` | `BUG-M015-BO-SUSP-xxx` |
 
