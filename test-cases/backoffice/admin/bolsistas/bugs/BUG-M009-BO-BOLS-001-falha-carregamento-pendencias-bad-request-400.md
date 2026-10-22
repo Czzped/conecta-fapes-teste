@@ -50,9 +50,9 @@ Windows 11 / Google Chrome / Backoffice Admin (Vue 3 / Nuxt UI)
 
 ## Evidências
 - 📷 Screenshots / Vídeos:
-  - ![Console do navegador exibindo múltiplos erros 400 Bad Request nos endpoints de visualizarpendencias](evidencia-01-console-erro-400.png)
-  - ![Aba Rede demonstrando respostas 400 para informacoesgerais, buscapersonalizada, editais e projetos](evidencia-02-network-requisicoes-400.png)
-  - ![Tela de Visualizar Pendências vazia e com indicadores zerados devido às falhas de API](evidencia-03-tela-pendencias-vazia.png)
+  - ![Console do navegador exibindo múltiplos erros 400 Bad Request nos endpoints de visualizarpendencias](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/skill-test/test-cases/backoffice/admin/bolsistas/bugs/evidencia-01-console-erro-400.png)
+  - ![Aba Rede demonstrando respostas 400 para informacoesgerais, buscapersonalizada, editais e projetos](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/skill-test/test-cases/backoffice/admin/bolsistas/bugs/evidencia-02-network-requisicoes-400.png)
+  - ![Tela de Visualizar Pendências vazia e com indicadores zerados devido às falhas de API](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/skill-test/test-cases/backoffice/admin/bolsistas/bugs/evidencia-03-tela-pendencias-vazia.png)
 - 🧾 Logs / Retorno da API:
   - `GET https://admin.conectafapes.hom.es.gov.br/api/gestaobolsa/visualizarpendencias/informacoesgerais?data=2026-10-22 -> 400 (Bad Request)` (268 B)
   - `GET https://admin.conectafapes.hom.es.gov.br/api/gestaobolsa/visualizarpendencias/select/projetos -> 400 (Bad Request)` (268 B)
