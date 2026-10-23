@@ -53,6 +53,8 @@ Windows / Navegador Web (Chrome/Edge) / Frontoffice Vue-Nuxt UI
 - A interface exibe um toast de erro genérico de falha no canto da tela após a submissão frustrada.
 
 ## Evidências
+
+### Cenário A: Tentativa de Cancelamento de Bolsa
 - 📷 Formulário de cancelamento preenchido:
 ![Modal Cancelar Bolsa](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/skill-test/test-cases/frontoffice/coordenador/minha-equipe/alterar-nivel-bolsa/bugs/evidencias-BUG-NIV-001-01-modal-cancelar-preenchido.png)
 
@@ -68,6 +70,27 @@ Windows / Navegador Web (Chrome/Edge) / Frontoffice Vue-Nuxt UI
 - 🧾 Logs / Retorno da API:
 `POST https://conectafapes.hom.es.gov.br/api/portalfapes/cancela-bolsa/bolsas/e6e07f7c-8e35-4c93-9a87-bfbebd7181cb/cancelamento -> 400 Bad Request`
 `{"value": null, "errors": ["Esta bolsa possui uma troca de nível em andamento. Cancele a troca para realizar esta operação."]}`
+
+### Cenário B: Tentativa de Extensão de Bolsa (Aditivo)
+- 📷 Tela de Aditivo preenchida com nova data de término:
+![Tela Aditivo](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/skill-test/test-cases/frontoffice/coordenador/minha-equipe/alterar-nivel-bolsa/bugs/evidencias-BUG-NIV-001-05-tela-aditivo-preenchida.png)
+
+- 📷 Modal de confirmação da extensão de bolsa:
+![Confirmar Extensão](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/skill-test/test-cases/frontoffice/coordenador/minha-equipe/alterar-nivel-bolsa/bugs/evidencias-BUG-NIV-001-06-modal-confirmar-extensao.png)
+
+- 📷 Toast de erro retornado pela interface:
+![Toast Erro Extensão](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/skill-test/test-cases/frontoffice/coordenador/minha-equipe/alterar-nivel-bolsa/bugs/evidencias-BUG-NIV-001-07-toast-erro-estender-troca-andamento.png)
+
+- 📷 Console com falha HTTP 400 Bad Request em alocacao-bolsista/estender:
+![Console 400 Estender](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/skill-test/test-cases/frontoffice/coordenador/minha-equipe/alterar-nivel-bolsa/bugs/evidencias-BUG-NIV-001-08-console-erro-400-estender.png)
+
+- 📷 Payload de erro do backend no Network:
+![Network Payload Estender](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/skill-test/test-cases/frontoffice/coordenador/minha-equipe/alterar-nivel-bolsa/bugs/evidencias-BUG-NIV-001-09-network-payload-estender-backend.png)
+
+- 🧾 Logs / Retorno da API:
+`POST https://conectafapes.hom.es.gov.br/api/portalfapes/alocacao-bolsista/estender -> 400 Bad Request`
+`{"value": null, "errors": ["Esta bolsa possui uma troca de nível em andamento. Cancele a troca para realizar esta operação."]}`
+
 
 ## Sugestão de Investigação
 - Nos componentes responsáveis pela renderização do menu de ações (`BolsistaListItem.vue` e `BolsistaDocumentos.vue`), verificar se a alocação possui uma troca pendente vinculada (`bolsa.possuiTrocaPendente` ou equivalente).
