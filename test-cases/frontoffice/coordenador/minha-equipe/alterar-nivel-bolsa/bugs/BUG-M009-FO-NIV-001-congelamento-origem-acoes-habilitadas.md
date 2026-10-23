@@ -54,16 +54,16 @@ Windows / Navegador Web (Chrome/Edge) / Frontoffice Vue-Nuxt UI
 
 ## Evidências
 - 📷 Formulário de cancelamento preenchido:
-![Modal Cancelar Bolsa](evidencias-BUG-NIV-001-01-modal-cancelar-preenchido.png)
+![Modal Cancelar Bolsa](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/skill-test/test-cases/frontoffice/coordenador/minha-equipe/alterar-nivel-bolsa/bugs/evidencias-BUG-NIV-001-01-modal-cancelar-preenchido.png)
 
 - 📷 Toast de erro retornado pela interface:
-![Toast de Erro](evidencias-BUG-NIV-001-02-toast-erro-troca-andamento.png)
+![Toast de Erro](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/skill-test/test-cases/frontoffice/coordenador/minha-equipe/alterar-nivel-bolsa/bugs/evidencias-BUG-NIV-001-02-toast-erro-troca-andamento.png)
 
 - 📷 Console com falha HTTP 400 Bad Request:
-![Console 400 Bad Request](evidencias-BUG-NIV-001-03-console-erro-400-cancelamento.png)
+![Console 400 Bad Request](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/skill-test/test-cases/frontoffice/coordenador/minha-equipe/alterar-nivel-bolsa/bugs/evidencias-BUG-NIV-001-03-console-erro-400-cancelamento.png)
 
 - 📷 Payload de erro do backend no Network:
-![Network Payload Backend](evidencias-BUG-NIV-001-04-network-payload-erro-backend.png)
+![Network Payload Backend](https://raw.githubusercontent.com/Czzped/conecta-fapes-teste/skill-test/test-cases/frontoffice/coordenador/minha-equipe/alterar-nivel-bolsa/bugs/evidencias-BUG-NIV-001-04-network-payload-erro-backend.png)
 
 - 🧾 Logs / Retorno da API:
 `POST https://conectafapes.hom.es.gov.br/api/portalfapes/cancela-bolsa/bolsas/e6e07f7c-8e35-4c93-9a87-bfbebd7181cb/cancelamento -> 400 Bad Request`

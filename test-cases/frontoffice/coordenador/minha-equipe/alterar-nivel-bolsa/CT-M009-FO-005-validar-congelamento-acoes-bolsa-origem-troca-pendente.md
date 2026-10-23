@@ -36,3 +36,6 @@ Validar congelamento de ações de cancelamento, aditivo e edição da bolsa de 
 
 ## Prioridade
 [x] Alta  [ ] Média  [ ] Baixa
+
+## Bugs Relacionados
+- [BUG-M009-FO-NIV-001](bugs/BUG-M009-FO-NIV-001-congelamento-origem-acoes-habilitadas.md) (Issue [#735](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/735)): Ações de cancelamento e extensão permanecem habilitadas na bolsa de origem com troca de nível pendente, resultando em HTTP 400.
