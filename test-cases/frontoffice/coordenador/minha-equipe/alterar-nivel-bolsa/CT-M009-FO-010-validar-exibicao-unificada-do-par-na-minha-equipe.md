@@ -40,3 +40,6 @@ Validar exibição unificada do par de bolsas na listagem de Minha Equipe sem du
 
 ## Prioridade
 [ ] Alta  [x] Média  [ ] Baixa
+
+## Bugs Relacionados
+- [BUG-M009-FO-NIV-002](bugs/BUG-M009-FO-NIV-002-ausencia-rotulo-em-espera-card-troca-detalhes.md) (Issue [#736](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/736)): Ausência do rótulo "Em espera" e de card informativo da troca de nível em curso na listagem e detalhes do bolsista.
