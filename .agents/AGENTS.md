@@ -45,6 +45,12 @@ Agent personas and skills for the Conecta FAPES project.
    - Após a criação da Issue, o agente deve **vinculá-la automaticamente ao projeto da FAPES** (`Conecta Fapes - Teste` / `Project 46`):
      `gh project item-add 46 --owner leds-conectafapes --url <URL_DA_ISSUE_CRIADA>`
    - O agente deve fornecer o link direto da Issue do GitHub ao usuário ao final do processo.
+5. **Inclusão Autônoma de Evidências e Prints:**
+   - Sempre que o usuário fornecer prints/screenshots ao solicitar a abertura de um bug, o agente deve **obrigatoriamente salvar as imagens locais na pasta de bugs correspondente** (seguindo a convenção `evidencias-BUG-[TAG]-[NUM]-[seq]-[descricao].png`).
+   - O agente deve referenciar e renderizar os prints diretamente na seção `## Evidências` do relatório `.md` local e no corpo da Issue criada no GitHub, garantindo que as imagens estejam incorporadas sem que o usuário precise adicioná-las manualmente.
+6. **Validação Rigorosa de Casos de Teste Associados:**
+   - Ao citar qualquer Caso de Teste Relacionado (`CT-*.md`) em um relatório de bug, o agente deve **obrigatoriamente pesquisar e validar no repositório** se o caso de teste existe e se o ID e o título citados são exatamente os corretos.
+   - Se o cenário específico coberto pelo bug ainda **não existir** no repositório, o agente deve **apontar explicitamente essa ausência ao usuário** e proceder ou solicitar a criação do novo caso de teste correspondente.
 
 
 ```
