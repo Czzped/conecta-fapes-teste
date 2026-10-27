@@ -14,6 +14,7 @@ Os casos de teste e relatos de defeitos estão organizados por canais de produto
 ```text
 test-cases/
 ├── MAPA-QA-GLOBAL.md          # Matriz unificada de consulta rápida para IAs e humanos
+├── matrizes/                  # Matrizes formais de rastreabilidade (RTM) por fluxo/feature
 ├── referencias/               # Templates e manuais de token-saving para IAs
 ├── frontoffice/               # Testes e bugs do Portal Coordenador e Bolsista
 │   ├── coordenador/           # Rotas /coordenador/* (início, perfil, pagamentos, prestação)
