@@ -10,7 +10,7 @@
 | **Branch de Trabalho** | `skill-test` |
 | **Ambiente de Testes** | Homologação (`https://conectafapes.hom.es.gov.br` / `https://admin.conectafapes.hom.es.gov.br`) |
 | **Data da Emissão** | 26/10/2026 |
-| **Status Consolidado** | **12 de 14 CTs Executados (85.7% de Cobertura)** \| **10 Aprovados, 2 Bugs no FO, 2 CTs de Borda Pendentes no BO** |
+| **Status Consolidado** | **13 de 14 CTs Executados (92.8% de Cobertura)** \| **11 Aprovados, 2 Bugs no FO, 1 Bug no BO, 1 CT de Borda Pendente no BO** |
 
 ---
 
@@ -21,11 +21,11 @@
 |                       MÉTRICAS GERAIS DE EXECUÇÃO                        |
 +----------------------+--------------------+------------------------------+
 | Total Planejado      | 14 Casos de Teste  | 100% Cobertura Mapeada       |
-| Executados           | 12 Casos de Teste  | 85.7% do Ciclo Executado     |
-| Aprovados (Passed)   | 10 Casos de Teste  | 71.4% do Total de Cenários   |
+| Executados           | 13 Casos de Teste  | 92.8% do Ciclo Executado     |
+| Aprovados (Passed)   | 11 Casos de Teste  | 78.6% do Total de Cenários   |
 | Com Falha (Failed)   | 02 Casos de Teste  | 14.3% do Total (2 Bugs FO)   |
-| Pendentes (Pending)  | 02 Casos de Teste  | 14.3% (BO Reprovação e Job)  |
-| Bugs Registrados     | 02 Defeitos Ativos | [#735], [#736]               |
+| Pendentes (Pending)  | 01 Caso de Teste   | 07.1% (BO Expiração via Job) |
+| Bugs Registrados     | 03 Defeitos Ativos | [#735], [#736], BUG-BO-001   |
 +----------------------+--------------------+------------------------------+
 ```
 
@@ -34,8 +34,8 @@
 | Canal | CTs Totais | Passou | Falhou | Pendente | Bugs Associados |
 |---|:---:|:---:|:---:|:---:|---|
 | **Frontoffice (Portal Coordenador)** | 10 | 8 | 2 | 0 | [#735](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/735), [#736](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/736) |
-| **Backoffice (Portal Admin FAPES)** | 4 | 2 | 0 | 2 | Nenhum bug impeditivo na esteira principal |
-| **Total** | **14** | **10** | **2** | **2** | **2 Defeitos Registrados** |
+| **Backoffice (Portal Admin FAPES)** | 4 | 3 | 0 | 1 | BUG-M009-BO-NIV-001 (Consistência URL) |
+| **Total** | **14** | **11** | **2** | **1** | **3 Defeitos Registrados** |
 
 ---
 
@@ -64,7 +64,7 @@
 |:---:|---|:---:|---|:---:|:---:|---|
 | **[CT-M009-BO-004]** | Validar filtro segmentado, indicadores e selos visuais na fila de pendências | Usabilidade / Regressão | M009: Visualização e triagem pela FAPES | [#728](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/728) |  **Passou** | Filtro `Alteração de nível`, selos roxos `BPIG-IV → BPIG-III (60%)` e contadores validados com sucesso |
 | **[CT-M009-BO-001]** | Implementar novo nível com swap atômico e transição de pagamentos | Positivo / Limite | RN07, RN11, Regra Swap Atômico, Supressão Autherix | [#725](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/725) |  **Passou** | Tela de documentos exibe reaproveitamento de certidões da origem, requisitos declaratórios e botão `Implementar Novo Nível` |
-| **[CT-M009-BO-002]** | Reprovar solicitação de alteração mantendo bolsa de origem ativa | Positivo / Negativo | RN05, FR-013 (Descongelamento na reprovação) | [#726](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/726) | ⏳ **Pendente** | Cenário alternativo para validação com nova massa de teste específica para reprovação |
+| **[CT-M009-BO-002]** | Reprovar solicitação de alteração mantendo bolsa de origem ativa | Positivo / Negativo | RN05, FR-013 (Descongelamento na reprovação) | [#726](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/726) |  **Passou** | Modal com justificativa obrigatória validado; origem mantida ativa ("Em andamento") e ações descongeladas no Frontoffice |
 | **[CT-M009-BO-003]** | Validar encerramento de par e descongelamento por expiração via job | Limite / Regressão | RN04 (Prazo documental), Invariante job expiração | [#727](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/727) | ⏳ **Pendente** | Cenário de borda/job assíncrono para validação com data limite extrapolada |
 
 ---
@@ -75,6 +75,7 @@
 |---|---|---|:---:|:---:|:---:|---|
 | **BUG-M009-FO-NIV-001** | Botões "Cancelar Bolsa" e "Estender Bolsa" continuam ativos na bolsa de origem em espera e retornam erro HTTP 400 | Frontoffice: `/coordenador/minha-equipe` (Detalhes) | 🟠 **Média** | [#735](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/735) (Sub de [#729](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/729)) | Aberto | Violação da regra de congelamento preventivo (FR-013). Gera frustração e mensagens de erro de backend no front. |
 | **BUG-M009-FO-NIV-002** | Ausência do rótulo visual "Em espera" e de card explicativo na tela de detalhes da bolsa de origem | Frontoffice: `/coordenador/minha-equipe` (Detalhes) | 🟡 **Baixa/Média** | [#736](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/736) (Sub de [#729](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/729)) | Aberto | Violação de Heurística de Usabilidade #1 (Visibilidade do Status do Sistema). O coordenador não sabe o motivo das ações estarem congeladas. |
+| **BUG-M009-BO-NIV-001** | Tela de documentos do bolsista confia em query param (?status=REPROVADA) para ocultar botões de ação reexibindo aprovação/reprovação se o parâmetro for removido | Backoffice: `/gestao-bolsa/documentos-bolsista/:id` | 🟡 **Média** | [BUG-M009-BO-NIV-001](backoffice/admin/bolsistas/alterar-nivel-bolsa/bugs/BUG-M009-BO-NIV-001-remocao-parametro-url-reexibe-botoes-aprovacao.md) (Sub de [#729](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/729)) | Aberto | Falha de integridade e consistência de estado. A remoção de query string reexibe botões de mutação em alocações já reprovadas. |
 
 ---
 
@@ -95,6 +96,5 @@
 
 1. **Reteste dos Bugs de Frontoffice**:
    - Retestar [#735](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/735) e [#736](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/736) assim que o time de desenvolvimento publicar a correção de desativação dos botões de ciclo de vida e a inclusão do chip visual "Em espera".
-2. **Execução dos Cenários de Borda do Backoffice**:
-   - **CT-M009-BO-002**: Simular reprovação fundamentada com nova massa de teste para assegurar que a bolsa de origem retorna ao estado 100% ativo e descongelada.
+2. **Execução do Cenário de Borda Restante do Backoffice**:
    - **CT-M009-BO-003**: Acionar o job agendado com prazo expirado para checar a invalidação limpa da proposta.
