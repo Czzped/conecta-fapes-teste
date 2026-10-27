@@ -2,7 +2,7 @@
 [Bug] Tela de documentos do bolsista confia em query param (?status=REPROVADA) para ocultar botões de ação reexibindo aprovação/reprovação se o parâmetro for removido
 
 ## ID
-BUG-M009-BO-NIV-001
+BUG-M009-BO-NIV-001 (Issue https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/738)
 
 ## Requisito/Regra Violada
 - Regra Canônica: `M009: RN05` (Tratamento de Reprovação e Preservação de Histórico), Heurística de Nielsen #1 (Visibilidade do Status do Sistema) e Princípio de Integridade de Estado (a interface deve derivar permissões e visibilidade de ações do status canônico da entidade no backend, não de parâmetros voláteis de consulta na URL).
