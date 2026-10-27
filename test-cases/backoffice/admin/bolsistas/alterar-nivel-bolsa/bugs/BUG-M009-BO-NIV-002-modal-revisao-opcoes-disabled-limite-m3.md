@@ -2,7 +2,7 @@
 [Bug] Modal de solicitar revisão desabilita todas as opções de dias extras e impede envio de segunda diligência quando prazo atinge o limite M3
 
 ## ID
-BUG-M009-BO-NIV-002
+BUG-M009-BO-NIV-002 (Issue https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/742)
 
 ## Requisito/Regra Violada
 - Regra Canônica: `M009: RN04` (Prazos regulamentares de documentação), `M004: EPIC-M004-001` (Calendário mensal e marcos da folha M2 e M3) e Heurística de Nielsen #5 (Prevenção de Erros) e #9 (Recuperação e consistência em fluxos com restrições temporais).

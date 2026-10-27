@@ -10,7 +10,7 @@
 | **Branch de Trabalho** | `skill-test` |
 | **Ambiente de Testes** | Homologação (`https://conectafapes.hom.es.gov.br` / `https://admin.conectafapes.hom.es.gov.br`) |
 | **Data da Emissão** | 26/10/2026 |
-| **Status Consolidado** | **13 de 14 CTs Executados (92.8% de Cobertura)** \| **11 Aprovados, 2 Bugs no FO, 1 Bug no BO, 1 CT de Borda Pendente no BO** |
+| **Status Consolidado** | **13 de 14 CTs Executados (92.8% de Cobertura)** \| **11 Aprovados, 2 Bugs no FO, 2 Bugs no BO, 1 CT de Borda Pendente no BO** |
 
 ---
 
@@ -25,7 +25,7 @@
 | Aprovados (Passed)   | 11 Casos de Teste  | 78.6% do Total de Cenários   |
 | Com Falha (Failed)   | 02 Casos de Teste  | 14.3% do Total (2 Bugs FO)   |
 | Pendentes (Pending)  | 01 Caso de Teste   | 07.1% (BO Expiração via Job) |
-| Bugs Registrados     | 03 Defeitos Ativos | [#735], [#736], [#738]       |
+| Bugs Registrados     | 04 Defeitos Ativos | [#735], [#736], [#738], [#742] |
 +----------------------+--------------------+------------------------------+
 ```
 
@@ -34,8 +34,8 @@
 | Canal | CTs Totais | Passou | Falhou | Pendente | Bugs Associados |
 |---|:---:|:---:|:---:|:---:|---|
 | **Frontoffice (Portal Coordenador)** | 10 | 8 | 2 | 0 | [#735](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/735), [#736](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/736) |
-| **Backoffice (Portal Admin FAPES)** | 4 | 3 | 0 | 1 | BUG-M009-BO-NIV-001 (Consistência URL) |
-| **Total** | **14** | **11** | **2** | **1** | **3 Defeitos Registrados** |
+| **Backoffice (Portal Admin FAPES)** | 4 | 3 | 0 | 1 | [#738], [#742] (Estado URL e Trava M3) |
+| **Total** | **14** | **11** | **2** | **1** | **4 Defeitos Registrados** |
 
 ---
 
@@ -76,6 +76,7 @@
 | **BUG-M009-FO-NIV-001** | Botões "Cancelar Bolsa" e "Estender Bolsa" continuam ativos na bolsa de origem em espera e retornam erro HTTP 400 | Frontoffice: `/coordenador/minha-equipe` (Detalhes) | 🟠 **Média** | [#735](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/735) (Sub de [#729](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/729)) | Aberto | Violação da regra de congelamento preventivo (FR-013). Gera frustração e mensagens de erro de backend no front. |
 | **BUG-M009-FO-NIV-002** | Ausência do rótulo visual "Em espera" e de card explicativo na tela de detalhes da bolsa de origem | Frontoffice: `/coordenador/minha-equipe` (Detalhes) | 🟡 **Baixa/Média** | [#736](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/736) (Sub de [#729](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/729)) | Aberto | Violação de Heurística de Usabilidade #1 (Visibilidade do Status do Sistema). O coordenador não sabe o motivo das ações estarem congeladas. |
 | **BUG-M009-BO-NIV-001** | Tela de documentos do bolsista confia em query param (?status=REPROVADA) para ocultar botões de ação reexibindo aprovação/reprovação se o parâmetro for removido | Backoffice: `/gestao-bolsa/documentos-bolsista/:id` | 🟡 **Média** | [#738](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/738) (Sub de [#729](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/729)) | Aberto | Falha de integridade e consistência de estado. A remoção de query string reexibe botões de mutação em alocações já reprovadas. |
+| **BUG-M009-BO-NIV-002** | Modal de solicitar revisão desabilita todas as opções de dias extras e impede envio de segunda diligência quando prazo atinge o limite M3 | Backoffice: `/gestao-bolsa/documentos-bolsista/:id` | 🟠 **Alta** | [#742](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/742) (Sub de [#729](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/729)) | Aberto | Falha de lógica e usabilidade. O analista é impossibilitado de solicitar adequação em mais de um documento quando o prazo concedido na 1ª diligência atinge o teto M3. |
 
 ---
 
