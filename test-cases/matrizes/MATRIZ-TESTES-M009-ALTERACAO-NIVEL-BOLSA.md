@@ -10,7 +10,7 @@
 | **Branch de Trabalho** | `skill-test` |
 | **Ambiente de Testes** | Homologação (`https://conectafapes.hom.es.gov.br` / `https://admin.conectafapes.hom.es.gov.br`) |
 | **Data da Emissão** | 26/10/2026 |
-| **Status Consolidado** | **13 de 14 CTs Executados (92.8% de Cobertura)** \| **11 Aprovados, 2 Bugs no FO, 2 Bugs no BO, 1 CT de Borda Pendente no BO** |
+| **Status Consolidado** | **12 de 14 CTs Concluídos (85.7% de Cobertura)** \| **10 Aprovados, 2 Falhas no FO, 2 Pendentes no BO (Implementação e Job), 4 Bugs Ativos** |
 
 ---
 
@@ -21,10 +21,10 @@
 |                       MÉTRICAS GERAIS DE EXECUÇÃO                        |
 +----------------------+--------------------+------------------------------+
 | Total Planejado      | 14 Casos de Teste  | 100% Cobertura Mapeada       |
-| Executados           | 13 Casos de Teste  | 92.8% do Ciclo Executado     |
-| Aprovados (Passed)   | 11 Casos de Teste  | 78.6% do Total de Cenários   |
+| Total Executado      | 12 Casos de Teste  | 85.7% do Ciclo Concluído     |
+| Aprovados (Passed)   | 10 Casos de Teste  | 71.4% do Total de Cenários   |
 | Com Falha (Failed)   | 02 Casos de Teste  | 14.3% do Total (2 Bugs FO)   |
-| Pendentes (Pending)  | 01 Caso de Teste   | 07.1% (BO Expiração via Job) |
+| Pendentes (Pending)  | 02 Casos de Teste  | 14.3% (BO Implementação e Job)|
 | Bugs Registrados     | 04 Defeitos Ativos | [#735], [#736], [#738], [#742] |
 +----------------------+--------------------+------------------------------+
 ```
@@ -34,8 +34,8 @@
 | Canal | CTs Totais | Passou | Falhou | Pendente | Bugs Associados |
 |---|:---:|:---:|:---:|:---:|---|
 | **Frontoffice (Portal Coordenador)** | 10 | 8 | 2 | 0 | [#735](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/735), [#736](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/736) |
-| **Backoffice (Portal Admin FAPES)** | 4 | 3 | 0 | 1 | [#738], [#742] (Estado URL e Trava M3) |
-| **Total** | **14** | **11** | **2** | **1** | **4 Defeitos Registrados** |
+| **Backoffice (Portal Admin FAPES)** | 4 | 2 | 0 | 2 | [#738], [#742] (Estado URL e Trava M3) |
+| **Total** | **14** | **10** | **2** | **2** | **4 Defeitos Registrados** |
 
 ---
 
@@ -63,7 +63,7 @@
 | ID CT | Título do Cenário | Tipo | Regra Canônica / Invariante | Issue GitHub | Status | Evidência / Observação |
 |:---:|---|:---:|---|:---:|:---:|---|
 | **[CT-M009-BO-004]** | Validar filtro segmentado, indicadores e selos visuais na fila de pendências | Usabilidade / Regressão | M009: Visualização e triagem pela FAPES | [#728](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/728) |  **Passou** | Filtro `Alteração de nível`, selos roxos `BPIG-IV → BPIG-III (60%)` e contadores validados com sucesso |
-| **[CT-M009-BO-001]** | Implementar novo nível com swap atômico e transição de pagamentos | Positivo / Limite | RN07, RN11, Regra Swap Atômico, Supressão Autherix | [#725](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/725) |  **Passou** | Tela de documentos exibe reaproveitamento de certidões da origem, requisitos declaratórios e botão `Implementar Novo Nível` |
+| **[CT-M009-BO-001]** | Implementar novo nível com swap atômico e transição de pagamentos | Positivo / Limite | RN07, RN11, Regra Swap Atômico, Supressão Autherix | [#725](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/725) | ⏳ **Parcial** | Interface de documentos e botões validados; clique de implementação e swap atômico pendente de efetivação |
 | **[CT-M009-BO-002]** | Reprovar solicitação de alteração mantendo bolsa de origem ativa | Positivo / Negativo | RN05, FR-013 (Descongelamento na reprovação) | [#726](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/726) |  **Passou** | Modal com justificativa obrigatória validado; origem mantida ativa ("Em andamento") e ações descongeladas no Frontoffice |
 | **[CT-M009-BO-003]** | Validar encerramento de par e descongelamento por expiração via job | Limite / Regressão | RN04 (Prazo documental), Invariante job expiração | [#727](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/727) | ⏳ **Pendente** | Cenário de borda/job assíncrono para validação com data limite extrapolada |
 
