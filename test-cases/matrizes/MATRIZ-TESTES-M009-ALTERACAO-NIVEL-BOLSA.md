@@ -25,7 +25,7 @@
 | Aprovados (Passed)   | 10 Casos de Teste  | 71.4% do Total de Cenários   |
 | Com Falha (Failed)   | 02 Casos de Teste  | 14.3% do Total (2 Bugs FO)   |
 | Pendentes (Pending)  | 02 Casos de Teste  | 14.3% (BO Implementação e Job)|
-| Bugs Registrados     | 05 Defeitos Ativos | [#735], [#736], [#738], [#742], [BO-NIV-003] |
+| Bugs Registrados     | 05 Defeitos Ativos | [#735], [#736], [#738], [#742], [#748] |
 +----------------------+--------------------+------------------------------+
 ```
 
@@ -34,7 +34,7 @@
 | Canal | CTs Totais | Passou | Falhou | Pendente | Bugs Associados |
 |---|:---:|:---:|:---:|:---:|---|
 | **Frontoffice (Portal Coordenador)** | 10 | 8 | 2 | 0 | [#735](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/735), [#736](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/736) |
-| **Backoffice (Portal Admin FAPES)** | 4 | 2 | 0 | 2 | [#738], [#742], BUG-M009-BO-NIV-003 |
+| **Backoffice (Portal Admin FAPES)** | 4 | 2 | 0 | 2 | [#738], [#742], [#748] |
 | **Total** | **14** | **10** | **2** | **2** | **5 Defeitos Registrados** |
 
 ---
@@ -77,7 +77,7 @@
 | **BUG-M009-FO-NIV-002** | Ausência do rótulo visual "Em espera" e de card explicativo na tela de detalhes da bolsa de origem | Frontoffice: `/coordenador/minha-equipe` (Detalhes) | 🟡 **Baixa/Média** | [#736](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/736) (Sub de [#729](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/729)) | Aberto | Violação de Heurística de Usabilidade #1 (Visibilidade do Status do Sistema). O coordenador não sabe o motivo das ações estarem congeladas. |
 | **BUG-M009-BO-NIV-001** | Tela de documentos do bolsista confia em query param (?status=REPROVADA) para ocultar botões de ação reexibindo aprovação/reprovação se o parâmetro for removido | Backoffice: `/gestao-bolsa/documentos-bolsista/:id` | 🟡 **Média** | [#738](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/738) (Sub de [#729](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/729)) | Aberto | Falha de integridade e consistência de estado. A remoção de query string reexibe botões de mutação em alocações já reprovadas. |
 | **BUG-M009-BO-NIV-002** | Modal de solicitar revisão desabilita todas as opções de dias extras e impede envio de segunda diligência quando prazo atinge o limite M3 | Backoffice: `/gestao-bolsa/documentos-bolsista/:id` | 🟠 **Alta** | [#742](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/742) (Sub de [#729](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/729)) | Aberto | Falha de lógica e usabilidade. O analista é impossibilitado de solicitar adequação em mais de um documento quando o prazo concedido na 1ª diligência atinge o teto M3. |
-| **BUG-M009-BO-NIV-003** | Botão "Implementar Bolsa" habilitado indevidamente para alocação com status "Documentação Pendente" causa erro 400 da API e modal alerta falso positivo de acúmulo da bolsa de origem | Backoffice: `/gestao-bolsa/documentos-bolsista/:id` | 🟠 **Alta** | [Issue a ser criada] (Sub de [#729](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/729)) | Aberto | Violação da Heurística de Nielsen #5 (Prevenção de Erros). O sistema habilita a ação de implementação antes do envio da documentação e termo pelo bolsista, gerando erro 400 e falso positivo de acúmulo. |
+| **BUG-M009-BO-NIV-003** | Botão "Implementar Bolsa" habilitado indevidamente para alocação com status "Documentação Pendente" causa erro 400 da API e modal alerta falso positivo de acúmulo da bolsa de origem | Backoffice: `/gestao-bolsa/documentos-bolsista/:id` | 🟠 **Alta** | [#748](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/748) (Sub de [#729](https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/729)) | Aberto | Violação da Heurística de Nielsen #5 (Prevenção de Erros). O sistema habilita a ação de implementação antes do envio da documentação e termo pelo bolsista, gerando erro 400 e falso positivo de acúmulo. |
 
 ---
 

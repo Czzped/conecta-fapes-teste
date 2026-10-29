@@ -2,7 +2,7 @@
 [Bug] Botão "Implementar Bolsa" habilitado indevidamente para alocação com status "Documentação Pendente" causa erro 400 da API e modal alerta falso positivo de acúmulo da bolsa de origem
 
 ## ID
-BUG-M009-BO-NIV-003
+BUG-M009-BO-NIV-003 (Issue https://github.com/leds-conectafapes/leds-conectafapes-prestacao-de-contas/issues/748)
 
 ## Requisito/Regra Violada
 - Regra Canônica: `M009: RN07` (Implementação de bolsa), `M009: RN04` (Avaliação documental), Heurística de Nielsen #5 (Prevenção de Erros) e Heurística #9 (Auxiliar os usuários a reconhecer, diagnosticar e recuperar-se de erros).
