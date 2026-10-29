@@ -20,15 +20,20 @@ Windows / Navegador Web (Chrome/Edge) / Backoffice Vue/Nuxt Admin UI
 [ ] 🔴 Bloqueante  [x] 🟠 Alta  [ ] 🟡 Média  [ ] 🟢 Baixa
 
 ## Passo a Passo
+> **Nota para Reprodução (Brecha de Fluxo):** Para reproduzir o cenário em que o botão "Implementar Bolsa" é indevidamente habilitado antes do envio legítimo da documentação pelo bolsista, é necessário executar a manobra de solicitar revisão e em seguida aprovar os documentos pendentes na tela do Backoffice:
+
 1. Acessar `/gestao-bolsa/visualizar-pendencias`.
 2. Localizar e abrir a pendência de alteração de nível do bolsista André Sarmento Spalenza (alocação nova com status de domínio `DOCUMENTACAO_PENDENTE`, aguardando envio de documentos e termo pelo bolsista no portal).
-3. Na tela de `Documentos do Bolsista`, inspecionar os requisitos declaratórios ("Requisitos sem Documentos") e marcar os checkboxes "Cumpre requisito?".
-4. Observar que o botão primário `Implementar Bolsa` no rodapé da página torna-se habilitado (verde).
-5. Clicar em `Implementar Bolsa`.
-6. Observar a abertura do modal de confirmação `Bolsista com outras alocações ativas`.
-7. No modal, verificar a lista de alocações ativas apresentadas: o sistema exibe a própria bolsa de origem do bolsista no mesmo projeto (`Linkes (Connect), BPIG-II`).
-8. Clicar em `Continuar implementação`.
-9. Observar a resposta da requisição na aba Rede e o feedback exibido em tela.
+3. Na seção **Documentos para Avaliação**, identificar os documentos que ainda não foram enviados pelo bolsista (o botão direto de aprovação fica desabilitado).
+4. No documento pendente, clicar na ação **Pedir revisão** (ícone de triângulo/alerta), preencher uma justificativa (ex: *"teste"*), definir os dias extras e confirmar o envio.
+5. Com o documento colocado em status de revisão, realizar a aprovação do documento para forçar o status `APROVADO_MANUAL` (ou aprovar os documentos reaproveitados da origem já disponíveis).
+6. Na seção **Requisitos sem Documentos**, marcar todos os checkboxes *"Cumpre requisito?"*.
+7. Com todos os itens com decisão favorável/aprovados na tela, observar que o frontend conclui que todos os requisitos foram atendidos e **habilita indevidamente o botão verde `Implementar Bolsa`** no rodapé.
+8. Clicar em `Implementar Bolsa`.
+9. Observar a abertura do modal de confirmação `Bolsista com outras alocações ativas`.
+10. No modal, verificar a lista de alocações ativas apresentadas: o sistema exibe a própria bolsa de origem do bolsista no mesmo projeto (`Linkes (Connect), BPIG-II`).
+11. Clicar em `Continuar implementação`.
+12. Observar a resposta da requisição na aba Rede e o feedback exibido em tela.
 
 ## Dados de Entrada
 - Bolsista: `Andre Sarmento Spalenza`
@@ -42,7 +47,7 @@ Windows / Navegador Web (Chrome/Edge) / Backoffice Vue/Nuxt Admin UI
 3. **Feedback de Erro Adequado:** Caso ocorra erro de negócio na API, o frontend deve exibir a mensagem amigável retornada pelo backend (`"A bolsa deve estar em avaliação ou suspensa antes que seja ativada"`) em vez de um toast genérico *"Erro ao aprovar solicitação"*.
 
 ## Comportamento Atual
-1. O botão `Implementar Bolsa` fica habilitado apenas porque os checkboxes da tela foram marcados, ignorando o ciclo de vida da bolsa (`DOCUMENTACAO_PENDENTE`).
+1. O frontend permite contornar a ausência de envio prévio pelo bolsista através da manobra de solicitar revisão e aprovar em seguida o documento. Ao associar isso à marcação dos checkboxes, o botão `Implementar Bolsa` fica habilitado sem validar se a bolsa ainda está no status de domínio `DOCUMENTACAO_PENDENTE`.
 2. O modal de acúmulo exibe um alerta falso-positivo acusando a própria bolsa de origem como impeditivo de acúmulo.
 3. Ao clicar em `Continuar implementação`, a API recusa com `HTTP 400 Bad Request` com o erro:
    `"A bolsa deve estar em avaliação ou suspensa antes que seja ativada"`.
